@@ -11,6 +11,8 @@ namespace notf.Tables
         private readonly short[] _x;
         private readonly short[] _y;
 
+        public static readonly Glyph Empty = new Glyph(new byte[0], new short[0], new short[0]);
+
         public Glyph(byte[] instructions, short[] x, short[] y)
         {
             _instructions = instructions;
@@ -142,7 +144,7 @@ namespace notf.Tables
                 }
                 else
                 {
-                    // Empty glyph
+                    glyphs.Add(Glyph.Empty);
                 }
             }
             return glyphs;
