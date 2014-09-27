@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bounds.cs" />
     <Compile Include="IO\ByteOrderSwappingBinaryReader.cs" />
     <Compile Include="Tables\Glyph.cs" />
     <Compile Include="Tables\GlyphLocations.cs" />
