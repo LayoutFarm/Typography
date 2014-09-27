@@ -49,7 +49,7 @@ namespace notf
         public override int Read(byte[] buffer, int index, int count) { throw new NotImplementedException(); }
         public override int Read(char[] buffer, int index, int count) { throw new NotImplementedException(); }
         public override bool ReadBoolean() { throw new NotImplementedException(); }
-        public override byte ReadByte() { throw new NotImplementedException(); }
+        public override byte ReadByte() { return base.ReadByte(); }
         public override byte[] ReadBytes(int count) { return base.ReadBytes(count); }
         public override char ReadChar() { throw new NotImplementedException(); }
         public override char[] ReadChars(int count) { throw new NotImplementedException(); }

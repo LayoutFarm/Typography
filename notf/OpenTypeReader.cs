@@ -31,6 +31,16 @@ namespace notf
                 var glyphLocations = new GlyphLocations(tables.Single(t => t.Tag == "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
                 var glyphs = Glyph.From(tables.Single(t => t.Tag == "glyf"), glyphLocations);
 
+                int gno = 0;
+                foreach (var glyph in glyphs.Take(5))
+                {
+                    Console.WriteLine("=== {0} ===", gno);
+                    for (int i = 0; i < glyph.PointCount; i++)
+                    {
+                        Console.WriteLine("  {0}, {1}", glyph.X[i], glyph.Y[i]);
+                    }
+                    Console.WriteLine();
+                }
             }
         }
 
