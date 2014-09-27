@@ -10,6 +10,7 @@ namespace NRasterizer.Tables
     internal class Head
     {
         private readonly short _indexToLocFormat;
+        private readonly Bounds _bounds;
 
         public bool WideGlyphLocations { get { return _indexToLocFormat > 0; } }
 
@@ -27,10 +28,7 @@ namespace NRasterizer.Tables
             var modified = input.ReadUInt64();
             
             // bounding box for all glyphs
-            var xMin = input.ReadInt16();
-            var yMin = input.ReadInt16();
-            var xMax = input.ReadInt16();
-            var yMax = input.ReadInt16();
+            _bounds = BoundsReader.ReadFrom(input);
             
             var macStyle = input.ReadUInt16();
             var lowestRecPPEM = input.ReadUInt16();

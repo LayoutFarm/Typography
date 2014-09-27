@@ -98,16 +98,7 @@ namespace NRasterizer.Tables
             // TODO: Parse composite glyphs
             return Glyph.Empty;
         }
-
-        private static Bounds ReadBounds(BinaryReader input)
-        {
-            var xMin = input.ReadInt16();
-            var yMin = input.ReadInt16();
-            var xMax = input.ReadInt16();
-            var yMax = input.ReadInt16();
-            return new Bounds(xMin, yMin, xMax, yMax);
-        }
-
+        
         internal static List<Glyph> From(TableEntry table, GlyphLocations locations)
         {
             var glyphCount = locations.GlyphCount;
@@ -122,7 +113,7 @@ namespace NRasterizer.Tables
                 if (length > 0)
                 {
                     var contoursCount = input.ReadInt16();
-                    var bounds = ReadBounds(input);
+                    var bounds = BoundsReader.ReadFrom(input);
                     if (contoursCount >= 0)
                     {
                         glyphs.Add(ReadSimpleGlyph(input, contoursCount, bounds));
