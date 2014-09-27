@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace notf
+namespace notf.Tables
 {
     public class MaxProfile
     {

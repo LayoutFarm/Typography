@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace notf
+namespace notf.Tables
 {
     internal class TableEntry
     {
