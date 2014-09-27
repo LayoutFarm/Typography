@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "notf", "notf.csproj", "{5BD9866C-9022-4AD8-BB96-EFED35C8324F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRasterizer", "NRasterizer\NRasterizer.csproj", "{5BD9866C-9022-4AD8-BB96-EFED35C8324F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "..\Sample\Sample.csproj", "{B73ED844-1048-4A82-BAD9-F13311E4AA94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{B73ED844-1048-4A82-BAD9-F13311E4AA94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
