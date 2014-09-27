@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace notf
 {
@@ -16,8 +17,23 @@ namespace notf
                 UInt16 entrySelector = input.ReadUInt16();
                 UInt16 rangeShift = input.ReadUInt16();
 
-                Console.WriteLine("tables: " + tableCount);
+                for (int i = 0; i < tableCount; i++)
+                {
+                    var tag = input.ReadUInt32();
+                    var checkSum = input.ReadUInt32();
+                    var offset = input.ReadUInt32();
+                    var length = input.ReadUInt32();
+
+                    Console.WriteLine(TagToString(tag));
+                }
             }
+        }
+
+        private String TagToString(uint tag)
+        {
+            var bytes = BitConverter.GetBytes(tag);
+            Array.Reverse(bytes);
+            return Encoding.ASCII.GetString(bytes);
         }
     }
 }
