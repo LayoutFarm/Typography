@@ -5,24 +5,49 @@ using System.IO;
 
 namespace notf.Tables
 {
+    public class Bounds
+    {
+        private readonly short _xmin;
+        private readonly short _ymin;
+        private readonly short _xmax;
+        private readonly short _ymax;
+
+        public static readonly Bounds Zero = new Bounds(0, 0, 0, 0);
+        public Bounds(short xmin, short ymin, short xmax, short ymax)
+        {
+            _xmin = xmin;
+            _ymin = ymin;
+            _xmax = xmax;
+            _ymax = ymax;
+        }
+        public short XMin { get { return _xmin; } }
+        public short YMin { get { return _ymin; } }
+        public short XMax { get { return _xmax; } }
+        public short YMax { get { return _ymax; } }
+    }
+
     public class Glyph
     {
         private readonly byte[] _instructions;
         private readonly short[] _x;
         private readonly short[] _y;
+        private readonly Bounds _bounds;
 
-        public static readonly Glyph Empty = new Glyph(new byte[0], new short[0], new short[0]);
+        public static readonly Glyph Empty = new Glyph(new byte[0], new short[0], new short[0], Bounds.Zero);
 
-        public Glyph(byte[] instructions, short[] x, short[] y)
+        public Glyph(byte[] instructions, short[] x, short[] y, Bounds bounds)
         {
             _instructions = instructions;
             _x = x;
             _y = y;
+            _bounds = bounds;
         }
 
         public short[] X { get { return _x; } }
         public short[] Y { get { return _y; } }
         public int PointCount { get { return _x.Length; } } // or y...
+
+        public Bounds Bounds { get { return _bounds; } }
 
         [Flags]
         private enum Flag: byte
@@ -89,7 +114,7 @@ namespace notf.Tables
             return xs;
         }
 
-        private static Glyph ReadSimpleGlyph(BinaryReader input, int count)
+        private static Glyph ReadSimpleGlyph(BinaryReader input, int count, Bounds bounds)
         {
             var endPoints = new ushort[count];
             for (int i=0; i<count; i++)
@@ -107,12 +132,22 @@ namespace notf.Tables
             var xs = ReadCoordinates(input, pointCount, flags, Flag.XByte, Flag.XSignOrSame);
             var ys = ReadCoordinates(input, pointCount, flags, Flag.YByte, Flag.YSignOrSame);
 
-            return new Glyph(instructions, xs, ys);
+            return new Glyph(instructions, xs, ys, bounds);
         }
 
-        private static Glyph ReadCompositeGlyph(BinaryReader input, int count)
+        private static Glyph ReadCompositeGlyph(BinaryReader input, int count, Bounds bounds)
         {
-            return null;
+            // TODO: Parse composite glyphs
+            return Glyph.Empty;
+        }
+
+        private static Bounds ReadBounds(BinaryReader input)
+        {
+            var xMin = input.ReadInt16();
+            var yMin = input.ReadInt16();
+            var xMax = input.ReadInt16();
+            var yMax = input.ReadInt16();
+            return new Bounds(xMin, yMin, xMax, yMax);
         }
 
         internal static List<Glyph> From(TableEntry table, GlyphLocations locations)
@@ -129,17 +164,14 @@ namespace notf.Tables
                 if (length > 0)
                 {
                     var contoursCount = input.ReadInt16();
-                    var xMin = input.ReadInt16();
-                    var yMin = input.ReadInt16();
-                    var xMax = input.ReadInt16();
-                    var yMax = input.ReadInt16();
+                    var bounds = ReadBounds(input);
                     if (contoursCount >= 0)
                     {
-                        glyphs.Add(ReadSimpleGlyph(input, contoursCount));
+                        glyphs.Add(ReadSimpleGlyph(input, contoursCount, bounds));
                     }
                     else
                     {
-                        glyphs.Add(ReadCompositeGlyph(input, -contoursCount));
+                        glyphs.Add(ReadCompositeGlyph(input, -contoursCount, bounds));
                     }
                 }
                 else
