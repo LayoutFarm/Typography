@@ -26,6 +26,7 @@ namespace notf
                     tables.Add(TableEntry.ReadFrom(input));
                 }
 
+                var header = Head.From(tables.Single(t => t.Tag == "head"));
                 var maximumProfile = MaxProfile.From(tables.Single(t => t.Tag == "maxp"));
                 var glyphs = Glyph.From(tables.Single(t => t.Tag == "glyf"), maximumProfile.GlyphCount);
 
