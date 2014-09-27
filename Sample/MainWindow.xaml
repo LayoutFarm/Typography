@@ -4,6 +4,7 @@
         Title="MainWindow" Height="350" Width="525">
     <DockPanel>
         <Button DockPanel.Dock="Bottom" Command="{Binding Load}">Load Segoe UI</Button>
+        <Slider DockPanel.Dock="Top" Minimum="0" Maximum="{Binding Typeface.Glyphs.Count}" Value="{Binding SelectedGlyph}" />
 
         <ItemsControl ItemsSource="{Binding Points}">
             <ItemsControl.ItemsPanel>
@@ -19,7 +20,7 @@
             </ItemsControl.ItemContainerStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Black"/>
+                    <Ellipse Width="20" Height="20" Fill="Black" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

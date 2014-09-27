@@ -55,6 +55,7 @@
     </ApplicationDefinition>
     <Compile Include="ViewModels\Commands\AlwaysExecutableCommand.cs" />
     <Compile Include="ViewModels\Commands\DelegatingCommand.cs" />
+    <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
