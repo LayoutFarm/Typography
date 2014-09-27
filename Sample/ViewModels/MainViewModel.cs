@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace Sample.ViewModels
 {
@@ -36,12 +37,21 @@ namespace Sample.ViewModels
             }
         }
 
-        private IEnumerable<Point> ToPoints(Glyph glyph)
+        private IEnumerable<Point> ToPoints(Glyph glyph, Rect target)
         {
-            var x = glyph.X;
-            var y = glyph.Y;
+            var allX = glyph.X;
+            var allY = glyph.Y;
+            var bounds = glyph.Bounds;
             for (int i = 0; i < glyph.PointCount; i++)
-                yield return new Point(x[i], y[i]);
+            {
+                float x = allX[i];
+                float y = allY[i];
+                var p = new Point(
+                    (x - bounds.XMin) / (bounds.XMax - bounds.XMin),
+                    (y - bounds.YMin) / (bounds.YMax - bounds.YMin));
+                yield return p;
+            }
+                
         }
 
         public int SelectedGlyph
@@ -53,7 +63,7 @@ namespace Sample.ViewModels
                 RaisePropertyChanged();
 
                 // Update points
-                Points = ToPoints(_typeface.Glyphs[_selected]).ToList();
+                Points = ToPoints(_typeface.Glyphs[_selected], Rect.Empty).ToList();
             }
         }
 
