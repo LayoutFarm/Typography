@@ -10,30 +10,25 @@ namespace Sample
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Typeface _typeface;
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void Load(FileInfo fontFile)
+        private Typeface Load(FileInfo fontFile)
         {
-            var reader = new OpenTypeReader();
             using (var stream = fontFile.OpenRead())
             {
-                reader.Reader(stream);
+                return new OpenTypeReader().Read(stream);
             }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var f = new FileInfo(@"C:\Users\vidstige\Desktop\segoe\segoeui.ttf");
-            Load(f);
-
-            //foreach (var path in Directory.EnumerateFiles(@"C:\Windows\Fonts"))
-            //{
-            //    Console.WriteLine("path: " + path);
-            //    Load(new FileInfo(path));
-            //}
+            _typeface = Load(f);
         }
     }
 }
