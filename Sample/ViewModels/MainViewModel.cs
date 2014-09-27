@@ -1,5 +1,4 @@
 ﻿using NRasterizer;
-using NRasterizer.Tables;
 using Sample.ViewModels.Commands;
 using System.Collections.Generic;
 using System.IO;
