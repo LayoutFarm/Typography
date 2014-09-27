@@ -16,16 +16,24 @@ namespace NRasterizer
         public virtual int EatInstructionStream(byte[] instructions, int ip, Stack<UInt32> stack) { return ip; }
         public abstract void Execute(GraphicState state, Stack<UInt32> stack, params bool[] flags);
     }
+
+    internal class NOP : Instruction
+    {
+        public override bool Matches(byte opcode) { return true; } // take the rest
+        public override void Execute(GraphicState state, Stack<UInt32> stack, params bool[] flags)
+        {
+        }
+    }
     
     internal class NPushB : Instruction
     {
         public override bool Matches(byte opcode) { return opcode == 0x40; }
         public override int EatInstructionStream(byte[] instructions, int ip, Stack<UInt32> stack)
         {
-            byte n = instructions[ip++];
-            for (int i = 0; i < n; i++)
+            byte n = instructions[++ip];
+            for (int i = 0; i < n; ++i)
             {
-                stack.Push(instructions[ip++]); // TODO: instructions may overrun?
+                stack.Push(instructions[++ip]); // TODO: instructions may overrun?
             }
             return ip;
         }
@@ -48,15 +56,24 @@ namespace NRasterizer
 
         public Interpreter()
         {
-            var instructions = new List<Instruction>();
-            instructions.Add(new NPushB());
+            var instructions = new List<Instruction>
+            {
+                new NPushB(),
+                new MDAP(),
+                new NOP()
+            };
+            
             _lookup = BuildLookup(instructions);
         }
 
         private Instruction[] BuildLookup(List<Instruction> instructions)
         {
-            var result = new List<Instruction>(256);
-            return result.ToArray();
+            var result = new Instruction[256];
+            for (int opcode = 0; opcode < 256; opcode++)
+            {
+                result[opcode] = instructions.First(i => i.Matches((byte)opcode));
+            }
+            return result;
         }
 
         public void Run(byte[] instructions)

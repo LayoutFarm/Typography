@@ -21,5 +21,12 @@
         public int PointCount { get { return _x.Length; } } // or y...
         public short[] X { get { return _x; } }
         public short[] Y { get { return _y; } }
+
+        // For debug
+        public void Run()
+        {
+            var interpreter = new Interpreter();
+            interpreter.Run(_instructions);
+        }
     }
 }

@@ -3,7 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <DockPanel>
-        <Button DockPanel.Dock="Bottom" Command="{Binding Load}">Load Segoe UI</Button>
+        <Grid DockPanel.Dock="Bottom" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Command="{Binding Load}">Load Segoe UI</Button>
+            <Button Grid.Column="1" Command="{Binding Rasterize}">Rasterize</Button>
+        </Grid>
+        
         <Slider DockPanel.Dock="Top" Minimum="0" Maximum="{Binding Typeface.Glyphs.Count}" Value="{Binding SelectedGlyph}" />
 
         <Viewbox>

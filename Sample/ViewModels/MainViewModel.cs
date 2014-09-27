@@ -65,6 +65,12 @@ namespace Sample.ViewModels
         }
 
         public ICommand Load { get { return new DelegatingCommand(LoadTypeface); } }
+        public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
+
+        private void RasterizeGlyph()
+        {
+            _typeface.Glyphs[_selected].Run();
+        }
 
         private Typeface LoadFrom(FileInfo fontFile)
         {
