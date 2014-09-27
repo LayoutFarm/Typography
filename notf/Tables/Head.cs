@@ -11,7 +11,7 @@ namespace notf.Tables
     {
         private readonly short _indexToLocFormat;
 
-        public bool WideLoca { get { return _indexToLocFormat > 0; } }
+        public bool WideGlyphLocations { get { return _indexToLocFormat > 0; } }
 
         private Head(BinaryReader input)
         {            
