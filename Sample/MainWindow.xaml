@@ -21,7 +21,7 @@
             </ItemsControl.ItemContainerStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Ellipse Width="0.1" Height="0.1" Fill="Black" />
+                    <Ellipse Width="0.02" Height="0.02" Fill="Black" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
