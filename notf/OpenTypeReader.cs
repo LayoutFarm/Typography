@@ -22,44 +22,12 @@ namespace notf
                 var tables = new List<TableEntry>(tableCount);
                 for (int i = 0; i < tableCount; i++)
                 {
-                    tables.Add(Table.ReadFrom(input));
+                    tables.Add(TableEntry.ReadFrom(input));
                 }
 
-                var cmap = tables.Single(t => t.Tag == "glyf");
+                var maximumProfile = MaxProfile.From(tables.Single(t => t.Tag == "maxp"));
+                var glyphs = Glyph.From(tables.Single(t => t.Tag == "glyf"), maximumProfile.GlyphCount);
 
-            }
-        }
-
-        private class TableEntry
-        {
-            private readonly uint _tag;
-            private readonly uint _checkSum;
-            private readonly uint _offset;
-            private readonly uint _length;
-
-            public string Tag { get { return TagToString(_tag); } }
-            private TableEntry(uint tag, uint checkSum, uint offset, uint length)
-            {
-                _tag = tag;
-                _checkSum = checkSum;
-                _offset = offset;
-                _length = length;
-
-            }
-
-            public static TableEntry ReadFrom(BinaryReader input)
-            {
-                var tag = input.ReadUInt32();
-                var checkSum = input.ReadUInt32();
-                var offset = input.ReadUInt32();
-                var length = input.ReadUInt32();
-                return new Table(tag, checkSum, offset, length);
-            }
-            private String TagToString(uint tag)
-            {
-                var bytes = BitConverter.GetBytes(tag);
-                Array.Reverse(bytes);
-                return Encoding.ASCII.GetString(bytes);
             }
         }
 

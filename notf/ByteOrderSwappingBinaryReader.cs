@@ -55,7 +55,7 @@ namespace notf
         public override char[] ReadChars(int count) { throw new NotImplementedException(); }
         public override decimal ReadDecimal() { throw new NotImplementedException(); }
         public override double ReadDouble() { throw new NotImplementedException(); }
-        public override short ReadInt16() { throw new NotImplementedException(); }
+        public override short ReadInt16() { return (short)SwapBytes((ushort)base.ReadUInt16()); }
         public override int ReadInt32() { throw new NotImplementedException(); }
         public override long ReadInt64() { throw new NotImplementedException(); }
         public override sbyte ReadSByte() { throw new NotImplementedException(); }
