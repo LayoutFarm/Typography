@@ -12,6 +12,7 @@ namespace NRasterizer.Tables
         private readonly short _indexToLocFormat;
         private readonly Bounds _bounds;
 
+        public Bounds Bounds { get { return _bounds; } }
         public bool WideGlyphLocations { get { return _indexToLocFormat > 0; } }
 
         private Head(BinaryReader input)

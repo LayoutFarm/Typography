@@ -35,18 +35,17 @@ namespace Sample.ViewModels
             }
         }
 
-        private IEnumerable<Point> ToPoints(Glyph glyph, Rect target)
+        private IEnumerable<Point> ToPoints(Glyph glyph, Bounds source, Rect target)
         {
             var allX = glyph.X;
             var allY = glyph.Y;
-            var bounds = glyph.Bounds;
             for (int i = 0; i < glyph.PointCount; i++)
             {
                 float x = allX[i];
                 float y = allY[i];
                 var p = new Point(
-                    (x - bounds.XMin) / (bounds.XMax - bounds.XMin),
-                    (y - bounds.YMin) / (bounds.YMax - bounds.YMin));
+                    (x - source.XMin) / (source.XMax - source.XMin),
+                    (y - source.YMin) / (source.YMax - source.YMin));
                 yield return p;
             }
                 
@@ -61,7 +60,7 @@ namespace Sample.ViewModels
                 RaisePropertyChanged();
 
                 // Update points
-                Points = ToPoints(_typeface.Glyphs[_selected], Rect.Empty).ToList();
+                Points = ToPoints(_typeface.Glyphs[_selected], _typeface.Bounds, Rect.Empty).ToList();
             }
         }
 

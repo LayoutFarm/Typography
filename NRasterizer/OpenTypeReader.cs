@@ -32,7 +32,7 @@ namespace NRasterizer
                 var glyphLocations = new GlyphLocations(tables.Single(t => t.Tag == "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
                 var glyphs = Glyf.From(tables.Single(t => t.Tag == "glyf"), glyphLocations);
 
-                return new Typeface(glyphs);
+                return new Typeface(header.Bounds, glyphs);
             }
         }
 
