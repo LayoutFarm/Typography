@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace notf.Tables
+namespace NRasterizer.Tables
 {
     internal class TableEntry
     {

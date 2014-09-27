@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace notf.Tables
+namespace NRasterizer.Tables
 {
     public class MaxProfile
     {

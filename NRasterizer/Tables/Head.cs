@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace notf.Tables
+namespace NRasterizer.Tables
 {
     internal class Head
     {

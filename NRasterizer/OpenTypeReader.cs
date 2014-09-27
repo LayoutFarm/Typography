@@ -3,9 +3,10 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using notf.Tables;
+using NRasterizer.IO;
+using NRasterizer.Tables;
 
-namespace notf
+namespace NRasterizer
 {
     public class OpenTypeReader
     {

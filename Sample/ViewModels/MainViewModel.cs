@@ -1,12 +1,11 @@
-﻿using notf;
-using notf.Tables;
+﻿using NRasterizer;
+using NRasterizer.Tables;
 using Sample.ViewModels.Commands;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Shapes;
 
 namespace Sample.ViewModels
 {

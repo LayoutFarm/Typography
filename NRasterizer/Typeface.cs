@@ -1,7 +1,7 @@
-﻿using notf.Tables;
+﻿using NRasterizer.Tables;
 using System.Collections.Generic;
 
-namespace notf
+namespace NRasterizer
 {
     public class Typeface
     {

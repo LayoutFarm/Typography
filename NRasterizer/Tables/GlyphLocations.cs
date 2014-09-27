@@ -1,6 +1,6 @@
-﻿
-using System;
-namespace notf.Tables
+﻿using System;
+
+namespace NRasterizer.Tables
 {
     internal class GlyphLocations
     {
