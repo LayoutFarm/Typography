@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteOrderSwappingBinaryReader.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

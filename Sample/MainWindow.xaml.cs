@@ -1,4 +1,5 @@
 ﻿using notf;
+using System;
 using System.IO;
 using System.Windows;
 
@@ -14,14 +15,25 @@ namespace Sample
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Load(FileInfo fontFile)
         {
-            var f = new FileInfo(@"C:\Users\vidstige\Desktop\segoe\segoeui.ttf");
             var reader = new OpenTypeReader();
-            using (var stream = f.OpenRead())
+            using (var stream = fontFile.OpenRead())
             {
                 reader.Reader(stream);
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var f = new FileInfo(@"C:\Users\vidstige\Desktop\segoe\segoeui.ttf");
+            Load(f);
+
+            //foreach (var path in Directory.EnumerateFiles(@"C:\Windows\Fonts"))
+            //{
+            //    Console.WriteLine("path: " + path);
+            //    Load(new FileInfo(path));
+            //}
         }
     }
 }
