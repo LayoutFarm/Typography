@@ -95,13 +95,30 @@ namespace NRasterizer
 
         private void RenderScanlines(Raster scanFlags, Raster target)
         {
+            var source = scanFlags.Pixels;
+            var destinataion = target.Pixels;
+            var stride = target.Stride;
+            
+            for (int y = 0; y < target.Height; y++)
+            {
+                bool fill = false;
+                int row = stride * y;
+                for (int x = 0; x < target.Width; x++)
+                {
+                    if (source[row + x] > 0)
+                    {
+                        fill = !fill;
+                    }
+                    destinataion[row + x] = fill ? (byte)255 : (byte)0;
+                }
+            }
         }
 
         private void Rasterize(Glyph glyph, Raster raster)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride);
-            SetScanFlags(glyph, raster);
-            //RenderScanlines(flags, raster);
+            SetScanFlags(glyph, flags);
+            RenderScanlines(flags, raster);
         }
 
         public void Rasterize(string text, int size, Raster raster)
