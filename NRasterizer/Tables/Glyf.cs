@@ -90,7 +90,7 @@ namespace NRasterizer.Tables
             var xs = ReadCoordinates(input, pointCount, flags, Flag.XByte, Flag.XSignOrSame);
             var ys = ReadCoordinates(input, pointCount, flags, Flag.YByte, Flag.YSignOrSame);
 
-            return new Glyph(instructions, xs, ys, bounds);
+            return new Glyph(xs, ys, flags.Select(f => f.HasFlag(Flag.OnCurve)).ToArray(), endPoints, bounds);
         }
 
         private static Glyph ReadCompositeGlyph(BinaryReader input, int count, Bounds bounds)

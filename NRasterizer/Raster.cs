@@ -15,9 +15,9 @@
             _pixels = new byte[_stride * _height];
         }
 
-        int Width { get { return _width; } }
-        int Height { get { return _height; } }
-        int Stride { get { return _stride; } }
-        byte[] Pixels { get { return _pixels; } }
+        public int Width { get { return _width; } }
+        public int Height { get { return _height; } }
+        public int Stride { get { return _stride; } }
+        public byte[] Pixels { get { return _pixels; } }
     }
 }

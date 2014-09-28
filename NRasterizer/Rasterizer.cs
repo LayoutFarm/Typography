@@ -13,7 +13,8 @@ namespace NRasterizer
 
         private void Rasterize(Glyph glyph, Raster raster)
         {
-
+            var pixels = raster.Pixels;
+            var flags = new Raster(raster.Width, raster.Height, raster.Stride);
         }
 
         public void Rasterize(string text, int size, Raster raster)

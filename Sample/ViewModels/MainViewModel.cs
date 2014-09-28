@@ -40,7 +40,7 @@ namespace Sample.ViewModels
         {
             var allX = glyph.X;
             var allY = glyph.Y;
-            for (int i = 0; i < glyph.PointCount; i++)
+            for (int i = 0; i < glyph.X.Length; i++)
             {
                 float x = allX[i];
                 float y = allY[i];
