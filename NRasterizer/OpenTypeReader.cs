@@ -1,10 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using NRasterizer.IO;
+using NRasterizer.Tables;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using NRasterizer.IO;
-using NRasterizer.Tables;
+using System.Linq;
 
 namespace NRasterizer
 {

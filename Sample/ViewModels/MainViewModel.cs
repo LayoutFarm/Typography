@@ -71,7 +71,7 @@ namespace Sample.ViewModels
         {
             //SelectedGlyph = _typeface.LookupIndex((char)0x0041); // A
 
-            var raster = new Raster(640, 480, 640);
+            var raster = new Raster(640, 128, 640);
             var r = new Rasterizer(_typeface);
             r.Rasterize("ABC", 32, raster);
         }
