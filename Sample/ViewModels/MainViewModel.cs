@@ -46,7 +46,7 @@ namespace Sample.ViewModels
                 float y = allY[i];
                 var p = new Point(
                     (x - source.XMin) / (source.XMax - source.XMin),
-                    (y - source.YMin) / (source.YMax - source.YMin));
+                    1.0 - ((y - source.YMin) / (source.YMax - source.YMin)));
                 yield return p;
             }
         }
@@ -68,10 +68,11 @@ namespace Sample.ViewModels
         public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
 
         private void RasterizeGlyph()
-        {            
-            var raster = new Raster(640, 480, 640);
-            var r = new Rasterizer(_typeface, Encoding.UTF8);
-            r.Rasterize("a", 32, raster);
+        {
+            SelectedGlyph = _typeface.LookupIndex(0x0041); // A
+            //var raster = new Raster(640, 480, 640);
+            //var r = new Rasterizer(_typeface, Encoding.UTF8);
+            //r.Rasterize("a", 32, raster);
         }
 
         private Typeface LoadFrom(FileInfo fontFile)
