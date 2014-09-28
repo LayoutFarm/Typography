@@ -57,10 +57,10 @@ namespace NRasterizer
             }
         }
 
-        private void Rasterize(Glyph glyph, Raster raster)
+        private void SetScanFlags(Glyph glyph, Raster scanFlags)
         {
-            var pixels = raster.Pixels;
-            var flags = new Raster(raster.Width, raster.Height, raster.Stride);
+            var pixels = scanFlags.Pixels;
+
             var allX = glyph.X;
             var allY = glyph.Y;
             var allOn = glyph.On;
@@ -71,10 +71,10 @@ namespace NRasterizer
                 var end = glyph.GetContourEnd(contour);
                 for (int i = begin + 1; i < end; i++)
                 {
-                    var x0 = allX[i-1];
-                    var y0 = allY[i-1];
-                    var on1 = allOn[i-1];
-                    
+                    var x0 = allX[i - 1];
+                    var y0 = allY[i - 1];
+                    var on1 = allOn[i - 1];
+
                     var x1 = allX[i];
                     var y1 = allY[i];
                     var on2 = allOn[i];
@@ -82,15 +82,26 @@ namespace NRasterizer
                     if (on2)
                     {
                         // draw line in flags
-                        DrawLine(raster, x0, y0, x1, y1);
+                        DrawLine(scanFlags, x0, y0, x1, y1);
                     }
                     else
                     {
-                        DrawLine(raster, x0, y0, x1, y1); // TODO: Draw bezier
+                        DrawLine(scanFlags, x0, y0, x1, y1); // TODO: Draw bezier
                         Console.WriteLine("bezier!");
                     }
                 }
             }
+        }
+
+        private void RenderScanlines(Raster scanFlags, Raster target)
+        {
+        }
+
+        private void Rasterize(Glyph glyph, Raster raster)
+        {
+            var flags = new Raster(raster.Width, raster.Height, raster.Stride);
+            SetScanFlags(glyph, raster);
+            //RenderScanlines(flags, raster);
         }
 
         public void Rasterize(string text, int size, Raster raster)
