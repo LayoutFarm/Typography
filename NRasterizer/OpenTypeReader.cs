@@ -32,7 +32,16 @@ namespace NRasterizer
                 var glyphLocations = new GlyphLocations(tables.Single(t => t.Tag == "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
                 var glyphs = Glyf.From(tables.Single(t => t.Tag == "glyf"), glyphLocations);
 
-                return new Typeface(header.Bounds, glyphs);
+                var cmaps = CharacterMap.From(tables.Single(t => t.Tag == "cmap"));
+
+                // Debug
+                for (uint c = 0; c < 0x00A8; c++)
+                {
+                    var index = cmaps[0].CharacterToGlyphIndex(c);
+                    Console.WriteLine("0x{0:x4} -> {1}", c, index);
+                }
+
+                return new Typeface(header.Bounds, glyphs, cmaps);
             }
         }
 

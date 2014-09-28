@@ -28,6 +28,7 @@ namespace NRasterizer.Tables
             return new TableEntry(input);
         }
 
+        // TODO: Take offset parameter as commonly two seeks are made in a row
         public BinaryReader GetDataReader()
         {
             _input.BaseStream.Seek(_offset, SeekOrigin.Begin);
