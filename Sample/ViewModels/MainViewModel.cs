@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace Sample.ViewModels
 {
@@ -15,7 +16,9 @@ namespace Sample.ViewModels
 
         private List<Point> _points = new List<Point>();
         private int _selected;
-        
+
+        private readonly WriteableBitmap _raster = new WriteableBitmap(640, 480, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
+
         public List<Point> Points
         {
             get { return _points; }
@@ -67,13 +70,28 @@ namespace Sample.ViewModels
         public ICommand Load { get { return new DelegatingCommand(LoadTypeface); } }
         public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
 
+        public BitmapSource Raster
+        {
+            get
+            {
+                return _raster;
+            }
+        }
+
+        private Int32Rect Bounds(WriteableBitmap bitmap)
+        {
+            return new Int32Rect(0, 0, bitmap.PixelHeight, bitmap.PixelHeight);
+        }
+
         private void RasterizeGlyph()
         {
             //SelectedGlyph = _typeface.LookupIndex((char)0x0041); // A
 
-            var raster = new Raster(640, 128, 640);
+            var raster = new Raster(_raster.PixelWidth, _raster.PixelHeight, _raster.PixelWidth);
             var r = new Rasterizer(_typeface);
-            r.Rasterize("ABC", 32, raster);
+            r.Rasterize("A", 32, raster);
+
+            _raster.WritePixels(Bounds(_raster), raster.Pixels, raster.Stride, 0);
         }
 
         private Typeface LoadFrom(FileInfo fontFile)

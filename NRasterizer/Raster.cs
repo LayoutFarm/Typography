@@ -1,6 +1,6 @@
 ﻿namespace NRasterizer
 {
-        public class Raster
+    public class Raster
     {
         private readonly int _width;
         private readonly int _height;
@@ -19,5 +19,13 @@
         public int Height { get { return _height; } }
         public int Stride { get { return _stride; } }
         public byte[] Pixels { get { return _pixels; } }
+    }
+
+    public static class RasterExtensions
+    {
+        public static void SetPixel(this Raster raster, int x, int y, byte value)
+        {
+            raster.Pixels[x + y * raster.Stride] = value;
+        }
     }
 }
