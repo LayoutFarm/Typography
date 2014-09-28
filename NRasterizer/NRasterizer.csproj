@@ -40,12 +40,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bounds.cs" />
+    <Compile Include="CharacterMap.cs" />
     <Compile Include="Glyph.cs" />
     <Compile Include="Interpreter.cs" />
     <Compile Include="IO\ByteOrderSwappingBinaryReader.cs" />
     <Compile Include="Rasterizer.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
-    <Compile Include="Tables\CharacterMap.cs" />
+    <Compile Include="Tables\CmapReader.cs" />
     <Compile Include="Tables\Glyf.cs" />
     <Compile Include="Tables\GlyphLocations.cs" />
     <Compile Include="Tables\Head.cs" />

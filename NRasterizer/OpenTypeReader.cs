@@ -31,8 +31,7 @@ namespace NRasterizer
                 var maximumProfile = MaxProfile.From(tables.Single(t => t.Tag == "maxp"));
                 var glyphLocations = new GlyphLocations(tables.Single(t => t.Tag == "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
                 var glyphs = Glyf.From(tables.Single(t => t.Tag == "glyf"), glyphLocations);
-
-                var cmaps = CharacterMap.From(tables.Single(t => t.Tag == "cmap"));
+                var cmaps = CmapReader.From(tables.Single(t => t.Tag == "cmap"));
 
                 return new Typeface(header.Bounds, glyphs, cmaps);
             }

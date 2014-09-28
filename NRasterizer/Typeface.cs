@@ -1,5 +1,4 @@
-﻿using NRasterizer.Tables;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace NRasterizer
 {
