@@ -34,13 +34,6 @@ namespace NRasterizer
 
                 var cmaps = CharacterMap.From(tables.Single(t => t.Tag == "cmap"));
 
-                // Debug
-                for (uint c = 0; c < 0x00A8; c++)
-                {
-                    var index = cmaps[0].CharacterToGlyphIndex(c);
-                    Console.WriteLine("0x{0:x4} -> {1}", c, index);
-                }
-
                 return new Typeface(header.Bounds, glyphs, cmaps);
             }
         }
