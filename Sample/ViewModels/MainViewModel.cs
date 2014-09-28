@@ -3,6 +3,7 @@ using Sample.ViewModels.Commands;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -14,7 +15,7 @@ namespace Sample.ViewModels
 
         private List<Point> _points = new List<Point>();
         private int _selected;
-
+        
         public List<Point> Points
         {
             get { return _points; }
@@ -48,7 +49,6 @@ namespace Sample.ViewModels
                     (y - source.YMin) / (source.YMax - source.YMin));
                 yield return p;
             }
-                
         }
 
         public int SelectedGlyph
@@ -68,8 +68,10 @@ namespace Sample.ViewModels
         public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
 
         private void RasterizeGlyph()
-        {
-            _typeface.Glyphs[_selected].Run();
+        {            
+            var raster = new Raster(640, 480, 640);
+            var r = new Rasterizer(_typeface, Encoding.UTF8);
+            r.Rasterize("a", 32, raster);
         }
 
         private Typeface LoadFrom(FileInfo fontFile)
