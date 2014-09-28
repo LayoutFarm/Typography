@@ -15,11 +15,15 @@ namespace NRasterizer
             _cmaps = cmaps;
         }
 
-        public int LookupIndex(uint character)
+        public int LookupIndex(char character)
         {
             // TODO: What if there are none or several tables?
             return _cmaps[0].CharacterToGlyphIndex(character);
-            //return _glyphs[index];
+        }
+
+        public Glyph Lookup(char character)
+        {
+            return _glyphs[LookupIndex(character)];
         }
 
         public Bounds Bounds { get { return _bounds; } }

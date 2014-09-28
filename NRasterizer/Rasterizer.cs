@@ -27,13 +27,18 @@ namespace NRasterizer
     {
         private readonly Typeface _typeface;
 
-        public Rasterizer(Typeface typeface, Encoding encoding)
+        public Rasterizer(Typeface typeface)
         {
             _typeface = typeface;
         }
 
         public void Rasterize(string text, int size, Raster raster)
         {
+            foreach (var character in text)
+            {
+                var glyph = _typeface.Lookup(character);
+
+            }
         }
     }
 }

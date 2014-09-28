@@ -69,10 +69,11 @@ namespace Sample.ViewModels
 
         private void RasterizeGlyph()
         {
-            SelectedGlyph = _typeface.LookupIndex(0x0041); // A
-            //var raster = new Raster(640, 480, 640);
-            //var r = new Rasterizer(_typeface, Encoding.UTF8);
-            //r.Rasterize("a", 32, raster);
+            //SelectedGlyph = _typeface.LookupIndex((char)0x0041); // A
+
+            var raster = new Raster(640, 480, 640);
+            var r = new Rasterizer(_typeface);
+            r.Rasterize("ABC", 32, raster);
         }
 
         private Typeface LoadFrom(FileInfo fontFile)
