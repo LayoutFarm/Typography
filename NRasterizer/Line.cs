@@ -43,8 +43,8 @@
 
             if (deltay == 0)
             {
-                raster.SetPixel(x0, y0, 255);
-                raster.SetPixel(x1, y1, 255);
+                //raster.SetPixel(x0, y0, 255);
+                //raster.SetPixel(x1, y1, 255);
                 return;
             }
 
@@ -56,12 +56,12 @@
             {
                 raster.SetPixel(x, y, 255);
                 error += deltaError;
-                if (error >= 0.5)
+                if (error > 0.5)
                 {
                     x++;
                     error -= 1.0f;
                 }
-                if (error <= 0.5)
+                if (error < 0.5)
                 {
                     x--;
                     error += 1.0f;
