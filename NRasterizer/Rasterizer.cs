@@ -19,40 +19,35 @@ namespace NRasterizer
             b = tmp;
         }
 
-        // TODO: Use beshenham
-        private void DrawLine(Raster raster, short x0, short y0, short x1, short y1)
+        private void DrawLineFlags(Raster raster, int x0, int y0, int x1, int y1)
         {
-            int xDistance = Math.Abs(x1 - x0);
-            int yDistance = Math.Abs(y1 - y0);
+            int deltax = x1 - x0;
+            int deltay = y1 - y0;
 
-            if (xDistance >= yDistance)
+            if (deltay == 0)
             {
-                if (x0 > x1)
-                {
-                    Swap(ref x0, ref x1);
-                    Swap(ref y0, ref y1);
-                }
-                int dx = x1 - x0;
-                int dy = y1 - y0;
-                for (int x = x0; x < x1; x++)
-                {
-                    short y = (short)(y0 + (x-x0) * dy / dx);
-                    raster.SetPixel(x >> 3, y >> 3, 255);
-                }
+                raster.SetPixel(x0, y0, 255);
+                raster.SetPixel(x1, y0, 255);
+                return;
             }
-            else
+
+            float error = 0;
+            float deltaError = (float)deltax / (float)deltay;
+            
+            int x = x0;
+            for (int y = y0; y <= y1; y++)
             {
-                if (y0 > y1)
+                raster.SetPixel(x, y, 255);
+                error += deltaError;
+                if (error >= 0.5)
                 {
-                    Swap(ref x0, ref x1);
-                    Swap(ref y0, ref y1);
+                    x++;
+                    error -= 1.0f;
                 }
-                int dx = x1 - x0;
-                int dy = y1 - y0;
-                for (int y = y0; y < y1; y++)
+                if (error <= 0.5)
                 {
-                    short x = (short)(x0 + (y - y0) * dx / dy);
-                    raster.SetPixel(x >> 3, y >> 3, 255);
+                    x--;
+                    error += 1.0f;
                 }
             }
         }
@@ -81,12 +76,13 @@ namespace NRasterizer
 
                     if (on2)
                     {
+                        const int scaleShift = 3;
                         // draw line in flags
-                        DrawLine(scanFlags, x0, y0, x1, y1);
+                        DrawLineFlags(scanFlags, x0 >> scaleShift, y0 >> scaleShift, x1 >> scaleShift, y1 >> scaleShift);
                     }
                     else
                     {
-                        DrawLine(scanFlags, x0, y0, x1, y1); // TODO: Draw bezier
+                        //DrawLineFlags(scanFlags, x0, y0, x1, y1); // TODO: Draw bezier
                         Console.WriteLine("bezier!");
                     }
                 }
@@ -117,8 +113,10 @@ namespace NRasterizer
         private void Rasterize(Glyph glyph, Raster raster)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride);
-            SetScanFlags(glyph, flags);
-            RenderScanlines(flags, raster);
+            //SetScanFlags(glyph, flags);
+            //RenderScanlines(flags, raster);
+
+            SetScanFlags(glyph, raster);
         }
 
         public void Rasterize(string text, int size, Raster raster)
