@@ -89,7 +89,7 @@ namespace Sample.ViewModels
 
             var raster = new Raster(_raster.PixelWidth, _raster.PixelHeight, _raster.PixelWidth);
             var r = new Rasterizer(_typeface);
-            r.Rasterize("c", 32, raster);
+            r.Rasterize("n", 32, raster);
 
             _raster.WritePixels(Bounds(_raster), raster.Pixels, raster.Stride, 0);
         }

@@ -19,7 +19,7 @@ namespace NRasterizer
 
             for (int contour = 0; contour < glyph.ContourCount; contour++)
             {
-                foreach (var segment in glyph.GetContourIterator(contour, 0, 32, 0.1f, 0.1f))
+                foreach (var segment in glyph.GetContourIterator(contour, 0, 220, 0.1f, -0.1f))
                 {
                     segment.FillFlags(scanFlags);
                 }
