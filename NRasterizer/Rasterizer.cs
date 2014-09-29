@@ -69,13 +69,24 @@ namespace NRasterizer
                     if (segment.on)
                     {
                         const int scaleShift = 3;
+                        const int yOffset = 256;
                         // draw line in flags
-                        DrawLineFlags(scanFlags, segment.x0 >> scaleShift, segment.y0 >> scaleShift, segment.x1 >> scaleShift, segment.y1 >> scaleShift);
+                        DrawLineFlags(scanFlags,
+                            segment.x0 >> scaleShift,
+                            yOffset + segment.y0 >> scaleShift,
+                            segment.x1 >> scaleShift,
+                            yOffset + segment.y1 >> scaleShift);
                     }
                     else
                     {
                         const int scaleShift = 3;
-                        DrawLineFlags(scanFlags, segment.x0 >> scaleShift, segment.y0 >> scaleShift, segment.x1 >> scaleShift, segment.y1 >> scaleShift);
+                        const int yOffset = 256;
+                        // draw line in flags
+                        DrawLineFlags(scanFlags,
+                            segment.x0 >> scaleShift,
+                            yOffset + segment.y0 >> scaleShift,
+                            segment.x1 >> scaleShift,
+                            yOffset + segment.y1 >> scaleShift); 
                         Console.WriteLine("bezier!");
                     }
 
