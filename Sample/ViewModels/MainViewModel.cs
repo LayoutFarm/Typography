@@ -17,7 +17,7 @@ namespace Sample.ViewModels
         private List<Point> _points = new List<Point>();
         private int _selected;
 
-        private readonly WriteableBitmap _raster = new WriteableBitmap(640, 480, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
+        private readonly WriteableBitmap _raster = new WriteableBitmap(320, 240, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
 
         public List<Point> Points
         {
@@ -89,7 +89,7 @@ namespace Sample.ViewModels
 
             var raster = new Raster(_raster.PixelWidth, _raster.PixelHeight, _raster.PixelWidth);
             var r = new Rasterizer(_typeface);
-            r.Rasterize("A", 32, raster);
+            r.Rasterize("X", 32, raster);
 
             _raster.WritePixels(Bounds(_raster), raster.Pixels, raster.Stride, 0);
         }

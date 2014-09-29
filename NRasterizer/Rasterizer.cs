@@ -12,22 +12,28 @@ namespace NRasterizer
             _typeface = typeface;
         }
 
-        private void Swap(ref short a, ref short b)
+        private void Swap<T>(ref T a, ref T b)
         {
-            short tmp = a;
+            T tmp = a;
             a = b;
             b = tmp;
         }
 
         private void DrawLineFlags(Raster raster, int x0, int y0, int x1, int y1)
         {
+            if (y0 > y1)
+            {
+                Swap(ref x0, ref x1);
+                Swap(ref y0, ref y1);
+            }
+
             int deltax = x1 - x0;
             int deltay = y1 - y0;
 
             if (deltay == 0)
             {
                 raster.SetPixel(x0, y0, 255);
-                raster.SetPixel(x1, y0, 255);
+                raster.SetPixel(x1, y1, 255);
                 return;
             }
 
@@ -35,7 +41,7 @@ namespace NRasterizer
             float deltaError = (float)deltax / (float)deltay;
             
             int x = x0;
-            for (int y = y0; y <= y1; y++)
+            for (int y = y0; y < y1; y++)
             {
                 raster.SetPixel(x, y, 255);
                 error += deltaError;
@@ -64,15 +70,16 @@ namespace NRasterizer
             {
                 var begin = glyph.GetContourBegin(contour);
                 var end = glyph.GetContourEnd(contour);
-                for (int i = begin + 1; i < end; i++)
+                var contourLength = end - begin;
+                for (int i = 0; i < contourLength; i++)
                 {
-                    var x0 = allX[i - 1];
-                    var y0 = allY[i - 1];
-                    var on1 = allOn[i - 1];
+                    var x0 = allX[begin + i];
+                    var y0 = allY[begin + i];
+                    var on1 = allOn[begin + i];
 
-                    var x1 = allX[i];
-                    var y1 = allY[i];
-                    var on2 = allOn[i];
+                    var x1 = allX[begin + (i + 1) % contourLength];
+                    var y1 = allY[begin + (i + 1) % contourLength];
+                    var on2 = allOn[begin + (i + 1) % contourLength];
 
                     if (on2)
                     {
@@ -82,7 +89,8 @@ namespace NRasterizer
                     }
                     else
                     {
-                        //DrawLineFlags(scanFlags, x0, y0, x1, y1); // TODO: Draw bezier
+                        const int scaleShift = 3;
+                        DrawLineFlags(scanFlags, x0 >> scaleShift, y0 >> scaleShift, x1 >> scaleShift, y1 >> scaleShift);
                         Console.WriteLine("bezier!");
                     }
                 }
@@ -113,10 +121,10 @@ namespace NRasterizer
         private void Rasterize(Glyph glyph, Raster raster)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride);
-            //SetScanFlags(glyph, flags);
-            //RenderScanlines(flags, raster);
+            SetScanFlags(glyph, flags);
+            RenderScanlines(flags, raster);
 
-            SetScanFlags(glyph, raster);
+            //SetScanFlags(glyph, raster);
         }
 
         public void Rasterize(string text, int size, Raster raster)
