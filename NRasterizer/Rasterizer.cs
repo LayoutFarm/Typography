@@ -62,37 +62,23 @@ namespace NRasterizer
         {
             var pixels = scanFlags.Pixels;
 
-            var allX = glyph.X;
-            var allY = glyph.Y;
-            var allOn = glyph.On;
-
             for (int contour = 0; contour < glyph.ContourCount; contour++)
             {
-                var begin = glyph.GetContourBegin(contour);
-                var end = glyph.GetContourEnd(contour);
-                var contourLength = end - begin;
-                for (int i = 0; i < contourLength; i++)
+                foreach (var segment in glyph.GetContourIterator(contour))
                 {
-                    var x0 = allX[begin + i];
-                    var y0 = allY[begin + i];
-                    var on1 = allOn[begin + i];
-
-                    var x1 = allX[begin + (i + 1) % contourLength];
-                    var y1 = allY[begin + (i + 1) % contourLength];
-                    var on2 = allOn[begin + (i + 1) % contourLength];
-
-                    if (on2)
+                    if (segment.on)
                     {
                         const int scaleShift = 3;
                         // draw line in flags
-                        DrawLineFlags(scanFlags, x0 >> scaleShift, y0 >> scaleShift, x1 >> scaleShift, y1 >> scaleShift);
+                        DrawLineFlags(scanFlags, segment.x0 >> scaleShift, segment.y0 >> scaleShift, segment.x1 >> scaleShift, segment.y1 >> scaleShift);
                     }
                     else
                     {
                         const int scaleShift = 3;
-                        DrawLineFlags(scanFlags, x0 >> scaleShift, y0 >> scaleShift, x1 >> scaleShift, y1 >> scaleShift);
+                        DrawLineFlags(scanFlags, segment.x0 >> scaleShift, segment.y0 >> scaleShift, segment.x1 >> scaleShift, segment.y1 >> scaleShift);
                         Console.WriteLine("bezier!");
                     }
+
                 }
             }
         }
@@ -121,10 +107,10 @@ namespace NRasterizer
         private void Rasterize(Glyph glyph, Raster raster)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride);
-            SetScanFlags(glyph, flags);
-            RenderScanlines(flags, raster);
+            //SetScanFlags(glyph, flags);
+            //RenderScanlines(flags, raster);
 
-            //SetScanFlags(glyph, raster);
+            SetScanFlags(glyph, raster);
         }
 
         public void Rasterize(string text, int size, Raster raster)
