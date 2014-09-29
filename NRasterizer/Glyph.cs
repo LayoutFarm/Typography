@@ -2,23 +2,6 @@
 
 namespace NRasterizer
 {
-    public struct Line
-    {
-        public Line(short x0, short y0, short x1, short y1, bool on)
-        {
-            this.x0 = x0;
-            this.y0 = y0;
-            this.x1 = x1;
-            this.y1 = y1;
-            this.on = on;
-        }
-        public short x0;
-        public short y0;
-        public short x1;
-        public short y1;
-        public bool on;
-    }
-
     public class Glyph
     {
         private readonly short[] _x;
@@ -42,8 +25,7 @@ namespace NRasterizer
 
         public int ContourCount { get { return _contourEndPoints.Length; } }
 
-        // Returns indices to the X/Y/On arrays
-        public IEnumerable<Line> GetContourIterator(int contourIndex)
+        internal IEnumerable<Segment> GetContourIterator(int contourIndex)
         {
             var begin = GetContourBegin(contourIndex);
             var end = GetContourEnd(contourIndex);

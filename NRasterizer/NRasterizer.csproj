@@ -39,13 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bezier.cs" />
     <Compile Include="Bounds.cs" />
     <Compile Include="CharacterMap.cs" />
     <Compile Include="Glyph.cs" />
     <Compile Include="Interpreter.cs" />
     <Compile Include="IO\ByteOrderSwappingBinaryReader.cs" />
+    <Compile Include="Line.cs" />
     <Compile Include="Raster.cs" />
     <Compile Include="Rasterizer.cs" />
+    <Compile Include="Segment.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
     <Compile Include="Tables\CmapReader.cs" />
     <Compile Include="Tables\Glyf.cs" />
