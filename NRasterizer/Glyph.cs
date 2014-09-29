@@ -25,15 +25,37 @@ namespace NRasterizer
 
         public int ContourCount { get { return _contourEndPoints.Length; } }
 
-        internal IEnumerable<Segment> GetContourIterator(int contourIndex)
+        internal IEnumerable<Segment> GetContourIterator(int contourIndex, float xOffset, float yOffset, float scaleX, float scaleY)
         {
             var begin = GetContourBegin(contourIndex);
             var end = GetContourEnd(contourIndex);
             for (int i = begin; i < end; i++)
             {
-                yield return new Line(_x[i], _y[i], _x[i+1], _y[i+1], _on[i]);
+                if (_on[i + 1])
+                {
+                    yield return new Line(
+                        (int)(xOffset + _x[i] * scaleX),
+                        (int)(yOffset + _y[i] * scaleY),
+                        (int)(xOffset + _x[i + 1] * scaleX),
+                        (int)(yOffset + _y[i + 1] * scaleY));
+                }
+                else
+                {
+                    yield return new Bezier(
+                        xOffset + _x[i] * scaleX,
+                        yOffset + _y[i] * scaleY,
+                        xOffset + _x[i + 1] * scaleX,
+                        yOffset + _y[i + 1] * scaleY,
+                        xOffset + _x[i + 2] * scaleX,
+                        yOffset + _y[i + 2] * scaleY);
+                }
             }
-            yield return new Line(_x[end], _y[end], _x[begin], _y[begin], _on[end]);
+            // TODO: What if the last segment if a bezier
+            yield return new Line(
+                (int)(xOffset + _x[end] * scaleX),
+                (int)(yOffset + _y[end] * scaleY),
+                (int)(xOffset + _x[begin] * scaleX),
+                (int)(yOffset + _y[begin] * scaleY));
         }
 
         private int GetContourBegin(int contourIndex)

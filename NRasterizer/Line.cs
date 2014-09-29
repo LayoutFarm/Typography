@@ -2,29 +2,25 @@
 {
     public class Line: Segment
     {
-        public Line(short x0, short y0, short x1, short y1, bool on)
+        public Line(int x0, int y0, int x1, int y1)
         {
             this.x0 = x0;
             this.y0 = y0;
             this.x1 = x1;
             this.y1 = y1;
-            this.on = on;
         }
-        public readonly short x0;
-        public readonly short y0;
-        public readonly short x1;
-        public readonly short y1;
-        public readonly bool on;
+        public readonly int x0;
+        public readonly int y0;
+        public readonly int x1;
+        public readonly int y1;
 
         public void FillFlags(Raster target)
         {
-            const int scaleShift = 3;
-            const int yOffset = 256;
             DrawLineFlags(target,
-                x0 >> scaleShift,
-                yOffset + y0 >> scaleShift,
-                x1 >> scaleShift,
-                yOffset + y1 >> scaleShift);
+                x0,
+                y0,
+                x1,
+                y1);
         }
 
         private void Swap<T>(ref T a, ref T b)
@@ -33,6 +29,7 @@
             a = b;
             b = tmp;
         }
+
         private void DrawLineFlags(Raster raster, int x0, int y0, int x1, int y1)
         {
             if (y0 > y1)
