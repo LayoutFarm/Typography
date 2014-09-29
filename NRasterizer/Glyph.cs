@@ -61,7 +61,7 @@ namespace NRasterizer
         private int GetContourBegin(int contourIndex)
         {
             if (contourIndex == 0) return 0;
-            return _contourEndPoints[contourIndex - 1];
+            return _contourEndPoints[contourIndex - 1]+1;
         }
 
         private int GetContourEnd(int contourIndex)
