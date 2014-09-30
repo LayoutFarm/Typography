@@ -10,6 +10,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Command="{Binding Load}">Load Segoe UI</Button>
             <!--<Button Grid.Column="1" Command="{Binding Rasterize}">Rasterize</Button>-->
+            <Button Grid.Column="1" Command="{Binding SaveRaster}">Save raster</Button>
         </Grid>
         
         <StackPanel DockPanel.Dock="Top">

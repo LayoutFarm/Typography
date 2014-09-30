@@ -1,5 +1,6 @@
 ﻿using NRasterizer;
 using Sample.ViewModels.Commands;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,8 +71,27 @@ namespace Sample.ViewModels
 
         public ICommand Load { get { return new DelegatingCommand(LoadTypeface); } }
         //public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
+        public ICommand SaveRaster { get { return new DelegatingCommand(SaveRasterToFile); } }
 
         public BitmapSource Raster { get { return _raster; } }
+
+        public void SaveRasterToFile()
+        {
+            var file = new FileInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "screenshot.png"));
+            SavePng(_raster, file);
+        }
+
+        private void SavePng(BitmapSource bitmap, FileInfo file)
+        {
+            BitmapFrame frame = BitmapFrame.Create(_raster);
+            
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(frame);
+            using (var stream = file.OpenWrite())
+            {
+                encoder.Save(stream);
+            }
+        }
 
         public string Text
         {
