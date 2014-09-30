@@ -25,6 +25,8 @@
     {
         public static void SetPixel(this Raster raster, int x, int y, byte value)
         {
+            if (x < 0 || x >= raster.Width) return;
+            if (y < 0 || y >= raster.Height) return;
             raster.Pixels[x + y * raster.Stride] = value;
         }
     }
