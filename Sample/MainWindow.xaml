@@ -9,12 +9,17 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Command="{Binding Load}">Load Segoe UI</Button>
-            <Button Grid.Column="1" Command="{Binding Rasterize}">Rasterize</Button>
+            <!--<Button Grid.Column="1" Command="{Binding Rasterize}">Rasterize</Button>-->
         </Grid>
         
-        <Slider DockPanel.Dock="Top" Minimum="0" Maximum="{Binding Typeface.Glyphs.Count}" Value="{Binding SelectedGlyph}" />
+        <StackPanel DockPanel.Dock="Top">
+            <Slider DockPanel.Dock="Top" Minimum="0" Maximum="{Binding Typeface.Glyphs.Count}" Value="{Binding SelectedGlyph}" />            
+            <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
 
-        <Grid>
+        <Image Source="{Binding Raster}" Stretch="Uniform" />
+        
+        <!--<Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -39,9 +44,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Viewbox>
-            
-            <Image Grid.Column="1" Source="{Binding Raster}" Stretch="Uniform" />
-            
-        </Grid>
+        </Grid> -->
     </DockPanel>
 </Window>

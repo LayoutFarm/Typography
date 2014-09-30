@@ -16,6 +16,7 @@ namespace Sample.ViewModels
 
         private List<Point> _points = new List<Point>();
         private int _selected;
+        private string _text = "s";
 
         private readonly WriteableBitmap _raster = new WriteableBitmap(320, 240, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
 
@@ -68,13 +69,18 @@ namespace Sample.ViewModels
         }
 
         public ICommand Load { get { return new DelegatingCommand(LoadTypeface); } }
-        public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
+        //public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
 
-        public BitmapSource Raster
+        public BitmapSource Raster { get { return _raster; } }
+
+        public string Text
         {
-            get
+            get { return _text; }
+            set
             {
-                return _raster;
+                _text = value;
+                Draw(_text);
+                RaisePropertyChanged();
             }
         }
 
@@ -83,13 +89,13 @@ namespace Sample.ViewModels
             return new Int32Rect(0, 0, bitmap.PixelHeight, bitmap.PixelHeight);
         }
 
-        private void RasterizeGlyph()
+        private void Draw(string s)
         {
             //SelectedGlyph = _typeface.LookupIndex((char)0x0041); // A
 
             var raster = new Raster(_raster.PixelWidth, _raster.PixelHeight, _raster.PixelWidth);
             var r = new Rasterizer(_typeface);
-            r.Rasterize("n", 32, raster);
+            r.Rasterize(s, 32, raster);
 
             _raster.WritePixels(Bounds(_raster), raster.Pixels, raster.Stride, 0);
         }

@@ -50,10 +50,10 @@ namespace NRasterizer
         private void Rasterize(Glyph glyph, Raster raster)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride);
-            //SetScanFlags(glyph, flags);
-            //RenderScanlines(flags, raster);
+            SetScanFlags(glyph, flags);
+            RenderScanlines(flags, raster);
 
-            SetScanFlags(glyph, raster);
+            //SetScanFlags(glyph, raster);
         }
 
         public void Rasterize(string text, int size, Raster raster)
