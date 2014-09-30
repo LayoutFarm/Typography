@@ -29,7 +29,7 @@ namespace NRasterizer
         {
             var begin = GetContourBegin(contourIndex);
             var end = GetContourEnd(contourIndex);
-            for (int i = begin; i < end; i++)
+            for (int i = begin; i < end; i += _on[i+1] ? 1 : 2)
             {
                 if (_on[i + 1])
                 {
