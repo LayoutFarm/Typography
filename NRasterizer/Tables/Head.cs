@@ -11,6 +11,7 @@ namespace NRasterizer.Tables
     {
         private readonly short _indexToLocFormat;
         private readonly Bounds _bounds;
+        private readonly ushort _unitsPerEm;
 
         public Bounds Bounds { get { return _bounds; } }
         public bool WideGlyphLocations { get { return _indexToLocFormat > 0; } }
@@ -24,7 +25,7 @@ namespace NRasterizer.Tables
             if (magicNumber != 0x5F0F3CF5) throw new ApplicationException("Invalid magic number!" + magicNumber.ToString("x"));
 
             var flags = input.ReadUInt16();
-            var unitsPerEm = input.ReadUInt16(); // valid is 16 to 16384
+            _unitsPerEm = input.ReadUInt16(); // valid is 16 to 16384
             var created = input.ReadUInt64(); //  International date (8-byte field). (?)
             var modified = input.ReadUInt64();
             
@@ -42,5 +43,7 @@ namespace NRasterizer.Tables
         {
             return new Head(table.GetDataReader());
         }
+
+        public ushort UnitsPerEm { get { return _unitsPerEm; } }
     }
 }

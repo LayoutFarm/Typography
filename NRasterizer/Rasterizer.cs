@@ -6,20 +6,20 @@ namespace NRasterizer
     public class Rasterizer
     {
         private readonly Typeface _typeface;
+        private const int pointsPerInch = 72;
 
         public Rasterizer(Typeface typeface)
         {
             _typeface = typeface;
         }
 
-
-        private void SetScanFlags(Glyph glyph, Raster scanFlags)
+        private void SetScanFlags(Glyph glyph, Raster scanFlags, int size)
         {
+            float scale = (float)(size * scanFlags.Resolution) / (pointsPerInch * _typeface.UnitsPerEm);
             var pixels = scanFlags.Pixels;
-
             for (int contour = 0; contour < glyph.ContourCount; contour++)
             {
-                foreach (var segment in glyph.GetContourIterator(contour, 0, 220, 0.1f, -0.1f))
+                foreach (var segment in glyph.GetContourIterator(contour, 0, 120, scale, -scale))
                 {
                     segment.FillFlags(scanFlags);
                 }
@@ -47,10 +47,10 @@ namespace NRasterizer
             }
         }
 
-        private void Rasterize(Glyph glyph, Raster raster)
+        private void Rasterize(Glyph glyph, int size, Raster raster)
         {
-            var flags = new Raster(raster.Width, raster.Height, raster.Stride);
-            SetScanFlags(glyph, flags);
+            var flags = new Raster(raster.Width, raster.Height, raster.Stride, raster.Resolution);
+            SetScanFlags(glyph, flags, size);
             RenderScanlines(flags, raster);
 
             //SetScanFlags(glyph, raster);
@@ -61,7 +61,7 @@ namespace NRasterizer
             foreach (var character in text)
             {
                 var glyph = _typeface.Lookup(character);
-                Rasterize(glyph, raster);
+                Rasterize(glyph, size, raster);
             }
         }
     }

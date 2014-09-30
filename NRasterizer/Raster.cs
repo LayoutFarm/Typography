@@ -5,13 +5,15 @@
         private readonly int _width;
         private readonly int _height;
         private readonly int _stride;
+        private readonly int _resolution;
         private readonly byte[] _pixels;
 
-        public Raster(int width, int height, int stride)
+        public Raster(int width, int height, int stride, int resolution)
         {
             _width = width;
             _height = height;
             _stride = stride;
+            _resolution = resolution;
             _pixels = new byte[_stride * _height];
         }
 
@@ -19,6 +21,8 @@
         public int Height { get { return _height; } }
         public int Stride { get { return _stride; } }
         public byte[] Pixels { get { return _pixels; } }
+
+        public int Resolution { get { return _resolution; } }
     }
 
     public static class RasterExtensions

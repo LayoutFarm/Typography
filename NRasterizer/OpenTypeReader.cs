@@ -32,7 +32,7 @@ namespace NRasterizer
                 var glyphs = Glyf.From(tables.Single(t => t.Tag == "glyf"), glyphLocations);
                 var cmaps = CmapReader.From(tables.Single(t => t.Tag == "cmap"));
 
-                return new Typeface(header.Bounds, glyphs, cmaps);
+                return new Typeface(header.Bounds, header.UnitsPerEm, glyphs, cmaps);
             }
         }
 
