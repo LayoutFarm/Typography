@@ -37,8 +37,10 @@ namespace NRasterizer
                 var glyphs = Glyf.From(FindTable(tables, "glyf"), glyphLocations);
                 var cmaps = CmapReader.From(FindTable(tables,"cmap"));
 
-                var hhae = HorizontalHeader.From(FindTable(tables, "hhea"));
-
+                var horizontalHeader = HorizontalHeader.From(FindTable(tables, "hhea"));
+                var horizontalMetrics = HorizontalMetrics.From(FindTable(tables, "hmtx"),
+                    horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount);
+                
                 return new Typeface(header.Bounds, header.UnitsPerEm, glyphs, cmaps);
             }
         }
