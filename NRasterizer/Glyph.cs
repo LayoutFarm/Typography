@@ -31,9 +31,9 @@ namespace NRasterizer
         {
             var begin = GetContourBegin(contourIndex);
             var end = GetContourEnd(contourIndex);
-            for (int i = begin; i < end; i += _on[i+1] ? 1 : 2)
+            for (int i = begin; i < end; i += _on[(i+1) % _on.Length] ? 1 : 2)
             {
-                if (_on[i + 1])
+                if (_on[(i + 1) % _on.Length])
                 {
                     yield return new Line(
                         (int)(xOffset + (fontX + _x[i]) * scaleX),
@@ -48,8 +48,8 @@ namespace NRasterizer
                         yOffset + (fontY + _y[i]) * scaleY,
                         xOffset + (fontX + _x[i + 1]) * scaleX,
                         yOffset + (fontY + _y[i + 1]) * scaleY,
-                        xOffset + (fontX + _x[i + 2]) * scaleX,
-                        yOffset + (fontY + _y[i + 2]) * scaleY);
+                        xOffset + (fontX + _x[(i + 2) % _y.Length]) * scaleX,
+                        yOffset + (fontY + _y[(i + 2) % _y.Length]) * scaleY);
                 }
             }
             // TODO: What if the last segment if a bezier
