@@ -25,7 +25,9 @@ namespace NRasterizer
 
         public int ContourCount { get { return _contourEndPoints.Length; } }
 
-        internal IEnumerable<Segment> GetContourIterator(int contourIndex, float xOffset, float yOffset, float scaleX, float scaleY)
+        internal IEnumerable<Segment> GetContourIterator(int contourIndex,
+            int fontX, int fontY,
+            float xOffset, float yOffset, float scaleX, float scaleY)
         {
             var begin = GetContourBegin(contourIndex);
             var end = GetContourEnd(contourIndex);
@@ -34,28 +36,28 @@ namespace NRasterizer
                 if (_on[i + 1])
                 {
                     yield return new Line(
-                        (int)(xOffset + _x[i] * scaleX),
-                        (int)(yOffset + _y[i] * scaleY),
-                        (int)(xOffset + _x[i + 1] * scaleX),
-                        (int)(yOffset + _y[i + 1] * scaleY));
+                        (int)(xOffset + (fontX + _x[i]) * scaleX),
+                        (int)(yOffset + (fontY + _y[i]) * scaleY),
+                        (int)(xOffset + (fontX + _x[i + 1]) * scaleX),
+                        (int)(yOffset + (fontY + _y[i + 1]) * scaleY));
                 }
                 else
                 {
                     yield return new Bezier(
-                        xOffset + _x[i] * scaleX,
-                        yOffset + _y[i] * scaleY,
-                        xOffset + _x[i + 1] * scaleX,
-                        yOffset + _y[i + 1] * scaleY,
-                        xOffset + _x[i + 2] * scaleX,
-                        yOffset + _y[i + 2] * scaleY);
+                        xOffset + (fontX + _x[i]) * scaleX,
+                        yOffset + (fontY + _y[i]) * scaleY,
+                        xOffset + (fontX + _x[i + 1]) * scaleX,
+                        yOffset + (fontY + _y[i + 1]) * scaleY,
+                        xOffset + (fontX + _x[i + 2]) * scaleX,
+                        yOffset + (fontY + _y[i + 2]) * scaleY);
                 }
             }
             // TODO: What if the last segment if a bezier
             yield return new Line(
-                (int)(xOffset + _x[end] * scaleX),
-                (int)(yOffset + _y[end] * scaleY),
-                (int)(xOffset + _x[begin] * scaleX),
-                (int)(yOffset + _y[begin] * scaleY));
+                (int)(xOffset + (fontX + _x[end]) * scaleX),
+                (int)(yOffset + (fontY + _y[end]) * scaleY),
+                (int)(xOffset + (fontX +_x[begin]) * scaleX),
+                (int)(yOffset + (fontY + _y[begin]) * scaleY));
         }
 
         private int GetContourBegin(int contourIndex)

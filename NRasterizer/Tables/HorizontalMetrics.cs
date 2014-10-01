@@ -29,6 +29,11 @@ namespace NRasterizer.Tables
             }
         }
 
+        public ushort GetAdvanceWidth(int index)
+        {
+            return _advanceWidths[index];
+        }
+
         public static HorizontalMetrics From(TableEntry table, UInt16 count, UInt16 numGlyphs)
         {
             return new HorizontalMetrics(table.GetDataReader(), count, numGlyphs);

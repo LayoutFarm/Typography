@@ -41,7 +41,7 @@ namespace NRasterizer
                 var horizontalMetrics = HorizontalMetrics.From(FindTable(tables, "hmtx"),
                     horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount);
                 
-                return new Typeface(header.Bounds, header.UnitsPerEm, glyphs, cmaps);
+                return new Typeface(header.Bounds, header.UnitsPerEm, glyphs, cmaps, horizontalMetrics);
             }
         }
 
