@@ -14,7 +14,7 @@
         </Grid>
         
         <StackPanel DockPanel.Dock="Top">
-            <Slider DockPanel.Dock="Top" Minimum="0" Maximum="{Binding Typeface.Glyphs.Count}" Value="{Binding SelectedGlyph}" />            
+            <Slider DockPanel.Dock="Top" Minimum="8" Maximum="128" Value="{Binding FontSize}" />            
             <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
