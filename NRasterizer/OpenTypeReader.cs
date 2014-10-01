@@ -9,6 +9,11 @@ namespace NRasterizer
 {
     public class OpenTypeReader
     {
+        private TableEntry FindTable(IEnumerable<TableEntry> tables, string tableName)
+        {
+            return tables.Single(t => t.Tag == tableName);
+        }
+
         public Typeface Read(Stream stream)
         {
             var little = BitConverter.IsLittleEndian;
@@ -26,11 +31,13 @@ namespace NRasterizer
                     tables.Add(TableEntry.ReadFrom(input));
                 }
 
-                var header = Head.From(tables.Single(t => t.Tag == "head"));
-                var maximumProfile = MaxProfile.From(tables.Single(t => t.Tag == "maxp"));
-                var glyphLocations = new GlyphLocations(tables.Single(t => t.Tag == "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
-                var glyphs = Glyf.From(tables.Single(t => t.Tag == "glyf"), glyphLocations);
-                var cmaps = CmapReader.From(tables.Single(t => t.Tag == "cmap"));
+                var header = Head.From(FindTable(tables, "head"));
+                var maximumProfile = MaxProfile.From(FindTable(tables, "maxp"));
+                var glyphLocations = new GlyphLocations(FindTable(tables, "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
+                var glyphs = Glyf.From(FindTable(tables, "glyf"), glyphLocations);
+                var cmaps = CmapReader.From(FindTable(tables,"cmap"));
+
+                var hhae = HorizontalHeader.From(FindTable(tables, "hhea"));
 
                 return new Typeface(header.Bounds, header.UnitsPerEm, glyphs, cmaps);
             }

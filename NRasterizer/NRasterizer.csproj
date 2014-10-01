@@ -54,6 +54,7 @@
     <Compile Include="Tables\Glyf.cs" />
     <Compile Include="Tables\GlyphLocations.cs" />
     <Compile Include="Tables\Head.cs" />
+    <Compile Include="Tables\HorizontalHeader.cs" />
     <Compile Include="Tables\MaxProfile.cs" />
     <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
