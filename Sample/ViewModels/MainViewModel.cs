@@ -17,9 +17,16 @@ namespace Sample.ViewModels
 
         private List<Point> _points = new List<Point>();
         private int _size;
-        private string _text = "s";
+        private string _text = "abc";
 
         private readonly WriteableBitmap _raster = new WriteableBitmap(320, 240, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
+
+        public MainViewModel()
+        {
+            LoadTypeface();
+            _size = 48;
+            Draw(_text, _size);
+        }
 
         //public List<Point> Points
         //{
@@ -71,7 +78,13 @@ namespace Sample.ViewModels
         //public ICommand Rasterize { get { return new DelegatingCommand(RasterizeGlyph); } }
         public ICommand SaveRaster { get { return new DelegatingCommand(SaveRasterToFile); } }
 
-        public BitmapSource Raster { get { return _raster; } }
+        public BitmapSource Raster
+        {
+            get
+            {
+                return _raster;
+            }
+        }
 
         public void SaveRasterToFile()
         {
