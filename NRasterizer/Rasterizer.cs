@@ -26,6 +26,21 @@ namespace NRasterizer
             }
         }
 
+        private void RenderFlags(Raster scanFlags, Raster target)
+        {            
+            var source = scanFlags.Pixels;
+            var destinataion = target.Pixels;
+            var stride = target.Stride;
+            for (int y = 0; y < target.Height; y++)
+            {
+                int row = stride * y;
+                for (int x = 0; x < target.Width; x++)
+                {
+                    destinataion[row + x] = (byte)(source[row + x] * 128);
+                }
+            }
+        }
+
         private void RenderScanlines(Raster scanFlags, Raster target)
         {
             var source = scanFlags.Pixels;
@@ -50,10 +65,7 @@ namespace NRasterizer
         public void Rasterize(string text, int size, Raster raster, bool toFlags = false)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride, raster.Resolution);
-
-            if (toFlags)
-                flags = raster;
-
+            
             // 
             int fx = 0;
             int fy = 0;
@@ -64,8 +76,14 @@ namespace NRasterizer
                 fx += _typeface.GetAdvanceWidth(character);
             }
 
-            if (!toFlags)
+            if (toFlags)
+            {
+                RenderFlags(flags, raster);
+            }
+            else
+            {
                 RenderScanlines(flags, raster);
+            }
         }
     }
 }
