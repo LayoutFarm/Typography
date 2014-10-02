@@ -33,5 +33,11 @@
             if (y < 0 || y >= raster.Height) return;
             raster.Pixels[x + y * raster.Stride] = value;
         }
+        public static void AddPixel(this Raster raster, int x, int y, byte delta)
+        {
+            if (x < 0 || x >= raster.Width) return;
+            if (y < 0 || y >= raster.Height) return;
+            raster.Pixels[x + y * raster.Stride] += delta;
+        }
     }
 }

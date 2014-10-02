@@ -36,7 +36,7 @@ namespace NRasterizer
                 int end = (int)Math.Max(Math.Max(y0, y1), y2);
                 for (int y = start; y < end; y++)
                 {
-                    raster.SetPixel((int)x0, y, 255);
+                    raster.AddPixel((int)x0, y, 1);
                 }
                 return;
             }

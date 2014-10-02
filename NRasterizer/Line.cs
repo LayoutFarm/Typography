@@ -54,7 +54,7 @@
             int x = x0;
             for (int y = y0; y < y1; y++)
             {
-                raster.SetPixel(x, y, 255);
+                raster.AddPixel(x, y, 1);
                 error += deltaError;
                 if (error > 0.5)
                 {
