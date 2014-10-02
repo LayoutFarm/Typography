@@ -47,9 +47,12 @@ namespace NRasterizer
             }
         }
         
-        public void Rasterize(string text, int size, Raster raster)
+        public void Rasterize(string text, int size, Raster raster, bool toFlags = false)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride, raster.Resolution);
+
+            if (toFlags)
+                flags = raster;
 
             // 
             int fx = 0;
@@ -57,11 +60,12 @@ namespace NRasterizer
             foreach (var character in text)
             {
                 var glyph = _typeface.Lookup(character);
-                SetScanFlags(glyph, flags, fx, fy, size, 0, 120);
+                SetScanFlags(glyph, flags, fx, fy, size, 0, 70);
                 fx += _typeface.GetAdvanceWidth(character);
             }
 
-            RenderScanlines(flags, raster);
+            if (!toFlags)
+                RenderScanlines(flags, raster);
         }
     }
 }

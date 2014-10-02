@@ -19,13 +19,15 @@ namespace Sample.ViewModels
         private int _size;
         private string _text = "abc";
 
-        private readonly WriteableBitmap _raster = new WriteableBitmap(320, 240, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
+        private bool _toFlags;
+
+        private readonly WriteableBitmap _raster = new WriteableBitmap(160, 120, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
 
         public MainViewModel()
         {
             LoadTypeface();
             _size = 48;
-            Draw(_text, _size);
+            UpdateRaster();
         }
 
         //public List<Point> Points
@@ -37,6 +39,17 @@ namespace Sample.ViewModels
         //        RaisePropertyChanged();
         //    }
         //}
+
+        public bool ToFlags
+        {
+            get { return _toFlags; }
+            set
+            {
+                _toFlags = value;
+                UpdateRaster();
+                RaisePropertyChanged();
+            }
+        }
 
         public Typeface Typeface
         {
@@ -69,7 +82,7 @@ namespace Sample.ViewModels
             set
             {
                 _size = value;
-                Draw(_text, _size);
+                UpdateRaster();
                 RaisePropertyChanged();
             }
         }
@@ -110,7 +123,7 @@ namespace Sample.ViewModels
             set
             {
                 _text = value;
-                Draw(_text, _size);
+                UpdateRaster();
                 RaisePropertyChanged();
             }
         }
@@ -120,13 +133,18 @@ namespace Sample.ViewModels
             return new Int32Rect(0, 0, bitmap.PixelHeight, bitmap.PixelHeight);
         }
 
+        private void UpdateRaster()
+        {
+            Draw(_text, _size);
+        }
+
         private void Draw(string text, int size)
         {
             //SelectedGlyph = _typeface.LookupIndex((char)0x0041); // A
 
             var raster = new Raster(_raster.PixelWidth, _raster.PixelHeight, _raster.PixelWidth, 72);
             var r = new Rasterizer(_typeface);
-            r.Rasterize(text, size, raster);
+            r.Rasterize(text, size, raster, _toFlags);
 
             _raster.WritePixels(Bounds(_raster), raster.Pixels, raster.Stride, 0);
         }

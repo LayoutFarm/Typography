@@ -14,11 +14,12 @@
         </Grid>
         
         <StackPanel DockPanel.Dock="Top">
+            <CheckBox IsChecked="{Binding ToFlags}">Flags</CheckBox>
             <Slider DockPanel.Dock="Top" Minimum="8" Maximum="128" Value="{Binding FontSize}" />            
             <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
-        <Image Source="{Binding Raster}" Stretch="Uniform" />
+        <Image Source="{Binding Raster}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
         
         <!--<Grid>
             <Grid.ColumnDefinitions>
