@@ -53,7 +53,7 @@ namespace NRasterizer
         {
             var begin = GetContourBegin(contourIndex);
             var end = GetContourEnd(contourIndex);
-            for (int i = begin; i < end; i++)
+            for (int i = begin; i <= end; i++)
             {
                 yield return At(i);
             }
@@ -113,7 +113,7 @@ namespace NRasterizer
             yield return new Line(
                 (int)(xOffset + (fontX + _x[end]) * scaleX),
                 (int)(yOffset + (fontY + _y[end]) * scaleY),
-                (int)(xOffset + (fontX +_x[begin]) * scaleX),
+                (int)(xOffset + (fontX + _x[begin]) * scaleX),
                 (int)(yOffset + (fontY + _y[begin]) * scaleY));
         }
 

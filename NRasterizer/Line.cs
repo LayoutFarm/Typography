@@ -68,5 +68,10 @@
                 }
             }
         }
+
+        public string ToString()
+        {
+            return string.Format("Line ({0}, {1}) to ({2}, {3})", x0, y0, x1, y1);
+        }
     }
 }

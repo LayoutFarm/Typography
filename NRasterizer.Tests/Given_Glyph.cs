@@ -34,6 +34,9 @@ namespace NRasterizer.Tests
             Assert.AreEqual(_y, line.y0);
             Assert.AreEqual(x, line.x1);
             Assert.AreEqual(y, line.y1);
+            _x = x;
+            _y = y;
+            _segmentIndex++;
         }
 
         private void AssertContourDone()
