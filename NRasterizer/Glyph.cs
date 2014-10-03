@@ -80,7 +80,7 @@ namespace NRasterizer
             return list[index % list.Count];
         }
 
-        internal IEnumerable<Segment> GetContourIterator(int contourIndex,
+        public IEnumerable<Segment> GetContourIterator(int contourIndex,
             int fontX, int fontY,
             float xOffset, float yOffset, float scaleX, float scaleY)
         {

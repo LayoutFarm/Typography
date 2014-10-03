@@ -1,6 +1,6 @@
 ﻿namespace NRasterizer
 {
-    interface Segment
+    public interface Segment
     {
         void FillFlags(Raster raster);
     }

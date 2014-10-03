@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRasterizer", "NRasterizer\NRasterizer.csproj", "{5BD9866C-9022-4AD8-BB96-EFED35C8324F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{B73ED844-1048-4A82-BAD9-F13311E4AA94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRasterizer.Tests", "NRasterizer.Tests\NRasterizer.Tests.csproj", "{FC36D8CB-3B6C-4078-AAE0-68A4223BB2C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +21,10 @@ Global
 		{B73ED844-1048-4A82-BAD9-F13311E4AA94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B73ED844-1048-4A82-BAD9-F13311E4AA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B73ED844-1048-4A82-BAD9-F13311E4AA94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC36D8CB-3B6C-4078-AAE0-68A4223BB2C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC36D8CB-3B6C-4078-AAE0-68A4223BB2C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC36D8CB-3B6C-4078-AAE0-68A4223BB2C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC36D8CB-3B6C-4078-AAE0-68A4223BB2C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
