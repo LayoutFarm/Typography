@@ -41,7 +41,7 @@ namespace NRasterizer.Tests
 
         private void AssertContourDone()
         {
-            Assert.AreEqual(_segmentIndex, _segments.Count - 1);
+            Assert.AreEqual(_segmentIndex, _segments.Count);
         }
 
         [TestMethod]
