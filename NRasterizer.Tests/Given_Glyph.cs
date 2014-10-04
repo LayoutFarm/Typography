@@ -39,6 +39,23 @@ namespace NRasterizer.Tests
             _segmentIndex++;
         }
 
+        private void AssertBezierTo(int cx, int cy, int endx, int endy)
+        {
+            var segment = _segments[_segmentIndex];
+            Assert.IsNotNull(segment);
+            Assert.IsInstanceOfType(segment, typeof(Bezier));
+            var bezier = (Bezier)segment;
+            Assert.AreEqual(_x, bezier.x0);
+            Assert.AreEqual(_y, bezier.y0);
+            Assert.AreEqual(cx, bezier.x1);
+            Assert.AreEqual(cy, bezier.y1);
+            Assert.AreEqual(endx, bezier.x2);
+            Assert.AreEqual(endy, bezier.y2);
+            _x = endx;
+            _y = endy;
+            _segmentIndex++;
+        }
+
         private void AssertContourDone()
         {
             Assert.AreEqual(_segmentIndex, _segments.Count);
@@ -57,6 +74,22 @@ namespace NRasterizer.Tests
             AssertLineTo(128, 0);
             AssertLineTo(128, 128);
             AssertLineTo(0, 128);
+            AssertLineTo(0, 0);
+            AssertContourDone();
+        }
+
+        [TestMethod]
+        public void With_Line_And_Bezier_Countour()
+        {
+            var x = new short[] { 0, 128, 128, 0 };
+            var y = new short[] { 0, 0, 128, 128 };
+            var on = new bool[] { true, true, false, true };
+
+            EatContour(new Glyph(x, y, on, new ushort[] { 3 }, null), 0);
+
+            StartAt(0, 0);
+            AssertLineTo(128, 0);
+            AssertBezierTo(128, 128, 0, 128);
             AssertLineTo(0, 0);
             AssertContourDone();
         }

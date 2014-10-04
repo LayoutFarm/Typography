@@ -2,7 +2,7 @@
 
 namespace NRasterizer
 {
-    internal class Bezier: Segment
+    public class Bezier: Segment
     {
         public readonly float x0;
         public readonly float y0;
