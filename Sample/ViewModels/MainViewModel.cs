@@ -25,6 +25,9 @@ namespace Sample.ViewModels
 
         private readonly WriteableBitmap _raster = new WriteableBitmap(160, 120, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
 
+        private bool _drawOutline = true;
+        private bool _drawRaster = true;
+
         public MainViewModel()
         {
             LoadTypeface();
@@ -41,6 +44,26 @@ namespace Sample.ViewModels
         //        RaisePropertyChanged();
         //    }
         //}
+
+        public bool DrawRaster
+        {
+            get { return _drawRaster; }
+            set
+            {
+                _drawRaster = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool DrawOutline
+        {
+            get { return _drawOutline; }
+            set
+            {
+                _drawOutline = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public List<Segment> Segments
         {
@@ -152,15 +175,22 @@ namespace Sample.ViewModels
 
         private void Draw(string text, int size)
         {
-            //SelectedGlyph = _typeface.LookupIndex((char)0x0041); // A
-            
             var raster = new Raster(_raster.PixelWidth, _raster.PixelHeight, _raster.PixelWidth, 72);
             var r = new Rasterizer(_typeface);
-            r.Rasterize(text, size, raster, _toFlags);
-
+            if (DrawRaster)
+            {
+                r.Rasterize(text, size, raster, _toFlags);
+            }
             _raster.WritePixels(Bounds(_raster), raster.Pixels, raster.Stride, 0);
 
-            Segments = r.GetAllSegments(text, size, raster.Resolution).ToList();
+            if (DrawOutline)
+            {
+                Segments = r.GetAllSegments(text, size, raster.Resolution).ToList();
+            }
+            else
+            {
+                Segments = Enumerable.Empty<Segment>().ToList();
+            }
         }
 
         private Typeface LoadFrom(FileInfo fontFile)

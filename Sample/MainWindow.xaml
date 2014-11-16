@@ -16,7 +16,12 @@
         </Grid>
         
         <StackPanel DockPanel.Dock="Top">
-            <CheckBox IsChecked="{Binding ToFlags}">Flags</CheckBox>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding ToFlags}">Flags</CheckBox>
+                <CheckBox IsChecked="{Binding DrawRaster}">Raster</CheckBox>
+                <CheckBox IsChecked="{Binding DrawOutline}">Outline</CheckBox>
+            </StackPanel>
+            
             <Slider DockPanel.Dock="Top" Minimum="8" Maximum="128" Value="{Binding FontSize}" />            
             <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
