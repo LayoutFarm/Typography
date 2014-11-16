@@ -53,6 +53,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\BezierToPointConverter.cs" />
     <Compile Include="ViewModels\Commands\AlwaysExecutableCommand.cs" />
     <Compile Include="ViewModels\Commands\DelegatingCommand.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />

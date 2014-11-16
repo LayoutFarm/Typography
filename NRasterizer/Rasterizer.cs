@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace NRasterizer
@@ -19,6 +21,7 @@ namespace NRasterizer
             var pixels = scanFlags.Pixels;
             for (int contour = 0; contour < glyph.ContourCount; contour++)
             {
+                var aerg = glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale).ToList();
                 foreach (var segment in glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale))
                 {
                     segment.FillFlags(scanFlags);
@@ -67,7 +70,7 @@ namespace NRasterizer
             var flags = new Raster(raster.Width, raster.Height, raster.Stride, raster.Resolution);
             
             // 
-            int fx = 0;
+            int fx = 64;
             int fy = 0;
             foreach (var character in text)
             {
@@ -83,6 +86,33 @@ namespace NRasterizer
             else
             {
                 RenderScanlines(flags, raster);
+            }
+        }
+
+        // TODO: Duplicated code from Rasterize & SetScanFlags
+        public IEnumerable<Segment> GetAllSegments(string text, int size, int resolution)
+        {
+            int x = 0;
+            int y = 70;
+
+            // 
+            int fx = 64;
+            int fy = 0;
+            foreach (var character in text)
+            {
+                var glyph = _typeface.Lookup(character);
+
+                float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
+                for (int contour = 0; contour < glyph.ContourCount; contour++)
+                {
+                    var aerg = glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale).ToList();
+                    foreach (var segment in glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale))
+                    {
+                        yield return segment;
+                    }
+                }
+
+                fx += _typeface.GetAdvanceWidth(character);
             }
         }
     }

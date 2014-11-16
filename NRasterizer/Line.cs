@@ -14,6 +14,11 @@
         public readonly int x1;
         public readonly int y1;
 
+        public int X0 { get { return x0; } }
+        public int Y0 { get { return y0; } }
+        public int X1 { get { return x1; } }
+        public int Y1 { get { return y1; } }
+
         public void FillFlags(Raster target)
         {
             DrawLineFlags(target,
@@ -69,7 +74,7 @@
             }
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return string.Format("Line ({0}, {1}) to ({2}, {3})", x0, y0, x1, y1);
         }

@@ -17,9 +17,11 @@ namespace Sample.ViewModels
 
         private List<Point> _points = new List<Point>();
         private int _size;
-        private string _text = "abc";
+        private string _text = "A";
 
         private bool _toFlags;
+
+        private List<Segment> _segments;
 
         private readonly WriteableBitmap _raster = new WriteableBitmap(160, 120, 72, 72, System.Windows.Media.PixelFormats.Gray8, null);
 
@@ -39,6 +41,16 @@ namespace Sample.ViewModels
         //        RaisePropertyChanged();
         //    }
         //}
+
+        public List<Segment> Segments
+        {
+            get { return _segments; }
+            set
+            {
+                _segments = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public bool ToFlags
         {
@@ -141,12 +153,14 @@ namespace Sample.ViewModels
         private void Draw(string text, int size)
         {
             //SelectedGlyph = _typeface.LookupIndex((char)0x0041); // A
-
+            
             var raster = new Raster(_raster.PixelWidth, _raster.PixelHeight, _raster.PixelWidth, 72);
             var r = new Rasterizer(_typeface);
             r.Rasterize(text, size, raster, _toFlags);
 
             _raster.WritePixels(Bounds(_raster), raster.Pixels, raster.Stride, 0);
+
+            Segments = r.GetAllSegments(text, size, raster.Resolution).ToList();
         }
 
         private Typeface LoadFrom(FileInfo fontFile)

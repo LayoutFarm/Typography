@@ -21,6 +21,9 @@ namespace NRasterizer
             this.y2 = y2;
         }
 
+        // Hack to get WPF binding working properly
+        public Bezier Me { get { return this; } }
+
         public void FillFlags(Raster raster)
         {
             if ((int)y0 == (int)y1 && (int)y1 == (int)y2)
