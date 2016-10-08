@@ -78,5 +78,6 @@
         {
             return string.Format("Line ({0}, {1}) to ({2}, {3})", x0, y0, x1, y1);
         }
+        public SegmentKind Kind { get { return SegmentKind.Line; } }
     }
 }

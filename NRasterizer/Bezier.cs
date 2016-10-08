@@ -2,7 +2,7 @@
 
 namespace NRasterizer
 {
-    public class Bezier: Segment
+    public class Bezier : Segment
     {
         public readonly float x0;
         public readonly float y0;
@@ -23,6 +23,7 @@ namespace NRasterizer
 
         // Hack to get WPF binding working properly
         public Bezier Me { get { return this; } }
+        public SegmentKind Kind { get { return SegmentKind.Bezier; } }
 
         public void FillFlags(Raster raster)
         {
