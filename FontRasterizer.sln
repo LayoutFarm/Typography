@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NRasterizer.Tests", "NRaste
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample2", "Sample2\Sample2.csproj", "{6627819C-F72B-4444-8461-14A57674FBD9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTypeParser", "OpenTypeParser\OpenTypeParser.csproj", "{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "org", "org", "{CF36C7A5-4281-41E0-B549-DAD46ED5E40C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,8 +37,17 @@ Global
 		{6627819C-F72B-4444-8461-14A57674FBD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6627819C-F72B-4444-8461-14A57674FBD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6627819C-F72B-4444-8461-14A57674FBD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5BD9866C-9022-4AD8-BB96-EFED35C8324F} = {CF36C7A5-4281-41E0-B549-DAD46ED5E40C}
+		{B73ED844-1048-4A82-BAD9-F13311E4AA94} = {CF36C7A5-4281-41E0-B549-DAD46ED5E40C}
+		{FC36D8CB-3B6C-4078-AAE0-68A4223BB2C4} = {CF36C7A5-4281-41E0-B549-DAD46ED5E40C}
 	EndGlobalSection
 EndGlobal

@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6627819C-F72B-4444-8461-14A57674FBD9}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sample2</RootNamespace>
-    <AssemblyName>Sample2</AssemblyName>
+    <RootNamespace>OpenTypeParser</RootNamespace>
+    <AssemblyName>OpenTypeParser</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,45 +31,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Bezier.cs" />
+    <Compile Include="Bounds.cs" />
+    <Compile Include="CharacterMap.cs" />
+    <Compile Include="Glyph.cs" />
+    <Compile Include="Interpreter.cs" />
+    <Compile Include="IO\ByteOrderSwappingBinaryReader.cs" />
+    <Compile Include="Line.cs" />
+    <Compile Include="Net20\ExtensionAttribute.cs" />
+    <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenTypeParser\OpenTypeParser.csproj">
-      <Project>{2dda36cc-9a17-44c8-b26b-1472bb48c0f4}</Project>
-      <Name>OpenTypeParser</Name>
-    </ProjectReference>
+    <Compile Include="Raster.cs" />
+    <Compile Include="Rasterizer.cs" />
+    <Compile Include="Segment.cs" />
+    <Compile Include="Tables\BoundsReader.cs" />
+    <Compile Include="Tables\CmapReader.cs" />
+    <Compile Include="Tables\Glyf.cs" />
+    <Compile Include="Tables\GlyphLocations.cs" />
+    <Compile Include="Tables\Head.cs" />
+    <Compile Include="Tables\HorizontalHeader.cs" />
+    <Compile Include="Tables\HorizontalMetrics.cs" />
+    <Compile Include="Tables\MaxProfile.cs" />
+    <Compile Include="Tables\TableEntry.cs" />
+    <Compile Include="Typeface.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

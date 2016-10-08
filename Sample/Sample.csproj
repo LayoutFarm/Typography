@@ -104,7 +104,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NRasterizer\NRasterizer.csproj">
       <Project>{5bd9866c-9022-4ad8-bb96-efed35c8324f}</Project>
-      <Name>notf</Name>
+      <Name>NRasterizer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
