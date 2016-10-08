@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace NRasterizer
 {
@@ -24,7 +24,7 @@ namespace NRasterizer
         {
         }
     }
-    
+
     internal class NPushB : Instruction
     {
         public override bool Matches(byte opcode) { return opcode == 0x40; }
@@ -62,7 +62,7 @@ namespace NRasterizer
                 new MDAP(),
                 new NOP()
             };
-            
+
             _lookup = BuildLookup(instructions);
         }
 
@@ -71,7 +71,16 @@ namespace NRasterizer
             var result = new Instruction[256];
             for (int opcode = 0; opcode < 256; opcode++)
             {
-                result[opcode] = instructions.First(i => i.Matches((byte)opcode));
+
+                foreach (Instruction inst in instructions)
+                {
+                    if (inst.Matches((byte)opcode))
+                    {
+                        result[opcode] = inst;
+                        break;
+                    }
+                }
+                //result[opcode] = instructions.First(i => i.Matches((byte)opcode));
             }
             return result;
         }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace NRasterizer
 {
     public class Rasterizer
@@ -21,7 +18,7 @@ namespace NRasterizer
             var pixels = scanFlags.Pixels;
             for (int contour = 0; contour < glyph.ContourCount; contour++)
             {
-                var aerg = glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale).ToList();
+                var aerg = new List<Segment>(glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale));
                 foreach (var segment in glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale))
                 {
                     segment.FillFlags(scanFlags);
@@ -30,7 +27,7 @@ namespace NRasterizer
         }
 
         private void RenderFlags(Raster scanFlags, Raster target)
-        {            
+        {
             var source = scanFlags.Pixels;
             var destinataion = target.Pixels;
             var stride = target.Stride;
@@ -49,7 +46,7 @@ namespace NRasterizer
             var source = scanFlags.Pixels;
             var destinataion = target.Pixels;
             var stride = target.Stride;
-            
+
             for (int y = 0; y < target.Height; y++)
             {
                 bool fill = false;
@@ -64,11 +61,11 @@ namespace NRasterizer
                 }
             }
         }
-        
+
         public void Rasterize(string text, int size, Raster raster, bool toFlags = false)
         {
             var flags = new Raster(raster.Width, raster.Height, raster.Stride, raster.Resolution);
-            
+
             // 
             int fx = 64;
             int fy = 0;
@@ -105,7 +102,7 @@ namespace NRasterizer
                 float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
                 for (int contour = 0; contour < glyph.ContourCount; contour++)
                 {
-                    var aerg = glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale).ToList();
+                    var aerg = new List<Segment>(glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale));
                     foreach (var segment in glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale))
                     {
                         yield return segment;

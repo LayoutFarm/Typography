@@ -3,7 +3,7 @@ using NRasterizer.Tables;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+
 
 namespace NRasterizer
 {
@@ -11,9 +11,15 @@ namespace NRasterizer
     {
         private TableEntry FindTable(IEnumerable<TableEntry> tables, string tableName)
         {
-            return tables.Single(t => t.Tag == tableName);
+            foreach (TableEntry te in tables)
+            {
+                if (te.Tag == tableName)
+                {
+                    return te;
+                }
+            }
+            return null;
         }
-
         public Typeface Read(Stream stream)
         {
             var little = BitConverter.IsLittleEndian;
@@ -35,12 +41,12 @@ namespace NRasterizer
                 var maximumProfile = MaxProfile.From(FindTable(tables, "maxp"));
                 var glyphLocations = new GlyphLocations(FindTable(tables, "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
                 var glyphs = Glyf.From(FindTable(tables, "glyf"), glyphLocations);
-                var cmaps = CmapReader.From(FindTable(tables,"cmap"));
+                var cmaps = CmapReader.From(FindTable(tables, "cmap"));
 
                 var horizontalHeader = HorizontalHeader.From(FindTable(tables, "hhea"));
                 var horizontalMetrics = HorizontalMetrics.From(FindTable(tables, "hmtx"),
                     horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount);
-                
+
                 return new Typeface(header.Bounds, header.UnitsPerEm, glyphs, cmaps, horizontalMetrics);
             }
         }

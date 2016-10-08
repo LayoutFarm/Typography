@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+
 using System.Collections.Generic;
 using System.IO;
 
@@ -8,7 +8,7 @@ namespace NRasterizer.Tables
     internal class Glyf
     {
         [Flags]
-        private enum Flag: byte
+        private enum Flag : byte
         {
             OnCurve = 1,
             XByte = 2,
@@ -17,7 +17,10 @@ namespace NRasterizer.Tables
             XSignOrSame = 16,
             YSignOrSame = 32
         }
-
+        static bool HasFlag(Flag target, Flag test)
+        {
+            return (target & test) != 0;
+        }
         private static Flag[] ReadFlags(BinaryReader input, int flagCount)
         {
             var result = new Flag[flagCount];
@@ -33,7 +36,7 @@ namespace NRasterizer.Tables
                 else
                 {
                     flag = (Flag)input.ReadByte();
-                    if (flag.HasFlag(Flag.Repeat))
+                    if (HasFlag(flag, Flag.Repeat))
                     {
                         repeatCount = input.ReadByte();
                     }
@@ -50,14 +53,14 @@ namespace NRasterizer.Tables
             for (int i = 0; i < pointCount; i++)
             {
                 int dx;
-                if (flags[i].HasFlag(isByte))
+                if (HasFlag(flags[i], isByte))
                 {
                     var b = input.ReadByte();
-                    dx = flags[i].HasFlag(signOrSame) ? b : -b;
+                    dx = HasFlag(flags[i], signOrSame) ? b : -b;
                 }
                 else
                 {
-                    if (flags[i].HasFlag(signOrSame))
+                    if (HasFlag(flags[i], signOrSame))
                     {
                         dx = 0;
                     }
@@ -75,7 +78,7 @@ namespace NRasterizer.Tables
         private static Glyph ReadSimpleGlyph(BinaryReader input, int count, Bounds bounds)
         {
             var endPoints = new ushort[count];
-            for (int i=0; i<count; i++)
+            for (int i = 0; i < count; i++)
             {
                 endPoints[i] = input.ReadUInt16();
             }
@@ -90,7 +93,13 @@ namespace NRasterizer.Tables
             var xs = ReadCoordinates(input, pointCount, flags, Flag.XByte, Flag.XSignOrSame);
             var ys = ReadCoordinates(input, pointCount, flags, Flag.YByte, Flag.YSignOrSame);
 
-            return new Glyph(xs, ys, flags.Select(f => f.HasFlag(Flag.OnCurve)).ToArray(), endPoints, bounds);
+            List<bool> list = new List<bool>();
+            foreach (Flag f in flags)
+            {
+                list.Add(HasFlag(f, Flag.OnCurve));
+            }
+
+            return new Glyph(xs, ys, list.ToArray(), endPoints, bounds);
         }
 
         private static Glyph ReadCompositeGlyph(BinaryReader input, int count, Bounds bounds)
@@ -98,7 +107,7 @@ namespace NRasterizer.Tables
             // TODO: Parse composite glyphs
             return Glyph.Empty;
         }
-        
+
         internal static List<Glyph> From(TableEntry table, GlyphLocations locations)
         {
             var glyphCount = locations.GlyphCount;

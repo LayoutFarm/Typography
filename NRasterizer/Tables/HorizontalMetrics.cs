@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+
 
 namespace NRasterizer.Tables
 {
@@ -21,7 +21,7 @@ namespace NRasterizer.Tables
                 _leftSideBearings.Add(input.ReadInt16());
             }
 
-            var advanceWidth = _advanceWidths.Last();
+            ushort advanceWidth = _advanceWidths[count - 1];
             for (int i = 0; i < numGlyphs - count; i++)
             {
                 _advanceWidths.Add(advanceWidth);

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
@@ -14,7 +14,7 @@ namespace NRasterizer.Tests
 
         private void EatContour(Glyph glyph, int contourIndex)
         {
-            _segments = glyph.GetContourIterator(contourIndex, 0, 0, 0, 0, 1, 1).ToList();
+            _segments = new List<Segment>(glyph.GetContourIterator(contourIndex, 0, 0, 0, 0, 1, 1));
             _segmentIndex = 0;
         }
 

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿
 using System.Collections.Generic;
 
 namespace NRasterizer
@@ -20,7 +20,7 @@ namespace NRasterizer
         public short Y { get { return _y; } }
         public bool On { get { return _on; } }
     }
-    
+
     public class Glyph
     {
         private readonly short[] _x;
@@ -30,7 +30,7 @@ namespace NRasterizer
         private readonly Bounds _bounds;
 
         public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new bool[0], new ushort[0], Bounds.Zero);
-        
+
         public Glyph(short[] x, short[] y, bool[] on, ushort[] contourEndPoints, Bounds bounds)
         {
             _x = x;
@@ -61,18 +61,40 @@ namespace NRasterizer
 
         private IEnumerable<Point> InsertImplicit(IEnumerable<Point> points)
         {
-            var previous = points.First();
-            yield return previous;
-            foreach (var p in points.Skip(1))
+
+            Point previous = null;
+            int count = 0;
+            foreach (Point p in points)
             {
-                if (!previous.On && !p.On)
+                if (count == 0)
                 {
-                    // implicit point on curve
-                    yield return new Point((short)((previous.X + p.X) / 2), (short)((previous.Y + p.Y) / 2), true);
+                    previous = p;
+                    yield return p;
                 }
-                previous = p;
-                yield return p;
+                else
+                {
+                    if (!previous.On && !p.On)
+                    {
+                        // implicit point on curve
+                        yield return new Point((short)((previous.X + p.X) / 2), (short)((previous.Y + p.Y) / 2), true);
+                    }
+                    previous = p;
+                    yield return p;
+                }
+                count++;
             }
+            //var previous = points.First();
+            //yield return previous;
+            //foreach (var p in points.Skip(1))
+            //{
+            //    if (!previous.On && !p.On)
+            //    {
+            //        // implicit point on curve
+            //        yield return new Point((short)((previous.X + p.X) / 2), (short)((previous.Y + p.Y) / 2), true);
+            //    }
+            //    previous = p;
+            //    yield return p;
+            //}
         }
 
         private T Circular<T>(List<T> list, int index)
@@ -84,7 +106,7 @@ namespace NRasterizer
             int fontX, int fontY,
             float xOffset, float yOffset, float scaleX, float scaleY)
         {
-            var pts = InsertImplicit(GetContourPoints(contourIndex)).ToList();
+            var pts = new List<Point>(InsertImplicit(GetContourPoints(contourIndex)));
 
             var begin = GetContourBegin(contourIndex);
             var end = GetContourEnd(contourIndex);
@@ -120,7 +142,7 @@ namespace NRasterizer
         private int GetContourBegin(int contourIndex)
         {
             if (contourIndex == 0) return 0;
-            return _contourEndPoints[contourIndex - 1]+1;
+            return _contourEndPoints[contourIndex - 1] + 1;
         }
 
         private int GetContourEnd(int contourIndex)
