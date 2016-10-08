@@ -43,8 +43,6 @@
     <Compile Include="Net20\ExtensionAttribute.cs" />
     <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Raster.cs" />
-    <Compile Include="Rasterizer.cs" />
     <Compile Include="Segment.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
     <Compile Include="Tables\CmapReader.cs" />
