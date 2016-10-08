@@ -2,9 +2,9 @@
 
 namespace NRasterizer.Tables
 {
-    internal class GlyphLocations
+    class GlyphLocations
     {
-        private readonly uint[] _offsets;
+        readonly uint[] _offsets;
 
         public uint[] Offsets { get { return _offsets; } }
         public int GlyphCount { get { return _offsets.Length - 1; } }

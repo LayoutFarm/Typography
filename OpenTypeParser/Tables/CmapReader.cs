@@ -4,7 +4,7 @@ using System.IO;
 
 namespace NRasterizer.Tables
 {
-    internal class CmapReader
+    class CmapReader
     {
         private static UInt16[] ReadUInt16Array(BinaryReader input, int length)
         {
@@ -21,40 +21,40 @@ namespace NRasterizer.Tables
             // I want to thank Microsoft for not giving a simple count on the glyphIdArray
             long tableStart = input.BaseStream.Position;
 
-            var format = input.ReadUInt16();
-            var length = input.ReadUInt16();
+            ushort format = input.ReadUInt16();
+            ushort length = input.ReadUInt16();
             if (format == 4)
             {
-                var version = input.ReadUInt16();
-                var segCountX2 = input.ReadUInt16();
-                var searchRange = input.ReadUInt16();
-                var entrySelector = input.ReadUInt16();
-                var rangeShift = input.ReadUInt16();
-                
-                var segCount = segCountX2 / 2;
+                ushort version = input.ReadUInt16();
+                ushort segCountX2 = input.ReadUInt16();
+                ushort searchRange = input.ReadUInt16();
+                ushort entrySelector = input.ReadUInt16();
+                ushort rangeShift = input.ReadUInt16();
 
-                var endCode = ReadUInt16Array(input, segCount); // last = 0xffff. What does that mean??
+                int segCount = segCountX2 / 2;
+
+                ushort[] endCode = ReadUInt16Array(input, segCount); // last = 0xffff. What does that mean??
 
                 input.ReadUInt16(); // Reserved = 0               
 
-                var startCode = ReadUInt16Array(input, segCount);
-                var idDelta = ReadUInt16Array(input, segCount);
-                var idRangeOffset = ReadUInt16Array(input, segCount);
+                ushort[] startCode = ReadUInt16Array(input, segCount);
+                ushort[] idDelta = ReadUInt16Array(input, segCount);
+                ushort[] idRangeOffset = ReadUInt16Array(input, segCount);
 
                 // I want to thank Microsoft for not giving a simple count on the glyphIdArray
-                var glyphIdArrayLength = (int)((input.BaseStream.Position - tableStart) / sizeof(UInt16));
-                var glyphIdArray = ReadUInt16Array(input, glyphIdArrayLength);
+                int glyphIdArrayLength = (int)((input.BaseStream.Position - tableStart) / sizeof(UInt16));
+                ushort[] glyphIdArray = ReadUInt16Array(input, glyphIdArrayLength);
 
                 return new CharacterMap(segCount, startCode, endCode, idDelta, idRangeOffset, glyphIdArray);
             }
             throw new ApplicationException("Unknown cmap subtable: " + format); // TODO: Replace all applicationexceptions
         }
 
-        private class CMapEntry
+        class CMapEntry
         {
-            private readonly UInt16 _platformId;
-            private readonly UInt16 _encodingId;
-            private readonly UInt32 _offset;
+            readonly UInt16 _platformId;
+            readonly UInt16 _encodingId;
+            readonly UInt32 _offset;
 
             public CMapEntry(UInt16 platformId, UInt16 encodingId, UInt32 offset)
             {
@@ -69,24 +69,24 @@ namespace NRasterizer.Tables
 
         internal static List<CharacterMap> From(TableEntry table)
         {
-            var input = table.GetDataReader();
+            BinaryReader input = table.GetDataReader();
 
-            var version = input.ReadUInt16(); // 0
-            var tableCount = input.ReadUInt16();
+            ushort version = input.ReadUInt16(); // 0
+            ushort tableCount = input.ReadUInt16();
 
             var entries = new List<CMapEntry>(tableCount);
             for (int i = 0; i < tableCount; i++)
             {
-                var platformId = input.ReadUInt16();
-                var encodingId = input.ReadUInt16();
-                var offset = input.ReadUInt32();
+                ushort platformId = input.ReadUInt16();
+                ushort encodingId = input.ReadUInt16();
+                uint offset = input.ReadUInt32();
                 entries.Add(new CMapEntry(platformId, encodingId, offset));
             }
 
             var result = new List<CharacterMap>(tableCount);
             foreach (var entry in entries)
             {
-                var subtable = table.GetDataReader();
+                BinaryReader subtable = table.GetDataReader();
                 subtable.BaseStream.Seek(entry.Offset, SeekOrigin.Current);
                 result.Add(ReadCharacterMap(entry, subtable));
             }

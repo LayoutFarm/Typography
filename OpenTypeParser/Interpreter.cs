@@ -6,18 +6,18 @@ using System.Text;
 
 namespace NRasterizer
 {
-    internal class GraphicState
+    class GraphicState
     {
     }
 
-    internal abstract class Instruction
+    abstract class Instruction
     {
         public abstract bool Matches(byte opcode);
         public virtual int EatInstructionStream(byte[] instructions, int ip, Stack<UInt32> stack) { return ip; }
         public abstract void Execute(GraphicState state, Stack<UInt32> stack, params bool[] flags);
     }
 
-    internal class NOP : Instruction
+    class NOP : Instruction
     {
         public override bool Matches(byte opcode) { return true; } // take the rest
         public override void Execute(GraphicState state, Stack<UInt32> stack, params bool[] flags)
@@ -25,7 +25,7 @@ namespace NRasterizer
         }
     }
 
-    internal class NPushB : Instruction
+    class NPushB : Instruction
     {
         public override bool Matches(byte opcode) { return opcode == 0x40; }
         public override int EatInstructionStream(byte[] instructions, int ip, Stack<UInt32> stack)
@@ -42,7 +42,7 @@ namespace NRasterizer
         }
     }
 
-    internal class MDAP : Instruction
+    class MDAP : Instruction
     {
         public override bool Matches(byte opcode) { return (opcode & 0xfe) == 0x2e; }
         public override void Execute(GraphicState state, Stack<UInt32> stack, params bool[] flags)
@@ -50,7 +50,7 @@ namespace NRasterizer
         }
     }
 
-    internal class Interpreter
+    class Interpreter
     {
         private readonly Instruction[] _lookup;
 

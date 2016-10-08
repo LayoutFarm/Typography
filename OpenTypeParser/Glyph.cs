@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace NRasterizer
 {
-    internal class Point
+    struct Point
     {
-        private readonly short _x;
-        private readonly short _y;
-        private readonly bool _on;
+        readonly short _x;
+        readonly short _y;
+        readonly bool _on;
 
         public Point(short x, short y, bool on)
         {
@@ -62,7 +62,7 @@ namespace NRasterizer
         private IEnumerable<Point> InsertImplicit(IEnumerable<Point> points)
         {
 
-            Point previous = null;
+            Point previous = new Point(); //empty point
             int count = 0;
             foreach (Point p in points)
             {

@@ -10,21 +10,21 @@ namespace NRasterizer.Tables
 
         private MaxProfile(BinaryReader input)
         {
-            var version = input.ReadUInt32(); // 0x00010000 == 1.0
+            uint version = input.ReadUInt32(); // 0x00010000 == 1.0
             _gylphCount = input.ReadUInt16();
-            var maxPointsPerGlyph = input.ReadUInt16();
-            var maxContoursPerGlyph = input.ReadUInt16();
-            var maxPointsPerCompositeGlyph = input.ReadUInt16();
-            var maxContoursPerCompositeGlyph = input.ReadUInt16();
-            var maxZones = input.ReadUInt16();
-            var maxTwilightPoints = input.ReadUInt16();
-            var maxStorage = input.ReadUInt16();
-            var maxFunctionDefs = input.ReadUInt16();
-            var maxInstructionDefs = input.ReadUInt16();
-            var maxStackElements = input.ReadUInt16();
-            var maxSizeOfInstructions = input.ReadUInt16();
-            var maxComponentElements = input.ReadUInt16();
-            var maxComponentDepth = input.ReadUInt16();
+            ushort maxPointsPerGlyph = input.ReadUInt16();
+            ushort maxContoursPerGlyph = input.ReadUInt16();
+            ushort maxPointsPerCompositeGlyph = input.ReadUInt16();
+            ushort maxContoursPerCompositeGlyph = input.ReadUInt16();
+            ushort maxZones = input.ReadUInt16();
+            ushort maxTwilightPoints = input.ReadUInt16();
+            ushort maxStorage = input.ReadUInt16();
+            ushort maxFunctionDefs = input.ReadUInt16();
+            ushort maxInstructionDefs = input.ReadUInt16();
+            ushort maxStackElements = input.ReadUInt16();
+            ushort maxSizeOfInstructions = input.ReadUInt16();
+            ushort maxComponentElements = input.ReadUInt16();
+            ushort maxComponentDepth = input.ReadUInt16();
         }
 
         public ushort GlyphCount { get { return _gylphCount; } }

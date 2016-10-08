@@ -1,19 +1,19 @@
-﻿using System; 
+﻿using System;
 
 namespace NRasterizer
 {
     class CharacterMap
     {
-        private readonly int _segCount;
-        private readonly ushort[] _startCode;
-        private readonly ushort[] _endCode;
-        private readonly ushort[] _idDelta;
-        private readonly ushort[] _idRangeOffset;
-        private readonly ushort[] _glyphIdArray;
+        readonly int _segCount;
+        readonly ushort[] _startCode;
+        readonly ushort[] _endCode;
+        readonly ushort[] _idDelta;
+        readonly ushort[] _idRangeOffset;
+        readonly ushort[] _glyphIdArray;
 
-        internal CharacterMap(int segCount, ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
+        public CharacterMap(int segCount, ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
         {
-            _segCount = segCount;        
+            _segCount = segCount;
             _startCode = startCode;
             _endCode = endCode;
             _idDelta = idDelta;

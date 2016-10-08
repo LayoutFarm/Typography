@@ -4,13 +4,13 @@ using System.Text;
 
 namespace NRasterizer.Tables
 {
-    internal class TableEntry
+    class TableEntry
     {
-        private readonly BinaryReader _input;
-        private readonly uint _tag;
-        private readonly uint _checkSum;
-        private readonly uint _offset;
-        private readonly uint _length;
+        readonly BinaryReader _input;
+        readonly uint _tag;
+        readonly uint _checkSum;
+        readonly uint _offset;
+        readonly uint _length;
 
         public string Tag { get { return TagToString(_tag); } }
 
@@ -38,7 +38,7 @@ namespace NRasterizer.Tables
 
         private String TagToString(uint tag)
         {
-            var bytes = BitConverter.GetBytes(tag);
+            byte[] bytes = BitConverter.GetBytes(tag);
             Array.Reverse(bytes);
             return Encoding.ASCII.GetString(bytes);
         }

@@ -2,10 +2,10 @@
 {
     public class Bounds
     {
-        private readonly short _xmin;
-        private readonly short _ymin;
-        private readonly short _xmax;
-        private readonly short _ymax;
+        readonly short _xmin;
+        readonly short _ymin;
+        readonly short _xmax;
+        readonly short _ymax;
 
         public static readonly Bounds Zero = new Bounds(0, 0, 0, 0);
 

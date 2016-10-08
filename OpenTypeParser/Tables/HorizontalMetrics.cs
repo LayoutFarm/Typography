@@ -5,10 +5,10 @@ using System.IO;
 
 namespace NRasterizer.Tables
 {
-    internal class HorizontalMetrics
+    class HorizontalMetrics
     {
-        private readonly List<ushort> _advanceWidths;
-        private readonly List<short> _leftSideBearings;
+        readonly List<ushort> _advanceWidths;
+        readonly List<short> _leftSideBearings;
 
         private HorizontalMetrics(BinaryReader input, UInt16 count, UInt16 numGlyphs)
         {
