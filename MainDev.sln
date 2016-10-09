@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.WinForms", "Sample.WinForms\Sample.WinForms.csproj", "{6627819C-F72B-4444-8461-14A57674FBD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTypeReader", "OpenTypeReader\OpenTypeReader.csproj", "{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "PixelFarmMiniAgg\PixelFarm.MiniAgg.One.csproj", "{CCE391D5-F166-4ECA-B99F-CE56B058CB58}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6627819C-F72B-4444-8461-14A57674FBD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6627819C-F72B-4444-8461-14A57674FBD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6627819C-F72B-4444-8461-14A57674FBD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6627819C-F72B-4444-8461-14A57674FBD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
