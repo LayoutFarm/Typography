@@ -64,7 +64,7 @@ namespace Sample2
                 for (; cpoint_index < nextContour; ++cpoint_index)
                 {
                     FtPoint vpoint = ftpoints[cpoint_index];
-                    int vtag = (int)flags[cpoint_index];
+                    int vtag = (int)flags[cpoint_index] & 0x1;
                     //bool has_dropout = (((vtag >> 2) & 0x1) != 0);
                     //int dropoutMode = vtag >> 3;
                     if ((vtag & 0x1) != 0)
