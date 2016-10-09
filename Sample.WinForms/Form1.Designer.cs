@@ -51,6 +51,7 @@
             this.txtInputChar.Name = "txtInputChar";
             this.txtInputChar.Size = new System.Drawing.Size(101, 20);
             this.txtInputChar.TabIndex = 1;
+            this.txtInputChar.Text = "B";
             this.txtInputChar.TextChanged += new System.EventHandler(this.txtInputChar_TextChanged);
             // 
             // label1
