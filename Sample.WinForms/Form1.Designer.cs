@@ -1,4 +1,4 @@
-﻿namespace Sample2
+﻿namespace SampleWinForms
 {
     partial class Form1
     {

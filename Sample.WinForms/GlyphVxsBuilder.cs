@@ -1,27 +1,13 @@
 ﻿//MIT, 2016,  WinterDev
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using NRasterizer;
 
 using System.Drawing;
 using System.Drawing.Imaging;
-using PixelFarm.Agg;
-namespace Sample2
+
+namespace PixelFarm.Agg
 {
-    static class Program
-    {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-        }
-    }
     public class GlyphVxsBuilder
     {
         readonly Typeface _typeface;

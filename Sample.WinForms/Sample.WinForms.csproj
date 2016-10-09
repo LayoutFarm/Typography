@@ -44,6 +44,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlyphVxsBuilder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -69,21 +70,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PixelFarm-dev\a_mini\projects\PixelFarm\MiniAgg.Complements\MiniAgg.Complements.csproj">
-      <Project>{ae0df71e-9b14-4197-b55a-e1e0ce0683c7}</Project>
-      <Name>MiniAgg.Complements</Name>
+    <ProjectReference Include="..\..\PixelFarm-dev\a_mini\projects\PixelFarm\PixelFarm.MiniAgg.One.csproj">
+      <Project>{CCE391D5-F166-4ECA-B99F-CE56B058CB58}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PixelFarm-dev\a_mini\projects\PixelFarm\MiniAgg\MiniAgg.csproj">
-      <Project>{4d5ce655-58fa-4523-8e46-738b941e9e47}</Project>
-      <Name>MiniAgg</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\PixelFarm-dev\a_mini\projects\PixelFarm\PixelFarm.Drawing\PixelFarm.Drawing.csproj">
-      <Project>{51d63482-5697-4b16-8401-506965624657}</Project>
-      <Name>PixelFarm.Drawing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenTypeParser\OpenTypeParser.csproj">
+    <ProjectReference Include="..\OpenTypeReader\OpenTypeReader.csproj">
       <Project>{2dda36cc-9a17-44c8-b26b-1472bb48c0f4}</Project>
-      <Name>OpenTypeParser</Name>
+      <Name>OpenTypeReader</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

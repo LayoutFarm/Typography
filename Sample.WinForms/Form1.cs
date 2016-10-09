@@ -1,13 +1,14 @@
 ﻿//MIT, 2016,  WinterDev
 using System;
 using System.Drawing;
-using System.Windows.Forms;
-using NRasterizer;
 using System.IO;
+using System.Windows.Forms;
+
+using NRasterizer;
 using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
 
-namespace Sample2
+namespace SampleWinForms
 {
     public partial class Form1 : Form
     {
