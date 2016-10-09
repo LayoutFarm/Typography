@@ -41,8 +41,14 @@ namespace SampleWinForms
 
         void ReadAndRender(string fontfile)
         {
+
+            if (string.IsNullOrEmpty(this.txtInputChar.Text))
+            {
+                return;
+            }
             var reader = new OpenTypeReader();
-            char testChar = 'A';
+            char testChar = txtInputChar.Text[0];//only 1 char
+
             int size = 72;
             int resolution = 72;
 
@@ -66,10 +72,22 @@ namespace SampleWinForms
                 //5. use PixelFarm's Agg to render to bitmap...
                 //5.1 clear background
                 p.Clear(PixelFarm.Drawing.Color.White);
-                //5.2 
-                p.FillColor = PixelFarm.Drawing.Color.Black;
-                //5.3
-                p.Fill(vxs);
+
+                if (chkFillBackground.Checked)
+                {
+                    //5.2 
+                    p.FillColor = PixelFarm.Drawing.Color.Black;
+                    //5.3
+                    p.Fill(vxs);
+                }
+
+                if (chkBorder.Checked)
+                {
+                    //5.4 
+                    p.StrokeColor = PixelFarm.Drawing.Color.Green;
+                    //5.5 
+                    p.Draw(vxs);
+                }
                 //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
                 BitmapHelper.CopyToWindowsBitmap(destImg, winBmp, new RectInt(0, 0, 300, 300));
                 //--------------- 
@@ -77,6 +95,11 @@ namespace SampleWinForms
                 g.Clear(Color.White);
                 g.DrawImage(winBmp, new Point(10, 0));
             }
+        }
+
+        private void txtInputChar_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
