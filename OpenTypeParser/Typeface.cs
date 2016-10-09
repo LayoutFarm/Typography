@@ -1,15 +1,17 @@
-﻿using NRasterizer.Tables;
+﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+
 using System.Collections.Generic;
+using NRasterizer.Tables;
 
 namespace NRasterizer
 {
     public class Typeface
     {
-        private readonly Bounds _bounds;
-        private readonly ushort _unitsPerEm;
-        private readonly List<Glyph> _glyphs;
-        private readonly List<CharacterMap> _cmaps;
-        private readonly HorizontalMetrics _horizontalMetrics;
+        readonly Bounds _bounds;
+        readonly ushort _unitsPerEm;
+        readonly List<Glyph> _glyphs;
+        readonly List<CharacterMap> _cmaps;
+        readonly HorizontalMetrics _horizontalMetrics;
 
         internal Typeface(Bounds bounds, ushort unitsPerEm, List<Glyph> glyphs, List<CharacterMap> cmaps, HorizontalMetrics horizontalMetrics)
         {

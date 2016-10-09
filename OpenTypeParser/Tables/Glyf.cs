@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 using System.Collections.Generic;
 using System.IO;
 

@@ -1,14 +1,16 @@
-﻿using System;
+﻿//Apache2, 2014-2016, Samuel Carlsson
+
+using System;
 using System.IO;
 
 namespace NRasterizer.IO
 {
-    public class ByteOrderSwappingBinaryReader: BinaryReader
+    class ByteOrderSwappingBinaryReader : BinaryReader
     {
-        public ByteOrderSwappingBinaryReader(Stream input): base(input)
+        public ByteOrderSwappingBinaryReader(Stream input) : base(input)
         {
         }
-        
+
         public ushort SwapBytes(ushort x)
         {
             return (ushort)((ushort)((x & 0xff) << 8) | ((x >> 8) & 0xff));

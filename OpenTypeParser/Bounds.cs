@@ -1,6 +1,7 @@
-﻿namespace NRasterizer
+﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+namespace NRasterizer
 {
-    public class Bounds
+    public struct Bounds
     {
         readonly short _xmin;
         readonly short _ymin;

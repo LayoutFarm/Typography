@@ -1,14 +1,12 @@
-﻿using System;
+﻿//MIT, 2016,  WinterDev
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using NRasterizer;
 
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using PixelFarm.Agg;
-using PixelFarm;
-
 namespace Sample2
 {
     static class Program
@@ -24,22 +22,19 @@ namespace Sample2
             Application.Run(new Form1());
         }
     }
-    public class Rasterizer2
+    public class GlyphVxsBuilder
     {
-        private readonly Typeface _typeface;
-        private const int pointsPerInch = 72;
-        GraphicsPath gfxPath;
-        public Rasterizer2(Typeface typeface)
+        readonly Typeface _typeface;
+        const int pointsPerInch = 72;
+
+        public GlyphVxsBuilder(Typeface typeface)
         {
             _typeface = typeface;
         }
         const double FT_RESIZE = 64; //essential to be floating point
         PixelFarm.Agg.VertexSource.PathWriter ps = new PixelFarm.Agg.VertexSource.PathWriter();
 
-        public PixelFarm.Agg.VertexStore MakeVxs()
-        {
-            return ps.Vxs;
-        }
+
         void RenderGlyph(ushort[] contours, FtPoint[] ftpoints, Flag[] flags)
         {
 
@@ -224,63 +219,27 @@ namespace Sample2
                 (v1.y + (double)v2.Y) / 2d);
         }
 
-        void RenderGlyph(Glyph glyph, int resolution, int fx, int fy, int size, int x, int y)
+        void RenderGlyph(Glyph glyph)
         {
-            float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
             ushort[] endPoints;
             Flag[] flags;
             FtPoint[] ftpoints = glyph.GetPoints(out endPoints, out flags);
             RenderGlyph(endPoints, ftpoints, flags);
         }
-
-        public void Rasterize(string text, int size, int resolution, bool toFlags = false)
+        /// <summary>
+        /// create vertex store 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="size"></param>
+        /// <param name="resolution"></param>
+        /// <param name="toFlags"></param>
+        /// <returns></returns>
+        public VertexStore CreateVxs(char c, int size, int resolution)
         {
-
-            int fx = 64;
-            int fy = 0;
-            foreach (var character in text)
-            {
-                var glyph = _typeface.Lookup(character);
-                RenderGlyph(glyph, resolution, fx, fy, size, 0, 70);
-                fx += _typeface.GetAdvanceWidth(character);
-            }
-
-            //if (toFlags)
-            //{
-            //    RenderFlags(flags, raster);
-            //}
-            //else
-            //{
-            //    RenderScanlines(flags, raster);
-            //}
+            float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
+            RenderGlyph(_typeface.Lookup(c));
+            return ps.Vxs;
         }
-
-        // TODO: Duplicated code from Rasterize & SetScanFlags
-        //public IEnumerable<Segment> GetAllSegments(string text, int size, int resolution)
-        //{
-        //    int x = 0;
-        //    int y = 70;
-
-        //    // 
-        //    int fx = 64;
-        //    int fy = 0;
-        //    foreach (var character in text)
-        //    {
-        //        var glyph = _typeface.Lookup(character);
-
-        //        float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
-        //        for (int contour = 0; contour < glyph.ContourCount; contour++)
-        //        {
-        //            var aerg = new List<Segment>(glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale));
-        //            foreach (var segment in glyph.GetContourIterator(contour, fx, fy, x, y, scale, -scale))
-        //            {
-        //                yield return segment;
-        //            }
-        //        }
-
-        //        fx += _typeface.GetAdvanceWidth(character);
-        //    }
-        //}
     }
 
     public static class BitmapHelper

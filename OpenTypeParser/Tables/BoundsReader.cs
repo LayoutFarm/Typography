@@ -1,9 +1,9 @@
-﻿
+﻿//Apache2, 2014-2016, Samuel Carlsson
 using System.IO;
 
 namespace NRasterizer.Tables
 {
-    public static class BoundsReader
+    static class BoundsReader
     {
         public static Bounds ReadFrom(BinaryReader input)
         {

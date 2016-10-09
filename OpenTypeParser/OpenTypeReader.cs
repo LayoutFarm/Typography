@@ -1,15 +1,15 @@
-﻿using NRasterizer.IO;
-using NRasterizer.Tables;
+﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using NRasterizer.IO;
+using NRasterizer.Tables;
 
 namespace NRasterizer
 {
     public class OpenTypeReader
     {
-        private TableEntry FindTable(IEnumerable<TableEntry> tables, string tableName)
+        static TableEntry FindTable(IEnumerable<TableEntry> tables, string tableName)
         {
             foreach (TableEntry te in tables)
             {

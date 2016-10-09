@@ -1,12 +1,10 @@
-﻿
-using System.Collections.Generic;
+﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 using System.IO;
-
 namespace NRasterizer.Tables
 {
     public class MaxProfile
     {
-        private ushort _gylphCount;
+        ushort _gylphCount;
 
         private MaxProfile(BinaryReader input)
         {
