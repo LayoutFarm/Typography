@@ -85,6 +85,8 @@ namespace SampleWinForms
                 {
                     //5.4 
                     p.StrokeColor = PixelFarm.Drawing.Color.Green;
+                    //user can specific border width here...
+                    //p.StrokeWidth = 2;
                     //5.5 
                     p.Draw(vxs);
                 }
