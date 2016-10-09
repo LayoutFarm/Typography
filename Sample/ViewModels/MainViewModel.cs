@@ -204,7 +204,8 @@ namespace Sample.ViewModels
         private void LoadTypeface()
         {
             //var f = new FileInfo(@"C:\Users\vidstige\Desktop\segoe\segoeui.ttf");
-            var f = new FileInfo(@"segoeui.ttf");
+            //var f = new FileInfo(@"segoeui.ttf");
+            var f = new FileInfo(@"tahoma.ttf");
             Typeface = LoadFrom(f);
         }
     }

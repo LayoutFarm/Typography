@@ -41,7 +41,7 @@ namespace Sample2
         void ReadAndRender(string fontfile)
         {
             var reader = new OpenTypeReader();
-            string text = "B";
+            string text = "C";
             int size = 72;
             //gfxPath = new GraphicsPath();
 
