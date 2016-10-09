@@ -19,4 +19,4 @@ Screenshots
 -----------
 Some screenshots of the current master.
 
-![Screenshot](screenshots/2.png "Screenshot 2") 
+![Screenshot](screenshots/3.png "Screenshot 3") 
