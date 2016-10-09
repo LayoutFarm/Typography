@@ -5,8 +5,8 @@ using System.IO;
 
 namespace NRasterizer.Tables
 {
-   
-    class Glyf
+
+    static class Glyf
     {
 
         static bool HasFlag(Flag target, Flag test)
@@ -100,7 +100,7 @@ namespace NRasterizer.Tables
             return Glyph.Empty;
         }
 
-        internal static List<Glyph> From(TableEntry table, GlyphLocations locations)
+        public static List<Glyph> From(TableEntry table, GlyphLocations locations)
         {
             int glyphCount = locations.GlyphCount;
 

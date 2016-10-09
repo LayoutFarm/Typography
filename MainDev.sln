@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample2", "Sample2\Sample2.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTypeParser", "OpenTypeParser\OpenTypeParser.csproj", "{2DDA36CC-9A17-44C8-B26B-1472BB48C0F4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "original", "original", "{CF36C7A5-4281-41E0-B549-DAD46ED5E40C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modified", "modified", "{CF36C7A5-4281-41E0-B549-DAD46ED5E40C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.Drawing", "..\PixelFarm-dev\a_mini\projects\PixelFarm\PixelFarm.Drawing\PixelFarm.Drawing.csproj", "{51D63482-5697-4B16-8401-506965624657}"
 EndProject

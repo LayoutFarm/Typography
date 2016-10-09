@@ -5,7 +5,7 @@ using System.IO;
 
 namespace NRasterizer.Tables
 {
-    internal class Glyf
+    static class Glyf
     {
         [Flags]
         private enum Flag : byte
