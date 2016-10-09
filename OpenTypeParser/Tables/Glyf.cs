@@ -5,18 +5,10 @@ using System.IO;
 
 namespace NRasterizer.Tables
 {
+   
     class Glyf
     {
-        [Flags]
-        private enum Flag : byte
-        {
-            OnCurve = 1,
-            XByte = 2,
-            YByte = 4,
-            Repeat = 8,
-            XSignOrSame = 16,
-            YSignOrSame = 32
-        }
+
         static bool HasFlag(Flag target, Flag test)
         {
             return (target & test) != 0;
@@ -93,13 +85,13 @@ namespace NRasterizer.Tables
             short[] xs = ReadCoordinates(input, pointCount, flags, Flag.XByte, Flag.XSignOrSame);
             short[] ys = ReadCoordinates(input, pointCount, flags, Flag.YByte, Flag.YSignOrSame);
 
-            List<bool> list = new List<bool>();
-            foreach (Flag f in flags)
-            {
-                list.Add(HasFlag(f, Flag.OnCurve));
-            }
+            //List<bool> list = new List<bool>();
+            //foreach (Flag f in flags)
+            //{
+            //    list.Add(HasFlag(f, Flag.OnCurve));
+            //}
 
-            return new Glyph(xs, ys, list.ToArray(), endPoints, bounds);
+            return new Glyph(xs, ys, flags, endPoints, bounds);
         }
 
         static Glyph ReadCompositeGlyph(BinaryReader input, int count, Bounds bounds)
