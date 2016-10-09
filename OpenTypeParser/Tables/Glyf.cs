@@ -8,18 +8,17 @@ namespace NRasterizer.Tables
 
     static class Glyf
     {
-
         static bool HasFlag(Flag target, Flag test)
         {
-            return (target & test) != 0;
+            return (target & test) == test;
         }
         static Flag[] ReadFlags(BinaryReader input, int flagCount)
         {
             var result = new Flag[flagCount];
-            int c = 0;
+            int i = 0;
             int repeatCount = 0;
             var flag = (Flag)0;
-            while (c < flagCount)
+            while (i < flagCount)
             {
                 if (repeatCount > 0)
                 {
@@ -33,7 +32,7 @@ namespace NRasterizer.Tables
                         repeatCount = input.ReadByte();
                     }
                 }
-                result[c++] = flag;
+                result[i++] = flag;
             }
             return result;
         }

@@ -19,7 +19,7 @@ namespace NRasterizer.Tables
         }
         static bool HasFlag(Flag target, Flag test)
         {
-            return (target & test) != 0;
+            return (target & test) == test;
         }
         private static Flag[] ReadFlags(BinaryReader input, int flagCount)
         {

@@ -7,11 +7,11 @@ namespace NRasterizer
     public enum Flag : byte
     {
         OnCurve = 1,
-        XByte = 2,
-        YByte = 4,
-        Repeat = 8,
-        XSignOrSame = 16,
-        YSignOrSame = 32
+        XByte = 1 << 1,
+        YByte = 1 << 2,
+        Repeat = 1 << 3,
+        XSignOrSame = 1 << 4,
+        YSignOrSame = 1 << 5
     }
     public struct FtPoint
     {
@@ -95,7 +95,7 @@ namespace NRasterizer
                 yield return At(i);
             }
         }
-    
+
         //private IEnumerable<FtPoint> InsertImplicit(IEnumerable<FtPoint> points)
         //{
 
