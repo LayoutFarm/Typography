@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using NRasterizer;
 using System.IO;
 using PixelFarm.Agg;
+using PixelFarm.Agg.VertexSource;
 
 namespace Sample2
 {
@@ -15,6 +16,8 @@ namespace Sample2
         ImageGraphics2D imgGfx2d;
         ActualImage destImg;
         Bitmap winBmp;
+        static CurveFlattener curveFlattener = new CurveFlattener();
+
         public Form1()
         {
             InitializeComponent();
@@ -30,15 +33,15 @@ namespace Sample2
                 p = new AggCanvasPainter(imgGfx2d);
                 winBmp = new Bitmap(300, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
-
             }
-            ReadAndRender(@"..\..\segoeui.ttf");
+            //ReadAndRender(@"..\..\segoeui.ttf");
+            ReadAndRender(@"..\..\tahoma.ttf");
         }
 
         void ReadAndRender(string fontfile)
         {
             var reader = new OpenTypeReader();
-            string text = "C";
+            string text = "B";
             int size = 72;
             //gfxPath = new GraphicsPath();
 
@@ -49,7 +52,10 @@ namespace Sample2
                 //fill into gfx path               
                 r.Rasterize(text, size, 72, false);
                 //render to screen
-                VertexStore vxs = r.MakeVxs();
+
+                VertexStore vxs1 = r.MakeVxs();
+                VertexStore vxs = curveFlattener.MakeVxs(vxs1);
+
                 p.Clear(PixelFarm.Drawing.Color.White);
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 p.Fill(vxs);
