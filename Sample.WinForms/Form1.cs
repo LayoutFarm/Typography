@@ -60,10 +60,16 @@ namespace SampleWinForms
                 var builder = new GlyphVxsBuilder(typeFace);
                 VertexStore vxs1 = builder.CreateVxs(testChar, size, resolution);
                 //----------------
-                //3. do mini translate
+                //3. do mini translate, scale
                 var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
+                    //translate
                      new PixelFarm.Agg.Transform.AffinePlan(
-                         PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 10, 10));
+                         PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 10, 10),
+                    //scale
+                     new PixelFarm.Agg.Transform.AffinePlan(
+                         PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, 4, 4)
+                         );
+
                 vxs1 = mat.TransformToVxs(vxs1);
                 //----------------
                 //4. flatten all curves 
