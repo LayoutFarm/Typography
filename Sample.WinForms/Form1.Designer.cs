@@ -33,6 +33,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.chkBorder = new System.Windows.Forms.CheckBox();
             this.chkFillBackground = new System.Windows.Forms.CheckBox();
+            this.chkUseGdiPath = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -85,11 +86,23 @@
             this.chkFillBackground.Text = "Fill BackGround";
             this.chkFillBackground.UseVisualStyleBackColor = true;
             // 
+            // chkUseGdiPath
+            // 
+            this.chkUseGdiPath.AutoSize = true;
+            this.chkUseGdiPath.Location = new System.Drawing.Point(380, 13);
+            this.chkUseGdiPath.Name = "chkUseGdiPath";
+            this.chkUseGdiPath.Size = new System.Drawing.Size(83, 17);
+            this.chkUseGdiPath.TabIndex = 5;
+            this.chkUseGdiPath.Text = "UseGdiPath";
+            this.chkUseGdiPath.UseVisualStyleBackColor = true;
+            this.chkUseGdiPath.CheckedChanged += new System.EventHandler(this.chkUseGdiPath_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(641, 336);
+            this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkUseGdiPath);
             this.Controls.Add(this.chkFillBackground);
             this.Controls.Add(this.chkBorder);
             this.Controls.Add(this.label1);
@@ -109,6 +122,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkBorder;
         private System.Windows.Forms.CheckBox chkFillBackground;
+        private System.Windows.Forms.CheckBox chkUseGdiPath;
     }
 }
 
