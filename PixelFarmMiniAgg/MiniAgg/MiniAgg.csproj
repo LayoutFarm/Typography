@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4D5CE655-58FA-4523-8E46-738B941E9E47}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MiniAgg</RootNamespace>
+    <AssemblyName>MiniAgg</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="00_Context\ImageGraphics2D_RenderImages.cs" />
+    <Compile Include="01_Base\AggMemMx.cs" />
+    <Compile Include="02_PixelBuffer\ChildImage.cs" />
+    <Compile Include="02_PixelBuffer\ColorOrder.cs" />
+    <Compile Include="02_PixelBuffer\ColorRGBAf.cs" />
+    <Compile Include="02_PixelBuffer\PixelBlenderGray.cs" />
+    <Compile Include="02_PixelBuffer\ImageHelper.cs" />
+    <Compile Include="03_SpanGenerators\1_ImgSpanGen.cs" />
+    <Compile Include="03_SpanGenerators\ISpanInterpolator.cs" />
+    <Compile Include="07_ISpanInterpolator\LineInterpolators.cs" />
+    <Compile Include="07_ISpanInterpolator\SpanInterpolatorLinear.cs" />
+    <Compile Include="07_ISpanInterpolator\SpanInterpolatorPerspectiveLerp.cs" />
+    <Compile Include="07_Lines\2.2_LineInterpolators.cs" />
+    <Compile Include="07_Lines\2.1_DistanceInterpolators.cs" />
+    <Compile Include="07_Lines\2.3_EllipseBrensenhemInterpolator.cs" />
+    <Compile Include="07_Lines\3.1_LineRenderer.cs" />
+    <Compile Include="08_ImageResampling\FilterRGBAImageSpanGen.cs" />
+    <Compile Include="08_ImageResampling\FilterRGBImageSpanGen.cs" />
+    <Compile Include="08_ImageResampling\ImageFreeTransform.cs" />
+    <Compile Include="08_ImageResampling\ImageInterpolationQuality.cs" />
+    <Compile Include="08_ImageResampling\ImageTransform.cs" />
+    <Compile Include="x_notused\x_ImageHelper2.cs" />
+    <Compile Include="x_notused\x_ImageSpan.cs" />
+    <Compile Include="x_notused\x_PixelBlenderFloat.cs" />
+    <Compile Include="03_SpanGenerators\0_ISpanGenerator.cs" />
+    <Compile Include="04_Scanline\0_ScanlineSpan.cs" />
+    <Compile Include="07_Lines\1.2_PatternFilter.cs" />
+    <Compile Include="07_Lines\1.3_LineParameters.cs" />
+    <Compile Include="04_Scanline\6_ClipLiangBarsky.cs" />
+    <Compile Include="03_SpanGenerators\IGammaFunction.cs" />
+    <Compile Include="07_Lines\1.1_LinesAA.cs" />
+    <Compile Include="04_Scanline\4.2_CellAARasterizer.cs" />
+    <Compile Include="08_ImageResampling\IImageFilter.cs" />
+    <Compile Include="07_Lines\4_OutlineAARasterizer.cs" />
+    <Compile Include="08_ImageResampling\FilterImageSpanGenerator.cs" />
+    <Compile Include="03_SpanGenerators\4_ImgSpanGenGray.cs" />
+    <Compile Include="03_SpanGenerators\2_ImgSpanGenRGB.cs" />
+    <Compile Include="03_SpanGenerators\3_ImgSpanGenRGBA.cs" />
+    <Compile Include="08_ImageResampling\ImageFilterLookupTable.cs" />
+    <Compile Include="08_ImageResampling\FilterImageSpanGenerator.ImageBufferAccessor.cs" />
+    <Compile Include="01_Base\NativeBufferMan.cs" />
+    <Compile Include="02_PixelBuffer\GammaLookUpTable.cs" />
+    <Compile Include="00_Context\Graphics2D.cs" />
+    <Compile Include="07_Lines\3.3_ImageLineRenderer.cs" />
+    <Compile Include="02_PixelBuffer\IImageReaderWriter.cs" />
+    <Compile Include="02_PixelBuffer\ImageReaderWriterBase.cs" />
+    <Compile Include="00_Context\ImageGraphics2D.cs" />
+    <Compile Include="02_PixelBuffer\PixelBlenderRGBA.cs" />
+    <Compile Include="04_Scanline\1_Scanline.cs" />
+    <Compile Include="07_Lines\3.2_OutlineRenderer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="04_Scanline\2_ScanlinePacked8.cs" />
+    <Compile Include="04_Scanline\3_ScanlineUnpacked8.cs" />
+    <Compile Include="04_Scanline\4.1_ScanlineRasterizer.cs" />
+    <Compile Include="04_Scanline\5_ScanlineRasToDestBitmapRenderer.cs" />
+    <Compile Include="04_Scanline\4.3_VectorClipper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PixelFarm.Drawing\PixelFarm.Drawing.csproj">
+      <Project>{51D63482-5697-4B16-8401-506965624657}</Project>
+      <Name>PixelFarm.Drawing</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
