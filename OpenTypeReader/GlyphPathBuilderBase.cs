@@ -1,20 +1,20 @@
-﻿//Apache2, 2014-2016,   WinterDev
-using System;
-using System.Collections.Generic;
+﻿//-----------------------------------------------------
+//Apache2, 2014-2016,   WinterDev
+//some logics from FreeType Lib (FTL, BSD-3 clause)
+//-----------------------------------------------------
 
+using System;
 namespace NRasterizer
 {
     public abstract class GlyphPathBuilderBase
     {
         readonly Typeface _typeface;
         const int pointsPerInch = 72;
-
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
         }
         const double FT_RESIZE = 64; //essential to be floating point
-
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
@@ -22,11 +22,8 @@ namespace NRasterizer
         protected abstract void OnCurve4(double p2x, double p2y, double p3x, double p3y, double x, double y);
         protected abstract void OnMoveTo(double x, double y);
         protected abstract void OnLineTo(double x, double y);
-
-
         void RenderGlyph(ushort[] contours, FtPoint[] ftpoints, Flag[] flags)
         {
-
             //outline version
             //-----------------------------
             int npoints = ftpoints.Length;
@@ -38,7 +35,6 @@ namespace NRasterizer
             //-----------------------------------
             double lastMoveX = 0;
             double lastMoveY = 0;
-
             int controlPointCount = 0;
             while (todoContourCount > 0)
             {
@@ -47,7 +43,6 @@ namespace NRasterizer
                 FtPointD secondControlPoint = new FtPointD();
                 FtPointD thirdControlPoint = new FtPointD();
                 bool justFromCurveMode = false;
-
                 for (; cpoint_index < nextContour; ++cpoint_index)
                 {
                     FtPoint vpoint = ftpoints[cpoint_index];
@@ -226,5 +221,4 @@ namespace NRasterizer
             RenderGlyph(_typeface.Lookup(c));
         }
     }
-
 }

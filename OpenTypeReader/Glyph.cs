@@ -1,5 +1,6 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
-using System; 
+
+using System;
 namespace NRasterizer
 {
     [Flags]
@@ -16,11 +17,11 @@ namespace NRasterizer
     public struct FtPoint
     {
         readonly short _x;
-        readonly short _y; 
+        readonly short _y;
         public FtPoint(short x, short y)
         {
             _x = x;
-            _y = y; 
+            _y = y;
         }
         public short X { get { return _x; } }
         public short Y { get { return _y; } }
@@ -58,13 +59,10 @@ namespace NRasterizer
     {
         readonly short[] _x;
         readonly short[] _y;
-
         readonly Flag[] _flags;
         readonly ushort[] _contourEndPoints;
         readonly Bounds _bounds;
-
         public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new Flag[0], new ushort[0], Bounds.Zero);
-
         public Glyph(short[] x, short[] y, Flag[] flags, ushort[] contourEndPoints, Bounds bounds)
         {
             _x = x;
@@ -78,7 +76,6 @@ namespace NRasterizer
         {
             contourEndPoints = _contourEndPoints;
             flags = this._flags;
-
             int j = _x.Length;
             FtPoint[] points = new FtPoint[j];
             for (int i = 0; i < j; ++i)
@@ -87,6 +84,5 @@ namespace NRasterizer
             }
             return points;
         }
-
     }
 }

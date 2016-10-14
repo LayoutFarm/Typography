@@ -1,31 +1,40 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
+using System.IO;
 namespace NRasterizer.Tables
 {
-    class GlyphLocations
+    class GlyphLocations : TableEntry
     {
-        readonly uint[] _offsets;
-
+        uint[] _offsets;
+        public GlyphLocations(int glyphCount, bool wideLocations)
+        {
+            _offsets = new uint[glyphCount + 1];
+            this.WideLocations = wideLocations;
+        }
+        public override string Name
+        {
+            get { return "loca"; }
+        }
+        public bool WideLocations { get; private set; }
         public uint[] Offsets { get { return _offsets; } }
         public int GlyphCount { get { return _offsets.Length - 1; } }
 
-        public GlyphLocations(TableEntry table, int glyphCount, bool wideLocations)
+        protected override void ReadContentFrom(BinaryReader reader)
         {
-            var input = table.GetDataReader();
+            int glyphCount = GlyphCount;
             _offsets = new uint[glyphCount + 1];
-
-            if (wideLocations)
+            if (WideLocations)
             {
                 for (int i = 0; i < glyphCount + 1; i++)
                 {
-                    _offsets[i] = input.ReadUInt32();
+                    _offsets[i] = reader.ReadUInt32();
                 }
             }
             else
             {
                 for (int i = 0; i < glyphCount + 1; i++)
                 {
-                    _offsets[i] = (uint)(input.ReadUInt16() * 2);
+                    _offsets[i] = (uint)(reader.ReadUInt16() * 2);
                 }
             }
         }

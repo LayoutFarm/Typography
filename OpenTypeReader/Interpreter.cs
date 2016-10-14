@@ -1,6 +1,7 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+
 using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 namespace NRasterizer
 {
     class GraphicState
@@ -50,7 +51,6 @@ namespace NRasterizer
     class Interpreter
     {
         private readonly Instruction[] _lookup;
-
         public Interpreter()
         {
             var instructions = new List<Instruction>
@@ -59,7 +59,6 @@ namespace NRasterizer
                 new MDAP(),
                 new NOP()
             };
-
             _lookup = BuildLookup(instructions);
         }
 
@@ -68,7 +67,6 @@ namespace NRasterizer
             var result = new Instruction[256];
             for (int opcode = 0; opcode < 256; opcode++)
             {
-
                 foreach (Instruction inst in instructions)
                 {
                     if (inst.Matches((byte)opcode))

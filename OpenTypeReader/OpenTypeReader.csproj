@@ -51,6 +51,8 @@
     <Compile Include="Tables\HorizontalMetrics.cs" />
     <Compile Include="Tables\MaxProfile.cs" />
     <Compile Include="Tables\TableEntry.cs" />
+    <Compile Include="Tables\TableHeader.cs" />
+    <Compile Include="Tables\TableEntryCollection.cs" />
     <Compile Include="Typeface.cs" />
   </ItemGroup>
   <ItemGroup />
