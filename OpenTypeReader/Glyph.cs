@@ -72,10 +72,11 @@ namespace NRasterizer
             _bounds = bounds;
         }
         public Bounds Bounds { get { return _bounds; } }
-        public FtPoint[] GetPoints(out ushort[] contourEndPoints, out Flag[] flags)
+        public ushort[] EndPoints { get { return _contourEndPoints; } }
+        public Flag[] Flags { get { return _flags; } }
+        public FtPoint[] GetPoints()
         {
-            contourEndPoints = _contourEndPoints;
-            flags = this._flags;
+
             int j = _x.Length;
             FtPoint[] points = new FtPoint[j];
             for (int i = 0; i < j; ++i)

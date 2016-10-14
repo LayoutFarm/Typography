@@ -23,6 +23,21 @@ namespace SampleWinForms
         {
             InitializeComponent();
             this.Load += new EventHandler(Form1_Load);
+
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
+            cmbRenderChoices.SelectedIndex = 0;
+
+            cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
+        }
+
+
+        enum RenderChoice
+        {
+            RenderWithMiniAgg,
+            RenderWithGdiPlusPath,
+            RenderWithPlugableGlyphRasterizer //new 
         }
 
         void Form1_Load(object sender, EventArgs e)
@@ -61,15 +76,22 @@ namespace SampleWinForms
                 //1. read typeface from font file
                 Typeface typeFace = reader.Read(fs);
 
-                if (!chkUseGdiPath.Checked)
+                RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
+                switch (renderChoice)
                 {
-                    RenderWithMiniAgg(typeFace, testChar, size, resolution);
-                }
-                else
-                {
-                    RenderWithGdiPlusPath(typeFace, testChar, size, resolution);
-                }
+                    case RenderChoice.RenderWithMiniAgg:
+                        RenderWithMiniAgg(typeFace, testChar, size, resolution);
+                        break;
+                    case RenderChoice.RenderWithGdiPlusPath:
+                        RenderWithGdiPlusPath(typeFace, testChar, size, resolution);
+                        break;
+                    case RenderChoice.RenderWithPlugableGlyphRasterizer:
+                        RenderWithPlugableGlyphRasterizer(typeFace, testChar, size, resolution);
+                        break;
+                    default:
+                        throw new NotSupportedException();
 
+                }
             }
         }
 
@@ -133,7 +155,7 @@ namespace SampleWinForms
             //3. just render to background-graphics
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             g.Clear(Color.White);
-            
+
             //credit:
             //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
@@ -153,16 +175,44 @@ namespace SampleWinForms
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
 
         }
+        void RenderWithPlugableGlyphRasterizer(Typeface typeface, char testChar, int size, int resolution)
+        {
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            g.Clear(Color.White);
+            ////credit:
+            ////http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
+
+            //2. glyph to gdi path
+            var gdiGlyphRasterizer = new NRasterizer.CLI.GDIGlyphRasterizer();
+            var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
+            builder.Build(testChar, size, resolution);
+
+            if (chkFillBackground.Checked)
+            {
+                gdiGlyphRasterizer.Fill(g, Brushes.Black);
+            }
+            if (chkBorder.Checked)
+            {
+                gdiGlyphRasterizer.Draw(g, Pens.Green);
+            }
+            //transform back
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+
+        }
         private void txtInputChar_TextChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }
 
-        private void chkUseGdiPath_CheckedChanged(object sender, EventArgs e)
+        void cmbRenderChoices_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.Text = chkUseGdiPath.Checked ?
-                "Render with Gdi+ Path" :
-                "Render with PixelFarm";
+            button1_Click(this, EventArgs.Empty);
         }
+
+
+
     }
 }

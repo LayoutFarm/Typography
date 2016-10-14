@@ -14,7 +14,9 @@ namespace NRasterizer
         {
             _typeface = typeface;
         }
+
         const double FT_RESIZE = 64; //essential to be floating point
+
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
@@ -22,6 +24,7 @@ namespace NRasterizer
         protected abstract void OnCurve4(double p2x, double p2y, double p3x, double p3y, double x, double y);
         protected abstract void OnMoveTo(double x, double y);
         protected abstract void OnLineTo(double x, double y);
+
         void RenderGlyph(ushort[] contours, FtPoint[] ftpoints, Flag[] flags)
         {
             //outline version
@@ -209,10 +212,7 @@ namespace NRasterizer
 
         void RenderGlyph(Glyph glyph)
         {
-            ushort[] endPoints;
-            Flag[] flags;
-            FtPoint[] ftpoints = glyph.GetPoints(out endPoints, out flags);
-            RenderGlyph(endPoints, ftpoints, flags);
+            RenderGlyph(glyph.EndPoints, glyph.GetPoints(), glyph.Flags);
         }
 
         public void Build(char c, int size, int resolution)

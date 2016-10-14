@@ -37,7 +37,9 @@
     <Compile Include="CharacterMap.cs" />
     <Compile Include="FontCollection\InstalledFont.cs" />
     <Compile Include="Glyph.cs" />
+    <Compile Include="GlyphPathBuilder.cs" />
     <Compile Include="GlyphPathBuilderBase.cs" />
+    <Compile Include="IGlyphRasterizer.cs" />
     <Compile Include="Interpreter.cs" />
     <Compile Include="IO\ByteOrderSwappingBinaryReader.cs" />
     <Compile Include="Net20\ExtensionAttribute.cs" />
