@@ -26,6 +26,7 @@ namespace NRasterizer
                 }
 
                 //translate...
+                NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
                 Head header = ReadTableIfExists(tables, input, new Head());
                 MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
                 GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));

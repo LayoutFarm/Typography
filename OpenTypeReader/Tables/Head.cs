@@ -8,10 +8,8 @@ namespace NRasterizer.Tables
     {
         short _indexToLocFormat;
         Bounds _bounds;
-        ushort _unitsPerEm;
-        public Bounds Bounds { get { return _bounds; } }
-        public bool WideGlyphLocations { get { return _indexToLocFormat > 0; } }
 
+     
         public Head()
         {
         }
@@ -21,24 +19,38 @@ namespace NRasterizer.Tables
         }
         protected override void ReadContentFrom(BinaryReader input)
         {
-            uint version = input.ReadUInt32(); // 0x00010000 for version 1.0.
-            uint fontRevision = input.ReadUInt32();
-            uint checkSumAdjustment = input.ReadUInt32();
-            uint magicNumber = input.ReadUInt32();
-            if (magicNumber != 0x5F0F3CF5) throw new ApplicationException("Invalid magic number!" + magicNumber.ToString("x"));
-            ushort flags = input.ReadUInt16();
-            _unitsPerEm = input.ReadUInt16(); // valid is 16 to 16384
-            ulong created = input.ReadUInt64(); //  International date (8-byte field). (?)
-            ulong modified = input.ReadUInt64();
+            Version = input.ReadUInt32(); // 0x00010000 for version 1.0.
+            FontRevision = input.ReadUInt32();
+            CheckSumAdjustment = input.ReadUInt32();
+            MagicNumber = input.ReadUInt32();
+            if (MagicNumber != 0x5F0F3CF5) throw new ApplicationException("Invalid magic number!" + MagicNumber.ToString("x"));
+            Flags = input.ReadUInt16();
+            UnitsPerEm = input.ReadUInt16(); // valid is 16 to 16384
+            Created = input.ReadUInt64(); //  International date (8-byte field). (?)
+            Modified = input.ReadUInt64();
             // bounding box for all glyphs
             _bounds = BoundsReader.ReadFrom(input);
-            ushort macStyle = input.ReadUInt16();
-            ushort lowestRecPPEM = input.ReadUInt16();
-            short fontDirectionHint = input.ReadInt16();
+            MacStyle = input.ReadUInt16();
+            LowestRecPPEM = input.ReadUInt16();
+            FontDirectionHint = input.ReadInt16();
             _indexToLocFormat = input.ReadInt16(); // 0 for 16-bit offsets, 1 for 32-bit.
-            short glyphDataFormat = input.ReadInt16(); // 0
+            GlyphDataFormat = input.ReadInt16(); // 0
         }
 
-        public ushort UnitsPerEm { get { return _unitsPerEm; } }
+        public uint Version { get; private set; }
+        public uint FontRevision { get; private set; }
+        public uint CheckSumAdjustment { get; private set; }
+        public uint MagicNumber { get; private set; }
+        public ushort Flags { get; private set; }
+        public ushort UnitsPerEm { get; private set; }
+        public ulong Created { get; private set; }
+        public ulong Modified { get; private set; }
+        public Bounds Bounds { get { return _bounds; } }
+        public ushort MacStyle { get; private set; }
+        public ushort LowestRecPPEM { get; private set; }
+        public short FontDirectionHint { get; private set; }
+        public bool WideGlyphLocations { get { return _indexToLocFormat > 0; } }
+        public short GlyphDataFormat { get; private set; }
+
     }
 }
