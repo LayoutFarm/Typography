@@ -1,7 +1,6 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
-using System;
-using System.IO;
+using System; 
 using System.Text;
 namespace NRasterizer.Tables
 {
@@ -43,13 +42,6 @@ namespace NRasterizer.Tables
             return "{" + Tag + "}";
         }
 
-        public static TableHeader From(BinaryReader input)
-        {
-            return new TableHeader(
-                input.ReadUInt32(),
-                input.ReadUInt32(),
-                input.ReadUInt32(),
-                input.ReadUInt32());
-        }
+      
     }
 }
