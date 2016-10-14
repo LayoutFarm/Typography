@@ -33,5 +33,11 @@ namespace NRasterizer.Tables
             //intend ***
             throw new NotImplementedException();
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return this.Name;
+        }
+#endif
     }
 }

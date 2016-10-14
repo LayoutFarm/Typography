@@ -11,15 +11,34 @@ namespace NRasterizer
         readonly List<Glyph> _glyphs;
         readonly List<CharacterMap> _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
-        internal Typeface(Bounds bounds, ushort unitsPerEm, List<Glyph> glyphs, List<CharacterMap> cmaps, HorizontalMetrics horizontalMetrics)
+        readonly NameEntry _nameEntry;
+        readonly Kern _kern;
+        internal Typeface(
+            NameEntry nameEntry,
+            Bounds bounds,
+            ushort unitsPerEm,
+            List<Glyph> glyphs,
+            List<CharacterMap> cmaps,
+            HorizontalMetrics horizontalMetrics,
+            Kern kern)
         {
+            _nameEntry = nameEntry;
             _bounds = bounds;
             _unitsPerEm = unitsPerEm;
             _glyphs = glyphs;
             _cmaps = cmaps;
             _horizontalMetrics = horizontalMetrics;
-        }
 
+            _kern = kern;
+        }
+        public string Name
+        {
+            get { return _nameEntry.FontName; }
+        }
+        public string FontSubFamily
+        {
+            get { return _nameEntry.FontSubFamily; }
+        }
         public int LookupIndex(char character)
         {
             // TODO: What if there are none or several tables?
@@ -35,7 +54,10 @@ namespace NRasterizer
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(character));
         }
-
+        public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
+        {
+            return _kern.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
+        }
         public Bounds Bounds { get { return _bounds; } }
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
         public List<Glyph> Glyphs { get { return _glyphs; } }

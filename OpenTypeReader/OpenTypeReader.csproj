@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="Bounds.cs" />
     <Compile Include="CharacterMap.cs" />
+    <Compile Include="FontCollection\InstalledFont.cs" />
     <Compile Include="Glyph.cs" />
     <Compile Include="GlyphPathBuilderBase.cs" />
     <Compile Include="Interpreter.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="Tables\Head.cs" />
     <Compile Include="Tables\HorizontalHeader.cs" />
     <Compile Include="Tables\HorizontalMetrics.cs" />
+    <Compile Include="Tables\Kern.cs" />
     <Compile Include="Tables\MaxProfile.cs" />
     <Compile Include="Tables\NameEntry.cs" />
     <Compile Include="Tables\TableEntry.cs" />
