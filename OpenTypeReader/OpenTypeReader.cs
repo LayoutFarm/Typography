@@ -1,55 +1,66 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using NRasterizer.IO;
 using NRasterizer.Tables;
-
 namespace NRasterizer
 {
     public class OpenTypeReader
     {
-        static TableEntry FindTable(IEnumerable<TableEntry> tables, string tableName)
-        {
-            foreach (TableEntry te in tables)
-            {
-                if (te.Tag == tableName)
-                {
-                    return te;
-                }
-            }
-            return null;
-        }
         public Typeface Read(Stream stream)
         {
             var little = BitConverter.IsLittleEndian;
-            using (BinaryReader input = new ByteOrderSwappingBinaryReader(stream))
+            using (var input = new ByteOrderSwappingBinaryReader(stream))
             {
-                uint version = input.ReadUInt32();
+                ushort majorVersion = input.ReadUInt16();
+                ushort minorVersion = input.ReadUInt16();
                 ushort tableCount = input.ReadUInt16();
                 ushort searchRange = input.ReadUInt16();
                 ushort entrySelector = input.ReadUInt16();
                 ushort rangeShift = input.ReadUInt16();
-
-                var tables = new List<TableEntry>(tableCount);
+                var tables = new TableEntryCollection();
                 for (int i = 0; i < tableCount; i++)
                 {
-                    tables.Add(TableEntry.ReadFrom(input));
+                    tables.AddEntry(new UnreadTableEntry(TableHeader.From(input)));
                 }
 
-                Head header = Head.From(FindTable(tables, "head"));
-                MaxProfile maximumProfile = MaxProfile.From(FindTable(tables, "maxp"));
-                GlyphLocations glyphLocations = new GlyphLocations(FindTable(tables, "loca"), maximumProfile.GlyphCount, header.WideGlyphLocations);
-                List<Glyph> glyphs = Glyf.From(FindTable(tables, "glyf"), glyphLocations);
-                List<CharacterMap> cmaps = CmapReader.From(FindTable(tables, "cmap"));
-
-                var horizontalHeader = HorizontalHeader.From(FindTable(tables, "hhea"));
-                var horizontalMetrics = HorizontalMetrics.From(FindTable(tables, "hmtx"),
-                    horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount);
-
-                return new Typeface(header.Bounds, header.UnitsPerEm, glyphs, cmaps, horizontalMetrics);
+                //translate...
+                Head header = ReadTableIfExists(tables, input, new Head());
+                MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
+                GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
+                Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
+                Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
+                HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
+                HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
+                return new Typeface(header.Bounds, header.UnitsPerEm, glyf.Glyphs, cmaps.CharMaps, horizontalMetrics);
             }
         }
-
+        static T ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, T resultTable)
+            where T : TableEntry
+        {
+            TableEntry found;
+            if (tables.TryGetTable(resultTable.Name, out found))
+            {
+                //found table name
+                //check if we have read this table or not
+                if (found is UnreadTableEntry)
+                {
+                    //set header before actal read
+                    resultTable.Header = found.Header;
+                    resultTable.LoadDataFrom(reader);
+                    //then reaplce
+                    tables.ReplaceTable(resultTable);
+                    return resultTable;
+                }
+                else
+                {
+                    //we have read this table
+                    throw new NotSupportedException();
+                }
+            }
+            //not found
+            return null;
+        }
     }
 }

@@ -1,52 +1,37 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+
 using System;
 using System.IO;
-using System.Text;
-
 namespace NRasterizer.Tables
 {
-    class TableEntry
+    abstract class TableEntry
     {
-        readonly BinaryReader _input;
-        readonly uint _tag;
-        readonly uint _checkSum;
-        readonly uint _offset;
-        readonly uint _length;
-
-        public string Tag { get { return TagToString(_tag); } }
-
-        private TableEntry(BinaryReader input)
+        public TableEntry()
         {
-            _input = input;
-            _tag = _input.ReadUInt32();
-            _checkSum = _input.ReadUInt32();
-            _offset = _input.ReadUInt32();
-            _length = _input.ReadUInt32();
         }
-
-        public static TableEntry ReadFrom(BinaryReader input)
+        public TableHeader Header { get; set; }
+        protected abstract void ReadContentFrom(BinaryReader reader);
+        public abstract string Name { get; }
+        public void LoadDataFrom(BinaryReader reader)
         {
-            return new TableEntry(input);
+            reader.BaseStream.Seek(this.Header.Offset, SeekOrigin.Begin);
+            ReadContentFrom(reader);
         }
-
-        // TODO: Take offset parameter as commonly two seeks are made in a row
-        public BinaryReader GetDataReader()
+    }
+    class UnreadTableEntry : TableEntry
+    {
+        public UnreadTableEntry(TableHeader header)
         {
-            _input.BaseStream.Seek(_offset, SeekOrigin.Begin);
-            // TODO: Limit reading to _length by wrapping BinaryReader (or Stream)?
-            return _input;
+            this.Header = header;
         }
-
-        private String TagToString(uint tag)
+        public override string Name
         {
-            byte[] bytes = BitConverter.GetBytes(tag);
-            Array.Reverse(bytes);
-            return Encoding.ASCII.GetString(bytes);
+            get { return this.Header.Tag; }
         }
-
-        public override string ToString()
+        protected override void ReadContentFrom(BinaryReader reader)
         {
-            return "{" + Tag + "}";
+            //intend ***
+            throw new NotImplementedException();
         }
     }
 }

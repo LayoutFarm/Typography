@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using NRasterizer.Tables;
-
 namespace NRasterizer
 {
     public class Typeface
@@ -12,7 +11,6 @@ namespace NRasterizer
         readonly List<Glyph> _glyphs;
         readonly List<CharacterMap> _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
-
         internal Typeface(Bounds bounds, ushort unitsPerEm, List<Glyph> glyphs, List<CharacterMap> cmaps, HorizontalMetrics horizontalMetrics)
         {
             _bounds = bounds;
@@ -41,5 +39,7 @@ namespace NRasterizer
         public Bounds Bounds { get { return _bounds; } }
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
         public List<Glyph> Glyphs { get { return _glyphs; } }
+
+        //-------------------------------------------------------
     }
 }

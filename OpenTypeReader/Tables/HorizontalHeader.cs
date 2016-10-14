@@ -1,20 +1,25 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+
 using System;
 using System.IO;
-
 namespace NRasterizer.Tables
 {
-    class HorizontalHeader
+    class HorizontalHeader : TableEntry
     {
-        readonly UInt16 _numerOfHorizontalMetrics;
-
-        public HorizontalHeader(BinaryReader input)
+        UInt16 _numerOfHorizontalMetrics;
+        public HorizontalHeader()
+        {
+        }
+        public override string Name
+        {
+            get { return "hhea"; }
+        }
+        protected override void ReadContentFrom(BinaryReader input)
         {
             uint version = input.ReadUInt32();
             short ascender = input.ReadInt16();
             short descent = input.ReadInt16();
             short lineGap = input.ReadInt16();
-
             ushort advanceWidthMax = input.ReadUInt16();
             short minLeftSideBearing = input.ReadInt16();
             short minRightSideBearing = input.ReadInt16();
@@ -29,7 +34,6 @@ namespace NRasterizer.Tables
             short metricDataFormat = input.ReadInt16(); // 0
             _numerOfHorizontalMetrics = input.ReadUInt16();
         }
-
         public UInt16 HorizontalMetricsCount
         {
             get { return _numerOfHorizontalMetrics; }
@@ -38,11 +42,6 @@ namespace NRasterizer.Tables
         void Reserved(short zero)
         {
             // should be zero
-        }
-
-        public static HorizontalHeader From(TableEntry table)
-        {
-            return new HorizontalHeader(table.GetDataReader());
         }
     }
 }
