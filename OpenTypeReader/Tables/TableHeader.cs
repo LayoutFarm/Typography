@@ -11,6 +11,7 @@ namespace NRasterizer.Tables
         readonly uint _checkSum;
         readonly uint _offset;
         readonly uint _length;
+
         public TableHeader(uint tag, uint checkSum, uint offset, uint len)
         {
             _tag = tag;
@@ -27,10 +28,9 @@ namespace NRasterizer.Tables
         //    // TODO: Limit reading to _length by wrapping BinaryReader (or Stream)?
         //    return _input;
         //}
-        public uint Offset
-        {
-            get { return _offset; }
-        }
+        public uint Offset { get { return _offset; } }
+        public uint CheckSum { get { return _checkSum; } }
+        public uint Length { get { return _length; } }
         static String TagToString(uint tag)
         {
             byte[] bytes = BitConverter.GetBytes(tag);
