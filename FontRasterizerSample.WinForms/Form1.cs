@@ -24,7 +24,7 @@ namespace SampleWinForms
             InitializeComponent();
             this.Load += new EventHandler(Form1_Load);
 
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg); 
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTypePlanAndMiniAgg);
             cmbRenderChoices.SelectedIndex = 0;
@@ -35,7 +35,7 @@ namespace SampleWinForms
 
         enum RenderChoice
         {
-            RenderWithMiniAgg, 
+            RenderWithMiniAgg,
             RenderWithPlugableGlyphRasterizer, //new 
             RenderWithTypePlanAndMiniAgg, //new
         }
@@ -80,12 +80,12 @@ namespace SampleWinForms
                 switch (renderChoice)
                 {
                     case RenderChoice.RenderWithMiniAgg:
-                        RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint, resolution);
+                        RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
                         break;
                     //case RenderChoice.RenderWithGdiPlusPath:
                     //    RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
                     //    break;
-                
+
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
@@ -142,32 +142,13 @@ namespace SampleWinForms
 
 
 
-        void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint, int resolution)
+        void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
             //2. glyph-to-vxs builder
             var builder = new GlyphPathBuilderVxs(typeface);
+            builder.Build(testChar, sizeInPoint);
+            VertexStore vxs = builder.GetVxs(); 
 
-            builder.Build(testChar, sizeInPoint, resolution);
-            VertexStore vxs1 = builder.GetVxs();
-            //----------------
-            //3. do mini translate, scale
-
-            float scale = GetFUnitToPixelsScale(sizeInPoint, typeface.UnitsPerEm);
-
-            var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
-                //scale
-                 new PixelFarm.Agg.Transform.AffinePlan(
-                     PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale),
-                //translate
-                 new PixelFarm.Agg.Transform.AffinePlan(
-                     PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 1, 1)
-                     );
-
-            vxs1 = mat.TransformToVxs(vxs1);
-            //----------------
-            //4. flatten all curves 
-            VertexStore vxs = curveFlattener.MakeVxs(vxs1);
-            //---------------- 
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
             p.Clear(PixelFarm.Drawing.Color.White);
@@ -179,11 +160,8 @@ namespace SampleWinForms
                 //5.3
                 p.Fill(vxs);
             }
-
-
             if (chkBorder.Checked)
             {
-
                 //5.4 
                 p.StrokeColor = PixelFarm.Drawing.Color.Green;
                 //user can specific border width here...
@@ -240,7 +218,7 @@ namespace SampleWinForms
             //2. glyph to gdi path
             var gdiGlyphRasterizer = new NRasterizer.CLI.GDIGlyphRasterizer();
             var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
-            builder.Build(testChar, sizeInPoint, resolution);
+            builder.Build(testChar, sizeInPoint);
 
 
             if (chkFillBackground.Checked)

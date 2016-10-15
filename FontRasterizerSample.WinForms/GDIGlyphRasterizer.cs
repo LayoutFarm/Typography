@@ -12,7 +12,7 @@ namespace NRasterizer.CLI
         float lastMoveY;
         float lastX;
         float lastY;
-
+          
         public GDIGlyphRasterizer()
         {
 
@@ -22,11 +22,13 @@ namespace NRasterizer.CLI
 
         public void BeginRead(int countourCount)
         {
+            
             ps.Reset();
         }
 
         public void EndRead()
         {
+
 
         }
 

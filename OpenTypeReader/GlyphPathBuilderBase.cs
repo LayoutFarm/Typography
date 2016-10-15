@@ -9,10 +9,11 @@ namespace NRasterizer
     public abstract class GlyphPathBuilderBase
     {
         readonly Typeface _typeface;
-        const int pointsPerInch = 72;
+        protected const int pointsPerInch = 72;
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
+            this.Resolution = 96;//default dpi 
         }
         struct FtPoint
         {
@@ -62,7 +63,7 @@ namespace NRasterizer
                 bool isFirstPoint = true;
                 FtPoint secondControlPoint = new FtPoint();
                 FtPoint thirdControlPoint = new FtPoint();
-                 
+
 
                 bool justFromCurveMode = false;
                 for (; cpoint_index < nextContour; ++cpoint_index)
@@ -204,20 +205,41 @@ namespace NRasterizer
                 (short)((v1.Y + v2y) >> 1));
         }
 
-
         void RenderGlyph(Glyph glyph)
         {
             RenderGlyph(glyph.EndPoints, glyph.Xs, glyph.Ys, glyph.OnCurves);
         }
 
-        public void Build(char c, float sizeInPoints, int resolution)
+        public void Build(char c, float sizeInPoints)
         {
-            BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints, resolution);
+            BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints);
         }
-        public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints, int resolution)
+        public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-            float scale = (float)(sizeInPoints * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
+            this.SizeInPoints = sizeInPoints;
             RenderGlyph(_typeface.GetGlyphByIndex(glyphIndex));
+        }
+        public float SizeInPoints
+        {
+            get;
+            set;
+        }
+        public float Resolution
+        {
+            get;
+            set;
+        }
+        protected Typeface TypeFace
+        {
+            get { return _typeface; }
+        }
+        protected ushort TypeFaceUnitPerEm
+        {
+            get { return _typeface.UnitsPerEm; }
+        }
+        public static float GetFUnitToPixelsScale(float fontSizeInPoint, int resolution, ushort unitPerEm)
+        {
+            return ((fontSizeInPoint * resolution) / (pointsPerInch * unitPerEm));
         }
     }
 }

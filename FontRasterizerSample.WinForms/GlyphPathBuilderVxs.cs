@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using NRasterizer;
+using PixelFarm.Agg.VertexSource;
 
 namespace PixelFarm.Agg
 {
@@ -22,6 +23,7 @@ namespace PixelFarm.Agg
         }
         protected override void OnEndRead()
         {
+
         }
         protected override void OnCloseFigure()
         {
@@ -43,12 +45,29 @@ namespace PixelFarm.Agg
         {
             ps.MoveTo(x, y);
         }
+
+        /// <summary>
+        /// get processed/scaled vxs
+        /// </summary>
+        /// <returns></returns>
         public VertexStore GetVxs()
         {
-            //copy vxs result***
-            //return ps.Vxs;
+            float scale = (float)(SizeInPoints * Resolution) / (pointsPerInch * TypeFaceUnitPerEm);
+            var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
+                //scale
+             new PixelFarm.Agg.Transform.AffinePlan(
+                 PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale),
+                //translate
+             new PixelFarm.Agg.Transform.AffinePlan(
+                 PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 1, 1)
+                 );
+            return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs));
+        }
+        public VertexStore GetUnscaledVxs()
+        {
             return VertexStore.CreateCopy(ps.Vxs);
         }
+        static CurveFlattener curveFlattener = new CurveFlattener();
     }
 
 
