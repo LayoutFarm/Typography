@@ -15,8 +15,8 @@ namespace NRasterizer
             _typeface = typeface;
         }
 
-        const double FT_RESIZE = 64; //essential to be floating point
-
+        //const double FT_RESIZE = 64; //essential to be floating point
+        const double FT_RESIZE = 1; //essential to be floating point
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
@@ -199,14 +199,13 @@ namespace NRasterizer
             RenderGlyph(glyph.EndPoints, glyph.Xs, glyph.Ys, glyph.OnCurves);
         }
 
-        public void Build(char c, int size, int resolution)
+        public void Build(char c, float sizeInPoints, int resolution)
         {
-            float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
-            RenderGlyph(_typeface.Lookup(c));
+            BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints, resolution);
         }
-        public void BuildFromGlyphIndex(ushort glyphIndex, int size, int resolution)
+        public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints, int resolution)
         {
-            float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
+            float scale = (float)(sizeInPoints * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
             RenderGlyph(_typeface.GetGlyphByIndex(glyphIndex));
         }
     }

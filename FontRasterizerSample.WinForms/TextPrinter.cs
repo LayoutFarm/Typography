@@ -29,12 +29,11 @@ namespace SampleWinForms
 
             var glyphPathBuilder = new GlyphPathBuilderVxs(typeface);
             int j = str.Length;
-            int res = 72;//?
-
+            int res = 96;//default resolution 96dpi
             //2. 
             //shaping, glyph substitution
-
             ushort[] glyphIndices = new ushort[j];
+            float cx = 0;
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = (ushort)typeface.LookupIndex(str[i]);
@@ -43,7 +42,7 @@ namespace SampleWinForms
                 //if not, create and cache
                 //----------------------------------- 
                 glyphIndices[i] = glyIndex;
-                glyphPathBuilder.BuildFromGlyphIndex(glyIndex, (int)size, res);
+                glyphPathBuilder.BuildFromGlyphIndex(glyIndex, size, res);
                 //----------------------------------- 
                 var vxs = glyphPathBuilder.GetVxs();
                 //this advWidth in font design unit 
