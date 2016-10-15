@@ -37,7 +37,8 @@ namespace SampleWinForms
         {
             RenderWithMiniAgg,
             RenderWithGdiPlusPath,
-            RenderWithPlugableGlyphRasterizer //new 
+            RenderWithPlugableGlyphRasterizer, //new 
+            RenderWithTypePlanAndMiniAgg, //new
         }
 
         void Form1_Load(object sender, EventArgs e)
@@ -88,6 +89,9 @@ namespace SampleWinForms
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, size, resolution);
                         break;
+                    case RenderChoice.RenderWithTypePlanAndMiniAgg:
+                        RenderWithTextPrinter(typeFace, this.txtInputChar.Text, size, resolution);
+                        break;
                     default:
                         throw new NotSupportedException();
 
@@ -106,10 +110,10 @@ namespace SampleWinForms
             var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
                 //translate
                  new PixelFarm.Agg.Transform.AffinePlan(
-                     PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 10, 10),
+                     PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 1, 1),
                 //scale
                  new PixelFarm.Agg.Transform.AffinePlan(
-                     PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, 4, 4)
+                     PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, 1, 1)
                      );
 
             vxs1 = mat.TransformToVxs(vxs1);
@@ -128,6 +132,7 @@ namespace SampleWinForms
                 //5.3
                 p.Fill(vxs);
             }
+
 
             if (chkBorder.Checked)
             {
@@ -189,6 +194,7 @@ namespace SampleWinForms
             var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
             builder.Build(testChar, size, resolution);
 
+
             if (chkFillBackground.Checked)
             {
                 gdiGlyphRasterizer.Fill(g, Brushes.Black);
@@ -201,6 +207,11 @@ namespace SampleWinForms
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
 
+        }
+        void RenderWithTextPrinter(Typeface typeface, string str, int size, int resolution)
+        {
+            TextPrinter printer = new TextPrinter();
+            printer.Print(typeface, str);
         }
         private void txtInputChar_TextChanged(object sender, EventArgs e)
         {
