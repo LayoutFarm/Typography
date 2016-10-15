@@ -211,7 +211,6 @@
     <Compile Include="PixelFarm.Drawing\9_PixelFarm_AggVertex_More\VertexSource\VertexData.cs" />
     <Compile Include="PixelFarm.Drawing\9_PixelFarm_AggVertex_More\VertexSource\VertexStoreBuilder.cs" />
     <Compile Include="PixelFarm.Drawing\BasicRenderBox\IRenderElement.cs" />
-    <Compile Include="Typeface.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
