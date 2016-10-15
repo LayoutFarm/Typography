@@ -38,7 +38,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GlyphPathBuilderGdiPlus.cs" />
     <Compile Include="GDIGlyphRasterizer.cs" />
     <Compile Include="GlyphPathBuilderVxs.cs" />
     <Compile Include="Form1.cs">

@@ -1,5 +1,5 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
-
+using System;
 using System.Collections.Generic;
 using System.IO;
 namespace NRasterizer.Tables
@@ -142,5 +142,17 @@ namespace NRasterizer.Tables
             // TODO: Parse composite glyphs
             return Glyph.Empty;
         }
+
+        [Flags]
+        enum Flag : byte
+        {
+            OnCurve = 1,
+            XByte = 1 << 1,
+            YByte = 1 << 2,
+            Repeat = 1 << 3,
+            XSignOrSame = 1 << 4,
+            YSignOrSame = 1 << 5
+        }
+
     }
 }
