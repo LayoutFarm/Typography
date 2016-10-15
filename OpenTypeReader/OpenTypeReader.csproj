@@ -46,7 +46,7 @@
     <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
-    <Compile Include="Tables\CmapReader.cs" />
+    <Compile Include="Tables\Cmap.cs" />
     <Compile Include="Tables\Glyf.cs" />
     <Compile Include="Tables\GlyphLocations.cs" />
     <Compile Include="Tables\Head.cs" />
