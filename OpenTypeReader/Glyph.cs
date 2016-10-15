@@ -3,17 +3,6 @@
 using System;
 namespace NRasterizer
 {
-    [Flags]
-    enum Flag : byte
-    {
-        OnCurve = 1,
-        XByte = 1 << 1,
-        YByte = 1 << 2,
-        Repeat = 1 << 3,
-        XSignOrSame = 1 << 4,
-        YSignOrSame = 1 << 5
-    }
-
     public struct FtPoint
     {
         readonly short _x;
