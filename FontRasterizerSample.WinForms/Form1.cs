@@ -70,7 +70,7 @@ namespace SampleWinForms
             var reader = new OpenTypeReader();
             char testChar = txtInputChar.Text[0];//only 1 char
 
-            float fontSizeInPoint = 18;
+            float fontSizeInPoint = 14;
             int resolution = 96;
 
             using (var fs = new FileStream(fontfile, FileMode.Open))
@@ -156,12 +156,12 @@ namespace SampleWinForms
             float scale = GetFUnitToPixelsScale(sizeInPoint, typeface.UnitsPerEm);
 
             var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
-                //translate
-                 new PixelFarm.Agg.Transform.AffinePlan(
-                     PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 1, 1),
                 //scale
                  new PixelFarm.Agg.Transform.AffinePlan(
-                     PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale)
+                     PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale),
+                //translate
+                 new PixelFarm.Agg.Transform.AffinePlan(
+                     PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 1, 1)
                      );
 
             vxs1 = mat.TransformToVxs(vxs1);
