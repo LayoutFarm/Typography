@@ -63,14 +63,7 @@ namespace NRasterizer
         readonly Bounds _bounds;
         readonly bool[] _onCurves;
         public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new bool[0], new ushort[0], Bounds.Zero);
-        //internal Glyph(short[] xs, short[] ys, Flag[] flags, ushort[] contourEndPoints, Bounds bounds)
-        //{
-        //    _xs = xs;
-        //    _ys = ys;
-        //    _contourEndPoints = contourEndPoints;
-        //    _bounds = bounds;
 
-        //}
         public Glyph(short[] xs, short[] ys, bool[] onCurves, ushort[] contourEndPoints, Bounds bounds)
         {
             _xs = xs;
@@ -84,16 +77,6 @@ namespace NRasterizer
         public Bounds Bounds { get { return _bounds; } }
         public ushort[] EndPoints { get { return _contourEndPoints; } }
         public bool[] OnCurves { get { return _onCurves; } }
-        public FtPoint[] GetPoints()
-        {
-
-            int j = _xs.Length;
-            FtPoint[] points = new FtPoint[j];
-            for (int i = 0; i < j; ++i)
-            {
-                points[i] = new FtPoint(_xs[i], _ys[i]);
-            }
-            return points;
-        }
+       
     }
 }
