@@ -28,8 +28,18 @@ namespace SampleWinForms
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTypePlanAndMiniAgg);
             cmbRenderChoices.SelectedIndex = 0;
-
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
+
+
+            lstFontSizes.Items.AddRange(
+                new object[]{
+                    8, 9,
+                    10,11,
+                    12,
+                    14,
+                    16,
+                    18,20,22,24,26,28,36,48,72
+                });
         }
 
 
@@ -43,6 +53,8 @@ namespace SampleWinForms
         void Form1_Load(object sender, EventArgs e)
         {
             this.Text = "Render with PixelFarm";
+            this.lstFontSizes.SelectedIndex = 5;
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -59,6 +71,8 @@ namespace SampleWinForms
             //  ReadAndRender(@"..\..\segoeui.ttf");
             ReadAndRender(@"..\..\tahoma.ttf");
         }
+
+        float fontSizeInPoint = 14; //default
         void ReadAndRender(string fontfile)
         {
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -68,7 +82,6 @@ namespace SampleWinForms
             var reader = new OpenTypeReader();
             char testChar = txtInputChar.Text[0];//only 1 char
 
-            float fontSizeInPoint = 14;
             int resolution = 96;
 
             using (var fs = new FileStream(fontfile, FileMode.Open))
@@ -147,7 +160,7 @@ namespace SampleWinForms
             //2. glyph-to-vxs builder
             var builder = new GlyphPathBuilderVxs(typeface);
             builder.Build(testChar, sizeInPoint);
-            VertexStore vxs = builder.GetVxs(); 
+            VertexStore vxs = builder.GetVxs();
 
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
@@ -245,6 +258,13 @@ namespace SampleWinForms
         }
         void cmbRenderChoices_SelectedIndexChanged(object sender, EventArgs e)
         {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void lstFontSizes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //new font size
+            fontSizeInPoint = (int)lstFontSizes.SelectedItem;
             button1_Click(this, EventArgs.Empty);
         }
 
