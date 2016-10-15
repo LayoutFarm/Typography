@@ -27,19 +27,19 @@ namespace PixelFarm.Agg
         {
             ps.CloseFigure();
         }
-        protected override void OnCurve3(double p2x, double p2y, double x, double y)
+        protected override void OnCurve3(short p2x, short p2y, short x, short y)
         {
             ps.Curve3(p2x, p2y, x, y);
         }
-        protected override void OnCurve4(double p2x, double p2y, double p3x, double p3y, double x, double y)
+        protected override void OnCurve4(short p2x, short p2y, short p3x, short p3y, short x, short y)
         {
             ps.Curve4(p2x, p2y, p3x, p3y, x, y);
         }
-        protected override void OnLineTo(double x, double y)
+        protected override void OnLineTo(short x, short y)
         {
             ps.LineTo(x, y);
         }
-        protected override void OnMoveTo(double x, double y)
+        protected override void OnMoveTo(short x, short y)
         {
             ps.MoveTo(x, y);
         }

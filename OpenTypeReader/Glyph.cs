@@ -20,29 +20,6 @@ namespace NRasterizer
             return "(" + _x + "," + _y + ")";
         }
     }
-    public struct FtPointD
-    {
-        readonly double _x;
-        readonly double _y;
-        public FtPointD(double x, double y)
-        {
-            _x = x;
-            _y = y;
-        }
-        public FtPointD(FtPoint p)
-        {
-            _x = p.X;
-            _y = p.Y;
-        }
-        public double x { get { return _x; } }
-        public double y { get { return _y; } }
-        public override string ToString()
-        {
-            return "(" + _x + "," + _y + ")";
-        }
-    }
-
-
 
     public class Glyph
     {
@@ -66,6 +43,6 @@ namespace NRasterizer
         public Bounds Bounds { get { return _bounds; } }
         public ushort[] EndPoints { get { return _contourEndPoints; } }
         public bool[] OnCurves { get { return _onCurves; } }
-       
+
     }
 }
