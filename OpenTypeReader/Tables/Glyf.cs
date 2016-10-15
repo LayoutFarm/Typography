@@ -127,13 +127,14 @@ namespace NRasterizer.Tables
             Flag[] flags = ReadFlags(input, pointCount);
             short[] xs = ReadCoordinates(input, pointCount, flags, Flag.XByte, Flag.XSignOrSame);
             short[] ys = ReadCoordinates(input, pointCount, flags, Flag.YByte, Flag.YSignOrSame);
-            //List<bool> list = new List<bool>();
-            //foreach (Flag f in flags)
-            //{
-            //    list.Add(HasFlag(f, Flag.OnCurve));
-            //}
 
-            return new Glyph(xs, ys, flags, endPoints, bounds);
+            bool[] onCurves = new bool[flags.Length];
+            for (int i = onCurves.Length - 1; i >= 0; --i)
+            {
+                onCurves[i] = HasFlag(flags[i], Flag.OnCurve);
+            }
+
+            return new Glyph(xs, ys, onCurves, endPoints, bounds);
         }
 
         static Glyph ReadCompositeGlyph(BinaryReader input, int count, Bounds bounds)

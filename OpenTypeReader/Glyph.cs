@@ -4,7 +4,7 @@ using System;
 namespace NRasterizer
 {
     [Flags]
-    public enum Flag : byte
+    enum Flag : byte
     {
         OnCurve = 1,
         XByte = 1 << 1,
@@ -57,31 +57,41 @@ namespace NRasterizer
 
     public class Glyph
     {
-        readonly short[] _x;
-        readonly short[] _y;
-        readonly Flag[] _flags;
+        readonly short[] _xs;
+        readonly short[] _ys;
         readonly ushort[] _contourEndPoints;
         readonly Bounds _bounds;
-        public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new Flag[0], new ushort[0], Bounds.Zero);
-        public Glyph(short[] x, short[] y, Flag[] flags, ushort[] contourEndPoints, Bounds bounds)
+        readonly bool[] _onCurves;
+        public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new bool[0], new ushort[0], Bounds.Zero);
+        //internal Glyph(short[] xs, short[] ys, Flag[] flags, ushort[] contourEndPoints, Bounds bounds)
+        //{
+        //    _xs = xs;
+        //    _ys = ys;
+        //    _contourEndPoints = contourEndPoints;
+        //    _bounds = bounds;
+
+        //}
+        public Glyph(short[] xs, short[] ys, bool[] onCurves, ushort[] contourEndPoints, Bounds bounds)
         {
-            _x = x;
-            _y = y;
-            _flags = flags;
+            _xs = xs;
+            _ys = ys;
+            _onCurves = onCurves;
             _contourEndPoints = contourEndPoints;
             _bounds = bounds;
         }
+        internal short[] Xs { get { return _xs; } }
+        internal short[] Ys { get { return _ys; } }
         public Bounds Bounds { get { return _bounds; } }
         public ushort[] EndPoints { get { return _contourEndPoints; } }
-        public Flag[] Flags { get { return _flags; } }
+        public bool[] OnCurves { get { return _onCurves; } }
         public FtPoint[] GetPoints()
         {
 
-            int j = _x.Length;
+            int j = _xs.Length;
             FtPoint[] points = new FtPoint[j];
             for (int i = 0; i < j; ++i)
             {
-                points[i] = new FtPoint(_x[i], _y[i]);
+                points[i] = new FtPoint(_xs[i], _ys[i]);
             }
             return points;
         }
