@@ -14,10 +14,23 @@ namespace NRasterizer
         {
             _typeface = typeface;
         }
+        struct FtPoint
+        {
+            readonly short _x;
+            readonly short _y;
+            public FtPoint(short x, short y)
+            {
+                _x = x;
+                _y = y;
+            }
+            public short X { get { return _x; } }
+            public short Y { get { return _y; } }
 
-        //const double FT_RESIZE = 64; //essential to be floating point
-        //const double FT_RESIZE = 1; //essential to be floating point
-
+            public override string ToString()
+            {
+                return "(" + _x + "," + _y + ")";
+            }
+        }
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
@@ -41,6 +54,7 @@ namespace NRasterizer
             short lastMoveX = 0;
             short lastMoveY = 0;
 
+
             int controlPointCount = 0;
             while (todoContourCount > 0)
             {
@@ -48,8 +62,9 @@ namespace NRasterizer
                 bool isFirstPoint = true;
                 FtPoint secondControlPoint = new FtPoint();
                 FtPoint thirdControlPoint = new FtPoint();
-                bool justFromCurveMode = false;
+                 
 
+                bool justFromCurveMode = false;
                 for (; cpoint_index < nextContour; ++cpoint_index)
                 {
 
@@ -188,12 +203,7 @@ namespace NRasterizer
                 (short)((v1.X + v2x) >> 1),
                 (short)((v1.Y + v2y) >> 1));
         }
-        static FtPoint GetMidPoint(FtPoint v1, FtPoint v2)
-        {
-            return new FtPoint(
-             (short)((v1.X + v2.X) >> 1),
-             (short)((v1.Y + v2.Y) >> 1));
-        }
+
 
         void RenderGlyph(Glyph glyph)
         {

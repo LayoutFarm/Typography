@@ -3,23 +3,7 @@
 using System;
 namespace NRasterizer
 {
-    public struct FtPoint
-    {
-        readonly short _x;
-        readonly short _y;
-        public FtPoint(short x, short y)
-        {
-            _x = x;
-            _y = y;
-        }
-        public short X { get { return _x; } }
-        public short Y { get { return _y; } }
-
-        public override string ToString()
-        {
-            return "(" + _x + "," + _y + ")";
-        }
-    }
+   
 
     public class Glyph
     {
