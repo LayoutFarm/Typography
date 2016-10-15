@@ -24,8 +24,7 @@ namespace SampleWinForms
             InitializeComponent();
             this.Load += new EventHandler(Form1_Load);
 
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg); 
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTypePlanAndMiniAgg);
             cmbRenderChoices.SelectedIndex = 0;
@@ -36,8 +35,7 @@ namespace SampleWinForms
 
         enum RenderChoice
         {
-            RenderWithMiniAgg,
-            RenderWithGdiPlusPath,
+            RenderWithMiniAgg, 
             RenderWithPlugableGlyphRasterizer, //new 
             RenderWithTypePlanAndMiniAgg, //new
         }
@@ -84,9 +82,10 @@ namespace SampleWinForms
                     case RenderChoice.RenderWithMiniAgg:
                         RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
-                    case RenderChoice.RenderWithGdiPlusPath:
-                        RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
-                        break;
+                    //case RenderChoice.RenderWithGdiPlusPath:
+                    //    RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
+                    //    break;
+                
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
@@ -199,36 +198,36 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(10, 0));
         }
-        void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
-        {
-            //2. glyph to gdi path
-            var builder = new GlyphPathBuilderGdiPlus(typeface);
-            builder.Build(testChar, sizeInPoint, resolution);
-            System.Drawing.Drawing2D.GraphicsPath gfxPath = builder.GetGraphicsPath();
-            //--------------- 
-            //3. just render to background-graphics
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
+        //void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
+        //{
+        //    //2. glyph to gdi path
+        //    var builder = new GlyphPathBuilderGdiPlus(typeface);
+        //    builder.Build(testChar, sizeInPoint, resolution);
+        //    System.Drawing.Drawing2D.GraphicsPath gfxPath = builder.GetGraphicsPath();
+        //    //--------------- 
+        //    //3. just render to background-graphics
+        //    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+        //    g.Clear(Color.White);
 
-            //credit:
-            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+        //    //credit:
+        //    //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+        //    g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+        //    g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
 
-            if (chkFillBackground.Checked)
-            {
-                g.FillPath(Brushes.Black, gfxPath);
-            }
-            if (chkBorder.Checked)
-            {
-                g.DrawPath(Pens.Green, gfxPath);
-            }
+        //    if (chkFillBackground.Checked)
+        //    {
+        //        g.FillPath(Brushes.Black, gfxPath);
+        //    }
+        //    if (chkBorder.Checked)
+        //    {
+        //        g.DrawPath(Pens.Green, gfxPath);
+        //    }
 
-            //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+        //    //transform back
+        //    g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+        //    g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
 
-        }
+        //}
         void RenderWithPlugableGlyphRasterizer(Typeface typeface, char testChar, float sizeInPoint, int resolution)
         {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
