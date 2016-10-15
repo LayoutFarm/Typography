@@ -27,6 +27,7 @@ namespace SampleWinForms
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithTypePlanAndMiniAgg);
             cmbRenderChoices.SelectedIndex = 0;
 
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
@@ -136,6 +137,7 @@ namespace SampleWinForms
 
             if (chkBorder.Checked)
             {
+                
                 //5.4 
                 p.StrokeColor = PixelFarm.Drawing.Color.Green;
                 //user can specific border width here...
@@ -211,19 +213,15 @@ namespace SampleWinForms
         void RenderWithTextPrinter(Typeface typeface, string str, int size, int resolution)
         {
             TextPrinter printer = new TextPrinter();
-            printer.Print(typeface, str);
+            printer.Print(typeface, size, str);
         }
         private void txtInputChar_TextChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }
-
         void cmbRenderChoices_SelectedIndexChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }
-
-
-
     }
 }

@@ -1,7 +1,7 @@
 ﻿//MIT, 2016,  WinterDev
 using System;
 using System.Collections.Generic;
-using NRasterizer; 
+using NRasterizer;
 
 namespace PixelFarm.Agg
 {
@@ -21,7 +21,7 @@ namespace PixelFarm.Agg
             ps.Clear();
         }
         protected override void OnEndRead()
-        { 
+        {
         }
         protected override void OnCloseFigure()
         {
@@ -45,7 +45,9 @@ namespace PixelFarm.Agg
         }
         public VertexStore GetVxs()
         {
-            return ps.Vxs;
+            //copy vxs result***
+            //return ps.Vxs;
+            return VertexStore.CreateCopy(ps.Vxs);
         }
     }
 
