@@ -39,5 +39,6 @@ Tahoma, 11 pts
 
 ---
 Enable Kerning
+
 ![enable_kerning1](https://cloud.githubusercontent.com/assets/7447159/19415089/7d3ae864-938e-11e6-94b1-4817b327832a.png)
 
