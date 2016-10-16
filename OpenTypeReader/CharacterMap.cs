@@ -5,11 +5,13 @@ namespace NRasterizer
 {
     class CharacterMap
     {
+        //https://www.microsoft.com/typography/otspec/cmap.htm
+
         readonly int _segCount;
-        readonly ushort[] _startCode;
-        readonly ushort[] _endCode;
-        readonly ushort[] _idDelta;
-        readonly ushort[] _idRangeOffset;
+        readonly ushort[] _startCode; //Starting character code for each segment
+        readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
+        readonly ushort[] _idDelta; //Delta for all character codes in segment
+        readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
         readonly ushort[] _glyphIdArray;
         public CharacterMap(int segCount, ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
         {
@@ -28,7 +30,7 @@ namespace NRasterizer
 
         public uint RawCharacterToGlyphIndex(UInt32 character)
         {
-            // TODO: Fast fegment lookup using bit operations?
+            // TODO: Fast segment lookup using bit operations?
             for (int i = 0; i < _segCount; i++)
             {
                 if (_endCode[i] >= character && _startCode[i] <= character)
@@ -39,6 +41,17 @@ namespace NRasterizer
                     }
                     else
                     {
+                        //If the idRangeOffset value for the segment is not 0,
+                        //the mapping of character codes relies on glyphIdArray. 
+                        //The character code offset from startCode is added to the idRangeOffset value.
+                        //This sum is used as an offset from the current location within idRangeOffset itself to index out the correct glyphIdArray value. 
+                        //This obscure indexing trick works because glyphIdArray immediately follows idRangeOffset in the font file.
+                        //The C expression that yields the glyph index is:
+
+                        //*(idRangeOffset[i]/2 
+                        //+ (c - startCount[i]) 
+                        //+ &idRangeOffset[i])
+
                         var offset = _idRangeOffset[i] / 2 + (character - _startCode[i]);
                         // I want to thank Microsoft for this clever pointer trick
                         // TODO: What if the value fetched is inside the _idRangeOffset table?
