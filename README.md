@@ -36,3 +36,8 @@ Tahoma, 8 pts
 Tahoma, 11 pts
 
 ![compare3_tahoma_11pts](https://cloud.githubusercontent.com/assets/7447159/19414753/bec50254-9381-11e6-8ebb-07b23d84eb90.png)
+
+---
+Enable Kerning
+![enable_kerning1](https://cloud.githubusercontent.com/assets/7447159/19415089/7d3ae864-938e-11e6-94b1-4817b327832a.png)
+
