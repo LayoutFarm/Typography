@@ -168,18 +168,34 @@ namespace NRasterizer.Tables
                 {
                     subTableOffsets[m] = reader.ReadUInt16();
                 }
-                ushort markFilteringSet = reader.ReadUInt16();
+
+                ushort markFilteringSet =
+                    ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
+
                 lookupRecords.Add(
-                    new LookupRecord(lookupType,
+                    new LookupRecord(
+                        lookupListHeadPos,
+                    //  
+                        lookupType,
                         lookupFlags,
                         subTableCount,
-                        subTableOffsets,
+                        subTableOffsets,//Array of offsets to SubTables-from beginning of Lookup table
                         markFilteringSet));
             }
+            //----------------------------------------------
+            //read each lookup record content ...
+            for (int i = 0; i < lookupCount; ++i)
+            {
+                LookupRecord lookupRecord = lookupRecords[i];
+                //set origin
+                reader.BaseStream.Seek(lookupListHeadPos + subTableOffset[i], SeekOrigin.Begin);
+                lookupRecord.ReadRecordContent(reader);
+            }
+
         }
         void ReadFeaureVariations(BinaryReader reader)
         {
-
+            throw new NotImplementedException();
         }
 
         struct ScriptRecord
@@ -221,26 +237,207 @@ namespace NRasterizer.Tables
             }
         }
 
-        struct LookupRecord
+        class LookupRecord
         {
+            long offsetOfLookupTableList;
             public readonly ushort lookupType;
             public readonly ushort lookupFlags;
             public readonly ushort subTableCount;
             public readonly ushort[] offsets;
             public readonly ushort markFilteringSet;
+            //--------------------------
+            public int format;
 
-            public LookupRecord(ushort lookupType,
+            public LookupRecord(
+                long offsetOfLookupTableList,
+                ushort lookupType,
                 ushort lookupFlags,
                 ushort subTableCount,
                 ushort[] offsets,
                 ushort markFilteringSet
                  )
             {
+                this.offsetOfLookupTableList = offsetOfLookupTableList;
                 this.lookupType = lookupType;
                 this.lookupFlags = lookupFlags;
                 this.subTableCount = subTableCount;
                 this.offsets = offsets;
                 this.markFilteringSet = markFilteringSet;
+            }
+            public void ReadRecordContent(BinaryReader reader)
+            {
+                switch (lookupType)
+                {
+                    default: throw new NotSupportedException();
+                    case 1:
+                        ReadLookupType1(reader);
+                        break;
+                    case 2:
+                        ReadLookupType2(reader);
+                        break;
+                    case 3:
+                        ReadLookupType3(reader);
+                        break;
+                    case 4:
+                        ReadLookupType4(reader);
+                        break;
+                    case 5:
+                        ReadLookupType5(reader);
+                        break;
+                    case 6:
+                        ReadLookupType6(reader);
+                        break;
+                    case 7:
+                        ReadLookupType7(reader);
+                        break;
+                    case 8:
+                        ReadLookupType8(reader);
+                        break;
+                }
+            }
+            /// <summary>
+            /// LookupType 1: Single Substitution Subtable
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType1(BinaryReader reader)
+            {
+
+
+                //---------------------
+                //LookupType 1: Single Substitution Subtable
+                //Single substitution (SingleSubst) subtables tell a client to replace a single glyph with another glyph. 
+                //The subtables can be either of two formats. 
+                //Both formats require two distinct sets of glyph indices: one that defines input glyphs (specified in the Coverage table), 
+                //and one that defines the output glyphs. Format 1 requires less space than Format 2, but it is less flexible.
+                //------------------------------------
+                // 1.1 Single Substitution Format 1
+                //------------------------------------
+                //Format 1 calculates the indices of the output glyphs, 
+                //which are not explicitly defined in the subtable. 
+                //To calculate an output glyph index, Format 1 adds a constant delta value to the input glyph index.
+                //For the substitutions to occur properly, the glyph indices in the input and output ranges must be in the same order. 
+                //This format does not use the Coverage Index that is returned from the Coverage table.
+
+                //The SingleSubstFormat1 subtable begins with a format identifier (SubstFormat) of 1. An offset references a Coverage table that specifies the indices of the input glyphs. DeltaGlyphID is the constant value added to each input glyph index to calculate the index of the corresponding output glyph.
+
+                //Example 2 at the end of this chapter uses Format 1 to replace standard numerals with lining numerals. 
+
+                //SingleSubstFormat1 subtable: Calculated output glyph indices
+                //Type 	Name 	Description
+                //USHORT 	SubstFormat 	Format identifier-format = 1
+                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
+                //SHORT 	DeltaGlyphID 	Add to original GlyphID to get substitute GlyphID
+
+                //------------------------------------
+                //1.2 Single Substitution Format 2
+                //------------------------------------
+                //Format 2 is more flexible than Format 1, but requires more space. It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table.
+                //The SingleSubstFormat2 subtable specifies a format identifier (SubstFormat), an offset to a Coverage table that defines the input glyph indices, a count of output glyph indices in the Substitute array (GlyphCount), and a list of the output glyph indices in the Substitute array (Substitute).
+                //The Substitute array must contain the same number of glyph indices as the Coverage table. To locate the corresponding output glyph index in the Substitute array, this format uses the Coverage Index returned from the Coverage table.
+
+                //Example 3 at the end of this chapter uses Format 2 to substitute vertically oriented glyphs for horizontally oriented glyphs.
+
+
+                //SingleSubstFormat2 subtable: Specified output glyph indices
+                //Type 	Name 	Description
+                //USHORT 	SubstFormat 	Format identifier-format = 2
+                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
+                //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array
+                //GlyphID 	Substitute
+                //[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index
+
+
+
+                //---------------------
+                //move to read pos
+                //---------------------
+                int j = offsets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(offsetOfLookupTableList + offsets[i], SeekOrigin.Begin);
+                    //-------------
+                    this.format = reader.ReadUInt16();
+                    ushort coverage = reader.ReadUInt16(); //Offset to Coverage table-from beginning of Substitution table
+
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                short deltaGlyphId = reader.ReadInt16();// 	Add to original GlyphID to get substitute GlyphID
+                            } break;
+                        case 2:
+                            {
+                                ushort glyphCount = reader.ReadUInt16();
+                                ushort[] substitueGlyphs = new ushort[glyphCount];// 	Array of substitute GlyphIDs-ordered by Coverage Index
+                                for (int n = 0; n < glyphCount; ++n)
+                                {
+                                    substitueGlyphs[n] = reader.ReadUInt16();
+                                }
+                                //---------
+
+                            }
+                            break;
+                    }
+                }
+
+            }
+            /// <summary>
+            /// LookupType 2: Multiple Substitution Subtable
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType2(BinaryReader reader)
+            {
+                throw new NotImplementedException();
+            }
+            /// <summary>
+            /// LookupType 3: Alternate Substitution Subtable 
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType3(BinaryReader reader)
+            {
+                throw new NotImplementedException();
+            }
+            /// <summary>
+            /// LookupType 4: Ligature Substitution Subtable
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType4(BinaryReader reader)
+            {
+                throw new NotImplementedException();
+            }
+            /// <summary>
+            /// LookupType 5: Contextual Substitution Subtable
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType5(BinaryReader reader)
+            {
+                throw new NotImplementedException();
+            }
+            /// <summary>
+            /// LookupType 6: Chaining Contextual Substitution Subtable
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType6(BinaryReader reader)
+            {
+                throw new NotImplementedException();
+            }
+            /// <summary>
+            /// LookupType 7: Extension Substitution
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType7(BinaryReader reader)
+            {
+                throw new NotImplementedException();
+            }
+            /// <summary>
+            /// LookupType 8: Reverse Chaining Contextual Single Substitution Subtable
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType8(BinaryReader reader)
+            {
+                throw new NotImplementedException();
             }
         }
         static string TagToString(uint tag)
