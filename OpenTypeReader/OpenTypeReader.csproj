@@ -49,6 +49,7 @@
     <Compile Include="Tables\Cmap.cs" />
     <Compile Include="Tables\Glyf.cs" />
     <Compile Include="Tables\GlyphLocations.cs" />
+    <Compile Include="Tables\GSUB.cs" />
     <Compile Include="Tables\Head.cs" />
     <Compile Include="Tables\HorizontalHeader.cs" />
     <Compile Include="Tables\HorizontalMetrics.cs" />
