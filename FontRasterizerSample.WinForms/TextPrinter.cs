@@ -20,6 +20,16 @@ namespace SampleWinForms
     class TextPrinter
     {
 
+        public TextPrinter()
+        {
+            //default
+            EnableKerning = true;
+        }
+        public bool EnableKerning
+        {
+            get;
+            set;
+        }
         public void Print(Typeface typeface, float size, string str, GlyphPlan[] glyphPlanBuffer)
         {
             Print(typeface, size, str.ToCharArray(), glyphPlanBuffer);
@@ -34,40 +44,48 @@ namespace SampleWinForms
             var glyphPathBuilder = new GlyphPathBuilderVxs(typeface);
             int j = str.Length;
 
+            //TODO:....
+            //2.  
+            //shaping, glyph substitution
+            for (int i = 0; i < j; ++i)
+            {
+                var glyphPlan = new GlyphPlan();
+                glyphPlan.glyphIndex = (ushort)typeface.LookupIndex(str[i]);
+                glyphPlanBuffer[i] = glyphPlan;
+            }
+
+
             float scale = GlyphPathBuilder.GetFUnitToPixelsScale(size,
                 glyphPathBuilder.Resolution,
                 typeface.UnitsPerEm);
-
-
-            //vxs cache
-            //Dictionary<int, GlyphPathBuilderVxs> vxsDic = new Dictionary<int, GlyphPathBuilderVxs>();
-
             float cx = 0;
             float cy = 0;
+            bool enable_kerning = this.EnableKerning;
             for (int i = 0; i < j; ++i)
             {
-                ushort glyIndex = (ushort)typeface.LookupIndex(str[i]);
+                GlyphPlan glyphPlan = glyphPlanBuffer[i];
+                ushort glyIndex = glyphPlan.glyphIndex;
                 //-----------------------------------
                 //check if we static vxs/bmp for this glyph
                 //if not, create and cache
                 //-----------------------------------  
-
                 glyphPathBuilder.BuildFromGlyphIndex(glyIndex, size);
                 //----------------------------------- 
                 var vxs = glyphPathBuilder.GetVxs();
-
                 //this advWidth in font design unit 
                 float advWidth = typeface.GetAdvanceWidthFromGlyphIndex(glyIndex) * scale;
-                //----------------------------------- 
-                GlyphPlan glyphPlan = new GlyphPlan();
-                glyphPlan.glyphIndex = glyIndex;
+                //---------------------------------- 
                 glyphPlan.x = cx;
                 glyphPlan.y = 0;
                 glyphPlan.advX = advWidth;
                 glyphPlan.vxs = vxs;
                 //
-                glyphPlanBuffer[i] = glyphPlan;
-                //
+
+                if (enable_kerning && i > 0)
+                {
+                    //check kerning
+                    advWidth += typeface.GetKernDistance(glyphPlanBuffer[i - 1].glyphIndex, glyphPlanBuffer[i].glyphIndex) * scale;
+                }
                 cx += advWidth;
             }
 
