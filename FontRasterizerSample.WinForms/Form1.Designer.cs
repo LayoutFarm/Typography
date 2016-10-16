@@ -36,6 +36,7 @@
             this.cmbRenderChoices = new System.Windows.Forms.ComboBox();
             this.lstFontSizes = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.chkKern = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -115,11 +116,25 @@
             this.label2.TabIndex = 9;
             this.label2.Text = "Size in Points";
             // 
+            // chkKern
+            // 
+            this.chkKern.AutoSize = true;
+            this.chkKern.Checked = true;
+            this.chkKern.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkKern.Location = new System.Drawing.Point(237, 59);
+            this.chkKern.Name = "chkKern";
+            this.chkKern.Size = new System.Drawing.Size(85, 17);
+            this.chkKern.TabIndex = 10;
+            this.chkKern.Text = "Do Kerning1";
+            this.chkKern.UseVisualStyleBackColor = true;
+            this.chkKern.CheckedChanged += new System.EventHandler(this.chkKern_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkKern);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lstFontSizes);
             this.Controls.Add(this.cmbRenderChoices);
@@ -145,6 +160,7 @@
         private System.Windows.Forms.ComboBox cmbRenderChoices;
         private System.Windows.Forms.ListBox lstFontSizes;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox chkKern;
     }
 }
 

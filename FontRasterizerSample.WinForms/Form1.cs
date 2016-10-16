@@ -220,7 +220,9 @@ namespace SampleWinForms
         }
         void RenderWithTextPrinterAndMiniAgg(Typeface typeface, string str, float sizeInPoint, int resolution)
         {
+            //1. 
             TextPrinter printer = new TextPrinter();
+            printer.EnableKerning = this.chkKern.Checked;
             int len = str.Length;
             GlyphPlan[] glyphPlanList = new GlyphPlan[len];
             printer.Print(typeface, sizeInPoint, str, glyphPlanList);
@@ -287,6 +289,11 @@ namespace SampleWinForms
         {
             //new font size
             fontSizeInPoint = (int)lstFontSizes.SelectedItem;
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkKern_CheckedChanged(object sender, EventArgs e)
+        {
             button1_Click(this, EventArgs.Empty);
         }
 
