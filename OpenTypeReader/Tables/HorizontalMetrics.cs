@@ -5,17 +5,29 @@ using System.Collections.Generic;
 using System.IO;
 namespace NRasterizer.Tables
 {
+
     class HorizontalMetrics : TableEntry
     {
-        List<ushort> _advanceWidths;
-        List<short> _leftSideBearings;
-        int _count;
+        //https://www.microsoft.com/typography/otspec/hmtx.htm
+        // A font rendering engine must use the advanceWidths in the hmtx table for the advances of a CFF OFF font,
+        //even though the CFF table specifies its own glyph widths.
+        //Note that fonts in a Font Collection which share a CFF table may specify different advanceWidths in their hmtx table for a particular glyph index.
+        //For any glyph, xmax and xmin are given in 'glyf' table, lsb and aw are given in 'hmtx' table. rsb is calculated as follows:
+        //  rsb = aw - (lsb + xmax - xmin)
+        //If pp1 and pp2 are phantom points used to control lsb and rsb, their initial position in x is calculated as follows:
+        //  pp1 = xmin - lsb
+        //  pp2 = pp1 + aw
+
+        List<ushort> _advanceWidths; //in font design unit
+        List<short> _leftSideBearings;//lsb, in font design unit
+        int _numOfHMatrics;
         int _numGlyphs;
-        public HorizontalMetrics(UInt16 count, UInt16 numGlyphs)
+        public HorizontalMetrics(UInt16 numOfHMatrics, UInt16 numGlyphs)
         {
+            //The value numOfHMetrics comes from the 'hhea' table**   
             _advanceWidths = new List<ushort>(numGlyphs);
             _leftSideBearings = new List<short>(numGlyphs);
-            _count = count;
+            _numOfHMatrics = numOfHMatrics;
             _numGlyphs = numGlyphs;
         }
         public override string Name
@@ -26,22 +38,45 @@ namespace NRasterizer.Tables
         {
             return _advanceWidths[index];
         }
+        public short GetLeftSideBearing(int index)
+        {
+            return _leftSideBearings[index];
+        }
+        public void GetHMatric(int index, out ushort advWidth, out short lsb)
+        {
+            advWidth = _advanceWidths[index];
+            lsb = _leftSideBearings[index];
+        }
         protected override void ReadContentFrom(BinaryReader input)
         {
-            int count = _count;
-            int numGlyphs = _numGlyphs;
-            for (int i = 0; i < count; i++)
+            //===============================================================================
+            //1. hMatrics : have both advance width and leftSideBearing(lsb)
+            //Paired advance width and left side bearing values for each glyph. 
+            //The value numOfHMetrics comes from the 'hhea' table**
+            //If the font is monospaced, only one entry need be in the array, 
+            //but that entry is required. The last entry applies to all subsequent glyphs
+
+            int numOfHMatrics = _numOfHMatrics;
+            for (int i = 0; i < numOfHMatrics; i++)
             {
                 _advanceWidths.Add(input.ReadUInt16());
                 _leftSideBearings.Add(input.ReadInt16());
             }
 
-            ushort advanceWidth = _advanceWidths[count - 1];
-            for (int i = 0; i < numGlyphs - count; i++)
+            //===============================================================================
+            //2. (only) LeftSideBearing:  (same advanced width (eg. monospace font), vary only left side bearing)
+            //Here the advanceWidth is assumed to be the same as the advanceWidth for the last entry above.
+            //The number of entries in this array is derived from numGlyphs (from 'maxp' table) minus numberOfHMetrics.
+            int numGlyphs = _numGlyphs;
+            int nEntries = numGlyphs - numOfHMatrics;
+            ushort advanceWidth = _advanceWidths[numOfHMatrics - 1];
+
+            for (int i = 0; i < nEntries; i++)
             {
                 _advanceWidths.Add(advanceWidth);
                 _leftSideBearings.Add(input.ReadInt16());
             }
+
         }
     }
 }

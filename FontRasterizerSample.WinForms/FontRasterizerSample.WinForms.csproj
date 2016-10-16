@@ -7,8 +7,8 @@
     <ProjectGuid>{6627819C-F72B-4444-8461-14A57674FBD9}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sample2</RootNamespace>
-    <AssemblyName>Sample2</AssemblyName>
+    <RootNamespace>SampleWinForms</RootNamespace>
+    <AssemblyName>FontRasterizer.Sample.WinForms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -38,7 +38,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GlyphPathBuilderGdiPlus.cs" />
+    <Compile Include="GDIGlyphRasterizer.cs" />
     <Compile Include="GlyphPathBuilderVxs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -47,6 +47,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="BitmapHelper.cs" />
+    <Compile Include="TextPrinter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -60,6 +61,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -72,13 +74,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\PixelFarm-dev\a_mini\projects\PixelFarm\PixelFarm.MiniAgg.One.csproj">
+      <Project>{CCE391D5-F166-4ECA-B99F-CE56B058CB58}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OpenTypeReader\OpenTypeReader.csproj">
       <Project>{2dda36cc-9a17-44c8-b26b-1472bb48c0f4}</Project>
       <Name>OpenTypeReader</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PixelFarmMiniAgg\PixelFarm.MiniAgg.One.csproj">
-      <Project>{CCE391D5-F166-4ECA-B99F-CE56B058CB58}</Project>
-      <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

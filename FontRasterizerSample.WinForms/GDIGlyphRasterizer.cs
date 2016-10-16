@@ -1,43 +1,62 @@
-﻿//MIT, 2016,  WinterDev
+﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+
 using System;
-using System.Collections.Generic;
-//
-using System.Drawing; //*** 
-using NRasterizer;
+using System.Drawing;
 
-namespace PixelFarm.Agg
+namespace NRasterizer.CLI
 {
-    //this is Gdi+ version
-    //render with System.Drawing.Drawing2d.GraphicsPath 
-
-    public class GlyphPathBuilderGdiPlus : GlyphPathBuilderBase
+    public class GDIGlyphRasterizer : IGlyphRasterizer
     {
         System.Drawing.Drawing2D.GraphicsPath ps = new System.Drawing.Drawing2D.GraphicsPath();
         float lastMoveX;
         float lastMoveY;
         float lastX;
         float lastY;
-
-        public GlyphPathBuilderGdiPlus(Typeface typeface)
-            : base(typeface)
+          
+        public GDIGlyphRasterizer()
         {
 
         }
-        protected override void OnBeginRead(int countourCount)
+
+        #region IGlyphRasterizer implementation
+
+        public void BeginRead(int countourCount)
         {
+            
             ps.Reset();
         }
-        protected override void OnEndRead()
+
+        public void EndRead()
         {
 
+
         }
-        protected override void OnCloseFigure()
+
+        /// <summary>
+        /// fill g
+        /// </summary>
+        /// <param name="g"></param>
+        public void Fill(Graphics g, Brush brush)
+        {
+            g.FillPath(brush, ps);
+        }
+        /// <summary>
+        /// draw outline
+        /// </summary>
+        /// <param name="g"></param>
+        public void Draw(Graphics g, Pen pen)
+        {
+            g.DrawPath(pen, ps);
+        }
+
+
+        public void CloseFigure()
         {
             ps.CloseFigure();
         }
-        protected override void OnCurve3(double p2x, double p2y, double x, double y)
-        {
 
+        public void Curve3(double p2x, double p2y, double x, double y)
+        {
             //from http://stackoverflow.com/questions/9485788/convert-quadratic-curve-to-cubic-curve
             //Control1X = StartX + (.66 * (ControlX - StartX))
             //Control2X = EndX + (.66 * (ControlX - EndX))
@@ -56,7 +75,8 @@ namespace PixelFarm.Agg
                 new PointF(lastX = (float)x, lastY = (float)y));
 
         }
-        protected override void OnCurve4(double p2x, double p2y, double p3x, double p3y, double x, double y)
+
+        public void Curve4(double p2x, double p2y, double p3x, double p3y, double x, double y)
         {
             // ps.Curve4(p2x, p2y, p3x, p3y, x, y);
 
@@ -67,22 +87,21 @@ namespace PixelFarm.Agg
                 new PointF(lastX = (float)x, lastY = (float)y));
 
         }
-        protected override void OnLineTo(double x, double y)
+
+        public void LineTo(double x, double y)
         {
             ps.AddLine(
-               new PointF(lastX, lastY),
-               new PointF(lastX = (float)x, lastY = (float)y));
+                new PointF(lastX, lastY),
+                new PointF(lastX = (float)x, lastY = (float)y));
         }
-        protected override void OnMoveTo(double x, double y)
+
+        public void MoveTo(double x, double y)
         {
             lastX = lastMoveX = (float)x;
             lastY = lastMoveY = (float)y;
         }
-        public System.Drawing.Drawing2D.GraphicsPath GetGraphicsPath()
-        {
-            return ps;
-        }
+
+        #endregion
     }
-
-
 }
+

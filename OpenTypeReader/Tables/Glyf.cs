@@ -1,5 +1,5 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
-
+using System;
 using System.Collections.Generic;
 using System.IO;
 namespace NRasterizer.Tables
@@ -127,13 +127,14 @@ namespace NRasterizer.Tables
             Flag[] flags = ReadFlags(input, pointCount);
             short[] xs = ReadCoordinates(input, pointCount, flags, Flag.XByte, Flag.XSignOrSame);
             short[] ys = ReadCoordinates(input, pointCount, flags, Flag.YByte, Flag.YSignOrSame);
-            //List<bool> list = new List<bool>();
-            //foreach (Flag f in flags)
-            //{
-            //    list.Add(HasFlag(f, Flag.OnCurve));
-            //}
 
-            return new Glyph(xs, ys, flags, endPoints, bounds);
+            bool[] onCurves = new bool[flags.Length];
+            for (int i = onCurves.Length - 1; i >= 0; --i)
+            {
+                onCurves[i] = HasFlag(flags[i], Flag.OnCurve);
+            }
+
+            return new Glyph(xs, ys, onCurves, endPoints, bounds);
         }
 
         static Glyph ReadCompositeGlyph(BinaryReader input, int count, Bounds bounds)
@@ -141,5 +142,17 @@ namespace NRasterizer.Tables
             // TODO: Parse composite glyphs
             return Glyph.Empty;
         }
+
+        [Flags]
+        enum Flag : byte
+        {
+            OnCurve = 1,
+            XByte = 1 << 1,
+            YByte = 1 << 2,
+            Repeat = 1 << 3,
+            XSignOrSame = 1 << 4,
+            YSignOrSame = 1 << 5
+        }
+
     }
 }

@@ -33,7 +33,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.chkBorder = new System.Windows.Forms.CheckBox();
             this.chkFillBackground = new System.Windows.Forms.CheckBox();
-            this.chkUseGdiPath = new System.Windows.Forms.CheckBox();
+            this.cmbRenderChoices = new System.Windows.Forms.ComboBox();
+            this.lstFontSizes = new System.Windows.Forms.ListBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
@@ -86,23 +88,41 @@
             this.chkFillBackground.Text = "Fill BackGround";
             this.chkFillBackground.UseVisualStyleBackColor = true;
             // 
-            // chkUseGdiPath
+            // cmbRenderChoices
             // 
-            this.chkUseGdiPath.AutoSize = true;
-            this.chkUseGdiPath.Location = new System.Drawing.Point(380, 13);
-            this.chkUseGdiPath.Name = "chkUseGdiPath";
-            this.chkUseGdiPath.Size = new System.Drawing.Size(83, 17);
-            this.chkUseGdiPath.TabIndex = 5;
-            this.chkUseGdiPath.Text = "UseGdiPath";
-            this.chkUseGdiPath.UseVisualStyleBackColor = true;
-            this.chkUseGdiPath.CheckedChanged += new System.EventHandler(this.chkUseGdiPath_CheckedChanged);
+            this.cmbRenderChoices.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbRenderChoices.FormattingEnabled = true;
+            this.cmbRenderChoices.Location = new System.Drawing.Point(380, 12);
+            this.cmbRenderChoices.Name = "cmbRenderChoices";
+            this.cmbRenderChoices.Size = new System.Drawing.Size(224, 21);
+            this.cmbRenderChoices.TabIndex = 7;
+            // 
+            // lstFontSizes
+            // 
+            this.lstFontSizes.FormattingEnabled = true;
+            this.lstFontSizes.Location = new System.Drawing.Point(653, 26);
+            this.lstFontSizes.Name = "lstFontSizes";
+            this.lstFontSizes.Size = new System.Drawing.Size(100, 212);
+            this.lstFontSizes.TabIndex = 8;
+            this.lstFontSizes.SelectedIndexChanged += new System.EventHandler(this.lstFontSizes_SelectedIndexChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(650, 10);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(70, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Size in Points";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
-            this.Controls.Add(this.chkUseGdiPath);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.lstFontSizes);
+            this.Controls.Add(this.cmbRenderChoices);
             this.Controls.Add(this.chkFillBackground);
             this.Controls.Add(this.chkBorder);
             this.Controls.Add(this.label1);
@@ -122,7 +142,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkBorder;
         private System.Windows.Forms.CheckBox chkFillBackground;
-        private System.Windows.Forms.CheckBox chkUseGdiPath;
+        private System.Windows.Forms.ComboBox cmbRenderChoices;
+        private System.Windows.Forms.ListBox lstFontSizes;
+        private System.Windows.Forms.Label label2;
     }
 }
 
