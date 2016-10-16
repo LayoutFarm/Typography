@@ -224,7 +224,7 @@ namespace NRasterizer
             get;
             set;
         }
-        public float Resolution
+        public int Resolution
         {
             get;
             set;
@@ -237,6 +237,8 @@ namespace NRasterizer
         {
             get { return _typeface.UnitsPerEm; }
         }
+       
+
         public static float GetFUnitToPixelsScale(float fontSizeInPoint, int resolution, ushort unitPerEm)
         {
             return ((fontSizeInPoint * resolution) / (pointsPerInch * unitPerEm));

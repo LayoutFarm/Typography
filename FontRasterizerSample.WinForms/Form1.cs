@@ -62,10 +62,10 @@ namespace SampleWinForms
 
             if (g == null)
             {
-                destImg = new ActualImage(300, 300, PixelFarm.Agg.Image.PixelFormat.ARGB32);
+                destImg = new ActualImage(400, 300, PixelFarm.Agg.Image.PixelFormat.ARGB32);
                 imgGfx2d = new ImageGraphics2D(destImg, null); //no platform
                 p = new AggCanvasPainter(imgGfx2d);
-                winBmp = new Bitmap(300, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
             }
             //  ReadAndRender(@"..\..\segoeui.ttf");
@@ -103,7 +103,7 @@ namespace SampleWinForms
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
                     case RenderChoice.RenderWithTypePlanAndMiniAgg:
-                        RenderWithTextPrinter(typeFace, this.txtInputChar.Text, fontSizeInPoint, resolution);
+                        RenderWithTextPrinterAndMiniAgg(typeFace, this.txtInputChar.Text, fontSizeInPoint, resolution);
                         break;
                     default:
                         throw new NotSupportedException();
@@ -189,36 +189,7 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(10, 0));
         }
-        //void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
-        //{
-        //    //2. glyph to gdi path
-        //    var builder = new GlyphPathBuilderGdiPlus(typeface);
-        //    builder.Build(testChar, sizeInPoint, resolution);
-        //    System.Drawing.Drawing2D.GraphicsPath gfxPath = builder.GetGraphicsPath();
-        //    //--------------- 
-        //    //3. just render to background-graphics
-        //    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-        //    g.Clear(Color.White);
 
-        //    //credit:
-        //    //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-        //    g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-        //    g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
-
-        //    if (chkFillBackground.Checked)
-        //    {
-        //        g.FillPath(Brushes.Black, gfxPath);
-        //    }
-        //    if (chkBorder.Checked)
-        //    {
-        //        g.DrawPath(Pens.Green, gfxPath);
-        //    }
-
-        //    //transform back
-        //    g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-        //    g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
-
-        //}
         void RenderWithPlugableGlyphRasterizer(Typeface typeface, char testChar, float sizeInPoint, int resolution)
         {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -247,10 +218,61 @@ namespace SampleWinForms
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
 
         }
-        void RenderWithTextPrinter(Typeface typeface, string str, float sizeInPoint, int resolution)
+        void RenderWithTextPrinterAndMiniAgg(Typeface typeface, string str, float sizeInPoint, int resolution)
         {
             TextPrinter printer = new TextPrinter();
-            printer.Print(typeface, sizeInPoint, str);
+            int len = str.Length;
+            GlyphPlan[] glyphPlanList = new GlyphPlan[len];
+            printer.Print(typeface, sizeInPoint, str, glyphPlanList);
+            //--------------------------
+
+            //5. use PixelFarm's Agg to render to bitmap...
+            //5.1 clear background
+            p.Clear(PixelFarm.Drawing.Color.White);
+
+            if (chkFillBackground.Checked)
+            {
+                //5.2 
+                p.FillColor = PixelFarm.Drawing.Color.Black;
+                //5.3 
+                int glyphListLen = glyphPlanList.Length;
+
+                float ox = p.OriginX;
+                float oy = p.OriginY;
+                float cx = 0;
+                float cy = 10;
+                for (int i = 0; i < glyphListLen; ++i)
+                {
+                    GlyphPlan glyphPlan = glyphPlanList[i];
+                    cx = glyphPlan.x;
+                    p.SetOrigin(cx, cy);
+                    p.Fill(glyphPlan.vxs);
+                }
+                p.SetOrigin(ox, oy);
+
+            }
+            if (chkBorder.Checked)
+            {
+                //5.4 
+                p.StrokeColor = PixelFarm.Drawing.Color.Green;
+                //user can specific border width here...
+                //p.StrokeWidth = 2;
+                //5.5 
+                int glyphListLen = glyphPlanList.Length;
+                for (int i = 0; i < glyphListLen; ++i)
+                {
+                    GlyphPlan glyphPlan = glyphPlanList[i];
+                    p.Draw(glyphPlan.vxs);
+                }
+            }
+            //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
+            BitmapHelper.CopyToWindowsBitmap(destImg, winBmp, new RectInt(0, 0, 300, 300));
+            //--------------- 
+            //7. just render our bitmap
+            g.Clear(Color.White);
+            g.DrawImage(winBmp, new Point(10, 0));
+            //--------------------------
+
         }
         private void txtInputChar_TextChanged(object sender, EventArgs e)
         {

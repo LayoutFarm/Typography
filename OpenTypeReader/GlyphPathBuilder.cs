@@ -24,7 +24,6 @@ namespace NRasterizer
         protected override void OnCloseFigure()
         {
             _rasterizer.CloseFigure();
-
         }
         protected override void OnCurve3(short p2x, short p2y, short x, short y)
         {
