@@ -14,7 +14,7 @@ License
 -----------
 Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
-some code are in FreeType license (http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT)
+some code are in The FreeType Project license (BSD 3 clauses)
 
 Screenshots
 -----------
