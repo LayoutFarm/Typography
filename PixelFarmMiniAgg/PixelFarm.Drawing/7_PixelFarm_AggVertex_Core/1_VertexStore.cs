@@ -179,7 +179,7 @@ namespace PixelFarm.Agg
                 {
                     //copy old buffer to new buffer 
                     int actualLen = m_num_vertices << 1;
-                    for (int i = actualLen - 1; i >= 0;)
+                    for (int i = actualLen - 1; i >= 0; )
                     {
                         new_xy[i] = m_coord_xy[i];
                         i--;
@@ -239,6 +239,42 @@ namespace PixelFarm.Agg
             m_CommandAndFlags = vstore.m_cmds;
         }
 
-        //----------------------------------------------------------
+        private VertexStore(VertexStore src)
+        {
+
+            this.m_allocated_vertices = src.m_allocated_vertices;
+            this.m_num_vertices = src.m_num_vertices;
+
+            int coord_len = src.m_coord_xy.Length;
+            int cmds_len = src.m_cmds.Length;
+
+            this.m_coord_xy = new double[coord_len];
+            this.m_cmds = new VertexCmd[cmds_len];
+
+            System.Array.Copy(
+                 src.m_coord_xy,
+                 0,
+                 this.m_coord_xy,
+                 0,
+                 coord_len);
+
+            System.Array.Copy(
+                 src.m_cmds,
+                 0,
+                 this.m_cmds,
+                 0,
+                 cmds_len); 
+        }
+
+        /// <summary>
+        /// copy from src to the new one
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public static VertexStore CreateCopy(VertexStore src)
+        {
+            return new VertexStore(src);
+
+        }
     }
 }

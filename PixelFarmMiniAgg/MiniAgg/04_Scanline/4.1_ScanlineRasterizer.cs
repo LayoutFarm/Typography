@@ -94,9 +94,7 @@ namespace PixelFarm.Agg
 
         RectInt userModeClipBox;
         //---------------
-        //offset x offset y
-        double addVertextOffsetX = 0;
-        double addVertextOffsetY = 0;
+       
         enum Status
         {
             Initial,
@@ -207,16 +205,7 @@ namespace PixelFarm.Agg
             }
         }
 
-        public double AddVertexOffsetX
-        {
-            get { return this.addVertextOffsetX; }
-            set { this.addVertextOffsetX = value; }
-        }
-        public double AddVertexOffsetY
-        {
-            get { return this.addVertextOffsetY; }
-            set { this.addVertextOffsetY = value; }
-        }
+        
         void AddVertex(VertexCmd cmd, double x, double y)
         {
             switch (cmd)
@@ -253,7 +242,16 @@ namespace PixelFarm.Agg
             m_status = Status.MoveTo;
         }
         //-------------------------------------------------------------------
-
+        public float OffsetOriginX
+        {
+            get;
+            set;
+        }
+        public float OffsetOriginY
+        {
+            get;
+            set;
+        }
         public void AddPath(VertexStore vxs)
         {
             this.AddPath(new VertexStoreSnap(vxs));
@@ -263,6 +261,8 @@ namespace PixelFarm.Agg
             double x = 0;
             double y = 0;
             if (m_cellAARas.Sorted) { Reset(); }
+            float offsetOrgX = OffsetOriginX;
+            float offsetOrgY = OffsetOriginY;
 
             if (snap.VxsHasMoreThanOnePart)
             {
@@ -270,12 +270,13 @@ namespace PixelFarm.Agg
                 //render all parts
                 VertexStore vxs = snap.GetInternalVxs();
                 int j = vxs.Count;
+
                 for (int i = 0; i < j; ++i)
                 {
                     var cmd = vxs.GetVertex(i, out x, out y);
                     if (cmd != VertexCmd.Stop)
                     {
-                        AddVertex(cmd, x, y);
+                        AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
                     }
                 }
             }
@@ -291,7 +292,7 @@ namespace PixelFarm.Agg
 #if DEBUG
                     dbugVertexCount++;
 #endif
-                    AddVertex(cmd, x, y);
+                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
                 }
             }
         }
@@ -351,7 +352,7 @@ namespace PixelFarm.Agg
         //--------------------------------------------------------------------
         internal bool SweepScanline(Scanline scline)
         {
-            for (;;)
+            for (; ; )
             {
                 if (m_scan_y > m_cellAARas.MaxY)
                 {

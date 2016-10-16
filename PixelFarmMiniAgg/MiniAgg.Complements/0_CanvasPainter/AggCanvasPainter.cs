@@ -285,6 +285,19 @@ namespace PixelFarm.Agg
         {
             get { return this.gx; }
         }
+        public float OriginX
+        {
+            get { return sclineRas.OffsetOriginX; }
+        }
+        public float OriginY
+        {
+            get { return sclineRas.OffsetOriginY; }
+        }
+        public void SetOrigin(float x, float y)
+        {
+            sclineRas.OffsetOriginX = x;
+            sclineRas.OffsetOriginY = y;
+        }
         /// <summary>
         /// fill vertex store
         /// </summary>
