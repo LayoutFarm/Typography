@@ -70,6 +70,7 @@ namespace NRasterizer
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
+                //GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
 
                 return new Typeface(
                     nameEntry,
