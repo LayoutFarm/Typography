@@ -9,50 +9,72 @@ namespace NRasterizer
     public abstract class GlyphPathBuilderBase
     {
         readonly Typeface _typeface;
-        const int pointsPerInch = 72;
+        protected const int pointsPerInch = 72;
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
+            this.Resolution = 96;//default dpi 
         }
+        struct FtPoint
+        {
+            readonly short _x;
+            readonly short _y;
+            public FtPoint(short x, short y)
+            {
+                _x = x;
+                _y = y;
+            }
+            public short X { get { return _x; } }
+            public short Y { get { return _y; } }
 
-        const double FT_RESIZE = 64; //essential to be floating point
-
+            public override string ToString()
+            {
+                return "(" + _x + "," + _y + ")";
+            }
+        }
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
-        protected abstract void OnCurve3(double p2x, double p2y, double x, double y);
-        protected abstract void OnCurve4(double p2x, double p2y, double p3x, double p3y, double x, double y);
-        protected abstract void OnMoveTo(double x, double y);
-        protected abstract void OnLineTo(double x, double y);
+        protected abstract void OnCurve3(short p2x, short p2y, short x, short y);
+        protected abstract void OnCurve4(short p2x, short p2y, short p3x, short p3y, short x, short y);
+        protected abstract void OnMoveTo(short x, short y);
+        protected abstract void OnLineTo(short x, short y);
 
-        void RenderGlyph(ushort[] contours, FtPoint[] ftpoints, Flag[] flags)
+        void RenderGlyph(ushort[] contours, short[] xs, short[] ys, bool[] onCurves)
         {
+
             //outline version
             //-----------------------------
-            int npoints = ftpoints.Length;
+            int npoints = xs.Length;
             int startContour = 0;
             int cpoint_index = 0;
             int todoContourCount = contours.Length;
-            //-----------------------------------
+            //----------------------------------- 
             OnBeginRead(todoContourCount);
             //-----------------------------------
-            double lastMoveX = 0;
-            double lastMoveY = 0;
+            short lastMoveX = 0;
+            short lastMoveY = 0;
+
+
             int controlPointCount = 0;
             while (todoContourCount > 0)
             {
                 int nextContour = contours[startContour] + 1;
                 bool isFirstPoint = true;
-                FtPointD secondControlPoint = new FtPointD();
-                FtPointD thirdControlPoint = new FtPointD();
+                FtPoint secondControlPoint = new FtPoint();
+                FtPoint thirdControlPoint = new FtPoint();
+
+
                 bool justFromCurveMode = false;
                 for (; cpoint_index < nextContour; ++cpoint_index)
                 {
-                    FtPoint vpoint = ftpoints[cpoint_index];
-                    int vtag = (int)flags[cpoint_index] & 0x1;
+
+                    short vpoint_x = xs[cpoint_index];
+                    short vpoint_y = ys[cpoint_index];
+                    //int vtag = (int)flags[cpoint_index] & 0x1;
                     //bool has_dropout = (((vtag >> 2) & 0x1) != 0);
                     //int dropoutMode = vtag >> 3;
-                    if ((vtag & 0x1) != 0)
+                    if (onCurves[cpoint_index])
                     {
                         //on curve
                         if (justFromCurveMode)
@@ -61,15 +83,15 @@ namespace NRasterizer
                             {
                                 case 1:
                                     {
-                                        OnCurve3(secondControlPoint.x / FT_RESIZE, secondControlPoint.y / FT_RESIZE,
-                                            vpoint.X / FT_RESIZE, vpoint.Y / FT_RESIZE);
+                                        OnCurve3(secondControlPoint.X, secondControlPoint.Y,
+                                            vpoint_x, vpoint_y);
                                     }
                                     break;
                                 case 2:
                                     {
-                                        OnCurve4(secondControlPoint.x / FT_RESIZE, secondControlPoint.y / FT_RESIZE,
-                                           thirdControlPoint.x / FT_RESIZE, thirdControlPoint.y / FT_RESIZE,
-                                           vpoint.X / FT_RESIZE, vpoint.Y / FT_RESIZE);
+                                        OnCurve4(secondControlPoint.X, secondControlPoint.Y,
+                                             thirdControlPoint.X, thirdControlPoint.Y,
+                                             vpoint_x, vpoint_y);
                                     }
                                     break;
                                 default:
@@ -85,11 +107,11 @@ namespace NRasterizer
                             if (isFirstPoint)
                             {
                                 isFirstPoint = false;
-                                OnMoveTo(lastMoveX = (vpoint.X / FT_RESIZE), lastMoveY = (vpoint.Y / FT_RESIZE));
+                                OnMoveTo(lastMoveX = (vpoint_x), lastMoveY = (vpoint_y));
                             }
                             else
                             {
-                                OnLineTo(vpoint.X / FT_RESIZE, vpoint.Y / FT_RESIZE);
+                                OnLineTo(vpoint_x, vpoint_y);
                             }
 
                             //if (has_dropout)
@@ -107,43 +129,27 @@ namespace NRasterizer
                         switch (controlPointCount)
                         {
                             case 0:
-                                {   //bit 1 set=> off curve, this is a control point
-                                    //if this is a 2nd order or 3rd order control point
-                                    if (((vtag >> 1) & 0x1) != 0)
-                                    {
-                                        //printf("[%d] bzc3rd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
-                                        thirdControlPoint = new FtPointD(vpoint);
-                                    }
-                                    else
-                                    {
-                                        //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
-                                        secondControlPoint = new FtPointD(vpoint);
-                                    }
+                                {
+                                    secondControlPoint = new FtPoint(vpoint_x, vpoint_y);
                                 }
                                 break;
                             case 1:
                                 {
-                                    if (((vtag >> 1) & 0x1) != 0)
-                                    {
-                                        //printf("[%d] bzc3rd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
-                                        thirdControlPoint = new FtPointD(vpoint.X, vpoint.Y);
-                                    }
-                                    else
-                                    {
-                                        //we already have prev second control point
-                                        //so auto calculate line to 
-                                        //between 2 point
-                                        FtPointD mid = GetMidPoint(secondControlPoint, vpoint);
-                                        //----------
-                                        //generate curve3
-                                        OnCurve3(secondControlPoint.x / FT_RESIZE, secondControlPoint.y / FT_RESIZE,
-                                            mid.x / FT_RESIZE, mid.y / FT_RESIZE);
-                                        //------------------------
-                                        controlPointCount--;
-                                        //------------------------
-                                        //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
-                                        secondControlPoint = new FtPointD(vpoint);
-                                    }
+
+                                    //we already have prev second control point
+                                    //so auto calculate line to 
+                                    //between 2 point
+                                    FtPoint mid = GetMidPoint(secondControlPoint, vpoint_x, vpoint_y);
+                                    //----------
+                                    //generate curve3
+                                    OnCurve3(secondControlPoint.X, secondControlPoint.Y,
+                                        mid.X, mid.Y);
+                                    //------------------------
+                                    controlPointCount--;
+                                    //------------------------
+                                    //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
+                                    secondControlPoint = new FtPoint(vpoint_x, vpoint_y);
+
                                 }
                                 break;
                             default:
@@ -167,15 +173,15 @@ namespace NRasterizer
                         case 0: break;
                         case 1:
                             {
-                                OnCurve3(secondControlPoint.x / FT_RESIZE, secondControlPoint.y / FT_RESIZE,
-                                  lastMoveX, lastMoveY);
+                                OnCurve3(secondControlPoint.X, secondControlPoint.Y,
+                                    lastMoveX, lastMoveY);
                             }
                             break;
                         case 2:
                             {
-                                OnCurve4(secondControlPoint.x / FT_RESIZE, secondControlPoint.y / FT_RESIZE,
-                                   thirdControlPoint.x / FT_RESIZE, thirdControlPoint.y / FT_RESIZE,
-                                  lastMoveX, lastMoveY);
+                                OnCurve4(secondControlPoint.X, secondControlPoint.Y,
+                                    thirdControlPoint.X, thirdControlPoint.Y,
+                                    lastMoveX, lastMoveY);
                             }
                             break;
                         default:
@@ -191,34 +197,51 @@ namespace NRasterizer
             }
             OnEndRead();
         }
-        static FtPointD GetMidPoint(FtPoint v1, FtPoint v2)
+
+        static FtPoint GetMidPoint(FtPoint v1, short v2x, short v2y)
         {
-            return new FtPointD(
-                ((double)v1.X + (double)v2.X) / 2d,
-                ((double)v1.Y + (double)v2.Y) / 2d);
-        }
-        static FtPointD GetMidPoint(FtPointD v1, FtPointD v2)
-        {
-            return new FtPointD(
-                ((double)v1.x + (double)v2.x) / 2d,
-                ((double)v1.y + (double)v2.y) / 2d);
-        }
-        static FtPointD GetMidPoint(FtPointD v1, FtPoint v2)
-        {
-            return new FtPointD(
-                (v1.x + (double)v2.X) / 2d,
-                (v1.y + (double)v2.Y) / 2d);
+            return new FtPoint(
+                (short)((v1.X + v2x) >> 1),
+                (short)((v1.Y + v2y) >> 1));
         }
 
         void RenderGlyph(Glyph glyph)
         {
-            RenderGlyph(glyph.EndPoints, glyph.GetPoints(), glyph.Flags);
+            RenderGlyph(glyph.EndPoints, glyph.Xs, glyph.Ys, glyph.OnCurves);
         }
 
-        public void Build(char c, int size, int resolution)
+        public void Build(char c, float sizeInPoints)
         {
-            float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
-            RenderGlyph(_typeface.Lookup(c));
+            BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints);
+        }
+        public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
+        {
+            this.SizeInPoints = sizeInPoints;
+            RenderGlyph(_typeface.GetGlyphByIndex(glyphIndex));
+        }
+        public float SizeInPoints
+        {
+            get;
+            set;
+        }
+        public int Resolution
+        {
+            get;
+            set;
+        }
+        protected Typeface TypeFace
+        {
+            get { return _typeface; }
+        }
+        protected ushort TypeFaceUnitPerEm
+        {
+            get { return _typeface.UnitsPerEm; }
+        }
+       
+
+        public static float GetFUnitToPixelsScale(float fontSizeInPoint, int resolution, ushort unitPerEm)
+        {
+            return ((fontSizeInPoint * resolution) / (pointsPerInch * unitPerEm));
         }
     }
 }

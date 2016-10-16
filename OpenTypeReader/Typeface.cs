@@ -48,10 +48,17 @@ namespace NRasterizer
         {
             return _glyphs[LookupIndex(character)];
         }
-
+        public Glyph GetGlyphByIndex(int glyphIndex)
+        {
+            return _glyphs[glyphIndex];
+        }
         public ushort GetAdvanceWidth(char character)
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(character));
+        }
+        public ushort GetAdvanceWidthFromGlyphIndex(int glyphIndex)
+        {
+            return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
