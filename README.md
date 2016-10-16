@@ -1,4 +1,4 @@
-PixelFarm's FontRasterizer
+![PixelFarm's FontRasterizer](https://cloud.githubusercontent.com/assets/7447159/19415118/c971bf72-938f-11e6-8ca1-36a90ff0e3b5.png)
 ===========
 
 Simple and clean TrueType font renderer written purely in c#.
@@ -39,5 +39,6 @@ Tahoma, 11 pts
 
 ---
 Enable Kerning
+
 ![enable_kerning1](https://cloud.githubusercontent.com/assets/7447159/19415089/7d3ae864-938e-11e6-94b1-4817b327832a.png)
 
