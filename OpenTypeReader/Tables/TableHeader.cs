@@ -1,6 +1,6 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
-using System; 
+using System;
 using System.Text;
 namespace NRasterizer.Tables
 {
@@ -30,7 +30,7 @@ namespace NRasterizer.Tables
         public uint Offset { get { return _offset; } }
         public uint CheckSum { get { return _checkSum; } }
         public uint Length { get { return _length; } }
-        static String TagToString(uint tag)
+        static string TagToString(uint tag)
         {
             byte[] bytes = BitConverter.GetBytes(tag);
             Array.Reverse(bytes);
@@ -42,6 +42,6 @@ namespace NRasterizer.Tables
             return "{" + Tag + "}";
         }
 
-      
+
     }
 }
