@@ -161,11 +161,22 @@ namespace NRasterizer.Tables
             throw new NotImplementedException();
         }
 
+        internal struct LookupResult
+        {
 
+            public readonly LookupSubTable foundOnTable;
+            public readonly int foundAtIndex;
+            public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
+            {
+                this.foundAtIndex = foundAtIndex;
+                this.foundOnTable = foundOnTable;
+            }
+
+        }
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
-        class LookupTable
+        internal class LookupTable
         {
             //--------------------------
             long lookupTablePos;
@@ -199,6 +210,34 @@ namespace NRasterizer.Tables
                 return lookupType.ToString();
             }
 #endif
+            public int FindGlyphIndex(int glyphIndex)
+            {
+                //check if input glyphIndex is in coverage area 
+                for (int i = subTables.Count - 1; i >= 0; --i)
+                {
+                    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+                    if (foundAtIndex > -1)
+                    {
+                        //found                        
+                        return foundAtIndex;
+                    }
+                }
+                return -1;
+            }
+            public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
+            {
+                //check if input glyphIndex is in coverage area 
+                for (int i = subTables.Count - 1; i >= 0; --i)
+                {
+                    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+                    if (foundAtIndex > -1)
+                    {
+                        //found                        
+                        outputResults.Add(new LookupResult(subTables[i], i));
+                    }
+                }
+
+            }
             public void ReadRecordContent(BinaryReader reader)
             {
                 switch (lookupType)
@@ -413,9 +452,8 @@ namespace NRasterizer.Tables
 
         public bool CheckSubstitution(int inputGlyph)
         {
-
-            int j = lookupTables.Count;
-            for (int i = 0; i < j; ++i)
+            List<GSUB.LookupResult> foundResults = new List<LookupResult>();
+            for (int i = lookupTables.Count - 1; i >= 0; --i)
             {
                 LookupTable lookup = lookupTables[i];
                 if (lookup.lookupType != 1)
@@ -424,6 +462,12 @@ namespace NRasterizer.Tables
                     //TODO: implement more
                     continue;
                 }
+                int foundIndex = lookup.FindGlyphIndex(inputGlyph);
+                if (foundIndex > -1)
+                {
+                    //found here 
+                    lookup.FindGlyphIndexAll(inputGlyph, foundResults);
+                } 
             }
             return false;
         }

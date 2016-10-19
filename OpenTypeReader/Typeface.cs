@@ -97,6 +97,7 @@ namespace NRasterizer
                 output.Add(LookupIndex(buffer[i]));
             }
             //check for glyph substitution
+             
             this.GSUBTable.CheckSubstitution(output[1]);
 
         }

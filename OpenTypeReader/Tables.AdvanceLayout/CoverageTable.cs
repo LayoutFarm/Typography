@@ -116,8 +116,8 @@ namespace NRasterizer.Tables
             }
             public bool Contains(int glyphIndex)
             {
-                return (end <= glyphIndex &&
-                        start >= glyphIndex);
+                return glyphIndex >= start && glyphIndex <= end;
+                 
             }
 #if DEBUG
             public override string ToString()

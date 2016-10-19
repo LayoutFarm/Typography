@@ -38,6 +38,9 @@ namespace NRasterizer.Tables
             this.CoverageOffset = coverageOffset;
             this.DeltaGlyph = deltaGlyph;
         }
+        /// <summary>
+        /// Add to original GlyphID to get substitute GlyphID
+        /// </summary>
         public short DeltaGlyph
         {
             //format1
@@ -56,6 +59,9 @@ namespace NRasterizer.Tables
             this.CoverageOffset = coverageOffset;
             this.SubstitueGlyphs = substitueGlyphs;
         }
+        /// <summary>
+        /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
+        /// </summary>
         public ushort[] SubstitueGlyphs
         {
             get;
