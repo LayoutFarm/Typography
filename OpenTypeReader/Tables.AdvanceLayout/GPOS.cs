@@ -389,7 +389,50 @@ namespace NRasterizer.Tables
             void ReadLookupType4(BinaryReader reader)
             {
                 Console.WriteLine("skip lookup type 4");
-                //throw new NotImplementedException();
+                //MarkBasePosFormat1 subtable: MarkToBase attachment point
+                //Value 	Type 	Description
+                //USHORT 	PosFormat 	Format identifier-format = 1
+                //Offset 	MarkCoverage 	Offset to MarkCoverage table-from beginning of MarkBasePos subtable
+                //Offset 	BaseCoverage 	Offset to BaseCoverage table-from beginning of MarkBasePos subtable
+                //USHORT 	ClassCount 	Number of classes defined for marks
+                //Offset 	MarkArray 	Offset to MarkArray table-from beginning of MarkBasePos subtable
+                //Offset 	BaseArray 	Offset to BaseArray table-from beginning of MarkBasePos subtable
+
+                //The BaseArray table consists of an array (BaseRecord) and count (BaseCount) of BaseRecords. The array stores the BaseRecords in the same order as the BaseCoverage Index. Each base glyph in the BaseCoverage table has a BaseRecord.
+                //BaseArray table
+                //Value 	Type 	Description
+                //USHORT 	BaseCount 	Number of BaseRecords
+                //struct 	BaseRecord[BaseCount] 	Array of BaseRecords-in order of BaseCoverage Index
+                long thisLoookupTablePos = reader.BaseStream.Position;
+                int j = subTableOffsets.Length;
+
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+
+                    //-----------------------
+                    LookupSubTable subTable = null;
+                    ushort format = reader.ReadUInt16();
+                    if (format != 1)
+                    {
+                        throw new NotSupportedException();
+                    }
+                    short markCoverageOffset = reader.ReadInt16();
+                    short baseCoverageOffset = reader.ReadInt16();
+                    ushort classCount = reader.ReadUInt16();
+                    short markArrayOffset = reader.ReadInt16();
+                    short baseArrayOffset = reader.ReadInt16();
+
+
+
+
+
+                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                    this.subTables.Add(subTable);
+                }
+
+
             }
             /// <summary>
             /// Lookup Type 5: MarkToLigature Attachment Positioning Subtable
@@ -398,6 +441,39 @@ namespace NRasterizer.Tables
             void ReadLookupType5(BinaryReader reader)
             {
                 Console.WriteLine("skip lookup type 5");
+                //USHORT 	PosFormat 	Format identifier-format = 1
+                //Offset 	MarkCoverage 	Offset to Mark Coverage table-from beginning of MarkLigPos subtable
+                //Offset 	LigatureCoverage 	Offset to Ligature Coverage table-from beginning of MarkLigPos subtable
+                //USHORT 	ClassCount 	Number of defined mark classes
+                //Offset 	MarkArray 	Offset to MarkArray table-from beginning of MarkLigPos subtable
+                //Offset 	LigatureArray 	Offset to LigatureArray table-from beginning of MarkLigPos subtable
+
+                long thisLoookupTablePos = reader.BaseStream.Position;
+                int j = subTableOffsets.Length;
+
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+
+                    //-----------------------
+                    LookupSubTable subTable = null;
+                    ushort format = reader.ReadUInt16();
+                    if (format != 1)
+                    {
+                        throw new NotSupportedException();
+                    }
+                    short markCoverageOffset = reader.ReadInt16();
+                    short ligatureCoverageOffset = reader.ReadInt16();
+                    ushort classCount = reader.ReadUInt16();
+                    short markArrayOffset = reader.ReadInt16();
+                    short ligatureArrayOffset = reader.ReadInt16();
+
+                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                    this.subTables.Add(subTable);
+                }
+
+
             }
             /// <summary>
             /// Lookup Type 6: MarkToMark Attachment Positioning Subtable
@@ -406,7 +482,39 @@ namespace NRasterizer.Tables
             void ReadLookupType6(BinaryReader reader)
             {
                 Console.WriteLine("skip lookup type 6");
-                //throw new NotImplementedException();
+
+                //USHORT 	PosFormat 	Format identifier-format = 1
+                //Offset 	Mark1Coverage 	Offset to Combining Mark Coverage table-from beginning of MarkMarkPos subtable
+                //Offset 	Mark2Coverage 	Offset to Base Mark Coverage table-from beginning of MarkMarkPos subtable
+                //USHORT 	ClassCount 	Number of Combining Mark classes defined
+                //Offset 	Mark1Array 	Offset to MarkArray table for Mark1-from beginning of MarkMarkPos subtable
+                //Offset 	Mark2Array 	Offset to Mark2Array table for Mark2-from beginning of MarkMarkPos subtable
+
+                long thisLoookupTablePos = reader.BaseStream.Position;
+                int j = subTableOffsets.Length;
+
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+
+                    //-----------------------
+                    LookupSubTable subTable = null;
+                    ushort format = reader.ReadUInt16();
+                    if (format != 1)
+                    {
+                        throw new NotSupportedException();
+                    }
+                    short mark1CoverageOffset = reader.ReadInt16();
+                    short mark2CoverageOffset = reader.ReadInt16();
+                    ushort classCount = reader.ReadUInt16();
+                    short mark1ArrayOffset = reader.ReadInt16();
+                    short mark2ArrayOffset = reader.ReadInt16();
+
+                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                    this.subTables.Add(subTable);
+                }
+
             }
             /// <summary>
             /// Lookup Type 7: Contextual Positioning Subtables
@@ -422,7 +530,87 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType8(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 8");
+                long thisLoookupTablePos = reader.BaseStream.Position;
+                int j = subTableOffsets.Length;
+
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+                    //-----------------------
+                    LookupSubTable subTable = null;
+                    ushort format = reader.ReadUInt16();
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                //Chaining Context Positioning Format 1: Simple Chaining Context Glyph Positioning
+                                // USHORT 	PosFormat 	Format identifier-format = 1
+                                //Offset 	Coverage 	Offset to Coverage table-from beginning of ContextPos subtable
+                                //USHORT 	ChainPosRuleSetCount 	Number of ChainPosRuleSet tables
+                                //Offset 	ChainPosRuleSet
+                                //[ChainPosRuleSetCount] 	Array of offsets to ChainPosRuleSet tables-from beginning of ContextPos subtable-ordered by Coverage Index
+
+                                short coverageOffset = reader.ReadInt16();
+                                ushort chainPosRuleSetCount = reader.ReadUInt16();
+                                short[] chainPosRuleSetOffsetList = Utils.ReadInt16Array(reader, chainPosRuleSetCount);
+
+                            } break;
+                        case 2:
+                            {
+                                //Chaining Context Positioning Format 2: Class-based Chaining Context Glyph Positioning
+                                //USHORT 	PosFormat 	Format identifier-format = 2
+                                //Offset 	Coverage 	Offset to Coverage table-from beginning of ChainContextPos subtable
+                                //Offset 	BacktrackClassDef 	Offset to ClassDef table containing backtrack sequence context-from beginning of ChainContextPos subtable
+                                //Offset 	InputClassDef 	Offset to ClassDef table containing input sequence context-from beginning of ChainContextPos subtable
+                                //Offset 	LookaheadClassDef 	Offset to ClassDef table containing lookahead sequence context-from beginning of ChainContextPos subtable
+                                //USHORT 	ChainPosClassSetCnt 	Number of ChainPosClassSet tables
+                                //Offset 	ChainPosClassSet
+                                //[ChainPosClassSetCnt] 	Array of offsets to ChainPosClassSet tables-from beginning of ChainContextPos subtable-ordered by input class-may be NULL
+
+                                short coverageOffset = reader.ReadInt16();
+                                short backTrackClassDefOffset = reader.ReadInt16();
+                                short inpuClassDefOffset = reader.ReadInt16();
+                                short lookadheadClassDefOffset = reader.ReadInt16();
+                                ushort chainPosClassSetCnt = reader.ReadUInt16();
+                                short[] chainPosClassSetOffsetArray = Utils.ReadInt16Array(reader, chainPosClassSetCnt);
+
+                            } break;
+                        case 3:
+                            {
+
+                                //Chaining Context Positioning Format 3: Coverage-based Chaining Context Glyph Positioning
+                                //USHORT 	PosFormat 	Format identifier-format = 3
+                                //USHORT 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
+                                //Offset 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
+                                //USHORT 	InputGlyphCount 	Number of glyphs in input sequence
+                                //Offset 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
+                                //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
+                                //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
+                                //USHORT 	PosCount 	Number of PosLookupRecords
+                                //struct 	PosLookupRecord
+                                //[PosCount] 	Array of PosLookupRecords,in design order
+
+                                ushort backtrackGlyphCount = reader.ReadUInt16();
+                                short[] backtrackCoverageOffsets = Utils.ReadInt16Array(reader, backtrackGlyphCount);
+                                //
+                                ushort inputGlyphCount = reader.ReadUInt16();
+                                short[] inputGlyphCoverageOffsets = Utils.ReadInt16Array(reader, inputGlyphCount);
+                                //
+                                ushort lookaheadGlyphCount = reader.ReadUInt16();
+                                short[] lookaheadCoverageOffsets = Utils.ReadInt16Array(reader, lookaheadGlyphCount);
+                                //
+                                ushort posCount = reader.ReadUInt16();
+                                //read each lookahead record
+
+
+                            } break;
+                    }
+
+
+                    this.subTables.Add(subTable);
+                }
             }
             /// <summary>
             /// LookupType 9: Extension Positioning
