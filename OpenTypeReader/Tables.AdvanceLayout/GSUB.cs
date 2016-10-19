@@ -344,11 +344,7 @@ namespace NRasterizer.Tables
                         case 2:
                             {
                                 ushort glyphCount = reader.ReadUInt16();
-                                ushort[] substitueGlyphs = new ushort[glyphCount];// 	Array of substitute GlyphIDs-ordered by Coverage Index
-                                for (int n = 0; n < glyphCount; ++n)
-                                {
-                                    substitueGlyphs[n] = reader.ReadUInt16();
-                                }
+                                ushort[] substitueGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
                                 subTable = new LookupSubTableT1F2(coverage, substitueGlyphs);
                             }
                             break;
@@ -449,11 +445,7 @@ namespace NRasterizer.Tables
                                 //6.1 Chaining Context Substitution Format 1: Simple Chaining Context Glyph Substitution 
                                 ushort coverage = reader.ReadUInt16();
                                 ushort chainSubRulesetCount = reader.ReadUInt16();
-                                short[] chainSubRulesetOffsets = new short[chainSubRulesetCount];
-                                for (int n = 0; n < chainSubRulesetCount; ++n)
-                                {
-                                    chainSubRulesetOffsets[n] = reader.ReadInt16();
-                                }
+                                short[] chainSubRulesetOffsets = Utils.ReadInt16Array(reader, chainSubRulesetCount);
 
                             } break;
                         case 2:
@@ -475,11 +467,8 @@ namespace NRasterizer.Tables
                                 short inputClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing input sequence data-from beginning of Substitution table
                                 short lookAheadClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing lookahead sequence data-from beginning of Substitution table
                                 ushort chainSubclassSetCount = reader.ReadUInt16(); //Number of ChainSubClassSet tables
-                                short[] chainSubClassOffsets = new short[chainSubclassSetCount];
-                                for (int n = 0; n < chainSubclassSetCount; ++n)
-                                {
-                                    chainSubClassOffsets[n] = reader.ReadInt16();
-                                }
+                                short[] chainSubClassOffsets = Utils.ReadInt16Array(reader, chainSubclassSetCount);
+
                             }
                             break;
                         case 3:
@@ -498,23 +487,11 @@ namespace NRasterizer.Tables
                                 //
 
                                 ushort backtrackingGlyphCount = reader.ReadUInt16();
-                                short[] backtrackingCoverageArray = new short[backtrackingGlyphCount];
-                                for (int n = 0; n < backtrackingGlyphCount; ++n)
-                                {
-                                    backtrackingCoverageArray[n] = reader.ReadInt16();
-                                }
+                                short[] backtrackingCoverageArray = Utils.ReadInt16Array(reader, backtrackingGlyphCount);
                                 ushort inputGlyphCount = reader.ReadUInt16();
-                                short[] inputGlyphCoverageArray = new short[inputGlyphCount];
-                                for (int n = 0; n < inputGlyphCount; ++n)
-                                {
-                                    inputGlyphCoverageArray[n] = reader.ReadInt16();
-                                }
+                                short[] inputGlyphCoverageArray = Utils.ReadInt16Array(reader, inputGlyphCount);
                                 ushort lookAheadGlyphCount = reader.ReadUInt16();
-                                short[] lookAheadCoverageArray = new short[lookAheadGlyphCount];
-                                for (int n = 0; n < lookAheadGlyphCount; ++n)
-                                {
-                                    lookAheadCoverageArray[n] = reader.ReadInt16();
-                                }
+                                short[] lookAheadCoverageArray = Utils.ReadInt16Array(reader, lookAheadGlyphCount);
 
                             }
                             break;
@@ -522,7 +499,7 @@ namespace NRasterizer.Tables
                     //-------------------------------------------------------------
 
 
-                    
+
                     this.subTables.Add(subTable);
                 }
 

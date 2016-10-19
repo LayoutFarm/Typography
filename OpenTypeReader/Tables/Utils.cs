@@ -22,5 +22,14 @@ namespace NRasterizer.Tables
             }
             return arr;
         }
+        public static ushort[] ReadUInt16Array(BinaryReader reader, int nRecords)
+        {
+            ushort[] arr = new ushort[nRecords];
+            for (int i = 0; i < nRecords; ++i)
+            {
+                arr[i] = reader.ReadUInt16();
+            }
+            return arr;
+        }
     }
 }
