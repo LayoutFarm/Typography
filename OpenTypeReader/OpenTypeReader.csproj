@@ -45,11 +45,13 @@
     <Compile Include="Net20\ExtensionAttribute.cs" />
     <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tables.AdvanceLayout\CoverageTable.cs" />
+    <Compile Include="Tables.AdvanceLayout\LookupSubTable.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
     <Compile Include="Tables\Cmap.cs" />
     <Compile Include="Tables\Glyf.cs" />
     <Compile Include="Tables\GlyphLocations.cs" />
-    <Compile Include="Tables\GSUB.cs" />
+    <Compile Include="Tables.AdvanceLayout\GSUB.cs" />
     <Compile Include="Tables\Head.cs" />
     <Compile Include="Tables\HorizontalHeader.cs" />
     <Compile Include="Tables\HorizontalMetrics.cs" />
