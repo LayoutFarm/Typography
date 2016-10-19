@@ -14,7 +14,7 @@ namespace NRasterizer.Tables
 
         ScriptList scriptList = new ScriptList();
         FeatureList featureList = new FeatureList();
-        List<LookupTable> lookupRecords = new List<LookupTable>();
+        List<LookupTable> lookupTables = new List<LookupTable>();
 
         long gsubTableStartAt;
         public override string Name
@@ -107,7 +107,7 @@ namespace NRasterizer.Tables
             //Offset 	SubTable
             //[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
             //unit16 	MarkFilteringSet
-            lookupRecords.Clear();
+            lookupTables.Clear();
             ushort lookupCount = reader.ReadUInt16();
             int[] subTableOffset = new int[lookupCount];
             for (int i = 0; i < lookupCount; ++i)
@@ -136,7 +136,7 @@ namespace NRasterizer.Tables
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
 
-                lookupRecords.Add(
+                lookupTables.Add(
                     new LookupTable(
                         lookupTablePos,
                         lookupType,
@@ -149,7 +149,7 @@ namespace NRasterizer.Tables
             //read each lookup record content ...
             for (int i = 0; i < lookupCount; ++i)
             {
-                LookupTable lookupRecord = lookupRecords[i];
+                LookupTable lookupRecord = lookupTables[i];
                 //set origin
                 reader.BaseStream.Seek(lookupListHeadPos + subTableOffset[i], SeekOrigin.Begin);
                 lookupRecord.ReadRecordContent(reader);
@@ -168,7 +168,7 @@ namespace NRasterizer.Tables
         class LookupTable
         {
             //--------------------------
-            long lookupTablePos; 
+            long lookupTablePos;
             //--------------------------
             public readonly ushort lookupType;
             public readonly ushort lookupFlags;
@@ -186,7 +186,7 @@ namespace NRasterizer.Tables
                 ushort markFilteringSet
                  )
             {
-                this.lookupTablePos = lookupTablePos; 
+                this.lookupTablePos = lookupTablePos;
                 this.lookupType = lookupType;
                 this.lookupFlags = lookupFlags;
                 this.subTableCount = subTableCount;
@@ -409,6 +409,23 @@ namespace NRasterizer.Tables
             {
                 throw new NotImplementedException();
             }
+        }
+
+        public bool CheckSubstitution(int inputGlyph)
+        {
+
+            int j = lookupTables.Count;
+            for (int i = 0; i < j; ++i)
+            {
+                LookupTable lookup = lookupTables[i];
+                if (lookup.lookupType != 1)
+                {
+                    //this version, handle only type1
+                    //TODO: implement more
+                    continue;
+                }
+            }
+            return false;
         }
 
     }

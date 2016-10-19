@@ -52,6 +52,7 @@
     <Compile Include="Tables.AdvanceLayout\GPOS.cs" />
     <Compile Include="Tables.AdvanceLayout\LookupSubTable.cs" />
     <Compile Include="Tables.AdvanceLayout\ScriptList.cs" />
+    <Compile Include="Tables.AdvanceLayout\ScriptTable.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
     <Compile Include="Tables\Cmap.cs" />
     <Compile Include="Tables\Glyf.cs" />

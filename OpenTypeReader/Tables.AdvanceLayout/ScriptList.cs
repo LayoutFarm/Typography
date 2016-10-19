@@ -10,6 +10,7 @@ namespace NRasterizer.Tables
     class ScriptList
     {
         List<ScriptRecord> scriptRecords = new List<ScriptRecord>();
+        List<ScriptTable> scriptTables = new List<ScriptTable>();
 
         struct ScriptRecord
         {
@@ -32,6 +33,7 @@ namespace NRasterizer.Tables
 
         public void ReadFrom(BinaryReader reader)
         {
+            long scriptListStartAt = reader.BaseStream.Position;
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             //ScriptList table
             //Type 	Name 	Description
@@ -45,12 +47,25 @@ namespace NRasterizer.Tables
             //Offset 	Script 	Offset to Script table-from beginning of ScriptList
             scriptRecords.Clear();
             ushort scriptCount = reader.ReadUInt16();
+
             for (int i = 0; i < scriptCount; ++i)
             {
                 //read script record
                 scriptRecords.Add(new ScriptRecord(
-                    reader.ReadUInt32(),
-                    reader.ReadUInt16()));
+                    reader.ReadUInt32(), //tag
+                    reader.ReadUInt16())); //offset
+            }
+            //-------------
+            //then read each
+            for (int i = 0; i < scriptCount; ++i)
+            {
+                ScriptRecord scriptRecord = scriptRecords[i];
+                //move to
+                reader.BaseStream.Seek(scriptListStartAt + scriptRecord.offset, SeekOrigin.Begin);
+                ScriptTable scriptTable = new ScriptTable(scriptRecord.scriptTag);
+                scriptTable.ReadFrom(reader);
+                scriptTables.Add(scriptTable);
+
             }
         }
     }
