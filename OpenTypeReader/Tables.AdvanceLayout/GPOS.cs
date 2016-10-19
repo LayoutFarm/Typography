@@ -229,7 +229,7 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType1(BinaryReader reader)
             {
-                long thisLoookupTablePos = reader.BaseStream.Position;
+                long thisLookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
                 for (int i = 0; i < j; ++i)
@@ -255,10 +255,7 @@ namespace NRasterizer.Tables
 
                                 short coverage = reader.ReadInt16();
                                 ushort valueFormat = reader.ReadUInt16();
-                                ValueRecord value = new ValueRecord();
-                                value.ReadFrom(reader, valueFormat);
-
-                                subTable = new LookupType1SubTable(value);
+                                subTable = new LookupType1SubTable(ValueRecord.CreateFrom(reader, valueFormat));
 
                             } break;
                         case 2:
@@ -346,7 +343,7 @@ namespace NRasterizer.Tables
                 //Value 	Type 	Description
                 //ValueRecord 	Value1 	Positioning for first glyph-empty if ValueFormat1 = 0
                 //ValueRecord 	Value2 	Positioning for second glyph-empty if ValueFormat2 = 0
-                long thisLoookupTablePos = reader.BaseStream.Position;
+                long thisLookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
                 for (int i = 0; i < j; ++i)
@@ -372,13 +369,14 @@ namespace NRasterizer.Tables
                                 for (int n = 0; n < pairSetCount; ++n)
                                 {
                                     //read each pair set table
-                                    reader.BaseStream.Seek(thisLoookupTablePos + pairSetOffsetArray[i], SeekOrigin.Begin);
+                                    reader.BaseStream.Seek(thisLookupTablePos + pairSetOffsetArray[i], SeekOrigin.Begin);
                                     var pairSetTable = new PairSetTable();
                                     pairSetTable.ReadFrom(reader, value1Format, value2Format);
                                     pairSetTables[n] = pairSetTable;
                                 }
                                 subTable = new LookupType2SubTable(pairSetTables);
-
+                                reader.BaseStream.Seek(thisLookupTablePos + coverage, SeekOrigin.Begin);
+                                
                             } break;
                         case 2:
                             {
@@ -398,7 +396,7 @@ namespace NRasterizer.Tables
                             }
                             break;
                     }
-                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+
                     this.subTables.Add(subTable);
                 }
             }
@@ -473,7 +471,7 @@ namespace NRasterizer.Tables
                 //Offset 	MarkArray 	Offset to MarkArray table-from beginning of MarkLigPos subtable
                 //Offset 	LigatureArray 	Offset to LigatureArray table-from beginning of MarkLigPos subtable
 
-                long thisLoookupTablePos = reader.BaseStream.Position;
+                long thisLookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
                 for (int i = 0; i < j; ++i)
@@ -515,7 +513,7 @@ namespace NRasterizer.Tables
                 //Offset 	Mark1Array 	Offset to MarkArray table for Mark1-from beginning of MarkMarkPos subtable
                 //Offset 	Mark2Array 	Offset to Mark2Array table for Mark2-from beginning of MarkMarkPos subtable
 
-                long thisLoookupTablePos = reader.BaseStream.Position;
+                long thisLookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
                 for (int i = 0; i < j; ++i)
@@ -555,7 +553,7 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType8(BinaryReader reader)
             {
-                long thisLoookupTablePos = reader.BaseStream.Position;
+                long thisLookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
                 for (int i = 0; i < j; ++i)
