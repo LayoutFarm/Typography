@@ -9,7 +9,7 @@ namespace NRasterizer.Tables
 
     class GPOS : TableEntry
     {
-        long gposStartAt;
+        long gposTableStartAt;
         ScriptList scriptList = new ScriptList();
         FeatureList featureList = new FeatureList();
         List<LookupTable> lookupRecords = new List<LookupTable>();
@@ -19,7 +19,7 @@ namespace NRasterizer.Tables
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            gposStartAt = reader.BaseStream.Position;
+            gposTableStartAt = reader.BaseStream.Position;
             //-------------------------------------------
             // GPOS Header
             //The GPOS table begins with a header that contains a version number for the table. Two versions are defined. Version 1.0 contains offsets to three tables: ScriptList, FeatureList, and LookupList. Version 1.1 also includes an offset to a FeatureVariations table. For descriptions of these tables, see the chapter, OpenType Layout Common Table Formats . Example 1 at the end of this chapter shows a GPOS Header table definition.
@@ -256,7 +256,7 @@ namespace NRasterizer.Tables
                             }
                             break;
                     }
-                //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
                     this.subTables.Add(subTable);
                 }
             }

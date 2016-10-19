@@ -79,6 +79,11 @@ namespace NRasterizer
             get;
             set;
         }
+        internal BASE BaseTable
+        {
+            get;
+            set;
+        }
         //-------------------------------------------------------
     }
 }
