@@ -322,10 +322,8 @@ namespace NRasterizer.Tables
                 //GlyphID 	Substitute
                 //[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
 
-                long thisLoookupTablePos = reader.BaseStream.Position;
+
                 int j = subTableOffsets.Length;
-
-
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
@@ -375,10 +373,8 @@ namespace NRasterizer.Tables
 
                 //    Note: The order of the output glyph indices depends on the writing direction of the text. For text written left to right, the left-most glyph will be first glyph in the sequence. Conversely, for text written right to left, the right-most glyph will be first.
 
-                //The use of multiple substitution for deletion of an input glyph is prohibited. GlyphCount should always be greater than 0.
-
-                //Example 4 at the end of this chapter shows how to replace a single ligature with three glyphs.
-
+                //The use of multiple substitution for deletion of an input glyph is prohibited. GlyphCount should always be greater than 0. 
+                //Example 4 at the end of this chapter shows how to replace a single ligature with three glyphs. 
 
                 //MultipleSubstFormat1 subtable: Multiple output glyphs
                 //Type 	Name 	Description
@@ -391,10 +387,7 @@ namespace NRasterizer.Tables
                 //Type 	Name 	Description
                 //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array. This should always be greater than 0.
                 //GlyphID 	Substitute
-                //[GlyphCount]
-
-
-
+                //[GlyphCount] 
                 Console.WriteLine("skip lookup2");
 
             }
@@ -429,7 +422,110 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType6(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 6");
+                //LookupType 6: Chaining Contextual Substitution Subtable
+                //A Chaining Contextual Substitution subtable (ChainContextSubst) describes glyph substitutions in context with an ability to look back and/or look ahead
+                //in the sequence of glyphs. 
+                //The design of the Chaining Contextual Substitution subtable is parallel to that of the Contextual Substitution subtable,
+                //including the availability of three formats for handling sequences of glyphs, glyph classes, or glyph sets. Each format can describe one or more backtrack,
+                //input, and lookahead sequences and one or more substitutions for each sequence.
+                //-----------------------
+                //TODO: impl here
+                Console.WriteLine("not complete lookup type 6!");
+                int j = subTableOffsets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+
+                    //-----------------------
+                    LookupSubTable subTable = null;
+                    ushort format = reader.ReadUInt16();
+
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                //6.1 Chaining Context Substitution Format 1: Simple Chaining Context Glyph Substitution 
+                                ushort coverage = reader.ReadUInt16();
+                                ushort chainSubRulesetCount = reader.ReadUInt16();
+                                short[] chainSubRulesetOffsets = new short[chainSubRulesetCount];
+                                for (int n = 0; n < chainSubRulesetCount; ++n)
+                                {
+                                    chainSubRulesetOffsets[n] = reader.ReadInt16();
+                                }
+
+                            } break;
+                        case 2:
+                            {
+                                //6.2 Chaining Context Substitution Format 2: Class-based Chaining Context Glyph Substitution       
+                                //USHORT 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
+                                //Offset 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
+                                //USHORT 	InputGlyphCount 	Number of glyphs in input sequence
+                                //Offset 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
+                                //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
+                                //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
+                                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                                //struct 	SubstLookupRecord
+                                //[SubstCount] 	Array of SubstLookupRecords, in design order
+
+
+                                ushort coverage = reader.ReadUInt16(); //Offset to Coverage table-from beginning of Substitution table
+                                short backtrackClassDef = reader.ReadInt16(); //Offset to glyph ClassDef table containing backtrack sequence data-from beginning of Substitution table
+                                short inputClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing input sequence data-from beginning of Substitution table
+                                short lookAheadClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing lookahead sequence data-from beginning of Substitution table
+                                ushort chainSubclassSetCount = reader.ReadUInt16(); //Number of ChainSubClassSet tables
+                                short[] chainSubClassOffsets = new short[chainSubclassSetCount];
+                                for (int n = 0; n < chainSubclassSetCount; ++n)
+                                {
+                                    chainSubClassOffsets[n] = reader.ReadInt16();
+                                }
+                            }
+                            break;
+                        case 3:
+                            {
+                                //6.3 Chaining Context Substitution Format 3: Coverage-based Chaining Context Glyph Substitution
+                                //
+                                //USHORT 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
+                                //Offset 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
+                                //USHORT 	InputGlyphCount 	Number of glyphs in input sequence
+                                //Offset 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
+                                //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
+                                //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
+                                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                                //struct 	SubstLookupRecord
+                                //[SubstCount] 	Array of SubstLookupRecords, in design order
+                                //
+
+                                ushort backtrackingGlyphCount = reader.ReadUInt16();
+                                short[] backtrackingCoverageArray = new short[backtrackingGlyphCount];
+                                for (int n = 0; n < backtrackingGlyphCount; ++n)
+                                {
+                                    backtrackingCoverageArray[n] = reader.ReadInt16();
+                                }
+                                ushort inputGlyphCount = reader.ReadUInt16();
+                                short[] inputGlyphCoverageArray = new short[inputGlyphCount];
+                                for (int n = 0; n < inputGlyphCount; ++n)
+                                {
+                                    inputGlyphCoverageArray[n] = reader.ReadInt16();
+                                }
+                                ushort lookAheadGlyphCount = reader.ReadUInt16();
+                                short[] lookAheadCoverageArray = new short[lookAheadGlyphCount];
+                                for (int n = 0; n < lookAheadGlyphCount; ++n)
+                                {
+                                    lookAheadCoverageArray[n] = reader.ReadInt16();
+                                }
+
+                            }
+                            break;
+                    }
+                    //-------------------------------------------------------------
+
+
+                    
+                    this.subTables.Add(subTable);
+                }
+
                 //throw new NotImplementedException();
             }
             /// <summary>
@@ -467,7 +563,7 @@ namespace NRasterizer.Tables
                 {
                     //found here 
                     lookup.FindGlyphIndexAll(inputGlyph, foundResults);
-                } 
+                }
             }
             return false;
         }
