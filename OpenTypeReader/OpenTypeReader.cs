@@ -79,7 +79,10 @@ namespace NRasterizer
                     glyf.Glyphs,
                     cmaps.CharMaps,
                     horizontalMetrics,
-                    kern);
+                    kern)
+                    {
+                        GSUBTable = gsub
+                    };
             }
         }
         static TableHeader ReadTableHeader(BinaryReader input)
