@@ -1,4 +1,4 @@
-﻿//Apache2, 2016,  WinterDev
+﻿//Apache2,  2016,  WinterDev
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,52 +7,47 @@ using System.Text;
 namespace NRasterizer.Tables
 {
 
-    class GSUB : TableEntry
+    class GPOS : TableEntry
     {
-        //from https://www.microsoft.com/typography/otspec/GSUB.htm
-
-
+        long gposStartAt;
         ScriptList scriptList = new ScriptList();
         FeatureList featureList = new FeatureList();
         List<LookupTable> lookupRecords = new List<LookupTable>();
-
-        long gsubTableStartAt;
         public override string Name
         {
-            get { return "GSUB"; }
+            get { return "GPOS"; }
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            //----------
-            gsubTableStartAt = reader.BaseStream.Position;
-            //----------
-            //1. header
-            //GSUB Header
+            gposStartAt = reader.BaseStream.Position;
+            //-------------------------------------------
+            // GPOS Header
+            //The GPOS table begins with a header that contains a version number for the table. Two versions are defined. Version 1.0 contains offsets to three tables: ScriptList, FeatureList, and LookupList. Version 1.1 also includes an offset to a FeatureVariations table. For descriptions of these tables, see the chapter, OpenType Layout Common Table Formats . Example 1 at the end of this chapter shows a GPOS Header table definition.
+            //GPOS Header, Version 1.0
+            //Value 	Type 	Description
+            //USHORT 	MajorVersion 	Major version of the GPOS table, = 1
+            //USHORT 	MinorVersion 	Minor version of the GPOS table, = 0
+            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GPOS table
+            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GPOS table
+            //Offset 	LookupList 	Offset to LookupList table, from beginning of GPOS table
 
-            //The GSUB table begins with a header that contains a version number for the table (Version) and offsets to a three tables: ScriptList, FeatureList, and LookupList. For descriptions of each of these tables, see the chapter, OpenType Common Table Formats. Example 1 at the end of this chapter shows a GSUB Header table definition.
-            //GSUB Header, Version 1.0
-            //Type 	Name 	Description
-            //USHORT 	MajorVersion 	Major version of the GSUB table, = 1
-            //USHORT 	MinorVersion 	Minor version of the GSUB table, = 0
-            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GSUB table
-            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GSUB table
-            //Offset 	LookupList 	Offset to LookupList table, from beginning of GSUB table
+            //GPOS Header, Version 1.1
+            //Value 	Type 	Description
+            //USHORT 	MajorVersion 	Major version of the GPOS table, = 1
+            //USHORT 	MinorVersion 	Minor version of the GPOS table, = 1
+            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GPOS table
+            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GPOS table
+            //Offset 	LookupList 	Offset to LookupList table, from beginning of GPOS table
+            //ULONG 	FeatureVariations 	Offset to FeatureVariations table, from beginning of GPOS table (may be NULL) 
 
-            //GSUB Header, Version 1.1
-            //Type 	Name 	Description
-            //USHORT 	MajorVersion 	Major version of the GSUB table, = 1
-            //USHORT 	MinorVersion 	Minor version of the GSUB table, = 1
-            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GSUB table
-            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GSUB table
-            //Offset 	LookupList 	Offset to LookupList table, from beginning of GSUB table
-            //ULONG 	FeatureVariations 	Offset to FeatureVariations table, from beginning of the GSUB table (may be NULL)
-            //--------------------
-            MajorVersion = reader.ReadUInt16();
-            MinorVersion = reader.ReadUInt16();
+            this.MajorVersion = reader.ReadUInt16();
+            this.MinorVersion = reader.ReadUInt16();
+
             ushort scriptListOffset = reader.ReadUInt16();//from beginning of GSUB table
             ushort featureListOffset = reader.ReadUInt16();//from beginning of GSUB table
             ushort lookupListOffset = reader.ReadUInt16();//from beginning of GSUB table
             uint featureVariations = (MinorVersion == 1) ? reader.ReadUInt32() : 0;//from beginning of GSUB table
+
             //-----------------------
             //1. scriptlist
             reader.BaseStream.Seek(this.Header.Offset + scriptListOffset, SeekOrigin.Begin);
@@ -76,13 +71,13 @@ namespace NRasterizer.Tables
         }
         public ushort MajorVersion { get; private set; }
         public ushort MinorVersion { get; private set; }
-
-
-
+        void ReadFeaureVariations(BinaryReader reader)
+        {
+            throw new NotImplementedException();
+        }
         void ReadLookupListTable(BinaryReader reader)
         {
             long lookupListHeadPos = reader.BaseStream.Position;
-
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             //LookupList table
             //Type 	Name 	Description
@@ -156,19 +151,13 @@ namespace NRasterizer.Tables
             }
 
         }
-        void ReadFeaureVariations(BinaryReader reader)
-        {
-            throw new NotImplementedException();
-        }
-
-
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
         class LookupTable
         {
             //--------------------------
-            long lookupTablePos; 
+            long lookupTablePos;
             //--------------------------
             public readonly ushort lookupType;
             public readonly ushort lookupFlags;
@@ -186,7 +175,7 @@ namespace NRasterizer.Tables
                 ushort markFilteringSet
                  )
             {
-                this.lookupTablePos = lookupTablePos; 
+                this.lookupTablePos = lookupTablePos;
                 this.lookupType = lookupType;
                 this.lookupFlags = lookupFlags;
                 this.subTableCount = subTableCount;
@@ -228,61 +217,17 @@ namespace NRasterizer.Tables
                     case 8:
                         ReadLookupType8(reader);
                         break;
+                    case 9:
+                        ReadLookupType9(reader);
+                        break;
                 }
             }
             /// <summary>
-            /// LookupType 1: Single Substitution Subtable
+            /// Lookup Type 1: Single Adjustment Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType1(BinaryReader reader)
             {
-
-
-                //---------------------
-                //LookupType 1: Single Substitution Subtable
-                //Single substitution (SingleSubst) subtables tell a client to replace a single glyph with another glyph. 
-                //The subtables can be either of two formats. 
-                //Both formats require two distinct sets of glyph indices: one that defines input glyphs (specified in the Coverage table), 
-                //and one that defines the output glyphs. Format 1 requires less space than Format 2, but it is less flexible.
-                //------------------------------------
-                // 1.1 Single Substitution Format 1
-                //------------------------------------
-                //Format 1 calculates the indices of the output glyphs, 
-                //which are not explicitly defined in the subtable. 
-                //To calculate an output glyph index, Format 1 adds a constant delta value to the input glyph index.
-                //For the substitutions to occur properly, the glyph indices in the input and output ranges must be in the same order. 
-                //This format does not use the Coverage Index that is returned from the Coverage table.
-
-                //The SingleSubstFormat1 subtable begins with a format identifier (SubstFormat) of 1. 
-                //An offset references a Coverage table that specifies the indices of the input glyphs.
-                //DeltaGlyphID is the constant value added to each input glyph index to calculate the index of the corresponding output glyph.
-
-                //Example 2 at the end of this chapter uses Format 1 to replace standard numerals with lining numerals. 
-
-                //SingleSubstFormat1 subtable: Calculated output glyph indices
-                //Type 	Name 	Description
-                //USHORT 	SubstFormat 	Format identifier-format = 1
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                //SHORT 	DeltaGlyphID 	Add to original GlyphID to get substitute GlyphID
-
-                //------------------------------------
-                //1.2 Single Substitution Format 2
-                //------------------------------------
-                //Format 2 is more flexible than Format 1, but requires more space. 
-                //It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table.
-                //The SingleSubstFormat2 subtable specifies a format identifier (SubstFormat), an offset to a Coverage table that defines the input glyph indices,
-                //a count of output glyph indices in the Substitute array (GlyphCount), and a list of the output glyph indices in the Substitute array (Substitute).
-                //The Substitute array must contain the same number of glyph indices as the Coverage table. To locate the corresponding output glyph index in the Substitute array, this format uses the Coverage Index returned from the Coverage table.
-
-                //Example 3 at the end of this chapter uses Format 2 to substitute vertically oriented glyphs for horizontally oriented glyphs. 
-                //SingleSubstFormat2 subtable: Specified output glyph indices
-                //Type 	Name 	Description
-                //USHORT 	SubstFormat 	Format identifier-format = 2
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array
-                //GlyphID 	Substitute
-                //[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
-
                 long thisLoookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
@@ -301,66 +246,33 @@ namespace NRasterizer.Tables
                         default: throw new NotSupportedException();
                         case 1:
                             {
-                                short deltaGlyph = reader.ReadInt16();
-                                subTable = new LookupSubTableT1F1(coverage, deltaGlyph);
+                                //Single Adjustment Positioning: Format 1
+
                             } break;
                         case 2:
                             {
-                                ushort glyphCount = reader.ReadUInt16();
-                                ushort[] substitueGlyphs = new ushort[glyphCount];// 	Array of substitute GlyphIDs-ordered by Coverage Index
-                                for (int n = 0; n < glyphCount; ++n)
-                                {
-                                    substitueGlyphs[n] = reader.ReadUInt16();
-                                }
-                                subTable = new LookupSubTableT1F2(coverage, substitueGlyphs);
+                                //Single Adjustment Positioning: Format 2
+
                             }
                             break;
                     }
-                    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
                     this.subTables.Add(subTable);
                 }
             }
             /// <summary>
-            /// LookupType 2: Multiple Substitution Subtable
+            ///  Lookup Type 2: Pair Adjustment Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType2(BinaryReader reader)
             {
 
-                //LookupType 2: Multiple Substitution Subtable 
-                //A Multiple Substitution (MultipleSubst) subtable replaces a single glyph with more than one glyph, 
-                //as when multiple glyphs replace a single ligature. 
-                //The subtable has a single format: MultipleSubstFormat1. The subtable specifies a format identifier (SubstFormat), an offset to a Coverage table that defines the input glyph indices, a count of offsets in the Sequence array (SequenceCount), and an array of offsets to Sequence tables that define the output glyph indices (Sequence). The Sequence table offsets are ordered by the Coverage Index of the input glyphs.
-
-                //For each input glyph listed in the Coverage table, a Sequence table defines the output glyphs. Each Sequence table contains a count of the glyphs in the output glyph sequence (GlyphCount) and an array of output glyph indices (Substitute).
-
-                //    Note: The order of the output glyph indices depends on the writing direction of the text. For text written left to right, the left-most glyph will be first glyph in the sequence. Conversely, for text written right to left, the right-most glyph will be first.
-
-                //The use of multiple substitution for deletion of an input glyph is prohibited. GlyphCount should always be greater than 0.
-
-                //Example 4 at the end of this chapter shows how to replace a single ligature with three glyphs.
-
-
-                //MultipleSubstFormat1 subtable: Multiple output glyphs
-                //Type 	Name 	Description
-                //USHORT 	SubstFormat 	Format identifier-format = 1
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                //USHORT 	SequenceCount 	Number of Sequence table offsets in the Sequence array
-                //Offset 	Sequence
-                //[SequenceCount] 	Array of offsets to Sequence tables-from beginning of Substitution table-ordered by Coverage Index
-                //Sequence table
-                //Type 	Name 	Description
-                //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array. This should always be greater than 0.
-                //GlyphID 	Substitute
-                //[GlyphCount]
-
-
-
                 Console.WriteLine("skip lookup2");
 
             }
+
             /// <summary>
-            /// LookupType 3: Alternate Substitution Subtable 
+            /// Lookup Type 3: Cursive Attachment Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType3(BinaryReader reader)
@@ -368,7 +280,7 @@ namespace NRasterizer.Tables
                 throw new NotImplementedException();
             }
             /// <summary>
-            /// LookupType 4: Ligature Substitution Subtable
+            /// Lookup Type 4: MarkToBase Attachment Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType4(BinaryReader reader)
@@ -377,15 +289,15 @@ namespace NRasterizer.Tables
                 //throw new NotImplementedException();
             }
             /// <summary>
-            /// LookupType 5: Contextual Substitution Subtable
+            /// Lookup Type 5: MarkToLigature Attachment Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType5(BinaryReader reader)
             {
-                throw new NotImplementedException();
+                Console.WriteLine("skip lookup type 4");
             }
             /// <summary>
-            /// LookupType 6: Chaining Contextual Substitution Subtable
+            /// Lookup Type 6: MarkToMark Attachment Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType6(BinaryReader reader)
@@ -394,22 +306,30 @@ namespace NRasterizer.Tables
                 //throw new NotImplementedException();
             }
             /// <summary>
-            /// LookupType 7: Extension Substitution
+            /// Lookup Type 7: Contextual Positioning Subtables
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType7(BinaryReader reader)
             {
-                throw new NotImplementedException();
+                Console.WriteLine("skip lookup type 7");
             }
             /// <summary>
-            /// LookupType 8: Reverse Chaining Contextual Single Substitution Subtable
+            /// LookupType 8: Chaining Contextual Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType8(BinaryReader reader)
             {
-                throw new NotImplementedException();
+                Console.WriteLine("skip lookup type 8");
+            }
+            /// <summary>
+            /// LookupType 9: Extension Positioning
+            /// </summary>
+            /// <param name="reader"></param>
+            void ReadLookupType9(BinaryReader reader)
+            {
+                Console.WriteLine("skip lookup type 9");
             }
         }
-
     }
+
 }

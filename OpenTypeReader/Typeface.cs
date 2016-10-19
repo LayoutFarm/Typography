@@ -68,7 +68,13 @@ namespace NRasterizer
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
         public List<Glyph> Glyphs { get { return _glyphs; } }
 
+        //-------------------------------------------------------
         internal GSUB GSUBTable
+        {
+            get;
+            set;
+        }
+        internal GPOS GPOSTable
         {
             get;
             set;

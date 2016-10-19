@@ -46,7 +46,10 @@
     <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tables.AdvanceLayout\CoverageTable.cs" />
+    <Compile Include="Tables.AdvanceLayout\FeatureList.cs" />
+    <Compile Include="Tables.AdvanceLayout\GPOS.cs" />
     <Compile Include="Tables.AdvanceLayout\LookupSubTable.cs" />
+    <Compile Include="Tables.AdvanceLayout\ScriptList.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
     <Compile Include="Tables\Cmap.cs" />
     <Compile Include="Tables\Glyf.cs" />
@@ -61,6 +64,7 @@
     <Compile Include="Tables\TableEntry.cs" />
     <Compile Include="Tables\TableHeader.cs" />
     <Compile Include="Tables\TableEntryCollection.cs" />
+    <Compile Include="Tables\Utils.cs" />
     <Compile Include="Typeface.cs" />
   </ItemGroup>
   <ItemGroup />
