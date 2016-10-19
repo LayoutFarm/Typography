@@ -7,7 +7,7 @@ using System.Text;
 namespace NRasterizer.Tables
 {
 
-    class GSUB : TableEntry
+    partial class GSUB : TableEntry
     {
         //from https://www.microsoft.com/typography/otspec/GSUB.htm
 

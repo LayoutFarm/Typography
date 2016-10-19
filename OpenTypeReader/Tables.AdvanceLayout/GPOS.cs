@@ -232,7 +232,6 @@ namespace NRasterizer.Tables
                 long thisLoookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
-
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
@@ -252,10 +251,14 @@ namespace NRasterizer.Tables
                                 //Offset 	Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
                                 //USHORT 	ValueFormat 	Defines the types of data in the ValueRecord
                                 //ValueRecord 	Value 	Defines positioning value(s)-applied to all glyphs in the Coverage table
+
+
                                 short coverage = reader.ReadInt16();
                                 ushort valueFormat = reader.ReadUInt16();
                                 ValueRecord value = new ValueRecord();
                                 value.ReadFrom(reader, valueFormat);
+
+                                subTable = new LookupType1SubTable(value);
 
                             } break;
                         case 2:
@@ -270,15 +273,17 @@ namespace NRasterizer.Tables
                                 short coverage = reader.ReadInt16();
                                 ushort valueFormat = reader.ReadUInt16();
                                 ushort valueCount = reader.ReadUInt16();
+                                var values = new ValueRecord[valueCount];
                                 for (int n = 0; n < valueCount; ++n)
                                 {
-                                    ValueRecord value = new ValueRecord();
-                                    value.ReadFrom(reader, valueFormat);
+                                    values[n] = ValueRecord.CreateFrom(reader, valueFormat);
                                 }
+                                subTable = new LookupType1SubTable(values);
                             }
                             break;
                     }
-                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+
+                    //subTable.CoverageTable = CoverageTable.ReadFrom(reader);
                     this.subTables.Add(subTable);
                 }
             }
@@ -325,12 +330,16 @@ namespace NRasterizer.Tables
                 //struct 	Class1Record
                 //[Class1Count] 	Array of Class1 records-ordered by Class1
 
-                //Each Class1Record contains an array of Class2Records (Class2Record), which also are ordered by class value. One Class2Record must be declared for each class in the ClassDef2 table, including Class 0.
+                //Each Class1Record contains an array of Class2Records (Class2Record), which also are ordered by class value. 
+                //One Class2Record must be declared for each class in the ClassDef2 table, including Class 0.
                 //Class1Record
                 //Value 	Type 	Description
                 //struct 	Class2Record[Class2Count] 	Array of Class2 records-ordered by Class2
 
-                //A Class2Record consists of two ValueRecords, one for the first glyph in a class pair (Value1) and one for the second glyph (Value2). If the PairPos subtable has a value of zero (0) for ValueFormat1 or ValueFormat2, the corresponding record (ValueRecord1 or ValueRecord2) will be empty.
+                //A Class2Record consists of two ValueRecords,
+                //one for the first glyph in a class pair (Value1) and one for the second glyph (Value2).
+                //If the PairPos subtable has a value of zero (0) for ValueFormat1 or ValueFormat2, 
+                //the corresponding record (ValueRecord1 or ValueRecord2) will be empty.
 
                 //Example 5 at the end of this chapter demonstrates pair kerning with glyph classes in a PairPosFormat2 subtable.
                 //Class2Record
@@ -359,19 +368,39 @@ namespace NRasterizer.Tables
                                 ushort value2Format = reader.ReadUInt16();
                                 ushort pairSetCount = reader.ReadUInt16();
                                 short[] pairSetOffsetArray = Utils.ReadInt16Array(reader, pairSetCount);
+                                PairSetTable[] pairSetTables = new PairSetTable[pairSetCount];
+                                for (int n = 0; n < pairSetCount; ++n)
+                                {
+                                    //read each pair set table
+                                    reader.BaseStream.Seek(thisLoookupTablePos + pairSetOffsetArray[i], SeekOrigin.Begin);
+                                    var pairSetTable = new PairSetTable();
+                                    pairSetTable.ReadFrom(reader, value1Format, value2Format);
+                                    pairSetTables[n] = pairSetTable;
+                                }
+                                subTable = new LookupType2SubTable(pairSetTables);
 
                             } break;
                         case 2:
                             {
 
-                                throw new NotSupportedException();
+
+                                short coverage = reader.ReadInt16();
+                                ushort value1Format = reader.ReadUInt16();
+                                ushort value2Format = reader.ReadUInt16();
+                                short classDef1Offset = reader.ReadInt16();
+                                short classDef2Offset = reader.ReadInt16();
+                                ushort class1Count = reader.ReadUInt16();
+                                ushort class2Count = reader.ReadUInt16();
+
+
+                                throw new NotImplementedException();
+
                             }
                             break;
                     }
                     //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
                     this.subTables.Add(subTable);
                 }
-
             }
 
             /// <summary>
@@ -403,7 +432,7 @@ namespace NRasterizer.Tables
                 //Value 	Type 	Description
                 //USHORT 	BaseCount 	Number of BaseRecords
                 //struct 	BaseRecord[BaseCount] 	Array of BaseRecords-in order of BaseCoverage Index
-                long thisLoookupTablePos = reader.BaseStream.Position;
+                long thisSubTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
                 for (int i = 0; i < j; ++i)
@@ -423,10 +452,6 @@ namespace NRasterizer.Tables
                     ushort classCount = reader.ReadUInt16();
                     short markArrayOffset = reader.ReadInt16();
                     short baseArrayOffset = reader.ReadInt16();
-
-
-
-
 
                     //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
                     this.subTables.Add(subTable);

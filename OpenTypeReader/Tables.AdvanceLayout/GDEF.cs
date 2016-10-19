@@ -23,7 +23,7 @@ using System.Text;
 
 namespace NRasterizer.Tables
 {
-    //
+  
 
     /// <summary>
     /// 

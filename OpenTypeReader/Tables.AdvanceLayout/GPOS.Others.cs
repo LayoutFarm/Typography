@@ -14,8 +14,21 @@ namespace NRasterizer.Tables
 
         class PairSetTable
         {
-            public List<PairSet> pairSets = new List<PairSet>();
-
+            List<PairSet> pairSets = new List<PairSet>();
+            public void ReadFrom(BinaryReader reader, ushort v1format, ushort v2format)
+            {
+                ushort rowCount = reader.ReadUInt16();
+                for (int i = 0; i < rowCount; ++i)
+                {
+                    //GlyphID 	SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
+                    //ValueRecord 	Value1 	Positioning data for the first glyph in the pair
+                    //ValueRecord 	Value2 	Positioning data for the second glyph in the pair
+                    ushort secondGlyp = reader.ReadUInt16();
+                    ValueRecord v1 = ValueRecord.CreateFrom(reader, v1format);
+                    ValueRecord v2 = ValueRecord.CreateFrom(reader, v2format);
+                    PairSet pset = new PairSet(secondGlyp, v1, v2);
+                }
+            }
         }
 
 
@@ -117,6 +130,12 @@ namespace NRasterizer.Tables
             const int FMT_XAdvDevice = 1 << 6;
             const int FMT_YAdvDevice = 1 << 7;
 
+            public static ValueRecord CreateFrom(BinaryReader reader, ushort valueFormat)
+            {
+                var v = new ValueRecord();
+                v.ReadFrom(reader, valueFormat);
+                return v;
+            }
         }
 
 
@@ -231,5 +250,65 @@ namespace NRasterizer.Tables
 
             }
         }
+
+
+        class MarkArrayTable
+        {
+            //Mark Array
+            //The MarkArray table defines the class and the anchor point for a mark glyph. 
+            //Three GPOS subtables-MarkToBase, MarkToLigature, 
+            //and MarkToMark Attachment-use the MarkArray table to specify data for attaching marks.
+
+            //The MarkArray table contains a count of the number of mark records (MarkCount) and an array of those records (MarkRecord).
+            //Each mark record defines the class of the mark and an offset to the Anchor table that contains data for the mark.
+
+            //A class value can be 0 (zero), but the MarkRecord must explicitly assign that class value (this differs from the ClassDef table, 
+            //in which all glyphs not assigned class values automatically belong to Class 0).
+            //The GPOS subtables that refer to MarkArray tables use the class assignments for indexing zero-based arrays that contain data for each mark class.
+
+            // MarkArray table
+            //Value 	Type 	Description
+            //USHORT 	MarkCount 	Number of MarkRecords
+            //struct 	MarkRecord
+            //[MarkCount] 	Array of MarkRecords-in Coverage order
+            //MarkRecord
+            //Value 	Type 	Description
+            //USHORT 	Class 	Class defined for this mark
+            //Offset 	MarkAnchor 	Offset to Anchor table-from beginning of MarkArray table
+            MarkRecord[] records;
+            public void ReadFrom(BinaryReader reader)
+            {
+                ushort markCount = reader.ReadUInt16();
+                records = new MarkRecord[markCount];
+                for (int i = 0; i < markCount; ++i)
+                {
+                    records[i] = new MarkRecord(
+                        reader.ReadUInt16(),
+                        reader.ReadInt16());
+                }
+            }
+        }
+
+        struct MarkRecord
+        {
+            public readonly ushort markClass;
+            public readonly short offset;
+            public MarkRecord(ushort markClass, short offset)
+            {
+                this.markClass = markClass;
+                this.offset = offset;
+            }
+        }
+
+
+        class Class1Record
+        {
+
+        }
+        class Class2Record
+        {
+
+        }
+
     }
 }
