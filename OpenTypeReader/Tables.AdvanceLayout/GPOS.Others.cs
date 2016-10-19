@@ -4,11 +4,34 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+//https://www.microsoft.com/typography/otspec/GPOS.htm
+
 namespace NRasterizer.Tables
 {
     partial class GPOS
     {
-        //https://www.microsoft.com/typography/otspec/GPOS.htm
+
+
+        class PairSetTable
+        {
+            public List<PairSet> pairSets = new List<PairSet>();
+
+        }
+
+
+        struct PairSet
+        {
+            public readonly ushort secondGlyph;//GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
+            public readonly ValueRecord value1;//Positioning data for the first glyph in the pair
+            public readonly ValueRecord value2;//Positioning data for the second glyph in the pair   
+            public PairSet(ushort secondGlyph, ValueRecord v1, ValueRecord v2)
+            {
+                this.secondGlyph = secondGlyph;
+                this.value1 = v1;
+                this.value2 = v2;
+            }
+        }
+
 
         class ValueRecord
         {
@@ -94,6 +117,21 @@ namespace NRasterizer.Tables
             const int FMT_XAdvDevice = 1 << 6;
             const int FMT_YAdvDevice = 1 << 7;
 
+        }
+
+
+        class AnchorTable
+        {
+            //Anchor Table
+
+            //A GPOS table uses anchor points to position one glyph with respect to another.
+            //Each glyph defines an anchor point, and the text-processing client attaches the glyphs by aligning their corresponding anchor points.
+
+            //To describe an anchor point, an Anchor table can use one of three formats. 
+            //The first format uses design units to specify a location for the anchor point.
+            //The other two formats refine the location of the anchor point using contour points (Format 2) or Device tables (Format 3). 
+            //In a variable font, the third format uses a VariationIndex table (a variant of a Device table) to 
+            //reference variation data for adjustment of the anchor position for the current variation instance, as needed. 
         }
     }
 }
