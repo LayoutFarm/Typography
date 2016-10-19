@@ -4,8 +4,11 @@ using System;
 using System.IO;
 namespace NRasterizer.IO
 {
+   
     class ByteOrderSwappingBinaryReader : BinaryReader
     {
+        //All OpenType fonts use Motorola-style byte ordering (Big Endian)
+        //
         public ByteOrderSwappingBinaryReader(Stream input) : base(input)
         {
         }

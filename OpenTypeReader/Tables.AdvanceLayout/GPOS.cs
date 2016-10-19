@@ -6,8 +6,9 @@ using System.Text;
 
 namespace NRasterizer.Tables
 {
+    //https://www.microsoft.com/typography/otspec/GPOS.htm
 
-    class GPOS : TableEntry
+    partial class GPOS : TableEntry
     {
         long gposTableStartAt;
         ScriptList scriptList = new ScriptList();
@@ -240,19 +241,40 @@ namespace NRasterizer.Tables
                     //-----------------------
                     LookupSubTable subTable = null;
                     ushort format = reader.ReadUInt16();
-                    ushort coverage = reader.ReadUInt16();
+
                     switch (format)
                     {
                         default: throw new NotSupportedException();
                         case 1:
                             {
                                 //Single Adjustment Positioning: Format 1
+                                // USHORT 	PosFormat 	Format identifier-format = 1
+                                //Offset 	Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
+                                //USHORT 	ValueFormat 	Defines the types of data in the ValueRecord
+                                //ValueRecord 	Value 	Defines positioning value(s)-applied to all glyphs in the Coverage table
+                                short coverage = reader.ReadInt16();
+                                ushort valueFormat = reader.ReadUInt16();
+                                ValueRecord value = new ValueRecord();
+                                value.ReadFrom(reader, valueFormat);
 
                             } break;
                         case 2:
                             {
                                 //Single Adjustment Positioning: Format 2
-
+                                //USHORT 	PosFormat 	Format identifier-format = 2
+                                //Offset 	Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
+                                //USHORT 	ValueFormat 	Defines the types of data in the ValueRecord
+                                //USHORT 	ValueCount 	Number of ValueRecords
+                                //ValueRecord 	Value
+                                //[ValueCount] 	Array of ValueRecords-positioning values applied to glyphs
+                                short coverage = reader.ReadInt16();
+                                ushort valueFormat = reader.ReadUInt16();
+                                ushort valueCount = reader.ReadUInt16();
+                                for (int n = 0; n < valueCount; ++n)
+                                {
+                                    ValueRecord value = new ValueRecord();
+                                    value.ReadFrom(reader, valueFormat);
+                                }
                             }
                             break;
                     }
@@ -266,8 +288,89 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType2(BinaryReader reader)
             {
+                //-----------------------------------------------
+                // USHORT 	PosFormat 	Format identifier-format = 1
+                //Offset 	Coverage 	Offset to Coverage table-from beginning of PairPos subtable-only the first glyph in each pair
+                //USHORT 	ValueFormat1 	Defines the types of data in ValueRecord1-for the first glyph in the pair -may be zero (0)
+                //USHORT 	ValueFormat2 	Defines the types of data in ValueRecord2-for the second glyph in the pair -may be zero (0)
+                //USHORT 	PairSetCount 	Number of PairSet tables
+                //Offset 	PairSetOffset
+                //[PairSetCount] 	Array of offsets to PairSet tables-from beginning of PairPos subtable-ordered by Coverage Index
+                //                PairSet table
+                //Value 	Type 	Description
+                //USHORT 	PairValueCount 	Number of PairValueRecords
+                //struct 	PairValueRecord
+                //[PairValueCount] 	Array of PairValueRecords-ordered by GlyphID of the second glyph
 
-                Console.WriteLine("skip lookup2");
+                //A PairValueRecord specifies the second glyph in a pair (SecondGlyph) and defines a ValueRecord for each glyph (Value1 and Value2). If ValueFormat1 is set to zero (0) in the PairPos subtable, ValueRecord1 will be empty; similarly, if ValueFormat2 is 0, Value2 will be empty.
+
+                //Example 4 at the end of this chapter shows a PairPosFormat1 subtable that defines two cases of pair kerning.
+                //PairValueRecord
+                //Value 	Type 	Description
+                //GlyphID 	SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
+                //ValueRecord 	Value1 	Positioning data for the first glyph in the pair
+                //ValueRecord 	Value2 	Positioning data for the second glyph in the pair
+                //-----------------------------------------------
+
+                // PairPosFormat2 subtable: Class pair adjustment
+                //Value 	Type 	Description
+                //USHORT 	PosFormat 	Format identifier-format = 2
+                //Offset 	Coverage 	Offset to Coverage table-from beginning of PairPos subtable-for the first glyph of the pair
+                //USHORT 	ValueFormat1 	ValueRecord definition-for the first glyph of the pair-may be zero (0)
+                //USHORT 	ValueFormat2 	ValueRecord definition-for the second glyph of the pair-may be zero (0)
+                //Offset 	ClassDef1 	Offset to ClassDef table-from beginning of PairPos subtable-for the first glyph of the pair
+                //Offset 	ClassDef2 	Offset to ClassDef table-from beginning of PairPos subtable-for the second glyph of the pair
+                //USHORT 	Class1Count 	Number of classes in ClassDef1 table-includes Class0
+                //USHORT 	Class2Count 	Number of classes in ClassDef2 table-includes Class0
+                //struct 	Class1Record
+                //[Class1Count] 	Array of Class1 records-ordered by Class1
+
+                //Each Class1Record contains an array of Class2Records (Class2Record), which also are ordered by class value. One Class2Record must be declared for each class in the ClassDef2 table, including Class 0.
+                //Class1Record
+                //Value 	Type 	Description
+                //struct 	Class2Record[Class2Count] 	Array of Class2 records-ordered by Class2
+
+                //A Class2Record consists of two ValueRecords, one for the first glyph in a class pair (Value1) and one for the second glyph (Value2). If the PairPos subtable has a value of zero (0) for ValueFormat1 or ValueFormat2, the corresponding record (ValueRecord1 or ValueRecord2) will be empty.
+
+                //Example 5 at the end of this chapter demonstrates pair kerning with glyph classes in a PairPosFormat2 subtable.
+                //Class2Record
+                //Value 	Type 	Description
+                //ValueRecord 	Value1 	Positioning for first glyph-empty if ValueFormat1 = 0
+                //ValueRecord 	Value2 	Positioning for second glyph-empty if ValueFormat2 = 0
+                long thisLoookupTablePos = reader.BaseStream.Position;
+                int j = subTableOffsets.Length;
+
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+
+                    //-----------------------
+                    LookupSubTable subTable = null;
+                    ushort format = reader.ReadUInt16();
+
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                short coverage = reader.ReadInt16();
+                                ushort value1Format = reader.ReadUInt16();
+                                ushort value2Format = reader.ReadUInt16();
+                                ushort pairSetCount = reader.ReadUInt16();
+                                short[] pairSetOffsetArray = Utils.ReadInt16Array(reader, pairSetCount);
+
+                            } break;
+                        case 2:
+                            {
+
+                                throw new NotSupportedException();
+                            }
+                            break;
+                    }
+                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                    this.subTables.Add(subTable);
+                }
 
             }
 
@@ -294,7 +397,7 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType5(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 4");
+                Console.WriteLine("skip lookup type 5");
             }
             /// <summary>
             /// Lookup Type 6: MarkToMark Attachment Positioning Subtable
@@ -330,6 +433,10 @@ namespace NRasterizer.Tables
                 Console.WriteLine("skip lookup type 9");
             }
         }
+
+
+
+
     }
 
 }
