@@ -24,8 +24,6 @@ using System.Text;
 namespace NRasterizer.Tables
 {
 
-
-
     class GDEF : TableEntry
     {
         long tableStartAt;

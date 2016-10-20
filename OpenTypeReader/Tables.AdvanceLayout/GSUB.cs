@@ -54,17 +54,14 @@ namespace NRasterizer.Tables
             ushort lookupListOffset = reader.ReadUInt16();//from beginning of GSUB table
             uint featureVariations = (MinorVersion == 1) ? reader.ReadUInt32() : 0;//from beginning of GSUB table
             //-----------------------
-            //1. scriptlist
-            reader.BaseStream.Seek(this.Header.Offset + scriptListOffset, SeekOrigin.Begin);
-            scriptList.ReadFrom(reader);
+            //1. scriptlist 
+            scriptList = ScriptList.CreateFrom(reader, gsubTableStartAt + scriptListOffset);
             //-----------------------
-            //2. feature list
-            reader.BaseStream.Seek(this.Header.Offset + featureListOffset, SeekOrigin.Begin);
-            featureList.ReadFrom(reader);
+            //2. feature list             
+            featureList = FeatureList.CreateFrom(reader, gsubTableStartAt + featureListOffset);
             //-----------------------
-            //3. lookup list
-            reader.BaseStream.Seek(this.Header.Offset + lookupListOffset, SeekOrigin.Begin);
-            ReadLookupListTable(reader);
+            //3. lookup list 
+            ReadLookupListTable(reader, gsubTableStartAt + lookupListOffset);
             //-----------------------
             //4. feature variations
             if (featureVariations > 0)
@@ -79,10 +76,11 @@ namespace NRasterizer.Tables
 
 
 
-        void ReadLookupListTable(BinaryReader reader)
+        void ReadLookupListTable(BinaryReader reader, long lookupListHeadPos)
         {
-            long lookupListHeadPos = reader.BaseStream.Position;
-
+            reader.BaseStream.Seek(lookupListHeadPos, SeekOrigin.Begin);
+            //
+            //------
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             //LookupList table
             //Type 	Name 	Description
@@ -349,7 +347,7 @@ namespace NRasterizer.Tables
                             }
                             break;
                     }
-                  
+
                     subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                     this.subTables.Add(subTable);
                 }

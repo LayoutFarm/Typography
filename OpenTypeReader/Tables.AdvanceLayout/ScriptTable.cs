@@ -47,35 +47,37 @@ namespace NRasterizer.Tables
 
         LangSysTable[] langSysTables;
         public short DefaultLangSysOffset;
-        public readonly uint scriptTag;
-        public ScriptTable(uint scriptTag)
-        {
-            this.scriptTag = scriptTag;
-        }
+        public uint scriptTag;
 
-        public void ReadFrom(BinaryReader reader)
+        public static ScriptTable CreateFrom(BinaryReader reader, long beginAt)
         {
-            long scriptTableStartPos = reader.BaseStream.Position;
+            reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //
-            DefaultLangSysOffset = reader.ReadInt16();
+            //
+            ScriptTable scriptTable = new ScriptTable();
+
+            scriptTable.DefaultLangSysOffset = reader.ReadInt16();
             ushort langSysCount = reader.ReadUInt16();
-            langSysTables = new LangSysTable[langSysCount];
+            LangSysTable[] langSysTables = scriptTable.langSysTables = new LangSysTable[langSysCount];
 
             for (int i = 0; i < langSysCount; ++i)
             {
-                uint langSysTagIden = reader.ReadUInt32(); //langSysTagIdentifier 
-                short langSysOffset = reader.ReadInt16(); //offset
-                langSysTables[i] = new LangSysTable(langSysTagIden, langSysOffset);
+                langSysTables[i] = new LangSysTable(
+                    reader.ReadUInt32(), //langSysTagIdentifier 
+                    reader.ReadInt16());//offset
             }
             //-----------
             //read actual content of each table
             for (int i = 0; i < langSysCount; ++i)
             {
                 LangSysTable langSysTable = langSysTables[i];
-                reader.BaseStream.Seek(scriptTableStartPos + langSysTable.offset, SeekOrigin.Begin);
+                reader.BaseStream.Seek(beginAt + langSysTable.offset, SeekOrigin.Begin);
                 langSysTable.ReadFrom(reader);
             }
+
+            return scriptTable;
         }
+
 #if DEBUG
         public override string ToString()
         {

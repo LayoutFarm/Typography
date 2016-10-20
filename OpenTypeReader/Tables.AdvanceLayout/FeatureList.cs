@@ -9,12 +9,12 @@ namespace NRasterizer.Tables
 
     class FeatureList
     {
-        List<FeatureRecord> featureRecords = new List<FeatureRecord>();
 
-        public void ReadFrom(BinaryReader reader)
+        FeatureRecord[] featureRecords;
+        public static FeatureList CreateFrom(BinaryReader reader, long begin)
         {
             //https://www.microsoft.com/typography/otspec/chapter2.htm
-            //FeatureList table
+            //FeatureList table         
             //Type 	Name 	Description
             //USHORT 	FeatureCount 	Number of FeatureRecords in this table
             //struct 	FeatureRecord[FeatureCount] 	Array of FeatureRecords-zero-based (first feature has FeatureIndex = 0)-listed alphabetically by FeatureTag
@@ -22,21 +22,26 @@ namespace NRasterizer.Tables
             //Type 	Name 	Description
             //Tag 	FeatureTag 	4-byte feature identification tag
             //Offset 	Feature 	Offset to Feature table-from beginning of FeatureList
-            featureRecords.Clear();
+            reader.BaseStream.Seek(begin, SeekOrigin.Begin);
+            //
+            FeatureList featureList = new FeatureList();
             ushort featureCount = reader.ReadUInt16();
+            FeatureRecord[] featureRecords = featureList.featureRecords = new FeatureRecord[featureCount];
             for (int i = 0; i < featureCount; ++i)
             {
                 //read script record
-                featureRecords.Add(new FeatureRecord(
-                    reader.ReadUInt32(),
-                    reader.ReadUInt16()));
+                featureRecords[i] = new FeatureRecord(
+                    reader.ReadUInt32(), //script tag
+                    reader.ReadInt16()); //offset
             }
+
+            return featureList;
         }
         struct FeatureRecord
         {
             public readonly uint scriptTag;//4-byte ScriptTag identifier
-            public readonly ushort offset; //Script Offset to Script table-from beginning of ScriptList
-            public FeatureRecord(uint scriptTag, ushort offset)
+            public readonly short offset; //Script Offset to Script table-from beginning of ScriptList
+            public FeatureRecord(uint scriptTag, short offset)
             {
                 this.scriptTag = scriptTag;
                 this.offset = offset;
@@ -45,10 +50,12 @@ namespace NRasterizer.Tables
             {
                 get { return Utils.TagToString(scriptTag); }
             }
+#if DEBUG
             public override string ToString()
             {
                 return ScriptName + "," + offset;
             }
+#endif
         }
 
     }
