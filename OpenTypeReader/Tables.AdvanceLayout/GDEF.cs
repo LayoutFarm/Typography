@@ -23,16 +23,13 @@ using System.Text;
 
 namespace NRasterizer.Tables
 {
-  
 
-    /// <summary>
-    /// 
-    /// </summary>
+
+
     class GDEF : TableEntry
     {
-        long gdefTableStartAt;
-        ScriptList scriptList = new ScriptList();
-        FeatureList featureList = new FeatureList();
+        long tableStartAt;
+
         public override string Name
         {
             get { return "GDEF"; }
@@ -40,7 +37,7 @@ namespace NRasterizer.Tables
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            gdefTableStartAt = reader.BaseStream.Position;
+            tableStartAt = reader.BaseStream.Position;
             //-----------------------------------------
             //GDEF Header, Version 1.0
             //Type 	Name 	Description
@@ -70,50 +67,55 @@ namespace NRasterizer.Tables
             //Offset 	MarkGlyphSetsDef 	Offset to the table of mark set definitions, from beginning of GDEF header (may be NULL)
             //ULONG 	ItemVarStore 	Offset to the Item Variation Store table, from beginning of GDEF header (may be NULL)
 
+            //common to 1.0, 1.2, 1.3...
             this.MajorVersion = reader.ReadUInt16();
             this.MinorVersion = reader.ReadUInt16();
             //
             short glyphClassDefOffset = reader.ReadInt16();
             short attachListOffset = reader.ReadInt16();
-            short ligCaretList = reader.ReadInt16();
-            short markAttachClassDef = reader.ReadInt16();
-            short markGlyphSetsDef = 0;
-            uint itemVarStore = 0;
+            short ligCaretListOffset = reader.ReadInt16();
+            short markAttachClassDefOffset = reader.ReadInt16();
+            short markGlyphSetsDefOffset = 0;
+            uint itemVarStoreOffset = 0;
+            //
             switch (MinorVersion)
             {
                 default: throw new NotSupportedException();
                 case 0: break;
                 case 1:
-                    markGlyphSetsDef = reader.ReadInt16();
+                    markGlyphSetsDefOffset = reader.ReadInt16();
                     break;
                 case 3:
-                    markGlyphSetsDef = reader.ReadInt16();
-                    itemVarStore = reader.ReadUInt32();
+                    markGlyphSetsDefOffset = reader.ReadInt16();
+                    itemVarStoreOffset = reader.ReadUInt32();
                     break;
             }
             //---------------
-            reader.BaseStream.Seek(this.Header.Offset + glyphClassDefOffset, SeekOrigin.Begin);
 
 
-            reader.BaseStream.Seek(this.Header.Offset + attachListOffset, SeekOrigin.Begin);
+            this.GlyphClassDef = (glyphClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, tableStartAt + glyphClassDefOffset);
+            this.AttachmentListTable = (attachListOffset == 0) ? null : AttachmentListTable.CreateFrom(reader, tableStartAt + attachListOffset);
+            this.LigCaretList = (ligCaretListOffset == 0) ? null : LigCaretList.CreateFrom(reader, tableStartAt + ligCaretListOffset);
 
+            //A Mark Attachment Class Definition Table defines the class to which a mark glyph may belong.
+            //This table uses the same format as the Class Definition table (for details, see the chapter, Common Table Formats ).
+            this.MarkAttachmentClassDef = (markAttachClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, tableStartAt + markAttachClassDefOffset);
+            this.MarkGlyphSetsTable = (markGlyphSetsDefOffset == 0) ? null : MarkGlyphSetsTable.CreateFrom(reader, tableStartAt + markGlyphSetsDefOffset);
 
-            reader.BaseStream.Seek(this.Header.Offset + ligCaretList, SeekOrigin.Begin);
-
-
-            reader.BaseStream.Seek(this.Header.Offset + markAttachClassDef, SeekOrigin.Begin);
-
-            if (markGlyphSetsDef != 0)
+            if (itemVarStoreOffset != 0)
             {
-                reader.BaseStream.Seek(this.Header.Offset + markGlyphSetsDef, SeekOrigin.Begin);
-            }
-            if (itemVarStore != 0)
-            {
-                reader.BaseStream.Seek(this.Header.Offset + itemVarStore, SeekOrigin.Begin);
+                //not support
+                throw new NotSupportedException();
+                reader.BaseStream.Seek(this.Header.Offset + itemVarStoreOffset, SeekOrigin.Begin);
             }
         }
-        public int MajorVersion { get; set; }
-        public int MinorVersion { get; set; }
+        public int MajorVersion { get; private set; }
+        public int MinorVersion { get; private set; }
+        public ClassDefTable GlyphClassDef { get; private set; }
+        public AttachmentListTable AttachmentListTable { get; private set; }
+        public LigCaretList LigCaretList { get; private set; }
+        public ClassDefTable MarkAttachmentClassDef { get; private set; }
+        public MarkGlyphSetsTable MarkGlyphSetsTable { get; private set; }
 
     }
 }

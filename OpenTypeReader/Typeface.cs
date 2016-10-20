@@ -69,6 +69,11 @@ namespace NRasterizer
         public List<Glyph> Glyphs { get { return _glyphs; } }
 
         //-------------------------------------------------------
+        internal GDEF GDEFTable
+        {
+            get;
+            set;
+        }
         internal GSUB GSUBTable
         {
             get;

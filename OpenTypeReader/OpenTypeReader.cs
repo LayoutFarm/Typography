@@ -72,7 +72,7 @@ namespace NRasterizer
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
                 GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
-                GDEF gdef = ReadTableIfExists(tables, input, new GDEF()); 
+                GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
 
                 return new Typeface(
@@ -84,6 +84,7 @@ namespace NRasterizer
                     horizontalMetrics,
                     kern)
                     {
+                        GDEFTable = gdef,
                         GSUBTable = gsub,
                         GPOSTable = gpos,
                         BaseTable = baseTable

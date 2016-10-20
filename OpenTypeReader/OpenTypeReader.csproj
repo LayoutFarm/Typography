@@ -45,13 +45,16 @@
     <Compile Include="Net20\ExtensionAttribute.cs" />
     <Compile Include="OpenTypeReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tables.AdvanceLayout\AttachmentListTable.cs" />
     <Compile Include="Tables.AdvanceLayout\Base.cs" />
+    <Compile Include="Tables.AdvanceLayout\ClassDefTable.cs" />
     <Compile Include="Tables.AdvanceLayout\CoverageTable.cs" />
     <Compile Include="Tables.AdvanceLayout\FeatureList.cs" />
     <Compile Include="Tables.AdvanceLayout\GDEF.cs" />
     <Compile Include="Tables.AdvanceLayout\GPOS.cs" />
     <Compile Include="Tables.AdvanceLayout\GPOS.Others.cs" />
     <Compile Include="Tables.AdvanceLayout\GSUB.SubTables.cs" />
+    <Compile Include="Tables.AdvanceLayout\LigatureCaretListTable.cs" />
     <Compile Include="Tables.AdvanceLayout\ScriptList.cs" />
     <Compile Include="Tables.AdvanceLayout\ScriptTable.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
