@@ -239,6 +239,7 @@ namespace NRasterizer.Tables
                     get;
                     private set;
                 }
+                public CoverageTable CoverageTable { get; set; }
             }
             /// <summary>
             /// Lookup Type 1: Single Adjustment Positioning Subtable
@@ -252,10 +253,10 @@ namespace NRasterizer.Tables
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
-
+                    long subTableStartAt = reader.BaseStream.Position + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
-                    LookupSubTable subTable = null;
+
                     ushort format = reader.ReadUInt16();
 
                     switch (format)
@@ -267,13 +268,15 @@ namespace NRasterizer.Tables
                                 // USHORT 	PosFormat 	Format identifier-format = 1
                                 //Offset 	Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
                                 //USHORT 	ValueFormat 	Defines the types of data in the ValueRecord
-                                //ValueRecord 	Value 	Defines positioning value(s)-applied to all glyphs in the Coverage table
-
-
+                                //ValueRecord 	Value 	Defines positioning value(s)-applied to all glyphs in the Coverage table 
                                 short coverage = reader.ReadInt16();
                                 ushort valueFormat = reader.ReadUInt16();
-                                subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
-
+                                var subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
+                                //-------
+                                reader.BaseStream.Seek(subTableStartAt + coverage, SeekOrigin.Begin);
+                                subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                                //-------
+                                this.subTables.Add(subTable);
                             } break;
                         case 2:
                             {
@@ -292,13 +295,15 @@ namespace NRasterizer.Tables
                                 {
                                     values[n] = ValueRecord.CreateFrom(reader, valueFormat);
                                 }
-                                subTable = new LkSubTableType1(values);
+                                var subTable = new LkSubTableType1(values);
+                                //-------
+                                reader.BaseStream.Seek(subTableStartAt + coverage, SeekOrigin.Begin);
+                                subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                                //-------
+                                this.subTables.Add(subTable);
                             }
                             break;
                     }
-
-                    //subTable.CoverageTable = CoverageTable.ReadFrom(reader);
-                    this.subTables.Add(subTable);
                 }
             }
 
@@ -524,8 +529,6 @@ namespace NRasterizer.Tables
                     //---------------------------------------------------------------------------
                     this.subTables.Add(lookupType4);
                 }
-
-
             }
 
 
@@ -606,7 +609,7 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType6(BinaryReader reader)
             {
-                 
+
                 //USHORT 	PosFormat 	Format identifier-format = 1
                 //Offset 	Mark1Coverage 	Offset to Combining Mark Coverage table-from beginning of MarkMarkPos subtable
                 //Offset 	Mark2Coverage 	Offset to Base Mark Coverage table-from beginning of MarkMarkPos subtable
