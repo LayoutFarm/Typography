@@ -450,6 +450,173 @@ namespace NRasterizer.Tables
             }
 
         }
+
+        //------
+
+        //format 7, 8
+
+
+        struct PosLookupRecord
+        {
+
+
+            //PosLookupRecord
+            //Value 	Type 	Description
+            //USHORT 	SequenceIndex 	Index to input glyph sequence-first glyph = 0
+            //USHORT 	LookupListIndex 	Lookup to apply to that position-zero-based
+
+            public readonly ushort seqIndex;
+            public readonly ushort lookupListIndex;
+            public PosLookupRecord(ushort seqIndex, ushort lookupListIndex)
+            {
+                this.seqIndex = seqIndex;
+                this.lookupListIndex = lookupListIndex;
+            }
+        }
+
+
+        class PosRuleSetTable
+        {
+
+            //PosRuleSet table: All contexts beginning with the same glyph
+            // Value 	Type 	Description
+            //USHORT 	PosRuleCount 	Number of PosRule tables
+            //Offset 	PosRule
+            //[PosRuleCount] 	Array of offsets to PosRule tables-from beginning of PosRuleSet-ordered by preference
+            //
+            //A PosRule table consists of a count of the glyphs to be matched in the input context sequence (GlyphCount), 
+            //including the first glyph in the sequence, and an array of glyph indices that describe the context (Input). 
+            //The Coverage table specifies the index of the first glyph in the context, and the Input array begins with the second glyph in the context sequence. As a result, the first index position in the array is specified with the number one (1), not zero (0). The Input array lists the indices in the order the corresponding glyphs appear in the text. For text written from right to left, the right-most glyph will be first; conversely, for text written from left to right, the left-most glyph will be first.
+
+            //A PosRule table also contains a count of the positioning operations to be performed on the input glyph sequence (PosCount) and an array of PosLookupRecords (PosLookupRecord). Each record specifies a position in the input glyph sequence and a LookupList index to the positioning lookup to be applied there. The array should list records in design order, or the order the lookups should be applied to the entire glyph sequence.
+
+            //Example 10 at the end of this chapter demonstrates glyph kerning in context with a ContextPosFormat1 subtable.
+
+            PosRuleTable[] posRuleTables;
+            public void ReadFrom(BinaryReader reader)
+            {
+                long tableStartAt = reader.BaseStream.Position;
+                ushort posRuleCount = reader.ReadUInt16();
+                short[] posRuleTableOffsets = Utils.ReadInt16Array(reader, posRuleCount);
+                int j = posRuleTableOffsets.Length;
+                posRuleTables = new PosRuleTable[posRuleCount];
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to and read
+                    reader.BaseStream.Seek(tableStartAt + posRuleTableOffsets[i], SeekOrigin.Begin);
+                    var posRuleTable = new PosRuleTable();
+                    posRuleTable.ReadFrom(reader);
+                    posRuleTables[i] = posRuleTable;
+
+                }
+            }
+
+            public static PosRuleSetTable CreateFrom(BinaryReader reader)
+            {
+                var posRuleSetTable = new PosRuleSetTable();
+                posRuleSetTable.ReadFrom(reader);
+                return posRuleSetTable;
+            }
+        }
+        class PosRuleTable
+        {
+
+            //PosRule subtable
+            //Value 	Type 	Description
+            //USHORT 	GlyphCount 	Number of glyphs in the Input glyph sequence
+            //USHORT 	PosCount 	Number of PosLookupRecords
+            //GlyphID 	Input[GlyphCount - 1]  Array of input GlyphIDs-starting with the second glyph***
+            //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
+            PosLookupRecord[] posLookupRecords;
+            ushort[] inputGlyphIds;
+            public void ReadFrom(BinaryReader reader)
+            {
+                ushort glyphCount = reader.ReadUInt16();
+                ushort posCount = reader.ReadUInt16();
+                inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
+
+                posLookupRecords = new PosLookupRecord[posCount];
+                for (int i = 0; i < posCount; ++i)
+                {
+                    posLookupRecords[i] = new PosLookupRecord(
+                        reader.ReadUInt16(), //seqIndex
+                        reader.ReadUInt16()); //lookupListIndex
+                }
+            }
+        }
+
+        //lktype 8 , format 2
+        // PosClassSet table: All contexts beginning with the same class
+        //Value 	Type 	Description
+        //USHORT 	PosClassRuleCnt 	Number of PosClassRule tables
+        //Offset 	PosClassRule[PosClassRuleCnt] 	Array of offsets to PosClassRule tables-from beginning of PosClassSet-ordered by preference
+
+        //For each context, a PosClassRule table contains a count of the glyph classes in a given context (GlyphCount), including the first class in the context sequence. A class array lists the classes, beginning with the second class, that follow the first class in the context. The first class listed indicates the second position in the context sequence.
+
+        //    Note: Text order depends on the writing direction of the text. For text written from right to left, the right-most glyph will be first. Conversely, for text written from left to right, the left-most glyph will be first.
+
+        //The values specified in the Class array are those defined in the ClassDef table. For example, consider a context consisting of the sequence: Class 2, Class 7, Class 5, Class 0. The Class array will read: Class[0] = 7, Class[1] = 5, and Class[2] = 0. The first class in the sequence, Class 2, is defined by the index into the PosClassSet array of offsets. The total number and sequence of glyph classes listed in the Class array must match the total number and sequence of glyph classes contained in the input context.
+
+        //A PosClassRule also contains a count of the positioning operations to be performed on the context (PosCount) and an array of PosLookupRecords (PosLookupRecord) that supply the positioning data. For each position in the context that requires a positioning operation, a PosLookupRecord specifies a LookupList index and a position in the input glyph class sequence where the lookup is applied. The PosLookupRecord array lists PosLookupRecords in design order, or the order in which lookups are applied to the entire glyph sequence.
+
+        //Example 11 at the end of this chapter demonstrates a ContextPosFormat2 subtable that uses glyph classes to modify accent positions in glyph strings.
+        //PosClassRule table: One class context definition
+        //Value 	Type 	Description
+        //USHORT 	GlyphCount 	Number of glyphs to be matched
+        //USHORT 	PosCount 	Number of PosLookupRecords
+        //USHORT 	Class[GlyphCount - 1] 	Array of classes-beginning with the second class-to be matched to the input glyph sequence
+        //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
+
+        class PosClassSetTable
+        {
+            PosClassRule[] posClasses;
+            public void ReadFrom(BinaryReader reader)
+            {
+                long tableStartAt = reader.BaseStream.Position;
+                //
+                ushort posClassRuleCnt = reader.ReadUInt16();
+                short[] posClassRuleOffsets = Utils.ReadInt16Array(reader, posClassRuleCnt);
+                int j = posClassRuleOffsets.Length;
+
+                posClasses = new PosClassRule[posClassRuleCnt];
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to and read
+                    reader.BaseStream.Seek(tableStartAt + posClassRuleOffsets[i], SeekOrigin.Begin);
+                    var posClassRule = new PosClassRule();
+                    posClassRule.ReadFrom(reader);
+                    posClasses[i] = posClassRule;
+                }
+            }
+
+            public static PosClassSetTable CreateFrom(BinaryReader reader)
+            {
+                var posClassSetTable = new PosClassSetTable();
+                posClassSetTable.ReadFrom(reader);
+                return posClassSetTable;
+            }
+        }
+        class PosClassRule
+        {
+            PosLookupRecord[] posLookupRecords;
+            ushort[] inputGlyphIds;
+            public void ReadFrom(BinaryReader reader)
+            {
+                ushort glyphCount = reader.ReadUInt16();
+                ushort posCount = reader.ReadUInt16();
+                inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
+
+                posLookupRecords = new PosLookupRecord[posCount];
+                for (int i = 0; i < posCount; ++i)
+                {
+                    posLookupRecords[i] = new PosLookupRecord(
+                        reader.ReadUInt16(), //seqIndex
+                        reader.ReadUInt16()); //lookupListIndex
+                }
+            }
+        }
+
+
     }
 
 }

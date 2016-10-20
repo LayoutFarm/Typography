@@ -51,7 +51,6 @@
     <Compile Include="Tables.AdvanceLayout\GDEF.cs" />
     <Compile Include="Tables.AdvanceLayout\GPOS.cs" />
     <Compile Include="Tables.AdvanceLayout\GPOS.Others.cs" />
-    <Compile Include="Tables.AdvanceLayout\GPOS.SubTables.cs" />
     <Compile Include="Tables.AdvanceLayout\GSUB.SubTables.cs" />
     <Compile Include="Tables.AdvanceLayout\ScriptList.cs" />
     <Compile Include="Tables.AdvanceLayout\ScriptTable.cs" />
