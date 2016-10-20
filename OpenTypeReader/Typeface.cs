@@ -68,11 +68,38 @@ namespace NRasterizer
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
         public List<Glyph> Glyphs { get { return _glyphs; } }
 
+        //-------------------------------------------------------
         internal GSUB GSUBTable
         {
             get;
             set;
         }
+        internal GPOS GPOSTable
+        {
+            get;
+            set;
+        }
+        internal BASE BaseTable
+        {
+            get;
+            set;
+        }
+
         //-------------------------------------------------------
+
+        public void Lookup(char[] buffer, List<int> output)
+        {
+            //do shaping here?
+            //1. do look up and substitution 
+            int j = buffer.Length;
+            for (int i = 0; i < j; ++i)
+            {
+                output.Add(LookupIndex(buffer[i]));
+            }
+            //check for glyph substitution
+             
+            this.GSUBTable.CheckSubstitution(output[1]);
+
+        }
     }
 }

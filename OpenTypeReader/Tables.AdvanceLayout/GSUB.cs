@@ -1,4 +1,4 @@
-﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+﻿//Apache2, 2016,  WinterDev
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,13 +7,15 @@ using System.Text;
 namespace NRasterizer.Tables
 {
 
-    class GSUB : TableEntry
+    partial class GSUB : TableEntry
     {
         //from https://www.microsoft.com/typography/otspec/GSUB.htm
 
-        List<ScriptRecord> scriptRecords = new List<ScriptRecord>();
-        List<FeatureRecord> featureRecords = new List<FeatureRecord>();
-        List<LookupTable> lookupRecords = new List<LookupTable>();
+
+        ScriptList scriptList = new ScriptList();
+        FeatureList featureList = new FeatureList();
+        List<LookupTable> lookupTables = new List<LookupTable>();
+
         long gsubTableStartAt;
         public override string Name
         {
@@ -54,11 +56,11 @@ namespace NRasterizer.Tables
             //-----------------------
             //1. scriptlist
             reader.BaseStream.Seek(this.Header.Offset + scriptListOffset, SeekOrigin.Begin);
-            ReadScriptListTable(reader);
+            scriptList.ReadFrom(reader);
             //-----------------------
             //2. feature list
             reader.BaseStream.Seek(this.Header.Offset + featureListOffset, SeekOrigin.Begin);
-            ReadFeatureListTable(reader);
+            featureList.ReadFrom(reader);
             //-----------------------
             //3. lookup list
             reader.BaseStream.Seek(this.Header.Offset + lookupListOffset, SeekOrigin.Begin);
@@ -75,52 +77,8 @@ namespace NRasterizer.Tables
         public ushort MajorVersion { get; private set; }
         public ushort MinorVersion { get; private set; }
 
-        void ReadScriptListTable(BinaryReader reader)
-        {
-            //https://www.microsoft.com/typography/otspec/chapter2.htm
-            //ScriptList table
-            //Type 	Name 	Description
-            //USHORT 	ScriptCount 	Number of ScriptRecords
-            //struct 	ScriptRecord
-            //[ScriptCount] 	Array of ScriptRecords
-            //-listed alphabetically by ScriptTag
-            //ScriptRecord
-            //Type 	Name 	Description
-            //Tag 	ScriptTag 	4-byte ScriptTag identifier
-            //Offset 	Script 	Offset to Script table-from beginning of ScriptList
-            scriptRecords.Clear();
-            ushort scriptCount = reader.ReadUInt16();
-            for (int i = 0; i < scriptCount; ++i)
-            {
-                //read script record
-                scriptRecords.Add(new ScriptRecord(
-                    reader.ReadUInt32(),
-                    reader.ReadUInt16()));
-            }
-        }
 
-        void ReadFeatureListTable(BinaryReader reader)
-        {
-            //https://www.microsoft.com/typography/otspec/chapter2.htm
-            //FeatureList table
-            //Type 	Name 	Description
-            //USHORT 	FeatureCount 	Number of FeatureRecords in this table
-            //struct 	FeatureRecord[FeatureCount] 	Array of FeatureRecords-zero-based (first feature has FeatureIndex = 0)-listed alphabetically by FeatureTag
-            //FeatureRecord
-            //Type 	Name 	Description
-            //Tag 	FeatureTag 	4-byte feature identification tag
-            //Offset 	Feature 	Offset to Feature table-from beginning of FeatureList
-            featureRecords.Clear();
-            ushort featureCount = reader.ReadUInt16();
-            for (int i = 0; i < featureCount; ++i)
-            {
-                //read script record
-                featureRecords.Add(new FeatureRecord(
-                    reader.ReadUInt32(),
-                    reader.ReadUInt16()));
-            }
 
-        }
         void ReadLookupListTable(BinaryReader reader)
         {
             long lookupListHeadPos = reader.BaseStream.Position;
@@ -149,7 +107,7 @@ namespace NRasterizer.Tables
             //Offset 	SubTable
             //[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
             //unit16 	MarkFilteringSet
-            lookupRecords.Clear();
+            lookupTables.Clear();
             ushort lookupCount = reader.ReadUInt16();
             int[] subTableOffset = new int[lookupCount];
             for (int i = 0; i < lookupCount; ++i)
@@ -178,7 +136,7 @@ namespace NRasterizer.Tables
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
 
-                lookupRecords.Add(
+                lookupTables.Add(
                     new LookupTable(
                         lookupTablePos,
                         lookupType,
@@ -191,7 +149,7 @@ namespace NRasterizer.Tables
             //read each lookup record content ...
             for (int i = 0; i < lookupCount; ++i)
             {
-                LookupTable lookupRecord = lookupRecords[i];
+                LookupTable lookupRecord = lookupTables[i];
                 //set origin
                 reader.BaseStream.Seek(lookupListHeadPos + subTableOffset[i], SeekOrigin.Begin);
                 lookupRecord.ReadRecordContent(reader);
@@ -203,53 +161,25 @@ namespace NRasterizer.Tables
             throw new NotImplementedException();
         }
 
-        struct ScriptRecord
+        internal struct LookupResult
         {
-            public readonly uint scriptTag;//4-byte ScriptTag identifier
-            public readonly ushort offset; //Script Offset to Script table-from beginning of ScriptList
-            public ScriptRecord(uint scriptTag, ushort offset)
+
+            public readonly LookupSubTable foundOnTable;
+            public readonly int foundAtIndex;
+            public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
             {
-                this.scriptTag = scriptTag;
-                this.offset = offset;
-            }
-            public string ScriptName
-            {
-                get { return TagToString(scriptTag); }
+                this.foundAtIndex = foundAtIndex;
+                this.foundOnTable = foundOnTable;
             }
 
-
-            public override string ToString()
-            {
-                return ScriptName + "," + offset;
-            }
         }
-        struct FeatureRecord
-        {
-            public readonly uint scriptTag;//4-byte ScriptTag identifier
-            public readonly ushort offset; //Script Offset to Script table-from beginning of ScriptList
-            public FeatureRecord(uint scriptTag, ushort offset)
-            {
-                this.scriptTag = scriptTag;
-                this.offset = offset;
-            }
-            public string ScriptName
-            {
-                get { return TagToString(scriptTag); }
-            }
-            public override string ToString()
-            {
-                return ScriptName + "," + offset;
-            }
-        }
-
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
-        class LookupTable
+        internal class LookupTable
         {
             //--------------------------
             long lookupTablePos;
-
             //--------------------------
             public readonly ushort lookupType;
             public readonly ushort lookupFlags;
@@ -268,7 +198,6 @@ namespace NRasterizer.Tables
                  )
             {
                 this.lookupTablePos = lookupTablePos;
-
                 this.lookupType = lookupType;
                 this.lookupFlags = lookupFlags;
                 this.subTableCount = subTableCount;
@@ -281,6 +210,34 @@ namespace NRasterizer.Tables
                 return lookupType.ToString();
             }
 #endif
+            public int FindGlyphIndex(int glyphIndex)
+            {
+                //check if input glyphIndex is in coverage area 
+                for (int i = subTables.Count - 1; i >= 0; --i)
+                {
+                    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+                    if (foundAtIndex > -1)
+                    {
+                        //found                        
+                        return foundAtIndex;
+                    }
+                }
+                return -1;
+            }
+            public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
+            {
+                //check if input glyphIndex is in coverage area 
+                for (int i = subTables.Count - 1; i >= 0; --i)
+                {
+                    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+                    if (foundAtIndex > -1)
+                    {
+                        //found                        
+                        outputResults.Add(new LookupResult(subTables[i], i));
+                    }
+                }
+
+            }
             public void ReadRecordContent(BinaryReader reader)
             {
                 switch (lookupType)
@@ -365,15 +322,13 @@ namespace NRasterizer.Tables
                 //GlyphID 	Substitute
                 //[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
 
-                long thisLoookupTablePos = reader.BaseStream.Position;
+
                 int j = subTableOffsets.Length;
-
-
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
-
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
                     LookupSubTable subTable = null;
                     ushort format = reader.ReadUInt16();
@@ -389,16 +344,13 @@ namespace NRasterizer.Tables
                         case 2:
                             {
                                 ushort glyphCount = reader.ReadUInt16();
-                                ushort[] substitueGlyphs = new ushort[glyphCount];// 	Array of substitute GlyphIDs-ordered by Coverage Index
-                                for (int n = 0; n < glyphCount; ++n)
-                                {
-                                    substitueGlyphs[n] = reader.ReadUInt16();
-                                }
+                                ushort[] substitueGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
                                 subTable = new LookupSubTableT1F2(coverage, substitueGlyphs);
                             }
                             break;
                     }
-                    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                  
+                    subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                     this.subTables.Add(subTable);
                 }
             }
@@ -418,10 +370,8 @@ namespace NRasterizer.Tables
 
                 //    Note: The order of the output glyph indices depends on the writing direction of the text. For text written left to right, the left-most glyph will be first glyph in the sequence. Conversely, for text written right to left, the right-most glyph will be first.
 
-                //The use of multiple substitution for deletion of an input glyph is prohibited. GlyphCount should always be greater than 0.
-
-                //Example 4 at the end of this chapter shows how to replace a single ligature with three glyphs.
-
+                //The use of multiple substitution for deletion of an input glyph is prohibited. GlyphCount should always be greater than 0. 
+                //Example 4 at the end of this chapter shows how to replace a single ligature with three glyphs. 
 
                 //MultipleSubstFormat1 subtable: Multiple output glyphs
                 //Type 	Name 	Description
@@ -434,10 +384,7 @@ namespace NRasterizer.Tables
                 //Type 	Name 	Description
                 //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array. This should always be greater than 0.
                 //GlyphID 	Substitute
-                //[GlyphCount]
-
-
-
+                //[GlyphCount] 
                 Console.WriteLine("skip lookup2");
 
             }
@@ -472,7 +419,91 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType6(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 6");
+                //LookupType 6: Chaining Contextual Substitution Subtable
+                //A Chaining Contextual Substitution subtable (ChainContextSubst) describes glyph substitutions in context with an ability to look back and/or look ahead
+                //in the sequence of glyphs. 
+                //The design of the Chaining Contextual Substitution subtable is parallel to that of the Contextual Substitution subtable,
+                //including the availability of three formats for handling sequences of glyphs, glyph classes, or glyph sets. Each format can describe one or more backtrack,
+                //input, and lookahead sequences and one or more substitutions for each sequence.
+                //-----------------------
+                //TODO: impl here
+                Console.WriteLine("not complete lookup type 6!");
+                int j = subTableOffsets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+
+                    //-----------------------
+                    LookupSubTable subTable = null;
+                    ushort format = reader.ReadUInt16();
+
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                //6.1 Chaining Context Substitution Format 1: Simple Chaining Context Glyph Substitution 
+                                ushort coverage = reader.ReadUInt16();
+                                ushort chainSubRulesetCount = reader.ReadUInt16();
+                                short[] chainSubRulesetOffsets = Utils.ReadInt16Array(reader, chainSubRulesetCount);
+
+                            } break;
+                        case 2:
+                            {
+                                //6.2 Chaining Context Substitution Format 2: Class-based Chaining Context Glyph Substitution       
+                                //USHORT 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
+                                //Offset 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
+                                //USHORT 	InputGlyphCount 	Number of glyphs in input sequence
+                                //Offset 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
+                                //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
+                                //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
+                                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                                //struct 	SubstLookupRecord
+                                //[SubstCount] 	Array of SubstLookupRecords, in design order
+
+
+                                ushort coverage = reader.ReadUInt16(); //Offset to Coverage table-from beginning of Substitution table
+                                short backtrackClassDef = reader.ReadInt16(); //Offset to glyph ClassDef table containing backtrack sequence data-from beginning of Substitution table
+                                short inputClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing input sequence data-from beginning of Substitution table
+                                short lookAheadClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing lookahead sequence data-from beginning of Substitution table
+                                ushort chainSubclassSetCount = reader.ReadUInt16(); //Number of ChainSubClassSet tables
+                                short[] chainSubClassOffsets = Utils.ReadInt16Array(reader, chainSubclassSetCount);
+
+                            }
+                            break;
+                        case 3:
+                            {
+                                //6.3 Chaining Context Substitution Format 3: Coverage-based Chaining Context Glyph Substitution
+                                //
+                                //USHORT 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
+                                //Offset 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
+                                //USHORT 	InputGlyphCount 	Number of glyphs in input sequence
+                                //Offset 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
+                                //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
+                                //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
+                                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                                //struct 	SubstLookupRecord
+                                //[SubstCount] 	Array of SubstLookupRecords, in design order
+                                //
+
+                                ushort backtrackingGlyphCount = reader.ReadUInt16();
+                                short[] backtrackingCoverageArray = Utils.ReadInt16Array(reader, backtrackingGlyphCount);
+                                ushort inputGlyphCount = reader.ReadUInt16();
+                                short[] inputGlyphCoverageArray = Utils.ReadInt16Array(reader, inputGlyphCount);
+                                ushort lookAheadGlyphCount = reader.ReadUInt16();
+                                short[] lookAheadCoverageArray = Utils.ReadInt16Array(reader, lookAheadGlyphCount);
+
+                            }
+                            break;
+                    }
+                    //-------------------------------------------------------------
+
+
+
+                    this.subTables.Add(subTable);
+                }
+
                 //throw new NotImplementedException();
             }
             /// <summary>
@@ -492,11 +523,27 @@ namespace NRasterizer.Tables
                 throw new NotImplementedException();
             }
         }
-        static string TagToString(uint tag)
+
+        public bool CheckSubstitution(int inputGlyph)
         {
-            byte[] bytes = BitConverter.GetBytes(tag);
-            Array.Reverse(bytes);
-            return Encoding.ASCII.GetString(bytes);
+            List<GSUB.LookupResult> foundResults = new List<LookupResult>();
+            for (int i = lookupTables.Count - 1; i >= 0; --i)
+            {
+                LookupTable lookup = lookupTables[i];
+                if (lookup.lookupType != 1)
+                {
+                    //this version, handle only type1
+                    //TODO: implement more
+                    continue;
+                }
+                int foundIndex = lookup.FindGlyphIndex(inputGlyph);
+                if (foundIndex > -1)
+                {
+                    //found here 
+                    lookup.FindGlyphIndexAll(inputGlyph, foundResults);
+                }
+            }
+            return false;
         }
 
     }

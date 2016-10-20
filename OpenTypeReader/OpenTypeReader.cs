@@ -71,6 +71,9 @@ namespace NRasterizer
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
+                GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
+                GDEF gdef = ReadTableIfExists(tables, input, new GDEF()); 
+                BASE baseTable = ReadTableIfExists(tables, input, new BASE());
 
                 return new Typeface(
                     nameEntry,
@@ -81,7 +84,9 @@ namespace NRasterizer
                     horizontalMetrics,
                     kern)
                     {
-                        GSUBTable = gsub
+                        GSUBTable = gsub,
+                        GPOSTable = gpos,
+                        BaseTable = baseTable
                     };
             }
         }

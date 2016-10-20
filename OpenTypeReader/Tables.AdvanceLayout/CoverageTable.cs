@@ -1,4 +1,4 @@
-﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+﻿//Apache2, 2016, WinterDev
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,12 +12,58 @@ namespace NRasterizer.Tables
         ushort _format;
         RangeRecord[] ranges;
         ushort[] orderedGlyphIdList;
+
         private CoverageTable()
         {
         }
-        public static CoverageTable ReadFrom(BinaryReader reader)
+        public int FindGlyphIndex(int glyphIndex)
         {
-            CoverageTable coverageTable = new CoverageTable();
+            switch (_format)
+            {
+                //should not occur here
+                default: throw new NotSupportedException();
+                case 1:
+                    {
+                        //TODO: imple fast search here                       
+
+                        for (int i = orderedGlyphIdList.Length - 1; i >= 0; --i)
+                        {
+                            ushort gly = orderedGlyphIdList[i];
+                            if (gly < glyphIndex)
+                            {
+                                return -1;//not found
+                            }
+                            else if (gly == glyphIndex)
+                            {
+                                return i;
+                            }
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        //search in range
+                        for (int i = ranges.Length - 1; i >= 0; --i)
+                        {
+                            RangeRecord range = ranges[i];
+                            if (range.Contains(glyphIndex))
+                            {
+                                //found
+                                return i;
+                            }
+                        }
+                        //not found in range
+                        return -1;
+                    }
+                    break;
+            }
+            return -1;//not found
+        }
+        public static CoverageTable CreateFrom(BinaryReader reader, long beginAt)
+        {
+            reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+            //---------------------------------------------------
+            var coverageTable = new CoverageTable();
             //1. format  
             switch (coverageTable._format = reader.ReadUInt16())
             {
@@ -55,7 +101,6 @@ namespace NRasterizer.Tables
             return coverageTable;
         }
 
-
         struct RangeRecord
         {
             //GlyphID 	Start 	First GlyphID in the range
@@ -69,6 +114,11 @@ namespace NRasterizer.Tables
                 this.start = start;
                 this.end = end;
                 this.startCoverageIndex = startCoverageIndex;
+            }
+            public bool Contains(int glyphIndex)
+            {
+                return glyphIndex >= start && glyphIndex <= end;
+
             }
 #if DEBUG
             public override string ToString()
