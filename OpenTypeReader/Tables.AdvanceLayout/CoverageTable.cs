@@ -59,9 +59,11 @@ namespace NRasterizer.Tables
             }
             return -1;//not found
         }
-        public static CoverageTable ReadFrom(BinaryReader reader)
+        public static CoverageTable ReadFrom(BinaryReader reader, long beginAt)
         {
-            CoverageTable coverageTable = new CoverageTable();
+            reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+            //---------------------------------------------------
+            var coverageTable = new CoverageTable();
             //1. format  
             switch (coverageTable._format = reader.ReadUInt16())
             {
@@ -99,7 +101,6 @@ namespace NRasterizer.Tables
             return coverageTable;
         }
 
-
         struct RangeRecord
         {
             //GlyphID 	Start 	First GlyphID in the range
@@ -117,7 +118,7 @@ namespace NRasterizer.Tables
             public bool Contains(int glyphIndex)
             {
                 return glyphIndex >= start && glyphIndex <= end;
-                 
+
             }
 #if DEBUG
             public override string ToString()

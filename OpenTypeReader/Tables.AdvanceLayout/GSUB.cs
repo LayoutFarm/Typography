@@ -327,8 +327,8 @@ namespace NRasterizer.Tables
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
-
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
                     LookupSubTable subTable = null;
                     ushort format = reader.ReadUInt16();
@@ -349,7 +349,8 @@ namespace NRasterizer.Tables
                             }
                             break;
                     }
-                    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                  
+                    subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverage);
                     this.subTables.Add(subTable);
                 }
             }
