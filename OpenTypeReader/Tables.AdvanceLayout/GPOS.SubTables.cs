@@ -10,31 +10,18 @@ namespace NRasterizer.Tables
 {
     partial class GPOS
     {
-
-        class LookupType1SubTable : LookupSubTable
+        abstract class LookupSubTable
         {
-            ValueRecord singleValue;
-            ValueRecord[] multiValues;
-            public LookupType1SubTable(ValueRecord singleValue)
+            public int Format
             {
-                this.Format = 1;
-                this.singleValue = singleValue;
+                get;
+                protected set;
             }
-            public LookupType1SubTable(ValueRecord[] valueRecords)
+            public ushort CoverageOffset
             {
-                this.Format = 2;
-                this.multiValues = valueRecords;
+                get;
+                protected set;
             }
-        }
-        class LookupType2SubTable : LookupSubTable
-        {
-            PairSetTable[] pairSetTables;
-            public LookupType2SubTable(PairSetTable[] pairSetTables)
-            {
-                this.Format = 1;
-                this.pairSetTables = pairSetTables;
-            }
-
         }
 
     }

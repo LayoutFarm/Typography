@@ -291,16 +291,88 @@ namespace NRasterizer.Tables
 
         struct MarkRecord
         {
+            /// <summary>
+            /// Class defined for this mark
+            /// </summary>
             public readonly ushort markClass;
+            /// <summary>
+            /// Offset to Anchor table-from beginning of MarkArray table
+            /// </summary>
             public readonly short offset;
             public MarkRecord(ushort markClass, short offset)
             {
                 this.markClass = markClass;
                 this.offset = offset;
             }
+#if DEBUG
+            public override string ToString()
+            {
+                return "class " + markClass + ",offset=" + offset;
+            }
+#endif
+        }
+
+        class Mark2ArrayTable
+        {
+            ///Mark2Array table
+            //Value 	Type 	Description
+            //USHORT 	Mark2Count 	Number of Mark2 records
+            //struct 	Mark2Record
+            //[Mark2Count] 	Array of Mark2 records-in Coverage order
+
+            //Each Mark2Record contains an array of offsets to Anchor tables (Mark2Anchor). The array of zero-based offsets, measured from the beginning of the Mark2Array table, defines the entire set of Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. The Anchor tables in the Mark2Anchor array are ordered by Mark1 class value.
+
+            //A Mark2Record declares one Anchor table for each mark class (including Class 0) identified in the MarkRecords of the MarkArray. Each Anchor table specifies one Mark2 attachment point used to attach all the Mark1 glyphs in a particular class to the Mark2 glyph.
+
+            Mark2Record[] mark2Records;
+            public void ReadFrom(BinaryReader reader, ushort classCount)
+            {
+                ushort mark2Count = reader.ReadUInt16();
+                mark2Records = new Mark2Record[mark2Count];
+                for (int i = 0; i < mark2Count; ++i)
+                {
+                    mark2Records[i] = new Mark2Record(
+                        Utils.ReadInt16Array(reader, classCount));
+                }
+            }
+        }
+
+        struct Mark2Record
+        {
+            //Mark2Record
+            //Value 	Type 	Description
+            //Offset 	Mark2Anchor
+            //[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
+            public readonly short[] offsets;
+            public Mark2Record(short[] offsets)
+            {
+                this.offsets = offsets;
+            }
         }
 
 
+        class BaseArrayTable
+        {
+            BaseRecord[] records;
+            public void ReadFrom(BinaryReader reader, ushort classCount)
+            {
+                ushort baseCount = reader.ReadUInt16();
+                records = new BaseRecord[baseCount];
+                for (int i = 0; i < baseCount; ++i)
+                {
+                    records[i] = new BaseRecord(Utils.ReadInt16Array(reader, classCount));
+                }
+            }
+        }
+        struct BaseRecord
+        {
+            public short[] offsets;
+            public BaseRecord(short[] offsets)
+            {
+                this.offsets = offsets;
+            }
+
+        }
         class Class1Record
         {
 
@@ -310,5 +382,74 @@ namespace NRasterizer.Tables
 
         }
 
+
+        // LigatureArray table
+        //Value 	Type 	Description
+        //USHORT 	LigatureCount 	Number of LigatureAttach table offsets
+        //Offset 	LigatureAttach
+        //[LigatureCount] 	Array of offsets to LigatureAttach tables-from beginning of LigatureArray table-ordered by LigatureCoverage Index
+
+        //Each LigatureAttach table consists of an array (ComponentRecord) and count (ComponentCount) of the component glyphs in a ligature. The array stores the ComponentRecords in the same order as the components in the ligature. The order of the records also corresponds to the writing direction of the text. For text written left to right, the first component is on the left; for text written right to left, the first component is on the right.
+        //LigatureAttach table
+        //Value 	Type 	Description
+        //USHORT 	ComponentCount 	Number of ComponentRecords in this ligature
+        //struct 	ComponentRecord[ComponentCount] 	Array of Component records-ordered in writing direction
+
+        //A ComponentRecord, one for each component in the ligature, contains an array of offsets to the Anchor tables that define all the attachment points used to attach marks to the component (LigatureAnchor). For each mark class (including Class 0) identified in the MarkArray records, an Anchor table specifies the point used to attach all the marks in a particular class to the ligature base glyph, relative to the component.
+
+        //In a ComponentRecord, the zero-based LigatureAnchor array lists offsets to Anchor tables by mark class. If a component does not define an attachment point for a particular class of marks, then the offset to the corresponding Anchor table will be NULL.
+
+        //Example 8 at the end of this chapter shows a MarkLisPosFormat1 subtable used to attach mark accents to a ligature glyph in the Arabic script.
+        //ComponentRecord
+        //Value 	Type 	Description
+        //Offset 	LigatureAnchor
+        //[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of LigatureAttach table-ordered by class-NULL if a component does not have an attachment for a class-zero-based array
+        class LigatureArrayTable
+        {
+            LigatureAttachTable[] ligatures;
+            public void ReadFrom(BinaryReader reader, ushort classCount)
+            {
+                long startPos = reader.BaseStream.Position;
+                ushort ligatureCount = reader.ReadUInt16();
+                short[] offsets = Utils.ReadInt16Array(reader, ligatureCount);
+
+                ligatures = new LigatureAttachTable[ligatureCount];
+
+                for (int i = 0; i < ligatureCount; ++i)
+                {
+                    //each ligature table
+                    reader.BaseStream.Seek(startPos + offsets[i], SeekOrigin.Begin);
+                    ligatures[i] = LigatureAttachTable.ReadFrom(reader, classCount);
+                }
+            }
+        }
+        class LigatureAttachTable
+        {
+            ComponentRecord[] records;
+            public static LigatureAttachTable ReadFrom(BinaryReader reader, ushort classCount)
+            {
+                LigatureAttachTable table = new LigatureAttachTable();
+                ushort componentCount = reader.ReadUInt16();
+                ComponentRecord[] componentRecs = new ComponentRecord[componentCount];
+                table.records = componentRecs;
+                for (int i = 0; i < componentCount; ++i)
+                {
+                    componentRecs[i] = new ComponentRecord(
+                        Utils.ReadInt16Array(reader, classCount));
+                }
+                return table;
+            }
+
+        }
+        struct ComponentRecord
+        {
+            public short[] offsets;
+            public ComponentRecord(short[] offsets)
+            {
+                this.offsets = offsets;
+            }
+
+        }
     }
+
 }

@@ -9,6 +9,27 @@ namespace NRasterizer.Tables
 
     partial class GSUB : TableEntry
     {
+        internal abstract class LookupSubTable
+        {
+            public int Format
+            {
+                get;
+                protected set;
+            }
+            public ushort CoverageOffset
+            {
+                get;
+                protected set;
+            }
+            public CoverageTable CoverageTable
+            {
+                get;
+                set;
+            }
+
+        }
+
+
         /// <summary>
         ///  for lookup table type 1, format1
         /// </summary>

@@ -105,17 +105,14 @@ namespace NRasterizer.Tables
             //unit16 	MarkFilteringSet
             lookupRecords.Clear();
             ushort lookupCount = reader.ReadUInt16();
-            int[] subTableOffset = new int[lookupCount];
-            for (int i = 0; i < lookupCount; ++i)
-            {
-                subTableOffset[i] = reader.ReadUInt16();
-            }
+            short[] lookupTableOffsets = Utils.ReadInt16Array(reader, lookupCount);
+
             //----------------------------------------------
             //load each sub table
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             for (int i = 0; i < lookupCount; ++i)
             {
-                long lookupTablePos = lookupListHeadPos + subTableOffset[i];
+                long lookupTablePos = lookupListHeadPos + lookupTableOffsets[i];
                 reader.BaseStream.Seek(lookupTablePos, SeekOrigin.Begin);
 
                 ushort lookupType = reader.ReadUInt16();//Each Lookup table may contain only one type of information (LookupType)
@@ -123,11 +120,7 @@ namespace NRasterizer.Tables
                 ushort subTableCount = reader.ReadUInt16();
                 //Each LookupType is defined with one or more subtables, and each subtable definition provides a different representation format
                 //
-                ushort[] subTableOffsets = new ushort[subTableCount];
-                for (int m = 0; m < subTableCount; ++m)
-                {
-                    subTableOffsets[m] = reader.ReadUInt16();
-                }
+                short[] subTableOffsets = Utils.ReadInt16Array(reader, subTableCount);
 
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
@@ -147,7 +140,7 @@ namespace NRasterizer.Tables
             {
                 LookupTable lookupRecord = lookupRecords[i];
                 //set origin
-                reader.BaseStream.Seek(lookupListHeadPos + subTableOffset[i], SeekOrigin.Begin);
+                reader.BaseStream.Seek(lookupListHeadPos + lookupTableOffsets[i], SeekOrigin.Begin);
                 lookupRecord.ReadRecordContent(reader);
             }
 
@@ -163,7 +156,7 @@ namespace NRasterizer.Tables
             public readonly ushort lookupType;
             public readonly ushort lookupFlags;
             public readonly ushort subTableCount;
-            public readonly ushort[] subTableOffsets;
+            public readonly short[] subTableOffsets;
             public readonly ushort markFilteringSet;
             //--------------------------
             List<LookupSubTable> subTables = new List<LookupSubTable>();
@@ -172,7 +165,7 @@ namespace NRasterizer.Tables
                 ushort lookupType,
                 ushort lookupFlags,
                 ushort subTableCount,
-                ushort[] subTableOffsets,
+                short[] subTableOffsets,
                 ushort markFilteringSet
                  )
             {
@@ -223,6 +216,22 @@ namespace NRasterizer.Tables
                         break;
                 }
             }
+             
+            class LkSubTableType1 : LookupSubTable
+            {
+                ValueRecord singleValue;
+                ValueRecord[] multiValues;
+                public LkSubTableType1(ValueRecord singleValue)
+                {
+                    this.Format = 1;
+                    this.singleValue = singleValue;
+                }
+                public LkSubTableType1(ValueRecord[] valueRecords)
+                {
+                    this.Format = 2;
+                    this.multiValues = valueRecords;
+                }
+            }
             /// <summary>
             /// Lookup Type 1: Single Adjustment Positioning Subtable
             /// </summary>
@@ -255,7 +264,7 @@ namespace NRasterizer.Tables
 
                                 short coverage = reader.ReadInt16();
                                 ushort valueFormat = reader.ReadUInt16();
-                                subTable = new LookupType1SubTable(ValueRecord.CreateFrom(reader, valueFormat));
+                                subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
 
                             } break;
                         case 2:
@@ -275,13 +284,29 @@ namespace NRasterizer.Tables
                                 {
                                     values[n] = ValueRecord.CreateFrom(reader, valueFormat);
                                 }
-                                subTable = new LookupType1SubTable(values);
+                                subTable = new LkSubTableType1(values);
                             }
                             break;
                     }
 
                     //subTable.CoverageTable = CoverageTable.ReadFrom(reader);
                     this.subTables.Add(subTable);
+                }
+            }
+
+
+            class LkSubTableType2 : LookupSubTable
+            {
+                PairSetTable[] pairSetTables;
+                public LkSubTableType2(PairSetTable[] pairSetTables)
+                {
+                    this.Format = 1;
+                    this.pairSetTables = pairSetTables;
+                }
+                public CoverageTable CoverageTable
+                {
+                    get;
+                    set;
                 }
             }
             /// <summary>
@@ -349,10 +374,11 @@ namespace NRasterizer.Tables
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
 
                     //-----------------------
-                    LookupSubTable subTable = null;
+
                     ushort format = reader.ReadUInt16();
 
                     switch (format)
@@ -374,9 +400,12 @@ namespace NRasterizer.Tables
                                     pairSetTable.ReadFrom(reader, value1Format, value2Format);
                                     pairSetTables[n] = pairSetTable;
                                 }
-                                subTable = new LookupType2SubTable(pairSetTables);
-                                reader.BaseStream.Seek(thisLookupTablePos + coverage, SeekOrigin.Begin);
-                                
+                                var subTable = new LkSubTableType2(pairSetTables);
+                                //coverage
+                                reader.BaseStream.Seek(subTableStartAt + coverage, SeekOrigin.Begin);
+                                subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+
+                                subTables.Add(subTable);
                             } break;
                         case 2:
                             {
@@ -397,7 +426,7 @@ namespace NRasterizer.Tables
                             break;
                     }
 
-                    this.subTables.Add(subTable);
+
                 }
             }
 
@@ -409,13 +438,25 @@ namespace NRasterizer.Tables
             {
                 throw new NotImplementedException();
             }
+
+            class LkSubTableType4 : LookupSubTable
+            {
+                public LkSubTableType4()
+                {
+                }
+                public CoverageTable MarkCoverageTable { get; set; }
+                public CoverageTable BaseCoverageTable { get; set; }
+                public BaseArrayTable BaseArrayTable { get; set; }
+                public MarkArrayTable MarkArrayTable { get; set; }
+            }
             /// <summary>
             /// Lookup Type 4: MarkToBase Attachment Positioning Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType4(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 4");
+
+
                 //MarkBasePosFormat1 subtable: MarkToBase attachment point
                 //Value 	Type 	Description
                 //USHORT 	PosFormat 	Format identifier-format = 1
@@ -425,37 +466,68 @@ namespace NRasterizer.Tables
                 //Offset 	MarkArray 	Offset to MarkArray table-from beginning of MarkBasePos subtable
                 //Offset 	BaseArray 	Offset to BaseArray table-from beginning of MarkBasePos subtable
 
-                //The BaseArray table consists of an array (BaseRecord) and count (BaseCount) of BaseRecords. The array stores the BaseRecords in the same order as the BaseCoverage Index. Each base glyph in the BaseCoverage table has a BaseRecord.
+                //The BaseArray table consists of an array (BaseRecord) and count (BaseCount) of BaseRecords. 
+                //The array stores the BaseRecords in the same order as the BaseCoverage Index. 
+                //Each base glyph in the BaseCoverage table has a BaseRecord.
+
                 //BaseArray table
                 //Value 	Type 	Description
                 //USHORT 	BaseCount 	Number of BaseRecords
                 //struct 	BaseRecord[BaseCount] 	Array of BaseRecords-in order of BaseCoverage Index
                 long thisSubTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
-
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+                    long subtableStart = thisSubTablePos + subTableOffsets[i]; //beginning of MarkBasePos subtable ***
+                    reader.BaseStream.Seek(subtableStart, SeekOrigin.Begin);
 
-                    //-----------------------
-                    LookupSubTable subTable = null;
+                    //----------------------- 
                     ushort format = reader.ReadUInt16();
                     if (format != 1)
                     {
                         throw new NotSupportedException();
                     }
-                    short markCoverageOffset = reader.ReadInt16();
+                    short markCoverageOffset = reader.ReadInt16(); //offset from 
                     short baseCoverageOffset = reader.ReadInt16();
                     ushort classCount = reader.ReadUInt16();
                     short markArrayOffset = reader.ReadInt16();
                     short baseArrayOffset = reader.ReadInt16();
 
-                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
-                    this.subTables.Add(subTable);
+                    //---------------------------------------------------------------------------
+
+                    //read mark array table
+                    var lookupType4 = new LkSubTableType4();
+                    //---------------------------------------------------------------------------
+                    reader.BaseStream.Seek(subtableStart + markCoverageOffset, SeekOrigin.Begin);
+                    lookupType4.MarkCoverageTable = CoverageTable.ReadFrom(reader);
+                    //---------------------------------------------------------------------------
+                    reader.BaseStream.Seek(subtableStart + baseCoverageOffset, SeekOrigin.Begin);
+                    lookupType4.BaseCoverageTable = CoverageTable.ReadFrom(reader);
+                    //---------------------------------------------------------------------------
+                    reader.BaseStream.Seek(subtableStart + markArrayOffset, SeekOrigin.Begin);
+                    var markArrayTable = new MarkArrayTable();
+                    markArrayTable.ReadFrom(reader);
+                    lookupType4.MarkArrayTable = markArrayTable;
+                    //---------------------------------------------------------------------------
+                    reader.BaseStream.Seek(subtableStart + baseArrayOffset, SeekOrigin.Begin);
+                    var baseArrayTable = new BaseArrayTable();
+                    baseArrayTable.ReadFrom(reader, classCount);
+                    lookupType4.BaseArrayTable = baseArrayTable;
+                    //---------------------------------------------------------------------------
+                    this.subTables.Add(lookupType4);
                 }
 
 
+            }
+
+
+            class LkSubTableType5 : LookupSubTable
+            {
+                public CoverageTable MarkCoverage { get; set; }
+                public CoverageTable LigatureCoverage { get; set; }
+                public MarkArrayTable MarkArrayTable { get; set; }
+                public LigatureArrayTable LigatureArrayTable { get; set; }
             }
             /// <summary>
             /// Lookup Type 5: MarkToLigature Attachment Positioning Subtable
@@ -463,7 +535,6 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType5(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 5");
                 //USHORT 	PosFormat 	Format identifier-format = 1
                 //Offset 	MarkCoverage 	Offset to Mark Coverage table-from beginning of MarkLigPos subtable
                 //Offset 	LigatureCoverage 	Offset to Ligature Coverage table-from beginning of MarkLigPos subtable
@@ -476,28 +547,52 @@ namespace NRasterizer.Tables
 
                 for (int i = 0; i < j; ++i)
                 {
-                    //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
 
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
-                    LookupSubTable subTable = null;
+
                     ushort format = reader.ReadUInt16();
                     if (format != 1)
                     {
                         throw new NotSupportedException();
                     }
-                    short markCoverageOffset = reader.ReadInt16();
+                    short markCoverageOffset = reader.ReadInt16(); //from beginning of MarkLigPos subtable
                     short ligatureCoverageOffset = reader.ReadInt16();
                     ushort classCount = reader.ReadUInt16();
                     short markArrayOffset = reader.ReadInt16();
                     short ligatureArrayOffset = reader.ReadInt16();
-
-                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+                    //-----------------------
+                    var subTable = new LkSubTableType5();
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + markCoverageOffset, SeekOrigin.Begin);
+                    subTable.MarkCoverage = CoverageTable.ReadFrom(reader);
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + ligatureCoverageOffset, SeekOrigin.Begin);
+                    subTable.LigatureCoverage = CoverageTable.ReadFrom(reader);
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + markArrayOffset, SeekOrigin.Begin);
+                    var markArrayTable = new MarkArrayTable();
+                    markArrayTable.ReadFrom(reader);
+                    subTable.MarkArrayTable = markArrayTable;
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + ligatureArrayOffset, SeekOrigin.Begin);
+                    var ligatureArrayTable = new LigatureArrayTable();
+                    ligatureArrayTable.ReadFrom(reader, classCount);
+                    subTable.LigatureArrayTable = ligatureArrayTable;
+                    //-----------------------
                     this.subTables.Add(subTable);
                 }
-
-
             }
+            class LkSubTableType6 : LookupSubTable
+            {
+                public CoverageTable MarkCoverage1 { get; set; }
+                public CoverageTable MarkCoverage2 { get; set; }
+                public CoverageTable LigatureCoverage { get; set; }
+                public MarkArrayTable Mark1ArrayTable { get; set; }
+                public Mark2ArrayTable Mark2ArrayTable { get; set; }
+            }
+
             /// <summary>
             /// Lookup Type 6: MarkToMark Attachment Positioning Subtable
             /// </summary>
@@ -519,10 +614,11 @@ namespace NRasterizer.Tables
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
 
                     //-----------------------
-                    LookupSubTable subTable = null;
+
                     ushort format = reader.ReadUInt16();
                     if (format != 1)
                     {
@@ -533,8 +629,28 @@ namespace NRasterizer.Tables
                     ushort classCount = reader.ReadUInt16();
                     short mark1ArrayOffset = reader.ReadInt16();
                     short mark2ArrayOffset = reader.ReadInt16();
+                    //
+                    var subTable = new LkSubTableType6();
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + mark1CoverageOffset, SeekOrigin.Begin);
+                    subTable.MarkCoverage1 = CoverageTable.ReadFrom(reader);
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + mark2CoverageOffset, SeekOrigin.Begin);
+                    subTable.MarkCoverage2 = CoverageTable.ReadFrom(reader);
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + mark1ArrayOffset, SeekOrigin.Begin);
+                    var markArrayTable = new MarkArrayTable();
+                    markArrayTable.ReadFrom(reader);
+                    subTable.Mark1ArrayTable = markArrayTable;
+                    //-----------------------
+                    var mark2ArrayTable = new Mark2ArrayTable();
+                    mark2ArrayTable.ReadFrom(reader, classCount);
+                    subTable.Mark2ArrayTable = mark2ArrayTable;
+                    //-----------------------
+                    reader.BaseStream.Seek(subTableStartAt + mark2ArrayOffset, SeekOrigin.Begin);
+                    //-----------------------
 
-                    //    subTable.CoverageTable = CoverageTable.ReadFrom(reader);
+
                     this.subTables.Add(subTable);
                 }
 
@@ -547,6 +663,10 @@ namespace NRasterizer.Tables
             {
                 Console.WriteLine("skip lookup type 7");
             }
+
+
+
+
             /// <summary>
             /// LookupType 8: Chaining Contextual Positioning Subtable
             /// </summary>
