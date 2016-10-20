@@ -11,6 +11,37 @@ namespace NRasterizer.Tables
     partial class GPOS
     {
 
+        static PosRuleSetTable[] CreateMultiplePosRuleSetTables(long initPos, short[] offsets, BinaryReader reader)
+        {
+            int j = offsets.Length;
+            PosRuleSetTable[] results = new PosRuleSetTable[j];
+            for (int i = 0; i < j; ++i)
+            {
+                results[i] = PosRuleSetTable.CreateFrom(reader, initPos + offsets[i]);
+            }
+            return results;
+        }
+        static CoverageTable[] CreateMultipleCoverageTables(long initPos, short[] offsets, BinaryReader reader)
+        {
+            int j = offsets.Length;
+            CoverageTable[] results = new CoverageTable[j];
+            for (int i = 0; i < j; ++i)
+            {
+                results[i] = CoverageTable.CreateFrom(reader, initPos + offsets[i]);
+            }
+            return results;
+        }
+        static PosLookupRecord[] CreateMultiplePosLookupRecords(BinaryReader reader, int count)
+        {
+
+            PosLookupRecord[] results = new PosLookupRecord[count];
+            for (int n = 0; n < count; ++n)
+            {
+                results[n] = PosLookupRecord.CreateFrom(reader);
+            }
+            return results;
+        }
+
 
         class PairSetTable
         {
@@ -276,7 +307,7 @@ namespace NRasterizer.Tables
             //USHORT 	Class 	Class defined for this mark
             //Offset 	MarkAnchor 	Offset to Anchor table-from beginning of MarkArray table
             MarkRecord[] records;
-            public void ReadFrom(BinaryReader reader)
+            void ReadFrom(BinaryReader reader)
             {
                 ushort markCount = reader.ReadUInt16();
                 records = new MarkRecord[markCount];
@@ -286,6 +317,14 @@ namespace NRasterizer.Tables
                         reader.ReadUInt16(),
                         reader.ReadInt16());
                 }
+            }
+            public static MarkArrayTable CreateFrom(BinaryReader reader, long beginAt)
+            {
+                reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                //
+                var markArrTable = new MarkArrayTable();
+                markArrTable.ReadFrom(reader);
+                return markArrTable;
             }
         }
 
@@ -325,15 +364,20 @@ namespace NRasterizer.Tables
             //A Mark2Record declares one Anchor table for each mark class (including Class 0) identified in the MarkRecords of the MarkArray. Each Anchor table specifies one Mark2 attachment point used to attach all the Mark1 glyphs in a particular class to the Mark2 glyph.
 
             Mark2Record[] mark2Records;
-            public void ReadFrom(BinaryReader reader, ushort classCount)
+            public static Mark2ArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
             {
+                reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                //---
+                var mark2ArrTable = new Mark2ArrayTable();
+
                 ushort mark2Count = reader.ReadUInt16();
-                mark2Records = new Mark2Record[mark2Count];
+                mark2ArrTable.mark2Records = new Mark2Record[mark2Count];
                 for (int i = 0; i < mark2Count; ++i)
                 {
-                    mark2Records[i] = new Mark2Record(
+                    mark2ArrTable.mark2Records[i] = new Mark2Record(
                         Utils.ReadInt16Array(reader, classCount));
                 }
+                return mark2ArrTable;
             }
         }
 
@@ -354,14 +398,21 @@ namespace NRasterizer.Tables
         class BaseArrayTable
         {
             BaseRecord[] records;
-            public void ReadFrom(BinaryReader reader, ushort classCount)
+
+            public static BaseArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
             {
+                reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                //---
+                var baseArrTable = new BaseArrayTable();
+
                 ushort baseCount = reader.ReadUInt16();
-                records = new BaseRecord[baseCount];
+                baseArrTable.records = new BaseRecord[baseCount];
                 for (int i = 0; i < baseCount; ++i)
                 {
-                    records[i] = new BaseRecord(Utils.ReadInt16Array(reader, classCount));
+                    baseArrTable.records[i] = new BaseRecord(Utils.ReadInt16Array(reader, classCount));
                 }
+
+                return baseArrTable;
             }
         }
         struct BaseRecord
@@ -470,6 +521,10 @@ namespace NRasterizer.Tables
                 this.seqIndex = seqIndex;
                 this.lookupListIndex = lookupListIndex;
             }
+            public static PosLookupRecord CreateFrom(BinaryReader reader)
+            {
+                return new PosLookupRecord(reader.ReadUInt16(), reader.ReadUInt16());
+            }
         }
 
 
@@ -491,7 +546,7 @@ namespace NRasterizer.Tables
             //Example 10 at the end of this chapter demonstrates glyph kerning in context with a ContextPosFormat1 subtable.
 
             PosRuleTable[] posRuleTables;
-            public void ReadFrom(BinaryReader reader)
+            void ReadFrom(BinaryReader reader)
             {
                 long tableStartAt = reader.BaseStream.Position;
                 ushort posRuleCount = reader.ReadUInt16();
@@ -509,8 +564,10 @@ namespace NRasterizer.Tables
                 }
             }
 
-            public static PosRuleSetTable CreateFrom(BinaryReader reader)
+            public static PosRuleSetTable CreateFrom(BinaryReader reader, long beginAt)
             {
+                reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                //------------
                 var posRuleSetTable = new PosRuleSetTable();
                 posRuleSetTable.ReadFrom(reader);
                 return posRuleSetTable;
@@ -532,14 +589,7 @@ namespace NRasterizer.Tables
                 ushort glyphCount = reader.ReadUInt16();
                 ushort posCount = reader.ReadUInt16();
                 inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
-
-                posLookupRecords = new PosLookupRecord[posCount];
-                for (int i = 0; i < posCount; ++i)
-                {
-                    posLookupRecords[i] = new PosLookupRecord(
-                        reader.ReadUInt16(), //seqIndex
-                        reader.ReadUInt16()); //lookupListIndex
-                }
+                posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
             }
         }
 
@@ -568,7 +618,7 @@ namespace NRasterizer.Tables
             //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
 
             PosClassRule[] posClasses;
-            public void ReadFrom(BinaryReader reader)
+            void ReadFrom(BinaryReader reader)
             {
                 long tableStartAt = reader.BaseStream.Position;
                 //
@@ -579,16 +629,15 @@ namespace NRasterizer.Tables
                 posClasses = new PosClassRule[posClassRuleCnt];
                 for (int i = 0; i < j; ++i)
                 {
-                    //move to and read
-                    reader.BaseStream.Seek(tableStartAt + posClassRuleOffsets[i], SeekOrigin.Begin);
-                    var posClassRule = new PosClassRule();
-                    posClassRule.ReadFrom(reader);
-                    posClasses[i] = posClassRule;
+                    //move to and read                     
+                    posClasses[i] = PosClassRule.CreateFrom(reader, tableStartAt = posClassRuleOffsets[i]);
                 }
             }
 
-            public static PosClassSetTable CreateFrom(BinaryReader reader)
+            public static PosClassSetTable CreateFrom(BinaryReader reader, long beginAt)
             {
+                reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                //--------
                 var posClassSetTable = new PosClassSetTable();
                 posClassSetTable.ReadFrom(reader);
                 return posClassSetTable;
@@ -598,19 +647,18 @@ namespace NRasterizer.Tables
         {
             PosLookupRecord[] posLookupRecords;
             ushort[] inputGlyphIds;
-            public void ReadFrom(BinaryReader reader)
+
+            public static PosClassRule CreateFrom(BinaryReader reader, long beginAt)
             {
+                //--------
+                reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                //--------
+                PosClassRule posClassRule = new PosClassRule();
                 ushort glyphCount = reader.ReadUInt16();
                 ushort posCount = reader.ReadUInt16();
-                inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
-
-                posLookupRecords = new PosLookupRecord[posCount];
-                for (int i = 0; i < posCount; ++i)
-                {
-                    posLookupRecords[i] = new PosLookupRecord(
-                        reader.ReadUInt16(), //seqIndex
-                        reader.ReadUInt16()); //lookupListIndex
-                }
+                posClassRule.inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
+                posClassRule.posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
+                return posClassRule;
             }
         }
 

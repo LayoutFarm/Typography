@@ -273,7 +273,7 @@ namespace NRasterizer.Tables
                                 ushort valueFormat = reader.ReadUInt16();
                                 var subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
                                 //-------                                 
-                                subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverage);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 //-------
                                 this.subTables.Add(subTable);
                             } break;
@@ -297,7 +297,7 @@ namespace NRasterizer.Tables
                                 var subTable = new LkSubTableType1(values);
                                 //-------
 
-                                subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverage);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 //-------
                                 this.subTables.Add(subTable);
                             }
@@ -413,7 +413,7 @@ namespace NRasterizer.Tables
                                 }
                                 var subTable = new LkSubTableType2(pairSetTables);
                                 //coverage                                 
-                                subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverage);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
 
                                 subTables.Add(subTable);
                             } break;
@@ -509,19 +509,13 @@ namespace NRasterizer.Tables
                     //read mark array table
                     var lookupType4 = new LkSubTableType4();
                     //---------------------------------------------------------------------------                     
-                    lookupType4.MarkCoverageTable = CoverageTable.ReadFrom(reader, subtableStart + markCoverageOffset);
+                    lookupType4.MarkCoverageTable = CoverageTable.CreateFrom(reader, subtableStart + markCoverageOffset);
                     //---------------------------------------------------------------------------                    
-                    lookupType4.BaseCoverageTable = CoverageTable.ReadFrom(reader, subtableStart + baseCoverageOffset);
-                    //---------------------------------------------------------------------------
-                    reader.BaseStream.Seek(subtableStart + markArrayOffset, SeekOrigin.Begin);
-                    var markArrayTable = new MarkArrayTable();
-                    markArrayTable.ReadFrom(reader);
-                    lookupType4.MarkArrayTable = markArrayTable;
-                    //---------------------------------------------------------------------------
-                    reader.BaseStream.Seek(subtableStart + baseArrayOffset, SeekOrigin.Begin);
-                    var baseArrayTable = new BaseArrayTable();
-                    baseArrayTable.ReadFrom(reader, classCount);
-                    lookupType4.BaseArrayTable = baseArrayTable;
+                    lookupType4.BaseCoverageTable = CoverageTable.CreateFrom(reader, subtableStart + baseCoverageOffset);
+                    //---------------------------------------------------------------------------                     
+                    lookupType4.MarkArrayTable = MarkArrayTable.CreateFrom(reader, subtableStart + markArrayOffset);
+                    //---------------------------------------------------------------------------                     
+                    lookupType4.BaseArrayTable = BaseArrayTable.CreateFrom(reader, subtableStart + baseArrayOffset, classCount);
                     //---------------------------------------------------------------------------
                     this.subTables.Add(lookupType4);
                 }
@@ -571,14 +565,11 @@ namespace NRasterizer.Tables
                     //-----------------------
                     var subTable = new LkSubTableType5();
                     //-----------------------
-                    subTable.MarkCoverage = CoverageTable.ReadFrom(reader, subTableStartAt + markCoverageOffset);
+                    subTable.MarkCoverage = CoverageTable.CreateFrom(reader, subTableStartAt + markCoverageOffset);
                     //-----------------------
-                    subTable.LigatureCoverage = CoverageTable.ReadFrom(reader, subTableStartAt + ligatureCoverageOffset);
-                    //-----------------------
-                    reader.BaseStream.Seek(subTableStartAt + markArrayOffset, SeekOrigin.Begin);
-                    var markArrayTable = new MarkArrayTable();
-                    markArrayTable.ReadFrom(reader);
-                    subTable.MarkArrayTable = markArrayTable;
+                    subTable.LigatureCoverage = CoverageTable.CreateFrom(reader, subTableStartAt + ligatureCoverageOffset);
+                    //-----------------------                     
+                    subTable.MarkArrayTable = MarkArrayTable.CreateFrom(reader, subTableStartAt + markArrayOffset);
                     //-----------------------
                     reader.BaseStream.Seek(subTableStartAt + ligatureArrayOffset, SeekOrigin.Begin);
                     var ligatureArrayTable = new LigatureArrayTable();
@@ -634,23 +625,10 @@ namespace NRasterizer.Tables
                     short mark2ArrayOffset = reader.ReadInt16();
                     //
                     var subTable = new LkSubTableType6();
-                    //-----------------------
-
-                    subTable.MarkCoverage1 = CoverageTable.ReadFrom(reader, subTableStartAt + mark1CoverageOffset);
-                    //-----------------------                     
-                    subTable.MarkCoverage2 = CoverageTable.ReadFrom(reader, subTableStartAt + mark2CoverageOffset);
-                    //-----------------------
-                    reader.BaseStream.Seek(subTableStartAt + mark1ArrayOffset, SeekOrigin.Begin);
-                    var markArrayTable = new MarkArrayTable();
-                    markArrayTable.ReadFrom(reader);
-                    subTable.Mark1ArrayTable = markArrayTable;
-                    //-----------------------
-                    var mark2ArrayTable = new Mark2ArrayTable();
-                    mark2ArrayTable.ReadFrom(reader, classCount);
-                    subTable.Mark2ArrayTable = mark2ArrayTable;
-                    //-----------------------
-                    reader.BaseStream.Seek(subTableStartAt + mark2ArrayOffset, SeekOrigin.Begin);
-                    //-----------------------
+                    subTable.MarkCoverage1 = CoverageTable.CreateFrom(reader, subTableStartAt + mark1CoverageOffset);
+                    subTable.MarkCoverage2 = CoverageTable.CreateFrom(reader, subTableStartAt + mark2CoverageOffset);
+                    subTable.Mark1ArrayTable = MarkArrayTable.CreateFrom(reader, subTableStartAt + mark1ArrayOffset);
+                    subTable.Mark2ArrayTable = Mark2ArrayTable.CreateFrom(reader, subTableStartAt + mark2ArrayOffset, classCount);
 
 
                     this.subTables.Add(subTable);
@@ -693,17 +671,10 @@ namespace NRasterizer.Tables
                                 short[] posRuleSetOffsets = Utils.ReadInt16Array(reader, posRuleSetCount);
 
                                 LkSubTableType7Fmt1 subTable = new LkSubTableType7Fmt1();
-                                PosRuleSetTable[] posRuleSetTables = new PosRuleSetTable[posRuleSetCount];
-                                subTable.PosRuleSetTables = posRuleSetTables;
-                                for (int n = 0; n < posRuleSetCount; ++n)
-                                {
-                                    reader.BaseStream.Seek(subTableStartAt + posRuleSetOffsets[i], SeekOrigin.Begin);
-                                    posRuleSetTables[n] = PosRuleSetTable.CreateFrom(reader);
-                                }
-                                //----------
-                                subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverageOffset);
-                                //----------
+                                subTable.PosRuleSetTables = CreateMultiplePosRuleSetTables(subTableStartAt, posRuleSetOffsets, reader);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
 
+                                //-----------
                                 subTables.Add(subTable);
                             } break;
                         case 2:
@@ -727,12 +698,10 @@ namespace NRasterizer.Tables
                                 subTable.PosClassSetTables = posClassSetTables;
                                 for (int n = 0; n < posClassSetCount; ++n)
                                 {
-                                    PosClassSetTable posClassSetTable = new PosClassSetTable();
-                                    posClassSetTable.ReadFrom(reader);
-                                    posClassSetTables[n] = posClassSetTable;
+                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, coverageOffset);
                                 }
                                 //----------                                  
-                                subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverageOffset);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
                                 //---------- 
                                 subTables.Add(subTable);
                                 //----------
@@ -751,17 +720,8 @@ namespace NRasterizer.Tables
                                 ushort posCount = reader.ReadUInt16();
                                 //read each lookahead record
                                 short[] coverageOffsets = Utils.ReadInt16Array(reader, glyphCount);
-                                PosLookupRecord[] posLookupRecords = new PosLookupRecord[posCount];
-                                subTable.PosLookupRecords = posLookupRecords;
-                                for (int n = 0; n < posCount; ++n)
-                                {
-                                    posLookupRecords[n] = new PosLookupRecord(
-                                        reader.ReadUInt16(),
-                                        reader.ReadUInt16());
-                                }
-
-                                //---------- 
-                                subTable.CoverageTables = ReadMultipleCoverageTables(subTableStartAt, coverageOffsets, reader);
+                                subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount); 
+                                subTable.CoverageTables = CreateMultipleCoverageTables(subTableStartAt, coverageOffsets, reader);
                                 //---------- 
                                 subTables.Add(subTable);
                                 //----------
@@ -770,16 +730,7 @@ namespace NRasterizer.Tables
                 }
             }
 
-            static CoverageTable[] ReadMultipleCoverageTables(long initPos, short[] covTableOffsets, BinaryReader reader)
-            {
-                int j = covTableOffsets.Length;
-                CoverageTable[] coverageTables = new CoverageTable[j];
-                for (int i = 0; i < j; ++i)
-                {
-                    coverageTables[i] = CoverageTable.ReadFrom(reader, initPos + covTableOffsets[i]);
-                }
-                return coverageTables;
-            }
+
 
             class LkSubTableType7Fmt1 : LookupSubTable
             {
@@ -876,16 +827,9 @@ namespace NRasterizer.Tables
                                 short[] chainPosRuleSetOffsetList = Utils.ReadInt16Array(reader, chainPosRuleSetCount);
 
                                 LkSubTableType8Fmt1 subTable = new LkSubTableType8Fmt1();
-                                PosRuleSetTable[] posRuleSetTables = new PosRuleSetTable[chainPosRuleSetCount];
-                                subTable.PosRuleSetTables = posRuleSetTables;
-                                for (int n = 0; n < chainPosRuleSetCount; ++n)
-                                {
-                                    reader.BaseStream.Seek(subTableStartAt + chainPosRuleSetOffsetList[i], SeekOrigin.Begin);
-                                    posRuleSetTables[n] = PosRuleSetTable.CreateFrom(reader);
-                                }
-                                //----------
 
-                                subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverageOffset);
+                                subTable.PosRuleSetTables = CreateMultiplePosRuleSetTables(subTableStartAt, chainPosRuleSetOffsetList, reader);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
                                 //----------
 
                                 subTables.Add(subTable);
@@ -918,15 +862,12 @@ namespace NRasterizer.Tables
                                 subTable.PosClassSetTables = posClassSetTables;
                                 for (int n = 0; n < chainPosClassSetCnt; ++n)
                                 {
-                                    reader.BaseStream.Seek(subTableStartAt + chainPosClassSetOffsetArray[i], SeekOrigin.Begin);
-                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader);
+                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + chainPosClassSetOffsetArray[i]);
                                 }
                                 //----------
 
-                                subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverageOffset);
-                                //---------- 
-
-
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+                                //----------  
                                 subTables.Add(subTable);
                                 //----------
                             } break;
@@ -944,33 +885,22 @@ namespace NRasterizer.Tables
                                 //USHORT 	PosCount 	Number of PosLookupRecords
                                 //struct 	PosLookupRecord[PosCount] 	Array of PosLookupRecords,in design order
 
+                                var subTable = new LkSubTableType8Fmt3();
+                                //
                                 ushort backtrackGlyphCount = reader.ReadUInt16();
                                 short[] backtrackCoverageOffsets = Utils.ReadInt16Array(reader, backtrackGlyphCount);
-
                                 ushort inputGlyphCount = reader.ReadUInt16();
                                 short[] inputGlyphCoverageOffsets = Utils.ReadInt16Array(reader, inputGlyphCount);
-
-
                                 //
                                 ushort lookaheadGlyphCount = reader.ReadUInt16();
                                 short[] lookaheadCoverageOffsets = Utils.ReadInt16Array(reader, lookaheadGlyphCount);
                                 //
                                 ushort posCount = reader.ReadUInt16();
-                                PosLookupRecord[] posLookAheadRecords = new PosLookupRecord[posCount];
-                                for (int n = 0; n < posCount; ++n)
-                                {
-                                    posLookAheadRecords[n] = new PosLookupRecord(
-                                        reader.ReadUInt16(),
-                                        reader.ReadUInt16());
-                                }
-                                //read each lookahead record
-
-                                var subTable = new LkSubTableType8Fmt3();
-                                subTable.BacktrackCoverages = ReadMultipleCoverageTables(subTableStartAt, backtrackCoverageOffsets, reader);
-                                subTable.InputGlyphCoverages = ReadMultipleCoverageTables(subTableStartAt, inputGlyphCoverageOffsets, reader);
-                                subTable.LookaheadCoverages = ReadMultipleCoverageTables(subTableStartAt, lookaheadCoverageOffsets, reader);
-                                subTable.PosLookupRecords = posLookAheadRecords;
-
+                                subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
+                                //--------------
+                                subTable.BacktrackCoverages = CreateMultipleCoverageTables(subTableStartAt, backtrackCoverageOffsets, reader);
+                                subTable.InputGlyphCoverages = CreateMultipleCoverageTables(subTableStartAt, inputGlyphCoverageOffsets, reader);
+                                subTable.LookaheadCoverages = CreateMultipleCoverageTables(subTableStartAt, lookaheadCoverageOffsets, reader);
                                 subTables.Add(subTable);
 
                             } break;

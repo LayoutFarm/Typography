@@ -59,7 +59,7 @@ namespace NRasterizer.Tables
             }
             return -1;//not found
         }
-        public static CoverageTable ReadFrom(BinaryReader reader, long beginAt)
+        public static CoverageTable CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //---------------------------------------------------

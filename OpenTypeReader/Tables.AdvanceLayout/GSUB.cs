@@ -350,7 +350,7 @@ namespace NRasterizer.Tables
                             break;
                     }
                   
-                    subTable.CoverageTable = CoverageTable.ReadFrom(reader, subTableStartAt + coverage);
+                    subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                     this.subTables.Add(subTable);
                 }
             }
