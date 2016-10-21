@@ -444,6 +444,129 @@ namespace NRasterizer.Tables
             class LkSubTableT6Fmt1 : LookupSubTable
             {
                 public CoverageTable CoverageTable { get; set; }
+                public ChainSubRuleSetTable[] subRuleSets;
+
+            }
+
+            class ChainSubRuleSetTable
+            {
+                //ChainSubRuleSet table: All contexts beginning with the same glyph
+                //Type 	Name 	Description
+                //USHORT 	ChainSubRuleCount 	Number of ChainSubRule tables
+                //Offset 	ChainSubRule
+                //[ChainSubRuleCount] 	Array of offsets to ChainSubRule tables-from beginning of ChainSubRuleSet table-ordered by preference
+
+                //A ChainSubRule table consists of a count of the glyphs to be matched in the backtrack,
+                //input, and lookahead context sequences, including the first glyph in each sequence, 
+                //and an array of glyph indices that describe each portion of the contexts. 
+                //The Coverage table specifies the index of the first glyph in each context,
+                //and each array begins with the second glyph (array index = 1) in the context sequence.
+
+                // Note: All arrays list the indices in the order the corresponding glyphs appear in the text. 
+                //For text written from right to left, the right-most glyph will be first; conversely, 
+                //for text written from left to right, the left-most glyph will be first.
+
+                ChainSubRuleSubTable[] chainSubRuleSubTables;
+                public static ChainSubRuleSetTable CreateFrom(BinaryReader reader, long beginAt)
+                {
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                    //---
+                    ChainSubRuleSetTable table = new ChainSubRuleSetTable();
+                    ushort subRuleCount = reader.ReadUInt16();
+                    short[] subRuleOffsets = Utils.ReadInt16Array(reader, subRuleCount);
+                    ChainSubRuleSubTable[] chainSubRuleSubTables = table.chainSubRuleSubTables = new ChainSubRuleSubTable[subRuleCount];
+                    for (int i = 0; i < subRuleCount; ++i)
+                    {
+                        chainSubRuleSubTables[i] = ChainSubRuleSubTable.CreateFrom(reader, beginAt + subRuleOffsets[i]);
+                    }
+
+                    return table;
+                }
+            }
+
+            //SubstLookupRecord
+            //Type 	Name 	Description
+            //USHORT 	SequenceIndex 	Index into current glyph sequence-first glyph = 0
+            //USHORT 	LookupListIndex 	Lookup to apply to that position-zero-based
+
+            //The SequenceIndex in a SubstLookupRecord must take into consideration the order 
+            //in which lookups are applied to the entire glyph sequence.
+            //Because multiple substitutions may occur per context,
+            //the SequenceIndex and LookupListIndex refer to the glyph sequence after the text-processing client has applied any previous lookups.
+            //In other words, the SequenceIndex identifies the location for the substitution at the time that the lookup is to be applied.
+            //For example, consider an input glyph sequence of four glyphs.
+            //The first glyph does not have a substitute, but the middle 
+            //two glyphs will be replaced with a ligature, and a single glyph will replace the fourth glyph:
+
+            //    The first glyph is in position 0. No lookups will be applied at position 0, so no SubstLookupRecord is defined.
+            //    The SubstLookupRecord defined for the ligature substitution specifies the SequenceIndex as position 1,
+            //which is the position of the first-glyph component in the ligature string. After the ligature replaces the glyphs in positions 1 and 2, however,
+            //the input glyph sequence consists of only three glyphs, not the original four.
+            //    To replace the last glyph in the sequence,
+            //the SubstLookupRecord defines the SequenceIndex as position 2 instead of position 3. 
+            //This position reflects the effect of the ligature substitution applied before this single substitution.
+
+            //    Note: This example assumes that the LookupList specifies the ligature substitution lookup before the single substitution lookup.
+
+            struct SubstLookupRecord
+            {
+                public readonly ushort sequenceIndex;
+                public readonly ushort lookupListIndex;
+                public SubstLookupRecord(ushort seqIndex, ushort lookupListIndex)
+                {
+                    this.sequenceIndex = seqIndex;
+                    this.lookupListIndex = lookupListIndex;
+                }
+            }
+            class ChainSubRuleSubTable
+            {
+
+                //A ChainSubRule table also contains a count of the substitutions to be performed on the input glyph sequence (SubstCount)
+                //and an array of SubstitutionLookupRecords (SubstLookupRecord). 
+                //Each record specifies a position in the input glyph sequence and a LookupListIndex to the substitution lookup that is applied at that position.
+                //The array should list records in design order, or the order the lookups should be applied to the entire glyph sequence.
+
+                //ChainSubRule subtable
+                //Type 	Name 	Description
+                //USHORT 	BacktrackGlyphCount 	Total number of glyphs in the backtrack sequence (number of glyphs to be matched before the first glyph)
+                //GlyphID 	Backtrack[BacktrackGlyphCount] 	Array of backtracking GlyphID's (to be matched before the input sequence)
+                //USHORT 	InputGlyphCount 	Total number of glyphs in the input sequence (includes the first glyph)
+                //GlyphID 	Input[InputGlyphCount - 1] 	Array of input GlyphIDs (start with second glyph)
+                //USHORT 	LookaheadGlyphCount 	Total number of glyphs in the look ahead sequence (number of glyphs to be matched after the input sequence)
+                //GlyphID 	LookAhead[LookAheadGlyphCount] 	Array of lookahead GlyphID's (to be matched after the input sequence)
+                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords (in design order)
+
+                ushort[] backTrackingGlyphs;
+                ushort[] inputGlyphs;
+                ushort[] lookaheadGlyphs;
+                SubstLookupRecord[] substLookupRecords;
+                public static ChainSubRuleSubTable CreateFrom(BinaryReader reader, long beginAt)
+                {
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                    //
+                    //------------
+                    ChainSubRuleSubTable subRuleTable = new ChainSubRuleSubTable();
+                    ushort backtrackGlyphCount = reader.ReadUInt16();
+                    subRuleTable.backTrackingGlyphs = Utils.ReadUInt16Array(reader, backtrackGlyphCount);
+                    //--------
+                    ushort inputGlyphCount = reader.ReadUInt16();
+                    subRuleTable.inputGlyphs = Utils.ReadUInt16Array(reader, inputGlyphCount - 1);//*** start with second glyph, so -1
+                    //----------
+                    ushort lookaheadGlyphCount = reader.ReadUInt16();
+                    subRuleTable.lookaheadGlyphs = Utils.ReadUInt16Array(reader, lookaheadGlyphCount);
+                    //------------
+                    ushort substCount = reader.ReadUInt16();
+                    SubstLookupRecord[] substLookupRecords = subRuleTable.substLookupRecords = new SubstLookupRecord[substCount];
+                    for (int i = 0; i < substCount; ++i)
+                    {
+                        substLookupRecords[i] = new SubstLookupRecord(
+                            reader.ReadUInt16(),
+                            reader.ReadUInt16());
+                    }
+
+                    return subRuleTable;
+                }
 
             }
 
@@ -486,7 +609,11 @@ namespace NRasterizer.Tables
                                 ushort chainSubRulesetCount = reader.ReadUInt16();
                                 short[] chainSubRulesetOffsets = Utils.ReadInt16Array(reader, chainSubRulesetCount);
                                 var subTable = new LkSubTableT6Fmt1();
-
+                                ChainSubRuleSetTable[] subRuleSets = subTable.subRuleSets = new ChainSubRuleSetTable[chainSubRulesetCount];
+                                for (int n = 0; n < chainSubRulesetCount; ++n)
+                                {
+                                    subRuleSets[i] = ChainSubRuleSetTable.CreateFrom(reader, subTableStartAt + chainSubRulesetOffsets[i]);
+                                }
 
 
                                 //----------------------------
@@ -503,9 +630,7 @@ namespace NRasterizer.Tables
                                 //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
                                 //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
                                 //USHORT 	SubstCount 	Number of SubstLookupRecords
-                                //struct 	SubstLookupRecord
-                                //[SubstCount] 	Array of SubstLookupRecords, in design order
-
+                                //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords, in design order
 
                                 ushort coverage = reader.ReadUInt16(); //Offset to Coverage table-from beginning of Substitution table
                                 short backtrackClassDef = reader.ReadInt16(); //Offset to glyph ClassDef table containing backtrack sequence data-from beginning of Substitution table
@@ -527,9 +652,7 @@ namespace NRasterizer.Tables
                                 //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
                                 //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
                                 //USHORT 	SubstCount 	Number of SubstLookupRecords
-                                //struct 	SubstLookupRecord
-                                //[SubstCount] 	Array of SubstLookupRecords, in design order
-                                //
+                                //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords, in design order
 
                                 ushort backtrackingGlyphCount = reader.ReadUInt16();
                                 short[] backtrackingCoverageArray = Utils.ReadInt16Array(reader, backtrackingGlyphCount);
@@ -538,14 +661,14 @@ namespace NRasterizer.Tables
                                 ushort lookAheadGlyphCount = reader.ReadUInt16();
                                 short[] lookAheadCoverageArray = Utils.ReadInt16Array(reader, lookAheadGlyphCount);
 
+
+
+
+
                             }
                             break;
                     }
-                    //-------------------------------------------------------------
-
-
-
-
+                    //------------------------------------------------------------- 
                 }
 
                 //throw new NotImplementedException();
