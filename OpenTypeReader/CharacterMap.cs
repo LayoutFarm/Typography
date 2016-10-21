@@ -13,6 +13,7 @@ namespace NRasterizer
         readonly ushort[] _idDelta; //Delta for all character codes in segment
         readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
         readonly ushort[] _glyphIdArray;
+
         public CharacterMap(int segCount, ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
         {
             _segCount = segCount;
@@ -23,6 +24,8 @@ namespace NRasterizer
             _glyphIdArray = glyphIdArray;
         }
 
+        public ushort PlatformId { get; set; }
+        public ushort EncodingId { get; set; }
         public int CharacterToGlyphIndex(UInt32 character)
         {
             return (int)RawCharacterToGlyphIndex(character);

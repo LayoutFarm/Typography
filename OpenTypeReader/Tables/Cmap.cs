@@ -38,12 +38,11 @@ namespace NRasterizer.Tables
             {
                 CMapEntry entry = entries[i];
                 input.BaseStream.Seek(beginAt + entry.Offset, SeekOrigin.Begin);
-                charMaps[i] = ReadCharacterMap(entry, input);
-
+                CharacterMap cmap = charMaps[i] = ReadCharacterMap(entry, input);
+                cmap.PlatformId = entry.PlatformId;
+                cmap.EncodingId = entry.EncodingId;
             }
         }
-
-
         static CharacterMap ReadCharacterMap(CMapEntry entry, BinaryReader input)
         {
 
