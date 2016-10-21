@@ -743,7 +743,7 @@ namespace NRasterizer.Tables
                                 //read each lookahead record
                                 short[] coverageOffsets = Utils.ReadInt16Array(reader, glyphCount);
                                 subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
-                                subTable.CoverageTables = CreateMultipleCoverageTables(subTableStartAt, coverageOffsets, reader);
+                                subTable.CoverageTables = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, coverageOffsets, reader);
                                 //---------- 
                                 subTables.Add(subTable);
                                 //----------
@@ -920,9 +920,10 @@ namespace NRasterizer.Tables
                                 ushort posCount = reader.ReadUInt16();
                                 subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                                 //--------------
-                                subTable.BacktrackCoverages = CreateMultipleCoverageTables(subTableStartAt, backtrackCoverageOffsets, reader);
-                                subTable.InputGlyphCoverages = CreateMultipleCoverageTables(subTableStartAt, inputGlyphCoverageOffsets, reader);
-                                subTable.LookaheadCoverages = CreateMultipleCoverageTables(subTableStartAt, lookaheadCoverageOffsets, reader);
+
+                                subTable.BacktrackCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, backtrackCoverageOffsets, reader);
+                                subTable.InputGlyphCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, inputGlyphCoverageOffsets, reader);
+                                subTable.LookaheadCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, lookaheadCoverageOffsets, reader);
                                 subTables.Add(subTable);
 
                             } break;

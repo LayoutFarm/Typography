@@ -21,16 +21,7 @@ namespace NRasterizer.Tables
             }
             return results;
         }
-        static CoverageTable[] CreateMultipleCoverageTables(long initPos, short[] offsets, BinaryReader reader)
-        {
-            int j = offsets.Length;
-            CoverageTable[] results = new CoverageTable[j];
-            for (int i = 0; i < j; ++i)
-            {
-                results[i] = CoverageTable.CreateFrom(reader, initPos + offsets[i]);
-            }
-            return results;
-        }
+      
         static PosLookupRecord[] CreateMultiplePosLookupRecords(BinaryReader reader, int count)
         {
 
