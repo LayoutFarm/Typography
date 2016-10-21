@@ -115,5 +115,55 @@ namespace NRasterizer.Tables
         public ClassDefTable MarkAttachmentClassDef { get; private set; }
         public MarkGlyphSetsTable MarkGlyphSetsTable { get; private set; }
 
+        //------------------------
+        /// <summary>
+        /// fill gdef to each glyphs
+        /// </summary>
+        /// <param name="inputGlyphs"></param>
+        public void FillGlyphData(Glyph[] inputGlyphs)
+        {
+
+            FillClassDefs(inputGlyphs);
+        }
+        void FillClassDefs(Glyph[] inputGlyphs)
+        {
+            //1. glyph def 
+            ClassDefTable classDef = GlyphClassDef;
+            switch (classDef.Format)
+            {
+                default:
+                    throw new NotSupportedException(); 
+                case 1:
+                    {
+                        ushort startGlyph = classDef.startGlyph;
+                        ushort[] classValues = classDef.classValueArray;
+
+                        int len = classValues.Length;
+                        for (int i = startGlyph; i < len; ++i)
+                        {
+                            inputGlyphs[i].GlyphClassDef = (GlyphClassKind)classValues[i];
+                        }
+
+                    } break;
+                case 2:
+                    {
+                        ClassDefTable.ClassRangeRecord[] records = classDef.records;
+                        int len = records.Length;
+                        for (int n = 0; n < len; ++n)
+                        {
+                            ClassDefTable.ClassRangeRecord rec = records[n];
+                            GlyphClassKind glyphKind = (GlyphClassKind)rec.classNo;
+                            for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
+                            {
+                                inputGlyphs[i].GlyphClassDef = glyphKind;
+
+                            }
+                        }
+
+
+                    }
+                    break;
+            }
+        }
     }
 }

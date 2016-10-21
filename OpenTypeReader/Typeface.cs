@@ -68,23 +68,23 @@ namespace NRasterizer
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
         public Glyph[] Glyphs { get { return _glyphs; } }
 
-        //-------------------------------------------------------
-        internal GDEF GDEFTable
+
+        GDEF GDEFTable
         {
             get;
             set;
         }
-        internal GSUB GSUBTable
+        GSUB GSUBTable
         {
             get;
             set;
         }
-        internal GPOS GPOSTable
+        GPOS GPOSTable
         {
             get;
             set;
         }
-        internal BASE BaseTable
+        BASE BaseTable
         {
             get;
             set;
@@ -102,9 +102,25 @@ namespace NRasterizer
                 output.Add(LookupIndex(buffer[i]));
             }
             //check for glyph substitution
-
             this.GSUBTable.CheckSubstitution(output[1]);
+        }
+        //-------------------------------------------------------
+        //experiment
+        internal void LoadOpenTypeLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable)
+        {
+
+            //***
+            this.GDEFTable = gdefTable;
+            this.GSUBTable = gsubTable;
+            this.GPOSTable = gposTable;
+            this.BaseTable = baseTable;
+            //---------------------------
+            //1. fill glyph definition            
+            gdefTable.FillGlyphData(this.Glyphs);
+
+
 
         }
+
     }
 }

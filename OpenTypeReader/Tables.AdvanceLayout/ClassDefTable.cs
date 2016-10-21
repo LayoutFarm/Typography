@@ -81,13 +81,11 @@ namespace NRasterizer.Tables
         public int Format { get; private set; }
         //----------------
         //format 1
-        ushort startGlyph;
-        ushort[] classValueArray;
+        public ushort startGlyph;
+        public ushort[] classValueArray;
         //---------------
         //format2
-        ClassRangeRecord[] records;
-
-
+        public ClassRangeRecord[] records;
         public static ClassDefTable CreateFrom(BinaryReader reader, long beginAt)
         {
 
@@ -121,7 +119,7 @@ namespace NRasterizer.Tables
             }
             return classDefTable;
         }
-        struct ClassRangeRecord
+        internal struct ClassRangeRecord
         {
             public readonly ushort startGlyphId;
             public readonly ushort endGlyphId;
@@ -139,6 +137,9 @@ namespace NRasterizer.Tables
             }
 #endif
         }
+
+
+
     }
 
 }
