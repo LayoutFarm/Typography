@@ -445,7 +445,7 @@ namespace NRasterizer.Tables
                                 for (int n = 0; n < seqCount; ++n)
                                 {
                                     reader.BaseStream.Seek(subTableStartAt + seqOffsets[n], SeekOrigin.Begin);
-                                    ushort glyphCount= reader.ReadUInt16();
+                                    ushort glyphCount = reader.ReadUInt16();
                                     subTable.SeqTables[n] = new SequenceTable(
                                         Utils.ReadUInt16Array(reader, glyphCount));
                                 }
@@ -463,14 +463,142 @@ namespace NRasterizer.Tables
             {
                 throw new NotImplementedException();
             }
+
+            class LkSubTableT4 : LookupSubTable
+            {
+                public LigatureSetTable[] LigatureSetTables { get; set; }
+            }
+            class LigatureSetTable
+            {
+                //LigatureSet table: All ligatures beginning with the same glyph
+                //Type 	Name 	Description
+                //USHORT 	LigatureCount 	Number of Ligature tables
+                //Offset 	Ligature[LigatureCount] 	Array of offsets to Ligature tables-from beginning of LigatureSet table-ordered by preference
+
+                public LigatureTable[] Ligatures { get; set; }
+                public static LigatureSetTable CreateFrom(BinaryReader reader, long beginAt)
+                {
+                    LigatureSetTable ligSetTable = new LigatureSetTable();
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                    //
+                    ushort ligCount = reader.ReadUInt16();
+                    short[] ligOffsets = Utils.ReadInt16Array(reader, ligCount);
+                    //
+                    LigatureTable[] ligTables = ligSetTable.Ligatures = new LigatureTable[ligCount];
+                    for (int i = 0; i < ligCount; ++i)
+                    {
+                        ligTables[i] = LigatureTable.CreateFrom(reader, beginAt + ligOffsets[i]);
+                    }
+                    return ligSetTable;
+                }
+
+            }
+            struct LigatureTable
+            {
+                //GlyphID 	LigGlyph 	GlyphID of ligature to substitute
+                //USHORT 	CompCount 	Number of components in the ligature
+                //GlyphID 	Component[CompCount - 1] 	Array of component GlyphIDs-start with the second component-ordered in writing direction
+                public ushort GlyphId { get; set; }
+                public ushort[] ComponentGlyphs { get; set; }
+                public static LigatureTable CreateFrom(BinaryReader reader, long beginAt)
+                {
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                    // 
+                    LigatureTable ligTable = new LigatureTable();
+                    ligTable.GlyphId = reader.ReadUInt16();
+                    ushort compCount = reader.ReadUInt16();
+                    ligTable.ComponentGlyphs = Utils.ReadUInt16Array(reader, compCount);
+                    return ligTable;
+                }
+            }
             /// <summary>
             /// LookupType 4: Ligature Substitution Subtable
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType4(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 4");
-                //throw new NotImplementedException();
+                //LookupType 4: Ligature Substitution Subtable
+
+                //A Ligature Substitution (LigatureSubst) subtable identifies ligature substitutions where a single glyph 
+                //replaces multiple glyphs. One LigatureSubst subtable can specify any number of ligature substitutions.
+
+                //The subtable uses a single format: LigatureSubstFormat1. 
+                //It contains a format identifier (SubstFormat),
+                //a Coverage table offset (Coverage), a count of the ligature sets defined in this table (LigSetCount),
+                //and an array of offsets to LigatureSet tables (LigatureSet).
+                //The Coverage table specifies only the index of the first glyph component of each ligature set.
+
+
+                //LigatureSubstFormat1 subtable: All ligature substitutions in a script
+                //Type 	Name 	Description
+                //USHORT 	SubstFormat 	Format identifier-format = 1
+                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
+                //USHORT 	LigSetCount 	Number of LigatureSet tables
+                //Offset 	LigatureSet[LigSetCount] 	Array of offsets to LigatureSet tables-from beginning of Substitution table-ordered by Coverage Index
+
+                //A LigatureSet table, one for each covered glyph, 
+                //specifies all the ligature strings that begin with the covered glyph.
+                //For example, if the Coverage table lists the glyph index for a lowercase “f,”
+                //then a LigatureSet table will define the “ffl,” “fl,” “ffi,” “fi,” and “ff” ligatures.
+                //If the Coverage table also lists the glyph index for a lowercase “e,” 
+                //then a different LigatureSet table will define the “etc” ligature.
+
+                //A LigatureSet table consists of a count of the ligatures that begin with
+                //the covered glyph (LigatureCount) and an array of offsets to Ligature tables,
+                //which define the glyphs in each ligature (Ligature). 
+                //The order in the Ligature offset array defines the preference for using the ligatures.
+                //For example, if the “ffl” ligature is preferable to the “ff” ligature, then the Ligature array would list the offset to the “ffl” Ligature table before the offset to the “ff” Ligature table.
+
+                //LigatureSet table: All ligatures beginning with the same glyph
+                //Type 	Name 	Description
+                //USHORT 	LigatureCount 	Number of Ligature tables
+                //Offset 	Ligature[LigatureCount] 	Array of offsets to Ligature tables-from beginning of LigatureSet table-ordered by preference
+
+
+                //For each ligature in the set, a Ligature table specifies the GlyphID of the output ligature glyph (LigGlyph);
+                // count of the total number of component glyphs in the ligature, including the first component (CompCount); 
+                //and an array of GlyphIDs for the components (Component).
+                //The array starts with the second component glyph (array index = 1) in the ligature 
+                //because the first component glyph is specified in the Coverage table.
+
+                //    Note: The Component array lists GlyphIDs according to the writing direction of the text.
+                //For text written right to left, the right-most glyph will be first. 
+                //Conversely, for text written left to right, the left-most glyph will be first.
+
+                //Example 6 at the end of this chapter shows how to replace a string of glyphs with a single ligature.
+
+                //Ligature table: Glyph components for one ligature
+                //Type 	Name 	Description
+                //GlyphID 	LigGlyph 	GlyphID of ligature to substitute
+                //USHORT 	CompCount 	Number of components in the ligature
+                //GlyphID 	Component[CompCount - 1] 	Array of component GlyphIDs-start with the second component-ordered in writing direction
+
+                int j = subTableOffsets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
+                    ushort format = reader.ReadUInt16();
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                short coverageOffset = reader.ReadInt16();
+                                ushort ligSetCount = reader.ReadUInt16();
+                                short[] ligSetOffsets = Utils.ReadInt16Array(reader, ligSetCount);
+                                LkSubTableT4 subTable = new LkSubTableT4();
+                                LigatureSetTable[] ligSetTables = subTable.LigatureSetTables = new LigatureSetTable[ligSetCount];
+                                for (int n = 0; n < ligSetCount; ++n)
+                                {
+                                    ligSetTables[n] = LigatureSetTable.CreateFrom(reader, subTableStartAt + ligSetOffsets[n]);
+                                }
+                                this.subTables.Add(subTable);
+
+                            } break;
+                    }
+                }
             }
             /// <summary>
             /// LookupType 5: Contextual Substitution Subtable
