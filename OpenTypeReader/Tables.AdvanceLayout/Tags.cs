@@ -12,7 +12,8 @@ namespace NRasterizer.Tables
     static class TagsLookup
     {
 
-        static Dictionary<string, TagInfo> registerTags = new Dictionary<string, TagInfo>();
+        static Dictionary<string, TagInfo> registeredScriptTags = new Dictionary<string, TagInfo>();
+        static Dictionary<string, TagInfo> registeredFeatureTags = new Dictionary<string, TagInfo>();
 
         static TagsLookup()
         {
@@ -363,7 +364,7 @@ namespace NRasterizer.Tables
             RegisterFeatureTag("twid", "Third Widths");
             //            
             RegisterFeatureTag("unic", "Unicase");
-     
+
             RegisterFeatureTag("valt", "Alternate Vertical Metrics");
             RegisterFeatureTag("vatu", "Vattu Variants");
             RegisterFeatureTag("vert", "Vertical Writing");
@@ -375,8 +376,8 @@ namespace NRasterizer.Tables
             RegisterFeatureTag("vrt2", "Vertical Alternates and Rotation");
             RegisterFeatureTag("vrtr", "Vertical Alternates for Rotation");
             //
-      
-            
+
+
         }
 
         static void RegisterBaselineTags()
@@ -391,7 +392,7 @@ namespace NRasterizer.Tables
         public static TagInfo GetTagInfo(string shortname)
         {
             TagInfo found;
-            registerTags.TryGetValue(shortname, out found);
+            registeredScriptTags.TryGetValue(shortname, out found);
             return found;
         }
 #if DEBUG
@@ -408,7 +409,7 @@ namespace NRasterizer.Tables
 #if DEBUG
             debugCheckShortName(shortname);
 #endif
-            if (registerTags.ContainsKey(shortname))
+            if (registeredScriptTags.ContainsKey(shortname))
             {
                 //TODO: fix this
                 if (shortname == "kana")
@@ -417,14 +418,14 @@ namespace NRasterizer.Tables
                     return;
                 }
             }
-            registerTags.Add(shortname, new TagInfo(TagKind.Script, shortname, fullname));
+            registeredScriptTags.Add(shortname, new TagInfo(TagKind.Script, shortname, fullname));
         }
         static void RegisterFeatureTag(string shortname, string fullname)
         {
 #if DEBUG
             debugCheckShortName(shortname);
 #endif
-            registerTags.Add(shortname, new TagInfo(TagKind.Feature, shortname, fullname));
+            registeredFeatureTags.Add(shortname, new TagInfo(TagKind.Feature, shortname, fullname));             
         }
     }
 
