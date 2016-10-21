@@ -9,7 +9,7 @@ namespace NRasterizer
         readonly Bounds _bounds;
         readonly ushort _unitsPerEm;
         readonly List<Glyph> _glyphs;
-        readonly List<CharacterMap> _cmaps;
+        readonly CharacterMap[] _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
         readonly Kern _kern;
@@ -18,7 +18,7 @@ namespace NRasterizer
             Bounds bounds,
             ushort unitsPerEm,
             List<Glyph> glyphs,
-            List<CharacterMap> cmaps,
+            CharacterMap[] cmaps,
             HorizontalMetrics horizontalMetrics,
             Kern kern)
         {
