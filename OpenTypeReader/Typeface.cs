@@ -101,8 +101,9 @@ namespace NRasterizer
             {
                 output.Add(LookupIndex(buffer[i]));
             }
+            //tmp disable here
             //check for glyph substitution
-            this.GSUBTable.CheckSubstitution(output[1]);
+            //this.GSUBTable.CheckSubstitution(output[1]);
         }
         //-------------------------------------------------------
         //experiment
