@@ -46,7 +46,6 @@ namespace NRasterizer.Tables
 
         static CharacterMap ReadCharacterMap(CMapEntry entry, BinaryReader input)
         {
-            // I want to thank Microsoft for not giving a simple count on the glyphIdArray
 
             ushort format = input.ReadUInt16();
             ushort length = input.ReadUInt16();
