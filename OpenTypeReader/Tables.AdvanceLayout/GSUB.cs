@@ -235,30 +235,32 @@ namespace NRasterizer.Tables
 #endif
             public int FindGlyphIndex(int glyphIndex)
             {
+                throw new NotSupportedException();
                 //check if input glyphIndex is in coverage area 
-                for (int i = subTables.Count - 1; i >= 0; --i)
-                {
-                    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-                    if (foundAtIndex > -1)
-                    {
-                        //found                        
-                        return foundAtIndex;
-                    }
-                }
-                return -1;
+                //for (int i = subTables.Count - 1; i >= 0; --i)
+                //{
+                //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+                //    if (foundAtIndex > -1)
+                //    {
+                //        //found                        
+                //        return foundAtIndex;
+                //    }
+                //}
+                //return -1;
             }
             public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
             {
+                throw new NotSupportedException();
                 //check if input glyphIndex is in coverage area 
-                for (int i = subTables.Count - 1; i >= 0; --i)
-                {
-                    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-                    if (foundAtIndex > -1)
-                    {
-                        //found                        
-                        outputResults.Add(new LookupResult(subTables[i], i));
-                    }
-                }
+                //for (int i = subTables.Count - 1; i >= 0; --i)
+                //{
+                //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+                //    if (foundAtIndex > -1)
+                //    {
+                //        //found                        
+                //        outputResults.Add(new LookupResult(subTables[i], i));
+                //    }
+                //}
 
             }
             public void ReadRecordContent(BinaryReader reader)
@@ -353,28 +355,29 @@ namespace NRasterizer.Tables
                     long subTableStartAt = lookupTablePos + subTableOffsets[i];
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
-                    LookupSubTable subTable = null;
+
                     ushort format = reader.ReadUInt16();
-                    ushort coverage = reader.ReadUInt16();
+                    short coverage = reader.ReadInt16();
                     switch (format)
                     {
                         default: throw new NotSupportedException();
                         case 1:
                             {
                                 short deltaGlyph = reader.ReadInt16();
-                                subTable = new LkSubTableT1F1(coverage, deltaGlyph);
+                                var subTable = new LkSubTableT1Fmt1(coverage, deltaGlyph);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                this.subTables.Add(subTable);
                             } break;
                         case 2:
                             {
                                 ushort glyphCount = reader.ReadUInt16();
                                 ushort[] substitueGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
-                                subTable = new LkSubTableT1F2(coverage, substitueGlyphs);
+                                var subTable = new LkSubTableT1Fmt2(coverage, substitueGlyphs);
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                this.subTables.Add(subTable);
                             }
                             break;
                     }
-
-                    subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-                    this.subTables.Add(subTable);
                 }
             }
             /// <summary>
@@ -436,6 +439,14 @@ namespace NRasterizer.Tables
             {
                 throw new NotImplementedException();
             }
+
+
+            class LkSubTableT6Fmt1 : LookupSubTable
+            {
+                public CoverageTable CoverageTable { get; set; }
+
+            }
+
             /// <summary>
             /// LookupType 6: Chaining Contextual Substitution Subtable
             /// </summary>
@@ -455,20 +466,32 @@ namespace NRasterizer.Tables
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin); 
-                    LookupSubTable subTable = null;
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     ushort format = reader.ReadUInt16();
-
                     switch (format)
                     {
                         default: throw new NotSupportedException();
                         case 1:
                             {
                                 //6.1 Chaining Context Substitution Format 1: Simple Chaining Context Glyph Substitution 
+                                //ChainContextSubstFormat1 subtable: Simple context glyph substitution
+                                //Type 	Name 	Description
+                                //USHORT 	SubstFormat 	Format identifier-format = 1
+                                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
+                                //USHORT 	ChainSubRuleSetCount 	Number of ChainSubRuleSet tables-must equal GlyphCount in Coverage table
+                                //Offset 	ChainSubRuleSet[ChainSubRuleSetCount] 	Array of offsets to ChainSubRuleSet tables-from beginning of Substitution table-ordered by Coverage Index
+
                                 ushort coverage = reader.ReadUInt16();
                                 ushort chainSubRulesetCount = reader.ReadUInt16();
                                 short[] chainSubRulesetOffsets = Utils.ReadInt16Array(reader, chainSubRulesetCount);
+                                var subTable = new LkSubTableT6Fmt1();
 
+
+
+                                //----------------------------
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                this.subTables.Add(subTable);
                             } break;
                         case 2:
                             {
@@ -522,7 +545,7 @@ namespace NRasterizer.Tables
 
 
 
-                    this.subTables.Add(subTable);
+
                 }
 
                 //throw new NotImplementedException();

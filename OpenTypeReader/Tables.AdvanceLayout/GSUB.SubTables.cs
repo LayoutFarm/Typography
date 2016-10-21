@@ -16,31 +16,21 @@ namespace NRasterizer.Tables
                 get;
                 protected set;
             }
-            public ushort CoverageOffset
-            {
-                get;
-                protected set;
-            }
-            public CoverageTable CoverageTable
-            {
-                get;
-                set;
-            }
-
         }
 
 
         /// <summary>
         ///  for lookup table type 1, format1
         /// </summary>
-        class LkSubTableT1F1 : LookupSubTable
+        class LkSubTableT1Fmt1 : LookupSubTable
         {
-            public LkSubTableT1F1(ushort coverageOffset, short deltaGlyph)
+            public LkSubTableT1Fmt1(short coverageOffset, short deltaGlyph)
             {
                 this.Format = 1;
-                this.CoverageOffset = coverageOffset;
+                this.CoverateOffset = coverageOffset;
                 this.DeltaGlyph = deltaGlyph;
             }
+            public short CoverateOffset { get; set; }
             /// <summary>
             /// Add to original GlyphID to get substitute GlyphID
             /// </summary>
@@ -50,18 +40,24 @@ namespace NRasterizer.Tables
                 get;
                 private set;
             }
+            public CoverageTable CoverageTable
+            {
+                get;
+                set;
+            }
         }
         /// <summary>
         /// for lookup table type 1, format2
         /// </summary>
-        class LkSubTableT1F2 : LookupSubTable
+        class LkSubTableT1Fmt2 : LookupSubTable
         {
-            public LkSubTableT1F2(ushort coverageOffset, ushort[] substitueGlyphs)
+            public LkSubTableT1Fmt2(short coverageOffset, ushort[] substitueGlyphs)
             {
                 this.Format = 2;
                 this.CoverageOffset = coverageOffset;
                 this.SubstitueGlyphs = substitueGlyphs;
             }
+            public short CoverageOffset { get; set; }
             /// <summary>
             /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
             /// </summary>
@@ -70,8 +66,13 @@ namespace NRasterizer.Tables
                 get;
                 private set;
             }
+            public CoverageTable CoverageTable
+            {
+                get;
+                set;
+            }
         }
-        
+
 
 
     }
