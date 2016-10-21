@@ -57,6 +57,7 @@
     <Compile Include="Tables.AdvanceLayout\LigatureCaretListTable.cs" />
     <Compile Include="Tables.AdvanceLayout\ScriptList.cs" />
     <Compile Include="Tables.AdvanceLayout\ScriptTable.cs" />
+    <Compile Include="Tables.AdvanceLayout\Tags.cs" />
     <Compile Include="Tables\BoundsReader.cs" />
     <Compile Include="Tables\Cmap.cs" />
     <Compile Include="Tables\Glyf.cs" />
