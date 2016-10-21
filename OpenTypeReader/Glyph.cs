@@ -1,6 +1,7 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
+using System.Text;
 namespace NRasterizer
 {
 
@@ -31,10 +32,17 @@ namespace NRasterizer
 
 
         internal GlyphClassKind GlyphClassDef { get; set; }
+        internal ushort MarkClassDef { get; set; }
 #if DEBUG
         public override string ToString()
         {
-            return GlyphClassDef.ToString();
+            var stbuilder = new StringBuilder();
+            stbuilder.Append("class=" + GlyphClassDef.ToString());
+            if (MarkClassDef != 0)
+            {
+                stbuilder.Append(",mark_class=" + MarkClassDef);
+            }
+            return stbuilder.ToString();
         }
 #endif
 

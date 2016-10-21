@@ -122,26 +122,38 @@ namespace NRasterizer.Tables
         /// <param name="inputGlyphs"></param>
         public void FillGlyphData(Glyph[] inputGlyphs)
         {
-
+            //1. 
             FillClassDefs(inputGlyphs);
+            //2. 
+            FillAttachPoints(inputGlyphs);
+            //3.
+            FillLigatureCarets(inputGlyphs);
+            //4.
+            FillMarkAttachmentClassDefs(inputGlyphs);
+            //5.
+            FillMarkGlyphSets(inputGlyphs);
         }
         void FillClassDefs(Glyph[] inputGlyphs)
         {
             //1. glyph def 
             ClassDefTable classDef = GlyphClassDef;
+            if (classDef == null) return;
+            //-----------------------------------------
+
             switch (classDef.Format)
             {
                 default:
-                    throw new NotSupportedException(); 
+                    throw new NotSupportedException();
                 case 1:
                     {
                         ushort startGlyph = classDef.startGlyph;
                         ushort[] classValues = classDef.classValueArray;
-
                         int len = classValues.Length;
+                        int gIndex = startGlyph;
                         for (int i = startGlyph; i < len; ++i)
                         {
-                            inputGlyphs[i].GlyphClassDef = (GlyphClassKind)classValues[i];
+                            inputGlyphs[gIndex].GlyphClassDef = (GlyphClassKind)classValues[i];
+                            gIndex++;
                         }
 
                     } break;
@@ -156,14 +168,87 @@ namespace NRasterizer.Tables
                             for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
                             {
                                 inputGlyphs[i].GlyphClassDef = glyphKind;
-
                             }
                         }
-
-
                     }
                     break;
             }
+        }
+        void FillAttachPoints(Glyph[] inputGlyphs)
+        {
+            AttachmentListTable attachmentListTable = this.AttachmentListTable;
+            if (attachmentListTable == null) { return; }
+            //-----------------------------------------
+            throw new NotSupportedException();
+        }
+        void FillLigatureCarets(Glyph[] inputGlyphs)
+        {
+            Console.WriteLine("please implement FillLigatureCarets()");
+        }
+        void FillMarkAttachmentClassDefs(Glyph[] inpuGlyphs)
+        {
+            //Mark Attachment Class Definition Table
+            //A Mark Class Definition Table is used to assign mark glyphs into different classes 
+            //that can be used in lookup tables within the GSUB or GPOS table to control how mark glyphs within a glyph sequence are treated by lookups.
+            //For more information on the use of mark attachment classes, 
+            //see the description of lookup flags in the “Lookup Table” section of the chapter, OpenType Layout Common Table Formats.
+            ClassDefTable markAttachmentClassDef = this.MarkAttachmentClassDef;
+            if (markAttachmentClassDef == null) return;
+            //-----------------------------------------
+
+            switch (markAttachmentClassDef.Format)
+            {
+                default:
+                    throw new NotSupportedException();
+                case 1:
+                    {
+                        ushort startGlyph = markAttachmentClassDef.startGlyph;
+                        ushort[] classValues = markAttachmentClassDef.classValueArray;
+
+                        int len = classValues.Length;
+                        int gIndex = startGlyph;
+                        for (int i = startGlyph; i < len; ++i)
+                        {
+#if DEBUG
+                            Glyph dbugTestGlyph = inpuGlyphs[gIndex];
+#endif
+                            inpuGlyphs[gIndex].MarkClassDef = classValues[i];
+                            gIndex++;
+                        }
+
+                    } break;
+                case 2:
+                    {
+                        ClassDefTable.ClassRangeRecord[] records = markAttachmentClassDef.records;
+                        int len = records.Length;
+                        for (int n = 0; n < len; ++n)
+                        {
+                            ClassDefTable.ClassRangeRecord rec = records[n];
+                            for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
+                            {
+#if DEBUG
+                                Glyph dbugTestGlyph = inpuGlyphs[i];
+#endif
+                                inpuGlyphs[i].MarkClassDef = rec.classNo;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        void FillMarkGlyphSets(Glyph[] inputGlyphs)
+        {
+            //Mark Glyph Sets Table
+            //A Mark Glyph Sets table is used to define sets of mark glyphs that can be used in lookup tables within the GSUB or GPOS table to control 
+            //how mark glyphs within a glyph sequence are treated by lookups. For more information on the use of mark glyph sets,
+            //see the description of lookup flags in the “Lookup Table” section of the chapter, OpenType Layout Common Table Formats.
+            MarkGlyphSetsTable markGlyphSets = this.MarkGlyphSetsTable;
+            if (markGlyphSets == null) return;
+            //-------           
+            Console.WriteLine("please implement FillMarkGlyphSets()");
+
+            throw new NotImplementedException();
+
         }
     }
 }
