@@ -380,6 +380,20 @@ namespace NRasterizer.Tables
                     }
                 }
             }
+
+
+            class LkSubTableT2 : LookupSubTable
+            {
+                public SequenceTable[] SeqTables { get; set; }
+            }
+            struct SequenceTable
+            {
+                public ushort[] substitueGlyphs;
+                public SequenceTable(ushort[] substitueGlyphs)
+                {
+                    this.substitueGlyphs = substitueGlyphs;
+                }
+            }
             /// <summary>
             /// LookupType 2: Multiple Substitution Subtable
             /// </summary>
@@ -404,15 +418,42 @@ namespace NRasterizer.Tables
                 //USHORT 	SubstFormat 	Format identifier-format = 1
                 //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
                 //USHORT 	SequenceCount 	Number of Sequence table offsets in the Sequence array
-                //Offset 	Sequence
-                //[SequenceCount] 	Array of offsets to Sequence tables-from beginning of Substitution table-ordered by Coverage Index
+                //Offset 	Sequence[SequenceCount] 	Array of offsets to Sequence tables-from beginning of Substitution table-ordered by Coverage Index
                 //Sequence table
                 //Type 	Name 	Description
-                //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array. This should always be greater than 0.
-                //GlyphID 	Substitute
-                //[GlyphCount] 
-                Console.WriteLine("skip lookup2");
+                //USHORT 	GlyphCount 	Number of GlyphI Ds in the Substitute array. This should always be greater than 0.
+                //GlyphID 	Substitute[GlyphCount]  String of GlyphIDs to substitute
 
+                int j = subTableOffsets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
+                    ushort format = reader.ReadUInt16();
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                short coverageOffset = reader.ReadInt16();
+                                ushort seqCount = reader.ReadUInt16();
+                                short[] seqOffsets = Utils.ReadInt16Array(reader, seqCount);
+
+                                var subTable = new LkSubTableT2();
+                                subTable.SeqTables = new SequenceTable[seqCount];
+                                for (int n = 0; n < seqCount; ++n)
+                                {
+                                    reader.BaseStream.Seek(subTableStartAt + seqOffsets[n], SeekOrigin.Begin);
+                                    ushort glyphCount= reader.ReadUInt16();
+                                    subTable.SeqTables[n] = new SequenceTable(
+                                        Utils.ReadUInt16Array(reader, glyphCount));
+                                }
+                                this.subTables.Add(subTable);
+                            } break;
+                    }
+                    //------------------------------------------------------------- 
+                }
             }
             /// <summary>
             /// LookupType 3: Alternate Substitution Subtable 
@@ -680,7 +721,7 @@ namespace NRasterizer.Tables
                 //input, and lookahead sequences and one or more substitutions for each sequence.
                 //-----------------------
                 //TODO: impl here
-                Console.WriteLine("not complete lookup type 6!");
+
                 int j = subTableOffsets.Length;
                 for (int i = 0; i < j; ++i)
                 {
