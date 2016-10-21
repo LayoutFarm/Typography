@@ -8,7 +8,7 @@ namespace NRasterizer
     {
         readonly Bounds _bounds;
         readonly ushort _unitsPerEm;
-        readonly List<Glyph> _glyphs;
+        readonly Glyph[] _glyphs;
         readonly CharacterMap[] _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
@@ -17,7 +17,7 @@ namespace NRasterizer
             NameEntry nameEntry,
             Bounds bounds,
             ushort unitsPerEm,
-            List<Glyph> glyphs,
+            Glyph[] glyphs,
             CharacterMap[] cmaps,
             HorizontalMetrics horizontalMetrics,
             Kern kern)
@@ -66,7 +66,7 @@ namespace NRasterizer
         }
         public Bounds Bounds { get { return _bounds; } }
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
-        public List<Glyph> Glyphs { get { return _glyphs; } }
+        public Glyph[] Glyphs { get { return _glyphs; } }
 
         //-------------------------------------------------------
         internal GDEF GDEFTable
@@ -102,7 +102,7 @@ namespace NRasterizer
                 output.Add(LookupIndex(buffer[i]));
             }
             //check for glyph substitution
-             
+
             this.GSUBTable.CheckSubstitution(output[1]);
 
         }

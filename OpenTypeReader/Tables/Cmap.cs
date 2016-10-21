@@ -23,13 +23,14 @@ namespace NRasterizer.Tables
             //
             ushort version = input.ReadUInt16(); // 0
             ushort tableCount = input.ReadUInt16();
-            var entries = new List<CMapEntry>(tableCount);
+
+            var entries = new CMapEntry[tableCount];
             for (int i = 0; i < tableCount; i++)
             {
                 ushort platformId = input.ReadUInt16();
                 ushort encodingId = input.ReadUInt16();
                 uint offset = input.ReadUInt32();
-                entries.Add(new CMapEntry(platformId, encodingId, offset));
+                entries[i] = new CMapEntry(platformId, encodingId, offset);
             }
 
             charMaps = new CharacterMap[tableCount];
@@ -37,7 +38,7 @@ namespace NRasterizer.Tables
             {
                 CMapEntry entry = entries[i];
                 input.BaseStream.Seek(beginAt + entry.Offset, SeekOrigin.Begin);
-                charMaps[i] = (ReadCharacterMap(entry, input));
+                charMaps[i] = ReadCharacterMap(entry, input);
 
             }
         }
