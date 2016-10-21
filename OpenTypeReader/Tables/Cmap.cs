@@ -41,15 +41,7 @@ namespace NRasterizer.Tables
 
             }
         }
-        static UInt16[] ReadUInt16Array(BinaryReader input, int length)
-        {
-            var result = new UInt16[length];
-            for (int i = 0; i < length; i++)
-            {
-                result[i] = input.ReadUInt16();
-            }
-            return result;
-        }
+
 
         static CharacterMap ReadCharacterMap(CMapEntry entry, BinaryReader input)
         {
@@ -91,18 +83,18 @@ namespace NRasterizer.Tables
             ushort entrySelector = input.ReadUInt16();//2 * (2**FLOOR(log2(segCount)))
             ushort rangeShift = input.ReadUInt16(); //2 * (2**FLOOR(log2(segCount)))
             int segCount = segCountX2 / 2;
-            ushort[] endCode = ReadUInt16Array(input, segCount);//Ending character code for each segment, last = 0xFFFF.            
+            ushort[] endCode = Utils.ReadUInt16Array(input, segCount);//Ending character code for each segment, last = 0xFFFF.            
             //>To ensure that the search will terminate, the final endCode value must be 0xFFFF.
             //>This segment need not contain any valid mappings. It can simply map the single character code 0xFFFF to the missing character glyph, glyph 0.
 
             input.ReadUInt16(); // Reserved = 0               
-            ushort[] startCode = ReadUInt16Array(input, segCount); //Starting character code for each segment
-            ushort[] idDelta = ReadUInt16Array(input, segCount); //Delta for all character codes in segment
-            ushort[] idRangeOffset = ReadUInt16Array(input, segCount); //Offset in bytes to glyph indexArray, or 0   
+            ushort[] startCode = Utils.ReadUInt16Array(input, segCount); //Starting character code for each segment
+            ushort[] idDelta = Utils.ReadUInt16Array(input, segCount); //Delta for all character codes in segment
+            ushort[] idRangeOffset = Utils.ReadUInt16Array(input, segCount); //Offset in bytes to glyph indexArray, or 0   
             //------------------------------------------------------------------------------------ 
             long remainingLen = tableStartEndAt - input.BaseStream.Position;
             int recordNum2 = (int)(remainingLen / 2);
-            ushort[] glyphIdArray = ReadUInt16Array(input, recordNum2);//Glyph index array 
+            ushort[] glyphIdArray = Utils.ReadUInt16Array(input, recordNum2);//Glyph index array 
             return new CharacterMap(segCount, startCode, endCode, idDelta, idRangeOffset, glyphIdArray);
         }
         //static int FindGlyphIdArrayLenInBytes(ushort[] idRangeOffset)
