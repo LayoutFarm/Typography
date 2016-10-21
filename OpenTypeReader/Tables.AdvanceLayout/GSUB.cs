@@ -441,12 +441,7 @@ namespace NRasterizer.Tables
             }
 
 
-            class LkSubTableT6Fmt1 : LookupSubTable
-            {
-                public CoverageTable CoverageTable { get; set; }
-                public ChainSubRuleSetTable[] subRuleSets;
 
-            }
 
             class ChainSubRuleSetTable
             {
@@ -517,6 +512,15 @@ namespace NRasterizer.Tables
                     this.sequenceIndex = seqIndex;
                     this.lookupListIndex = lookupListIndex;
                 }
+                public static SubstLookupRecord[] CreateSubstLookupRecords(BinaryReader reader, ushort ncount)
+                {
+                    SubstLookupRecord[] results = new SubstLookupRecord[ncount];
+                    for (int i = 0; i < ncount; ++i)
+                    {
+                        results[i] = new SubstLookupRecord(reader.ReadUInt16(), reader.ReadUInt16());
+                    }
+                    return results;
+                }
             }
             class ChainSubRuleSubTable
             {
@@ -557,17 +561,109 @@ namespace NRasterizer.Tables
                     subRuleTable.lookaheadGlyphs = Utils.ReadUInt16Array(reader, lookaheadGlyphCount);
                     //------------
                     ushort substCount = reader.ReadUInt16();
-                    SubstLookupRecord[] substLookupRecords = subRuleTable.substLookupRecords = new SubstLookupRecord[substCount];
-                    for (int i = 0; i < substCount; ++i)
-                    {
-                        substLookupRecords[i] = new SubstLookupRecord(
-                            reader.ReadUInt16(),
-                            reader.ReadUInt16());
-                    }
+                    subRuleTable.substLookupRecords = SubstLookupRecord.CreateSubstLookupRecords(reader, substCount);
 
                     return subRuleTable;
                 }
 
+            }
+
+
+            class ChainSubClassSet
+            {
+
+                //ChainSubClassSet subtable
+                //Type 	Name 	Description
+                //USHORT 	ChainSubClassRuleCnt 	Number of ChainSubClassRule tables
+                //Offset 	ChainSubClassRule[ChainSubClassRuleCount] 	Array of offsets to ChainSubClassRule tables-from beginning of ChainSubClassSet-ordered by preference
+
+                //For each context, a ChainSubClassRule table contains a count of the glyph classes in the context sequence (GlyphCount),
+                //including the first class. 
+                //A Class array lists the classes, beginning with the second class (array index = 1), that follow the first class in the context.
+
+                //    Note: Text order depends on the writing direction of the text. For text written from right to left, the right-most class will be first. Conversely, for text written from left to right, the left-most class will be first.
+
+                //The values specified in the Class array are the values defined in the ClassDef table. 
+                //The first class in the sequence,
+                //Class 2, is identified in the ChainContextSubstFormat2 table by the ChainSubClassSet array index of the corresponding ChainSubClassSet.
+
+                //A ChainSubClassRule also contains a count of the substitutions to be performed on the context (SubstCount) and an array of SubstLookupRecords (SubstLookupRecord) that supply the substitution data. For each position in the context that requires a substitution, a SubstLookupRecord specifies a LookupList index and a position in the input glyph sequence where the lookup is applied. The SubstLookupRecord array lists SubstLookupRecords in design order-that is, the order in which lookups should be applied to the entire glyph sequence.
+
+
+                ChainSubClassRuleTable[] subClassRuleTables;
+                public static ChainSubClassSet CreateFrom(BinaryReader reader, long beginAt)
+                {
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                    //
+                    ChainSubClassSet chainSubClassSet = new ChainSubClassSet();
+                    ushort count = reader.ReadUInt16();
+                    short[] subClassRuleOffsets = Utils.ReadInt16Array(reader, count);
+
+                    ChainSubClassRuleTable[] subClassRuleTables = chainSubClassSet.subClassRuleTables = new ChainSubClassRuleTable[count];
+                    for (int i = 0; i < count; ++i)
+                    {
+                        subClassRuleTables[i] = ChainSubClassRuleTable.CreateFrom(reader, beginAt + subClassRuleOffsets[i]);
+                    }
+                    return chainSubClassSet;
+                }
+            }
+            class ChainSubClassRuleTable
+            {
+                //ChainSubClassRule table: Chaining context definition for one class
+                //Type 	Name 	Description
+                //USHORT 	BacktrackGlyphCount 	Total number of glyphs in the backtrack sequence (number of glyphs to be matched before the first glyph)
+                //USHORT 	Backtrack[BacktrackGlyphCount] 	Array of backtracking classes(to be matched before the input sequence)
+                //USHORT 	InputGlyphCount 	Total number of classes in the input sequence (includes the first class)
+                //USHORT 	Input[InputGlyphCount - 1] 	Array of input classes(start with second class; to be matched with the input glyph sequence)
+                //USHORT 	LookaheadGlyphCount 	Total number of classes in the look ahead sequence (number of classes to be matched after the input sequence)
+                //USHORT 	LookAhead[LookAheadGlyphCount] 	Array of lookahead classes(to be matched after the input sequence)
+                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords (in design order)
+
+                ushort[] backtrakcingClassDefs;
+                ushort[] inputClassDefs;
+                ushort[] lookaheadClassDefs;
+                SubstLookupRecord[] subsLookupRecords;
+                public static ChainSubClassRuleTable CreateFrom(BinaryReader reader, long beginAt)
+                {
+                    ChainSubClassRuleTable subClassRuleTable = new ChainSubClassRuleTable();
+                    ushort backtrackingCount = reader.ReadUInt16();
+                    subClassRuleTable.backtrakcingClassDefs = Utils.ReadUInt16Array(reader, backtrackingCount);
+                    ushort inputGlyphCount = reader.ReadUInt16();
+                    subClassRuleTable.inputClassDefs = Utils.ReadUInt16Array(reader, inputGlyphCount - 1);//** -1
+                    ushort lookaheadGlyphCount = reader.ReadUInt16();
+                    subClassRuleTable.lookaheadClassDefs = Utils.ReadUInt16Array(reader, lookaheadGlyphCount);
+                    ushort substCount = reader.ReadUInt16();
+                    subClassRuleTable.subsLookupRecords = SubstLookupRecord.CreateSubstLookupRecords(reader, substCount);
+
+                    return subClassRuleTable;
+                }
+            }
+
+            //-------------------------------------------------------------
+            class LkSubTableT6Fmt1 : LookupSubTable
+            {
+                public CoverageTable CoverageTable { get; set; }
+                public ChainSubRuleSetTable[] SubRuleSets { get; set; }
+            }
+
+
+            class LkSubTableT6Fmt2 : LookupSubTable
+            {
+                public CoverageTable CoverageTable { get; set; }
+                public ClassDefTable BacktrackClassDef { get; set; }
+                public ClassDefTable InputClassDef { get; set; }
+                public ClassDefTable LookaheadClassDef { get; set; }
+                public ChainSubClassSet[] ChainSubClassSets { get; set; }
+            }
+
+
+            class LkSubTableT6Fmt3 : LookupSubTable
+            {
+                public CoverageTable[] BacktrackingCoverages { get; set; }
+                public CoverageTable[] InputCoverages { get; set; }
+                public CoverageTable[] LookaheadCoverages { get; set; }
+                public SubstLookupRecord[] SubstLookupRecords { get; set; }
             }
 
             /// <summary>
@@ -605,40 +701,52 @@ namespace NRasterizer.Tables
                                 //USHORT 	ChainSubRuleSetCount 	Number of ChainSubRuleSet tables-must equal GlyphCount in Coverage table
                                 //Offset 	ChainSubRuleSet[ChainSubRuleSetCount] 	Array of offsets to ChainSubRuleSet tables-from beginning of Substitution table-ordered by Coverage Index
 
-                                ushort coverage = reader.ReadUInt16();
+                                var subTable = new LkSubTableT6Fmt1();
+                                short coverage = reader.ReadInt16();
                                 ushort chainSubRulesetCount = reader.ReadUInt16();
                                 short[] chainSubRulesetOffsets = Utils.ReadInt16Array(reader, chainSubRulesetCount);
-                                var subTable = new LkSubTableT6Fmt1();
-                                ChainSubRuleSetTable[] subRuleSets = subTable.subRuleSets = new ChainSubRuleSetTable[chainSubRulesetCount];
+                                ChainSubRuleSetTable[] subRuleSets = subTable.SubRuleSets = new ChainSubRuleSetTable[chainSubRulesetCount];
                                 for (int n = 0; n < chainSubRulesetCount; ++n)
                                 {
-                                    subRuleSets[i] = ChainSubRuleSetTable.CreateFrom(reader, subTableStartAt + chainSubRulesetOffsets[i]);
+                                    subRuleSets[n] = ChainSubRuleSetTable.CreateFrom(reader, subTableStartAt + chainSubRulesetOffsets[n]);
                                 }
-
-
                                 //----------------------------
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 this.subTables.Add(subTable);
                             } break;
                         case 2:
                             {
-                                //6.2 Chaining Context Substitution Format 2: Class-based Chaining Context Glyph Substitution       
-                                //USHORT 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
-                                //Offset 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
-                                //USHORT 	InputGlyphCount 	Number of glyphs in input sequence
-                                //Offset 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
-                                //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
-                                //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
-                                //USHORT 	SubstCount 	Number of SubstLookupRecords
-                                //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords, in design order
+                                //ChainContextSubstFormat2 subtable: Class-based chaining context glyph substitution
+                                //Type 	Name 	Description
+                                //USHORT 	SubstFormat 	Format identifier-format = 2
+                                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
+                                //Offset 	BacktrackClassDef 	Offset to glyph ClassDef table containing backtrack sequence data-from beginning of Substitution table
+                                //Offset 	InputClassDef 	Offset to glyph ClassDef table containing input sequence data-from beginning of Substitution table
+                                //Offset 	LookaheadClassDef 	Offset to glyph ClassDef table containing lookahead sequence data-from beginning of Substitution table
+                                //USHORT 	ChainSubClassSetCnt 	Number of ChainSubClassSet tables
+                                //Offset 	ChainSubClassSet[ChainSubClassSetCnt] 	Array of offsets to ChainSubClassSet tables-from beginning of Substitution table-ordered by input class-may be NULL
+                                var subTable = new LkSubTableT6Fmt2();
+                                short coverage = reader.ReadInt16();
+                                short backtrackClassDefOffset = reader.ReadInt16();
+                                short inputClassDefOffset = reader.ReadInt16();
+                                short lookaheadClassDefOffset = reader.ReadInt16();
+                                ushort chainSubClassSetCount = reader.ReadUInt16();
+                                short[] chainSubClassSetOffsets = Utils.ReadInt16Array(reader, chainSubClassSetCount);
+                                //
+                                subTable.BacktrackClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + backtrackClassDefOffset);
+                                subTable.InputClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + inputClassDefOffset);
+                                subTable.LookaheadClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + lookaheadClassDefOffset);
+                                if (chainSubClassSetCount != 0)
+                                {
+                                    ChainSubClassSet[] chainSubClassSets = subTable.ChainSubClassSets = new ChainSubClassSet[chainSubClassSetCount];
+                                    for (int n = 0; n < chainSubClassSetCount; ++n)
+                                    {
+                                        chainSubClassSets[n] = ChainSubClassSet.CreateFrom(reader, subTableStartAt + chainSubClassSetOffsets[i]);
+                                    }
+                                }
 
-                                ushort coverage = reader.ReadUInt16(); //Offset to Coverage table-from beginning of Substitution table
-                                short backtrackClassDef = reader.ReadInt16(); //Offset to glyph ClassDef table containing backtrack sequence data-from beginning of Substitution table
-                                short inputClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing input sequence data-from beginning of Substitution table
-                                short lookAheadClassDef = reader.ReadInt16();//Offset to glyph ClassDef table containing lookahead sequence data-from beginning of Substitution table
-                                ushort chainSubclassSetCount = reader.ReadUInt16(); //Number of ChainSubClassSet tables
-                                short[] chainSubClassOffsets = Utils.ReadInt16Array(reader, chainSubclassSetCount);
-
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                this.subTables.Add(subTable);
                             }
                             break;
                         case 3:
@@ -653,25 +761,27 @@ namespace NRasterizer.Tables
                                 //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
                                 //USHORT 	SubstCount 	Number of SubstLookupRecords
                                 //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords, in design order
-
+                                LkSubTableT6Fmt3 subTable = new LkSubTableT6Fmt3();
                                 ushort backtrackingGlyphCount = reader.ReadUInt16();
-                                short[] backtrackingCoverageArray = Utils.ReadInt16Array(reader, backtrackingGlyphCount);
+                                short[] backtrackingCoverageOffsets = Utils.ReadInt16Array(reader, backtrackingGlyphCount);
                                 ushort inputGlyphCount = reader.ReadUInt16();
-                                short[] inputGlyphCoverageArray = Utils.ReadInt16Array(reader, inputGlyphCount);
+                                short[] inputGlyphCoverageOffsets = Utils.ReadInt16Array(reader, inputGlyphCount);
                                 ushort lookAheadGlyphCount = reader.ReadUInt16();
-                                short[] lookAheadCoverageArray = Utils.ReadInt16Array(reader, lookAheadGlyphCount);
+                                short[] lookAheadCoverageOffsets = Utils.ReadInt16Array(reader, lookAheadGlyphCount);
+                                ushort substCount = reader.ReadUInt16();
+                                subTable.SubstLookupRecords = SubstLookupRecord.CreateSubstLookupRecords(reader, substCount);
+                                //
+                                subTable.BacktrackingCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, backtrackingCoverageOffsets, reader);
+                                subTable.InputCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, inputGlyphCoverageOffsets, reader);
+                                subTable.LookaheadCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, lookAheadCoverageOffsets, reader);
 
 
-
-
-
+                                subTables.Add(subTable);
                             }
                             break;
                     }
                     //------------------------------------------------------------- 
                 }
-
-                //throw new NotImplementedException();
             }
             /// <summary>
             /// LookupType 7: Extension Substitution
