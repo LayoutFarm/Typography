@@ -4,6 +4,46 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//from https://www.microsoft.com/typography/developers/opentype/detail.htm
+//GDEF Table
+//As discussed in Part One, 
+//the most important tables for glyph processing are GSUB and GPOS, 
+//but both these tables make use of data in the Glyph Definition table.
+//The GDEF table contains three kinds of information in subtables:
+//1. glyph class definitions that classify different types of glyphs in a font;  
+//2. attachment point lists that identify glyph positioning attachments for each glyph; 
+//and 3. ligature caret lists that provide information for caret positioning and text selection involving ligatures.
+
+//The Glyph Class Definition subtable identifies 
+//four glyph classes: 
+//1. simple glyphs,
+//2. ligature glyphs (glyphs representing two or more glyph components), 
+//3. combining mark glyphs (glyphs that combine with other classes), 
+//and 4. glyph components (glyphs that represent individual parts of ligature glyphs). 
+
+//These classes are used by both GSUB and GPOS to differentiate glyphs in a string; for example,
+//to distinguish between a base vowel (simple glyph)
+//and the accent (combining mark glyph) that a GPOS feature will position above it.
+
+//The Attachment Point List 
+//identifies all the glyph attachment points defined in the GPOS table. 
+//Clients that access this information in the GDEF table can cache attachment coordinates with the rasterized glyph bitmaps, 
+//and avoid having to recalculate the attachment points each time they display a glyph. 
+//Without this table, 
+//GPOS features could still be enabled, 
+//but processing speed would be slower because the client would need to decode the GPOS lookups
+//that define the attachment points and compile its own list.
+
+//The Ligature Caret List
+//defines the positions for the caret to occupy in ligatures. 
+//This information, which can be fine tuned for particular bitmap sizes,
+//makes it possible for the caret to step across the component characters of a ligature, and for the user to select text including parts of ligatures. 
+//In the example on the left, below, the caret is positioned between two components of a ligature; on the right, text is selected from within a ligature. 
+//
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //https://www.microsoft.com/typography/otspec/GDEF.htm
 //GDEF — Glyph Definition Table
 
@@ -19,6 +59,7 @@ using System.Text;
 //The GSUB and GPOS tables may reference certain GDEF table information used for processing of lookup tables. See, for example, the LookupFlag bit enumeration in “OpenType Layout Common Table Formats”.
 
 //In variable fonts, the GDEF, GPOS and JSTF tables may all reference variation data within the ItemVariationStore table contained within the GDEF table. See below for further discussion of variable fonts and the ItemVariationStore table.
+///////////////////////////////////////////////////////////////////////////////
 
 
 namespace NRasterizer.Tables

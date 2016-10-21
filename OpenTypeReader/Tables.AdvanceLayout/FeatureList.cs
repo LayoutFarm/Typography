@@ -32,7 +32,7 @@ namespace NRasterizer.Tables
             {
                 //read script record
                 featureRecords[i] = new FeatureRecord(
-                    reader.ReadUInt32(), //script tag
+                    reader.ReadUInt32(), //feature tag
                     reader.ReadInt16()); //offset 
             }
             //read each feature table
@@ -40,28 +40,27 @@ namespace NRasterizer.Tables
             for (int i = 0; i < featureCount; ++i)
             {
                 FeatureRecord frecord = featureRecords[i];
-                (featureTables[i] = FeatureTable.CreateFrom(reader, beginAt + frecord.offset)).FeatureTag = frecord.scriptTag;
-            }
-
+                (featureTables[i] = FeatureTable.CreateFrom(reader, beginAt + frecord.offset)).FeatureTag = frecord.featureTag;
+            } 
             return featureList;
         }
         struct FeatureRecord
         {
-            public readonly uint scriptTag;//4-byte ScriptTag identifier
+            public readonly uint featureTag;//4-byte ScriptTag identifier
             public readonly short offset; //Script Offset to Script table-from beginning of ScriptList
-            public FeatureRecord(uint scriptTag, short offset)
+            public FeatureRecord(uint featureTag, short offset)
             {
-                this.scriptTag = scriptTag;
+                this.featureTag = featureTag;
                 this.offset = offset;
             }
-            public string ScriptName
+            public string FeatureName
             {
-                get { return Utils.TagToString(scriptTag); }
+                get { return Utils.TagToString(featureTag); }
             }
 #if DEBUG
             public override string ToString()
             {
-                return ScriptName + "," + offset;
+                return FeatureName + "," + offset;
             }
 #endif
         }
@@ -128,6 +127,12 @@ namespace NRasterizer.Tables
             {
                 get { return Utils.TagToString(this.FeatureTag); }
             }
+#if DEBUG
+            public override string ToString()
+            {
+                return this.TagName;
+            }
+#endif
         }
 
     }

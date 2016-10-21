@@ -33,9 +33,9 @@ namespace NRasterizer.Tables
         /// <summary>
         ///  for lookup table type 1, format1
         /// </summary>
-        class LookupSubTableT1F1 : LookupSubTable
+        class LkSubTableT1F1 : LookupSubTable
         {
-            public LookupSubTableT1F1(ushort coverageOffset, short deltaGlyph)
+            public LkSubTableT1F1(ushort coverageOffset, short deltaGlyph)
             {
                 this.Format = 1;
                 this.CoverageOffset = coverageOffset;
@@ -54,9 +54,9 @@ namespace NRasterizer.Tables
         /// <summary>
         /// for lookup table type 1, format2
         /// </summary>
-        class LookupSubTableT1F2 : LookupSubTable
+        class LkSubTableT1F2 : LookupSubTable
         {
-            public LookupSubTableT1F2(ushort coverageOffset, ushort[] substitueGlyphs)
+            public LkSubTableT1F2(ushort coverageOffset, ushort[] substitueGlyphs)
             {
                 this.Format = 2;
                 this.CoverageOffset = coverageOffset;
@@ -71,5 +71,8 @@ namespace NRasterizer.Tables
                 private set;
             }
         }
+        
+
+
     }
 }

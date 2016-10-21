@@ -41,7 +41,9 @@ namespace NRasterizer.Tables
 
         public static ScriptList CreateFrom(BinaryReader reader, long beginAt)
         {
-            //
+
+      
+
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
 
             //https://www.microsoft.com/typography/otspec/chapter2.htm
