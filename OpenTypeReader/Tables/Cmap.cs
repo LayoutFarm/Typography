@@ -5,6 +5,27 @@ using System.Collections.Generic;
 using System.IO;
 namespace NRasterizer.Tables
 {
+    ////////////////////////////////////////////////////////////////////////
+    //from https://www.microsoft.com/typography/developers/opentype/detail.htm
+    //CMAP Table
+    //Every glyph in a TrueType font is identified by a unique Glyph ID (GID),
+    //a simple sequential numbering of all the glyphs in the font. 
+    //These GIDs are mapped to character codepoints in the font's CMAP table.
+    //In OpenType fonts, the principal mapping is to Unicode codepoints; that is, 
+    //the GIDs of nominal glyph representations of specific characters are mapped to appropriate Unicode values.
+
+    //The key to OpenType glyph processing is that not every glyph in a font is directly mapped to a codepoint. 
+    //Variant glyph forms, ligatures, dynamically composed diacritics and other rendering forms do not require entries in the CMAP table. 
+    //Rather, their GIDs are mapped in layout features to the GIDs of nominal character forms, 
+    //i.e. to those glyphs that do have CMAP entries. This is the heart of glyph processing: the mapping of GIDs to each other, 
+    //rather than directly to character codepoints.
+
+    //In order for fonts to be able to correctly render text, 
+    //font developers must ensure that the correct nominal glyph form GIDs are mapped to the correct Unicode codepoints. 
+    //Application developers, of course, must ensure that their applications correctly manage input and storage of Unicode text codepoints,
+    //or map correctly to these codepoints from other codepages and character sets. 
+    ////////////////////////////////////////////////////////////////////////
+
     class Cmap : TableEntry
     {
         CharacterMap[] charMaps;
@@ -69,7 +90,15 @@ namespace NRasterizer.Tables
                         //    A variable-length array of glyph IDs (unsigned words).
                         long tableStartEndAt = input.BaseStream.Position + length;
 
-                        ushort version = input.ReadUInt16();
+                        ushort language = input.ReadUInt16();
+                        //Note on the language field in 'cmap' subtables:
+                        //Note on the language field in 'cmap' subtables: 
+                        //The language field must be set to zero for all cmap subtables whose platform IDs are other than Macintosh (platform ID 1).
+                        //For cmap subtables whose platform IDs are Macintosh, set this field to the Macintosh language ID of the cmap subtable plus one, 
+                        //or to zero if the cmap subtable is not language-specific.
+                        //For example, a Mac OS Turkish cmap subtable must set this field to 18, since the Macintosh language ID for Turkish is 17. 
+                        //A Mac OS Roman cmap subtable must set this field to 0, since Mac OS Roman is not a language-specific encoding.
+
                         ushort segCountX2 = input.ReadUInt16(); //2 * segCount
                         ushort searchRange = input.ReadUInt16(); //2 * (2**FLOOR(log2(segCount)))
                         ushort entrySelector = input.ReadUInt16();//2 * (2**FLOOR(log2(segCount)))

@@ -7,10 +7,34 @@ using System.Text;
 namespace NRasterizer.Tables
 {
 
+    ////////////////////////////////////////////////////////////////
+    //https://www.microsoft.com/typography/developers/opentype/detail.htm 
+    //GSUB Table
+    //The GSUB table contains substitution lookups that map GIDs to GIDs and associate these mappings with particular OpenType Layout features. The OpenType specification currently supports six different GSUB lookup types:
+
+    //    1. Single        Replaces one glyph with one glyph.
+    //    2. Multiple      Replaces one glyph with more than one glyph.
+    //    3. Alternate     Replaces one glyph with one of many glyphs.
+    //    4. Ligature      Replaces multiple glyphs with one glyph.
+    //    5. Context       Replaces one or more glyphs in context.
+    //    6. Chaining Context   Replaces one or more glyphs in chained context. 
+
+    //Although these lookups are defined by the font developer, 
+    //it is important for application developers to understand that some features require relatively complex UI support.
+    //In particular, OTL features using type 3 lookups may require the application to present options
+    //to the user (an example of this is provided in the discussion of OTLS in Part One). 
+    //In addition, some registered features allow more than one lookup type to be employed, 
+    //so application developers cannot rely on supporting only some lookup types.
+    //Similarly, features may have both GSUB and GPOS solutions—e.g. the 'Case-Sensitive Forms' feature—so applications 
+    //that want to support these features should avoid limiting their support to only one of these tables. 
+    //In setting priorities for feature support,
+    //it is important to consider the possible interaction of features and to provide users with powerful sets of typographic tools that work together. 
+
+    ////////////////////////////////////////////////////////////////
+
     partial class GSUB : TableEntry
     {
         //from https://www.microsoft.com/typography/otspec/GSUB.htm
-
 
         ScriptList scriptList = new ScriptList();
         FeatureList featureList = new FeatureList();
@@ -338,13 +362,13 @@ namespace NRasterizer.Tables
                         case 1:
                             {
                                 short deltaGlyph = reader.ReadInt16();
-                                subTable = new LookupSubTableT1F1(coverage, deltaGlyph);
+                                subTable = new LkSubTableT1F1(coverage, deltaGlyph);
                             } break;
                         case 2:
                             {
                                 ushort glyphCount = reader.ReadUInt16();
                                 ushort[] substitueGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
-                                subTable = new LookupSubTableT1F2(coverage, substitueGlyphs);
+                                subTable = new LkSubTableT1F2(coverage, substitueGlyphs);
                             }
                             break;
                     }
@@ -431,9 +455,7 @@ namespace NRasterizer.Tables
                 for (int i = 0; i < j; ++i)
                 {
                     //move to read pos
-                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin);
-
-                    //-----------------------
+                    reader.BaseStream.Seek(lookupTablePos + subTableOffsets[i], SeekOrigin.Begin); 
                     LookupSubTable subTable = null;
                     ushort format = reader.ReadUInt16();
 
