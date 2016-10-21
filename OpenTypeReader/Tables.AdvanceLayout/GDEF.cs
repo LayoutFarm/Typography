@@ -150,7 +150,7 @@ namespace NRasterizer.Tables
                         ushort[] classValues = classDef.classValueArray;
                         int len = classValues.Length;
                         int gIndex = startGlyph;
-                        for (int i = startGlyph; i < len; ++i)
+                        for (int i = 0; i < len; ++i)
                         {
                             inputGlyphs[gIndex].GlyphClassDef = (GlyphClassKind)classValues[i];
                             gIndex++;
@@ -185,7 +185,7 @@ namespace NRasterizer.Tables
         {
             Console.WriteLine("please implement FillLigatureCarets()");
         }
-        void FillMarkAttachmentClassDefs(Glyph[] inpuGlyphs)
+        void FillMarkAttachmentClassDefs(Glyph[] inputGlyphs)
         {
             //Mark Attachment Class Definition Table
             //A Mark Class Definition Table is used to assign mark glyphs into different classes 
@@ -207,12 +207,12 @@ namespace NRasterizer.Tables
 
                         int len = classValues.Length;
                         int gIndex = startGlyph;
-                        for (int i = startGlyph; i < len; ++i)
+                        for (int i = 0; i < len; ++i)
                         {
 #if DEBUG
-                            Glyph dbugTestGlyph = inpuGlyphs[gIndex];
+                            Glyph dbugTestGlyph = inputGlyphs[gIndex];
 #endif
-                            inpuGlyphs[gIndex].MarkClassDef = classValues[i];
+                            inputGlyphs[gIndex].MarkClassDef = classValues[i];
                             gIndex++;
                         }
 
@@ -227,9 +227,9 @@ namespace NRasterizer.Tables
                             for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
                             {
 #if DEBUG
-                                Glyph dbugTestGlyph = inpuGlyphs[i];
+                                Glyph dbugTestGlyph = inputGlyphs[i];
 #endif
-                                inpuGlyphs[i].MarkClassDef = rec.classNo;
+                                inputGlyphs[i].MarkClassDef = rec.classNo;
                             }
                         }
                     }
