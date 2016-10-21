@@ -23,7 +23,11 @@ namespace NRasterizer.Tables
             gposTableStartAt = reader.BaseStream.Position;
             //-------------------------------------------
             // GPOS Header
-            //The GPOS table begins with a header that contains a version number for the table. Two versions are defined. Version 1.0 contains offsets to three tables: ScriptList, FeatureList, and LookupList. Version 1.1 also includes an offset to a FeatureVariations table. For descriptions of these tables, see the chapter, OpenType Layout Common Table Formats . Example 1 at the end of this chapter shows a GPOS Header table definition.
+            //The GPOS table begins with a header that contains a version number for the table. Two versions are defined. 
+            //Version 1.0 contains offsets to three tables: ScriptList, FeatureList, and LookupList. 
+            //Version 1.1 also includes an offset to a FeatureVariations table.
+            //For descriptions of these tables, see the chapter, OpenType Layout Common Table Formats .
+            //Example 1 at the end of this chapter shows a GPOS Header table definition.
             //GPOS Header, Version 1.0
             //Value 	Type 	Description
             //USHORT 	MajorVersion 	Major version of the GPOS table, = 1
