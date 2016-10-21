@@ -14,7 +14,7 @@ namespace NRasterizer.Tables
 
         ScriptList scriptList = new ScriptList();
         FeatureList featureList = new FeatureList();
-        List<LookupTable> lookupTables = new List<LookupTable>();
+        LookupTable[] lookupTables;
 
         long gsubTableStartAt;
         public override string Name
@@ -105,8 +105,9 @@ namespace NRasterizer.Tables
             //Offset 	SubTable
             //[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
             //unit16 	MarkFilteringSet
-            lookupTables.Clear();
+
             ushort lookupCount = reader.ReadUInt16();
+            lookupTables = new LookupTable[lookupCount];
             int[] subTableOffset = new int[lookupCount];
             for (int i = 0; i < lookupCount; ++i)
             {
@@ -134,14 +135,14 @@ namespace NRasterizer.Tables
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
 
-                lookupTables.Add(
+                lookupTables[i] =
                     new LookupTable(
                         lookupTablePos,
                         lookupType,
                         lookupFlags,
                         subTableCount,
                         subTableOffsets,//Array of offsets to SubTables-from beginning of Lookup table
-                        markFilteringSet));
+                        markFilteringSet);
             }
             //----------------------------------------------
             //read each lookup record content ...
@@ -525,7 +526,7 @@ namespace NRasterizer.Tables
         public bool CheckSubstitution(int inputGlyph)
         {
             List<GSUB.LookupResult> foundResults = new List<LookupResult>();
-            for (int i = lookupTables.Count - 1; i >= 0; --i)
+            for (int i = lookupTables.Length - 1; i >= 0; --i)
             {
                 LookupTable lookup = lookupTables[i];
                 if (lookup.lookupType != 1)
