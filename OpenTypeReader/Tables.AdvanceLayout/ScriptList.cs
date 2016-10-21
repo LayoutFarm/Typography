@@ -9,14 +9,19 @@ namespace NRasterizer.Tables
 
     class ScriptList
     {
-        List<ScriptRecord> scriptRecords = new List<ScriptRecord>();
-        List<ScriptTable> scriptTables = new List<ScriptTable>();
+        //https://www.microsoft.com/typography/otspec/chapter2.htm
+        //The ScriptList identifies the scripts in a font, 
+        //each of which is represented by a Script table that contains script and language-system data.
+        //Language system tables reference features, which are defined in the FeatureList. 
+        //Each feature table references the lookup data defined in the LookupList that describes how, when, and where to implement the feature.
 
+        ScriptRecord[] scriptRecords;
+        ScriptTable[] scriptTables;
         struct ScriptRecord
         {
             public readonly uint scriptTag;//4-byte ScriptTag identifier
-            public readonly ushort offset; //Script Offset to Script table-from beginning of ScriptList
-            public ScriptRecord(uint scriptTag, ushort offset)
+            public readonly short offset; //Script Offset to Script table-from beginning of ScriptList
+            public ScriptRecord(uint scriptTag, short offset)
             {
                 this.scriptTag = scriptTag;
                 this.offset = offset;
@@ -25,15 +30,20 @@ namespace NRasterizer.Tables
             {
                 get { return Utils.TagToString(scriptTag); }
             }
+#if DEBUG
             public override string ToString()
             {
                 return ScriptName + "," + offset;
             }
+#endif
         }
 
-        public void ReadFrom(BinaryReader reader)
+
+        public static ScriptList CreateFrom(BinaryReader reader, long beginAt)
         {
-            long scriptListStartAt = reader.BaseStream.Position;
+            //
+            reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             //ScriptList table
             //Type 	Name 	Description
@@ -45,29 +55,33 @@ namespace NRasterizer.Tables
             //Type 	Name 	Description
             //Tag 	ScriptTag 	4-byte ScriptTag identifier
             //Offset 	Script 	Offset to Script table-from beginning of ScriptList
-            scriptRecords.Clear();
+
+            ScriptList scriptList = new ScriptList();
             ushort scriptCount = reader.ReadUInt16();
+            ScriptRecord[] scRecords = scriptList.scriptRecords = new ScriptRecord[scriptCount];
 
             for (int i = 0; i < scriptCount; ++i)
             {
                 //read script record
-                scriptRecords.Add(new ScriptRecord(
+                scRecords[i] = new ScriptRecord(
                     reader.ReadUInt32(), //tag
-                    reader.ReadUInt16())); //offset
+                    reader.ReadInt16());//offset                 
             }
             //-------------
+            ScriptTable[] scriptTables = scriptList.scriptTables = new ScriptTable[scriptCount];
             //then read each
             for (int i = 0; i < scriptCount; ++i)
             {
-                ScriptRecord scriptRecord = scriptRecords[i];
+                ScriptRecord scriptRecord = scRecords[i];
                 //move to
-                reader.BaseStream.Seek(scriptListStartAt + scriptRecord.offset, SeekOrigin.Begin);
-                ScriptTable scriptTable = new ScriptTable(scriptRecord.scriptTag);
-                scriptTable.ReadFrom(reader);
-                scriptTables.Add(scriptTable);
-
+                ScriptTable scriptTable = ScriptTable.CreateFrom(reader, beginAt + scriptRecord.offset);
+                scriptTable.scriptTag = scriptRecord.scriptTag;
+                scriptTables[i] = scriptTable;
             }
+            return scriptList;
         }
+
+
     }
 
 

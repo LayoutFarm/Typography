@@ -23,7 +23,11 @@ namespace NRasterizer.Tables
             gposTableStartAt = reader.BaseStream.Position;
             //-------------------------------------------
             // GPOS Header
-            //The GPOS table begins with a header that contains a version number for the table. Two versions are defined. Version 1.0 contains offsets to three tables: ScriptList, FeatureList, and LookupList. Version 1.1 also includes an offset to a FeatureVariations table. For descriptions of these tables, see the chapter, OpenType Layout Common Table Formats . Example 1 at the end of this chapter shows a GPOS Header table definition.
+            //The GPOS table begins with a header that contains a version number for the table. Two versions are defined. 
+            //Version 1.0 contains offsets to three tables: ScriptList, FeatureList, and LookupList. 
+            //Version 1.1 also includes an offset to a FeatureVariations table.
+            //For descriptions of these tables, see the chapter, OpenType Layout Common Table Formats .
+            //Example 1 at the end of this chapter shows a GPOS Header table definition.
             //GPOS Header, Version 1.0
             //Value 	Type 	Description
             //USHORT 	MajorVersion 	Major version of the GPOS table, = 1
@@ -50,17 +54,15 @@ namespace NRasterizer.Tables
             uint featureVariations = (MinorVersion == 1) ? reader.ReadUInt32() : 0;//from beginning of GSUB table
 
             //-----------------------
-            //1. scriptlist
-            reader.BaseStream.Seek(this.Header.Offset + scriptListOffset, SeekOrigin.Begin);
-            scriptList.ReadFrom(reader);
+            //1. scriptlist             
+            scriptList = ScriptList.CreateFrom(reader, gposTableStartAt + scriptListOffset);
             //-----------------------
-            //2. feature list
-            reader.BaseStream.Seek(this.Header.Offset + featureListOffset, SeekOrigin.Begin);
-            featureList.ReadFrom(reader);
+            //2. feature list             
+            featureList = FeatureList.CreateFrom(reader, gposTableStartAt + featureListOffset);
             //-----------------------
             //3. lookup list
-            reader.BaseStream.Seek(this.Header.Offset + lookupListOffset, SeekOrigin.Begin);
-            ReadLookupListTable(reader);
+
+            ReadLookupListTable(reader, gposTableStartAt + lookupListOffset);
             //-----------------------
             //4. feature variations
             if (featureVariations > 0)
@@ -76,25 +78,45 @@ namespace NRasterizer.Tables
         {
             throw new NotImplementedException();
         }
-        void ReadLookupListTable(BinaryReader reader)
+        void ReadLookupListTable(BinaryReader reader, long lookupListBeginAt)
         {
-            long lookupListHeadPos = reader.BaseStream.Position;
+
+            reader.BaseStream.Seek(lookupListBeginAt, SeekOrigin.Begin);
+            //
+
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             //LookupList table
             //Type 	Name 	Description
             //USHORT 	LookupCount 	Number of lookups in this table
             //Offset 	Lookup[LookupCount] 	Array of offsets to Lookup tables-from beginning of LookupList -zero based (first lookup is Lookup index = 0)
+
             //Lookup Table
+            //A Lookup table (Lookup) defines the specific conditions, type, 
+            //and results of a substitution or positioning action that is used to implement a feature. 
+            //For example, a substitution operation requires a list of target glyph indices to be replaced, 
+            //a list of replacement glyph indices, and a description of the type of substitution action.
+            //Each Lookup table may contain only one type of information (LookupType),
+            //determined by whether the lookup is part of a GSUB or GPOS table. GSUB supports eight LookupTypes, 
+            //and GPOS supports nine LookupTypes (for details about LookupTypes, see the GSUB and GPOS chapters of the document).
 
-            //A Lookup table (Lookup) defines the specific conditions, type, and results of a substitution or positioning action that is used to implement a feature. For example, a substitution operation requires a list of target glyph indices to be replaced, a list of replacement glyph indices, and a description of the type of substitution action.
+            //Each LookupType is defined with one or more subtables, 
+            //and each subtable definition provides a different representation format.
+            //The format is determined by the content of the information required for an operation and by required storage efficiency.
+            //When glyph information is best presented in more than one format,
+            //a single lookup may contain more than one subtable, as long as all the subtables are the same LookupType. 
+            //For example, within a given lookup, a glyph index array format may best represent one set of target glyphs,
+            //whereas a glyph index range format may be better for another set of target glyphs.
 
-            //Each Lookup table may contain only one type of information (LookupType), determined by whether the lookup is part of a GSUB or GPOS table. GSUB supports eight LookupTypes, and GPOS supports nine LookupTypes (for details about LookupTypes, see the GSUB and GPOS chapters of the document).
+            //During text processing, a client applies a lookup to each glyph in the string before moving to the next lookup. 
+            //A lookup is finished for a glyph after the client makes the substitution/positioning operation.
+            //To move to the “next” glyph, the client will typically skip all the glyphs that participated in the lookup operation: glyphs 
+            //that were substituted/positioned as well as any other glyphs that formed a context for the operation. However, in the case of pair positioning operations (i.e., kerning), the “next” glyph in a sequence may be the second glyph of the positioned pair (see pair positioning lookup for details).
 
-            //Each LookupType is defined with one or more subtables, and each subtable definition provides a different representation format. The format is determined by the content of the information required for an operation and by required storage efficiency. When glyph information is best presented in more than one format, a single lookup may contain more than one subtable, as long as all the subtables are the same LookupType. For example, within a given lookup, a glyph index array format may best represent one set of target glyphs, whereas a glyph index range format may be better for another set of target glyphs.
-
-            //During text processing, a client applies a lookup to each glyph in the string before moving to the next lookup. A lookup is finished for a glyph after the client makes the substitution/positioning operation. To move to the “next” glyph, the client will typically skip all the glyphs that participated in the lookup operation: glyphs that were substituted/positioned as well as any other glyphs that formed a context for the operation. However, in the case of pair positioning operations (i.e., kerning), the “next” glyph in a sequence may be the second glyph of the positioned pair (see pair positioning lookup for details).
-
-            //A Lookup table contains a LookupType, specified as an integer, that defines the type of information stored in the lookup. The LookupFlag specifies lookup qualifiers that assist a text-processing client in substituting or positioning glyphs. The SubTableCount specifies the total number of SubTables. The SubTable array specifies offsets, measured from the beginning of the Lookup table, to each SubTable enumerated in the SubTable array.
+            //A Lookup table contains a LookupType, specified as an integer, that defines the type of information stored in the lookup.
+            //The LookupFlag specifies lookup qualifiers that assist a text-processing client in substituting or positioning glyphs.
+            //The SubTableCount specifies the total number of SubTables. 
+            //The SubTable array specifies offsets, measured from the beginning of the Lookup table, to each SubTable enumerated in the SubTable array.
+            //
             //Lookup table
             //Type 	Name 	Description
             //USHORT 	LookupType 	Different enumerations for GSUB and GPOS
@@ -112,7 +134,7 @@ namespace NRasterizer.Tables
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             for (int i = 0; i < lookupCount; ++i)
             {
-                long lookupTablePos = lookupListHeadPos + lookupTableOffsets[i];
+                long lookupTablePos = lookupListBeginAt + lookupTableOffsets[i];
                 reader.BaseStream.Seek(lookupTablePos, SeekOrigin.Begin);
 
                 ushort lookupType = reader.ReadUInt16();//Each Lookup table may contain only one type of information (LookupType)
@@ -140,7 +162,7 @@ namespace NRasterizer.Tables
             {
                 LookupTable lookupRecord = lookupRecords[i];
                 //set origin
-                reader.BaseStream.Seek(lookupListHeadPos + lookupTableOffsets[i], SeekOrigin.Begin);
+                reader.BaseStream.Seek(lookupListBeginAt + lookupTableOffsets[i], SeekOrigin.Begin);
                 lookupRecord.ReadRecordContent(reader);
             }
 
@@ -720,7 +742,7 @@ namespace NRasterizer.Tables
                                 ushort posCount = reader.ReadUInt16();
                                 //read each lookahead record
                                 short[] coverageOffsets = Utils.ReadInt16Array(reader, glyphCount);
-                                subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount); 
+                                subTable.PosLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                                 subTable.CoverageTables = CreateMultipleCoverageTables(subTableStartAt, coverageOffsets, reader);
                                 //---------- 
                                 subTables.Add(subTable);

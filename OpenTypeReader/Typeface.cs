@@ -8,8 +8,8 @@ namespace NRasterizer
     {
         readonly Bounds _bounds;
         readonly ushort _unitsPerEm;
-        readonly List<Glyph> _glyphs;
-        readonly List<CharacterMap> _cmaps;
+        readonly Glyph[] _glyphs;
+        readonly CharacterMap[] _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
         readonly Kern _kern;
@@ -17,8 +17,8 @@ namespace NRasterizer
             NameEntry nameEntry,
             Bounds bounds,
             ushort unitsPerEm,
-            List<Glyph> glyphs,
-            List<CharacterMap> cmaps,
+            Glyph[] glyphs,
+            CharacterMap[] cmaps,
             HorizontalMetrics horizontalMetrics,
             Kern kern)
         {
@@ -66,20 +66,25 @@ namespace NRasterizer
         }
         public Bounds Bounds { get { return _bounds; } }
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
-        public List<Glyph> Glyphs { get { return _glyphs; } }
+        public Glyph[] Glyphs { get { return _glyphs; } }
 
-        //-------------------------------------------------------
-        internal GSUB GSUBTable
+
+        GDEF GDEFTable
         {
             get;
             set;
         }
-        internal GPOS GPOSTable
+        GSUB GSUBTable
         {
             get;
             set;
         }
-        internal BASE BaseTable
+        GPOS GPOSTable
+        {
+            get;
+            set;
+        }
+        BASE BaseTable
         {
             get;
             set;
@@ -97,9 +102,25 @@ namespace NRasterizer
                 output.Add(LookupIndex(buffer[i]));
             }
             //check for glyph substitution
-             
             this.GSUBTable.CheckSubstitution(output[1]);
+        }
+        //-------------------------------------------------------
+        //experiment
+        internal void LoadOpenTypeLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable)
+        {
+
+            //***
+            this.GDEFTable = gdefTable;
+            this.GSUBTable = gsubTable;
+            this.GPOSTable = gposTable;
+            this.BaseTable = baseTable;
+            //---------------------------
+            //1. fill glyph definition            
+            gdefTable.FillGlyphData(this.Glyphs);
+
+
 
         }
+
     }
 }

@@ -72,22 +72,24 @@ namespace NRasterizer
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
                 GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
-                GDEF gdef = ReadTableIfExists(tables, input, new GDEF()); 
+                GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
 
-                return new Typeface(
+                var typeface = new Typeface(
                     nameEntry,
                     header.Bounds,
                     header.UnitsPerEm,
                     glyf.Glyphs,
                     cmaps.CharMaps,
                     horizontalMetrics,
-                    kern)
-                    {
-                        GSUBTable = gsub,
-                        GPOSTable = gpos,
-                        BaseTable = baseTable
-                    };
+                    kern);
+
+                typeface.LoadOpenTypeLayoutInfo(
+                    gdef,
+                    gsub,
+                    gpos,
+                    baseTable);
+                return typeface;
             }
         }
         static TableHeader ReadTableHeader(BinaryReader input)

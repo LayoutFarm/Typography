@@ -424,15 +424,7 @@ namespace NRasterizer.Tables
             }
 
         }
-        class Class1Record
-        {
-
-        }
-        class Class2Record
-        {
-
-        }
-
+        
 
         // LigatureArray table
         //Value 	Type 	Description
