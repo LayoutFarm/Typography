@@ -101,8 +101,33 @@ namespace NOpenType
             short[] new_ys = CloneArray(original._ys);
             ushort[] new_contourEndPoints = CloneArray(original._contourEndPoints);
             bool[] new_onCurves = CloneArray(original._onCurves);
-
             return new Glyph(new_xs, new_ys, new_onCurves, new_contourEndPoints, original.Bounds);
+        }
+
+        /// <summary>
+        /// append data from src to dest, dest data will changed***
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dest"></param>
+        internal static void AppendGlyph(Glyph dest, Glyph src)
+        {
+            int org_dest_len = dest._contourEndPoints.Length;
+            int src_contour_count = src._contourEndPoints.Length;
+            ushort org_last_point = (ushort)(dest._contourEndPoints[org_dest_len - 1] + 1); //since start at 0 
+
+            dest._xs = ConcatArray(dest._xs, src._xs);
+            dest._ys = ConcatArray(dest._ys, src._ys);
+            dest._onCurves = ConcatArray(dest._onCurves, src._onCurves);
+            dest._contourEndPoints = ConcatArray(dest._contourEndPoints, src._contourEndPoints);
+            //offset contour point
+            int newlen = dest._contourEndPoints.Length;
+            for (int i = org_dest_len; i < newlen; ++i)
+            {
+                dest._contourEndPoints[i] += (ushort)org_last_point;
+            }
+            //calculate new bounds
+
+
         }
 
         public static T[] CloneArray<T>(T[] original)
@@ -112,7 +137,13 @@ namespace NOpenType
             return newClone;
         }
 
-
+        public static T[] ConcatArray<T>(T[] arr1, T[] arr2)
+        {
+            T[] newArr = new T[arr1.Length + arr2.Length];
+            Array.Copy(arr1, 0, newArr, 0, arr1.Length);
+            Array.Copy(arr2, 0, newArr, arr1.Length, arr2.Length);
+            return newArr;
+        }
 
         internal GlyphClassKind GlyphClassDef { get; set; }
         internal ushort MarkClassDef { get; set; }
