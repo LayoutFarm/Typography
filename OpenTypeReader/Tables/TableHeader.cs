@@ -18,7 +18,7 @@ namespace NRasterizer.Tables
             _offset = offset;
             _length = len;
         }
-        public string Tag { get { return TagToString(_tag); } }
+        public string Tag { get { return Utils.TagToString(_tag); } }
 
         //// TODO: Take offset parameter as commonly two seeks are made in a row
         //public BinaryReader GetDataReader()
@@ -30,13 +30,7 @@ namespace NRasterizer.Tables
         public uint Offset { get { return _offset; } }
         public uint CheckSum { get { return _checkSum; } }
         public uint Length { get { return _length; } }
-        static string TagToString(uint tag)
-        {
-            byte[] bytes = BitConverter.GetBytes(tag);
-            Array.Reverse(bytes);
-            return Encoding.ASCII.GetString(bytes);
-        }
-
+        
         public override string ToString()
         {
             return "{" + Tag + "}";

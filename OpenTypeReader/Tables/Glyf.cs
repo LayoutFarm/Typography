@@ -6,12 +6,12 @@ namespace NRasterizer.Tables
 {
     class Glyf : TableEntry
     {
-        List<Glyph> _glyphs;
+        Glyph[] _glyphs;
         public Glyf(GlyphLocations glyphLocations)
         {
             this.GlyphLocations = glyphLocations;
         }
-        public List<Glyph> Glyphs
+        public Glyph[] Glyphs
         {
             get { return _glyphs; }
         }
@@ -26,14 +26,15 @@ namespace NRasterizer.Tables
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            _glyphs = new List<Glyph>();
+
+            uint tableOffset = this.Header.Offset;
             GlyphLocations locations = this.GlyphLocations;
             int glyphCount = locations.GlyphCount;
-            uint tableOffset = this.Header.Offset;
+            _glyphs = new Glyph[glyphCount];
+
             for (int i = 0; i < glyphCount; i++)
             {
-                reader.BaseStream.Seek(tableOffset, SeekOrigin.Begin);//reset 
-                reader.BaseStream.Seek(locations.Offsets[i], SeekOrigin.Current);
+                reader.BaseStream.Seek(tableOffset + locations.Offsets[i], SeekOrigin.Begin);//reset                  
                 uint length = locations.Offsets[i + 1] - locations.Offsets[i];
                 if (length > 0)
                 {
@@ -41,16 +42,16 @@ namespace NRasterizer.Tables
                     Bounds bounds = BoundsReader.ReadFrom(reader);
                     if (contoursCount >= 0)
                     {
-                        _glyphs.Add(ReadSimpleGlyph(reader, contoursCount, bounds));
+                        _glyphs[i] = ReadSimpleGlyph(reader, contoursCount, bounds);
                     }
                     else
                     {
-                        _glyphs.Add(ReadCompositeGlyph(reader, -contoursCount, bounds));
+                        _glyphs[i] = ReadCompositeGlyph(reader, -contoursCount, bounds);
                     }
                 }
                 else
                 {
-                    _glyphs.Add(Glyph.Empty);
+                    _glyphs[i] = Glyph.Empty;
                 }
             }
         }

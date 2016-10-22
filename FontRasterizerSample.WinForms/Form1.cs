@@ -1,5 +1,7 @@
 ﻿//MIT, 2016,  WinterDev
 using System;
+using System.Collections.Generic;
+
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -89,15 +91,20 @@ namespace SampleWinForms
                 //1. read typeface from font file
                 Typeface typeFace = reader.Read(fs);
 
+#if DEBUG
+                string inputstr = "ก่นกิ่น";
+                List<int> outputGlyphIndice = new List<int>();
+                typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
+#endif
+
+
+
                 RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
                 switch (renderChoice)
                 {
                     case RenderChoice.RenderWithMiniAgg:
                         RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
                         break;
-                    //case RenderChoice.RenderWithGdiPlusPath:
-                    //    RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
-                    //    break;
 
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
