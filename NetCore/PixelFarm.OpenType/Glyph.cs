@@ -119,15 +119,22 @@ namespace NOpenType
             dest._ys = ConcatArray(dest._ys, src._ys);
             dest._onCurves = ConcatArray(dest._onCurves, src._onCurves);
             dest._contourEndPoints = ConcatArray(dest._contourEndPoints, src._contourEndPoints);
-            //offset contour point
+
+            //offset latest append contour  end points
             int newlen = dest._contourEndPoints.Length;
             for (int i = org_dest_len; i < newlen; ++i)
             {
                 dest._contourEndPoints[i] += (ushort)org_last_point;
             }
             //calculate new bounds
-
-
+            Bounds destBound = dest.Bounds;
+            Bounds srcBound = src.Bounds;
+            short newXmin = (short)Math.Min(destBound.XMin, srcBound.XMin);
+            short newYMin = (short)Math.Min(destBound.YMin, srcBound.YMin);
+            short newXMax = (short)Math.Max(destBound.XMax, srcBound.XMax);
+            short newYMax = (short)Math.Max(destBound.YMax, srcBound.YMax);
+            
+            dest._bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
         }
 
         public static T[] CloneArray<T>(T[] original)
