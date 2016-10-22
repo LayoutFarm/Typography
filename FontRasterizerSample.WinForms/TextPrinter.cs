@@ -14,11 +14,25 @@ namespace SampleWinForms
         public float y;
         public float advX;
         public VertexStore vxs;
+    }
+
+    class GlyphsCache
+    {
+        Dictionary<int, VertexStore> _glyphIndexToVxsDic = new Dictionary<int, VertexStore>();
+        Typeface _typeface;
+        public GlyphsCache(Typeface typeface)
+        {
+            _typeface = typeface;
+        }
+
+
 
     }
 
     class TextPrinter
     {
+
+        Dictionary<Typeface, GlyphsCache> _glyphCaches = new Dictionary<Typeface, GlyphsCache>();
 
         public TextPrinter()
         {
@@ -34,8 +48,20 @@ namespace SampleWinForms
         {
             Print(typeface, size, str.ToCharArray(), glyphPlanBuffer);
         }
+
         public void Print(Typeface typeface, float size, char[] str, GlyphPlan[] glyphPlanBuffer)
         {
+
+            //check if we have created a glyph cache
+            GlyphsCache glyphCache;
+            if (!_glyphCaches.TryGetValue(typeface, out glyphCache))
+            {
+                //create new 
+                glyphCache = new GlyphsCache(typeface);
+                _glyphCaches.Add(typeface, glyphCache);
+            }
+
+            //---------------------------------------------- 
             //1. convert char[] to glyph[]
             //2. send to shaping engine
             //3. layout position of each glyph 

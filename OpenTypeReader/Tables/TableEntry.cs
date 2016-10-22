@@ -17,6 +17,11 @@ namespace NRasterizer.Tables
             reader.BaseStream.Seek(this.Header.Offset, SeekOrigin.Begin);
             ReadContentFrom(reader);
         }
+        public uint TableLength
+        {
+            get { return this.Header.Length; }
+        }
+
     }
     class UnreadTableEntry : TableEntry
     {

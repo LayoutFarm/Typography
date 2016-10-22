@@ -1,12 +1,16 @@
-﻿//Apache2, 2014-2016, Samuel Carlsson
+﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
 using System.IO;
 namespace NRasterizer.IO
 {
+
     class ByteOrderSwappingBinaryReader : BinaryReader
     {
-        public ByteOrderSwappingBinaryReader(Stream input) : base(input)
+        //All OpenType fonts use Motorola-style byte ordering (Big Endian)
+        //
+        public ByteOrderSwappingBinaryReader(Stream input)
+            : base(input)
         {
         }
 
@@ -62,7 +66,7 @@ namespace NRasterizer.IO
         public override uint ReadUInt32() { return SwapBytes(base.ReadUInt32()); }
         public override ulong ReadUInt64() { return SwapBytes(base.ReadUInt64()); }
 
-        public new void Dispose()
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
