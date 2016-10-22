@@ -1,7 +1,7 @@
 ﻿//MIT, 2016,  WinterDev
 using System;
 using System.Collections.Generic;
-using NRasterizer;
+using NOpenType;
 
 using System.Drawing;
 using System.Drawing.Imaging;

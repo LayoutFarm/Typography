@@ -6,7 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-using NRasterizer;
+using NOpenType;
 using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
 
@@ -207,7 +207,7 @@ namespace SampleWinForms
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
 
             //2. glyph to gdi path
-            var gdiGlyphRasterizer = new NRasterizer.CLI.GDIGlyphRasterizer();
+            var gdiGlyphRasterizer = new NOpenType.CLI.GDIGlyphRasterizer();
             var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
             builder.Build(testChar, sizeInPoint);
 

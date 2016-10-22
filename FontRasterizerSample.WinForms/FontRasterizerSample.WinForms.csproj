@@ -78,9 +78,9 @@
       <Project>{CCE391D5-F166-4ECA-B99F-CE56B058CB58}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OpenTypeReader\OpenTypeReader.csproj">
-      <Project>{2dda36cc-9a17-44c8-b26b-1472bb48c0f4}</Project>
-      <Name>OpenTypeReader</Name>
+    <ProjectReference Include="..\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
+      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
+      <Name>PixelFarm.OpenType</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

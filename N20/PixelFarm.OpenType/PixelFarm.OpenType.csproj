@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PixelFarm.OpenType</RootNamespace>
+    <AssemblyName>PixelFarm.OpenType</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Bounds.cs">
+      <Link>Bounds.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\CharacterMap.cs">
+      <Link>CharacterMap.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\FontCollection\InstalledFont.cs">
+      <Link>FontCollection\InstalledFont.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Glyph.cs">
+      <Link>Glyph.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\GlyphPathBuilder.cs">
+      <Link>GlyphPathBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilderBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\IGlyphRasterizer.cs">
+      <Link>IGlyphRasterizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Interpreter.cs">
+      <Link>Interpreter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\IO\ByteOrderSwappingBinaryReader.cs">
+      <Link>IO\ByteOrderSwappingBinaryReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\OpenTypeReader.cs">
+      <Link>OpenTypeReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\AttachmentListTable.cs">
+      <Link>Tables.AdvancedLayout\AttachmentListTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\Base.cs">
+      <Link>Tables.AdvancedLayout\Base.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\ClassDefTable.cs">
+      <Link>Tables.AdvancedLayout\ClassDefTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\CoverageTable.cs">
+      <Link>Tables.AdvancedLayout\CoverageTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\FeatureList.cs">
+      <Link>Tables.AdvancedLayout\FeatureList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\GDEF.cs">
+      <Link>Tables.AdvancedLayout\GDEF.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\GPOS.cs">
+      <Link>Tables.AdvancedLayout\GPOS.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\GPOS.Others.cs">
+      <Link>Tables.AdvancedLayout\GPOS.Others.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\GSUB.cs">
+      <Link>Tables.AdvancedLayout\GSUB.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\GSUB.SubTables.cs">
+      <Link>Tables.AdvancedLayout\GSUB.SubTables.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\LigatureCaretListTable.cs">
+      <Link>Tables.AdvancedLayout\LigatureCaretListTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\ScriptList.cs">
+      <Link>Tables.AdvancedLayout\ScriptList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\ScriptTable.cs">
+      <Link>Tables.AdvancedLayout\ScriptTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\Tags.cs">
+      <Link>Tables.AdvancedLayout\Tags.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\BoundsReader.cs">
+      <Link>Tables\BoundsReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Cmap.cs">
+      <Link>Tables\Cmap.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Glyf.cs">
+      <Link>Tables\Glyf.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\GlyphLocations.cs">
+      <Link>Tables\GlyphLocations.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Head.cs">
+      <Link>Tables\Head.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\HorizontalHeader.cs">
+      <Link>Tables\HorizontalHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\HorizontalMetrics.cs">
+      <Link>Tables\HorizontalMetrics.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Kern.cs">
+      <Link>Tables\Kern.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\MaxProfile.cs">
+      <Link>Tables\MaxProfile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\NameEntry.cs">
+      <Link>Tables\NameEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\TableEntry.cs">
+      <Link>Tables\TableEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\TableEntryCollection.cs">
+      <Link>Tables\TableEntryCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\TableHeader.cs">
+      <Link>Tables\TableHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Utils.cs">
+      <Link>Tables\Utils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Typeface.cs">
+      <Link>Typeface.cs</Link>
+    </Compile>
+    <Compile Include="Net20\ExtensionAttribute.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
