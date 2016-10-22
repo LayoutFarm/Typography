@@ -17,8 +17,7 @@ namespace NOpenType
         }
         protected override void OnBeginRead(int countourCount)
         {
-            scale = (float)(SizeInPoints * Resolution) / (pointsPerInch * TypeFaceUnitPerEm);
-
+            scale = TypeFace.CalculateScale(SizeInPoints);
             _rasterizer.BeginRead(countourCount);
         }
         protected override void OnCloseFigure()
