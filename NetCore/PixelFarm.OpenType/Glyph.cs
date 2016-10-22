@@ -68,31 +68,45 @@ namespace NOpenType
 
 
             //change data on current glyph
+            short new_xmin = 0;
+            short new_ymin = 0;
+            short new_xmax = 0;
+            short new_ymax = 0;
+
+
             short[] xs = glyph._xs;
             short[] ys = glyph._ys;
+
             for (int i = xs.Length - 1; i >= 0; --i)
             {
                 short x = xs[i];
                 short y = ys[i];
 
-                xs[i] = (short)((x * m00) + (y * m01));
-                ys[i] = (short)((x * m10) + (y * m11));
+                short newX = xs[i] = (short)((x * m00) + (y * m01));
+                short newY = ys[i] = (short)((x * m10) + (y * m11));
+
+                //------
+                if (newX < new_xmin)
+                {
+                    new_xmin = newX;
+                }
+                if (newX > new_xmax)
+                {
+                    new_xmax = newX;
+                }
+                //------
+                if (newY < new_ymin)
+                {
+                    new_ymin = newY;
+                }
+                if (newY > new_ymax)
+                {
+                    new_ymax = newY;
+                }
             }
-            //-------------------------
-            Bounds orgBounds = glyph._bounds;
-            short xmin = orgBounds.XMin;
-            short ymin = orgBounds.YMin;
-
-            short xmax = orgBounds.XMax;
-            short ymax = orgBounds.YMax;
-
             glyph._bounds = new Bounds(
-               (short)(xmin * m00 + ymin * m01),
-               (short)(xmin * m10 + ymin * m11),
-                //-----------------------------------
-               (short)(xmax * m00 + ymax * m01),
-               (short)(xmax * m00 + ymax * m01));
-
+                new_xmin, new_ymin,
+                new_xmax, new_ymax);
         }
         internal static Glyph Clone(Glyph original)
         {
@@ -133,7 +147,7 @@ namespace NOpenType
             short newYMin = (short)Math.Min(destBound.YMin, srcBound.YMin);
             short newXMax = (short)Math.Max(destBound.XMax, srcBound.XMax);
             short newYMax = (short)Math.Max(destBound.YMax, srcBound.YMax);
-            
+
             dest._bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
         }
 
