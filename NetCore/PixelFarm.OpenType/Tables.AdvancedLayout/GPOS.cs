@@ -937,7 +937,7 @@ namespace NRasterizer.Tables
             /// <param name="reader"></param>
             void ReadLookupType9(BinaryReader reader)
             {
-                Console.WriteLine("skip lookup type 9");
+                //Console.WriteLine("skip lookup type 9");
             }
         }
 

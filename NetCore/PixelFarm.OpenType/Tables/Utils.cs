@@ -7,11 +7,13 @@ namespace NRasterizer.Tables
 {
     static class Utils
     {
+
+
         public static string TagToString(uint tag)
         {
             byte[] bytes = BitConverter.GetBytes(tag);
             Array.Reverse(bytes);
-            return Encoding.ASCII.GetString(bytes);
+            return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
         public static short[] ReadInt16Array(BinaryReader reader, int nRecords)
         {

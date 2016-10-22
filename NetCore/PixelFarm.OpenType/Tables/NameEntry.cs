@@ -45,13 +45,14 @@ namespace NRasterizer.Tables
                 Encoding enc2;
                 if (ttRecord.uEncodingID == 3 || ttRecord.uEncodingID == 1)
                 {
+                    
                     enc2 = Encoding.BigEndianUnicode;
                 }
                 else
                 {
                     enc2 = Encoding.UTF8;
                 }
-                string strRet = enc2.GetString(buf);
+                string strRet = enc2.GetString(buf, 0, buf.Length);
                 switch (ttRecord.uNameID)
                 {
                     case 1:

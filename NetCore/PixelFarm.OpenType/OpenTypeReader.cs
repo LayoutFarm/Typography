@@ -35,13 +35,7 @@ namespace NRasterizer
                 return new InstalledFont(nameEntry.FontName, nameEntry.FontSubFamily);
             }
         }
-        public InstalledFont ReadPreview(string fontFileName)
-        {
-            using (var fs = new FileStream(fontFileName, FileMode.Open))
-            {
-                return ReadPreview(fs);
-            }
-        }
+        
 
         public Typeface Read(Stream stream)
         {

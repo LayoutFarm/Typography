@@ -224,7 +224,7 @@ namespace NRasterizer.Tables
         }
         void FillLigatureCarets(Glyph[] inputGlyphs)
         {
-            Console.WriteLine("please implement FillLigatureCarets()");
+            //Console.WriteLine("please implement FillLigatureCarets()");
         }
         void FillMarkAttachmentClassDefs(Glyph[] inputGlyphs)
         {
@@ -286,7 +286,7 @@ namespace NRasterizer.Tables
             MarkGlyphSetsTable markGlyphSets = this.MarkGlyphSetsTable;
             if (markGlyphSets == null) return;
             //-------           
-            Console.WriteLine("please implement FillMarkGlyphSets()");
+            //Console.WriteLine("please implement FillMarkGlyphSets()");
 
             throw new NotImplementedException();
 
