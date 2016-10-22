@@ -69,6 +69,15 @@ namespace NOpenType
         public Glyph[] Glyphs { get { return _glyphs; } }
 
 
+        const int pointsPerInch = 72;
+        public float CalculateScale(float sizeInPointUnit, int resolution = 96)
+        {
+            //  float scale = GlyphPathBuilder.GetFUnitToPixelsScale(size,
+            //glyphPathBuilder.Resolution,
+            //typeface.UnitsPerEm);
+            return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
+        }
+
         GDEF GDEFTable
         {
             get;

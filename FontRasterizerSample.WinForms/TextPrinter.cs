@@ -84,15 +84,13 @@ namespace SampleWinForms
             }
 
 
-            float scale = GlyphPathBuilder.GetFUnitToPixelsScale(size,
-                glyphPathBuilder.Resolution,
-                typeface.UnitsPerEm);
+            float scale = typeface.CalculateScale(size);
 
             float cx = 0;
             float cy = 0;
             bool enable_kerning = this.EnableKerning;
 
-           
+
             for (int i = 0; i < j; ++i)
             {
                 GlyphPlan glyphPlan = glyphPlanBuffer[i];
