@@ -58,7 +58,42 @@ namespace NOpenType
                (short)(orgBounds.YMax + dy));
 
         }
+        internal static void Apply2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
+        {
+            //x'= |m00 m01|x
+            //y'= |m10 m11|y
+            //--
+            //x' = x*m00+ y*m01
+            //y' = x*m10+ y*m11
 
+
+            //change data on current glyph
+            short[] xs = glyph._xs;
+            short[] ys = glyph._ys;
+            for (int i = xs.Length - 1; i >= 0; --i)
+            {
+                short x = xs[i];
+                short y = ys[i];
+
+                xs[i] = (short)((x * m00) + (y * m01));
+                ys[i] = (short)((x * m10) + (y * m11));
+            }
+            //-------------------------
+            Bounds orgBounds = glyph._bounds;
+            short xmin = orgBounds.XMin;
+            short ymin = orgBounds.YMin;
+
+            short xmax = orgBounds.XMax;
+            short ymax = orgBounds.YMax;
+
+            glyph._bounds = new Bounds(
+               (short)(xmin * m00 + ymin * m01),
+               (short)(xmin * m10 + ymin * m11),
+                //-----------------------------------
+               (short)(xmax * m00 + ymax * m01),
+               (short)(xmax * m00 + ymax * m01));
+
+        }
         internal static Glyph Clone(Glyph original)
         {
             //----------------------
