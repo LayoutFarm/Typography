@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     ////////////////////////////////////////////////////////////////////////
     //from https://www.microsoft.com/typography/developers/opentype/detail.htm

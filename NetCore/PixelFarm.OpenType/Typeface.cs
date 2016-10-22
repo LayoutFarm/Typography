@@ -1,8 +1,8 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System.Collections.Generic;
-using NRasterizer.Tables;
-namespace NRasterizer
+using NOpenType.Tables;
+namespace NOpenType
 {
     public class Typeface
     {

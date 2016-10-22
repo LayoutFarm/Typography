@@ -1,6 +1,6 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
-namespace NRasterizer
+namespace NOpenType
 {
     public struct Bounds
     {

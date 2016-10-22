@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     //Script Table and Language System Record 
     //A Script table identifies each language system that defines how to use the glyphs in a script for a particular language.

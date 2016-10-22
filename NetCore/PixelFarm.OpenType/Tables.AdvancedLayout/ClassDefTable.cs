@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     //https://www.microsoft.com/typography/otspec/chapter2.htm
     //Class Definition Table

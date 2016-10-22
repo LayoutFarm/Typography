@@ -62,7 +62,7 @@ using System.Text;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
 
     class GDEF : TableEntry

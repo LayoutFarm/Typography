@@ -3,7 +3,7 @@
 using System;
 using System.Drawing;
 
-namespace NRasterizer.CLI
+namespace NOpenType.CLI
 {
     public class GDIGlyphRasterizer : IGlyphRasterizer
     {

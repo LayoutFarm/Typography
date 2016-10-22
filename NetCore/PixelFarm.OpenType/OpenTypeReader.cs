@@ -2,9 +2,9 @@
 
 using System;
 using System.IO;
-using NRasterizer.IO;
-using NRasterizer.Tables;
-namespace NRasterizer
+using NOpenType.IO;
+using NOpenType.Tables;
+namespace NOpenType
 {
     public class OpenTypeReader
     {

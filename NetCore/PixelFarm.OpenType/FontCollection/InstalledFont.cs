@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-namespace NRasterizer
+namespace NOpenType
 {
     public class InstalledFont
     {

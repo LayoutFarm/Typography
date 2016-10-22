@@ -2,7 +2,7 @@
 
 using System.IO;
 using System.Text;
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     class NameEntry : TableEntry
     {

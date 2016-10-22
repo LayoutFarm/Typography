@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     class Kern : TableEntry
     {

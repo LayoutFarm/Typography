@@ -4,7 +4,7 @@
 //-----------------------------------------------------
 
 using System;
-namespace NRasterizer
+namespace NOpenType
 {
     public abstract class GlyphPathBuilderBase
     {

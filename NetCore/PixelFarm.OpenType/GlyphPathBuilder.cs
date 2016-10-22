@@ -1,7 +1,7 @@
 ﻿//Apache2, 2014-2016,   WinterDev
 using System;
 using System.Collections.Generic;
-namespace NRasterizer
+namespace NOpenType
 {
     /// <summary>
     /// gerneral glyph path builder

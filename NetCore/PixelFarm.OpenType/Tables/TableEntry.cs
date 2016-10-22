@@ -2,7 +2,7 @@
 
 using System;
 using System.IO;
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     abstract class TableEntry
     {

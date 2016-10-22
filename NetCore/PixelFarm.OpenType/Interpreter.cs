@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-namespace NRasterizer
+namespace NOpenType
 {
     class GraphicState
     {

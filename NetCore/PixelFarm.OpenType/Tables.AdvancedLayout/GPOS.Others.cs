@@ -6,7 +6,7 @@ using System.Text;
 
 //https://www.microsoft.com/typography/otspec/GPOS.htm
 
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     partial class GPOS
     {

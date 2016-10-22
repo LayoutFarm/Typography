@@ -2,7 +2,7 @@
 
 using System;
 using System.IO;
-namespace NRasterizer.IO
+namespace NOpenType.IO
 {
 
     class ByteOrderSwappingBinaryReader : BinaryReader

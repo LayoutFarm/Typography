@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using NRasterizer;
+using NOpenType;
 using PixelFarm.Agg;
 namespace SampleWinForms
 {

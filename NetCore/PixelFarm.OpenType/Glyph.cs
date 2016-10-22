@@ -2,7 +2,7 @@
 
 using System;
 using System.Text;
-namespace NRasterizer
+namespace NOpenType
 {
 
 

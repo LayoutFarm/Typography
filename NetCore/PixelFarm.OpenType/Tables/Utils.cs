@@ -3,7 +3,7 @@
 using System;
 using System.Text;
 using System.IO;
-namespace NRasterizer.Tables
+namespace NOpenType.Tables
 {
     static class Utils
     {

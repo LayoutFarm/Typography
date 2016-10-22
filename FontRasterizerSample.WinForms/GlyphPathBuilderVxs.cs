@@ -1,7 +1,7 @@
 ﻿//MIT, 2016,  WinterDev
 using System;
 using System.Collections.Generic;
-using NRasterizer;
+using NOpenType;
 using PixelFarm.Agg.VertexSource;
 
 namespace PixelFarm.Agg
@@ -9,7 +9,7 @@ namespace PixelFarm.Agg
     //this is PixelFarm version ***
     //render with MiniAgg
 
-    public class GlyphPathBuilderVxs : NRasterizer.GlyphPathBuilderBase
+    public class GlyphPathBuilderVxs : NOpenType.GlyphPathBuilderBase
     {
         PixelFarm.Agg.VertexSource.PathWriter ps = new PixelFarm.Agg.VertexSource.PathWriter();
         public GlyphPathBuilderVxs(Typeface typeface)
