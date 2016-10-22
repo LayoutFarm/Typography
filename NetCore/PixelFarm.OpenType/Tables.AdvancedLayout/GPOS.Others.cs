@@ -21,7 +21,7 @@ namespace NRasterizer.Tables
             }
             return results;
         }
-      
+
         static PosLookupRecord[] CreateMultiplePosLookupRecords(BinaryReader reader, int count)
         {
 
@@ -181,7 +181,7 @@ namespace NRasterizer.Tables
 
                 switch (this.format = reader.ReadUInt16())
                 {
-                    default: throw new NotFiniteNumberException();
+                    default: throw new NotSupportedException();
                     case 1:
                         {
                             // AnchorFormat1 table: Design units only
@@ -196,7 +196,8 @@ namespace NRasterizer.Tables
                             short xcoord = reader.ReadInt16();
                             short ycoord = reader.ReadInt16();
 
-                        } break;
+                        }
+                        break;
                     case 2:
                         {
                             //Anchor Table: Format 2
@@ -224,7 +225,8 @@ namespace NRasterizer.Tables
                             ushort anchorPoint = reader.ReadUInt16();
 
 
-                        } break;
+                        }
+                        break;
                     case 3:
                         {
 
@@ -267,7 +269,8 @@ namespace NRasterizer.Tables
                             short ydeviceTableOffset = reader.ReadInt16();
 
 
-                        } break;
+                        }
+                        break;
                 }
 
             }
@@ -415,7 +418,7 @@ namespace NRasterizer.Tables
             }
 
         }
-        
+
 
         // LigatureArray table
         //Value 	Type 	Description

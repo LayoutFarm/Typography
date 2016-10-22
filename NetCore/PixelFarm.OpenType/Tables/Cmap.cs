@@ -73,7 +73,7 @@ namespace NRasterizer.Tables
             {
                 default:
                     {
-                        throw new ApplicationException("Unknown cmap subtable: " + format); // TODO: Replace all applicationexceptions
+                        throw new Exception("Unknown cmap subtable: " + format); // TODO: Replace all applicationexceptions
                     }
                 case 4:
                     {

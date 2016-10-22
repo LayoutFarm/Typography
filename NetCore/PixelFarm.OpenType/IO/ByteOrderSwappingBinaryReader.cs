@@ -43,7 +43,7 @@ namespace NRasterizer.IO
         }
 
         public override Stream BaseStream { get { return base.BaseStream; } }
-        public override void Close() { base.Close(); }
+        //public override void Close() { base.Close(); }
 
         public override int PeekChar() { throw new NotImplementedException(); }
         public override int Read() { throw new NotImplementedException(); }
@@ -54,7 +54,7 @@ namespace NRasterizer.IO
         public override byte[] ReadBytes(int count) { return base.ReadBytes(count); }
         public override char ReadChar() { throw new NotImplementedException(); }
         public override char[] ReadChars(int count) { throw new NotImplementedException(); }
-        public override decimal ReadDecimal() { throw new NotImplementedException(); }
+        //public override decimal ReadDecimal() { throw new NotImplementedException(); }
         public override double ReadDouble() { throw new NotImplementedException(); }
         public override short ReadInt16() { return (short)SwapBytes(base.ReadUInt16()); }
         public override int ReadInt32() { throw new NotImplementedException(); }
@@ -66,7 +66,7 @@ namespace NRasterizer.IO
         public override uint ReadUInt32() { return SwapBytes(base.ReadUInt32()); }
         public override ulong ReadUInt64() { return SwapBytes(base.ReadUInt64()); }
 
-        public void Dispose()
+        public new void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);

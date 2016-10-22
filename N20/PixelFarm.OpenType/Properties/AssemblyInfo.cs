@@ -1,14 +1,15 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OpenTypeParser")]
+[assembly: AssemblyTitle("PixelFarm.OpenType")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("OpenTypeParser")]
+[assembly: AssemblyProduct("PixelFarm.OpenType")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2dda36cc-9a17-44c8-b26b-1472bb48c0f4")]
+[assembly: Guid("29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6")]
 
 // Version information for an assembly consists of the following four values:
 //

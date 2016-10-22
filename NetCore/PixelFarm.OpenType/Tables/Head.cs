@@ -9,7 +9,7 @@ namespace NRasterizer.Tables
         short _indexToLocFormat;
         Bounds _bounds;
 
-     
+
         public Head()
         {
         }
@@ -23,7 +23,7 @@ namespace NRasterizer.Tables
             FontRevision = input.ReadUInt32();
             CheckSumAdjustment = input.ReadUInt32();
             MagicNumber = input.ReadUInt32();
-            if (MagicNumber != 0x5F0F3CF5) throw new ApplicationException("Invalid magic number!" + MagicNumber.ToString("x"));
+            if (MagicNumber != 0x5F0F3CF5) throw new Exception("Invalid magic number!" + MagicNumber.ToString("x"));
             Flags = input.ReadUInt16();
             UnitsPerEm = input.ReadUInt16(); // valid is 16 to 16384
             Created = input.ReadUInt64(); //  International date (8-byte field). (?)
