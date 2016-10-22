@@ -8,15 +8,23 @@ namespace NOpenType
 
     public class Glyph
     {
-        readonly short[] _xs;
-        readonly short[] _ys;
-        readonly ushort[] _contourEndPoints;
-        readonly Bounds _bounds;
-        readonly bool[] _onCurves;
+        short[] _xs;
+        short[] _ys;
+        ushort[] _contourEndPoints;
+        Bounds _bounds;
+        bool[] _onCurves;
         public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new bool[0], new ushort[0], Bounds.Zero);
 
-        public Glyph(short[] xs, short[] ys, bool[] onCurves, ushort[] contourEndPoints, Bounds bounds)
+#if DEBUG
+        public readonly int dbugId;
+        static int s_debugTotalId;
+#endif
+        internal Glyph(short[] xs, short[] ys, bool[] onCurves, ushort[] contourEndPoints, Bounds bounds)
         {
+
+#if DEBUG
+            this.dbugId = s_debugTotalId++;
+#endif
             _xs = xs;
             _ys = ys;
             _onCurves = onCurves;
@@ -29,6 +37,46 @@ namespace NOpenType
         public ushort[] EndPoints { get { return _contourEndPoints; } }
         public bool[] OnCurves { get { return _onCurves; } }
         //--------------
+
+        internal static void OffsetXY(Glyph glyph, short dx, short dy)
+        {
+
+            //change data on current glyph
+            short[] xs = glyph._xs;
+            short[] ys = glyph._ys;
+            for (int i = xs.Length - 1; i >= 0; --i)
+            {
+                xs[i] += dx;
+                ys[i] += dy;
+            }
+            //-------------------------
+            Bounds orgBounds = glyph._bounds;
+            glyph._bounds = new Bounds(
+               (short)(orgBounds.XMin + dx),
+               (short)(orgBounds.YMin + dy),
+               (short)(orgBounds.XMax + dx),
+               (short)(orgBounds.YMax + dy));
+
+        }
+
+        internal static Glyph Clone(Glyph original)
+        {
+            //----------------------
+            short[] new_xs = CloneArray(original._xs);
+            short[] new_ys = CloneArray(original._ys);
+            ushort[] new_contourEndPoints = CloneArray(original._contourEndPoints);
+            bool[] new_onCurves = CloneArray(original._onCurves);
+
+            return new Glyph(new_xs, new_ys, new_onCurves, new_contourEndPoints, original.Bounds);
+        }
+
+        public static T[] CloneArray<T>(T[] original)
+        {
+            T[] newClone = new T[original.Length];
+            Array.Copy(original, newClone, newClone.Length);
+            return newClone;
+        }
+
 
 
         internal GlyphClassKind GlyphClassDef { get; set; }
