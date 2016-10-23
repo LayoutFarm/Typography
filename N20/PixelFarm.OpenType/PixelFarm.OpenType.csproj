@@ -101,6 +101,9 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\LigatureCaretListTable.cs">
       <Link>Tables.AdvancedLayout\LigatureCaretListTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\MathTable.cs">
+      <Link>Tables.AdvancedLayout\MathTable.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\ScriptList.cs">
       <Link>Tables.AdvancedLayout\ScriptList.cs</Link>
     </Compile>

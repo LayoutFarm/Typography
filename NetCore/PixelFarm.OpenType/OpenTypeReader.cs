@@ -63,13 +63,14 @@ namespace NOpenType
                 Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
-                OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
+                OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());           
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
                 VerticalDeviceMatrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMatrics());
 
 
                 //--------------
+                PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 //--------------
                 //advanced typography
