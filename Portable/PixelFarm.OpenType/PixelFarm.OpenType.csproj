@@ -109,17 +109,35 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\Tags.cs">
       <Link>Tables.AdvancedLayout\Tags.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\Gasp.cs">
+      <Link>Tables.TrueType\Gasp.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\Glyf.cs">
+      <Link>Tables.TrueType\Glyf.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\GlyphLocations.cs">
+      <Link>Tables.TrueType\GlyphLocations.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\FVar.cs">
+      <Link>Tables.Variations\FVar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\GVar.cs">
+      <Link>Tables.Variations\GVar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\HVar.cs">
+      <Link>Tables.Variations\HVar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\MVar.cs">
+      <Link>Tables.Variations\MVar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\VVar.cs">
+      <Link>Tables.Variations\VVar.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\BoundsReader.cs">
       <Link>Tables\BoundsReader.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Cmap.cs">
       <Link>Tables\Cmap.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Glyf.cs">
-      <Link>Tables\Glyf.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\GlyphLocations.cs">
-      <Link>Tables\GlyphLocations.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Head.cs">
       <Link>Tables\Head.cs</Link>
@@ -138,6 +156,12 @@
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\NameEntry.cs">
       <Link>Tables\NameEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\OS2.cs">
+      <Link>Tables\OS2.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Post.cs">
+      <Link>Tables\Post.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\TableEntry.cs">
       <Link>Tables\TableEntry.cs</Link>
