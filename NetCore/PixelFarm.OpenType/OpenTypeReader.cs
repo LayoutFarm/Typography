@@ -79,8 +79,8 @@ namespace NOpenType
                     glyf.Glyphs,
                     cmaps.CharMaps,
                     horizontalMetrics,
-                    kern);
-
+                    os2Table);
+                typeface.KernTable = kern;
                 typeface.LoadOpenTypeLayoutInfo(
                     gdef,
                     gsub,
