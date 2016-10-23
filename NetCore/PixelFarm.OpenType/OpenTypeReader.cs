@@ -66,6 +66,9 @@ namespace NOpenType
                 OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
+                VerticalDeviceMatrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMatrics());
+
+
                 //--------------
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 //--------------
