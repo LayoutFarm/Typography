@@ -73,7 +73,31 @@ namespace NOpenType.Tables
             {
                 default:
                     {
-                        throw new Exception("Unknown cmap subtable: " + format); // TODO: Replace all applicationexceptions
+                        throw new Exception("Unknown cmap subtable: " + format); // TODO: Replace all application exceptions
+                    }
+                case 0:
+                    {
+                        //Format 0: Byte encoding table
+                        //This is the Apple standard character to glyph index mapping table.
+                        //Type 	Name 	Description
+                        //USHORT 	format 	Format number is set to 0.
+                        //USHORT 	length 	This is the length in bytes of the subtable.
+                        //USHORT 	language 	Please see “Note on the language field in 'cmap' subtables“ in this document.
+                        //BYTE 	glyphIdArray[256] 	An array that maps character codes to glyph index values.
+                        //This is a simple 1 to 1 mapping of character codes to glyph indices. 
+                        //The glyph set is limited to 256. Note that if this format is used to index into a larger glyph set,
+                        //only the first 256 glyphs will be accessible. 
+
+                        ushort language = input.ReadUInt16(); 
+                        byte[] only256Glyphs = input.ReadBytes(256);
+                        ushort[] only256UInt16Glyphs = new ushort[256];
+                        for (int i = 255; i >= 0; --i)
+                        {
+                            //expand
+                            only256UInt16Glyphs[i] = only256Glyphs[i];
+                        }
+                        //convert to format4 cmap table
+                        return new CharacterMap(1, new ushort[] { 0 }, new ushort[] { 255 }, null, null, only256UInt16Glyphs);
                     }
                 case 4:
                     {
@@ -121,25 +145,6 @@ namespace NOpenType.Tables
             }
         }
 
-        //static int FindGlyphIdArrayLenInBytes(ushort[] idRangeOffset)
-        //{
-        //    //1. find max OffsetValue (in bytes unit)
-        //    //this is the possible value to reach from the idRangeOffsetRecord 
-        //    ushort max = 0;
-        //    int foundAt = 0;
-        //    for (int i = idRangeOffset.Length - 1; i >= 0; --i)
-        //    {
-        //        ushort off = idRangeOffset[i];
-        //        if (off > max)
-        //        {
-        //            max = off;
-        //            foundAt = i;
-        //        }
-        //    }
-        //    //----------------------------
-        //    //2. then offset with current found record
-        //    return max - (foundAt * 2); //*2 = to byte unit 
-        //}
         struct CMapEntry
         {
             readonly UInt16 _platformId;

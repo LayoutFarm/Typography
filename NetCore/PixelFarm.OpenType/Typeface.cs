@@ -126,8 +126,11 @@ namespace NOpenType
             this.BaseTable = baseTable;
             //---------------------------
             //1. fill glyph definition            
-            gdefTable.FillGlyphData(this.Glyphs);
-
+            if (gdefTable != null)
+            {
+                gdefTable.FillGlyphData(this.Glyphs);
+            }
+            
 
 
         }

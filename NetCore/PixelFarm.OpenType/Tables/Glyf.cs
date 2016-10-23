@@ -79,6 +79,10 @@ namespace NOpenType.Tables
                 //------------------------
                 short contoursCount = reader.ReadInt16();
                 Bounds bounds = BoundsReader.ReadFrom(reader);
+                if (glyphIndex == 7)
+                {
+
+                }
                 _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, -contoursCount, bounds);
             }
 
@@ -217,6 +221,22 @@ namespace NOpenType.Tables
         [Flags]
         enum CompositeGlyphFlags : ushort
         {
+            //These are the constants for the flags field:
+            //Bit   Flags 	 	Description
+            //0     ARG_1_AND_2_ARE_WORDS  	If this is set, the arguments are words; otherwise, they are bytes.
+            //1     ARGS_ARE_XY_VALUES 	  	If this is set, the arguments are xy values; otherwise, they are points.
+            //2     ROUND_XY_TO_GRID 	  	For the xy values if the preceding is true.
+            //3     WE_HAVE_A_SCALE 	 	This indicates that there is a simple scale for the component. Otherwise, scale = 1.0.
+            //4     RESERVED 	        	This bit is reserved. Set it to 0.
+            //5     MORE_COMPONENTS 	    Indicates at least one more glyph after this one.
+            //6     WE_HAVE_AN_X_AND_Y_SCALE 	  	The x direction will use a different scale from the y direction.
+            //7     WE_HAVE_A_TWO_BY_TWO 	  	There is a 2 by 2 transformation that will be used to scale the component.
+            //8     WE_HAVE_INSTRUCTIONS 	 	Following the last component are instructions for the composite character.
+            //9     USE_MY_METRICS 	 	        If set, this forces the aw and lsb (and rsb) for the composite to be equal to those from this original glyph. This works for hinted and unhinted characters.
+            //10    OVERLAP_COMPOUND 	 	    If set, the components of the compound glyph overlap. Use of this flag is not required in OpenType — that is, it is valid to have components overlap without having this flag set. It may affect behaviors in some platforms, however. (See Apple’s specification for details regarding behavior in Apple platforms.)
+            //11    SCALED_COMPONENT_OFFSET 	The composite is designed to have the component offset scaled.
+            //12    UNSCALED_COMPONENT_OFFSET 	The composite is designed not to have the component offset scaled.
+
             ARG_1_AND_2_ARE_WORDS = 1,
             ARGS_ARE_XY_VALUES = 1 << 1,
             ROUND_XY_TO_GRID = 1 << 2,
@@ -253,23 +273,15 @@ namespace NOpenType.Tables
             //see more at https://fontforge.github.io/assets/old/Composites/index.html
             //---------
 
-            Glyph newGlyph = null;
+            Glyph finalGlyph = null;
             CompositeGlyphFlags flags;
-            int doCount = 0;
 
             do
             {
-                if (doCount > 0)
-                {
-                    //TODO: implement this
-                    //the current version is not support composite glyph 
-                    //that has more than 1 component
-                    //so..
-                    return Glyph.Empty;
-                }
+
                 flags = (CompositeGlyphFlags)reader.ReadUInt16();
                 ushort glyphIndex = reader.ReadUInt16();
-                newGlyph = Glyph.Clone(createdGlyhps[glyphIndex]);
+                Glyph newGlyph = Glyph.Clone(createdGlyhps[glyphIndex]);
 
                 short arg1 = 0;
                 short arg2 = 0;
@@ -287,27 +299,35 @@ namespace NOpenType.Tables
                     arg1and2 = (ushort)((a1 << 8) | a2);
                 }
                 //-----------------------------------------
+                float xscale = 1;
+                float scale01 = 0;
+                float scale10 = 0;
+                float yscale = 1;
 
+                bool useMatrix = false;
+                //-----------------------------------------
+                bool hasScale = false;
                 if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_A_SCALE))
                 {
                     //If the bit WE_HAVE_A_SCALE is set,
                     //the scale value is read in 2.14 format-the value can be between -2 to almost +2.
                     //The glyph will be scaled by this value before grid-fitting. 
-                    short scale = reader.ReadInt16(); /* Format 2.14 */
-                    throw new NotSupportedException();
+                    xscale = yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    hasScale = true;
                 }
                 else if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_AN_X_AND_Y_SCALE))
                 {
-                    short xscale = reader.ReadInt16(); /* Format 2.14 */
-                    short yscale = reader.ReadInt16(); /* Format 2.14 */
-                    throw new NotSupportedException();
+                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    hasScale = true;
                 }
                 else if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_A_TWO_BY_TWO))
                 {
-                    throw new NotSupportedException();
-                    //The bit WE_HAVE_A_TWO_BY_TWO allows for linear transformation of the X and Y coordinates by specifying a 2 × 2 matrix.
-                    //This could be used for scaling and 90-degree rotations of the glyph components, for example.
 
+                    //The bit WE_HAVE_A_TWO_BY_TWO allows for linear transformation of the X and Y coordinates by specifying a 2 × 2 matrix.
+                    //This could be used for scaling and 90-degree*** rotations of the glyph components, for example.
+
+                    //2x2 matrix
 
                     //The purpose of USE_MY_METRICS is to force the lsb and rsb to take on a desired value.
                     //For example, an i-circumflex (U+00EF) is often composed of the circumflex and a dotless-i. 
@@ -317,32 +337,70 @@ namespace NOpenType.Tables
                     //(or would need to be explicitly set with TrueType instructions).
 
                     //Note that the behavior of the USE_MY_METRICS operation is undefined for rotated composite components. 
+                    useMatrix = true;
+                    hasScale = true;
+                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    scale01 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    scale10 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
 
-                    short xscale = reader.ReadInt16(); /* Format 2.14 */
-                    short scale01 = reader.ReadInt16(); /* Format 2.14 */
-                    short scale10 = reader.ReadInt16(); /* Format 2.14 */
-                    short yscale = reader.ReadInt16(); /* Format 2.14 */
+                    if (HasFlag(flags, CompositeGlyphFlags.UNSCALED_COMPONENT_OFFSET))
+                    {
 
+
+                    }
+                    else
+                    {
+
+
+                    }
                     if (HasFlag(flags, CompositeGlyphFlags.USE_MY_METRICS))
                     {
-                    }
 
+                    }
                 }
 
                 //--------------------------------------------------------------------
                 if (HasFlag(flags, CompositeGlyphFlags.ARGS_ARE_XY_VALUES))
                 {
+                    //Argument1 and argument2 can be either x and y offsets to be added to the glyph or two point numbers.  
                     //x and y offsets to be added to the glyph
                     //When arguments 1 and 2 are an x and a y offset instead of points and the bit ROUND_XY_TO_GRID is set to 1,
-                    //the values are rounded to those of the closest grid lines before they are added to the glyph. X and Y offsets are described in FUnits. 
-                    if (HasFlag(flags, CompositeGlyphFlags.ROUND_XY_TO_GRID))
-                    {
+                    //the values are rounded to those of the closest grid lines before they are added to the glyph.
+                    //X and Y offsets are described in FUnits. 
 
+                    if (useMatrix)
+                    {
+                        //use this matrix  
+                        Glyph.Apply2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.OffsetXY(newGlyph, (short)(arg1), arg2);
                     }
-                    //TODO: implement round xy to grid***
-                    //----------------------------
-                    Glyph.OffsetXY(newGlyph, arg1, arg2);
-                    //Argument1 and argument2 can be either x and y offsets to be added to the glyph or two point numbers.  
+                    else
+                    {
+                        if (hasScale)
+                        {
+                            if (xscale == 1.0 && yscale == 1.0)
+                            {
+
+                            }
+                            else
+                            {
+                                Glyph.Apply2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                            }
+                            Glyph.OffsetXY(newGlyph, arg1, arg2);
+                        }
+                        else
+                        {
+                            if (HasFlag(flags, CompositeGlyphFlags.ROUND_XY_TO_GRID))
+                            {
+                                //TODO: implement round xy to grid***
+                                //----------------------------
+                            }
+                            //just offset***
+                            Glyph.OffsetXY(newGlyph, arg1, arg2);
+                        }
+                    }
+
 
                 }
                 else
@@ -354,10 +412,17 @@ namespace NOpenType.Tables
 
                 }
 
-                //----------------------------
-                //TODO: implement more than one round here
+                //
+                if (finalGlyph == null)
+                {
+                    finalGlyph = newGlyph;
+                }
+                else
+                {
+                    //merge 
+                    Glyph.AppendGlyph(finalGlyph, newGlyph);
+                }
 
-                doCount++;
             } while (HasFlag(flags, CompositeGlyphFlags.MORE_COMPONENTS));
             if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_INSTRUCTIONS))
             {
@@ -394,23 +459,9 @@ namespace NOpenType.Tables
             //    USHORT numInstr
             //    BYTE instr[numInstr]
             //------------------------------------------------------------ 
-            //These are the constants for the flags field:
-            //Bit   Flags 	 	Description
-            //0     ARG_1_AND_2_ARE_WORDS  	If this is set, the arguments are words; otherwise, they are bytes.
-            //1     ARGS_ARE_XY_VALUES 	  	If this is set, the arguments are xy values; otherwise, they are points.
-            //2     ROUND_XY_TO_GRID 	  	For the xy values if the preceding is true.
-            //3     WE_HAVE_A_SCALE 	 	This indicates that there is a simple scale for the component. Otherwise, scale = 1.0.
-            //4     RESERVED 	        	This bit is reserved. Set it to 0.
-            //5     MORE_COMPONENTS 	    Indicates at least one more glyph after this one.
-            //6     WE_HAVE_AN_X_AND_Y_SCALE 	  	The x direction will use a different scale from the y direction.
-            //7     WE_HAVE_A_TWO_BY_TWO 	  	There is a 2 by 2 transformation that will be used to scale the component.
-            //8     WE_HAVE_INSTRUCTIONS 	 	Following the last component are instructions for the composite character.
-            //9     USE_MY_METRICS 	 	        If set, this forces the aw and lsb (and rsb) for the composite to be equal to those from this original glyph. This works for hinted and unhinted characters.
-            //10    OVERLAP_COMPOUND 	 	    If set, the components of the compound glyph overlap. Use of this flag is not required in OpenType — that is, it is valid to have components overlap without having this flag set. It may affect behaviors in some platforms, however. (See Apple’s specification for details regarding behavior in Apple platforms.)
-            //11    SCALED_COMPONENT_OFFSET 	The composite is designed to have the component offset scaled.
-            //12    UNSCALED_COMPONENT_OFFSET 	The composite is designed not to have the component offset scaled.
 
-            return (newGlyph == null) ? Glyph.Empty : newGlyph;
+
+            return (finalGlyph == null) ? Glyph.Empty : finalGlyph;
 
         }
 
