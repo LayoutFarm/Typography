@@ -4,6 +4,9 @@ using System;
 using System.IO;
 namespace NOpenType.Tables
 {
+    /// <summary>
+    /// this is base class of all 'top' font table
+    /// </summary>
     abstract class TableEntry
     {
         public TableEntry()

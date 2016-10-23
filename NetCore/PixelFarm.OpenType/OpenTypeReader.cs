@@ -35,7 +35,7 @@ namespace NOpenType
                 return new InstalledFont(nameEntry.FontName, nameEntry.FontSubFamily);
             }
         }
-        
+
 
         public Typeface Read(Stream stream)
         {
@@ -63,11 +63,22 @@ namespace NOpenType
                 Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
+                OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());           
+                //--------------
+                Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
+                VerticalDeviceMatrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMatrics());
+
+
+                //--------------
+                PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
+                //--------------
+                //advanced typography
                 GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
                 GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
                 GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
+                //--------------
 
                 var typeface = new Typeface(
                     nameEntry,
@@ -76,8 +87,11 @@ namespace NOpenType
                     glyf.Glyphs,
                     cmaps.CharMaps,
                     horizontalMetrics,
-                    kern);
-
+                    os2Table);
+                //----------------------------
+                typeface.KernTable = kern;
+                typeface.GaspTable = gaspTable;
+                //----------------------------
                 typeface.LoadOpenTypeLayoutInfo(
                     gdef,
                     gsub,
