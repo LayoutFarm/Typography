@@ -79,6 +79,10 @@ namespace NOpenType.Tables
                 //------------------------
                 short contoursCount = reader.ReadInt16();
                 Bounds bounds = BoundsReader.ReadFrom(reader);
+                if (glyphIndex == 7)
+                {
+
+                }
                 _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, -contoursCount, bounds);
             }
 
@@ -269,23 +273,15 @@ namespace NOpenType.Tables
             //see more at https://fontforge.github.io/assets/old/Composites/index.html
             //---------
 
-            Glyph newGlyph = null;
+            Glyph finalGlyph = null;
             CompositeGlyphFlags flags;
-            int doCount = 0;
 
             do
             {
-                if (doCount > 0)
-                {
-                    //TODO: implement this
-                    //the current version is not support composite glyph 
-                    //that has more than 1 component
-                    //so..
-                    return Glyph.Empty;
-                }
+
                 flags = (CompositeGlyphFlags)reader.ReadUInt16();
                 ushort glyphIndex = reader.ReadUInt16();
-                newGlyph = Glyph.Clone(createdGlyhps[glyphIndex]);
+                Glyph newGlyph = Glyph.Clone(createdGlyhps[glyphIndex]);
 
                 short arg1 = 0;
                 short arg2 = 0;
@@ -316,13 +312,13 @@ namespace NOpenType.Tables
                     //If the bit WE_HAVE_A_SCALE is set,
                     //the scale value is read in 2.14 format-the value can be between -2 to almost +2.
                     //The glyph will be scaled by this value before grid-fitting. 
-                    xscale = yscale = reader.ReadInt16() / (1 << 14); /* Format 2.14 */
+                    xscale = yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_AN_X_AND_Y_SCALE))
                 {
-                    xscale = reader.ReadInt16() / (1 << 14); /* Format 2.14 */
-                    yscale = reader.ReadInt16() / (1 << 14); /* Format 2.14 */
+                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_A_TWO_BY_TWO))
@@ -343,15 +339,14 @@ namespace NOpenType.Tables
                     //Note that the behavior of the USE_MY_METRICS operation is undefined for rotated composite components. 
                     useMatrix = true;
                     hasScale = true;
-                    xscale = reader.ReadInt16() / (1 << 14); /* Format 2.14 */
-                    scale01 = reader.ReadInt16() / (1 << 14); /* Format 2.14 */
-                    scale10 = reader.ReadInt16() / (1 << 14); /* Format 2.14 */
-                    yscale = reader.ReadInt16() / (1 << 14); /* Format 2.14 */
+                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    scale01 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    scale10 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
 
                     if (HasFlag(flags, CompositeGlyphFlags.UNSCALED_COMPONENT_OFFSET))
                     {
-                        //rotate, not scale
-                        //so just 90 degree rotate?
+
 
                     }
                     else
@@ -368,16 +363,17 @@ namespace NOpenType.Tables
                 //--------------------------------------------------------------------
                 if (HasFlag(flags, CompositeGlyphFlags.ARGS_ARE_XY_VALUES))
                 {
+                    //Argument1 and argument2 can be either x and y offsets to be added to the glyph or two point numbers.  
                     //x and y offsets to be added to the glyph
                     //When arguments 1 and 2 are an x and a y offset instead of points and the bit ROUND_XY_TO_GRID is set to 1,
-                    //the values are rounded to those of the closest grid lines before they are added to the glyph. X and Y offsets are described in FUnits. 
+                    //the values are rounded to those of the closest grid lines before they are added to the glyph.
+                    //X and Y offsets are described in FUnits. 
 
                     if (useMatrix)
                     {
-
-                        //use this matrix
+                        //use this matrix  
                         Glyph.Apply2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
-                        Glyph.OffsetXY(newGlyph, arg1, arg2);
+                        Glyph.OffsetXY(newGlyph, (short)(arg1), arg2);
                     }
                     else
                     {
@@ -389,26 +385,8 @@ namespace NOpenType.Tables
                             }
                             else
                             {
-
+                                Glyph.Apply2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
-                            //scale and translate ***
-                            //not correct        
-                            //arg1 *= xscale;
-                            //arg2 *= yscale;
-                            //short dx = 0, dy = 0;
-                            //if (HasFlag(flags, CompositeGlyphFlags.ROUND_XY_TO_GRID))
-                            //{
-                            //    //TODO: implement round xy to grid***
-                            //    //----------------------------
-                            //    dx = (short)Math.Round(arg1);
-                            //    dy = (short)Math.Round(arg2);
-                            //}
-                            //else
-                            //{
-                            //    dx = (short)Math.Round(arg1);
-                            //    dy = (short)Math.Round(arg2);
-                            //}
-                            ////not correct
                             Glyph.OffsetXY(newGlyph, arg1, arg2);
                         }
                         else
@@ -422,7 +400,7 @@ namespace NOpenType.Tables
                             Glyph.OffsetXY(newGlyph, arg1, arg2);
                         }
                     }
-                    //Argument1 and argument2 can be either x and y offsets to be added to the glyph or two point numbers.  
+
 
                 }
                 else
@@ -434,10 +412,17 @@ namespace NOpenType.Tables
 
                 }
 
-                //----------------------------
-                //TODO: implement more than one round here
+                //
+                if (finalGlyph == null)
+                {
+                    finalGlyph = newGlyph;
+                }
+                else
+                {
+                    //merge 
+                    Glyph.AppendGlyph(finalGlyph, newGlyph);
+                }
 
-                doCount++;
             } while (HasFlag(flags, CompositeGlyphFlags.MORE_COMPONENTS));
             if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_INSTRUCTIONS))
             {
@@ -476,7 +461,7 @@ namespace NOpenType.Tables
             //------------------------------------------------------------ 
 
 
-            return (newGlyph == null) ? Glyph.Empty : newGlyph;
+            return (finalGlyph == null) ? Glyph.Empty : finalGlyph;
 
         }
 

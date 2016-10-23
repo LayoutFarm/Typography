@@ -82,8 +82,8 @@ namespace NOpenType
                 short x = xs[i];
                 short y = ys[i];
 
-                short newX = xs[i] = (short)((x * m00) + (y * m01));
-                short newY = ys[i] = (short)((x * m10) + (y * m11));
+                short newX = xs[i] = (short)Math.Round((x * m00) + (y * m01));
+                short newY = ys[i] = (short)Math.Round((x * m10) + (y * m11));
 
                 //------
                 if (newX < new_xmin)
