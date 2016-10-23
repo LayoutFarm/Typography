@@ -1,5 +1,4 @@
-﻿
-//Apache2, 2016, WinterDev
+﻿//Apache2, 2016, WinterDev
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +23,8 @@ namespace NOpenType.Tables
         //
         //At intermediate sizes, hinting and monochrome rendering will usually produce the best appearance. 
         //
-        //At large sizes, the combination of hinting and grayscale rendering will typically produce the best appearance.
+        //At large sizes, the combination of hinting and grayscale rendering will
+        //typically produce the best appearance.
 
         //If the 'gasp' table is not present in a typeface,
         //the rasterizer may apply default rules to decide how to render the glyphs on grayscale devices.
