@@ -11,8 +11,10 @@ namespace NOpenType
         readonly Glyph[] _glyphs;
         readonly CharacterMap[] _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
-        readonly NameEntry _nameEntry;
-        readonly Kern _kern;
+        readonly NameEntry _nameEntry;        
+        readonly OS2Table _os2Table;
+        Kern _kern;
+
         internal Typeface(
             NameEntry nameEntry,
             Bounds bounds,
@@ -20,7 +22,7 @@ namespace NOpenType
             Glyph[] glyphs,
             CharacterMap[] cmaps,
             HorizontalMetrics horizontalMetrics,
-            Kern kern)
+            OS2Table os2Table)
         {
             _nameEntry = nameEntry;
             _bounds = bounds;
@@ -28,7 +30,17 @@ namespace NOpenType
             _glyphs = glyphs;
             _cmaps = cmaps;
             _horizontalMetrics = horizontalMetrics;
-            _kern = kern;
+            _os2Table = os2Table;
+        }
+        internal Kern KernTable
+        {
+            get { return _kern; }
+            set { this._kern = value; }
+        }
+        internal Gasp GaspTable
+        {
+            get;
+            set;
         }
         public string Name
         {
@@ -130,7 +142,7 @@ namespace NOpenType
             {
                 gdefTable.FillGlyphData(this.Glyphs);
             }
-            
+
 
 
         }
