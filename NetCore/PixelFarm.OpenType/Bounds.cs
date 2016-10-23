@@ -21,5 +21,7 @@ namespace NOpenType
         public short YMin { get { return _ymin; } }
         public short XMax { get { return _xmax; } }
         public short YMax { get { return _ymax; } }
+
+       
     }
 }

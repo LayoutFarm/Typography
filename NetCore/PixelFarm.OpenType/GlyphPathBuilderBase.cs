@@ -9,11 +9,9 @@ namespace NOpenType
     public abstract class GlyphPathBuilderBase
     {
         readonly Typeface _typeface;
-        protected const int pointsPerInch = 72;
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
-            this.Resolution = 96;//default dpi 
         }
         struct FtPoint
         {
@@ -224,11 +222,7 @@ namespace NOpenType
             get;
             set;
         }
-        public int Resolution
-        {
-            get;
-            set;
-        }
+
         protected Typeface TypeFace
         {
             get { return _typeface; }
@@ -237,11 +231,6 @@ namespace NOpenType
         {
             get { return _typeface.UnitsPerEm; }
         }
-       
 
-        public static float GetFUnitToPixelsScale(float fontSizeInPoint, int resolution, ushort unitPerEm)
-        {
-            return ((fontSizeInPoint * resolution) / (pointsPerInch * unitPerEm));
-        }
     }
 }

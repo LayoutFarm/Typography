@@ -11,8 +11,10 @@ namespace NOpenType
         readonly Glyph[] _glyphs;
         readonly CharacterMap[] _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
-        readonly NameEntry _nameEntry;
-        readonly Kern _kern;
+        readonly NameEntry _nameEntry;        
+        readonly OS2Table _os2Table;
+        Kern _kern;
+
         internal Typeface(
             NameEntry nameEntry,
             Bounds bounds,
@@ -20,7 +22,7 @@ namespace NOpenType
             Glyph[] glyphs,
             CharacterMap[] cmaps,
             HorizontalMetrics horizontalMetrics,
-            Kern kern)
+            OS2Table os2Table)
         {
             _nameEntry = nameEntry;
             _bounds = bounds;
@@ -28,7 +30,17 @@ namespace NOpenType
             _glyphs = glyphs;
             _cmaps = cmaps;
             _horizontalMetrics = horizontalMetrics;
-            _kern = kern;
+            _os2Table = os2Table;
+        }
+        internal Kern KernTable
+        {
+            get { return _kern; }
+            set { this._kern = value; }
+        }
+        internal Gasp GaspTable
+        {
+            get;
+            set;
         }
         public string Name
         {
@@ -68,6 +80,15 @@ namespace NOpenType
         public ushort UnitsPerEm { get { return _unitsPerEm; } }
         public Glyph[] Glyphs { get { return _glyphs; } }
 
+
+        const int pointsPerInch = 72;
+        public float CalculateScale(float sizeInPointUnit, int resolution = 96)
+        {
+            //  float scale = GlyphPathBuilder.GetFUnitToPixelsScale(size,
+            //glyphPathBuilder.Resolution,
+            //typeface.UnitsPerEm);
+            return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
+        }
 
         GDEF GDEFTable
         {
@@ -117,7 +138,10 @@ namespace NOpenType
             this.BaseTable = baseTable;
             //---------------------------
             //1. fill glyph definition            
-            gdefTable.FillGlyphData(this.Glyphs);
+            if (gdefTable != null)
+            {
+                gdefTable.FillGlyphData(this.Glyphs);
+            }
 
 
 

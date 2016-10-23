@@ -8,15 +8,23 @@ namespace NOpenType
 
     public class Glyph
     {
-        readonly short[] _xs;
-        readonly short[] _ys;
-        readonly ushort[] _contourEndPoints;
-        readonly Bounds _bounds;
-        readonly bool[] _onCurves;
+        short[] _xs;
+        short[] _ys;
+        ushort[] _contourEndPoints;
+        Bounds _bounds;
+        bool[] _onCurves;
         public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new bool[0], new ushort[0], Bounds.Zero);
 
-        public Glyph(short[] xs, short[] ys, bool[] onCurves, ushort[] contourEndPoints, Bounds bounds)
+#if DEBUG
+        public readonly int dbugId;
+        static int s_debugTotalId;
+#endif
+        internal Glyph(short[] xs, short[] ys, bool[] onCurves, ushort[] contourEndPoints, Bounds bounds)
         {
+
+#if DEBUG
+            this.dbugId = s_debugTotalId++;
+#endif
             _xs = xs;
             _ys = ys;
             _onCurves = onCurves;
@@ -30,6 +38,133 @@ namespace NOpenType
         public bool[] OnCurves { get { return _onCurves; } }
         //--------------
 
+        internal static void OffsetXY(Glyph glyph, short dx, short dy)
+        {
+
+            //change data on current glyph
+            short[] xs = glyph._xs;
+            short[] ys = glyph._ys;
+            for (int i = xs.Length - 1; i >= 0; --i)
+            {
+                xs[i] += dx;
+                ys[i] += dy;
+            }
+            //-------------------------
+            Bounds orgBounds = glyph._bounds;
+            glyph._bounds = new Bounds(
+               (short)(orgBounds.XMin + dx),
+               (short)(orgBounds.YMin + dy),
+               (short)(orgBounds.XMax + dx),
+               (short)(orgBounds.YMax + dy));
+
+        }
+        internal static void Apply2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
+        {
+            //x'= |m00 m01|x
+            //y'= |m10 m11|y
+            //--
+            //x' = x*m00+ y*m01
+            //y' = x*m10+ y*m11
+
+
+            //change data on current glyph
+            short new_xmin = 0;
+            short new_ymin = 0;
+            short new_xmax = 0;
+            short new_ymax = 0;
+
+
+            short[] xs = glyph._xs;
+            short[] ys = glyph._ys;
+
+            for (int i = xs.Length - 1; i >= 0; --i)
+            {
+                short x = xs[i];
+                short y = ys[i];
+
+                short newX = xs[i] = (short)Math.Round((x * m00) + (y * m01));
+                short newY = ys[i] = (short)Math.Round((x * m10) + (y * m11));
+
+                //------
+                if (newX < new_xmin)
+                {
+                    new_xmin = newX;
+                }
+                if (newX > new_xmax)
+                {
+                    new_xmax = newX;
+                }
+                //------
+                if (newY < new_ymin)
+                {
+                    new_ymin = newY;
+                }
+                if (newY > new_ymax)
+                {
+                    new_ymax = newY;
+                }
+            }
+            glyph._bounds = new Bounds(
+                new_xmin, new_ymin,
+                new_xmax, new_ymax);
+        }
+        internal static Glyph Clone(Glyph original)
+        {
+            //----------------------
+            short[] new_xs = CloneArray(original._xs);
+            short[] new_ys = CloneArray(original._ys);
+            ushort[] new_contourEndPoints = CloneArray(original._contourEndPoints);
+            bool[] new_onCurves = CloneArray(original._onCurves);
+            return new Glyph(new_xs, new_ys, new_onCurves, new_contourEndPoints, original.Bounds);
+        }
+
+        /// <summary>
+        /// append data from src to dest, dest data will changed***
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dest"></param>
+        internal static void AppendGlyph(Glyph dest, Glyph src)
+        {
+            int org_dest_len = dest._contourEndPoints.Length;
+            int src_contour_count = src._contourEndPoints.Length;
+            ushort org_last_point = (ushort)(dest._contourEndPoints[org_dest_len - 1] + 1); //since start at 0 
+
+            dest._xs = ConcatArray(dest._xs, src._xs);
+            dest._ys = ConcatArray(dest._ys, src._ys);
+            dest._onCurves = ConcatArray(dest._onCurves, src._onCurves);
+            dest._contourEndPoints = ConcatArray(dest._contourEndPoints, src._contourEndPoints);
+
+            //offset latest append contour  end points
+            int newlen = dest._contourEndPoints.Length;
+            for (int i = org_dest_len; i < newlen; ++i)
+            {
+                dest._contourEndPoints[i] += (ushort)org_last_point;
+            }
+            //calculate new bounds
+            Bounds destBound = dest.Bounds;
+            Bounds srcBound = src.Bounds;
+            short newXmin = (short)Math.Min(destBound.XMin, srcBound.XMin);
+            short newYMin = (short)Math.Min(destBound.YMin, srcBound.YMin);
+            short newXMax = (short)Math.Max(destBound.XMax, srcBound.XMax);
+            short newYMax = (short)Math.Max(destBound.YMax, srcBound.YMax);
+
+            dest._bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
+        }
+
+        public static T[] CloneArray<T>(T[] original)
+        {
+            T[] newClone = new T[original.Length];
+            Array.Copy(original, newClone, newClone.Length);
+            return newClone;
+        }
+
+        public static T[] ConcatArray<T>(T[] arr1, T[] arr2)
+        {
+            T[] newArr = new T[arr1.Length + arr2.Length];
+            Array.Copy(arr1, 0, newArr, 0, arr1.Length);
+            Array.Copy(arr2, 0, newArr, arr1.Length, arr2.Length);
+            return newArr;
+        }
 
         internal GlyphClassKind GlyphClassDef { get; set; }
         internal ushort MarkClassDef { get; set; }
