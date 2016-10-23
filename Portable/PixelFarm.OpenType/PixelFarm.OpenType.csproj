@@ -97,8 +97,14 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\GSUB.SubTables.cs">
       <Link>Tables.AdvancedLayout\GSUB.SubTables.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\JustificationTable.cs">
+      <Link>Tables.AdvancedLayout\JustificationTable.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\LigatureCaretListTable.cs">
       <Link>Tables.AdvancedLayout\LigatureCaretListTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\MathTable.cs">
+      <Link>Tables.AdvancedLayout\MathTable.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\ScriptList.cs">
       <Link>Tables.AdvancedLayout\ScriptList.cs</Link>

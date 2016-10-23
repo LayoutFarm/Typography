@@ -1,5 +1,4 @@
-﻿//Apache2,  2016,  WinterDev 
-
+﻿//Apache2,  2016,  WinterDev  
 
 using System;
 using System.Collections.Generic;

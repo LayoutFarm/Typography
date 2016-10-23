@@ -53,9 +53,7 @@ namespace NOpenType.Tables
             short[] offsets = Utils.ReadInt16Array(reader, numRatios);
             //------
             //actual vdmx group
-            for (int i = 0; i < numRatios; ++i)
-            {
-            }
+            //TODO: implement this
         }
         struct Ratio
         {

@@ -1,1 +1,1 @@
-﻿
+﻿//https://www.microsoft.com/typography/otspec/jstf.htm
