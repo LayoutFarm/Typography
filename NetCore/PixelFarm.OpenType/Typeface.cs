@@ -37,6 +37,11 @@ namespace NOpenType
             get { return _kern; }
             set { this._kern = value; }
         }
+        internal Gasp GaspTable
+        {
+            get;
+            set;
+        }
         public string Name
         {
             get { return _nameEntry.FontName; }
