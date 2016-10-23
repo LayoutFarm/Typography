@@ -109,6 +109,33 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\Tags.cs">
       <Link>Tables.AdvancedLayout\Tags.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\HorizontalDeviceMatrics.cs">
+      <Link>Tables.Others\HorizontalDeviceMatrics.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\Kern.cs">
+      <Link>Tables.Others\Kern.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\LinearThreashold.cs">
+      <Link>Tables.Others\LinearThreashold.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\Merge.cs">
+      <Link>Tables.Others\Merge.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\Meta.cs">
+      <Link>Tables.Others\Meta.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\STAT.cs">
+      <Link>Tables.Others\STAT.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\VerticalDeviceMatrics.cs">
+      <Link>Tables.Others\VerticalDeviceMatrics.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\VerticalMatrics.cs">
+      <Link>Tables.Others\VerticalMatrics.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\VerticalMatricsHeader.cs">
+      <Link>Tables.Others\VerticalMatricsHeader.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\Gasp.cs">
       <Link>Tables.TrueType\Gasp.cs</Link>
     </Compile>
@@ -147,9 +174,6 @@
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\HorizontalMetrics.cs">
       <Link>Tables\HorizontalMetrics.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Kern.cs">
-      <Link>Tables\Kern.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\MaxProfile.cs">
       <Link>Tables\MaxProfile.cs</Link>
