@@ -42,6 +42,11 @@ namespace NOpenType
             get;
             set;
         }
+        internal OS2Table OS2Table
+        {
+            get;
+            set;
+        }
         public string Name
         {
             get { return _nameEntry.FontName; }
@@ -83,10 +88,7 @@ namespace NOpenType
 
         const int pointsPerInch = 72;
         public float CalculateScale(float sizeInPointUnit, int resolution = 96)
-        {
-            //  float scale = GlyphPathBuilder.GetFUnitToPixelsScale(size,
-            //glyphPathBuilder.Resolution,
-            //typeface.UnitsPerEm);
+        { 
             return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
         }
 
@@ -141,10 +143,7 @@ namespace NOpenType
             if (gdefTable != null)
             {
                 gdefTable.FillGlyphData(this.Glyphs);
-            }
-
-
-
+            } 
         }
 
     }
