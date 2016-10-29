@@ -6,8 +6,15 @@ using NOpenType.IO;
 using NOpenType.Tables;
 namespace NOpenType
 {
-
-
+    [Flags]
+    public enum ReadFlags
+    {
+        Full = 0,
+        Name = 1,
+        Matrix = 1 << 2,
+        AdvancedLayout = 1 << 3,
+        Variation = 1 << 4
+    }
 
     public class OpenTypeReader
     {
@@ -40,7 +47,7 @@ namespace NOpenType
         }
 
 
-        public Typeface Read(Stream stream)
+        public Typeface Read(Stream stream, ReadFlags readFlags = ReadFlags.Full)
         {
             var little = BitConverter.IsLittleEndian;
             using (var input = new ByteOrderSwappingBinaryReader(stream))
@@ -59,19 +66,19 @@ namespace NOpenType
                 //------------------------------------------------------------------ 
                 OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
                 NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
+
                 Head header = ReadTableIfExists(tables, input, new Head());
                 MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
-                Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
-                GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
-                Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
 
                 //--------------
+                Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
+                GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
+                Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
+                //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
                 VerticalDeviceMatrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMatrics());
-
-
                 //--------------
                 PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
