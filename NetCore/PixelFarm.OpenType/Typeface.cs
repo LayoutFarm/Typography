@@ -11,8 +11,8 @@ namespace NOpenType
         readonly Glyph[] _glyphs;
         readonly CharacterMap[] _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
-        readonly NameEntry _nameEntry;        
-        readonly OS2Table _os2Table;
+        readonly NameEntry _nameEntry;
+
         Kern _kern;
 
         internal Typeface(
@@ -30,7 +30,7 @@ namespace NOpenType
             _glyphs = glyphs;
             _cmaps = cmaps;
             _horizontalMetrics = horizontalMetrics;
-            _os2Table = os2Table;
+            OS2Table = os2Table;
         }
         internal Kern KernTable
         {
@@ -46,6 +46,37 @@ namespace NOpenType
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// OS2 sTypoAscender, in font designed unit
+        /// </summary>
+        public short Ascender
+        {
+            get
+            {
+                return OS2Table.sTypoAscender;
+            }
+        }
+        /// <summary>
+        /// OS2 sTypoDescender, in font designed unit
+        /// </summary>
+        public short Descender
+        {
+            get
+            {
+                return OS2Table.sTypoDescender;
+            }
+        }
+        /// <summary>
+        /// OS2 Linegap
+        /// </summary>
+        public short LineGap
+        {
+            get
+            {
+                return OS2Table.sTypoLineGap;
+            }
         }
         public string Name
         {
@@ -88,7 +119,7 @@ namespace NOpenType
 
         const int pointsPerInch = 72;
         public float CalculateScale(float sizeInPointUnit, int resolution = 96)
-        { 
+        {
             return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
         }
 
@@ -143,7 +174,66 @@ namespace NOpenType
             if (gdefTable != null)
             {
                 gdefTable.FillGlyphData(this.Glyphs);
-            } 
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------
+    namespace Extensions
+    {
+
+        public static class TypefaceExtensions
+        {
+            public static bool DoseSupportUnicode(
+                this Typeface typeface,
+                UnicodeLangBits unicodeLangBits)
+            {
+                if (typeface.OS2Table == null)
+                {
+                    return false;
+                }
+                //-----------------------------
+                long bits = (long)unicodeLangBits;
+                int bitpos = (int)(bits >> 32);
+
+                if (bitpos == 0)
+                {
+                    return true; //default
+                }
+                else if (bitpos < 32)
+                {
+                    //use range 1
+                    return (typeface.OS2Table.ulUnicodeRange1 & (1 << bitpos)) != 0;
+                }
+                else if (bitpos < 64)
+                {
+                    return (typeface.OS2Table.ulUnicodeRange2 & (1 << (bitpos - 32))) != 0;
+                }
+                else if (bitpos < 96)
+                {
+                    return (typeface.OS2Table.ulUnicodeRange3 & (1 << (bitpos - 64))) != 0;
+                }
+                else if (bitpos < 128)
+                {
+                    return (typeface.OS2Table.ulUnicodeRange4 & (1 << (bitpos - 96))) != 0;
+                }
+                else
+                {
+                    throw new System.NotSupportedException();
+                }
+            }
+        }
+        public static class UnicodeLangBitsExtension
+        {
+            public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
+            {
+                long bits = (long)unicodeLangBits;
+                int bitpos = (int)(bits >> 32);
+                int lower32 = (int)(bits & 0xFFFFFFFF);
+                return new UnicodeRangeInfo(bitpos,
+                    lower32 >> 16,
+                    lower32 & 0xFFFF);
+            }
         }
 
     }

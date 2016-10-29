@@ -7,6 +7,8 @@ using System.IO;
 using System.Windows.Forms;
 
 using NOpenType;
+using NOpenType.Extensions;
+
 using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
 
@@ -83,8 +85,7 @@ namespace SampleWinForms
                 return;
             }
             var reader = new OpenTypeReader();
-            char testChar = txtInputChar.Text[0];//only 1 char
-
+            char testChar = txtInputChar.Text[0];//only 1 char 
             int resolution = 96;
 
             using (var fs = new FileStream(fontfile, FileMode.Open))
@@ -93,6 +94,18 @@ namespace SampleWinForms
                 Typeface typeFace = reader.Read(fs);
 
 #if DEBUG
+                //-----
+                //about typeface 
+                short ascender = typeFace.Ascender;
+                short descender = typeFace.Descender;
+                short lineGap = typeFace.LineGap;
+
+                NOpenType.Tables.UnicodeLangBits test = NOpenType.Tables.UnicodeLangBits.Thai;
+                NOpenType.Tables.UnicodeRangeInfo rangeInfo = test.ToUnicodeRangeInfo();
+                bool doseSupport = typeFace.DoseSupportUnicode(test);
+
+
+                //-----
                 string inputstr = "ก่นกิ่น";
                 List<int> outputGlyphIndice = new List<int>();
                 typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
