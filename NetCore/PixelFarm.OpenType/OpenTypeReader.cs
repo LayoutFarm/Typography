@@ -6,6 +6,9 @@ using NOpenType.IO;
 using NOpenType.Tables;
 namespace NOpenType
 {
+
+
+
     public class OpenTypeReader
     {
         /// <summary>
@@ -53,17 +56,17 @@ namespace NOpenType
                 {
                     tables.AddEntry(new UnreadTableEntry(ReadTableHeader(input)));
                 }
-
-                //translate...
+                //------------------------------------------------------------------ 
+                OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
                 NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
                 Head header = ReadTableIfExists(tables, input, new Head());
                 MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
+                Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
                 Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
-                Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
-                OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());           
+
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
                 VerticalDeviceMatrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMatrics());
