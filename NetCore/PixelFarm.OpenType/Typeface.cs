@@ -78,6 +78,19 @@ namespace NOpenType
                 return OS2Table.sTypoLineGap;
             }
         }
+        /// <summary>
+        /// overall calculated line spacing 
+        /// </summary>
+        public int LineSpacing
+        {
+            get
+            {
+                return Ascender - Descender + LineGap;
+            }
+        }
+
+
+
         public string Name
         {
             get { return _nameEntry.FontName; }
