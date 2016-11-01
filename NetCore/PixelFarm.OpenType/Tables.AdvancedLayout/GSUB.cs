@@ -982,7 +982,7 @@ namespace NOpenType.Tables
                     {
                         ushort cur_glyphIndex = glyphIndices[i];
                         //check if this is in input coverage or not
-                        if (IsInRange(InputCoverages, cur_glyphIndex))
+                        if (CoverageTable.IsInRange(InputCoverages, cur_glyphIndex))
                         {
                             //check back tracking or look ahead
                             if (BacktrackingCoverages.Length > 0 && LookaheadCoverages.Length > 0)
@@ -995,7 +995,7 @@ namespace NOpenType.Tables
                                 if (i > 0)
                                 {
                                     //has next glyph
-                                    if (IsInRange(BacktrackingCoverages, glyphIndices[i - 1]))
+                                    if (CoverageTable.IsInRange(BacktrackingCoverages, glyphIndices[i - 1]))
                                     {
                                         //match!, then
                                         //do substitution
@@ -1017,7 +1017,7 @@ namespace NOpenType.Tables
                                 if (i < len - 1)
                                 {
                                     //has next glyph
-                                    if (IsInRange(LookaheadCoverages, glyphIndices[i + 1]))
+                                    if (CoverageTable.IsInRange(LookaheadCoverages, glyphIndices[i + 1]))
                                     {
                                         //match!, then
                                         //do substitution
@@ -1041,22 +1041,7 @@ namespace NOpenType.Tables
                     }
                 }
             }
-            static bool IsInRange(CoverageTable[] coverageTables, ushort cur_glyphIndex)
-            {
-                //just test
-                //TODO: 
-                //reduce loop by make this a dicision table*** 
-                int j = coverageTables.Length;
-                for (int i = 0; i < j; ++i)
-                {
-                    int found = coverageTables[i].FindPosition(cur_glyphIndex);
-                    if (found > -1)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
+
             /// <summary>
             /// LookupType 6: Chaining Contextual Substitution Subtable
             /// </summary>

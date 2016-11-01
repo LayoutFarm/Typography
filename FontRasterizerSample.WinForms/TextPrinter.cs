@@ -96,6 +96,23 @@ namespace SampleWinForms
                 glyphSubstitution.DoSubstitution(inputGlyphs);
             }
 
+            //set glyph position
+            j = inputGlyphs.Count;
+            List<GlyphPos> glyphPositions = new List<GlyphPos>(j);
+            for (int i = 0; i < j; ++i)
+            {
+                ushort glyIndex = inputGlyphs[i];
+                glyphPositions.Add(new GlyphPos(glyIndex));
+            }
+            //--------------
+            //do gpos
+            if (j > 1)
+            {
+                GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, "thai");
+                glyphSetPos.DoGlyphPosition(glyphPositions);
+
+            }
+            //--------------
             float scale = typeface.CalculateScale(size);
             float cx = 0;
             float cy = 0;
@@ -103,12 +120,13 @@ namespace SampleWinForms
 
 
             j = inputGlyphs.Count;
+            glyphPlanBuffer = new List<GlyphPlan>(j);
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];
                 GlyphPlan glyphPlan = new GlyphPlan(glyIndex);
                 glyphPlanBuffer.Add(glyphPlan);
-                
+
                 //-----------------------------------
                 //check if we static vxs/bmp for this glyph
                 //if not, create and cache

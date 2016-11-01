@@ -138,6 +138,24 @@ namespace NOpenType.Tables
             }
 #endif
         }
+
+        //------------------------------------------------------------------------------------------
+        public static bool IsInRange(CoverageTable[] coverageTables, ushort cur_glyphIndex)
+        {
+            //just test
+            //TODO: 
+            //reduce loop by make this a dicision table*** 
+            int j = coverageTables.Length;
+            for (int i = 0; i < j; ++i)
+            {
+                int found = coverageTables[i].FindPosition(cur_glyphIndex);
+                if (found > -1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 }
