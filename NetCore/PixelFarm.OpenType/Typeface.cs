@@ -11,8 +11,8 @@ namespace NOpenType
         readonly Glyph[] _glyphs;
         readonly CharacterMap[] _cmaps;
         readonly HorizontalMetrics _horizontalMetrics;
-        readonly NameEntry _nameEntry;        
-        readonly OS2Table _os2Table;
+        readonly NameEntry _nameEntry;
+
         Kern _kern;
 
         internal Typeface(
@@ -30,7 +30,7 @@ namespace NOpenType
             _glyphs = glyphs;
             _cmaps = cmaps;
             _horizontalMetrics = horizontalMetrics;
-            _os2Table = os2Table;
+            OS2Table = os2Table;
         }
         internal Kern KernTable
         {
@@ -47,6 +47,81 @@ namespace NOpenType
             get;
             set;
         }
+
+        /// <summary>
+        /// OS2 sTypoAscender, in font designed unit
+        /// </summary>
+        public short Ascender
+        {
+            get
+            {
+
+                return OS2Table.sTypoAscender;
+            }
+        }
+        /// <summary>
+        /// OS2 sTypoDescender, in font designed unit
+        /// </summary>
+        public short Descender
+        {
+            get
+            {
+                return OS2Table.sTypoDescender;
+            }
+        }
+        /// <summary>
+        /// OS2 Linegap
+        /// </summary>
+        public short LineGap
+        {
+            get
+            {
+                return OS2Table.sTypoLineGap;
+            }
+        }
+        /// <summary>
+        /// overall calculated line spacing 
+        /// </summary>
+        public int LineSpacing
+        {
+            get
+            {
+
+                //from https://www.microsoft.com/typography/OTSpec/recom.htm#tad
+                //sTypoAscender, sTypoDescender and sTypoLineGap
+                //sTypoAscender is used to determine the optimum offset from the top of a text frame to the first baseline.
+                //sTypoDescender is used to determine the optimum offset from the last baseline to the bottom of the text frame. 
+                //The value of (sTypoAscender - sTypoDescender) is recommended to equal one em.
+                //
+                //While the OpenType specification allows for CJK (Chinese, Japanese, and Korean) fonts' sTypoDescender and sTypoAscender 
+                //fields to specify metrics different from the HorizAxis.ideo and HorizAxis.idtp baselines in the 'BASE' table,
+                //CJK font developers should be aware that existing applications may not read the 'BASE' table at all but simply use 
+                //the sTypoDescender and sTypoAscender fields to describe the bottom and top edges of the ideographic em-box. 
+                //If developers want their fonts to work correctly with such applications, 
+                //they should ensure that any ideographic em-box values in the 'BASE' table describe the same bottom and top edges as the sTypoDescender and
+                //sTypoAscender fields. 
+                //See the sections “OpenType CJK Font Guidelines“ and ”Ideographic Em-Box“ for more details.
+
+                //For Western fonts, the Ascender and Descender fields in Type 1 fonts' AFM files are a good source of sTypoAscender
+                //and sTypoDescender, respectively. 
+                //The Minion Pro font family (designed on a 1000-unit em), 
+                //for example, sets sTypoAscender = 727 and sTypoDescender = -273.
+
+                //sTypoAscender, sTypoDescender and sTypoLineGap specify the recommended line spacing for single-spaced horizontal text.
+                //The baseline-to-baseline value is expressed by:
+                //OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap
+
+                //sTypoLineGap will usually be set by the font developer such that the value of the above expression is approximately 120% of the em.
+                //The application can use this value as the default horizontal line spacing. 
+                //The Minion Pro font family (designed on a 1000-unit em), for example, sets sTypoLineGap = 200.
+
+
+                return Ascender - Descender + LineGap;
+            }
+        }
+
+
+
         public string Name
         {
             get { return _nameEntry.FontName; }
@@ -88,7 +163,7 @@ namespace NOpenType
 
         const int pointsPerInch = 72;
         public float CalculateScale(float sizeInPointUnit, int resolution = 96)
-        { 
+        {
             return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
         }
 
@@ -143,7 +218,66 @@ namespace NOpenType
             if (gdefTable != null)
             {
                 gdefTable.FillGlyphData(this.Glyphs);
-            } 
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------
+    namespace Extensions
+    {
+
+        public static class TypefaceExtensions
+        {
+            public static bool DoseSupportUnicode(
+                this Typeface typeface,
+                UnicodeLangBits unicodeLangBits)
+            {
+                if (typeface.OS2Table == null)
+                {
+                    return false;
+                }
+                //-----------------------------
+                long bits = (long)unicodeLangBits;
+                int bitpos = (int)(bits >> 32);
+
+                if (bitpos == 0)
+                {
+                    return true; //default
+                }
+                else if (bitpos < 32)
+                {
+                    //use range 1
+                    return (typeface.OS2Table.ulUnicodeRange1 & (1 << bitpos)) != 0;
+                }
+                else if (bitpos < 64)
+                {
+                    return (typeface.OS2Table.ulUnicodeRange2 & (1 << (bitpos - 32))) != 0;
+                }
+                else if (bitpos < 96)
+                {
+                    return (typeface.OS2Table.ulUnicodeRange3 & (1 << (bitpos - 64))) != 0;
+                }
+                else if (bitpos < 128)
+                {
+                    return (typeface.OS2Table.ulUnicodeRange4 & (1 << (bitpos - 96))) != 0;
+                }
+                else
+                {
+                    throw new System.NotSupportedException();
+                }
+            }
+        }
+        public static class UnicodeLangBitsExtension
+        {
+            public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
+            {
+                long bits = (long)unicodeLangBits;
+                int bitpos = (int)(bits >> 32);
+                int lower32 = (int)(bits & 0xFFFFFFFF);
+                return new UnicodeRangeInfo(bitpos,
+                    lower32 >> 16,
+                    lower32 & 0xFFFF);
+            }
         }
 
     }

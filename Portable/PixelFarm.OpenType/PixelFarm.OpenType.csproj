@@ -151,6 +151,9 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\GlyphLocations.cs">
       <Link>Tables.TrueType\GlyphLocations.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\AVar.cs">
+      <Link>Tables.Variations\AVar.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\FVar.cs">
       <Link>Tables.Variations\FVar.cs</Link>
     </Compile>
