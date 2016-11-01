@@ -246,7 +246,8 @@ namespace SampleWinForms
             TextPrinter printer = new TextPrinter();
             printer.EnableKerning = this.chkKern.Checked;
             int len = str.Length;
-            GlyphPlan[] glyphPlanList = new GlyphPlan[len];
+            
+            List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
             printer.Print(typeface, sizeInPoint, str, glyphPlanList);
             //--------------------------
 
@@ -259,7 +260,7 @@ namespace SampleWinForms
                 //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 //5.3 
-                int glyphListLen = glyphPlanList.Length;
+                int glyphListLen = glyphPlanList.Count;
 
                 float ox = p.OriginX;
                 float oy = p.OriginY;
@@ -282,7 +283,7 @@ namespace SampleWinForms
                 //user can specific border width here...
                 //p.StrokeWidth = 2;
                 //5.5 
-                int glyphListLen = glyphPlanList.Length;
+                int glyphListLen = glyphPlanList.Count;
                 for (int i = 0; i < glyphListLen; ++i)
                 {
                     GlyphPlan glyphPlan = glyphPlanList[i];

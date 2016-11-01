@@ -16,7 +16,7 @@ namespace NOpenType.Tables
         private CoverageTable()
         {
         }
-        public int FindGlyphIndex(int glyphIndex)
+        public int FindPosition(int glyphIndex)
         {
             switch (_format)
             {
@@ -55,7 +55,7 @@ namespace NOpenType.Tables
                         //not found in range
                         return -1;
                     }
-                    break;
+
             }
             return -1;//not found
         }

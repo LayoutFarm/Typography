@@ -286,13 +286,13 @@ namespace NOpenType
         {
             string lang;
             Typeface typeface;
-
+            GSUB gsubTable;
             List<GSUB.LookupTable> lookupTables;
             public GlyphSubStitution(Typeface typeface, string lang)
             {
                 this.typeface = typeface;
                 //check if this lang has 
-                GSUB gsubTable = typeface.GSUBTable;
+                gsubTable = typeface.GSUBTable;
                 ScriptTable scriptTable = gsubTable.ScriptList.FindScriptTable(lang);
                 if (scriptTable != null)
                 {
@@ -332,10 +332,15 @@ namespace NOpenType
                     }
                 }
             }
-            public void DoSubstitution(ushort[] inputCodePoints, List<ushort> outputCodePoints)
+            public void DoSubstitution(List<ushort> outputCodePoints)
             {
 
-
+                //load
+                int j = lookupTables.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    lookupTables[i].DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
+                }
 
             }
         }
