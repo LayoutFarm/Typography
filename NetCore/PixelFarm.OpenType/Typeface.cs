@@ -328,7 +328,7 @@ namespace NOpenType
                         for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
                         {
                             FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
-                            if (feature.TagName == "ccmp")
+                            if (feature.TagName == "ccmp") //glyph composition/decomposition
                             {
                                 //this version we implement ccmp
                                 features.Add(feature);
@@ -391,9 +391,9 @@ namespace NOpenType
                         for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
                         {
                             FeatureList.FeatureTable feature = gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
-                            //this version we implement ccmp
-                            if (feature.TagName == "mark" ||
-                                feature.TagName == "mkmk")
+                             
+                            if (feature.TagName == "mark" || //mark=> mark to base
+                                feature.TagName == "mkmk")   //mkmk => mark to mask
                             {
                                 //current version we implement this 2 features
                                 features.Add(feature);

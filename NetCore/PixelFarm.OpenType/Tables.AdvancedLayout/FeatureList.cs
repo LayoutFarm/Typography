@@ -7,6 +7,26 @@ using System.Text;
 namespace NOpenType.Tables
 {
 
+    //from https://www.microsoft.com/typography/otfntdev/standot/features.aspx
+    //The order for applying standard features encoded in OpenType fonts:
+
+    //Feature   	Feature function 	                                Layout operation 	Required
+    //---------------------
+    //Language based forms: 		
+    //---------------------
+    //ccmp 	        Character composition/decomposition substitution 	GSUB 	
+    //---------------------
+    //Typographical forms: 
+    //---------------------	
+    //liga 	        Standard ligature substitution 	                    GSUB 	
+    //clig 	        Contextual ligature substitution 	                GSUB 	
+    //Positioning features: 		
+    //kern 	        Pair kerning 	                                    GPOS 	
+    //mark 	        Mark to base positioning 	                        GPOS 	X
+    //mkmk 	        Mark to mark positioning 	                        GPOS 	X
+
+    //[GSUB = glyph substitution, GPOS = glyph positioning]
+
     class FeatureList
     {
 
@@ -143,4 +163,10 @@ namespace NOpenType.Tables
         }
 
     }
+
+
+
+
+
+
 }

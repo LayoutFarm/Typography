@@ -217,7 +217,7 @@ namespace NOpenType.Tables
             }
             public void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
             {
-                
+
                 int j = subTables.Count;
                 for (int i = 0; i < j; ++i)
                 {
@@ -225,7 +225,7 @@ namespace NOpenType.Tables
                 }
             }
             public List<LookupSubTable> SubTables { get { return subTables; } }
-            
+
 #if DEBUG
             public override string ToString()
             {
@@ -525,13 +525,45 @@ namespace NOpenType.Tables
             /// <param name="reader"></param>
             void ReadLookupType4(BinaryReader reader)
             {
+                //The MarkToBase attachment (MarkBasePos) subtable is used to position combining mark glyphs with respect to base glyphs. 
+                //For example, the Arabic, Hebrew, and Thai scripts combine vowels, diacritical marks, and tone marks with base glyphs.
 
+                //In the MarkBasePos subtable, every mark glyph has an anchor point and is associated with a class of marks. 
+                //Each base glyph then defines an anchor point for each class of marks it uses.
+
+                //For example, assume two mark classes: all marks positioned above base glyphs (Class 0),
+                //and all marks positioned below base glyphs (Class 1). 
+                //In this case, each base glyph that uses these marks would define two anchor points, 
+                //one for attaching the mark glyphs listed in Class 0,
+                //and one for attaching the mark glyphs listed in Class 1.
+
+                //To identify the base glyph that combines with a mark,
+                //the text-processing client must look backward in the glyph string from the mark to the preceding base glyph.
+                //To combine the mark and base glyph, the client aligns their attachment points,
+                //positioning the mark with respect to the final pen point (advance) position of the base glyph.
+
+                //The MarkToBase Attachment subtable has one format: MarkBasePosFormat1. 
+                //The subtable begins with a format identifier (PosFormat) and
+                //offsets to two Coverage tables: one that lists all the mark glyphs referenced in the subtable (MarkCoverage), 
+                //and one that lists all the base glyphs referenced in the subtable (BaseCoverage).
+
+                //For each mark glyph in the MarkCoverage table,
+                //a record specifies its class and an offset to the Anchor table that describes the mark's attachment point (MarkRecord).
+                //A mark class is identified by a specific integer, called a class value.
+                //ClassCount specifies the total number of distinct mark classes defined in all the MarkRecords.
+
+                //The MarkBasePosFormat1 subtable also contains an offset to a MarkArray table, 
+                //which contains all the MarkRecords stored in an array (MarkRecord) by MarkCoverage Index. 
+                //A MarkArray table also contains a count of the defined MarkRecords (MarkCount). 
+                //(For details about MarkArrays and MarkRecords, see the end of this chapter.)
+
+                //The MarkBasePosFormat1 subtable also contains an offset to a BaseArray table (BaseArray).
 
                 //MarkBasePosFormat1 subtable: MarkToBase attachment point
                 //Value 	Type 	Description
                 //USHORT 	PosFormat 	Format identifier-format = 1
-                //Offset 	MarkCoverage 	Offset to MarkCoverage table-from beginning of MarkBasePos subtable
-                //Offset 	BaseCoverage 	Offset to BaseCoverage table-from beginning of MarkBasePos subtable
+                //Offset 	MarkCoverage 	Offset to MarkCoverage table-from beginning of MarkBasePos subtable ( all the mark glyphs referenced in the subtable)
+                //Offset 	BaseCoverage 	Offset to BaseCoverage table-from beginning of MarkBasePos subtable (all the base glyphs referenced in the subtable)
                 //USHORT 	ClassCount 	Number of classes defined for marks
                 //Offset 	MarkArray 	Offset to MarkArray table-from beginning of MarkBasePos subtable
                 //Offset 	BaseArray 	Offset to BaseArray table-from beginning of MarkBasePos subtable
