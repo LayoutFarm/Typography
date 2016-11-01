@@ -53,7 +53,11 @@ namespace NOpenType.Tables
             //1. header
             //GSUB Header
 
-            //The GSUB table begins with a header that contains a version number for the table (Version) and offsets to a three tables: ScriptList, FeatureList, and LookupList. For descriptions of each of these tables, see the chapter, OpenType Common Table Formats. Example 1 at the end of this chapter shows a GSUB Header table definition.
+            //The GSUB table begins with a header that contains a version number for the table (Version) and
+            //offsets to a three tables: ScriptList, FeatureList, and LookupList. 
+            //For descriptions of each of these tables, see the chapter, 
+            //OpenType Common Table Formats. Example 1 at the end of this chapter shows a GSUB Header table definition.
+
             //GSUB Header, Version 1.0
             //Type 	Name 	Description
             //USHORT 	MajorVersion 	Major version of the GSUB table, = 1
@@ -95,9 +99,16 @@ namespace NOpenType.Tables
             }
 
         }
+
         public ushort MajorVersion { get; private set; }
         public ushort MinorVersion { get; private set; }
 
+        public ScriptList ScriptList { get { return scriptList; } }
+        public FeatureList FeatureList { get { return featureList; } }
+        public LookupTable GetLookupTable(int index)
+        {
+            return lookupTables[index];
+        }
 
 
         void ReadLookupListTable(BinaryReader reader, long lookupListHeadPos)
@@ -183,19 +194,21 @@ namespace NOpenType.Tables
         {
             throw new NotImplementedException();
         }
+        
 
-        internal struct LookupResult
-        {
 
-            public readonly LookupSubTable foundOnTable;
-            public readonly int foundAtIndex;
-            public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
-            {
-                this.foundAtIndex = foundAtIndex;
-                this.foundOnTable = foundOnTable;
-            }
+        //internal struct LookupResult
+        //{
 
-        }
+        //    public readonly LookupSubTable foundOnTable;
+        //    public readonly int foundAtIndex;
+        //    public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
+        //    {
+        //        this.foundAtIndex = foundAtIndex;
+        //        this.foundOnTable = foundOnTable;
+        //    }
+
+        //}
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
@@ -248,21 +261,21 @@ namespace NOpenType.Tables
                 //}
                 //return -1;
             }
-            public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
-            {
-                throw new NotSupportedException();
-                //check if input glyphIndex is in coverage area 
-                //for (int i = subTables.Count - 1; i >= 0; --i)
-                //{
-                //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-                //    if (foundAtIndex > -1)
-                //    {
-                //        //found                        
-                //        outputResults.Add(new LookupResult(subTables[i], i));
-                //    }
-                //}
+            //public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
+            //{
+            //    throw new NotSupportedException();
+            //    //check if input glyphIndex is in coverage area 
+            //    //for (int i = subTables.Count - 1; i >= 0; --i)
+            //    //{
+            //    //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+            //    //    if (foundAtIndex > -1)
+            //    //    {
+            //    //        //found                        
+            //    //        outputResults.Add(new LookupResult(subTables[i], i));
+            //    //    }
+            //    //}
 
-            }
+            //}
             public void ReadRecordContent(BinaryReader reader)
             {
                 switch (lookupType)
@@ -970,27 +983,27 @@ namespace NOpenType.Tables
             }
         }
 
-        public bool CheckSubstitution(int inputGlyph)
-        {
-            List<GSUB.LookupResult> foundResults = new List<LookupResult>();
-            for (int i = lookupTables.Length - 1; i >= 0; --i)
-            {
-                LookupTable lookup = lookupTables[i];
-                if (lookup.lookupType != 1)
-                {
-                    //this version, handle only type1
-                    //TODO: implement more
-                    continue;
-                }
-                int foundIndex = lookup.FindGlyphIndex(inputGlyph);
-                if (foundIndex > -1)
-                {
-                    //found here 
-                    lookup.FindGlyphIndexAll(inputGlyph, foundResults);
-                }
-            }
-            return false;
-        }
+        //public bool CheckSubstitution(int inputGlyph)
+        //{
+        //    List<GSUB.LookupResult> foundResults = new List<LookupResult>();
+        //    for (int i = lookupTables.Length - 1; i >= 0; --i)
+        //    {
+        //        LookupTable lookup = lookupTables[i];
+        //        if (lookup.lookupType != 1)
+        //        {
+        //            //this version, handle only type1
+        //            //TODO: implement more
+        //            continue;
+        //        }
+        //        int foundIndex = lookup.FindGlyphIndex(inputGlyph);
+        //        if (foundIndex > -1)
+        //        {
+        //            //found here 
+        //            lookup.FindGlyphIndexAll(inputGlyph, foundResults);
+        //        }
+        //    }
+        //    return false;
+        //}
 
     }
 }

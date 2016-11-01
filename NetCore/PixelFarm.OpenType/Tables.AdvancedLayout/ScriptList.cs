@@ -15,7 +15,7 @@ namespace NOpenType.Tables
         //Language system tables reference features, which are defined in the FeatureList. 
         //Each feature table references the lookup data defined in the LookupList that describes how, when, and where to implement the feature.
 
-        ScriptRecord[] scriptRecords;
+
         ScriptTable[] scriptTables;
         struct ScriptRecord
         {
@@ -39,10 +39,22 @@ namespace NOpenType.Tables
         }
 
 
+        public ScriptTable FindScriptTable(string scriptTagName)
+        {
+            for (int i = scriptTables.Length - 1; i >= 0; --i)
+            {
+                if (scriptTables[i].ScriptTagName == scriptTagName)
+                {
+                    return scriptTables[i];
+                }
+            }
+            return null;
+        }
+
         public static ScriptList CreateFrom(BinaryReader reader, long beginAt)
         {
 
-      
+
 
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
 
@@ -60,7 +72,7 @@ namespace NOpenType.Tables
 
             ScriptList scriptList = new ScriptList();
             ushort scriptCount = reader.ReadUInt16();
-            ScriptRecord[] scRecords = scriptList.scriptRecords = new ScriptRecord[scriptCount];
+            ScriptRecord[] scRecords = new ScriptRecord[scriptCount];
 
             for (int i = 0; i < scriptCount; ++i)
             {

@@ -167,22 +167,22 @@ namespace NOpenType
             return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
         }
 
-        GDEF GDEFTable
+        internal GDEF GDEFTable
         {
             get;
             set;
         }
-        GSUB GSUBTable
+        internal GSUB GSUBTable
         {
             get;
             set;
         }
-        GPOS GPOSTable
+        internal GPOS GPOSTable
         {
             get;
             set;
         }
-        BASE BaseTable
+        internal BASE BaseTable
         {
             get;
             set;
@@ -279,6 +279,67 @@ namespace NOpenType
                     lower32 & 0xFFFF);
             }
         }
+
+
+        //TODO: move to another file
+        public class GlyphSubStitution
+        {
+            string lang;
+            Typeface typeface;
+
+            List<GSUB.LookupTable> lookupTables;
+            public GlyphSubStitution(Typeface typeface, string lang)
+            {
+                this.typeface = typeface;
+                //check if this lang has 
+                GSUB gsubTable = typeface.GSUBTable;
+                ScriptTable scriptTable = gsubTable.ScriptList.FindScriptTable(lang);
+                if (scriptTable != null)
+                {
+                    ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
+
+                    if (defaultLang.HasRequireFeature)
+                    {
+
+                    }
+                    //other feature
+                    if (defaultLang.featureIndexList != null)
+                    {
+                        //get features 
+                        var features = new List<FeatureList.FeatureTable>();
+                        for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
+                        {
+                            FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
+                            if (feature.TagName == "ccmp")
+                            {
+                                //this version we implement ccmp
+                                features.Add(feature);
+                            }
+                        }
+                        //-----------------------
+
+                        lookupTables = new List<GSUB.LookupTable>();
+                        int j = features.Count;
+                        for (int i = 0; i < j; ++i)
+                        {
+                            FeatureList.FeatureTable feature = features[i];
+                            ushort[] lookupListIndices = feature.LookupListIndice;
+                            foreach (ushort lookupIndex in lookupListIndices)
+                            {
+                                lookupTables.Add(gsubTable.GetLookupTable(lookupIndex));
+                            }
+                        }
+                    }
+                }
+            }
+            public void DoSubstitution(ushort[] inputCodePoints, List<ushort> outputCodePoints)
+            {
+
+
+
+            }
+        }
+
 
     }
 }

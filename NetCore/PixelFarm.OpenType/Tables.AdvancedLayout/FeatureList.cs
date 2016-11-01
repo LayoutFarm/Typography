@@ -11,7 +11,7 @@ namespace NOpenType.Tables
     {
 
 
-        FeatureTable[] featureTables;
+        public FeatureTable[] featureTables;
         public static FeatureList CreateFrom(BinaryReader reader, long beginAt)
         {
             //https://www.microsoft.com/typography/otspec/chapter2.htm
@@ -41,7 +41,7 @@ namespace NOpenType.Tables
             {
                 FeatureRecord frecord = featureRecords[i];
                 (featureTables[i] = FeatureTable.CreateFrom(reader, beginAt + frecord.offset)).FeatureTag = frecord.featureTag;
-            } 
+            }
             return featureList;
         }
         struct FeatureRecord
@@ -102,7 +102,7 @@ namespace NOpenType.Tables
         //USHORT 	LookupCount 	Number of LookupList indices for this feature
         //USHORT 	LookupListIndex[LookupCount] 	Array of LookupList indices for this feature -zero-based (first lookup is LookupListIndex = 0)
 
-        class FeatureTable
+        public class FeatureTable
         {
 
             ushort[] lookupListIndice;
@@ -117,6 +117,13 @@ namespace NOpenType.Tables
                 featureTable.lookupListIndice = Utils.ReadUInt16Array(reader, lookupCount);
 
                 return featureTable;
+            }
+            public ushort[] LookupListIndice
+            {
+                get
+                {
+                    return lookupListIndice;
+                }
             }
             public uint FeatureTag
             {

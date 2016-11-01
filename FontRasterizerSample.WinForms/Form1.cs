@@ -31,7 +31,7 @@ namespace SampleWinForms
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTypePlanAndMiniAgg);
-            cmbRenderChoices.SelectedIndex = 0;
+            cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
 
@@ -106,7 +106,8 @@ namespace SampleWinForms
 
 
                 //-----
-                string inputstr = "ก่นกิ่น";
+                //string inputstr = "ก่นกิ่น";
+                string inputstr = "ญญู";
                 List<int> outputGlyphIndice = new List<int>();
                 typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
 #endif

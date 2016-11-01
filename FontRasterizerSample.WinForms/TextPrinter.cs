@@ -3,7 +3,10 @@ using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using NOpenType;
+using NOpenType.Extensions;
+
 using PixelFarm.Agg;
+
 namespace SampleWinForms
 {
 
@@ -65,23 +68,35 @@ namespace SampleWinForms
             //1. convert char[] to glyph[]
             //2. send to shaping engine
             //3. layout position of each glyph 
-            //---------------------------------------------- 
-
+            //----------------------------------------------  
             var glyphPathBuilder = new GlyphPathBuilderVxs(typeface);
             int j = str.Length;
+
+            //TODO:....
+            //2.  
+            //shaping,
+            //glyph substitution
+
+            ushort[] inputGlyphs = new ushort[j];
+            for (int i = 0; i < j; ++i)
+            {
+                //1st
+                var glyphPlan = new GlyphPlan();
+                inputGlyphs[i] = glyphPlan.glyphIndex = (ushort)typeface.LookupIndex(str[i]);
+                glyphPlanBuffer[i] = glyphPlan;
+            }
+
+
             if (j > 1)
             {
                 //for debug
+                //test for thai lang
+                List<ushort> outputCodePoints = new List<ushort>();
+                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, "thai");
+                glyphSubstitution.DoSubstitution(inputGlyphs, outputCodePoints);
+
             }
-            //TODO:....
-            //2.  
-            //shaping, glyph substitution
-            for (int i = 0; i < j; ++i)
-            {
-                var glyphPlan = new GlyphPlan();
-                glyphPlan.glyphIndex = (ushort)typeface.LookupIndex(str[i]);
-                glyphPlanBuffer[i] = glyphPlan;
-            }
+
 
 
             float scale = typeface.CalculateScale(size);

@@ -9,6 +9,9 @@ namespace NOpenType.Tables
 
     partial class GSUB : TableEntry
     {
+        /// <summary>
+        /// base class of lookup sub table
+        /// </summary>
         internal abstract class LookupSubTable
         {
             public int Format
