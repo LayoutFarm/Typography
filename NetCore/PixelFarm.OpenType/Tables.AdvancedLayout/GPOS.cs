@@ -516,7 +516,25 @@ namespace NOpenType.Tables
                 public MarkArrayTable MarkArrayTable { get; set; }
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    //find marker
+                    int j = inputGlyphs.Count;
+                    for (int i = 0; i < j; ++i)
+                    {
+                        int markFound = MarkCoverageTable.FindPosition(inputGlyphs[i].glyphIndex);
+                        if (markFound > -1)
+                        {
+                            if (i > -1)
+                            {
+                                //look back for base
+                                int baseFound = BaseCoverageTable.FindPosition(inputGlyphs[i - 1].glyphIndex);
+                                if (baseFound > -1)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
             /// <summary>

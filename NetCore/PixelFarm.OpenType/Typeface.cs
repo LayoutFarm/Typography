@@ -226,7 +226,7 @@ namespace NOpenType
     //------------------------------------------------------------------------------------------------------
     public class GlyphPos
     {
-        public ushort glyphIndex;
+        public readonly ushort glyphIndex;
         public GlyphPos(ushort glyphIndex)
         {
             this.glyphIndex = glyphIndex;
@@ -391,7 +391,7 @@ namespace NOpenType
                         for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
                         {
                             FeatureList.FeatureTable feature = gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
-                             
+
                             if (feature.TagName == "mark" || //mark=> mark to base
                                 feature.TagName == "mkmk")   //mkmk => mark to mask
                             {
