@@ -505,6 +505,9 @@ namespace NOpenType.Tables
             }
 
             //-------------------------------------------------------------------------
+            /// <summary>
+            /// Lookup Type 4:MarkToBase Attachment Positioning, or called (MarkBasePos) table
+            /// </summary>
             class LkSubTableType4 : LookupSubTable
             {
                 public LkSubTableType4()
@@ -514,6 +517,7 @@ namespace NOpenType.Tables
                 public CoverageTable BaseCoverageTable { get; set; }
                 public BaseArrayTable BaseArrayTable { get; set; }
                 public MarkArrayTable MarkArrayTable { get; set; }
+
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
                     //find marker
@@ -534,8 +538,25 @@ namespace NOpenType.Tables
                             }
                         }
                     }
+                }
+#if DEBUG
+                public void dbugTest()
+                {
+                    //count base covate
+                    ushort[] expandedMarks = MarkCoverageTable.dbugGetExpandedGlyphs();
+                    if (expandedMarks.Length != MarkArrayTable.dbugGetAnchorCount())
+                    {
+                        throw new NotSupportedException();
+                    }
+                    //--------------------------
+                    ushort[] expandedBase = BaseCoverageTable.dbugGetExpandedGlyphs();
+                    if (expandedBase.Length != BaseArrayTable.dbugGetRecordCount())
+                    {
+                        throw new NotSupportedException();
+                    }
 
                 }
+#endif
             }
             /// <summary>
             /// Lookup Type 4: MarkToBase Attachment Positioning Subtable
@@ -610,7 +631,7 @@ namespace NOpenType.Tables
                     }
                     short markCoverageOffset = reader.ReadInt16(); //offset from 
                     short baseCoverageOffset = reader.ReadInt16();
-                    ushort classCount = reader.ReadUInt16();
+                    ushort mark_classCount = reader.ReadUInt16();
                     short markArrayOffset = reader.ReadInt16();
                     short baseArrayOffset = reader.ReadInt16();
 
@@ -625,8 +646,11 @@ namespace NOpenType.Tables
                     //---------------------------------------------------------------------------                     
                     lookupType4.MarkArrayTable = MarkArrayTable.CreateFrom(reader, subtableStart + markArrayOffset);
                     //---------------------------------------------------------------------------                     
-                    lookupType4.BaseArrayTable = BaseArrayTable.CreateFrom(reader, subtableStart + baseArrayOffset, classCount);
+                    lookupType4.BaseArrayTable = BaseArrayTable.CreateFrom(reader, subtableStart + baseArrayOffset, mark_classCount);
                     //---------------------------------------------------------------------------
+#if DEBUG
+                    lookupType4.dbugTest();
+#endif
                     this.subTables.Add(lookupType4);
                 }
             }
@@ -693,11 +717,16 @@ namespace NOpenType.Tables
                     this.subTables.Add(subTable);
                 }
             }
+
+
+            //-----------------------------------------------------------------
+            /// <summary>
+            /// Lookup Type 6: MarkToMark Attachment
+            /// </summary>
             class LkSubTableType6 : LookupSubTable
             {
                 public CoverageTable MarkCoverage1 { get; set; }
                 public CoverageTable MarkCoverage2 { get; set; }
-                public CoverageTable LigatureCoverage { get; set; }
                 public MarkArrayTable Mark1ArrayTable { get; set; }
                 public Mark2ArrayTable Mark2ArrayTable { get; set; }
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)

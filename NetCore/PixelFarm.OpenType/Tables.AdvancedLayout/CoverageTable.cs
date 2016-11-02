@@ -10,8 +10,11 @@ namespace NOpenType.Tables
     {
         //https://www.microsoft.com/typography/otspec/chapter2.htm
         ushort _format;
-        RangeRecord[] ranges;
-        ushort[] orderedGlyphIdList;
+        ushort[] orderedGlyphIdList; //for format1
+        //----------------------------------
+        int[] rangeOffsets;
+        RangeRecord[] ranges;//for format2
+        //----------------------------------
 
         private CoverageTable()
         {
@@ -42,14 +45,17 @@ namespace NOpenType.Tables
                     break;
                 case 2:
                     {
-                        //search in range
+                        //return 'logical' coverage index
+
                         for (int i = ranges.Length - 1; i >= 0; --i)
                         {
                             RangeRecord range = ranges[i];
                             if (range.Contains(glyphIndex))
                             {
                                 //found
-                                return i;
+                                //(glyphIndex - range.start) -> local offset
+                                //then + overall rangeOffsets 
+                                return (glyphIndex - range.start) + rangeOffsets[i];
                             }
                         }
                         //not found in range
@@ -94,11 +100,33 @@ namespace NOpenType.Tables
                                 reader.ReadUInt16());
                         }
                         coverageTable.ranges = ranges;
+                        coverageTable.UpdateRangeOffsets();
                     }
                     break;
 
             }
             return coverageTable;
+        }
+
+        void UpdateRangeOffsets()
+        {
+            //for format 2
+#if DEBUG
+            if (this._format != 2)
+            {
+                throw new NotSupportedException();
+            }
+#endif
+            int j = ranges.Length;
+            int total = 0;
+            rangeOffsets = new int[j];
+            for (int i = 0; i < j; ++i)
+            {
+                RangeRecord r = ranges[i];
+                rangeOffsets[i] = total;
+                total += r.Width;
+            }
+
         }
 
         public static CoverageTable[] CreateMultipleCoverageTables(long initPos, short[] offsets, BinaryReader reader)
@@ -129,7 +157,10 @@ namespace NOpenType.Tables
             public bool Contains(int glyphIndex)
             {
                 return glyphIndex >= start && glyphIndex <= end;
-
+            }
+            public int Width
+            {
+                get { return end - start + 1; }
             }
 #if DEBUG
             public override string ToString()
@@ -156,6 +187,34 @@ namespace NOpenType.Tables
             }
             return false;
         }
+#if DEBUG
+        public ushort[] dbugGetExpandedGlyphs()
+        {
+            switch (_format)
+            {
+                default:
+                    throw new NotSupportedException();
+                case 1:
+                    return orderedGlyphIdList;
+                case 2:
+                    {
+                        List<ushort> list = new List<ushort>();
+                        int j = ranges.Length;
+                        for (int i = 0; i < j; ++i)
+                        {
+                            RangeRecord range = ranges[i];
+                            for (ushort n = range.start; n <= range.end; ++n)
+                            {
+                                list.Add(n);
+                            }
+                        }
+                        return list.ToArray();
+                    }
+
+            }
+
+        }
+#endif
     }
 
 }

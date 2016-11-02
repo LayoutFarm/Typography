@@ -18,21 +18,25 @@ namespace NOpenType.Tables
         public static short[] ReadInt16Array(BinaryReader reader, int nRecords)
         {
             short[] arr = new short[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            int i = 0;
+            for (int n = nRecords - 1; n >= 0; --n)
             {
-                arr[i] = reader.ReadInt16();
+                arr[i++] = reader.ReadInt16();
             }
+
             return arr;
         }
         public static ushort[] ReadUInt16Array(BinaryReader reader, int nRecords)
         {
             ushort[] arr = new ushort[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            int i = 0;
+            for (int n = nRecords - 1; n >= 0; --n)
             {
-                arr[i] = reader.ReadUInt16();
+                arr[i++] = reader.ReadUInt16();
             }
+            
             return arr;
         }
-       
+
     }
 }

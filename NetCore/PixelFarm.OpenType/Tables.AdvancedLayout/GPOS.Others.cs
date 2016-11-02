@@ -317,7 +317,7 @@ namespace NOpenType.Tables
             // MarkArray table
             //Value 	Type 	Description
             //USHORT 	MarkCount 	Number of MarkRecords
-            //struct 	MarkRecord[MarkCount] 	Array of MarkRecords-in Coverage order
+            //struct 	MarkRecord[MarkCount] 	Array of MarkRecords in Coverage order
             //MarkRecord
             //Value 	Type 	Description
             //USHORT 	Class 	Class defined for this mark
@@ -331,6 +331,7 @@ namespace NOpenType.Tables
                 records = new MarkRecord[markCount];
                 for (int i = 0; i < markCount; ++i)
                 {
+                    //1 mark : 1 anchor
                     records[i] = new MarkRecord(
                         reader.ReadUInt16(),//mark class
                         reader.ReadInt16()); //offset to anchor table
@@ -352,6 +353,12 @@ namespace NOpenType.Tables
                 }
 
             }
+#if DEBUG
+            public int dbugGetAnchorCount()
+            {
+                return anchorPoints.Length;
+            }
+#endif
             public static MarkArrayTable CreateFrom(BinaryReader reader, long beginAt)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -469,9 +476,16 @@ namespace NOpenType.Tables
                 {
 
                     short[] offsets = baseRecs[i].offsets;
-                    int m = offsets.Length;
-                    AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[m];
-                    for (int n = 0; n < m; ++n)
+#if DEBUG
+                    if (classCount != offsets.Length)
+                    {
+                        throw new NotSupportedException();
+                    }
+#endif
+                    //each base has anchor point for mark glyph'class
+
+                    AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[classCount];
+                    for (int n = 0; n < classCount; ++n)
                     {
                         short offset = offsets[n];
                         if (offset < 0)
@@ -487,12 +501,22 @@ namespace NOpenType.Tables
 
                 return baseArrTable;
             }
+
+#if DEBUG
+            public int dbugGetRecordCount()
+            {
+                return records.Length;
+            }
+#endif
+          
         }
         struct BaseRecord
         {
             //BaseRecord
             //Value 	Type 	Description
-            //Offset 	BaseAnchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of BaseArray table-ordered by class-zero-based
+            //Offset 	BaseAnchor[ClassCount] 	Array of offsets (one per class) to 
+            //Anchor tables-from beginning of BaseArray table-ordered by class-zero-based
+
             public short[] offsets;
             public AnchorPoint[] anchors;
             public BaseRecord(short[] offsets)
