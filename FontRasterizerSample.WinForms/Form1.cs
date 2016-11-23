@@ -205,7 +205,7 @@ namespace SampleWinForms
                 p.Draw(vxs);
             }
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            BitmapHelper.CopyToWindowsBitmap(destImg, winBmp, new RectInt(0, 0, 300, 300));
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
@@ -298,7 +298,7 @@ namespace SampleWinForms
                 p.SetOrigin(ox, oy);
             }
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            BitmapHelper.CopyToWindowsBitmap(destImg, winBmp, new RectInt(0, 0, 300, 300));
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
