@@ -30,7 +30,7 @@ namespace SampleWinForms
 
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithTypePlanAndMiniAgg);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
@@ -51,7 +51,7 @@ namespace SampleWinForms
         {
             RenderWithMiniAgg,
             RenderWithPlugableGlyphRasterizer, //new 
-            RenderWithTypePlanAndMiniAgg, //new
+            RenderWithTextPrinterAndMiniAgg, //new
         }
 
         void Form1_Load(object sender, EventArgs e)
@@ -124,7 +124,7 @@ namespace SampleWinForms
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
-                    case RenderChoice.RenderWithTypePlanAndMiniAgg:
+                    case RenderChoice.RenderWithTextPrinterAndMiniAgg:
                         RenderWithTextPrinterAndMiniAgg(typeFace, this.txtInputChar.Text, fontSizeInPoint, resolution);
                         break;
                     default:
@@ -284,11 +284,18 @@ namespace SampleWinForms
                 //p.StrokeWidth = 2;
                 //5.5 
                 int glyphListLen = glyphPlanList.Count;
+                float ox = p.OriginX;
+                float oy = p.OriginY;
+                float cx = 0;
+                float cy = 10;
                 for (int i = 0; i < glyphListLen; ++i)
                 {
                     GlyphPlan glyphPlan = glyphPlanList[i];
+                    cx = glyphPlan.x;
+                    p.SetOrigin(cx, cy);
                     p.Draw(glyphPlan.vxs);
                 }
+                p.SetOrigin(ox, oy);
             }
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
             BitmapHelper.CopyToWindowsBitmap(destImg, winBmp, new RectInt(0, 0, 300, 300));

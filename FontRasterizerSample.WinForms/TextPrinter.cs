@@ -108,8 +108,8 @@ namespace SampleWinForms
             //do gpos
             if (j > 1)
             {
-                GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, "thai");
-                glyphSetPos.DoGlyphPosition(glyphPositions);
+                //GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, "thai");
+                //glyphSetPos.DoGlyphPosition(glyphPositions);
 
             }
             //--------------
@@ -120,7 +120,7 @@ namespace SampleWinForms
 
 
             j = inputGlyphs.Count;
-            glyphPlanBuffer = new List<GlyphPlan>(j);
+         
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];
