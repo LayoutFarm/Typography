@@ -50,12 +50,12 @@ namespace PixelFarm.Agg
             public const int MASK = SCALE - 1;   //----image_subpixel_mask 
         }
 
-        void Calculate(Image.IImageFilter filter)
+        void Calculate(Imaging.IImageFilter filter)
         {
             Calculate(filter, true);
         }
 
-        void Calculate(Image.IImageFilter filter, bool normalization)
+        void Calculate(Imaging.IImageFilter filter, bool normalization)
         {
             double r = filter.GetRadius();
             ReallocLut(r);
@@ -82,11 +82,11 @@ namespace PixelFarm.Agg
             m_radius = m_diameter = m_start = 0;
         }
 
-        public ImageFilterLookUpTable(Image.IImageFilter filter)
+        public ImageFilterLookUpTable(Imaging.IImageFilter filter)
             : this(filter, true)
         {
         }
-        public ImageFilterLookUpTable(Image.IImageFilter filter, bool normalization)
+        public ImageFilterLookUpTable(Imaging.IImageFilter filter, bool normalization)
         {
             m_weight_array = new int[256];
             Calculate(filter, normalization);

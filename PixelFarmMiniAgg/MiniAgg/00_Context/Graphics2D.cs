@@ -18,7 +18,7 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-using PixelFarm.Agg.Image;
+using PixelFarm.Agg.Imaging;
 using PixelFarm.Agg.Transform;
 namespace PixelFarm.Agg
 {
@@ -27,18 +27,26 @@ namespace PixelFarm.Agg
         protected ActualImage destActualImage;
         protected ScanlineRasterizer sclineRas;
         Affine currentTxMatrix = Affine.IdentityMatrix;
-         
+
         //------------------------------------------------------------------------
 
         public abstract void SetClippingRect(RectInt rect);
         public abstract RectInt GetClippingRect();
         public abstract void Clear(Drawing.Color color);
         //------------------------------------------------------------------------
-        //render vertices
+        /// <summary>
+        /// we do NOT store vxs
+        /// </summary>
+        /// <param name="vertexSource"></param>
+        /// <param name="c"></param>
         public abstract void Render(VertexStoreSnap vertexSource, Drawing.Color c);
         //------------------------------------------------------------------------
 
-
+        /// <summary>
+        /// we do NOT store vxs
+        /// </summary>
+        /// <param name="vxs"></param>
+        /// <param name="c"></param>
         public void Render(VertexStore vxs, Drawing.Color c)
         {
             Render(new VertexStoreSnap(vxs), c);
@@ -79,9 +87,9 @@ namespace PixelFarm.Agg
             set;
         }
         //================
-        public static ImageGraphics2D CreateFromImage(ActualImage actualImage,PixelFarm.Drawing.GraphicsPlatform gfxPlatform)
+        public static ImageGraphics2D CreateFromImage(ActualImage actualImage)
         {
-            return new ImageGraphics2D(actualImage, gfxPlatform);
+            return new ImageGraphics2D(actualImage);
         }
         public abstract bool UseSubPixelRendering
         {
@@ -91,13 +99,21 @@ namespace PixelFarm.Agg
 
 
 #if DEBUG
+        VertexStore dbug_v1 = new VertexStore(8);
+        VertexStore dbug_v2 = new VertexStore();
+        Stroke dbugStroke = new Stroke(1);
         public void dbugLine(double x1, double y1, double x2, double y2, Drawing.Color color)
         {
-            VertexStore vxs = new VertexStore(8);
-            vxs.AddMoveTo(x1, y1);
-            vxs.AddLineTo(x2, y2);
-            vxs.AddStop();
-            Render(new Stroke(1).MakeVxs(vxs), color);
+
+
+            dbug_v1.AddMoveTo(x1, y1);
+            dbug_v1.AddLineTo(x2, y2);
+            dbug_v1.AddStop();
+
+            dbugStroke.MakeVxs(dbug_v1, dbug_v2);
+            Render(dbug_v2, color);
+            dbug_v1.Clear();
+            dbug_v2.Clear();
         }
 #endif
 

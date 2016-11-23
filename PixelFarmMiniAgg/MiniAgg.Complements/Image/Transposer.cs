@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 
 using PixelFarm.Drawing;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     //=======================================================pixfmt_transposer
     public sealed class FormatTransposer : ProxyImage

@@ -98,7 +98,9 @@ namespace PixelFarm.Agg
         }
         public void Fill(ActualImage img, int x, int y)
         {
-            Fill(new MyImageReaderWriter(img), x, y);
+            var imgReadWrite = new MyImageReaderWriter();
+            imgReadWrite.ReloadImage(img);
+            Fill(imgReadWrite, x, y);
         }
         public void Fill(ImageReaderWriterBase bufferToFillOn, int x, int y)
         {

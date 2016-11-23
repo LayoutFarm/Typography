@@ -7,7 +7,7 @@
 
 using System;
 using PixelFarm.VectorMath;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     public struct PointF
     {
@@ -179,6 +179,9 @@ namespace PixelFarm.Agg.Image
         ActualImage srcImageInput;
         int srcW = 0;
         int srcH = 0;
+        public FreeTransform()
+        {
+        }
         public ActualImage Bitmap
         {
             get
@@ -194,7 +197,8 @@ namespace PixelFarm.Agg.Image
                 try
                 {
                     this.srcImageInput = value;
-                    this.srcCB = new MyImageReaderWriter(value);
+                    this.srcCB = new MyImageReaderWriter();
+                    srcCB.ReloadImage(value);
                     srcH = value.Height;
                     srcW = value.Width;
                 }
@@ -208,9 +212,7 @@ namespace PixelFarm.Agg.Image
         public Point ImageLocation
         {
             //left bottom?
-            get { return new Point(rect.Left, rect.Bottom); }
-            //set { rect.Location = value; }
-
+            get { return new Point(rect.Left, rect.Bottom); } 
         }
 
         bool isBilinear = false;
@@ -325,7 +327,8 @@ namespace PixelFarm.Agg.Image
         ActualImage GetTransformedBitmapNoInterpolation()
         {
             var destCB = new ActualImage(rect.Width, rect.Height, PixelFormat.ARGB32);
-            var destWriter = new MyImageReaderWriter(destCB);
+            var destWriter = new MyImageReaderWriter();
+            destWriter.ReloadImage(destCB);
             PointF ptInPlane = new PointF();
             int x1, x2, y1, y2;
             double dab, dbc, dcd, dda;
@@ -367,7 +370,8 @@ namespace PixelFarm.Agg.Image
             //4 points sampling
             //weight between four point
             ActualImage destCB = new ActualImage(rect.Width, rect.Height, PixelFormat.ARGB32);
-            MyImageReaderWriter destWriter = new MyImageReaderWriter(destCB);
+            MyImageReaderWriter destWriter = new MyImageReaderWriter();
+            destWriter.ReloadImage(destCB);
             PointF ptInPlane = new PointF();
             int x1, x2, y1, y2;
             double dab, dbc, dcd, dda;
@@ -463,7 +467,8 @@ namespace PixelFarm.Agg.Image
             ////-----------------------------------------
 
             ActualImage destCB = new ActualImage(rect.Width, rect.Height, PixelFormat.ARGB32);
-            MyImageReaderWriter destWriter = new MyImageReaderWriter(destCB);
+            MyImageReaderWriter destWriter = new MyImageReaderWriter();
+            destWriter.ReloadImage(destCB);
             //PointF ptInPlane = new PointF();
 
             //int stride2 = bmpdata2.Stride;

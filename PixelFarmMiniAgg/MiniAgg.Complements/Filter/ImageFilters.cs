@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 using System;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     //-----------------------------------------------image_filter_bilinear
     public struct ImageFilterBilinear : IImageFilter

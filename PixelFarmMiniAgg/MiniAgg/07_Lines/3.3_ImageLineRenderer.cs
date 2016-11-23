@@ -20,7 +20,7 @@
 #if true
 using System;
 using PixelFarm.Drawing;
-using PixelFarm.Agg.Image;
+using PixelFarm.Agg.Imaging;
 namespace PixelFarm.Agg.Lines
 {
     /*

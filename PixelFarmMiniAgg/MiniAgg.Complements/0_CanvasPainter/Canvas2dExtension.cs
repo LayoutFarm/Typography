@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.Agg.Transform;
 using PixelFarm.Agg.VertexSource;
@@ -31,48 +32,54 @@ namespace PixelFarm.Agg
         //helper tools, run in render thread***
         //not thread safe ***
 
-        static MyTypeFacePrinter stringPrinter;
+        //static MyTypeFacePrinter stringPrinter;
         static Stroke stroke = new Stroke(1);
         static RoundedRect roundRect = new RoundedRect();
         static SimpleRect simpleRect = new SimpleRect();
         static Ellipse ellipse = new Ellipse();
 
-        static SvgFontStore svgFontStore = new SvgFontStore();
-        public static void DrawString(this ImageGraphics2D gx,
-            string text,
-            double x,
-            double y,
-            double pointSize = 12,
-            Justification justification = Justification.Left,
-            Baseline baseline = Baseline.Text,
-            Color color = new Color(),
-            bool drawFromHintedCache = false,
-            Color backgroundColor = new Color())
-        {
-            ////use svg font 
-            var svgFont = svgFontStore.LoadFont(SvgFontStore.DEFAULT_SVG_FONTNAME, (int)pointSize);
+        //static SvgFontStore svgFontStore = new SvgFontStore();
+        //public static void DrawString(this ImageGraphics2D gx,
+        //    string text,
+        //    double x,
+        //    double y,
+        //    double pointSize = 12,
+        //    Justification justification = Justification.Left,
+        //    Baseline baseline = Baseline.Text,
+        //    Color color = new Color(),
+        //    bool drawFromHintedCache = false,
+        //    Color backgroundColor = new Color())
+        //{
+        //    ////use svg font 
+        //    var svgFont = svgFontStore.LoadFont(SvgFontStore.DEFAULT_SVG_FONTNAME, (int)pointSize);
+        //    //TODO: review here
+        //    //stringPrinter on each platform may not interchangeable ***
+        //    if (stringPrinter == null)
+        //    {
+        //        stringPrinter = new MyTypeFacePrinter(gx.GfxPlatform);
 
-            //TODO: review here
-            //stringPrinter on each platform may not interchangeable ***
-            if (stringPrinter == null)
-            {
-                stringPrinter = new MyTypeFacePrinter(gx.GfxPlatform);
+        //    }
 
-            }
-
-            stringPrinter.CurrentFont = svgFont;
-            stringPrinter.DrawFromHintedCache = false;
-            stringPrinter.LoadText(text);
-            VertexStore vxs = stringPrinter.MakeVxs();
-            vxs = Affine.NewTranslation(x, y).TransformToVxs(vxs);
-            gx.Render(vxs, Color.Black);
-        }
+        //    stringPrinter.CurrentActualFont = svgFont;
+        //    stringPrinter.DrawFromHintedCache = false;
+        //    stringPrinter.LoadText(text);
+        //    VertexStore vxs = stringPrinter.MakeVxs();
+        //    vxs = Affine.NewTranslation(x, y).TransformToVxs(vxs);
+        //    gx.Render(vxs, Color.Black);
+        //}
 
         public static void Rectangle(this Graphics2D gx, double left, double bottom, double right, double top, Color color, double strokeWidth = 1)
         {
             stroke.Width = strokeWidth;
             simpleRect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
-            gx.Render(stroke.MakeVxs(simpleRect.MakeVxs()), color);
+
+            var v1 = GetFreeVxs();
+            var v2 = GetFreeVxs();
+
+            gx.Render(stroke.MakeVxs(simpleRect.MakeVxs(v1), v2), color);
+
+            RelaseVxs(ref v1);
+            RelaseVxs(ref v2);
         }
         public static void Rectangle(this Graphics2D gx, RectD rect, Color color, double strokeWidth = 1)
         {
@@ -110,17 +117,35 @@ namespace PixelFarm.Agg
             }
 
             simpleRect.SetRect(left, bottom, right, top);
-            gx.Render(simpleRect.MakeVertexSnap(), fillColor);
+            var v1 = GetFreeVxs();
+            gx.Render(simpleRect.MakeVertexSnap(v1), fillColor);
+            RelaseVxs(ref v1);
         }
         public static void Circle(this Graphics2D g, double x, double y, double radius, Color color)
         {
             ellipse.Set(x, y, radius, radius);
-            g.Render(ellipse.MakeVxs(), color);
+            var v1 = GetFreeVxs();
+            g.Render(ellipse.MakeVxs(v1), color);
+            RelaseVxs(ref v1);
         }
         public static void Circle(this Graphics2D g, Vector2 origin, double radius, Color color)
         {
             Circle(g, origin.x, origin.y, radius, color);
         }
+
+
+        //this is not thread safe ****
+        static VertexStorePool s_vxsPool = new VertexStorePool();
+
+        static VertexStore GetFreeVxs()
+        {
+            return s_vxsPool.GetFreeVxs();
+        }
+        static void RelaseVxs(ref VertexStore vxs)
+        {
+            s_vxsPool.Release(ref vxs);
+        }
+
     }
 }
 

@@ -28,7 +28,7 @@
 
 using System;
 using PixelFarm.Drawing;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     public class PixelBlenderGray : IPixelBlender
     {

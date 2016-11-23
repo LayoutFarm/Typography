@@ -20,16 +20,17 @@
 //----------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using PixelFarm.Drawing;
-using PixelFarm.Agg.Image;
+using PixelFarm.Agg.Imaging;
 using PixelFarm.Agg.Transform;
 namespace PixelFarm.Agg
 {
     public sealed partial class ImageGraphics2D : Graphics2D
     {
-        ImageReaderWriterBase destImageReaderWriter;
+        MyImageReaderWriter destImageReaderWriter;
         ScanlinePacked8 sclinePack8;
-        VertexStore myTmpImgRectVxs = new VertexStore();
+
         ScanlineRasToDestBitmapRenderer sclineRasToBmp;
         PixelBlenderBGRA pixBlenderRGBA32;
         IPixelBlender currentBlender;
@@ -39,13 +40,16 @@ namespace PixelFarm.Agg
         int destHeight;
         RectInt clipBox;
         ImageInterpolationQuality imgInterpolationQuality = ImageInterpolationQuality.Bilinear;
-        GraphicsPlatform gfxPlatform;
-        public ImageGraphics2D(ActualImage destImage, GraphicsPlatform gfxPlatform)
+
+        ActualImage destImage;
+        public ImageGraphics2D(ActualImage destImage)
         {
             //create from actual image
-            this.gfxPlatform = gfxPlatform;
+            this.destImage = destImage;
+
             this.destActualImage = destImage;
-            this.destImageReaderWriter = new MyImageReaderWriter(destImage);
+            this.destImageReaderWriter = new MyImageReaderWriter();
+            destImageReaderWriter.ReloadImage(destImage);
             this.sclineRas = new ScanlineRasterizer();
             this.sclineRasToBmp = new ScanlineRasToDestBitmapRenderer();
             this.destWidth = destImage.Width;
@@ -55,10 +59,7 @@ namespace PixelFarm.Agg
             this.sclinePack8 = new ScanlinePacked8();
             this.currentBlender = this.pixBlenderRGBA32 = new PixelBlenderBGRA();
         }
-        public GraphicsPlatform GfxPlatform
-        {
-            get { return this.gfxPlatform; }
-        }
+
         public override ScanlinePacked8 ScanlinePacked8
         {
             get { return this.sclinePack8; }
@@ -95,23 +96,15 @@ namespace PixelFarm.Agg
             get { return this.ImageInterpolationQuality; }
             set { this.imgInterpolationQuality = value; }
         }
+
+        VertexStorePool _vxsPool = new VertexStorePool();
         VertexStore GetFreeVxs()
         {
-            if (myTmpImgRectVxs != null)
-            {
-                VertexStore tmp = this.myTmpImgRectVxs;
-                this.myTmpImgRectVxs = null;
-                return tmp;
-            }
-            else
-            {
-                return new VertexStore(4);
-            }
+            return _vxsPool.GetFreeVxs();
         }
-        void ReleaseVxs(VertexStore vxs)
+        void ReleaseVxs(ref VertexStore vxs)
         {
-            this.myTmpImgRectVxs = vxs;
-            vxs.Clear();
+            _vxsPool.Release(ref vxs);
         }
         public override void Clear(Color color)
         {
@@ -223,6 +216,12 @@ namespace PixelFarm.Agg
             }
         }
 
+
+        /// <summary>
+        /// we do NOT store vxs/vxsSnap
+        /// </summary>
+        /// <param name="vxsSnap"></param>
+        /// <param name="color"></param>
         public override void Render(VertexStoreSnap vxsSnap, Drawing.Color color)
         {
             //reset rasterizer before render each vertextSnap 
@@ -231,7 +230,14 @@ namespace PixelFarm.Agg
             Affine transform = this.CurrentTransformMatrix;
             if (!transform.IsIdentity())
             {
-                sclineRas.AddPath(transform.TransformToVxs(vxsSnap));
+
+                var v1 = transform.TransformToVxs(vxsSnap, GetFreeVxs());
+                sclineRas.AddPath(v1);
+                ReleaseVxs(ref v1);
+                //-------------------------
+                //since sclineRas do NOT store vxs
+                //then we can reuse the vxs***
+                //-------------------------
             }
             else
             {

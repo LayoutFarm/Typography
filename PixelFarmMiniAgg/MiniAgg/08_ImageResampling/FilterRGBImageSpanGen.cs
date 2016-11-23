@@ -28,7 +28,7 @@
 
 using img_subpix_const = PixelFarm.Agg.ImageFilterLookUpTable.ImgSubPixConst;
 using img_filter_const = PixelFarm.Agg.ImageFilterLookUpTable.ImgFilterConst;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     //=================================================span_image_resample_rgb
     class FilterRGBImageSpanGen : FilterImageSpanGenerator

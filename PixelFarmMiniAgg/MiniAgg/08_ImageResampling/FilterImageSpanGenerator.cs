@@ -24,7 +24,7 @@
 
 using System;
 using img_subpix_scale = PixelFarm.Agg.ImageFilterLookUpTable.ImgSubPixConst;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     //=====================================================span_image_resample
     public abstract partial class FilterImageSpanGenerator : ImgSpanGen

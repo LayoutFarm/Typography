@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System;
 //using Mono.Simd;
 
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     public interface IPixelBlender
     {

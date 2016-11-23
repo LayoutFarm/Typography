@@ -8,7 +8,7 @@ using System.Drawing.Imaging;
 
 namespace PixelFarm.Agg
 {
-    
+
 
     public static class BitmapHelper
     {
@@ -28,7 +28,7 @@ namespace PixelFarm.Agg
            RectInt rect)
         {
             int offset = 0;
-            byte[] buffer = backingImageBufferByte.GetBuffer();
+            byte[] buffer = ActualImage.GetBuffer(backingImageBufferByte);
             BitmapHelper.CopyToWindowsBitmap(buffer, offset,
                 backingImageBufferByte.Stride, backingImageBufferByte.Height,
                 backingImageBufferByte.BitDepth,
@@ -121,7 +121,7 @@ namespace PixelFarm.Agg
         {
             int h = windowsBitmap.Height;
             int w = windowsBitmap.Width;
-            byte[] buffer = actualImage.GetBuffer();
+            byte[] buffer = ActualImage.GetBuffer(actualImage);
             BitmapData bitmapData1 = windowsBitmap.LockBits(
                       new Rectangle(0, 0,
                           w,
@@ -157,7 +157,7 @@ namespace PixelFarm.Agg
         {
             int h = windowsBitmap.Height;
             int w = windowsBitmap.Width;
-            byte[] buffer = actualImage.GetBuffer();
+            byte[] buffer = ActualImage.GetBuffer(actualImage);
             BitmapData bitmapData1 = windowsBitmap.LockBits(
                       new Rectangle(0, 0,
                           w,
