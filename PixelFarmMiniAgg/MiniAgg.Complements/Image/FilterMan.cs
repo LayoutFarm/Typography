@@ -19,7 +19,7 @@
 // Class to output the vertex source of a string as a run of glyphs.
 //----------------------------------------------------------------------------
 
-using PixelFarm.Agg.Image;
+using PixelFarm.Agg.Imaging;
 namespace PixelFarm.Agg
 {
     public enum BlurMethod

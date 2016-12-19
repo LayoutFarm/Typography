@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 
 using PixelFarm.Drawing;
-using PixelFarm.Agg.Image;
+using PixelFarm.Agg.Imaging;
 namespace PixelFarm.Agg
 {
     public enum ScanlineRenderMode

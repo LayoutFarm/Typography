@@ -1,6 +1,6 @@
 ﻿//2014-2016, BSD WinterDev
 
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     public class CubicInterpolator
     {

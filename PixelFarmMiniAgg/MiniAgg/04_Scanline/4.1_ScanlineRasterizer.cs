@@ -94,7 +94,7 @@ namespace PixelFarm.Agg
 
         RectInt userModeClipBox;
         //---------------
-       
+
         enum Status
         {
             Initial,
@@ -205,7 +205,7 @@ namespace PixelFarm.Agg
             }
         }
 
-        
+
         void AddVertex(VertexCmd cmd, double x, double y)
         {
             switch (cmd)
@@ -252,12 +252,31 @@ namespace PixelFarm.Agg
             get;
             set;
         }
+        /// <summary>
+        /// we do NOT store vxs
+        /// </summary>
+        /// <param name="vxs"></param>
         public void AddPath(VertexStore vxs)
-        {
+        { 
+            
+            //-----------------------------------------------------
+            //*** we extract vertext command and coord(x,y) from
+            //the snap but not store the snap inside rasterizer
+            //-----------------------------------------------------
+
             this.AddPath(new VertexStoreSnap(vxs));
         }
+        /// <summary>
+        /// we do NOT store snap ***
+        /// </summary>
+        /// <param name="snap"></param>
         public void AddPath(VertexStoreSnap snap)
         {
+            //-----------------------------------------------------
+            //*** we extract vertext command and coord(x,y) from
+            //the snap but not store the snap inside rasterizer
+            //-----------------------------------------------------
+
             double x = 0;
             double y = 0;
             if (m_cellAARas.Sorted) { Reset(); }
@@ -270,7 +289,6 @@ namespace PixelFarm.Agg
                 //render all parts
                 VertexStore vxs = snap.GetInternalVxs();
                 int j = vxs.Count;
-
                 for (int i = 0; i < j; ++i)
                 {
                     var cmd = vxs.GetVertex(i, out x, out y);

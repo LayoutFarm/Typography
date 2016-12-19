@@ -20,7 +20,7 @@
 
 using System;
 using PixelFarm.Drawing;
-using PixelFarm.Agg.Image;
+using PixelFarm.Agg.Imaging;
 namespace PixelFarm.Agg
 {
     public abstract class ImageReaderWriterBase : IImageReaderWriter
@@ -32,6 +32,7 @@ namespace PixelFarm.Agg
         int[] xTableArray;
         //--------------------------------------------
         protected byte[] m_ByteBuffer;
+        ActualImage ownerByteBuffer;
         //--------------------------------------------
         // Pointer to first pixel depending on strideInBytes and image position
         protected int bufferFirstPixel;
@@ -46,13 +47,13 @@ namespace PixelFarm.Agg
 
         protected void Attach(int width, int height, int bitsPerPixel, byte[] imgbuffer, IPixelBlender recieveBlender)
         {
+
+
+
             if (width <= 0 || height <= 0)
             {
                 throw new ArgumentOutOfRangeException("You must have a width and height > than 0.");
             }
-
-
-
             if (bitsPerPixel != 32 && bitsPerPixel != 24 && bitsPerPixel != 8)
             {
                 throw new Exception("Unsupported bits per pixel.");
@@ -218,8 +219,8 @@ namespace PixelFarm.Agg
                 fixed (int* first = &yTableArray[0])
                 {
                     //go last
-                    int* cur = first + height;
-                    for (int i = height - 1; i >= 0;)
+                    int* cur = first + height - 1;
+                    for (int i = height - 1; i >= 0; )
                     {
                         //--------------------
                         *cur = i * strideInBytes;
@@ -231,9 +232,9 @@ namespace PixelFarm.Agg
                 fixed (int* first = &xTableArray[0])
                 {
                     //go last
-                    int* cur = first + width;
+                    int* cur = first + width - 1;
                     //even
-                    for (int i = width - 1; i >= 0;)
+                    for (int i = width - 1; i >= 0; )
                     {
                         //--------------------
                         *cur = i * m_DistanceInBytesBetweenPixelsInclusive;
@@ -619,13 +620,13 @@ namespace PixelFarm.Agg
     public class MyImageReaderWriter : ImageReaderWriterBase
     {
         ActualImage actualImage;
+        PixelBlenderBGRA pixelBlenderRGBA;
+        PixelBlenderGray pixelBlenderGray;
+
         public MyImageReaderWriter()
         {
         }
-        public MyImageReaderWriter(ActualImage actualImage)
-        {
-            ReloadImage(actualImage);
-        }
+
         public void ReloadImage(ActualImage actualImage)
         {
             if (this.actualImage == actualImage)
@@ -638,20 +639,21 @@ namespace PixelFarm.Agg
             {
                 case PixelFormat.ARGB32:
                     {
+
                         Attach(actualImage.Width,
                             actualImage.Height,
                             actualImage.BitDepth,
-                            actualImage.GetBuffer(),
-                            new PixelBlenderBGRA());
+                            ActualImage.GetBuffer(actualImage),
+                            pixelBlenderRGBA ?? (pixelBlenderRGBA = new PixelBlenderBGRA()));
                     }
                     break;
                 case PixelFormat.GrayScale8:
                     {
                         Attach(actualImage.Width,
-                            actualImage.Height,
-                            actualImage.BitDepth,
-                            actualImage.GetBuffer(),
-                            new PixelFarm.Agg.Image.PixelBlenderGray(1));
+                          actualImage.Height,
+                          actualImage.BitDepth,
+                          ActualImage.GetBuffer(actualImage),
+                          pixelBlenderGray ?? (pixelBlenderGray = new PixelBlenderGray(1)));
                     }
                     break;
                 case PixelFormat.RGB24:

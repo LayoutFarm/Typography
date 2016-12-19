@@ -34,7 +34,7 @@ namespace PixelFarm.Agg.VertexSource
             int num_vertice;
             int num_alloc_vertice;
             double[] coord_xy;
-            VertexCmd[] cmds;
+            byte[] cmds;
             PathWriter.UnsafeDirectGetData(pathSource,
                 out num_alloc_vertice,
                 out num_vertice,
@@ -47,7 +47,7 @@ namespace PixelFarm.Agg.VertexSource
             writer.Write(num_vertice); //actual vertices
             //3. all vertice
             int totalCoord = num_vertice << 1;
-            for (int i = 0; i < totalCoord;)
+            for (int i = 0; i < totalCoord; )
             {
                 writer.Write(coord_xy[i]);//x
                 i++;
@@ -102,8 +102,8 @@ namespace PixelFarm.Agg.VertexSource
             //3.
             double[] coord_xy = new double[totalCoord];
             //4.
-            VertexCmd[] cmds = new VertexCmd[num_vertice];
-            for (int i = 0; i < totalCoord;)
+            byte[] cmds = new byte[num_vertice];
+            for (int i = 0; i < totalCoord; )
             {
                 coord_xy[i] = reader.ReadDouble();
                 i++;
@@ -114,7 +114,7 @@ namespace PixelFarm.Agg.VertexSource
             int cmds_count = reader.ReadInt32();
             for (int i = 0; i < cmds_count; ++i)
             {
-                cmds[i] = (VertexCmd)reader.ReadByte();
+                cmds[i] = reader.ReadByte();
             }
 
             PathWriter.UnsafeDirectSetData(

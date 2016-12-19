@@ -31,7 +31,7 @@
 
 using System;
 using PixelFarm.Drawing;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     //==============================================================stack_blur
     public class StackBlur

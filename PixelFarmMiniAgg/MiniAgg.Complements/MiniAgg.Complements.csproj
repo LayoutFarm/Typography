@@ -38,18 +38,13 @@
     <Compile Include="0_CanvasPainter\AggRenderVx.cs" />
     <Compile Include="0_CanvasPainter\Canvas2dExtension.cs" />
     <Compile Include="0_CanvasPainter\dbugVertexSourceIO.cs" />
+    <Compile Include="0_CanvasPainter\TextPrinter.cs" />
     <Compile Include="1_Base\ScanlineRasToDestBitmapRendererExtension.cs" />
     <Compile Include="2_SpanGenerators\SpanGradient_GradientValueCalculators.cs" />
     <Compile Include="4_Animation\ColorComponentStepup.cs" />
     <Compile Include="4_Animation\GfxProcessorModule.cs" />
     <Compile Include="4_Animation\ParallelTimeline.cs" />
     <Compile Include="4_Animation\Timelines.cs" />
-    <Compile Include="FontSvg\SvgFont.cs" />
-    <Compile Include="FontSvg\SvgFontFace.cs" />
-    <Compile Include="FontSvg\SvgFontFace_LiberationSans.cs" />
-    <Compile Include="FontSvg\SvgFontStore.cs" />
-    <Compile Include="Font\MyTypeFacePrinter.cs" />
-    <Compile Include="Font\TextPrinter.cs" />
     <Compile Include="Image\FilterMan.cs" />
     <Compile Include="x_notused\KDTree.cs" />
     <Compile Include="1_Base\PixelBlenderRGB.cs" />
@@ -79,9 +74,9 @@
       <Project>{4D5CE655-58FA-4523-8E46-738B941E9E47}</Project>
       <Name>MiniAgg</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PixelFarm.Drawing\PixelFarm.Drawing.csproj">
+    <ProjectReference Include="..\PixelFarm.Drawing.Core\PixelFarm.Drawing.Core.csproj">
       <Project>{51D63482-5697-4B16-8401-506965624657}</Project>
-      <Name>PixelFarm.Drawing</Name>
+      <Name>PixelFarm.Drawing.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

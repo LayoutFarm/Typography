@@ -161,7 +161,10 @@ namespace NOpenType.Tables
         }
 
 
-        class AnchorTable
+        /// <summary>
+        /// To describe an anchor point
+        /// </summary>
+        class AnchorPoint
         {
             //Anchor Table
 
@@ -174,12 +177,19 @@ namespace NOpenType.Tables
             //In a variable font, the third format uses a VariationIndex table (a variant of a Device table) to 
             //reference variation data for adjustment of the anchor position for the current variation instance, as needed. 
 
-            ushort format;
-            public void ReadFrom(BinaryReader reader)
-            {
-                long anchorTableStartAt = reader.BaseStream.Position;
+            public ushort format;
+            public short xcoord;
+            public short ycoord;
+            public ushort refGlyphContourPoint;
+            public short xdeviceTableOffset;
+            public short ydeviceTableOffset;
 
-                switch (this.format = reader.ReadUInt16())
+            public static AnchorPoint CreateFrom(BinaryReader reader, long beginAt)
+            {
+                AnchorPoint anchorPoint = new AnchorPoint();
+                reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+
+                switch (anchorPoint.format = reader.ReadUInt16())
                 {
                     default: throw new NotSupportedException();
                     case 1:
@@ -193,9 +203,8 @@ namespace NOpenType.Tables
                             //USHORT 	AnchorFormat 	Format identifier, = 1
                             //SHORT 	XCoordinate 	Horizontal value, in design units
                             //SHORT 	YCoordinate 	Vertical value, in design units
-                            short xcoord = reader.ReadInt16();
-                            short ycoord = reader.ReadInt16();
-
+                            anchorPoint.xcoord = reader.ReadInt16();
+                            anchorPoint.ycoord = reader.ReadInt16();
                         }
                         break;
                     case 2:
@@ -220,10 +229,9 @@ namespace NOpenType.Tables
                             //SHORT 	YCoordinate 	Vertical value, in design units
                             //USHORT 	AnchorPoint 	Index to glyph contour point
 
-                            short xcoord = reader.ReadInt16();
-                            short ycoord = reader.ReadInt16();
-                            ushort anchorPoint = reader.ReadUInt16();
-
+                            anchorPoint.xcoord = reader.ReadInt16();
+                            anchorPoint.ycoord = reader.ReadInt16();
+                            anchorPoint.refGlyphContourPoint = reader.ReadUInt16();
 
                         }
                         break;
@@ -263,17 +271,32 @@ namespace NOpenType.Tables
                             //Offset 	XDeviceTable 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for X coordinate, from beginning of Anchor table (may be NULL)
                             //Offset 	YDeviceTable 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for Y coordinate, from beginning of Anchor table (may be NULL)
 
-                            short xcoord = reader.ReadInt16();
-                            short ycoord = reader.ReadInt16();
-                            short xdeviceTableOffset = reader.ReadInt16();
-                            short ydeviceTableOffset = reader.ReadInt16();
-
-
+                            anchorPoint.xcoord = reader.ReadInt16();
+                            anchorPoint.ycoord = reader.ReadInt16();
+                            anchorPoint.xdeviceTableOffset = reader.ReadInt16();
+                            anchorPoint.ydeviceTableOffset = reader.ReadInt16();
                         }
                         break;
                 }
+                return anchorPoint;
 
             }
+#if DEBUG
+            public override string ToString()
+            {
+                switch (format)
+                {
+                    default: return "";
+                    case 1:
+                        return format + "(" + xcoord + "," + ycoord + ")";
+                    case 2:
+                        return format + "(" + xcoord + "," + ycoord + "), ref_point=" + refGlyphContourPoint;
+                    case 3:
+                        return format + "(" + xcoord + "," + ycoord + "), xy_device(" + xdeviceTableOffset + "," + ydeviceTableOffset + ")";
+                }
+
+            }
+#endif
         }
 
 
@@ -281,8 +304,8 @@ namespace NOpenType.Tables
         {
             //Mark Array
             //The MarkArray table defines the class and the anchor point for a mark glyph. 
-            //Three GPOS subtables-MarkToBase, MarkToLigature, 
-            //and MarkToMark Attachment-use the MarkArray table to specify data for attaching marks.
+            //Three GPOS subtables-MarkToBase, MarkToLigature, and MarkToMark Attachment
+            //use the MarkArray table to specify data for attaching marks.
 
             //The MarkArray table contains a count of the number of mark records (MarkCount) and an array of those records (MarkRecord).
             //Each mark record defines the class of the mark and an offset to the Anchor table that contains data for the mark.
@@ -294,24 +317,48 @@ namespace NOpenType.Tables
             // MarkArray table
             //Value 	Type 	Description
             //USHORT 	MarkCount 	Number of MarkRecords
-            //struct 	MarkRecord
-            //[MarkCount] 	Array of MarkRecords-in Coverage order
+            //struct 	MarkRecord[MarkCount] 	Array of MarkRecords in Coverage order
             //MarkRecord
             //Value 	Type 	Description
             //USHORT 	Class 	Class defined for this mark
             //Offset 	MarkAnchor 	Offset to Anchor table-from beginning of MarkArray table
             MarkRecord[] records;
+            AnchorPoint[] anchorPoints;
             void ReadFrom(BinaryReader reader)
             {
+                long markTableBeginAt = reader.BaseStream.Position;
                 ushort markCount = reader.ReadUInt16();
                 records = new MarkRecord[markCount];
                 for (int i = 0; i < markCount; ++i)
                 {
+                    //1 mark : 1 anchor
                     records[i] = new MarkRecord(
-                        reader.ReadUInt16(),
-                        reader.ReadInt16());
+                        reader.ReadUInt16(),//mark class
+                        reader.ReadInt16()); //offset to anchor table
                 }
+                //---------------------------
+                //read anchor
+                anchorPoints = new AnchorPoint[markCount];
+                for (int i = 0; i < markCount; ++i)
+                {
+                    MarkRecord markRec = records[i];
+                    //bug?
+                    if (markRec.offset < 0)
+                    {
+                        //TODO: review here
+                        //found err on Tahoma
+                        continue;
+                    }
+                    anchorPoints[i] = AnchorPoint.CreateFrom(reader, markTableBeginAt + markRec.offset);
+                }
+
             }
+#if DEBUG
+            public int dbugGetAnchorCount()
+            {
+                return anchorPoints.Length;
+            }
+#endif
             public static MarkArrayTable CreateFrom(BinaryReader reader, long beginAt)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -350,12 +397,17 @@ namespace NOpenType.Tables
             ///Mark2Array table
             //Value 	Type 	Description
             //USHORT 	Mark2Count 	Number of Mark2 records
-            //struct 	Mark2Record
-            //[Mark2Count] 	Array of Mark2 records-in Coverage order
+            //struct 	Mark2Record[Mark2Count] 	Array of Mark2 records-in Coverage order
 
-            //Each Mark2Record contains an array of offsets to Anchor tables (Mark2Anchor). The array of zero-based offsets, measured from the beginning of the Mark2Array table, defines the entire set of Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. The Anchor tables in the Mark2Anchor array are ordered by Mark1 class value.
+            //Each Mark2Record contains an array of offsets to Anchor tables (Mark2Anchor).
+            //The array of zero-based offsets, measured from the beginning of the Mark2Array table, 
+            //defines the entire set of Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. 
+            //The Anchor tables in the Mark2Anchor array are ordered by Mark1 class value.
 
-            //A Mark2Record declares one Anchor table for each mark class (including Class 0) identified in the MarkRecords of the MarkArray. Each Anchor table specifies one Mark2 attachment point used to attach all the Mark1 glyphs in a particular class to the Mark2 glyph.
+            //A Mark2Record declares one Anchor table for each mark class (including Class 0)
+            //identified in the MarkRecords of the MarkArray.
+            //Each Anchor table specifies one Mark2 attachment point used to attach all 
+            //the Mark1 glyphs in a particular class to the Mark2 glyph.
 
             Mark2Record[] mark2Records;
             public static Mark2ArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
@@ -391,6 +443,21 @@ namespace NOpenType.Tables
 
         class BaseArrayTable
         {
+            //BaseArray table
+            //Value 	Type 	Description
+            //USHORT 	BaseCount 	Number of BaseRecords
+            //struct 	BaseRecord[BaseCount] 	Array of BaseRecords-in order of BaseCoverage Index
+
+            //A BaseRecord declares one Anchor table for each mark class (including Class 0)
+            //identified in the MarkRecords of the MarkArray.
+            //Each Anchor table specifies one attachment point used to attach all the marks in a particular class to the base glyph.
+            //A BaseRecord contains an array of offsets to Anchor tables (BaseAnchor).
+            //The zero-based array of offsets defines the entire set of attachment points each base glyph uses to attach marks.
+            //The offsets to Anchor tables are ordered by mark class.
+
+            // Note: Anchor tables are not tagged with class value identifiers.
+            //Instead, the index value of an Anchor table in the array defines the class value represented by the Anchor table.
+
             BaseRecord[] records;
 
             public static BaseArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
@@ -398,24 +465,91 @@ namespace NOpenType.Tables
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
                 //---
                 var baseArrTable = new BaseArrayTable();
-
                 ushort baseCount = reader.ReadUInt16();
-                baseArrTable.records = new BaseRecord[baseCount];
+                BaseRecord[] baseRecs = baseArrTable.records = new BaseRecord[baseCount];
                 for (int i = 0; i < baseCount; ++i)
                 {
                     baseArrTable.records[i] = new BaseRecord(Utils.ReadInt16Array(reader, classCount));
                 }
+                //read anchor table 
+                for (int i = 0; i < baseCount; ++i)
+                {
+
+                    short[] offsets = baseRecs[i].offsets;
+#if DEBUG
+                    if (classCount != offsets.Length)
+                    {
+                        throw new NotSupportedException();
+                    }
+#endif
+                    //each base has anchor point for mark glyph'class
+
+                    AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[classCount];
+                    for (int n = 0; n < classCount; ++n)
+                    {
+                        short offset = offsets[n];
+                        if (offset < 0)
+                        {
+                            //TODO: review here 
+                            //bug?
+                            continue;
+                        }
+                        anchors[n] = AnchorPoint.CreateFrom(reader, beginAt + offsets[n]);
+                    }
+                }
+
 
                 return baseArrTable;
             }
+
+#if DEBUG
+            public int dbugGetRecordCount()
+            {
+                return records.Length;
+            }
+#endif
+          
         }
         struct BaseRecord
         {
+            //BaseRecord
+            //Value 	Type 	Description
+            //Offset 	BaseAnchor[ClassCount] 	Array of offsets (one per class) to 
+            //Anchor tables-from beginning of BaseArray table-ordered by class-zero-based
+
             public short[] offsets;
+            public AnchorPoint[] anchors;
             public BaseRecord(short[] offsets)
             {
                 this.offsets = offsets;
+                anchors = null;
             }
+#if DEBUG
+            public override string ToString()
+            {
+                StringBuilder stbuilder = new StringBuilder();
+                if (anchors != null)
+                {
+                    int i = 0;
+                    foreach (AnchorPoint a in anchors)
+                    {
+                        if (i > 0)
+                        {
+                            stbuilder.Append(',');
+                        }
+                        if (a == null)
+                        {
+                            stbuilder.Append("null");
+                        }
+                        else
+                        {
+                            stbuilder.Append(a.ToString());
+                        }
+                    }
+                }
+                return stbuilder.ToString();
+            }
+#endif
 
         }
 

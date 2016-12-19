@@ -53,7 +53,11 @@ namespace NOpenType.Tables
             //1. header
             //GSUB Header
 
-            //The GSUB table begins with a header that contains a version number for the table (Version) and offsets to a three tables: ScriptList, FeatureList, and LookupList. For descriptions of each of these tables, see the chapter, OpenType Common Table Formats. Example 1 at the end of this chapter shows a GSUB Header table definition.
+            //The GSUB table begins with a header that contains a version number for the table (Version) and
+            //offsets to a three tables: ScriptList, FeatureList, and LookupList. 
+            //For descriptions of each of these tables, see the chapter, 
+            //OpenType Common Table Formats. Example 1 at the end of this chapter shows a GSUB Header table definition.
+
             //GSUB Header, Version 1.0
             //Type 	Name 	Description
             //USHORT 	MajorVersion 	Major version of the GSUB table, = 1
@@ -95,9 +99,16 @@ namespace NOpenType.Tables
             }
 
         }
+
         public ushort MajorVersion { get; private set; }
         public ushort MinorVersion { get; private set; }
 
+        public ScriptList ScriptList { get { return scriptList; } }
+        public FeatureList FeatureList { get { return featureList; } }
+        public LookupTable GetLookupTable(int index)
+        {
+            return lookupTables[index];
+        }
 
 
         void ReadLookupListTable(BinaryReader reader, long lookupListHeadPos)
@@ -161,6 +172,7 @@ namespace NOpenType.Tables
 
                 lookupTables[i] =
                     new LookupTable(
+                        this,
                         lookupTablePos,
                         lookupType,
                         lookupFlags,
@@ -176,26 +188,34 @@ namespace NOpenType.Tables
                 //set origin
                 reader.BaseStream.Seek(lookupListHeadPos + subTableOffset[i], SeekOrigin.Begin);
                 lookupRecord.ReadRecordContent(reader);
-            }
 
+                //assign gsub owner**
+                foreach (LookupSubTable subtable in lookupRecord.SubTables)
+                {
+                    subtable.OwnerGSub = this;
+                }
+            }
+            //----------------------------------------------
         }
         void ReadFeaureVariations(BinaryReader reader)
         {
             throw new NotImplementedException();
         }
 
-        internal struct LookupResult
-        {
 
-            public readonly LookupSubTable foundOnTable;
-            public readonly int foundAtIndex;
-            public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
-            {
-                this.foundAtIndex = foundAtIndex;
-                this.foundOnTable = foundOnTable;
-            }
 
-        }
+        //internal struct LookupResult
+        //{
+
+        //    public readonly LookupSubTable foundOnTable;
+        //    public readonly int foundAtIndex;
+        //    public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
+        //    {
+        //        this.foundAtIndex = foundAtIndex;
+        //        this.foundOnTable = foundOnTable;
+        //    }
+
+        //}
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
@@ -211,7 +231,9 @@ namespace NOpenType.Tables
             public readonly ushort markFilteringSet;
             //--------------------------
             List<LookupSubTable> subTables = new List<LookupSubTable>();
+            GSUB ownerGsubTable;
             public LookupTable(
+                GSUB owner,
                 long lookupTablePos,
                 ushort lookupType,
                 ushort lookupFlags,
@@ -220,6 +242,7 @@ namespace NOpenType.Tables
                 ushort markFilteringSet
                  )
             {
+                this.ownerGsubTable = owner;
                 this.lookupTablePos = lookupTablePos;
                 this.lookupType = lookupType;
                 this.lookupFlags = lookupFlags;
@@ -227,42 +250,57 @@ namespace NOpenType.Tables
                 this.subTableOffsets = subTableOffsets;
                 this.markFilteringSet = markFilteringSet;
             }
+            public GSUB GSubTable
+            {
+                get { return this.ownerGsubTable; }
+            }
+            public List<LookupSubTable> SubTables
+            {
+                get { return subTables; }
+            }
+            public void DoSubstitution(List<ushort> inputGlyphs, int startAt, int len)
+            {
+                int j = subTables.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    subTables[i].DoSubtitution(inputGlyphs, startAt, len);
+                }
+            }
 #if DEBUG
             public override string ToString()
             {
                 return lookupType.ToString();
             }
 #endif
-            public int FindGlyphIndex(int glyphIndex)
-            {
-                throw new NotSupportedException();
-                //check if input glyphIndex is in coverage area 
-                //for (int i = subTables.Count - 1; i >= 0; --i)
-                //{
-                //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-                //    if (foundAtIndex > -1)
-                //    {
-                //        //found                        
-                //        return foundAtIndex;
-                //    }
-                //}
-                //return -1;
-            }
-            public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
-            {
-                throw new NotSupportedException();
-                //check if input glyphIndex is in coverage area 
-                //for (int i = subTables.Count - 1; i >= 0; --i)
-                //{
-                //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-                //    if (foundAtIndex > -1)
-                //    {
-                //        //found                        
-                //        outputResults.Add(new LookupResult(subTables[i], i));
-                //    }
-                //}
-
-            }
+            //public int FindGlyphIndex(int glyphIndex)
+            //{
+            //    throw new NotSupportedException();
+            //    //check if input glyphIndex is in coverage area 
+            //    //for (int i = subTables.Count - 1; i >= 0; --i)
+            //    //{
+            //    //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+            //    //    if (foundAtIndex > -1)
+            //    //    {
+            //    //        //found                        
+            //    //        return foundAtIndex;
+            //    //    }
+            //    //}
+            //    //return -1;
+            //}
+            //public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
+            //{
+            //    throw new NotSupportedException();
+            //    //check if input glyphIndex is in coverage area 
+            //    //for (int i = subTables.Count - 1; i >= 0; --i)
+            //    //{
+            //    //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
+            //    //    if (foundAtIndex > -1)
+            //    //    {
+            //    //        //found                        
+            //    //        outputResults.Add(new LookupResult(subTables[i], i));
+            //    //    }
+            //    //} 
+            //}
             public void ReadRecordContent(BinaryReader reader)
             {
                 switch (lookupType)
@@ -294,6 +332,78 @@ namespace NOpenType.Tables
                         break;
                 }
             }
+
+            /// <summary>
+            ///  for lookup table type 1, format1
+            /// </summary>
+            class LkSubTableT1Fmt1 : LookupSubTable
+            {
+                public LkSubTableT1Fmt1(short coverageOffset, short deltaGlyph)
+                {
+
+                    this.CoverateOffset = coverageOffset;
+                    this.DeltaGlyph = deltaGlyph;
+                }
+                public short CoverateOffset { get; set; }
+                /// <summary>
+                /// Add to original GlyphID to get substitute GlyphID
+                /// </summary>
+                public short DeltaGlyph
+                {
+                    //format1
+                    get;
+                    private set;
+                }
+                public CoverageTable CoverageTable
+                {
+                    get;
+                    set;
+                }
+
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            /// <summary>
+            /// for lookup table type 1, format2
+            /// </summary>
+            class LkSubTableT1Fmt2 : LookupSubTable
+            {
+                public LkSubTableT1Fmt2(short coverageOffset, ushort[] substitueGlyphs)
+                {
+                    this.CoverageOffset = coverageOffset;
+                    this.SubstitueGlyphs = substitueGlyphs;
+                }
+                public short CoverageOffset { get; set; }
+                /// <summary>
+                /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
+                /// </summary>
+                public ushort[] SubstitueGlyphs
+                {
+                    get;
+                    private set;
+                }
+                public CoverageTable CoverageTable
+                {
+                    get;
+                    set;
+                }
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+                    int endBefore = startAt + len;
+                    for (int i = startAt; i < endBefore; ++i)
+                    {
+                        int foundAt = CoverageTable.FindPosition(glyphIndices[i]);
+                        if (foundAt > -1)
+                        {
+                            glyphIndices[i] = SubstitueGlyphs[foundAt];
+                        }
+                    }
+                }
+            }
+
+
             /// <summary>
             /// LookupType 1: Single Substitution Subtable
             /// </summary>
@@ -384,7 +494,20 @@ namespace NOpenType.Tables
 
             class LkSubTableT2 : LookupSubTable
             {
+
+                public CoverageTable CoverageTable { get; set; }
                 public SequenceTable[] SeqTables { get; set; }
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+                    int j = glyphIndices.Count;
+                    for (int i = 0; i < j; ++i)
+                    {
+                        if (CoverageTable.FindPosition(glyphIndices[i]) > -1)
+                        {
+                            throw new NotSupportedException();
+                        }
+                    }
+                }
             }
             struct SequenceTable
             {
@@ -421,7 +544,7 @@ namespace NOpenType.Tables
                 //Offset 	Sequence[SequenceCount] 	Array of offsets to Sequence tables-from beginning of Substitution table-ordered by Coverage Index
                 //Sequence table
                 //Type 	Name 	Description
-                //USHORT 	GlyphCount 	Number of GlyphI Ds in the Substitute array. This should always be greater than 0.
+                //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array. This should always be greater than 0.
                 //GlyphID 	Substitute[GlyphCount]  String of GlyphIDs to substitute
 
                 int j = subTableOffsets.Length;
@@ -449,6 +572,8 @@ namespace NOpenType.Tables
                                     subTable.SeqTables[n] = new SequenceTable(
                                         Utils.ReadUInt16Array(reader, glyphCount));
                                 }
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+
                                 this.subTables.Add(subTable);
                             } break;
                     }
@@ -466,7 +591,12 @@ namespace NOpenType.Tables
 
             class LkSubTableT4 : LookupSubTable
             {
+
                 public LigatureSetTable[] LigatureSetTables { get; set; }
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+                    throw new NotImplementedException();
+                }
             }
             class LigatureSetTable
             {
@@ -812,27 +942,104 @@ namespace NOpenType.Tables
             //-------------------------------------------------------------
             class LkSubTableT6Fmt1 : LookupSubTable
             {
+
                 public CoverageTable CoverageTable { get; set; }
                 public ChainSubRuleSetTable[] SubRuleSets { get; set; }
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+                    throw new NotImplementedException();
+                }
             }
 
 
             class LkSubTableT6Fmt2 : LookupSubTable
             {
+
                 public CoverageTable CoverageTable { get; set; }
                 public ClassDefTable BacktrackClassDef { get; set; }
                 public ClassDefTable InputClassDef { get; set; }
                 public ClassDefTable LookaheadClassDef { get; set; }
                 public ChainSubClassSet[] ChainSubClassSets { get; set; }
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+                    throw new NotImplementedException();
+                }
             }
 
 
             class LkSubTableT6Fmt3 : LookupSubTable
             {
+
                 public CoverageTable[] BacktrackingCoverages { get; set; }
                 public CoverageTable[] InputCoverages { get; set; }
                 public CoverageTable[] LookaheadCoverages { get; set; }
                 public SubstLookupRecord[] SubstLookupRecords { get; set; }
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+
+                    int endBefore = startAt + len;
+                    for (int i = startAt; i < endBefore; ++i)
+                    {
+                        ushort cur_glyphIndex = glyphIndices[i];
+                        //check if this is in input coverage or not
+                        if (CoverageTable.IsInRange(InputCoverages, cur_glyphIndex))
+                        {
+                            //check back tracking or look ahead
+                            if (BacktrackingCoverages.Length > 0 && LookaheadCoverages.Length > 0)
+                            {
+                                throw new NotSupportedException();
+                            }
+                            if (BacktrackingCoverages.Length > 0)
+                            {
+
+                                if (i > 0)
+                                {
+                                    //has next glyph
+                                    if (CoverageTable.IsInRange(BacktrackingCoverages, glyphIndices[i - 1]))
+                                    {
+                                        //match!, then
+                                        //do substitution
+                                        ushort replaceAt = SubstLookupRecords[0].sequenceIndex;
+                                        ushort lookupIndex = SubstLookupRecords[0].lookupListIndex;
+                                        if (replaceAt != 0)
+                                        {
+
+                                        }
+                                        LookupTable anotherLookup = this.OwnerGSub.GetLookupTable(lookupIndex);
+                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?                                         
+                                        //****
+                                        continue;
+                                    }
+                                }
+                            }
+                            if (LookaheadCoverages.Length > 0)
+                            {
+                                if (i < len - 1)
+                                {
+                                    //has next glyph
+                                    if (CoverageTable.IsInRange(LookaheadCoverages, glyphIndices[i + 1]))
+                                    {
+                                        //match!, then
+                                        //do substitution
+                                        ushort replaceAt = SubstLookupRecords[0].sequenceIndex;
+                                        ushort lookupIndex = SubstLookupRecords[0].lookupListIndex;
+                                        if (replaceAt != 0)
+                                        {
+
+                                        }
+                                        LookupTable anotherLookup = this.OwnerGSub.GetLookupTable(lookupIndex);
+                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?                                         
+                                        //****
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                        //-----------------
+                        //no substituion occurs
+                        //just pass t 
+                    }
+                }
             }
 
             /// <summary>
@@ -970,27 +1177,27 @@ namespace NOpenType.Tables
             }
         }
 
-        public bool CheckSubstitution(int inputGlyph)
-        {
-            List<GSUB.LookupResult> foundResults = new List<LookupResult>();
-            for (int i = lookupTables.Length - 1; i >= 0; --i)
-            {
-                LookupTable lookup = lookupTables[i];
-                if (lookup.lookupType != 1)
-                {
-                    //this version, handle only type1
-                    //TODO: implement more
-                    continue;
-                }
-                int foundIndex = lookup.FindGlyphIndex(inputGlyph);
-                if (foundIndex > -1)
-                {
-                    //found here 
-                    lookup.FindGlyphIndexAll(inputGlyph, foundResults);
-                }
-            }
-            return false;
-        }
+        //public bool CheckSubstitution(int inputGlyph)
+        //{
+        //    List<GSUB.LookupResult> foundResults = new List<LookupResult>();
+        //    for (int i = lookupTables.Length - 1; i >= 0; --i)
+        //    {
+        //        LookupTable lookup = lookupTables[i];
+        //        if (lookup.lookupType != 1)
+        //        {
+        //            //this version, handle only type1
+        //            //TODO: implement more
+        //            continue;
+        //        }
+        //        int foundIndex = lookup.FindGlyphIndex(inputGlyph);
+        //        if (foundIndex > -1)
+        //        {
+        //            //found here 
+        //            lookup.FindGlyphIndexAll(inputGlyph, foundResults);
+        //        }
+        //    }
+        //    return false;
+        //}
 
     }
 }

@@ -7,6 +7,8 @@ using System.IO;
 using System.Windows.Forms;
 
 using NOpenType;
+using NOpenType.Extensions;
+
 using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
 
@@ -28,8 +30,8 @@ namespace SampleWinForms
 
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithTypePlanAndMiniAgg);
-            cmbRenderChoices.SelectedIndex = 0;
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
+            cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
 
@@ -49,7 +51,7 @@ namespace SampleWinForms
         {
             RenderWithMiniAgg,
             RenderWithPlugableGlyphRasterizer, //new 
-            RenderWithTypePlanAndMiniAgg, //new
+            RenderWithTextPrinterAndMiniAgg, //new
         }
 
         void Form1_Load(object sender, EventArgs e)
@@ -64,8 +66,8 @@ namespace SampleWinForms
 
             if (g == null)
             {
-                destImg = new ActualImage(400, 300, PixelFarm.Agg.Image.PixelFormat.ARGB32);
-                imgGfx2d = new ImageGraphics2D(destImg, null); //no platform
+                destImg = new ActualImage(400, 300, PixelFormat.ARGB32);
+                imgGfx2d = new ImageGraphics2D(destImg); //no platform
                 p = new AggCanvasPainter(imgGfx2d);
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
@@ -83,8 +85,7 @@ namespace SampleWinForms
                 return;
             }
             var reader = new OpenTypeReader();
-            char testChar = txtInputChar.Text[0];//only 1 char
-
+            char testChar = txtInputChar.Text[0];//only 1 char 
             int resolution = 96;
 
             using (var fs = new FileStream(fontfile, FileMode.Open))
@@ -93,7 +94,20 @@ namespace SampleWinForms
                 Typeface typeFace = reader.Read(fs);
 
 #if DEBUG
-                string inputstr = "ก่นกิ่น";
+                //-----
+                //about typeface 
+                short ascender = typeFace.Ascender;
+                short descender = typeFace.Descender;
+                short lineGap = typeFace.LineGap;
+
+                NOpenType.Tables.UnicodeLangBits test = NOpenType.Tables.UnicodeLangBits.Thai;
+                NOpenType.Tables.UnicodeRangeInfo rangeInfo = test.ToUnicodeRangeInfo();
+                bool doseSupport = typeFace.DoseSupportUnicode(test);
+
+
+                //-----
+                //string inputstr = "ก่นกิ่น";
+                string inputstr = "ญญู";
                 List<int> outputGlyphIndice = new List<int>();
                 typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
 #endif
@@ -110,7 +124,7 @@ namespace SampleWinForms
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
-                    case RenderChoice.RenderWithTypePlanAndMiniAgg:
+                    case RenderChoice.RenderWithTextPrinterAndMiniAgg:
                         RenderWithTextPrinterAndMiniAgg(typeFace, this.txtInputChar.Text, fontSizeInPoint, resolution);
                         break;
                     default:
@@ -191,7 +205,7 @@ namespace SampleWinForms
                 p.Draw(vxs);
             }
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            BitmapHelper.CopyToWindowsBitmap(destImg, winBmp, new RectInt(0, 0, 300, 300));
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
@@ -232,7 +246,8 @@ namespace SampleWinForms
             TextPrinter printer = new TextPrinter();
             printer.EnableKerning = this.chkKern.Checked;
             int len = str.Length;
-            GlyphPlan[] glyphPlanList = new GlyphPlan[len];
+
+            List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
             printer.Print(typeface, sizeInPoint, str, glyphPlanList);
             //--------------------------
 
@@ -245,7 +260,7 @@ namespace SampleWinForms
                 //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 //5.3 
-                int glyphListLen = glyphPlanList.Length;
+                int glyphListLen = glyphPlanList.Count;
 
                 float ox = p.OriginX;
                 float oy = p.OriginY;
@@ -268,15 +283,22 @@ namespace SampleWinForms
                 //user can specific border width here...
                 //p.StrokeWidth = 2;
                 //5.5 
-                int glyphListLen = glyphPlanList.Length;
+                int glyphListLen = glyphPlanList.Count;
+                float ox = p.OriginX;
+                float oy = p.OriginY;
+                float cx = 0;
+                float cy = 10;
                 for (int i = 0; i < glyphListLen; ++i)
                 {
                     GlyphPlan glyphPlan = glyphPlanList[i];
+                    cx = glyphPlan.x;
+                    p.SetOrigin(cx, cy);
                     p.Draw(glyphPlan.vxs);
                 }
+                p.SetOrigin(ox, oy);
             }
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            BitmapHelper.CopyToWindowsBitmap(destImg, winBmp, new RectInt(0, 0, 300, 300));
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);

@@ -18,7 +18,7 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     partial class FilterImageSpanGenerator
     {

@@ -3,7 +3,10 @@ using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using NOpenType;
+using NOpenType.Extensions;
+
 using PixelFarm.Agg;
+
 namespace SampleWinForms
 {
 
@@ -14,6 +17,10 @@ namespace SampleWinForms
         public float y;
         public float advX;
         public VertexStore vxs;
+        public GlyphPlan(ushort glyphIndex)
+        {
+            this.glyphIndex = glyphIndex;
+        }
     }
 
     class GlyphsCache
@@ -44,12 +51,13 @@ namespace SampleWinForms
             get;
             set;
         }
-        public void Print(Typeface typeface, float size, string str, GlyphPlan[] glyphPlanBuffer)
+        public void Print(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Print(typeface, size, str.ToCharArray(), glyphPlanBuffer);
         }
 
-        public void Print(Typeface typeface, float size, char[] str, GlyphPlan[] glyphPlanBuffer)
+        List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
+        public void Print(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
         {
 
             //check if we have created a glyph cache
@@ -65,36 +73,60 @@ namespace SampleWinForms
             //1. convert char[] to glyph[]
             //2. send to shaping engine
             //3. layout position of each glyph 
-            //---------------------------------------------- 
-
+            //----------------------------------------------  
             var glyphPathBuilder = new GlyphPathBuilderVxs(typeface);
             int j = str.Length;
+
+            //TODO:....
+            //2.  
+            //shaping,
+            //glyph substitution
+
+            inputGlyphs.Clear();
+            for (int i = 0; i < j; ++i)
+            {
+                //1st 
+                inputGlyphs.Add((ushort)typeface.LookupIndex(str[i]));
+            }
             if (j > 1)
             {
                 //for debug
+                //test for thai lang 
+                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, "thai");
+                glyphSubstitution.DoSubstitution(inputGlyphs);
             }
-            //TODO:....
-            //2.  
-            //shaping, glyph substitution
+
+            //set glyph position
+            j = inputGlyphs.Count;
+            List<GlyphPos> glyphPositions = new List<GlyphPos>(j);
             for (int i = 0; i < j; ++i)
             {
-                var glyphPlan = new GlyphPlan();
-                glyphPlan.glyphIndex = (ushort)typeface.LookupIndex(str[i]);
-                glyphPlanBuffer[i] = glyphPlan;
+                ushort glyIndex = inputGlyphs[i];
+                glyphPositions.Add(new GlyphPos(glyIndex));
             }
+            //--------------
+            //do gpos
+            if (j > 1)
+            {
+                //GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, "thai");
+                //glyphSetPos.DoGlyphPosition(glyphPositions);
 
-
+            }
+            //--------------
             float scale = typeface.CalculateScale(size);
-
             float cx = 0;
             float cy = 0;
             bool enable_kerning = this.EnableKerning;
 
 
+            j = inputGlyphs.Count;
+         
             for (int i = 0; i < j; ++i)
             {
-                GlyphPlan glyphPlan = glyphPlanBuffer[i];
-                ushort glyIndex = glyphPlan.glyphIndex;
+                ushort glyIndex = inputGlyphs[i];
+                GlyphPlan glyphPlan = new GlyphPlan(glyIndex);
+                glyphPlanBuffer.Add(glyphPlan);
+
                 //-----------------------------------
                 //check if we static vxs/bmp for this glyph
                 //if not, create and cache

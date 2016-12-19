@@ -30,11 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Bounds.cs">
       <Link>Bounds.cs</Link>
     </Compile>
@@ -149,6 +144,9 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\GlyphLocations.cs">
       <Link>Tables.TrueType\GlyphLocations.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\AVar.cs">
+      <Link>Tables.Variations\AVar.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Variations\FVar.cs">
       <Link>Tables.Variations\FVar.cs</Link>
     </Compile>
@@ -209,7 +207,9 @@
     <Compile Include="Net20\ExtensionAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

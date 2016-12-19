@@ -220,7 +220,7 @@ namespace NOpenType
         public float SizeInPoints
         {
             get;
-            set;
+            private set;
         }
 
         protected Typeface TypeFace

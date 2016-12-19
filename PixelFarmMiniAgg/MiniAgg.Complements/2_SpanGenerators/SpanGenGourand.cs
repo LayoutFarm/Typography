@@ -104,19 +104,18 @@ namespace PixelFarm.Agg
                 m_cmd[6] = VertexCmd.Stop;
             }
         }
-        public VertexStore MakeVxs()
+        public VertexStore MakeVxs(VertexStore outputVxs)
         {
-            VertexStore vxs = new VertexStore();
             for (int i = 0; i < 8; ++i)
             {
                 VertexCmd cmd;
-                vxs.AddVertex(m_x[i], m_y[i], cmd = m_cmd[i]);
+                outputVxs.AddVertex(m_x[i], m_y[i], cmd = m_cmd[i]);
                 if (cmd == VertexCmd.Stop)
                 {
                     break;
                 }
             }
-            return vxs;
+            return outputVxs;
         }
 
         // Vertex Source Interface to feed the coordinates to the rasterizer 

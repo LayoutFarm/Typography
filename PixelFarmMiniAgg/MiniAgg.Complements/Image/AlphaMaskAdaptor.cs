@@ -16,7 +16,7 @@
 
 using System;
 using PixelFarm.Drawing;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     //==================================================pixfmt_amask_adaptor
     public sealed class AlphaMaskAdaptor : ProxyImage

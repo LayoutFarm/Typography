@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 
 using PixelFarm.Drawing;
-namespace PixelFarm.Agg.Image
+namespace PixelFarm.Agg.Imaging
 {
     public abstract class ProxyImage : IImageReaderWriter
     {
