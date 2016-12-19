@@ -66,7 +66,7 @@ namespace SampleWinForms
 
             if (g == null)
             {
-                destImg = new ActualImage(400, 300, PixelFarm.Agg.PixelFormat.ARGB32);
+                destImg = new ActualImage(400, 300, PixelFormat.ARGB32);
                 imgGfx2d = new ImageGraphics2D(destImg); //no platform
                 p = new AggCanvasPainter(imgGfx2d);
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);

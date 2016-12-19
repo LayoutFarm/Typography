@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontRasterizerSample.WinForms", "FontRasterizerSample.WinForms\FontRasterizerSample.WinForms.csproj", "{6627819C-F72B-4444-8461-14A57674FBD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "..\PixelFarm-dev\a_mini\projects\PixelFarm\PixelFarm.MiniAgg.One.csproj", "{CCE391D5-F166-4ECA-B99F-CE56B058CB58}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NetCore", "NetCore", "{0A7E0FB5-22E3-449C-8148-93A396FB7034}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Net20", "Net20", "{CB8ECDAF-B05D-4EE2-8169-E78CD6F3F714}"
@@ -12,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.OpenType", "N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj", "{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Portable", "Portable", "{4A232022-1F41-45B1-92E0-28DFCB93F3C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "PixelFarmMiniAgg\PixelFarm.MiniAgg.One.csproj", "{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +23,14 @@ Global
 		{6627819C-F72B-4444-8461-14A57674FBD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6627819C-F72B-4444-8461-14A57674FBD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6627819C-F72B-4444-8461-14A57674FBD9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCE391D5-F166-4ECA-B99F-CE56B058CB58}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

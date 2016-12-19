@@ -74,13 +74,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PixelFarm-dev\a_mini\projects\PixelFarm\PixelFarm.MiniAgg.One.csproj">
-      <Project>{CCE391D5-F166-4ECA-B99F-CE56B058CB58}</Project>
-      <Name>PixelFarm.MiniAgg.One</Name>
-    </ProjectReference>
     <ProjectReference Include="..\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>PixelFarm.OpenType</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PixelFarmMiniAgg\PixelFarm.MiniAgg.One.csproj">
+      <Project>{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
