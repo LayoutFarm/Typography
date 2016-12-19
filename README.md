@@ -1,4 +1,4 @@
-![PixelFarm's Typography](https://github.com/LayoutFarm/Typography/blob/gpos/screenshots/title.png)
+![PixelFarm's Typography](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title.png)
 ===========
 
 Simple and clean TrueType font renderer written purely in c#.
