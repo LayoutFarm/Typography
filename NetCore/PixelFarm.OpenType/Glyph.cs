@@ -58,14 +58,13 @@ namespace NOpenType
                (short)(orgBounds.YMax + dy));
 
         }
-        internal static void Apply2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
-        {
-            //x'= |m00 m01|x
-            //y'= |m10 m11|y
-            //--
-            //x' = x*m00+ y*m01
-            //y' = x*m10+ y*m11
 
+
+        internal static void TransformNormalWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
+        {
+
+            //http://stackoverflow.com/questions/13188156/whats-the-different-between-vector2-transform-and-vector2-transformnormal-i
+            //http://www.technologicalutopia.com/sourcecode/xnageometry/vector2.cs.htm
 
             //change data on current glyph
             short new_xmin = 0;
@@ -82,9 +81,60 @@ namespace NOpenType
                 short x = xs[i];
                 short y = ys[i];
 
+                //please note that this is transform normal***
+
+                short newX = xs[i] = (short)Math.Round((x * m00) + (y * m10));
+                short newY = ys[i] = (short)Math.Round((x * m01) + (y * m11));
+                //------
+                if (newX < new_xmin)
+                {
+                    new_xmin = newX;
+                }
+                if (newX > new_xmax)
+                {
+                    new_xmax = newX;
+                }
+                //------
+                if (newY < new_ymin)
+                {
+                    new_ymin = newY;
+                }
+                if (newY > new_ymax)
+                {
+                    new_ymax = newY;
+                }
+            }
+            glyph._bounds = new Bounds(
+                new_xmin, new_ymin,
+                new_xmax, new_ymax);
+
+        }
+        internal static void TransformWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
+        {
+            //x'= |m00 m01|x
+            //y'= |m10 m11|y
+            //--
+            //x' = x*m00+ y*m01
+            //y' = x*m10+ y*m11
+
+
+            //change data on current glyph
+            short new_xmin = 0;
+            short new_ymin = 0;
+            short new_xmax = 0;
+            short new_ymax = 0;
+            
+            short[] xs = glyph._xs;
+            short[] ys = glyph._ys;
+
+            for (int i = xs.Length - 1; i >= 0; --i)
+            {
+                short x = xs[i];
+                short y = ys[i];
+
+
                 short newX = xs[i] = (short)Math.Round((x * m00) + (y * m01));
                 short newY = ys[i] = (short)Math.Round((x * m10) + (y * m11));
-
                 //------
                 if (newX < new_xmin)
                 {
