@@ -79,10 +79,13 @@ namespace NOpenType.Tables
                 //------------------------
                 short contoursCount = reader.ReadInt16();
                 Bounds bounds = BoundsReader.ReadFrom(reader);
+
+#if DEBUG
                 if (glyphIndex == 7)
                 {
 
                 }
+#endif
                 _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, -contoursCount, bounds);
             }
 
@@ -372,7 +375,7 @@ namespace NOpenType.Tables
                     if (useMatrix)
                     {
                         //use this matrix  
-                        Glyph.Apply2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
+                        Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
                         Glyph.OffsetXY(newGlyph, (short)(arg1), arg2);
                     }
                     else
@@ -385,7 +388,7 @@ namespace NOpenType.Tables
                             }
                             else
                             {
-                                Glyph.Apply2x2Matrix(newGlyph, xscale, 0, 0, yscale);
+                                Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, 0, 0, yscale);
                             }
                             Glyph.OffsetXY(newGlyph, arg1, arg2);
                         }
