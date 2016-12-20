@@ -1,4 +1,5 @@
-Source code from multiple projects here...
+Source code from multiple projects,
+here...
 
 Apache2, 2014-2016, Samuel Carlsson, from https://github.com/vidstige/NRasterizer
 
