@@ -201,6 +201,9 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Utils.cs">
       <Link>Tables\Utils.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\TrueTypeInterpreter.cs">
+      <Link>TrueTypeInterperter\TrueTypeInterpreter.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Typeface.cs">
       <Link>Typeface.cs</Link>
     </Compile>
