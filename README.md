@@ -12,9 +12,11 @@ Simple and clean TrueType font renderer written purely in c#.
  
 License
 -----------
-Apache2, 2014-2016, Samuel Carlsson, WinterDev
+Apache2, 2014-2016, Samuel Carlsson, from https://github.com/vidstige/NRasterizer
 
-some code are in The FreeType Project license (BSD 3 clauses)
+MIT, 2015, Michael Popoloski MIT, from https://github.com/MikePopoloski/SharpFont
+
+The FreeType Project LICENSE (3-clauses), from https://www.freetype.org/
 
 Screenshots
 -----------
