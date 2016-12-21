@@ -32,7 +32,7 @@ namespace NOpenType
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
         }
-        internal SharpFont.Interpreter Interpreter
+        internal NOpenType.TrueTypeHinting.Interpreter Interpreter
         {
             get;
             set;
