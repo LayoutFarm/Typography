@@ -90,6 +90,7 @@ namespace NOpenType
                 GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
 
+                EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
                 //---------------------------------------------
                 //about truetype instruction init
                 //control values table
@@ -128,7 +129,10 @@ namespace NOpenType
                 {
                     typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
                 }
-                typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                if (propProgramTable != null)
+                {
+                    typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                }
                 //-------------------------
                 typeface.LoadOpenTypeLayoutInfo(
                     gdef,

@@ -73,8 +73,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //  ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
-            ReadAndRender(@"..\..\CompositeMS2.ttf");
+            ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
         float fontSizeInPoint = 14; //default
