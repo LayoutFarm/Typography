@@ -51,9 +51,6 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\IGlyphRasterizer.cs">
       <Link>IGlyphRasterizer.cs</Link>
     </Compile>
-    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Interpreter.cs">
-      <Link>Interpreter.cs</Link>
-    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\IO\ByteOrderSwappingBinaryReader.cs">
       <Link>IO\ByteOrderSwappingBinaryReader.cs</Link>
     </Compile>

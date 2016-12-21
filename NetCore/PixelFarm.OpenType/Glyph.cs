@@ -59,7 +59,6 @@ namespace NOpenType
 
         }
 
-
         internal static void TransformNormalWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
         {
 
@@ -123,7 +122,7 @@ namespace NOpenType
             short new_ymin = 0;
             short new_xmax = 0;
             short new_ymax = 0;
-            
+
             short[] xs = glyph._xs;
             short[] ys = glyph._ys;
 
