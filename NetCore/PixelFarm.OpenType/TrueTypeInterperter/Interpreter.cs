@@ -1,8 +1,8 @@
-﻿//MIT, 2015, Michael Popoloski
+﻿//MIT, 2015, Michael Popoloski's SharpFont
 using System;
 using System.Numerics;
 
-namespace SharpFont
+namespace NOpenType.TrueTypeHinting
 {
     class Interpreter
     {

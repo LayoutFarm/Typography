@@ -1,8 +1,9 @@
-﻿//MIT, 2015, Michael Popoloski
+﻿//MIT, 2015, Michael Popoloski's SharpFont
+
 using System;
 using System.Runtime.Serialization;
 
-namespace SharpFont
+namespace NOpenType
 {
 
     public class InvalidFontException : Exception
