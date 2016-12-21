@@ -35,8 +35,6 @@ namespace System.Numerics
         static Vector2 unitVector = new Vector2(1f, 1f);
         static Vector2 unitXVector = new Vector2(1f, 0f);
         static Vector2 unitYVector = new Vector2(0f, 1f);
-
-
         public float X;
         public float Y;
         public static readonly Vector2 Zero = new Vector2(0, 0);

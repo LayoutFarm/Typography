@@ -96,24 +96,20 @@ namespace SampleWinForms
 #if DEBUG
                 //-----
                 //about typeface 
-                short ascender = typeFace.Ascender;
-                short descender = typeFace.Descender;
-                short lineGap = typeFace.LineGap;
+                //short ascender = typeFace.Ascender;
+                //short descender = typeFace.Descender;
+                //short lineGap = typeFace.LineGap;
 
-                NOpenType.Tables.UnicodeLangBits test = NOpenType.Tables.UnicodeLangBits.Thai;
-                NOpenType.Tables.UnicodeRangeInfo rangeInfo = test.ToUnicodeRangeInfo();
-                bool doseSupport = typeFace.DoseSupportUnicode(test);
-
-
-                //-----
-                //string inputstr = "ก่นกิ่น";
-                string inputstr = "ญญู";
-                List<int> outputGlyphIndice = new List<int>();
-                typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
+                //NOpenType.Tables.UnicodeLangBits test = NOpenType.Tables.UnicodeLangBits.Thai;
+                //NOpenType.Tables.UnicodeRangeInfo rangeInfo = test.ToUnicodeRangeInfo();
+                //bool doseSupport = typeFace.DoseSupportUnicode(test); 
+                ////-----
+                ////string inputstr = "ก่นกิ่น";
+                //string inputstr = "ญญู";
+                //List<int> outputGlyphIndice = new List<int>();
+                //typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
 #endif
-
-
-
+                 
                 RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
                 switch (renderChoice)
                 {

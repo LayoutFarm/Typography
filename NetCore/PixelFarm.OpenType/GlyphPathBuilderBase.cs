@@ -222,7 +222,6 @@ namespace NOpenType
             get;
             private set;
         }
-
         protected Typeface TypeFace
         {
             get { return _typeface; }

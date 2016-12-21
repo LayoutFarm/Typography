@@ -200,7 +200,7 @@
       <Link>Tables\Utils.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\ForNet20.cs">
-      <Link>TrueTypeInterperter\ForNet20.cs</Link>
+      <Link>Net20\ForNet20.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Geometry.cs">
       <Link>TrueTypeInterperter\Geometry.cs</Link>
@@ -212,7 +212,7 @@
       <Link>TrueTypeInterperter\InvalidFontException.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Matrix3x2.cs">
-      <Link>TrueTypeInterperter\Matrix3x2.cs</Link>
+      <Link>Net20\Matrix3x2.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Typeface.cs">
       <Link>Typeface.cs</Link>
