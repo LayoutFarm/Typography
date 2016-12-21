@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -198,14 +199,23 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Utils.cs">
       <Link>Tables\Utils.cs</Link>
     </Compile>
-    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\TrueTypeInterpreter.cs">
-      <Link>TrueTypeInterperter\TrueTypeInterpreter.cs</Link>
-    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Typeface.cs">
       <Link>Typeface.cs</Link>
     </Compile>
     <Compile Include="Net20\ExtensionAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrueTypeInterperter\FontFace.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\CharacterMap.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\DataReader.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\ForNet20.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\Geometry.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\Interpreter.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\KerningTable.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\Matrix3x2.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\SbitTable.cs" />
+    <Compile Include="TrueTypeInterperter\Internal\SfntTables.cs" />
+    <Compile Include="TrueTypeInterperter\InvalidFontException.cs" />
+    <Compile Include="TrueTypeInterperter\Metrics.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
