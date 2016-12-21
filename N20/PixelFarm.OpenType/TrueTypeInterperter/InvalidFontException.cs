@@ -4,10 +4,7 @@ using System.Runtime.Serialization;
 
 namespace SharpFont
 {
-    /// <summary>
-    /// Represents errors that occur due to invalid data in a font file.
-    /// </summary>
-    [Serializable]
+
     public class InvalidFontException : Exception
     {
         /// <summary>
