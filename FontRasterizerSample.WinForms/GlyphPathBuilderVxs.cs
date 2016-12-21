@@ -57,6 +57,7 @@ namespace PixelFarm.Agg
         public VertexStore GetVxs()
         {
 
+
             float scale = TypeFace.CalculateScale(SizeInPoints);
 
             var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
@@ -67,10 +68,7 @@ namespace PixelFarm.Agg
             _reuseVxs1.Clear();
             _reuseVxs2.Clear();
 
-            VertexStore output = curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, _reuseVxs1), _reuseVxs2);
-
-
-            return output;
+            return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, _reuseVxs1), _reuseVxs2);
         }
         public VertexStore GetUnscaledVxs()
         {
