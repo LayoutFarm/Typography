@@ -204,6 +204,7 @@
     </Compile>
     <Compile Include="Net20\ExtensionAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tables.TrueType\Cvt_Programs.cs" />
     <Compile Include="TrueTypeInterperter\FontFace.cs" />
     <Compile Include="TrueTypeInterperter\Internal\CharacterMap.cs" />
     <Compile Include="TrueTypeInterperter\Internal\DataReader.cs" />
