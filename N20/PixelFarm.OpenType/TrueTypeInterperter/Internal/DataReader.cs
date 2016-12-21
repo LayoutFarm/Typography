@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 
 namespace SharpFont
 {
+    //TODO: merge to existing one and remove this
+
     unsafe sealed class DataReader : IDisposable
     {
         readonly Stream stream;

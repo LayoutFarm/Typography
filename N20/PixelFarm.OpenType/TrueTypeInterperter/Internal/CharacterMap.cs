@@ -1,22 +1,28 @@
 ﻿//MIT, 2015, Michael Popoloski
 using System.Collections.Generic;
 
-namespace SharpFont {
-    class CharacterMap {
+namespace SharpFont
+{
+    //TODO: merge to existing one and remove this
+    class CharacterMap
+    {
         Dictionary<CodePoint, int> table;
 
-        CharacterMap (Dictionary<CodePoint, int> table) {
+        CharacterMap(Dictionary<CodePoint, int> table)
+        {
             this.table = table;
         }
 
-        public int Lookup (CodePoint codePoint) {
+        public int Lookup(CodePoint codePoint)
+        {
             int index;
             if (table.TryGetValue(codePoint, out index))
                 return index;
             return -1;
         }
 
-        public static CharacterMap ReadCmap (DataReader reader, TableRecord[] tables) {
+        public static CharacterMap ReadCmap(DataReader reader, TableRecord[] tables)
+        {
             SfntTables.SeekToTable(reader, tables, FourCC.Cmap, required: true);
 
             // skip version
@@ -26,8 +32,10 @@ namespace SharpFont {
             // read all of the subtable headers
             var subtableCount = reader.ReadUInt16BE();
             var subtableHeaders = new CmapSubtableHeader[subtableCount];
-            for (int i = 0; i < subtableHeaders.Length; i++) {
-                subtableHeaders[i] = new CmapSubtableHeader {
+            for (int i = 0; i < subtableHeaders.Length; i++)
+            {
+                subtableHeaders[i] = new CmapSubtableHeader
+                {
                     PlatformID = reader.ReadUInt16BE(),
                     EncodingID = reader.ReadUInt16BE(),
                     Offset = reader.ReadUInt32BE()
@@ -36,11 +44,13 @@ namespace SharpFont {
 
             // search for a "full" Unicode table first
             var chosenSubtableOffset = 0u;
-            for (int i = 0; i < subtableHeaders.Length; i++) {
+            for (int i = 0; i < subtableHeaders.Length; i++)
+            {
                 var platform = subtableHeaders[i].PlatformID;
                 var encoding = subtableHeaders[i].EncodingID;
                 if ((platform == PlatformID.Microsoft && encoding == WindowsEncoding.UnicodeFull) ||
-                    (platform == PlatformID.Unicode && encoding == UnicodeEncoding.Unicode32)) {
+                    (platform == PlatformID.Unicode && encoding == UnicodeEncoding.Unicode32))
+                {
 
                     chosenSubtableOffset = subtableHeaders[i].Offset;
                     break;
@@ -49,12 +59,15 @@ namespace SharpFont {
 
             // if no full unicode table, just grab the first
             // one that supports any flavor of Unicode
-            if (chosenSubtableOffset == 0) {
-                for (int i = 0; i < subtableHeaders.Length; i++) {
+            if (chosenSubtableOffset == 0)
+            {
+                for (int i = 0; i < subtableHeaders.Length; i++)
+                {
                     var platform = subtableHeaders[i].PlatformID;
                     var encoding = subtableHeaders[i].EncodingID;
                     if ((platform == PlatformID.Microsoft && encoding == WindowsEncoding.UnicodeBmp) ||
-                         platform == PlatformID.Unicode) {
+                         platform == PlatformID.Unicode)
+                    {
 
                         chosenSubtableOffset = subtableHeaders[i].Offset;
                         break;
@@ -69,13 +82,15 @@ namespace SharpFont {
             // jump to our chosen table and find out what format it's in
             reader.Seek(cmapOffset + chosenSubtableOffset);
             var format = reader.ReadUInt16BE();
-            switch (format) {
+            switch (format)
+            {
                 case 4: return ReadCmapFormat4(reader);
                 default: throw new InvalidFontException("Unsupported cmap format.");
             }
         }
 
-        unsafe static CharacterMap ReadCmapFormat4 (DataReader reader) {
+        unsafe static CharacterMap ReadCmapFormat4(DataReader reader)
+        {
             // skip over length and language
             reader.Skip(sizeof(short) * 2);
 
@@ -104,20 +119,24 @@ namespace SharpFont {
 
             // build table from each segment
             var table = new Dictionary<CodePoint, int>();
-            for (int i = 0; i < segmentCount; i++) {
+            for (int i = 0; i < segmentCount; i++)
+            {
                 // read the "idRangeOffset" for the current segment
                 // if nonzero, we need to jump into the glyphIdArray to figure out the mapping
                 // the layout is bizarre; see the OpenType spec for details
                 var idRangeOffset = reader.ReadUInt16BE();
-                if (idRangeOffset != 0) {
+                if (idRangeOffset != 0)
+                {
                     var currentOffset = reader.Position;
                     reader.Seek(currentOffset + idRangeOffset - sizeof(ushort));
 
                     var end = endCount[i];
                     var delta = idDelta[i];
-                    for (var codepoint = startCount[i]; codepoint <= end; codepoint++) {
+                    for (var codepoint = startCount[i]; codepoint <= end; codepoint++)
+                    {
                         var glyphId = reader.ReadUInt16BE();
-                        if (glyphId != 0) {
+                        if (glyphId != 0)
+                        {
                             var glyphIndex = (glyphId + delta) & 0xFFFF;
                             if (glyphIndex != 0)
                                 table.Add((CodePoint)codepoint, glyphIndex);
@@ -126,11 +145,13 @@ namespace SharpFont {
 
                     reader.Seek(currentOffset);
                 }
-                else {
+                else
+                {
                     // otherwise, do a straight iteration through the segment
                     var end = endCount[i];
                     var delta = idDelta[i];
-                    for (var codepoint = startCount[i]; codepoint <= end; codepoint++) {
+                    for (var codepoint = startCount[i]; codepoint <= end; codepoint++)
+                    {
                         var glyphIndex = (codepoint + delta) & 0xFFFF;
                         if (glyphIndex != 0)
                             table.Add((CodePoint)codepoint, glyphIndex);
@@ -143,7 +164,8 @@ namespace SharpFont {
 
         const int MaxSegments = 1024;
 
-        struct CmapSubtableHeader {
+        struct CmapSubtableHeader
+        {
             public int PlatformID;
             public int EncodingID;
             public uint Offset;

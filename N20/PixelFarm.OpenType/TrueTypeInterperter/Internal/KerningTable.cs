@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace SharpFont
 {
+    //TODO: merge to existing one and remove this
     class KerningTable
     {
         Dictionary<uint, int> table;

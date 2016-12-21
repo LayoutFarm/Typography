@@ -4,6 +4,7 @@ using System.Numerics;
 
 namespace SharpFont
 {
+    //TODO: merge to existing one and remove this
     /// <summary>
     /// Contains various metrics that apply to a font face as a whole, scaled for a particular size.
     /// </summary>

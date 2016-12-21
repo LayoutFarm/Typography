@@ -7,6 +7,7 @@ using System.Threading;
 
 namespace SharpFont
 {
+    //TODO: merge to existing one and remove this
     /// <summary>
     /// Represents a single font face, maintaining all font data in memory.
     /// </summary>
