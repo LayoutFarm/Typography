@@ -44,8 +44,7 @@ namespace NOpenType
         {
             _rasterizer.EndRead();
         }
-        public IGlyphRasterizer Rasterizer { get; set; }
-
+        
     }
 
 }

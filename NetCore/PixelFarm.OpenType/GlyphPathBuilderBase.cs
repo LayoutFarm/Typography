@@ -194,6 +194,7 @@ namespace NOpenType
                 todoContourCount--;
             }
             OnEndRead();
+
         }
 
         static FtPoint GetMidPoint(FtPoint v1, short v2x, short v2y)
@@ -215,6 +216,7 @@ namespace NOpenType
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
             this.SizeInPoints = sizeInPoints;
+
             RenderGlyph(_typeface.GetGlyphByIndex(glyphIndex));
         }
         public float SizeInPoints

@@ -6,6 +6,7 @@ using System;
 
 namespace NOpenType
 {
+    //
     public interface IGlyphRasterizer
     {
         void BeginRead(int countourCount);
