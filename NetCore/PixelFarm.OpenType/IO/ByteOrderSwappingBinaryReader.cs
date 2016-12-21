@@ -14,12 +14,12 @@ namespace NOpenType.IO
         {
         }
 
-        public ushort SwapBytes(ushort x)
+        static ushort SwapBytes(ushort x)
         {
             return (ushort)((ushort)((x & 0xff) << 8) | ((x >> 8) & 0xff));
         }
 
-        public uint SwapBytes(uint x)
+        static uint SwapBytes(uint x)
         {
             return ((x & 0x000000ff) << 24) +
                 ((x & 0x0000ff00) << 8) +
