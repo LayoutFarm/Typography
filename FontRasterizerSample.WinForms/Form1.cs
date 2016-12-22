@@ -73,8 +73,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //  ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
-            ReadAndRender(@"..\..\CompositeMS2.ttf");
+            ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
         float fontSizeInPoint = 14; //default
@@ -96,24 +96,20 @@ namespace SampleWinForms
 #if DEBUG
                 //-----
                 //about typeface 
-                short ascender = typeFace.Ascender;
-                short descender = typeFace.Descender;
-                short lineGap = typeFace.LineGap;
+                //short ascender = typeFace.Ascender;
+                //short descender = typeFace.Descender;
+                //short lineGap = typeFace.LineGap;
 
-                NOpenType.Tables.UnicodeLangBits test = NOpenType.Tables.UnicodeLangBits.Thai;
-                NOpenType.Tables.UnicodeRangeInfo rangeInfo = test.ToUnicodeRangeInfo();
-                bool doseSupport = typeFace.DoseSupportUnicode(test);
-
-
-                //-----
-                //string inputstr = "ก่นกิ่น";
-                string inputstr = "ญญู";
-                List<int> outputGlyphIndice = new List<int>();
-                typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
+                //NOpenType.Tables.UnicodeLangBits test = NOpenType.Tables.UnicodeLangBits.Thai;
+                //NOpenType.Tables.UnicodeRangeInfo rangeInfo = test.ToUnicodeRangeInfo();
+                //bool doseSupport = typeFace.DoseSupportUnicode(test); 
+                ////-----
+                ////string inputstr = "ก่นกิ่น";
+                //string inputstr = "ญญู";
+                //List<int> outputGlyphIndice = new List<int>();
+                //typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
 #endif
-
-
-
+                 
                 RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
                 switch (renderChoice)
                 {
@@ -181,6 +177,7 @@ namespace SampleWinForms
         {
             //2. glyph-to-vxs builder
             var builder = new GlyphPathBuilderVxs(typeface);
+            builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
             builder.Build(testChar, sizeInPoint);
             VertexStore vxs = builder.GetVxs();
 
@@ -224,6 +221,7 @@ namespace SampleWinForms
             //2. glyph to gdi path
             var gdiGlyphRasterizer = new NOpenType.CLI.GDIGlyphRasterizer();
             var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
+            builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
             builder.Build(testChar, sizeInPoint);
 
 

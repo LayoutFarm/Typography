@@ -37,6 +37,7 @@
             this.lstFontSizes = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.chkKern = new System.Windows.Forms.CheckBox();
+            this.chkTrueTypeHint = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -129,11 +130,24 @@
             this.chkKern.UseVisualStyleBackColor = true;
             this.chkKern.CheckedChanged += new System.EventHandler(this.chkKern_CheckedChanged);
             // 
+            // chkTrueTypeHint
+            // 
+            this.chkTrueTypeHint.AutoSize = true;
+            this.chkTrueTypeHint.Checked = true;
+            this.chkTrueTypeHint.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTrueTypeHint.Location = new System.Drawing.Point(237, 82);
+            this.chkTrueTypeHint.Name = "chkTrueTypeHint";
+            this.chkTrueTypeHint.Size = new System.Drawing.Size(125, 17);
+            this.chkTrueTypeHint.TabIndex = 11;
+            this.chkTrueTypeHint.Text = "Do TrueType Hinting";
+            this.chkTrueTypeHint.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkTrueTypeHint);
             this.Controls.Add(this.chkKern);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lstFontSizes);
@@ -161,6 +175,7 @@
         private System.Windows.Forms.ListBox lstFontSizes;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkKern;
+        private System.Windows.Forms.CheckBox chkTrueTypeHint;
     }
 }
 

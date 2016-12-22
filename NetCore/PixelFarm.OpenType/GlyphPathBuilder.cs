@@ -17,26 +17,33 @@ namespace NOpenType
         }
         protected override void OnBeginRead(int countourCount)
         {
-            scale = TypeFace.CalculateScale(SizeInPoints);
+            if (this.UseTrueTypeInterpreter)
+            {
+                scale = 1;
+            }
+            else
+            {
+                scale = TypeFace.CalculateScale(SizeInPoints);
+            }
             _rasterizer.BeginRead(countourCount);
         }
         protected override void OnCloseFigure()
         {
             _rasterizer.CloseFigure();
         }
-        protected override void OnCurve3(short p2x, short p2y, short x, short y)
+        protected override void OnCurve3(float p2x, float p2y, float x, float y)
         {
             _rasterizer.Curve3(p2x * scale, p2y * scale, x * scale, y * scale);
         }
-        protected override void OnCurve4(short p2x, short p2y, short p3x, short p3y, short x, short y)
+        protected override void OnCurve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
         {
             _rasterizer.Curve4(p2x * scale, p2y * scale, p3x * scale, p3y * scale, x * scale, y * scale);
         }
-        protected override void OnLineTo(short x, short y)
+        protected override void OnLineTo(float x, float y)
         {
             _rasterizer.LineTo(x * scale, y * scale);
         }
-        protected override void OnMoveTo(short x, short y)
+        protected override void OnMoveTo(float x, float y)
         {
             _rasterizer.MoveTo(x * scale, y * scale);
         }
@@ -44,7 +51,6 @@ namespace NOpenType
         {
             _rasterizer.EndRead();
         }
-        public IGlyphRasterizer Rasterizer { get; set; }
 
     }
 

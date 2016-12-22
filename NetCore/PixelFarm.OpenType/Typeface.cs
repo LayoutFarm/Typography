@@ -1,7 +1,7 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
-
 using System.Collections.Generic;
 using NOpenType.Tables;
+
 namespace NOpenType
 {
     public class Typeface
@@ -10,6 +10,7 @@ namespace NOpenType
         readonly ushort _unitsPerEm;
         readonly Glyph[] _glyphs;
         readonly CharacterMap[] _cmaps;
+        //TODO: implement vertical metrics
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
 
@@ -32,6 +33,14 @@ namespace NOpenType
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
         }
+
+        /// <summary>
+        /// control values in Font unit
+        /// </summary>
+        internal int[] ControlValues { get; set; }
+        internal byte[] PrepProgramBuffer { get; set; }
+        internal byte[] FpgmProgramBuffer { get; set; }
+        internal MaxProfile MaxProfile { get; set; }
         internal Kern KernTable
         {
             get { return _kern; }
@@ -148,9 +157,14 @@ namespace NOpenType
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(character));
         }
-        public ushort GetAdvanceWidthFromGlyphIndex(int glyphIndex)
+        public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
         {
+
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
+        }
+        public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
+        {
+            return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
@@ -166,7 +180,14 @@ namespace NOpenType
         {
             return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
         }
-
+        public static float ConvPointsToPixels(float pointsValue, int resolution = 96)
+        {
+            //http://stackoverflow.com/questions/139655/convert-pixels-to-points
+            //points = pixels * 72 / 96
+            //pixels = points * 96 /72
+            //pixels = points * resolution / pointPerInch
+            return pointsValue * resolution / pointsPerInch;
+        }
         internal GDEF GDEFTable
         {
             get;

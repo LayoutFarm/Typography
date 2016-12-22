@@ -67,6 +67,7 @@ namespace NOpenType
                 OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
                 NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
 
+
                 Head header = ReadTableIfExists(tables, input, new Head());
                 MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
@@ -88,8 +89,14 @@ namespace NOpenType
                 GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
                 GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
-                //--------------
 
+                EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
+                //---------------------------------------------
+                //about truetype instruction init
+              
+
+              
+                //--------------------------------------------- 
                 var typeface = new Typeface(
                     nameEntry,
                     header.Bounds,
@@ -101,7 +108,23 @@ namespace NOpenType
                 //----------------------------
                 typeface.KernTable = kern;
                 typeface.GaspTable = gaspTable;
+                typeface.MaxProfile = maximumProfile;
                 //----------------------------
+                FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
+                //control values table
+                CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
+
+                typeface.ControlValues = cvtTable.controlValues;
+                if (fpgmTable != null)
+                {
+                    typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
+                }
+                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable()); 
+                if (propProgramTable != null)
+                {
+                    typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                }
+                //-------------------------
                 typeface.LoadOpenTypeLayoutInfo(
                     gdef,
                     gsub,

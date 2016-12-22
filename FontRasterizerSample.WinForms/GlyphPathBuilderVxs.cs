@@ -15,8 +15,8 @@ namespace PixelFarm.Agg
         public GlyphPathBuilderVxs(Typeface typeface)
             : base(typeface)
         {
-
         }
+
         protected override void OnBeginRead(int countourCount)
         {
             ps.Clear();
@@ -29,19 +29,19 @@ namespace PixelFarm.Agg
         {
             ps.CloseFigure();
         }
-        protected override void OnCurve3(short p2x, short p2y, short x, short y)
+        protected override void OnCurve3(float p2x, float p2y, float x, float y)
         {
             ps.Curve3(p2x, p2y, x, y);
         }
-        protected override void OnCurve4(short p2x, short p2y, short p3x, short p3y, short x, short y)
+        protected override void OnCurve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
         {
             ps.Curve4(p2x, p2y, p3x, p3y, x, y);
         }
-        protected override void OnLineTo(short x, short y)
+        protected override void OnLineTo(float x, float y)
         {
             ps.LineTo(x, y);
         }
-        protected override void OnMoveTo(short x, short y)
+        protected override void OnMoveTo(float x, float y)
         {
             ps.MoveTo(x, y);
         }
@@ -52,18 +52,24 @@ namespace PixelFarm.Agg
         /// <returns></returns>
         public VertexStore GetVxs()
         {
-            float scale = TypeFace.CalculateScale(SizeInPoints);// (float)(SizeInPoints * Resolution) / (pointsPerInch * TypeFaceUnitPerEm);
-            var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
-                //scale
-             new PixelFarm.Agg.Transform.AffinePlan(
-                 PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale),
-                //translate
-             new PixelFarm.Agg.Transform.AffinePlan(
-                 PixelFarm.Agg.Transform.AffineMatrixCommand.Translate, 1, 1)
-                 );
             VertexStore vxs1 = new VertexStore();
-            VertexStore vxs2 = new VertexStore();
-            return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, vxs1), vxs2);
+            //1. calculate scale 
+            if (UseTrueTypeInterpreter)
+            {
+                return curveFlattener.MakeVxs(ps.Vxs, vxs1);
+            }
+            else
+            {
+                VertexStore vxs2 = new VertexStore();
+                float scale = UseTrueTypeInterpreter ? 1 :
+                TypeFace.CalculateScale(SizeInPoints);
+                var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
+                    new PixelFarm.Agg.Transform.AffinePlan(
+                        PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
+
+                return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, vxs1), vxs2);
+            }
+
         }
         public VertexStore GetUnscaledVxs()
         {
