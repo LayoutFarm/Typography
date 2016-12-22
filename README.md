@@ -1,12 +1,12 @@
 ![PixelFarm's Typography](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title.png)
 ===========
 
-Simple and clean TrueType font renderer written purely in c#.
+pure C# TrueType and OpenType Font Reader, Glyph Layout and Rendering.
 
- * 1.Loads .ttf files, with OpenTypeReader (former NRasterizer,https://github.com/vidstige/NRasterizer)
+ * 1.Loads .ttf files, with OpenTypeReader (from NRasterizer's OpenType ,https://github.com/vidstige/NRasterizer)
  
  * 2.Rasterizes char to bitmap with pure software renderer + Agg(anti grain geometry) Quality! with 
-      our PixelFarm's MiniAgg :) (https://github.com/LayoutFarm/PixelFarm)
+      our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
 	  
  * .Net >=2.0 
  
