@@ -141,6 +141,7 @@
             this.chkTrueTypeHint.TabIndex = 11;
             this.chkTrueTypeHint.Text = "Do TrueType Hinting";
             this.chkTrueTypeHint.UseVisualStyleBackColor = true;
+            this.chkTrueTypeHint.CheckedChanged += new System.EventHandler(this.chkTrueTypeHint_CheckedChanged);
             // 
             // Form1
             // 

@@ -51,6 +51,11 @@ namespace SampleWinForms
             get;
             set;
         }
+        public bool EnableTrueTypeHint
+        {
+            get;
+            set;
+        }
         public void Print(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Print(typeface, size, str.ToCharArray(), glyphPlanBuffer);
@@ -117,10 +122,10 @@ namespace SampleWinForms
             float cx = 0;
             float cy = 0;
             bool enable_kerning = this.EnableKerning;
-
+            glyphPathBuilder.UseTrueTypeInterpreter = this.EnableTrueTypeHint;
 
             j = inputGlyphs.Count;
-         
+            
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];

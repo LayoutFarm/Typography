@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
-            this.txtInputChar.Text = "ABCDEFG";
+            this.txtInputChar.Text = "ai";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -244,6 +244,8 @@ namespace SampleWinForms
             //1. 
             TextPrinter printer = new TextPrinter();
             printer.EnableKerning = this.chkKern.Checked;
+            printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
+
             int len = str.Length;
 
             List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
@@ -322,6 +324,11 @@ namespace SampleWinForms
         }
 
         private void chkKern_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkTrueTypeHint_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }

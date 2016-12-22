@@ -54,15 +54,14 @@ namespace PixelFarm.Agg
         {
             VertexStore vxs1 = new VertexStore();
             //1. calculate scale 
-            if (UseTrueTypeInterpreter)
+            if (PassInterpreterModule)
             {
                 return curveFlattener.MakeVxs(ps.Vxs, vxs1);
             }
             else
             {
                 VertexStore vxs2 = new VertexStore();
-                float scale = UseTrueTypeInterpreter ? 1 :
-                TypeFace.CalculateScale(SizeInPoints);
+                float scale = TypeFace.CalculateScale(SizeInPoints);
                 var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
                     new PixelFarm.Agg.Transform.AffinePlan(
                         PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));

@@ -17,7 +17,7 @@ namespace NOpenType
         }
         protected override void OnBeginRead(int countourCount)
         {
-            if (this.UseTrueTypeInterpreter)
+            if (this.PassInterpreterModule)
             {
                 scale = 1;
             }

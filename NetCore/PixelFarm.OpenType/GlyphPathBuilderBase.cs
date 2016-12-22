@@ -11,7 +11,7 @@ namespace NOpenType
         readonly Typeface _typeface;
         SharpFont.Interpreter _interpreter;
         bool _useInterpreter;
-
+        bool _passInterpreterModule;
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
@@ -56,6 +56,7 @@ namespace NOpenType
             get { return _useInterpreter; }
             set
             {
+                 
                 _useInterpreter = value;
                 if (value && _interpreter == null)
                 {
@@ -75,6 +76,10 @@ namespace NOpenType
                     }
                 }
             }
+        }
+        protected bool PassInterpreterModule
+        {
+            get { return this._passInterpreterModule; }
         }
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
@@ -103,10 +108,13 @@ namespace NOpenType
             GlyphPointF[] glyphPoints = glyph.GlyphPoints;
             ushort[] contourEndPoints = glyph.EndPoints;
             //-------------------------------------------
+            _passInterpreterModule = false;
+            int npoints = glyphPoints.Length;
+
             Typeface currentTypeFace = this.TypeFace;
             if (UseTrueTypeInterpreter &&
                 currentTypeFace.PrepProgramBuffer != null &&
-                 glyph.GlyphInstructions != null)
+                glyph.GlyphInstructions != null)
             {
 
                 //the true type hint logics come from Michael Popoloski 's SharpFont project.
@@ -133,11 +141,13 @@ namespace NOpenType
                 int verticalAdv = 0;
                 int vFrontSideBearing = 0;
 
+                //-------------------------
+                //TODO: review here again
                 var pp1 = new GlyphPointF((glyph.MinX - hFrontSideBearing), 0, true);
                 var pp2 = new GlyphPointF(pp1.X + horizontalAdv, 0, true);
                 var pp3 = new GlyphPointF(0, glyph.MaxY + vFrontSideBearing, true);
                 var pp4 = new GlyphPointF(0, pp3.Y - verticalAdv, true);
-
+                //-------------------------
                 newGlyphPoints[orgLen] = (pp1 * scaleFactor);
                 newGlyphPoints[orgLen + 1] = (pp2 * scaleFactor);
                 newGlyphPoints[orgLen + 2] = (pp3 * scaleFactor);
@@ -155,11 +165,10 @@ namespace NOpenType
 
 
                 glyphPoints = newGlyphPoints;
+                _passInterpreterModule = true;
             }
 
-            //outline version
-            //-----------------------------
-            int npoints = glyphPoints.Length;
+
             int startContour = 0;
             int cpoint_index = 0;
             int todoContourCount = contourEndPoints.Length;
