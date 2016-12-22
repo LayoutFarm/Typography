@@ -1,7 +1,7 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
-
 using System.Collections.Generic;
 using NOpenType.Tables;
+
 namespace NOpenType
 {
     public class Typeface
@@ -10,6 +10,7 @@ namespace NOpenType
         readonly ushort _unitsPerEm;
         readonly Glyph[] _glyphs;
         readonly CharacterMap[] _cmaps;
+        //TODO: implement vertical metrics
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
 
@@ -156,9 +157,14 @@ namespace NOpenType
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(character));
         }
-        public ushort GetAdvanceWidthFromGlyphIndex(int glyphIndex)
+        public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
         {
+
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
+        }
+        public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
+        {
+            return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
@@ -180,7 +186,7 @@ namespace NOpenType
             //points = pixels * 72 / 96
             //pixels = points * 96 /72
             //pixels = points * resolution / pointPerInch
-            return pointsValue * resolution / pointsPerInch; 
+            return pointsValue * resolution / pointsPerInch;
         }
         internal GDEF GDEFTable
         {

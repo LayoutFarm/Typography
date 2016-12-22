@@ -117,11 +117,12 @@ namespace NOpenType
         internal static Glyph Clone(Glyph original)
         {
             //---------------------- 
-            GlyphPointF[] newPoints = Utils.CloneArray(original.glyphPoints);
-            ushort[] new_contourEndPoints = Utils.CloneArray(original._contourEndPoints);
-            byte[] glyphInstructions = Utils.CloneArray(original.GlyphInstructions);
 
-            return new Glyph(newPoints, new_contourEndPoints, original.Bounds, glyphInstructions);
+            return new Glyph(
+                Utils.CloneArray(original.glyphPoints),
+                Utils.CloneArray(original._contourEndPoints),
+                original.Bounds,
+                Utils.CloneArray(original.GlyphInstructions));
         }
 
         /// <summary>
@@ -155,9 +156,26 @@ namespace NOpenType
             dest._bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
         }
 
-        
+
         internal GlyphClassKind GlyphClassDef { get; set; }
         internal ushort MarkClassDef { get; set; }
+        public short MinX
+        {
+            get { return _bounds.XMin; }
+        }
+        public short MaxX
+        {
+            get { return _bounds.XMax; }
+        }
+        public short MinY
+        {
+            get { return _bounds.YMin; }
+        }
+        public short MaxY
+        {
+            get { return _bounds.YMax; }
+        }
+
 #if DEBUG
         public override string ToString()
         {

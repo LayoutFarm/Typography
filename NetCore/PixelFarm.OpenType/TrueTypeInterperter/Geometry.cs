@@ -34,11 +34,16 @@ namespace NOpenType
 
         public static implicit operator Vector2(GlyphPointF p) { return p.P; }
 
-
+        public static GlyphPointF operator *(GlyphPointF p, float n)
+        {
+            return new GlyphPointF(p.P * n, p.onCurve);
+        }
         public bool IsEqualsWith(GlyphPointF another)
         {
             return this.P == another.P && this.onCurve == another.onCurve;
         }
+        public float X { get { return this.P.X; } }
+        public float Y { get { return this.P.Y; } }
     }
 
 

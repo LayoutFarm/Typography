@@ -145,5 +145,11 @@ namespace System.Numerics
         {
             return (X * X) + (Y * Y);
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + X + "," + Y + ")";
+        }
+#endif
     }
 }

@@ -221,6 +221,7 @@ namespace SampleWinForms
             //2. glyph to gdi path
             var gdiGlyphRasterizer = new NOpenType.CLI.GDIGlyphRasterizer();
             var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
+            builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
             builder.Build(testChar, sizeInPoint);
 
 

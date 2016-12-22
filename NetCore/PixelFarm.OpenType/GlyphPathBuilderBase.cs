@@ -1,6 +1,6 @@
-﻿//-----------------------------------------------------
-//Apache2, 2014-2016,   WinterDev
-//some logics from FreeType Lib (FTL, BSD-3 clause)
+﻿//Apache2, 2016, WinterDev
+//MIT, 2015, Michael Popoloski 
+//FTL, 3-clauses BSD, FreeType project
 //-----------------------------------------------------
 
 using System;
@@ -84,23 +84,65 @@ namespace NOpenType
         protected abstract void OnMoveTo(float x, float y);
         protected abstract void OnLineTo(float x, float y);
 
-        void RenderGlyph(GlyphPointF[] glyphPoints, ushort[] contours)
+
+        static FtPoint GetMidPoint(FtPoint v1, short v2x, short v2y)
         {
+            return new FtPoint(
+                (short)((v1.X + v2x) >> 1),
+                (short)((v1.Y + v2y) >> 1));
+        }
+        static FtPointF GetMidPointF(FtPointF v1, float v2x, float v2y)
+        {
+            return new FtPointF(
+                ((v1.X + v2x) / 2),
+                 ((v1.Y + v2y) / 2));
+        }
+        void RenderGlyph(ushort glyphIndex, Glyph glyph)
+        {
+            //-------------------------------------------
+            GlyphPointF[] glyphPoints = glyph.GlyphPoints;
+            ushort[] contourEndPoints = glyph.EndPoints;
+            //-------------------------------------------
             Typeface currentTypeFace = this.TypeFace;
-            if (UseTrueTypeInterpreter && currentTypeFace.PrepProgramBuffer != null)
+            if (UseTrueTypeInterpreter &&
+                currentTypeFace.PrepProgramBuffer != null &&
+                 glyph.GlyphInstructions != null)
             {
+
+                //the true type hint logics come from Michael Popoloski 's SharpFont project.
 #if DEBUG
                 GlyphPointF[] backupGlyphPoints = glyphPoints;
 #endif
                 //1. use a clone version           
-                GlyphPointF[] newGlyphPoints = Utils.CloneArray(glyphPoints);
+                int orgLen = glyphPoints.Length;
+                GlyphPointF[] newGlyphPoints = Utils.CloneArray(glyphPoints, 4); //extend org with 4 elems
                 //2. scale
                 float scaleFactor = currentTypeFace.CalculateScale(SizeInPoints);
-                int j = newGlyphPoints.Length;
-                for (int i = newGlyphPoints.Length - 1; i >= 0; --i)
+                for (int i = orgLen - 1; i >= 0; --i)
                 {
                     newGlyphPoints[i].ApplyScale(scaleFactor);
                 }
+
+
+                //----------------------------------------------
+                // add phantom points; these are used to define the extents of the glyph,
+                // and can be modified by hinting instructions
+
+                int horizontalAdv = currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+                int hFrontSideBearing = currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
+                int verticalAdv = 0;
+                int vFrontSideBearing = 0;
+
+                var pp1 = new GlyphPointF((glyph.MinX - hFrontSideBearing), 0, true);
+                var pp2 = new GlyphPointF(pp1.X + horizontalAdv, 0, true);
+                var pp3 = new GlyphPointF(0, glyph.MaxY + vFrontSideBearing, true);
+                var pp4 = new GlyphPointF(0, pp3.Y - verticalAdv, true);
+
+                newGlyphPoints[orgLen] = (pp1 * scaleFactor);
+                newGlyphPoints[orgLen + 1] = (pp2 * scaleFactor);
+                newGlyphPoints[orgLen + 2] = (pp3 * scaleFactor);
+                newGlyphPoints[orgLen + 3] = (pp4 * scaleFactor);
+
 
                 //3. 
                 float sizeInPixels = Typeface.ConvPointsToPixels(SizeInPoints);
@@ -109,15 +151,8 @@ namespace NOpenType
                     sizeInPixels,
                     currentTypeFace.PrepProgramBuffer);
                 //then hint
-                _interpreter.HintGlyph(newGlyphPoints, contours, currentTypeFace.PrepProgramBuffer);
-                //change it
+                _interpreter.HintGlyph(newGlyphPoints, contourEndPoints, glyph.GlyphInstructions);
 
-#if DEBUG
-                //test?
-                if (Utils.dbugIsDiff(newGlyphPoints, glyphPoints))
-                {
-                }
-#endif
 
                 glyphPoints = newGlyphPoints;
             }
@@ -127,7 +162,7 @@ namespace NOpenType
             int npoints = glyphPoints.Length;
             int startContour = 0;
             int cpoint_index = 0;
-            int todoContourCount = contours.Length;
+            int todoContourCount = contourEndPoints.Length;
             //----------------------------------- 
             OnBeginRead(todoContourCount);
             //-----------------------------------
@@ -136,7 +171,7 @@ namespace NOpenType
             int controlPointCount = 0;
             while (todoContourCount > 0)
             {
-                int nextContour = contours[startContour] + 1;
+                int nextContour = contourEndPoints[startContour] + 1;
                 bool isFirstPoint = true;
                 FtPointF secondControlPoint = new FtPointF();
                 FtPointF thirdControlPoint = new FtPointF();
@@ -276,23 +311,6 @@ namespace NOpenType
 
         }
 
-        static FtPoint GetMidPoint(FtPoint v1, short v2x, short v2y)
-        {
-            return new FtPoint(
-                (short)((v1.X + v2x) >> 1),
-                (short)((v1.Y + v2y) >> 1));
-        }
-        static FtPointF GetMidPointF(FtPointF v1, float v2x, float v2y)
-        {
-            return new FtPointF(
-                ((v1.X + v2x) / 2),
-                 ((v1.Y + v2y) / 2));
-        }
-        void RenderGlyph(Glyph glyph)
-        {
-            RenderGlyph(glyph.GlyphPoints, glyph.EndPoints);
-        }
-
         public void Build(char c, float sizeInPoints)
         {
             BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints);
@@ -301,7 +319,7 @@ namespace NOpenType
         {
             this.SizeInPoints = sizeInPoints;
 
-            RenderGlyph(_typeface.GetGlyphByIndex(glyphIndex));
+            RenderGlyph(glyphIndex, _typeface.GetGlyphByIndex(glyphIndex));
         }
         public float SizeInPoints
         {

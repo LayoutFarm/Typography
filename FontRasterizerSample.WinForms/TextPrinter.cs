@@ -135,7 +135,7 @@ namespace SampleWinForms
                 //----------------------------------- 
                 var vxs = glyphPathBuilder.GetVxs();
                 //this advWidth in font design unit 
-                float advWidth = typeface.GetAdvanceWidthFromGlyphIndex(glyIndex) * scale;
+                float advWidth = typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex) * scale;
                 //---------------------------------- 
                 glyphPlan.x = cx;
                 glyphPlan.y = 0;
