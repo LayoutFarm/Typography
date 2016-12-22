@@ -32,11 +32,7 @@ namespace NOpenType
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
         }
-        internal SharpFont.Interpreter Interpreter
-        {
-            get;
-            set;
-        }
+       
         internal byte[] PrepProgramBuffer { get; set; }
         internal byte[] FpgmProgramBuffer { get; set; }
         internal MaxProfile MaxProfile { get; set; }

@@ -97,19 +97,7 @@ namespace NOpenType
                 CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
                 //read in global font program data
                 PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
-                //we can init it later
-                var interpreter = new SharpFont.Interpreter(
-                    maximumProfile.MaxStackElements,
-                    maximumProfile.MaxStorage,
-                    maximumProfile.MaxFunctionDefs,
-                    maximumProfile.MaxInstructionDefs,
-                    maximumProfile.MaxTwilightPoints);
-                // the fpgm table optionally contains a program to run at initialization time
-                FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
-                if (fpgmTable != null)
-                {
-                    interpreter.InitializeFunctionDefs(fpgmTable.programBuffer);
-                }
+               
                 //--------------------------------------------- 
                 var typeface = new Typeface(
                     nameEntry,
@@ -124,7 +112,8 @@ namespace NOpenType
                 typeface.GaspTable = gaspTable;
                 //----------------------------
                 typeface.MaxProfile = maximumProfile;
-                typeface.Interpreter = interpreter;
+
+                FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
                 if (fpgmTable != null)
                 {
                     typeface.FpgmProgramBuffer = fpgmTable.programBuffer;

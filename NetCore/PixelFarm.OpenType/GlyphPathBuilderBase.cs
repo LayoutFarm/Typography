@@ -9,6 +9,9 @@ namespace NOpenType
     public abstract class GlyphPathBuilderBase
     {
         readonly Typeface _typeface;
+        SharpFont.Interpreter _interpreter;
+        bool _useInterpreter;
+
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
@@ -47,6 +50,32 @@ namespace NOpenType
                 return "(" + _x + "," + _y + ")";
             }
         }
+        public bool UseTrueTypeInterpreter
+        {
+            get { return _useInterpreter; }
+            set
+            {
+                _useInterpreter = value;
+                if (_useInterpreter && _interpreter == null)
+                {
+                    //we can init it later
+                    NOpenType.Typeface currentTypeFace = this.TypeFace;
+                    Tables.MaxProfile maximumProfile = currentTypeFace.MaxProfile;
+                    _interpreter = new SharpFont.Interpreter(
+                        maximumProfile.MaxStackElements,
+                        maximumProfile.MaxStorage,
+                        maximumProfile.MaxFunctionDefs,
+                        maximumProfile.MaxInstructionDefs,
+                        maximumProfile.MaxTwilightPoints);
+                    // the fpgm table optionally contains a program to run at initialization time 
+                    if (currentTypeFace.FpgmProgramBuffer != null)
+                    {
+                        _interpreter.InitializeFunctionDefs(currentTypeFace.FpgmProgramBuffer);
+                    }
+
+                }
+            }
+        }
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
@@ -57,6 +86,10 @@ namespace NOpenType
 
         void RenderGlyph(ushort[] contours, GlyphPointF[] glyphPoints)
         {
+            //-----------------------------
+
+
+
 
             //outline version
             //-----------------------------
