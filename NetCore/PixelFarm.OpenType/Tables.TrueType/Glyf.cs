@@ -217,7 +217,7 @@ namespace NOpenType.Tables
                 onCurves[i] = HasFlag(flags[i], SimpleGlyphFlag.OnCurve);
             }
 
-            return new Glyph(xs, ys, onCurves, endPoints, bounds);
+            return new Glyph(xs, ys, onCurves, endPoints, bounds, instructions);
         }
 
 
@@ -431,6 +431,7 @@ namespace NOpenType.Tables
             {
                 ushort numInstr = reader.ReadUInt16();
                 byte[] insts = reader.ReadBytes(numInstr);
+                finalGlyph.GlyphInstructions = insts;
             }
             //F2DOT14 	16-bit signed fixed number with the low 14 bits of fraction (2.14).
             //Transformation Option
