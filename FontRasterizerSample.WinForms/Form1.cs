@@ -255,7 +255,12 @@ namespace SampleWinForms
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
             p.Clear(PixelFarm.Drawing.Color.White);
-
+            //---------------------------
+            //TODO: review here
+            //fake subpixel rendering 
+            //not correct
+            p.UseSubPixelRendering = true;
+            //---------------------------
             if (chkFillBackground.Checked)
             {
                 //5.2 
