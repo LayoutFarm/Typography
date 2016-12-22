@@ -34,6 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
+            this.txtInputChar.Text = "ABCDEFG";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -109,7 +110,7 @@ namespace SampleWinForms
                 //List<int> outputGlyphIndice = new List<int>();
                 //typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
 #endif
-                 
+
                 RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
                 switch (renderChoice)
                 {
