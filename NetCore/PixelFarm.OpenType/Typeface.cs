@@ -32,7 +32,11 @@ namespace NOpenType
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
         }
-       
+
+        /// <summary>
+        /// control values in Font unit
+        /// </summary>
+        internal int[] ControlValues { get; set; }
         internal byte[] PrepProgramBuffer { get; set; }
         internal byte[] FpgmProgramBuffer { get; set; }
         internal MaxProfile MaxProfile { get; set; }
@@ -170,7 +174,14 @@ namespace NOpenType
         {
             return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
         }
-
+        public static float ConvPointsToPixels(float pointsValue, int resolution = 96)
+        {
+            //http://stackoverflow.com/questions/139655/convert-pixels-to-points
+            //points = pixels * 72 / 96
+            //pixels = points * 96 /72
+            //pixels = points * resolution / pointPerInch
+            return pointsValue * resolution / pointsPerInch; 
+        }
         internal GDEF GDEFTable
         {
             get;

@@ -116,11 +116,10 @@ namespace NOpenType
 
         internal static Glyph Clone(Glyph original)
         {
-            //----------------------
-
-            GlyphPointF[] newPoints = CloneArray(original.glyphPoints);
-            ushort[] new_contourEndPoints = CloneArray(original._contourEndPoints);
-            byte[] glyphInstructions = CloneArray(original.GlyphInstructions);
+            //---------------------- 
+            GlyphPointF[] newPoints = Utils.CloneArray(original.glyphPoints);
+            ushort[] new_contourEndPoints = Utils.CloneArray(original._contourEndPoints);
+            byte[] glyphInstructions = Utils.CloneArray(original.GlyphInstructions);
 
             return new Glyph(newPoints, new_contourEndPoints, original.Bounds, glyphInstructions);
         }
@@ -136,8 +135,8 @@ namespace NOpenType
             int src_contour_count = src._contourEndPoints.Length;
             ushort org_last_point = (ushort)(dest._contourEndPoints[org_dest_len - 1] + 1); //since start at 0 
 
-            dest.glyphPoints = ConcatArray(dest.glyphPoints, src.glyphPoints);
-            dest._contourEndPoints = ConcatArray(dest._contourEndPoints, src._contourEndPoints);
+            dest.glyphPoints = Utils.ConcatArray(dest.glyphPoints, src.glyphPoints);
+            dest._contourEndPoints = Utils.ConcatArray(dest._contourEndPoints, src._contourEndPoints);
 
             //offset latest append contour  end points
             int newlen = dest._contourEndPoints.Length;
@@ -156,21 +155,7 @@ namespace NOpenType
             dest._bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
         }
 
-        public static T[] CloneArray<T>(T[] original)
-        {
-            T[] newClone = new T[original.Length];
-            Array.Copy(original, newClone, newClone.Length);
-            return newClone;
-        }
-
-        public static T[] ConcatArray<T>(T[] arr1, T[] arr2)
-        {
-            T[] newArr = new T[arr1.Length + arr2.Length];
-            Array.Copy(arr1, 0, newArr, 0, arr1.Length);
-            Array.Copy(arr2, 0, newArr, arr1.Length, arr2.Length);
-            return newArr;
-        }
-
+        
         internal GlyphClassKind GlyphClassDef { get; set; }
         internal ushort MarkClassDef { get; set; }
 #if DEBUG

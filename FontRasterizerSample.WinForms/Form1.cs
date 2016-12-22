@@ -177,6 +177,7 @@ namespace SampleWinForms
         {
             //2. glyph-to-vxs builder
             var builder = new GlyphPathBuilderVxs(typeface);
+            builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
             builder.Build(testChar, sizeInPoint);
             VertexStore vxs = builder.GetVxs();
 

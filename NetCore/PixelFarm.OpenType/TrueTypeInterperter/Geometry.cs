@@ -25,6 +25,10 @@ namespace NOpenType
         public GlyphPointF Offset(Vector2 offset) { return new GlyphPointF(P + offset, onCurve); }
         public GlyphPointF Offset(short dx, short dy) { return new GlyphPointF(new Vector2(P.X + dx, P.Y + dy), onCurve); }
 
+        public void ApplyScale(float scale)
+        {
+            P *= scale;
+        }
 
         public override string ToString() { return P.ToString() + " " + onCurve.ToString(); }
 

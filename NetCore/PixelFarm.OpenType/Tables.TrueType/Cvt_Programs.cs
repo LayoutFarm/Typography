@@ -6,7 +6,10 @@ namespace NOpenType.Tables
 
     class CvtTable : TableEntry
     {
-        int[] funits;
+        /// <summary>
+        /// control value in font unit
+        /// </summary>
+        internal int[] controlValues;
         public override string Name
         {
             get { return "cvt "; /*need 4 chars*/}
@@ -19,7 +22,7 @@ namespace NOpenType.Tables
             {
                 results[i] = reader.ReadInt16();
             }
-            this.funits = results;
+            this.controlValues = results;
         }
     }
     class PrepTable : TableEntry

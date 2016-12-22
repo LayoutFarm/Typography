@@ -15,6 +15,7 @@ namespace NOpenType
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
+            this.UseTrueTypeInterpreter = true;//default?
         }
         struct FtPoint
         {
@@ -56,7 +57,7 @@ namespace NOpenType
             set
             {
                 _useInterpreter = value;
-                if (_useInterpreter && _interpreter == null)
+                if (value && _interpreter == null)
                 {
                     //we can init it later
                     NOpenType.Typeface currentTypeFace = this.TypeFace;
@@ -72,7 +73,6 @@ namespace NOpenType
                     {
                         _interpreter.InitializeFunctionDefs(currentTypeFace.FpgmProgramBuffer);
                     }
-
                 }
             }
         }
@@ -84,12 +84,38 @@ namespace NOpenType
         protected abstract void OnMoveTo(float x, float y);
         protected abstract void OnLineTo(float x, float y);
 
-        void RenderGlyph(ushort[] contours, GlyphPointF[] glyphPoints)
+        void RenderGlyph(GlyphPointF[] glyphPoints, ushort[] contours)
         {
-            //-----------------------------
+            Typeface currentTypeFace = this.TypeFace;
+            if (UseTrueTypeInterpreter && currentTypeFace.PrepProgramBuffer != null)
+            {
+#if DEBUG
+                GlyphPointF[] backupGlyphPoints = glyphPoints;
+#endif
+                //1. use a clone version           
+                GlyphPointF[] newGlyphPoints = Utils.CloneArray(glyphPoints);
+                //2. scale
+                float scaleFactor = currentTypeFace.CalculateScale(SizeInPoints);
+                int j = newGlyphPoints.Length;
+                for (int i = newGlyphPoints.Length - 1; i >= 0; --i)
+                {
+                    newGlyphPoints[i].ApplyScale(scaleFactor);
+                }
 
+                //3. 
+                float sizeInPixels = Typeface.ConvPointsToPixels(SizeInPoints);
 
+                int[] cvt = Utils.CloneArray(currentTypeFace.ControlValues);
 
+                _interpreter.SetControlValueTable(currentTypeFace.ControlValues,
+                    scaleFactor,
+                    sizeInPixels,
+                    currentTypeFace.PrepProgramBuffer);
+                //then hint
+                _interpreter.HintGlyph(newGlyphPoints, contours, currentTypeFace.PrepProgramBuffer);
+                //change it
+                glyphPoints = newGlyphPoints;
+            }
 
             //outline version
             //-----------------------------
@@ -102,8 +128,6 @@ namespace NOpenType
             //-----------------------------------
             float lastMoveX = 0;
             float lastMoveY = 0;
-
-
             int controlPointCount = 0;
             while (todoContourCount > 0)
             {
@@ -261,7 +285,7 @@ namespace NOpenType
         }
         void RenderGlyph(Glyph glyph)
         {
-            RenderGlyph(glyph.EndPoints, glyph.GlyphPoints);
+            RenderGlyph(glyph.GlyphPoints, glyph.EndPoints);
         }
 
         public void Build(char c, float sizeInPoints)

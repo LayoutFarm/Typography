@@ -93,11 +93,9 @@ namespace NOpenType
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
                 //---------------------------------------------
                 //about truetype instruction init
-                //control values table
-                CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
-                //read in global font program data
-                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
-               
+              
+
+              
                 //--------------------------------------------- 
                 var typeface = new Typeface(
                     nameEntry,
@@ -110,14 +108,18 @@ namespace NOpenType
                 //----------------------------
                 typeface.KernTable = kern;
                 typeface.GaspTable = gaspTable;
-                //----------------------------
                 typeface.MaxProfile = maximumProfile;
-
+                //----------------------------
                 FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
+                //control values table
+                CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
+
+                typeface.ControlValues = cvtTable.controlValues;
                 if (fpgmTable != null)
                 {
                     typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
                 }
+                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable()); 
                 if (propProgramTable != null)
                 {
                     typeface.PrepProgramBuffer = propProgramTable.programBuffer;

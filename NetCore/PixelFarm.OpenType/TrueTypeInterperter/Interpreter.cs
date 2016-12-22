@@ -14,7 +14,7 @@ namespace SharpFont
         InstructionStream[] instructionDefs;
         float[] controlValueTable;
         int[] storage;
-        int[] contours;
+        ushort[] contours;
         float scale;
         int ppem;
         int callStackSize;
@@ -77,7 +77,7 @@ namespace SharpFont
             }
         }
 
-        public void HintGlyph(GlyphPointF[] glyphPoints, int[] contours, byte[] instructions)
+        public void HintGlyph(GlyphPointF[] glyphPoints, ushort[] contours, byte[] instructions)
         {
             if (instructions == null || instructions.Length == 0)
                 return;

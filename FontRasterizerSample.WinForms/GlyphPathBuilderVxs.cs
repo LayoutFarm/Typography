@@ -57,13 +57,12 @@ namespace PixelFarm.Agg
         public VertexStore GetVxs()
         {
 
-            //1. calculate scale
-            float scale = TypeFace.CalculateScale(SizeInPoints);
-
+            //1. calculate scale 
+            float scale = UseTrueTypeInterpreter ? 1 :
+                TypeFace.CalculateScale(SizeInPoints);
             var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
-                //scale
-             new PixelFarm.Agg.Transform.AffinePlan(
-                 PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
+                new PixelFarm.Agg.Transform.AffinePlan(
+                    PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
 
             _reuseVxs1.Clear();
             _reuseVxs2.Clear();

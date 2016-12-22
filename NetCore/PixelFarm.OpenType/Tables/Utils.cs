@@ -3,12 +3,10 @@
 using System;
 using System.Text;
 using System.IO;
-namespace NOpenType.Tables
+namespace NOpenType
 {
     static class Utils
     {
-
-
         public static string TagToString(uint tag)
         {
             byte[] bytes = BitConverter.GetBytes(tag);
@@ -34,8 +32,22 @@ namespace NOpenType.Tables
             {
                 arr[i++] = reader.ReadUInt16();
             }
-            
+
             return arr;
+        }
+        public static T[] CloneArray<T>(T[] original)
+        {
+            T[] newClone = new T[original.Length];
+            Array.Copy(original, newClone, newClone.Length);
+            return newClone;
+        }
+
+        public static T[] ConcatArray<T>(T[] arr1, T[] arr2)
+        {
+            T[] newArr = new T[arr1.Length + arr2.Length];
+            Array.Copy(arr1, 0, newArr, 0, arr1.Length);
+            Array.Copy(arr2, 0, newArr, arr1.Length, arr2.Length);
+            return newArr;
         }
 
     }

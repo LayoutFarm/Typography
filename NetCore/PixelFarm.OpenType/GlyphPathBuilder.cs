@@ -17,7 +17,14 @@ namespace NOpenType
         }
         protected override void OnBeginRead(int countourCount)
         {
-            scale = TypeFace.CalculateScale(SizeInPoints);
+            if (this.UseTrueTypeInterpreter)
+            {
+                scale = 1;
+            }
+            else
+            {
+                scale = TypeFace.CalculateScale(SizeInPoints);
+            }
             _rasterizer.BeginRead(countourCount);
         }
         protected override void OnCloseFigure()
@@ -44,7 +51,7 @@ namespace NOpenType
         {
             _rasterizer.EndRead();
         }
-        
+
     }
 
 }
