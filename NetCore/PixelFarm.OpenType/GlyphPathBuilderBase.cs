@@ -30,41 +30,45 @@ namespace NOpenType
                 return "(" + _x + "," + _y + ")";
             }
         }
+        struct FtPointF
+        {
+            readonly float _x;
+            readonly float _y;
+            public FtPointF(float x, float y)
+            {
+                _x = x;
+                _y = y;
+            }
+            public float X { get { return _x; } }
+            public float Y { get { return _y; } }
+
+            public override string ToString()
+            {
+                return "(" + _x + "," + _y + ")";
+            }
+        }
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
-        protected abstract void OnCurve3(short p2x, short p2y, short x, short y);
-        protected abstract void OnCurve4(short p2x, short p2y, short p3x, short p3y, short x, short y);
-        protected abstract void OnMoveTo(short x, short y);
-        protected abstract void OnLineTo(short x, short y);
+        protected abstract void OnCurve3(float p2x, float p2y, float x, float y);
+        protected abstract void OnCurve4(float p2x, float p2y, float p3x, float p3y, float x, float y);
+        protected abstract void OnMoveTo(float x, float y);
+        protected abstract void OnLineTo(float x, float y);
 
-        void RenderGlyph(ushort[] contours, short[] xs, short[] ys, bool[] onCurves)
+        void RenderGlyph(ushort[] contours, GlyphPointF[] glyphPoints)
         {
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             //outline version
             //-----------------------------
-            int npoints = xs.Length;
+            int npoints = glyphPoints.Length;
             int startContour = 0;
             int cpoint_index = 0;
             int todoContourCount = contours.Length;
             //----------------------------------- 
             OnBeginRead(todoContourCount);
             //-----------------------------------
-            short lastMoveX = 0;
-            short lastMoveY = 0;
+            float lastMoveX = 0;
+            float lastMoveY = 0;
 
 
             int controlPointCount = 0;
@@ -72,20 +76,20 @@ namespace NOpenType
             {
                 int nextContour = contours[startContour] + 1;
                 bool isFirstPoint = true;
-                FtPoint secondControlPoint = new FtPoint();
-                FtPoint thirdControlPoint = new FtPoint();
-
+                FtPointF secondControlPoint = new FtPointF();
+                FtPointF thirdControlPoint = new FtPointF();
 
                 bool justFromCurveMode = false;
                 for (; cpoint_index < nextContour; ++cpoint_index)
                 {
 
-                    short vpoint_x = xs[cpoint_index];
-                    short vpoint_y = ys[cpoint_index];
+                    GlyphPointF vpoint = glyphPoints[cpoint_index];
+                    float vpoint_x = vpoint.P.X;
+                    float vpoint_y = vpoint.P.Y;
                     //int vtag = (int)flags[cpoint_index] & 0x1;
                     //bool has_dropout = (((vtag >> 2) & 0x1) != 0);
                     //int dropoutMode = vtag >> 3;
-                    if (onCurves[cpoint_index])
+                    if (vpoint.onCurve)
                     {
                         //on curve
                         if (justFromCurveMode)
@@ -141,7 +145,7 @@ namespace NOpenType
                         {
                             case 0:
                                 {
-                                    secondControlPoint = new FtPoint(vpoint_x, vpoint_y);
+                                    secondControlPoint = new FtPointF(vpoint_x, vpoint_y);
                                 }
                                 break;
                             case 1:
@@ -150,7 +154,7 @@ namespace NOpenType
                                     //we already have prev second control point
                                     //so auto calculate line to 
                                     //between 2 point
-                                    FtPoint mid = GetMidPoint(secondControlPoint, vpoint_x, vpoint_y);
+                                    FtPointF mid = GetMidPointF(secondControlPoint, vpoint_x, vpoint_y);
                                     //----------
                                     //generate curve3
                                     OnCurve3(secondControlPoint.X, secondControlPoint.Y,
@@ -159,7 +163,7 @@ namespace NOpenType
                                     controlPointCount--;
                                     //------------------------
                                     //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
-                                    secondControlPoint = new FtPoint(vpoint_x, vpoint_y);
+                                    secondControlPoint = new FtPointF(vpoint_x, vpoint_y);
 
                                 }
                                 break;
@@ -216,10 +220,15 @@ namespace NOpenType
                 (short)((v1.X + v2x) >> 1),
                 (short)((v1.Y + v2y) >> 1));
         }
-
+        static FtPointF GetMidPointF(FtPointF v1, float v2x, float v2y)
+        {
+            return new FtPointF(
+                ((v1.X + v2x) / 2),
+                 ((v1.Y + v2y) / 2));
+        }
         void RenderGlyph(Glyph glyph)
         {
-            RenderGlyph(glyph.EndPoints, glyph.Xs, glyph.Ys, glyph.OnCurves);
+            RenderGlyph(glyph.EndPoints, glyph.GlyphPoints);
         }
 
         public void Build(char c, float sizeInPoints)

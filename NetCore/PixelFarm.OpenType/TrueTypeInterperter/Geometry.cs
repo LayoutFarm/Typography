@@ -1,32 +1,35 @@
-﻿//MIT, 2015, Michael Popoloski's SharpFont
+﻿//MIT, 2015, Michael Popoloski's SharpFont,
+//MIT, 2016, WinterDev
+
 using System;
 using System.Numerics;
-namespace SharpFont
+namespace NOpenType
 {
 
 
-    struct GlyphPointF
+    public struct GlyphPointF
     {
         public Vector2 P;
-        public PointType Type;
-        public GlyphPointF(Vector2 position, PointType type)
+        public bool onCurve;
+        public GlyphPointF(float x, float y, bool onCurve)
+        {
+            P = new Vector2(x, y);
+            this.onCurve = onCurve;
+        }
+        public GlyphPointF(Vector2 position, bool onCurve)
         {
             P = position;
-            Type = type;
+            this.onCurve = onCurve;
         }
 
-        public GlyphPointF Offset(Vector2 offset) { return new GlyphPointF(P + offset, Type); }
+        public GlyphPointF Offset(Vector2 offset) { return new GlyphPointF(P + offset, onCurve); }
+        public GlyphPointF Offset(short dx, short dy) { return new GlyphPointF(new Vector2(P.X + dx, P.Y + dy), onCurve); }
 
-        public override string ToString() { return P.ToString() + " " + Type.ToString(); }
+
+        public override string ToString() { return P.ToString() + " " + onCurve.ToString(); }
 
         public static implicit operator Vector2(GlyphPointF p) { return p.P; }
     }
 
-    enum PointType : byte
-    {
-        OnCurve,
-        Quadratic,
-        Cubic
-    }
 
 }

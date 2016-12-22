@@ -1,6 +1,7 @@
 ﻿//MIT, 2015, Michael Popoloski's SharpFont
 using System;
 using System.Numerics;
+using NOpenType;
 
 namespace SharpFont
 {
@@ -311,10 +312,12 @@ namespace SharpFont
                             for (int i = 0; i < state.Loop; i++)
                             {
                                 var index = stack.Pop();
-                                if (points.Current[index].Type == PointType.OnCurve)
-                                    points.Current[index].Type = PointType.Quadratic;
-                                else
-                                    points.Current[index].Type = PointType.OnCurve;
+                                //review here again!
+                                points.Current[index].onCurve = !points.Current[index].onCurve;
+                                //if (points.Current[index].onCurve)
+                                //    points.Current[index].onCurve = false;
+                                //else
+                                //    points.Current[index].onCurve = true;
                             }
                             state.Loop = 1;
                         }
@@ -323,14 +326,16 @@ namespace SharpFont
                         {
                             var end = stack.Pop();
                             for (int i = stack.Pop(); i <= end; i++)
-                                points.Current[i].Type = PointType.OnCurve;
+                                //points.Current[i].Type = PointType.OnCurve;
+                                points.Current[i].onCurve = true;
                         }
                         break;
                     case OpCode.FLIPRGOFF:
                         {
                             var end = stack.Pop();
                             for (int i = stack.Pop(); i <= end; i++)
-                                points.Current[i].Type = PointType.Quadratic;
+                                //points.Current[i].Type = PointType.Quadratic;
+                                points.Current[i].onCurve = false;
                         }
                         break;
                     case OpCode.SHP0:

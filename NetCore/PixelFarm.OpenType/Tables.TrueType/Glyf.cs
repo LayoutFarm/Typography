@@ -211,13 +211,17 @@ namespace NOpenType.Tables
             short[] xs = ReadCoordinates(reader, pointCount, flags, SimpleGlyphFlag.XByte, SimpleGlyphFlag.XSignOrSame);
             short[] ys = ReadCoordinates(reader, pointCount, flags, SimpleGlyphFlag.YByte, SimpleGlyphFlag.YSignOrSame);
 
-            bool[] onCurves = new bool[flags.Length];
-            for (int i = onCurves.Length - 1; i >= 0; --i)
+            int n = xs.Length;
+            GlyphPointF[] glyphPoints = new GlyphPointF[n];
+            for (int i = n - 1; i >= 0; --i)
             {
-                onCurves[i] = HasFlag(flags[i], SimpleGlyphFlag.OnCurve);
+                bool onCurve = HasFlag(flags[i], SimpleGlyphFlag.OnCurve);
+                glyphPoints[i] = new GlyphPointF(xs[i], ys[i], onCurve);
             }
-
-            return new Glyph(xs, ys, onCurves, endPoints, bounds, instructions);
+            //-----------
+            //lets build GlyphPoint set
+            //-----------
+            return new Glyph(glyphPoints, endPoints, bounds, instructions);
         }
 
 
