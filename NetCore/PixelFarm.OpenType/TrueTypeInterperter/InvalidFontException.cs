@@ -2,7 +2,7 @@
 
 using System;
 
-namespace NOpenType
+namespace SharpFont
 {
 
     public class InvalidFontException : Exception

@@ -98,7 +98,7 @@ namespace NOpenType
                 //read in global font program data
                 PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
                 //we can init it later
-                var interpreter = new NOpenType.TrueTypeHinting.Interpreter(
+                var interpreter = new SharpFont.Interpreter(
                     maximumProfile.MaxStackElements,
                     maximumProfile.MaxStorage,
                     maximumProfile.MaxFunctionDefs,

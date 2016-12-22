@@ -2,7 +2,7 @@
 using System;
 using System.Numerics;
 
-namespace NOpenType.TrueTypeHinting
+namespace SharpFont
 {
     class Interpreter
     {
