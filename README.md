@@ -47,4 +47,5 @@ Enable Kerning
 
 ---
 Enable TrueType Hinting
+
 ![enable_truetype_hinting](https://cloud.githubusercontent.com/assets/7447159/21422705/7cdbe85c-c86b-11e6-8abf-04d7d015d6d9.png)
