@@ -45,3 +45,6 @@ Enable Kerning
 
 ![enable_kerning1](https://cloud.githubusercontent.com/assets/7447159/19415089/7d3ae864-938e-11e6-94b1-4817b327832a.png)
 
+---
+Enable TrueType Hinting
+![enable_truetype_hinting](https://cloud.githubusercontent.com/assets/7447159/21422705/7cdbe85c-c86b-11e6-8abf-04d7d015d6d9.png)
