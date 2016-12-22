@@ -14,7 +14,7 @@ namespace NOpenType
         Bounds _bounds;
         bool[] _onCurves;
         public static readonly Glyph Empty = new Glyph(new short[0], new short[0], new bool[0], new ushort[0], Bounds.Zero, null);
-        
+
 #if DEBUG
         public readonly int dbugId;
         static int s_debugTotalId;
@@ -35,7 +35,7 @@ namespace NOpenType
             _bounds = bounds;
             GlyphInstructions = glyphInstructions;
         }
-        
+
         internal short[] Xs { get { return _xs; } }
         internal short[] Ys { get { return _ys; } }
         public Bounds Bounds { get { return _bounds; } }
@@ -171,6 +171,7 @@ namespace NOpenType
             ushort[] new_contourEndPoints = CloneArray(original._contourEndPoints);
             bool[] new_onCurves = CloneArray(original._onCurves);
             byte[] glyphInstructions = CloneArray(original.GlyphInstructions);
+            
             return new Glyph(new_xs, new_ys, new_onCurves, new_contourEndPoints, original.Bounds, glyphInstructions);
         }
 

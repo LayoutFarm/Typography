@@ -41,6 +41,19 @@ namespace NOpenType
         void RenderGlyph(ushort[] contours, short[] xs, short[] ys, bool[] onCurves)
         {
 
+
+
+
+
+
+
+
+
+
+
+
+
+
             //outline version
             //-----------------------------
             int npoints = xs.Length;
