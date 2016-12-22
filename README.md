@@ -27,7 +27,7 @@ Some screenshots of the current master.
 
 ---
 
-Enable TrueType Hinting, Tahoma , 10 pts
+Enable TrueType Hinting, Tahoma , 8 pts
 
 ![enable_truetype_hinting](https://cloud.githubusercontent.com/assets/7447159/21425153/03d4f3c2-c87a-11e6-863e-eb2ba9bc0d61.png)
 
