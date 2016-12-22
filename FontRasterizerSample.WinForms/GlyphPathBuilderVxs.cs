@@ -46,28 +46,30 @@ namespace PixelFarm.Agg
             ps.MoveTo(x, y);
         }
 
-
-        VertexStore _reuseVxs1 = new VertexStore();
-        VertexStore _reuseVxs2 = new VertexStore();
-
         /// <summary>
         /// get processed/scaled vxs
         /// </summary>
         /// <returns></returns>
         public VertexStore GetVxs()
         {
-
+            VertexStore vxs1 = new VertexStore();
             //1. calculate scale 
-            float scale = UseTrueTypeInterpreter ? 1 :
+            if (UseTrueTypeInterpreter)
+            {
+                return curveFlattener.MakeVxs(ps.Vxs, vxs1);
+            }
+            else
+            {
+                VertexStore vxs2 = new VertexStore();
+                float scale = UseTrueTypeInterpreter ? 1 :
                 TypeFace.CalculateScale(SizeInPoints);
-            var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
-                new PixelFarm.Agg.Transform.AffinePlan(
-                    PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
+                var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
+                    new PixelFarm.Agg.Transform.AffinePlan(
+                        PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
 
-            _reuseVxs1.Clear();
-            _reuseVxs2.Clear();
+                return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, vxs1), vxs2);
+            }
 
-            return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, _reuseVxs1), _reuseVxs2);
         }
         public VertexStore GetUnscaledVxs()
         {
