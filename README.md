@@ -26,17 +26,17 @@ Some screenshots of the current master.
 ![Screenshot](screenshots/3.png "Screenshot 3") 
 
 ---
-Tahoma, 72 pts
+Tahoma, 72 pts (disable TrueType Hinting)
 
 ![compare1_tahoma_72pts](https://cloud.githubusercontent.com/assets/7447159/19414301/597e7b82-9372-11e6-81b8-5c8374a7400d.png)
 
 ---
-Tahoma, 8 pts
+Tahoma, 8 pts, (disable TrueType Hinting)
 
 ![compare2_tahoma_8pts](https://cloud.githubusercontent.com/assets/7447159/19414345/de616836-9373-11e6-87ac-64076a8d9f1c.png)
 
 ---
-Tahoma, 11 pts
+Tahoma, 11 pts (disable TrueType Hinting)
 
 ![compare3_tahoma_11pts](https://cloud.githubusercontent.com/assets/7447159/19414753/bec50254-9381-11e6-8ebb-07b23d84eb90.png)
 
@@ -46,6 +46,6 @@ Enable Kerning
 ![enable_kerning1](https://cloud.githubusercontent.com/assets/7447159/19415089/7d3ae864-938e-11e6-94b1-4817b327832a.png)
 
 ---
-Enable TrueType Hinting
+Enable TrueType Hinting, Tahoma , 10 pts
 
 ![enable_truetype_hinting](https://cloud.githubusercontent.com/assets/7447159/21422705/7cdbe85c-c86b-11e6-8abf-04d7d015d6d9.png)
