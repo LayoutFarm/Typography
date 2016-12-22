@@ -104,9 +104,6 @@ namespace NOpenType
 
                 //3. 
                 float sizeInPixels = Typeface.ConvPointsToPixels(SizeInPoints);
-
-                int[] cvt = Utils.CloneArray(currentTypeFace.ControlValues);
-
                 _interpreter.SetControlValueTable(currentTypeFace.ControlValues,
                     scaleFactor,
                     sizeInPixels,
@@ -114,6 +111,14 @@ namespace NOpenType
                 //then hint
                 _interpreter.HintGlyph(newGlyphPoints, contours, currentTypeFace.PrepProgramBuffer);
                 //change it
+
+#if DEBUG
+                //test?
+                if (Utils.dbugIsDiff(newGlyphPoints, glyphPoints))
+                {
+                }
+#endif
+
                 glyphPoints = newGlyphPoints;
             }
 

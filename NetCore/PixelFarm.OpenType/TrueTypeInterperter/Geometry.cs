@@ -33,6 +33,12 @@ namespace NOpenType
         public override string ToString() { return P.ToString() + " " + onCurve.ToString(); }
 
         public static implicit operator Vector2(GlyphPointF p) { return p.P; }
+
+
+        public bool IsEqualsWith(GlyphPointF another)
+        {
+            return this.P == another.P && this.onCurve == another.onCurve;
+        }
     }
 
 

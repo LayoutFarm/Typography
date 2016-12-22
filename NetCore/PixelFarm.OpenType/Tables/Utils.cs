@@ -49,6 +49,24 @@ namespace NOpenType
             Array.Copy(arr2, 0, newArr, arr1.Length, arr2.Length);
             return newArr;
         }
+#if DEBUG
+        public static bool dbugIsDiff(GlyphPointF[] set1, GlyphPointF[] set2)
+        {
+            int j = set1.Length;
+            if (j != set2.Length)
+            {
+                return true;
+            }
+            for (int i = j - 1; i >= 0; --i)
+            {
+                if (set1[i].IsEqualsWith(set2[i]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+#endif
 
     }
 }

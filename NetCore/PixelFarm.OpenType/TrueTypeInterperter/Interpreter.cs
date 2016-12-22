@@ -48,7 +48,8 @@ namespace SharpFont
 
             if (controlValueTable == null)
                 controlValueTable = new float[cvt.Length];
-            for (int i = 0; i < cvt.Length; i++)
+            //copy cvt and apply scale
+            for (int i = cvt.Length - 1; i >= 0; --i)
                 controlValueTable[i] = cvt[i] * scale;
 
             this.scale = scale;
@@ -133,7 +134,7 @@ namespace SharpFont
                     case OpCode.PUSHB8:
                         {
                             var count = opcode == OpCode.NPUSHB ? stream.NextByte() : opcode - OpCode.PUSHB1 + 1;
-                            for (int i = 0; i < count; i++)
+                            for (int i = count - 1; i >= 0; --i)
                                 stack.Push(stream.NextByte());
                         }
                         break;
@@ -148,7 +149,7 @@ namespace SharpFont
                     case OpCode.PUSHW8:
                         {
                             var count = opcode == OpCode.NPUSHW ? stream.NextByte() : opcode - OpCode.PUSHW1 + 1;
-                            for (int i = 0; i < count; i++)
+                            for (int i = count - 1; i >= 0; --i)
                                 stack.Push(stream.NextWord());
                         }
                         break;
@@ -518,7 +519,8 @@ namespace SharpFont
                             if (contours.Length == 0)
                                 break;
 
-                            fixed (GlyphPointF* currentPtr = points.Current) fixed (GlyphPointF* originalPtr = points.Original)
+                            fixed (GlyphPointF* currentPtr = points.Current)
+                            fixed (GlyphPointF* originalPtr = points.Original)
                             {
                                 // opcode controls whether we care about X or Y direction
                                 // do some pointer trickery so we can operate on the
