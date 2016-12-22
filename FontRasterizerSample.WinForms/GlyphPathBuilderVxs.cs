@@ -57,7 +57,7 @@ namespace PixelFarm.Agg
         public VertexStore GetVxs()
         {
 
-
+            //1. calculate scale
             float scale = TypeFace.CalculateScale(SizeInPoints);
 
             var mat = PixelFarm.Agg.Transform.Affine.NewMatix(

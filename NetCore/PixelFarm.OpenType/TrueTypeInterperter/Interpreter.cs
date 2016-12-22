@@ -32,7 +32,7 @@ namespace SharpFont
             instructionDefs = new InstructionStream[maxInstructionDefs > 0 ? 256 : 0];
             state = new GraphicsState();
             cvtState = new GraphicsState();
-            twilight = new Zone(new PointF[maxTwilightPoints], isTwilight: true);
+            twilight = new Zone(new GlyphPointF[maxTwilightPoints], isTwilight: true);
         }
 
         public void InitializeFunctionDefs(byte[] instructions)
@@ -76,7 +76,7 @@ namespace SharpFont
             }
         }
 
-        public void HintGlyph(PointF[] glyphPoints, int[] contours, byte[] instructions)
+        public void HintGlyph(GlyphPointF[] glyphPoints, int[] contours, byte[] instructions)
         {
             if (instructions == null || instructions.Length == 0)
                 return;
@@ -513,7 +513,7 @@ namespace SharpFont
                             if (contours.Length == 0)
                                 break;
 
-                            fixed (PointF* currentPtr = points.Current) fixed (PointF* originalPtr = points.Original)
+                            fixed (GlyphPointF* currentPtr = points.Current) fixed (GlyphPointF* originalPtr = points.Original)
                             {
                                 // opcode controls whether we care about X or Y direction
                                 // do some pointer trickery so we can operate on the
@@ -1373,7 +1373,7 @@ namespace SharpFont
         static float F26Dot6ToFloat(int value) { return value / 64.0f; }
         static int FloatToF26Dot6(float value) { return (int)Math.Round(value * 64.0f); }
 
-        unsafe static float* GetPoint(byte* data, int index) { return (float*)(data + sizeof(PointF) * index); }
+        unsafe static float* GetPoint(byte* data, int index) { return (float*)(data + sizeof(GlyphPointF) * index); }
 
         static readonly float Sqrt2Over2 = (float)(Math.Sqrt(2) / 2);
 
@@ -1510,16 +1510,16 @@ namespace SharpFont
 
         struct Zone
         {
-            public PointF[] Current;
-            public PointF[] Original;
+            public GlyphPointF[] Current;
+            public GlyphPointF[] Original;
             public TouchState[] TouchState;
             public bool IsTwilight;
 
-            public Zone(PointF[] points, bool isTwilight)
+            public Zone(GlyphPointF[] points, bool isTwilight)
             {
                 IsTwilight = isTwilight;
                 Current = points;
-                Original = (PointF[])points.Clone();
+                Original = (GlyphPointF[])points.Clone();
                 TouchState = new TouchState[points.Length];
             }
 

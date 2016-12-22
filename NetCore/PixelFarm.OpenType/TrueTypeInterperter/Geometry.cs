@@ -17,31 +17,31 @@ namespace SharpFont
         public static FUnit Max(FUnit a, FUnit b) { return (FUnit)Math.Max(a.value, b.value); }
         public static FUnit Min(FUnit a, FUnit b) { return (FUnit)Math.Min(a.value, b.value); }
     }
- 
 
-    struct PointF
+
+    struct GlyphPointF
     {
         public Vector2 P;
         public PointType Type;
 
-        public PointF(Vector2 position, PointType type)
+        public GlyphPointF(Vector2 position, PointType type)
         {
             P = position;
             Type = type;
         }
 
-        public PointF Offset(Vector2 offset) { return new PointF(P + offset, Type); }
+        public GlyphPointF Offset(Vector2 offset) { return new GlyphPointF(P + offset, Type); }
 
         public override string ToString() { return P.ToString() + " " + Type.ToString(); }
 
-        public static implicit operator Vector2(PointF p) { return p.P; }
+        public static implicit operator Vector2(GlyphPointF p) { return p.P; }
     }
 
-    enum PointType
+    enum PointType : byte
     {
         OnCurve,
         Quadratic,
         Cubic
     }
-     
+
 }
