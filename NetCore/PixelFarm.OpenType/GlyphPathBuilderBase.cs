@@ -1,6 +1,6 @@
-﻿//-----------------------------------------------------
-//Apache2, 2014-2016,   WinterDev
-//some logics from FreeType Lib (FTL, BSD-3 clause)
+﻿//Apache2, 2016, WinterDev
+//MIT, 2015, Michael Popoloski 
+//FTL, 3-clauses BSD, FreeType project
 //-----------------------------------------------------
 
 using System;
@@ -9,9 +9,13 @@ namespace NOpenType
     public abstract class GlyphPathBuilderBase
     {
         readonly Typeface _typeface;
+        SharpFont.Interpreter _interpreter;
+        bool _useInterpreter;
+        bool _passInterpreterModule;
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
+            this.UseTrueTypeInterpreter = true;//default?
         }
         struct FtPoint
         {
@@ -30,49 +34,168 @@ namespace NOpenType
                 return "(" + _x + "," + _y + ")";
             }
         }
+        struct FtPointF
+        {
+            readonly float _x;
+            readonly float _y;
+            public FtPointF(float x, float y)
+            {
+                _x = x;
+                _y = y;
+            }
+            public float X { get { return _x; } }
+            public float Y { get { return _y; } }
+
+            public override string ToString()
+            {
+                return "(" + _x + "," + _y + ")";
+            }
+        }
+        public bool UseTrueTypeInterpreter
+        {
+            get { return _useInterpreter; }
+            set
+            {
+                 
+                _useInterpreter = value;
+                if (value && _interpreter == null)
+                {
+                    //we can init it later
+                    NOpenType.Typeface currentTypeFace = this.TypeFace;
+                    Tables.MaxProfile maximumProfile = currentTypeFace.MaxProfile;
+                    _interpreter = new SharpFont.Interpreter(
+                        maximumProfile.MaxStackElements,
+                        maximumProfile.MaxStorage,
+                        maximumProfile.MaxFunctionDefs,
+                        maximumProfile.MaxInstructionDefs,
+                        maximumProfile.MaxTwilightPoints);
+                    // the fpgm table optionally contains a program to run at initialization time 
+                    if (currentTypeFace.FpgmProgramBuffer != null)
+                    {
+                        _interpreter.InitializeFunctionDefs(currentTypeFace.FpgmProgramBuffer);
+                    }
+                }
+            }
+        }
+        protected bool PassInterpreterModule
+        {
+            get { return this._passInterpreterModule; }
+        }
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
-        protected abstract void OnCurve3(short p2x, short p2y, short x, short y);
-        protected abstract void OnCurve4(short p2x, short p2y, short p3x, short p3y, short x, short y);
-        protected abstract void OnMoveTo(short x, short y);
-        protected abstract void OnLineTo(short x, short y);
+        protected abstract void OnCurve3(float p2x, float p2y, float x, float y);
+        protected abstract void OnCurve4(float p2x, float p2y, float p3x, float p3y, float x, float y);
+        protected abstract void OnMoveTo(float x, float y);
+        protected abstract void OnLineTo(float x, float y);
 
-        void RenderGlyph(ushort[] contours, short[] xs, short[] ys, bool[] onCurves)
+
+        static FtPoint GetMidPoint(FtPoint v1, short v2x, short v2y)
         {
+            return new FtPoint(
+                (short)((v1.X + v2x) >> 1),
+                (short)((v1.Y + v2y) >> 1));
+        }
+        static FtPointF GetMidPointF(FtPointF v1, float v2x, float v2y)
+        {
+            return new FtPointF(
+                ((v1.X + v2x) / 2),
+                 ((v1.Y + v2y) / 2));
+        }
+        void RenderGlyph(ushort glyphIndex, Glyph glyph)
+        {
+            //-------------------------------------------
+            GlyphPointF[] glyphPoints = glyph.GlyphPoints;
+            ushort[] contourEndPoints = glyph.EndPoints;
+            //-------------------------------------------
+            _passInterpreterModule = false;
+            int npoints = glyphPoints.Length;
 
-            //outline version
-            //-----------------------------
-            int npoints = xs.Length;
+            Typeface currentTypeFace = this.TypeFace;
+            if (UseTrueTypeInterpreter &&
+                currentTypeFace.PrepProgramBuffer != null &&
+                glyph.GlyphInstructions != null)
+            {
+
+                //the true type hint logics come from Michael Popoloski 's SharpFont project.
+#if DEBUG
+                GlyphPointF[] backupGlyphPoints = glyphPoints;
+#endif
+                //1. use a clone version           
+                int orgLen = glyphPoints.Length;
+                GlyphPointF[] newGlyphPoints = Utils.CloneArray(glyphPoints, 4); //extend org with 4 elems
+                //2. scale
+                float scaleFactor = currentTypeFace.CalculateScale(SizeInPoints);
+                for (int i = orgLen - 1; i >= 0; --i)
+                {
+                    newGlyphPoints[i].ApplyScale(scaleFactor);
+                }
+
+
+                //----------------------------------------------
+                // add phantom points; these are used to define the extents of the glyph,
+                // and can be modified by hinting instructions
+
+                int horizontalAdv = currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+                int hFrontSideBearing = currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
+                int verticalAdv = 0;
+                int vFrontSideBearing = 0;
+
+                //-------------------------
+                //TODO: review here again
+                var pp1 = new GlyphPointF((glyph.MinX - hFrontSideBearing), 0, true);
+                var pp2 = new GlyphPointF(pp1.X + horizontalAdv, 0, true);
+                var pp3 = new GlyphPointF(0, glyph.MaxY + vFrontSideBearing, true);
+                var pp4 = new GlyphPointF(0, pp3.Y - verticalAdv, true);
+                //-------------------------
+                newGlyphPoints[orgLen] = (pp1 * scaleFactor);
+                newGlyphPoints[orgLen + 1] = (pp2 * scaleFactor);
+                newGlyphPoints[orgLen + 2] = (pp3 * scaleFactor);
+                newGlyphPoints[orgLen + 3] = (pp4 * scaleFactor);
+
+
+                //3. 
+                float sizeInPixels = Typeface.ConvPointsToPixels(SizeInPoints);
+                _interpreter.SetControlValueTable(currentTypeFace.ControlValues,
+                    scaleFactor,
+                    sizeInPixels,
+                    currentTypeFace.PrepProgramBuffer);
+                //then hint
+                _interpreter.HintGlyph(newGlyphPoints, contourEndPoints, glyph.GlyphInstructions);
+
+
+                glyphPoints = newGlyphPoints;
+                _passInterpreterModule = true;
+            }
+
+
             int startContour = 0;
             int cpoint_index = 0;
-            int todoContourCount = contours.Length;
+            int todoContourCount = contourEndPoints.Length;
             //----------------------------------- 
             OnBeginRead(todoContourCount);
             //-----------------------------------
-            short lastMoveX = 0;
-            short lastMoveY = 0;
-
-
+            float lastMoveX = 0;
+            float lastMoveY = 0;
             int controlPointCount = 0;
             while (todoContourCount > 0)
             {
-                int nextContour = contours[startContour] + 1;
+                int nextContour = contourEndPoints[startContour] + 1;
                 bool isFirstPoint = true;
-                FtPoint secondControlPoint = new FtPoint();
-                FtPoint thirdControlPoint = new FtPoint();
-
+                FtPointF secondControlPoint = new FtPointF();
+                FtPointF thirdControlPoint = new FtPointF();
 
                 bool justFromCurveMode = false;
                 for (; cpoint_index < nextContour; ++cpoint_index)
                 {
 
-                    short vpoint_x = xs[cpoint_index];
-                    short vpoint_y = ys[cpoint_index];
+                    GlyphPointF vpoint = glyphPoints[cpoint_index];
+                    float vpoint_x = vpoint.P.X;
+                    float vpoint_y = vpoint.P.Y;
                     //int vtag = (int)flags[cpoint_index] & 0x1;
                     //bool has_dropout = (((vtag >> 2) & 0x1) != 0);
                     //int dropoutMode = vtag >> 3;
-                    if (onCurves[cpoint_index])
+                    if (vpoint.onCurve)
                     {
                         //on curve
                         if (justFromCurveMode)
@@ -128,7 +251,7 @@ namespace NOpenType
                         {
                             case 0:
                                 {
-                                    secondControlPoint = new FtPoint(vpoint_x, vpoint_y);
+                                    secondControlPoint = new FtPointF(vpoint_x, vpoint_y);
                                 }
                                 break;
                             case 1:
@@ -137,7 +260,7 @@ namespace NOpenType
                                     //we already have prev second control point
                                     //so auto calculate line to 
                                     //between 2 point
-                                    FtPoint mid = GetMidPoint(secondControlPoint, vpoint_x, vpoint_y);
+                                    FtPointF mid = GetMidPointF(secondControlPoint, vpoint_x, vpoint_y);
                                     //----------
                                     //generate curve3
                                     OnCurve3(secondControlPoint.X, secondControlPoint.Y,
@@ -146,7 +269,7 @@ namespace NOpenType
                                     controlPointCount--;
                                     //------------------------
                                     //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
-                                    secondControlPoint = new FtPoint(vpoint_x, vpoint_y);
+                                    secondControlPoint = new FtPointF(vpoint_x, vpoint_y);
 
                                 }
                                 break;
@@ -194,18 +317,7 @@ namespace NOpenType
                 todoContourCount--;
             }
             OnEndRead();
-        }
 
-        static FtPoint GetMidPoint(FtPoint v1, short v2x, short v2y)
-        {
-            return new FtPoint(
-                (short)((v1.X + v2x) >> 1),
-                (short)((v1.Y + v2y) >> 1));
-        }
-
-        void RenderGlyph(Glyph glyph)
-        {
-            RenderGlyph(glyph.EndPoints, glyph.Xs, glyph.Ys, glyph.OnCurves);
         }
 
         public void Build(char c, float sizeInPoints)
@@ -215,14 +327,14 @@ namespace NOpenType
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
             this.SizeInPoints = sizeInPoints;
-            RenderGlyph(_typeface.GetGlyphByIndex(glyphIndex));
+
+            RenderGlyph(glyphIndex, _typeface.GetGlyphByIndex(glyphIndex));
         }
         public float SizeInPoints
         {
             get;
             private set;
         }
-
         protected Typeface TypeFace
         {
             get { return _typeface; }

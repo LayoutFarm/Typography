@@ -14,12 +14,12 @@ namespace NOpenType.IO
         {
         }
 
-        public ushort SwapBytes(ushort x)
+        static ushort SwapBytes(ushort x)
         {
             return (ushort)((ushort)((x & 0xff) << 8) | ((x >> 8) & 0xff));
         }
 
-        public uint SwapBytes(uint x)
+        static uint SwapBytes(uint x)
         {
             return ((x & 0x000000ff) << 24) +
                 ((x & 0x0000ff00) << 8) +
@@ -27,7 +27,7 @@ namespace NOpenType.IO
                 ((x & 0xff000000) >> 24);
         }
 
-        public ulong SwapBytes(ulong value)
+        static ulong SwapBytes(ulong value)
         {
             ulong uvalue = value;
             ulong swapped =
@@ -66,10 +66,11 @@ namespace NOpenType.IO
         public override uint ReadUInt32() { return SwapBytes(base.ReadUInt32()); }
         public override ulong ReadUInt64() { return SwapBytes(base.ReadUInt64()); }
 
-        public new void Dispose()
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+         
     }
 }

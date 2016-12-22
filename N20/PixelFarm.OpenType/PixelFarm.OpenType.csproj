@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,9 +51,6 @@
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\IGlyphRasterizer.cs">
       <Link>IGlyphRasterizer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Interpreter.cs">
-      <Link>Interpreter.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\IO\ByteOrderSwappingBinaryReader.cs">
       <Link>IO\ByteOrderSwappingBinaryReader.cs</Link>
@@ -108,6 +106,9 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.AdvancedLayout\Tags.cs">
       <Link>Tables.AdvancedLayout\Tags.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\EBLCTable.cs">
+      <Link>Tables\EBLCTable.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\HorizontalDeviceMatrics.cs">
       <Link>Tables.Others\HorizontalDeviceMatrics.cs</Link>
     </Compile>
@@ -134,6 +135,9 @@
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.Others\VerticalMatricsHeader.cs">
       <Link>Tables.Others\VerticalMatricsHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\Cvt_Programs.cs">
+      <Link>TrueTypeInterperter\Cvt_Programs.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables.TrueType\Gasp.cs">
       <Link>Tables.TrueType\Gasp.cs</Link>
@@ -200,6 +204,21 @@
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Utils.cs">
       <Link>Tables\Utils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\ForNet20.cs">
+      <Link>Net20\ForNet20.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Geometry.cs">
+      <Link>TrueTypeInterperter\Geometry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Interpreter.cs">
+      <Link>TrueTypeInterperter\Interpreter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\InvalidFontException.cs">
+      <Link>TrueTypeInterperter\InvalidFontException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Matrix3x2.cs">
+      <Link>Net20\Matrix3x2.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Typeface.cs">
       <Link>Typeface.cs</Link>
