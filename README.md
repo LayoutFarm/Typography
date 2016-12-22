@@ -48,4 +48,4 @@ Enable Kerning
 ---
 Enable TrueType Hinting, Tahoma , 10 pts
 
-![enable_truetype_hinting](https://cloud.githubusercontent.com/assets/7447159/21422705/7cdbe85c-c86b-11e6-8abf-04d7d015d6d9.png)
+![enable_truetype_hinting](https://cloud.githubusercontent.com/assets/7447159/21425153/03d4f3c2-c87a-11e6-863e-eb2ba9bc0d61.png)
