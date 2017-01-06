@@ -477,7 +477,8 @@ namespace NOpenType.Tables
                                 var subTable = new LkSubTableT1Fmt1(coverage, deltaGlyph);
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 this.subTables.Add(subTable);
-                            } break;
+                            }
+                            break;
                         case 2:
                             {
                                 ushort glyphCount = reader.ReadUInt16();
@@ -575,7 +576,8 @@ namespace NOpenType.Tables
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
 
                                 this.subTables.Add(subTable);
-                            } break;
+                            }
+                            break;
                     }
                     //------------------------------------------------------------- 
                 }
@@ -726,7 +728,8 @@ namespace NOpenType.Tables
                                 }
                                 this.subTables.Add(subTable);
 
-                            } break;
+                            }
+                            break;
                     }
                 }
             }
@@ -1089,7 +1092,8 @@ namespace NOpenType.Tables
                                 //----------------------------
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 this.subTables.Add(subTable);
-                            } break;
+                            }
+                            break;
                         case 2:
                             {
                                 //ChainContextSubstFormat2 subtable: Class-based chaining context glyph substitution
@@ -1165,8 +1169,56 @@ namespace NOpenType.Tables
             /// <param name="reader"></param>
             void ReadLookupType7(BinaryReader reader)
             {
+
+                //LookupType 7: Extension Substitution
+
+                //This lookup provides a mechanism whereby any other lookup type's subtables are stored at a 32-bit offset location in the 'GSUB' table. 
+                //This is needed if the total size of the subtables exceeds the 16-bit limits of the various other offsets in the 'GSUB' table.
+                //In this specification, the subtable stored at the 32-bit offset location is termed the “extension” subtable.
+
+                //ExtensionSubstFormat1 subtable
+                //Type      Name                Description
+                //USHORT    SubstFormat         Format identifier.Set to 1.
+                //USHORT    ExtensionLookupType Lookup type of subtable referenced by ExtensionOffset (i.e.the extension subtable).
+                //ULONG     ExtensionOffset     Offset to the extension subtable, of lookup type ExtensionLookupType, relative to the start of the ExtensionSubstFormat1 subtable.
+
+                //ExtensionLookupType must be set to any lookup type other than 7.
+                //All subtables in a LookupType 7 lookup must have the same ExtensionLookupType.
+                //All offsets in the extension subtables are set in the usual way, 
+                //i.e.relative to the extension subtables themselves.
+
+                //When an OpenType layout engine encounters a LookupType 7 Lookup table, it shall:
+
+                //Proceed as though the Lookup table's LookupType field were set to the ExtensionLookupType of the subtables.
+                //Proceed as though each extension subtable referenced by ExtensionOffset replaced the LookupType 7 subtable that referenced it.
+
+                //Substitution Lookup Record
+
+                //All contextual substitution subtables specify the substitution data in a Substitution Lookup Record (SubstLookupRecord).
+                //Each record contains a SequenceIndex, 
+                //which indicates the position where the substitution will occur in the glyph sequence.
+                //In addition, a LookupListIndex identifies the lookup to be applied at the glyph position specified by the SequenceIndex.
+
+                //The contextual substitution subtables defined in Examples 7, 8, and 9 at the end of this chapter show SubstLookupRecords.
+                int j = subTableOffsets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
+                    ushort format = reader.ReadUInt16();
+                    ushort extensionLookupType = reader.ReadUInt16();
+                    uint extensionOffset = reader.ReadUInt32();
+                    if (extensionLookupType == 7)
+                    {
+                        throw new NotSupportedException();
+                    }
+                }
+                //TODO: impl more , this is not complete!
+                return;
                 throw new NotImplementedException();
             }
+
             /// <summary>
             /// LookupType 8: Reverse Chaining Contextual Single Substitution Subtable
             /// </summary>

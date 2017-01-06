@@ -73,8 +73,9 @@ namespace SampleWinForms
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
             }
-            //  ReadAndRender(@"..\..\segoeui.ttf");
-            ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\segoeui.ttf");
+            //ReadAndRender(@"..\..\tahoma.ttf");
+            ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -220,7 +221,7 @@ namespace SampleWinForms
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
-            g.DrawImage(winBmp, new Point(30, 20)); 
+            g.DrawImage(winBmp, new Point(30, 20));
         }
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
