@@ -75,6 +75,7 @@ namespace PixelFarm.Agg
 
         }
     }
+
     public class GlyphContour
     {
         internal List<GlyphPart> parts = new List<GlyphPart>();
@@ -96,6 +97,11 @@ namespace PixelFarm.Agg
     {
         public abstract GlyphPartKind Kind { get; }
     }
+
+    static class GlyphDirectionAnalyzer
+    {
+
+    }
     public class GlyphLine : GlyphPart
     {
         internal float x0;
@@ -108,7 +114,10 @@ namespace PixelFarm.Agg
             this.y0 = y0;
             this.x1 = x1;
             this.y1 = y1;
+            //find direction of this line
+
         }
+
         public override GlyphPartKind Kind { get { return GlyphPartKind.Line; } }
 #if DEBUG
         public override string ToString()
