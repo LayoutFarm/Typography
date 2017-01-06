@@ -17,7 +17,7 @@ namespace NOpenType
         }
         protected override void OnBeginRead(int countourCount)
         {
-            if (this.PassInterpreterModule)
+            if (this.PassHintInterpreterModule)
             {
                 scale = 1;
             }

@@ -77,7 +77,7 @@ namespace NOpenType
                 }
             }
         }
-        protected bool PassInterpreterModule
+        protected bool PassHintInterpreterModule
         {
             get { return this._passInterpreterModule; }
         }

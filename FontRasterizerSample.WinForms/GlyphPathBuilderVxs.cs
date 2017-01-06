@@ -53,13 +53,13 @@ namespace PixelFarm.Agg
         public VertexStore GetVxs()
         {
             VertexStore vxs1 = new VertexStore();
-            //1. calculate scale 
-            if (PassInterpreterModule)
+            if (PassHintInterpreterModule)
             {
                 return curveFlattener.MakeVxs(ps.Vxs, vxs1);
             }
             else
             {
+
                 VertexStore vxs2 = new VertexStore();
                 float scale = TypeFace.CalculateScale(SizeInPoints);
                 var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
@@ -68,7 +68,22 @@ namespace PixelFarm.Agg
 
                 return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, vxs1), vxs2);
             }
-
+        }
+        public VertexStore GetUnflattenVxs()
+        {
+            VertexStore vxs1 = new VertexStore();
+            if (PassHintInterpreterModule)
+            {
+                return ps.Vxs;
+            }
+            else
+            {
+                float scale = TypeFace.CalculateScale(SizeInPoints);
+                var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
+                    new PixelFarm.Agg.Transform.AffinePlan(
+                        PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
+                return mat.TransformToVxs(ps.Vxs, vxs1);
+            }
         }
         public VertexStore GetUnscaledVxs()
         {

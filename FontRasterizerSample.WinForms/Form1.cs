@@ -43,7 +43,7 @@ namespace SampleWinForms
                     12,
                     14,
                     16,
-                    18,20,22,24,26,28,36,48,72
+                    18,20,22,24,26,28,36,48,72,180
                 });
         }
 
@@ -202,6 +202,14 @@ namespace SampleWinForms
                 //5.5 
                 p.Draw(vxs);
             }
+
+            if (chkShowControlPoints.Checked)
+            {
+                //draw control point
+                VertexStore unflatVxs = builder.GetUnflattenVxs();
+
+            }
+
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 

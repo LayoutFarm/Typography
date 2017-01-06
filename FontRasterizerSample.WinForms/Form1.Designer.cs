@@ -38,6 +38,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.chkKern = new System.Windows.Forms.CheckBox();
             this.chkTrueTypeHint = new System.Windows.Forms.CheckBox();
+            this.chkShowControlPoints = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -143,11 +144,24 @@
             this.chkTrueTypeHint.UseVisualStyleBackColor = true;
             this.chkTrueTypeHint.CheckedChanged += new System.EventHandler(this.chkTrueTypeHint_CheckedChanged);
             // 
+            // chkShowControlPoints
+            // 
+            this.chkShowControlPoints.AutoSize = true;
+            this.chkShowControlPoints.Checked = true;
+            this.chkShowControlPoints.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowControlPoints.Location = new System.Drawing.Point(380, 59);
+            this.chkShowControlPoints.Name = "chkShowControlPoints";
+            this.chkShowControlPoints.Size = new System.Drawing.Size(121, 17);
+            this.chkShowControlPoints.TabIndex = 12;
+            this.chkShowControlPoints.Text = "Show Control Points";
+            this.chkShowControlPoints.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkShowControlPoints);
             this.Controls.Add(this.chkTrueTypeHint);
             this.Controls.Add(this.chkKern);
             this.Controls.Add(this.label2);
@@ -177,6 +191,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkKern;
         private System.Windows.Forms.CheckBox chkTrueTypeHint;
+        private System.Windows.Forms.CheckBox chkShowControlPoints;
     }
 }
 
