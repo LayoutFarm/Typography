@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
-            this.txtInputChar.Text = "ai";
+            this.txtInputChar.Text = "B";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -43,7 +43,7 @@ namespace SampleWinForms
                     12,
                     14,
                     16,
-                    18,20,22,24,26,28,36,48,72,180
+                    18,20,22,24,26,28,36,48,72,240
                 });
         }
 
@@ -202,12 +202,17 @@ namespace SampleWinForms
                 //5.5 
                 p.Draw(vxs);
             }
-
             if (chkShowControlPoints.Checked)
             {
+                //draw for debug ...
                 //draw control point
-                VertexStore unflatVxs = builder.GetUnflattenVxs();
-
+                List<GlyphContour> contours = builder.GetContours();
+                int j = contours.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    GlyphContour cnt = contours[i];
+                    DrawGlyphContour(cnt, p);
+                }
             }
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
@@ -215,7 +220,53 @@ namespace SampleWinForms
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
-            g.DrawImage(winBmp, new Point(10, 0));
+            g.DrawImage(winBmp, new Point(30, 20)); 
+        }
+        void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
+        {
+            //for debug
+            List<GlyphPart> parts = cnt.parts;
+            int n = parts.Count;
+            for (int i = 0; i < n; ++i)
+            {
+                GlyphPart part = parts[i];
+                switch (part.Kind)
+                {
+                    default: throw new NotSupportedException();
+                    case GlyphPartKind.Line:
+                        {
+                            GlyphLine line = (GlyphLine)part;
+                            p.FillColor = PixelFarm.Drawing.Color.Red;
+                            p.FillRectLBWH(line.x0, line.y0, 2, 2);
+                            p.FillRectLBWH(line.x1, line.y1, 2, 2);
+                        }
+                        break;
+                    case GlyphPartKind.Curve3:
+                        {
+                            GlyphCurve3 c = (GlyphCurve3)part;
+                            p.FillColor = PixelFarm.Drawing.Color.Red;
+                            p.FillRectLBWH(c.x0, c.y0, 2, 2);
+                            p.FillColor = PixelFarm.Drawing.Color.Blue;
+                            p.FillRectLBWH(c.p2x, c.p2y, 2, 2);
+                            p.FillColor = PixelFarm.Drawing.Color.Red;
+                            p.FillRectLBWH(c.x, c.y, 2, 2);
+                        }
+                        break;
+                    case GlyphPartKind.Curve4:
+                        {
+                            GlyphCurve4 c = (GlyphCurve4)part;
+                            p.FillColor = PixelFarm.Drawing.Color.Red;
+                            p.FillRectLBWH(c.x0, c.y0, 2, 2);
+                            p.FillColor = PixelFarm.Drawing.Color.Blue;
+                            p.FillRectLBWH(c.p2x, c.p2y, 2, 2);
+                            p.FillRectLBWH(c.p3x, c.p3y, 2, 2);
+                            p.FillColor = PixelFarm.Drawing.Color.Red;
+                            p.FillRectLBWH(c.x, c.y, 2, 2);
+                        }
+                        break;
+                }
+
+            }
         }
 
         void RenderWithPlugableGlyphRasterizer(Typeface typeface, char testChar, float sizeInPoint, int resolution)
@@ -267,7 +318,7 @@ namespace SampleWinForms
             //TODO: review here
             //fake subpixel rendering 
             //not correct
-            p.UseSubPixelRendering = true;
+            //p.UseSubPixelRendering = true;
             //---------------------------
             if (chkFillBackground.Checked)
             {

@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GDIGlyphRasterizer.cs" />
+    <Compile Include="GlyphAnalysis.cs" />
     <Compile Include="GlyphPathBuilderVxs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
