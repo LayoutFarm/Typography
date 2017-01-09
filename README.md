@@ -19,7 +19,7 @@ MIT, 2015, Michael Popoloski, from https://github.com/MikePopoloski/SharpFont
 
 The FreeType Project LICENSE (3-clauses BSD),2003-2016, David Turner, Robert Wilhelm, and Werner Lemberg. from https://www.freetype.org/
 
-SGI Free Software License B,  Eric Veach, Lars Brubaker (C# port), PixelFarm's Tesselate project
+SGI Free Software License B,  Eric Veach, Lars Brubaker (C# port), from https://github.com/PaintLab/PixelFarm/tree/master/a_mini/projects/PixelFarm/Tesselate
 
 Screenshots
 -----------
