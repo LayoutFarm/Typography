@@ -43,7 +43,7 @@ namespace SampleWinForms
                     12,
                     14,
                     16,
-                    18,20,22,24,26,28,36,48,72,240
+                    18,20,22,24,26,28,36,48,72,240,300
                 });
         }
 
@@ -208,22 +208,24 @@ namespace SampleWinForms
                 //draw for debug ...
                 //draw control point
                 List<GlyphContour> contours = builder.GetContours();
-                int j = contours.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    GlyphContour cnt = contours[i];
-                    DrawGlyphContour(cnt, p);
+                TessWithPolyTriAndDraw(contours, p);
 
+                //int j = contours.Count;
+                //for (int i = 0; i < j; ++i)
+                //{
+                //    GlyphContour cnt = contours[i];
+                //    DrawGlyphContour(cnt, p);
 
-                    //for debug
-                    if (chkShowTess.Checked)
-                    {
-                        if (i == 0)
-                        {
-                            TessContourAndDraw(cnt, p);
-                        }
-                    }
-                }
+                //    //for debug
+                //    if (chkShowTess.Checked)
+                //    {
+                //        //TessContourAndDraw(cnt, p);
+                //        if (i == 0)
+                //        {
+                //            TessWithPolyTriAndDraw(cnt, p);
+                //        }
+                //    }
+                //}
             }
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
@@ -233,22 +235,100 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
+        void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p)
+        {
+
+
+            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+            int cntCount = contours.Count;
+
+            Poly2Tri.Polygon polygon = CreatePolygon(contours[0]);//first contour            
+            if (cntCount > 0)
+            {
+                //debug only
+                for (int n = 1; n < cntCount; ++n)
+                {
+                    polygon.AddHole(CreatePolygon(contours[n]));
+                }
+            }
+
+            Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated
+            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
+            p.FillColor = PixelFarm.Drawing.Color.Yellow;
+
+            foreach (var tri in polygon.Triangles)
+            {
+                //draw each triangles
+                p.Line(tri.P0.X, tri.P0.Y, tri.P1.X, tri.P1.Y);
+                p.Line(tri.P1.X, tri.P1.Y, tri.P2.X, tri.P2.Y);
+                p.Line(tri.P2.X, tri.P2.Y, tri.P1.X, tri.P1.Y);
+
+                //find center of each triangle
+
+                var p_centerx = tri.P0.X + tri.P1.X + tri.P2.X;
+                var p_centery = tri.P0.Y + tri.P1.Y + tri.P2.Y;
+                
+                p.FillRectLBWH(p_centerx / 3, p_centery / 3, 1, 1);
+            }
+        }
+
+        struct TmpPoint
+        {
+            public double x;
+            public double y;
+        }
+        static Poly2Tri.Polygon CreatePolygon(GlyphContour cnt)
+        {
+            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+            List<float> allPoints = cnt.allPoints;
+            int lim = allPoints.Count - 1;
+
+            //limitation: poly tri not accept duplicated points!
+            double prevX = 0;
+            double prevY = 0;
+
+            Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
+            for (int i = 0; i < lim;)
+            {
+                var x = allPoints[i];
+                var y = allPoints[i + 1];
+                if (x != prevX && y != prevY)
+                {
+                    TmpPoint tmp_point = new TmpPoint();
+                    tmp_point.x = x;
+                    tmp_point.y = y;
+                    if (!tmpPoints.ContainsKey(tmp_point))
+                    {
+                        tmpPoints.Add(tmp_point, true);
+                        points.Add(new Poly2Tri.PolygonPoint(
+                            x,
+                            y));
+                    }
+                    prevX = x;
+                    prevY = y;
+
+                }
+                i += 2;
+            }
+
+            Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
+            return polygon;
+        }
         void TessContourAndDraw(GlyphContour cnt, AggCanvasPainter p)
         {
             cnt.Tess();
             var tessVertices = cnt.tessVertices;
             int vtxCount = tessVertices.Count;
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
-            for (int n = 2; n < vtxCount; ++n)
+            for (int n = 1; n < vtxCount; ++n)
             {
-                var p0 = tessVertices[n - 2];
-                var p1 = tessVertices[n - 1];
-                var p2 = tessVertices[n];
-                 
+                //var p0 = tessVertices[n - 2];
+                var p0 = tessVertices[n - 1];
+                var p1 = tessVertices[n];
 
                 p.Line(p0.m_X, p0.m_Y, p1.m_X, p1.m_Y);
-                p.Line(p1.m_X, p1.m_Y, p2.m_X, p2.m_Y);
-                p.Line(p2.m_X, p2.m_Y, p0.m_X, p0.m_Y);
+                //p.Line(p1.m_X, p1.m_Y, p2.m_X, p2.m_Y);
+                //p.Line(p2.m_X, p2.m_Y, p0.m_X, p0.m_Y);
 
             }
 
@@ -296,7 +376,6 @@ namespace SampleWinForms
                         }
                         break;
                 }
-
             }
         }
 

@@ -58,7 +58,7 @@
             this.txtInputChar.Name = "txtInputChar";
             this.txtInputChar.Size = new System.Drawing.Size(101, 20);
             this.txtInputChar.TabIndex = 1;
-            this.txtInputChar.Text = "B";
+            this.txtInputChar.Text = "I";
             this.txtInputChar.TextChanged += new System.EventHandler(this.txtInputChar_TextChanged);
             // 
             // label1
@@ -73,7 +73,7 @@
             // chkBorder
             // 
             this.chkBorder.AutoSize = true;
-            this.chkBorder.Location = new System.Drawing.Point(237, 13);
+            this.chkBorder.Location = new System.Drawing.Point(510, 39);
             this.chkBorder.Name = "chkBorder";
             this.chkBorder.Size = new System.Drawing.Size(57, 17);
             this.chkBorder.TabIndex = 3;
@@ -85,7 +85,7 @@
             this.chkFillBackground.AutoSize = true;
             this.chkFillBackground.Checked = true;
             this.chkFillBackground.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkFillBackground.Location = new System.Drawing.Point(237, 36);
+            this.chkFillBackground.Location = new System.Drawing.Point(510, 62);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 4;
@@ -124,7 +124,7 @@
             this.chkKern.AutoSize = true;
             this.chkKern.Checked = true;
             this.chkKern.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkKern.Location = new System.Drawing.Point(237, 59);
+            this.chkKern.Location = new System.Drawing.Point(510, 85);
             this.chkKern.Name = "chkKern";
             this.chkKern.Size = new System.Drawing.Size(85, 17);
             this.chkKern.TabIndex = 10;
@@ -137,7 +137,7 @@
             this.chkTrueTypeHint.AutoSize = true;
             this.chkTrueTypeHint.Checked = true;
             this.chkTrueTypeHint.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTrueTypeHint.Location = new System.Drawing.Point(237, 82);
+            this.chkTrueTypeHint.Location = new System.Drawing.Point(510, 108);
             this.chkTrueTypeHint.Name = "chkTrueTypeHint";
             this.chkTrueTypeHint.Size = new System.Drawing.Size(125, 17);
             this.chkTrueTypeHint.TabIndex = 11;
@@ -150,7 +150,7 @@
             this.chkShowControlPoints.AutoSize = true;
             this.chkShowControlPoints.Checked = true;
             this.chkShowControlPoints.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowControlPoints.Location = new System.Drawing.Point(380, 59);
+            this.chkShowControlPoints.Location = new System.Drawing.Point(510, 132);
             this.chkShowControlPoints.Name = "chkShowControlPoints";
             this.chkShowControlPoints.Size = new System.Drawing.Size(121, 17);
             this.chkShowControlPoints.TabIndex = 12;
@@ -160,7 +160,7 @@
             // chkShowTess
             // 
             this.chkShowTess.AutoSize = true;
-            this.chkShowTess.Location = new System.Drawing.Point(380, 82);
+            this.chkShowTess.Location = new System.Drawing.Point(510, 155);
             this.chkShowTess.Name = "chkShowTess";
             this.chkShowTess.Size = new System.Drawing.Size(110, 17);
             this.chkShowTess.TabIndex = 13;
