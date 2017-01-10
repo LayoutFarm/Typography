@@ -37,8 +37,11 @@ namespace PixelFarm.Agg
         }
         protected override void OnCloseFigure()
         {
-            cntBuilder.CloseFigure();
-            contours.Add(cntBuilder.CurrentContour);
+            cntBuilder.CloseFigure(); 
+            GlyphContour cntContour = cntBuilder.CurrentContour;
+            cntContour.allPoints = cntBuilder.GetAllPoints();
+            cntBuilder.Reset();
+            contours.Add(cntContour);
             ps.CloseFigure();
         }
         protected override void OnCurve3(float p2x, float p2y, float x, float y)

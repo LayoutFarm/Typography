@@ -9,7 +9,6 @@ namespace PixelFarm.Agg
     //this is PixelFarm version ***
     //render with MiniAgg
 
-
     public class GlyphContourBuilder
     {
         float curX;
@@ -17,6 +16,8 @@ namespace PixelFarm.Agg
         float latestMoveToX;
         float latestMoveToY;
         GlyphContour currentCnt;
+        List<float> allPoints = new List<float>();
+
         public GlyphContourBuilder()
         {
 
@@ -33,18 +34,26 @@ namespace PixelFarm.Agg
             this.curX = x;
             this.curY = y;
 
+            allPoints.Add(x);
+            allPoints.Add(y);
+
         }
         public void CloseFigure()
         {
             currentCnt.AddPart(new GlyphLine(curX, curY, latestMoveToX, latestMoveToY));
+
+            allPoints.Add(latestMoveToX);
+            allPoints.Add(latestMoveToY);
+
             this.curX = latestMoveToX;
             this.curY = latestMoveToY;
         }
+        
         public void Reset()
         {
             currentCnt = new GlyphContour();
             this.latestMoveToX = this.curX = this.latestMoveToY = this.curY = 0;
-
+            allPoints = new List<float>();
         }
         public void Curve3(float p2x, float p2y, float x, float y)
         {
@@ -52,6 +61,13 @@ namespace PixelFarm.Agg
                 curX, curY,
                 p2x, p2y,
                 x, y));
+
+            allPoints.Add(curX);
+            allPoints.Add(curY);
+            allPoints.Add(p2x);
+            allPoints.Add(p2y);
+            allPoints.Add(x);
+            allPoints.Add(y);
 
             this.curX = x;
             this.curY = y;
@@ -63,6 +79,18 @@ namespace PixelFarm.Agg
                 p2x, p2y,
                 p3x, p3y,
                 x, y));
+
+
+            allPoints.Add(curX);
+            allPoints.Add(curY);
+            allPoints.Add(p2x);
+            allPoints.Add(p2y);
+            allPoints.Add(p3x);
+            allPoints.Add(p3y);
+            allPoints.Add(x);
+            allPoints.Add(y);
+
+
             this.curX = x;
             this.curY = y;
         }
@@ -72,18 +100,35 @@ namespace PixelFarm.Agg
             {
                 return currentCnt;
             }
-
+        }
+        public List<float> GetAllPoints()
+        {
+            return this.allPoints;
         }
     }
 
     public class GlyphContour
     {
         internal List<GlyphPart> parts = new List<GlyphPart>();
+        internal List<float> allPoints;
+
+        internal List<DrawingGL.Vertex> tessVertices;
+
         public void AddPart(GlyphPart part)
         {
             parts.Add(part);
         }
+        public void Tess()
+        {
+            //tesselate the this for analysis
+            Tesselate.Tesselator tess = new Tesselate.Tesselator();
+            DrawingGL.TessTool t = new DrawingGL.TessTool(tess);
+            tessVertices = t.TessPolygon(this.allPoints.ToArray());
+
+        }
     }
+
+
 
     public enum GlyphPartKind
     {
@@ -96,6 +141,7 @@ namespace PixelFarm.Agg
     public abstract class GlyphPart
     {
         public abstract GlyphPartKind Kind { get; }
+
     }
 
     static class GlyphDirectionAnalyzer
@@ -119,6 +165,7 @@ namespace PixelFarm.Agg
         }
 
         public override GlyphPartKind Kind { get { return GlyphPartKind.Line; } }
+
 #if DEBUG
         public override string ToString()
         {

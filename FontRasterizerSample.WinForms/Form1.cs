@@ -31,7 +31,7 @@ namespace SampleWinForms
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
-            cmbRenderChoices.SelectedIndex = 2;
+            cmbRenderChoices.SelectedIndex = 0;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
             this.txtInputChar.Text = "B";
@@ -58,7 +58,7 @@ namespace SampleWinForms
         void Form1_Load(object sender, EventArgs e)
         {
             this.Text = "Render with PixelFarm";
-            this.lstFontSizes.SelectedIndex = 5;
+            this.lstFontSizes.SelectedIndex = lstFontSizes.Items.Count - 1;//select last one 
 
         }
 
@@ -213,6 +213,13 @@ namespace SampleWinForms
                 {
                     GlyphContour cnt = contours[i];
                     DrawGlyphContour(cnt, p);
+
+
+                    //for debug
+                    if (chkShowTess.Checked)
+                    {
+                        TessContourAndDraw(cnt, p);
+                    }
                 }
             }
 
@@ -222,6 +229,20 @@ namespace SampleWinForms
             //7. just render our bitmap
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
+        }
+        void TessContourAndDraw(GlyphContour cnt, AggCanvasPainter p)
+        {
+            cnt.Tess();
+            var tessVertices = cnt.tessVertices;
+            int vtxCount = tessVertices.Count;
+            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
+            for (int n = 1; n < vtxCount; ++n)
+            {
+                var vtx = tessVertices[n];
+                var prev = tessVertices[n - 1];
+                p.Line(prev.m_X, prev.m_Y, vtx.m_X, vtx.m_Y);
+            }
+
         }
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
@@ -398,6 +419,9 @@ namespace SampleWinForms
             button1_Click(this, EventArgs.Empty);
         }
 
-
+        private void chkShowTess_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
     }
 }
