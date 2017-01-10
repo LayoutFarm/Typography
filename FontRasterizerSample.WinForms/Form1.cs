@@ -218,7 +218,10 @@ namespace SampleWinForms
                     //for debug
                     if (chkShowTess.Checked)
                     {
-                        TessContourAndDraw(cnt, p);
+                        if (i == 0)
+                        {
+                            TessContourAndDraw(cnt, p);
+                        }
                     }
                 }
             }
@@ -236,11 +239,17 @@ namespace SampleWinForms
             var tessVertices = cnt.tessVertices;
             int vtxCount = tessVertices.Count;
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
-            for (int n = 1; n < vtxCount; ++n)
+            for (int n = 2; n < vtxCount; ++n)
             {
-                var vtx = tessVertices[n];
-                var prev = tessVertices[n - 1];
-                p.Line(prev.m_X, prev.m_Y, vtx.m_X, vtx.m_Y);
+                var p0 = tessVertices[n - 2];
+                var p1 = tessVertices[n - 1];
+                var p2 = tessVertices[n];
+                 
+
+                p.Line(p0.m_X, p0.m_Y, p1.m_X, p1.m_Y);
+                p.Line(p1.m_X, p1.m_Y, p2.m_X, p2.m_Y);
+                p.Line(p2.m_X, p2.m_Y, p0.m_X, p0.m_Y);
+
             }
 
         }

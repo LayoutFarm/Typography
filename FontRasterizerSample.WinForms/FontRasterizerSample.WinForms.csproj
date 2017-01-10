@@ -88,6 +88,10 @@
       <Project>{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
+    <ProjectReference Include="..\poly2tri-cs\Poly2Tri.csproj">
+      <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
+      <Name>Poly2Tri</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
