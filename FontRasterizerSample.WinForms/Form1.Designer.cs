@@ -40,6 +40,7 @@
             this.chkTrueTypeHint = new System.Windows.Forms.CheckBox();
             this.chkShowControlPoints = new System.Windows.Forms.CheckBox();
             this.chkShowTess = new System.Windows.Forms.CheckBox();
+            this.chkShowGrid = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -168,11 +169,23 @@
             this.chkShowTess.UseVisualStyleBackColor = true;
             this.chkShowTess.CheckedChanged += new System.EventHandler(this.chkShowTess_CheckedChanged);
             // 
+            // chkShowGrid
+            // 
+            this.chkShowGrid.AutoSize = true;
+            this.chkShowGrid.Location = new System.Drawing.Point(510, 178);
+            this.chkShowGrid.Name = "chkShowGrid";
+            this.chkShowGrid.Size = new System.Drawing.Size(75, 17);
+            this.chkShowGrid.TabIndex = 14;
+            this.chkShowGrid.Text = "Show Grid";
+            this.chkShowGrid.UseVisualStyleBackColor = true;
+            this.chkShowGrid.CheckedChanged += new System.EventHandler(this.chkShowGrid_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkShowGrid);
             this.Controls.Add(this.chkShowTess);
             this.Controls.Add(this.chkShowControlPoints);
             this.Controls.Add(this.chkTrueTypeHint);
@@ -206,6 +219,7 @@
         private System.Windows.Forms.CheckBox chkTrueTypeHint;
         private System.Windows.Forms.CheckBox chkShowControlPoints;
         private System.Windows.Forms.CheckBox chkShowTess;
+        private System.Windows.Forms.CheckBox chkShowGrid;
     }
 }
 

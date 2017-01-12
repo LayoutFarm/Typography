@@ -203,30 +203,32 @@ namespace SampleWinForms
                 //5.5 
                 p.Draw(vxs);
             }
-            if (chkShowControlPoints.Checked)
+
+
+            if (chkShowTess.Checked)
             {
                 //draw for debug ...
                 //draw control point
                 List<GlyphContour> contours = builder.GetContours();
                 TessWithPolyTriAndDraw(contours, p);
-
-                //int j = contours.Count;
-                //for (int i = 0; i < j; ++i)
-                //{
-                //    GlyphContour cnt = contours[i];
-                //    DrawGlyphContour(cnt, p);
-
-                //    //for debug
-                //    if (chkShowTess.Checked)
-                //    {
-                //        //TessContourAndDraw(cnt, p);
-                //        if (i == 0)
-                //        {
-                //            TessWithPolyTriAndDraw(cnt, p);
-                //        }
-                //    }
-                //}
             }
+            if (chkShowControlPoints.Checked)
+            {
+                List<GlyphContour> contours = builder.GetContours();
+                int j = contours.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    GlyphContour cnt = contours[i];
+                    DrawGlyphContour(cnt, p);
+                }
+            }
+
+            if (chkShowGrid.Checked)
+            {
+                //render grid
+                RenderGrid(800, 600, 5, p);
+            }
+
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
@@ -234,6 +236,21 @@ namespace SampleWinForms
             //7. just render our bitmap
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
+        }
+        void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
+        {
+            //render grid 
+
+            p.FillColor = PixelFarm.Drawing.Color.Gray;
+            for (int y = 0; y < height;)
+            {
+                for (int x = 0; x < width;)
+                {
+                    p.FillRectLBWH(x, y, 1, 1);
+                    x += sqSize;
+                }
+                y += sqSize;
+            }
         }
         void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p)
         {
@@ -267,8 +284,8 @@ namespace SampleWinForms
 
                 var p_centerx = tri.P0.X + tri.P1.X + tri.P2.X;
                 var p_centery = tri.P0.Y + tri.P1.Y + tri.P2.Y;
-                
-                p.FillRectLBWH(p_centerx / 3, p_centery / 3, 1, 1);
+
+                p.FillRectLBWH(p_centerx / 3, p_centery / 3, 2, 2);
             }
         }
 
@@ -508,6 +525,11 @@ namespace SampleWinForms
         }
 
         private void chkShowTess_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkShowGrid_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }
