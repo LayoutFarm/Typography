@@ -45,6 +45,7 @@ namespace SampleWinForms
                     16,
                     18,20,22,24,26,28,36,48,72,240,300
                 });
+            this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
         }
 
 
@@ -226,7 +227,7 @@ namespace SampleWinForms
             if (chkShowGrid.Checked)
             {
                 //render grid
-                RenderGrid(800, 600, 5, p);
+                RenderGrid(800, 600, _gridSize, p);
             }
 
 
@@ -532,6 +533,31 @@ namespace SampleWinForms
         private void chkShowGrid_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
+        }
+
+        int _gridSize = 5;//default
+
+        private void TxtGridSize_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                int result = this._gridSize;
+                if (int.TryParse(this.txtGridSize.Text, out result))
+                {
+                    if (result < 5)
+                    {
+                        _gridSize = 5;
+                    }
+                    else if (result > 200)
+                    {
+                        _gridSize = 200;
+                    }
+                }
+                this._gridSize = result;
+                this.txtGridSize.Text = _gridSize.ToString();
+                button1_Click(this, EventArgs.Empty);
+            }
+            
         }
     }
 }

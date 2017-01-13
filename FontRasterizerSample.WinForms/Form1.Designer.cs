@@ -41,6 +41,8 @@
             this.chkShowControlPoints = new System.Windows.Forms.CheckBox();
             this.chkShowTess = new System.Windows.Forms.CheckBox();
             this.chkShowGrid = new System.Windows.Forms.CheckBox();
+            this.txtGridSize = new System.Windows.Forms.TextBox();
+            this.chkDoGridFitting = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -180,11 +182,31 @@
             this.chkShowGrid.UseVisualStyleBackColor = true;
             this.chkShowGrid.CheckedChanged += new System.EventHandler(this.chkShowGrid_CheckedChanged);
             // 
+            // txtGridSize
+            // 
+            this.txtGridSize.Location = new System.Drawing.Point(580, 178);
+            this.txtGridSize.Name = "txtGridSize";
+            this.txtGridSize.Size = new System.Drawing.Size(51, 20);
+            this.txtGridSize.TabIndex = 15;
+            this.txtGridSize.Text = "5";
+            // 
+            // chkDoGridFitting
+            // 
+            this.chkDoGridFitting.AutoSize = true;
+            this.chkDoGridFitting.Location = new System.Drawing.Point(510, 204);
+            this.chkDoGridFitting.Name = "chkDoGridFitting";
+            this.chkDoGridFitting.Size = new System.Drawing.Size(93, 17);
+            this.chkDoGridFitting.TabIndex = 16;
+            this.chkDoGridFitting.Text = "Do Grid Fitting";
+            this.chkDoGridFitting.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkDoGridFitting);
+            this.Controls.Add(this.txtGridSize);
             this.Controls.Add(this.chkShowGrid);
             this.Controls.Add(this.chkShowTess);
             this.Controls.Add(this.chkShowControlPoints);
@@ -220,6 +242,8 @@
         private System.Windows.Forms.CheckBox chkShowControlPoints;
         private System.Windows.Forms.CheckBox chkShowTess;
         private System.Windows.Forms.CheckBox chkShowGrid;
+        private System.Windows.Forms.TextBox txtGridSize;
+        private System.Windows.Forms.CheckBox chkDoGridFitting;
     }
 }
 
