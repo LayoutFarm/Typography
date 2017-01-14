@@ -1,7 +1,6 @@
-﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+﻿//Apahce2, 2017, WinterDev
+//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
-using System;
-using System.Text;
 namespace NOpenType.Tables
 {
     struct TableHeader
@@ -30,7 +29,7 @@ namespace NOpenType.Tables
         public uint Offset { get { return _offset; } }
         public uint CheckSum { get { return _checkSum; } }
         public uint Length { get { return _length; } }
-        
+
         public override string ToString()
         {
             return "{" + Tag + "}";

@@ -1,6 +1,5 @@
-﻿//Apache2, 2014-2016,   WinterDev
-using System;
-using System.Collections.Generic;
+﻿ //Apache2, 2014-2017, WinterDev
+ 
 namespace NOpenType
 {
     /// <summary>

@@ -1,9 +1,6 @@
-﻿//Apache2,  2016,  WinterDev  
+﻿//Apache2, 2016-2017, WinterDev 
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace NOpenType.Tables
 {

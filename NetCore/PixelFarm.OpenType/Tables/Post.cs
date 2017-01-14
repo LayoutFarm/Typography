@@ -1,5 +1,4 @@
-﻿
-//Apache2, 2016, WinterDev
+﻿//Apache2, 2016-2017, WinterDev
 
 using System.IO;
 using System.Text;
