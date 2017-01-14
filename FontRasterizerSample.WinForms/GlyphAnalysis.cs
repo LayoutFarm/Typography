@@ -1,8 +1,6 @@
 ﻿//MIT, 2016,  WinterDev
 using System;
-using System.Collections.Generic;
-using NOpenType;
-using PixelFarm.Agg.VertexSource;
+using System.Collections.Generic; 
 
 namespace PixelFarm.Agg
 {
@@ -110,22 +108,12 @@ namespace PixelFarm.Agg
     public class GlyphContour
     {
         internal List<GlyphPart> parts = new List<GlyphPart>();
-        internal List<float> allPoints;
-
-        internal List<DrawingGL.Vertex> tessVertices;
-
+        internal List<float> allPoints; 
         public void AddPart(GlyphPart part)
         {
             parts.Add(part);
         }
-        public void Tess()
-        {
-            //tesselate the this for analysis
-            Tesselate.Tesselator tess = new Tesselate.Tesselator();
-            DrawingGL.TessTool t = new DrawingGL.TessTool(tess);
-            tessVertices = t.TessPolygon(this.allPoints.ToArray());
-
-        }
+        
     }
 
 

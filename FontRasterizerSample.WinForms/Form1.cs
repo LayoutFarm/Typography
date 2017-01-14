@@ -332,25 +332,7 @@ namespace SampleWinForms
             Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
             return polygon;
         }
-        void TessContourAndDraw(GlyphContour cnt, AggCanvasPainter p)
-        {
-            cnt.Tess();
-            var tessVertices = cnt.tessVertices;
-            int vtxCount = tessVertices.Count;
-            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
-            for (int n = 1; n < vtxCount; ++n)
-            {
-                //var p0 = tessVertices[n - 2];
-                var p0 = tessVertices[n - 1];
-                var p1 = tessVertices[n];
-
-                p.Line(p0.m_X, p0.m_Y, p1.m_X, p1.m_Y);
-                //p.Line(p1.m_X, p1.m_Y, p2.m_X, p2.m_Y);
-                //p.Line(p2.m_X, p2.m_Y, p0.m_X, p0.m_Y);
-
-            }
-
-        }
+       
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
             //for debug
