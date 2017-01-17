@@ -51,12 +51,18 @@ namespace NOpenType
                 return "(" + _x + "," + _y + ")";
             }
         }
+
+        /// <summary>
+        /// use Maxim's Agg Vertical Hinting
+        /// </summary>
+        public bool UseVerticalHinting { get; set; }
+
         public bool UseTrueTypeInterpreter
         {
             get { return _useInterpreter; }
             set
             {
-                 
+
                 _useInterpreter = value;
                 if (value && _interpreter == null)
                 {
@@ -102,6 +108,15 @@ namespace NOpenType
                 ((v1.X + v2x) / 2),
                  ((v1.Y + v2y) / 2));
         }
+        static void ApplyScaleOnlyOnXAxis(GlyphPointF[] glyphPoints, float xscale)
+        {
+
+            for (int i = glyphPoints.Length - 1; i >= 0; --i)
+            {
+                glyphPoints[i].ApplyScaleOnlyOnXAxis(xscale);
+            }
+
+        }
         void RenderGlyph(ushort glyphIndex, Glyph glyph)
         {
             //-------------------------------------------
@@ -131,8 +146,6 @@ namespace NOpenType
                     newGlyphPoints[i].ApplyScale(scaleFactor);
                 }
 
-
-                //----------------------------------------------
                 // add phantom points; these are used to define the extents of the glyph,
                 // and can be modified by hinting instructions
 
@@ -152,7 +165,16 @@ namespace NOpenType
                 newGlyphPoints[orgLen + 1] = (pp2 * scaleFactor);
                 newGlyphPoints[orgLen + 2] = (pp3 * scaleFactor);
                 newGlyphPoints[orgLen + 3] = (pp4 * scaleFactor);
+                //----------------------------------------------
+                //test : agg's vertical hint
+                //apply large scale on horizontal axis only 
+                //translate and then scale back
 
+                float agg_x_scale = 1000;
+                if (UseVerticalHinting)
+                {
+                    ApplyScaleOnlyOnXAxis(newGlyphPoints, agg_x_scale);
+                }
 
                 //3. 
                 float sizeInPixels = Typeface.ConvPointsToPixels(SizeInPoints);
@@ -163,6 +185,11 @@ namespace NOpenType
                 //then hint
                 _interpreter.HintGlyph(newGlyphPoints, contourEndPoints, glyph.GlyphInstructions);
 
+                //scale back
+                if (UseVerticalHinting)
+                {
+                    ApplyScaleOnlyOnXAxis(newGlyphPoints, 1f / agg_x_scale);
+                }
 
                 glyphPoints = newGlyphPoints;
                 _passInterpreterModule = true;

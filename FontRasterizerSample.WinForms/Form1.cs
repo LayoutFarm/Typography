@@ -75,8 +75,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
-            ReadAndRender(@"..\..\cambriaz.ttf");
+            ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -181,6 +181,7 @@ namespace SampleWinForms
             //2. glyph-to-vxs builder
             var builder = new GlyphPathBuilderVxs(typeface);
             builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
+            builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
             builder.Build(testChar, sizeInPoint);
             VertexStore vxs = builder.GetVxs();
 
@@ -414,6 +415,7 @@ namespace SampleWinForms
             TextPrinter printer = new TextPrinter();
             printer.EnableKerning = this.chkKern.Checked;
             printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
+            printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
 
             int len = str.Length;
 
@@ -540,6 +542,11 @@ namespace SampleWinForms
                 button1_Click(this, EventArgs.Empty);
             }
             
+        }
+
+        private void chkVerticalHinting_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
         }
     }
 }

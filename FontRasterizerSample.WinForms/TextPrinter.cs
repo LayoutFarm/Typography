@@ -56,6 +56,12 @@ namespace SampleWinForms
             get;
             set;
         }
+        public bool UseAggVerticalHinting
+        {
+            get;
+            set;
+        }
+    
         public void Print(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Print(typeface, size, str.ToCharArray(), glyphPlanBuffer);
@@ -123,6 +129,7 @@ namespace SampleWinForms
             float cy = 0;
             bool enable_kerning = this.EnableKerning;
             glyphPathBuilder.UseTrueTypeInterpreter = this.EnableTrueTypeHint;
+            glyphPathBuilder.UseVerticalHinting = this.UseAggVerticalHinting;
 
             j = inputGlyphs.Count;
             

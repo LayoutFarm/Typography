@@ -29,6 +29,10 @@ namespace NOpenType
         {
             P *= scale;
         }
+        public void ApplyScaleOnlyOnXAxis(float scale)
+        {
+            P = new Vector2(P.X * scale, P.Y);
+        }
 
         public override string ToString() { return P.ToString() + " " + onCurve.ToString(); }
 
