@@ -75,8 +75,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            ReadAndRender(@"..\..\tahoma.ttf");
-            //ReadAndRender(@"..\..\cambriaz.ttf");
+            //ReadAndRender(@"..\..\tahoma.ttf");
+            ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -274,12 +274,20 @@ namespace SampleWinForms
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
             p.FillColor = PixelFarm.Drawing.Color.Yellow;
 
+
+            List<EdgeLine> edges = new List<EdgeLine>();
+
             foreach (var tri in polygon.Triangles)
             {
                 //draw each triangles
-                p.Line(tri.P0.X, tri.P0.Y, tri.P1.X, tri.P1.Y);
-                p.Line(tri.P1.X, tri.P1.Y, tri.P2.X, tri.P2.Y);
-                p.Line(tri.P2.X, tri.P2.Y, tri.P0.X, tri.P0.Y);
+                //p.Line(tri.P0.X, tri.P0.Y, tri.P1.X, tri.P1.Y);
+                //p.Line(tri.P1.X, tri.P1.Y, tri.P2.X, tri.P2.Y);
+                //p.Line(tri.P2.X, tri.P2.Y, tri.P0.X, tri.P0.Y);
+
+                edges.Add(new EdgeLine(tri.P0, tri.P1));
+                edges.Add(new EdgeLine(tri.P1, tri.P2));
+                edges.Add(new EdgeLine(tri.P2, tri.P0));
+
                 //find center of each triangle
                 //--------------------------------------------- 
                 var p_centerx = tri.P0.X + tri.P1.X + tri.P2.X;
@@ -287,6 +295,107 @@ namespace SampleWinForms
 
                 p.FillRectLBWH(p_centerx / 3, p_centery / 3, 2, 2);
             }
+            //-------------------
+
+            //sort
+            //remove duplicated edge?
+
+            edges.Sort((e1, e2) =>
+            {
+                if (e1.y1 == e2.y1)
+                {
+                    return e1.x0.CompareTo(e2.x0);
+                }
+                else
+                {
+                    return e1.y1.CompareTo(e2.y1);
+                }
+            });
+            //remove shared edge
+
+
+            for (int i = edges.Count - 1; i > 0; --i)
+            {
+                EdgeLine e_now = edges[i];
+                EdgeLine e_prev = edges[i - 1];
+
+                if (e_now.SameCoordinateWidth(e_prev))
+                {
+                    //remove the two
+                    //TODO: remove if we can have more than duplicate 2 edges
+                    edges.RemoveAt(i);
+                    edges.RemoveAt(i - 1);
+                    --i;
+                }
+            }
+
+            for (int i = edges.Count - 1; i > 0; --i)
+            {
+                //draw only unique edge
+                EdgeLine e = edges[i];
+                p.Line(e.x0, e.y0, e.x1, e.y1);       
+            }
+
+        }
+
+        class EdgeLine
+        {
+            public double x0;
+            public double y0;
+            public double x1;
+            public double y1;
+            public EdgeLine(Poly2Tri.TriangulationPoint p, Poly2Tri.TriangulationPoint q)
+            {
+                x0 = p.X;
+                y0 = p.Y;
+                x1 = q.X;
+                y1 = q.Y;
+                //
+                Arrange();
+
+            }
+            void Arrange()
+            {
+                if (y1 < y0)
+                {
+                    //swap
+                    double tmp_y = y1;
+                    y1 = y0;
+                    y0 = tmp_y;
+                    //swap x 
+                    double tmp_x = x1;
+                    x1 = x0;
+                    x0 = tmp_x;
+                }
+                else if (y1 == y0)
+                {
+                    if (x1 < x0)
+                    {
+                        //swap
+                        //swap
+                        double tmp_y = y1;
+                        y1 = y0;
+                        y0 = tmp_y;
+                        //swap x 
+                        double tmp_x = x1;
+                        x1 = x0;
+                        x0 = tmp_x;
+                    }
+                }
+            }
+            public override string ToString()
+            {
+                return x0 + "," + y0 + "," + x1 + "," + y1;
+            }
+            public bool SameCoordinateWidth(EdgeLine another)
+            {
+                return this.x0 == another.x0 &&
+                    this.x1 == another.x1 &&
+                    this.y0 == another.y0 &&
+                    this.y1 == another.y1;
+            }
+
+
         }
 
         struct TmpPoint
@@ -342,7 +451,7 @@ namespace SampleWinForms
                             }
                             else
                             {
-                                
+
                             }
                         }
                     }
