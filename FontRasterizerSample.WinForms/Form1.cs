@@ -244,9 +244,9 @@ namespace SampleWinForms
             //render grid 
 
             p.FillColor = PixelFarm.Drawing.Color.Gray;
-            for (int y = 0; y < height;)
+            for (int y = 0; y < height; )
             {
-                for (int x = 0; x < width;)
+                for (int x = 0; x < width; )
                 {
                     p.FillRectLBWH(x, y, 1, 1);
                     x += sqSize;
@@ -260,16 +260,15 @@ namespace SampleWinForms
 
             List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
             int cntCount = contours.Count;
-
             Poly2Tri.Polygon polygon = CreatePolygon(contours[0]);//first contour            
-            if (cntCount > 0)
+            //if (cntCount > 0)
+            //{
+            //    //debug only
+            for (int n = 1; n < cntCount; ++n)
             {
-                //debug only
-                for (int n = 1; n < cntCount; ++n)
-                {
-                    polygon.AddHole(CreatePolygon(contours[n]));
-                }
+                polygon.AddHole(CreatePolygon(contours[n]));
             }
+            //}
 
             Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
@@ -281,9 +280,8 @@ namespace SampleWinForms
                 p.Line(tri.P0.X, tri.P0.Y, tri.P1.X, tri.P1.Y);
                 p.Line(tri.P1.X, tri.P1.Y, tri.P2.X, tri.P2.Y);
                 p.Line(tri.P2.X, tri.P2.Y, tri.P0.X, tri.P0.Y);
-
                 //find center of each triangle
-
+                //--------------------------------------------- 
                 var p_centerx = tri.P0.X + tri.P1.X + tri.P2.X;
                 var p_centery = tri.P0.Y + tri.P1.Y + tri.P2.Y;
 
@@ -307,10 +305,11 @@ namespace SampleWinForms
             double prevY = 0;
 
             Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
-            for (int i = 0; i < lim;)
+            for (int i = 0; i < lim; )
             {
                 var x = allPoints[i];
                 var y = allPoints[i + 1];
+                //
                 if (x != prevX && y != prevY)
                 {
                     TmpPoint tmp_point = new TmpPoint();
@@ -323,9 +322,60 @@ namespace SampleWinForms
                             x,
                             y));
                     }
+                    else
+                    {
+                        //temp fixed***
+                        while (true)
+                        {
+                            x += 0.1f;
+                            y += 0.1f;
+
+                            tmp_point.x = x;
+                            tmp_point.y = y;
+                            if (!tmpPoints.ContainsKey(tmp_point))
+                            {
+                                tmpPoints.Add(tmp_point, true);
+                                points.Add(new Poly2Tri.PolygonPoint(
+                                    x,
+                                    y));
+                                break;
+                            }
+                            else
+                            {
+                                
+                            }
+                        }
+                    }
+
                     prevX = x;
                     prevY = y;
 
+                }
+                else
+                {
+                    //a duplicate point
+                    //temp fix***
+                    //minor shift x and y
+                    x += 0.5f;
+                    y += 0.5f;
+
+
+                    TmpPoint tmp_point = new TmpPoint();
+                    tmp_point.x = x;
+                    tmp_point.y = y;
+                    if (!tmpPoints.ContainsKey(tmp_point))
+                    {
+                        tmpPoints.Add(tmp_point, true);
+                        points.Add(new Poly2Tri.PolygonPoint(
+                            x,
+                            y));
+                    }
+                    else
+                    {
+                    }
+
+                    prevX = x;
+                    prevY = y;
                 }
                 i += 2;
             }
@@ -333,7 +383,7 @@ namespace SampleWinForms
             Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
             return polygon;
         }
-       
+
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
             //for debug
@@ -541,7 +591,7 @@ namespace SampleWinForms
                 this.txtGridSize.Text = _gridSize.ToString();
                 button1_Click(this, EventArgs.Empty);
             }
-            
+
         }
 
         private void chkVerticalHinting_CheckedChanged(object sender, EventArgs e)
