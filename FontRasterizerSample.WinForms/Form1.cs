@@ -280,7 +280,7 @@ namespace SampleWinForms
                 //draw each triangles
                 p.Line(tri.P0.X, tri.P0.Y, tri.P1.X, tri.P1.Y);
                 p.Line(tri.P1.X, tri.P1.Y, tri.P2.X, tri.P2.Y);
-                p.Line(tri.P2.X, tri.P2.Y, tri.P1.X, tri.P1.Y);
+                p.Line(tri.P2.X, tri.P2.Y, tri.P0.X, tri.P0.Y);
 
                 //find center of each triangle
 
