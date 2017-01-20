@@ -30,7 +30,7 @@ namespace NOpenType.Tables
             Created = input.ReadUInt64(); //  International date (8-byte field). (?)
             Modified = input.ReadUInt64();
             // bounding box for all glyphs
-            _bounds = BoundsReader.ReadFrom(input);
+            _bounds = Utils.ReadBounds(input);
             MacStyle = input.ReadUInt16();
             LowestRecPPEM = input.ReadUInt16();
             FontDirectionHint = input.ReadInt16();
