@@ -111,22 +111,71 @@ namespace PixelFarm.Agg
         internal List<GlyphPart> parts = new List<GlyphPart>();
         internal List<float> allPoints;
         bool analyzed;
+        bool isClockwise;
+
+        public GlyphContour()
+        {
+        }
         public void AddPart(GlyphPart part)
         {
             parts.Add(part);
         }
 
+        public bool IsClockwise
+        {
+            get { return this.isClockwise; }
+        }
         public void Analyze(GlyphPartAnalyzer analyzer)
         {
             if (analyzed) return;
-            //
-            int j = parts.Count;
-
-
-            for (int i = 0; i < j; ++i)
+            // 
+            //---------------
+            //http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+            //check if hole or not
+            //clockwise or counter-clockwise
             {
-                parts[i].Analyze(analyzer);
+                //Some of the suggested methods will fail in the case of a non-convex polygon, such as a crescent. 
+                //Here's a simple one that will work with non-convex polygons (it'll even work with a self-intersecting polygon like a figure-eight, telling you whether it's mostly clockwise).
+
+                //Sum over the edges, (x2 − x1)(y2 + y1). 
+                //If the result is positive the curve is clockwise,
+                //if it's negative the curve is counter-clockwise. (The result is twice the enclosed area, with a +/- convention.)
+                int j = allPoints.Count;
+                float total = 0;
+                for (int i = 3; i < j; ++i)
+                {
+                    float x0 = allPoints[i - 3];
+                    float y0 = allPoints[i - 2];
+                    float x1 = allPoints[i - 1];
+                    float y1 = allPoints[i];
+
+                    total += (x1 - x0) * (y1 + y0);
+                    i += 2;
+                }
+                //the last one
+                {
+                    float x0 = allPoints[j - 2];
+                    float y0 = allPoints[j - 1];
+                    float x1 = allPoints[0];
+                    float y1 = allPoints[1];
+                    total += (x1 - x0) * (y1 + y0);
+                }
+
+                isClockwise = total >= 0;
+
             }
+
+            //flatten each part ...
+            //-------------------------------
+            {
+                int j = parts.Count;
+                //---------------
+                for (int i = 0; i < j; ++i)
+                {
+                    parts[i].Analyze(analyzer);
+                }
+            }
+
 
             analyzed = true;
         }
@@ -142,12 +191,13 @@ namespace PixelFarm.Agg
 
     public class GlyphPartAnalyzer
     {
-        int n_steps = 20;
-        public int NSteps
+        public GlyphPartAnalyzer()
         {
-            get { return n_steps; }
-            set { n_steps = value; }
+            this.NSteps = 20;
         }
+        public int NSteps { get; set; }
+        public float PixelScale { get; set; }
+
         public void CreateBezierVxs4(
             int nsteps,
             List<GlyphPoint2D> points,
