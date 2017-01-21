@@ -37,7 +37,7 @@ namespace PixelFarm.Agg
         }
         protected override void OnCloseFigure()
         {
-            cntBuilder.CloseFigure(); 
+            cntBuilder.CloseFigure();
             GlyphContour cntContour = cntBuilder.CurrentContour;
             cntContour.allPoints = cntBuilder.GetAllPoints();
             cntBuilder.Reset();
@@ -85,11 +85,15 @@ namespace PixelFarm.Agg
                 var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
                     new PixelFarm.Agg.Transform.AffinePlan(
                         PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
-
+                //transform -> flatten ->output
                 return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, vxs1), vxs2);
             }
         }
 
+        public float GetPixelScale()
+        {
+            return TypeFace.CalculateScale(SizeInPoints);
+        }
         public VertexStore GetUnscaledVxs()
         {
             return VertexStore.CreateCopy(ps.Vxs);
