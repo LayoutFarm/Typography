@@ -190,9 +190,9 @@ namespace SampleWinForms
 
             if (chkFillBackground.Checked)
             {
-                ////5.2 
+                //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
-                ////5.3
+                //5.3
                 p.Fill(vxs);
             }
             if (chkBorder.Checked)
@@ -207,30 +207,31 @@ namespace SampleWinForms
 
             if (chkMasterOutlineAnalysis.Checked)
             {
-                //List<GlyphContour> contours = builder.GetContours();
-                //int j = contours.Count;
-                //var analyzer = new GlyphPartAnalyzer();
-                //analyzer.NSteps = 4;
-                //for (int i = 0; i < j; ++i)
-                //{
-                //    //analyze each contour
-                //    contours[i].Analyze(analyzer);
-                //}
-                ////draw each contour point
-                //for (int i = 0; i < j; ++i)
-                //{
-                //    DrawGlyphControlPoints2(contours[i], p);
-                //}
-
+                List<GlyphContour> contours = builder.GetContours();
+                int j = contours.Count;
+                var analyzer = new GlyphPartAnalyzer();
+                analyzer.NSteps = 4;
+                analyzer.PixelScale = builder.GetPixelScale();
+                for (int i = 0; i < j; ++i)
+                {
+                    //analyze each contour
+                    contours[i].Analyze(analyzer);
+                }
+                //draw each contour point
+                for (int i = 0; i < j; ++i)
+                {
+                    DrawGlyphControlPoints2(contours[i], p, analyzer.PixelScale);
+                }
             }
 
-            //if (chkShowTess.Checked)
-            //{
-            //    //draw for debug ...
-            //    //draw control point
-            //    List<GlyphContour> contours = builder.GetContours();
-            //    TessWithPolyTriAndDraw(contours, p);
-            //}
+            if (chkShowTess.Checked)
+            {
+                //draw for debug ...
+                //draw control point
+                List<GlyphContour> contours = builder.GetContours();
+                float scale = builder.GetPixelScale();
+                TessWithPolyTriAndDraw(contours, p, scale);
+            }
 
             if (chkShowGrid.Checked)
             {
@@ -272,19 +273,32 @@ namespace SampleWinForms
                 y += sqSize;
             }
         }
-        void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p)
+        void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float scale)
         {
 
 
             List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
             int cntCount = contours.Count;
+
+            GlyphContour cnt = contours[0];
             Poly2Tri.Polygon polygon = CreatePolygon(contours[0]);//first contour            
+            bool isHoleIf = !cnt.IsClockwise;
             //if (cntCount > 0)
             //{
             //    //debug only
             for (int n = 1; n < cntCount; ++n)
             {
-                polygon.AddHole(CreatePolygon(contours[n]));
+                cnt = contours[n];
+                //IsHole is correct after we Analyze() the glyph contour
+                if (cnt.IsClockwise == isHoleIf)
+                {
+                    polygon.AddHole(CreatePolygon(cnt));
+                }
+                else
+                {
+                    //eg i
+                    //the is a complete separate dot  (i head) over i body 
+                }
             }
             //}
 
@@ -293,14 +307,16 @@ namespace SampleWinForms
             p.FillColor = PixelFarm.Drawing.Color.Yellow;
 
 
-            List<EdgeLine> edges = new List<EdgeLine>();
 
+
+
+            List<EdgeLine> edges = new List<EdgeLine>();
             foreach (var tri in polygon.Triangles)
             {
                 //draw each triangles
-                p.Line(tri.P0.X, tri.P0.Y, tri.P1.X, tri.P1.Y);
-                p.Line(tri.P1.X, tri.P1.Y, tri.P2.X, tri.P2.Y);
-                p.Line(tri.P2.X, tri.P2.Y, tri.P0.X, tri.P0.Y);
+                p.Line(tri.P0.X * scale, tri.P0.Y * scale, tri.P1.X * scale, tri.P1.Y * scale);
+                p.Line(tri.P1.X * scale, tri.P1.Y * scale, tri.P2.X * scale, tri.P2.Y * scale);
+                p.Line(tri.P2.X * scale, tri.P2.Y * scale, tri.P0.X * scale, tri.P0.Y * scale);
 
                 edges.Add(new EdgeLine(tri.P0, tri.P1));
                 edges.Add(new EdgeLine(tri.P1, tri.P2));
@@ -308,8 +324,8 @@ namespace SampleWinForms
 
                 //find center of each triangle
                 //--------------------------------------------- 
-                var p_centerx = tri.P0.X + tri.P1.X + tri.P2.X;
-                var p_centery = tri.P0.Y + tri.P1.Y + tri.P2.Y;
+                var p_centerx = (tri.P0.X + tri.P1.X + tri.P2.X) * scale;
+                var p_centery = (tri.P0.Y + tri.P1.Y + tri.P2.Y) * scale;
 
                 p.FillRectLBWH(p_centerx / 3, p_centery / 3, 2, 2);
             }
@@ -511,7 +527,7 @@ namespace SampleWinForms
             return polygon;
         }
 
-        void DrawGlyphControlPoints2(GlyphContour cnt, AggCanvasPainter p)
+        void DrawGlyphControlPoints2(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
         {
             //for debug
             List<GlyphPart> parts = cnt.parts;
@@ -539,10 +555,12 @@ namespace SampleWinForms
 
                     int lower = (int)(point.y);
                     int snap1_diff = lower % 5;
-                    int f_y = proper;
+                    float f_y = proper;
+                    float f_x = (float)point.x;
+
                     if (point.kind == PointKind.CurveInbetween)
                     {
-                        continue;
+
                     }
                     else
                     {
@@ -565,13 +583,17 @@ namespace SampleWinForms
                             f_y *= gridSize;
                         }
                     }
+
+                    f_x = f_x * pixelScale;
+                    f_y = f_y * pixelScale;
+
                     if (totalCount == 0)
                     {
-                        vxs.AddMoveTo(point.x, f_y);
+                        vxs.AddMoveTo(f_x, f_y);
                     }
                     else
                     {
-                        vxs.AddLineTo(point.x, f_y);
+                        vxs.AddLineTo(f_x, f_y);
                     }
 
                     totalCount++;
@@ -582,7 +604,7 @@ namespace SampleWinForms
             vxs.AddCloseFigure();
             p.Fill(vxs);
 
-            return;
+
             //------------------
             for (int i = 0; i < j; ++i)
             {
@@ -605,11 +627,12 @@ namespace SampleWinForms
                     int proper = (int)Math.Round(point.y, 0);
                     int lower = (int)(point.y);
                     int snap1_diff = lower % 5;
-                    int f_y = proper;
+                    float f_y = proper;
+                    float f_x = (float)point.x;
 
                     if (point.kind == PointKind.CurveInbetween)
                     {
-                        continue;
+
                     }
                     else
                     {
@@ -633,7 +656,12 @@ namespace SampleWinForms
                             f_y *= gridSize;
                         }
                     }
-                    p.FillRectLBWH(point.x, f_y, 2, 2);
+
+                    f_x = f_x * pixelScale;
+                    f_y = f_y * pixelScale;
+
+
+                    p.FillRectLBWH(f_x, f_y, 2, 2);
                 }
             }
         }

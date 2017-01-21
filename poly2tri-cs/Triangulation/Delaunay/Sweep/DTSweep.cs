@@ -321,10 +321,10 @@ namespace Poly2Tri
             try
             {
 
-              
+
                 tcx.EdgeEventConstrainedEdge = edge;
-                tcx.EdgeEventRight = edge.P.X > edge.Q.X; 
-            
+                tcx.EdgeEventRight = edge.P.X > edge.Q.X;
+
                 if (tcx.IsDebugEnabled) { tcx.DTDebugContext.PrimaryTriangle = node.Triangle; }
 
                 if (MarkEdgeSideOfTriangle(node.Triangle, edge.P, edge.Q)) return;
@@ -338,7 +338,7 @@ namespace Poly2Tri
             }
             catch (PointOnEdgeException e)
             {
-                //Debug.WriteLine( String.Format( "Warning: Skipping Edge: {0}", e.Message ) );
+                //Debug.WriteLine(String.Format("Warning: Skipping Edge: {0}", e.Message));
                 throw;
             }
         }
@@ -531,7 +531,7 @@ namespace Poly2Tri
         private static bool MarkEdgeSideOfTriangle(DelaunayTriangle triangle, TriangulationPoint ep, TriangulationPoint eq)
         {
             switch (triangle.FindEdgeIndex(ep, eq))
-            {   
+            {
                 case 0:
                     {   //mark constraint
                         triangle.C0 = true;
