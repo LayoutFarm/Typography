@@ -205,7 +205,7 @@ namespace SampleWinForms
                 p.Draw(vxs);
             }
 
-            if (chkMasterOutlineAnalysis.Checked)
+            //master outline analysis
             {
                 List<GlyphContour> contours = builder.GetContours();
                 int j = contours.Count;
@@ -218,9 +218,16 @@ namespace SampleWinForms
                     contours[i].Analyze(analyzer);
                 }
                 //draw each contour point
+            }
+
+            if (chkMasterOutlineAnalysis.Checked)
+            {
+                List<GlyphContour> contours = builder.GetContours();
+                int j = contours.Count;
+                float pixelScale = builder.GetPixelScale();
                 for (int i = 0; i < j; ++i)
                 {
-                    DrawGlyphControlPoints2(contours[i], p, analyzer.PixelScale);
+                    DrawGlyphControlPoints2(contours[i], p, pixelScale);
                 }
             }
 
