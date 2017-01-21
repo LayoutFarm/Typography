@@ -29,8 +29,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Poly2Tri {
-	public enum TriangulationAlgorithm {
-		DTSweep
-	}
+namespace Poly2Tri
+{
+    public enum TriangulationAlgorithm
+    {
+        DTSweep
+    }
 }

@@ -39,6 +39,11 @@ namespace PixelFarm.Agg
         }
         public void CloseFigure()
         {
+            if (curX == latestMoveToX &&
+                curY == latestMoveToY)
+            {
+                return;
+            }
             currentCnt.AddPart(new GlyphLine(curX, curY, latestMoveToX, latestMoveToY));
 
             allPoints.Add(latestMoveToX);
@@ -244,6 +249,17 @@ namespace PixelFarm.Agg
         public abstract GlyphPartKind Kind { get; }
         public abstract void Analyze(GlyphPartAnalyzer analyzer);
         public abstract List<GlyphPoint2D> GetFlattenPoints();
+
+#if DEBUG
+        static int dbugTotalId;
+        public readonly int dbugId = dbugTotalId++;
+        public GlyphPart()
+        {
+            //if (this.dbugId == 16)
+            //{
+            //}
+        }
+#endif
     }
 
     public enum PointKind : byte

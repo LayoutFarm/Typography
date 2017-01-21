@@ -297,15 +297,16 @@ namespace SampleWinForms
             {
                 cnt = contours[n];
                 //IsHole is correct after we Analyze() the glyph contour
-                if (cnt.IsClockwise == isHoleIf)
-                {
-                    //polygon.AddHole(CreatePolygon2(cnt));
-                }
-                else
-                {
-                    //eg i
-                    //the is a complete separate dot  (i head) over i body 
-                }
+                polygon.AddHole(CreatePolygon2(cnt));
+                //if (cnt.IsClockwise == isHoleIf)
+                //{
+                //     polygon.AddHole(CreatePolygon2(cnt));
+                //}
+                //else
+                //{
+                //    //eg i
+                //    //the is a complete separate dot  (i head) over i body 
+                //}
             }
             //}
 
@@ -567,10 +568,12 @@ namespace SampleWinForms
                 for (int i = 0; i < j; ++i)
                 {
                     GlyphPart p = allParts[i];
-                    if (allPoints.Count >= 102)
+#if DEBUG
+                    if (allPoints.Count >= 30)
                     {
 
                     }
+#endif
                     List<GlyphPoint2D> fpoints = p.GetFlattenPoints();
                     if (tt == 0)
                     {
@@ -581,6 +584,7 @@ namespace SampleWinForms
                             allPoints.Add((float)fp.x);
                             allPoints.Add((float)fp.y);
                         }
+                        tt++;
                     }
                     else
                     {
@@ -593,15 +597,28 @@ namespace SampleWinForms
                             allPoints.Add((float)fp.y);
                         }
                     }
-                    tt++;
+
                 }
 
             }
             //---------------------------------------
             {
-
-
+                //check last (x,y) and first (x,y)
                 int lim = allPoints.Count - 1;
+                {
+                    if (allPoints[lim] == allPoints[1]
+                        && allPoints[lim - 1] == allPoints[0])
+                    {
+                        //remove last (x,y)
+                        allPoints.RemoveAt(lim);
+                        allPoints.RemoveAt(lim - 1);
+                        lim -= 2;
+                    }
+                }
+
+
+
+
                 //limitation: poly tri not accept duplicated points!
                 double prevX = 0;
                 double prevY = 0;
@@ -610,57 +627,13 @@ namespace SampleWinForms
                 {
                     var x = allPoints[i];
                     var y = allPoints[i + 1];
-                    //
-                    if (x != prevX && y != prevY)
+
+                    if (x == prevX && y == prevY)
                     {
-                        TmpPoint tmp_point = new TmpPoint();
-                        tmp_point.x = x;
-                        tmp_point.y = y;
-                        if (!tmpPoints.ContainsKey(tmp_point))
-                        {
-                            tmpPoints.Add(tmp_point, true);
-                            points.Add(new Poly2Tri.PolygonPoint(
-                                x,
-                                y));
-                        }
-                        else
-                        {
-                            //temp fixed***
-                            while (true)
-                            {
-                                x += 0.1f;
-                                y += 0.1f;
-
-                                tmp_point.x = x;
-                                tmp_point.y = y;
-                                if (!tmpPoints.ContainsKey(tmp_point))
-                                {
-                                    tmpPoints.Add(tmp_point, true);
-                                    points.Add(new Poly2Tri.PolygonPoint(
-                                        x,
-                                        y));
-                                    break;
-                                }
-                                else
-                                {
-
-                                }
-                            }
-                        }
-
-                        prevX = x;
-                        prevY = y;
-
+                        throw new NotSupportedException();
                     }
                     else
                     {
-                        //a duplicate point
-                        //temp fix***
-                        //minor shift x and y
-                        x += 0.5f;
-                        y += 0.5f;
-
-
                         TmpPoint tmp_point = new TmpPoint();
                         tmp_point.x = x;
                         tmp_point.y = y;
@@ -673,11 +646,65 @@ namespace SampleWinForms
                         }
                         else
                         {
+                            
+                            throw new NotSupportedException();
+                            //temp fixed***
+
+                            //while (true)
+                            //{
+                            //    x += 0.1f;
+                            //    y += 0.1f;
+
+                            //    tmp_point.x = x;
+                            //    tmp_point.y = y;
+                            //    if (!tmpPoints.ContainsKey(tmp_point))
+                            //    {
+                            //        tmpPoints.Add(tmp_point, true);
+                            //        points.Add(new Poly2Tri.PolygonPoint(
+                            //            x,
+                            //            y));
+                            //        break;
+                            //    }
+                            //    else
+                            //    {
+
+                            //    }
+                            //}
                         }
 
                         prevX = x;
                         prevY = y;
+
                     }
+                    //if (x != prevX && y != prevY)
+                    //{
+
+
+                    //}
+                    //else
+                    //{
+                    //    //a duplicate point
+                    //    //temp fix***
+                    //    //minor shift x and y
+                    //    x += 0.5f;
+                    //    y += 0.5f;
+                    //    TmpPoint tmp_point = new TmpPoint();
+                    //    tmp_point.x = x;
+                    //    tmp_point.y = y;
+                    //    if (!tmpPoints.ContainsKey(tmp_point))
+                    //    {
+                    //        tmpPoints.Add(tmp_point, true);
+                    //        points.Add(new Poly2Tri.PolygonPoint(
+                    //            x,
+                    //            y));
+                    //    }
+                    //    else
+                    //    {
+                    //    }
+
+                    //    prevX = x;
+                    //    prevY = y;
+                    //}
                     i += 2;
                 }
 

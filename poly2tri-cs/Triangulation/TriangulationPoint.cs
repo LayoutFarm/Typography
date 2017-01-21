@@ -51,11 +51,11 @@ namespace Poly2Tri
         public TriangulationPoint(double x, double y)
         {
             X = x; Y = y;
-#if DEBUG
-            if (this.dbugId == 53)
-            {
-            }
-#endif
+//#if DEBUG
+//            if (this.dbugId == 53)
+//            {
+//            }
+//#endif
 
         }
         public override string ToString()
