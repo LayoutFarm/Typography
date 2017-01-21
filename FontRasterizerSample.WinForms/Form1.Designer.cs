@@ -44,6 +44,7 @@
             this.txtGridSize = new System.Windows.Forms.TextBox();
             this.chkDoGridFitting = new System.Windows.Forms.CheckBox();
             this.chkVerticalHinting = new System.Windows.Forms.CheckBox();
+            this.chkMasterOutlineAnalysis = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -139,8 +140,6 @@
             // chkTrueTypeHint
             // 
             this.chkTrueTypeHint.AutoSize = true;
-            this.chkTrueTypeHint.Checked = true;
-            this.chkTrueTypeHint.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkTrueTypeHint.Location = new System.Drawing.Point(491, 108);
             this.chkTrueTypeHint.Name = "chkTrueTypeHint";
             this.chkTrueTypeHint.Size = new System.Drawing.Size(125, 17);
@@ -204,8 +203,6 @@
             // chkVerticalHinting
             // 
             this.chkVerticalHinting.AutoSize = true;
-            this.chkVerticalHinting.Checked = true;
-            this.chkVerticalHinting.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkVerticalHinting.Location = new System.Drawing.Point(510, 131);
             this.chkVerticalHinting.Name = "chkVerticalHinting";
             this.chkVerticalHinting.Size = new System.Drawing.Size(123, 17);
@@ -214,11 +211,25 @@
             this.chkVerticalHinting.UseVisualStyleBackColor = true;
             this.chkVerticalHinting.CheckedChanged += new System.EventHandler(this.chkVerticalHinting_CheckedChanged);
             // 
+            // chkMasterOutlineAnalysis
+            // 
+            this.chkMasterOutlineAnalysis.AutoSize = true;
+            this.chkMasterOutlineAnalysis.Checked = true;
+            this.chkMasterOutlineAnalysis.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkMasterOutlineAnalysis.Location = new System.Drawing.Point(495, 303);
+            this.chkMasterOutlineAnalysis.Name = "chkMasterOutlineAnalysis";
+            this.chkMasterOutlineAnalysis.Size = new System.Drawing.Size(129, 17);
+            this.chkMasterOutlineAnalysis.TabIndex = 18;
+            this.chkMasterOutlineAnalysis.Text = "MasterOutlineAnalysis";
+            this.chkMasterOutlineAnalysis.UseVisualStyleBackColor = true;
+            this.chkMasterOutlineAnalysis.CheckedChanged += new System.EventHandler(this.chkMasterOutlineAnalysis_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkMasterOutlineAnalysis);
             this.Controls.Add(this.chkVerticalHinting);
             this.Controls.Add(this.chkDoGridFitting);
             this.Controls.Add(this.txtGridSize);
@@ -260,6 +271,7 @@
         private System.Windows.Forms.TextBox txtGridSize;
         private System.Windows.Forms.CheckBox chkDoGridFitting;
         private System.Windows.Forms.CheckBox chkVerticalHinting;
+        private System.Windows.Forms.CheckBox chkMasterOutlineAnalysis;
     }
 }
 
