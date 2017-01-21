@@ -46,7 +46,7 @@ namespace Poly2Tri
 
     }
     public static class DTSweepConstraintMaker
-    {   
+    {
         /// <summary>
         /// Give two points in any order. Will always be ordered so
         /// that q.y > p.y and q.x > p.x if same y value 

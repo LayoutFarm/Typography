@@ -104,7 +104,7 @@ namespace Poly2Tri
                 {
                     cloneHoles[i] = myHoles[i].CleanClone();
                 }
-                
+
                 //for (int i = 0; i < j; ++i)
                 //{
                 //    cloneHoles.Add(myHoles[i].CleanClone());

@@ -163,6 +163,8 @@
             // chkShowTess
             // 
             this.chkShowTess.AutoSize = true;
+            this.chkShowTess.Checked = true;
+            this.chkShowTess.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkShowTess.Location = new System.Drawing.Point(495, 184);
             this.chkShowTess.Name = "chkShowTess";
             this.chkShowTess.Size = new System.Drawing.Size(110, 17);

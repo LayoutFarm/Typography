@@ -338,6 +338,7 @@ namespace Poly2Tri
             }
             catch (PointOnEdgeException e)
             {
+
                 //Debug.WriteLine(String.Format("Warning: Skipping Edge: {0}", e.Message));
                 throw;
             }
@@ -573,6 +574,7 @@ namespace Poly2Tri
 
             if (o1 == Orientation.Collinear)
             {
+
                 // TODO: Split edge in two
                 ////            splitEdge( ep, eq, p1 );
                 //            edgeEvent( tcx, p1, eq, triangle, point );

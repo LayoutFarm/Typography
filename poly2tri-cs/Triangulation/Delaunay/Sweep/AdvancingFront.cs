@@ -43,7 +43,7 @@ namespace Poly2Tri
     /**
      * @author Thomas Åhlen (thahlen@gmail.com)
      */
-      class AdvancingFront
+    class AdvancingFront
     {
         public readonly AdvancingFrontNode Head;
         public readonly AdvancingFrontNode Tail;

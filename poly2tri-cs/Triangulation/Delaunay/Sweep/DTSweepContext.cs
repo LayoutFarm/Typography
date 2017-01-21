@@ -61,7 +61,11 @@ namespace Poly2Tri
         internal DTSweepConstraint EdgeEventConstrainedEdge;
         internal bool EdgeEventRight;
         //----------------------------------
+#if DEBUG
 
+        static int dbugTotalId;
+        public int dbugId = dbugTotalId++;
+#endif
 
         public DTSweepContext()
         {

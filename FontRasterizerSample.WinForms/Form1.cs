@@ -288,7 +288,7 @@ namespace SampleWinForms
             int cntCount = contours.Count;
 
             GlyphContour cnt = contours[0];
-            Poly2Tri.Polygon polygon = CreatePolygon(contours[0]);//first contour            
+            Poly2Tri.Polygon polygon = CreatePolygon2(contours[0]);//first contour            
             bool isHoleIf = !cnt.IsClockwise;
             //if (cntCount > 0)
             //{
@@ -299,7 +299,7 @@ namespace SampleWinForms
                 //IsHole is correct after we Analyze() the glyph contour
                 if (cnt.IsClockwise == isHoleIf)
                 {
-                    polygon.AddHole(CreatePolygon(cnt));
+                    //polygon.AddHole(CreatePolygon2(cnt));
                 }
                 else
                 {
@@ -443,8 +443,20 @@ namespace SampleWinForms
         {
             public double x;
             public double y;
+#if DEBUG
+            public override string ToString()
+            {
+                return x + "," + y;
+            }
+#endif
         }
-        static Poly2Tri.Polygon CreatePolygon(GlyphContour cnt)
+        /// <summary>
+        /// create polygon from original master outline point,
+        /// fix duplicated point
+        /// </summary>
+        /// <param name="cnt"></param>
+        /// <returns></returns>
+        static Poly2Tri.Polygon CreatePolygon1(GlyphContour cnt)
         {
             List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
             List<float> allPoints = cnt.allPoints;
@@ -534,6 +546,145 @@ namespace SampleWinForms
             return polygon;
         }
 
+        /// <summary>
+        /// create polygon from flatten curve outline point
+        /// </summary>
+        /// <param name="cnt"></param>
+        /// <returns></returns>
+        static Poly2Tri.Polygon CreatePolygon2(GlyphContour cnt)
+        {
+            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+            List<GlyphPart> allParts = cnt.parts;
+            //---------------------------------------
+            //merge all generated points
+            //also remove duplicated point too!
+            List<float> allPoints = new List<float>();
+
+            {
+                int tt = 0;
+                int j = allParts.Count;
+
+                for (int i = 0; i < j; ++i)
+                {
+                    GlyphPart p = allParts[i];
+                    if (allPoints.Count >= 102)
+                    {
+
+                    }
+                    List<GlyphPoint2D> fpoints = p.GetFlattenPoints();
+                    if (tt == 0)
+                    {
+                        int n = fpoints.Count;
+                        for (int m = 0; m < n; ++m)
+                        {
+                            GlyphPoint2D fp = fpoints[m];
+                            allPoints.Add((float)fp.x);
+                            allPoints.Add((float)fp.y);
+                        }
+                    }
+                    else
+                    {
+                        //except first point
+                        int n = fpoints.Count;
+                        for (int m = 1; m < n; ++m)
+                        {
+                            GlyphPoint2D fp = fpoints[m];
+                            allPoints.Add((float)fp.x);
+                            allPoints.Add((float)fp.y);
+                        }
+                    }
+                    tt++;
+                }
+
+            }
+            //---------------------------------------
+            {
+
+
+                int lim = allPoints.Count - 1;
+                //limitation: poly tri not accept duplicated points!
+                double prevX = 0;
+                double prevY = 0;
+                Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
+                for (int i = 0; i < lim; )
+                {
+                    var x = allPoints[i];
+                    var y = allPoints[i + 1];
+                    //
+                    if (x != prevX && y != prevY)
+                    {
+                        TmpPoint tmp_point = new TmpPoint();
+                        tmp_point.x = x;
+                        tmp_point.y = y;
+                        if (!tmpPoints.ContainsKey(tmp_point))
+                        {
+                            tmpPoints.Add(tmp_point, true);
+                            points.Add(new Poly2Tri.PolygonPoint(
+                                x,
+                                y));
+                        }
+                        else
+                        {
+                            //temp fixed***
+                            while (true)
+                            {
+                                x += 0.1f;
+                                y += 0.1f;
+
+                                tmp_point.x = x;
+                                tmp_point.y = y;
+                                if (!tmpPoints.ContainsKey(tmp_point))
+                                {
+                                    tmpPoints.Add(tmp_point, true);
+                                    points.Add(new Poly2Tri.PolygonPoint(
+                                        x,
+                                        y));
+                                    break;
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                        }
+
+                        prevX = x;
+                        prevY = y;
+
+                    }
+                    else
+                    {
+                        //a duplicate point
+                        //temp fix***
+                        //minor shift x and y
+                        x += 0.5f;
+                        y += 0.5f;
+
+
+                        TmpPoint tmp_point = new TmpPoint();
+                        tmp_point.x = x;
+                        tmp_point.y = y;
+                        if (!tmpPoints.ContainsKey(tmp_point))
+                        {
+                            tmpPoints.Add(tmp_point, true);
+                            points.Add(new Poly2Tri.PolygonPoint(
+                                x,
+                                y));
+                        }
+                        else
+                        {
+                        }
+
+                        prevX = x;
+                        prevY = y;
+                    }
+                    i += 2;
+                }
+
+                Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
+                return polygon;
+            }
+        }
         void DrawGlyphControlPoints2(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
         {
             //for debug

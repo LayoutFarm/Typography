@@ -284,7 +284,7 @@ namespace Poly2Tri
             //1. clear points of this
             P0.tempName = P1.tempName = P2.tempName = 3;
             //2. assign tempName for t
-            t.P0.tempName = 0; t.P1.tempName = 1; t.P2.tempName = 2; 
+            t.P0.tempName = 0; t.P1.tempName = 1; t.P2.tempName = 2;
 
             bool a = P0.tempName != 3;
             bool b = P1.tempName != 3;
@@ -953,7 +953,7 @@ namespace Poly2Tri
 
             //return -1;
         }
-        
+
     }
 
 
