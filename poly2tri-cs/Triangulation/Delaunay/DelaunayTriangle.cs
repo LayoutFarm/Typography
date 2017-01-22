@@ -65,14 +65,27 @@ namespace Poly2Tri
         //next 4 bits for EdgeIsConstrained
         //int edgedNoteFlags;
 
-        public bool IsInterior { get; set; }
+#if DEBUG
+        public bool dbugActualTriangle;
+        static int dbugTotalId;
+        public readonly int dbugId = dbugTotalId++;
+#endif
+
         public DelaunayTriangle(TriangulationPoint p1, TriangulationPoint p2, TriangulationPoint p3)
         {
             this.P0 = p1;
             this.P1 = p2;
             this.P2 = p3;
         }
+#if DEBUG
+        public void dbugMarkAsActualTriangle()
+        {
+            dbugActualTriangle = true;
+        }
+#endif
 
+
+        public bool IsInterior { get; set; }
         public int IndexOf(TriangulationPoint p)
         {
 
@@ -600,8 +613,12 @@ namespace Poly2Tri
             }
         }
 
-        public override string ToString() { return P0 + "," + P1 + "," + P2; }
-
+#if DEBUG
+        public override string ToString()
+        {
+            return this.dbugId + (dbugActualTriangle ? "*" : "") + ": {" + P0 + "," + P1 + "," + P2 + "}";
+        }
+#endif
         /// <summary>
         /// Finalize edge marking
         /// </summary>

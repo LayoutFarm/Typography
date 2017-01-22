@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 0;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
-            this.txtInputChar.Text = "B";
+            this.txtInputChar.Text = "X";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -227,7 +227,7 @@ namespace SampleWinForms
                 float pixelScale = builder.GetPixelScale();
                 for (int i = 0; i < j; ++i)
                 {
-                    DrawGlyphControlPoints2(contours[i], p, pixelScale);
+                    DrawGlyphControlPoints3(contours[i], p, pixelScale);
                 }
             }
 
@@ -314,8 +314,12 @@ namespace SampleWinForms
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
             p.FillColor = PixelFarm.Drawing.Color.Yellow;
 
-
-
+#if DEBUG
+            foreach (var tri in polygon.Triangles)
+            {
+                tri.dbugMarkAsActualTriangle();
+            }
+#endif
 
 
             List<EdgeLine> edges = new List<EdgeLine>();
@@ -646,7 +650,7 @@ namespace SampleWinForms
                         }
                         else
                         {
-                            
+
                             throw new NotSupportedException();
                             //temp fixed***
 
@@ -711,6 +715,11 @@ namespace SampleWinForms
                 Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
                 return polygon;
             }
+        }
+
+        void DrawGlyphControlPoints3(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
+        {
+
         }
         void DrawGlyphControlPoints2(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
         {
@@ -788,7 +797,6 @@ namespace SampleWinForms
 
             vxs.AddCloseFigure();
             p.Fill(vxs);
-
 
             //------------------
             for (int i = 0; i < j; ++i)
