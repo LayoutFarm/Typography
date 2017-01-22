@@ -48,9 +48,7 @@
 ///   Comments!
 
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System; 
 namespace Poly2Tri
 {
     public static class DTSweep
