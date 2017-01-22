@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 0;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
-            this.txtInputChar.Text = "X";
+            this.txtInputChar.Text = "m";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -280,6 +280,27 @@ namespace SampleWinForms
                 y += sqSize;
             }
         }
+
+
+        static void DrawEdge(AggCanvasPainter p, PixelFarm.Agg.Typography.EdgeLine edge, float scale)
+        {
+
+            switch (edge.SlopKind)
+            {
+                default:
+                    p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
+                    break;
+                case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
+                    p.StrokeColor = PixelFarm.Drawing.Color.OrangeRed;
+                    break;
+                case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
+                    p.StrokeColor = PixelFarm.Drawing.Color.Yellow;
+                    break;
+
+            }
+            p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale); 
+
+        }
         void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float scale)
         {
 
@@ -311,69 +332,85 @@ namespace SampleWinForms
             //}
 
             Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated
-            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
-            p.FillColor = PixelFarm.Drawing.Color.Yellow;
 
+            PixelFarm.Agg.Typography.GlyphFitOutline glyphFitOutline = new PixelFarm.Agg.Typography.GlyphFitOutline(polygon);
+            glyphFitOutline.Analyze();
+
+            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
 #if DEBUG
-            foreach (var tri in polygon.Triangles)
+            List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
+            foreach (PixelFarm.Agg.Typography.GlyphTriangle tri in triAngles)
             {
-                tri.dbugMarkAsActualTriangle();
+                PixelFarm.Agg.Typography.EdgeLine e0 = tri.e0;
+                PixelFarm.Agg.Typography.EdgeLine e1 = tri.e1;
+                PixelFarm.Agg.Typography.EdgeLine e2 = tri.e2;
+
+                //draw each triangles
+                DrawEdge(p, e0, scale);
+                DrawEdge(p, e1, scale);
+                DrawEdge(p, e2, scale);
+
+                double cen_x = tri.CentroidX;
+                double cen_y = tri.CentroidY;
+                p.FillColor = PixelFarm.Drawing.Color.Yellow;
+                p.FillRectLBWH(cen_x * scale, cen_y * scale, 2, 2);
             }
+
 #endif
 
+            //---------------
+            //List<EdgeLine> edges = new List<EdgeLine>();
+            //foreach (var tri in polygon.Triangles)
+            //{
+            //    //draw each triangles
+            //    p.Line(tri.P0.X * scale, tri.P0.Y * scale, tri.P1.X * scale, tri.P1.Y * scale);
+            //    p.Line(tri.P1.X * scale, tri.P1.Y * scale, tri.P2.X * scale, tri.P2.Y * scale);
+            //    p.Line(tri.P2.X * scale, tri.P2.Y * scale, tri.P0.X * scale, tri.P0.Y * scale);
 
-            List<EdgeLine> edges = new List<EdgeLine>();
-            foreach (var tri in polygon.Triangles)
-            {
-                //draw each triangles
-                p.Line(tri.P0.X * scale, tri.P0.Y * scale, tri.P1.X * scale, tri.P1.Y * scale);
-                p.Line(tri.P1.X * scale, tri.P1.Y * scale, tri.P2.X * scale, tri.P2.Y * scale);
-                p.Line(tri.P2.X * scale, tri.P2.Y * scale, tri.P0.X * scale, tri.P0.Y * scale);
+            //    edges.Add(new EdgeLine(tri.P0, tri.P1));
+            //    edges.Add(new EdgeLine(tri.P1, tri.P2));
+            //    edges.Add(new EdgeLine(tri.P2, tri.P0));
 
-                edges.Add(new EdgeLine(tri.P0, tri.P1));
-                edges.Add(new EdgeLine(tri.P1, tri.P2));
-                edges.Add(new EdgeLine(tri.P2, tri.P0));
+            //    //find center of each triangle
+            //    //--------------------------------------------- 
+            //    var p_centerx = (tri.P0.X + tri.P1.X + tri.P2.X) * scale;
+            //    var p_centery = (tri.P0.Y + tri.P1.Y + tri.P2.Y) * scale;
 
-                //find center of each triangle
-                //--------------------------------------------- 
-                var p_centerx = (tri.P0.X + tri.P1.X + tri.P2.X) * scale;
-                var p_centery = (tri.P0.Y + tri.P1.Y + tri.P2.Y) * scale;
-
-                p.FillRectLBWH(p_centerx / 3, p_centery / 3, 2, 2);
-            }
+            //    p.FillRectLBWH(p_centerx / 3, p_centery / 3, 2, 2);
+            //}
             //-------------------
 
             //sort
             //remove duplicated edge?
 
-            edges.Sort((e1, e2) =>
-            {
-                if (e1.y1 == e2.y1)
-                {
-                    return e1.x0.CompareTo(e2.x0);
-                }
-                else
-                {
-                    return e1.y1.CompareTo(e2.y1);
-                }
-            });
-            //remove shared edge
+            //edges.Sort((e1, e2) =>
+            //{
+            //    if (e1.y1 == e2.y1)
+            //    {
+            //        return e1.x0.CompareTo(e2.x0);
+            //    }
+            //    else
+            //    {
+            //        return e1.y1.CompareTo(e2.y1);
+            //    }
+            //});
+            ////remove shared edge
 
 
-            for (int i = edges.Count - 1; i > 0; --i)
-            {
-                EdgeLine e_now = edges[i];
-                EdgeLine e_prev = edges[i - 1];
+            //for (int i = edges.Count - 1; i > 0; --i)
+            //{
+            //    EdgeLine e_now = edges[i];
+            //    EdgeLine e_prev = edges[i - 1];
 
-                if (e_now.SameCoordinateWidth(e_prev))
-                {
-                    //remove the two
-                    //TODO: remove if we can have more than duplicate 2 edges
-                    edges.RemoveAt(i);
-                    edges.RemoveAt(i - 1);
-                    --i;
-                }
-            }
+            //    if (e_now.SameCoordinateWidth(e_prev))
+            //    {
+            //        //remove the two
+            //        //TODO: remove if we can have more than duplicate 2 edges
+            //        edges.RemoveAt(i);
+            //        edges.RemoveAt(i - 1);
+            //        --i;
+            //    }
+            //}
 
             //for (int i = edges.Count - 1; i > 0; --i)
             //{

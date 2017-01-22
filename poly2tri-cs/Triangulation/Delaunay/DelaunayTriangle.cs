@@ -57,9 +57,9 @@ namespace Poly2Tri
         //lower 4 bits for EdgeIsDelaunay
         //next 4 bits for EdgeIsConstrained
         //int edgedNoteFlags;
-
+        public bool isActualTriangle;
 #if DEBUG
-        public bool dbugActualTriangle;
+
         static int dbugTotalId;
         public readonly int dbugId = dbugTotalId++;
 #endif
@@ -70,14 +70,10 @@ namespace Poly2Tri
             this.P1 = p2;
             this.P2 = p3;
         }
-#if DEBUG
-        public void dbugMarkAsActualTriangle()
+        public void MarkAsActualTriangle()
         {
-            dbugActualTriangle = true;
+            isActualTriangle = true;
         }
-#endif
-
-
         public bool IsInterior { get; set; }
         public int IndexOf(TriangulationPoint p)
         {
@@ -595,7 +591,7 @@ namespace Poly2Tri
 #if DEBUG
         public override string ToString()
         {
-            return this.dbugId + (dbugActualTriangle ? "*" : "") + ": {" + P0 + "," + P1 + "," + P2 + "}";
+            return this.dbugId + (isActualTriangle ? "*" : "") + ": {" + P0 + "," + P1 + "," + P2 + "}";
         }
 #endif
         /// <summary>
@@ -734,7 +730,11 @@ namespace Poly2Tri
             double cy = (P0.Y + P1.Y + P2.Y) / 3f;
             return new TriangulationPoint(cx, cy);
         }
-
+        public void Centroid2(out double cx, out double cy)
+        {
+            cx = (P0.X + P1.X + P2.X) / 3f;
+            cy = (P0.Y + P1.Y + P2.Y) / 3f;
+        }
         /// <summary>
         /// Get the index of the neighbor that shares this edge (or -1 if it isn't shared)
         /// </summary>
