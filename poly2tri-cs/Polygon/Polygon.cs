@@ -1,4 +1,4 @@
-﻿//BSD 2014, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 
 /* Poly2Tri
  * Copyright (c) 2009-2010, Poly2Tri Contributors
@@ -40,10 +40,9 @@
 ///   We have a lot of Add/Clear methods -- we may prefer to just expose the container
 ///   Some self-explanitory methods may deserve commenting anyways
 
+
 using System;
 using System.Collections.Generic;
-
-
 namespace Poly2Tri
 {
     public sealed class Polygon : Triangulatable
@@ -52,7 +51,6 @@ namespace Poly2Tri
         //List<TriangulationPoint> _steinerPoints;
         Polygon[] _holes;
         List<DelaunayTriangle> _triangles;
-
         /// <summary>
         /// Create a polygon from a list of at least 3 points with no duplicates.
         /// </summary>
@@ -61,7 +59,6 @@ namespace Poly2Tri
         {
             this._points = points;
             if (points.Length < 3) throw new ArgumentException("List has fewer than 3 points", "points");
-
             // Lets do one sanity check that first and last point hasn't got same position
             // Its something that often happen when importing polygon data from other formats 
             if (points[0].Equals(points[points.Length - 1]))
@@ -99,7 +96,6 @@ namespace Poly2Tri
                 j = myHoles.Length;
                 Polygon[] cloneHoles = new Polygon[j];
                 newPolygon._holes = cloneHoles;
-
                 for (int i = j - 1; i >= 0; --i)
                 {
                     cloneHoles[i] = myHoles[i].CleanClone();
@@ -281,11 +277,9 @@ namespace Poly2Tri
 
             tcx.MakeNewConstraint(_points[0], _points[j - 1]);
             tcx.Points.AddRange(_points);
-
             // Hole constraints
             if (_holes != null)
             {
-
                 foreach (Polygon p in _holes)
                 {
                     int p_npoints_lim = p._points.Length - 1;
@@ -304,6 +298,5 @@ namespace Poly2Tri
             //    tcx.Points.AddRange(_steinerPoints);
             //}
         }
-
     }
 }

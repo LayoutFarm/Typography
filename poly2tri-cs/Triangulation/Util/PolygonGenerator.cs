@@ -30,21 +30,17 @@
  */
 
 using System;
-
 namespace Poly2Tri
 {
     public class PolygonGenerator
     {
         static readonly Random RNG = new Random();
-
         private static double PI_2 = 2.0 * Math.PI;
-
         public static Polygon RandomCircleSweep(double scale, int vertexCount)
         {
             PolygonPoint point;
             PolygonPoint[] points;
             double radius = scale / 4;
-
             points = new PolygonPoint[vertexCount];
             for (int i = 0; i < vertexCount; i++)
             {
@@ -77,7 +73,6 @@ namespace Poly2Tri
             PolygonPoint point;
             PolygonPoint[] points;
             double radius = scale / 4;
-
             points = new PolygonPoint[vertexCount];
             for (int i = 0; i < vertexCount; i++)
             {

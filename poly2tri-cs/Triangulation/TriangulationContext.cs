@@ -30,13 +30,10 @@
  */
 
 using System.Collections.Generic;
-
 namespace Poly2Tri
 {
-
     public abstract class TriangulationContext
     {
-
         public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
         public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
         internal TriangulationContext()
@@ -56,14 +53,12 @@ namespace Poly2Tri
 
         //public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
         public abstract void MakeNewConstraint(TriangulationPoint a, TriangulationPoint b);
-
         public void Update(string message) { }
 
         public virtual void Clear()
         {
             this.Points.Clear();
             this.Triangles.Clear();
-
             if (DebugContext != null) { DebugContext.Clear(); }
 #if DEBUG
             dbugStepCount = 0;

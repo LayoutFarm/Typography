@@ -1,4 +1,4 @@
-﻿//BSD 2014, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 
 /* Poly2Tri
  * Copyright (c) 2009-2010, Poly2Tri Contributors
@@ -40,27 +40,20 @@
 ///     Bundling everything into an AoS mess?
 ///     Hardcode them all as ABC ?
 
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-
 namespace Poly2Tri
 {
-
-
-
     public class DelaunayTriangle
     {
-
         public TriangulationPoint P0, P1, P2;
         public DelaunayTriangle N0, N1, N2;
-
         //edge Delaunay  mark
         internal bool D0, D1, D2;
         //edge Constraint mark
         public bool C0, C1, C2;
-
-
         //lower 4 bits for EdgeIsDelaunay
         //next 4 bits for EdgeIsConstrained
         //int edgedNoteFlags;
@@ -88,7 +81,6 @@ namespace Poly2Tri
         public bool IsInterior { get; set; }
         public int IndexOf(TriangulationPoint p)
         {
-
             //if (TriangulationPoint.IsEqualPointCoord(P0, p)) return 0;
             //if (TriangulationPoint.IsEqualPointCoord(P1, p)) return 1;
             //if (TriangulationPoint.IsEqualPointCoord(P2, p)) return 2;
@@ -96,9 +88,7 @@ namespace Poly2Tri
             if (P0 == p) return 0;
             if (P1 == p) return 1;
             if (P2 == p) return 2;
-
             throw new Exception("Calling index with a point that doesn't exist in triangle");
-
             return -1;
             //return -1;
             //int i = Points.IndexOf(p);
@@ -107,11 +97,9 @@ namespace Poly2Tri
         }
         internal int FindIndexOf(TriangulationPoint p)
         {
-
             if (P0 == p) return 0;
             if (P1 == p) return 1;
             if (P2 == p) return 2;
-
             //if (TriangulationPoint.IsEqualPointCoord(P0, p)) return 0;
             //if (TriangulationPoint.IsEqualPointCoord(P1, p)) return 1;
             //if (TriangulationPoint.IsEqualPointCoord(P2, p)) return 2;
@@ -239,15 +227,18 @@ namespace Poly2Tri
                 case 0:
                     {
                         this.N0 = t;
-                    } break;
+                    }
+                    break;
                 case 1:
                     {
                         this.N1 = t;
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         this.N2 = t;
-                    } break;
+                    }
+                    break;
                 default:
                     {   //may be -1 
                         throw new Exception("Error marking neighbors -- t doesn't contain edge p1-p2!");
@@ -264,15 +255,18 @@ namespace Poly2Tri
                 case 0:
                     {
                         this.N0 = t;
-                    } break;
+                    }
+                    break;
                 case 1:
                     {
                         this.N1 = t;
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         this.N2 = t;
-                    } break;
+                    }
+                    break;
                 default:
                     {   //may be -1 
                         throw new Exception("Error marking neighbors -- t doesn't contain edge p1-p2!");
@@ -298,11 +292,9 @@ namespace Poly2Tri
             P0.tempName = P1.tempName = P2.tempName = 3;
             //2. assign tempName for t
             t.P0.tempName = 0; t.P1.tempName = 1; t.P2.tempName = 2;
-
             bool a = P0.tempName != 3;
             bool b = P1.tempName != 3;
             bool c = P2.tempName != 3;
-
             //P1.tempName 
             if (b && c) { N0 = t; t.MarkNeighbor(P1.tempName, P2.tempName, this); }
             else if (a && c) { N1 = t; t.MarkNeighbor(P0.tempName, P2.tempName, this); }
@@ -353,9 +345,6 @@ namespace Poly2Tri
                     }
             }
 
-
-
-
             //int finalPoint = ((hintPointNumOfT + 2) % 3); //CW=> (FindIndexOf(point) + 2) % 3 
             //switch ((finalPoint + 2) % 3)   //CW=> (FindIndexOf(point) + 2) % 3
             //{
@@ -363,7 +352,6 @@ namespace Poly2Tri
             //    case 1: return P1;
             //    default: return P2;
             //}
-
         }
         //public TriangulationPoint OppositePoint(DelaunayTriangle t, TriangulationPoint p)
         //{
@@ -434,38 +422,29 @@ namespace Poly2Tri
             out bool d_ccw,
             out bool d_cw)
         {
-
             switch (foundAt = IndexOf(point)) //ccw
             {
                 case 0:
                     t_cw = N1;
                     t_ccw = N2;
-
                     c_cw = C1;
                     c_ccw = C2;
-
                     d_cw = D1;
                     d_ccw = D2;
-
                     break;
                 case 1:
                     t_cw = N2;
                     t_ccw = N0;
-
                     c_cw = C2;
                     c_ccw = C0;
-
                     d_cw = D2;
                     d_ccw = D0;
-
                     break;
                 default://2
                     t_cw = N0;
                     t_ccw = N1;
-
                     c_cw = C0;
                     c_ccw = C1;
-
                     d_cw = D0;
                     d_ccw = D1;
                     break;
@@ -474,7 +453,6 @@ namespace Poly2Tri
 
         public DelaunayTriangle NeighborAcrossFrom(TriangulationPoint point)
         {
-
             switch (FindIndexOf(point))
             {
                 case 0:
@@ -571,7 +549,6 @@ namespace Poly2Tri
         /// <param name="nPoint">???</param>
         internal void Legalize(int previousOPointIndex, TriangulationPoint oPoint, TriangulationPoint nPoint, out int newOPointIndex)
         {
-
             //----------------
             //rotate cw (clockwise) 
             var temp = P2;
@@ -589,7 +566,8 @@ namespace Poly2Tri
                         // (IndexOf(1) + 1) % 3; =>2
                         // 2%3 = 2                        
                         P2 = nPoint;
-                    } break;
+                    }
+                    break;
                 case 1:
                     {
                         //after rotate cw , previousOPointIndex  of oPoint
@@ -598,8 +576,8 @@ namespace Poly2Tri
                         //(IndexOf(2) + 1) % 3; ==>0
                         //3 %3 =0 
                         P0 = nPoint;
-
-                    } break;
+                    }
+                    break;
                 case 2:
                 default:
                     {
@@ -609,7 +587,8 @@ namespace Poly2Tri
                         //return (IndexOf(0) + 1) % 3;==>1
                         //1%3 = 1; 
                         P1 = nPoint;
-                    } break;
+                    }
+                    break;
             }
         }
 
@@ -762,7 +741,6 @@ namespace Poly2Tri
         /// <returns>index of the shared edge or -1 if edge isn't shared</returns>
         public int FindEdgeIndex(TriangulationPoint p1, TriangulationPoint p2)
         {
-
             //temporary naming 3 points
             //-----------------------------
             //temp num technique , don't use with recursive
@@ -809,18 +787,21 @@ namespace Poly2Tri
                     {
                         C0 = c;
                         D0 = d;
-                    } break;
+                    }
+                    break;
                 case 1:
                     {
                         //(1+1)%3= 1
                         C1 = c;
                         D1 = d;
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         C2 = c;
                         D2 = d;
-                    } break;
+                    }
+                    break;
             }
         }
         public void SetNBCCW(int index, bool c, bool d)
@@ -832,18 +813,21 @@ namespace Poly2Tri
                     {
                         C0 = c;
                         D0 = d;
-                    } break;
+                    }
+                    break;
                 case 1:
                     {
                         //(1+1)%3= 1
                         C1 = c;
                         D1 = d;
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         C2 = c;
                         D2 = d;
-                    } break;
+                    }
+                    break;
             }
         }
         public static int FindEdgeIndexWithTempNameFlags(int totalFlags)
@@ -868,7 +852,6 @@ namespace Poly2Tri
                 default:
                     return -1;
             }
-
         }
         public static int FindEdgeIndex(int i1, int i2)
         {
@@ -905,8 +888,6 @@ namespace Poly2Tri
                     return 0;
             }
             return -1;
-
-
             //-------------------------------
             //version 1
             //-------------------------------
@@ -970,8 +951,5 @@ namespace Poly2Tri
 
             //return -1;
         }
-
     }
-
-
 }

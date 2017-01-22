@@ -69,31 +69,24 @@ namespace Poly2Tri
             double ady = pa.Y - pdy;
             double bdx = pb.X - pdx;
             double bdy = pb.Y - pdy;
-
             double adxbdy = adx * bdy;
             double bdxady = bdx * ady;
             double oabd = adxbdy - bdxady;
             //        oabd = orient2d(pa,pb,pd);
             if (oabd <= 0) return false;
-
             double cdx = pc.X - pdx;
             double cdy = pc.Y - pdy;
-
             double cdxady = cdx * ady;
             double adxcdy = adx * cdy;
             double ocad = cdxady - adxcdy;
             //      ocad = orient2d(pc,pa,pd);
             if (ocad <= 0) return false;
-
             double bdxcdy = bdx * cdy;
             double cdxbdy = cdx * bdy;
-
             double alift = adx * adx + ady * ady;
             double blift = bdx * bdx + bdy * bdy;
             double clift = cdx * cdx + cdy * cdy;
-
             double det = alift * (bdxcdy - cdxbdy) + blift * ocad + clift * oabd;
-
             return det > 0;
         }
 
@@ -105,7 +98,6 @@ namespace Poly2Tri
             double ady = pa.Y - pdy;
             double bdx = pb.X - pdx;
             double bdy = pb.Y - pdy;
-
             double adxbdy = adx * bdy;
             double bdxady = bdx * ady;
             double oabd = adxbdy - bdxady;
@@ -117,14 +109,12 @@ namespace Poly2Tri
 
             double cdx = pc.X - pdx;
             double cdy = pc.Y - pdy;
-
             double cdxady = cdx * ady;
             double adxcdy = adx * cdy;
             double ocad = cdxady - adxcdy;
             //      ocad = orient2d(pc,pa,pd);
 
             return ocad > 0;
-
             //if (ocad <= 0)
             //{
             //    return false;

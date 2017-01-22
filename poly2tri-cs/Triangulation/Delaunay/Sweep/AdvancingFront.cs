@@ -35,9 +35,9 @@
 ///   Eliminate Add/RemoveNode ?
 ///   Comments comments and more comments!
 
+
 using System.Text;
 using System;
-
 namespace Poly2Tri
 {
     /**
@@ -47,9 +47,7 @@ namespace Poly2Tri
     {
         public readonly AdvancingFrontNode Head;
         public readonly AdvancingFrontNode Tail;
-
         AdvancingFrontNode _search;
-
         public AdvancingFront(AdvancingFrontNode head, AdvancingFrontNode tail)
         {
             this.Head = head;
@@ -129,7 +127,6 @@ namespace Poly2Tri
             double px = point.X;
             AdvancingFrontNode node = this._search;// FindSearchNode(px);
             double nx = node.Point.X;
-
             if (px == nx)
             {
                 if (point != node.Point)

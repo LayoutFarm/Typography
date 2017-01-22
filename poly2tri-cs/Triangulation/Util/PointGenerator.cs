@@ -31,13 +31,11 @@
 
 using System;
 using System.Collections.Generic;
-
 namespace Poly2Tri
 {
     public class PointGenerator
     {
         static readonly Random RNG = new Random();
-
         public static List<TriangulationPoint> UniformDistribution(int n, double scale)
         {
             List<TriangulationPoint> points = new List<TriangulationPoint>();
@@ -50,7 +48,6 @@ namespace Poly2Tri
             double x = 0;
             double size = scale / n;
             double halfScale = 0.5 * scale;
-
             List<TriangulationPoint> points = new List<TriangulationPoint>();
             for (int i = 0; i < n + 1; i++)
             {

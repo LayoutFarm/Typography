@@ -34,6 +34,7 @@
 /// Future possibilities
 ///   Documentation!
 
+
 namespace Poly2Tri
 {
     public class PolygonPoint : TriangulationPoint

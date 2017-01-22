@@ -1,4 +1,4 @@
-﻿//BSD 2014, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 
 /* Poly2Tri
  * Copyright (c) 2009-2010, Poly2Tri Contributors
@@ -43,7 +43,6 @@ namespace Poly2Tri
             Q = p2;
         }
         public static readonly DTSweepConstraint Empty = new DTSweepConstraint();
-
     }
     public static class DTSweepConstraintMaker
     {
@@ -76,7 +75,5 @@ namespace Poly2Tri
             }
             Q.AddEdge(new DTSweepConstraint(P, Q));
         }
-
-
     }
 }
