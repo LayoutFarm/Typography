@@ -3,7 +3,7 @@ Dependencies
 ------------
 
 	Core Library:
-	- .NET 3.5
+	- .NET 2.0
 
 	Testbed:
 	- WinForms

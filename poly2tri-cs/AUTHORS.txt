@@ -6,4 +6,4 @@ Primary Contributors:
 Other Contributors:
 
   Michael Rickert                     (C#)
-  WinterDev	(github.com/preapre)	  (C#)
+  WinterDev	(github.com/prepare)	  (C#)

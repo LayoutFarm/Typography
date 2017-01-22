@@ -95,7 +95,9 @@ namespace Poly2Tri
             //long time = System.nanoTime();
             TriangulationContext tcx = GetFreeTcxContext(algorithm);
             tcx.Clear();
+            //step 1: (3.1) initialization
             tcx.PrepareTriangulation(t);
+            //step 2: (3.4) sweeping
             Triangulate(tcx);
             ReleaseCtxContext(tcx);
             //logger.info( "Triangulation of {} points [{}ms]", tcx.getPoints().size(), ( System.nanoTime() - time ) / 1e6 );

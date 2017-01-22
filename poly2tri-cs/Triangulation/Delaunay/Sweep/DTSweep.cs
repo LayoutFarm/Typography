@@ -98,8 +98,20 @@ namespace Poly2Tri
         /// <summary>
         /// Start sweeping the Y-sorted point set from bottom to top
         /// </summary>
-        private static void Sweep(DTSweepContext tcx)
+        static void Sweep(DTSweepContext tcx)
         {
+            //--------------------------
+            //step 2: (3.4) Sweeping
+            //following the idea of the sweep-line paradigm, the
+            //algorithm stops at every point and checks its status.
+            //  2 cases are possible:
+            //      1) a point is isolated OR 
+            //        it is the lower edge point( we name this case as a 'point event')
+            //      2) a point is the upper ending point of at least one line segment
+            //      (this case is considered as an 'edge event')
+            //Obviously, the point insertion is executed at each point regardless of its type, but the
+            //edge insertion is done only when the whole edge is swept
+            //--------------------------
             var points = tcx.Points;
             TriangulationPoint point;
             AdvancingFrontNode node;
@@ -152,7 +164,7 @@ namespace Poly2Tri
         /// <summary>
         /// If this is a Delaunay Triangulation of a pointset we need to fill so the triangle mesh gets a ConvexHull 
         /// </summary>
-        private static void FinalizationConvexHull(DTSweepContext tcx)
+        static void FinalizationConvexHull(DTSweepContext tcx)
         {
             AdvancingFrontNode n1, n2, n3;
             DelaunayTriangle t1;
@@ -215,7 +227,7 @@ namespace Poly2Tri
         /// <summary>
         /// We will traverse the entire advancing front and fill it to form a convex hull.
         /// </summary>
-        private static void TurnAdvancingFrontConvex(DTSweepContext tcx, AdvancingFrontNode b, AdvancingFrontNode c)
+        static void TurnAdvancingFrontConvex(DTSweepContext tcx, AdvancingFrontNode b, AdvancingFrontNode c)
         {
             AdvancingFrontNode first = b;
             while (c != tcx.Front.Tail)
@@ -247,7 +259,7 @@ namespace Poly2Tri
             }
         }
 
-        private static void FinalizationPolygon(DTSweepContext tcx)
+        static void FinalizationPolygon(DTSweepContext tcx)
         {
             // Get an Internal triangle to start with
             DelaunayTriangle t = tcx.Front.Head.Next.Triangle;
@@ -266,7 +278,7 @@ namespace Poly2Tri
         /// create a new triangle. If needed new holes and basins
         /// will be filled to.
         /// </summary>
-        private static AdvancingFrontNode PointEvent(DTSweepContext tcx, TriangulationPoint point)
+        static AdvancingFrontNode PointEvent(DTSweepContext tcx, TriangulationPoint point)
         {
             AdvancingFrontNode node, newNode;
             node = tcx.LocateNode(point);
@@ -681,6 +693,7 @@ namespace Poly2Tri
                         && ep == tcx.EdgeEventConstrainedEdge.P)
                     {
                         if (tcx.IsDebugEnabled) Console.WriteLine("[FLIP] - constrained edge done"); // TODO: remove
+                        //
                         t.SelectAndMarkConstrainedEdge(ep, eq);
                         ot.SelectAndMarkConstrainedEdge(ep, eq);
                         Legalize(tcx, t);
@@ -695,6 +708,7 @@ namespace Poly2Tri
                 else
                 {
                     if (tcx.IsDebugEnabled) Console.WriteLine("[FLIP] - flipping and continuing with triangle still crossing edge"); // TODO: remove
+                    //
                     Orientation o = TriangulationUtil.Orient2d(eq, op, ep);
                     t = NextFlipTriangle(tcx, o, t, ot, p, op);
                     FlipEdgeEvent(tcx, ep, eq, t, p);
@@ -826,7 +840,7 @@ namespace Poly2Tri
         /// <summary>
         /// Fills holes in the Advancing Front
         /// </summary>
-        private static void FillAdvancingFront(DTSweepContext tcx, AdvancingFrontNode n)
+        static void FillAdvancingFront(DTSweepContext tcx, AdvancingFrontNode n)
         {
             AdvancingFrontNode node;
             double angle;
@@ -867,7 +881,7 @@ namespace Poly2Tri
         /// </summary>
         /// <param name="tcx"></param>
         /// <param name="node">starting node, this or next node will be left node</param>
-        private static void FillBasin(DTSweepContext tcx, AdvancingFrontNode node)
+        static void FillBasin(DTSweepContext tcx, AdvancingFrontNode node)
         {
             if (TriangulationUtil.Orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW)
             {
@@ -899,7 +913,7 @@ namespace Poly2Tri
         /// <summary>
         /// Recursive algorithm to fill a Basin with triangles
         /// </summary>
-        private static void FillBasinReq(DTSweepContext tcx, AdvancingFrontNode node)
+        static void FillBasinReq(DTSweepContext tcx, AdvancingFrontNode node)
         {
             if (IsShallow(tcx, node)) return; // if shallow stop filling
 
@@ -935,7 +949,7 @@ namespace Poly2Tri
             FillBasinReq(tcx, node);
         }
 
-        private static bool IsShallow(DTSweepContext tcx, AdvancingFrontNode node)
+        static bool IsShallow(DTSweepContext tcx, AdvancingFrontNode node)
         {
             double height;
 
@@ -959,7 +973,7 @@ namespace Poly2Tri
         /// </summary>
         /// <param name="node">middle node</param>
         /// <returns>the angle between 3 front nodes</returns>
-        private static double HoleAngle(AdvancingFrontNode node)
+        static double HoleAngle(AdvancingFrontNode node)
         {
             // XXX: do we really need a signed angle for holeAngle?
             //      could possible save some cycles here
@@ -983,7 +997,7 @@ namespace Poly2Tri
         /// <summary>
         /// The basin angle is decided against the horizontal line [1,0]
         /// </summary>
-        private static double BasinAngle(AdvancingFrontNode node)
+        static double BasinAngle(AdvancingFrontNode node)
         {
             double ax = node.Point.X - node.Next.Next.Point.X;
             double ay = node.Point.Y - node.Next.Next.Point.Y;
