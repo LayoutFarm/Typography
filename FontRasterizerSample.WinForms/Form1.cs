@@ -353,11 +353,14 @@ namespace SampleWinForms
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
 #if DEBUG
             List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
-            int tri_count = 0;
+
             double prev_cenX = 0;
             double prev_cenY = 0;
-            foreach (PixelFarm.Agg.Typography.GlyphTriangle tri in triAngles)
+
+            int j = triAngles.Count;
+            for (int i = 0; i < j; ++i)
             {
+                PixelFarm.Agg.Typography.GlyphTriangle tri = triAngles[i];
                 PixelFarm.Agg.Typography.EdgeLine e0 = tri.e0;
                 PixelFarm.Agg.Typography.EdgeLine e1 = tri.e1;
                 PixelFarm.Agg.Typography.EdgeLine e2 = tri.e2;
@@ -372,13 +375,13 @@ namespace SampleWinForms
                 double cen_y = tri.CentroidY;
                 p.FillColor = PixelFarm.Drawing.Color.Yellow;
                 p.FillRectLBWH(cen_x * scale, cen_y * scale, 2, 2);
-                if (tri_count == 0)
+                if (i == 0)
                 {
                     //start mark
                     p.FillColor = PixelFarm.Drawing.Color.Yellow;
                     p.FillRectLBWH(cen_x * scale, cen_y * scale, 7, 7);
                 }
-                else if (tri_count > 0)
+                else
                 {
                     //draw line from prev centroid to this centroid
                     p.StrokeColor = PixelFarm.Drawing.Color.Red;
@@ -386,8 +389,8 @@ namespace SampleWinForms
                 }
                 prev_cenX = cen_x;
                 prev_cenY = cen_y;
-                tri_count++;
             }
+
 
 #endif
 
