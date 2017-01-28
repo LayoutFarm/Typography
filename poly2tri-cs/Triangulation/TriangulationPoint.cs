@@ -43,11 +43,10 @@ namespace Poly2Tri
         static int dbugTotalId;
         public readonly int dbugId = dbugTotalId++;
 #endif
-
-
         public TriangulationPoint(double x, double y)
         {
-            X = x; Y = y;
+            X = x;
+            Y = y;
             //#if DEBUG
             //            if (this.dbugId == 53)
             //            {
@@ -91,7 +90,7 @@ namespace Poly2Tri
         {
             return this.myEdges;
         }
-        public bool HasEdges { get { return myEdges != null; } }
+        //public bool HasEdges { get { return myEdges != null; } }
 
         //------------------------------------------------------------
 #if DEBUG

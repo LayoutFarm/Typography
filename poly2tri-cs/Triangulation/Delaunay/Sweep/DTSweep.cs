@@ -1174,10 +1174,10 @@ namespace Poly2Tri
             t.Legalize(p_foundAt, p, op, out new_p_foundAt);
             int new_op_foundAt;
             ot.Legalize(op_foundAt, op, p, out new_op_foundAt);
-            int p_pos_on_ot = ot.FindIndexOf(p);
+            int p_pos_on_ot = ot.IndexOf(p);
             int op_pos_on_ot = new_op_foundAt;//ot.FindIndexOf(op);
             int p_pos_on_t = new_p_foundAt; //t.FindIndexOf(p);
-            int op_pos_on_t = t.FindIndexOf(op);
+            int op_pos_on_t = t.IndexOf(op);
             //ot.SetDelaunayEdgeCCW(p, de1);
             //ot.SetConstrainedEdgeCCW(p, ce1);
             ot.SetNBCCW(p_pos_on_ot, ce1, de1);

@@ -74,6 +74,7 @@ namespace Poly2Tri
         {
             isActualTriangle = true;
         }
+
         public bool IsInterior { get; set; }
         public int IndexOf(TriangulationPoint p)
         {
@@ -91,31 +92,32 @@ namespace Poly2Tri
             //if (i == -1) throw new Exception("Calling index with a point that doesn't exist in triangle");
             //return i;
         }
-        internal int FindIndexOf(TriangulationPoint p)
-        {
-            if (P0 == p) return 0;
-            if (P1 == p) return 1;
-            if (P2 == p) return 2;
-            //if (TriangulationPoint.IsEqualPointCoord(P0, p)) return 0;
-            //if (TriangulationPoint.IsEqualPointCoord(P1, p)) return 1;
-            //if (TriangulationPoint.IsEqualPointCoord(P2, p)) return 2;
+        //internal int FindIndexOf(TriangulationPoint p)
+        //{
+        //    if (P0 == p) return 0;
+        //    if (P1 == p) return 1;
+        //    if (P2 == p) return 2;
+        //    //if (TriangulationPoint.IsEqualPointCoord(P0, p)) return 0;
+        //    //if (TriangulationPoint.IsEqualPointCoord(P1, p)) return 1;
+        //    //if (TriangulationPoint.IsEqualPointCoord(P2, p)) return 2;
 
-            return -1;
-            //return -1;
-            //int i = Points.IndexOf(p);
-            //if (i == -1) throw new Exception("Calling index with a point that doesn't exist in triangle");
-            //return i;
-        }
+        //    return -1;
+        //    //return -1;
+        //    //int i = Points.IndexOf(p);
+        //    //if (i == -1) throw new Exception("Calling index with a point that doesn't exist in triangle");
+        //    //return i;
+        //}
 
         public bool ContainsPoint(TriangulationPoint p)
         {
-            if (P0 == p) return true;
-            if (P1 == p) return true;
-            if (P2 == p) return true;
+            return (P0 == p) ||
+                    (P1 == p) ||
+                    (P2 == p);
+
             //if (TriangulationPoint.IsEqualPointCoord(P0, p)) return true;
             //if (TriangulationPoint.IsEqualPointCoord(P1, p)) return true;
             //if (TriangulationPoint.IsEqualPointCoord(P2, p)) return true;
-            return false;
+            //return false;
         }
         public bool EdgeIsDelaunay(int index)
         {
@@ -205,7 +207,7 @@ namespace Poly2Tri
 
         public bool Contains(TriangulationPoint p)
         {
-            return FindIndexOf(p) >= 0;
+            return ContainsPoint(p);             
         }
 
         /// <summary>
@@ -449,7 +451,7 @@ namespace Poly2Tri
 
         public DelaunayTriangle NeighborAcrossFrom(TriangulationPoint point)
         {
-            switch (FindIndexOf(point))
+            switch (IndexOf(point))
             {
                 case 0:
                     return N0;
@@ -464,7 +466,7 @@ namespace Poly2Tri
         {
             //return Points[(IndexOf(point) + 1) % 3];
 
-            switch ((FindIndexOf(point) + 1) % 3)
+            switch ((IndexOf(point) + 1) % 3)
             {
                 case 0:
                     return this.P0;
@@ -492,7 +494,7 @@ namespace Poly2Tri
         public TriangulationPoint PointCWFrom(TriangulationPoint point)
         {
             //return Points[(IndexOf(point) + 2) % 3]; 
-            switch ((FindIndexOf(point) + 2) % 3)
+            switch ((IndexOf(point) + 2) % 3)
             {
                 case 0:
                     return this.P0;
@@ -739,7 +741,7 @@ namespace Poly2Tri
         /// Get the index of the neighbor that shares this edge (or -1 if it isn't shared)
         /// </summary>
         /// <returns>index of the shared edge or -1 if edge isn't shared</returns>
-        public int FindEdgeIndex(TriangulationPoint p1, TriangulationPoint p2)
+        internal int FindEdgeIndex(TriangulationPoint p1, TriangulationPoint p2)
         {
             //temporary naming 3 points
             //-----------------------------
