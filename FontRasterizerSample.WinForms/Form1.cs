@@ -282,7 +282,7 @@ namespace SampleWinForms
         }
         static void DrawEdge(AggCanvasPainter p, PixelFarm.Agg.Typography.EdgeLine edge, float scale)
         {
-            if (edge.IsFreeSide)
+            if (edge.IsOutside)
             {
                 //free side                
                 switch (edge.SlopKind)

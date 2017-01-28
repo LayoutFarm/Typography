@@ -71,9 +71,9 @@ namespace PixelFarm.Agg.Typography
             e2 = new EdgeLine(p2, p0); 
             tri.Centroid2(out centroidX, out centroidY);
               
-            e0.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P0, tri.P1));
-            e1.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P1, tri.P2));
-            e2.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P2, tri.P0));
+            e0.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P0, tri.P1));
+            e1.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P1, tri.P2));
+            e2.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P2, tri.P0));
         }
         public void Analyze()
         {
@@ -154,7 +154,7 @@ namespace PixelFarm.Agg.Typography
             get;
             private set;
         }
-        public bool IsFreeSide
+        public bool IsOutside
         {
             get;
             internal set;
