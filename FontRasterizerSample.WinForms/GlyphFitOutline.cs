@@ -6,6 +6,9 @@ using PixelFarm.VectorMath;
 using Poly2Tri;
 namespace PixelFarm.Agg.Typography
 {
+
+
+
     //sample/test 
     public class GlyphFitOutline
     {
@@ -63,18 +66,23 @@ namespace PixelFarm.Agg.Typography
             TriangulationPoint p0 = _tri.P0;
             TriangulationPoint p1 = _tri.P1;
             TriangulationPoint p2 = _tri.P2;
-
             e0 = new EdgeLine(p0, p1);
             e1 = new EdgeLine(p1, p2);
-            e2 = new EdgeLine(p2, p0);
-
+            e2 = new EdgeLine(p2, p0); 
             tri.Centroid2(out centroidX, out centroidY);
-
+             
+            int edge_p01 = tri.FindEdgeIndex(tri.P0, tri.P1);
+            int edge_p12 = tri.FindEdgeIndex(tri.P1, tri.P2);
+            int edge_p20 = tri.FindEdgeIndex(tri.P2, tri.P0);
+            e0.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P0, tri.P1));
+            e1.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P1, tri.P2));
+            e2.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P2, tri.P0));
         }
         public void Analyze()
         {
             //check if triangle is part of vertical/horizontal stem or not
-
+           
+              
         }
         public double CentroidX
         {
@@ -84,6 +92,12 @@ namespace PixelFarm.Agg.Typography
         {
             get { return centroidY; }
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return this._tri.ToString();
+        }
+#endif
     }
 
     public enum LineSlopeKind : byte
@@ -104,9 +118,13 @@ namespace PixelFarm.Agg.Typography
         static readonly double _15degreeToRad = MathHelper.DegreesToRadians(15);
         static readonly double _90degreeToRad = MathHelper.DegreesToRadians(90);
 
-
+        Poly2Tri.TriangulationPoint p;
+        Poly2Tri.TriangulationPoint q;
         public EdgeLine(Poly2Tri.TriangulationPoint p, Poly2Tri.TriangulationPoint q)
         {
+            this.p = p;
+            this.q = q;
+
             x0 = p.X;
             y0 = p.Y;
             x1 = q.X;
@@ -119,7 +137,6 @@ namespace PixelFarm.Agg.Typography
             }
             else
             {
-
                 SlopAngle = Math.Abs(Math.Atan2(Math.Abs(y1 - y0), Math.Abs(x1 - x0)));
                 if (SlopAngle > _85degreeToRad)
                 {
@@ -133,7 +150,6 @@ namespace PixelFarm.Agg.Typography
                 {
                     SlopKind = LineSlopeKind.Other;
                 }
-
             }
         }
         public LineSlopeKind SlopKind
@@ -141,7 +157,11 @@ namespace PixelFarm.Agg.Typography
             get;
             private set;
         }
-
+        public bool IsFreeSide
+        {
+            get;
+            internal set;
+        }
         public double SlopAngle
         {
             get;
@@ -187,6 +207,15 @@ namespace PixelFarm.Agg.Typography
         //        this.y0 == another.y0 &&
         //        this.y1 == another.y1;
         //}
+
+
+    }
+
+
+
+    public class GlyphSkeleton
+    {
+        //reconstruction glyph ***
 
 
     }

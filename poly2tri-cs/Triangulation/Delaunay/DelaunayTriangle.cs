@@ -207,7 +207,7 @@ namespace Poly2Tri
 
         public bool Contains(TriangulationPoint p)
         {
-            return ContainsPoint(p);             
+            return ContainsPoint(p);
         }
 
         /// <summary>
@@ -741,7 +741,7 @@ namespace Poly2Tri
         /// Get the index of the neighbor that shares this edge (or -1 if it isn't shared)
         /// </summary>
         /// <returns>index of the shared edge or -1 if edge isn't shared</returns>
-        internal int FindEdgeIndex(TriangulationPoint p1, TriangulationPoint p2)
+        public int FindEdgeIndex(TriangulationPoint p1, TriangulationPoint p2)
         {
             //temporary naming 3 points
             //-----------------------------

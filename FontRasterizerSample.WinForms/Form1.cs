@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 0;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
-            this.txtInputChar.Text = "m";
+            this.txtInputChar.Text = "x";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -280,26 +280,40 @@ namespace SampleWinForms
                 y += sqSize;
             }
         }
-
-
         static void DrawEdge(AggCanvasPainter p, PixelFarm.Agg.Typography.EdgeLine edge, float scale)
         {
-
-            switch (edge.SlopKind)
+            if (edge.IsFreeSide)
             {
-                default:
-                    p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
-                    break;
-                case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
-                    p.StrokeColor = PixelFarm.Drawing.Color.OrangeRed;
-                    break;
-                case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
-                    p.StrokeColor = PixelFarm.Drawing.Color.Yellow;
-                    break;
-
+                //free side                
+                switch (edge.SlopKind)
+                {
+                    default:
+                        p.StrokeColor = PixelFarm.Drawing.Color.Green;
+                        break;
+                    case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
+                        p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
+                        break;
+                    case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
+                        p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                        break;
+                }  
             }
-            p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale); 
-
+            else
+            {
+                switch (edge.SlopKind)
+                {
+                    default:
+                        p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
+                        break;
+                    case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
+                        p.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                        break;
+                    case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
+                        p.StrokeColor = PixelFarm.Drawing.Color.Yellow;
+                        break;
+                } 
+            }
+            p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
         void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float scale)
         {
