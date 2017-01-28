@@ -296,7 +296,7 @@ namespace SampleWinForms
                     case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
                         p.StrokeColor = PixelFarm.Drawing.Color.Red;
                         break;
-                }  
+                }
             }
             else
             {
@@ -311,7 +311,7 @@ namespace SampleWinForms
                     case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
                         p.StrokeColor = PixelFarm.Drawing.Color.Yellow;
                         break;
-                } 
+                }
             }
             p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
@@ -353,6 +353,9 @@ namespace SampleWinForms
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
 #if DEBUG
             List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
+            int tri_count = 0;
+            double prev_cenX = 0;
+            double prev_cenY = 0;
             foreach (PixelFarm.Agg.Typography.GlyphTriangle tri in triAngles)
             {
                 PixelFarm.Agg.Typography.EdgeLine e0 = tri.e0;
@@ -364,10 +367,26 @@ namespace SampleWinForms
                 DrawEdge(p, e1, scale);
                 DrawEdge(p, e2, scale);
 
+                //draw centroid
                 double cen_x = tri.CentroidX;
                 double cen_y = tri.CentroidY;
                 p.FillColor = PixelFarm.Drawing.Color.Yellow;
                 p.FillRectLBWH(cen_x * scale, cen_y * scale, 2, 2);
+                if (tri_count == 0)
+                {
+                    //start mark
+                    p.FillColor = PixelFarm.Drawing.Color.Yellow;
+                    p.FillRectLBWH(cen_x * scale, cen_y * scale, 7, 7);
+                }
+                else if (tri_count > 0)
+                {
+                    //draw line from prev centroid to this centroid
+                    p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                    p.Line(prev_cenX * scale, prev_cenY * scale, cen_x * scale, cen_y * scale);
+                }
+                prev_cenX = cen_x;
+                prev_cenY = cen_y;
+                tri_count++;
             }
 
 #endif

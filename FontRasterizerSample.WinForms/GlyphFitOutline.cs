@@ -35,11 +35,12 @@ namespace PixelFarm.Agg.Typography
             }
         }
 
-
+#if DEBUG
         public List<GlyphTriangle> dbugGetTriangles()
         {
             return _triangles;
         }
+#endif
 
     }
     public enum GlyphTrianglePart : byte
@@ -68,9 +69,9 @@ namespace PixelFarm.Agg.Typography
             TriangulationPoint p2 = _tri.P2;
             e0 = new EdgeLine(p0, p1);
             e1 = new EdgeLine(p1, p2);
-            e2 = new EdgeLine(p2, p0); 
+            e2 = new EdgeLine(p2, p0);
             tri.Centroid2(out centroidX, out centroidY);
-              
+
             e0.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P0, tri.P1));
             e1.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P1, tri.P2));
             e2.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P2, tri.P0));
@@ -78,8 +79,8 @@ namespace PixelFarm.Agg.Typography
         public void Analyze()
         {
             //check if triangle is part of vertical/horizontal stem or not
-           
-              
+
+
         }
         public double CentroidX
         {
