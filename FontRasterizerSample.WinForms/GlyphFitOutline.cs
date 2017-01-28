@@ -70,10 +70,7 @@ namespace PixelFarm.Agg.Typography
             e1 = new EdgeLine(p1, p2);
             e2 = new EdgeLine(p2, p0); 
             tri.Centroid2(out centroidX, out centroidY);
-             
-            int edge_p01 = tri.FindEdgeIndex(tri.P0, tri.P1);
-            int edge_p12 = tri.FindEdgeIndex(tri.P1, tri.P2);
-            int edge_p20 = tri.FindEdgeIndex(tri.P2, tri.P0);
+              
             e0.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P0, tri.P1));
             e1.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P1, tri.P2));
             e2.IsFreeSide = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P2, tri.P0));
