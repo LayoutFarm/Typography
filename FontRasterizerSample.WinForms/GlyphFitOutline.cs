@@ -27,15 +27,12 @@ namespace PixelFarm.Agg.Typography
         }
 
         List<GlyphBone> bones;
+#if DEBUG
+
+#endif
         public void Analyze(int pixelSize)
         {
-            //we analyze each triangle here
-            //int j = _triangles.Count;
-            //for (int i = 0; i < j; ++i)
-            //{
-            //    _triangles[i].Analyze(pixelSize, pixelSize);
-            //}
-            //analyze connected contour
+            //we analyze each triangle here 
             int j = _triangles.Count;
             double c_x = 0, c_y = 0;
 
@@ -55,9 +52,7 @@ namespace PixelFarm.Agg.Typography
                     if (foundIndex > -1)
                     {
                         usedTriList.Add(tri);
-                        var newBone = new GlyphBone();
-                        newBone.p = usedTriList[foundIndex];
-                        newBone.q = tri;
+                        var newBone = new GlyphBone(usedTriList[foundIndex], tri); 
                         latestJoint = tri;
                         bones.Add(newBone);
                     }
@@ -101,7 +96,12 @@ namespace PixelFarm.Agg.Typography
 
     public class GlyphBone
     {
-        public GlyphTriangle p, q;
+        public readonly GlyphTriangle p, q;
+        public GlyphBone(GlyphTriangle p, GlyphTriangle q)
+        {
+            this.p = p; 
+            this.q = q;
+        }
         public override string ToString()
         {
             return p + " -> " + q;

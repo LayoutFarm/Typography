@@ -45,6 +45,7 @@
             this.chkDoGridFitting = new System.Windows.Forms.CheckBox();
             this.chkVerticalHinting = new System.Windows.Forms.CheckBox();
             this.chkMasterOutlineAnalysis = new System.Windows.Forms.CheckBox();
+            this.chkDrawBone = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -226,11 +227,23 @@
             this.chkMasterOutlineAnalysis.UseVisualStyleBackColor = true;
             this.chkMasterOutlineAnalysis.CheckedChanged += new System.EventHandler(this.chkMasterOutlineAnalysis_CheckedChanged);
             // 
+            // chkDrawBone
+            // 
+            this.chkDrawBone.AutoSize = true;
+            this.chkDrawBone.Location = new System.Drawing.Point(495, 256);
+            this.chkDrawBone.Name = "chkDrawBone";
+            this.chkDrawBone.Size = new System.Drawing.Size(76, 17);
+            this.chkDrawBone.TabIndex = 19;
+            this.chkDrawBone.Text = "DrawBone";
+            this.chkDrawBone.UseVisualStyleBackColor = true;
+            this.chkDrawBone.CheckedChanged += new System.EventHandler(this.chkDrawBone_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkDrawBone);
             this.Controls.Add(this.chkMasterOutlineAnalysis);
             this.Controls.Add(this.chkVerticalHinting);
             this.Controls.Add(this.chkDoGridFitting);
@@ -274,6 +287,7 @@
         private System.Windows.Forms.CheckBox chkDoGridFitting;
         private System.Windows.Forms.CheckBox chkVerticalHinting;
         private System.Windows.Forms.CheckBox chkMasterOutlineAnalysis;
+        private System.Windows.Forms.CheckBox chkDrawBone;
     }
 }
 

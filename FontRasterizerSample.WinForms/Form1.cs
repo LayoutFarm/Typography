@@ -353,6 +353,12 @@ namespace SampleWinForms
 #if DEBUG
             List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
             int j = triAngles.Count;
+            //
+            double prev_cx = 0, prev_cy = 0;
+            //
+
+            bool drawBone = this.chkDrawBone.Checked;
+
             for (int i = 0; i < j; ++i)
             {
                 //---------------
@@ -369,93 +375,54 @@ namespace SampleWinForms
                 //draw centroid
                 double cen_x = tri.CentroidX;
                 double cen_y = tri.CentroidY;
-                ////---------------
+                //---------------
                 p.FillColor = PixelFarm.Drawing.Color.Yellow;
                 p.FillRectLBWH(cen_x * pixelScale, cen_y * pixelScale, 2, 2);
+                if (!drawBone)
+                {
+                    //if not draw bone then draw connected lines
+                    if (i == 0)
+                    {
+                        //start mark
+                        p.FillColor = PixelFarm.Drawing.Color.Yellow;
+                        p.FillRectLBWH(cen_x * pixelScale, cen_y * pixelScale, 7, 7);
+                    }
+                    else
+                    {
+                        p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                        p.Line(
+                            prev_cx * pixelScale, prev_cy * pixelScale,
+                           cen_x * pixelScale, cen_y * pixelScale);
+                    }
+                    prev_cx = cen_x;
+                    prev_cy = cen_y;
+                }
             }
             //---------------
             //draw bone
-            List<PixelFarm.Agg.Typography.GlyphBone> bones = glyphFitOutline.dbugGetBones();
-            j = bones.Count;
-            for (int i = 0; i < j; ++i)
+
+            if (drawBone)
             {
-                PixelFarm.Agg.Typography.GlyphBone b = bones[i];
-                if (i == 0)
+                List<PixelFarm.Agg.Typography.GlyphBone> bones = glyphFitOutline.dbugGetBones();
+                j = bones.Count;
+                for (int i = 0; i < j; ++i)
                 {
-                    //start mark
-                    p.FillColor = PixelFarm.Drawing.Color.Yellow;
-                    p.FillRectLBWH(b.p.CentroidX * pixelScale, b.p.CentroidY, 7, 7);
+                    PixelFarm.Agg.Typography.GlyphBone b = bones[i];
+                    if (i == 0)
+                    {
+                        //start mark
+                        p.FillColor = PixelFarm.Drawing.Color.Yellow;
+                        p.FillRectLBWH(b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale, 7, 7);
+                    }
+                    //draw each bone
+                    p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                    p.Line(
+                        b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale,
+                        b.q.CentroidX * pixelScale, b.q.CentroidY * pixelScale);
                 }
-                //draw each bone
-                p.StrokeColor = PixelFarm.Drawing.Color.Red;
-                p.Line(
-                    b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale,
-                    b.q.CentroidX * pixelScale, b.q.CentroidY * pixelScale);
             }
             //---------------
 #endif
-
-            //---------------
-            //List<EdgeLine> edges = new List<EdgeLine>();
-            //foreach (var tri in polygon.Triangles)
-            //{
-            //    //draw each triangles
-            //    p.Line(tri.P0.X * scale, tri.P0.Y * scale, tri.P1.X * scale, tri.P1.Y * scale);
-            //    p.Line(tri.P1.X * scale, tri.P1.Y * scale, tri.P2.X * scale, tri.P2.Y * scale);
-            //    p.Line(tri.P2.X * scale, tri.P2.Y * scale, tri.P0.X * scale, tri.P0.Y * scale);
-
-            //    edges.Add(new EdgeLine(tri.P0, tri.P1));
-            //    edges.Add(new EdgeLine(tri.P1, tri.P2));
-            //    edges.Add(new EdgeLine(tri.P2, tri.P0));
-
-            //    //find center of each triangle
-            //    //--------------------------------------------- 
-            //    var p_centerx = (tri.P0.X + tri.P1.X + tri.P2.X) * scale;
-            //    var p_centery = (tri.P0.Y + tri.P1.Y + tri.P2.Y) * scale;
-
-            //    p.FillRectLBWH(p_centerx / 3, p_centery / 3, 2, 2);
-            //}
-            //-------------------
-
-            //sort
-            //remove duplicated edge?
-
-            //edges.Sort((e1, e2) =>
-            //{
-            //    if (e1.y1 == e2.y1)
-            //    {
-            //        return e1.x0.CompareTo(e2.x0);
-            //    }
-            //    else
-            //    {
-            //        return e1.y1.CompareTo(e2.y1);
-            //    }
-            //});
-            ////remove shared edge
-
-
-            //for (int i = edges.Count - 1; i > 0; --i)
-            //{
-            //    EdgeLine e_now = edges[i];
-            //    EdgeLine e_prev = edges[i - 1];
-
-            //    if (e_now.SameCoordinateWidth(e_prev))
-            //    {
-            //        //remove the two
-            //        //TODO: remove if we can have more than duplicate 2 edges
-            //        edges.RemoveAt(i);
-            //        edges.RemoveAt(i - 1);
-            //        --i;
-            //    }
-            //}
-
-            //for (int i = edges.Count - 1; i > 0; --i)
-            //{
-            //    //draw only unique edge
-            //    EdgeLine e = edges[i];
-            //    p.Line(e.x0, e.y0, e.x1, e.y1);
-            //}
-
         }
 
         class EdgeLine
@@ -1149,6 +1116,11 @@ namespace SampleWinForms
         }
 
         private void chkMasterOutlineAnalysis_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkDrawBone_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }
