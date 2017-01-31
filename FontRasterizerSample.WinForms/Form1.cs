@@ -74,8 +74,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            ReadAndRender(@"..\..\tahoma.ttf");
-            //ReadAndRender(@"..\..\cambriaz.ttf");
+            //ReadAndRender(@"..\..\tahoma.ttf");
+            ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -168,9 +168,7 @@ namespace SampleWinForms
         //-------------------
         //1. conv font design unit to em
         // em = designUnit / unit_per_Em       
-        //2. conv font design unit to pixels
-
-
+        //2. conv font design unit to pixels 
         // float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
 
 
@@ -238,6 +236,7 @@ namespace SampleWinForms
                 List<GlyphContour> contours = builder.GetContours();
                 float scale = builder.GetPixelScale();
                 TessWithPolyTriAndDraw(contours, p, scale);
+
             }
 
             if (chkShowGrid.Checked)
@@ -315,7 +314,7 @@ namespace SampleWinForms
             }
             p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
-        void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float scale)
+        void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float pixelScale)
         {
 
 
@@ -348,50 +347,52 @@ namespace SampleWinForms
             Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated
 
             PixelFarm.Agg.Typography.GlyphFitOutline glyphFitOutline = new PixelFarm.Agg.Typography.GlyphFitOutline(polygon);
-            glyphFitOutline.Analyze();
+            glyphFitOutline.Analyze(_gridSize);
 
             p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
 #if DEBUG
             List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
-
-            double prev_cenX = 0;
-            double prev_cenY = 0;
-
             int j = triAngles.Count;
             for (int i = 0; i < j; ++i)
             {
+                //---------------
                 PixelFarm.Agg.Typography.GlyphTriangle tri = triAngles[i];
                 PixelFarm.Agg.Typography.EdgeLine e0 = tri.e0;
                 PixelFarm.Agg.Typography.EdgeLine e1 = tri.e1;
                 PixelFarm.Agg.Typography.EdgeLine e2 = tri.e2;
-
+                //---------------
                 //draw each triangles
-                DrawEdge(p, e0, scale);
-                DrawEdge(p, e1, scale);
-                DrawEdge(p, e2, scale);
-
+                DrawEdge(p, e0, pixelScale);
+                DrawEdge(p, e1, pixelScale);
+                DrawEdge(p, e2, pixelScale);
+                //---------------
                 //draw centroid
                 double cen_x = tri.CentroidX;
                 double cen_y = tri.CentroidY;
+                ////---------------
                 p.FillColor = PixelFarm.Drawing.Color.Yellow;
-                p.FillRectLBWH(cen_x * scale, cen_y * scale, 2, 2);
+                p.FillRectLBWH(cen_x * pixelScale, cen_y * pixelScale, 2, 2);
+            }
+            //---------------
+            //draw bone
+            List<PixelFarm.Agg.Typography.GlyphBone> bones = glyphFitOutline.dbugGetBones();
+            j = bones.Count;
+            for (int i = 0; i < j; ++i)
+            {
+                PixelFarm.Agg.Typography.GlyphBone b = bones[i];
                 if (i == 0)
                 {
                     //start mark
                     p.FillColor = PixelFarm.Drawing.Color.Yellow;
-                    p.FillRectLBWH(cen_x * scale, cen_y * scale, 7, 7);
+                    p.FillRectLBWH(b.p.CentroidX * pixelScale, b.p.CentroidY, 7, 7);
                 }
-                else
-                {
-                    //draw line from prev centroid to this centroid
-                    p.StrokeColor = PixelFarm.Drawing.Color.Red;
-                    p.Line(prev_cenX * scale, prev_cenY * scale, cen_x * scale, cen_y * scale);
-                }
-                prev_cenX = cen_x;
-                prev_cenY = cen_y;
+                //draw each bone
+                p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                p.Line(
+                    b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale,
+                    b.q.CentroidX * pixelScale, b.q.CentroidY * pixelScale);
             }
-
-
+            //---------------
 #endif
 
             //---------------

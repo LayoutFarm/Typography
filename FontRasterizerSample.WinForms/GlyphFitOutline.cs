@@ -25,24 +25,89 @@ namespace PixelFarm.Agg.Typography
                 _triangles.Add(new GlyphTriangle(tri));
             }
         }
-        public void Analyze()
+
+        List<GlyphBone> bones;
+        public void Analyze(int pixelSize)
         {
             //we analyze each triangle here
+            //int j = _triangles.Count;
+            //for (int i = 0; i < j; ++i)
+            //{
+            //    _triangles[i].Analyze(pixelSize, pixelSize);
+            //}
+            //analyze connected contour
             int j = _triangles.Count;
+            double c_x = 0, c_y = 0;
+
+            GlyphTriangle latestJoint = null;
+            bones = new List<GlyphBone>();
+
+            List<GlyphTriangle> usedTriList = new List<GlyphTriangle>();
             for (int i = 0; i < j; ++i)
             {
-                _triangles[i].Analyze();
+                GlyphTriangle tri = _triangles[i];
+                c_x = tri.CentroidX;
+                c_y = tri.CentroidY;
+                if (i > 0)
+                {
+                    //check the new tri is connected with latest tri or not?
+                    int foundIndex = FindLatestConnectedTri(usedTriList, tri);
+                    if (foundIndex > -1)
+                    {
+                        usedTriList.Add(tri);
+                        var newBone = new GlyphBone();
+                        newBone.p = usedTriList[foundIndex];
+                        newBone.q = tri;
+                        latestJoint = tri;
+                        bones.Add(newBone);
+                    }
+                    else
+                    {
+                        //not found
+                    }
+                }
+                else
+                {
+                    usedTriList.Add(tri);
+                    latestJoint = tri;
+                }
             }
         }
-
+        int FindLatestConnectedTri(List<GlyphTriangle> usedTriList, GlyphTriangle tri)
+        {
+            //search back ***
+            for (int i = usedTriList.Count - 1; i >= 0; --i)
+            {
+                GlyphTriangle t = usedTriList[i];
+                if (t.IsConnectedWith(tri))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 #if DEBUG
         public List<GlyphTriangle> dbugGetTriangles()
         {
             return _triangles;
         }
+        public List<GlyphBone> dbugGetBones()
+        {
+            return bones;
+        }
 #endif
-
     }
+
+
+    public class GlyphBone
+    {
+        public GlyphTriangle p, q;
+        public override string ToString()
+        {
+            return p + " -> " + q;
+        }
+    }
+
     public enum GlyphTrianglePart : byte
     {
         Unknown,
@@ -76,10 +141,50 @@ namespace PixelFarm.Agg.Typography
             e1.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P1, tri.P2));
             e2.IsOutside = tri.EdgeIsConstrained(tri.FindEdgeIndex(tri.P2, tri.P0));
         }
-        public void Analyze()
+        static int RoundToNearestSide(float org, int gridsize)
+        {
+            float actual1 = org / (float)gridsize;
+            int integer1 = (int)(actual1);
+            float floatModulo = actual1 - integer1;
+            if (floatModulo > (gridsize / 2))
+            {
+                return (integer1 + 1) + gridsize;
+            }
+            else
+            {
+                return integer1 * gridsize;
+            }
+        }
+        public void Analyze(int pixelWidth, int pixelHeight)
         {
             //check if triangle is part of vertical/horizontal stem or not
+            //snap some edge to match with pixel size            
+            //1. outside count
 
+            int outside_count =
+                ((e0.IsOutside) ? 1 : 0) +
+                ((e1.IsOutside) ? 1 : 0) +
+                ((e2.IsOutside) ? 1 : 0);
+            switch (outside_count)
+            {
+                case 0:
+                    break;
+                case 1:
+                    {
+                        //check this
+                    }
+                    break;
+                case 2:
+                    {
+                        //have 2 outside
+                        //usu
+                    }
+                    break;
+                default:
+
+                    break;
+
+            }
 
         }
         public double CentroidX
@@ -89,6 +194,19 @@ namespace PixelFarm.Agg.Typography
         public double CentroidY
         {
             get { return centroidY; }
+        }
+
+        public bool IsConnectedWith(GlyphTriangle anotherTri)
+        {
+            DelaunayTriangle t2 = anotherTri._tri;
+            if (t2 == this._tri)
+            {
+                throw new NotSupportedException();
+            }
+            //else 
+            return this._tri.N0 == t2 ||
+                   this._tri.N1 == t2 ||
+                   this._tri.N2 == t2;
         }
 #if DEBUG
         public override string ToString()
