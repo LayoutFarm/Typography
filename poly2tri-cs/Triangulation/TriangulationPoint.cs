@@ -32,7 +32,7 @@
 using System.Collections.Generic;
 namespace Poly2Tri
 {
-    public class TriangulationPoint
+    public sealed class TriangulationPoint
     {
         // List of edges this point constitutes an upper ending point (CDT) 
         public readonly double X;

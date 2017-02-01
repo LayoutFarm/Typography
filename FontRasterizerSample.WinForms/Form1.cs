@@ -318,7 +318,7 @@ namespace SampleWinForms
         {
 
 
-            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             int cntCount = contours.Count;
 
             GlyphContour cnt = contours[0];
@@ -504,7 +504,7 @@ namespace SampleWinForms
         /// <returns></returns>
         static Poly2Tri.Polygon CreatePolygon1(GlyphContour cnt)
         {
-            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             List<float> allPoints = cnt.allPoints;
             int lim = allPoints.Count - 1;
 
@@ -526,7 +526,7 @@ namespace SampleWinForms
                     if (!tmpPoints.ContainsKey(tmp_point))
                     {
                         tmpPoints.Add(tmp_point, true);
-                        points.Add(new Poly2Tri.PolygonPoint(
+                        points.Add(new Poly2Tri.TriangulationPoint(
                             x,
                             y));
                     }
@@ -543,7 +543,7 @@ namespace SampleWinForms
                             if (!tmpPoints.ContainsKey(tmp_point))
                             {
                                 tmpPoints.Add(tmp_point, true);
-                                points.Add(new Poly2Tri.PolygonPoint(
+                                points.Add(new Poly2Tri.TriangulationPoint(
                                     x,
                                     y));
                                 break;
@@ -574,7 +574,7 @@ namespace SampleWinForms
                     if (!tmpPoints.ContainsKey(tmp_point))
                     {
                         tmpPoints.Add(tmp_point, true);
-                        points.Add(new Poly2Tri.PolygonPoint(
+                        points.Add(new Poly2Tri.TriangulationPoint(
                             x,
                             y));
                     }
@@ -599,7 +599,7 @@ namespace SampleWinForms
         /// <returns></returns>
         static Poly2Tri.Polygon CreatePolygon2(GlyphContour cnt)
         {
-            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             List<GlyphPart> allParts = cnt.parts;
             //---------------------------------------
             //merge all generated points
@@ -685,7 +685,7 @@ namespace SampleWinForms
                         if (!tmpPoints.ContainsKey(tmp_point))
                         {
                             tmpPoints.Add(tmp_point, true);
-                            points.Add(new Poly2Tri.PolygonPoint(
+                            points.Add(new Poly2Tri.TriangulationPoint(
                                 x,
                                 y));
                         }
