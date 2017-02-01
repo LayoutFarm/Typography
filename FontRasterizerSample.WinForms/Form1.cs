@@ -220,13 +220,13 @@ namespace SampleWinForms
 
             if (chkMasterOutlineAnalysis.Checked)
             {
-                List<GlyphContour> contours = builder.GetContours();
-                int j = contours.Count;
-                float pixelScale = builder.GetPixelScale();
-                for (int i = 0; i < j; ++i)
-                {
-                    DrawGlyphControlPoints3(contours[i], p, pixelScale);
-                }
+                //List<GlyphContour> contours = builder.GetContours();
+                //int j = contours.Count;
+                //float pixelScale = builder.GetPixelScale();
+                //for (int i = 0; i < j; ++i)
+                //{
+                //    DrawGlyphControlPoints3(contours[i], p, pixelScale);
+                //}
             }
 
             if (chkShowTess.Checked)
@@ -529,8 +529,8 @@ namespace SampleWinForms
                         int n = fpoints.Count;
                         for (int m = 0; m < n; ++m)
                         {
-                            GlyphPoint2D fp = fpoints[m];
-                            mergedPoints.Add(fp);
+                            //GlyphPoint2D fp = fpoints[m];
+                            mergedPoints.Add(fpoints[m]);
                             //allPoints.Add((float)fp.x);
                             //allPoints.Add((float)fp.y);
                         }
@@ -542,8 +542,8 @@ namespace SampleWinForms
                         int n = fpoints.Count;
                         for (int m = 1; m < n; ++m)
                         {
-                            GlyphPoint2D fp = fpoints[m];
-                            mergedPoints.Add(fp);
+                            //GlyphPoint2D fp = fpoints[m];
+                            mergedPoints.Add(fpoints[m]);
                             //allPoints.Add((float)fp.x);
                             //allPoints.Add((float)fp.y);
                         }
@@ -588,13 +588,13 @@ namespace SampleWinForms
                         {
                             //ensure no duplicated point
                             tmpPoints.Add(tmp_point, true);
-                            points.Add(new Poly2Tri.TriangulationPoint(
-                                x,
-                                y));
+                            var userTriangulationPoint = new Poly2Tri.TriangulationPoint(x, y) { userData = p };
+                            p.triangulationPoint = userTriangulationPoint;
+                            points.Add(userTriangulationPoint);
                         }
                         else
                         {
-                            throw new NotSupportedException(); 
+                            throw new NotSupportedException();
                         }
 
                         prevX = x;
@@ -606,149 +606,7 @@ namespace SampleWinForms
                 return polygon;
             }
         }
-
-        void DrawGlyphControlPoints3(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
-        {
-
-        }
-        void DrawGlyphControlPoints2(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
-        {
-            //for debug
-            List<GlyphPart> parts = cnt.parts;
-            int j = parts.Count;
-
-            int gridSize = this._gridSize;
-            int halfGrid = gridSize / 2;
-
-            //------------------------------------------------
-            p.FillColor = PixelFarm.Drawing.Color.Black;
-            VertexStore vxs = new VertexStore();
-
-            int totalCount = 0;
-
-            for (int i = 0; i < j; ++i)
-            {
-                GlyphPart part = parts[i];
-                List<GlyphPoint2D> points = part.GetFlattenPoints();
-                int n = points.Count;
-
-                for (int m = 0; m < n; ++m)
-                {
-                    GlyphPoint2D point = points[m];
-                    int proper = (int)Math.Round(point.y, 0);
-
-                    int lower = (int)(point.y);
-                    int snap1_diff = lower % 5;
-                    float f_y = proper;
-                    float f_x = (float)point.x;
-
-                    if (point.kind == PointKind.CurveInbetween)
-                    {
-
-                    }
-                    else
-                    {
-                        if (proper - lower != 0)
-                        {
-                            if (snap1_diff > halfGrid)
-                            {
-                                f_y = ((lower / gridSize) + 1);
-                                f_y *= gridSize;
-                            }
-                            else
-                            {
-                                f_y = (lower / gridSize);
-                                f_y *= gridSize;
-                            }
-                        }
-                        else
-                        {
-                            f_y = (lower / gridSize);
-                            f_y *= gridSize;
-                        }
-                    }
-
-                    f_x = f_x * pixelScale;
-                    f_y = f_y * pixelScale;
-
-                    if (totalCount == 0)
-                    {
-                        vxs.AddMoveTo(f_x, f_y);
-                    }
-                    else
-                    {
-                        vxs.AddLineTo(f_x, f_y);
-                    }
-
-                    totalCount++;
-                }
-
-            }
-
-            vxs.AddCloseFigure();
-            p.Fill(vxs);
-
-            //------------------
-            for (int i = 0; i < j; ++i)
-            {
-                GlyphPart part = parts[i];
-                List<GlyphPoint2D> points = part.GetFlattenPoints();
-                int n = points.Count;
-                for (int m = 0; m < n; ++m)
-                {
-                    GlyphPoint2D point = points[m];
-                    switch (point.kind)
-                    {
-                        default:
-                            p.FillColor = PixelFarm.Drawing.Color.Green;
-                            break;
-                        case PointKind.CurveInbetween:
-                            p.FillColor = PixelFarm.Drawing.Color.Red;
-                            break;
-                    }
-
-                    int proper = (int)Math.Round(point.y, 0);
-                    int lower = (int)(point.y);
-                    int snap1_diff = lower % 5;
-                    float f_y = proper;
-                    float f_x = (float)point.x;
-
-                    if (point.kind == PointKind.CurveInbetween)
-                    {
-
-                    }
-                    else
-                    {
-
-                        if (proper - lower != 0)
-                        {
-                            if (snap1_diff > halfGrid)
-                            {
-                                f_y = ((lower / gridSize) + 1);
-                                f_y *= gridSize;
-                            }
-                            else
-                            {
-                                f_y = (lower / gridSize);
-                                f_y *= gridSize;
-                            }
-                        }
-                        else
-                        {
-                            f_y = (lower / gridSize);
-                            f_y *= gridSize;
-                        }
-                    }
-
-                    f_x = f_x * pixelScale;
-                    f_y = f_y * pixelScale;
-
-
-                    p.FillRectLBWH(f_x, f_y, 2, 2);
-                }
-            }
-        }
-
+ 
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
             //for debug

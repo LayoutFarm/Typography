@@ -48,12 +48,7 @@ namespace Poly2Tri
         {
             X = x;
             Y = y;
-            //#if DEBUG
-            //            if (this.dbugId == 53)
-            //            {
-            //            }
-            //#endif
-
+         
         }
         public override string ToString()
         {

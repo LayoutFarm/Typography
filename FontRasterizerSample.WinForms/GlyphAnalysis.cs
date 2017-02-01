@@ -285,6 +285,10 @@ namespace PixelFarm.Agg
         public readonly double x;
         public readonly double y;
         public PointKind kind;
+
+        //
+        internal Poly2Tri.TriangulationPoint triangulationPoint;
+
         public GlyphPoint2D(double x, double y, PointKind kind)
         {
             this.x = x;

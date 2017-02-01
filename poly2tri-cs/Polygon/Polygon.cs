@@ -86,7 +86,7 @@ namespace Poly2Tri
             for (int i = j - 1; i >= 0; --i)
             {
                 var p = myPoints[i];
-                clonePoints[i] = new TriangulationPoint(p.X, p.Y);
+                clonePoints[i] = new TriangulationPoint(p.X, p.Y) { userData = p.userData };
             }
 
             //-----------------------------------------------------------------
