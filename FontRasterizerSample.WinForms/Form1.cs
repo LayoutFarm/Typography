@@ -487,109 +487,19 @@ namespace SampleWinForms
 
         struct TmpPoint
         {
-            public double x;
-            public double y;
+            public readonly double x;
+            public readonly double y;
+            public TmpPoint(double x, double y)
+            {
+                this.x = x;
+                this.y = y;
+            }
 #if DEBUG
             public override string ToString()
             {
                 return x + "," + y;
             }
 #endif
-        }
-        /// <summary>
-        /// create polygon from original master outline point,
-        /// fix duplicated point
-        /// </summary>
-        /// <param name="cnt"></param>
-        /// <returns></returns>
-        static Poly2Tri.Polygon CreatePolygon1(GlyphContour cnt)
-        {
-            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
-            List<float> allPoints = cnt.allPoints;
-            int lim = allPoints.Count - 1;
-
-            //limitation: poly tri not accept duplicated points!
-            double prevX = 0;
-            double prevY = 0;
-
-            Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
-            for (int i = 0; i < lim; )
-            {
-                var x = allPoints[i];
-                var y = allPoints[i + 1];
-                //
-                if (x != prevX && y != prevY)
-                {
-                    TmpPoint tmp_point = new TmpPoint();
-                    tmp_point.x = x;
-                    tmp_point.y = y;
-                    if (!tmpPoints.ContainsKey(tmp_point))
-                    {
-                        tmpPoints.Add(tmp_point, true);
-                        points.Add(new Poly2Tri.TriangulationPoint(
-                            x,
-                            y));
-                    }
-                    else
-                    {
-                        //temp fixed***
-                        while (true)
-                        {
-                            x += 0.1f;
-                            y += 0.1f;
-
-                            tmp_point.x = x;
-                            tmp_point.y = y;
-                            if (!tmpPoints.ContainsKey(tmp_point))
-                            {
-                                tmpPoints.Add(tmp_point, true);
-                                points.Add(new Poly2Tri.TriangulationPoint(
-                                    x,
-                                    y));
-                                break;
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                    }
-
-                    prevX = x;
-                    prevY = y;
-
-                }
-                else
-                {
-                    //a duplicate point
-                    //temp fix***
-                    //minor shift x and y
-                    x += 0.5f;
-                    y += 0.5f;
-
-
-                    TmpPoint tmp_point = new TmpPoint();
-                    tmp_point.x = x;
-                    tmp_point.y = y;
-                    if (!tmpPoints.ContainsKey(tmp_point))
-                    {
-                        tmpPoints.Add(tmp_point, true);
-                        points.Add(new Poly2Tri.TriangulationPoint(
-                            x,
-                            y));
-                    }
-                    else
-                    {
-                    }
-
-                    prevX = x;
-                    prevY = y;
-                }
-                i += 2;
-            }
-
-            Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
-            return polygon;
         }
 
         /// <summary>
@@ -679,11 +589,10 @@ namespace SampleWinForms
                     }
                     else
                     {
-                        TmpPoint tmp_point = new TmpPoint();
-                        tmp_point.x = x;
-                        tmp_point.y = y;
+                        TmpPoint tmp_point = new TmpPoint(x, y);
                         if (!tmpPoints.ContainsKey(tmp_point))
                         {
+                            //ensure no duplicated point
                             tmpPoints.Add(tmp_point, true);
                             points.Add(new Poly2Tri.TriangulationPoint(
                                 x,

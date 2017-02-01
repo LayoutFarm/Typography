@@ -726,12 +726,7 @@ namespace Poly2Tri
             return Math.Abs((b * h * 0.5f));
         }
 
-        public TriangulationPoint Centroid()
-        {
-            double cx = (P0.X + P1.X + P2.X) / 3f;
-            double cy = (P0.Y + P1.Y + P2.Y) / 3f;
-            return new TriangulationPoint(cx, cy);
-        }
+     
         public void Centroid2(out double cx, out double cy)
         {
             cx = (P0.X + P1.X + P2.X) / 3f;

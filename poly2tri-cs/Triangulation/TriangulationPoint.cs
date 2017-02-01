@@ -38,6 +38,7 @@ namespace Poly2Tri
         public readonly double X;
         public readonly double Y;
         internal byte tempName;
+        public object userData;
         List<DTSweepConstraint> myEdges = new List<DTSweepConstraint>();
 #if DEBUG
         static int dbugTotalId;
