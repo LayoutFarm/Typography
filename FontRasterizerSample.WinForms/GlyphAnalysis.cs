@@ -282,14 +282,18 @@ namespace PixelFarm.Agg
     {
         //glyph point 
         //for analysis
-        public double x;
-        public double y;
+        public readonly double x;
+        public readonly double y;
         public PointKind kind;
         public GlyphPoint2D(double x, double y, PointKind kind)
         {
             this.x = x;
             this.y = y;
             this.kind = kind;
+        }
+        public bool IsEqualValues(GlyphPoint2D another)
+        {
+            return x == another.x && y == another.y;
         }
 #if DEBUG
         public override string ToString()

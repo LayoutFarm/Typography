@@ -513,9 +513,8 @@ namespace SampleWinForms
             List<GlyphPart> allParts = cnt.parts;
             //---------------------------------------
             //merge all generated points
-            //also remove duplicated point too!
-            List<float> allPoints = new List<float>();
-
+            //also remove duplicated point too! 
+            List<GlyphPoint2D> mergedPoints = new List<GlyphPoint2D>();
             {
                 int tt = 0;
                 int j = allParts.Count;
@@ -523,12 +522,7 @@ namespace SampleWinForms
                 for (int i = 0; i < j; ++i)
                 {
                     GlyphPart p = allParts[i];
-#if DEBUG
-                    if (allPoints.Count >= 30)
-                    {
 
-                    }
-#endif
                     List<GlyphPoint2D> fpoints = p.GetFlattenPoints();
                     if (tt == 0)
                     {
@@ -536,8 +530,9 @@ namespace SampleWinForms
                         for (int m = 0; m < n; ++m)
                         {
                             GlyphPoint2D fp = fpoints[m];
-                            allPoints.Add((float)fp.x);
-                            allPoints.Add((float)fp.y);
+                            mergedPoints.Add(fp);
+                            //allPoints.Add((float)fp.x);
+                            //allPoints.Add((float)fp.y);
                         }
                         tt++;
                     }
@@ -548,8 +543,9 @@ namespace SampleWinForms
                         for (int m = 1; m < n; ++m)
                         {
                             GlyphPoint2D fp = fpoints[m];
-                            allPoints.Add((float)fp.x);
-                            allPoints.Add((float)fp.y);
+                            mergedPoints.Add(fp);
+                            //allPoints.Add((float)fp.x);
+                            //allPoints.Add((float)fp.y);
                         }
                     }
 
@@ -559,29 +555,27 @@ namespace SampleWinForms
             //---------------------------------------
             {
                 //check last (x,y) and first (x,y)
-                int lim = allPoints.Count - 1;
+                int lim = mergedPoints.Count - 1;
                 {
-                    if (allPoints[lim] == allPoints[1]
-                        && allPoints[lim - 1] == allPoints[0])
+                    if (mergedPoints[lim].IsEqualValues(mergedPoints[0]))
                     {
                         //remove last (x,y)
-                        allPoints.RemoveAt(lim);
-                        allPoints.RemoveAt(lim - 1);
-                        lim -= 2;
+                        mergedPoints.RemoveAt(lim);
+                        lim -= 1;
                     }
                 }
-
-
-
 
                 //limitation: poly tri not accept duplicated points!
                 double prevX = 0;
                 double prevY = 0;
                 Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
-                for (int i = 0; i < lim; )
+                lim = mergedPoints.Count;
+
+                for (int i = 0; i < lim; ++i)
                 {
-                    var x = allPoints[i];
-                    var y = allPoints[i + 1];
+                    GlyphPoint2D p = mergedPoints[i];
+                    double x = p.x;
+                    double y = p.y;
 
                     if (x == prevX && y == prevY)
                     {
@@ -600,66 +594,12 @@ namespace SampleWinForms
                         }
                         else
                         {
-
-                            throw new NotSupportedException();
-                            //temp fixed***
-
-                            //while (true)
-                            //{
-                            //    x += 0.1f;
-                            //    y += 0.1f;
-
-                            //    tmp_point.x = x;
-                            //    tmp_point.y = y;
-                            //    if (!tmpPoints.ContainsKey(tmp_point))
-                            //    {
-                            //        tmpPoints.Add(tmp_point, true);
-                            //        points.Add(new Poly2Tri.PolygonPoint(
-                            //            x,
-                            //            y));
-                            //        break;
-                            //    }
-                            //    else
-                            //    {
-
-                            //    }
-                            //}
+                            throw new NotSupportedException(); 
                         }
 
                         prevX = x;
                         prevY = y;
-
                     }
-                    //if (x != prevX && y != prevY)
-                    //{
-
-
-                    //}
-                    //else
-                    //{
-                    //    //a duplicate point
-                    //    //temp fix***
-                    //    //minor shift x and y
-                    //    x += 0.5f;
-                    //    y += 0.5f;
-                    //    TmpPoint tmp_point = new TmpPoint();
-                    //    tmp_point.x = x;
-                    //    tmp_point.y = y;
-                    //    if (!tmpPoints.ContainsKey(tmp_point))
-                    //    {
-                    //        tmpPoints.Add(tmp_point, true);
-                    //        points.Add(new Poly2Tri.PolygonPoint(
-                    //            x,
-                    //            y));
-                    //    }
-                    //    else
-                    //    {
-                    //    }
-
-                    //    prevX = x;
-                    //    prevY = y;
-                    //}
-                    i += 2;
                 }
 
                 Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
