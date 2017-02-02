@@ -166,7 +166,7 @@
             this.chkShowTess.AutoSize = true;
             this.chkShowTess.Checked = true;
             this.chkShowTess.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowTess.Location = new System.Drawing.Point(495, 184);
+            this.chkShowTess.Location = new System.Drawing.Point(495, 220);
             this.chkShowTess.Name = "chkShowTess";
             this.chkShowTess.Size = new System.Drawing.Size(110, 17);
             this.chkShowTess.TabIndex = 13;
@@ -177,7 +177,7 @@
             // chkShowGrid
             // 
             this.chkShowGrid.AutoSize = true;
-            this.chkShowGrid.Location = new System.Drawing.Point(495, 207);
+            this.chkShowGrid.Location = new System.Drawing.Point(495, 243);
             this.chkShowGrid.Name = "chkShowGrid";
             this.chkShowGrid.Size = new System.Drawing.Size(75, 17);
             this.chkShowGrid.TabIndex = 14;
@@ -187,7 +187,7 @@
             // 
             // txtGridSize
             // 
-            this.txtGridSize.Location = new System.Drawing.Point(565, 207);
+            this.txtGridSize.Location = new System.Drawing.Point(565, 243);
             this.txtGridSize.Name = "txtGridSize";
             this.txtGridSize.Size = new System.Drawing.Size(51, 20);
             this.txtGridSize.TabIndex = 15;
@@ -196,7 +196,7 @@
             // chkDoGridFitting
             // 
             this.chkDoGridFitting.AutoSize = true;
-            this.chkDoGridFitting.Location = new System.Drawing.Point(495, 233);
+            this.chkDoGridFitting.Location = new System.Drawing.Point(495, 269);
             this.chkDoGridFitting.Name = "chkDoGridFitting";
             this.chkDoGridFitting.Size = new System.Drawing.Size(93, 17);
             this.chkDoGridFitting.TabIndex = 16;
@@ -219,7 +219,7 @@
             this.chkMasterOutlineAnalysis.AutoSize = true;
             this.chkMasterOutlineAnalysis.Checked = true;
             this.chkMasterOutlineAnalysis.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkMasterOutlineAnalysis.Location = new System.Drawing.Point(495, 303);
+            this.chkMasterOutlineAnalysis.Location = new System.Drawing.Point(495, 339);
             this.chkMasterOutlineAnalysis.Name = "chkMasterOutlineAnalysis";
             this.chkMasterOutlineAnalysis.Size = new System.Drawing.Size(129, 17);
             this.chkMasterOutlineAnalysis.TabIndex = 18;
@@ -230,7 +230,7 @@
             // chkDrawBone
             // 
             this.chkDrawBone.AutoSize = true;
-            this.chkDrawBone.Location = new System.Drawing.Point(495, 256);
+            this.chkDrawBone.Location = new System.Drawing.Point(495, 292);
             this.chkDrawBone.Name = "chkDrawBone";
             this.chkDrawBone.Size = new System.Drawing.Size(76, 17);
             this.chkDrawBone.TabIndex = 19;

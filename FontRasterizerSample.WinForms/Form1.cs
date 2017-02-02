@@ -228,18 +228,21 @@ namespace SampleWinForms
                 //    DrawGlyphControlPoints3(contours[i], p, pixelScale);
                 //}
             }
-
-            if (chkShowTess.Checked)
+            float scale = builder.GetPixelScale();
+            PixelFarm.Agg.Typography.GlyphFitOutline glyphOutline = null;
             {
                 //draw for debug ...
                 //draw control point
                 List<GlyphContour> contours = builder.GetContours();
-                float scale = builder.GetPixelScale();
+                
                 //----
-                PixelFarm.Agg.Typography.GlyphFitOutline glyphOutline = TessWithPolyTriAndDraw(contours, p, scale);
-                PixelFarm.Agg.VertexStore vxs2 = CreateContourVxs(contours[0], scale);
+                glyphOutline = TessWithPolyTriAndDraw(contours, p, scale);
+                PixelFarm.Agg.VertexStore vxs2 = CreateFitContourVxs(contours[0], scale);
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 p.Fill(vxs2);
+            }
+            if (chkShowTess.Checked)
+            {
 #if DEBUG
                 debugDrawTriangulatedGlyph(glyphOutline, scale);
 #endif
@@ -271,19 +274,25 @@ namespace SampleWinForms
             g.DrawImage(winBmp, new Point(30, 20));
         }
 
-        static VertexStore CreateContourVxs(GlyphContour contour, float pixelScale)
+        static VertexStore CreateFitContourVxs(GlyphContour contour, float pixelScale)
         {
             VertexStore vxs = new VertexStore();
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
             //merge 0 = start
             GlyphPoint2D firstPoint = mergePoints[0];
-            vxs.AddMoveTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
+            double p_x = firstPoint.x * pixelScale;
+            double p_y = firstPoint.y * pixelScale;
+            vxs.AddMoveTo(p_x, p_y);
             for (int i = 1; i < j; ++i)
             {
                 //all merge point is polygon point
                 GlyphPoint2D p = mergePoints[i];
-                vxs.AddLineTo(p.x * pixelScale, p.y * pixelScale);
+                //
+                p_x = p.x * pixelScale;
+                p_y = p.y * pixelScale;
+
+                vxs.AddLineTo(p_x, p_y);
             }
             vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
             return vxs;
