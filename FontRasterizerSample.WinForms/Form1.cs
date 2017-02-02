@@ -191,7 +191,7 @@ namespace SampleWinForms
                 //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 //5.3
-                p.Fill(vxs);
+                // p.Fill(vxs);
             }
             if (chkBorder.Checked)
             {
@@ -236,7 +236,6 @@ namespace SampleWinForms
                 List<GlyphContour> contours = builder.GetContours();
                 float scale = builder.GetPixelScale();
                 TessWithPolyTriAndDraw(contours, p, scale);
-
             }
 
             if (chkShowGrid.Checked)
@@ -423,68 +422,13 @@ namespace SampleWinForms
             }
             //---------------
 #endif
-        }
 
-        class EdgeLine
-        {
-            public double x0;
-            public double y0;
-            public double x1;
-            public double y1;
-            public EdgeLine(Poly2Tri.TriangulationPoint p, Poly2Tri.TriangulationPoint q)
-            {
-                x0 = p.X;
-                y0 = p.Y;
-                x1 = q.X;
-                y1 = q.Y;
-                //
-                Arrange();
-
-            }
-            void Arrange()
-            {
-                if (y1 < y0)
-                {
-                    //swap
-                    double tmp_y = y1;
-                    y1 = y0;
-                    y0 = tmp_y;
-                    //swap x 
-                    double tmp_x = x1;
-                    x1 = x0;
-                    x0 = tmp_x;
-                }
-                else if (y1 == y0)
-                {
-                    if (x1 < x0)
-                    {
-                        //swap
-                        //swap
-                        double tmp_y = y1;
-                        y1 = y0;
-                        y0 = tmp_y;
-                        //swap x 
-                        double tmp_x = x1;
-                        x1 = x0;
-                        x0 = tmp_x;
-                    }
-                }
-            }
-            public override string ToString()
-            {
-                return x0 + "," + y0 + "," + x1 + "," + y1;
-            }
-            public bool SameCoordinateWidth(EdgeLine another)
-            {
-                return this.x0 == another.x0 &&
-                    this.x1 == another.x1 &&
-                    this.y0 == another.y0 &&
-                    this.y1 == another.y1;
-            }
-
+            //
+             
 
         }
 
+  
         struct TmpPoint
         {
             public readonly double x;
@@ -606,7 +550,7 @@ namespace SampleWinForms
                 return polygon;
             }
         }
- 
+
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
             //for debug
