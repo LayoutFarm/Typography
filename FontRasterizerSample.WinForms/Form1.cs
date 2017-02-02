@@ -235,7 +235,14 @@ namespace SampleWinForms
                 //draw control point
                 List<GlyphContour> contours = builder.GetContours();
                 float scale = builder.GetPixelScale();
-                TessWithPolyTriAndDraw(contours, p, scale);
+                //----
+                PixelFarm.Agg.Typography.GlyphFitOutline glyphOutline = TessWithPolyTriAndDraw(contours, p, scale);
+                PixelFarm.Agg.VertexStore vxs2 = CreateContourVxs(contours[0], scale);
+                p.FillColor = PixelFarm.Drawing.Color.Black;
+                p.Fill(vxs2);
+#if DEBUG
+                debugDrawTriangulatedGlyph(glyphOutline, scale);
+#endif
             }
 
             if (chkShowGrid.Checked)
@@ -262,6 +269,24 @@ namespace SampleWinForms
             //7. just render our bitmap
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
+        }
+
+        static VertexStore CreateContourVxs(GlyphContour contour, float pixelScale)
+        {
+            VertexStore vxs = new VertexStore();
+            List<GlyphPoint2D> mergePoints = contour.mergedPoints;
+            int j = mergePoints.Count;
+            //merge 0 = start
+            GlyphPoint2D firstPoint = mergePoints[0];
+            vxs.AddMoveTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
+            for (int i = 1; i < j; ++i)
+            {
+                //all merge point is polygon point
+                GlyphPoint2D p = mergePoints[i];
+                vxs.AddLineTo(p.x * pixelScale, p.y * pixelScale);
+            }
+            vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
+            return vxs;
         }
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
         {
@@ -313,13 +338,11 @@ namespace SampleWinForms
             }
             p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
-        void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float pixelScale)
+
+        PixelFarm.Agg.Typography.GlyphFitOutline TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float pixelScale)
         {
-
-
             List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             int cntCount = contours.Count;
-
             GlyphContour cnt = contours[0];
             Poly2Tri.Polygon polygon = CreatePolygon2(contours[0]);//first contour            
             bool isHoleIf = !cnt.IsClockwise;
@@ -343,19 +366,37 @@ namespace SampleWinForms
             }
             //}
 
-            Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated
-
+            Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated 
             PixelFarm.Agg.Typography.GlyphFitOutline glyphFitOutline = new PixelFarm.Agg.Typography.GlyphFitOutline(polygon);
             glyphFitOutline.Analyze(_gridSize);
-
-            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
+            return glyphFitOutline;
+        }
+        struct TmpPoint
+        {
+            public readonly double x;
+            public readonly double y;
+            public TmpPoint(double x, double y)
+            {
+                this.x = x;
+                this.y = y;
+            }
 #if DEBUG
+            public override string ToString()
+            {
+                return x + "," + y;
+            }
+#endif
+        }
+
+#if DEBUG
+        void debugDrawTriangulatedGlyph(PixelFarm.Agg.Typography.GlyphFitOutline glyphFitOutline, float pixelScale)
+        {
+            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
             List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
             int j = triAngles.Count;
             //
             double prev_cx = 0, prev_cy = 0;
-            //
-
+            // 
             bool drawBone = this.chkDrawBone.Checked;
 
             for (int i = 0; i < j; ++i)
@@ -398,8 +439,7 @@ namespace SampleWinForms
                 }
             }
             //---------------
-            //draw bone
-
+            //draw bone 
             if (drawBone)
             {
                 List<PixelFarm.Agg.Typography.GlyphBone> bones = glyphFitOutline.dbugGetBones();
@@ -421,30 +461,9 @@ namespace SampleWinForms
                 }
             }
             //---------------
-#endif
-
-            //
-             
-
         }
 
-  
-        struct TmpPoint
-        {
-            public readonly double x;
-            public readonly double y;
-            public TmpPoint(double x, double y)
-            {
-                this.x = x;
-                this.y = y;
-            }
-#if DEBUG
-            public override string ToString()
-            {
-                return x + "," + y;
-            }
 #endif
-        }
 
         /// <summary>
         /// create polygon from flatten curve outline point
@@ -459,6 +478,8 @@ namespace SampleWinForms
             //merge all generated points
             //also remove duplicated point too! 
             List<GlyphPoint2D> mergedPoints = new List<GlyphPoint2D>();
+            cnt.mergedPoints = mergedPoints;
+            //---------------------------------------
             {
                 int tt = 0;
                 int j = allParts.Count;

@@ -115,6 +115,9 @@ namespace PixelFarm.Agg
     {
         internal List<GlyphPart> parts = new List<GlyphPart>();
         internal List<float> allPoints;
+
+        //result of analysis
+        internal List<GlyphPoint2D> mergedPoints;
         bool analyzed;
         bool isClockwise;
 
