@@ -235,20 +235,43 @@ namespace PixelFarm.Agg.Typography
             int matchingEdgeSideNo;
             if (FindMatchingOuterSide(targetEdge, q, out matchingEdgeLine, out matchingEdgeSideNo))
             {
-
+                //mid point of each edge
                 double pe_midX, pe_midY;
                 CalculateMidPoint(targetEdge, out pe_midX, out pe_midY);
                 double qe_midX, qe_midY;
                 CalculateMidPoint(matchingEdgeLine, out qe_midX, out qe_midY);
+
                 if (pe_midY > qe_midY)
                 {
                     //p side is upper , q side is lower
-                    targetEdge.IsUpper = true;
+                    if (targetEdge.SlopKind == LineSlopeKind.Horizontal)
+                    {
+                        targetEdge.IsUpper = true;
+                    }
                 }
                 else
                 {
-                    matchingEdgeLine.IsUpper = true;
+                    if (matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
+                    {
+                        matchingEdgeLine.IsUpper = true;
+                    }
                 }
+
+                if (pe_midX < qe_midX)
+                {
+                    if (targetEdge.SlopKind == LineSlopeKind.Vertical)
+                    {
+                        targetEdge.IsLeftSide = true;
+                    }
+                }
+                else
+                {
+                    if (matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
+                    {
+                        matchingEdgeLine.IsLeftSide = true;
+                    }
+                }
+
 
             }
         }
@@ -272,11 +295,11 @@ namespace PixelFarm.Agg.Typography
             diff2 = Math.Abs(another.e2.SlopAngle) - compareSlope;
             //}
             //find min
-            int mostMinDiffSide = FindMinIndex(diff0, diff1, diff2);
-            if (mostMinDiffSide > -1)
+            int minDiffSide = FindMinIndex(diff0, diff1, diff2);
+            if (minDiffSide > -1)
             {
-                edgeIndex = mostMinDiffSide;
-                switch (mostMinDiffSide)
+                edgeIndex = minDiffSide;
+                switch (minDiffSide)
                 {
                     default: throw new NotSupportedException();
                     case 0:
@@ -512,6 +535,11 @@ namespace PixelFarm.Agg.Typography
             private set;
         }
         public bool IsUpper
+        {
+            get;
+            internal set;
+        }
+        public bool IsLeftSide
         {
             get;
             internal set;
