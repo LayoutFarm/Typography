@@ -235,9 +235,7 @@ namespace PixelFarm.Agg.Typography
             int matchingEdgeSideNo;
             if (FindMatchingOuterSide(targetEdge, q, out matchingEdgeLine, out matchingEdgeSideNo))
             {
-                //assign matching edge line  
-                targetEdge.AddMatchingEdge(matchingEdgeLine);
-
+                //assign matching edge line   
                 //mid point of each edge
                 double pe_midX, pe_midY;
                 CalculateMidPoint(targetEdge, out pe_midX, out pe_midY);
@@ -250,6 +248,10 @@ namespace PixelFarm.Agg.Typography
                     if (targetEdge.SlopKind == LineSlopeKind.Horizontal)
                     {
                         targetEdge.IsUpper = true;
+                        if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
+                        {
+                            targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
+                        }
                     }
                 }
                 else
@@ -257,6 +259,10 @@ namespace PixelFarm.Agg.Typography
                     if (matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
                     {
                         matchingEdgeLine.IsUpper = true;
+                        if (targetEdge.IsOutside && targetEdge.SlopKind == LineSlopeKind.Horizontal)
+                        {
+                            matchingEdgeLine.AddMatchingOutsideEdge(targetEdge);
+                        }
                     }
                 }
 
@@ -265,6 +271,10 @@ namespace PixelFarm.Agg.Typography
                     if (targetEdge.SlopKind == LineSlopeKind.Vertical)
                     {
                         targetEdge.IsLeftSide = true;
+                        if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
+                        {
+                            targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
+                        }
                     }
                 }
                 else
@@ -272,10 +282,12 @@ namespace PixelFarm.Agg.Typography
                     if (matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
                     {
                         matchingEdgeLine.IsLeftSide = true;
+                        if (targetEdge.IsOutside & targetEdge.SlopKind == LineSlopeKind.Vertical)
+                        {
+                            matchingEdgeLine.AddMatchingOutsideEdge(targetEdge);
+                        }
                     }
                 }
-
-
             }
         }
         static bool FindMatchingOuterSide(EdgeLine compareEdge, GlyphTriangle another, out EdgeLine result, out int edgeIndex)
@@ -556,7 +568,7 @@ namespace PixelFarm.Agg.Typography
             return SlopKind + ":" + x0 + "," + y0 + "," + x1 + "," + y1;
         }
 
-        public void AddMatchingEdge(EdgeLine edgeLine)
+        public void AddMatchingOutsideEdge(EdgeLine edgeLine)
         {
 #if DEBUG
             if (edgeLine == this) { throw new NotSupportedException(); }
@@ -569,11 +581,13 @@ namespace PixelFarm.Agg.Typography
             {
                 matchingEdges.Add(edgeLine, true);
             }
+#if DEBUG
             if (matchingEdges.Count > 1)
             {
 
             }
+#endif
         }
     }
-     
+
 }

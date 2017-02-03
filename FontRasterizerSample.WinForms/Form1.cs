@@ -430,40 +430,44 @@ namespace SampleWinForms
                         //we know after do bone analysis
 
                         //------------
-                        //both p and q of this edge is part of horizontal edge
-
+                        //both p and q of this edge is part of horizontal edge 
                         var p = edge.p.userData as GlyphPoint2D;
                         if (p != null)
                         {
+                            //TODO: review here
                             p.isPartOfHorizontalEdge = true;
                             p.isUpperSide = edge.IsUpper;
+                            p.horizontalEdge = edge;
                         }
 
                         var q = edge.q.userData as GlyphPoint2D;
                         if (q != null)
                         {
+                            //TODO: review here
                             q.isPartOfHorizontalEdge = true;
+                            q.horizontalEdge = edge;
                             q.isUpperSide = edge.IsUpper;
                         }
-                    } break; 
+                    } break;
                 case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
                     {
                         //both p and q of this edge is part of vertical edge 
                         var p = edge.p.userData as GlyphPoint2D;
                         if (p != null)
                         {
+                            //TODO: review here
                             p.isPartOfVerticalEdge = true;
                             p.isLeftSide = edge.IsLeftSide;
+                            p.verticalEdge = edge;
                         }
 
                         var q = edge.q.userData as GlyphPoint2D;
                         if (q != null)
-                        {
+                        {   //TODO: review here
                             q.isPartOfVerticalEdge = true;
                             q.isLeftSide = edge.IsLeftSide;
+                            q.verticalEdge = edge;
                         }
-
-
                     } break;
             }
 
