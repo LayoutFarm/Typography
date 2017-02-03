@@ -229,7 +229,12 @@ namespace SampleWinForms
                 glyphOutline = TessWithPolyTri(contours, scale);
                 if (chkYGridFitting.Checked || chkXGridFitting.Checked)
                 {
-                    PixelFarm.Agg.VertexStore vxs2 = CreateFitContourVxs(contours[0], scale, chkXGridFitting.Checked, chkYGridFitting.Checked);
+                    PixelFarm.Agg.VertexStore vxs2 = new VertexStore();
+                    int j = contours.Count;
+                    for (int i = 0; i < j; ++i)
+                    {
+                        CreateFitContourVxs(vxs2, contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked);
+                    }
                     p.FillColor = PixelFarm.Drawing.Color.Black;
                     p.Fill(vxs2);
                 }
@@ -267,9 +272,8 @@ namespace SampleWinForms
             g.DrawImage(winBmp, new Point(30, 20));
         }
 
-        static VertexStore CreateFitContourVxs(GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
+        static void CreateFitContourVxs(VertexStore vxs, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
-            VertexStore vxs = new VertexStore();
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
             //merge 0 = start
@@ -304,7 +308,7 @@ namespace SampleWinForms
                 vxs.AddLineTo(p_x, p_y);
             }
             vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
-            return vxs;
+         
         }
         const int GRID_SIZE = 1;
         const float GRID_SIZE_25 = 1 / 4;
@@ -337,11 +341,11 @@ namespace SampleWinForms
 
             if (floatModulo >= (GRID_SIZE_66))
             {
-                return (integer1 - 0.5f) * gridsize;
+                return (integer1) * gridsize;
             }
             else
             {
-                return integer1 * gridsize;
+                return org;
             }
         }
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
