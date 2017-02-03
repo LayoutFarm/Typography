@@ -235,6 +235,9 @@ namespace PixelFarm.Agg.Typography
             int matchingEdgeSideNo;
             if (FindMatchingOuterSide(targetEdge, q, out matchingEdgeLine, out matchingEdgeSideNo))
             {
+                //assign matching edge line  
+                targetEdge.AddMatchingEdge(matchingEdgeLine);
+
                 //mid point of each edge
                 double pe_midX, pe_midY;
                 CalculateMidPoint(targetEdge, out pe_midX, out pe_midY);
@@ -487,6 +490,9 @@ namespace PixelFarm.Agg.Typography
 
         internal Poly2Tri.TriangulationPoint p;
         internal Poly2Tri.TriangulationPoint q;
+
+        Dictionary<EdgeLine, bool> matchingEdges;
+
         public EdgeLine(Poly2Tri.TriangulationPoint p, Poly2Tri.TriangulationPoint q)
         {
             this.p = p;
@@ -545,56 +551,29 @@ namespace PixelFarm.Agg.Typography
             internal set;
         }
 
-        //void Arrange()
-        //{
-        //    if (y1 < y0)
-        //    {
-        //        //swap
-        //        double tmp_y = y1;
-        //        y1 = y0;
-        //        y0 = tmp_y;
-        //        //swap x 
-        //        double tmp_x = x1;
-        //        x1 = x0;
-        //        x0 = tmp_x;
-        //    }
-        //    else if (y1 == y0)
-        //    {
-        //        if (x1 < x0)
-        //        {
-        //            //swap
-        //            //swap
-        //            double tmp_y = y1;
-        //            y1 = y0;
-        //            y0 = tmp_y;
-        //            //swap x 
-        //            double tmp_x = x1;
-        //            x1 = x0;
-        //            x0 = tmp_x;
-        //        }
-        //    }
-        //}
         public override string ToString()
         {
             return SlopKind + ":" + x0 + "," + y0 + "," + x1 + "," + y1;
         }
-        //public bool SameCoordinateWidth(EdgeLine another)
-        //{
-        //    return this.x0 == another.x0 &&
-        //        this.x1 == another.x1 &&
-        //        this.y0 == another.y0 &&
-        //        this.y1 == another.y1;
-        //}
 
+        public void AddMatchingEdge(EdgeLine edgeLine)
+        {
+#if DEBUG
+            if (edgeLine == this) { throw new NotSupportedException(); }
+#endif
+            if (matchingEdges == null)
+            {
+                matchingEdges = new Dictionary<EdgeLine, bool>();
+            }
+            if (!matchingEdges.ContainsKey(edgeLine))
+            {
+                matchingEdges.Add(edgeLine, true);
+            }
+            if (matchingEdges.Count > 1)
+            {
 
+            }
+        }
     }
-
-
-
-    public class GlyphSkeleton
-    {
-        //reconstruction glyph ***
-
-
-    }
+     
 }

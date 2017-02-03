@@ -445,10 +445,7 @@ namespace SampleWinForms
                             q.isPartOfHorizontalEdge = true;
                             q.isUpperSide = edge.IsUpper;
                         }
-
-
-                    } break;
-
+                    } break; 
                 case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
                     {
                         //both p and q of this edge is part of vertical edge 
