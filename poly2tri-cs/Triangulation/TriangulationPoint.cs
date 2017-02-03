@@ -32,12 +32,14 @@
 using System.Collections.Generic;
 namespace Poly2Tri
 {
-    public class TriangulationPoint
+    public sealed class TriangulationPoint
     {
         // List of edges this point constitutes an upper ending point (CDT) 
         public readonly double X;
         public readonly double Y;
         internal byte tempName;
+        public object userData;
+
         List<DTSweepConstraint> myEdges = new List<DTSweepConstraint>();
 #if DEBUG
         static int dbugTotalId;
@@ -47,12 +49,7 @@ namespace Poly2Tri
         {
             X = x;
             Y = y;
-            //#if DEBUG
-            //            if (this.dbugId == 53)
-            //            {
-            //            }
-            //#endif
-
+         
         }
         public override string ToString()
         {

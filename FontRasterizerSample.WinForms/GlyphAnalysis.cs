@@ -115,6 +115,9 @@ namespace PixelFarm.Agg
     {
         internal List<GlyphPart> parts = new List<GlyphPart>();
         internal List<float> allPoints;
+
+        //result of analysis
+        internal List<GlyphPoint2D> mergedPoints;
         bool analyzed;
         bool isClockwise;
 
@@ -282,14 +285,25 @@ namespace PixelFarm.Agg
     {
         //glyph point 
         //for analysis
-        public double x;
-        public double y;
+        public readonly double x;
+        public readonly double y;
         public PointKind kind;
+
+        //
+        internal Poly2Tri.TriangulationPoint triangulationPoint;
+        internal double adjustedX;
+        internal double adjustedY;
+        internal bool isPartOfHorizontalEdge;
+        internal bool isUpperSide;
         public GlyphPoint2D(double x, double y, PointKind kind)
         {
             this.x = x;
             this.y = y;
             this.kind = kind;
+        }
+        public bool IsEqualValues(GlyphPoint2D another)
+        {
+            return x == another.x && y == another.y;
         }
 #if DEBUG
         public override string ToString()

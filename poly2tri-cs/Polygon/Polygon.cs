@@ -55,7 +55,7 @@ namespace Poly2Tri
         /// Create a polygon from a list of at least 3 points with no duplicates.
         /// </summary>
         /// <param name="points">A list of unique points</param>
-        public Polygon(PolygonPoint[] points)
+        public Polygon(TriangulationPoint[] points)
         {
             this._points = points;
             if (points.Length < 3) throw new ArgumentException("List has fewer than 3 points", "points");
@@ -64,7 +64,7 @@ namespace Poly2Tri
             if (points[0].Equals(points[points.Length - 1]))
             {
                 //reduce last ***
-                PolygonPoint[] newPoints = new PolygonPoint[points.Length - 1];
+                TriangulationPoint[] newPoints = new TriangulationPoint[points.Length - 1];
                 Array.Copy(this._points, 0, newPoints, 0, points.Length - 1);
                 this._points = newPoints;
             }
@@ -86,7 +86,7 @@ namespace Poly2Tri
             for (int i = j - 1; i >= 0; --i)
             {
                 var p = myPoints[i];
-                clonePoints[i] = new PolygonPoint(p.X, p.Y);
+                clonePoints[i] = new TriangulationPoint(p.X, p.Y) { userData = p.userData };
             }
 
             //-----------------------------------------------------------------

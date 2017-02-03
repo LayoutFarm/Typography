@@ -74,8 +74,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
-            ReadAndRender(@"..\..\cambriaz.ttf");
+            ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -118,7 +118,6 @@ namespace SampleWinForms
                     case RenderChoice.RenderWithMiniAgg:
                         RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
                         break;
-
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
@@ -191,7 +190,10 @@ namespace SampleWinForms
                 //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 //5.3
-                p.Fill(vxs);
+                if (!chkDoGridFitting.Checked)
+                {
+                    p.Fill(vxs);
+                }
             }
             if (chkBorder.Checked)
             {
@@ -218,25 +220,36 @@ namespace SampleWinForms
                 //draw each contour point
             }
 
-            if (chkMasterOutlineAnalysis.Checked)
-            {
-                List<GlyphContour> contours = builder.GetContours();
-                int j = contours.Count;
-                float pixelScale = builder.GetPixelScale();
-                for (int i = 0; i < j; ++i)
-                {
-                    DrawGlyphControlPoints3(contours[i], p, pixelScale);
-                }
-            }
+            //if (chkMasterOutlineAnalysis.Checked)
+            //{
+            //    //List<GlyphContour> contours = builder.GetContours();
+            //    //int j = contours.Count;
+            //    //float pixelScale = builder.GetPixelScale();
+            //    //for (int i = 0; i < j; ++i)
+            //    //{
+            //    //    DrawGlyphControlPoints3(contours[i], p, pixelScale);
+            //    //}
+            //}
+            float scale = builder.GetPixelScale();
 
-            if (chkShowTess.Checked)
+            PixelFarm.Agg.Typography.GlyphFitOutline glyphOutline = null;
             {
                 //draw for debug ...
                 //draw control point
                 List<GlyphContour> contours = builder.GetContours();
-                float scale = builder.GetPixelScale();
-                TessWithPolyTriAndDraw(contours, p, scale);
-
+                glyphOutline = TessWithPolyTri(contours, scale);
+                if (chkDoGridFitting.Checked)
+                {
+                    PixelFarm.Agg.VertexStore vxs2 = CreateFitContourVxs(contours[0], scale);
+                    p.FillColor = PixelFarm.Drawing.Color.Black;
+                    p.Fill(vxs2);
+                }
+            }
+            if (chkShowTess.Checked)
+            {
+#if DEBUG
+                debugDrawTriangulatedGlyph(glyphOutline, scale);
+#endif
             }
 
             if (chkShowGrid.Checked)
@@ -264,10 +277,81 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
+
+        static VertexStore CreateFitContourVxs(GlyphContour contour, float pixelScale)
+        {
+            VertexStore vxs = new VertexStore();
+            List<GlyphPoint2D> mergePoints = contour.mergedPoints;
+            int j = mergePoints.Count;
+            //merge 0 = start
+            GlyphPoint2D firstPoint = mergePoints[0];
+            double p_x = firstPoint.x * pixelScale;
+            double p_y = firstPoint.y * pixelScale;
+
+            vxs.AddMoveTo(p_x, p_y);
+            for (int i = 1; i < j; ++i)
+            {
+                //all merge point is polygon point
+                GlyphPoint2D p = mergePoints[i];
+                p_x = p.x * pixelScale;
+                p_y = p.y * pixelScale;
+
+                if (p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
+                {
+                    //vertical fitting
+                    //fit p_y to grid
+                    p_y = RoundToNearestSide((float)p_y, 1);
+                }
+                vxs.AddLineTo(p_x, p_y);
+            }
+            vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
+            return vxs;
+        }
+        const int GRID_SIZE = 1;
+        const float GRID_SIZE_25 = 1 / 4;
+        const float GRID_SIZE_50 = 2 / 4;
+        const float GRID_SIZE_75 = 3 / 4;
+
+        const float GRID_SIZE_33 = 1 / 3;
+        const float GRID_SIZE_66 = 2 / 3;
+
+        static float RoundToNearestSide(float org, int gridsize)
+        {
+            float actual1 = org / (float)GRID_SIZE;
+            float integer1 = (int)(actual1);
+            float floatModulo = actual1 - integer1;
+
+            //if (floatModulo > (GRID_SIZE_75))
+            //{
+            //    return (integer1 + 0.75f) * gridsize;
+            //}
+            //else if (floatModulo > GRID_SIZE_50)
+            //{
+            //    return (integer1 + 0.5f) * gridsize;
+            //}
+            //else if (floatModulo > GRID_SIZE_25)
+            //{
+            //    return (integer1 + 0.25f) * gridsize;
+            //}
+            //else
+            //{
+            //    return integer1 * gridsize;
+            //}
+
+
+            //-----------
+            if (floatModulo >= (GRID_SIZE_66))
+            {
+                return (integer1 + 1) * gridsize;
+            }
+            else
+            {
+                return integer1 * gridsize;
+            }
+        }
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
         {
             //render grid 
-
             p.FillColor = PixelFarm.Drawing.Color.Gray;
             for (int y = 0; y < height; )
             {
@@ -293,7 +377,15 @@ namespace SampleWinForms
                         p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
                         break;
                     case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
-                        p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                        if (edge.IsUpper)
+                        {
+                            p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                        }
+                        else
+                        {
+                            p.StrokeColor = PixelFarm.Drawing.Color.Black;
+                        }
+                        //p.StrokeColor = PixelFarm.Drawing.Color.Red;
                         break;
                 }
             }
@@ -314,13 +406,48 @@ namespace SampleWinForms
             }
             p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
-        void TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float pixelScale)
+
+        static void AssignPointEdgeInvolvement(PixelFarm.Agg.Typography.EdgeLine edge)
         {
+            if (!edge.IsOutside)
+            {
+                return;
+            }
 
+            switch (edge.SlopKind)
+            {
 
-            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+                case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
+                    {
+                        //horiontal edge
+                        //must check if this is upper horizontal 
+                        //or lower horizontal 
+                        //we know after do bone analysis
+                        {
+                            var p = edge.p.userData as GlyphPoint2D;
+                            if (p != null)
+                            {
+                                p.isPartOfHorizontalEdge = true;
+                                p.isUpperSide = edge.IsUpper;
+                            }
+                        }
+                        {
+                            var q = edge.q.userData as GlyphPoint2D;
+                            if (q != null)
+                            {
+                                q.isPartOfHorizontalEdge = true;
+                                q.isUpperSide = edge.IsUpper;
+                            }
+                        }
+
+                    } break;
+            }
+
+        }
+        PixelFarm.Agg.Typography.GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours, float pixelScale)
+        {
+            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             int cntCount = contours.Count;
-
             GlyphContour cnt = contours[0];
             Poly2Tri.Polygon polygon = CreatePolygon2(contours[0]);//first contour            
             bool isHoleIf = !cnt.IsClockwise;
@@ -344,19 +471,71 @@ namespace SampleWinForms
             }
             //}
 
-            Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated
-
+            //------------------------------------------
+            Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated 
             PixelFarm.Agg.Typography.GlyphFitOutline glyphFitOutline = new PixelFarm.Agg.Typography.GlyphFitOutline(polygon);
-            glyphFitOutline.Analyze(_gridSize);
+            glyphFitOutline.Analyze();
+            //------------------------------------------
 
-            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
+            List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
+            int triangleCount = triAngles.Count;
+            double prev_cx = 0, prev_cy = 0;
+            bool drawBone = this.chkDrawBone.Checked;
+            for (int i = 0; i < triangleCount; ++i)
+            {
+                //---------------
+                PixelFarm.Agg.Typography.GlyphTriangle tri = triAngles[i];
+                //PixelFarm.Agg.Typography.EdgeLine e0 = tri.e0;
+                //PixelFarm.Agg.Typography.EdgeLine e1 = tri.e1;
+                //PixelFarm.Agg.Typography.EdgeLine e2 = tri.e2;
+                AssignPointEdgeInvolvement(tri.e0);
+                AssignPointEdgeInvolvement(tri.e1);
+                AssignPointEdgeInvolvement(tri.e2);
+
+
+
+                //---------------
+                //draw each triangles
+                //DrawEdge(p, e0, pixelScale);
+                //DrawEdge(p, e1, pixelScale);
+                //DrawEdge(p, e2, pixelScale);
+                //---------------
+                //draw centroid
+                double cen_x = tri.CentroidX;
+                double cen_y = tri.CentroidY;
+                //--------------- 
+                prev_cx = cen_x;
+                prev_cy = cen_y;
+            }
+
+            return glyphFitOutline;
+        }
+        struct TmpPoint
+        {
+            public readonly double x;
+            public readonly double y;
+            public TmpPoint(double x, double y)
+            {
+                this.x = x;
+                this.y = y;
+            }
 #if DEBUG
+            public override string ToString()
+            {
+                return x + "," + y;
+            }
+#endif
+        }
+
+#if DEBUG
+        void debugDrawTriangulatedGlyph(PixelFarm.Agg.Typography.GlyphFitOutline glyphFitOutline, float pixelScale)
+        {
+            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
             List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
             int j = triAngles.Count;
             //
             double prev_cx = 0, prev_cy = 0;
-            //
-
+            // 
             bool drawBone = this.chkDrawBone.Checked;
 
             for (int i = 0; i < j; ++i)
@@ -399,8 +578,7 @@ namespace SampleWinForms
                 }
             }
             //---------------
-            //draw bone
-
+            //draw bone 
             if (drawBone)
             {
                 List<PixelFarm.Agg.Typography.GlyphBone> bones = glyphFitOutline.dbugGetBones();
@@ -422,175 +600,9 @@ namespace SampleWinForms
                 }
             }
             //---------------
+        }
+
 #endif
-        }
-
-        class EdgeLine
-        {
-            public double x0;
-            public double y0;
-            public double x1;
-            public double y1;
-            public EdgeLine(Poly2Tri.TriangulationPoint p, Poly2Tri.TriangulationPoint q)
-            {
-                x0 = p.X;
-                y0 = p.Y;
-                x1 = q.X;
-                y1 = q.Y;
-                //
-                Arrange();
-
-            }
-            void Arrange()
-            {
-                if (y1 < y0)
-                {
-                    //swap
-                    double tmp_y = y1;
-                    y1 = y0;
-                    y0 = tmp_y;
-                    //swap x 
-                    double tmp_x = x1;
-                    x1 = x0;
-                    x0 = tmp_x;
-                }
-                else if (y1 == y0)
-                {
-                    if (x1 < x0)
-                    {
-                        //swap
-                        //swap
-                        double tmp_y = y1;
-                        y1 = y0;
-                        y0 = tmp_y;
-                        //swap x 
-                        double tmp_x = x1;
-                        x1 = x0;
-                        x0 = tmp_x;
-                    }
-                }
-            }
-            public override string ToString()
-            {
-                return x0 + "," + y0 + "," + x1 + "," + y1;
-            }
-            public bool SameCoordinateWidth(EdgeLine another)
-            {
-                return this.x0 == another.x0 &&
-                    this.x1 == another.x1 &&
-                    this.y0 == another.y0 &&
-                    this.y1 == another.y1;
-            }
-
-
-        }
-
-        struct TmpPoint
-        {
-            public double x;
-            public double y;
-#if DEBUG
-            public override string ToString()
-            {
-                return x + "," + y;
-            }
-#endif
-        }
-        /// <summary>
-        /// create polygon from original master outline point,
-        /// fix duplicated point
-        /// </summary>
-        /// <param name="cnt"></param>
-        /// <returns></returns>
-        static Poly2Tri.Polygon CreatePolygon1(GlyphContour cnt)
-        {
-            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
-            List<float> allPoints = cnt.allPoints;
-            int lim = allPoints.Count - 1;
-
-            //limitation: poly tri not accept duplicated points!
-            double prevX = 0;
-            double prevY = 0;
-
-            Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
-            for (int i = 0; i < lim; )
-            {
-                var x = allPoints[i];
-                var y = allPoints[i + 1];
-                //
-                if (x != prevX && y != prevY)
-                {
-                    TmpPoint tmp_point = new TmpPoint();
-                    tmp_point.x = x;
-                    tmp_point.y = y;
-                    if (!tmpPoints.ContainsKey(tmp_point))
-                    {
-                        tmpPoints.Add(tmp_point, true);
-                        points.Add(new Poly2Tri.PolygonPoint(
-                            x,
-                            y));
-                    }
-                    else
-                    {
-                        //temp fixed***
-                        while (true)
-                        {
-                            x += 0.1f;
-                            y += 0.1f;
-
-                            tmp_point.x = x;
-                            tmp_point.y = y;
-                            if (!tmpPoints.ContainsKey(tmp_point))
-                            {
-                                tmpPoints.Add(tmp_point, true);
-                                points.Add(new Poly2Tri.PolygonPoint(
-                                    x,
-                                    y));
-                                break;
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                    }
-
-                    prevX = x;
-                    prevY = y;
-
-                }
-                else
-                {
-                    //a duplicate point
-                    //temp fix***
-                    //minor shift x and y
-                    x += 0.5f;
-                    y += 0.5f;
-
-
-                    TmpPoint tmp_point = new TmpPoint();
-                    tmp_point.x = x;
-                    tmp_point.y = y;
-                    if (!tmpPoints.ContainsKey(tmp_point))
-                    {
-                        tmpPoints.Add(tmp_point, true);
-                        points.Add(new Poly2Tri.PolygonPoint(
-                            x,
-                            y));
-                    }
-                    else
-                    {
-                    }
-
-                    prevX = x;
-                    prevY = y;
-                }
-                i += 2;
-            }
-
-            Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
-            return polygon;
-        }
 
         /// <summary>
         /// create polygon from flatten curve outline point
@@ -599,13 +611,14 @@ namespace SampleWinForms
         /// <returns></returns>
         static Poly2Tri.Polygon CreatePolygon2(GlyphContour cnt)
         {
-            List<Poly2Tri.PolygonPoint> points = new List<Poly2Tri.PolygonPoint>();
+            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             List<GlyphPart> allParts = cnt.parts;
             //---------------------------------------
             //merge all generated points
-            //also remove duplicated point too!
-            List<float> allPoints = new List<float>();
-
+            //also remove duplicated point too! 
+            List<GlyphPoint2D> mergedPoints = new List<GlyphPoint2D>();
+            cnt.mergedPoints = mergedPoints;
+            //---------------------------------------
             {
                 int tt = 0;
                 int j = allParts.Count;
@@ -613,21 +626,17 @@ namespace SampleWinForms
                 for (int i = 0; i < j; ++i)
                 {
                     GlyphPart p = allParts[i];
-#if DEBUG
-                    if (allPoints.Count >= 30)
-                    {
 
-                    }
-#endif
                     List<GlyphPoint2D> fpoints = p.GetFlattenPoints();
                     if (tt == 0)
                     {
                         int n = fpoints.Count;
                         for (int m = 0; m < n; ++m)
                         {
-                            GlyphPoint2D fp = fpoints[m];
-                            allPoints.Add((float)fp.x);
-                            allPoints.Add((float)fp.y);
+                            //GlyphPoint2D fp = fpoints[m];
+                            mergedPoints.Add(fpoints[m]);
+                            //allPoints.Add((float)fp.x);
+                            //allPoints.Add((float)fp.y);
                         }
                         tt++;
                     }
@@ -637,9 +646,10 @@ namespace SampleWinForms
                         int n = fpoints.Count;
                         for (int m = 1; m < n; ++m)
                         {
-                            GlyphPoint2D fp = fpoints[m];
-                            allPoints.Add((float)fp.x);
-                            allPoints.Add((float)fp.y);
+                            //GlyphPoint2D fp = fpoints[m];
+                            mergedPoints.Add(fpoints[m]);
+                            //allPoints.Add((float)fp.x);
+                            //allPoints.Add((float)fp.y);
                         }
                     }
 
@@ -649,29 +659,27 @@ namespace SampleWinForms
             //---------------------------------------
             {
                 //check last (x,y) and first (x,y)
-                int lim = allPoints.Count - 1;
+                int lim = mergedPoints.Count - 1;
                 {
-                    if (allPoints[lim] == allPoints[1]
-                        && allPoints[lim - 1] == allPoints[0])
+                    if (mergedPoints[lim].IsEqualValues(mergedPoints[0]))
                     {
                         //remove last (x,y)
-                        allPoints.RemoveAt(lim);
-                        allPoints.RemoveAt(lim - 1);
-                        lim -= 2;
+                        mergedPoints.RemoveAt(lim);
+                        lim -= 1;
                     }
                 }
-
-
-
 
                 //limitation: poly tri not accept duplicated points!
                 double prevX = 0;
                 double prevY = 0;
                 Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
-                for (int i = 0; i < lim; )
+                lim = mergedPoints.Count;
+
+                for (int i = 0; i < lim; ++i)
                 {
-                    var x = allPoints[i];
-                    var y = allPoints[i + 1];
+                    GlyphPoint2D p = mergedPoints[i];
+                    double x = p.x;
+                    double y = p.y;
 
                     if (x == prevX && y == prevY)
                     {
@@ -679,224 +687,27 @@ namespace SampleWinForms
                     }
                     else
                     {
-                        TmpPoint tmp_point = new TmpPoint();
-                        tmp_point.x = x;
-                        tmp_point.y = y;
+                        TmpPoint tmp_point = new TmpPoint(x, y);
                         if (!tmpPoints.ContainsKey(tmp_point))
                         {
+                            //ensure no duplicated point
                             tmpPoints.Add(tmp_point, true);
-                            points.Add(new Poly2Tri.PolygonPoint(
-                                x,
-                                y));
+                            var userTriangulationPoint = new Poly2Tri.TriangulationPoint(x, y) { userData = p };
+                            p.triangulationPoint = userTriangulationPoint;
+                            points.Add(userTriangulationPoint);
                         }
                         else
                         {
-
                             throw new NotSupportedException();
-                            //temp fixed***
-
-                            //while (true)
-                            //{
-                            //    x += 0.1f;
-                            //    y += 0.1f;
-
-                            //    tmp_point.x = x;
-                            //    tmp_point.y = y;
-                            //    if (!tmpPoints.ContainsKey(tmp_point))
-                            //    {
-                            //        tmpPoints.Add(tmp_point, true);
-                            //        points.Add(new Poly2Tri.PolygonPoint(
-                            //            x,
-                            //            y));
-                            //        break;
-                            //    }
-                            //    else
-                            //    {
-
-                            //    }
-                            //}
                         }
 
                         prevX = x;
                         prevY = y;
-
                     }
-                    //if (x != prevX && y != prevY)
-                    //{
-
-
-                    //}
-                    //else
-                    //{
-                    //    //a duplicate point
-                    //    //temp fix***
-                    //    //minor shift x and y
-                    //    x += 0.5f;
-                    //    y += 0.5f;
-                    //    TmpPoint tmp_point = new TmpPoint();
-                    //    tmp_point.x = x;
-                    //    tmp_point.y = y;
-                    //    if (!tmpPoints.ContainsKey(tmp_point))
-                    //    {
-                    //        tmpPoints.Add(tmp_point, true);
-                    //        points.Add(new Poly2Tri.PolygonPoint(
-                    //            x,
-                    //            y));
-                    //    }
-                    //    else
-                    //    {
-                    //    }
-
-                    //    prevX = x;
-                    //    prevY = y;
-                    //}
-                    i += 2;
                 }
 
                 Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
                 return polygon;
-            }
-        }
-
-        void DrawGlyphControlPoints3(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
-        {
-
-        }
-        void DrawGlyphControlPoints2(GlyphContour cnt, AggCanvasPainter p, float pixelScale)
-        {
-            //for debug
-            List<GlyphPart> parts = cnt.parts;
-            int j = parts.Count;
-
-            int gridSize = this._gridSize;
-            int halfGrid = gridSize / 2;
-
-            //------------------------------------------------
-            p.FillColor = PixelFarm.Drawing.Color.Black;
-            VertexStore vxs = new VertexStore();
-
-            int totalCount = 0;
-
-            for (int i = 0; i < j; ++i)
-            {
-                GlyphPart part = parts[i];
-                List<GlyphPoint2D> points = part.GetFlattenPoints();
-                int n = points.Count;
-
-                for (int m = 0; m < n; ++m)
-                {
-                    GlyphPoint2D point = points[m];
-                    int proper = (int)Math.Round(point.y, 0);
-
-                    int lower = (int)(point.y);
-                    int snap1_diff = lower % 5;
-                    float f_y = proper;
-                    float f_x = (float)point.x;
-
-                    if (point.kind == PointKind.CurveInbetween)
-                    {
-
-                    }
-                    else
-                    {
-                        if (proper - lower != 0)
-                        {
-                            if (snap1_diff > halfGrid)
-                            {
-                                f_y = ((lower / gridSize) + 1);
-                                f_y *= gridSize;
-                            }
-                            else
-                            {
-                                f_y = (lower / gridSize);
-                                f_y *= gridSize;
-                            }
-                        }
-                        else
-                        {
-                            f_y = (lower / gridSize);
-                            f_y *= gridSize;
-                        }
-                    }
-
-                    f_x = f_x * pixelScale;
-                    f_y = f_y * pixelScale;
-
-                    if (totalCount == 0)
-                    {
-                        vxs.AddMoveTo(f_x, f_y);
-                    }
-                    else
-                    {
-                        vxs.AddLineTo(f_x, f_y);
-                    }
-
-                    totalCount++;
-                }
-
-            }
-
-            vxs.AddCloseFigure();
-            p.Fill(vxs);
-
-            //------------------
-            for (int i = 0; i < j; ++i)
-            {
-                GlyphPart part = parts[i];
-                List<GlyphPoint2D> points = part.GetFlattenPoints();
-                int n = points.Count;
-                for (int m = 0; m < n; ++m)
-                {
-                    GlyphPoint2D point = points[m];
-                    switch (point.kind)
-                    {
-                        default:
-                            p.FillColor = PixelFarm.Drawing.Color.Green;
-                            break;
-                        case PointKind.CurveInbetween:
-                            p.FillColor = PixelFarm.Drawing.Color.Red;
-                            break;
-                    }
-
-                    int proper = (int)Math.Round(point.y, 0);
-                    int lower = (int)(point.y);
-                    int snap1_diff = lower % 5;
-                    float f_y = proper;
-                    float f_x = (float)point.x;
-
-                    if (point.kind == PointKind.CurveInbetween)
-                    {
-
-                    }
-                    else
-                    {
-
-                        if (proper - lower != 0)
-                        {
-                            if (snap1_diff > halfGrid)
-                            {
-                                f_y = ((lower / gridSize) + 1);
-                                f_y *= gridSize;
-                            }
-                            else
-                            {
-                                f_y = (lower / gridSize);
-                                f_y *= gridSize;
-                            }
-                        }
-                        else
-                        {
-                            f_y = (lower / gridSize);
-                            f_y *= gridSize;
-                        }
-                    }
-
-                    f_x = f_x * pixelScale;
-                    f_y = f_y * pixelScale;
-
-
-                    p.FillRectLBWH(f_x, f_y, 2, 2);
-                }
             }
         }
 
@@ -1121,6 +932,11 @@ namespace SampleWinForms
         }
 
         private void chkDrawBone_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkDoGridFitting_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }
