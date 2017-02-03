@@ -27,10 +27,7 @@ namespace PixelFarm.Agg.Typography
         }
 
         List<GlyphBone> bones;
-#if DEBUG
-
-#endif
-        public void Analyze(int pixelSize)
+        public void Analyze()
         {
             //we analyze each triangle here 
             int j = _triangles.Count;
@@ -38,7 +35,6 @@ namespace PixelFarm.Agg.Typography
 
             GlyphTriangle latestJoint = null;
             bones = new List<GlyphBone>();
-
             List<GlyphTriangle> usedTriList = new List<GlyphTriangle>();
             for (int i = 0; i < j; ++i)
             {
@@ -52,7 +48,7 @@ namespace PixelFarm.Agg.Typography
                     if (foundIndex > -1)
                     {
                         usedTriList.Add(tri);
-                        var newBone = new GlyphBone(usedTriList[foundIndex], tri); 
+                        var newBone = new GlyphBone(usedTriList[foundIndex], tri);
                         latestJoint = tri;
                         bones.Add(newBone);
                     }
@@ -67,6 +63,22 @@ namespace PixelFarm.Agg.Typography
                     latestJoint = tri;
                 }
             }
+
+            //----------------------------------------
+            int boneCount = bones.Count;
+            for (int i = 0; i < boneCount; ++i)
+            {
+                //each bone has 2 triangles at its ends
+                //we analyze both triangles' roles
+                //eg...
+                //left -right 
+                //top-bottom
+                GlyphBone bone = bones[i];
+                bone.Analyze();
+
+
+            }
+            //----------------------------------------
         }
         int FindLatestConnectedTri(List<GlyphTriangle> usedTriList, GlyphTriangle tri)
         {
@@ -94,14 +106,230 @@ namespace PixelFarm.Agg.Typography
     }
 
 
+    public enum BoneDirection : byte
+    {
+        /// <summary>
+        /// 0 degree direction (horizontal left to right)
+        /// </summary>
+        D0,
+        D45,
+        D90,
+        D135,
+        D180,
+        D225,
+        D270,
+        D315
+    }
     public class GlyphBone
     {
         public readonly GlyphTriangle p, q;
         public GlyphBone(GlyphTriangle p, GlyphTriangle q)
         {
-            this.p = p; 
+            this.p = p;
             this.q = q;
         }
+        static readonly double _85degreeToRad = MathHelper.DegreesToRadians(85);
+        static readonly double _15degreeToRad = MathHelper.DegreesToRadians(15);
+        static readonly double _90degreeToRad = MathHelper.DegreesToRadians(90);
+
+        public double SlopAngle { get; private set; }
+        public LineSlopeKind SlopKind { get; private set; }
+        static void CalculateMidPoint(EdgeLine e, out double midX, out double midY)
+        {
+            midX = (e.x0 + e.x1) / 2;
+            midY = (e.y0 + e.y1) / 2;
+        }
+        public void Analyze()
+        {
+            //check if q is upper or lower when compare with p
+            //check if q is on left side or right side of p
+            //then we know the direction
+
+            //p
+            double x0 = p.CentroidX;
+            double y0 = p.CentroidY;
+            //q
+            double x1 = q.CentroidX;
+            double y1 = q.CentroidY;
+
+            if (x1 == x0)
+            {
+                this.SlopKind = LineSlopeKind.Vertical;
+                SlopAngle = 1;
+            }
+            else
+            {
+                SlopAngle = Math.Abs(Math.Atan2(Math.Abs(y1 - y0), Math.Abs(x1 - x0)));
+                if (SlopAngle > _85degreeToRad)
+                {
+                    SlopKind = LineSlopeKind.Vertical;
+                }
+                else if (SlopAngle < _15degreeToRad)
+                {
+                    SlopKind = LineSlopeKind.Horizontal;
+                }
+                else
+                {
+                    SlopKind = LineSlopeKind.Other;
+                }
+            }
+            //--------------------------------------
+
+            int p_outsideCount = OutSideCount(p);
+            int q_outsideCount = OutSideCount(q);
+            bool p_isTip = false;
+            bool q_isTip = false;
+
+            if (p_outsideCount >= 2)
+            {
+                //tip bone
+                p_isTip = true;
+            }
+            if (q_outsideCount >= 2)
+            {
+                //tipbone
+                q_isTip = true;
+            }
+            //-------------------------------------- 
+            //p_isTip && q_isTip is possible eg. dot or dot of  i etc.
+            //-------------------------------------- 
+            //find matching side 
+
+            if (p.e0.IsOutside)
+            {
+                //find matching side on q
+                MarkMatchingEdge(p.e0, q);
+            }
+            if (p.e1.IsOutside)
+            {
+                //find matching side on q   
+                MarkMatchingEdge(p.e1, q);
+            }
+            if (p.e2.IsOutside)
+            {
+                //find matching side on q
+                MarkMatchingEdge(p.e2, q);
+            }
+
+
+            if (q.e0.IsOutside)
+            {
+                //find matching side on q
+                MarkMatchingEdge(q.e0, p);
+            }
+            if (q.e1.IsOutside)
+            {
+                //find matching side on q   
+                MarkMatchingEdge(q.e1, p);
+            }
+            if (q.e2.IsOutside)
+            {
+                //find matching side on q
+                MarkMatchingEdge(q.e2, p);
+            }
+        }
+        static void MarkMatchingEdge(EdgeLine targetEdge, GlyphTriangle q)
+        {
+
+            EdgeLine matchingEdgeLine;
+            int matchingEdgeSideNo;
+            if (FindMatchingOuterSide(targetEdge, q, out matchingEdgeLine, out matchingEdgeSideNo))
+            {
+
+                double pe_midX, pe_midY;
+                CalculateMidPoint(targetEdge, out pe_midX, out pe_midY);
+                double qe_midX, qe_midY;
+                CalculateMidPoint(matchingEdgeLine, out qe_midX, out qe_midY);
+                if (pe_midY > qe_midY)
+                {
+                    //p side is upper , q side is lower
+                    targetEdge.IsUpper = true;
+                }
+                else
+                {
+                    matchingEdgeLine.IsUpper = true;
+                }
+
+            }
+        }
+        static bool FindMatchingOuterSide(EdgeLine compareEdge, GlyphTriangle another, out EdgeLine result, out int edgeIndex)
+        {
+            //compare by radian of edge line
+            double compareSlope = Math.Abs(compareEdge.SlopAngle);
+            double diff0 = double.MaxValue;
+            double diff1 = double.MaxValue;
+            double diff2 = double.MaxValue;
+            //if (another.e0.IsOutside)
+            //{
+            diff0 = Math.Abs(another.e0.SlopAngle) - compareSlope;
+            //}
+            //if (another.e1.IsOutside)
+            //{
+            diff1 = Math.Abs(another.e1.SlopAngle) - compareSlope;
+            //}
+            //if (another.e2.IsOutside)
+            //{
+            diff2 = Math.Abs(another.e2.SlopAngle) - compareSlope;
+            //}
+            //find min
+            int mostMinDiffSide = FindMinIndex(diff0, diff1, diff2);
+            if (mostMinDiffSide > -1)
+            {
+                edgeIndex = mostMinDiffSide;
+                switch (mostMinDiffSide)
+                {
+                    default: throw new NotSupportedException();
+                    case 0:
+                        result = another.e0;
+                        break;
+                    case 1:
+                        result = another.e1;
+                        break;
+                    case 2:
+                        result = another.e2;
+                        break;
+                }
+                return true;
+            }
+            else
+            {
+                edgeIndex = -1;
+                result = null;
+                return false;
+            }
+        }
+        static int FindMinIndex(double d0, double d1, double d2)
+        {
+            unsafe
+            {
+                double* tmpArr = stackalloc double[3];
+                tmpArr[0] = d0;
+                tmpArr[1] = d1;
+                tmpArr[2] = d2;
+
+                int minAt = -1;
+                double currentMin = double.MaxValue;
+                for (int i = 0; i < 3; ++i)
+                {
+                    double d = tmpArr[i];
+                    if (d < currentMin)
+                    {
+                        currentMin = d;
+                        minAt = i;
+                    }
+                }
+                return minAt;
+            }
+        }
+        static int OutSideCount(GlyphTriangle t)
+        {
+            int n = 0;
+            n += t.e0.IsOutside ? 1 : 0;
+            n += t.e1.IsOutside ? 1 : 0;
+            n += t.e2.IsOutside ? 1 : 0;
+            return n;
+        }
+
         public override string ToString()
         {
             return p + " -> " + q;
@@ -195,7 +423,6 @@ namespace PixelFarm.Agg.Typography
         {
             get { return centroidY; }
         }
-
         public bool IsConnectedWith(GlyphTriangle anotherTri)
         {
             DelaunayTriangle t2 = anotherTri._tri;
@@ -208,6 +435,7 @@ namespace PixelFarm.Agg.Typography
                    this._tri.N1 == t2 ||
                    this._tri.N2 == t2;
         }
+
 #if DEBUG
         public override string ToString()
         {
@@ -234,8 +462,8 @@ namespace PixelFarm.Agg.Typography
         static readonly double _15degreeToRad = MathHelper.DegreesToRadians(15);
         static readonly double _90degreeToRad = MathHelper.DegreesToRadians(90);
 
-        Poly2Tri.TriangulationPoint p;
-        Poly2Tri.TriangulationPoint q;
+        internal Poly2Tri.TriangulationPoint p;
+        internal Poly2Tri.TriangulationPoint q;
         public EdgeLine(Poly2Tri.TriangulationPoint p, Poly2Tri.TriangulationPoint q)
         {
             this.p = p;
@@ -283,6 +511,12 @@ namespace PixelFarm.Agg.Typography
             get;
             private set;
         }
+        public bool IsUpper
+        {
+            get;
+            internal set;
+        }
+
         //void Arrange()
         //{
         //    if (y1 < y0)

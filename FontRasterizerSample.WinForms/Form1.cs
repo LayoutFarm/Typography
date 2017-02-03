@@ -74,8 +74,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
-            ReadAndRender(@"..\..\cambriaz.ttf");
+            ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -118,7 +118,6 @@ namespace SampleWinForms
                     case RenderChoice.RenderWithMiniAgg:
                         RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
                         break;
-
                     case RenderChoice.RenderWithPlugableGlyphRasterizer:
                         RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
@@ -191,7 +190,10 @@ namespace SampleWinForms
                 //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 //5.3
-                // p.Fill(vxs);
+                if (!chkDoGridFitting.Checked)
+                {
+                    p.Fill(vxs);
+                }
             }
             if (chkBorder.Checked)
             {
@@ -218,28 +220,30 @@ namespace SampleWinForms
                 //draw each contour point
             }
 
-            if (chkMasterOutlineAnalysis.Checked)
-            {
-                //List<GlyphContour> contours = builder.GetContours();
-                //int j = contours.Count;
-                //float pixelScale = builder.GetPixelScale();
-                //for (int i = 0; i < j; ++i)
-                //{
-                //    DrawGlyphControlPoints3(contours[i], p, pixelScale);
-                //}
-            }
+            //if (chkMasterOutlineAnalysis.Checked)
+            //{
+            //    //List<GlyphContour> contours = builder.GetContours();
+            //    //int j = contours.Count;
+            //    //float pixelScale = builder.GetPixelScale();
+            //    //for (int i = 0; i < j; ++i)
+            //    //{
+            //    //    DrawGlyphControlPoints3(contours[i], p, pixelScale);
+            //    //}
+            //}
             float scale = builder.GetPixelScale();
+
             PixelFarm.Agg.Typography.GlyphFitOutline glyphOutline = null;
             {
                 //draw for debug ...
                 //draw control point
                 List<GlyphContour> contours = builder.GetContours();
-                
-                //----
-                glyphOutline = TessWithPolyTriAndDraw(contours, p, scale);
-                PixelFarm.Agg.VertexStore vxs2 = CreateFitContourVxs(contours[0], scale);
-                p.FillColor = PixelFarm.Drawing.Color.Black;
-                p.Fill(vxs2);
+                glyphOutline = TessWithPolyTri(contours, scale);
+                if (chkDoGridFitting.Checked)
+                {
+                    PixelFarm.Agg.VertexStore vxs2 = CreateFitContourVxs(contours[0], scale);
+                    p.FillColor = PixelFarm.Drawing.Color.Black;
+                    p.Fill(vxs2);
+                }
             }
             if (chkShowTess.Checked)
             {
@@ -283,24 +287,71 @@ namespace SampleWinForms
             GlyphPoint2D firstPoint = mergePoints[0];
             double p_x = firstPoint.x * pixelScale;
             double p_y = firstPoint.y * pixelScale;
+
             vxs.AddMoveTo(p_x, p_y);
             for (int i = 1; i < j; ++i)
             {
                 //all merge point is polygon point
                 GlyphPoint2D p = mergePoints[i];
-                //
                 p_x = p.x * pixelScale;
                 p_y = p.y * pixelScale;
 
+                if (p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
+                {
+                    //vertical fitting
+                    //fit p_y to grid
+                    p_y = RoundToNearestSide((float)p_y, 1);
+                }
                 vxs.AddLineTo(p_x, p_y);
             }
             vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
             return vxs;
         }
+        const int GRID_SIZE = 1;
+        const float GRID_SIZE_25 = 1 / 4;
+        const float GRID_SIZE_50 = 2 / 4;
+        const float GRID_SIZE_75 = 3 / 4;
+
+        const float GRID_SIZE_33 = 1 / 3;
+        const float GRID_SIZE_66 = 2 / 3;
+
+        static float RoundToNearestSide(float org, int gridsize)
+        {
+            float actual1 = org / (float)GRID_SIZE;
+            float integer1 = (int)(actual1);
+            float floatModulo = actual1 - integer1;
+
+            //if (floatModulo > (GRID_SIZE_75))
+            //{
+            //    return (integer1 + 0.75f) * gridsize;
+            //}
+            //else if (floatModulo > GRID_SIZE_50)
+            //{
+            //    return (integer1 + 0.5f) * gridsize;
+            //}
+            //else if (floatModulo > GRID_SIZE_25)
+            //{
+            //    return (integer1 + 0.25f) * gridsize;
+            //}
+            //else
+            //{
+            //    return integer1 * gridsize;
+            //}
+
+
+            //-----------
+            if (floatModulo >= (GRID_SIZE_66))
+            {
+                return (integer1 + 1) * gridsize;
+            }
+            else
+            {
+                return integer1 * gridsize;
+            }
+        }
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
         {
             //render grid 
-
             p.FillColor = PixelFarm.Drawing.Color.Gray;
             for (int y = 0; y < height; )
             {
@@ -326,7 +377,15 @@ namespace SampleWinForms
                         p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
                         break;
                     case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
-                        p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                        if (edge.IsUpper)
+                        {
+                            p.StrokeColor = PixelFarm.Drawing.Color.Red;
+                        }
+                        else
+                        {
+                            p.StrokeColor = PixelFarm.Drawing.Color.Black;
+                        }
+                        //p.StrokeColor = PixelFarm.Drawing.Color.Red;
                         break;
                 }
             }
@@ -348,7 +407,44 @@ namespace SampleWinForms
             p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
 
-        PixelFarm.Agg.Typography.GlyphFitOutline TessWithPolyTriAndDraw(List<GlyphContour> contours, AggCanvasPainter p, float pixelScale)
+        static void AssignPointEdgeInvolvement(PixelFarm.Agg.Typography.EdgeLine edge)
+        {
+            if (!edge.IsOutside)
+            {
+                return;
+            }
+
+            switch (edge.SlopKind)
+            {
+
+                case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
+                    {
+                        //horiontal edge
+                        //must check if this is upper horizontal 
+                        //or lower horizontal 
+                        //we know after do bone analysis
+                        {
+                            var p = edge.p.userData as GlyphPoint2D;
+                            if (p != null)
+                            {
+                                p.isPartOfHorizontalEdge = true;
+                                p.isUpperSide = edge.IsUpper;
+                            }
+                        }
+                        {
+                            var q = edge.q.userData as GlyphPoint2D;
+                            if (q != null)
+                            {
+                                q.isPartOfHorizontalEdge = true;
+                                q.isUpperSide = edge.IsUpper;
+                            }
+                        }
+
+                    } break;
+            }
+
+        }
+        PixelFarm.Agg.Typography.GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours, float pixelScale)
         {
             List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             int cntCount = contours.Count;
@@ -375,9 +471,43 @@ namespace SampleWinForms
             }
             //}
 
+            //------------------------------------------
             Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated 
             PixelFarm.Agg.Typography.GlyphFitOutline glyphFitOutline = new PixelFarm.Agg.Typography.GlyphFitOutline(polygon);
-            glyphFitOutline.Analyze(_gridSize);
+            glyphFitOutline.Analyze();
+            //------------------------------------------
+
+            List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
+            int triangleCount = triAngles.Count;
+            double prev_cx = 0, prev_cy = 0;
+            bool drawBone = this.chkDrawBone.Checked;
+            for (int i = 0; i < triangleCount; ++i)
+            {
+                //---------------
+                PixelFarm.Agg.Typography.GlyphTriangle tri = triAngles[i];
+                //PixelFarm.Agg.Typography.EdgeLine e0 = tri.e0;
+                //PixelFarm.Agg.Typography.EdgeLine e1 = tri.e1;
+                //PixelFarm.Agg.Typography.EdgeLine e2 = tri.e2;
+                AssignPointEdgeInvolvement(tri.e0);
+                AssignPointEdgeInvolvement(tri.e1);
+                AssignPointEdgeInvolvement(tri.e2);
+
+
+
+                //---------------
+                //draw each triangles
+                //DrawEdge(p, e0, pixelScale);
+                //DrawEdge(p, e1, pixelScale);
+                //DrawEdge(p, e2, pixelScale);
+                //---------------
+                //draw centroid
+                double cen_x = tri.CentroidX;
+                double cen_y = tri.CentroidY;
+                //--------------- 
+                prev_cx = cen_x;
+                prev_cy = cen_y;
+            }
+
             return glyphFitOutline;
         }
         struct TmpPoint
@@ -802,6 +932,11 @@ namespace SampleWinForms
         }
 
         private void chkDrawBone_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkDoGridFitting_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }

@@ -291,7 +291,10 @@ namespace PixelFarm.Agg
 
         //
         internal Poly2Tri.TriangulationPoint triangulationPoint;
-
+        internal double adjustedX;
+        internal double adjustedY;
+        internal bool isPartOfHorizontalEdge;
+        internal bool isUpperSide;
         public GlyphPoint2D(double x, double y, PointKind kind)
         {
             this.x = x;
