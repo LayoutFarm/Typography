@@ -190,7 +190,7 @@ namespace SampleWinForms
                 //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 //5.3
-                if (!chkDoGridFitting.Checked)
+                if (!chkYGridFitting.Checked)
                 {
                     p.Fill(vxs);
                 }
@@ -219,17 +219,6 @@ namespace SampleWinForms
                 }
                 //draw each contour point
             }
-
-            //if (chkMasterOutlineAnalysis.Checked)
-            //{
-            //    //List<GlyphContour> contours = builder.GetContours();
-            //    //int j = contours.Count;
-            //    //float pixelScale = builder.GetPixelScale();
-            //    //for (int i = 0; i < j; ++i)
-            //    //{
-            //    //    DrawGlyphControlPoints3(contours[i], p, pixelScale);
-            //    //}
-            //}
             float scale = builder.GetPixelScale();
 
             PixelFarm.Agg.Typography.GlyphFitOutline glyphOutline = null;
@@ -238,9 +227,14 @@ namespace SampleWinForms
                 //draw control point
                 List<GlyphContour> contours = builder.GetContours();
                 glyphOutline = TessWithPolyTri(contours, scale);
-                if (chkDoGridFitting.Checked)
+                if (chkYGridFitting.Checked || chkXGridFitting.Checked)
                 {
-                    PixelFarm.Agg.VertexStore vxs2 = CreateFitContourVxs(contours[0], scale);
+                    PixelFarm.Agg.VertexStore vxs2 = new VertexStore();
+                    int j = contours.Count;
+                    for (int i = 0; i < j; ++i)
+                    {
+                        CreateFitContourVxs(vxs2, contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked);
+                    }
                     p.FillColor = PixelFarm.Drawing.Color.Black;
                     p.Fill(vxs2);
                 }
@@ -278,17 +272,17 @@ namespace SampleWinForms
             g.DrawImage(winBmp, new Point(30, 20));
         }
 
-        static VertexStore CreateFitContourVxs(GlyphContour contour, float pixelScale)
+        static void CreateFitContourVxs(VertexStore vxs, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
-            VertexStore vxs = new VertexStore();
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
             //merge 0 = start
             GlyphPoint2D firstPoint = mergePoints[0];
             double p_x = firstPoint.x * pixelScale;
             double p_y = firstPoint.y * pixelScale;
-
             vxs.AddMoveTo(p_x, p_y);
+
+
             for (int i = 1; i < j; ++i)
             {
                 //all merge point is polygon point
@@ -296,16 +290,25 @@ namespace SampleWinForms
                 p_x = p.x * pixelScale;
                 p_y = p.y * pixelScale;
 
-                if (p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
+                if (y_axis && p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
                 {
                     //vertical fitting
                     //fit p_y to grid
-                    p_y = RoundToNearestSide((float)p_y, 1);
+                    p_y = RoundToNearestVerticalSide((float)p_y);
                 }
+
+                if (x_axis && p.isPartOfVerticalEdge && p.isLeftSide)
+                {
+                    //horizontal fitting
+                    //fix p_x to grid
+                    p_x = RoundToNearestHorizontalSide((float)p_x);
+
+                }
+
                 vxs.AddLineTo(p_x, p_y);
             }
             vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
-            return vxs;
+
         }
         const int GRID_SIZE = 1;
         const float GRID_SIZE_25 = 1 / 4;
@@ -315,38 +318,34 @@ namespace SampleWinForms
         const float GRID_SIZE_33 = 1 / 3;
         const float GRID_SIZE_66 = 2 / 3;
 
-        static float RoundToNearestSide(float org, int gridsize)
+        static float RoundToNearestVerticalSide(float org)
         {
-            float actual1 = org / (float)GRID_SIZE;
+            float actual1 = org;
             float integer1 = (int)(actual1);
             float floatModulo = actual1 - integer1;
 
-            //if (floatModulo > (GRID_SIZE_75))
-            //{
-            //    return (integer1 + 0.75f) * gridsize;
-            //}
-            //else if (floatModulo > GRID_SIZE_50)
-            //{
-            //    return (integer1 + 0.5f) * gridsize;
-            //}
-            //else if (floatModulo > GRID_SIZE_25)
-            //{
-            //    return (integer1 + 0.25f) * gridsize;
-            //}
-            //else
-            //{
-            //    return integer1 * gridsize;
-            //}
-
-
-            //-----------
             if (floatModulo >= (GRID_SIZE_66))
             {
-                return (integer1 + 1) * gridsize;
+                return (integer1 + 1);
             }
             else
             {
-                return integer1 * gridsize;
+                return integer1;
+            }
+        }
+        static float RoundToNearestHorizontalSide(float org)
+        {
+            float actual1 = org;
+            float integer1 = (int)(actual1);//lower
+            float floatModulo = actual1 - integer1;
+
+            if (floatModulo >= (GRID_SIZE_66))
+            {
+                return (integer1 + 1);
+            }
+            else
+            {
+                return integer1;
             }
         }
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
@@ -374,7 +373,14 @@ namespace SampleWinForms
                         p.StrokeColor = PixelFarm.Drawing.Color.Green;
                         break;
                     case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
-                        p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
+                        if (edge.IsLeftSide)
+                        {
+                            p.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                        }
+                        else
+                        {
+                            p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
+                        }
                         break;
                     case PixelFarm.Agg.Typography.LineSlopeKind.Horizontal:
                         if (edge.IsUpper)
@@ -383,9 +389,8 @@ namespace SampleWinForms
                         }
                         else
                         {
-                            p.StrokeColor = PixelFarm.Drawing.Color.Black;
+                            p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
                         }
-                        //p.StrokeColor = PixelFarm.Drawing.Color.Red;
                         break;
                 }
             }
@@ -423,23 +428,46 @@ namespace SampleWinForms
                         //must check if this is upper horizontal 
                         //or lower horizontal 
                         //we know after do bone analysis
+
+                        //------------
+                        //both p and q of this edge is part of horizontal edge 
+                        var p = edge.p.userData as GlyphPoint2D;
+                        if (p != null)
                         {
-                            var p = edge.p.userData as GlyphPoint2D;
-                            if (p != null)
-                            {
-                                p.isPartOfHorizontalEdge = true;
-                                p.isUpperSide = edge.IsUpper;
-                            }
-                        }
-                        {
-                            var q = edge.q.userData as GlyphPoint2D;
-                            if (q != null)
-                            {
-                                q.isPartOfHorizontalEdge = true;
-                                q.isUpperSide = edge.IsUpper;
-                            }
+                            //TODO: review here
+                            p.isPartOfHorizontalEdge = true;
+                            p.isUpperSide = edge.IsUpper;
+                            p.horizontalEdge = edge;
                         }
 
+                        var q = edge.q.userData as GlyphPoint2D;
+                        if (q != null)
+                        {
+                            //TODO: review here
+                            q.isPartOfHorizontalEdge = true;
+                            q.horizontalEdge = edge;
+                            q.isUpperSide = edge.IsUpper;
+                        }
+                    } break;
+                case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
+                    {
+                        //both p and q of this edge is part of vertical edge 
+                        var p = edge.p.userData as GlyphPoint2D;
+                        if (p != null)
+                        {
+                            //TODO: review here
+                            p.isPartOfVerticalEdge = true;
+                            p.isLeftSide = edge.IsLeftSide;
+                            p.verticalEdge = edge;
+                        }
+
+                        var q = edge.q.userData as GlyphPoint2D;
+                        if (q != null)
+                        {   //TODO: review here
+                            q.isPartOfVerticalEdge = true;
+                            q.isLeftSide = edge.IsLeftSide;
+                            q.verticalEdge = edge;
+                        }
                     } break;
             }
 
@@ -936,7 +964,12 @@ namespace SampleWinForms
             button1_Click(this, EventArgs.Empty);
         }
 
-        private void chkDoGridFitting_CheckedChanged(object sender, EventArgs e)
+        private void chkYGridFitting_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkXGridFitting_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }
