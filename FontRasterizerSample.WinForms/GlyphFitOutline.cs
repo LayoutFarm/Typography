@@ -259,9 +259,9 @@ namespace PixelFarm.Agg.Typography
                     if (matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
                     {
                         matchingEdgeLine.IsUpper = true;
-                        if (targetEdge.IsOutside && targetEdge.SlopKind == LineSlopeKind.Horizontal)
+                        if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
                         {
-                            matchingEdgeLine.AddMatchingOutsideEdge(targetEdge);
+                            targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
                         }
                     }
                 }
@@ -282,9 +282,9 @@ namespace PixelFarm.Agg.Typography
                     if (matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
                     {
                         matchingEdgeLine.IsLeftSide = true;
-                        if (targetEdge.IsOutside & targetEdge.SlopKind == LineSlopeKind.Vertical)
+                        if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
                         {
-                            matchingEdgeLine.AddMatchingOutsideEdge(targetEdge);
+                            targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
                         }
                     }
                 }
@@ -568,6 +568,24 @@ namespace PixelFarm.Agg.Typography
             return SlopKind + ":" + x0 + "," + y0 + "," + x1 + "," + y1;
         }
 
+        public EdgeLine GetMatchingOutsideEdge()
+        {
+            if (matchingEdges == null) { return null; }
+
+            if (matchingEdges.Count == 1)
+            {
+                foreach (EdgeLine line in matchingEdges.Keys)
+                {
+                    return line;
+                }
+                return null;
+            }
+            else
+            {
+                return null;
+            }
+
+        }
         public void AddMatchingOutsideEdge(EdgeLine edgeLine)
         {
 #if DEBUG

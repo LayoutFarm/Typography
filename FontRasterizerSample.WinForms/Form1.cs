@@ -75,7 +75,7 @@ namespace SampleWinForms
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
             ReadAndRender(@"..\..\tahoma.ttf");
-            //ReadAndRender(@"..\..\cambriaz.ttf");
+            // ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -271,8 +271,85 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
-
         static void CreateFitContourVxs(VertexStore vxs, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
+        {
+            List<GlyphPoint2D> mergePoints = contour.mergedPoints;
+            int j = mergePoints.Count;
+            //merge 0 = start
+            double prev_px = 0;
+            double prev_py = 0;
+            double p_x = 0;
+            double p_y = 0;
+            double first_px = 0;
+            double first_py = 0;
+
+            {
+                GlyphPoint2D p = mergePoints[0];
+                p_x = p.x * pixelScale;
+                p_y = p.y * pixelScale;
+
+                if (y_axis && p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
+                {
+                    //vertical fitting
+                    //fit p_y to grid
+                    p_y = RoundToNearestVerticalSide((float)p_y);
+                }
+
+                if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)
+                {
+                    float new_x = RoundToNearestHorizontalSide((float)p_x);
+                    //adjust right-side vertical edge
+                    PixelFarm.Agg.Typography.EdgeLine rightside = p.GetMatchingVerticalEdge();
+                    if (rightside != null)
+                    {
+
+                    }
+                    p_x = new_x;
+                }
+                vxs.AddMoveTo(p_x, p_y);
+                //-------------
+                first_px = prev_px = p_x;
+                first_py = prev_py = p_y;
+            }
+
+            for (int i = 1; i < j; ++i)
+            {
+                //all merge point is polygon point
+                GlyphPoint2D p = mergePoints[i];
+                p_x = p.x * pixelScale;
+                p_y = p.y * pixelScale;
+
+                if (y_axis && p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
+                {
+                    //vertical fitting
+                    //fit p_y to grid
+                    p_y = RoundToNearestVerticalSide((float)p_y);
+                }
+
+                if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)
+                {
+                    //horizontal fitting
+                    //fix p_x to grid
+                    float new_x = RoundToNearestHorizontalSide((float)p_x);
+                    //adjust right-side vertical edge
+                    PixelFarm.Agg.Typography.EdgeLine rightside = p.GetMatchingVerticalEdge();
+                    if (rightside != null)
+                    {
+
+                    }
+                    p_x = new_x;
+                }
+                //
+                vxs.AddLineTo(p_x, p_y);
+                //
+                prev_px = p_x;
+                prev_py = p_y;
+
+            }
+            vxs.AddLineTo(first_px, first_py);
+
+        }
+        static void CreateFitContourVxs2(VertexStore vxs, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
@@ -297,8 +374,10 @@ namespace SampleWinForms
                     p_y = RoundToNearestVerticalSide((float)p_y);
                 }
 
-                if (x_axis && p.isPartOfVerticalEdge && p.isLeftSide)
+
+                if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)
                 {
+
                     //horizontal fitting
                     //fix p_x to grid
                     p_x = RoundToNearestHorizontalSide((float)p_x);
@@ -311,12 +390,12 @@ namespace SampleWinForms
 
         }
         const int GRID_SIZE = 1;
-        const float GRID_SIZE_25 = 1 / 4;
-        const float GRID_SIZE_50 = 2 / 4;
-        const float GRID_SIZE_75 = 3 / 4;
+        const float GRID_SIZE_25 = 1f / 4f;
+        const float GRID_SIZE_50 = 2f / 4f;
+        const float GRID_SIZE_75 = 3f / 4f;
 
-        const float GRID_SIZE_33 = 1 / 3;
-        const float GRID_SIZE_66 = 2 / 3;
+        const float GRID_SIZE_33 = 1f / 3f;
+        const float GRID_SIZE_66 = 2f / 3f;
 
         static float RoundToNearestVerticalSide(float org)
         {
@@ -324,7 +403,7 @@ namespace SampleWinForms
             float integer1 = (int)(actual1);
             float floatModulo = actual1 - integer1;
 
-            if (floatModulo >= (GRID_SIZE_66))
+            if (floatModulo >= (GRID_SIZE_50))
             {
                 return (integer1 + 1);
             }
@@ -339,7 +418,7 @@ namespace SampleWinForms
             float integer1 = (int)(actual1);//lower
             float floatModulo = actual1 - integer1;
 
-            if (floatModulo >= (GRID_SIZE_66))
+            if (floatModulo >= (GRID_SIZE_50))
             {
                 return (integer1 + 1);
             }
@@ -455,18 +534,15 @@ namespace SampleWinForms
                         var p = edge.p.userData as GlyphPoint2D;
                         if (p != null)
                         {
-                            //TODO: review here
-                            p.isPartOfVerticalEdge = true;
-                            p.isLeftSide = edge.IsLeftSide;
-                            p.verticalEdge = edge;
+                            //TODO: review here 
+                            p.AddVerticalEdge(edge);
                         }
 
                         var q = edge.q.userData as GlyphPoint2D;
                         if (q != null)
                         {   //TODO: review here
-                            q.isPartOfVerticalEdge = true;
-                            q.isLeftSide = edge.IsLeftSide;
-                            q.verticalEdge = edge;
+                           
+                            q.AddVerticalEdge(edge);
                         }
                     } break;
             }
@@ -507,33 +583,15 @@ namespace SampleWinForms
 
             List<PixelFarm.Agg.Typography.GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
             int triangleCount = triAngles.Count;
-            double prev_cx = 0, prev_cy = 0;
+
             bool drawBone = this.chkDrawBone.Checked;
             for (int i = 0; i < triangleCount; ++i)
             {
                 //---------------
                 PixelFarm.Agg.Typography.GlyphTriangle tri = triAngles[i];
-                //PixelFarm.Agg.Typography.EdgeLine e0 = tri.e0;
-                //PixelFarm.Agg.Typography.EdgeLine e1 = tri.e1;
-                //PixelFarm.Agg.Typography.EdgeLine e2 = tri.e2;
                 AssignPointEdgeInvolvement(tri.e0);
                 AssignPointEdgeInvolvement(tri.e1);
                 AssignPointEdgeInvolvement(tri.e2);
-
-
-
-                //---------------
-                //draw each triangles
-                //DrawEdge(p, e0, pixelScale);
-                //DrawEdge(p, e1, pixelScale);
-                //DrawEdge(p, e2, pixelScale);
-                //---------------
-                //draw centroid
-                double cen_x = tri.CentroidX;
-                double cen_y = tri.CentroidY;
-                //--------------- 
-                prev_cx = cen_x;
-                prev_cy = cen_y;
             }
 
             return glyphFitOutline;
@@ -970,6 +1028,11 @@ namespace SampleWinForms
         }
 
         private void chkXGridFitting_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkFillBackground_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
         }

@@ -89,14 +89,13 @@
             // chkFillBackground
             // 
             this.chkFillBackground.AutoSize = true;
-            this.chkFillBackground.Checked = true;
-            this.chkFillBackground.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkFillBackground.Location = new System.Drawing.Point(491, 62);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 4;
             this.chkFillBackground.Text = "Fill BackGround";
             this.chkFillBackground.UseVisualStyleBackColor = true;
+            this.chkFillBackground.CheckedChanged += new System.EventHandler(this.chkFillBackground_CheckedChanged);
             // 
             // cmbRenderChoices
             // 
