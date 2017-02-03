@@ -294,21 +294,21 @@ namespace SampleWinForms
                 {
                     //vertical fitting
                     //fit p_y to grid
-                    p_y = RoundToNearestVerticalSide((float)p_y, 1);
+                    p_y = RoundToNearestVerticalSide((float)p_y);
                 }
 
-                if (x_axis && p.isPartOfVerticalEdge && p.isLeftSide && p_x < 3)
+                if (x_axis && p.isPartOfVerticalEdge && p.isLeftSide)
                 {
                     //horizontal fitting
                     //fix p_x to grid
-                    p_x = RoundToNearestHorizontalSide((float)p_x, 1);
+                    p_x = RoundToNearestHorizontalSide((float)p_x);
 
                 }
 
                 vxs.AddLineTo(p_x, p_y);
             }
             vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
-         
+
         }
         const int GRID_SIZE = 1;
         const float GRID_SIZE_25 = 1 / 4;
@@ -318,34 +318,34 @@ namespace SampleWinForms
         const float GRID_SIZE_33 = 1 / 3;
         const float GRID_SIZE_66 = 2 / 3;
 
-        static float RoundToNearestVerticalSide(float org, int gridsize)
+        static float RoundToNearestVerticalSide(float org)
         {
-            float actual1 = org / (float)GRID_SIZE;
+            float actual1 = org;
             float integer1 = (int)(actual1);
             float floatModulo = actual1 - integer1;
 
             if (floatModulo >= (GRID_SIZE_66))
             {
-                return (integer1 + 1) * gridsize;
+                return (integer1 + 1);
             }
             else
             {
-                return integer1 * gridsize;
+                return integer1;
             }
         }
-        static float RoundToNearestHorizontalSide(float org, int gridsize)
+        static float RoundToNearestHorizontalSide(float org)
         {
-            float actual1 = org / (float)GRID_SIZE;
-            float integer1 = (int)(actual1);
+            float actual1 = org;
+            float integer1 = (int)(actual1);//lower
             float floatModulo = actual1 - integer1;
 
             if (floatModulo >= (GRID_SIZE_66))
             {
-                return (integer1) * gridsize;
+                return (integer1 + 1);
             }
             else
             {
-                return org;
+                return integer1;
             }
         }
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
@@ -428,45 +428,44 @@ namespace SampleWinForms
                         //must check if this is upper horizontal 
                         //or lower horizontal 
                         //we know after do bone analysis
+
+                        //------------
+                        //both p and q of this edge is part of horizontal edge
+
+                        var p = edge.p.userData as GlyphPoint2D;
+                        if (p != null)
                         {
-                            var p = edge.p.userData as GlyphPoint2D;
-                            if (p != null)
-                            {
-                                p.isPartOfHorizontalEdge = true;
-                                p.isUpperSide = edge.IsUpper;
-                            }
+                            p.isPartOfHorizontalEdge = true;
+                            p.isUpperSide = edge.IsUpper;
                         }
+
+                        var q = edge.q.userData as GlyphPoint2D;
+                        if (q != null)
                         {
-                            var q = edge.q.userData as GlyphPoint2D;
-                            if (q != null)
-                            {
-                                q.isPartOfHorizontalEdge = true;
-                                q.isUpperSide = edge.IsUpper;
-                            }
+                            q.isPartOfHorizontalEdge = true;
+                            q.isUpperSide = edge.IsUpper;
                         }
+
 
                     } break;
 
                 case PixelFarm.Agg.Typography.LineSlopeKind.Vertical:
                     {
-                        //vertical edge 
-                        //check left side or right side
+                        //both p and q of this edge is part of vertical edge 
+                        var p = edge.p.userData as GlyphPoint2D;
+                        if (p != null)
                         {
-                            var p = edge.p.userData as GlyphPoint2D;
-                            if (p != null)
-                            {
-                                p.isPartOfVerticalEdge = true;
-                                p.isLeftSide = edge.IsLeftSide;
-                            }
+                            p.isPartOfVerticalEdge = true;
+                            p.isLeftSide = edge.IsLeftSide;
                         }
+
+                        var q = edge.q.userData as GlyphPoint2D;
+                        if (q != null)
                         {
-                            var q = edge.q.userData as GlyphPoint2D;
-                            if (q != null)
-                            {
-                                q.isPartOfVerticalEdge = true;
-                                q.isLeftSide = edge.IsLeftSide;
-                            }
+                            q.isPartOfVerticalEdge = true;
+                            q.isLeftSide = edge.IsLeftSide;
                         }
+
 
                     } break;
             }
