@@ -31,16 +31,11 @@ namespace PixelFarm.Agg.Typography
         {
             //we analyze each triangle here 
             int j = _triangles.Count;
-            double c_x = 0, c_y = 0;
-
-            GlyphTriangle latestJoint = null;
             bones = new List<GlyphBone>();
             List<GlyphTriangle> usedTriList = new List<GlyphTriangle>();
             for (int i = 0; i < j; ++i)
             {
                 GlyphTriangle tri = _triangles[i];
-                c_x = tri.CentroidX;
-                c_y = tri.CentroidY;
                 if (i > 0)
                 {
                     //check the new tri is connected with latest tri or not?
@@ -48,21 +43,33 @@ namespace PixelFarm.Agg.Typography
                     if (foundIndex > -1)
                     {
                         usedTriList.Add(tri);
-                        var newBone = new GlyphBone(usedTriList[foundIndex], tri);
-                        latestJoint = tri;
-                        bones.Add(newBone);
+                        bones.Add(new GlyphBone(usedTriList[foundIndex], tri));
                     }
                     else
                     {
                         //not found
+                        //?
+
                     }
                 }
                 else
                 {
                     usedTriList.Add(tri);
-                    latestJoint = tri;
                 }
             }
+
+            if (j > 1)
+            {
+                //connect the last tri to the first tri
+                //if it is connected
+                GlyphTriangle firstTri = _triangles[0];
+                GlyphTriangle lastTri = _triangles[j - 1];
+                if (firstTri.IsConnectedWith(lastTri))
+                {
+                    bones.Add(new GlyphBone(lastTri, firstTri));
+                }
+            }
+
 
             //----------------------------------------
             int boneCount = bones.Count;
@@ -75,8 +82,6 @@ namespace PixelFarm.Agg.Typography
                 //top-bottom
                 GlyphBone bone = bones[i];
                 bone.Analyze();
-
-
             }
             //----------------------------------------
         }
@@ -290,8 +295,8 @@ namespace PixelFarm.Agg.Typography
                                 targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
                             }
                         }
-                    } 
-                } 
+                    }
+                }
             }
         }
         static bool FindMatchingOuterSide(EdgeLine compareEdge, GlyphTriangle another, out EdgeLine result, out int edgeIndex)

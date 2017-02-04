@@ -331,12 +331,18 @@ namespace SampleWinForms
                     //horizontal fitting
                     //fix p_x to grid
                     float new_x = RoundToNearestHorizontalSide((float)p_x);
-                    //adjust right-side vertical edge
-                    PixelFarm.Agg.Typography.EdgeLine rightside = p.GetMatchingVerticalEdge();
-                    if (rightside != null)
-                    {
-
-                    }
+                    ////adjust right-side vertical edge
+                    //PixelFarm.Agg.Typography.EdgeLine rightside = p.GetMatchingVerticalEdge();
+                    //if (rightside != null && !rightside.IsLeftSide && rightside.IsOutside)
+                    //{
+                    //    var rightSideP = rightside.p.userData as GlyphPoint2D;
+                    //    var rightSideQ = rightside.q.userData as GlyphPoint2D;
+                    //    //find move diff
+                    //    float movediff = (float)p_x - new_x;
+                    //    //adjust right side edge
+                    //    rightSideP.x = rightSideP.x + movediff;
+                    //    rightSideQ.x = rightSideQ.x + movediff;
+                    //}
                     p_x = new_x;
                 }
                 //
@@ -349,7 +355,7 @@ namespace SampleWinForms
             vxs.AddLineTo(first_px, first_py);
 
         }
-     
+
         const int GRID_SIZE = 1;
         const float GRID_SIZE_25 = 1f / 4f;
         const float GRID_SIZE_50 = 2f / 4f;
@@ -502,7 +508,7 @@ namespace SampleWinForms
                         var q = edge.q.userData as GlyphPoint2D;
                         if (q != null)
                         {   //TODO: review here
-                           
+
                             q.AddVerticalEdge(edge);
                         }
                     } break;
