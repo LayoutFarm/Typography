@@ -237,38 +237,17 @@ namespace PixelFarm.Agg.Typography
             {
                 //assign matching edge line   
                 //mid point of each edge
+                //p-triangle's edge midX,midY
                 double pe_midX, pe_midY;
                 CalculateMidPoint(targetEdge, out pe_midX, out pe_midY);
+                //q-triangle's edge midX,midY
                 double qe_midX, qe_midY;
                 CalculateMidPoint(matchingEdgeLine, out qe_midX, out qe_midY);
 
-                if (pe_midY > qe_midY)
+                if (targetEdge.SlopKind == LineSlopeKind.Vertical)
                 {
-                    //p side is upper , q side is lower
-                    if (targetEdge.SlopKind == LineSlopeKind.Horizontal)
-                    {
-                        targetEdge.IsUpper = true;
-                        if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
-                        {
-                            targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
-                        }
-                    }
-                }
-                else
-                {
-                    if (matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
-                    {
-                        matchingEdgeLine.IsUpper = true;
-                        if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
-                        {
-                            targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
-                        }
-                    }
-                }
-
-                if (pe_midX < qe_midX)
-                {
-                    if (targetEdge.SlopKind == LineSlopeKind.Vertical)
+                    //TODO: review same side edge (Fan shape)
+                    if (pe_midX < qe_midX)
                     {
                         targetEdge.IsLeftSide = true;
                         if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
@@ -276,18 +255,43 @@ namespace PixelFarm.Agg.Typography
                             targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
                         }
                     }
-                }
-                else
-                {
-                    if (matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
+                    else
                     {
-                        matchingEdgeLine.IsLeftSide = true;
+                        //matchingEdgeLine.IsLeftSide = true;
                         if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Vertical)
                         {
                             targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
                         }
                     }
                 }
+                else if (targetEdge.SlopKind == LineSlopeKind.Horizontal)
+                {
+                    //TODO: review same side edge (Fan shape)
+
+                    if (pe_midY > qe_midY)
+                    {
+                        //p side is upper , q side is lower
+                        if (targetEdge.SlopKind == LineSlopeKind.Horizontal)
+                        {
+                            targetEdge.IsUpper = true;
+                            if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
+                            {
+                                targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
+                        {
+                            // matchingEdgeLine.IsUpper = true;
+                            if (matchingEdgeLine.IsOutside && matchingEdgeLine.SlopKind == LineSlopeKind.Horizontal)
+                            {
+                                targetEdge.AddMatchingOutsideEdge(matchingEdgeLine);
+                            }
+                        }
+                    } 
+                } 
             }
         }
         static bool FindMatchingOuterSide(EdgeLine compareEdge, GlyphTriangle another, out EdgeLine result, out int edgeIndex)
@@ -297,18 +301,13 @@ namespace PixelFarm.Agg.Typography
             double diff0 = double.MaxValue;
             double diff1 = double.MaxValue;
             double diff2 = double.MaxValue;
-            //if (another.e0.IsOutside)
-            //{
-            diff0 = Math.Abs(another.e0.SlopAngle) - compareSlope;
-            //}
-            //if (another.e1.IsOutside)
-            //{
-            diff1 = Math.Abs(another.e1.SlopAngle) - compareSlope;
-            //}
-            //if (another.e2.IsOutside)
-            //{
-            diff2 = Math.Abs(another.e2.SlopAngle) - compareSlope;
-            //}
+
+            diff0 = Math.Abs(Math.Abs(another.e0.SlopAngle) - compareSlope);
+
+            diff1 = Math.Abs(Math.Abs(another.e1.SlopAngle) - compareSlope);
+
+            diff2 = Math.Abs(Math.Abs(another.e2.SlopAngle) - compareSlope);
+
             //find min
             int minDiffSide = FindMinIndex(diff0, diff1, diff2);
             if (minDiffSide > -1)

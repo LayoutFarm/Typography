@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 0;
             cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
 
-            this.txtInputChar.Text = "x";
+            this.txtInputChar.Text = "i";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -349,46 +349,7 @@ namespace SampleWinForms
             vxs.AddLineTo(first_px, first_py);
 
         }
-        static void CreateFitContourVxs2(VertexStore vxs, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
-        {
-            List<GlyphPoint2D> mergePoints = contour.mergedPoints;
-            int j = mergePoints.Count;
-            //merge 0 = start
-            GlyphPoint2D firstPoint = mergePoints[0];
-            double p_x = firstPoint.x * pixelScale;
-            double p_y = firstPoint.y * pixelScale;
-            vxs.AddMoveTo(p_x, p_y);
-
-
-            for (int i = 1; i < j; ++i)
-            {
-                //all merge point is polygon point
-                GlyphPoint2D p = mergePoints[i];
-                p_x = p.x * pixelScale;
-                p_y = p.y * pixelScale;
-
-                if (y_axis && p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
-                {
-                    //vertical fitting
-                    //fit p_y to grid
-                    p_y = RoundToNearestVerticalSide((float)p_y);
-                }
-
-
-                if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)
-                {
-
-                    //horizontal fitting
-                    //fix p_x to grid
-                    p_x = RoundToNearestHorizontalSide((float)p_x);
-
-                }
-
-                vxs.AddLineTo(p_x, p_y);
-            }
-            vxs.AddLineTo(firstPoint.x * pixelScale, firstPoint.y * pixelScale);
-
-        }
+     
         const int GRID_SIZE = 1;
         const float GRID_SIZE_25 = 1f / 4f;
         const float GRID_SIZE_50 = 2f / 4f;
