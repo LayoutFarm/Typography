@@ -1025,8 +1025,11 @@ namespace SampleWinForms
             AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
 
             painter.StrokeColor = PixelFarm.Drawing.Color.Black;
-            painter.StrokeWidth = 2.0f;
-            painter.Line(2, 0, 10, 15);
+            painter.StrokeWidth = 1.0f;
+            painter.Line(2, 0, 0, 15);  
+            painter.Line(2, 0, 20, 20);
+            painter.Line(2, 0, 30, 15);
+            painter.Line(2, 0, 30, 5);
             //clear surface bg
             p.Clear(PixelFarm.Drawing.Color.White);
             //draw img into that bg
@@ -1149,7 +1152,7 @@ namespace SampleWinForms
                     //--------------------------
                     //in-place swap
                     byte r = destImgBuffer[destImgIndex - 1];
-                    byte b = destImgBuffer[destImgIndex - 3]; 
+                    byte b = destImgBuffer[destImgIndex - 3];
                     destImgBuffer[destImgIndex - 3] = r;
                     destImgBuffer[destImgIndex - 1] = b;
                     //--------------------------
