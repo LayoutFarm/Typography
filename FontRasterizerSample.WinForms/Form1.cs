@@ -1104,9 +1104,9 @@ namespace SampleWinForms
             {
                 BlendLcdSpan(destImg, greyBuff, color, 0, y, greyBufferWidth);
             }
-            SwapRB(destImg);
+            //SwapRB(destImg);
         }
-        void BlendLcdSpan(ActualImage destImg, byte[] greyBuff,
+        void BlendLcdSpan(ActualImage destImg, byte[] expandGreyBuffer,
             PixelFarm.Drawing.Color color, int x, int y, int width)
         {
             byte[] rgb = new byte[3]{
@@ -1123,33 +1123,44 @@ namespace SampleWinForms
             int srcImgIndex = x + (width * y);
             int spanIndex = srcImgIndex;
             int i = x % 3;
+
+            int round = 0;
+
             do
             {
-                int a0 = greyBuff[spanIndex] * color.alpha;
+                int a0 = expandGreyBuffer[spanIndex] * color.alpha;
                 byte existingColor = destImgBuffer[destImgIndex];
                 byte newValue = (byte)((((rgb[i] - existingColor) * a0) + (existingColor << 16)) >> 16);
-                switch (i)
-                {
-                    case 0://r
-                        destImgBuffer[destImgIndex] = newValue;
-                        break;
-                    case 1://g//
-                        destImgBuffer[destImgIndex] = newValue;
-                        break;
-                    case 2://b
-                        destImgBuffer[destImgIndex] = newValue;
-                        break;
-                }
-
+                destImgBuffer[destImgIndex] = newValue;
+                //move to next dest
                 destImgIndex++;
                 i++;
+                round++;
                 if (i > 2)
                 {
-                    i = 0;
-                    destImgIndex += 1;
+                    i = 0;//reset
+                }
+                if (round > 2)
+                {
+                    //this is alpha chanel
+                    //so we skip alpha byte to next
+
+                    //and swap rgb of latest write pixel
+                    //--------------------------
+                    //in-place swap
+                    byte r = destImgBuffer[destImgIndex - 1];
+                    byte b = destImgBuffer[destImgIndex - 3]; 
+                    destImgBuffer[destImgIndex - 3] = r;
+                    destImgBuffer[destImgIndex - 1] = b;
+                    //--------------------------
+
+                    destImgIndex++;
+                    round = 0;
                 }
                 spanIndex++;
                 srcImgIndex++;
+
+
             } while (--width > 0);
 
 
