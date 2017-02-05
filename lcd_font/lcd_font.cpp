@@ -296,7 +296,10 @@ void blend_lcd_span(int x,
     do
     {
         int a0 = int(*span++) * color.a;
-        *p++ = (unsigned char)((((rgb[i++] - *p) * a0) + (*p << 16)) >> 16);
+		auto existingColor = *p;
+        //*p++ = (unsigned char)((((rgb[i++] - *p) * a0) + (*p << 16)) >> 16);
+		*p++ = (unsigned char)((((rgb[i++] - existingColor) * a0) + (existingColor << 16)) >> 16);
+		 
         if(i > 2) i = 0;
     }
     while(--width);

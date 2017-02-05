@@ -916,6 +916,8 @@ namespace SampleWinForms
             //--------------------------
 
         }
+
+
         private void txtInputChar_TextChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
@@ -1014,20 +1016,32 @@ namespace SampleWinForms
 
         private void cmdAggLcd_Click(object sender, EventArgs e)
         {
-            //agg lcd test
-            //lcd_distribution_lut<ggo_gray8> lut(1.0/3.0, 2.0/9.0, 1.0/9.0);
-            //lcd_distribution_lut<ggo_gray8> lut(0.5, 0.25, 0.125);
-            LcdDistributionLut lcdLut = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
+
 
             //1. create simple vertical line to test agg's lcd rendernig technique
             //create gray-scale actual image
+            ActualImage glyphImg = new ActualImage(20, 20, PixelFormat.ARGB32);
+            ImageGraphics2D glyph2d = new ImageGraphics2D(glyphImg);
+            AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
 
-            //ActualImage glyphImg = new ActualImage(20, 20, PixelFormat.ARGB32);
-            //ImageGraphics2D glyph2d = new ImageGraphics2D(glyphImg);
-            //AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
+            painter.StrokeColor = PixelFarm.Drawing.Color.Black;
+            painter.StrokeWidth = 2.0f;
+            painter.Line(2, 0, 10, 15);
+            //clear surface bg
             p.Clear(PixelFarm.Drawing.Color.White);
-
-
+            //draw img into that bg
+            //--------------- 
+            //convert glyphImg from RGBA to grey Scale buffer
+            //---------------
+            //lcd process ...
+            byte[] glyphGreyScale = CreateGreyScaleBuffer(glyphImg);
+            //
+            int newGreyBuffWidth;
+            byte[] greyBuff = PrepareLcd(glyphGreyScale, glyphImg.Width, glyphImg.Height, out newGreyBuffWidth);
+            //blend lcd
+            BlendWithLcdSpans(destImg, greyBuff, newGreyBuffWidth, glyphImg.Height);
+            //--------------- 
+            //p.DrawImage(glyphImg, 0, 0);
 
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
@@ -1035,5 +1049,215 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
+        static byte[] CreateGreyScaleBuffer(ActualImage img)
+        {
+            //assume img is 32 rgba img
+            int imgW = img.Width;
+            int height = img.Height;
+            //56 level grey scale buffer
+
+            byte[] srcImgBuffer = ActualImage.GetBuffer(img);
+            int greyScaleBufferLen = imgW * height;
+            byte[] greyScaleBuffer = new byte[greyScaleBufferLen];
+
+            //for (int i = greyScaleBufferLen - 1; i >= 0; --i)
+            //{
+            //    greyScaleBuffer[i] = 64;
+            //}
+
+
+            int destIndex = 0;
+            int srcImgIndex = 0;
+            int srcImgStride = img.Stride;
+
+            for (int y = 0; y < height; ++y)
+            {
+                srcImgIndex = srcImgStride * y;
+                destIndex = imgW * y;
+                for (int x = 0; x < imgW; ++x)
+                {
+                    byte r = srcImgBuffer[srcImgIndex];
+                    byte g = srcImgBuffer[srcImgIndex + 1];
+                    byte b = srcImgBuffer[srcImgIndex + 2];
+                    byte a = srcImgBuffer[srcImgIndex + 3];
+                    if (r != 0 || g != 0 || b != 0)
+                    {
+                    }
+                    //skip alpha
+                    //byte greyScaleValue =
+                    //    (byte)((0.333f * (float)r) + (0.5f * (float)g) + (0.1666f * (float)b));
+
+                    greyScaleBuffer[destIndex] = (byte)(((a + 1) / 256f) * 64f);
+
+                    destIndex++;
+                    srcImgIndex += 4;
+                }
+            }
+            return greyScaleBuffer;
+        }
+
+        void BlendWithLcdSpans(ActualImage destImg, byte[] greyBuff, int greyBufferWidth, int greyBufferHeight)
+        {
+
+            PixelFarm.Drawing.Color color = PixelFarm.Drawing.Color.Black;
+            for (int y = 0; y < greyBufferHeight; ++y)
+            {
+                BlendLcdSpan(destImg, greyBuff, color, 0, y, greyBufferWidth);
+            }
+            SwapRB(destImg);
+        }
+        void BlendLcdSpan(ActualImage destImg, byte[] greyBuff,
+            PixelFarm.Drawing.Color color, int x, int y, int width)
+        {
+            byte[] rgb = new byte[3]{
+                color.R,
+                color.G,
+                color.B
+            };
+            //-------------------------
+            //destination
+            byte[] destImgBuffer = ActualImage.GetBuffer(destImg);
+            //start pixel
+            int destImgIndex = (x * 4) + (destImg.Stride * y);
+            //start img src
+            int srcImgIndex = x + (width * y);
+            int spanIndex = srcImgIndex;
+            int i = x % 3;
+            do
+            {
+                int a0 = greyBuff[spanIndex] * color.alpha;
+                byte existingColor = destImgBuffer[destImgIndex];
+                byte newValue = (byte)((((rgb[i] - existingColor) * a0) + (existingColor << 16)) >> 16);
+                switch (i)
+                {
+                    case 0://r
+                        destImgBuffer[destImgIndex] = newValue;
+                        break;
+                    case 1://g//
+                        destImgBuffer[destImgIndex] = newValue;
+                        break;
+                    case 2://b
+                        destImgBuffer[destImgIndex] = newValue;
+                        break;
+                }
+
+                destImgIndex++;
+                i++;
+                if (i > 2)
+                {
+                    i = 0;
+                    destImgIndex += 1;
+                }
+                spanIndex++;
+                srcImgIndex++;
+            } while (--width > 0);
+
+
+        }
+        static void SwapRB(ActualImage destImg)
+        {
+            byte[] destImgBuffer = ActualImage.GetBuffer(destImg);
+            int width = destImg.Width;
+            int height = destImg.Height;
+            int destIndex = 0;
+            for (int y = 0; y < height; ++y)
+            {
+                destIndex = (y * destImg.Stride);
+                for (int x = 0; x < width; ++x)
+                {
+                    byte r = destImgBuffer[destIndex];
+                    byte g = destImgBuffer[destIndex + 1];
+                    byte b = destImgBuffer[destIndex + 2];
+                    byte a = destImgBuffer[destIndex + 3];
+                    //swap
+                    destImgBuffer[destIndex + 2] = r;
+                    destImgBuffer[destIndex] = b;
+                    destIndex += 4;
+                }
+            }
+        }
+        // Swap Blue and Red, that is convert RGB->BGR or BGR->RGB
+        ////---------------------------------
+        //void swap_rb(unsigned char* buf, unsigned width, unsigned height, unsigned stride)
+        //{
+        //    unsigned x, y;
+        //    for(y = 0; y < height; ++y)
+        //    {
+        //        unsigned char* p = buf + stride * y;
+        //        for(x = 0; x < width; ++x)
+        //        {
+        //            unsigned char v = p[0];
+        //            p[0] = p[2];
+        //            p[2] = v;
+        //            p += 3;
+        //        }
+        //    }
+        //}
+        //// Blend one span into the R-G-B 24 bit frame buffer
+        //// For the B-G-R byte order or for 32-bit buffers modify
+        //// this function accordingly. The general idea is 'span' 
+        //// contains alpha values for individual color channels in the 
+        //// R-G-B order, so, for the B-G-R order you will have to 
+        //// choose values from the 'span' array differently
+        ////---------------------------------
+        //void blend_lcd_span(int x, 
+        //                    int y, 
+        //                    const unsigned char* span, 
+        //                    int width, 
+        //                    const rgba& color, 
+        //                    unsigned char* rgb24_buf, 
+        //                    unsigned rgb24_stride)
+        //{
+        //    unsigned char* p = rgb24_buf + rgb24_stride * y + x;
+        //    unsigned char rgb[3] = { color.r, color.g, color.b };
+        //    int i = x % 3;
+        //    do
+        //    {
+        //        int a0 = int(*span++) * color.a;
+        //        *p++ = (unsigned char)((((rgb[i++] - *p) * a0) + (*p << 16)) >> 16);
+        //        if(i > 2) i = 0;
+        //    }
+        //    while(--width);
+        //}
+
+        static byte[] PrepareLcd(byte[] src, int srcW, int srcH, out int newImageStride)
+        {
+
+
+            //agg lcd test
+            //lcd_distribution_lut<ggo_gray8> lut(1.0/3.0, 2.0/9.0, 1.0/9.0);
+            //lcd_distribution_lut<ggo_gray8> lut(0.5, 0.25, 0.125);
+            LcdDistributionLut lut = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
+            int destImgStride = srcW + 4; //expand the original gray scale 
+            newImageStride = destImgStride;
+
+            byte[] destBuffer = new byte[destImgStride * srcH];
+
+
+            int destImgIndex = 0;
+            int srcImgIndex = 0;
+            for (int y = 0; y < srcH; ++y)
+            {
+
+                //find destination img
+                srcImgIndex = y * srcW;
+                destImgIndex = y * destImgStride; //start at new line  
+                for (int x = 0; x < srcW; ++x)
+                {
+                    //convert to grey scale  
+                    int v = src[srcImgIndex];// (int)((greyScaleValue / 255f) * 65f);
+                    //----------------------------------
+                    destBuffer[destImgIndex] += lut.Tertiary(v);
+                    destBuffer[destImgIndex + 1] += lut.Secondary(v);
+                    destBuffer[destImgIndex + 2] += lut.Primary(v);
+                    destBuffer[destImgIndex + 3] += lut.Secondary(v);
+                    destBuffer[destImgIndex + 4] += lut.Tertiary(v);
+                    destImgIndex++;
+                    srcImgIndex++;
+                }
+            }
+            return destBuffer;
+        }
+
     }
 }

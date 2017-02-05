@@ -88,7 +88,7 @@ namespace PixelFarm.Agg
             m_secondary = new byte[numLevel];
             m_tertiary = new byte[numLevel];
 
-            double norm = (255.0 / (numLevel - 1)) / (prim + second * 2 + tert * 2);
+            double norm = (255.0 / (numLevel - 1)) / (prim + second * 2 + tert * 3);
             prim *= norm;
             second *= norm;
             tert *= norm;
@@ -113,24 +113,7 @@ namespace PixelFarm.Agg
         }
     }
 
-
-    // Swap Blue and Red, that is convert RGB->BGR or BGR->RGB
-    ////---------------------------------
-    //void swap_rb(unsigned char* buf, unsigned width, unsigned height, unsigned stride)
-    //{
-    //    unsigned x, y;
-    //    for(y = 0; y < height; ++y)
-    //    {
-    //        unsigned char* p = buf + stride * y;
-    //        for(x = 0; x < width; ++x)
-    //        {
-    //            unsigned char v = p[0];
-    //            p[0] = p[2];
-    //            p[2] = v;
-    //            p += 3;
-    //        }
-    //    }
-    //}
+    
 
     // This function prepares the alpha-channel information 
     //// for the glyph averaging the values in accordance with 
