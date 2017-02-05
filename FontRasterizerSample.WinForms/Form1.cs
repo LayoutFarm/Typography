@@ -43,7 +43,7 @@ namespace SampleWinForms
                     12,
                     14,
                     16,
-                    18,20,22,24,26,28,36,48,72,240,300
+                    18,20,22,24,26,28,36,48,72,240,300,360
                 });
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
         }
@@ -59,7 +59,8 @@ namespace SampleWinForms
         void Form1_Load(object sender, EventArgs e)
         {
             this.Text = "Render with PixelFarm";
-            this.lstFontSizes.SelectedIndex = lstFontSizes.Items.Count - 1;//select last one  
+            //this.lstFontSizes.SelectedIndex = lstFontSizes.Items.Count - 1;//select last one  
+            this.lstFontSizes.SelectedIndex = 0;//select last one  
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -180,6 +181,7 @@ namespace SampleWinForms
             builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
             builder.Build(testChar, sizeInPoint);
             VertexStore vxs = builder.GetVxs();
+            p.UseSubPixelRendering = chkLcdTechnique.Checked;
 
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
@@ -860,7 +862,8 @@ namespace SampleWinForms
             //TODO: review here
             //fake subpixel rendering 
             //not correct
-            //p.UseSubPixelRendering = true;
+
+            p.UseSubPixelRendering = chkLcdTechnique.Checked;
             //---------------------------
             if (chkFillBackground.Checked)
             {
@@ -1002,6 +1005,35 @@ namespace SampleWinForms
         private void chkFillBackground_CheckedChanged(object sender, EventArgs e)
         {
             button1_Click(this, EventArgs.Empty);
+        }
+
+        private void chkLcdTechnique_CheckedChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
+
+        private void cmdAggLcd_Click(object sender, EventArgs e)
+        {
+            //agg lcd test
+            //lcd_distribution_lut<ggo_gray8> lut(1.0/3.0, 2.0/9.0, 1.0/9.0);
+            //lcd_distribution_lut<ggo_gray8> lut(0.5, 0.25, 0.125);
+            LcdDistributionLut lcdLut = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
+
+            //1. create simple vertical line to test agg's lcd rendernig technique
+            //create gray-scale actual image
+
+            //ActualImage glyphImg = new ActualImage(20, 20, PixelFormat.ARGB32);
+            //ImageGraphics2D glyph2d = new ImageGraphics2D(glyphImg);
+            //AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
+            p.Clear(PixelFarm.Drawing.Color.White);
+
+
+
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            //--------------- 
+            //7. just render our bitmap
+            g.Clear(Color.White);
+            g.DrawImage(winBmp, new Point(30, 20));
         }
     }
 }
