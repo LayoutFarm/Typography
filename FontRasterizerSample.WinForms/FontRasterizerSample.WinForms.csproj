@@ -81,7 +81,7 @@
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>PixelFarm.OpenType</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PixelFarmMiniAgg\PixelFarm.MiniAgg.One.csproj">
+    <ProjectReference Include="..\PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj">
       <Project>{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>

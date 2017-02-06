@@ -194,7 +194,11 @@ namespace PixelFarm.Agg
                         else
                         {
                             //other color
+#if WIN
                             uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
+#else
+                            uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
+#endif
                             int n = buffer.Length / 4;
                             unsafe
                             {

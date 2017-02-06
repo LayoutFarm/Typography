@@ -30,10 +30,7 @@ namespace PixelFarm.Agg
         public override bool UseSubPixelRendering
         {
             get { return this.sclineRasToBmp.ScanlineRenderMode == ScanlineRenderMode.SubPixelRendering; }
-            set
-            {
-                this.sclineRasToBmp.ScanlineRenderMode = value ? ScanlineRenderMode.SubPixelRendering : ScanlineRenderMode.Default;
-            }
+            set { this.sclineRasToBmp.ScanlineRenderMode = value ? ScanlineRenderMode.SubPixelRendering : ScanlineRenderMode.Default; }
         }
         Affine BuildImageBoundsPath(
             int srcW, int srcH,
@@ -211,7 +208,7 @@ namespace PixelFarm.Agg
                 var interpolator = new SpanInterpolatorLinear(sourceRectTransform);
                 var imgSpanGen = new ImgSpanGenRGBA_BilinearClip(source, Drawing.Color.Black, interpolator);
 
-
+                
                 var v1 = destRectTransform.TransformToVxs(imgBoundsPath, GetFreeVxs());
                 Render(v1, imgSpanGen);
                 ReleaseVxs(ref v1);

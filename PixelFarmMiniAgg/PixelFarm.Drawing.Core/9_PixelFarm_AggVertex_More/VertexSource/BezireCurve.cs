@@ -9,8 +9,7 @@ namespace PixelFarm.Agg.VertexSource
     public static class BezierCurve
     {
         static int NSteps = 20;
-        public static void CreateBezierVxs4(
-            VertexStore vxs, Vector2 start, Vector2 end,
+        public static void CreateBezierVxs4(VertexStore vxs, Vector2 start, Vector2 end,
             Vector2 control1, Vector2 control2)
         {
             var curve = new VectorMath.BezierCurveCubic(
@@ -36,9 +35,8 @@ namespace PixelFarm.Agg.VertexSource
             control1 = new Vector2(x1, y1);
             control2 = new Vector2(x2, y2);
         }
-        public static void CreateBezierVxs3(
-            VertexStore vxs, Vector2 start, Vector2 end,
-            Vector2 control1)
+        public static void CreateBezierVxs3(VertexStore vxs, Vector2 start, Vector2 end,
+           Vector2 control1)
         {
             var curve = new VectorMath.BezierCurveQuadric(
                 start, end,
