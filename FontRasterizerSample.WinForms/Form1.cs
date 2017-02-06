@@ -1014,7 +1014,7 @@ namespace SampleWinForms
             button1_Click(this, EventArgs.Empty);
         }
 
-        private void cmdAggLcd_Click(object sender, EventArgs e)
+        private void cmdAggLcd1_Click(object sender, EventArgs e)
         {
 
 
@@ -1026,7 +1026,7 @@ namespace SampleWinForms
 
             painter.StrokeColor = PixelFarm.Drawing.Color.Black;
             painter.StrokeWidth = 1.0f;
-            painter.Line(2, 0, 0, 15);  
+            painter.Line(2, 0, 0, 15);
             painter.Line(2, 0, 20, 20);
             painter.Line(2, 0, 30, 15);
             painter.Line(2, 0, 30, 5);
@@ -1040,7 +1040,7 @@ namespace SampleWinForms
             byte[] glyphGreyScale = CreateGreyScaleBuffer(glyphImg);
             //
             int newGreyBuffWidth;
-            byte[] greyBuff = PrepareLcd(glyphGreyScale, glyphImg.Width, glyphImg.Height, out newGreyBuffWidth);
+            byte[] greyBuff = CreateNewExpandedLcdGrayScale(glyphGreyScale, glyphImg.Width, glyphImg.Height, out newGreyBuffWidth);
             //blend lcd
             BlendWithLcdSpans(destImg, greyBuff, newGreyBuffWidth, glyphImg.Height);
             //--------------- 
@@ -1109,6 +1109,89 @@ namespace SampleWinForms
             }
             //SwapRB(destImg);
         }
+
+        void BlendWithLcdSpansV2(ActualImage destImg, ActualImage glyphImg, PixelFarm.Drawing.Color color)
+        {
+            var g8Lut = LcdDistributionLut.Lut8_1_2;
+            var forwardBuffer = new ScanlineRasToDestBitmapRenderer.ForwardTemporaryBuffer();
+            int glyphH = glyphImg.Height;
+            int glyphW = glyphImg.Width;
+            byte[] glyphBuffer = ActualImage.GetBuffer(glyphImg);
+            int srcIndex = 0;
+            int srcStride = glyphImg.Stride;
+            byte[] destImgBuffer = ActualImage.GetBuffer(destImg);
+            //start pixel
+            int destImgIndex = 0;
+            int destX = 0;
+            byte[] rgb = new byte[]{
+                color.R,
+                color.G,
+                color.B
+            };
+
+            for (int y = 0; y < glyphH; ++y)
+            {
+                srcIndex = srcStride * y;
+                destImgIndex = (destImg.Stride * y) + (destX * 4); //4 color component
+                int i = 0;
+                int round = 0;
+                for (int x = 0; x < glyphW; ++x)
+                {
+                    //1.
+                    //read 1 pixel (4 bytes, 4 color components)
+                    byte r = glyphBuffer[srcIndex];
+                    byte g = glyphBuffer[srcIndex + 1];
+                    byte b = glyphBuffer[srcIndex + 2];
+                    byte a = glyphBuffer[srcIndex + 3];
+                    //2.
+                    //convert to grey scale and convert to 65 level grey scale value
+                    byte greyScaleValue = (byte)(((a + 1) / 256f) * 64f);
+                    //3.
+                    //from single grey scale value it is expanded into 5 color component
+                    forwardBuffer.WriteAccum(
+                        g8Lut.Tertiary(greyScaleValue),
+                        g8Lut.Secondary(greyScaleValue),
+                        g8Lut.Primary(greyScaleValue));
+                    //4. read accumulate 'energy' back
+                    byte e0, e1, e2, e3, e4;
+                    forwardBuffer.ReadNext(out e0, out e1, out e2, out e3, out e4);
+                    //5. blend this pixel to dest image (expand to 5 (sub)pixel)
+
+                    //------------------------------------------------------------
+                    int a0 = e0 * color.alpha;
+                    byte existingColor = destImgBuffer[destImgIndex];
+                    byte newValue = (byte)((((rgb[i] - existingColor) * a0) + (existingColor << 16)) >> 16);
+                    destImgBuffer[destImgIndex] = newValue;
+                    //move to next dest
+                    destImgIndex++;
+                    i++;
+                    if (i > 2)
+                    {
+                        i = 0;//reset
+                    }
+                    round++;
+                    if (round > 2)
+                    {
+                        //this is alpha chanel
+                        //so we skip alpha byte to next
+
+                        //and swap rgb of latest write pixel
+                        //--------------------------
+                        //in-place swap
+                        byte r1 = destImgBuffer[destImgIndex - 1];
+                        byte b1 = destImgBuffer[destImgIndex - 3];
+                        destImgBuffer[destImgIndex - 3] = r1;
+                        destImgBuffer[destImgIndex - 1] = b1;
+                        //--------------------------
+
+                        destImgIndex++;
+                        round = 0;
+                    }
+                    //------------------------------------------------------------
+                    srcIndex += 4;
+                }
+            }
+        }
         void BlendLcdSpan(ActualImage destImg, byte[] expandGreyBuffer,
             PixelFarm.Drawing.Color color, int x, int y, int width)
         {
@@ -1137,12 +1220,14 @@ namespace SampleWinForms
                 destImgBuffer[destImgIndex] = newValue;
                 //move to next dest
                 destImgIndex++;
+
+
                 i++;
-                round++;
                 if (i > 2)
                 {
                     i = 0;//reset
                 }
+                round++;
                 if (round > 2)
                 {
                     //this is alpha chanel
@@ -1234,10 +1319,17 @@ namespace SampleWinForms
         //    while(--width);
         //}
 
-        static byte[] PrepareLcd(byte[] src, int srcW, int srcH, out int newImageStride)
+        /// <summary>
+        /// convert from original grey scale to expand lcd-ready grey scale ***
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="srcW"></param>
+        /// <param name="srcH"></param>
+        /// <param name="newImageStride"></param>
+        /// <returns></returns>
+        static byte[] CreateNewExpandedLcdGrayScale(byte[] src, int srcW, int srcH, out int newImageStride)
         {
-
-
+            //version 1:
             //agg lcd test
             //lcd_distribution_lut<ggo_gray8> lut(1.0/3.0, 2.0/9.0, 1.0/9.0);
             //lcd_distribution_lut<ggo_gray8> lut(0.5, 0.25, 0.125);
@@ -1271,6 +1363,40 @@ namespace SampleWinForms
                 }
             }
             return destBuffer;
+        }
+
+        private void cmdAggLcd2_Click(object sender, EventArgs e)
+        {
+            //version 2:
+            //1. create simple vertical line to test agg's lcd rendernig technique
+            //create gray-scale actual image
+            ActualImage glyphImg = new ActualImage(20, 20, PixelFormat.ARGB32);
+            ImageGraphics2D glyph2d = new ImageGraphics2D(glyphImg);
+            AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
+
+            painter.StrokeColor = PixelFarm.Drawing.Color.Black;
+            painter.StrokeWidth = 1.0f;
+            //painter.Line(2, 0, 2, 15);
+
+            painter.Line(2, 0, 0, 15);
+            painter.Line(2, 0, 20, 20);
+            painter.Line(2, 0, 30, 15);
+            painter.Line(2, 0, 30, 5);
+
+            //clear surface bg
+            p.Clear(PixelFarm.Drawing.Color.White);
+            //--------------------------
+            BlendWithLcdSpansV2(destImg, glyphImg, PixelFarm.Drawing.Color.Black);
+
+
+            //--------------- 
+            //p.DrawImage(glyphImg, 0, 0);
+
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            //--------------- 
+            //7. just render our bitmap
+            g.Clear(Color.White);
+            g.DrawImage(winBmp, new Point(30, 20));
         }
 
     }
