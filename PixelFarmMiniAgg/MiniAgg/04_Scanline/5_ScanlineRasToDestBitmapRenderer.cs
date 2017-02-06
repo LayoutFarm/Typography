@@ -67,7 +67,7 @@ namespace PixelFarm.Agg
 
         public class ForwardTemporaryBuffer
         {
-            //for subpixel grey scale buffer
+            //reuseable for subpixel grey scale buffer
 
             byte[] byteBuffer = new byte[5];
             int writeIndex = 0;
@@ -113,6 +113,12 @@ namespace PixelFarm.Agg
                         writeIndex = 0;
                         break;
                 }
+            }
+            public void Reset()
+            {
+                writeIndex = 0;
+                readIndex = 0;
+                byteBuffer[0] = byteBuffer[1] = byteBuffer[2] = byteBuffer[3] = byteBuffer[4] = 0;
             }
             public void ReadNext(out byte v0, out byte v1, out byte v2, out byte v3, out byte v4)
             {
@@ -170,7 +176,7 @@ namespace PixelFarm.Agg
             IPixelBlender blender = dest.GetRecieveBlender();
             int last_x = int.MinValue;
             int bufferOffset = 0;
-
+            _forwardTempBuff.Reset();
 
             for (int i = 1; i <= num_spans; ++i)
             {
