@@ -1020,18 +1020,18 @@ namespace SampleWinForms
 
             //1. create simple vertical line to test agg's lcd rendernig technique
             //create gray-scale actual image
-            ActualImage glyphImg = new ActualImage(20, 20, PixelFormat.ARGB32);
+            ActualImage glyphImg = new ActualImage(100, 100, PixelFormat.ARGB32);
             ImageGraphics2D glyph2d = new ImageGraphics2D(glyphImg);
             AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
 
             painter.StrokeColor = PixelFarm.Drawing.Color.Black;
             painter.StrokeWidth = 2.0f;
-            //painter.Line(0, 0, 15, 15);
+            painter.Line(0, 0, 15 * 3, 15); //scale horizontal 3 times
 
-            painter.Line(2, 0, 2, 15);
-            painter.Line(2, 0, 20, 20);
-            painter.Line(2, 0, 30, 15);
-            painter.Line(2, 0, 30, 5);
+            //painter.Line(2, 0, 2, 15);
+            //painter.Line(2, 0, 20, 20);
+            //painter.Line(2, 0, 30, 15);
+            //painter.Line(2, 0, 30, 5);
             //clear surface bg
             p.Clear(PixelFarm.Drawing.Color.White);
             //draw img into that bg
@@ -1226,7 +1226,7 @@ namespace SampleWinForms
                         case 0:
                             //nothing
                             break;
-                    } 
+                    }
                 }
             }
         }
@@ -1408,21 +1408,45 @@ namespace SampleWinForms
             //version 2:
             //1. create simple vertical line to test agg's lcd rendernig technique
             //create gray-scale actual image
-            ActualImage glyphImg = new ActualImage(20, 20, PixelFormat.ARGB32);
+            ActualImage glyphImg = new ActualImage(100, 100, PixelFormat.ARGB32);
             ImageGraphics2D glyph2d = new ImageGraphics2D(glyphImg);
             AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
 
             painter.StrokeColor = PixelFarm.Drawing.Color.Black;
             painter.StrokeWidth = 2.0f;
-            painter.Line(2, 0, 2, 15);
-            painter.Line(2, 0, 20, 20);
-            painter.Line(2, 0, 30, 15);
-            painter.Line(2, 0, 30, 5);
+            painter.Line(0, 0, 15 * 3, 15);
+
             //clear surface bg
             p.Clear(PixelFarm.Drawing.Color.White);
             //--------------------------
             BlendWithLcdTechnique(destImg, glyphImg, PixelFarm.Drawing.Color.Black);
 
+
+            //--------------- 
+            //p.DrawImage(glyphImg, 0, 0);
+
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            //--------------- 
+            //7. just render our bitmap
+            g.Clear(Color.White);
+            g.DrawImage(winBmp, new Point(30, 20));
+        }
+
+        private void cmdAggLcd3_Click(object sender, EventArgs e)
+        {
+            //version 3:
+            //1. create simple vertical line to test agg's lcd rendernig technique
+            //create gray-scale actual image
+
+
+
+            //clear surface bg
+            p.Clear(PixelFarm.Drawing.Color.White);
+            //--------------------------
+            p.StrokeColor = PixelFarm.Drawing.Color.Black;
+            p.StrokeWidth = 2.0f;
+            p.UseSubPixelRendering = true;
+            p.Line(0, 0, 20, 20);
 
             //--------------- 
             //p.DrawImage(glyphImg, 0, 0);
