@@ -1201,8 +1201,8 @@ namespace SampleWinForms
                 //we must draw extened 4 pixels
                 //---------
                 {
-                    int remaining = Math.Min(srcStride, 4);
-                    switch (remaining)
+                    int remainingEnergy = Math.Min(srcStride, 4);
+                    switch (remainingEnergy)
                     {
                         default: throw new NotSupportedException();
                         case 4:
