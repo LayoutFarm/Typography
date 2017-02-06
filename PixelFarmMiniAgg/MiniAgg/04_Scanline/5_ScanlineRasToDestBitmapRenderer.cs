@@ -132,8 +132,12 @@ namespace PixelFarm.Agg
                         }
                         else
                         {
-                            //check direction :  
-                            bool isUpHill = coverageValue >= prevCover; 
+                            //check direction : 
+
+                            bool isUpHill = coverageValue >= prevCover;
+                            //if (isUpHill != ((coverageValue % 2) > 0))
+                            //{
+                            //}
                             //---------------------------- 
                             byte c_r = 0, c_g = 0, c_b = 0;
                             //----------------------------
@@ -146,12 +150,11 @@ namespace PixelFarm.Agg
                                 {
                                     c_r = bgColor.R;
                                     c_g = bgColor.G;
-                                    c_b = (byte)(mix(cb_B, cf_B, (float)coverageValue / cover_1_3) * 255);
+                                    c_b = (byte)(mix(cb_B, cf_B, subpix_percent) * 255);
                                 }
                                 else
                                 {
-                                    //c_r = (byte)(mix(cb_R, cf_R, subpix_percent) * 255);
-                                    c_r = (byte)(mix(cb_R, cf_R, (float)coverageValue / cover_1_3) * 255);
+                                    c_r = (byte)(mix(cb_R, cf_R, subpix_percent) * 255);
                                     c_g = bgColor.G;
                                     c_b = bgColor.B;
                                 }
@@ -164,15 +167,13 @@ namespace PixelFarm.Agg
                                 if (isUpHill)
                                 {
                                     c_r = bgColor.R;
-                                    //c_g = (byte)(mix(cb_G, cf_G, subpix_percent) * 255);
-                                    c_g = (byte)(mix(cb_G, cf_G, (float)(coverageValue - cover_1_3) / cover_1_3) * 255);
+                                    c_g = (byte)(mix(cb_G, cf_G, subpix_percent) * 255);
                                     c_b = (byte)(mix(cb_B, cf_B, 1) * 255);
                                 }
                                 else
                                 {
                                     c_r = (byte)(mix(cb_R, cf_R, 1) * 255);
-                                    //c_g = (byte)(mix(cb_G, cf_G, subpix_percent) * 255);
-                                    c_g = (byte)(mix(cb_G, cf_G, (float)(coverageValue - cover_1_3) / cover_1_3) * 255);
+                                    c_g = (byte)(mix(cb_G, cf_G, subpix_percent) * 255);
                                     c_b = bgColor.B;
                                 }
 
@@ -184,7 +185,7 @@ namespace PixelFarm.Agg
                                 //cover > 2/3 but not full 
                                 if (isUpHill)
                                 {
-                                    c_r = (byte)(mix(cb_R, cf_R, (float)(coverageValue - cover_2_3) / cover_1_3) * 255);
+                                    c_r = (byte)(mix(cb_R, cf_R, subpix_percent) * 255);
                                     c_g = (byte)(mix(cb_G, cf_G, 1) * 255);
                                     c_b = (byte)(mix(cb_B, cf_B, 1) * 255);
                                 }
@@ -192,7 +193,7 @@ namespace PixelFarm.Agg
                                 {
                                     c_r = (byte)(mix(cb_R, cf_R, 1) * 255);
                                     c_g = (byte)(mix(cb_G, cf_G, 1) * 255);
-                                    c_b = (byte)(mix(cb_B, cf_B, (float)(coverageValue - cover_2_3) / cover_1_3) * 255);
+                                    c_b = (byte)(mix(cb_B, cf_B, subpix_percent) * 255);
                                 }
 
                                 int a = ((coverageValue + 1) * color.Alpha0To255) >> 8;
@@ -332,4 +333,3 @@ namespace PixelFarm.Agg
     {
     }
 }
-
