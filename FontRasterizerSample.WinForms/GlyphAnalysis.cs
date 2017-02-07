@@ -297,11 +297,8 @@ namespace PixelFarm.Agg
         internal bool isPartOfHorizontalEdge;
         internal bool isUpperSide;
         internal PixelFarm.Agg.Typography.EdgeLine horizontalEdge;
-        //
-        internal bool isPartOfVerticalEdge;
-        internal bool isLeftSide;
-        internal PixelFarm.Agg.Typography.EdgeLine verticalEdge;
-
+        // 
+        List<PixelFarm.Agg.Typography.EdgeLine> _edges;
         public GlyphPoint2D(double x, double y, PointKind kind)
         {
             this.x = x;
@@ -312,6 +309,43 @@ namespace PixelFarm.Agg
         {
             return x == another.x && y == another.y;
         }
+
+
+        internal void AddVerticalEdge(PixelFarm.Agg.Typography.EdgeLine v_edge)
+        {
+            //associated 
+            if (!this.IsPartOfVerticalEdge)
+            {
+                this.IsPartOfVerticalEdge = true;
+            }
+            if (!this.IsLeftSide)
+            {
+                this.IsLeftSide = v_edge.IsLeftSide;
+            }
+            
+            if (_edges == null)
+            {
+                _edges = new List<Typography.EdgeLine>();
+            }
+            _edges.Add(v_edge);
+        }
+        internal Typography.EdgeLine GetMatchingVerticalEdge()
+        {
+            if (_edges == null)
+            {
+                return null;
+            }
+            if (_edges.Count == 1)
+            {
+                return _edges[0].GetMatchingOutsideEdge();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        internal bool IsLeftSide { get; private set; }
+        internal bool IsPartOfVerticalEdge { get; private set; }
 #if DEBUG
         public override string ToString()
         {

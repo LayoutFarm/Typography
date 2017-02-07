@@ -38,7 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="00_Context\ImageGraphics2D_RenderImages.cs" />
-    <Compile Include="01_Base\AggMemMx.cs" />
     <Compile Include="02_PixelBuffer\ChildImage.cs" />
     <Compile Include="02_PixelBuffer\ColorOrder.cs" />
     <Compile Include="02_PixelBuffer\ColorRGBAf.cs" />
@@ -58,9 +57,6 @@
     <Compile Include="08_ImageResampling\ImageFreeTransform.cs" />
     <Compile Include="08_ImageResampling\ImageInterpolationQuality.cs" />
     <Compile Include="08_ImageResampling\ImageTransform.cs" />
-    <Compile Include="x_notused\x_ImageHelper2.cs" />
-    <Compile Include="x_notused\x_ImageSpan.cs" />
-    <Compile Include="x_notused\x_PixelBlenderFloat.cs" />
     <Compile Include="03_SpanGenerators\0_ISpanGenerator.cs" />
     <Compile Include="04_Scanline\0_ScanlineSpan.cs" />
     <Compile Include="07_Lines\1.2_PatternFilter.cs" />
@@ -77,7 +73,6 @@
     <Compile Include="03_SpanGenerators\3_ImgSpanGenRGBA.cs" />
     <Compile Include="08_ImageResampling\ImageFilterLookupTable.cs" />
     <Compile Include="08_ImageResampling\FilterImageSpanGenerator.ImageBufferAccessor.cs" />
-    <Compile Include="01_Base\NativeBufferMx.cs" />
     <Compile Include="02_PixelBuffer\GammaLookUpTable.cs" />
     <Compile Include="00_Context\Graphics2D.cs" />
     <Compile Include="07_Lines\3.3_ImageLineRenderer.cs" />

@@ -20,8 +20,13 @@
 
 namespace PixelFarm.Agg
 {
+    /// <summary>
+    /// color order
+    /// </summary>
     public static class CO
     {
+
+#if WIN
         /// <summary>
         /// order b
         /// </summary>
@@ -38,5 +43,24 @@ namespace PixelFarm.Agg
         /// order a
         /// </summary>
         public const int A = 3;
+#else
+        /// <summary>
+        /// order b
+        /// </summary>
+        public const int B = 2;
+        /// <summary>
+        /// order g
+        /// </summary>
+        public const int G = 1;
+        /// <summary>
+        /// order b
+        /// </summary>
+        public const int R = 0;
+        /// <summary>
+        /// order a
+        /// </summary>
+        public const int A = 3;
+#endif
+
     }
 }

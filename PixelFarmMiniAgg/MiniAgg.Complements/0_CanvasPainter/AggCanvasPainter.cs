@@ -35,6 +35,9 @@ namespace PixelFarm.Agg
         Color strokeColor;
         ScanlinePacked8 scline;
         ScanlineRasterizer sclineRas;
+        /// <summary>
+        /// scanline rasterizer to bitmap
+        /// </summary>
         ScanlineRasToDestBitmapRenderer sclineRasToBmp;
         FilterMan filterMan = new FilterMan();
         RequestFont currentFont;
@@ -118,7 +121,7 @@ namespace PixelFarm.Agg
 
 
         VertexStorePool _vxsPool = new VertexStorePool();
-         
+
         VertexStore GetFreeVxs()
         {
             return _vxsPool.GetFreeVxs();

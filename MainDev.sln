@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.OpenType", "N20\P
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Portable", "Portable", "{4A232022-1F41-45B1-92E0-28DFCB93F3C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "PixelFarmMiniAgg\PixelFarm.MiniAgg.One.csproj", "{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj", "{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PixelFarm.OpenType", "NetCore\PixelFarm.OpenType\PixelFarm.OpenType.xproj", "{B7D59BF6-3FB5-492D-8F92-B09D6024B0A6}"
 EndProject
