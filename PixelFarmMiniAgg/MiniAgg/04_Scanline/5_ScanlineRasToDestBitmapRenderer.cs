@@ -31,38 +31,40 @@ namespace PixelFarm.Agg
 
     public partial class ScanlineSubPixelRasterizer
     {
-        //this class design for render 32 bits RGBA 
+        //this class design for render 32 bits RGBA  
 
         ForwardTemporaryBuffer _forwardTempBuff = new ForwardTemporaryBuffer();
-        PixelBlenderBGRA _subPixelBlender = new PixelBlenderBGRA();
-        //agg lcd test
-        //lcd_distribution_lut<ggo_gray8> lut(1.0/3.0, 2.0/9.0, 1.0/9.0);
-        //lcd_distribution_lut<ggo_gray8> lut(0.5, 0.25, 0.125);
-
+        /// grey scale 4, 1/9 lcd lookup table
+        /// </summary> 
+        static readonly LcdDistributionLut s_g4_9LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 3f, 2f / 9f, 1f / 9f);
         /// <summary>
-        /// grey scale 8, lcd lookup table
+        /// grey scale 4, 1/8 lcd lookup table
         /// </summary>
-        //static readonly LcdDistributionLut g8LcdLut = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
-        static readonly LcdDistributionLut g8LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 3f, 2f / 9f, 1f / 9f);
+        static readonly LcdDistributionLut s_g4_8LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 2f, 1f / 4f, 1f / 8f);
+
+
         Color _color;
         byte[] _rgb = new byte[3];
 
         const int BASE_MASK = 255;
         const int EXISTING_A = 0;
-        const int m_DistanceInBytesBetweenPixelsInclusive = 4;
-        internal ScanlineSubPixelRasterizer()
-        {
-
-        }
+        const int m_DistanceInBytesBetweenPixelsInclusive = 4; //for 32 bits RGBA
 
         /// <summary>
         /// forward grayscale buffer
         /// </summary>
-        ForwardTemporaryBuffer forwardBuffer = new ForwardTemporaryBuffer();
+        ForwardTemporaryBuffer _forwardBuffer = new ForwardTemporaryBuffer();
         /// <summary>
         /// single line buffer 
         /// </summary>
-        SingleLineBuffer grayScaleLine = new SingleLineBuffer();
+        SingleLineBuffer _grayScaleLine = new SingleLineBuffer();
+        LcdDistributionLut _currentLcdLut = null;
+
+
+        internal ScanlineSubPixelRasterizer()
+        {
+
+        }
 
 
         public void RenderScanline(
@@ -71,12 +73,16 @@ namespace PixelFarm.Agg
               Scanline scline,
               Color color)
         {
+
+
 #if DEBUG
             int dbugMinScanlineCount = 0;
 #endif
+
             //1. ensure single line buffer width
-            grayScaleLine.EnsureLineStride(dest.Stride);
+            _grayScaleLine.EnsureLineStride(dest.Stride);
             //2. setup vars
+            _currentLcdLut = s_g4_9LcdLut;
             byte[] dest_buffer = dest.GetBuffer();
             int dest_w = dest.Width;
             int dest_h = dest.Height;
@@ -93,7 +99,7 @@ namespace PixelFarm.Agg
             while (sclineRas.SweepScanline(scline))
             {
                 //3.1. clear 
-                grayScaleLine.Clear();
+                _grayScaleLine.Clear();
 
                 //3.2. write grayscale span to temp buffer
                 //3.3 convert to subpixel value and write to dest buffer
@@ -108,29 +114,38 @@ namespace PixelFarm.Agg
                     if (span.len > 0)
                     {
                         //positive len  
-                        grayScaleLine.SubPixBlendSolidHSpan(span.x, span.len, color, covers, span.cover_index);
+                        _grayScaleLine.SubPixBlendSolidHSpan(span.x, span.len, color, covers, span.cover_index);
                     }
                     else
                     {
                         //fill the line, same coverage area
                         int x = span.x;
                         int x2 = (x - span.len - 1);
-                        grayScaleLine.SubPixBlendHL(x, x2, color, covers[span.cover_index]);
+                        _grayScaleLine.SubPixBlendHL(x, x2, color, covers[span.cover_index]);
                     }
                 }
 
 
-                Blend(dest_buffer, dest_stride, scline.Y, src_w, src_stride, this.grayScaleLine);
+                Blend(dest_buffer, dest_stride, scline.Y, src_w, src_stride, this._grayScaleLine);
 #if DEBUG
                 dbugMinScanlineCount++;
 #endif
             }
         }
+        public LcdDistributionLut LcdLut
+        {
+            get { return _currentLcdLut; }
+            set
+            {
+                _currentLcdLut = value;
+            }
+        }
         void Blend(byte[] destImgBuffer, int destStride, int y, int srcW, int srcStride, SingleLineBuffer lineBuffer)
         {
-            byte[] glyphBuffer = lineBuffer.GetInternalBuffer();
-            LcdDistributionLut g8Lut = g8LcdLut;
-            forwardBuffer.Reset();
+
+            byte[] lineBuff = lineBuffer.GetInternalBuffer();
+            LcdDistributionLut g8Lut = _currentLcdLut;
+            _forwardBuffer.Reset();
             int srcIndex = 0;
             //start pixel
             int destImgIndex = 0;
@@ -144,17 +159,17 @@ namespace PixelFarm.Agg
             destImgIndex = (destStride * y) + (destX * 4); //4 color component
             int i = 0;
             int round = 0;
-            forwardBuffer.Reset();
+            _forwardBuffer.Reset();
 
             for (int x = 0; x < srcW; ++x)
             {
                 byte e0 = 0;
                 //1.
                 //read 1 pixel (4 bytes, 4 color components)
-                byte r = glyphBuffer[srcIndex];
-                byte g = glyphBuffer[srcIndex + 1];
-                byte b = glyphBuffer[srcIndex + 2];
-                byte a = glyphBuffer[srcIndex + 3];
+                byte r = lineBuff[srcIndex];
+                byte g = lineBuff[srcIndex + 1];
+                byte b = lineBuff[srcIndex + 2];
+                byte a = lineBuff[srcIndex + 3];
                 //2.
                 //convert to grey scale and convert to 65 level grey scale value 
                 byte greyScaleValue = g8Lut.Convert255ToLevel(a);
@@ -163,15 +178,15 @@ namespace PixelFarm.Agg
                 //from single grey scale value it is expanded*** into 5 color-components
                 for (int n = 0; n < 3; ++n)
                 {
-                    forwardBuffer.WriteAccum(
+                    _forwardBuffer.WriteAccum(
                         g8Lut.Tertiary(greyScaleValue),
                         g8Lut.Secondary(greyScaleValue),
                         g8Lut.Primary(greyScaleValue));
                     //4. read accumulate 'energy' back 
-                    forwardBuffer.ReadNext(out e0);
+                    _forwardBuffer.ReadNext(out e0);
                     //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
                     //------------------------------------------------------------
-                    ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
+                    ScanlineSubPixelRasterizer.BlendSpan(e0 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                     //------------------------------------------------------------
                 }
                 srcIndex += 4;
@@ -182,28 +197,28 @@ namespace PixelFarm.Agg
             //---------
             {
                 byte e1, e2, e3, e4;
-                forwardBuffer.ReadRemaining4(out e1, out e2, out e3, out e4);
+                _forwardBuffer.ReadRemaining4(out e1, out e2, out e3, out e4);
                 int remainingEnergy = Math.Min(srcStride, 4);
                 switch (remainingEnergy)
                 {
                     default: throw new NotSupportedException();
                     case 4:
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e4, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e2 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e3 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e4 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 3:
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e2 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e3 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 2:
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e2 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 1:
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color_alpha, destImgBuffer, ref destImgIndex, ref round);
+                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 0:
                         //nothing
@@ -212,9 +227,9 @@ namespace PixelFarm.Agg
             }
         }
 
-        public static void BlendSpanWithLcdTechnique(byte energy, byte[] rgb, ref int color_index, byte colorA, byte[] destImgBuffer, ref int destImgIndex, ref int round)
+        public static void BlendSpan(int a0, byte[] rgb, ref int color_index, byte[] destImgBuffer, ref int destImgIndex, ref int round)
         {
-            int a0 = energy * colorA;
+            //a0 = energy * color_alpha
             byte existingColor = destImgBuffer[destImgIndex];
             byte newValue = (byte)((((rgb[color_index] - existingColor) * a0) + (existingColor << 16)) >> 16);
             destImgBuffer[destImgIndex] = newValue;

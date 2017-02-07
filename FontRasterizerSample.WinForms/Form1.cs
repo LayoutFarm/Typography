@@ -1139,6 +1139,8 @@ namespace SampleWinForms
                 color.B
             };
 
+            byte color_a = color.alpha;
+
             for (int y = 0; y < glyphH; ++y)
             {
                 srcIndex = srcStride * y;
@@ -1170,7 +1172,7 @@ namespace SampleWinForms
                         forwardBuffer.ReadNext(out e0);
                         //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
                         //------------------------------------------------------------
-                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpan(e0 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                         //------------------------------------------------------------
                     }
                     srcIndex += 4;
@@ -1187,22 +1189,22 @@ namespace SampleWinForms
                     {
                         default: throw new NotSupportedException();
                         case 4:
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e4, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e1 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e2 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e3 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e4 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 3:
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e1 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e2 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e3 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 2:
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e1 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e2 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 1:
-                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpan(e1 * color_a, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 0:
                             //nothing
