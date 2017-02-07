@@ -93,7 +93,7 @@ namespace PixelFarm.Agg
                         Color newColor = Color.FromArgb(alpha, sourceColor);
                         buffer[bufferOffset] = 0;
                         buffer[bufferOffset + 1] = 0;
-                        buffer[bufferOffset + 2] = 0;                        
+                        buffer[bufferOffset + 2] = 0;
                         buffer[bufferOffset + 3] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
                     }
                     bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
@@ -188,12 +188,53 @@ namespace PixelFarm.Agg
 #if DEBUG
             int dbugMinScanlineCount = 0;
 #endif
+            //1. ensure single line buffer width
             grayScaleLine.EnsureLineStride(dest.Stride);
+            //2. setup vars
+            byte[] dest_buffer = dest.GetBuffer();
+            int dest_w = dest.Width;
+            int dest_h = dest.Height;
+            int dest_stride = dest.Stride;
+            int src_w = dest_w;
+            int src_stride = dest_stride; 
+            //*** set color before call Blend()
+            this._color = color;
+            this._rgb[0] = color.R;
+            this._rgb[1] = color.G;
+            this._rgb[2] = color.B;
+            //---------------------------
+            //3. loop, render single scanline with subpixel rendering 
             while (sclineRas.SweepScanline(scline))
             {
-                grayScaleLine.Clear();
-                //
-                ScanlineSubPixRender(dest, scline, color);
+                //3.1. clear 
+                grayScaleLine.Clear(); 
+
+                //3.2. write grayscale span to temp buffer
+                //3.3 convert to subpixel value and write to dest buffer
+               
+                //render solid single scanline 
+                int num_spans = scline.SpanCount;
+                byte[] covers = scline.GetCovers();
+                //render each span in the scanline
+                for (int i = 1; i <= num_spans; ++i)
+                {
+                    ScanlineSpan span = scline.GetSpan(i);
+                    if (span.len > 0)
+                    {
+                        //positive len  
+                        SubPixBlendSolidHSpan(this.grayScaleLine, span.x, span.len, color, covers, span.cover_index);
+                    }
+                    else
+                    {
+                        //fill the line, same coverage area
+                        int x = span.x;
+                        int x2 = (x - span.len - 1);
+                        SubPixBlendHL(this.grayScaleLine, x, x2, color, covers[span.cover_index]);
+                    }
+                }
+
+
+                Blend(dest_buffer, dest_stride, scline.Y, src_w, src_stride, this.grayScaleLine);
 #if DEBUG
                 dbugMinScanlineCount++;
 #endif
@@ -282,51 +323,6 @@ namespace PixelFarm.Agg
                         break;
                 }
             }
-        }
-
-        /// <summary>
-        /// render single scanline with subpixel rendering 
-        /// </summary>
-        /// <param name="dest"></param>
-        /// <param name="scanline"></param>
-        /// <param name="color"></param>
-        void ScanlineSubPixRender(IImageReaderWriter dest, Scanline scanline, Color color)
-        {
-
-            //--------------------------------------
-            //1. write grayscale span to temp buffer
-            //2. convert to subpixel value and write to dest buffer
-            //--------------------------------------
-            //render solid single scanline
-            int y = scanline.Y;
-            int num_spans = scanline.SpanCount;
-            byte[] covers = scanline.GetCovers();
-            //render each span in the scanline
-            for (int i = 1; i <= num_spans; ++i)
-            {
-                ScanlineSpan span = scanline.GetSpan(i);
-                if (span.len > 0)
-                {
-                    //positive len  
-                    SubPixBlendSolidHSpan(this.grayScaleLine, span.x, span.len, color, covers, span.cover_index);
-                }
-                else
-                {
-                    //fill the line, same coverage area
-                    int x = span.x;
-                    int x2 = (x - span.len - 1);
-                    SubPixBlendHL(this.grayScaleLine, x, x2, color, covers[span.cover_index]);
-                }
-            }
-
-            //---------------------------
-            //set this before call Blend()
-            this._color = color;
-            this._rgb[0] = color.R;
-            this._rgb[1] = color.G;
-            this._rgb[2] = color.B;
-            //---------------------------
-            Blend(dest.GetBuffer(), dest.Stride, y, dest.Width, dest.Stride, this.grayScaleLine);
         }
 
         public static void BlendSpanWithLcdTechnique(byte energy, byte[] rgb, ref int color_index, byte colorA, byte[] destImgBuffer, ref int destImgIndex, ref int round)
