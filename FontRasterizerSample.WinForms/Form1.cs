@@ -1026,7 +1026,7 @@ namespace SampleWinForms
 
             painter.StrokeColor = PixelFarm.Drawing.Color.Black;
             painter.StrokeWidth = 2.0f;
-            painter.Line(0, 0, 15 * 3, 15); //scale horizontal 3 times
+            painter.Line(0, 0, 15 * 3, 15); //scale horizontal 3 times, 
 
             //painter.Line(2, 0, 2, 15);
             //painter.Line(2, 0, 20, 20);
@@ -1046,7 +1046,7 @@ namespace SampleWinForms
             //blend lcd
             BlendWithLcdSpans(destImg, greyBuff, newGreyBuffWidth, glyphImg.Height);
             //--------------- 
-            //p.DrawImage(glyphImg, 0, 0);
+            p.DrawImage(glyphImg, 0, 50);
 
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
@@ -1088,6 +1088,10 @@ namespace SampleWinForms
                     if (r != 0 || g != 0 || b != 0)
                     {
                     }
+                    if (a != 255)
+                    {
+
+                    }
                     //skip alpha
                     //byte greyScaleValue =
                     //    (byte)((0.333f * (float)r) + (0.5f * (float)g) + (0.1666f * (float)b));
@@ -1110,39 +1114,6 @@ namespace SampleWinForms
                 BlendLcdSpan(destImg, greyBuff, color, 0, y, greyBufferWidth);
             }
             //SwapRB(destImg);
-        }
-
-
-        static void BlendSpanWithLcdTechnique(byte energy, byte[] rgb, ref int i, byte colorA, byte[] destImgBuffer, ref int destImgIndex, ref int round)
-        {
-            int a0 = energy * colorA;
-            byte existingColor = destImgBuffer[destImgIndex];
-            byte newValue = (byte)((((rgb[i] - existingColor) * a0) + (existingColor << 16)) >> 16);
-            destImgBuffer[destImgIndex] = newValue;
-            //move to next dest
-            destImgIndex++;
-            i++;
-            if (i > 2)
-            {
-                i = 0;//reset
-            }
-            round++;
-            if (round > 2)
-            {
-                //this is alpha chanel
-                //so we skip alpha byte to next
-
-                //and swap rgb of latest write pixel
-                //--------------------------
-                //in-place swap
-                byte r1 = destImgBuffer[destImgIndex - 1];
-                byte b1 = destImgBuffer[destImgIndex - 3];
-                destImgBuffer[destImgIndex - 3] = r1;
-                destImgBuffer[destImgIndex - 1] = b1;
-                //-------------------------- 
-                destImgIndex++;
-                round = 0;
-            }
         }
         void BlendWithLcdTechnique(ActualImage destImg, ActualImage glyphImg, PixelFarm.Drawing.Color color)
         {
@@ -1184,16 +1155,20 @@ namespace SampleWinForms
                     byte greyScaleValue = (byte)(((a + 1) / 256f) * 64f);
                     //3.
                     //from single grey scale value it is expanded into 5 color component
-                    forwardBuffer.WriteAccum(
-                        g8Lut.Tertiary(greyScaleValue),
-                        g8Lut.Secondary(greyScaleValue),
-                        g8Lut.Primary(greyScaleValue));
-                    //4. read accumulate 'energy' back 
-                    forwardBuffer.ReadNext(out e0, out e1, out e2, out e3, out e4);
-                    //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
-                    //------------------------------------------------------------
-                    BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                    //------------------------------------------------------------
+                    for (int n = 0; n < 3; ++n)
+                    {
+                        forwardBuffer.WriteAccum(
+                            g8Lut.Tertiary(greyScaleValue),
+                            g8Lut.Secondary(greyScaleValue),
+                            g8Lut.Primary(greyScaleValue));
+                        //4. read accumulate 'energy' back 
+                        forwardBuffer.ReadNext(out e0, out e1, out e2, out e3, out e4);
+                        //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
+                        //------------------------------------------------------------
+                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        //------------------------------------------------------------
+                    }
+
                     srcIndex += 4;
                 }
                 //---------
@@ -1206,22 +1181,22 @@ namespace SampleWinForms
                     {
                         default: throw new NotSupportedException();
                         case 4:
-                            BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            BlendSpanWithLcdTechnique(e4, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e4, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 3:
-                            BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 2:
-                            BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 1:
-                            BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 0:
                             //nothing
@@ -1413,8 +1388,8 @@ namespace SampleWinForms
             AggCanvasPainter painter = new AggCanvasPainter(glyph2d);
 
             painter.StrokeColor = PixelFarm.Drawing.Color.Black;
-            painter.StrokeWidth = 2.0f;
-            painter.Line(0, 0, 15 * 3, 15);
+            painter.StrokeWidth = 1.0f;
+            painter.Line(0, 0, 15, 20);//not need to scale3
 
             //clear surface bg
             p.Clear(PixelFarm.Drawing.Color.White);
@@ -1423,7 +1398,7 @@ namespace SampleWinForms
 
 
             //--------------- 
-            //p.DrawImage(glyphImg, 0, 0);
+            p.DrawImage(glyphImg, 0, 50);
 
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
@@ -1431,26 +1406,17 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
-
         private void cmdAggLcd3_Click(object sender, EventArgs e)
         {
-            //version 3:
-            //1. create simple vertical line to test agg's lcd rendernig technique
-            //create gray-scale actual image
-
-
-
+            //version 3: 
             //clear surface bg
             p.Clear(PixelFarm.Drawing.Color.White);
             //--------------------------
             p.StrokeColor = PixelFarm.Drawing.Color.Black;
-            p.StrokeWidth = 2.0f;
+            p.StrokeWidth = 1.0f;
             p.UseSubPixelRendering = true;
-            p.Line(0, 0, 20, 20);
-
-            //--------------- 
-            //p.DrawImage(glyphImg, 0, 0);
-
+            p.Line(0, 0, 15, 20);
+            //--------------------------
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
             //7. just render our bitmap
