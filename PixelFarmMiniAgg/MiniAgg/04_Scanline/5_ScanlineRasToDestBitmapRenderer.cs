@@ -29,14 +29,10 @@ namespace PixelFarm.Agg
     }
 
 
-
-
-    /// <summary>
-    /// scanline rasterizer TO DESTINATION bitmap
-    /// </summary>  
-    public class ScanlineRasToDestBitmapRenderer
+    public class ScanlineSubPixelRasterizer
     {
-
+        ForwardTemporaryBuffer _forwardTempBuff = new ForwardTemporaryBuffer();
+        PixelBlenderBGRA _subPixelBlender = new PixelBlenderBGRA();
         //agg lcd test
         //lcd_distribution_lut<ggo_gray8> lut(1.0/3.0, 2.0/9.0, 1.0/9.0);
         //lcd_distribution_lut<ggo_gray8> lut(0.5, 0.25, 0.125);
@@ -44,26 +40,13 @@ namespace PixelFarm.Agg
         /// grey scale 8, lcd lookup table
         /// </summary>
         static readonly LcdDistributionLut g8LcdLut = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
-        //
-        const float cover_1_3 = 255f / 3f;
-        const float cover_2_3 = cover_1_3 * 2f;
-        ArrayList<Color> tempSpanColors = new ArrayList<Color>();
-        public ScanlineRasToDestBitmapRenderer()
-        {
-        }
-        public ScanlineRenderMode ScanlineRenderMode
-        {
-            get;
-            set;
-        }
-
-
         static float mix(float farColor, float nearColor, float weight)
         {
             //from ...
             //opengl es2 mix function              
             return farColor * (1f - weight) + (nearColor * weight);
         }
+
 
         public class ForwardTemporaryBuffer
         {
@@ -165,76 +148,7 @@ namespace PixelFarm.Agg
 
         }
 
-        ForwardTemporaryBuffer _forwardTempBuff = new ForwardTemporaryBuffer();
 
-
-        public static void BlendSpanWithLcdTechnique(byte energy, byte[] rgb, ref int color_index, byte colorA, byte[] destImgBuffer, ref int destImgIndex, ref int round)
-        {
-            int a0 = energy * colorA;
-            byte existingColor = destImgBuffer[destImgIndex];
-            byte newValue = (byte)((((rgb[color_index] - existingColor) * a0) + (existingColor << 16)) >> 16);
-            destImgBuffer[destImgIndex] = newValue;
-            //move to next dest
-            destImgIndex++;
-            color_index++;
-            if (color_index > 2)
-            {
-                color_index = 0;//reset
-            }
-            round++;
-            if (round > 2)
-            {
-                //this is alpha chanel
-                //so we skip alpha byte to next
-                //and swap rgb of latest write pixel
-                //--------------------------
-                //in-place swap
-                byte r1 = destImgBuffer[destImgIndex - 1];
-                byte b1 = destImgBuffer[destImgIndex - 3];
-                destImgBuffer[destImgIndex - 3] = r1;
-                destImgBuffer[destImgIndex - 1] = b1;
-                //-------------------------- 
-                destImgIndex++;
-                round = 0;
-            }
-        }
-
-        static void BlendSpanWithLcdTechnique2(byte energy,
-            byte[] rgb,
-            ref int color_index,
-            byte colorA,
-            byte[] destImgBuffer,
-            ref int destImgIndex, ref int round)
-        {
-            int a0 = energy * colorA;
-            byte existingColor = destImgBuffer[destImgIndex];
-            byte newValue = (byte)((((rgb[color_index] - existingColor) * a0) + (existingColor << 16)) >> 16);
-            destImgBuffer[destImgIndex] = newValue;
-            //move to next dest
-            destImgIndex++;
-            color_index++;
-            if (color_index > 2)
-            {
-                color_index = 0;//reset
-            }
-            round++;
-            if (round > 2)
-            {
-                //this is alpha chanel
-                //so we skip alpha byte to next
-                //and swap rgb of latest write pixel
-                //--------------------------
-                //in-place swap
-                byte r1 = destImgBuffer[destImgIndex - 1];
-                byte b1 = destImgBuffer[destImgIndex - 3];
-                destImgBuffer[destImgIndex - 3] = r1;
-                destImgBuffer[destImgIndex - 1] = b1;
-                //-------------------------- 
-                destImgIndex++;
-                round = 0;
-            }
-        }
-        PixelBlenderBGRA _subPixelBlender = new PixelBlenderBGRA();
         byte[] _rgb = new byte[3];
         byte[] _blankBuffer = new byte[4];
         byte[] _emptyStride = null;
@@ -356,10 +270,16 @@ namespace PixelFarm.Agg
             }
         }
 
-        ScanlineRasToDestBitmapRenderer.ForwardTemporaryBuffer forwardBuffer = new ScanlineRasToDestBitmapRenderer.ForwardTemporaryBuffer();
+        ForwardTemporaryBuffer forwardBuffer = new ForwardTemporaryBuffer();
+
+
+        internal ScanlineSubPixelRasterizer()
+        {
+        }
+
         void BlendWithLcdTechnique(byte[] destImgBuffer, int destStride, int y, int srcW, int srcStride, byte[] glyphBuffer, Color color)
         {
-            var g8Lut = LcdDistributionLut.Lut8_1_2;
+            var g8Lut = g8LcdLut;
             forwardBuffer.Reset();
             int srcIndex = 0;
             //start pixel
@@ -401,7 +321,8 @@ namespace PixelFarm.Agg
                     forwardBuffer.ReadNext(out e0, out e1, out e2, out e3, out e4);
                     //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
                     //------------------------------------------------------------
-                    ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                    ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                    
                     //------------------------------------------------------------
                 }
 
@@ -417,22 +338,22 @@ namespace PixelFarm.Agg
                 {
                     default: throw new NotSupportedException();
                     case 4:
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e4, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e4, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 3:
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 2:
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 1:
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 0:
                         //nothing
@@ -479,6 +400,93 @@ namespace PixelFarm.Agg
             byte[] buffer = dest.GetBuffer();
             BlendWithLcdTechnique(buffer, dest.Stride, y, dest.Width, dest.Stride, _emptyStride, color);
         }
+
+        public void RenderScanline(
+                IImageReaderWriter dest,
+                ScanlineRasterizer sclineRas,
+                Scanline scline,
+                Color color)
+        {
+#if DEBUG
+            int dbugMinScanlineCount = 0;
+#endif
+
+            while (sclineRas.SweepScanline(scline))
+            {
+                ScanlineSubPixRender(dest, scline, color);
+#if DEBUG
+                dbugMinScanlineCount++;
+#endif
+            }
+        }
+
+        public static void BlendSpanWithLcdTechnique(byte energy, byte[] rgb, ref int color_index, byte colorA, byte[] destImgBuffer, ref int destImgIndex, ref int round)
+        {
+            int a0 = energy * colorA;
+            byte existingColor = destImgBuffer[destImgIndex];
+            byte newValue = (byte)((((rgb[color_index] - existingColor) * a0) + (existingColor << 16)) >> 16);
+            destImgBuffer[destImgIndex] = newValue;
+            //move to next dest
+            destImgIndex++;
+            color_index++;
+            if (color_index > 2)
+            {
+                color_index = 0;//reset
+            }
+            round++;
+            if (round > 2)
+            {
+                //this is alpha chanel
+                //so we skip alpha byte to next
+                //and swap rgb of latest write pixel
+                //--------------------------
+                //in-place swap
+                byte r1 = destImgBuffer[destImgIndex - 1];
+                byte b1 = destImgBuffer[destImgIndex - 3];
+                destImgBuffer[destImgIndex - 3] = r1;
+                destImgBuffer[destImgIndex - 1] = b1;
+                //-------------------------- 
+                destImgIndex++;
+                round = 0;
+            }
+        }
+
+        static void BlendSpanWithLcdTechnique2(byte energy,
+            byte[] rgb,
+            ref int color_index,
+            byte colorA,
+            byte[] destImgBuffer,
+            ref int destImgIndex, ref int round)
+        {
+            int a0 = energy * colorA;
+            byte existingColor = destImgBuffer[destImgIndex];
+            byte newValue = (byte)((((rgb[color_index] - existingColor) * a0) + (existingColor << 16)) >> 16);
+            destImgBuffer[destImgIndex] = newValue;
+            //move to next dest
+            destImgIndex++;
+            color_index++;
+            if (color_index > 2)
+            {
+                color_index = 0;//reset
+            }
+            round++;
+            if (round > 2)
+            {
+                //this is alpha chanel
+                //so we skip alpha byte to next
+                //and swap rgb of latest write pixel
+                //--------------------------
+                //in-place swap
+                byte r1 = destImgBuffer[destImgIndex - 1];
+                byte b1 = destImgBuffer[destImgIndex - 3];
+                destImgBuffer[destImgIndex - 3] = r1;
+                destImgBuffer[destImgIndex - 1] = b1;
+                //-------------------------- 
+                destImgIndex++;
+                round = 0;
+            }
+        }
+
 
         //void SubPixRender(IImageReaderWriter dest, Scanline scanline, Color color)
         //{
@@ -635,7 +643,28 @@ namespace PixelFarm.Agg
         //            }
         //        }
         //    }
-        //}
+        //} 
+    }
+
+
+
+    /// <summary>
+    /// scanline rasterizer TO DESTINATION bitmap
+    /// </summary>  
+    public class ScanlineRasToDestBitmapRenderer
+    {
+
+        ScanlineSubPixelRasterizer scSubPixRas = new ScanlineSubPixelRasterizer();
+        ArrayList<Color> tempSpanColors = new ArrayList<Color>();
+        public ScanlineRasToDestBitmapRenderer()
+        {
+        }
+        public ScanlineRenderMode ScanlineRenderMode
+        {
+            get;
+            set;
+        }
+
         public void RenderWithColor(IImageReaderWriter dest,
                 ScanlineRasterizer sclineRas,
                 Scanline scline,
@@ -678,17 +707,7 @@ namespace PixelFarm.Agg
                     break;
                 case Agg.ScanlineRenderMode.SubPixelRendering:
                     {
-#if DEBUG
-                        int dbugMinScanlineCount = 0;
-#endif
-
-                        while (sclineRas.SweepScanline(scline))
-                        {
-                            ScanlineSubPixRender(dest, scline, color);
-#if DEBUG
-                            dbugMinScanlineCount++;
-#endif
-                        }
+                        scSubPixRas.RenderScanline(dest, sclineRas, scline, color);
                     }
                     break;
                 case Agg.ScanlineRenderMode.Custom:
@@ -898,8 +917,6 @@ namespace PixelFarm.Agg
         }
 
 
-        public static readonly LcdDistributionLut Lut8_1_2 = new LcdDistributionLut(GrayLevels.Gray8, 1f / 2f, 1f / 4f, 1f / 8f);
-        public static readonly LcdDistributionLut Lut8_1_3 = new LcdDistributionLut(GrayLevels.Gray8, 1f / 3f, 2f / 9f, 1f / 9f);
     }
 
 

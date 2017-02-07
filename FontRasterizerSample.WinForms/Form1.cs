@@ -1115,10 +1115,12 @@ namespace SampleWinForms
             }
             //SwapRB(destImg);
         }
+        LcdDistributionLut g8_1_2lcd = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
         void BlendWithLcdTechnique(ActualImage destImg, ActualImage glyphImg, PixelFarm.Drawing.Color color)
         {
-            var g8Lut = LcdDistributionLut.Lut8_1_2;
-            var forwardBuffer = new ScanlineRasToDestBitmapRenderer.ForwardTemporaryBuffer();
+            var g8Lut = g8_1_2lcd;
+
+            var forwardBuffer = new ScanlineSubPixelRasterizer.ForwardTemporaryBuffer();
             int glyphH = glyphImg.Height;
             int glyphW = glyphImg.Width;
             byte[] glyphBuffer = ActualImage.GetBuffer(glyphImg);
@@ -1165,7 +1167,7 @@ namespace SampleWinForms
                         forwardBuffer.ReadNext(out e0, out e1, out e2, out e3, out e4);
                         //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
                         //------------------------------------------------------------
-                        ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                        ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                         //------------------------------------------------------------
                     }
 
@@ -1181,22 +1183,22 @@ namespace SampleWinForms
                     {
                         default: throw new NotSupportedException();
                         case 4:
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e4, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e4, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 3:
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e3, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 2:
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e2, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 1:
-                            ScanlineRasToDestBitmapRenderer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
+                            ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e1, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                             break;
                         case 0:
                             //nothing
