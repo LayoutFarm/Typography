@@ -80,7 +80,7 @@ namespace PixelFarm.Agg
 #endif
 
             //1. ensure single line buffer width
-            _grayScaleLine.EnsureLineStride(dest.Stride);
+            _grayScaleLine.EnsureLineStride(dest.Width + 4);
             //2. setup vars
             _currentLcdLut = s_g4_1_3LcdLut;
             byte[] dest_buffer = dest.GetBuffer();
@@ -94,8 +94,10 @@ namespace PixelFarm.Agg
             this._rgb[0] = color.R;
             this._rgb[1] = color.G;
             this._rgb[2] = color.B;
+            byte color_alpha = color.alpha;
             //---------------------------
             //3. loop, render single scanline with subpixel rendering 
+            
             while (sclineRas.SweepScanline(scline))
             {
                 //3.1. clear 
@@ -114,14 +116,14 @@ namespace PixelFarm.Agg
                     if (span.len > 0)
                     {
                         //positive len  
-                        _grayScaleLine.SubPixBlendSolidHSpan(span.x, span.len, color, covers, span.cover_index);
+                        _grayScaleLine.SubPixBlendSolidHSpan(span.x, span.len, color_alpha, covers, span.cover_index);
                     }
                     else
                     {
                         //fill the line, same coverage area
                         int x = span.x;
                         int x2 = (x - span.len - 1);
-                        _grayScaleLine.SubPixBlendHL(x, x2, color, covers[span.cover_index]);
+                        _grayScaleLine.SubPixBlendHL(x, x2, color_alpha, covers[span.cover_index]);
                     }
                 }
 
@@ -166,10 +168,11 @@ namespace PixelFarm.Agg
                 byte e0 = 0;
                 //1.
                 //read 1 pixel (4 bytes, 4 color components)
-                byte r = lineBuff[srcIndex];
-                byte g = lineBuff[srcIndex + 1];
-                byte b = lineBuff[srcIndex + 2];
-                byte a = lineBuff[srcIndex + 3];
+                //byte r = lineBuff[srcIndex];
+                //byte g = lineBuff[srcIndex + 1];
+                //byte b = lineBuff[srcIndex + 2];
+                //byte a = lineBuff[srcIndex + 3];
+                byte a = lineBuff[srcIndex];
                 //2.
                 //convert to grey scale and convert to 65 level grey scale value 
                 byte greyScaleValue = g8Lut.Convert255ToLevel(a);
@@ -189,7 +192,7 @@ namespace PixelFarm.Agg
                     ScanlineSubPixelRasterizer.BlendSpan(e0 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
                     //------------------------------------------------------------
                 }
-                srcIndex += 4;
+                srcIndex++;
             }
             //---------
             //when finish each line
@@ -426,22 +429,22 @@ namespace PixelFarm.Agg
             //temporary buffer for grey scale buffer
 
             int stride;
-            byte[] line_buffer;
+            byte[] line_buffer; //buffer for 8 bits grey scale byte buffer
             public SingleLineBuffer()
             {
                 //default
                 EnsureLineStride(4);
             }
-            public void EnsureLineStride(int stride)
+            public void EnsureLineStride(int stride8Bits)
             {
-                this.stride = stride;
+                this.stride = stride8Bits;
                 if (line_buffer == null)
                 {
-                    line_buffer = new byte[stride];
+                    line_buffer = new byte[stride8Bits];
                 }
-                else if (line_buffer.Length != stride)
+                else if (line_buffer.Length != stride8Bits)
                 {
-                    line_buffer = new byte[stride];
+                    line_buffer = new byte[stride8Bits];
                 }
             }
             public void Clear()
@@ -453,8 +456,6 @@ namespace PixelFarm.Agg
                 return this.line_buffer;
             }
 
-
-
             static float mix(float farColor, float nearColor, float weight)
             {
                 //from ...
@@ -462,9 +463,7 @@ namespace PixelFarm.Agg
                 return farColor * (1f - weight) + (nearColor * weight);
             }
 
-
-
-            public void SubPixBlendSolidHSpan(int x, int len, Color sourceColor, byte[] covers, int coversIndex)
+            public void SubPixBlendSolidHSpan(int x, int len, byte src_alpha, byte[] covers, int coversIndex)
             {
                 //-------------------------------------
                 //reference code:
@@ -491,36 +490,29 @@ namespace PixelFarm.Agg
                 //}
                 //-------------------------------------
                 byte[] buffer = this.line_buffer;
-                byte colorAlpha = sourceColor.alpha;
-                if (colorAlpha != 0)
+                if (src_alpha != 0)
                 {
-                    int bufferOffset = x * 4;
+                    int bufferOffset = x;
                     do
                     {
-                        int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
+                        int alpha = ((src_alpha) * ((covers[coversIndex]) + 1)) >> 8;
                         if (alpha == BASE_MASK)
                         {
-                            buffer[bufferOffset] = 0;
-                            buffer[bufferOffset + 1] = 0;
-                            buffer[bufferOffset + 2] = 0;
-                            buffer[bufferOffset + 3] = colorAlpha;
+                            buffer[bufferOffset] = src_alpha;
                         }
                         else
                         {
-                            Color newColor = Color.FromArgb(alpha, sourceColor);
-                            buffer[bufferOffset] = 0;
-                            buffer[bufferOffset + 1] = 0;
-                            buffer[bufferOffset + 2] = 0;
-                            buffer[bufferOffset + 3] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+
+                            buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
                         }
-                        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+
+                        bufferOffset++;
                         coversIndex++;
-                    }
-                    while (--len != 0);
+                    } while (--len != 0);
                 }
             }
 
-            public void SubPixBlendHL(int x1, int x2, Color sourceColor, byte cover)
+            public void SubPixBlendHL(int x1, int x2, byte src_alpha, byte cover)
             {
                 ////------------------------------------------------- 
                 //reference code:
@@ -550,11 +542,11 @@ namespace PixelFarm.Agg
 
 
 
-                if (sourceColor.A == 0) { return; }
+                if (src_alpha == 0) { return; }
                 //------------------------------------------------- 
                 int len = x2 - x1 + 1;
-                int bufferOffset = x1 * 4;
-                byte alpha = (byte)(((int)(sourceColor.A) * (cover + 1)) >> 8);
+                int bufferOffset = x1;
+                byte alpha = (byte)(((int)(src_alpha) * (cover + 1)) >> 8);
                 byte[] buffer = this.line_buffer;
 
                 if (alpha == BASE_MASK)
@@ -562,26 +554,19 @@ namespace PixelFarm.Agg
                     //full
                     do
                     {
-                        buffer[bufferOffset] = 0;
-                        buffer[bufferOffset + 1] = 0;
-                        buffer[bufferOffset + 2] = 0;
-                        buffer[bufferOffset + CO.A] = sourceColor.alpha;
-                        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-                    }
-                    while (--len != 0);
+                        buffer[bufferOffset] = src_alpha;
+                        bufferOffset++;
+
+                    } while (--len != 0);
                 }
                 else
                 {
-                    Color newColor = Color.FromArgb(alpha, sourceColor);
                     do
                     {
-                        buffer[bufferOffset] = 0;
-                        buffer[bufferOffset + 1] = 0;
-                        buffer[bufferOffset + 2] = 0;
-                        buffer[bufferOffset + CO.A] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
-                        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-                    }
-                    while (--len != 0);
+                        buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                        bufferOffset++;
+
+                    } while (--len != 0);
                 }
             }
         }
