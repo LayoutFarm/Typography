@@ -76,7 +76,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
+    <ProjectReference Include="..\OpenType\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>PixelFarm.OpenType</Name>
     </ProjectReference>
@@ -84,9 +84,9 @@
       <Project>{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
-    <ProjectReference Include="..\poly2tri-cs\Poly2Tri.csproj">
+    <ProjectReference Include="..\PixelFarmMiniAgg\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
-      <Name>Poly2Tri</Name>
+      <Name>PixelFarm.Triangulation</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

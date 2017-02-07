@@ -208,6 +208,21 @@
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Tables\Utils.cs">
       <Link>Tables\Utils.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\ForNet20.cs">
+      <Link>TrueTypeInterperter\ForNet20.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Geometry.cs">
+      <Link>TrueTypeInterperter\Geometry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Interpreter.cs">
+      <Link>TrueTypeInterperter\Interpreter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\InvalidFontException.cs">
+      <Link>TrueTypeInterperter\InvalidFontException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NetCore\PixelFarm.OpenType\TrueTypeInterperter\Matrix3x2.cs">
+      <Link>TrueTypeInterperter\Matrix3x2.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\PixelFarm.OpenType\Typeface.cs">
       <Link>Typeface.cs</Link>
     </Compile>
