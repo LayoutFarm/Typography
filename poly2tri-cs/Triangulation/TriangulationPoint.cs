@@ -30,23 +30,26 @@
  */
 
 using System.Collections.Generic;
-
 namespace Poly2Tri
 {
-    public class TriangulationPoint
+    public sealed class TriangulationPoint
     {
-
-
         // List of edges this point constitutes an upper ending point (CDT) 
         public readonly double X;
         public readonly double Y;
         internal byte tempName;
+        public object userData;
+
         List<DTSweepConstraint> myEdges = new List<DTSweepConstraint>();
-
-
+#if DEBUG
+        static int dbugTotalId;
+        public readonly int dbugId = dbugTotalId++;
+#endif
         public TriangulationPoint(double x, double y)
         {
-            X = x; Y = y;
+            X = x;
+            Y = y;
+         
         }
         public override string ToString()
         {
@@ -84,7 +87,7 @@ namespace Poly2Tri
         {
             return this.myEdges;
         }
-        public bool HasEdges { get { return myEdges != null; } }
+        //public bool HasEdges { get { return myEdges != null; } }
 
         //------------------------------------------------------------
 #if DEBUG

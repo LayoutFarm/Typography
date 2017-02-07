@@ -34,7 +34,6 @@ namespace Poly2Tri
     public static class P2T
     {
         private static TriangulationAlgorithm _defaultAlgorithm = TriangulationAlgorithm.DTSweep;
-
         //public static void Triangulate(PolygonSet ps)
         //{
         //    TriangulationContext tcx = CreateContext(_defaultAlgorithm);
@@ -62,9 +61,8 @@ namespace Poly2Tri
         }
 
         //static DTSweepContext context = new DTSweepContext();
-        
-        static System.Collections.Generic.Stack<DTSweepContext> contextStacks = new System.Collections.Generic.Stack<DTSweepContext>();
 
+        static System.Collections.Generic.Stack<DTSweepContext> contextStacks = new System.Collections.Generic.Stack<DTSweepContext>();
         static TriangulationContext GetFreeTcxContext(TriangulationAlgorithm algorithm)
         {
             switch (algorithm)
@@ -95,7 +93,9 @@ namespace Poly2Tri
             //long time = System.nanoTime();
             TriangulationContext tcx = GetFreeTcxContext(algorithm);
             tcx.Clear();
+            //step 1: (3.1) initialization
             tcx.PrepareTriangulation(t);
+            //step 2: (3.4) sweeping
             Triangulate(tcx);
             ReleaseCtxContext(tcx);
             //logger.info( "Triangulation of {} points [{}ms]", tcx.getPoints().size(), ( System.nanoTime() - time ) / 1e6 );

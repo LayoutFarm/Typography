@@ -35,9 +35,9 @@
 /// Future possibilities
 ///   Comments!
 
+
 namespace Poly2Tri
 {
-
     class AdvancingFrontNode
     {
         public readonly TriangulationPoint Point;
@@ -45,11 +45,9 @@ namespace Poly2Tri
         /// cache x value of point
         /// </summary>
         public readonly double XValue;
-
         public AdvancingFrontNode Next;
         public AdvancingFrontNode Prev;
         public DelaunayTriangle Triangle;
-
         public AdvancingFrontNode(TriangulationPoint point)
         {
             this.Point = point;

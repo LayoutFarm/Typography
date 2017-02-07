@@ -70,6 +70,7 @@ namespace PixelFarm.Agg
             {
                 return GetVertex((int)(m_num_vertices - 1), out x, out y);
             }
+
             x = 0;
             y = 0;
             return VertexCmd.Stop;
@@ -325,6 +326,6 @@ namespace PixelFarm.Agg
 
 
 
-
+    
 
 }

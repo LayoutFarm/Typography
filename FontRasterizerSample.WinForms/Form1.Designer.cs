@@ -42,13 +42,16 @@
             this.chkShowTess = new System.Windows.Forms.CheckBox();
             this.chkShowGrid = new System.Windows.Forms.CheckBox();
             this.txtGridSize = new System.Windows.Forms.TextBox();
-            this.chkDoGridFitting = new System.Windows.Forms.CheckBox();
+            this.chkYGridFitting = new System.Windows.Forms.CheckBox();
             this.chkVerticalHinting = new System.Windows.Forms.CheckBox();
+            this.chkDrawBone = new System.Windows.Forms.CheckBox();
+            this.chkXGridFitting = new System.Windows.Forms.CheckBox();
+            this.chkLcdTechnique = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(129, 12);
+            this.button1.Location = new System.Drawing.Point(186, 3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(81, 37);
             this.button1.TabIndex = 0;
@@ -58,7 +61,7 @@
             // 
             // txtInputChar
             // 
-            this.txtInputChar.Location = new System.Drawing.Point(12, 29);
+            this.txtInputChar.Location = new System.Drawing.Point(79, 7);
             this.txtInputChar.Name = "txtInputChar";
             this.txtInputChar.Size = new System.Drawing.Size(101, 20);
             this.txtInputChar.TabIndex = 1;
@@ -87,14 +90,13 @@
             // chkFillBackground
             // 
             this.chkFillBackground.AutoSize = true;
-            this.chkFillBackground.Checked = true;
-            this.chkFillBackground.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkFillBackground.Location = new System.Drawing.Point(491, 62);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 4;
             this.chkFillBackground.Text = "Fill BackGround";
             this.chkFillBackground.UseVisualStyleBackColor = true;
+            this.chkFillBackground.CheckedChanged += new System.EventHandler(this.chkFillBackground_CheckedChanged);
             // 
             // cmbRenderChoices
             // 
@@ -139,8 +141,6 @@
             // chkTrueTypeHint
             // 
             this.chkTrueTypeHint.AutoSize = true;
-            this.chkTrueTypeHint.Checked = true;
-            this.chkTrueTypeHint.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkTrueTypeHint.Location = new System.Drawing.Point(491, 108);
             this.chkTrueTypeHint.Name = "chkTrueTypeHint";
             this.chkTrueTypeHint.Size = new System.Drawing.Size(125, 17);
@@ -164,7 +164,7 @@
             // chkShowTess
             // 
             this.chkShowTess.AutoSize = true;
-            this.chkShowTess.Location = new System.Drawing.Point(495, 184);
+            this.chkShowTess.Location = new System.Drawing.Point(494, 197);
             this.chkShowTess.Name = "chkShowTess";
             this.chkShowTess.Size = new System.Drawing.Size(110, 17);
             this.chkShowTess.TabIndex = 13;
@@ -175,7 +175,7 @@
             // chkShowGrid
             // 
             this.chkShowGrid.AutoSize = true;
-            this.chkShowGrid.Location = new System.Drawing.Point(495, 207);
+            this.chkShowGrid.Location = new System.Drawing.Point(495, 243);
             this.chkShowGrid.Name = "chkShowGrid";
             this.chkShowGrid.Size = new System.Drawing.Size(75, 17);
             this.chkShowGrid.TabIndex = 14;
@@ -185,27 +185,28 @@
             // 
             // txtGridSize
             // 
-            this.txtGridSize.Location = new System.Drawing.Point(565, 207);
+            this.txtGridSize.Location = new System.Drawing.Point(565, 243);
             this.txtGridSize.Name = "txtGridSize";
             this.txtGridSize.Size = new System.Drawing.Size(51, 20);
             this.txtGridSize.TabIndex = 15;
             this.txtGridSize.Text = "5";
             // 
-            // chkDoGridFitting
+            // chkYGridFitting
             // 
-            this.chkDoGridFitting.AutoSize = true;
-            this.chkDoGridFitting.Location = new System.Drawing.Point(495, 233);
-            this.chkDoGridFitting.Name = "chkDoGridFitting";
-            this.chkDoGridFitting.Size = new System.Drawing.Size(93, 17);
-            this.chkDoGridFitting.TabIndex = 16;
-            this.chkDoGridFitting.Text = "Do Grid Fitting";
-            this.chkDoGridFitting.UseVisualStyleBackColor = true;
+            this.chkYGridFitting.AutoSize = true;
+            this.chkYGridFitting.Checked = true;
+            this.chkYGridFitting.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkYGridFitting.Location = new System.Drawing.Point(495, 269);
+            this.chkYGridFitting.Name = "chkYGridFitting";
+            this.chkYGridFitting.Size = new System.Drawing.Size(111, 17);
+            this.chkYGridFitting.TabIndex = 16;
+            this.chkYGridFitting.Text = "Y Grid Auto Fitting";
+            this.chkYGridFitting.UseVisualStyleBackColor = true;
+            this.chkYGridFitting.CheckedChanged += new System.EventHandler(this.chkYGridFitting_CheckedChanged);
             // 
             // chkVerticalHinting
             // 
             this.chkVerticalHinting.AutoSize = true;
-            this.chkVerticalHinting.Checked = true;
-            this.chkVerticalHinting.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkVerticalHinting.Location = new System.Drawing.Point(510, 131);
             this.chkVerticalHinting.Name = "chkVerticalHinting";
             this.chkVerticalHinting.Size = new System.Drawing.Size(123, 17);
@@ -214,13 +215,51 @@
             this.chkVerticalHinting.UseVisualStyleBackColor = true;
             this.chkVerticalHinting.CheckedChanged += new System.EventHandler(this.chkVerticalHinting_CheckedChanged);
             // 
+            // chkDrawBone
+            // 
+            this.chkDrawBone.AutoSize = true;
+            this.chkDrawBone.Checked = true;
+            this.chkDrawBone.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkDrawBone.Location = new System.Drawing.Point(495, 220);
+            this.chkDrawBone.Name = "chkDrawBone";
+            this.chkDrawBone.Size = new System.Drawing.Size(76, 17);
+            this.chkDrawBone.TabIndex = 19;
+            this.chkDrawBone.Text = "DrawBone";
+            this.chkDrawBone.UseVisualStyleBackColor = true;
+            this.chkDrawBone.CheckedChanged += new System.EventHandler(this.chkDrawBone_CheckedChanged);
+            // 
+            // chkXGridFitting
+            // 
+            this.chkXGridFitting.AutoSize = true;
+            this.chkXGridFitting.Location = new System.Drawing.Point(495, 292);
+            this.chkXGridFitting.Name = "chkXGridFitting";
+            this.chkXGridFitting.Size = new System.Drawing.Size(111, 17);
+            this.chkXGridFitting.TabIndex = 20;
+            this.chkXGridFitting.Text = "X Grid Auto Fitting";
+            this.chkXGridFitting.UseVisualStyleBackColor = true;
+            this.chkXGridFitting.CheckedChanged += new System.EventHandler(this.chkXGridFitting_CheckedChanged);
+            // 
+            // chkLcdTechnique
+            // 
+            this.chkLcdTechnique.AutoSize = true;
+            this.chkLcdTechnique.Location = new System.Drawing.Point(495, 315);
+            this.chkLcdTechnique.Name = "chkLcdTechnique";
+            this.chkLcdTechnique.Size = new System.Drawing.Size(95, 17);
+            this.chkLcdTechnique.TabIndex = 21;
+            this.chkLcdTechnique.Text = "LcdTechnique";
+            this.chkLcdTechnique.UseVisualStyleBackColor = true;
+            this.chkLcdTechnique.CheckedChanged += new System.EventHandler(this.chkLcdTechnique_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.chkLcdTechnique);
+            this.Controls.Add(this.chkXGridFitting);
+            this.Controls.Add(this.chkDrawBone);
             this.Controls.Add(this.chkVerticalHinting);
-            this.Controls.Add(this.chkDoGridFitting);
+            this.Controls.Add(this.chkYGridFitting);
             this.Controls.Add(this.txtGridSize);
             this.Controls.Add(this.chkShowGrid);
             this.Controls.Add(this.chkShowTess);
@@ -258,8 +297,11 @@
         private System.Windows.Forms.CheckBox chkShowTess;
         private System.Windows.Forms.CheckBox chkShowGrid;
         private System.Windows.Forms.TextBox txtGridSize;
-        private System.Windows.Forms.CheckBox chkDoGridFitting;
+        private System.Windows.Forms.CheckBox chkYGridFitting;
         private System.Windows.Forms.CheckBox chkVerticalHinting;
+        private System.Windows.Forms.CheckBox chkDrawBone;
+        private System.Windows.Forms.CheckBox chkXGridFitting;
+        private System.Windows.Forms.CheckBox chkLcdTechnique;
     }
 }
 

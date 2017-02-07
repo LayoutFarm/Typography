@@ -1,4 +1,4 @@
-﻿//BSD 2014, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 
 /* Poly2Tri
  * Copyright (c) 2009-2010, Poly2Tri Contributors
@@ -45,7 +45,6 @@ namespace Poly2Tri
         // Inital triangle factor, seed triangle will extend 30% of 
         // PointSet width to both left and right.
         private const float ALPHA = 0.3f;
-
         internal AdvancingFront Front;
         TriangulationPoint Head { get; set; }
         TriangulationPoint Tail { get; set; }
@@ -61,7 +60,11 @@ namespace Poly2Tri
         internal DTSweepConstraint EdgeEventConstrainedEdge;
         internal bool EdgeEventRight;
         //----------------------------------
+#if DEBUG
 
+        static int dbugTotalId;
+        public int dbugId = dbugTotalId++;
+#endif
 
         public DTSweepContext()
         {
@@ -107,7 +110,6 @@ namespace Poly2Tri
             {
                 triangle.IsInterior = true;
                 Triangulatable.AddTriangle(triangle);
-
                 //0
                 if (!triangle.C0)
                 {
@@ -136,7 +138,6 @@ namespace Poly2Tri
         public override void Clear()
         {
             base.Clear();
-
         }
 
         //public void AddNode(AdvancingFrontNode node)
@@ -161,18 +162,14 @@ namespace Poly2Tri
         public void CreateAdvancingFront()
         {
             AdvancingFrontNode head, tail, middle;
-
             // Initial triangle
             DelaunayTriangle dtri = new DelaunayTriangle(Points[0], Tail, Head);
             Triangles.Add(dtri);
             head = new AdvancingFrontNode(dtri.P1);
             head.Triangle = dtri;
-
             middle = new AdvancingFrontNode(dtri.P0);
             middle.Triangle = dtri;
-
             tail = new AdvancingFrontNode(dtri.P2);
-
             Front = new AdvancingFront(head, tail);
             //Front.AddNode(middle);
 
@@ -236,19 +233,33 @@ namespace Poly2Tri
                     n.Triangle = t;
                 }
             }
-
         }
 
         public override void PrepareTriangulation(Triangulatable t)
         {
-            base.PrepareTriangulation(t);
+            //--------------------
+            //initialization phase:
+            //all points are sorted regarding y coordinate, 
+            //regardless of whether they define an edge or not.
+            //those points havingthe same y coordinates are also sorted
+            //in the x direction.
+            //Each point is associated with the information wheter nor not
+            //it is the upper ending point of one or more edge e^i
+            //--------------------
+            //the following creates 'initial triangle',
+            //max bounds,
+            //p1 and p2=> artificial points
+            //-------------------
+            //during the fininalization phase,
+            //all triangles, having at least one vertex among the 
+            //artificial points, are erased.
 
+
+            base.PrepareTriangulation(t);
             double xmax, xmin;
             double ymax, ymin;
-
             xmax = xmin = Points[0].X;
             ymax = ymin = Points[0].Y;
-
             // Calculate bounds. Should be combined with the sorting
             var tmp_points = this.Points;
             for (int i = tmp_points.Count - 1; i >= 0; --i)
@@ -263,17 +274,13 @@ namespace Poly2Tri
 
             double deltaX = ALPHA * (xmax - xmin);
             double deltaY = ALPHA * (ymax - ymin);
-
             TriangulationPoint p1 = new TriangulationPoint(xmax + deltaX, ymin - deltaY);
             TriangulationPoint p2 = new TriangulationPoint(xmin - deltaX, ymin - deltaY);
-
             Head = p1;
             Tail = p2;
-
             //long time = System.nanoTime();
             //Sort the points along y-axis
             Points.Sort(Compare);
-
             //logger.info( "Triangulation setup [{}ms]", ( System.nanoTime() - time ) / 1e6 );
         }
         static int Compare(TriangulationPoint p1, TriangulationPoint p2)
@@ -319,8 +326,5 @@ namespace Poly2Tri
         {
             get { return TriangulationAlgorithm.DTSweep; }
         }
-
-
-
     }
 }
