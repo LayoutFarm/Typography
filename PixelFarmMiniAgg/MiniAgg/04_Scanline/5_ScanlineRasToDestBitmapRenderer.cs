@@ -42,7 +42,8 @@ namespace PixelFarm.Agg
         /// <summary>
         /// grey scale 8, lcd lookup table
         /// </summary>
-        static readonly LcdDistributionLut g8LcdLut = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
+        //static readonly LcdDistributionLut g8LcdLut = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
+        static readonly LcdDistributionLut g8LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 3f, 2f / 9f, 1f / 9f);
         Color _color;
         byte[] _rgb = new byte[3];
 
@@ -156,7 +157,7 @@ namespace PixelFarm.Agg
                 //2.
                 //convert to grey scale and convert to 65 level grey scale value 
                 byte greyScaleValue = g8Lut.Convert255ToLevel(a);
-
+                
                 //3.
                 //from single grey scale value it is expanded into 5 color component
                 for (int n = 0; n < 3; ++n)
@@ -961,16 +962,27 @@ namespace PixelFarm.Agg
     //struct ggo_gray4 { enum { num_levels = 17, format = GGO_GRAY4_BITMAP }; };
     //struct ggo_gray8 { enum { num_levels = 65, format = GGO_GRAY8_BITMAP }; };
 
-    public enum GrayLevels
-    {
-        Gray2,
-        Gray4,
-        Gray8
-    }
+
 
 
     public class LcdDistributionLut
     {
+        public enum GrayLevels
+        {
+            /// <summary>
+            /// 4 level grey scale (0-3)
+            /// </summary>
+            Gray2,
+            /// <summary>
+            /// 16 levels grey scale (0-15)
+            /// </summary>
+            Gray4,
+            /// <summary>
+            /// 65 levels grey scale (0-64)
+            /// </summary>
+            Gray8
+        }
+
         GrayLevels grayLevel;
         byte[] m_primary;
         byte[] m_secondary;
@@ -985,7 +997,7 @@ namespace PixelFarm.Agg
         //--------------------------------
         int numLevel;
 
-        public LcdDistributionLut(GrayLevels grayLevel, double prim, double second, double tert)
+        public LcdDistributionLut(LcdDistributionLut.GrayLevels grayLevel, double prim, double second, double tert)
         {
             this.grayLevel = grayLevel;
 
@@ -1029,7 +1041,7 @@ namespace PixelFarm.Agg
         /// <returns></returns>
         public byte Convert255ToLevel(byte orgLevel)
         {
-            return (byte)((((float)orgLevel + 1) / 256f) * (float)numLevel);
+            return (byte)((((float)orgLevel + 1) / 256f) * (float)(numLevel - 1));
         }
         public byte Primary(int greyLevelIndex)
         {
