@@ -103,13 +103,77 @@ namespace PixelFarm.Agg
                 readIndex = 0;
                 byteBuffer[0] = byteBuffer[1] = byteBuffer[2] = byteBuffer[3] = byteBuffer[4] = 0;
             }
-            public void ReadNext(out byte v0, out byte v1, out byte v2, out byte v3, out byte v4)
+            public void ReadNext(out byte v0)
             {
-                //read from current read index
-                //
+                //read from current read index 
                 //indeed we can use loop for this,
-                //but in this case we just switch it
+                //but in this case we just switch it                  
+                switch (readIndex)
+                {
+                    default: throw new NotSupportedException();
+                    case 0:
+                        v0 = byteBuffer[0];
+                        readIndex = 1;
+                        byteBuffer[0] = 0;//clear for next accum 
+                        break;
+                    case 1:
+                        v0 = byteBuffer[1];
+                        readIndex = 2;
+                        byteBuffer[1] = 0;//clear for next accum 
+                        break;
+                    case 2:
+                        v0 = byteBuffer[2];
+                        readIndex = 3;
+                        byteBuffer[2] = 0;//clear for next accum 
+                        break;
+                    case 3:
+                        v0 = byteBuffer[3];
+                        readIndex = 4;
+                        byteBuffer[3] = 0;//clear for next accum 
+                        break;
+                    case 4:
+                        v0 = byteBuffer[4];
+                        readIndex = 0;
+                        byteBuffer[4] = 0;//clear for next accum 
+                        break;
+                }
+            }
 
+            public void ReadRemaining4(out byte v0, out byte v1, out byte v2, out byte v3)
+            {
+                //not clear byte,
+                //not move read index
+                switch (readIndex)
+                {
+                    default: throw new NotSupportedException();
+                    case 0:
+                        v0 = byteBuffer[0]; v1 = byteBuffer[1]; v2 = byteBuffer[2];
+                        v3 = byteBuffer[3];
+                        break;
+                    case 1:
+                        v0 = byteBuffer[1]; v1 = byteBuffer[2]; v2 = byteBuffer[3];
+                        v3 = byteBuffer[4];
+                        break;
+                    case 2:
+                        v0 = byteBuffer[2]; v1 = byteBuffer[3]; v2 = byteBuffer[4];
+                        v3 = byteBuffer[0];
+                        break;
+                    case 3:
+                        v0 = byteBuffer[3]; v1 = byteBuffer[4]; v2 = byteBuffer[0];
+                        v3 = byteBuffer[1];
+                        break;
+                    case 4:
+                        v0 = byteBuffer[4]; v1 = byteBuffer[0]; v2 = byteBuffer[1];
+                        v3 = byteBuffer[2];
+                        break;
+                }
+            }
+
+            public void ReadNext5(out byte v0, out byte v1, out byte v2, out byte v3, out byte v4)
+            {
+                //read from current read index 
+                //indeed we can use loop for this,
+                //but in this case we just switch it 
                 switch (readIndex)
                 {
                     default: throw new NotSupportedException();
@@ -297,7 +361,7 @@ namespace PixelFarm.Agg
             int i = 0;
             int round = 0;
             forwardBuffer.Reset();
-            byte e0 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
+            byte e0 = 0;
             for (int x = 0; x < srcW; ++x)
             {
                 //1.
@@ -318,11 +382,10 @@ namespace PixelFarm.Agg
                         g8Lut.Secondary(greyScaleValue),
                         g8Lut.Primary(greyScaleValue));
                     //4. read accumulate 'energy' back 
-                    forwardBuffer.ReadNext(out e0, out e1, out e2, out e3, out e4);
+                    forwardBuffer.ReadNext(out e0);
                     //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
                     //------------------------------------------------------------
                     ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
-                    
                     //------------------------------------------------------------
                 }
 
@@ -333,6 +396,8 @@ namespace PixelFarm.Agg
             //we must draw extened 4 pixels
             //---------
             {
+                byte e1, e2, e3, e4;
+                forwardBuffer.ReadRemaining4(out e1, out e2, out e3, out e4);
                 int remainingEnergy = Math.Min(srcStride, 4);
                 switch (remainingEnergy)
                 {

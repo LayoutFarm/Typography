@@ -1115,11 +1115,14 @@ namespace SampleWinForms
             }
             //SwapRB(destImg);
         }
+
+
+
+
         LcdDistributionLut g8_1_2lcd = new LcdDistributionLut(GrayLevels.Gray8, 0.5, 0.25, 0.125);
         void BlendWithLcdTechnique(ActualImage destImg, ActualImage glyphImg, PixelFarm.Drawing.Color color)
         {
             var g8Lut = g8_1_2lcd;
-
             var forwardBuffer = new ScanlineSubPixelRasterizer.ForwardTemporaryBuffer();
             int glyphH = glyphImg.Height;
             int glyphW = glyphImg.Width;
@@ -1143,7 +1146,7 @@ namespace SampleWinForms
                 int i = 0;
                 int round = 0;
                 forwardBuffer.Reset();
-                byte e0 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
+                byte e0 = 0;
                 for (int x = 0; x < glyphW; ++x)
                 {
                     //1.
@@ -1164,13 +1167,12 @@ namespace SampleWinForms
                             g8Lut.Secondary(greyScaleValue),
                             g8Lut.Primary(greyScaleValue));
                         //4. read accumulate 'energy' back 
-                        forwardBuffer.ReadNext(out e0, out e1, out e2, out e3, out e4);
+                        forwardBuffer.ReadNext(out e0);
                         //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
                         //------------------------------------------------------------
                         ScanlineSubPixelRasterizer.BlendSpanWithLcdTechnique(e0, rgb, ref i, color.alpha, destImgBuffer, ref destImgIndex, ref round);
                         //------------------------------------------------------------
                     }
-
                     srcIndex += 4;
                 }
                 //---------
@@ -1178,6 +1180,8 @@ namespace SampleWinForms
                 //we must draw extened 4 pixels
                 //---------
                 {
+                    byte e1, e2, e3, e4;
+                    forwardBuffer.ReadRemaining4(out e1, out e2, out e3, out e4);
                     int remainingEnergy = Math.Min(srcStride, 4);
                     switch (remainingEnergy)
                     {
