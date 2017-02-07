@@ -1416,6 +1416,8 @@ namespace SampleWinForms
             p.StrokeWidth = 1.0f;
             p.UseSubPixelRendering = true;
             p.Line(0, 0, 15, 20);
+            //p.UseSubPixelRendering = false;
+            //p.Line(30, 0, 45, 20);
             //--------------------------
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 

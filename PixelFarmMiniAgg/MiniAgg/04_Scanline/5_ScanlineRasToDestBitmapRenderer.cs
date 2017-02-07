@@ -297,6 +297,29 @@ namespace PixelFarm.Agg
 
         static void SubPixBlendHL(byte[] buffer, int x1, int x2, Color sourceColor, byte cover)
         {
+            //if (sourceColor.A == 0) { return; }
+            ////------------------------------------------------- 
+            //int len = x2 - x1 + 1;
+            //byte[] buffer = GetBuffer();
+            //int bufferOffset = GetBufferOffsetXY(x1, y);
+            //int alpha = (((int)(sourceColor.A) * (cover + 1)) >> 8);
+            //if (alpha == BASE_MASK)
+            //{
+            //    //full
+            //    recieveBlender.CopyPixels(buffer, bufferOffset, sourceColor, len);
+            //}
+            //else
+            //{
+            //    Color c2 = Color.FromArgb(alpha, sourceColor);
+            //    do
+            //    {
+            //        //copy pixel-by-pixel
+            //        recieveBlender.BlendPixel(buffer, bufferOffset, c2);
+            //        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+            //    }
+            //    while (--len != 0);
+            //}
+
             if (sourceColor.A == 0) { return; }
             //------------------------------------------------- 
             int len = x2 - x1 + 1;
@@ -310,14 +333,14 @@ namespace PixelFarm.Agg
                     buffer[bufferOffset] = 0;
                     buffer[bufferOffset + 1] = 0;
                     buffer[bufferOffset + 2] = 0;
-                    buffer[bufferOffset + CO.A] = sourceColor.alpha;//  
+                    buffer[bufferOffset + CO.A] = sourceColor.alpha;
                     bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
                 }
                 while (--len != 0);
             }
             else
             {
-                Color c2 = Color.FromArgb(alpha, sourceColor);
+                Color newColor = Color.FromArgb(alpha, sourceColor);
                 do
                 {
 
@@ -325,7 +348,8 @@ namespace PixelFarm.Agg
                     buffer[bufferOffset] = 0;
                     buffer[bufferOffset + 1] = 0;
                     buffer[bufferOffset + 2] = 0;
-                    buffer[bufferOffset + 3] = (byte)((sourceColor.alpha + a) - ((sourceColor.alpha * a + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                    buffer[bufferOffset + 3] = (byte)((newColor.alpha + a) - ((newColor.alpha * a + BASE_MASK) >> (int)Color.BASE_SHIFT));
+
                     bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
                 }
                 while (--len != 0);
@@ -415,7 +439,6 @@ namespace PixelFarm.Agg
                         break;
                 }
             }
-
         }
         void ScanlineSubPixRender(IImageReaderWriter dest, Scanline scanline, Color color)
         {
@@ -455,117 +478,6 @@ namespace PixelFarm.Agg
             }
             byte[] buffer = dest.GetBuffer();
             BlendWithLcdTechnique(buffer, dest.Stride, y, dest.Width, dest.Stride, _emptyStride, color);
-
-            ////--------------------------------------
-            ////convert from gray scale line to subpix
-
-            //byte[] buffer = dest.GetBuffer();
-            //IPixelBlender blender = dest.GetRecieveBlender();
-            //int last_x = int.MinValue;
-            //int destImgBufferIndex = 0;
-            //_forwardTempBuff.Reset();
-            //int round = 0;
-            //byte e0 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
-            //_rgb[0] = color.R;
-            //_rgb[1] = color.G;
-            //_rgb[2] = color.B;
-            ////--------------------------------------
-            //int color_index = 0; 
-            //for (int i = 1; i <= num_spans; ++i)
-            //{
-            //    //render span by span  
-            //    ScanlineSpan span = scanline.GetSpan(i);
-            //    int coverageValue = covers[span.cover_index];
-            //    if (span.x != last_x + 1)
-            //    {
-            //        destImgBufferIndex = dest.GetBufferOffsetXY(span.x, y);
-            //        _forwardTempBuff.Reset();
-            //        if (coverageValue < (255f / 3f))
-            //        {
-            //            color_index = 2;
-            //        }
-            //        else if (coverageValue < (255f * 2f / 3f))
-            //        {
-            //            color_index = 1;
-            //        }
-            //        else
-            //        {
-            //            color_index = 0;
-            //        }
-
-            //    }
-
-            //    last_x = span.x;
-            //    int num_pix = span.len;
-            //    if (num_pix < 0)
-            //    {
-            //        //special encode***
-            //        num_pix = -num_pix; //make it positive value
-            //        last_x += (num_pix - 1);
-            //        coverageValue = covers[span.cover_index];
-            //        //coverage value is related to coverage area => grey scale level 
-            //        //of current pixel,
-            //        //the 1st coverage value of span is translated to 'shift' of 1st color. 
-
-            //        //
-
-            //        //-----------------------
-            //        byte alpha = (byte)(((color.alpha) * (coverageValue + 1)) >> 8);
-            //        _subPixelBlender.BlendPixel(_blankBuffer, 0, Color.FromArgb(alpha, color));
-            //        //-----------------------
-
-            //        int greyLevel = (int)(((float)_blankBuffer[3] / 256f) * 64);
-
-            //        while (num_pix > 0)
-            //        {
-            //            //each pixel has 3 sub color and 1 alpha
-
-            //            for (int n = 0; n < 5; ++n)
-            //            {
-
-            //                _forwardTempBuff.WriteAccum(
-            //                    g8LcdLut.Tertiary(greyLevel),
-            //                    g8LcdLut.Secondary(greyLevel),
-            //                    g8LcdLut.Primary(greyLevel));
-            //                //4. read accumulate 'energy' back  
-            //                _forwardTempBuff.ReadNext(out e0, out e1, out e2, out e3, out e4);
-            //                //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
-            //                //------------------------------------------------------------
-            //                BlendSpanWithLcdTechnique2(e0, _rgb, ref color_index, alpha, buffer, ref destImgBufferIndex, ref round);
-            //            }
-            //            --num_pix;
-            //        }
-
-
-            //    }
-            //    else
-            //    {
-
-            //        int coverIndex = span.cover_index;
-            //        last_x += (num_pix - 1);
-
-            //        byte alpha = 0;
-            //        int greyLevel = 0;
-            //        while (num_pix > 0)
-            //        {
-            //            coverageValue = covers[coverIndex++];
-
-
-            //            //  int alpha = (((int)(color.alpha) * (coverageValue + 1)) >> 8);
-            //            //-----------------------
-            //            alpha = (byte)(((color.alpha) * (coverageValue + 1)) >> 8);
-            //            _subPixelBlender.BlendPixel(_blankBuffer, 0, Color.FromArgb(alpha, color));
-            //            //-----------------------
-            //            greyLevel = (int)(((float)_blankBuffer[3] / 256f) * 64);
-
-            //            //------------------------------------------------------------
-            //            --num_pix;
-            //        }
-            //        //end this span  
-            //        int remainingEnergy = dest.Width - last_x;
-
-            //    }
-            //}
         }
 
         //void SubPixRender(IImageReaderWriter dest, Scanline scanline, Color color)
