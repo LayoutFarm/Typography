@@ -38,7 +38,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AggLcd\AggLcd.cs" />
     <Compile Include="GDIGlyphRasterizer.cs" />
     <Compile Include="GlyphAnalysis.cs" />
     <Compile Include="GlyphFitOutline.cs" />
