@@ -36,11 +36,11 @@ namespace PixelFarm.Agg
         ForwardTemporaryBuffer _forwardTempBuff = new ForwardTemporaryBuffer();
         /// grey scale 4, 1/9 lcd lookup table
         /// </summary> 
-        static readonly LcdDistributionLut s_g4_9LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 3f, 2f / 9f, 1f / 9f);
+        static readonly LcdDistributionLut s_g4_1_3LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 3f, 2f / 9f, 1f / 9f);
         /// <summary>
         /// grey scale 4, 1/8 lcd lookup table
         /// </summary>
-        static readonly LcdDistributionLut s_g4_8LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 2f, 1f / 4f, 1f / 8f);
+        static readonly LcdDistributionLut s_g4_1_2LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 2f, 1f / 4f, 1f / 8f);
 
 
         Color _color;
@@ -82,7 +82,7 @@ namespace PixelFarm.Agg
             //1. ensure single line buffer width
             _grayScaleLine.EnsureLineStride(dest.Stride);
             //2. setup vars
-            _currentLcdLut = s_g4_9LcdLut;
+            _currentLcdLut = s_g4_1_3LcdLut;
             byte[] dest_buffer = dest.GetBuffer();
             int dest_w = dest.Width;
             int dest_h = dest.Height;
@@ -578,17 +578,12 @@ namespace PixelFarm.Agg
                         buffer[bufferOffset] = 0;
                         buffer[bufferOffset + 1] = 0;
                         buffer[bufferOffset + 2] = 0;
-                        buffer[bufferOffset + +CO.A] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                        buffer[bufferOffset + CO.A] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
                         bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
                     }
                     while (--len != 0);
                 }
             }
-
-
-
-
-
         }
 
         public class ForwardTemporaryBuffer

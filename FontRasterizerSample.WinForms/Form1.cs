@@ -1417,7 +1417,7 @@ namespace SampleWinForms
         private void cmdAggLcd3_Click(object sender, EventArgs e)
         {
             //version 3: 
-            //clear surface bg
+            //
             p.Clear(PixelFarm.Drawing.Color.White);
             //--------------------------
             p.StrokeColor = PixelFarm.Drawing.Color.Black;
