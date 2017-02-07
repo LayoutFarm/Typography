@@ -47,9 +47,6 @@
             this.chkDrawBone = new System.Windows.Forms.CheckBox();
             this.chkXGridFitting = new System.Windows.Forms.CheckBox();
             this.chkLcdTechnique = new System.Windows.Forms.CheckBox();
-            this.cmdAggLcd1 = new System.Windows.Forms.Button();
-            this.cmdAggLcd2 = new System.Windows.Forms.Button();
-            this.cmdAggLcd3 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -253,44 +250,11 @@
             this.chkLcdTechnique.UseVisualStyleBackColor = true;
             this.chkLcdTechnique.CheckedChanged += new System.EventHandler(this.chkLcdTechnique_CheckedChanged);
             // 
-            // cmdAggLcd1
-            // 
-            this.cmdAggLcd1.Location = new System.Drawing.Point(672, 258);
-            this.cmdAggLcd1.Name = "cmdAggLcd1";
-            this.cmdAggLcd1.Size = new System.Drawing.Size(81, 37);
-            this.cmdAggLcd1.TabIndex = 22;
-            this.cmdAggLcd1.Text = "AggLcd 1";
-            this.cmdAggLcd1.UseVisualStyleBackColor = true;
-            this.cmdAggLcd1.Click += new System.EventHandler(this.cmdAggLcd1_Click);
-            // 
-            // cmdAggLcd2
-            // 
-            this.cmdAggLcd2.Location = new System.Drawing.Point(672, 304);
-            this.cmdAggLcd2.Name = "cmdAggLcd2";
-            this.cmdAggLcd2.Size = new System.Drawing.Size(81, 37);
-            this.cmdAggLcd2.TabIndex = 23;
-            this.cmdAggLcd2.Text = "AggLcd 2";
-            this.cmdAggLcd2.UseVisualStyleBackColor = true;
-            this.cmdAggLcd2.Click += new System.EventHandler(this.cmdAggLcd2_Click);
-            // 
-            // cmdAggLcd3
-            // 
-            this.cmdAggLcd3.Location = new System.Drawing.Point(672, 347);
-            this.cmdAggLcd3.Name = "cmdAggLcd3";
-            this.cmdAggLcd3.Size = new System.Drawing.Size(81, 37);
-            this.cmdAggLcd3.TabIndex = 24;
-            this.cmdAggLcd3.Text = "AggLcd 3";
-            this.cmdAggLcd3.UseVisualStyleBackColor = true;
-            this.cmdAggLcd3.Click += new System.EventHandler(this.cmdAggLcd3_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
-            this.Controls.Add(this.cmdAggLcd3);
-            this.Controls.Add(this.cmdAggLcd2);
-            this.Controls.Add(this.cmdAggLcd1);
             this.Controls.Add(this.chkLcdTechnique);
             this.Controls.Add(this.chkXGridFitting);
             this.Controls.Add(this.chkDrawBone);
@@ -338,9 +302,6 @@
         private System.Windows.Forms.CheckBox chkDrawBone;
         private System.Windows.Forms.CheckBox chkXGridFitting;
         private System.Windows.Forms.CheckBox chkLcdTechnique;
-        private System.Windows.Forms.Button cmdAggLcd1;
-        private System.Windows.Forms.Button cmdAggLcd2;
-        private System.Windows.Forms.Button cmdAggLcd3;
     }
 }
 
