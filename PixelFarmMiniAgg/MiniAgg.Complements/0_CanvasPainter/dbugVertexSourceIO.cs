@@ -9,22 +9,22 @@ namespace PixelFarm.Agg.VertexSource
     {
         public static void Load(PathWriter vertexSource, string pathAndFileName)
         {
-            vertexSource.Clear();
-            var vxs = vertexSource.Vxs;
-            string[] allLines = File.ReadAllLines(pathAndFileName);
-            foreach (string line in allLines)
-            {
-                string[] elements = line.Split(',');
-                double x = double.Parse(elements[0]);
-                double y = double.Parse(elements[1]);
-                VertexCmd flagsAndCommand = (VertexCmd)System.Enum.Parse(typeof(VertexCmd), elements[2].Trim());
-                int len = elements.Length;
-                for (int i = 3; i < len; i++)
-                {
-                    flagsAndCommand |= (VertexCmd)System.Enum.Parse(typeof(VertexCmd), elements[i].Trim());
-                }
-                vxs.AddVertex(x, y, flagsAndCommand);
-            }
+            //vertexSource.Clear();
+            //var vxs = vertexSource.Vxs;
+            //string[] allLines = File.ReadAllLines(pathAndFileName);
+            //foreach (string line in allLines)
+            //{
+            //    string[] elements = line.Split(',');
+            //    double x = double.Parse(elements[0]);
+            //    double y = double.Parse(elements[1]);
+            //    VertexCmd flagsAndCommand = (VertexCmd)System.Enum.Parse(typeof(VertexCmd), elements[2].Trim());
+            //    int len = elements.Length;
+            //    for (int i = 3; i < len; i++)
+            //    {
+            //        flagsAndCommand |= (VertexCmd)System.Enum.Parse(typeof(VertexCmd), elements[i].Trim());
+            //    }
+            //    vxs.AddVertex(x, y, flagsAndCommand);
+            //}
         }
 
 

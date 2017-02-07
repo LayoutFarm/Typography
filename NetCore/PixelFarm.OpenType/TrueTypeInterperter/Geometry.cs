@@ -1,5 +1,5 @@
 ﻿//MIT, 2015, Michael Popoloski's SharpFont,
-//MIT, 2016, WinterDev
+//MIT, 2016-2017, WinterDev
 
 using System;
 using System.Numerics;
@@ -28,6 +28,10 @@ namespace NOpenType
         public void ApplyScale(float scale)
         {
             P *= scale;
+        }
+        public void ApplyScaleOnlyOnXAxis(float scale)
+        {
+            P = new Vector2(P.X * scale, P.Y);
         }
 
         public override string ToString() { return P.ToString() + " " + onCurve.ToString(); }

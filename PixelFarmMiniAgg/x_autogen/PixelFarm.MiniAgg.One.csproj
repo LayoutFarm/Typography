@@ -1,0 +1,517 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputType>Library</OutputType>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AssemblyName>PixelFarm.MiniAgg.One</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG; TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <DefineConstants> TRACE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\MiniAgg.Complements\0_CanvasPainter\AggCanvasPainter.cs">
+      <Link>MiniAgg.Complements\0_CanvasPainter\AggCanvasPainter.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\0_CanvasPainter\AggRenderVx.cs">
+      <Link>MiniAgg.Complements\0_CanvasPainter\AggRenderVx.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\0_CanvasPainter\Canvas2dExtension.cs">
+      <Link>MiniAgg.Complements\0_CanvasPainter\Canvas2dExtension.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\0_CanvasPainter\dbugVertexSourceIO.cs">
+      <Link>MiniAgg.Complements\0_CanvasPainter\dbugVertexSourceIO.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\0_CanvasPainter\TextPrinter.cs">
+      <Link>MiniAgg.Complements\0_CanvasPainter\TextPrinter.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\1_Base\BorderDouble.cs">
+      <Link>MiniAgg.Complements\1_Base\BorderDouble.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\1_Base\ClipProxyImage.cs">
+      <Link>MiniAgg.Complements\1_Base\ClipProxyImage.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\1_Base\GammaFuntions.cs">
+      <Link>MiniAgg.Complements\1_Base\GammaFuntions.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\1_Base\PixelBlenderRGB.cs">
+      <Link>MiniAgg.Complements\1_Base\PixelBlenderRGB.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\1_Base\ProxyImage.cs">
+      <Link>MiniAgg.Complements\1_Base\ProxyImage.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\1_Base\Queue.cs">
+      <Link>MiniAgg.Complements\1_Base\Queue.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\1_Base\ScanlineRasToDestBitmapRendererExtension.cs">
+      <Link>MiniAgg.Complements\1_Base\ScanlineRasToDestBitmapRendererExtension.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\2_SpanGenerators\SpanGenGourand.cs">
+      <Link>MiniAgg.Complements\2_SpanGenerators\SpanGenGourand.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\2_SpanGenerators\SpanGenGouraudRGBA.cs">
+      <Link>MiniAgg.Complements\2_SpanGenerators\SpanGenGouraudRGBA.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\2_SpanGenerators\SpanGradient.cs">
+      <Link>MiniAgg.Complements\2_SpanGenerators\SpanGradient.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\2_SpanGenerators\SpanGradient_GradientValueCalculators.cs">
+      <Link>MiniAgg.Complements\2_SpanGenerators\SpanGradient_GradientValueCalculators.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Filter\ImageFilters.cs">
+      <Link>MiniAgg.Complements\Filter\ImageFilters.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Filter\PatternFilterBilnearColorRGBA.cs">
+      <Link>MiniAgg.Complements\Filter\PatternFilterBilnearColorRGBA.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Filter\RecursiveBlur.cs">
+      <Link>MiniAgg.Complements\Filter\RecursiveBlur.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Filter\StackBlur.cs">
+      <Link>MiniAgg.Complements\Filter\StackBlur.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Image\AlphaMask.cs">
+      <Link>MiniAgg.Complements\Image\AlphaMask.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Image\AlphaMaskAdaptor.cs">
+      <Link>MiniAgg.Complements\Image\AlphaMaskAdaptor.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Image\FilterMan.cs">
+      <Link>MiniAgg.Complements\Image\FilterMan.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Image\FloodFiller.cs">
+      <Link>MiniAgg.Complements\Image\FloodFiller.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg.Complements\Image\Transposer.cs">
+      <Link>MiniAgg.Complements\Image\Transposer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\00_Context\Graphics2D.cs">
+      <Link>MiniAgg\00_Context\Graphics2D.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\00_Context\ImageGraphics2D.cs">
+      <Link>MiniAgg\00_Context\ImageGraphics2D.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\00_Context\ImageGraphics2D_RenderImages.cs">
+      <Link>MiniAgg\00_Context\ImageGraphics2D_RenderImages.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\ChildImage.cs">
+      <Link>MiniAgg\02_PixelBuffer\ChildImage.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\ColorOrder.cs">
+      <Link>MiniAgg\02_PixelBuffer\ColorOrder.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\ColorRGBAf.cs">
+      <Link>MiniAgg\02_PixelBuffer\ColorRGBAf.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\GammaLookUpTable.cs">
+      <Link>MiniAgg\02_PixelBuffer\GammaLookUpTable.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\IImageReaderWriter.cs">
+      <Link>MiniAgg\02_PixelBuffer\IImageReaderWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\ImageHelper.cs">
+      <Link>MiniAgg\02_PixelBuffer\ImageHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\ImageReaderWriterBase.cs">
+      <Link>MiniAgg\02_PixelBuffer\ImageReaderWriterBase.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\PixelBlenderGray.cs">
+      <Link>MiniAgg\02_PixelBuffer\PixelBlenderGray.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\02_PixelBuffer\PixelBlenderRGBA.cs">
+      <Link>MiniAgg\02_PixelBuffer\PixelBlenderRGBA.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\03_SpanGenerators\0_ISpanGenerator.cs">
+      <Link>MiniAgg\03_SpanGenerators\0_ISpanGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\03_SpanGenerators\1_ImgSpanGen.cs">
+      <Link>MiniAgg\03_SpanGenerators\1_ImgSpanGen.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\03_SpanGenerators\2_ImgSpanGenRGB.cs">
+      <Link>MiniAgg\03_SpanGenerators\2_ImgSpanGenRGB.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\03_SpanGenerators\3_ImgSpanGenRGBA.cs">
+      <Link>MiniAgg\03_SpanGenerators\3_ImgSpanGenRGBA.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\03_SpanGenerators\4_ImgSpanGenGray.cs">
+      <Link>MiniAgg\03_SpanGenerators\4_ImgSpanGenGray.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\03_SpanGenerators\IGammaFunction.cs">
+      <Link>MiniAgg\03_SpanGenerators\IGammaFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\03_SpanGenerators\ISpanInterpolator.cs">
+      <Link>MiniAgg\03_SpanGenerators\ISpanInterpolator.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\0_ScanlineSpan.cs">
+      <Link>MiniAgg\04_Scanline\0_ScanlineSpan.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\1_Scanline.cs">
+      <Link>MiniAgg\04_Scanline\1_Scanline.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\2_ScanlinePacked8.cs">
+      <Link>MiniAgg\04_Scanline\2_ScanlinePacked8.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\3_ScanlineUnpacked8.cs">
+      <Link>MiniAgg\04_Scanline\3_ScanlineUnpacked8.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\4.1_ScanlineRasterizer.cs">
+      <Link>MiniAgg\04_Scanline\4.1_ScanlineRasterizer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\4.2_CellAARasterizer.cs">
+      <Link>MiniAgg\04_Scanline\4.2_CellAARasterizer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\4.3_VectorClipper.cs">
+      <Link>MiniAgg\04_Scanline\4.3_VectorClipper.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\5_ScanlineRasToDestBitmapRenderer.cs">
+      <Link>MiniAgg\04_Scanline\5_ScanlineRasToDestBitmapRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\04_Scanline\6_ClipLiangBarsky.cs">
+      <Link>MiniAgg\04_Scanline\6_ClipLiangBarsky.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_ISpanInterpolator\LineInterpolators.cs">
+      <Link>MiniAgg\07_ISpanInterpolator\LineInterpolators.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_ISpanInterpolator\SpanInterpolatorLinear.cs">
+      <Link>MiniAgg\07_ISpanInterpolator\SpanInterpolatorLinear.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_ISpanInterpolator\SpanInterpolatorPerspectiveLerp.cs">
+      <Link>MiniAgg\07_ISpanInterpolator\SpanInterpolatorPerspectiveLerp.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\1.1_LinesAA.cs">
+      <Link>MiniAgg\07_Lines\1.1_LinesAA.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\1.2_PatternFilter.cs">
+      <Link>MiniAgg\07_Lines\1.2_PatternFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\1.3_LineParameters.cs">
+      <Link>MiniAgg\07_Lines\1.3_LineParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\2.1_DistanceInterpolators.cs">
+      <Link>MiniAgg\07_Lines\2.1_DistanceInterpolators.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\2.2_LineInterpolators.cs">
+      <Link>MiniAgg\07_Lines\2.2_LineInterpolators.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\2.3_EllipseBrensenhemInterpolator.cs">
+      <Link>MiniAgg\07_Lines\2.3_EllipseBrensenhemInterpolator.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\3.1_LineRenderer.cs">
+      <Link>MiniAgg\07_Lines\3.1_LineRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\3.2_OutlineRenderer.cs">
+      <Link>MiniAgg\07_Lines\3.2_OutlineRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\3.3_ImageLineRenderer.cs">
+      <Link>MiniAgg\07_Lines\3.3_ImageLineRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\07_Lines\4_OutlineAARasterizer.cs">
+      <Link>MiniAgg\07_Lines\4_OutlineAARasterizer.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\FilterImageSpanGenerator.cs">
+      <Link>MiniAgg\08_ImageResampling\FilterImageSpanGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\FilterImageSpanGenerator.ImageBufferAccessor.cs">
+      <Link>MiniAgg\08_ImageResampling\FilterImageSpanGenerator.ImageBufferAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\FilterRGBAImageSpanGen.cs">
+      <Link>MiniAgg\08_ImageResampling\FilterRGBAImageSpanGen.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\FilterRGBImageSpanGen.cs">
+      <Link>MiniAgg\08_ImageResampling\FilterRGBImageSpanGen.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\IImageFilter.cs">
+      <Link>MiniAgg\08_ImageResampling\IImageFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\ImageFilterLookupTable.cs">
+      <Link>MiniAgg\08_ImageResampling\ImageFilterLookupTable.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\ImageFreeTransform.cs">
+      <Link>MiniAgg\08_ImageResampling\ImageFreeTransform.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\ImageInterpolationQuality.cs">
+      <Link>MiniAgg\08_ImageResampling\ImageInterpolationQuality.cs</Link>
+    </Compile>
+    <Compile Include="..\MiniAgg\08_ImageResampling\ImageTransform.cs">
+      <Link>MiniAgg\08_ImageResampling\ImageTransform.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\0_Start\ExtensionAttribute.cs">
+      <Link>PixelFarm.Drawing.Core\0_Start\ExtensionAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\0_Start\GraphicsPlatform.cs">
+      <Link>PixelFarm.Drawing.Core\0_Start\GraphicsPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\BasicGeometries.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\BasicGeometries.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Brushes_Pens.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\Brushes_Pens.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Canvas.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\Canvas.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\CanvasOptions.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\CanvasOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\CanvasPaintToOutputDelegate.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\CanvasPaintToOutputDelegate.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Color.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\Color.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\CombineMode.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\CombineMode.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\DashStyle.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\DashStyle.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Fonts.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\Fonts.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\FontStyle.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\FontStyle.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\GraphicsPath.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\GraphicsPath.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Image_Bitmap.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\Image_Bitmap.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Rectangle.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\Rectangle.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\RectangleF.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\RectangleF.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Region.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\Region.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\RenderVx.cs">
+      <Link>PixelFarm.Drawing.Core\1_Drawing\RenderVx.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\ActualFont.cs">
+      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\ActualFont.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\FontFace.cs">
+      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\FontFace.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\FontGlyph.cs">
+      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\FontGlyph.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\FontKey.cs">
+      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\FontKey.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\NativeBridgeHB.cs">
+      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\NativeBridgeHB.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\4_Drawing_Text\TextShapingAndLayoutService.cs">
+      <Link>PixelFarm.Drawing.Core\4_Drawing_Text\TextShapingAndLayoutService.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\5_PixelFarm_Agg\ActualImage.cs">
+      <Link>PixelFarm.Drawing.Core\5_PixelFarm_Agg\ActualImage.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\5_PixelFarm_Agg\CanvasPainter.cs">
+      <Link>PixelFarm.Drawing.Core\5_PixelFarm_Agg\CanvasPainter.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\5_PixelFarm_Agg\PixelFormat.cs">
+      <Link>PixelFarm.Drawing.Core\5_PixelFarm_Agg\PixelFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AggBasics.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AggBasics.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AggMath.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AggMath.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AxisAlignedBoundingBox.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AxisAlignedBoundingBox.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurve.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurve.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurveCubic.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurveCubic.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurveQuadric.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurveQuadric.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\MathHelper.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\MathHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Matrix4x4.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Matrix4x4.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Quaternion.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Quaternion.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Ray.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Ray.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector2.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector2.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector3.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector3.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector3Float.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector3Float.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector4.cs">
+      <Link>PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector4.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\0_VertexCommandAndOrientation.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\0_VertexCommandAndOrientation.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\1_VertexStore.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\1_VertexStore.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\2_VertexStoreSnap.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\2_VertexStoreSnap.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\Collections.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\Collections.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\LineCapAndJoin.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\LineCapAndJoin.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\RectD.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\RectD.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\RectInt.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\RectInt.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\Stroke.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\Stroke.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\StrokeGenerator.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\StrokeGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\StrokeMath.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\StrokeMath.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\VertexDistanceList.cs">
+      <Link>PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\VertexDistanceList.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\0_ICoordTransformer.cs">
+      <Link>PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\0_ICoordTransformer.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\1_Affine.cs">
+      <Link>PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\1_Affine.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\2_Bilinear.cs">
+      <Link>PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\2_Bilinear.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\3_Perspective.cs">
+      <Link>PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\3_Perspective.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\4_SimulEqGeneral.cs">
+      <Link>PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\4_SimulEqGeneral.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\Viewport.cs">
+      <Link>PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\Viewport.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CubicBezier.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CubicBezier.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveBuilder.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFit.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFit.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFitBase.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFitBase.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurvePreprocess.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurvePreprocess.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\Spline.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\Spline.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\SplineBuilder.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\SplineBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\VectorHelper.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\VectorHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\HitTest\VertexHitTester.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\HitTest\VertexHitTester.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VectorClipping\cliper.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VectorClipping\cliper.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VectorClipping\VxsClipping.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VectorClipping\VxsClipping.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Arc.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Arc.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BezireCurve.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BezireCurve.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BoundingRect.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BoundingRect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BSpline.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BSpline.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Contour.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Contour.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\ContourGenerator.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\ContourGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\CurveFlattener.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\CurveFlattener.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Curves.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Curves.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Ellipse.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Ellipse.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\PathWriter.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\PathWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\RoundedRect.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\RoundedRect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\SimpleRect.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\SimpleRect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexData.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexData.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexStoreBuilder.cs">
+      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexStoreBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\AggMemMx.cs">
+      <Link>PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\AggMemMx.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\NativeBufferMx.cs">
+      <Link>PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\NativeBufferMx.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

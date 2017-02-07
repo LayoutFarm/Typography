@@ -51,7 +51,7 @@ namespace NOpenType.Tables
                     short contoursCount = reader.ReadInt16();
                     if (contoursCount >= 0)
                     {
-                        Bounds bounds = BoundsReader.ReadFrom(reader);
+                        Bounds bounds = Utils.ReadBounds(reader);
                         _glyphs[i] = ReadSimpleGlyph(reader, contoursCount, bounds);
                     }
                     else
@@ -78,7 +78,7 @@ namespace NOpenType.Tables
                 reader.BaseStream.Seek(tableOffset + locations.Offsets[glyphIndex], SeekOrigin.Begin);//reset     
                 //------------------------
                 short contoursCount = reader.ReadInt16();
-                Bounds bounds = BoundsReader.ReadFrom(reader);
+                Bounds bounds = Utils.ReadBounds(reader);
 
 #if DEBUG
                 if (glyphIndex == 7)

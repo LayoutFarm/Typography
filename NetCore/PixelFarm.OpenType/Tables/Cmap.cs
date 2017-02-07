@@ -1,4 +1,5 @@
-﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+﻿//Apache2, 2017, WinterDev
+//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
 using System.Collections.Generic;
@@ -88,7 +89,7 @@ namespace NOpenType.Tables
                         //The glyph set is limited to 256. Note that if this format is used to index into a larger glyph set,
                         //only the first 256 glyphs will be accessible. 
 
-                        ushort language = input.ReadUInt16(); 
+                        ushort language = input.ReadUInt16();
                         byte[] only256Glyphs = input.ReadBytes(256);
                         ushort[] only256UInt16Glyphs = new ushort[256];
                         for (int i = 255; i >= 0; --i)
@@ -97,7 +98,7 @@ namespace NOpenType.Tables
                             only256UInt16Glyphs[i] = only256Glyphs[i];
                         }
                         //convert to format4 cmap table
-                        return new CharacterMap(1, new ushort[] { 0 }, new ushort[] { 255 }, null, null, only256UInt16Glyphs);
+                        return CharacterMap.BuildFromFormat4(1, new ushort[] { 0 }, new ushort[] { 255 }, null, null, only256UInt16Glyphs);
                     }
                 case 4:
                     {
@@ -139,8 +140,34 @@ namespace NOpenType.Tables
                         //------------------------------------------------------------------------------------ 
                         long remainingLen = tableStartEndAt - input.BaseStream.Position;
                         int recordNum2 = (int)(remainingLen / 2);
-                        ushort[] glyphIdArray = Utils.ReadUInt16Array(input, recordNum2);//Glyph index array 
-                        return new CharacterMap(segCount, startCode, endCode, idDelta, idRangeOffset, glyphIdArray);
+                        ushort[] glyphIdArray = Utils.ReadUInt16Array(input, recordNum2);//Glyph index array                          
+                        return CharacterMap.BuildFromFormat4(segCount, startCode, endCode, idDelta, idRangeOffset, glyphIdArray);
+                    }
+                case 6:
+                    {
+
+                        //Format 6: Trimmed table mapping
+                        //Type    Name Description
+                        //USHORT format  Format number is set to 6.
+                        //USHORT  length This is the length in bytes of the subtable.
+                        //USHORT language    Please see “Note on the language field in 'cmap' subtables“ in this document.
+                        //USHORT firstCode   First character code of subrange.
+                        //USHORT entryCount  Number of character codes in subrange.
+                        //USHORT glyphIdArray[entryCount]   Array of glyph index values for character codes in the range.
+
+                        //The firstCode and entryCount values specify a subrange(beginning at firstCode, length = entryCount) within the range of possible character codes.
+                        //Codes outside of this subrange are mapped to glyph index 0.
+                        //The offset of the code(from the first code) within this subrange is used as index to the glyphIdArray, 
+                        //which provides the glyph index value.
+
+                        long tableStartEndAt = input.BaseStream.Position + length;
+                        ushort language = input.ReadUInt16();
+                        ushort firstCode = input.ReadUInt16();
+                        ushort entryCount = input.ReadUInt16();
+                        ushort[] glyphIdArray = Utils.ReadUInt16Array(input, entryCount);
+
+                        return CharacterMap.BuildFromFormat6(firstCode, glyphIdArray);
+                         
                     }
             }
         }

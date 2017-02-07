@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -39,6 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GDIGlyphRasterizer.cs" />
+    <Compile Include="GlyphAnalysis.cs" />
+    <Compile Include="GlyphFitOutline.cs" />
     <Compile Include="GlyphPathBuilderVxs.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -78,11 +80,16 @@
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>PixelFarm.OpenType</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PixelFarmMiniAgg\PixelFarm.MiniAgg.One.csproj">
+    <ProjectReference Include="..\PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj">
       <Project>{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
+    <ProjectReference Include="..\poly2tri-cs\Poly2Tri.csproj">
+      <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
+      <Name>Poly2Tri</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

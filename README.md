@@ -1,7 +1,7 @@
 ![PixelFarm's Typography](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title.png)
 ===========
 
-pure C# TrueType and OpenType Font Reader, Glyph Layout and Rendering.
+Pure C# TrueType and OpenType Font Reader, Glyph Layout and Rendering.
 
  * 1.Loads .ttf files, with OpenTypeReader (Big thanks go to NOpenType ,https://github.com/vidstige/NRasterizer)
  
@@ -9,15 +9,24 @@ pure C# TrueType and OpenType Font Reader, Glyph Layout and Rendering.
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
 	  
  * .Net >=2.0 
+
  
 License
 -----------
+
+Apache2, 2016-2017, WinterDev
 
 Apache2, 2014-2016, Samuel Carlsson, from https://github.com/vidstige/NRasterizer
 
 MIT, 2015, Michael Popoloski, from https://github.com/MikePopoloski/SharpFont
 
 The FreeType Project LICENSE (3-clauses BSD),2003-2016, David Turner, Robert Wilhelm, and Werner Lemberg. from https://www.freetype.org/
+
+BSD, 2009-2010, Poly2Tri Contributors.
+
+BSD, 2002-2005, Maxim Shemanarev (http://www.antigrain.com)Anti-Grain Geometry - Version 2.4,
+
+BSD, 2007-2014, Lars Brubaker, agg-sharp
 
 Screenshots
 -----------

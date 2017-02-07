@@ -1,9 +1,7 @@
-﻿//Apache2,  2016, WinterDev
+﻿//Apache2, 2016-2017, WinterDev
 //https://www.microsoft.com/typography/otspec/chapter2.htm
-using System;
-using System.Collections.Generic;
+
 using System.IO;
-using System.Text;
 
 namespace NOpenType.Tables
 {

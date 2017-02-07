@@ -1,5 +1,5 @@
-﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
-
+﻿//Apache2, 2017, WinterDev
+//Apache2, 2014-2016, Samuel Carlsson, WinterDev 
 using System;
 using System.Text;
 using System.IO;
@@ -7,6 +7,11 @@ namespace NOpenType
 {
     static class Utils
     {
+        public static Bounds ReadBounds(BinaryReader input)
+        {
+            //xmin, ymin,xmax,ymax
+            return new Bounds(input.ReadInt16(), input.ReadInt16(), input.ReadInt16(), input.ReadInt16());
+        }
         public static string TagToString(uint tag)
         {
             byte[] bytes = BitConverter.GetBytes(tag);

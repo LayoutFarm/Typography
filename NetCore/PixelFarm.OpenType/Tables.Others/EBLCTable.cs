@@ -1,9 +1,8 @@
-﻿//MIT, 2015, Michael Popoloski, WinterDev
+﻿//Apache2, 2017, WinterDev
+//MIT, 2015, Michael Popoloski, WinterDev
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using System; 
+using System.IO; 
 
 namespace NOpenType.Tables
 {
