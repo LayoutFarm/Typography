@@ -1157,7 +1157,7 @@ namespace SampleWinForms
                     byte a = glyphBuffer[srcIndex + 3];
                     //2.
                     //convert to grey scale and convert to 65 level grey scale value
-                    byte greyScaleValue = (byte)(((a + 1) / 256f) * 64f);
+                    byte greyScaleValue = g8Lut.Convert255ToLevel(a);
                     //3.
                     //from single grey scale value it is expanded into 5 color component
                     for (int n = 0; n < 3; ++n)

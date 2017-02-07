@@ -49,121 +49,9 @@ namespace PixelFarm.Agg
         const int BASE_MASK = 255;
         const int EXISTING_A = 0;
         const int m_DistanceInBytesBetweenPixelsInclusive = 4;
-        static void SubPixBlendSolidHSpan(SingleLineBuffer lineBuffer, int x, int len, Color sourceColor, byte[] covers, int coversIndex)
+        internal ScanlineSubPixelRasterizer()
         {
-            //int colorAlpha = sourceColor.alpha;
-            //if (colorAlpha != 0)
-            //{
-            //    byte[] buffer = GetBuffer();
-            //    int bufferOffset = GetBufferOffsetXY(x, y);
-            //    do
-            //    {
-            //        int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
-            //        if (alpha == BASE_MASK)
-            //        {
-            //            recieveBlender.CopyPixel(buffer, bufferOffset, sourceColor);
-            //        }
-            //        else
-            //        {
-            //            recieveBlender.BlendPixel(buffer, bufferOffset, Color.FromArgb(alpha, sourceColor));
-            //        }
-            //        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-            //        coversIndex++;
-            //    }
-            //    while (--len != 0);
-            //}
 
-            byte[] buffer = lineBuffer.GetInternalBuffer();
-            byte colorAlpha = sourceColor.alpha;
-            if (colorAlpha != 0)
-            {
-                int bufferOffset = x * 4;
-                do
-                {
-                    int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
-                    if (alpha == BASE_MASK)
-                    {
-                        buffer[bufferOffset] = 0;
-                        buffer[bufferOffset + 1] = 0;
-                        buffer[bufferOffset + 2] = 0;
-                        buffer[bufferOffset + 3] = colorAlpha;
-                    }
-                    else
-                    {
-                        Color newColor = Color.FromArgb(alpha, sourceColor);
-                        buffer[bufferOffset] = 0;
-                        buffer[bufferOffset + 1] = 0;
-                        buffer[bufferOffset + 2] = 0;
-                        buffer[bufferOffset + 3] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
-                    }
-                    bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-                    coversIndex++;
-                }
-                while (--len != 0);
-            }
-        }
-
-        static void SubPixBlendHL(SingleLineBuffer lineBuffer, int x1, int x2, Color sourceColor, byte cover)
-        {
-            //if (sourceColor.A == 0) { return; }
-            ////------------------------------------------------- 
-            //int len = x2 - x1 + 1;
-            //byte[] buffer = GetBuffer();
-            //int bufferOffset = GetBufferOffsetXY(x1, y);
-            //int alpha = (((int)(sourceColor.A) * (cover + 1)) >> 8);
-            //if (alpha == BASE_MASK)
-            //{
-            //    //full
-            //    recieveBlender.CopyPixels(buffer, bufferOffset, sourceColor, len);
-            //}
-            //else
-            //{
-            //    Color c2 = Color.FromArgb(alpha, sourceColor);
-            //    do
-            //    {
-            //        //copy pixel-by-pixel
-            //        recieveBlender.BlendPixel(buffer, bufferOffset, c2);
-            //        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-            //    }
-            //    while (--len != 0);
-            //}
-
-            if (sourceColor.A == 0) { return; }
-            //------------------------------------------------- 
-            int len = x2 - x1 + 1;
-            int bufferOffset = x1 * 4;
-            byte alpha = (byte)(((int)(sourceColor.A) * (cover + 1)) >> 8);
-            byte[] buffer = lineBuffer.GetInternalBuffer();
-
-            if (alpha == BASE_MASK)
-            {
-                //full
-                do
-                {
-                    buffer[bufferOffset] = 0;
-                    buffer[bufferOffset + 1] = 0;
-                    buffer[bufferOffset + 2] = 0;
-                    buffer[bufferOffset + CO.A] = sourceColor.alpha;
-                    bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-                }
-                while (--len != 0);
-            }
-            else
-            {
-                Color newColor = Color.FromArgb(alpha, sourceColor);
-                do
-                {
-
-
-                    buffer[bufferOffset] = 0;
-                    buffer[bufferOffset + 1] = 0;
-                    buffer[bufferOffset + 2] = 0;
-                    buffer[bufferOffset + +CO.A] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
-
-                    bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
-                }
-                while (--len != 0);
-            }
         }
 
         /// <summary>
@@ -175,10 +63,7 @@ namespace PixelFarm.Agg
         /// </summary>
         SingleLineBuffer grayScaleLine = new SingleLineBuffer();
 
-        internal ScanlineSubPixelRasterizer()
-        {
 
-        }
         public void RenderScanline(
               IImageReaderWriter dest,
               ScanlineRasterizer sclineRas,
@@ -196,7 +81,7 @@ namespace PixelFarm.Agg
             int dest_h = dest.Height;
             int dest_stride = dest.Stride;
             int src_w = dest_w;
-            int src_stride = dest_stride; 
+            int src_stride = dest_stride;
             //*** set color before call Blend()
             this._color = color;
             this._rgb[0] = color.R;
@@ -207,11 +92,11 @@ namespace PixelFarm.Agg
             while (sclineRas.SweepScanline(scline))
             {
                 //3.1. clear 
-                grayScaleLine.Clear(); 
+                grayScaleLine.Clear();
 
                 //3.2. write grayscale span to temp buffer
                 //3.3 convert to subpixel value and write to dest buffer
-               
+
                 //render solid single scanline 
                 int num_spans = scline.SpanCount;
                 byte[] covers = scline.GetCovers();
@@ -269,8 +154,9 @@ namespace PixelFarm.Agg
                 byte b = glyphBuffer[srcIndex + 2];
                 byte a = glyphBuffer[srcIndex + 3];
                 //2.
-                //convert to grey scale and convert to 65 level grey scale value
-                byte greyScaleValue = (byte)(((a + 1) / 256f) * 64f);
+                //convert to grey scale and convert to 65 level grey scale value 
+                byte greyScaleValue = g8Lut.Convert255ToLevel(a);
+
                 //3.
                 //from single grey scale value it is expanded into 5 color component
                 for (int n = 0; n < 3; ++n)
@@ -398,6 +284,143 @@ namespace PixelFarm.Agg
             //opengl es2 mix function              
             return farColor * (1f - weight) + (nearColor * weight);
         }
+
+
+
+        static void SubPixBlendSolidHSpan(SingleLineBuffer lineBuffer, int x, int len, Color sourceColor, byte[] covers, int coversIndex)
+        {
+            //-------------------------------------
+            //reference code:
+            //int colorAlpha = sourceColor.alpha;
+            //if (colorAlpha != 0)
+            //{
+            //    byte[] buffer = GetBuffer();
+            //    int bufferOffset = GetBufferOffsetXY(x, y);
+            //    do
+            //    {
+            //        int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
+            //        if (alpha == BASE_MASK)
+            //        {
+            //            recieveBlender.CopyPixel(buffer, bufferOffset, sourceColor);
+            //        }
+            //        else
+            //        {
+            //            recieveBlender.BlendPixel(buffer, bufferOffset, Color.FromArgb(alpha, sourceColor));
+            //        }
+            //        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+            //        coversIndex++;
+            //    }
+            //    while (--len != 0);
+            //}
+            //-------------------------------------
+            byte[] buffer = lineBuffer.GetInternalBuffer();
+            byte colorAlpha = sourceColor.alpha;
+            if (colorAlpha != 0)
+            {
+                int bufferOffset = x * 4;
+                do
+                {
+                    int alpha = ((colorAlpha) * ((covers[coversIndex]) + 1)) >> 8;
+                    if (alpha == BASE_MASK)
+                    {
+                        buffer[bufferOffset] = 0;
+                        buffer[bufferOffset + 1] = 0;
+                        buffer[bufferOffset + 2] = 0;
+                        buffer[bufferOffset + 3] = colorAlpha;
+                    }
+                    else
+                    {
+                        Color newColor = Color.FromArgb(alpha, sourceColor);
+                        buffer[bufferOffset] = 0;
+                        buffer[bufferOffset + 1] = 0;
+                        buffer[bufferOffset + 2] = 0;
+                        buffer[bufferOffset + 3] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                    }
+                    bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+                    coversIndex++;
+                }
+                while (--len != 0);
+            }
+        }
+
+        static void SubPixBlendHL(SingleLineBuffer lineBuffer, int x1, int x2, Color sourceColor, byte cover)
+        {
+            ////------------------------------------------------- 
+            //reference code:
+            //if (sourceColor.A == 0) { return; }
+            ////------------------------------------------------- 
+            //int len = x2 - x1 + 1;
+            //byte[] buffer = GetBuffer();
+            //int bufferOffset = GetBufferOffsetXY(x1, y);
+            //int alpha = (((int)(sourceColor.A) * (cover + 1)) >> 8);
+            //if (alpha == BASE_MASK)
+            //{
+            //    //full
+            //    recieveBlender.CopyPixels(buffer, bufferOffset, sourceColor, len);
+            //}
+            //else
+            //{
+            //    Color c2 = Color.FromArgb(alpha, sourceColor);
+            //    do
+            //    {
+            //        //copy pixel-by-pixel
+            //        recieveBlender.BlendPixel(buffer, bufferOffset, c2);
+            //        bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+            //    }
+            //    while (--len != 0);
+            //}
+            ////-------------------------------------------------  
+
+
+
+            if (sourceColor.A == 0) { return; }
+            //------------------------------------------------- 
+            int len = x2 - x1 + 1;
+            int bufferOffset = x1 * 4;
+            byte alpha = (byte)(((int)(sourceColor.A) * (cover + 1)) >> 8);
+            byte[] buffer = lineBuffer.GetInternalBuffer();
+
+            if (alpha == BASE_MASK)
+            {
+                //full
+                do
+                {
+                    buffer[bufferOffset] = 0;
+                    buffer[bufferOffset + 1] = 0;
+                    buffer[bufferOffset + 2] = 0;
+                    buffer[bufferOffset + CO.A] = sourceColor.alpha;
+                    bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+                }
+                while (--len != 0);
+            }
+            else
+            {
+                Color newColor = Color.FromArgb(alpha, sourceColor);
+                do
+                {
+
+
+                    buffer[bufferOffset] = 0;
+                    buffer[bufferOffset + 1] = 0;
+                    buffer[bufferOffset + 2] = 0;
+                    buffer[bufferOffset + +CO.A] = (byte)((newColor.alpha + EXISTING_A) - ((newColor.alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+
+                    bufferOffset += m_DistanceInBytesBetweenPixelsInclusive;
+                }
+                while (--len != 0);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
 
         //void SubPixRender(IImageReaderWriter dest, Scanline scanline, Color color)
         //{
@@ -960,10 +983,12 @@ namespace PixelFarm.Agg
         byte[] coverage_secondary;
         byte[] coverage_tertiary;
         //--------------------------------
+        int numLevel;
+
         public LcdDistributionLut(GrayLevels grayLevel, double prim, double second, double tert)
         {
             this.grayLevel = grayLevel;
-            int numLevel = 0;
+
             switch (grayLevel)
             {
                 default: throw new System.NotSupportedException();
@@ -996,7 +1021,15 @@ namespace PixelFarm.Agg
                 coverage_secondary[i] = m_secondary[toGreyScaleLevel];
                 coverage_tertiary[i] = m_tertiary[toGreyScaleLevel];
             }
-
+        }
+        /// <summary>
+        /// convert from original 0-255 to level for this lut
+        /// </summary>
+        /// <param name="orgLevel"></param>
+        /// <returns></returns>
+        public byte Convert255ToLevel(byte orgLevel)
+        {
+            return (byte)((((float)orgLevel + 1) / 256f) * (float)numLevel);
         }
         public byte Primary(int greyLevelIndex)
         {
