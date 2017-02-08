@@ -65,15 +65,12 @@ namespace PixelFarm.Agg
         {
 
         }
-
-
         public void RenderScanline(
-              IImageReaderWriter dest,
-              ScanlineRasterizer sclineRas,
-              Scanline scline,
-              Color color)
+            IImageReaderWriter dest,
+            ScanlineRasterizer sclineRas,
+            Scanline scline,
+            Color color)
         {
-
 
 #if DEBUG
             int dbugMinScanlineCount = 0;
@@ -82,7 +79,7 @@ namespace PixelFarm.Agg
             //1. ensure single line buffer width
             _grayScaleLine.EnsureLineStride(dest.Width + 4);
             //2. setup vars
-            _currentLcdLut = s_g4_1_3LcdLut;
+            _currentLcdLut = s_g4_1_2LcdLut;// s_g4_1_3LcdLut;
             byte[] dest_buffer = dest.GetBuffer();
             int dest_w = dest.Width;
             int dest_h = dest.Height;
@@ -97,12 +94,11 @@ namespace PixelFarm.Agg
             byte color_alpha = color.alpha;
             //---------------------------
             //3. loop, render single scanline with subpixel rendering 
-            
+
             while (sclineRas.SweepScanline(scline))
             {
                 //3.1. clear 
                 _grayScaleLine.Clear();
-
                 //3.2. write grayscale span to temp buffer
                 //3.3 convert to subpixel value and write to dest buffer
 
@@ -126,14 +122,13 @@ namespace PixelFarm.Agg
                         _grayScaleLine.SubPixBlendHL(x, x2, color_alpha, covers[span.cover_index]);
                     }
                 }
-
-
                 Blend(dest_buffer, dest_stride, scline.Y, src_w, src_stride, this._grayScaleLine);
 #if DEBUG
                 dbugMinScanlineCount++;
 #endif
             }
         }
+
         public LcdDistributionLut LcdLut
         {
             get { return _currentLcdLut; }
@@ -179,19 +174,18 @@ namespace PixelFarm.Agg
 
                 //3.
                 //from single grey scale value it is expanded*** into 5 color-components
-                for (int n = 0; n < 3; ++n)
-                {
-                    _forwardBuffer.WriteAccum(
-                        g8Lut.Tertiary(greyScaleValue),
-                        g8Lut.Secondary(greyScaleValue),
-                        g8Lut.Primary(greyScaleValue));
-                    //4. read accumulate 'energy' back 
-                    _forwardBuffer.ReadNext(out e0);
-                    //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
-                    //------------------------------------------------------------
-                    ScanlineSubPixelRasterizer.BlendSpan(e0 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                    //------------------------------------------------------------
-                }
+
+                _forwardBuffer.WriteAccum(
+                    g8Lut.Tertiary(greyScaleValue),
+                    g8Lut.Secondary(greyScaleValue),
+                    g8Lut.Primary(greyScaleValue));
+                //4. read accumulate 'energy' back 
+                _forwardBuffer.ReadNext(out e0);
+                //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
+                //------------------------------------------------------------
+                ScanlineSubPixelRasterizer.BlendSpan(e0 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                //------------------------------------------------------------
+
                 srcIndex++;
             }
             //---------
@@ -229,6 +223,7 @@ namespace PixelFarm.Agg
                 }
             }
         }
+
 
         public static void BlendSpan(int a0, byte[] rgb, ref int color_index, byte[] destImgBuffer, ref int destImgIndex, ref int round)
         {
@@ -766,8 +761,7 @@ namespace PixelFarm.Agg
             {
                 default:
                     {
-                        //prev mode  
-                        //this mode 
+
                         while (sclineRas.SweepScanline(scline))
                         {
                             //render solid single scanline
@@ -996,6 +990,7 @@ namespace PixelFarm.Agg
         /// <returns></returns>
         public byte Convert255ToLevel(byte orgLevel)
         {
+
             return (byte)((((float)orgLevel + 1) / 256f) * (float)(numLevel - 1));
         }
         public byte Primary(int greyLevelIndex)

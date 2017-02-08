@@ -1,4 +1,4 @@
-﻿//BSD, 2014-2016, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
@@ -33,7 +33,7 @@ namespace PixelFarm.Agg
         //-------------------------------------------------------
         public abstract double StrokeWidth { get; set; }
         public abstract SmoothingMode SmoothingMode { get; set; }
-        public abstract bool UseSubPixelRendering { get; set; }
+        public abstract bool UseSubPixelRendering { get; set; } 
         public abstract Color FillColor { get; set; }
         public abstract Color StrokeColor { get; set; }
         //-------------------------------------------------------

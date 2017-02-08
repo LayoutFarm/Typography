@@ -1,4 +1,4 @@
-//MIT, 2014-2016, WinterDev
+//MIT, 2014-2017, WinterDev
 
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
@@ -63,6 +63,11 @@ namespace PixelFarm.Agg
             this.currentBlender = this.pixBlenderRGBA32 = new PixelBlenderBGRA();
         }
 
+        public override bool UseSubPixelRendering2
+        {
+            get { return ScanlineRasterizer.UseSubPixelRendering; }
+            set { ScanlineRasterizer.UseSubPixelRendering = value; }
+        }
         public override ScanlinePacked8 ScanlinePacked8
         {
             get { return this.sclinePack8; }
