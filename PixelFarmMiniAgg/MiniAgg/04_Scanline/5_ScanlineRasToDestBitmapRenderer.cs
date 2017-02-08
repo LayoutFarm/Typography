@@ -63,7 +63,8 @@ namespace PixelFarm.Agg
 
         internal ScanlineSubPixelRasterizer()
         {
-
+            //default
+            _currentLcdLut = s_g4_1_2LcdLut;
         }
         public void RenderScanline(
             IImageReaderWriter dest,
@@ -79,7 +80,6 @@ namespace PixelFarm.Agg
             //1. ensure single line buffer width
             _grayScaleLine.EnsureLineStride(dest.Width + 4);
             //2. setup vars
-            _currentLcdLut = s_g4_1_2LcdLut;// s_g4_1_3LcdLut;
             byte[] dest_buffer = dest.GetBuffer();
             int dest_w = dest.Width;
             int dest_h = dest.Height;
@@ -88,9 +88,12 @@ namespace PixelFarm.Agg
             int src_stride = dest_stride;
             //*** set color before call Blend()
             this._color = color;
+
             this._rgb[0] = color.R;
             this._rgb[1] = color.G;
             this._rgb[2] = color.B;
+
+
             byte color_alpha = color.alpha;
             //---------------------------
             //3. loop, render single scanline with subpixel rendering 
@@ -100,8 +103,7 @@ namespace PixelFarm.Agg
                 //3.1. clear 
                 _grayScaleLine.Clear();
                 //3.2. write grayscale span to temp buffer
-                //3.3 convert to subpixel value and write to dest buffer
-
+                //3.3 convert to subpixel value and write to dest buffer 
                 //render solid single scanline 
                 int num_spans = scline.SpanCount;
                 byte[] covers = scline.GetCovers();
@@ -122,7 +124,7 @@ namespace PixelFarm.Agg
                         _grayScaleLine.SubPixBlendHL(x, x2, color_alpha, covers[span.cover_index]);
                     }
                 }
-                Blend(dest_buffer, dest_stride, scline.Y, src_w, src_stride, this._grayScaleLine);
+                BlendScanline(dest_buffer, dest_stride, scline.Y, src_w, src_stride, this._grayScaleLine);
 #if DEBUG
                 dbugMinScanlineCount++;
 #endif
@@ -137,11 +139,11 @@ namespace PixelFarm.Agg
                 _currentLcdLut = value;
             }
         }
-        void Blend(byte[] destImgBuffer, int destStride, int y, int srcW, int srcStride, SingleLineBuffer lineBuffer)
+        void BlendScanline(byte[] destImgBuffer, int destStride, int y, int srcW, int srcStride, SingleLineBuffer lineBuffer)
         {
 
             byte[] lineBuff = lineBuffer.GetInternalBuffer();
-            LcdDistributionLut g8Lut = _currentLcdLut;
+            LcdDistributionLut lcdLut = _currentLcdLut;
             _forwardBuffer.Reset();
             int srcIndex = 0;
             //start pixel
@@ -154,38 +156,30 @@ namespace PixelFarm.Agg
             //single line 
             srcIndex = 0;
             destImgIndex = (destStride * y) + (destX * 4); //4 color component
-            int i = 0;
+            int color_index = 0;
             int round = 0;
             _forwardBuffer.Reset();
 
+            byte e0 = 0;
             for (int x = 0; x < srcW; ++x)
             {
-                byte e0 = 0;
-                //1.
-                //read 1 pixel (4 bytes, 4 color components)
-                //byte r = lineBuff[srcIndex];
-                //byte g = lineBuff[srcIndex + 1];
-                //byte b = lineBuff[srcIndex + 2];
-                //byte a = lineBuff[srcIndex + 3];
+                //1. 
                 byte a = lineBuff[srcIndex];
                 //2.
                 //convert to grey scale and convert to 65 level grey scale value 
-                byte greyScaleValue = g8Lut.Convert255ToLevel(a);
-
+                byte greyScaleValue = lcdLut.Convert255ToLevel(a);
                 //3.
-                //from single grey scale value it is expanded*** into 5 color-components
-
+                //from single grey scale value it is expanded*** into 5 color-components 
                 _forwardBuffer.WriteAccum(
-                    g8Lut.Tertiary(greyScaleValue),
-                    g8Lut.Secondary(greyScaleValue),
-                    g8Lut.Primary(greyScaleValue));
+                    lcdLut.Tertiary(greyScaleValue),
+                    lcdLut.Secondary(greyScaleValue),
+                    lcdLut.Primary(greyScaleValue));
                 //4. read accumulate 'energy' back 
                 _forwardBuffer.ReadNext(out e0);
                 //5. blend this pixel to dest image (expand to 5 (sub)pixel) 
                 //------------------------------------------------------------
-                ScanlineSubPixelRasterizer.BlendSpan(e0 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                //------------------------------------------------------------
-
+                BlendPixel(e0 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
+                //------------------------------------------------------------ 
                 srcIndex++;
             }
             //---------
@@ -195,27 +189,28 @@ namespace PixelFarm.Agg
             {
                 byte e1, e2, e3, e4;
                 _forwardBuffer.ReadRemaining4(out e1, out e2, out e3, out e4);
+                //TODO: review here
                 int remainingEnergy = Math.Min(srcStride, 4);
                 switch (remainingEnergy)
                 {
                     default: throw new NotSupportedException();
                     case 4:
-                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                        BlendSpan(e2 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                        BlendSpan(e3 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                        BlendSpan(e4 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e1 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e2 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e3 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e4 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 3:
-                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                        BlendSpan(e2 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                        BlendSpan(e3 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e1 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e2 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e3 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 2:
-                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
-                        BlendSpan(e2 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e1 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e2 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 1:
-                        BlendSpan(e1 * color_alpha, rgb, ref i, destImgBuffer, ref destImgIndex, ref round);
+                        BlendPixel(e1 * color_alpha, rgb, ref color_index, destImgBuffer, ref destImgIndex, ref round);
                         break;
                     case 0:
                         //nothing
@@ -224,8 +219,7 @@ namespace PixelFarm.Agg
             }
         }
 
-
-        public static void BlendSpan(int a0, byte[] rgb, ref int color_index, byte[] destImgBuffer, ref int destImgIndex, ref int round)
+        public static void BlendPixel(int a0, byte[] rgb, ref int color_index, byte[] destImgBuffer, ref int destImgIndex, ref int round)
         {
             //a0 = energy * color_alpha
             byte existingColor = destImgBuffer[destImgIndex];
@@ -234,24 +228,25 @@ namespace PixelFarm.Agg
             //move to next dest
             destImgIndex++;
             color_index++;
-            if (color_index > 2)
+            if ((color_index) > 2)
             {
                 color_index = 0;//reset
             }
             round++;
-            if (round > 2)
+            if ((round) > 2)
             {
                 //this is alpha chanel
                 //so we skip alpha byte to next
                 //and swap rgb of latest write pixel
-                //--------------------------
+                //-------------------------- 
+                //TODO: review here, not correct
                 //in-place swap
                 byte r1 = destImgBuffer[destImgIndex - 1];
                 byte b1 = destImgBuffer[destImgIndex - 3];
                 destImgBuffer[destImgIndex - 3] = r1;
                 destImgBuffer[destImgIndex - 1] = b1;
                 //-------------------------- 
-                destImgIndex++;
+                destImgIndex++;//skip alpha chanel
                 round = 0;
             }
         }
@@ -573,13 +568,15 @@ namespace PixelFarm.Agg
             byte[] byteBuffer = new byte[5];
             int writeIndex = 0;
             int readIndex = 0;
-
+            public ForwardTemporaryBuffer()
+            {
+            }
             /// <summary>
-            /// accumulate byte data 
+            /// expand accumulaton data to 5 bytes
             /// </summary>
-            /// <param name="v0"></param>
-            /// <param name="v1"></param>
-            /// <param name="v2"></param>
+            /// <param name="v0">tertiary</param>
+            /// <param name="v1">secondary</param>
+            /// <param name="v2">primary</param>
             public void WriteAccum(byte v0, byte v1, byte v2)
             {
                 byte v3 = v1, v4 = v0;
@@ -687,7 +684,7 @@ namespace PixelFarm.Agg
                 }
             }
 
-            public void ReadNext5(out byte v0, out byte v1, out byte v2, out byte v3, out byte v4)
+            void ReadNext5(out byte v0, out byte v1, out byte v2, out byte v3, out byte v4)
             {
                 //read from current read index 
                 //indeed we can use loop for this,
@@ -865,57 +862,57 @@ namespace PixelFarm.Agg
     }
 
 
-    // Sub-pixel energy distribution lookup table.
-    // See description by Steve Gibson: http://grc.com/cttech.htm
-    // The class automatically normalizes the coefficients
-    // in such a way that primary + 2*secondary + 3*tertiary = 1.0
-    // Also, the input values are in range of 0...NumLevels, output ones
-    // are 0...255
-    //--------------------------------- 
-    //template<class GgoFormat> class lcd_distribution_lut
-    //{
-    //public:
-    //    lcd_distribution_lut(double prim, double second, double tert)
-    //    {
-    //        double norm = (255.0 / (GgoFormat::num_levels - 1)) / (prim + second*2 + tert*2);
-    //        prim   *= norm;
-    //        second *= norm;
-    //        tert   *= norm;
-    //        for(unsigned i = 0; i < GgoFormat::num_levels; i++)
-    //        {
-    //            m_primary[i]   = (unsigned char)floor(prim   * i);
-    //            m_secondary[i] = (unsigned char)floor(second * i);
-    //            m_tertiary[i]  = (unsigned char)floor(tert   * i);
-    //        }
-    //    }
-
-    //    unsigned primary(unsigned v)   const { return m_primary[v];   }
-    //    unsigned secondary(unsigned v) const { return m_secondary[v]; }
-    //    unsigned tertiary(unsigned v)  const { return m_tertiary[v];  }
-
-    //    static unsigned ggo_format()
-    //    {
-    //        return GgoFormat::format;
-    //    }
-
-    //private:
-    //    unsigned char m_primary[GgoFormat::num_levels];
-    //    unsigned char m_secondary[GgoFormat::num_levels];
-    //    unsigned char m_tertiary[GgoFormat::num_levels];
-    //};
-
-    //    // Possible formats for GetGlyphOutline() and corresponding 
-    //// numbers of levels of gray.
-    ////---------------------------------
-    //struct ggo_gray2 { enum { num_levels = 5,  format = GGO_GRAY2_BITMAP }; };
-    //struct ggo_gray4 { enum { num_levels = 17, format = GGO_GRAY4_BITMAP }; };
-    //struct ggo_gray8 { enum { num_levels = 65, format = GGO_GRAY8_BITMAP }; };
-
-
-
 
     public class LcdDistributionLut
     {
+
+        // Sub-pixel energy distribution lookup table.
+        // See description by Steve Gibson: http://grc.com/cttech.htm
+        // The class automatically normalizes the coefficients
+        // in such a way that primary + 2*secondary + 3*tertiary = 1.0
+        // Also, the input values are in range of 0...NumLevels, output ones
+        // are 0...255
+        //--------------------------------- 
+        //template<class GgoFormat> class lcd_distribution_lut
+        //{
+        //public:
+        //    lcd_distribution_lut(double prim, double second, double tert)
+        //    {
+        //        double norm = (255.0 / (GgoFormat::num_levels - 1)) / (prim + second*2 + tert*2);
+        //        prim   *= norm;
+        //        second *= norm;
+        //        tert   *= norm;
+        //        for(unsigned i = 0; i < GgoFormat::num_levels; i++)
+        //        {
+        //            m_primary[i]   = (unsigned char)floor(prim   * i);
+        //            m_secondary[i] = (unsigned char)floor(second * i);
+        //            m_tertiary[i]  = (unsigned char)floor(tert   * i);
+        //        }
+        //    }
+
+        //    unsigned primary(unsigned v)   const { return m_primary[v];   }
+        //    unsigned secondary(unsigned v) const { return m_secondary[v]; }
+        //    unsigned tertiary(unsigned v)  const { return m_tertiary[v];  }
+
+        //    static unsigned ggo_format()
+        //    {
+        //        return GgoFormat::format;
+        //    }
+
+        //private:
+        //    unsigned char m_primary[GgoFormat::num_levels];
+        //    unsigned char m_secondary[GgoFormat::num_levels];
+        //    unsigned char m_tertiary[GgoFormat::num_levels];
+        //};
+
+        //    // Possible formats for GetGlyphOutline() and corresponding 
+        //// numbers of levels of gray.
+        ////---------------------------------
+        //struct ggo_gray2 { enum { num_levels = 5,  format = GGO_GRAY2_BITMAP }; };
+        //struct ggo_gray4 { enum { num_levels = 17, format = GGO_GRAY4_BITMAP }; };
+        //struct ggo_gray8 { enum { num_levels = 65, format = GGO_GRAY8_BITMAP }; };
+
+
         public enum GrayLevels
         {
             /// <summary>
@@ -1020,8 +1017,6 @@ namespace PixelFarm.Agg
         {
             return coverage_tertiary[coverage];
         }
-
-
     }
 
 
