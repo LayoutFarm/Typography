@@ -391,11 +391,10 @@ namespace PixelFarm.Agg
                 {
                     this.sclineRasToBmp.ScanlineRenderMode = ScanlineRenderMode.Default;
                     this.sclineRas.UseSubPixelRendering = false;
-                }
-                this.sclineRasToBmp.ScanlineRenderMode = value ? ScanlineRenderMode.SubPixelRendering : ScanlineRenderMode.Default;
+                } 
             }
         }
-        
+
         public override Color FillColor
         {
             get { return fillColor; }
