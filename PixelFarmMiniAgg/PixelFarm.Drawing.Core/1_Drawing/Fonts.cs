@@ -1,4 +1,4 @@
-﻿//MIT, 2014-2016, WinterDev
+﻿//MIT, 2014-2017, WinterDev
 
 using System;
 using PixelFarm.Drawing.Fonts;
@@ -112,7 +112,7 @@ namespace PixelFarm.Drawing
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    return ConvEmSizeInPointsToPixels(SizeInPoints);                     
                 }
             }
         }

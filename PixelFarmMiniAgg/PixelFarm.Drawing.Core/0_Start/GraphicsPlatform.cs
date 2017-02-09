@@ -1,6 +1,4 @@
-﻿//MIT, 2014-2016, WinterDev 
-using System;
-using System.Collections.Generic;
+﻿//BSD, 2014-2017, WinterDev
 
 namespace PixelFarm.Drawing
 {
@@ -16,7 +14,7 @@ namespace PixelFarm.Drawing
             CanvasInitParameters canvasInitPars = new CanvasInitParameters());
 
 
-      
+
         //----------------------------------------------------------------------
         //set provider delegates before use it from comment graphics platform
         //----------------------------------------------------------------------
@@ -31,7 +29,7 @@ namespace PixelFarm.Drawing
         }
     }
 
-   
+
 
     public delegate byte[] ImageBufferProviderDelegate(string filename);
 

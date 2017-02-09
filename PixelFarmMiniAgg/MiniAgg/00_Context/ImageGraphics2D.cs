@@ -1,4 +1,4 @@
-//MIT, 2014-2016, WinterDev
+//MIT, 2014-2017, WinterDev
 
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
@@ -49,17 +49,25 @@ namespace PixelFarm.Agg
 
             this.destActualImage = destImage;
             this.destImageReaderWriter = new MyImageReaderWriter();
-            destImageReaderWriter.ReloadImage(destImage);
+            this.destImageReaderWriter.ReloadImage(destImage);
+            //
             this.sclineRas = new ScanlineRasterizer();
             this.sclineRasToBmp = new ScanlineRasToDestBitmapRenderer();
+            //
             this.destWidth = destImage.Width;
             this.destHeight = destImage.Height;
+            //
             this.clipBox = new RectInt(0, 0, destImage.Width, destImage.Height);
             this.sclineRas.SetClipBox(this.clipBox);
             this.sclinePack8 = new ScanlinePacked8();
             this.currentBlender = this.pixBlenderRGBA32 = new PixelBlenderBGRA();
         }
 
+        public override bool UseSubPixelRendering2
+        {
+            get { return ScanlineRasterizer.UseSubPixelRendering; }
+            set { ScanlineRasterizer.UseSubPixelRendering = value; }
+        }
         public override ScanlinePacked8 ScanlinePacked8
         {
             get { return this.sclinePack8; }
@@ -194,7 +202,11 @@ namespace PixelFarm.Agg
                         else
                         {
                             //other color
+#if WIN
                             uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
+#else
+                            uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
+#endif
                             int n = buffer.Length / 4;
                             unsafe
                             {

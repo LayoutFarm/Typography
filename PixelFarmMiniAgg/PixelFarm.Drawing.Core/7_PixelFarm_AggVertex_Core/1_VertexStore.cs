@@ -1,4 +1,4 @@
-﻿//BSD, 2014-2016, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -70,6 +70,7 @@ namespace PixelFarm.Agg
             {
                 return GetVertex((int)(m_num_vertices - 1), out x, out y);
             }
+
             x = 0;
             y = 0;
             return VertexCmd.Stop;
@@ -325,6 +326,6 @@ namespace PixelFarm.Agg
 
 
 
-
+    
 
 }

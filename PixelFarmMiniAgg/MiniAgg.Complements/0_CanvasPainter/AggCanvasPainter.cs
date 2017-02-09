@@ -35,6 +35,9 @@ namespace PixelFarm.Agg
         Color strokeColor;
         ScanlinePacked8 scline;
         ScanlineRasterizer sclineRas;
+        /// <summary>
+        /// scanline rasterizer to bitmap
+        /// </summary>
         ScanlineRasToDestBitmapRenderer sclineRasToBmp;
         FilterMan filterMan = new FilterMan();
         RequestFont currentFont;
@@ -118,7 +121,7 @@ namespace PixelFarm.Agg
 
 
         VertexStorePool _vxsPool = new VertexStorePool();
-         
+
         VertexStore GetFreeVxs()
         {
             return _vxsPool.GetFreeVxs();
@@ -377,8 +380,21 @@ namespace PixelFarm.Agg
         public override bool UseSubPixelRendering
         {
             get { return sclineRasToBmp.ScanlineRenderMode == ScanlineRenderMode.SubPixelRendering; }
-            set { this.sclineRasToBmp.ScanlineRenderMode = value ? ScanlineRenderMode.SubPixelRendering : ScanlineRenderMode.Default; }
+            set
+            {
+                if (value)
+                {
+                    this.sclineRasToBmp.ScanlineRenderMode = ScanlineRenderMode.SubPixelRendering;
+                    this.sclineRas.UseSubPixelRendering = true;
+                }
+                else
+                {
+                    this.sclineRasToBmp.ScanlineRenderMode = ScanlineRenderMode.Default;
+                    this.sclineRas.UseSubPixelRendering = false;
+                } 
+            }
         }
+
         public override Color FillColor
         {
             get { return fillColor; }

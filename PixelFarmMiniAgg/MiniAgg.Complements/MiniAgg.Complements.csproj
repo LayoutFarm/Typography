@@ -41,12 +41,7 @@
     <Compile Include="0_CanvasPainter\TextPrinter.cs" />
     <Compile Include="1_Base\ScanlineRasToDestBitmapRendererExtension.cs" />
     <Compile Include="2_SpanGenerators\SpanGradient_GradientValueCalculators.cs" />
-    <Compile Include="4_Animation\ColorComponentStepup.cs" />
-    <Compile Include="4_Animation\GfxProcessorModule.cs" />
-    <Compile Include="4_Animation\ParallelTimeline.cs" />
-    <Compile Include="4_Animation\Timelines.cs" />
     <Compile Include="Image\FilterMan.cs" />
-    <Compile Include="x_notused\KDTree.cs" />
     <Compile Include="1_Base\PixelBlenderRGB.cs" />
     <Compile Include="1_Base\Queue.cs" />
     <Compile Include="1_Base\BorderDouble.cs" />
@@ -59,14 +54,11 @@
     <Compile Include="2_SpanGenerators\SpanGradient.cs" />
     <Compile Include="Image\AlphaMaskAdaptor.cs" />
     <Compile Include="Image\FloodFiller.cs" />
-    <Compile Include="x_notused\x_ImageTgaIO.cs" />
     <Compile Include="Filter\RecursiveBlur.cs" />
     <Compile Include="Filter\StackBlur.cs" />
     <Compile Include="Image\Transposer.cs" />
-    <Compile Include="x_notused\ImageClipProxyFloat.cs" />
     <Compile Include="2_SpanGenerators\SpanGenGourand.cs" />
     <Compile Include="2_SpanGenerators\SpanGenGouraudRGBA.cs" />
-    <Compile Include="x_notused\SpanSubDivAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

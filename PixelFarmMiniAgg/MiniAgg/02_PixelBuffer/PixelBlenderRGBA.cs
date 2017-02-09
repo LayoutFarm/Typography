@@ -1,4 +1,4 @@
-//BSD, 2014-2016, WinterDev
+//BSD, 2014-2017, WinterDev
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -238,7 +238,7 @@ namespace PixelFarm.Agg.Imaging
 
     public sealed class PixelBlenderPreMultBGRA : PixelBlenderBGRABase, IPixelBlender
     {
-        static int[] m_Saturate9BitToByte = new int[1 << 9];
+        static readonly int[] m_Saturate9BitToByte = new int[1 << 9];
         public PixelBlenderPreMultBGRA()
         {
             if (m_Saturate9BitToByte[2] == 0)
@@ -252,7 +252,10 @@ namespace PixelFarm.Agg.Imaging
 
         public Color PixelToColorRGBA_Bytes(byte[] buffer, int bufferOffset)
         {
-            return new Color(buffer[bufferOffset + CO.A], buffer[bufferOffset + CO.R], buffer[bufferOffset + CO.G], buffer[bufferOffset + CO.B]);
+            return new Color(buffer[bufferOffset + CO.A],
+                buffer[bufferOffset + CO.R],
+                buffer[bufferOffset + CO.G],
+                buffer[bufferOffset + CO.B]);
         }
 
         public void CopyPixels(byte[] buffer, int bufferOffset, Color sourceColor, int count)
@@ -327,7 +330,7 @@ namespace PixelFarm.Agg.Imaging
                         for (int i = 0; i < count; i++)
                         {
 #if false
-                                BlendPixel(pDestBuffer, bufferOffset, sourceColors[sourceColorsOffset]);
+                           BlendPixel(pDestBuffer, bufferOffset, sourceColors[sourceColorsOffset]);
 #else
                             Color sourceColor = sourceColors[sourceColorsOffset];
                             if (sourceColor.alpha == 255)

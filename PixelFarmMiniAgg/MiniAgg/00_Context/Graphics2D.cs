@@ -1,4 +1,4 @@
-//BSD, 2014-2016, WinterDev
+//BSD, 2014-2017, WinterDev
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -41,7 +41,7 @@ namespace PixelFarm.Agg
         /// <param name="c"></param>
         public abstract void Render(VertexStoreSnap vertexSource, Drawing.Color c);
         //------------------------------------------------------------------------
-
+        public abstract bool UseSubPixelRendering2 { get; set; }
         /// <summary>
         /// we do NOT store vxs
         /// </summary>
