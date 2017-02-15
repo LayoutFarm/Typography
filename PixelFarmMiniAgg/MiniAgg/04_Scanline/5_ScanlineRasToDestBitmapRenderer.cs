@@ -41,25 +41,20 @@ namespace PixelFarm.Agg
         /// grey scale 4, 1/8 lcd lookup table
         /// </summary>
         static readonly LcdDistributionLut s_g4_1_2LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 2f, 1f / 4f, 1f / 8f);
-
-
         Color _color;
-        byte[] _rgb = new byte[3];
 
         const int BASE_MASK = 255;
-        const int EXISTING_A = 0;
-        const int m_DistanceInBytesBetweenPixelsInclusive = 4; //for 32 bits RGBA
-
+        //in this case EXISTING_A (existing alpha always 0) 
+        //const int EXISTING_A = 0; 
         /// <summary>
         /// forward grayscale buffer
         /// </summary>
         ForwardTemporaryBuffer _forwardBuffer = new ForwardTemporaryBuffer();
         /// <summary>
-        /// single line buffer 
+        /// single line gray-scale buffer(8 bits) 
         /// </summary>
         SingleLineBuffer _grayScaleLine = new SingleLineBuffer();
         LcdDistributionLut _currentLcdLut = null;
-
 
         internal ScanlineSubPixelRasterizer()
         {
@@ -89,14 +84,11 @@ namespace PixelFarm.Agg
             //*** set color before call Blend()
             this._color = color;
 
-            this._rgb[0] = color.R;
-            this._rgb[1] = color.G;
-            this._rgb[2] = color.B;
-
-
             byte color_alpha = color.alpha;
             //---------------------------
             //3. loop, render single scanline with subpixel rendering 
+
+            byte[] lineBuff = _grayScaleLine.GetInternalBuffer();
 
             while (sclineRas.SweepScanline(scline))
             {
@@ -124,7 +116,7 @@ namespace PixelFarm.Agg
                         _grayScaleLine.SubPixBlendHL(x, x2, color_alpha, covers[span.cover_index]);
                     }
                 }
-                BlendScanline(dest_buffer, dest_stride, scline.Y, src_w, src_stride, this._grayScaleLine);
+                BlendScanline(dest_buffer, dest_stride, scline.Y, src_w, src_stride, lineBuff);
 #if DEBUG
                 dbugMinScanlineCount++;
 #endif
@@ -141,10 +133,8 @@ namespace PixelFarm.Agg
         }
 
 
-        void BlendScanline(byte[] destImgBuffer, int destStride, int y, int srcW, int srcStride, SingleLineBuffer lineBuffer)
+        void BlendScanline(byte[] destImgBuffer, int destStride, int y, int srcW, int srcStride, byte[] grayScaleLineBuffer)
         {
-
-            byte[] lineBuff = lineBuffer.GetInternalBuffer();
             LcdDistributionLut lcdLut = _currentLcdLut;
             _forwardBuffer.Reset();
             int srcIndex = 0;
@@ -153,54 +143,68 @@ namespace PixelFarm.Agg
             int destX = 0;
             //-----------------
             byte color_alpha = _color.alpha;
-            byte[] rgb = this._rgb;
+            byte color_c0 = _color.red;
+            byte color_c1 = _color.green;
+            byte color_c2 = _color.blue;
+
             //-----------------
             //single line 
             srcIndex = 0;
             destImgIndex = (destStride * y) + (destX * 4); //4 color component
-            int color_index = 0;
-            int round = 0;
-            _forwardBuffer.Reset();
 
+
+            _forwardBuffer.Reset();
             int nwidth = srcW;
             while (nwidth > 3)
             {
-
-
                 //------------
                 //TODO: add release mode code (optimized version)
-                //1. convert from original grayscale value from lineBuff
-                //to lcd level
-                byte g0 = lcdLut.Convert255ToLevel(lineBuff[srcIndex]);
-                byte g1 = lcdLut.Convert255ToLevel(lineBuff[srcIndex + 1]);
-                byte g2 = lcdLut.Convert255ToLevel(lineBuff[srcIndex + 2]);
-                //3.
-                //from single grey scale value it is expanded*** into 5 color-components 
-                byte e_0, e_1, e_2; //energy 01,2,3
-                _forwardBuffer.WriteAccumAndReadBack(
-                    lcdLut,
-                    g0,
-                    g1,
-                    g2, //write
-                    out e_0, out e_1, out e_2); //and read back
+                //1. convert from original grayscale value from lineBuff to lcd level
+                //and 
+                //2.
+                //from single grey scale value,
+                //it is expanded*** into 5 color-components 
+
+                byte e_0, e_1, e_2; //energy 0,1,2 
+                {
+                    byte write0 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex]);
+                    byte write1 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 1]);
+                    byte write2 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 2]);
+
+                    //0
+                    _forwardBuffer.WriteAccumAndReadBack(
+                        lcdLut.Tertiary(write0),
+                        lcdLut.Secondary(write0),
+                        lcdLut.Primary(write0),
+                        out e_0);
+                    //1
+                    _forwardBuffer.WriteAccumAndReadBack(
+                        lcdLut.Tertiary(write1),
+                        lcdLut.Secondary(write1),
+                        lcdLut.Primary(write1),
+                        out e_1);
+                    //2
+                    _forwardBuffer.WriteAccumAndReadBack(
+                        lcdLut.Tertiary(write2),
+                        lcdLut.Secondary(write2),
+                        lcdLut.Primary(write2),
+                        out e_2);
+                }
 
                 //4. blend 3 pixels 
-                byte ec0 = destImgBuffer[destImgIndex];//existing color
-                byte ec1 = destImgBuffer[destImgIndex + 1];//existing color
-                byte ec2 = destImgBuffer[destImgIndex + 2];//existing color  
+                byte exc0 = destImgBuffer[destImgIndex];//existing color
+                byte exc1 = destImgBuffer[destImgIndex + 1];//existing color
+                byte exc2 = destImgBuffer[destImgIndex + 2];//existing color  
+
                 //--------------------------------------------------------
-                //note: that we swap e_2 and e_0 on the fly 
-                byte n0 = (byte)((((rgb[color_index] - ec0) * (e_2 * color_alpha)) + (ec0 << 16)) >> 16); //swap on the fly
-                byte n1 = (byte)((((rgb[color_index + 1] - ec1) * (e_1 * color_alpha)) + (ec1 << 16)) >> 16);
-                byte n2 = (byte)((((rgb[color_index + 2] - ec2) * (e_0 * color_alpha)) + (ec2 << 16)) >> 16);//swap on the fly
+                //note: that we swap e_2 and e_0 on the fly***
                 //-------------------------------------------------------- 
-                destImgBuffer[destImgIndex] = n0;
-                destImgBuffer[destImgIndex + 1] = n1;
-                destImgBuffer[destImgIndex + 2] = n2;
+                destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (e_2 * color_alpha)) + (exc0 << 16)) >> 16); //swap on the fly
+                destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - exc1) * (e_1 * color_alpha)) + (exc1 << 16)) >> 16);
+                destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - exc2) * (e_0 * color_alpha)) + (exc2 << 16)) >> 16);//swap on the fly
                 //---------------------------------------------------------
                 destImgIndex += 4;
-                round = 0;
-                color_index = 0;
+                 
                 srcIndex += 3;
                 nwidth -= 3;
             }
@@ -209,8 +213,7 @@ namespace PixelFarm.Agg
             //we must draw extened 4 pixels
             //---------
             {
-
-                //get remaining energy from _forwaed buffer
+                //get remaining energy from _forward buffer
                 byte ec_r1, ec_r2, ec_r3, ec_r4;
                 _forwardBuffer.ReadRemaining4(out ec_r1, out ec_r2, out ec_r3, out ec_r4);
 
@@ -226,54 +229,43 @@ namespace PixelFarm.Agg
                     default: throw new NotSupportedException();
                     case 5:
                         {
-                            //first round
-                            byte ec0 = destImgBuffer[destImgIndex];//existing color
-                            byte ec1 = destImgBuffer[destImgIndex + 1];//existing color
-                            byte ec2 = destImgBuffer[destImgIndex + 2];//existing color 
+                            //1st round
+                            byte exc0 = destImgBuffer[destImgIndex];//existing color
+                            byte exc1 = destImgBuffer[destImgIndex + 1];//existing color
+                            byte exc2 = destImgBuffer[destImgIndex + 2];//existing color 
 
                             //--------------------------------------------------------
-                            //note: that we swap e_2 and e_0 on the fly 
-                            byte n0 = (byte)((((rgb[color_index] - ec0) * (ec_r3 * color_alpha)) + (ec0 << 16)) >> 16); //swap on the fly
-                            byte n1 = (byte)((((rgb[color_index + 1] - ec1) * (ec_r2 * color_alpha)) + (ec1 << 16)) >> 16);
-                            byte n2 = (byte)((((rgb[color_index + 2] - ec2) * (ec_r1 * color_alpha)) + (ec2 << 16)) >> 16);//swap on the fly
-                                                                                                                           //-------------------------------------------------------- 
-                            destImgBuffer[destImgIndex] = n0;
-                            destImgBuffer[destImgIndex + 1] = n1;
-                            destImgBuffer[destImgIndex + 2] = n2; 
+                            //note: that we swap ec_r3 and ec_r1 on the fly***
+
+                            destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (ec_r3 * color_alpha)) + (exc0 << 16)) >> 16); //swap on the fly
+                            destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - exc1) * (ec_r2 * color_alpha)) + (exc1 << 16)) >> 16);
+                            destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - exc2) * (ec_r1 * color_alpha)) + (exc2 << 16)) >> 16);//swap on the fly
                             destImgIndex += 4;
-                            round = 0;
-                            color_index = 0;
-                            srcIndex += 3; 
+
+
+                            srcIndex += 3;
                             //--------------------------------------------------------
                             //2nd round
-                            ec0 = destImgBuffer[destImgIndex];//existing color
-                            n0 = (byte)((((rgb[color_index] - ec0) * (ec_r4 * color_alpha)) + (ec0 << 16)) >> 16);
-                            destImgBuffer[destImgIndex] = n0;//swap  on the fly
+                            exc0 = destImgBuffer[destImgIndex];//existing color 
+                            destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (ec_r4 * color_alpha)) + (exc0 << 16)) >> 16);
                         }
                         break;
                     case 4:
                         {
-                            //first round
+                            //1st round
                             byte ec0 = destImgBuffer[destImgIndex];//existing color
                             byte ec1 = destImgBuffer[destImgIndex + 1];//existing color
                             byte ec2 = destImgBuffer[destImgIndex + 2];//existing color 
 
                             //--------------------------------------------------------
                             //note: that we swap e_2 and e_0 on the fly 
-                            byte n0 = (byte)((((rgb[color_index] - ec0) * (ec_r3 * color_alpha)) + (ec0 << 16)) >> 16); //swap on the fly
-                            byte n1 = (byte)((((rgb[color_index + 1] - ec1) * (ec_r2 * color_alpha)) + (ec1 << 16)) >> 16);
-                            byte n2 = (byte)((((rgb[color_index + 2] - ec2) * (ec_r1 * color_alpha)) + (ec2 << 16)) >> 16);//swap on the fly
-                                                                                                                           //-------------------------------------------------------- 
-                            destImgBuffer[destImgIndex] = n0;
-                            destImgBuffer[destImgIndex + 1] = n1;
-                            destImgBuffer[destImgIndex + 2] = n2;
 
-                            destImgIndex += 4;
-                            round = 0;
-                            color_index = 0;
+                            destImgBuffer[destImgIndex] = (byte)((((color_c0 - ec0) * (ec_r3 * color_alpha)) + (ec0 << 16)) >> 16); //swap on the fly
+                            destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - ec1) * (ec_r2 * color_alpha)) + (ec1 << 16)) >> 16);
+                            destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - ec2) * (ec_r1 * color_alpha)) + (ec2 << 16)) >> 16);//swap on the fly
+
+                            destImgIndex += 4;                             
                             srcIndex += 3;
-
-                            //--------------------------------------------------------
                         }
                         break;
                     case 3:
@@ -527,8 +519,10 @@ namespace PixelFarm.Agg
                         }
                         else
                         {
-
-                            buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                            //original
+                            //buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                            //since in this case EXISTING_A is always 0, so we remove it
+                            buffer[bufferOffset] = (byte)((alpha) - ((BASE_MASK) >> (int)Color.BASE_SHIFT));
                         }
 
                         bufferOffset++;
@@ -588,7 +582,10 @@ namespace PixelFarm.Agg
                 {
                     do
                     {
-                        buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                        //original
+                        //buffer[bufferOffset] = (byte)((alpha + EXISTING_A) - ((alpha * EXISTING_A + BASE_MASK) >> (int)Color.BASE_SHIFT));
+                        //since in this case EXISTING_A is always 0, so we remove it
+                        buffer[bufferOffset] = (byte)((alpha) - ((BASE_MASK) >> (int)Color.BASE_SHIFT));
                         bufferOffset++;
 
                     } while (--len != 0);
@@ -602,72 +599,56 @@ namespace PixelFarm.Agg
 
             byte[] byteBuffer = new byte[5];
             int writeIndex = 0;
-            int readIndex = 0;
             public ForwardTemporaryBuffer()
             {
             }
-            public void WriteAccumAndReadBack(
-                LcdDistributionLut lut,
-                byte write0, byte write1, byte write2,
-                out byte read0, out byte read1, out byte read2)
-            {
 
-                //0
-                WriteAccum(
-                    lut.Tertiary(write0),
-                    lut.Secondary(write0),
-                    lut.Primary(write0));
-                ReadNext(out read0);
-                //1
-                WriteAccum(
-                    lut.Tertiary(write1),
-                    lut.Secondary(write1),
-                    lut.Primary(write1));
-                ReadNext(out read1);
-                //2
-                WriteAccum(
-                    lut.Tertiary(write2),
-                    lut.Secondary(write2),
-                    lut.Primary(write2));
-                ReadNext(out read2);
-            }
             /// <summary>
             /// expand accumulaton data to 5 bytes
             /// </summary>
             /// <param name="v0">tertiary</param>
             /// <param name="v1">secondary</param>
             /// <param name="v2">primary</param>
-            public void WriteAccum(byte v0, byte v1, byte v2)
+            public void WriteAccumAndReadBack(byte v0, byte v1, byte v2, out byte readBack)
             {
-                byte v3 = v1, v4 = v0;
+                //-----------------------------------------------
+                //0       -     1   -   2   -   1     -0
+                //tertiary-secondary-primary-secondary-tertiary
+                //-----------------------------------------------
                 //indeed we can use loop for this,
                 //but in this case we just switch it
                 switch (writeIndex)
                 {
                     default: throw new NotSupportedException();
                     case 0:
-                        byteBuffer[0] += v0; byteBuffer[1] += v1; byteBuffer[2] += v2;
-                        byteBuffer[3] += v3; byteBuffer[4] += v4;
+                        readBack = (byte)(byteBuffer[0] + v0); byteBuffer[0] = 0;//accum-read-reset
+                        byteBuffer[1] += v1; byteBuffer[2] += v2;
+                        byteBuffer[3] += v1; byteBuffer[4] += v0;
                         writeIndex = 1;
+
                         break;
                     case 1:
-                        byteBuffer[1] += v0; byteBuffer[2] += v1; byteBuffer[3] += v2;
-                        byteBuffer[4] += v3; byteBuffer[0] += v4;
+                        readBack = (byte)(byteBuffer[1] + v0); byteBuffer[1] = 0;//accum-read-reset
+                        byteBuffer[2] += v1; byteBuffer[3] += v2;
+                        byteBuffer[4] += v1; byteBuffer[0] += v0;
                         writeIndex = 2;
                         break;
                     case 2:
-                        byteBuffer[2] += v0; byteBuffer[3] += v1; byteBuffer[4] += v2;
-                        byteBuffer[0] += v3; byteBuffer[1] += v4;
+                        readBack = (byte)(byteBuffer[2] + v0); byteBuffer[2] = 0;//accum-read-reset
+                        byteBuffer[3] += v1; byteBuffer[4] += v2;
+                        byteBuffer[0] += v1; byteBuffer[1] += v0;
                         writeIndex = 3;
                         break;
                     case 3:
-                        byteBuffer[3] += v0; byteBuffer[4] += v1; byteBuffer[0] += v2;
-                        byteBuffer[1] += v3; byteBuffer[2] += v4;
+                        readBack = (byte)(byteBuffer[3] + v0); byteBuffer[3] = 0; //accum-read-reset
+                        byteBuffer[4] += v1; byteBuffer[0] += v2;
+                        byteBuffer[1] += v1; byteBuffer[2] += v0;
                         writeIndex = 4;
                         break;
                     case 4:
-                        byteBuffer[4] += v0; byteBuffer[0] += v1; byteBuffer[1] += v2;
-                        byteBuffer[2] += v3; byteBuffer[3] += v4;
+                        readBack = (byte)(byteBuffer[4] + v0); byteBuffer[4] = 0; //accum-read-reset
+                        byteBuffer[0] += v1; byteBuffer[1] += v2;
+                        byteBuffer[2] += v1; byteBuffer[3] += v0;
                         writeIndex = 0;
                         break;
                 }
@@ -675,50 +656,14 @@ namespace PixelFarm.Agg
             public void Reset()
             {
                 writeIndex = 0;
-                readIndex = 0;
                 byteBuffer[0] = byteBuffer[1] = byteBuffer[2] = byteBuffer[3] = byteBuffer[4] = 0;
-            }
-            public void ReadNext(out byte v0)
-            {
-                //read from current read index 
-                //indeed we can use loop for this,
-                //but in this case we just switch it                  
-                switch (readIndex)
-                {
-                    default: throw new NotSupportedException();
-                    case 0:
-                        v0 = byteBuffer[0];
-                        readIndex = 1;
-                        byteBuffer[0] = 0;//clear for next accum 
-                        break;
-                    case 1:
-                        v0 = byteBuffer[1];
-                        readIndex = 2;
-                        byteBuffer[1] = 0;//clear for next accum 
-                        break;
-                    case 2:
-                        v0 = byteBuffer[2];
-                        readIndex = 3;
-                        byteBuffer[2] = 0;//clear for next accum 
-                        break;
-                    case 3:
-                        v0 = byteBuffer[3];
-                        readIndex = 4;
-                        byteBuffer[3] = 0;//clear for next accum 
-                        break;
-                    case 4:
-                        v0 = byteBuffer[4];
-                        readIndex = 0;
-                        byteBuffer[4] = 0;//clear for next accum 
-                        break;
-                }
             }
 
             public void ReadRemaining4(out byte v0, out byte v1, out byte v2, out byte v3)
             {
                 //not clear byte,
                 //not move read index
-                switch (readIndex)
+                switch (writeIndex)
                 {
                     default: throw new NotSupportedException();
                     case 0:
@@ -743,48 +688,6 @@ namespace PixelFarm.Agg
                         break;
                 }
             }
-
-            void ReadNext5(out byte v0, out byte v1, out byte v2, out byte v3, out byte v4)
-            {
-                //read from current read index 
-                //indeed we can use loop for this,
-                //but in this case we just switch it 
-                switch (readIndex)
-                {
-                    default: throw new NotSupportedException();
-                    case 0:
-                        v0 = byteBuffer[0]; v1 = byteBuffer[1]; v2 = byteBuffer[2];
-                        v3 = byteBuffer[3]; v4 = byteBuffer[4];
-                        readIndex = 1;
-                        byteBuffer[0] = 0;//clear for next accum 
-                        break;
-                    case 1:
-                        v0 = byteBuffer[1]; v1 = byteBuffer[2]; v2 = byteBuffer[3];
-                        v3 = byteBuffer[4]; v4 = byteBuffer[0];
-                        readIndex = 2;
-                        byteBuffer[1] = 0;//clear for next accum 
-                        break;
-                    case 2:
-                        v0 = byteBuffer[2]; v1 = byteBuffer[3]; v2 = byteBuffer[4];
-                        v3 = byteBuffer[0]; v4 = byteBuffer[1];
-                        readIndex = 3;
-                        byteBuffer[2] = 0;//clear for next accum 
-                        break;
-                    case 3:
-                        v0 = byteBuffer[3]; v1 = byteBuffer[4]; v2 = byteBuffer[0];
-                        v3 = byteBuffer[1]; v4 = byteBuffer[2];
-                        readIndex = 4;
-                        byteBuffer[3] = 0;//clear for next accum 
-                        break;
-                    case 4:
-                        v0 = byteBuffer[4]; v1 = byteBuffer[0]; v2 = byteBuffer[1];
-                        v3 = byteBuffer[2]; v4 = byteBuffer[3];
-                        readIndex = 0;
-                        byteBuffer[4] = 0;//clear for next accum 
-                        break;
-                }
-            }
-
         }
 
 
@@ -1047,7 +950,6 @@ namespace PixelFarm.Agg
         /// <returns></returns>
         public byte Convert255ToLevel(byte orgLevel)
         {
-
             return (byte)((((float)orgLevel + 1) / 256f) * (float)(numLevel - 1));
         }
         public byte Primary(int greyLevelIndex)
