@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8F69AB8D-174A-4912-9328-CAE8EDA5564B}</ProjectGuid>
+    <ProjectGuid>{B431B5F6-C296-4A3E-A1AA-8C6EA5711374}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Typography.MsdfGen</RootNamespace>
-    <AssemblyName>Typography.MsdfGen</AssemblyName>
+    <RootNamespace>Typography.FontProvider</RootNamespace>
+    <AssemblyName>Typography.FontProvider</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -33,20 +33,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EdgeColor.cs" />
-    <Compile Include="EdgeColoring.cs" />
-    <Compile Include="EdgeHolder.cs" />
-    <Compile Include="EdgeSegment.cs" />
-    <Compile Include="EquationSolver.cs" />
-    <Compile Include="MsdfGen.cs" />
-    <Compile Include="SignedDistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Typography.OpenType\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
-      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
-      <Name>Typography.OpenType</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
