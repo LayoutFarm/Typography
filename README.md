@@ -28,6 +28,7 @@ BSD, 2002-2005, Maxim Shemanarev (http://www.antigrain.com)Anti-Grain Geometry -
 
 BSD, 2007-2014, Lars Brubaker, agg-sharp, from  https://github.com/MatterHackers/agg-sharp 
 
+MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
 
 Screenshots
 -----------
