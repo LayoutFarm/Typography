@@ -1,7 +1,7 @@
 ﻿//MIT, 2015, Michael Popoloski's SharpFont
 using System;
 using System.Numerics;
-using NOpenType;
+using Typography.OpenType;
 
 namespace SharpFont
 {

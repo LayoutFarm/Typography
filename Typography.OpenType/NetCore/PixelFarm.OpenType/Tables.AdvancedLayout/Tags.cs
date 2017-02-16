@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     static class TagsLookup
     {

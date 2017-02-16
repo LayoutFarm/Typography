@@ -3,7 +3,7 @@
 
 using System.IO;
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     //Script Table and Language System Record 
     //A Script table identifies each language system that defines how to use the glyphs in a script for a particular language.

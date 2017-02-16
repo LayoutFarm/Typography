@@ -59,7 +59,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
 
     class GDEF : TableEntry

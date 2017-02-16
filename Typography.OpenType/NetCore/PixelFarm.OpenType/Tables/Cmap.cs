@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     ////////////////////////////////////////////////////////////////////////
     //from https://www.microsoft.com/typography/developers/opentype/detail.htm

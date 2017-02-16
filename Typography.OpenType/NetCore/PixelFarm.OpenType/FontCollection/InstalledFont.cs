@@ -3,7 +3,7 @@
 //MIT, 2016-2016, WinterDev
 
 
-namespace NOpenType
+namespace Typography.OpenType
 {
     public class InstalledFont
     {

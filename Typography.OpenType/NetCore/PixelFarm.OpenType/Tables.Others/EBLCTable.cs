@@ -4,7 +4,7 @@
 using System; 
 using System.IO; 
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     /// <summary>
     /// FontBitmapTable

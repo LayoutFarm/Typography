@@ -2,7 +2,7 @@
 //https://www.microsoft.com/typography/otspec/loca.htm
 
 using System.IO;
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     class GlyphLocations : TableEntry
     {

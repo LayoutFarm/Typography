@@ -1,7 +1,7 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson
 
 using System.IO;
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     static class BoundsReader
     {

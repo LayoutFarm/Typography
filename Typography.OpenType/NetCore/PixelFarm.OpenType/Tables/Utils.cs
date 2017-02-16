@@ -3,7 +3,7 @@
 using System;
 using System.Text;
 using System.IO;
-namespace NOpenType
+namespace Typography.OpenType
 {
     static class Utils
     {

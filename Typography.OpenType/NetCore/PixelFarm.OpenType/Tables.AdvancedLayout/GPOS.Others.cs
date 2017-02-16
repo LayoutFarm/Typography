@@ -6,7 +6,7 @@ using System.Text;
 
 //https://www.microsoft.com/typography/otspec/GPOS.htm
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     partial class GPOS
     {

@@ -3,7 +3,7 @@
 
 using System;
 using System.Numerics;
-namespace NOpenType
+namespace Typography.OpenType
 {
 
 

@@ -2,7 +2,7 @@
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
-namespace NOpenType
+namespace Typography.OpenType
 {
     class CharacterMap
     {
@@ -43,7 +43,7 @@ namespace NOpenType
         }
         public static CharacterMap BuildFromFormat6(ushort startCode, ushort[] glyphIdArray)
         {
-            return new NOpenType.CharacterMap(startCode, glyphIdArray);
+            return new CharacterMap(startCode, glyphIdArray);
         }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }

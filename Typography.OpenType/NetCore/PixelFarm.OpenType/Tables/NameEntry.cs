@@ -3,7 +3,7 @@
 
 using System.IO;
 using System.Text;
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     class NameEntry : TableEntry
     {

@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
 
     //https://www.microsoft.com/typography/otspec/os2.htm

@@ -4,7 +4,7 @@
 //-----------------------------------------------------
 
 using System;
-namespace NOpenType
+namespace Typography.OpenType
 {
     public abstract class GlyphPathBuilderBase
     {
@@ -67,7 +67,7 @@ namespace NOpenType
                 if (value && _interpreter == null)
                 {
                     //we can init it later
-                    NOpenType.Typeface currentTypeFace = this.TypeFace;
+                    Typeface currentTypeFace = this.TypeFace;
                     Tables.MaxProfile maximumProfile = currentTypeFace.MaxProfile;
                     _interpreter = new SharpFont.Interpreter(
                         maximumProfile.MaxStackElements,
