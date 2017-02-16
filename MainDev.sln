@@ -1,19 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontRasterizerSample.WinForms", "FontRasterizerSample.WinForms\FontRasterizerSample.WinForms.csproj", "{6627819C-F72B-4444-8461-14A57674FBD9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NetCore", "NetCore", "{0A7E0FB5-22E3-449C-8148-93A396FB7034}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Net20", "Net20", "{CB8ECDAF-B05D-4EE2-8169-E78CD6F3F714}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.OpenType", "OpenType\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj", "{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.OpenType", "Typography.OpenType\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj", "{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.MiniAgg.One", "PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj", "{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarm.Triangulation", "PixelFarmMiniAgg\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj", "{C5E5802D-6A45-4FE9-BAE7-5F0AE91D72C1}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PixelFarm.OpenType", "OpenType\NetCore\PixelFarm.OpenType\PixelFarm.OpenType.xproj", "{B7D59BF6-3FB5-492D-8F92-B09D6024B0A6}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PixelFarm.OpenType", "Typography.OpenType\NetCore\PixelFarm.OpenType\PixelFarm.OpenType.xproj", "{B7D59BF6-3FB5-492D-8F92-B09D6024B0A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
