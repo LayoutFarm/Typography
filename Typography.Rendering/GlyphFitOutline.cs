@@ -504,8 +504,8 @@ namespace PixelFarm.Agg.Typography
         static readonly double _15degreeToRad = MathHelper.DegreesToRadians(15);
         static readonly double _90degreeToRad = MathHelper.DegreesToRadians(90);
 
-        internal Poly2Tri.TriangulationPoint p;
-        internal Poly2Tri.TriangulationPoint q;
+        public Poly2Tri.TriangulationPoint p;
+        public Poly2Tri.TriangulationPoint q;
 
         Dictionary<EdgeLine, bool> matchingEdges;
 

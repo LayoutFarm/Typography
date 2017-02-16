@@ -113,11 +113,11 @@ namespace PixelFarm.Agg
 
     public class GlyphContour
     {
-        internal List<GlyphPart> parts = new List<GlyphPart>();
-        internal List<float> allPoints;
+        public List<GlyphPart> parts = new List<GlyphPart>();
+        public List<float> allPoints;
 
         //result of analysis
-        internal List<GlyphPoint2D> mergedPoints;
+        public List<GlyphPoint2D> mergedPoints;
         bool analyzed;
         bool isClockwise;
 
@@ -290,13 +290,13 @@ namespace PixelFarm.Agg
         public PointKind kind;
 
         //
-        internal Poly2Tri.TriangulationPoint triangulationPoint;
-        internal double adjustedX;
-        internal double adjustedY;
+        public Poly2Tri.TriangulationPoint triangulationPoint;
+        public double adjustedX;
+        public double adjustedY;
         //
-        internal bool isPartOfHorizontalEdge;
-        internal bool isUpperSide;
-        internal PixelFarm.Agg.Typography.EdgeLine horizontalEdge;
+        public bool isPartOfHorizontalEdge;
+        public bool isUpperSide;
+        public PixelFarm.Agg.Typography.EdgeLine horizontalEdge;
         // 
         List<PixelFarm.Agg.Typography.EdgeLine> _edges;
         public GlyphPoint2D(double x, double y, PointKind kind)
@@ -311,7 +311,7 @@ namespace PixelFarm.Agg
         }
 
 
-        internal void AddVerticalEdge(PixelFarm.Agg.Typography.EdgeLine v_edge)
+        public void AddVerticalEdge(PixelFarm.Agg.Typography.EdgeLine v_edge)
         {
             //associated 
             if (!this.IsPartOfVerticalEdge)
@@ -322,14 +322,14 @@ namespace PixelFarm.Agg
             {
                 this.IsLeftSide = v_edge.IsLeftSide;
             }
-            
+
             if (_edges == null)
             {
                 _edges = new List<Typography.EdgeLine>();
             }
             _edges.Add(v_edge);
         }
-        internal Typography.EdgeLine GetMatchingVerticalEdge()
+        public Typography.EdgeLine GetMatchingVerticalEdge()
         {
             if (_edges == null)
             {
@@ -344,8 +344,8 @@ namespace PixelFarm.Agg
                 return null;
             }
         }
-        internal bool IsLeftSide { get; private set; }
-        internal bool IsPartOfVerticalEdge { get; private set; }
+        public bool IsLeftSide { get; private set; }
+        public bool IsPartOfVerticalEdge { get; private set; }
 #if DEBUG
         public override string ToString()
         {
@@ -356,10 +356,10 @@ namespace PixelFarm.Agg
     }
     public class GlyphLine : GlyphPart
     {
-        internal float x0;
-        internal float y0;
-        internal float x1;
-        internal float y1;
+        public float x0;
+        public float y0;
+        public float x1;
+        public float y1;
 
         List<GlyphPoint2D> points;
         public GlyphLine(float x0, float y0, float x1, float y1)
@@ -392,7 +392,7 @@ namespace PixelFarm.Agg
     }
     public class GlyphCurve3 : GlyphPart
     {
-        internal float x0, y0, p2x, p2y, x, y;
+        public float x0, y0, p2x, p2y, x, y;
         List<GlyphPoint2D> points;
         public GlyphCurve3(float x0, float y0, float p2x, float p2y, float x, float y)
         {
@@ -428,7 +428,7 @@ namespace PixelFarm.Agg
     }
     public class GlyphCurve4 : GlyphPart
     {
-        internal float x0, y0, p2x, p2y, p3x, p3y, x, y;
+        public float x0, y0, p2x, p2y, p3x, p3y, x, y;
         List<GlyphPoint2D> points;
         public GlyphCurve4(float x0, float y0, float p2x, float p2y,
             float p3x, float p3y,

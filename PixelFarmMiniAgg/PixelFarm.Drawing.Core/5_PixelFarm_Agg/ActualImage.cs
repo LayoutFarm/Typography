@@ -18,7 +18,7 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-using System; 
+using System;
 namespace PixelFarm.Agg
 {
     public sealed class ActualImage : PixelFarm.Drawing.Image
@@ -29,7 +29,7 @@ namespace PixelFarm.Agg
         int bitDepth;
         PixelFormat pixelFormat;
         byte[] pixelBuffer;
-        
+
         public ActualImage(int width, int height, PixelFormat format)
         {
             //width and height must >0 
@@ -64,6 +64,8 @@ namespace PixelFarm.Agg
                     throw new NotSupportedException();
             }
         }
+        private ActualImage() { }
+
         public override void Dispose()
         {
 
@@ -101,9 +103,25 @@ namespace PixelFarm.Agg
         public static byte[] GetBuffer(ActualImage img)
         {
             return img.pixelBuffer;
-           
         }
- 
+
+        public static ActualImage CreateFromBuffer(int width, int height, PixelFormat format, int[] buffer)
+        {
+            if (format != PixelFormat.ARGB32)
+            {
+                throw new NotSupportedException();
+            }
+            //
+            var img = new ActualImage(width, height, format);
+            unsafe
+            {
+                fixed (byte* header = &img.pixelBuffer[0])
+                {
+                    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, (IntPtr)header, buffer.Length);
+                }
+            }
+            return img;
+        }
 
     }
 }
