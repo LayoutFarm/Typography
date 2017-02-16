@@ -66,3 +66,8 @@ Enable Kerning
 SubPixel Rendering
  
 ![lcd_09](https://cloud.githubusercontent.com/assets/7447159/22780526/a0e65712-eef1-11e6-948a-eca8e8158aaa.png)
+
+---
+Msdf Texture (https://github.com/Chlumsky/msdfgen) 
+
+![msdfgen](https://cloud.githubusercontent.com/assets/7447159/22966208/c0c2407c-f393-11e6-8575-250a6939214b.png)
