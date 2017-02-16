@@ -43,7 +43,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenType\N20\PixelFarm.OpenType\Typography.OpenType.csproj">
+    <ProjectReference Include="..\Typography.OpenType\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>Typography.OpenType</Name>
     </ProjectReference>
