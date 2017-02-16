@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO; 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     //https://www.microsoft.com/typography/otspec/GPOS.htm
 

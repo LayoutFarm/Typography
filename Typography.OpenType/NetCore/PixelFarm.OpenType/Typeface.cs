@@ -1,9 +1,9 @@
 ﻿//Apache2, 2017, WinterDev
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 using System.Collections.Generic;
-using NOpenType.Tables;
+using Typography.OpenType.Tables;
 
-namespace NOpenType
+namespace Typography.OpenType
 {
     public class Typeface
     {

@@ -2,8 +2,9 @@
 
 using System;
 using System.Drawing;
+using Typography.OpenType;
 
-namespace NOpenType.CLI
+namespace SampleWinForms
 {
     public class GDIGlyphRasterizer : IGlyphRasterizer
     {

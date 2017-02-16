@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 
 using System.Collections.Generic;
-using NOpenType; 
+using Typography.OpenType; 
 using PixelFarm.Agg;
 using Typography.TextLayout;
 

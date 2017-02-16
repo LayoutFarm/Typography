@@ -2,7 +2,7 @@
 
 using System.IO;
 using System.Text;
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     //https://www.microsoft.com/typography/otspec/post.htm
 

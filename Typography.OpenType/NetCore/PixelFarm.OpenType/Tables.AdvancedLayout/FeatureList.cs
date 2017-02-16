@@ -2,7 +2,7 @@
  
 using System.IO; 
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
 
     //from https://www.microsoft.com/typography/otfntdev/standot/features.aspx

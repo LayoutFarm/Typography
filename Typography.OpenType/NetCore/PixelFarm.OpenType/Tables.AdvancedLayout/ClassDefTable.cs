@@ -2,7 +2,7 @@
 using System; 
 using System.IO; 
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
     //https://www.microsoft.com/typography/otspec/chapter2.htm
     //Class Definition Table

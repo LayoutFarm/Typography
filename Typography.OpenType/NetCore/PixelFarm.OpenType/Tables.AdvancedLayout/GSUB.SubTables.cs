@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
 
     partial class GSUB : TableEntry

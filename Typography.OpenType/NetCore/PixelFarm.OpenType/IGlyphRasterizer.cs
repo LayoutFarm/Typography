@@ -5,7 +5,7 @@
 //-----------------------------------------------------
  
 
-namespace NOpenType
+namespace Typography.OpenType
 {
     //
     public interface IGlyphRasterizer

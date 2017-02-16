@@ -1,7 +1,7 @@
 ﻿//MIT, 2015-2016, Michael Popoloski, WinterDev
 using System;
 using System.IO;
-namespace NOpenType.Tables
+namespace Typography.OpenType.Tables
 {
 
     class CvtTable : TableEntry
