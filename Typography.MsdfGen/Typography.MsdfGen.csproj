@@ -42,12 +42,6 @@
     <Compile Include="SignedDistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Typography.OpenType\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
-      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
-      <Name>Typography.OpenType</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,17 +1,20 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System;
 using System.Collections.Generic;
-using Typography.OpenType;
+
+
+using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
 
-namespace PixelFarm.Agg
+
+using Typography.OpenType;
+using Typography.Rendering;
+
+namespace PixelFarm.Drawing.Fonts
 {
     //this is PixelFarm version ***
-    //render with MiniAgg
-
-
-
-    public class GlyphPathBuilderVxs : GlyphPathBuilderBase
+    //render with MiniAgg 
+    class GlyphPathBuilderVxs : GlyphPathBuilderBase
     {
         PathWriter ps = new PathWriter();
         List<GlyphContour> contours;

@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using PixelFarm.VectorMath;
 
 using Poly2Tri;
-namespace PixelFarm.Agg.Typography
+namespace Typography.Rendering
 {
-
-
-
+     
     //sample/test 
     public class GlyphFitOutline
     {

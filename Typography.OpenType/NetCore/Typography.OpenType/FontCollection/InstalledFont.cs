@@ -8,12 +8,13 @@ namespace Typography.OpenType
     public class InstalledFont
     {
 
-        public InstalledFont(string fontName, string fontSubFamily)
+        public InstalledFont(string fontName, string fontSubFamily, string fontPath = "")
         {
             FontName = fontName;
             FontSubFamily = fontSubFamily;
-            FontPath = "";
+            FontPath = fontPath;
         }
+         
         public string FontName { get; set; }
         public string FontSubFamily { get; set; }
         public string FontPath { get; set; }

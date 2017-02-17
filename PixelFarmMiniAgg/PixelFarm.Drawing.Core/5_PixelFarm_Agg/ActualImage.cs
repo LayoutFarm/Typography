@@ -104,7 +104,20 @@ namespace PixelFarm.Agg
         {
             return img.pixelBuffer;
         }
+        public static int[] GetBuffer2(ActualImage img)
+        {
 
+            int[] buff2 = new int[img.width * img.height];
+            unsafe
+            {
+                fixed (byte* header = &img.pixelBuffer[0])
+                {
+                    System.Runtime.InteropServices.Marshal.Copy((IntPtr)header, buff2, 0, buff2.Length);
+                }
+            }
+
+            return buff2;
+        }
         public static ActualImage CreateFromBuffer(int width, int height, PixelFormat format, int[] buffer)
         {
             if (format != PixelFormat.ARGB32)

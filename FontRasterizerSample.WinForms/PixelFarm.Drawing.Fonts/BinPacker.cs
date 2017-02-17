@@ -1,7 +1,7 @@
 ﻿//MIT, 2015-2016, Michael Popoloski
 
 using System;
-namespace SharpFont
+namespace PixelFarm.Drawing.Fonts
 {
     public struct Rect
     {
