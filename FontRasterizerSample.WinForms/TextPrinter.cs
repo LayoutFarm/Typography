@@ -11,7 +11,7 @@ namespace SampleWinForms
     class TextPrinter
     {
         GlyphLayout _glyphLayout = new GlyphLayout();
-        ScriptLang scriptLang;
+
         public TextPrinter()
         {
             //default         
@@ -20,12 +20,11 @@ namespace SampleWinForms
         {
             get
             {
-                return scriptLang;
+                return _glyphLayout.ScriptLang;
             }
             set
             {
-                scriptLang = value;
-                _glyphLayout.ScriptLang = value.shortname;
+                _glyphLayout.ScriptLang = value;
             }
         }
         public PositionTecnhique PositionTechnique

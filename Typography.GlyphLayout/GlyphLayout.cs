@@ -44,8 +44,7 @@ namespace Typography.TextLayout
         /// </summary>
         OpenType,
     }
-    //
-
+    // 
     public class GlyphLayout
     {
 
@@ -54,19 +53,15 @@ namespace Typography.TextLayout
         public GlyphLayout()
         {
             PositionTechnique = PositionTecnhique.OpenType;
-            ScriptLang = "";
+            ScriptLang = new ScriptLang("", "");
         }
         public PositionTecnhique PositionTechnique { get; set; }
-
-        public string ScriptLang { get; set; }
+        public ScriptLang ScriptLang { get; set; }
 
         public void Layout(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Layout(typeface, size, str.ToCharArray(), glyphPlanBuffer);
-        }
-
-
-
+        } 
         List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
 
         public void Layout(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
@@ -105,7 +100,7 @@ namespace Typography.TextLayout
 
                 //for debug
                 //test for thai lang 
-                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, this.ScriptLang);
+                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, this.ScriptLang.shortname);
                 glyphSubstitution.DoSubstitution(inputGlyphs);
             }
 
@@ -122,7 +117,7 @@ namespace Typography.TextLayout
             PositionTecnhique posTech = this.PositionTechnique;
             if (j > 1 && posTech == PositionTecnhique.OpenType)
             {
-                GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, ScriptLang);
+                GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, ScriptLang.shortname);
                 glyphSetPos.DoGlyphPosition(glyphPositions);
             }
             //--------------
@@ -131,7 +126,7 @@ namespace Typography.TextLayout
             float cy = 0;
 
             j = inputGlyphs.Count;
-             
+
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];
@@ -171,7 +166,7 @@ namespace Typography.TextLayout
                         break;
                 }
                 cx += advWidth;
-            } 
+            }
         }
 
     }
