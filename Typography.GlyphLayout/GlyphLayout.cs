@@ -111,7 +111,7 @@ namespace Typography.TextLayout
 
             j = inputGlyphs.Count;
 
-            bool enable_kerning = EnableKerning;
+            bool enable_kerning = false;// EnableKerning;
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];
@@ -134,8 +134,7 @@ namespace Typography.TextLayout
             }
 
             //TODO:....
-            //2.  
-            //shaping, glyph substitution
+            
             //3. layout glyph position
             //----------------------------------------------
             //4. actual render
