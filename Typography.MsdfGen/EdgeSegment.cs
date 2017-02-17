@@ -323,7 +323,5 @@ namespace Msdfgen
                 return new SignedDistance(minDistance,
                     EquationSolver.fabs(Vector2.dotProduct(direction(1).normalize(), (p[3] - origin).normalize())));
         }
-    }
-    /// Splits the edge segments into thirds which together represent the original edge.
-    //virtual void splitInThirds(EdgeSegment*&part1, EdgeSegment*&part2, EdgeSegment*&part3) const = 0;
+    } 
 }

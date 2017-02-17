@@ -5,8 +5,7 @@ using System;
 using System.Numerics;
 namespace Typography.OpenType
 {
-
-
+     
     public struct GlyphPointF
     {
         public Vector2 P;
