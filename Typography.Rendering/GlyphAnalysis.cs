@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.VectorMath;
+using PixelFarm.Agg.VertexSource;
 
-namespace PixelFarm.Agg
+namespace Typography.Rendering
 {
     //this is PixelFarm version ***
     //render with MiniAgg
@@ -212,7 +213,7 @@ namespace PixelFarm.Agg
             Vector2 start, Vector2 end,
             Vector2 control1, Vector2 control2)
         {
-            var curve = new VectorMath.BezierCurveCubic(
+            var curve = new BezierCurveCubic(
                 start, end,
                 control1, control2);
             points.Add(new GlyphPoint2D(start.x, start.y, PointKind.C4Start));
@@ -232,7 +233,7 @@ namespace PixelFarm.Agg
             Vector2 start, Vector2 end,
             Vector2 control1)
         {
-            var curve = new VectorMath.BezierCurveQuadric(
+            var curve = new BezierCurveQuadric(
                 start, end,
                 control1);
             points.Add(new GlyphPoint2D(start.x, start.y, PointKind.C3Start));
@@ -296,9 +297,9 @@ namespace PixelFarm.Agg
         //
         public bool isPartOfHorizontalEdge;
         public bool isUpperSide;
-        public PixelFarm.Agg.Typography.EdgeLine horizontalEdge;
+        public EdgeLine horizontalEdge;
         // 
-        List<PixelFarm.Agg.Typography.EdgeLine> _edges;
+        List<EdgeLine> _edges;
         public GlyphPoint2D(double x, double y, PointKind kind)
         {
             this.x = x;
@@ -311,7 +312,7 @@ namespace PixelFarm.Agg
         }
 
 
-        public void AddVerticalEdge(PixelFarm.Agg.Typography.EdgeLine v_edge)
+        public void AddVerticalEdge(EdgeLine v_edge)
         {
             //associated 
             if (!this.IsPartOfVerticalEdge)
@@ -325,11 +326,11 @@ namespace PixelFarm.Agg
 
             if (_edges == null)
             {
-                _edges = new List<Typography.EdgeLine>();
+                _edges = new List<EdgeLine>();
             }
             _edges.Add(v_edge);
         }
-        public Typography.EdgeLine GetMatchingVerticalEdge()
+        public EdgeLine GetMatchingVerticalEdge()
         {
             if (_edges == null)
             {

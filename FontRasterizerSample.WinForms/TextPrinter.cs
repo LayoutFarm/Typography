@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-2017, WinterDev
 
 using System.Collections.Generic;
-using Typography.OpenType; 
-using PixelFarm.Agg;
+using Typography.OpenType;
+using PixelFarm.Drawing.Fonts;
 using Typography.TextLayout;
 
 namespace SampleWinForms
