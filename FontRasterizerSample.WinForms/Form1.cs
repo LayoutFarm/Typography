@@ -36,16 +36,21 @@ namespace SampleWinForms
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
             cmbRenderChoices.SelectedIndex = 2;
-            cmbRenderChoices.SelectedIndexChanged += cmbRenderChoices_SelectedIndexChanged;
+            cmbRenderChoices.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
             cmbPositionTech.Items.Add(PositionTecnhique.OpenType);
             cmbPositionTech.Items.Add(PositionTecnhique.Kerning);
             cmbPositionTech.Items.Add(PositionTecnhique.None);
             cmbPositionTech.SelectedIndex = 0;
-            cmbPositionTech.SelectedIndexChanged += CmbPositionTech_SelectedIndexChanged;
+            cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
-
-
+            cmbHintTechnique.Items.Add(HintTechnique.None);
+            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction);
+            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
+            cmbHintTechnique.Items.Add(HintTechnique.CustomAutoFit);
+            cmbHintTechnique.SelectedIndex = 0;
+            cmbHintTechnique.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            //----------
             lstFontSizes.Items.AddRange(
                 new object[]{
                     8, 9,
@@ -69,7 +74,7 @@ namespace SampleWinForms
 
         private void CmbPositionTech_SelectedIndexChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         enum RenderChoice
@@ -90,7 +95,11 @@ namespace SampleWinForms
 
         private void button1_Click(object sender, EventArgs e)
         {
+            UpdateRenderOutput();
+        }
 
+        void UpdateRenderOutput()
+        {
             if (g == null)
             {
                 destImg = new ActualImage(400, 300, PixelFormat.ARGB32);
@@ -239,10 +248,26 @@ namespace SampleWinForms
 
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
-            //2. glyph-to-vxs builder
+            //----------------------------------------------------
             var builder = new GlyphPathBuilderVxs(typeface);
-            builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
-            builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
+            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            builder.UseTrueTypeInterpreter = false;//reset
+            builder.UseVerticalHinting = false;//reset
+            switch (hintTech)
+            {
+                case HintTechnique.TrueTypeInstruction:
+                    builder.UseTrueTypeInterpreter = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseVerticalHinting = true;
+                    break;
+                case HintTechnique.CustomAutoFit:
+                    //custom agg autofit 
+                    break;
+            }
+            //----------------------------------------------------
+
             builder.Build(testChar, sizeInPoint);
             VertexStore vxs = builder.GetVxs();
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
@@ -341,10 +366,25 @@ namespace SampleWinForms
 
         void RenderWithMsdfImg(Typeface typeface, char testChar, float sizeInPoint)
         {
-
+            //----------------------------------------------------
             var builder = new GlyphPathBuilderVxs(typeface);
-            builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
-            builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
+            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            builder.UseTrueTypeInterpreter = false;//reset
+            builder.UseVerticalHinting = false;//reset
+            switch (hintTech)
+            {
+                case HintTechnique.TrueTypeInstruction:
+                    builder.UseTrueTypeInterpreter = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseVerticalHinting = true;
+                    break;
+                case HintTechnique.CustomAutoFit:
+                    //custom agg autofit 
+                    break;
+            }
+            //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             VertexStore vxs = builder.GetVxs();
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
@@ -1020,8 +1060,25 @@ namespace SampleWinForms
 
             //2. glyph to gdi path
             var gdiGlyphRasterizer = new GDIGlyphRasterizer();
-            var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
-            builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
+            var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer); 
+           
+            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            builder.UseTrueTypeInterpreter = false;//reset
+            builder.UseVerticalHinting = false;//reset
+            switch (hintTech)
+            {
+                case HintTechnique.TrueTypeInstruction:
+                    builder.UseTrueTypeInterpreter = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseVerticalHinting = true;
+                    break;
+                case HintTechnique.CustomAutoFit:
+                    //custom agg autofit 
+                    break;
+            }
+            //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
 
 
@@ -1046,8 +1103,8 @@ namespace SampleWinForms
             printer.ScriptLang = ScriptLangs.Thai;
             //
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
-            printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
-            printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
+            //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
+            //printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
             //
             int len = str.Length;
             //
@@ -1120,38 +1177,35 @@ namespace SampleWinForms
 
         private void txtInputChar_TextChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
-        void cmbRenderChoices_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            button1_Click(this, EventArgs.Empty);
-        }
+
 
         private void lstFontSizes_SelectedIndexChanged(object sender, EventArgs e)
         {
             //new font size
             fontSizeInPoint = (int)lstFontSizes.SelectedItem;
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkKern_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkTrueTypeHint_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkShowTess_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkShowGrid_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         int _gridSize = 5;//default
@@ -1174,44 +1228,44 @@ namespace SampleWinForms
                 }
                 this._gridSize = result;
                 this.txtGridSize.Text = _gridSize.ToString();
-                button1_Click(this, EventArgs.Empty);
+                UpdateRenderOutput();
             }
 
         }
 
         private void chkVerticalHinting_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkMasterOutlineAnalysis_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkDrawBone_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkYGridFitting_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkXGridFitting_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkFillBackground_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void chkLcdTechnique_CheckedChanged(object sender, EventArgs e)
         {
-            button1_Click(this, EventArgs.Empty);
+            UpdateRenderOutput();
         }
 
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)

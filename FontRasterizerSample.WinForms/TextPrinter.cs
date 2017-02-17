@@ -32,16 +32,12 @@ namespace SampleWinForms
             get { return _glyphLayout.PositionTechnique; }
             set { _glyphLayout.PositionTechnique = value; }
         }
-        public bool EnableTrueTypeHint
+        public HintTechnique HintTechnique
         {
             get;
             set;
         }
-        public bool UseAggVerticalHinting
-        {
-            get;
-            set;
-        }
+       
 
         public void Print(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
@@ -73,5 +69,25 @@ namespace SampleWinForms
 
         }
 
+    }
+
+    public enum HintTechnique
+    {
+        /// <summary>
+        /// no hinting
+        /// </summary>
+        None,
+        /// <summary>
+        /// truetype instruction
+        /// </summary>
+        TrueTypeInstruction,
+        /// <summary>
+        /// truetype instruction vertical only
+        /// </summary>
+        TrueTypeInstruction_VerticalOnly,
+        /// <summary>
+        /// custom hint
+        /// </summary>
+        CustomAutoFit
     }
 }
