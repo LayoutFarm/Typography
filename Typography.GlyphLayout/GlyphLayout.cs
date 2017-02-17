@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenType;
-using Typography.OpenType.Tables;
 using Typography.OpenType.Extensions;
 
 
@@ -32,21 +31,37 @@ namespace Typography.TextLayout
         }
     }
 
+    public enum PositionTecnhique
+    {
+        None,
+        /// <summary>
+        /// use kerning table (old)
+        /// </summary>
+        Kerning, //old technique
+        /// <summary>
+        /// use opentype gpos table
+        /// </summary>
+        OpenType,
+    }
+    
+    // 
     public class GlyphLayout
     {
-        //glyph shaper
 
+        //glyph shaper engine? 
         Dictionary<Typeface, GlyphsCache> _glyphCaches = new Dictionary<Typeface, GlyphsCache>();
         public GlyphLayout()
         {
+            PositionTechnique = PositionTecnhique.OpenType;
+            ScriptLang = new ScriptLang("", "");
         }
-
+        public PositionTecnhique PositionTechnique { get; set; }
+        public ScriptLang ScriptLang { get; set; }
 
         public void Layout(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Layout(typeface, size, str.ToCharArray(), glyphPlanBuffer);
         }
-        public bool EnableKerning { get; set; }
         List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
 
         public void Layout(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
@@ -82,9 +97,10 @@ namespace Typography.TextLayout
             }
             if (j > 1)
             {
+
                 //for debug
                 //test for thai lang 
-                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, "thai");
+                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, this.ScriptLang.shortname);
                 glyphSubstitution.DoSubstitution(inputGlyphs);
             }
 
@@ -98,11 +114,11 @@ namespace Typography.TextLayout
             }
             //--------------
             //do gpos
-            if (j > 1)
+            PositionTecnhique posTech = this.PositionTechnique;
+            if (j > 1 && posTech == PositionTecnhique.OpenType)
             {
-                //GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, "thai");
-                //glyphSetPos.DoGlyphPosition(glyphPositions);
-
+                GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, ScriptLang.shortname);
+                glyphSetPos.DoGlyphPosition(glyphPositions);
             }
             //--------------
             float scale = typeface.CalculateScale(size);
@@ -111,36 +127,46 @@ namespace Typography.TextLayout
 
             j = inputGlyphs.Count;
 
-            bool enable_kerning = EnableKerning;
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];
                 GlyphPlan glyphPlan = new GlyphPlan(glyIndex);
                 glyphPlanBuffer.Add(glyphPlan);
-
                 //this advWidth in font design unit 
                 float advWidth = typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex) * scale;
-                //---------------------------------- 
-                glyphPlan.x = cx;
-                glyphPlan.y = 0;
-                glyphPlan.advX = advWidth;
+                //----------------------------------  
 
-                if (enable_kerning && i > 0)
+                switch (posTech)
                 {
-                    //check kerning
-                    advWidth += typeface.GetKernDistance(glyphPlanBuffer[i - 1].glyphIndex, glyphPlanBuffer[i].glyphIndex) * scale;
+                    case PositionTecnhique.None:
+                        {
+                            glyphPlan.x = cx;
+                            glyphPlan.y = cy;
+                            glyphPlan.advX = advWidth;
+                        }
+                        break;
+                    case PositionTecnhique.OpenType:
+                        {
+                            GlyphPos gpos_offset = glyphPositions[i];
+                            glyphPlan.x = cx + (scale * glyphPositions[i].x);
+                            glyphPlan.y = cy + (scale * glyphPositions[i].y);
+                            glyphPlan.advX = advWidth;
+                        }
+                        break;
+                    case PositionTecnhique.Kerning:
+                        {
+                            glyphPlan.x = cx;
+                            glyphPlan.y = cy;
+                            glyphPlan.advX = advWidth;
+                            if (i > 0)
+                            {
+                                advWidth += typeface.GetKernDistance(glyphPlanBuffer[i - 1].glyphIndex, glyphPlanBuffer[i].glyphIndex) * scale;
+                            }
+                        }
+                        break;
                 }
                 cx += advWidth;
             }
-
-            //TODO:....
-            //2.  
-            //shaping, glyph substitution
-            //3. layout glyph position
-            //----------------------------------------------
-            //4. actual render
-
-
         }
 
     }

@@ -1,7 +1,7 @@
 ﻿//Apache2, 2016-2017, WinterDev
 using System;
 using System.Collections.Generic;
-using System.IO; 
+using System.IO;
 namespace Typography.OpenType.Tables
 {
     //https://www.microsoft.com/typography/otspec/GPOS.htm
@@ -325,7 +325,8 @@ namespace Typography.OpenType.Tables
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 //-------
                                 this.subTables.Add(subTable);
-                            } break;
+                            }
+                            break;
                         case 2:
                             {
                                 //Single Adjustment Positioning: Format 2
@@ -469,7 +470,8 @@ namespace Typography.OpenType.Tables
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
 
                                 subTables.Add(subTable);
-                            } break;
+                            }
+                            break;
                         case 2:
                             {
 
@@ -520,19 +522,25 @@ namespace Typography.OpenType.Tables
                 {
                     //find marker
                     int j = inputGlyphs.Count;
-                    for (int i = 0; i < j; ++i)
+                    for (int i = 1; i < j; ++i) //start at 1
                     {
-                        int markFound = MarkCoverageTable.FindPosition(inputGlyphs[i].glyphIndex);
+                        GlyphPos glyphPos = inputGlyphs[i];
+                        int markFound = MarkCoverageTable.FindPosition(glyphPos.glyphIndex);
                         if (markFound > -1)
                         {
-                            if (i > -1)
+                            //this is mark glyph
+                            //then-> look back for base
+                            int baseFound = BaseCoverageTable.FindPosition(inputGlyphs[i - 1].glyphIndex);
+                            if (baseFound > -1)
                             {
-                                //look back for base
-                                int baseFound = BaseCoverageTable.FindPosition(inputGlyphs[i - 1].glyphIndex);
-                                if (baseFound > -1)
-                                {
-
-                                }
+                                //this is base glyph
+                                BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
+                                //find anchor on base glyph  
+                                //1. 
+                                AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
+                                //
+                                glyphPos.x += markAnchorPoint.xcoord;
+                                glyphPos.y += markAnchorPoint.ycoord;
                             }
                         }
                     }
@@ -729,7 +737,7 @@ namespace Typography.OpenType.Tables
                 public Mark2ArrayTable Mark2ArrayTable { get; set; }
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                 //   throw new NotImplementedException();
                 }
             }
 
@@ -821,7 +829,8 @@ namespace Typography.OpenType.Tables
 
                                 //-----------
                                 subTables.Add(subTable);
-                            } break;
+                            }
+                            break;
                         case 2:
                             {
                                 //Context Positioning Subtable: Format 2
@@ -850,7 +859,8 @@ namespace Typography.OpenType.Tables
                                 //---------- 
                                 subTables.Add(subTable);
                                 //----------
-                            } break;
+                            }
+                            break;
                         case 3:
                             {
                                 //ContextPosFormat3 subtable: Coverage-based context glyph positioning
@@ -870,7 +880,8 @@ namespace Typography.OpenType.Tables
                                 //---------- 
                                 subTables.Add(subTable);
                                 //----------
-                            } break;
+                            }
+                            break;
                     }
                 }
             }
@@ -1005,7 +1016,8 @@ namespace Typography.OpenType.Tables
                                 //----------
 
                                 subTables.Add(subTable);
-                            } break;
+                            }
+                            break;
                         case 2:
                             {
                                 //Chaining Context Positioning Format 2: Class-based Chaining Context Glyph Positioning
@@ -1042,7 +1054,8 @@ namespace Typography.OpenType.Tables
                                 //----------  
                                 subTables.Add(subTable);
                                 //----------
-                            } break;
+                            }
+                            break;
                         case 3:
                             {
 
@@ -1076,7 +1089,8 @@ namespace Typography.OpenType.Tables
                                 subTable.LookaheadCoverages = CoverageTable.CreateMultipleCoverageTables(subTableStartAt, lookaheadCoverageOffsets, reader);
                                 subTables.Add(subTable);
 
-                            } break;
+                            }
+                            break;
                     }
 
                 }

@@ -10,29 +10,34 @@ namespace SampleWinForms
 
     class TextPrinter
     {
-
         GlyphLayout _glyphLayout = new GlyphLayout();
 
         public TextPrinter()
         {
-            //default
-            EnableKerning = true;
+            //default         
         }
-        public bool EnableKerning
+        public ScriptLang ScriptLang
         {
-            get { return _glyphLayout.EnableKerning; }
-            set { _glyphLayout.EnableKerning = value; }
+            get
+            {
+                return _glyphLayout.ScriptLang;
+            }
+            set
+            {
+                _glyphLayout.ScriptLang = value;
+            }
         }
-        public bool EnableTrueTypeHint
+        public PositionTecnhique PositionTechnique
+        {
+            get { return _glyphLayout.PositionTechnique; }
+            set { _glyphLayout.PositionTechnique = value; }
+        }
+        public HintTechnique HintTechnique
         {
             get;
             set;
         }
-        public bool UseAggVerticalHinting
-        {
-            get;
-            set;
-        }
+       
 
         public void Print(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
@@ -64,5 +69,25 @@ namespace SampleWinForms
 
         }
 
+    }
+
+    public enum HintTechnique
+    {
+        /// <summary>
+        /// no hinting
+        /// </summary>
+        None,
+        /// <summary>
+        /// truetype instruction
+        /// </summary>
+        TrueTypeInstruction,
+        /// <summary>
+        /// truetype instruction vertical only
+        /// </summary>
+        TrueTypeInstruction_VerticalOnly,
+        /// <summary>
+        /// custom hint
+        /// </summary>
+        CustomAutoFit
     }
 }
