@@ -324,12 +324,13 @@ namespace Typography.OpenType
         //TODO: move to another file
         public class GlyphSubStitution
         {
-            string lang;
+
             Typeface typeface;
             GSUB gsubTable;
             List<GSUB.LookupTable> lookupTables;
             public GlyphSubStitution(Typeface typeface, string lang)
             {
+                this.Lang = lang;
                 this.typeface = typeface;
                 //check if this lang has 
                 gsubTable = typeface.GSUBTable;
@@ -340,7 +341,7 @@ namespace Typography.OpenType
 
                     if (defaultLang.HasRequireFeature)
                     {
-
+                        //TODO: review here
                     }
                     //other feature
                     if (defaultLang.featureIndexList != null)
@@ -382,6 +383,7 @@ namespace Typography.OpenType
                     lookupTables[i].DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
                 }
             }
+            public string Lang { get; set; }
         }
 
 

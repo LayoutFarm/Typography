@@ -180,10 +180,12 @@ namespace Typography.OpenType.Tables
             public ushort format;
             public short xcoord;
             public short ycoord;
+            /// <summary>
+            /// an index to a glyph contour point (AnchorPoint)
+            /// </summary>
             public ushort refGlyphContourPoint;
             public short xdeviceTableOffset;
             public short ydeviceTableOffset;
-
             public static AnchorPoint CreateFrom(BinaryReader reader, long beginAt)
             {
                 AnchorPoint anchorPoint = new AnchorPoint();
@@ -214,8 +216,9 @@ namespace Typography.OpenType.Tables
                             //Like AnchorFormat1, AnchorFormat2 specifies a format identifier (AnchorFormat) and
                             //a pair of design unit coordinates for the anchor point (Xcoordinate and Ycoordinate).
 
-                            //For fine-tuning the location of the anchor point, AnchorFormat2 also provides an index to a glyph contour point (AnchorPoint) 
-                            //that is on the outline of a glyph (AnchorPoint).
+                            //For fine-tuning the location of the anchor point,
+                            //AnchorFormat2 also provides an index to a glyph contour point (AnchorPoint) 
+                            //that is on the outline of a glyph (AnchorPoint).***
                             //Hinting can be used to move the AnchorPoint. In the rendered text,
                             //the AnchorPoint will provide the final positioning data for a given ppem size.
 
@@ -324,6 +327,12 @@ namespace Typography.OpenType.Tables
             //Offset 	MarkAnchor 	Offset to Anchor table-from beginning of MarkArray table
             MarkRecord[] records;
             AnchorPoint[] anchorPoints;
+            public AnchorPoint GetAnchorPoint(int index)
+            {
+                return anchorPoints[index];
+            }
+
+
             void ReadFrom(BinaryReader reader)
             {
                 long markTableBeginAt = reader.BaseStream.Position;
@@ -349,6 +358,7 @@ namespace Typography.OpenType.Tables
                         //found err on Tahoma
                         continue;
                     }
+                    //read table detail
                     anchorPoints[i] = AnchorPoint.CreateFrom(reader, markTableBeginAt + markRec.offset);
                 }
 
@@ -460,6 +470,10 @@ namespace Typography.OpenType.Tables
 
             BaseRecord[] records;
 
+            public BaseRecord GetBaseRecords(int index)
+            {
+                return records[index];
+            }
             public static BaseArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -497,8 +511,6 @@ namespace Typography.OpenType.Tables
                         anchors[n] = AnchorPoint.CreateFrom(reader, beginAt + offsets[n]);
                     }
                 }
-
-
                 return baseArrTable;
             }
 
@@ -508,7 +520,7 @@ namespace Typography.OpenType.Tables
                 return records.Length;
             }
 #endif
-          
+
         }
         struct BaseRecord
         {

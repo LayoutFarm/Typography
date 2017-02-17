@@ -31,12 +31,20 @@ namespace SampleWinForms
             InitializeComponent();
             this.Load += new EventHandler(Form1_Load);
 
+            //----------
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
             cmbRenderChoices.SelectedIndex = 2;
-            cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
+            cmbRenderChoices.SelectedIndexChanged += cmbRenderChoices_SelectedIndexChanged;
+            //----------
+            cmbPositionTech.Items.Add(PositionTecnhique.OpenType);
+            cmbPositionTech.Items.Add(PositionTecnhique.Kerning);
+            cmbPositionTech.Items.Add(PositionTecnhique.None);
+            cmbPositionTech.SelectedIndex = 0;
+            cmbPositionTech.SelectedIndexChanged += CmbPositionTech_SelectedIndexChanged;
+            //----------
 
 
             lstFontSizes.Items.AddRange(
@@ -50,13 +58,20 @@ namespace SampleWinForms
                 });
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
 
-            string inputstr = "ii";
-            ////string inputstr = "ก่นกิ่น";
+            //----------------
+            //string inputstr = "ii";
+            //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
+            string inputstr = "ป่า"; //for gpos test 
+            //----------------
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
         }
 
+        private void CmbPositionTech_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
 
         enum RenderChoice
         {
@@ -1028,7 +1043,8 @@ namespace SampleWinForms
         {
             //1. 
             TextPrinter printer = new TextPrinter();
-            printer.EnableKerning = this.chkKern.Checked;
+            printer.ScriptLang = "thai";//for test ***
+            printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
             printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
 
