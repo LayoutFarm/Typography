@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontRasterizerSample.WinForms", "FontRasterizerSample.WinForms\FontRasterizerSample.WinForms.csproj", "{6627819C-F72B-4444-8461-14A57674FBD9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontRasterizerSample.WinForms", "Demo\Windows\FontRasterizerSample.WinForms\FontRasterizerSample.WinForms.csproj", "{6627819C-F72B-4444-8461-14A57674FBD9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NetCore", "NetCore", "{0A7E0FB5-22E3-449C-8148-93A396FB7034}"
 EndProject
@@ -22,6 +22,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.GlyphLayout", "Typography.GlyphLayout\Typography.GlyphLayout.csproj", "{C48F2C17-3C32-4F27-A96C-60A9D86DF9CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.Rendering", "Typography.Rendering\Typography.Rendering.csproj", "{E4A1C3C3-1C1C-4E11-A2E6-A1FAFD6652C7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{EFD3FB30-FFF6-4717-9D2A-A909E6D01DEE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Windows", "Windows", "{B3080145-1DA3-4FCA-A0E5-D99A46F6B243}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -134,6 +138,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{6627819C-F72B-4444-8461-14A57674FBD9} = {B3080145-1DA3-4FCA-A0E5-D99A46F6B243}
 		{29ED0DFE-373C-4E98-BD4B-43F8E5FB16F6} = {CB8ECDAF-B05D-4EE2-8169-E78CD6F3F714}
+		{B3080145-1DA3-4FCA-A0E5-D99A46F6B243} = {EFD3FB30-FFF6-4717-9D2A-A909E6D01DEE}
 	EndGlobalSection
 EndGlobal

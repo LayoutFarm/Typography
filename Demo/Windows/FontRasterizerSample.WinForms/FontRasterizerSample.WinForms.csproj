@@ -78,27 +78,27 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PixelFarmMiniAgg\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
+    <ProjectReference Include="..\..\..\PixelFarmMiniAgg\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
       <Name>PixelFarm.Triangulation</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj">
+    <ProjectReference Include="..\..\..\PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj">
       <Project>{1088370f-1a7e-421b-bbcb-400a8eda5f1f}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.OpenType\N20\Typography.OpenType\Typography.OpenType.csproj">
+    <ProjectReference Include="..\..\..\Typography.OpenType\N20\Typography.OpenType\Typography.OpenType.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>Typography.OpenType</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+    <ProjectReference Include="..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj">
+    <ProjectReference Include="..\..\..\Typography.MsdfGen\Typography.MsdfGen.csproj">
       <Project>{8f69ab8d-174a-4912-9328-cae8eda5564b}</Project>
       <Name>Typography.MsdfGen</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.Rendering\Typography.Rendering.csproj">
+    <ProjectReference Include="..\..\..\Typography.Rendering\Typography.Rendering.csproj">
       <Project>{e4a1c3c3-1c1c-4e11-a2e6-a1fafd6652c7}</Project>
       <Name>Typography.Rendering</Name>
     </ProjectReference>
