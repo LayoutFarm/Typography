@@ -8,7 +8,6 @@ using System.Windows.Forms;
 
 using Typography.OpenType;
 using Typography.Rendering;
-using Typography.OpenType.Extensions;
 
 using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
@@ -1043,13 +1042,15 @@ namespace SampleWinForms
         {
             //1. 
             TextPrinter printer = new TextPrinter();
-            printer.ScriptLang = "thai";//for test ***
+            //for test Thai glyph for gsub and gpos
+            printer.ScriptLang = ScriptLangs.Thai;
+            //
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
             printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
-
+            //
             int len = str.Length;
-
+            //
             List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
             printer.Print(typeface, sizeInPoint, str, glyphPlanList);
             //--------------------------
