@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenType;
-using Typography.OpenType.Tables;
 using Typography.OpenType.Extensions;
 
 
@@ -32,7 +31,7 @@ namespace Typography.TextLayout
         }
     }
 
-    public enum PositionTecnhique : byte
+    public enum PositionTecnhique
     {
         None,
         /// <summary>
@@ -44,6 +43,7 @@ namespace Typography.TextLayout
         /// </summary>
         OpenType,
     }
+    
     // 
     public class GlyphLayout
     {
@@ -61,7 +61,7 @@ namespace Typography.TextLayout
         public void Layout(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Layout(typeface, size, str.ToCharArray(), glyphPlanBuffer);
-        } 
+        }
         List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
 
         public void Layout(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
