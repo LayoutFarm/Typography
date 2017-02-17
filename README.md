@@ -68,6 +68,12 @@ SubPixel Rendering
 ![lcd_09](https://cloud.githubusercontent.com/assets/7447159/22780526/a0e65712-eef1-11e6-948a-eca8e8158aaa.png)
 
 ---
-Msdf Texture (https://github.com/Chlumsky/msdfgen) 
+Multi-channel signed distance field (Msdf) Texture (https://github.com/Chlumsky/msdfgen) 
 
 ![msdfgen](https://cloud.githubusercontent.com/assets/7447159/22966208/c0c2407c-f393-11e6-8575-250a6939214b.png)
+
+---
+Msdf Texture
+
+![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/23061146/423cd040-f533-11e6-9f1a-a7fc3d60a14a.png)
+
