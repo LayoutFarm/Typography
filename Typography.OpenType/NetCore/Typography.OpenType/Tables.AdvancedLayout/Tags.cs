@@ -2,17 +2,255 @@
 using System;
 using System.Collections.Generic;
 
+namespace Typography.OpenType
+{
+
+    public sealed class ScriptLang
+    {
+        public readonly string fullname;
+        public readonly string shortname;
+        public ScriptLang(string fullname, string shortname)
+        {
+            this.fullname = fullname;
+            this.shortname = shortname;
+        }
+    }
+
+    public static class ScriptLangs
+    {
+        static Dictionary<string, Tables.TagInfo> registeredScriptTags = new Dictionary<string, Tables.TagInfo>();
+
+        //https://www.microsoft.com/typography/otspec/scripttags.htm
+        //https://www.microsoft.com/typography/otspec/languagetags.htm
+
+        //
+        public static readonly ScriptLang
+        //
+        Adlam = _("Adlam", "adlm"),
+        Anatolian_Hieroglyphs = _("Anatolian Hieroglyphs", "hluw"),
+        Arabic = _("Arabic", "arab"),
+        Armenian = _("Armenian", "armn"),
+        Avestan = _("Avestan", "avst"),
+        //
+        Balinese = _("Balinese", "bali"),
+        Bamum = _("Bamum", "bamu"),
+        Bassa_Vah = _("Bassa Vah ", "bass"),
+        Batak = _("Batak", "batk"),
+        Bengali = _("Bengali", "beng"),
+        Bengali_v_2 = _("Bengali v.2", "bng2"),
+        Bhaiksuki = _("Bhaiksuki", "bhks"),
+        Brahmi = _("Brahmi", "brah"),
+        Braille = _("Braille", "brai"),
+        Buginese = _("Buginese", "bugi"),
+        Buhid = _("Buhid", "buhd"),
+        Byzantine_Music = _("Byzantine Music", "byzm"),
+        //
+        Canadian_Syllabics = _("Canadian Syllabics", "cans"),
+        Carian = _("Carian", "cari"),
+        Caucasian_Albanian = _("Caucasian Albanian", "aghb"),
+        Chakma = _("Chakma", "cakm"),
+        Cham = _("Cham", "cham"),
+        Cherokee = _("Cherokee", "cher"),
+        CJK_Ideographic = _("CJK Ideographic", "hani"),
+        Coptic = _("Coptic", "copt"),
+        Cypriot_Syllabary = _("Cypriot Syllabary", "cprt"),
+        Cyrillic = _("Cyrillic", "cyrl"),
+        ////
+        Default = _("Default", "DFLT"),
+        Deseret = _("Deseret", "dsrt"),
+        Devanagari = _("Devanagari", "deva"),
+        Devanagari_v_2 = _("Devanagari v.2", "dev2"),
+        Duployan = _("Duployan", "dupl"),
+        ////            
+        Egyptian_Hieroglyphs = _("Egyptian Hieroglyphs", "egyp"),
+        Elbasan = _("Elbasan", "elba"),
+        Ethiopic = _("Ethiopic", "ethi"),
+        //// 
+        Georgian = _("Georgian", "geor"),
+        Glagolitic = _("Glagolitic", "glag"),
+        Gothic = _("Gothic", "goth"),
+        Grantha = _("Grantha", "gran"),
+        Greek = _("Greek", "grek"),
+        Gujarati = _("Gujarati", "gujr"),
+        Gujarati_v_2 = _("Gujarati v.2", "gjr2"),
+        Gurmukhi = _("Gurmukhi", "guru"),
+        Gurmukhi_v_2 = _("Gurmukhi v.2", "gur2"),
+        //// 
+        Hangul = _("Hangul", "hang"),
+        Hangul_Jamo = _("Hangul Jamo", "jamo"),
+        Hanunoo = _("Hanunoo", "hano"),
+        Hatran = _("Hatran", "hatr"),
+        Hebrew = _("Hebrew", "hebr"),
+        Hiragana = _("Hiragana", "kana"),
+        //// 
+        Imperial_Aramaic = _("Imperial Aramaic", "armi"),
+        Inscriptional_Pahlavi = _("Inscriptional Pahlavi", "phli"),
+        Inscriptional_Parthian = _("Inscriptional Parthian", "prti"),
+        ////             	
+        Javanese = _("Javanese", "java"),
+        //// 
+        Kaithi = _("Kaithi", "kthi"),
+        Kannada = _("Kannada", "knda"),
+        Kannada_v_2 = _("Kannada v.2", "knd2"),
+        Katakana = _("Katakana", "kana"),
+        Kayah_Li = _("Kayah Li", "kali"),
+        Kharosthi = _("Kharosthi", "khar"),
+        Khmer = _("Khmer", "khmr"),
+        Khojki = _("Khojki", "khoj"),
+        Khudawadi = _("Khudawadi", "sind"),
+        //// 
+        Lao = _("Lao", "lao"),
+        Latin = _("Latin", "latn"),
+        Lepcha = _("Lepcha", "lepc"),
+        Limbu = _("Limbu", "limb"),
+        Linear_A = _("Linear A", "lina"),
+        Linear_B = _("Linear B", "linb"),
+        Lisu = _("Lisu (Fraser)", "lisu"),
+        Lycian = _("Lycian", "lyci"),
+        Lydian = _("Lydian", "lydi"),
+        //// 
+        Mahajani = _("Mahajani", "mahj"),
+        Malayalam = _("Malayalam", "mlym"),
+        Malayalam_v_2 = _("Malayalam v.2", "mlm2"),
+        Mandaic = _("Mandaic, Mandaean", "mand"),
+        Manichaean = _("Manichaean", "mani"),
+        Marchen = _("Marchen", "marc"),
+        Math = _("Mathematical Alphanumeric Symbols", "math"),
+        Meitei_Mayek = _("Meitei Mayek (Meithei, Meetei)", "mtei"),
+        Mende_Kikakui = _("Mende Kikakui", "mend"),
+        Meroitic_Cursive = _("Meroitic Cursive", "merc"),
+        Meroitic_Hieroglyphs = _("Meroitic Hieroglyphs", "mero"),
+        Miao = _("Miao", "plrd"),
+        Modi = _("Modi", "modi"),
+        Mongolian = _("Mongolian", "mong"),
+        Mro = _("Mro", "mroo"),
+        Multani = _("Multani", "mult"),
+        Musical_Symbols = _("Musical Symbols", "musc"),
+        Myanmar = _("Myanmar", "mymr"),
+        Myanmar_v_2 = _("Myanmar v.2", "mym2"),
+        ////      
+        Nabataean = _("Nabataean", "nbat"),
+        Newa = _("Newa", "newa"),
+        New_Tai_Lue = _("New Tai Lue", "talu"),
+        N_Ko = _("N'Ko", "nko"),
+        //// 
+        Odia = _("Odia (formerly Oriya)", "orya"),
+        Odia_V_2 = _("Odia v.2 (formerly Oriya v.2)", "ory2"),
+        Ogham = _("Ogham", "ogam"),
+        Ol_Chiki = _("Ol Chiki", "olck"),
+        Old_Italic = _("Old Italic", "ital"),
+        Old_Hungarian = _("Old Hungarian", "hung"),
+        Old_North_Arabian = _("Old North Arabian", "narb"),
+        Old_Permic = _("Old Permic", "perm"),
+        Old_Persian_Cuneiform = _("Old Persian Cuneiform ", "xpeo"),
+        Old_South_Arabian = _("Old South Arabian", "sarb"),
+        Old_Turkic = _("Old Turkic, Orkhon Runic", "orkh"),
+        Osage = _("Osage", "osge"),
+        Osmanya = _("Osmanya", "osma"),
+        //// 
+        Pahawh_Hmong = _("Pahawh Hmong", "hmng"),
+        Palmyrene = _("Palmyrene", "palm"),
+        Pau_Cin_Hau = _("Pau Cin Hau", "pauc"),
+        Phags_pa = _("Phags-pa", "phag"),
+        Phoenician = _("Phoenician ", "phnx"),
+        Psalter_Pahlavi = _("Psalter Pahlavi", "phlp"),
+
+        //// 
+        Rejang = _("Rejang", "rjng"),
+        Runic = _("Runic", "runr"),
+
+        //// 
+        Samaritan = _("Samaritan", "samr"),
+        Saurashtra = _("Saurashtra", "saur"),
+        Sharada = _("Sharada", "shrd"),
+        Shavian = _("Shavian", "shaw"),
+        Siddham = _("Siddham", "sidd"),
+        Sign_Writing = _("Sign Writing", "sgnw"),
+        Sinhala = _("Sinhala", "sinh"),
+        Sora_Sompeng = _("Sora Sompeng", "sora"),
+        Sumero_Akkadian_Cuneiform = _("Sumero-Akkadian Cuneiform", "xsux"),
+        Sundanese = _("Sundanese", "sund"),
+        Syloti_Nagri = _("Syloti Nagri", "sylo"),
+        Syriac = _("Syriac", "syrc"),
+        ////       
+        Tagalog = _("Tagalog", "tglg"),
+        Tagbanwa = _("Tagbanwa", "tagb"),
+        Tai_Le = _("Tai Le", "tale"),
+        Tai_Tham = _("Tai Tham (Lanna)", "lana"),
+        Tai_Viet = _("Tai Viet", "tavt"),
+        Takri = _("Takri", "takr"),
+        Tamil = _("Tamil", "taml"),
+        Tamil_v_2 = _("Tamil v.2", "tml2"),
+        Tangut = _("Tangut", "tang"),
+        Telugu = _("Telugu", "telu"),
+        Telugu_v_2 = _("Telugu v.2", "tel2"),
+        Thaana = _("Thaana", "thaa"),
+        Thai = _("Thai", "thai"),
+        Tibetan = _("Tibetan", "tibt"),
+        Tifinagh = _("Tifinagh", "tfng"),
+        Tirhuta = _("Tirhuta", "tirh"),
+        ////
+        Ugaritic_Cuneiform = _("Ugaritic Cuneiform", "ugar"),
+        ////
+        Vai = _("Vai", "vai"),
+        ////
+        Warang_Citi = _("Warang Citi", "wara"),
+
+        ////
+        Yi = _("Yi", "yi")
+        //
+        ;
+
+        //--------------------------------------------------------------------
+
+        static ScriptLang _(string fullname, string shortname)
+        {
+            var scriptLang = new ScriptLang(fullname, shortname);
+            //
+            Tables.TagInfo tagInfo = new Tables.TagInfo(Tables.TagKind.Script, shortname, fullname);
+            if (registeredScriptTags.ContainsKey(shortname))
+            {
+                if (shortname == "kana")
+                {
+                    //Hiragana and Katakana 
+                    //both have same short name "kana"
+                }
+                else
+                {
+
+                }
+            }
+            else
+            {
+                registeredScriptTags.Add(shortname, tagInfo);
+            }
+            return scriptLang;
+        }
+
+
+        internal static Tables.TagInfo GetTagInfo(string shortname)
+        {
+            Tables.TagInfo found;
+            registeredScriptTags.TryGetValue(shortname, out found);
+            return found;
+        }
+    }
+
+
+}
+
 namespace Typography.OpenType.Tables
 {
+
+
     static class TagsLookup
     {
 
-        static Dictionary<string, TagInfo> registeredScriptTags = new Dictionary<string, TagInfo>();
         static Dictionary<string, TagInfo> registeredFeatureTags = new Dictionary<string, TagInfo>();
 
         static TagsLookup()
         {
-            RegisterScriptTags();
+
             RegisterFeatureTags();
             RegisterBaselineTags();
         }
@@ -25,184 +263,6 @@ namespace Typography.OpenType.Tables
             }
         }
 #endif
-
-        static void RegisterScriptTags()
-        {
-            //https://www.microsoft.com/typography/otspec/scripttags.htm
-            RegisterScriptTag("Adlam", "adlm");
-            RegisterScriptTag("Anatolian Hieroglyphs", "hluw");
-
-            RegisterScriptTag("Arabic", "arab");
-            RegisterScriptTag("Armenian", "armn");
-            RegisterScriptTag("Avestan", "avst");
-            //
-            RegisterScriptTag("Balinese", "bali");
-            RegisterScriptTag("Bamum", "bamu");
-            RegisterScriptTag("Bassa Vah ", "bass");
-            //
-            RegisterScriptTag("Batak", "batk");
-            RegisterScriptTag("Bengali", "beng");
-            RegisterScriptTag("Bengali v.2", "bng2");
-            RegisterScriptTag("Bhaiksuki", "bhks");
-            RegisterScriptTag("Brahmi", "brah");
-            RegisterScriptTag("Braille", "brai");
-            RegisterScriptTag("Buginese", "bugi");
-            RegisterScriptTag("Buhid", "buhd");
-            RegisterScriptTag("Byzantine Music", "byzm");
-            //
-            RegisterScriptTag("Canadian Syllabics", "cans");
-            RegisterScriptTag("Carian", "cari");
-            RegisterScriptTag("Caucasian Albanian", "aghb");
-            //
-            RegisterScriptTag("Chakma", "cakm");
-            RegisterScriptTag("Cham", "cham");
-            RegisterScriptTag("Cherokee", "cher");
-            RegisterScriptTag("CJK Ideographic", "hani");
-            RegisterScriptTag("Coptic", "copt");
-            RegisterScriptTag("Cypriot Syllabary", "cprt");
-            RegisterScriptTag("Cyrillic", "cyrl");
-            //
-            RegisterScriptTag("Default", "DFLT");
-            RegisterScriptTag("Deseret", "dsrt");
-            RegisterScriptTag("Devanagari", "deva");
-            RegisterScriptTag("Devanagari v.2", "dev2");
-            RegisterScriptTag("Duployan", "dupl");
-            //            
-            RegisterScriptTag("Egyptian Hieroglyphs", "egyp");
-            RegisterScriptTag("Elbasan", "elba");
-            RegisterScriptTag("Ethiopic", "ethi");
-            // 
-            RegisterScriptTag("Georgian", "geor");
-            RegisterScriptTag("Glagolitic", "glag");
-            RegisterScriptTag("Gothic", "goth");
-            RegisterScriptTag("Grantha", "gran");
-            RegisterScriptTag("Greek", "grek");
-            RegisterScriptTag("Gujarati", "gujr");
-            RegisterScriptTag("Gujarati v.2", "gjr2");
-            RegisterScriptTag("Gurmukhi", "guru");
-            RegisterScriptTag("Gurmukhi v.2", "gur2");
-            // 
-            RegisterScriptTag("Hangul", "hang");
-            RegisterScriptTag("Hangul Jamo", "jamo");
-            RegisterScriptTag("Hanunoo", "hano");
-            RegisterScriptTag("Hatran", "hatr");
-            RegisterScriptTag("Hebrew", "hebr");
-            RegisterScriptTag("Hiragana", "kana");
-            // 
-            RegisterScriptTag("Imperial Aramaic", "armi");
-            RegisterScriptTag("Inscriptional Pahlavi", "phli");
-            RegisterScriptTag("Inscriptional Parthian", "prti");
-            //             	
-            RegisterScriptTag("Javanese", "java");
-            // 
-            RegisterScriptTag("Kaithi", "kthi");
-            RegisterScriptTag("Kannada", "knda");
-            RegisterScriptTag("Kannada v.2", "knd2");
-            RegisterScriptTag("Katakana", "kana");
-            RegisterScriptTag("Kayah Li", "kali");
-            RegisterScriptTag("Kharosthi", "khar");
-            RegisterScriptTag("Khmer", "khmr");
-            RegisterScriptTag("Khojki", "khoj");
-            RegisterScriptTag("Khudawadi", "sind");
-            // 
-            RegisterScriptTag("Lao", "lao");
-            RegisterScriptTag("Latin", "latn");
-            RegisterScriptTag("Lepcha", "lepc");
-            RegisterScriptTag("Limbu", "limb");
-            RegisterScriptTag("Linear A", "lina");
-            RegisterScriptTag("Linear B", "linb");
-            RegisterScriptTag("Lisu (Fraser)", "lisu");
-            RegisterScriptTag("Lycian", "lyci");
-            RegisterScriptTag("Lydian", "lydi");
-            // 
-            RegisterScriptTag("Mahajani", "mahj");
-            RegisterScriptTag("Malayalam", "mlym");
-            RegisterScriptTag("Malayalam v.2", "mlm2");
-            RegisterScriptTag("Mandaic, Mandaean", "mand");
-            RegisterScriptTag("Manichaean", "mani");
-            RegisterScriptTag("Marchen", "marc");
-            RegisterScriptTag("Mathematical Alphanumeric Symbols", "math");
-            RegisterScriptTag("Meitei Mayek (Meithei, Meetei)", "mtei");
-            RegisterScriptTag("Mende Kikakui", "mend");
-            RegisterScriptTag("Meroitic Cursive", "merc");
-            RegisterScriptTag("Meroitic Hieroglyphs", "mero");
-            RegisterScriptTag("Miao", "plrd");
-            RegisterScriptTag("Modi", "modi");
-            RegisterScriptTag("Mongolian", "mong");
-            RegisterScriptTag("Mro", "mroo");
-            RegisterScriptTag("Multani", "mult");
-            RegisterScriptTag("Musical Symbols", "musc");
-            RegisterScriptTag("Myanmar", "mymr");
-            RegisterScriptTag("Myanmar v.2", "mym2");
-            //      
-            RegisterScriptTag("Nabataean", "nbat");
-            RegisterScriptTag("Newa", "newa");
-            RegisterScriptTag("New Tai Lue", "talu");
-            RegisterScriptTag("N'Ko", "nko");
-            // 
-            RegisterScriptTag("Odia (formerly Oriya)", "orya");
-            RegisterScriptTag("Odia v.2 (formerly Oriya v.2)", "ory2");
-            RegisterScriptTag("Ogham", "ogam");
-            RegisterScriptTag("Ol Chiki", "olck");
-            RegisterScriptTag("Old Italic", "ital");
-            RegisterScriptTag("Old Hungarian", "hung");
-            RegisterScriptTag("Old North Arabian", "narb");
-            RegisterScriptTag("Old Permic", "perm");
-            RegisterScriptTag("Old Persian Cuneiform ", "xpeo");
-            RegisterScriptTag("Old South Arabian", "sarb");
-            RegisterScriptTag("Old Turkic, Orkhon Runic", "orkh");
-            RegisterScriptTag("Osage", "osge");
-            RegisterScriptTag("Osmanya", "osma");
-            // 
-            RegisterScriptTag("Pahawh Hmong", "hmng");
-            RegisterScriptTag("Palmyrene", "palm");
-            RegisterScriptTag("Pau Cin Hau", "pauc");
-            RegisterScriptTag("Phags-pa", "phag");
-            RegisterScriptTag("Phoenician ", "phnx");
-            RegisterScriptTag("Psalter Pahlavi", "phlp");
-            // 
-            RegisterScriptTag("Rejang", "rjng");
-            RegisterScriptTag("Runic", "runr");
-            // 
-            RegisterScriptTag("Samaritan", "samr");
-            RegisterScriptTag("Saurashtra", "saur");
-            RegisterScriptTag("Sharada", "shrd");
-            RegisterScriptTag("Shavian", "shaw");
-            RegisterScriptTag("Siddham", "sidd");
-            RegisterScriptTag("Sign Writing", "sgnw");
-            RegisterScriptTag("Sinhala", "sinh");
-            RegisterScriptTag("Sora Sompeng", "sora");
-            RegisterScriptTag("Sumero-Akkadian Cuneiform", "xsux");
-            RegisterScriptTag("Sundanese", "sund");
-            RegisterScriptTag("Syloti Nagri", "sylo");
-            RegisterScriptTag("Syriac", "syrc");
-            //
-
-            RegisterScriptTag("Tagalog", "tglg");
-            RegisterScriptTag("Tagbanwa", "tagb");
-            RegisterScriptTag("Tai Le", "tale");
-            RegisterScriptTag("Tai Tham (Lanna)", "lana");
-            RegisterScriptTag("Tai Viet", "tavt");
-            RegisterScriptTag("Takri", "takr");
-            RegisterScriptTag("Tamil", "taml");
-            RegisterScriptTag("Tamil v.2", "tml2");
-            RegisterScriptTag("Tangut", "tang");
-            RegisterScriptTag("Telugu", "telu");
-            RegisterScriptTag("Telugu v.2", "tel2");
-            RegisterScriptTag("Thaana", "thaa");
-            RegisterScriptTag("Thai", "thai");
-            RegisterScriptTag("Tibetan", "tibt");
-            RegisterScriptTag("Tifinagh", "tfng");
-            RegisterScriptTag("Tirhuta", "tirh");
-            //
-            RegisterScriptTag("Ugaritic Cuneiform", "ugar");
-            //
-            RegisterScriptTag("Vai", "vai");
-            //
-            RegisterScriptTag("Warang Citi", "wara");
-            //
-            RegisterScriptTag("Yi", "yi");
-        }
 
         static void RegisterFeatureTags()
         {
@@ -387,39 +447,12 @@ namespace Typography.OpenType.Tables
         {
             //TODO: implement here
         }
-        static void RegisterLanguageTags()
-        {
-            //https://www.microsoft.com/typography/otspec/languagetags.htm
 
-        }
-
-        public static TagInfo GetScriptTagInfo(string shortname)
-        {
-            TagInfo found;
-            registeredScriptTags.TryGetValue(shortname, out found);
-            return found;
-        }
         public static TagInfo GetFeatureTagInfo(string shortname)
         {
             TagInfo found;
             registeredFeatureTags.TryGetValue(shortname, out found);
             return found;
-        }
-        static void RegisterScriptTag(string fullname, string shortname)
-        {
-#if DEBUG
-            debugCheckShortName(shortname);
-#endif
-            if (registeredScriptTags.ContainsKey(shortname))
-            {
-                //TODO: fix this
-                if (shortname == "kana")
-                {
-
-                    return;
-                }
-            }
-            registeredScriptTags.Add(shortname, new TagInfo(TagKind.Script, shortname, fullname));
         }
         static void RegisterFeatureTag(string shortname, string fullname)
         {
@@ -447,6 +480,7 @@ namespace Typography.OpenType.Tables
             this.FullName = fullname;
             this.ShortName = shortName;
         }
-
     }
+
+
 }

@@ -10,18 +10,28 @@ namespace SampleWinForms
 
     class TextPrinter
     {
-
         GlyphLayout _glyphLayout = new GlyphLayout();
-
+        ScriptLang scriptLang;
         public TextPrinter()
         {
-            //default
-            EnableKerning = true;
+            //default         
         }
-        public bool EnableKerning
+        public ScriptLang ScriptLang
         {
-            get { return _glyphLayout.EnableKerning; }
-            set { _glyphLayout.EnableKerning = value; }
+            get
+            {
+                return scriptLang;
+            }
+            set
+            {
+                scriptLang = value;
+                _glyphLayout.ScriptLang = value.shortname;
+            }
+        }
+        public PositionTecnhique PositionTechnique
+        {
+            get { return _glyphLayout.PositionTechnique; }
+            set { _glyphLayout.PositionTechnique = value; }
         }
         public bool EnableTrueTypeHint
         {

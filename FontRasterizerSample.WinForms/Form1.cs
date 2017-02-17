@@ -8,7 +8,6 @@ using System.Windows.Forms;
 
 using Typography.OpenType;
 using Typography.Rendering;
-using Typography.OpenType.Extensions;
 
 using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
@@ -31,14 +30,21 @@ namespace SampleWinForms
             InitializeComponent();
             this.Load += new EventHandler(Form1_Load);
 
+            //----------
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
-            cmbRenderChoices.SelectedIndex = 0;
-            cmbRenderChoices.SelectedIndexChanged += new EventHandler(cmbRenderChoices_SelectedIndexChanged);
+            cmbRenderChoices.SelectedIndex = 2;
+            cmbRenderChoices.SelectedIndexChanged += cmbRenderChoices_SelectedIndexChanged;
+            //----------
+            cmbPositionTech.Items.Add(PositionTecnhique.OpenType);
+            cmbPositionTech.Items.Add(PositionTecnhique.Kerning);
+            cmbPositionTech.Items.Add(PositionTecnhique.None);
+            cmbPositionTech.SelectedIndex = 0;
+            cmbPositionTech.SelectedIndexChanged += CmbPositionTech_SelectedIndexChanged;
+            //----------
 
-            this.txtInputChar.Text = "i";
 
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -50,8 +56,21 @@ namespace SampleWinForms
                     18,20,22,24,26,28,36,48,72,240,300,360
                 });
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
+
+            //----------------
+            //string inputstr = "ii";
+            //string inputstr = "ก่นกิ่น";
+            //string inputstr = "ญญู";
+            string inputstr = "ป่า"; //for gpos test 
+            //----------------
+            this.txtInputChar.Text = inputstr;
+            this.chkFillBackground.Checked = true;
         }
 
+        private void CmbPositionTech_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            button1_Click(this, EventArgs.Empty);
+        }
 
         enum RenderChoice
         {
@@ -91,6 +110,7 @@ namespace SampleWinForms
         {
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
             {
+                p.Clear(PixelFarm.Drawing.Color.White);
                 return;
             }
             var reader = new OpenTypeReader();
@@ -101,23 +121,6 @@ namespace SampleWinForms
             {
                 //1. read typeface from font file
                 Typeface typeFace = reader.Read(fs);
-
-#if DEBUG
-                //-----
-                //about typeface 
-                //short ascender = typeFace.Ascender;
-                //short descender = typeFace.Descender;
-                //short lineGap = typeFace.LineGap;
-
-                //NOpenType.Tables.UnicodeLangBits test = NOpenType.Tables.UnicodeLangBits.Thai;
-                //NOpenType.Tables.UnicodeRangeInfo rangeInfo = test.ToUnicodeRangeInfo();
-                //bool doseSupport = typeFace.DoseSupportUnicode(test); 
-                ////-----
-                ////string inputstr = "ก่นกิ่น";
-                //string inputstr = "ญญู";
-                //List<int> outputGlyphIndice = new List<int>();
-                //typeFace.Lookup(inputstr.ToCharArray(), outputGlyphIndice);
-#endif
 
                 RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
                 switch (renderChoice)
@@ -416,6 +419,7 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
+
         static GlyphContour CreateFitContourVxs2(GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
             GlyphContour newc = new GlyphContour();
@@ -1038,12 +1042,15 @@ namespace SampleWinForms
         {
             //1. 
             TextPrinter printer = new TextPrinter();
-            printer.EnableKerning = this.chkKern.Checked;
+            //for test Thai glyph for gsub and gpos
+            printer.ScriptLang = ScriptLangs.Thai;
+            //
+            printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
             printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
-
+            //
             int len = str.Length;
-
+            //
             List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
             printer.Print(typeface, sizeInPoint, str, glyphPlanList);
             //--------------------------

@@ -36,7 +36,6 @@
             this.cmbRenderChoices = new System.Windows.Forms.ComboBox();
             this.lstFontSizes = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.chkKern = new System.Windows.Forms.CheckBox();
             this.chkTrueTypeHint = new System.Windows.Forms.CheckBox();
             this.chkShowControlPoints = new System.Windows.Forms.CheckBox();
             this.chkShowTess = new System.Windows.Forms.CheckBox();
@@ -48,6 +47,7 @@
             this.chkXGridFitting = new System.Windows.Forms.CheckBox();
             this.chkLcdTechnique = new System.Windows.Forms.CheckBox();
             this.cmdBuildMsdfTexture = new System.Windows.Forms.Button();
+            this.cmbPositionTech = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // button1
@@ -81,7 +81,7 @@
             // chkBorder
             // 
             this.chkBorder.AutoSize = true;
-            this.chkBorder.Location = new System.Drawing.Point(491, 39);
+            this.chkBorder.Location = new System.Drawing.Point(597, 85);
             this.chkBorder.Name = "chkBorder";
             this.chkBorder.Size = new System.Drawing.Size(57, 17);
             this.chkBorder.TabIndex = 3;
@@ -91,7 +91,7 @@
             // chkFillBackground
             // 
             this.chkFillBackground.AutoSize = true;
-            this.chkFillBackground.Location = new System.Drawing.Point(491, 62);
+            this.chkFillBackground.Location = new System.Drawing.Point(490, 85);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 4;
@@ -125,19 +125,6 @@
             this.label2.Size = new System.Drawing.Size(70, 13);
             this.label2.TabIndex = 9;
             this.label2.Text = "Size in Points";
-            // 
-            // chkKern
-            // 
-            this.chkKern.AutoSize = true;
-            this.chkKern.Checked = true;
-            this.chkKern.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkKern.Location = new System.Drawing.Point(491, 85);
-            this.chkKern.Name = "chkKern";
-            this.chkKern.Size = new System.Drawing.Size(85, 17);
-            this.chkKern.TabIndex = 10;
-            this.chkKern.Text = "Do Kerning1";
-            this.chkKern.UseVisualStyleBackColor = true;
-            this.chkKern.CheckedChanged += new System.EventHandler(this.chkKern_CheckedChanged);
             // 
             // chkTrueTypeHint
             // 
@@ -261,11 +248,21 @@
             this.cmdBuildMsdfTexture.UseVisualStyleBackColor = true;
             this.cmdBuildMsdfTexture.Click += new System.EventHandler(this.cmdBuildMsdfTexture_Click);
             // 
+            // cmbPositionTech
+            // 
+            this.cmbPositionTech.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbPositionTech.FormattingEnabled = true;
+            this.cmbPositionTech.Location = new System.Drawing.Point(380, 39);
+            this.cmbPositionTech.Name = "cmbPositionTech";
+            this.cmbPositionTech.Size = new System.Drawing.Size(224, 21);
+            this.cmbPositionTech.TabIndex = 23;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.cmbPositionTech);
             this.Controls.Add(this.cmdBuildMsdfTexture);
             this.Controls.Add(this.chkLcdTechnique);
             this.Controls.Add(this.chkXGridFitting);
@@ -277,7 +274,6 @@
             this.Controls.Add(this.chkShowTess);
             this.Controls.Add(this.chkShowControlPoints);
             this.Controls.Add(this.chkTrueTypeHint);
-            this.Controls.Add(this.chkKern);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lstFontSizes);
             this.Controls.Add(this.cmbRenderChoices);
@@ -303,7 +299,6 @@
         private System.Windows.Forms.ComboBox cmbRenderChoices;
         private System.Windows.Forms.ListBox lstFontSizes;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox chkKern;
         private System.Windows.Forms.CheckBox chkTrueTypeHint;
         private System.Windows.Forms.CheckBox chkShowControlPoints;
         private System.Windows.Forms.CheckBox chkShowTess;
@@ -315,6 +310,7 @@
         private System.Windows.Forms.CheckBox chkXGridFitting;
         private System.Windows.Forms.CheckBox chkLcdTechnique;
         private System.Windows.Forms.Button cmdBuildMsdfTexture;
+        private System.Windows.Forms.ComboBox cmbPositionTech;
     }
 }
 

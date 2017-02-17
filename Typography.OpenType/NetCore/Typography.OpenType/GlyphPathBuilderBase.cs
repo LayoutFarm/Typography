@@ -15,7 +15,7 @@ namespace Typography.OpenType
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
-            this.UseTrueTypeInterpreter = true;//default?
+            this.UseTrueTypeInterpreter = false;//default?
         }
         struct FtPoint
         {
