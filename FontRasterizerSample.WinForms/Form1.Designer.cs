@@ -47,6 +47,7 @@
             this.chkDrawBone = new System.Windows.Forms.CheckBox();
             this.chkXGridFitting = new System.Windows.Forms.CheckBox();
             this.chkLcdTechnique = new System.Windows.Forms.CheckBox();
+            this.cmdBuildMsdfTexture = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -112,7 +113,7 @@
             this.lstFontSizes.FormattingEnabled = true;
             this.lstFontSizes.Location = new System.Drawing.Point(653, 26);
             this.lstFontSizes.Name = "lstFontSizes";
-            this.lstFontSizes.Size = new System.Drawing.Size(100, 212);
+            this.lstFontSizes.Size = new System.Drawing.Size(121, 212);
             this.lstFontSizes.TabIndex = 8;
             this.lstFontSizes.SelectedIndexChanged += new System.EventHandler(this.lstFontSizes_SelectedIndexChanged);
             // 
@@ -250,11 +251,22 @@
             this.chkLcdTechnique.UseVisualStyleBackColor = true;
             this.chkLcdTechnique.CheckedChanged += new System.EventHandler(this.chkLcdTechnique_CheckedChanged);
             // 
+            // cmdBuildMsdfTexture
+            // 
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(653, 243);
+            this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
+            this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 37);
+            this.cmdBuildMsdfTexture.TabIndex = 22;
+            this.cmdBuildMsdfTexture.Text = "Make MsdfTexture";
+            this.cmdBuildMsdfTexture.UseVisualStyleBackColor = true;
+            this.cmdBuildMsdfTexture.Click += new System.EventHandler(this.cmdBuildMsdfTexture_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(814, 427);
+            this.Controls.Add(this.cmdBuildMsdfTexture);
             this.Controls.Add(this.chkLcdTechnique);
             this.Controls.Add(this.chkXGridFitting);
             this.Controls.Add(this.chkDrawBone);
@@ -302,6 +314,7 @@
         private System.Windows.Forms.CheckBox chkDrawBone;
         private System.Windows.Forms.CheckBox chkXGridFitting;
         private System.Windows.Forms.CheckBox chkLcdTechnique;
+        private System.Windows.Forms.Button cmdBuildMsdfTexture;
     }
 }
 

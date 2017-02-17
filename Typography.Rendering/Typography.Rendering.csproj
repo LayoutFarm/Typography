@@ -34,11 +34,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FontAtlas\BinPacker.cs" />
-    <Compile Include="FontAtlas\SimpleFontAtlas.cs" />
     <Compile Include="GlyphAnalysis.cs" />
     <Compile Include="GlyphFitOutline.cs" />
-    <Compile Include="GlyphPathBuilderVxs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -50,13 +47,9 @@
       <Project>{1088370f-1a7e-421b-bbcb-400a8eda5f1f}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.OpenType\N20\PixelFarm.OpenType\PixelFarm.OpenType.csproj">
+    <ProjectReference Include="..\Typography.OpenType\N20\Typography.OpenType\Typography.OpenType.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>Typography.OpenType</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj">
-      <Project>{8f69ab8d-174a-4912-9328-cae8eda5564b}</Project>
-      <Name>Typography.MsdfGen</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
