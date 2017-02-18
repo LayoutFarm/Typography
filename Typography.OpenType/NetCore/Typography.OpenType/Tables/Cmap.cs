@@ -2,7 +2,6 @@
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenType.Tables
 {
@@ -167,7 +166,7 @@ namespace Typography.OpenType.Tables
                         ushort[] glyphIdArray = Utils.ReadUInt16Array(input, entryCount);
 
                         return CharacterMap.BuildFromFormat6(firstCode, glyphIdArray);
-                         
+
                     }
             }
         }

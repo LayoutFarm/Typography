@@ -1,8 +1,6 @@
-﻿//Apache2, 2016-2017, WinterDev
-
-using System.Collections.Generic;
+﻿//Apache2, 2016-2017, WinterDev 
 using System.IO;
-using System.Text;
+
 namespace Typography.OpenType.Tables
 {
 
@@ -944,5 +942,5 @@ namespace Typography.OpenType.Tables
         Reserved125 = (125 << 32),
         Reserved126 = (126 << 32),
         Reserved127 = (127 << 32),
-    } 
+    }
 }

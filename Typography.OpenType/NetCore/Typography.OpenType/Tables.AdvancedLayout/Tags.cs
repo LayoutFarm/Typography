@@ -480,7 +480,5 @@ namespace Typography.OpenType.Tables
             this.FullName = fullname;
             this.ShortName = shortName;
         }
-    }
-
-
+    } 
 }

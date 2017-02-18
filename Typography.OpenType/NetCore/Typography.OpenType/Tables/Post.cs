@@ -1,7 +1,6 @@
 ﻿//Apache2, 2016-2017, WinterDev
 
 using System.IO;
-using System.Text;
 namespace Typography.OpenType.Tables
 {
     //https://www.microsoft.com/typography/otspec/post.htm
