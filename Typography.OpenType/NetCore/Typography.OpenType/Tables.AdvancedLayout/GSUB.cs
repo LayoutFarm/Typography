@@ -271,35 +271,18 @@ namespace Typography.OpenType.Tables
                 return lookupType.ToString();
             }
 #endif
-            //public int FindGlyphIndex(int glyphIndex)
-            //{
-            //    throw new NotSupportedException();
-            //    //check if input glyphIndex is in coverage area 
-            //    //for (int i = subTables.Count - 1; i >= 0; --i)
-            //    //{
-            //    //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-            //    //    if (foundAtIndex > -1)
-            //    //    {
-            //    //        //found                        
-            //    //        return foundAtIndex;
-            //    //    }
-            //    //}
-            //    //return -1;
-            //}
-            //public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
-            //{
-            //    throw new NotSupportedException();
-            //    //check if input glyphIndex is in coverage area 
-            //    //for (int i = subTables.Count - 1; i >= 0; --i)
-            //    //{
-            //    //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-            //    //    if (foundAtIndex > -1)
-            //    //    {
-            //    //        //found                        
-            //    //        outputResults.Add(new LookupResult(subTables[i], i));
-            //    //    }
-            //    //} 
-            //}
+            public uint ForUseWithFeature
+            {
+                get;
+                set;
+            }
+            public string ForUseWithFeatureName
+            {
+                get
+                {
+                    return Utils.TagToString(this.ForUseWithFeature);
+                }
+            }
             public void ReadRecordContent(BinaryReader reader)
             {
                 switch (lookupType)
@@ -599,7 +582,7 @@ namespace Typography.OpenType.Tables
                     int end = startAt + len;
                     for (int i = startAt; i < end; ++i)
                     {
-                        int iscovered = this.CoverageTable.FindPosition(glyphIndices[i]); 
+                        int iscovered = this.CoverageTable.FindPosition(glyphIndices[i]);
                     }
                     //this.CoverageTable.FindPosition()
                     //Console.WriteLine("lksubtable3 is not  implemented");

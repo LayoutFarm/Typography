@@ -348,13 +348,11 @@ namespace Typography.OpenType
                 {
                     selectedLang = scriptTable.defaultLang;
                 }
-               
+
                 if (selectedLang.HasRequireFeature)
                 {
                     //TODO: review here
                 }
-
-
 
                 //other feature
                 if (selectedLang.featureIndexList != null)
@@ -363,9 +361,7 @@ namespace Typography.OpenType
                     var features = new List<FeatureList.FeatureTable>();
                     for (int i = 0; i < selectedLang.featureIndexList.Length; ++i)
                     {
-
                         FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[selectedLang.featureIndexList[i]];
-
                         switch (feature.TagName)
                         {
                             case "ccmp": //glyph composition/decomposition
@@ -373,14 +369,13 @@ namespace Typography.OpenType
                                 features.Add(feature);
                                 break;
                             case "liga":
-                                //Standard Ligatures
+                                //Standard Ligatures --enable by default
                                 features.Add(feature);
                                 break;
                         }
 
                     }
-                    //-----------------------
-
+                    //----------------------- 
                     lookupTables = new List<GSUB.LookupTable>();
                     int j = features.Count;
                     for (int i = 0; i < j; ++i)
@@ -389,6 +384,8 @@ namespace Typography.OpenType
                         ushort[] lookupListIndices = feature.LookupListIndice;
                         foreach (ushort lookupIndex in lookupListIndices)
                         {
+                            GSUB.LookupTable lktable = gsubTable.GetLookupTable(lookupIndex);
+                            lktable.ForUseWithFeature = feature.FeatureTag;
                             lookupTables.Add(gsubTable.GetLookupTable(lookupIndex));
                         }
                     }
