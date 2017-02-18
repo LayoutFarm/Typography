@@ -5,7 +5,7 @@ using System;
 namespace SharpFont
 {
 
-    public class InvalidFontException : Exception
+    class InvalidFontException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidFontException"/> class.
@@ -32,7 +32,5 @@ namespace SharpFont
             : base(message, innerException)
         {
         }
-
-        
     }
 }

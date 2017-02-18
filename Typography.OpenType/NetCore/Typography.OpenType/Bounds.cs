@@ -23,6 +23,5 @@ namespace Typography.OpenType
         public short XMax { get { return _xmax; } }
         public short YMax { get { return _ymax; } }
 
-       
     }
 }

@@ -1,11 +1,11 @@
 ﻿//MIT, 2015, Michael Popoloski's SharpFont,
 //MIT, 2016-2017, WinterDev
 
- 
+
 using System.Numerics;
 namespace Typography.OpenType
 {
-     
+
     public struct GlyphPointF
     {
         public Vector2 P;

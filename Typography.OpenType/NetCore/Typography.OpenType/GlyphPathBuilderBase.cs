@@ -55,6 +55,7 @@ namespace Typography.OpenType
         {
             get { return this._passInterpreterModule; }
         }
+
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
