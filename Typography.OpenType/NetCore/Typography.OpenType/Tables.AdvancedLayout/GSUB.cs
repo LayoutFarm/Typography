@@ -1,7 +1,7 @@
 ﻿//Apache2, 2016-2017,  WinterDev
 using System;
 using System.Collections.Generic;
-using System.IO; 
+using System.IO;
 
 namespace Typography.OpenType.Tables
 {
@@ -271,35 +271,18 @@ namespace Typography.OpenType.Tables
                 return lookupType.ToString();
             }
 #endif
-            //public int FindGlyphIndex(int glyphIndex)
-            //{
-            //    throw new NotSupportedException();
-            //    //check if input glyphIndex is in coverage area 
-            //    //for (int i = subTables.Count - 1; i >= 0; --i)
-            //    //{
-            //    //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-            //    //    if (foundAtIndex > -1)
-            //    //    {
-            //    //        //found                        
-            //    //        return foundAtIndex;
-            //    //    }
-            //    //}
-            //    //return -1;
-            //}
-            //public void FindGlyphIndexAll(int glyphIndex, List<LookupResult> outputResults)
-            //{
-            //    throw new NotSupportedException();
-            //    //check if input glyphIndex is in coverage area 
-            //    //for (int i = subTables.Count - 1; i >= 0; --i)
-            //    //{
-            //    //    int foundAtIndex = subTables[i].CoverageTable.FindGlyphIndex(glyphIndex);
-            //    //    if (foundAtIndex > -1)
-            //    //    {
-            //    //        //found                        
-            //    //        outputResults.Add(new LookupResult(subTables[i], i));
-            //    //    }
-            //    //} 
-            //}
+            public uint ForUseWithFeature
+            {
+                get;
+                set;
+            }
+            public string ForUseWithFeatureName
+            {
+                get
+                {
+                    return Utils.TagToString(this.ForUseWithFeature);
+                }
+            }
             public void ReadRecordContent(BinaryReader reader)
             {
                 switch (lookupType)
@@ -391,11 +374,16 @@ namespace Typography.OpenType.Tables
                 public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
                 {
                     int endBefore = startAt + len;
+                    return;
                     for (int i = startAt; i < endBefore; ++i)
                     {
                         int foundAt = CoverageTable.FindPosition(glyphIndices[i]);
                         if (foundAt > -1)
                         {
+                            if (glyphIndices[i] == 143)
+                            {
+                                continue;
+                            }
                             glyphIndices[i] = SubstitueGlyphs[foundAt];
                         }
                     }
@@ -582,21 +570,159 @@ namespace Typography.OpenType.Tables
                 }
             }
             /// <summary>
+            /// LookupType 3: Alternate Substitution Subtable
+            /// </summary>
+            class LkSubTableT3 : LookupSubTable
+            {
+                public CoverageTable CoverageTable { get; set; }
+                public AlternativeSetTable[] AlternativeSetTables { get; set; }
+                public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
+                {
+                    //Coverage table containing the indices of glyphs with alternative forms(Coverage),
+                    int end = startAt + len;
+                    for (int i = startAt; i < end; ++i)
+                    {
+                        int iscovered = this.CoverageTable.FindPosition(glyphIndices[i]);
+                    }
+                    //this.CoverageTable.FindPosition()
+                    //Console.WriteLine("lksubtable3 is not  implemented");
+                }
+            }
+            /// <summary>
             /// LookupType 3: Alternate Substitution Subtable 
             /// </summary>
             /// <param name="reader"></param>
             void ReadLookupType3(BinaryReader reader)
             {
-                throw new NotImplementedException();
+                //LookupType 3: Alternate Substitution Subtable
+
+                //An Alternate Substitution (AlternateSubst)subtable identifies any number of aesthetic alternatives
+                //from which a user can choose a glyph variant to replace the input glyph.
+
+                //For example, if a font contains four variants of the ampersand symbol,
+                //the cmap table will specify the index of one of the four glyphs as the default glyph index, 
+                //and an AlternateSubst subtable will list the indices of the other three glyphs as alternatives.
+                //A text - processing client would then have the option of replacing the default glyph with any of the three alternatives.
+
+                //The subtable has one format: AlternateSubstFormat1.
+                //The subtable contains a format identifier (SubstFormat),
+                //    an offset to a Coverage table containing the indices of glyphs with alternative forms(Coverage),
+                //    a count of offsets to AlternateSet tables(AlternateSetCount), 
+                //    and an array of offsets to AlternateSet tables(AlternateSet).
+
+                //For each glyph, an AlternateSet subtable contains a count of the alternative glyphs(GlyphCount) and
+                //   an array of their glyph indices(Alternate).
+                //Because all the glyphs are functionally equivalent, they can be in any order in the array.
+
+                //Example 5 at the end of this chapter shows how to replace the default ampersand glyph with alternative glyphs.
+
+                //AlternateSubstFormat1 subtable: Alternative output glyphs
+                //Type    Name    Description
+                //uint16  SubstFormat Format identifier - format = 1
+                //Offset16    Coverage    Offset to Coverage table - from beginning of Substitution table
+                //uint16  AlternateSetCount   Number of AlternateSet tables
+                //Offset16    AlternateSet[AlternateSetCount] Array of offsets to AlternateSet tables - from beginning of Substitution table - ordered by Coverage Index
+                //
+                //AlternateSet table
+                //Type    Name    Description
+                //uint16  GlyphCount  Number of glyph IDs in the Alternate array
+                //uint16  Alternate[GlyphCount]   Array of alternate glyph IDs -in arbitrary order
+
+                int j = subTableOffsets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    //move to read pos
+                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
+                    //
+                    ushort format = reader.ReadUInt16(); //The subtable has one format: AlternateSubstFormat1.
+                    switch (format)
+                    {
+                        default: throw new NotSupportedException();
+                        case 1:
+                            {
+                                short coverageOffset = reader.ReadInt16();
+                                ushort alternativeSetCount = reader.ReadUInt16();
+                                short[] alternativeTableOffsets = Utils.ReadInt16Array(reader, alternativeSetCount);
+
+                                LkSubTableT3 subTable = new LkSubTableT3();
+                                AlternativeSetTable[] alternativeSetTables = new AlternativeSetTable[alternativeSetCount];
+                                subTable.AlternativeSetTables = alternativeSetTables;
+                                for (int n = 0; n < alternativeSetCount; ++n)
+                                {
+                                    alternativeSetTables[n] = AlternativeSetTable.CreateFrom(reader, subTableStartAt + alternativeTableOffsets[n]);
+                                }
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
+
+                                this.subTables.Add(subTable);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            class AlternativeSetTable
+            {
+                public ushort[] alternativeGlyphIds;
+                public static AlternativeSetTable CreateFrom(BinaryReader reader, long beginAt)
+                {
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+                    // 
+                    AlternativeSetTable altTable = new AlternativeSetTable();
+                    ushort glyphCount = reader.ReadUInt16();
+                    altTable.alternativeGlyphIds = Utils.ReadUInt16Array(reader, glyphCount);
+                    return altTable;
+                }
             }
 
             class LkSubTableT4 : LookupSubTable
             {
-
+                public CoverageTable CoverageTable { get; set; }
                 public LigatureSetTable[] LigatureSetTables { get; set; }
+
                 public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    //check coverage
+                    int lim = startAt + len;
+                    for (int c = startAt; c < lim; ++c)
+                    {
+                        ushort glyphIndex = glyphIndices[c];
+                        int foundPos = this.CoverageTable.FindPosition(glyphIndex);
+                        if (foundPos > -1)
+                        {
+                            LigatureSetTable ligTable = LigatureSetTables[foundPos];
+                            LigatureTable[] ligs = ligTable.Ligatures;
+                            int j = ligs.Length;
+                            for (int i = 0; i < j; ++i)
+                            {
+                                LigatureTable lig = ligs[i];
+                                int remainingLen = lim - (c + 1);
+                                int compLen = lig.ComponentGlyphs.Length;
+                                if (compLen > remainingLen)
+                                {   //skip tp next component
+                                    continue;
+                                }
+                                bool allMatched = true;
+                                int tmp_i = c + 1;
+                                for (int p = 0; p < compLen; ++p)
+                                {
+                                    if (glyphIndices[tmp_i] != lig.ComponentGlyphs[p])
+                                    {
+                                        allMatched = false;
+                                        break; //exit from loop
+                                    }
+                                }
+                                if (allMatched)
+                                {
+                                    //remove all match and replace with selected glyph
+                                    glyphIndices.RemoveRange(c, compLen + 1);
+                                    glyphIndices.Insert(c, lig.GlyphId);
+                                    lim -= compLen;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             class LigatureSetTable
@@ -612,7 +738,7 @@ namespace Typography.OpenType.Tables
                     LigatureSetTable ligSetTable = new LigatureSetTable();
                     reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
                     //
-                    ushort ligCount = reader.ReadUInt16();
+                    ushort ligCount = reader.ReadUInt16(); //Number of Ligature tables
                     short[] ligOffsets = Utils.ReadInt16Array(reader, ligCount);
                     //
                     LigatureTable[] ligTables = ligSetTable.Ligatures = new LigatureTable[ligCount];
@@ -629,7 +755,13 @@ namespace Typography.OpenType.Tables
                 //GlyphID 	LigGlyph 	GlyphID of ligature to substitute
                 //USHORT 	CompCount 	Number of components in the ligature
                 //GlyphID 	Component[CompCount - 1] 	Array of component GlyphIDs-start with the second component-ordered in writing direction
+                /// <summary>
+                /// output glyph
+                /// </summary>
                 public ushort GlyphId { get; set; }
+                /// <summary>
+                /// ligature component start with second ordered glyph
+                /// </summary>
                 public ushort[] ComponentGlyphs { get; set; }
                 public static LigatureTable CreateFrom(BinaryReader reader, long beginAt)
                 {
@@ -638,9 +770,28 @@ namespace Typography.OpenType.Tables
                     LigatureTable ligTable = new LigatureTable();
                     ligTable.GlyphId = reader.ReadUInt16();
                     ushort compCount = reader.ReadUInt16();
-                    ligTable.ComponentGlyphs = Utils.ReadUInt16Array(reader, compCount);
+                    ligTable.ComponentGlyphs = Utils.ReadUInt16Array(reader, compCount - 1);
                     return ligTable;
                 }
+#if DEBUG
+                public override string ToString()
+                {
+                    var stbuilder = new System.Text.StringBuilder();
+                    int j = ComponentGlyphs.Length;
+                    stbuilder.Append("output:" + GlyphId + ",{");
+
+                    for (int i = 0; i < j; ++i)
+                    {
+                        if (i > 0)
+                        {
+                            stbuilder.Append(',');
+                        }
+                        stbuilder.Append(ComponentGlyphs[i]);
+                    }
+                    stbuilder.Append("}");
+                    return stbuilder.ToString();
+                }
+#endif
             }
             /// <summary>
             /// LookupType 4: Ligature Substitution Subtable
@@ -725,6 +876,7 @@ namespace Typography.OpenType.Tables
                                 {
                                     ligSetTables[n] = LigatureSetTable.CreateFrom(reader, subTableStartAt + ligSetOffsets[n]);
                                 }
+                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
                                 this.subTables.Add(subTable);
 
                             }

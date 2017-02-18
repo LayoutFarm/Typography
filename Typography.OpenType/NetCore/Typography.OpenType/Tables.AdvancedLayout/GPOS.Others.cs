@@ -45,10 +45,10 @@ namespace Typography.OpenType.Tables
                     //GlyphID 	SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
                     //ValueRecord 	Value1 	Positioning data for the first glyph in the pair
                     //ValueRecord 	Value2 	Positioning data for the second glyph in the pair
-                    ushort secondGlyp = reader.ReadUInt16();
+                    ushort secondGlyph = reader.ReadUInt16();
                     ValueRecord v1 = ValueRecord.CreateFrom(reader, v1format);
                     ValueRecord v2 = ValueRecord.CreateFrom(reader, v2format);
-                    PairSet pset = new PairSet(secondGlyp, v1, v2);
+                    PairSet pset = new PairSet(secondGlyph, v1, v2);
                 }
             }
         }
