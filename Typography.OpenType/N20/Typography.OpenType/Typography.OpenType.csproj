@@ -73,6 +73,9 @@
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\CoverageTable.cs">
       <Link>Tables.AdvancedLayout\CoverageTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\FeatureInfo.cs">
+      <Link>Tables.AdvancedLayout\FeatureInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\FeatureList.cs">
       <Link>Tables.AdvancedLayout\FeatureList.cs</Link>
     </Compile>
@@ -100,14 +103,14 @@
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\MathTable.cs">
       <Link>Tables.AdvancedLayout\MathTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\ScriptLang.cs">
+      <Link>Tables.AdvancedLayout\ScriptLang.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\ScriptList.cs">
       <Link>Tables.AdvancedLayout\ScriptList.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\ScriptTable.cs">
       <Link>Tables.AdvancedLayout\ScriptTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\Tags.cs">
-      <Link>Tables.AdvancedLayout\Tags.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.Others\EBLCTable.cs">
       <Link>Tables\EBLCTable.cs</Link>
