@@ -217,7 +217,7 @@ namespace Typography.OpenType
                 }
                 else
                 {
-
+                    //errors
                 }
             }
             else
@@ -235,6 +235,9 @@ namespace Typography.OpenType
             return found;
         }
     }
+
+
+
 
 
 }
@@ -480,5 +483,5 @@ namespace Typography.OpenType.Tables
             this.FullName = fullname;
             this.ShortName = shortName;
         }
-    } 
+    }
 }

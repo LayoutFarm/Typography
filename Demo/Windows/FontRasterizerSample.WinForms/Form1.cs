@@ -63,7 +63,7 @@ namespace SampleWinForms
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
 
             //----------------
-            string inputstr = "ii";
+            string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
             //string inputstr = "ป่า"; //for gpos test 
@@ -110,7 +110,8 @@ namespace SampleWinForms
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
             //ReadAndRender(@"..\..\tahoma.ttf");
-             ReadAndRender(@"..\..\cambriaz.ttf");
+            //ReadAndRender(@"..\..\cambriaz.ttf");
+            ReadAndRender(@"..\..\pala.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -1098,7 +1099,7 @@ namespace SampleWinForms
         {
             //1. 
             TextPrinter printer = new TextPrinter();
-            //for test Thai glyph for gsub and gpos
+
             printer.ScriptLang = ScriptLangs.Latin;
             //
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;

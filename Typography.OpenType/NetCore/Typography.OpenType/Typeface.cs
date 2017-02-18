@@ -339,26 +339,45 @@ namespace Typography.OpenType
                 if (scriptTable == null) { return; }   //early exit if no lookup tables      
 
                 //---------
-
-                ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
-
-                if (defaultLang.HasRequireFeature)
+                ScriptTable.LangSysTable selectedLang = null;
+                if (scriptTable.langSysTables != null)
+                {
+                    selectedLang = scriptTable.langSysTables[0];
+                }
+                else
+                {
+                    selectedLang = scriptTable.defaultLang;
+                }
+               
+                if (selectedLang.HasRequireFeature)
                 {
                     //TODO: review here
                 }
+
+
+
                 //other feature
-                if (defaultLang.featureIndexList != null)
+                if (selectedLang.featureIndexList != null)
                 {
                     //get features 
                     var features = new List<FeatureList.FeatureTable>();
-                    for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
+                    for (int i = 0; i < selectedLang.featureIndexList.Length; ++i)
                     {
-                        FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
-                        if (feature.TagName == "ccmp") //glyph composition/decomposition
+
+                        FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[selectedLang.featureIndexList[i]];
+
+                        switch (feature.TagName)
                         {
-                            //this version we implement ccmp
-                            features.Add(feature);
+                            case "ccmp": //glyph composition/decomposition
+                                //this version we implement ccmp
+                                features.Add(feature);
+                                break;
+                            case "liga":
+                                //Standard Ligatures
+                                features.Add(feature);
+                                break;
                         }
+
                     }
                     //-----------------------
 
