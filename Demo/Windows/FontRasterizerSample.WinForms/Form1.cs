@@ -149,7 +149,6 @@ namespace SampleWinForms
                         break;
                     default:
                         throw new NotSupportedException();
-
                 }
             }
         }
