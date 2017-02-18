@@ -63,10 +63,10 @@ namespace SampleWinForms
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
 
             //----------------
-            //string inputstr = "ii";
+            string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
-            string inputstr = "ป่า"; //for gpos test 
+            //string inputstr = "ป่า"; //for gpos test 
             //----------------
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
@@ -109,8 +109,9 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            ReadAndRender(@"..\..\tahoma.ttf");
-            // ReadAndRender(@"..\..\cambriaz.ttf");
+            //ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\cambriaz.ttf");
+            ReadAndRender(@"..\..\pala.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -149,7 +150,6 @@ namespace SampleWinForms
                         break;
                     default:
                         throw new NotSupportedException();
-
                 }
             }
         }
@@ -1060,8 +1060,8 @@ namespace SampleWinForms
 
             //2. glyph to gdi path
             var gdiGlyphRasterizer = new GDIGlyphRasterizer();
-            var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer); 
-           
+            var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
+
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInterpreter = false;//reset
             builder.UseVerticalHinting = false;//reset
@@ -1099,8 +1099,8 @@ namespace SampleWinForms
         {
             //1. 
             TextPrinter printer = new TextPrinter();
-            //for test Thai glyph for gsub and gpos
-            printer.ScriptLang = ScriptLangs.Thai;
+
+            printer.ScriptLang = ScriptLangs.Latin;
             //
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;

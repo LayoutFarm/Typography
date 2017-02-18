@@ -40,6 +40,9 @@
     <Compile Include="..\..\NetCore\Typography.OpenType\fontcollection\InstalledFont.cs">
       <Link>FontCollection\InstalledFont.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Typography.OpenType\Geometry.cs">
+      <Link>Geometry.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Glyph.cs">
       <Link>Glyph.cs</Link>
     </Compile>
@@ -70,6 +73,9 @@
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\CoverageTable.cs">
       <Link>Tables.AdvancedLayout\CoverageTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\FeatureInfo.cs">
+      <Link>Tables.AdvancedLayout\FeatureInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\FeatureList.cs">
       <Link>Tables.AdvancedLayout\FeatureList.cs</Link>
     </Compile>
@@ -97,14 +103,14 @@
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\MathTable.cs">
       <Link>Tables.AdvancedLayout\MathTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\ScriptLang.cs">
+      <Link>Tables.AdvancedLayout\ScriptLang.cs</Link>
+    </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\ScriptList.cs">
       <Link>Tables.AdvancedLayout\ScriptList.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\ScriptTable.cs">
       <Link>Tables.AdvancedLayout\ScriptTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenType\Tables.AdvancedLayout\Tags.cs">
-      <Link>Tables.AdvancedLayout\Tags.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Tables.Others\EBLCTable.cs">
       <Link>Tables\EBLCTable.cs</Link>
@@ -205,17 +211,11 @@
     <Compile Include="..\..\NetCore\Typography.OpenType\TrueTypeInterperter\ForNet20.cs">
       <Link>Net20\ForNet20.cs</Link>
     </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenType\TrueTypeInterperter\Geometry.cs">
-      <Link>TrueTypeInterperter\Geometry.cs</Link>
-    </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\TrueTypeInterperter\Interpreter.cs">
       <Link>TrueTypeInterperter\Interpreter.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\TrueTypeInterperter\InvalidFontException.cs">
       <Link>TrueTypeInterperter\InvalidFontException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenType\TrueTypeInterperter\Matrix3x2.cs">
-      <Link>Net20\Matrix3x2.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenType\Typeface.cs">
       <Link>Typeface.cs</Link>

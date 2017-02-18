@@ -53,7 +53,7 @@ namespace Typography.TextLayout
         public GlyphLayout()
         {
             PositionTechnique = PositionTecnhique.OpenType;
-            ScriptLang = new ScriptLang("", "");
+            ScriptLang = ScriptLangs.Latin;
         }
         public PositionTecnhique PositionTechnique { get; set; }
         public ScriptLang ScriptLang { get; set; }

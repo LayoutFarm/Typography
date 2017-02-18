@@ -1,3 +1,7 @@
+---
+Font files in this lib are for testing only.
+
+---
 Source code from multiple projects,
 here...
 
@@ -14,3 +18,4 @@ BSD, 2002-2005, Maxim Shemanarev (http://www.antigrain.com)Anti-Grain Geometry -
 BSD, 2007-2014, Lars Brubaker, agg-sharp
 
 MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
+

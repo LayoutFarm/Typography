@@ -4,6 +4,8 @@
 //-----------------------------------------------------
 
 using System;
+using System.Numerics;
+
 namespace Typography.OpenType
 {
     public abstract class GlyphPathBuilderBase
@@ -16,40 +18,6 @@ namespace Typography.OpenType
         {
             _typeface = typeface;
             this.UseTrueTypeInterpreter = false;//default?
-        }
-        struct FtPoint
-        {
-            readonly short _x;
-            readonly short _y;
-            public FtPoint(short x, short y)
-            {
-                _x = x;
-                _y = y;
-            }
-            public short X { get { return _x; } }
-            public short Y { get { return _y; } }
-
-            public override string ToString()
-            {
-                return "(" + _x + "," + _y + ")";
-            }
-        }
-        struct FtPointF
-        {
-            readonly float _x;
-            readonly float _y;
-            public FtPointF(float x, float y)
-            {
-                _x = x;
-                _y = y;
-            }
-            public float X { get { return _x; } }
-            public float Y { get { return _y; } }
-
-            public override string ToString()
-            {
-                return "(" + _x + "," + _y + ")";
-            }
         }
 
         /// <summary>
@@ -87,6 +55,7 @@ namespace Typography.OpenType
         {
             get { return this._passInterpreterModule; }
         }
+
         protected abstract void OnBeginRead(int countourCount);
         protected abstract void OnEndRead();
         protected abstract void OnCloseFigure();
@@ -95,16 +64,9 @@ namespace Typography.OpenType
         protected abstract void OnMoveTo(float x, float y);
         protected abstract void OnLineTo(float x, float y);
 
-
-        static FtPoint GetMidPoint(FtPoint v1, short v2x, short v2y)
+        static Vector2 GetMidPointF(Vector2 v1, float v2x, float v2y)
         {
-            return new FtPoint(
-                (short)((v1.X + v2x) >> 1),
-                (short)((v1.Y + v2y) >> 1));
-        }
-        static FtPointF GetMidPointF(FtPointF v1, float v2x, float v2y)
-        {
-            return new FtPointF(
+            return new Vector2(
                 ((v1.X + v2x) / 2),
                  ((v1.Y + v2y) / 2));
         }
@@ -209,8 +171,8 @@ namespace Typography.OpenType
             {
                 int nextContour = contourEndPoints[startContour] + 1;
                 bool isFirstPoint = true;
-                FtPointF secondControlPoint = new FtPointF();
-                FtPointF thirdControlPoint = new FtPointF();
+                Vector2 secondControlPoint = new Vector2();
+                Vector2 thirdControlPoint = new Vector2();
 
                 bool justFromCurveMode = false;
                 for (; cpoint_index < nextContour; ++cpoint_index)
@@ -278,7 +240,7 @@ namespace Typography.OpenType
                         {
                             case 0:
                                 {
-                                    secondControlPoint = new FtPointF(vpoint_x, vpoint_y);
+                                    secondControlPoint = new Vector2(vpoint_x, vpoint_y);
                                 }
                                 break;
                             case 1:
@@ -287,7 +249,7 @@ namespace Typography.OpenType
                                     //we already have prev second control point
                                     //so auto calculate line to 
                                     //between 2 point
-                                    FtPointF mid = GetMidPointF(secondControlPoint, vpoint_x, vpoint_y);
+                                    Vector2 mid = GetMidPointF(secondControlPoint, vpoint_x, vpoint_y);
                                     //----------
                                     //generate curve3
                                     OnCurve3(secondControlPoint.X, secondControlPoint.Y,
@@ -296,7 +258,7 @@ namespace Typography.OpenType
                                     controlPointCount--;
                                     //------------------------
                                     //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
-                                    secondControlPoint = new FtPointF(vpoint_x, vpoint_y);
+                                    secondControlPoint = new Vector2(vpoint_x, vpoint_y);
 
                                 }
                                 break;
