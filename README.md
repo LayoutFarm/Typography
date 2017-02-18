@@ -1,4 +1,4 @@
-![PixelFarm's Typography](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title.png)
+![PixelFarm's Typography](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title2.png)
 ===========
 
 Pure C# TrueType and OpenType Font Reader, Glyph Layout and Rendering.
