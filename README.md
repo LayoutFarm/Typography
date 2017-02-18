@@ -77,3 +77,11 @@ Msdf Texture
 
 ![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/23061146/423cd040-f533-11e6-9f1a-a7fc3d60a14a.png)
 
+---
+GSUB: ligature feature
+![ligature1](https://cloud.githubusercontent.com/assets/7447159/23093970/f7f879a8-f622-11e6-8539-8cdbcf1026d7.png)
+
+
+
+
+
