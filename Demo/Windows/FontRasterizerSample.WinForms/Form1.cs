@@ -109,8 +109,8 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            ReadAndRender(@"..\..\tahoma.ttf");
-            // ReadAndRender(@"..\..\cambriaz.ttf");
+            //ReadAndRender(@"..\..\tahoma.ttf");
+             ReadAndRender(@"..\..\cambriaz.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
@@ -1100,7 +1100,7 @@ namespace SampleWinForms
             //1. 
             TextPrinter printer = new TextPrinter();
             //for test Thai glyph for gsub and gpos
-            printer.ScriptLang = ScriptLangs.Thai;
+            printer.ScriptLang = ScriptLangs.Latin;
             //
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;

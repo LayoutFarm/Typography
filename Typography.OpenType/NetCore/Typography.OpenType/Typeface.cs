@@ -335,47 +335,51 @@ namespace Typography.OpenType
                 //check if this lang has 
                 gsubTable = typeface.GSUBTable;
                 ScriptTable scriptTable = gsubTable.ScriptList.FindScriptTable(lang);
-                if (scriptTable != null)
+                //---------
+                if (scriptTable == null) { return; }   //early exit if no lookup tables      
+
+                //---------
+
+                ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
+
+                if (defaultLang.HasRequireFeature)
                 {
-                    ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
-
-                    if (defaultLang.HasRequireFeature)
+                    //TODO: review here
+                }
+                //other feature
+                if (defaultLang.featureIndexList != null)
+                {
+                    //get features 
+                    var features = new List<FeatureList.FeatureTable>();
+                    for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
                     {
-                        //TODO: review here
-                    }
-                    //other feature
-                    if (defaultLang.featureIndexList != null)
-                    {
-                        //get features 
-                        var features = new List<FeatureList.FeatureTable>();
-                        for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
+                        FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
+                        if (feature.TagName == "ccmp") //glyph composition/decomposition
                         {
-                            FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
-                            if (feature.TagName == "ccmp") //glyph composition/decomposition
-                            {
-                                //this version we implement ccmp
-                                features.Add(feature);
-                            }
+                            //this version we implement ccmp
+                            features.Add(feature);
                         }
-                        //-----------------------
+                    }
+                    //-----------------------
 
-                        lookupTables = new List<GSUB.LookupTable>();
-                        int j = features.Count;
-                        for (int i = 0; i < j; ++i)
+                    lookupTables = new List<GSUB.LookupTable>();
+                    int j = features.Count;
+                    for (int i = 0; i < j; ++i)
+                    {
+                        FeatureList.FeatureTable feature = features[i];
+                        ushort[] lookupListIndices = feature.LookupListIndice;
+                        foreach (ushort lookupIndex in lookupListIndices)
                         {
-                            FeatureList.FeatureTable feature = features[i];
-                            ushort[] lookupListIndices = feature.LookupListIndice;
-                            foreach (ushort lookupIndex in lookupListIndices)
-                            {
-                                lookupTables.Add(gsubTable.GetLookupTable(lookupIndex));
-                            }
+                            lookupTables.Add(gsubTable.GetLookupTable(lookupIndex));
                         }
                     }
                 }
+
             }
             public void DoSubstitution(List<ushort> outputCodePoints)
             {
-
+                if (lookupTables == null) { return; } //early exit if no lookup tables
+                //
                 //load
                 int j = lookupTables.Count;
                 for (int i = 0; i < j; ++i)
@@ -383,70 +387,74 @@ namespace Typography.OpenType
                     lookupTables[i].DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
                 }
             }
-            public string Lang { get; set; }
+            public string Lang { get; private set; }
         }
 
 
         public class GlyphSetPosition
         {
-            string lang;
+
             Typeface typeface;
             GPOS gposTable;
             List<GPOS.LookupTable> lookupTables;
             public GlyphSetPosition(Typeface typeface, string lang)
             {
+                this.Lang = lang;
                 this.typeface = typeface;
                 //check if this lang has 
                 this.gposTable = typeface.GPOSTable;
                 ScriptTable scriptTable = gposTable.ScriptList.FindScriptTable(lang);
-                if (scriptTable != null)
+                //---------
+                if (scriptTable == null) { return; }   //early exit if no lookup tables      
+                //---------
+
+                ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
+
+                if (defaultLang.HasRequireFeature)
                 {
-                    ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
 
-                    if (defaultLang.HasRequireFeature)
+                }
+                //other feature
+                if (defaultLang.featureIndexList != null)
+                {
+                    //get features 
+                    var features = new List<FeatureList.FeatureTable>();
+                    for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
                     {
+                        FeatureList.FeatureTable feature = gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
 
-                    }
-                    //other feature
-                    if (defaultLang.featureIndexList != null)
-                    {
-                        //get features 
-                        var features = new List<FeatureList.FeatureTable>();
-                        for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
+                        if (feature.TagName == "mark" || //mark=> mark to base
+                            feature.TagName == "mkmk")   //mkmk => mark to mask
                         {
-                            FeatureList.FeatureTable feature = gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
-
-                            if (feature.TagName == "mark" || //mark=> mark to base
-                                feature.TagName == "mkmk")   //mkmk => mark to mask
-                            {
-                                //current version we implement this 2 features
-                                features.Add(feature);
-                            }
-                            else
-                            {
-
-                            }
+                            //current version we implement this 2 features
+                            features.Add(feature);
                         }
-
-                        //-----------------------
-
-                        lookupTables = new List<GPOS.LookupTable>();
-                        int j = features.Count;
-                        for (int i = 0; i < j; ++i)
+                        else
                         {
-                            FeatureList.FeatureTable feature = features[i];
-                            ushort[] lookupListIndices = feature.LookupListIndice;
-                            foreach (ushort lookupIndex in lookupListIndices)
-                            {
-                                lookupTables.Add(gposTable.GetLookupTable(lookupIndex));
-                            }
+
+                        }
+                    }
+
+                    //-----------------------
+
+                    lookupTables = new List<GPOS.LookupTable>();
+                    int j = features.Count;
+                    for (int i = 0; i < j; ++i)
+                    {
+                        FeatureList.FeatureTable feature = features[i];
+                        ushort[] lookupListIndices = feature.LookupListIndice;
+                        foreach (ushort lookupIndex in lookupListIndices)
+                        {
+                            lookupTables.Add(gposTable.GetLookupTable(lookupIndex));
                         }
                     }
                 }
+
             }
+            public string Lang { get; private set; }
             public void DoGlyphPosition(List<GlyphPos> glyphPositions)
             {
-
+                if (lookupTables == null) { return; } //early exit if no lookup tables
                 //load
                 int j = lookupTables.Count;
                 for (int i = 0; i < j; ++i)
