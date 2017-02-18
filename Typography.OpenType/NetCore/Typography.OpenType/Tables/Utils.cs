@@ -65,7 +65,7 @@ namespace Typography.OpenType
             }
             for (int i = j - 1; i >= 0; --i)
             {
-                if (!set1[i].IsEqualsWith(set2[i]))
+                if (!set1[i].dbugIsEqualsWith(set2[i]))
                 {
                     //yes, diff
                     return true;
