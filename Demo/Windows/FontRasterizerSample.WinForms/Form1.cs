@@ -62,6 +62,31 @@ namespace SampleWinForms
                 });
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
 
+            //----------
+            //simple load test fonts from local test dir
+            //and send it into test list
+
+            int selectedFileIndex = -1;
+            string selectedFontFileName = "pala.ttf";
+            int fileIndexCount = 0;
+            foreach (string file in Directory.GetFiles("..\\..", "*.ttf"))
+            {
+                var tmpLocalFile = new TempLocalFontFile(file);
+                lstFontList.Items.Add(tmpLocalFile);
+                if (selectedFileIndex < 0 && tmpLocalFile.OnlyFileName == selectedFontFileName)
+                {
+                    selectedFileIndex = fileIndexCount;
+                    _currentSelectedFontFile = file;
+                }
+                fileIndexCount++;
+            }
+            if (selectedFileIndex < 0) { selectedFileIndex = 0; }
+            lstFontList.SelectedIndex = selectedFileIndex;
+            lstFontList.SelectedIndexChanged += (s, e) =>
+            {
+                _currentSelectedFontFile = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+                UpdateRenderOutput();
+            };
             //----------------
             string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
@@ -71,12 +96,30 @@ namespace SampleWinForms
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
         }
-
+        string _currentSelectedFontFile = "";
         private void CmbPositionTech_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateRenderOutput();
         }
-
+        class TempLocalFontFile
+        {
+            //temp only
+            public readonly string actualFileName;
+            public TempLocalFontFile(string actualFileName)
+            {
+                this.actualFileName = actualFileName;
+            }
+            public string OnlyFileName
+            {
+                get { return Path.GetFileName(actualFileName); }
+            }
+#if DEBUG
+            public override string ToString()
+            {
+                return this.OnlyFileName;
+            }
+#endif            
+        }
         enum RenderChoice
         {
             RenderWithMiniAgg,
@@ -108,10 +151,11 @@ namespace SampleWinForms
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
             }
+
             //ReadAndRender(@"..\..\segoeui.ttf");
-            ReadAndRender(@"..\..\tahoma.ttf");
+            //ReadAndRender(@"..\..\tahoma.ttf");
             //ReadAndRender(@"..\..\cambriaz.ttf");
-            //ReadAndRender(@"..\..\pala.ttf");
+            ReadAndRender(_currentSelectedFontFile);
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 

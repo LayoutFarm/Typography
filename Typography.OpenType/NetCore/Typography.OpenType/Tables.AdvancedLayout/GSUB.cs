@@ -202,19 +202,6 @@ namespace Typography.OpenType.Tables
         }
 
 
-
-        //internal struct LookupResult
-        //{
-
-        //    public readonly LookupSubTable foundOnTable;
-        //    public readonly int foundAtIndex;
-        //    public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
-        //    {
-        //        this.foundAtIndex = foundAtIndex;
-        //        this.foundOnTable = foundOnTable;
-        //    }
-
-        //}
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
@@ -1160,7 +1147,7 @@ namespace Typography.OpenType.Tables
 
                                         }
                                         LookupTable anotherLookup = this.OwnerGSub.GetLookupTable(lookupIndex);
-                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?                                         
+                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?          
                                         //****
                                         continue;
                                     }
