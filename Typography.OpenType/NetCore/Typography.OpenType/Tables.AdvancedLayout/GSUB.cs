@@ -202,19 +202,6 @@ namespace Typography.OpenType.Tables
         }
 
 
-
-        //internal struct LookupResult
-        //{
-
-        //    public readonly LookupSubTable foundOnTable;
-        //    public readonly int foundAtIndex;
-        //    public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
-        //    {
-        //        this.foundAtIndex = foundAtIndex;
-        //        this.foundOnTable = foundOnTable;
-        //    }
-
-        //}
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
@@ -271,17 +258,11 @@ namespace Typography.OpenType.Tables
                 return lookupType.ToString();
             }
 #endif
-            public uint ForUseWithFeature
+
+            public string ForUseWithFeatureId
             {
                 get;
                 set;
-            }
-            public string ForUseWithFeatureName
-            {
-                get
-                {
-                    return Utils.TagToString(this.ForUseWithFeature);
-                }
             }
             public void ReadRecordContent(BinaryReader reader)
             {
@@ -1160,7 +1141,7 @@ namespace Typography.OpenType.Tables
 
                                         }
                                         LookupTable anotherLookup = this.OwnerGSub.GetLookupTable(lookupIndex);
-                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?                                         
+                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?          
                                         //****
                                         continue;
                                     }

@@ -330,6 +330,7 @@ namespace Typography.OpenType
             List<GSUB.LookupTable> lookupTables;
             public GlyphSubStitution(Typeface typeface, string lang)
             {
+                this.EnableLigation = true;//enable by default
                 this.Lang = lang;
                 this.typeface = typeface;
                 //check if this lang has 
@@ -385,7 +386,7 @@ namespace Typography.OpenType
                         foreach (ushort lookupIndex in lookupListIndices)
                         {
                             GSUB.LookupTable lktable = gsubTable.GetLookupTable(lookupIndex);
-                            lktable.ForUseWithFeature = feature.FeatureTag;
+                            lktable.ForUseWithFeatureId = feature.TagName;
                             lookupTables.Add(gsubTable.GetLookupTable(lookupIndex));
                         }
                     }
@@ -400,10 +401,26 @@ namespace Typography.OpenType
                 int j = lookupTables.Count;
                 for (int i = 0; i < j; ++i)
                 {
-                    lookupTables[i].DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
+                    GSUB.LookupTable lookupTable = lookupTables[i];
+                    //
+                    if (!EnableLigation &&
+                        lookupTable.ForUseWithFeatureId == Features.liga.shortname)
+                    {
+                        //skip this feature
+                        continue;
+                    }
+
+                    lookupTable.DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
                 }
             }
             public string Lang { get; private set; }
+
+            /// <summary>
+            /// enable gsub type4, ligation
+            /// </summary>
+            public bool EnableLigation { get; set; }
+
+
         }
 
 
