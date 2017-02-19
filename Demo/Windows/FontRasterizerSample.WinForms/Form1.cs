@@ -9,8 +9,7 @@ using System.Windows.Forms;
 using Typography.OpenType;
 using Typography.Rendering;
 
-using PixelFarm.Agg;
-using PixelFarm.Agg.VertexSource;
+using PixelFarm.Agg; 
 using Typography.TextLayout;
 using PixelFarm.Drawing.Fonts;
 
@@ -23,8 +22,8 @@ namespace SampleWinForms
         ImageGraphics2D imgGfx2d;
         ActualImage destImg;
         Bitmap winBmp;
-        static CurveFlattener curveFlattener = new CurveFlattener();
 
+        
         public Form1()
         {
             InitializeComponent();
