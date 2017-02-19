@@ -1,16 +1,22 @@
 ﻿//Apache2, 2016-2017, WinterDev
- 
-using System.IO; 
+
+using System.IO;
 
 namespace Typography.OpenType.Tables
 {
     //Ligature Caret List Table
-    //The Ligature Caret List table (LigCaretList) defines caret positions for all the ligatures in a font. The table consists of an offset to a Coverage table that lists all the ligature glyphs (Coverage), a count of the defined ligatures (LigGlyphCount), and an array of offsets to LigGlyph tables (LigGlyph). The array lists the LigGlyph tables, one for each ligature in the Coverage table, in the same order as the Coverage Index.
+    //The Ligature Caret List table (LigCaretList) defines caret positions for all the ligatures in a font. 
+    //The table consists of an offset to a Coverage table that lists all the ligature glyphs (Coverage),
+    //a count of the defined ligatures (LigGlyphCount), 
+    //and an array of offsets to LigGlyph tables (LigGlyph).
+
+    //The array lists the LigGlyph tables, 
+    //one for each ligature in the Coverage table, in the same order as the Coverage Index.
 
     //Example 4 at the end of this chapter shows a LigCaretList table.
     //LigCaretList table
-    //Type 	Name 	Description
-    //Offset 	Coverage 	Offset to Coverage table - from beginning of LigCaretList table
+    //Type 	    Name 	        Description
+    //Offset 	Coverage 	    Offset to Coverage table - from beginning of LigCaretList table
     //USHORT 	LigGlyphCount 	Number of ligature glyphs
     //Offset 	LigGlyph[LigGlyphCount] 	Array of offsets to LigGlyph tables-from beginning of LigCaretList table-in Coverage Index order
 
@@ -20,11 +26,14 @@ namespace Typography.OpenType.Tables
     class LigCaretList
     {
         LigGlyph[] ligGlyphs;
+        CoverageTable coverageTable;
+
         public static LigCaretList CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //----
             LigCaretList ligcaretList = new LigCaretList();
+            short coverageOffset = reader.ReadInt16();
             ushort ligGlyphCount = reader.ReadUInt16();
             short[] ligGlyphOffsets = Utils.ReadInt16Array(reader, ligGlyphCount);
             LigGlyph[] ligGlyphs = new LigGlyph[ligGlyphCount];
@@ -33,6 +42,7 @@ namespace Typography.OpenType.Tables
                 ligGlyphs[i] = LigGlyph.CreateFrom(reader, beginAt + ligGlyphOffsets[i]);
             }
             ligcaretList.ligGlyphs = ligGlyphs;
+            ligcaretList.coverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
             return ligcaretList;
         }
     }
