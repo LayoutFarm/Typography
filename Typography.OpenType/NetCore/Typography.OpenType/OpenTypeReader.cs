@@ -86,9 +86,9 @@ namespace Typography.OpenType
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 //--------------
                 //advanced typography
-                GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
-                GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
                 GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
+                GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
+                GPOS gpos = ReadTableIfExists(tables, input, new GPOS());                
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
 
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());

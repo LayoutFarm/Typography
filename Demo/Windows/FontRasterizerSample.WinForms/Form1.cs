@@ -109,9 +109,9 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
             }
             //ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
+            ReadAndRender(@"..\..\tahoma.ttf");
             //ReadAndRender(@"..\..\cambriaz.ttf");
-            ReadAndRender(@"..\..\pala.ttf");
+            //ReadAndRender(@"..\..\pala.ttf");
             //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
