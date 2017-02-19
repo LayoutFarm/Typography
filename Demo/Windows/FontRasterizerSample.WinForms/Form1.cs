@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Typography.OpenType;
 using Typography.Rendering;
 
-using PixelFarm.Agg; 
+using PixelFarm.Agg;
 using Typography.TextLayout;
 using PixelFarm.Drawing.Fonts;
 
@@ -23,7 +23,7 @@ namespace SampleWinForms
         ActualImage destImg;
         Bitmap winBmp;
 
-        
+
         public Form1()
         {
             InitializeComponent();
@@ -67,6 +67,10 @@ namespace SampleWinForms
 
             int selectedFileIndex = -1;
             string selectedFontFileName = "pala.ttf";
+            //string selectedFontFileName="tahoma.ttf";
+            //string selectedFontFileName="cambriaz.ttf";
+            //string selectedFontFileName="CompositeMS2.ttf"; 
+
             int fileIndexCount = 0;
             foreach (string file in Directory.GetFiles("..\\..", "*.ttf"))
             {
@@ -150,12 +154,7 @@ namespace SampleWinForms
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
             }
-
-            //ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
-            //ReadAndRender(@"..\..\cambriaz.ttf");
             ReadAndRender(_currentSelectedFontFile);
-            //ReadAndRender(@"..\..\CompositeMS2.ttf");
         }
 
         float fontSizeInPoint = 14; //default
