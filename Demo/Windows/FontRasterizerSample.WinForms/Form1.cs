@@ -1144,6 +1144,7 @@ namespace SampleWinForms
 
             printer.ScriptLang = ScriptLangs.Latin;
             //
+            printer.EnableLigature = this.chkGsubEnableLigature.Checked;
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
             //printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
@@ -1395,6 +1396,11 @@ namespace SampleWinForms
                 }
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
+        }
+
+        private void chkGsubEnableLigature_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateRenderOutput();
         }
     }
 }

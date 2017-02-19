@@ -43,7 +43,7 @@ namespace Typography.TextLayout
         /// </summary>
         OpenType,
     }
-    
+
     // 
     public class GlyphLayout
     {
@@ -57,12 +57,15 @@ namespace Typography.TextLayout
         }
         public PositionTecnhique PositionTechnique { get; set; }
         public ScriptLang ScriptLang { get; set; }
-
         public void Layout(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Layout(typeface, size, str.ToCharArray(), glyphPlanBuffer);
         }
         List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
+
+        public bool EnableLigature { get; set; }
+
+
 
         public void Layout(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
         {
@@ -88,7 +91,6 @@ namespace Typography.TextLayout
             //2.  
             //shaping,
             //glyph substitution
-
             inputGlyphs.Clear();
             for (int i = 0; i < j; ++i)
             {
@@ -97,14 +99,11 @@ namespace Typography.TextLayout
             }
             if (j > 1)
             {
-
-                //for debug
-                //test for thai lang 
                 GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, this.ScriptLang.shortname);
+                glyphSubstitution.EnableLigation = this.EnableLigature;
                 glyphSubstitution.DoSubstitution(inputGlyphs);
             }
 
-            //set glyph position
             j = inputGlyphs.Count;
             List<GlyphPos> glyphPositions = new List<GlyphPos>(j);
             for (int i = 0; i < j; ++i)

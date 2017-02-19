@@ -258,17 +258,11 @@ namespace Typography.OpenType.Tables
                 return lookupType.ToString();
             }
 #endif
-            public uint ForUseWithFeature
+
+            public string ForUseWithFeatureId
             {
                 get;
                 set;
-            }
-            public string ForUseWithFeatureName
-            {
-                get
-                {
-                    return Utils.TagToString(this.ForUseWithFeature);
-                }
             }
             public void ReadRecordContent(BinaryReader reader)
             {

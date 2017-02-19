@@ -48,6 +48,7 @@
             this.cmbPositionTech = new System.Windows.Forms.ComboBox();
             this.cmbHintTechnique = new System.Windows.Forms.ComboBox();
             this.lstFontList = new System.Windows.Forms.ListBox();
+            this.chkGsubEnableLigature = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -252,11 +253,25 @@
             this.lstFontList.Size = new System.Drawing.Size(121, 121);
             this.lstFontList.TabIndex = 25;
             // 
+            // chkGsubEnableLigature
+            // 
+            this.chkGsubEnableLigature.AutoSize = true;
+            this.chkGsubEnableLigature.Checked = true;
+            this.chkGsubEnableLigature.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkGsubEnableLigature.Location = new System.Drawing.Point(938, 14);
+            this.chkGsubEnableLigature.Name = "chkGsubEnableLigature";
+            this.chkGsubEnableLigature.Size = new System.Drawing.Size(136, 17);
+            this.chkGsubEnableLigature.TabIndex = 26;
+            this.chkGsubEnableLigature.Text = "GSUB: Enable Ligature";
+            this.chkGsubEnableLigature.UseVisualStyleBackColor = true;
+            this.chkGsubEnableLigature.CheckedChanged += new System.EventHandler(this.chkGsubEnableLigature_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(944, 427);
+            this.ClientSize = new System.Drawing.Size(1086, 526);
+            this.Controls.Add(this.chkGsubEnableLigature);
             this.Controls.Add(this.lstFontList);
             this.Controls.Add(this.cmbHintTechnique);
             this.Controls.Add(this.cmbPositionTech);
@@ -306,6 +321,7 @@
         private System.Windows.Forms.ComboBox cmbPositionTech;
         private System.Windows.Forms.ComboBox cmbHintTechnique;
         private System.Windows.Forms.ListBox lstFontList;
+        private System.Windows.Forms.CheckBox chkGsubEnableLigature;
     }
 }
 

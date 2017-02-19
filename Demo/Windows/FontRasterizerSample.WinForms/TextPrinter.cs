@@ -37,7 +37,11 @@ namespace SampleWinForms
             get;
             set;
         }
-       
+        public bool EnableLigature
+        {
+            get { return _glyphLayout.EnableLigature; }
+            set { this._glyphLayout.EnableLigature = value; }
+        }
 
         public void Print(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
