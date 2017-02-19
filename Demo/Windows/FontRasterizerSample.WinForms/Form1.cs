@@ -66,8 +66,8 @@ namespace SampleWinForms
             //and send it into test list
 
             int selectedFileIndex = -1;
-            string selectedFontFileName = "pala.ttf";
-            //string selectedFontFileName="tahoma.ttf";
+            //string selectedFontFileName = "pala.ttf";
+            string selectedFontFileName="tahoma.ttf";
             //string selectedFontFileName="cambriaz.ttf";
             //string selectedFontFileName="CompositeMS2.ttf"; 
 
@@ -91,7 +91,8 @@ namespace SampleWinForms
                 UpdateRenderOutput();
             };
             //----------------
-            string inputstr = "fi";
+            string inputstr = "น้ำ";
+            //string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
             //string inputstr = "ป่า"; //for gpos test 
@@ -1142,7 +1143,7 @@ namespace SampleWinForms
             //1. 
             TextPrinter printer = new TextPrinter();
 
-            printer.ScriptLang = ScriptLangs.Latin;
+            printer.ScriptLang = ScriptLangs.Thai;
             //
             printer.EnableLigature = this.chkGsubEnableLigature.Checked;
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;

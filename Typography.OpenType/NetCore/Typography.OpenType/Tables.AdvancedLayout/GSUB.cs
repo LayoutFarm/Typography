@@ -355,16 +355,12 @@ namespace Typography.OpenType.Tables
                 public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
                 {
                     int endBefore = startAt + len;
-                    return;
                     for (int i = startAt; i < endBefore; ++i)
                     {
                         int foundAt = CoverageTable.FindPosition(glyphIndices[i]);
                         if (foundAt > -1)
                         {
-                            if (glyphIndices[i] == 143)
-                            {
-                                continue;
-                            }
+
                             glyphIndices[i] = SubstitueGlyphs[foundAt];
                         }
                     }
@@ -422,8 +418,7 @@ namespace Typography.OpenType.Tables
                 //USHORT 	SubstFormat 	Format identifier-format = 2
                 //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
                 //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array
-                //GlyphID 	Substitute
-                //[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
+                //GlyphID 	Substitute[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
 
 
                 int j = subTableOffsets.Length;
@@ -471,9 +466,16 @@ namespace Typography.OpenType.Tables
                     int j = glyphIndices.Count;
                     for (int i = 0; i < j; ++i)
                     {
-                        if (CoverageTable.FindPosition(glyphIndices[i]) > -1)
+                        int foundPos = CoverageTable.FindPosition(glyphIndices[i]);
+                        if (foundPos > -1)
                         {
-                            throw new NotSupportedException();
+                            SequenceTable seqTable = SeqTables[foundPos];
+                            //replace current glyph index with new seq
+                            int new_seqCount = seqTable.substitueGlyphs.Length;
+                            glyphIndices.RemoveAt(i);
+                            glyphIndices.AddRange(seqTable.substitueGlyphs);
+                            len += (new_seqCount - 1);
+                            i += (new_seqCount - 1);
                         }
                     }
                 }

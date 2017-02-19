@@ -341,8 +341,10 @@ namespace Typography.OpenType
 
                 //---------
                 ScriptTable.LangSysTable selectedLang = null;
-                if (scriptTable.langSysTables != null)
+                if (scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
                 {
+                    //TODO: review here
+
                     selectedLang = scriptTable.langSysTables[0];
                 }
                 else
