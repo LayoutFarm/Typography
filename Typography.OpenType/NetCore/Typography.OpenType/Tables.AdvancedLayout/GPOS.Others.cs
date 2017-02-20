@@ -318,13 +318,13 @@ namespace Typography.OpenType.Tables
             //The GPOS subtables that refer to MarkArray tables use the class assignments for indexing zero-based arrays that contain data for each mark class.
 
             // MarkArray table
-            //Value 	Type 	Description
-            //USHORT 	MarkCount 	Number of MarkRecords
+            //Value 	Type 	                Description
+            //USHORT 	MarkCount 	            Number of MarkRecords
             //struct 	MarkRecord[MarkCount] 	Array of MarkRecords in Coverage order
             //MarkRecord
-            //Value 	Type 	Description
-            //USHORT 	Class 	Class defined for this mark
-            //Offset 	MarkAnchor 	Offset to Anchor table-from beginning of MarkArray table
+            //Value 	Type 	                Description
+            //USHORT 	Class 	                Class defined for this mark
+            //Offset 	MarkAnchor 	            Offset to Anchor table-from beginning of MarkArray table
             MarkRecord[] records;
             AnchorPoint[] anchorPoints;
             public AnchorPoint GetAnchorPoint(int index)
@@ -384,7 +384,7 @@ namespace Typography.OpenType.Tables
         struct MarkRecord
         {
             /// <summary>
-            /// Class defined for this mark
+            /// Class defined for this mark,. A mark class is identified by a specific integer, called a class value
             /// </summary>
             public readonly ushort markClass;
             /// <summary>

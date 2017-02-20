@@ -143,9 +143,7 @@ namespace Typography.TextLayout
                         break;
                     case PositionTecnhique.OpenType:
                         {
-                            GlyphPos gpos_offset = glyphPositions[i];
-
-
+                            GlyphPos gpos_offset = glyphPositions[i]; 
                             glyphPlan.x = cx + (scale * gpos_offset.xoffset);
                             glyphPlan.y = cy + (scale * gpos_offset.yoffset);
                             glyphPlan.advX = advWidth;
