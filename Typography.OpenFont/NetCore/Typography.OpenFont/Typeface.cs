@@ -1,9 +1,9 @@
 ﻿//Apache2, 2017, WinterDev
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 using System.Collections.Generic;
-using Typography.OpenType.Tables;
+using Typography.OpenFont.Tables;
 
-namespace Typography.OpenType
+namespace Typography.OpenFont
 {
     public class Typeface
     {

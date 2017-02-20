@@ -3,7 +3,7 @@
 
 using System;
 using System.Text;
-namespace Typography.OpenType
+namespace Typography.OpenFont
 { 
 
     public class Glyph

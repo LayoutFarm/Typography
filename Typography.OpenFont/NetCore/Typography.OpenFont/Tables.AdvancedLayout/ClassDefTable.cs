@@ -2,7 +2,7 @@
 using System; 
 using System.IO; 
 
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
     //https://www.microsoft.com/typography/otspec/chapter2.htm
     //Class Definition Table

@@ -1,7 +1,7 @@
 ﻿//Apache2, 2016-2017, WinterDev
 using System;
 using System.IO;
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
     /// <summary>
     /// Grid-fitting And Scan-conversion Procedure Table

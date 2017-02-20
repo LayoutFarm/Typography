@@ -7,7 +7,7 @@ using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
 
 
-using Typography.OpenType;
+using Typography.OpenFont;
 using Typography.Rendering;
 
 namespace PixelFarm.Drawing.Fonts

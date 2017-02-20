@@ -3,7 +3,7 @@
 
 using System;
 using System.IO;
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
     ////////////////////////////////////////////////////////////////////////
     //from https://www.microsoft.com/typography/developers/opentype/detail.htm

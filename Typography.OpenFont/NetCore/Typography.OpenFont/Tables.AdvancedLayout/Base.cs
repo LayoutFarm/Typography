@@ -7,7 +7,7 @@
 //language system, or feature in a font.
 
 using System.IO;
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
 
     class BASE : TableEntry

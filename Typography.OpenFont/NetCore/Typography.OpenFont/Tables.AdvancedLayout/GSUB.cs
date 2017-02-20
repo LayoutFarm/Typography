@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
 
     ////////////////////////////////////////////////////////////////

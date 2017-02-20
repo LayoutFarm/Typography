@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 
 using System.Collections.Generic;
-using Typography.OpenType;
+using Typography.OpenFont;
 using PixelFarm.Drawing.Fonts;
 using Typography.TextLayout;
 

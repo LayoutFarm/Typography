@@ -3,7 +3,7 @@
 
 
 using System.Numerics;
-namespace Typography.OpenType
+namespace Typography.OpenFont
 {
 
     public struct GlyphPointF

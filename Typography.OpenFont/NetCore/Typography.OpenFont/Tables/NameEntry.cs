@@ -3,7 +3,7 @@
 
 using System.IO;
 using System.Text;
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
     class NameEntry : TableEntry
     {

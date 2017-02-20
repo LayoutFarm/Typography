@@ -1,6 +1,6 @@
 ﻿ //Apache2, 2014-2017, WinterDev
  
-namespace Typography.OpenType
+namespace Typography.OpenFont
 {
     /// <summary>
     /// gerneral glyph path builder

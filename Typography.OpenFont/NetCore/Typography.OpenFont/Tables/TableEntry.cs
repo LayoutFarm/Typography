@@ -3,7 +3,7 @@
 
 using System;
 using System.IO;
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
     /// <summary>
     /// this is base class of all 'top' font table

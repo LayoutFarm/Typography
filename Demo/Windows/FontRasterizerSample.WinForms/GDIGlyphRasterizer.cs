@@ -2,7 +2,7 @@
 
 using System;
 using System.Drawing;
-using Typography.OpenType;
+using Typography.OpenFont;
 
 namespace SampleWinForms
 {

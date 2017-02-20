@@ -2,7 +2,7 @@
 
 using System.IO;
 
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
     //Ligature Caret List Table
     //The Ligature Caret List table (LigCaretList) defines caret positions for all the ligatures in a font. 

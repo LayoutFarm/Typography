@@ -2,7 +2,7 @@
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
-namespace Typography.OpenType
+namespace Typography.OpenFont
 {
     class CharacterMap
     {

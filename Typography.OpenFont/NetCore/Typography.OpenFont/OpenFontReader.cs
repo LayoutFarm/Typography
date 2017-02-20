@@ -3,9 +3,9 @@
 
 using System;
 using System.IO;
-using Typography.OpenType.IO;
-using Typography.OpenType.Tables;
-namespace Typography.OpenType
+using Typography.OpenFont.IO;
+using Typography.OpenFont.Tables;
+namespace Typography.OpenFont
 {
     [Flags]
     public enum ReadFlags

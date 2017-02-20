@@ -1,6 +1,6 @@
 ﻿//Apache2, 2016-2017, WinterDev
 using System.Collections.Generic;
-namespace Typography.OpenType
+namespace Typography.OpenFont
 {
     public sealed class ScriptLang
     {

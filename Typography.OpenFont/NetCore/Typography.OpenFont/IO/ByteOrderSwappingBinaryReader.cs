@@ -2,7 +2,7 @@
 
 using System;
 using System.IO;
-namespace Typography.OpenType.IO
+namespace Typography.OpenFont.IO
 {
 
     class ByteOrderSwappingBinaryReader : BinaryReader

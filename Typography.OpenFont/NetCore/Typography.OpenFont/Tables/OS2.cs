@@ -1,7 +1,7 @@
 ﻿//Apache2, 2016-2017, WinterDev 
 using System.IO;
 
-namespace Typography.OpenType.Tables
+namespace Typography.OpenFont.Tables
 {
 
     //https://www.microsoft.com/typography/otspec/os2.htm
