@@ -249,16 +249,20 @@ namespace Typography.OpenType
     public class GlyphPos
     {
         public readonly ushort glyphIndex;
-        public GlyphPos(ushort glyphIndex)
+        public readonly ushort advWidth;
+        public GlyphPos(ushort glyphIndex, ushort advWidth)
         {
             this.glyphIndex = glyphIndex;
+            this.advWidth = advWidth;
         }
-        public short x;
-        public short y;
+
+        public short xoffset;
+        public short yoffset; 
+
 #if DEBUG
         public override string ToString()
         {
-            return glyphIndex.ToString() + "(" + x + "," + y + ")";
+            return glyphIndex.ToString() + "(" + xoffset + "," + yoffset + ")";
         }
 #endif
     }
@@ -341,8 +345,10 @@ namespace Typography.OpenType
 
                 //---------
                 ScriptTable.LangSysTable selectedLang = null;
-                if (scriptTable.langSysTables != null)
+                if (scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
                 {
+                    //TODO: review here
+
                     selectedLang = scriptTable.langSysTables[0];
                 }
                 else
@@ -436,6 +442,9 @@ namespace Typography.OpenType
                 this.typeface = typeface;
                 //check if this lang has 
                 this.gposTable = typeface.GPOSTable;
+
+                if (gposTable == null) { return; }
+
                 ScriptTable scriptTable = gposTable.ScriptList.FindScriptTable(lang);
                 //---------
                 if (scriptTable == null) { return; }   //early exit if no lookup tables      
@@ -456,16 +465,21 @@ namespace Typography.OpenType
                     {
                         FeatureList.FeatureTable feature = gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
 
-                        if (feature.TagName == "mark" || //mark=> mark to base
-                            feature.TagName == "mkmk")   //mkmk => mark to mask
+                        switch (feature.TagName)
                         {
-                            //current version we implement this 2 features
-                            features.Add(feature);
-                        }
-                        else
-                        {
+                            case "mark"://mark=> mark to base
+                            case "mkmk"://mkmk => mark to mask
 
+                                //current version we implement this 2 features
+                                features.Add(feature);
+                                break;
+                            default:
+                                {
+
+                                }
+                                break;
                         }
+
                     }
 
                     //-----------------------
@@ -487,6 +501,7 @@ namespace Typography.OpenType
             public string Lang { get; private set; }
             public void DoGlyphPosition(List<GlyphPos> glyphPositions)
             {
+                
                 if (lookupTables == null) { return; } //early exit if no lookup tables
                 //load
                 int j = lookupTables.Count;

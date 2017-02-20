@@ -520,7 +520,9 @@ namespace Typography.OpenType.Tables
 
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
+                    int xpos = 0;
                     //find marker
+                    int x = 0;
                     int j = inputGlyphs.Count;
                     for (int i = 1; i < j; ++i) //start at 1
                     {
@@ -533,18 +535,28 @@ namespace Typography.OpenType.Tables
                             int baseFound = BaseCoverageTable.FindPosition(inputGlyphs[i - 1].glyphIndex);
                             if (baseFound > -1)
                             {
-                                //this is base glyph
-                                BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
-                                //find anchor on base glyph  
-                                //1. 
+                                ushort markClass = this.MarkArrayTable.GetMarkClass(markFound);
+                                //find anchor on base glyph   
                                 AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
-                                //
-                                glyphPos.x += markAnchorPoint.xcoord;
-                                glyphPos.y += markAnchorPoint.ycoord;
+                                BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
+                                AnchorPoint basePointForMark = baseRecord.anchors[markClass];
+
+                                glyphPos.xoffset += (short)((-inputGlyphs[i - 1].advWidth + basePointForMark.xcoord - markAnchorPoint.xcoord));
+
+#if DEBUG
+                                if (markAnchorPoint.ycoord != 0)
+                                {
+
+                                }
+#endif
+                                glyphPos.yoffset += markAnchorPoint.ycoord;
+
                             }
                         }
+                        xpos += glyphPos.advWidth;
                     }
                 }
+
 #if DEBUG
                 public void dbugTest()
                 {
@@ -734,10 +746,43 @@ namespace Typography.OpenType.Tables
                 public CoverageTable MarkCoverage1 { get; set; }
                 public CoverageTable MarkCoverage2 { get; set; }
                 public MarkArrayTable Mark1ArrayTable { get; set; }
-                public Mark2ArrayTable Mark2ArrayTable { get; set; }
+                public Mark2ArrayTable Mark2ArrayTable { get; set; } // Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. 
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                 //   throw new NotImplementedException();
+                    //find marker
+                    int x = 0;
+                    int j = inputGlyphs.Count;
+                    for (int i = 1; i < j; ++i) //start at 1
+                    {
+                        GlyphPos glyphPos = inputGlyphs[i];
+                        int markFound = MarkCoverage1.FindPosition(glyphPos.glyphIndex);
+                        if (markFound > -1)
+                        {
+                            //this is mark glyph
+                            //then-> look back for base 
+                            GlyphPos prev_pos = inputGlyphs[i - 1];
+                            int baseFound = MarkCoverage2.FindPosition(prev_pos.glyphIndex);
+                            if (baseFound > -1)
+                            {
+                                int markClassId = this.Mark1ArrayTable.GetMarkClass(markFound);
+                                AnchorPoint mark2BaseAnchor = this.Mark2ArrayTable.GetAnchorPoint(baseFound, markClassId);
+                                AnchorPoint mark1Anchor = this.Mark1ArrayTable.GetAnchorPoint(markFound);
+
+                                //TODO: review here
+                                if (mark1Anchor.ycoord < 0)
+                                {
+                                    //eg. น้ำ
+                                    prev_pos.yoffset += (short)(-mark1Anchor.ycoord);
+                                }
+                                else
+                                {
+                                    glyphPos.yoffset += (short)(mark1Anchor.ycoord);
+                                } 
+
+                                glyphPos.xoffset = (short)((prev_pos.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
+                            }
+                        }
+                    }
                 }
             }
 
