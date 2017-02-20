@@ -227,7 +227,7 @@ namespace Typography.OpenFont
         }
         //-------------------------------------------------------
         //experiment
-        internal void LoadOpenTypeLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable)
+        internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable)
         {
 
             //***

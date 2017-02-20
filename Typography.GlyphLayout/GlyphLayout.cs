@@ -39,9 +39,9 @@ namespace Typography.TextLayout
         /// </summary>
         Kerning, //old technique
         /// <summary>
-        /// use opentype gpos table
+        /// use openfont gpos table
         /// </summary>
-        OpenType,
+        OpenFont,
     }
 
 
@@ -51,7 +51,7 @@ namespace Typography.TextLayout
         Dictionary<Typeface, GlyphsCache> _glyphCaches = new Dictionary<Typeface, GlyphsCache>();
         public GlyphLayout()
         {
-            PositionTechnique = PositionTecnhique.OpenType;
+            PositionTechnique = PositionTecnhique.OpenFont;
             ScriptLang = ScriptLangs.Latin;
         }
         public PositionTecnhique PositionTechnique { get; set; }
@@ -110,7 +110,7 @@ namespace Typography.TextLayout
             }
 
             PositionTecnhique posTech = this.PositionTechnique;
-            if (j > 1 && posTech == PositionTecnhique.OpenType)
+            if (j > 1 && posTech == PositionTecnhique.OpenFont)
             {
                 GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, ScriptLang.shortname);
                 glyphSetPos.DoGlyphPosition(glyphPositions);
@@ -141,7 +141,7 @@ namespace Typography.TextLayout
                             glyphPlan.advX = advWidth;
                         }
                         break;
-                    case PositionTecnhique.OpenType:
+                    case PositionTecnhique.OpenFont:
                         {
                             GlyphPos gpos_offset = glyphPositions[i]; 
                             glyphPlan.x = cx + (scale * gpos_offset.xoffset);
