@@ -37,9 +37,9 @@
     <Compile Include="GlyphLayout.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Typography.OpenType\N20\Typography.OpenType\Typography.OpenType.csproj">
+    <ProjectReference Include="..\Typography.OpenFont\N20\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
-      <Name>Typography.OpenType</Name>
+      <Name>Typography.OpenFont</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
