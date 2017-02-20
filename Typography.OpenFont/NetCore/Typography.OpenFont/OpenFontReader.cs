@@ -17,7 +17,7 @@ namespace Typography.OpenFont
         Variation = 1 << 4
     }
 
-    public class OpenTypeReader
+    public class OpenFontReader
     {
         /// <summary>
         /// read only name entry
@@ -126,7 +126,7 @@ namespace Typography.OpenFont
                     typeface.PrepProgramBuffer = propProgramTable.programBuffer;
                 }
                 //-------------------------
-                typeface.LoadOpenTypeLayoutInfo(
+                typeface.LoadOpenFontLayoutInfo(
                     gdef,
                     gsub,
                     gpos,
