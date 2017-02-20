@@ -91,11 +91,12 @@ namespace SampleWinForms
                 UpdateRenderOutput();
             };
             //----------------
-            string inputstr = "น้ำ";
+            string inputstr = "ก้า";
             //string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
             //string inputstr = "ป่า"; //for gpos test 
+            //string inputstr = "快速上手";
             //----------------
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
@@ -1142,7 +1143,6 @@ namespace SampleWinForms
         {
             //1. 
             TextPrinter printer = new TextPrinter();
-
             printer.ScriptLang = ScriptLangs.Thai;
             //
             printer.EnableLigature = this.chkGsubEnableLigature.Checked;
