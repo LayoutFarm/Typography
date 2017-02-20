@@ -65,7 +65,7 @@ namespace Typography.TextLayout
         }
         List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
 
-     
+
 
         public void Layout(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
         {
@@ -106,9 +106,9 @@ namespace Typography.TextLayout
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];
-                glyphPositions.Add(new GlyphPos(glyIndex));
+                glyphPositions.Add(new GlyphPos(glyIndex, typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex)));
             }
-            
+
             PositionTecnhique posTech = this.PositionTechnique;
             if (j > 1 && posTech == PositionTecnhique.OpenType)
             {
@@ -125,6 +125,7 @@ namespace Typography.TextLayout
             for (int i = 0; i < j; ++i)
             {
                 ushort glyIndex = inputGlyphs[i];
+
                 GlyphPlan glyphPlan = new GlyphPlan(glyIndex);
                 glyphPlanBuffer.Add(glyphPlan);
                 //this advWidth in font design unit 
@@ -143,8 +144,10 @@ namespace Typography.TextLayout
                     case PositionTecnhique.OpenType:
                         {
                             GlyphPos gpos_offset = glyphPositions[i];
-                            glyphPlan.x = cx + (scale * glyphPositions[i].x);
-                            glyphPlan.y = cy + (scale * glyphPositions[i].y);
+
+
+                            glyphPlan.x = cx + (scale * gpos_offset.xoffset);
+                            glyphPlan.y = cy + (scale * gpos_offset.yoffset);
                             glyphPlan.advX = advWidth;
                         }
                         break;
