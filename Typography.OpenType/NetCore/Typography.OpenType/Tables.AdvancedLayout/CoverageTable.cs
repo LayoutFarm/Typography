@@ -33,6 +33,9 @@ namespace Typography.OpenType.Tables
                             ushort gly = orderedGlyphIdList[i];
                             if (gly < glyphIndex)
                             {
+                                //TODO: review here
+                                //we assume that the glyph list is ordered (lesser to greater)
+                                //since we seach backward,so if gly is lesser than glyphIndex 
                                 return -1;//not found
                             }
                             else if (gly == glyphIndex)
@@ -53,11 +56,15 @@ namespace Typography.OpenType.Tables
                             int pos = range.FindPosition(glyphIndex);
                             if (pos > -1)
                             {
-
                                 return pos_s + pos;
                             }
+                            if (range.start > glyphIndex)
+                            {
+                                //just stop
+                                return -1;
+                            }
                             pos_s += range.Width;
-                        } 
+                        }
                         return -1;
                     }
 
@@ -164,6 +171,7 @@ namespace Typography.OpenType.Tables
                 {
                     return glyphIndex - start;
                 }
+                //not found in this range
                 return -1;
             }
             public int Width
