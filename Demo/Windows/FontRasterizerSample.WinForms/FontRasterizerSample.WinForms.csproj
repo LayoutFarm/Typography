@@ -40,6 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PixelFarm.Drawing.Fonts\BinPacker.cs" />
+    <Compile Include="PixelFarm.Drawing.Fonts\GlyphPathBuilder.cs" />
+    <Compile Include="PixelFarm.Drawing.Fonts\IGlyphRasterizer.cs" />
     <Compile Include="PixelFarm.Drawing.Fonts\SimpleFontAtlas.cs" />
     <Compile Include="PixelFarm.Drawing.Fonts\SimpleFontAtlasBuilder2.cs" />
     <Compile Include="GDIGlyphRasterizer.cs" />
