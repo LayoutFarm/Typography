@@ -37,7 +37,7 @@ namespace SampleWinForms
             cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbPositionTech.Items.Add(PositionTecnhique.OpenType);
+            cmbPositionTech.Items.Add(PositionTecnhique.OpenFont);
             cmbPositionTech.Items.Add(PositionTecnhique.Kerning);
             cmbPositionTech.Items.Add(PositionTecnhique.None);
             cmbPositionTech.SelectedIndex = 0;
@@ -163,12 +163,13 @@ namespace SampleWinForms
         float fontSizeInPoint = 14; //default
         void ReadAndRender(string fontfile)
         {
+
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
             {
                 p.Clear(PixelFarm.Drawing.Color.White);
                 return;
             }
-            var reader = new OpenTypeReader();
+            var reader = new OpenFontReader();
             char testChar = txtInputChar.Text[0];//only 1 char 
             int resolution = 96;
 
@@ -1328,7 +1329,7 @@ namespace SampleWinForms
         static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
         {
             //sample
-            var reader = new OpenTypeReader();
+            var reader = new OpenFontReader();
             using (var fs = new FileStream(fontfile, FileMode.Open))
             {
                 //1. read typeface from font file
