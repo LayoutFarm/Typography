@@ -353,7 +353,6 @@ namespace Typography.OpenType.Tables
                 for (int i = 0; i < markCount; ++i)
                 {
                     MarkRecord markRec = records[i];
-
                     //bug?
                     if (markRec.offset < 0)
                     {
@@ -428,15 +427,31 @@ namespace Typography.OpenType.Tables
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
                 //---
                 var mark2ArrTable = new Mark2ArrayTable();
-
                 ushort mark2Count = reader.ReadUInt16();
                 mark2ArrTable.mark2Records = new Mark2Record[mark2Count];
                 for (int i = 0; i < mark2Count; ++i)
                 {
-                    mark2ArrTable.mark2Records[i] = new Mark2Record(
-                        Utils.ReadInt16Array(reader, classCount));
+                    mark2ArrTable.mark2Records[i] = new Mark2Record(Utils.ReadInt16Array(reader, classCount));
                 }
+                //read mark2 anchor
+                for (int i = 0; i < mark2Count; ++i)
+                {
+                    short[] offsets = mark2ArrTable.mark2Records[i].offsets;
+                    AnchorPoint[] anchors = mark2ArrTable.mark2Records[i].anchorPoints;
+                    int offsetCount = anchors.Length;
+                    for (int c = 0; c < offsetCount; ++c)
+                    {
+                        anchors[c] = AnchorPoint.CreateFrom(reader, beginAt + offsets[c]);
+                    }
+
+                }
+
+
                 return mark2ArrTable;
+            }
+            public AnchorPoint GetAnchorPoint(int index, int markClassId)
+            {
+                return mark2Records[index].anchorPoints[markClassId];
             }
         }
 
@@ -444,12 +459,13 @@ namespace Typography.OpenType.Tables
         {
             //Mark2Record
             //Value 	Type 	Description
-            //Offset 	Mark2Anchor
-            //[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
+            //Offset 	Mark2Anchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
             public readonly short[] offsets;
+            public readonly AnchorPoint[] anchorPoints;
             public Mark2Record(short[] offsets)
             {
                 this.offsets = offsets;
+                anchorPoints = new AnchorPoint[offsets.Length];
             }
         }
 
@@ -500,9 +516,7 @@ namespace Typography.OpenType.Tables
                     }
 #endif
                     //each base has anchor point for mark glyph'class
-                    if (classCount > 3)
-                    {
-                    }
+                   
                     AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[classCount];
                     for (int n = 0; n < classCount; ++n)
                     {

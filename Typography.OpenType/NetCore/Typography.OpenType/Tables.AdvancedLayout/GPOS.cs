@@ -535,8 +535,8 @@ namespace Typography.OpenType.Tables
                             int baseFound = BaseCoverageTable.FindPosition(inputGlyphs[i - 1].glyphIndex);
                             if (baseFound > -1)
                             {
-                                
-                                ushort markClass = this.MarkArrayTable.GetMarkClass(markFound); 
+
+                                ushort markClass = this.MarkArrayTable.GetMarkClass(markFound);
                                 //find anchor on base glyph   
                                 if (markClass == 2)
                                 {
@@ -548,7 +548,7 @@ namespace Typography.OpenType.Tables
                                     AnchorPoint basePointForMark = baseRecord.anchors[markClass];
                                     glyphPos.xoffset += markAnchorPoint.xcoord;
                                     glyphPos.yoffset += markAnchorPoint.ycoord;
-                                } 
+                                }
                             }
                         }
                         xpos += glyphPos.advWidth;
@@ -744,7 +744,7 @@ namespace Typography.OpenType.Tables
                 public CoverageTable MarkCoverage1 { get; set; }
                 public CoverageTable MarkCoverage2 { get; set; }
                 public MarkArrayTable Mark1ArrayTable { get; set; }
-                public Mark2ArrayTable Mark2ArrayTable { get; set; }
+                public Mark2ArrayTable Mark2ArrayTable { get; set; } // Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. 
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
                     //find marker
@@ -758,19 +758,15 @@ namespace Typography.OpenType.Tables
                         {
                             //this is mark glyph
                             //then-> look back for base
+                            int markClassId = this.Mark1ArrayTable.GetMarkClass(markFound);
                             int baseFound = MarkCoverage2.FindPosition(inputGlyphs[i - 1].glyphIndex);
                             if (baseFound > -1)
                             {
-                                ////this is base glyph
-                                //BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
-                                //AnchorPoint basePointForMark = baseRecord.anchors[markFound];
-                                ////find anchor on base glyph  
-                                ////1. 
-                                //AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
-                                //// 
-                                ////glyphPos.xoffset += (short)(-inputGlyphs[i - 1].advWidth + basePointForMark.xcoord + markAnchorPoint.xcoord);//(short)(baseRecord.anchors[0].xcoord + markAnchorPoint.xcoord);
-                                //glyphPos.xoffset += markAnchorPoint.xcoord;//(short)(baseRecord.anchors[0].xcoord + markAnchorPoint.xcoord);
-                                //glyphPos.yoffset += markAnchorPoint.ycoord;
+                                AnchorPoint mark2BaseAnchor = this.Mark2ArrayTable.GetAnchorPoint(baseFound, markClassId);
+                                AnchorPoint mark1Anchor = this.Mark1ArrayTable.GetAnchorPoint(markFound);
+
+                                glyphPos.xoffset += mark1Anchor.xcoord;
+                                glyphPos.yoffset += mark1Anchor.ycoord;
                             }
                         }
                     }

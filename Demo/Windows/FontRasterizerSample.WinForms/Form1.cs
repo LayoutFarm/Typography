@@ -67,7 +67,7 @@ namespace SampleWinForms
 
             int selectedFileIndex = -1;
             //string selectedFontFileName = "pala.ttf";
-            string selectedFontFileName="tahoma.ttf";
+            string selectedFontFileName = "tahoma.ttf";
             //string selectedFontFileName="cambriaz.ttf";
             //string selectedFontFileName="CompositeMS2.ttf"; 
 
@@ -91,7 +91,8 @@ namespace SampleWinForms
                 UpdateRenderOutput();
             };
             //----------------
-            string inputstr = "ก้า";
+            //string inputstr = "ก้า";
+            string inputstr = "น้ำ";
             //string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
@@ -1181,6 +1182,7 @@ namespace SampleWinForms
                 {
                     GlyphPlan glyphPlan = glyphPlanList[i];
                     cx = glyphPlan.x;
+                    cy = glyphPlan.y;
                     p.SetOrigin(cx, cy);
                     p.Fill((VertexStore)glyphPlan.vxs);
                 }

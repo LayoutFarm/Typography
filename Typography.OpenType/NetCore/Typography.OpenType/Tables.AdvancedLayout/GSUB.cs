@@ -473,7 +473,7 @@ namespace Typography.OpenType.Tables
                             //replace current glyph index with new seq
                             int new_seqCount = seqTable.substitueGlyphs.Length;
                             glyphIndices.RemoveAt(i);
-                            glyphIndices.AddRange(seqTable.substitueGlyphs);
+                            glyphIndices.InsertRange(i, seqTable.substitueGlyphs);
                             len += (new_seqCount - 1);
                             i += (new_seqCount - 1);
                         }
