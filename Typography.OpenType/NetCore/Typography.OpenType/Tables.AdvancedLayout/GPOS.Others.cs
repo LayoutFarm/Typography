@@ -331,8 +331,10 @@ namespace Typography.OpenType.Tables
             {
                 return anchorPoints[index];
             }
-
-
+            public ushort GetMarkClass(int index)
+            {
+                return records[index].markClass;
+            }
             void ReadFrom(BinaryReader reader)
             {
                 long markTableBeginAt = reader.BaseStream.Position;
@@ -351,6 +353,7 @@ namespace Typography.OpenType.Tables
                 for (int i = 0; i < markCount; ++i)
                 {
                     MarkRecord markRec = records[i];
+
                     //bug?
                     if (markRec.offset < 0)
                     {
@@ -497,7 +500,9 @@ namespace Typography.OpenType.Tables
                     }
 #endif
                     //each base has anchor point for mark glyph'class
-
+                    if (classCount > 3)
+                    {
+                    }
                     AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[classCount];
                     for (int n = 0; n < classCount; ++n)
                     {

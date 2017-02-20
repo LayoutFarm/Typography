@@ -520,7 +520,9 @@ namespace Typography.OpenType.Tables
 
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
+                    int xpos = 0;
                     //find marker
+                    int x = 0;
                     int j = inputGlyphs.Count;
                     for (int i = 1; i < j; ++i) //start at 1
                     {
@@ -533,18 +535,26 @@ namespace Typography.OpenType.Tables
                             int baseFound = BaseCoverageTable.FindPosition(inputGlyphs[i - 1].glyphIndex);
                             if (baseFound > -1)
                             {
-                                //this is base glyph
-                                BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
-                                //find anchor on base glyph  
-                                //1. 
-                                AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
-                                //
-                                glyphPos.x += markAnchorPoint.xcoord;
-                                glyphPos.y += markAnchorPoint.ycoord;
+                                
+                                ushort markClass = this.MarkArrayTable.GetMarkClass(markFound); 
+                                //find anchor on base glyph   
+                                if (markClass == 2)
+                                {
+                                    //TODO: review here again,
+                                    //temp fixed for Thai glyph: ป่า
+                                    AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
+                                    //this is base glyph
+                                    BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
+                                    AnchorPoint basePointForMark = baseRecord.anchors[markClass];
+                                    glyphPos.xoffset += markAnchorPoint.xcoord;
+                                    glyphPos.yoffset += markAnchorPoint.ycoord;
+                                } 
                             }
                         }
+                        xpos += glyphPos.advWidth;
                     }
                 }
+
 #if DEBUG
                 public void dbugTest()
                 {
@@ -737,7 +747,36 @@ namespace Typography.OpenType.Tables
                 public Mark2ArrayTable Mark2ArrayTable { get; set; }
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                 //   throw new NotImplementedException();
+                    //find marker
+                    int x = 0;
+                    int j = inputGlyphs.Count;
+                    for (int i = 1; i < j; ++i) //start at 1
+                    {
+                        GlyphPos glyphPos = inputGlyphs[i];
+                        int markFound = MarkCoverage1.FindPosition(glyphPos.glyphIndex);
+                        if (markFound > -1)
+                        {
+                            //this is mark glyph
+                            //then-> look back for base
+                            int baseFound = MarkCoverage2.FindPosition(inputGlyphs[i - 1].glyphIndex);
+                            if (baseFound > -1)
+                            {
+                                ////this is base glyph
+                                //BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
+                                //AnchorPoint basePointForMark = baseRecord.anchors[markFound];
+                                ////find anchor on base glyph  
+                                ////1. 
+                                //AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
+                                //// 
+                                ////glyphPos.xoffset += (short)(-inputGlyphs[i - 1].advWidth + basePointForMark.xcoord + markAnchorPoint.xcoord);//(short)(baseRecord.anchors[0].xcoord + markAnchorPoint.xcoord);
+                                //glyphPos.xoffset += markAnchorPoint.xcoord;//(short)(baseRecord.anchors[0].xcoord + markAnchorPoint.xcoord);
+                                //glyphPos.yoffset += markAnchorPoint.ycoord;
+                            }
+                        }
+                    }
+
+
+
                 }
             }
 
