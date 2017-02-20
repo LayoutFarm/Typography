@@ -86,9 +86,9 @@
       <Project>{1088370f-1a7e-421b-bbcb-400a8eda5f1f}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Typography.OpenType\N20\Typography.OpenType\Typography.OpenType.csproj">
+    <ProjectReference Include="..\..\..\Typography.OpenFont\N20\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
-      <Name>Typography.OpenType</Name>
+      <Name>Typography.OpenFont</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>

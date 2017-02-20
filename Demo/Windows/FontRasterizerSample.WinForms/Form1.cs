@@ -6,7 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-using Typography.OpenType;
+using Typography.OpenFont;
 using Typography.Rendering;
 
 using PixelFarm.Agg;
