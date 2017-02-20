@@ -1,7 +1,7 @@
 ﻿//Apache2, 2016-2017, WinterDev
 using System;
 using System.Collections.Generic;
-using System.IO; 
+using System.IO;
 
 namespace Typography.OpenType.Tables
 {
@@ -33,6 +33,9 @@ namespace Typography.OpenType.Tables
                             ushort gly = orderedGlyphIdList[i];
                             if (gly < glyphIndex)
                             {
+                                //TODO: review here
+                                //we assume that the glyph list is ordered (lesser to greater)
+                                //since we seach backward,so if gly is lesser than glyphIndex 
                                 return -1;//not found
                             }
                             else if (gly == glyphIndex)
@@ -44,20 +47,24 @@ namespace Typography.OpenType.Tables
                     break;
                 case 2:
                     {
-                        //return 'logical' coverage index
-
-                        for (int i = ranges.Length - 1; i >= 0; --i)
+                        //return 'logical' coverage index 
+                        int len = rangeOffsets.Length;
+                        int pos_s = 0;
+                        for (int i = 0; i < len; ++i)
                         {
                             RangeRecord range = ranges[i];
-                            if (range.Contains(glyphIndex))
+                            int pos = range.FindPosition(glyphIndex);
+                            if (pos > -1)
                             {
-                                //found
-                                //(glyphIndex - range.start) -> local offset
-                                //then + overall rangeOffsets 
-                                return (glyphIndex - range.start) + rangeOffsets[i];
+                                return pos_s + pos;
                             }
+                            if (range.start > glyphIndex)
+                            {
+                                //just stop
+                                return -1;
+                            }
+                            pos_s += range.Width;
                         }
-                        //not found in range
                         return -1;
                     }
 
@@ -85,7 +92,8 @@ namespace Typography.OpenType.Tables
                             orderedGlyphIdList[i] = reader.ReadUInt16();
                         }
                         coverageTable.orderedGlyphIdList = orderedGlyphIdList;
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         //CoverageFormat2 table: Range of glyphs
@@ -156,6 +164,15 @@ namespace Typography.OpenType.Tables
             public bool Contains(int glyphIndex)
             {
                 return glyphIndex >= start && glyphIndex <= end;
+            }
+            public int FindPosition(int glyphIndex)
+            {
+                if (glyphIndex >= start && glyphIndex <= end)
+                {
+                    return glyphIndex - start;
+                }
+                //not found in this range
+                return -1;
             }
             public int Width
             {

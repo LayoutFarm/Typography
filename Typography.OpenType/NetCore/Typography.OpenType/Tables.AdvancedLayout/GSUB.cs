@@ -202,19 +202,6 @@ namespace Typography.OpenType.Tables
         }
 
 
-
-        //internal struct LookupResult
-        //{
-
-        //    public readonly LookupSubTable foundOnTable;
-        //    public readonly int foundAtIndex;
-        //    public LookupResult(LookupSubTable foundOnTable, int foundAtIndex)
-        //    {
-        //        this.foundAtIndex = foundAtIndex;
-        //        this.foundOnTable = foundOnTable;
-        //    }
-
-        //}
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
@@ -271,17 +258,11 @@ namespace Typography.OpenType.Tables
                 return lookupType.ToString();
             }
 #endif
-            public uint ForUseWithFeature
+
+            public string ForUseWithFeatureId
             {
                 get;
                 set;
-            }
-            public string ForUseWithFeatureName
-            {
-                get
-                {
-                    return Utils.TagToString(this.ForUseWithFeature);
-                }
             }
             public void ReadRecordContent(BinaryReader reader)
             {
@@ -374,16 +355,12 @@ namespace Typography.OpenType.Tables
                 public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
                 {
                     int endBefore = startAt + len;
-                    return;
                     for (int i = startAt; i < endBefore; ++i)
                     {
                         int foundAt = CoverageTable.FindPosition(glyphIndices[i]);
                         if (foundAt > -1)
                         {
-                            if (glyphIndices[i] == 143)
-                            {
-                                continue;
-                            }
+
                             glyphIndices[i] = SubstitueGlyphs[foundAt];
                         }
                     }
@@ -441,8 +418,7 @@ namespace Typography.OpenType.Tables
                 //USHORT 	SubstFormat 	Format identifier-format = 2
                 //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
                 //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array
-                //GlyphID 	Substitute
-                //[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
+                //GlyphID 	Substitute[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
 
 
                 int j = subTableOffsets.Length;
@@ -490,9 +466,16 @@ namespace Typography.OpenType.Tables
                     int j = glyphIndices.Count;
                     for (int i = 0; i < j; ++i)
                     {
-                        if (CoverageTable.FindPosition(glyphIndices[i]) > -1)
+                        int foundPos = CoverageTable.FindPosition(glyphIndices[i]);
+                        if (foundPos > -1)
                         {
-                            throw new NotSupportedException();
+                            SequenceTable seqTable = SeqTables[foundPos];
+                            //replace current glyph index with new seq
+                            int new_seqCount = seqTable.substitueGlyphs.Length;
+                            glyphIndices.RemoveAt(i);
+                            glyphIndices.InsertRange(i, seqTable.substitueGlyphs);
+                            len += (new_seqCount - 1);
+                            i += (new_seqCount - 1);
                         }
                     }
                 }
@@ -1160,7 +1143,7 @@ namespace Typography.OpenType.Tables
 
                                         }
                                         LookupTable anotherLookup = this.OwnerGSub.GetLookupTable(lookupIndex);
-                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?                                         
+                                        anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?          
                                         //****
                                         continue;
                                     }

@@ -10,7 +10,6 @@ using Typography.OpenType;
 using Typography.Rendering;
 
 using PixelFarm.Agg;
-using PixelFarm.Agg.VertexSource;
 using Typography.TextLayout;
 using PixelFarm.Drawing.Fonts;
 
@@ -23,7 +22,7 @@ namespace SampleWinForms
         ImageGraphics2D imgGfx2d;
         ActualImage destImg;
         Bitmap winBmp;
-        static CurveFlattener curveFlattener = new CurveFlattener();
+
 
         public Form1()
         {
@@ -62,21 +61,71 @@ namespace SampleWinForms
                 });
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
 
+            //----------
+            //simple load test fonts from local test dir
+            //and send it into test list
+
+            int selectedFileIndex = -1;
+            //string selectedFontFileName = "pala.ttf";
+            string selectedFontFileName = "tahoma.ttf";
+            //string selectedFontFileName="cambriaz.ttf";
+            //string selectedFontFileName="CompositeMS2.ttf"; 
+
+            int fileIndexCount = 0;
+            foreach (string file in Directory.GetFiles("..\\..", "*.ttf"))
+            {
+                var tmpLocalFile = new TempLocalFontFile(file);
+                lstFontList.Items.Add(tmpLocalFile);
+                if (selectedFileIndex < 0 && tmpLocalFile.OnlyFileName == selectedFontFileName)
+                {
+                    selectedFileIndex = fileIndexCount;
+                    _currentSelectedFontFile = file;
+                }
+                fileIndexCount++;
+            }
+            if (selectedFileIndex < 0) { selectedFileIndex = 0; }
+            lstFontList.SelectedIndex = selectedFileIndex;
+            lstFontList.SelectedIndexChanged += (s, e) =>
+            {
+                _currentSelectedFontFile = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+                UpdateRenderOutput();
+            };
             //----------------
-            string inputstr = "fi";
+            //string inputstr = "ก้า";
+            string inputstr = "น้ำ";
+            //string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
             //string inputstr = "ป่า"; //for gpos test 
+            //string inputstr = "快速上手";
             //----------------
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
         }
-
+        string _currentSelectedFontFile = "";
         private void CmbPositionTech_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateRenderOutput();
         }
-
+        class TempLocalFontFile
+        {
+            //temp only
+            public readonly string actualFileName;
+            public TempLocalFontFile(string actualFileName)
+            {
+                this.actualFileName = actualFileName;
+            }
+            public string OnlyFileName
+            {
+                get { return Path.GetFileName(actualFileName); }
+            }
+#if DEBUG
+            public override string ToString()
+            {
+                return this.OnlyFileName;
+            }
+#endif            
+        }
         enum RenderChoice
         {
             RenderWithMiniAgg,
@@ -108,11 +157,7 @@ namespace SampleWinForms
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
             }
-            //ReadAndRender(@"..\..\segoeui.ttf");
-            //ReadAndRender(@"..\..\tahoma.ttf");
-            //ReadAndRender(@"..\..\cambriaz.ttf");
-            ReadAndRender(@"..\..\pala.ttf");
-            //ReadAndRender(@"..\..\CompositeMS2.ttf");
+            ReadAndRender(_currentSelectedFontFile);
         }
 
         float fontSizeInPoint = 14; //default
@@ -1099,9 +1144,9 @@ namespace SampleWinForms
         {
             //1. 
             TextPrinter printer = new TextPrinter();
-
-            printer.ScriptLang = ScriptLangs.Latin;
+            printer.ScriptLang = ScriptLangs.Thai;
             //
+            printer.EnableLigature = this.chkGsubEnableLigature.Checked;
             printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
             //printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
@@ -1137,6 +1182,7 @@ namespace SampleWinForms
                 {
                     GlyphPlan glyphPlan = glyphPlanList[i];
                     cx = glyphPlan.x;
+                    cy = glyphPlan.y;
                     p.SetOrigin(cx, cy);
                     p.Fill((VertexStore)glyphPlan.vxs);
                 }
@@ -1353,6 +1399,11 @@ namespace SampleWinForms
                 }
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
+        }
+
+        private void chkGsubEnableLigature_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateRenderOutput();
         }
     }
 }

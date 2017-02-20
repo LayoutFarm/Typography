@@ -14,9 +14,9 @@ namespace Typography.OpenType.Tables
     //The array lists the AttachPoint tables, one for each glyph in the Coverage table, in the same order as the Coverage Index.
     //AttachList table
     //Type 	Name 	Description
-    //Offset 	Coverage 	Offset to Coverage table - from beginning of AttachList table
-    //USHORT 	GlyphCount 	Number of glyphs with attachment points
-    //Offset 	AttachPoint[GlyphCount] 	Array of offsets to AttachPoint tables-from beginning of AttachList table-in Coverage Index order
+    //Offset16 	Coverage 	Offset to Coverage table - from beginning of AttachList table
+    //unint16 	GlyphCount 	Number of glyphs with attachment points
+    //Offset16 	AttachPoint[GlyphCount] 	Array of offsets to AttachPoint tables-from beginning of AttachList table-in Coverage Index order
 
     //An AttachPoint table consists of a count of the attachment points on a single glyph (PointCount) and 
     //an array of contour indices of those points (PointIndex), listed in increasing numerical order.
@@ -24,8 +24,8 @@ namespace Typography.OpenType.Tables
     //Example 3 at the end of the chapter demonstrates an AttachList table that defines attachment points for two glyphs.
     //AttachPoint table
     //Type 	Name 	Description
-    //USHORT 	PointCount 	Number of attachment points on this glyph
-    //USHORT 	PointIndex[PointCount] 	Array of contour point indices -in increasing numerical order
+    //uint16 	PointCount 	Number of attachment points on this glyph
+    //uint16 	PointIndex[PointCount] 	Array of contour point indices -in increasing numerical order
 
     class AttachmentListTable
     {
