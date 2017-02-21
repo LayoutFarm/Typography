@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
-            cmbRenderChoices.SelectedIndex = 0;
+            cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
             cmbPositionTech.Items.Add(PositionTecnhique.OpenFont);
@@ -374,24 +374,30 @@ namespace SampleWinForms
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
-            //var msdfBuilder = new MsdfGlyph();
-            //msdfBuilder.PxScale = builder.GetPixelScale();
+            var msdfGlyphGen = new MsdfGlyphGen();
+
+            Msdfgen.Shape shape = msdfGlyphGen.CreateMsdf(builder.GetOutputPoints(),
+                builder.GetOutputContours(),
+                builder.GetPixelScale());
+
+            //var msdfBuilder = new MsdfGlyphGen();
+            //msdfBuilder = builder.GetPixelScale();
             //builder.ReadShapes(msdfBuilder);
             //Msdfgen.Shape shape = msdfBuilder.ResultShape;
 
-            var cntBuilder = new GlyphContourReader();
-            builder.ReadShapes(cntBuilder);
-            List<GlyphContour> contours = cntBuilder.GetContours(); 
-            int j = contours.Count;
-            List<GlyphContour> newFitContours = new List<GlyphContour>();
-            float scale = builder.GetPixelScale();
+            //var cntBuilder = new GlyphContourReader();
+            //builder.ReadShapes(cntBuilder);
+            //List<GlyphContour> contours = cntBuilder.GetContours(); 
+            //int j = contours.Count;
+            //List<GlyphContour> newFitContours = new List<GlyphContour>();
+            //float scale = builder.GetPixelScale();
 
-            for (int i = 0; i < j; ++i)
-            {
-                newFitContours.Add(CreateFitContourVxs2(contours[i], scale, 
-                    chkXGridFitting.Checked, 
-                    chkYGridFitting.Checked));
-            }
+            //for (int i = 0; i < j; ++i)
+            //{
+            //    newFitContours.Add(CreateFitContourVxs2(contours[i], scale, 
+            //        chkXGridFitting.Checked, 
+            //        chkYGridFitting.Checked));
+            //}
 
             //var msdfGlyphGen = new MsdfGlyphGen();
 
@@ -400,28 +406,28 @@ namespace SampleWinForms
             //    builder.GetOutputContours(),
             //    builder.GetPixelScale());
 
-            Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
+            //Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
             //shape.InverseYAxis = false;
             double left, bottom, right, top;
             shape.findBounds(out left, out bottom, out right, out top);
 
             Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
             Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
-            Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);             
+            Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
 
-#if DEBUG
-            System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
-            
-            {
-                int nn = buffer.Length;
-                for (int mm = 0; mm < nn; ++mm)
-                {
-                    stbuilder.AppendLine(buffer[mm].ToString("X"));
-                }
-            }
-            File.WriteAllText("d:\\WImageTest\\a02.txt", stbuilder.ToString());
-#endif
+            //#if DEBUG
+            //            System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
+
+            //            {
+            //                int nn = buffer.Length;
+            //                for (int mm = 0; mm < nn; ++mm)
+            //                {
+            //                    stbuilder.AppendLine(buffer[mm].ToString("X"));
+            //                }
+            //            }
+            //            File.WriteAllText("d:\\WImageTest\\a02.txt", stbuilder.ToString());
+            //#endif
 
             int w = frgbBmp.Width;
             int h = frgbBmp.Height;
