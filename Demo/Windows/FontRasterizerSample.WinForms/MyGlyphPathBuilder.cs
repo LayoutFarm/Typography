@@ -3,10 +3,10 @@
 using Typography.OpenFont;
 namespace SampleWinForms
 {
-    //---
+    //-----------------------------------
     //sample MyGlyphPathBuilder :
     //for your flexiblity of glyph path builder.
-    //---
+    //-----------------------------------
 
     public class MyGlyphPathBuilder
     {
