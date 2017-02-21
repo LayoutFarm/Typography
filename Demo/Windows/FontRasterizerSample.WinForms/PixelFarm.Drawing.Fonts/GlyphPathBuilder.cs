@@ -22,7 +22,7 @@ namespace Typography.OpenFont
             }
             else
             {
-                scale = TypeFace.CalculateScale(SizeInPoints);
+                scale = TypeFace.CalculateFromPointToPixelScale(SizeInPoints);
             }
             _rasterizer.BeginRead(countourCount);
         }

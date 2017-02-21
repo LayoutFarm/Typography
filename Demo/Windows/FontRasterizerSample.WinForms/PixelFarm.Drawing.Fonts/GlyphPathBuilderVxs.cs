@@ -83,7 +83,7 @@ namespace PixelFarm.Drawing.Fonts
             else
             {
                 VertexStore vxs2 = new VertexStore();
-                float scale = TypeFace.CalculateScale(SizeInPoints);
+                float scale = TypeFace.CalculateFromPointToPixelScale(SizeInPoints);
                 var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
                     new PixelFarm.Agg.Transform.AffinePlan(
                         PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
@@ -100,7 +100,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             else
             {
-                float scale = TypeFace.CalculateScale(SizeInPoints);
+                float scale = TypeFace.CalculateFromPointToPixelScale(SizeInPoints);
                 var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
                     new PixelFarm.Agg.Transform.AffinePlan(
                         PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
@@ -112,7 +112,7 @@ namespace PixelFarm.Drawing.Fonts
         }
         public float GetPixelScale()
         {
-            return TypeFace.CalculateScale(SizeInPoints);
+            return TypeFace.CalculateFromPointToPixelScale(SizeInPoints);
         }
         public VertexStore GetUnscaledVxs()
         {

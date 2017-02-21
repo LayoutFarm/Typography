@@ -177,7 +177,7 @@ namespace Typography.OpenFont
 
 
         const int pointsPerInch = 72;
-        public float CalculateScale(float sizeInPointUnit, int resolution = 96)
+        public float CalculateFromPointToPixelScale(float sizeInPointUnit, int resolution = 96)
         {
             return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
         }

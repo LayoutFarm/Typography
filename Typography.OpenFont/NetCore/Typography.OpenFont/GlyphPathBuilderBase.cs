@@ -19,7 +19,7 @@ namespace Typography.OpenFont
             _typeface = typeface;
             this.UseTrueTypeInterpreter = false;//default?
         }
-
+         
         /// <summary>
         /// use Maxim's Agg Vertical Hinting
         /// </summary>
@@ -51,6 +51,8 @@ namespace Typography.OpenFont
                 }
             }
         }
+
+
         protected bool PassHintInterpreterModule
         {
             get { return this._passInterpreterModule; }
@@ -64,11 +66,11 @@ namespace Typography.OpenFont
         protected abstract void OnMoveTo(float x, float y);
         protected abstract void OnLineTo(float x, float y);
 
-        static Vector2 GetMidPointF(Vector2 v1, float v2x, float v2y)
+        static Vector2 GetMid(Vector2 v1, float v2x, float v2y)
         {
             return new Vector2(
-                ((v1.X + v2x) / 2),
-                 ((v1.Y + v2y) / 2));
+                ((v1.X + v2x) / 2f),
+                 ((v1.Y + v2y) / 2f));
         }
         static void ApplyScaleOnlyOnXAxis(GlyphPointF[] glyphPoints, float xscale)
         {
@@ -79,16 +81,18 @@ namespace Typography.OpenFont
             }
 
         }
-        void RenderGlyph(ushort glyphIndex, Glyph glyph)
+
+        void Build(ushort glyphIndex, Glyph glyph)
         {
             //-------------------------------------------
             GlyphPointF[] glyphPoints = glyph.GlyphPoints;
             ushort[] contourEndPoints = glyph.EndPoints;
             //-------------------------------------------
             _passInterpreterModule = false;
-            int npoints = glyphPoints.Length;
-
+       
             Typeface currentTypeFace = this.TypeFace;
+
+            //
             if (UseTrueTypeInterpreter &&
                 currentTypeFace.PrepProgramBuffer != null &&
                 glyph.GlyphInstructions != null)
@@ -102,10 +106,10 @@ namespace Typography.OpenFont
                 int orgLen = glyphPoints.Length;
                 GlyphPointF[] newGlyphPoints = Utils.CloneArray(glyphPoints, 4); //extend org with 4 elems
                 //2. scale
-                float scaleFactor = currentTypeFace.CalculateScale(SizeInPoints);
+                float pxScale = currentTypeFace.CalculateFromPointToPixelScale(SizeInPoints);
                 for (int i = orgLen - 1; i >= 0; --i)
                 {
-                    newGlyphPoints[i].ApplyScale(scaleFactor);
+                    newGlyphPoints[i].ApplyScale(pxScale);
                 }
 
                 // add phantom points; these are used to define the extents of the glyph,
@@ -123,10 +127,10 @@ namespace Typography.OpenFont
                 var pp3 = new GlyphPointF(0, glyph.MaxY + vFrontSideBearing, true);
                 var pp4 = new GlyphPointF(0, pp3.Y - verticalAdv, true);
                 //-------------------------
-                newGlyphPoints[orgLen] = (pp1 * scaleFactor);
-                newGlyphPoints[orgLen + 1] = (pp2 * scaleFactor);
-                newGlyphPoints[orgLen + 2] = (pp3 * scaleFactor);
-                newGlyphPoints[orgLen + 3] = (pp4 * scaleFactor);
+                newGlyphPoints[orgLen] = (pp1 * pxScale);
+                newGlyphPoints[orgLen + 1] = (pp2 * pxScale);
+                newGlyphPoints[orgLen + 2] = (pp3 * pxScale);
+                newGlyphPoints[orgLen + 3] = (pp4 * pxScale);
                 //----------------------------------------------
                 //test : agg's vertical hint
                 //apply large scale on horizontal axis only 
@@ -141,7 +145,7 @@ namespace Typography.OpenFont
                 //3. 
                 float sizeInPixels = Typeface.ConvPointsToPixels(SizeInPoints);
                 _interpreter.SetControlValueTable(currentTypeFace.ControlValues,
-                    scaleFactor,
+                    pxScale,
                     sizeInPixels,
                     currentTypeFace.PrepProgramBuffer);
                 //then hint
@@ -249,7 +253,7 @@ namespace Typography.OpenFont
                                     //we already have prev second control point
                                     //so auto calculate line to 
                                     //between 2 point
-                                    Vector2 mid = GetMidPointF(secondControlPoint, vpoint_x, vpoint_y);
+                                    Vector2 mid = GetMid(secondControlPoint, vpoint_x, vpoint_y);
                                     //----------
                                     //generate curve3
                                     OnCurve3(secondControlPoint.X, secondControlPoint.Y,
@@ -317,7 +321,7 @@ namespace Typography.OpenFont
         {
             this.SizeInPoints = sizeInPoints;
 
-            RenderGlyph(glyphIndex, _typeface.GetGlyphByIndex(glyphIndex));
+            Build(glyphIndex, _typeface.GetGlyphByIndex(glyphIndex));
         }
         public float SizeInPoints
         {
