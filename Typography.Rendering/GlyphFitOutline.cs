@@ -385,7 +385,7 @@ namespace Typography.Rendering
     }
     public class GlyphTriangle
     {
-        GlyphTrianglePart part;
+      
         DelaunayTriangle _tri;
         public EdgeLine e0;
         public EdgeLine e1;

@@ -39,12 +39,11 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PixelFarm.Drawing.Fonts\BinPacker.cs" />
-    <Compile Include="PixelFarm.Drawing.Fonts\GlyphPathBuilder.cs" />
-    <Compile Include="PixelFarm.Drawing.Fonts\IGlyphRasterizer.cs" />
-    <Compile Include="PixelFarm.Drawing.Fonts\SimpleFontAtlas.cs" />
-    <Compile Include="PixelFarm.Drawing.Fonts\SimpleFontAtlasBuilder2.cs" />
-    <Compile Include="GDIGlyphRasterizer.cs" />
+    <Compile Include="MyGlyphPathBuilder.cs" />
+    <Compile Include="FontAtlas\BinPacker.cs" />
+    <Compile Include="FontAtlas\SimpleFontAtlas.cs" />
+    <Compile Include="FontAtlas\SimpleFontAtlasBuilder2.cs" />
+    <Compile Include="GdiPlus\GlyphPathBuilderGdi.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

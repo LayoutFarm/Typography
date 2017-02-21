@@ -295,7 +295,7 @@ namespace SampleWinForms
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
             //----------------------------------------------------
-            var builder = new GlyphPathBuilderVxs(typeface);
+            var builder = new MyGlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
@@ -315,7 +315,10 @@ namespace SampleWinForms
             //----------------------------------------------------
 
             builder.Build(testChar, sizeInPoint);
-            VertexStore vxs = builder.GetVxs();
+            var vxsShapeBuilder = new GlyphPathBuilderVxs();
+            builder.ReadShapes(vxsShapeBuilder);
+            VertexStore vxs = vxsShapeBuilder.GetVxs();
+
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
 
             //5. use PixelFarm's Agg to render to bitmap...
@@ -343,44 +346,35 @@ namespace SampleWinForms
                 p.Draw(vxs);
             }
 
-            //master outline analysis
-            {
-                List<GlyphContour> contours = builder.GetContours();
-                int j = contours.Count;
-                var analyzer = new GlyphPartAnalyzer();
-                analyzer.NSteps = 4;
-                analyzer.PixelScale = builder.GetPixelScale();
-                for (int i = 0; i < j; ++i)
-                {
-                    //analyze each contour
-                    contours[i].Analyze(analyzer);
-                }
-                //draw each contour point
-            }
-            float scale = builder.GetPixelScale();
+            var analyzer1 = new GlyphContourReader();
+            builder.ReadShapes(analyzer1);
 
-            GlyphFitOutline glyphOutline = null;
-            {
-                //draw for debug ...
-                //draw control point
-                List<GlyphContour> contours = builder.GetContours();
-                glyphOutline = TessWithPolyTri(contours, scale);
-                if (chkYGridFitting.Checked || chkXGridFitting.Checked)
-                {
-                    PixelFarm.Agg.VertexStore vxs2 = new VertexStore();
-                    int j = contours.Count;
-                    for (int i = 0; i < j; ++i)
-                    {
-                        CreateFitContourVxs(vxs2, contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked);
-                    }
-                    p.FillColor = PixelFarm.Drawing.Color.Black;
-                    p.Fill(vxs2);
-                }
-            }
+            var autoFit = new GlyphAutoFit();
+            autoFit.Hint(analyzer1, builder.GetPixelScale()); 
+            //float scale = builder.GetPixelScale();
+
+            //GlyphFitOutline glyphOutline = null;
+            //{
+            //    //draw for debug ...
+            //    //draw control point
+            //    List<GlyphContour> contours = analyzer1.GetContours();
+            //    glyphOutline = TessWithPolyTri(contours, scale);
+            //    if (chkYGridFitting.Checked || chkXGridFitting.Checked)
+            //    {
+            //        PixelFarm.Agg.VertexStore vxs2 = new VertexStore();
+            //        int j = contours.Count;
+            //        for (int i = 0; i < j; ++i)
+            //        {
+            //            CreateFitContourVxs(vxs2, contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked);
+            //        }
+            //        p.FillColor = PixelFarm.Drawing.Color.Black;
+            //        p.Fill(vxs2);
+            //    }
+            //}
             if (chkShowTess.Checked)
             {
 #if DEBUG
-                debugDrawTriangulatedGlyph(glyphOutline, scale);
+                //debugDrawTriangulatedGlyph(glyphOutline, scale);
 #endif
             }
 
@@ -413,7 +407,7 @@ namespace SampleWinForms
         void RenderWithMsdfImg(Typeface typeface, char testChar, float sizeInPoint)
         {
             //----------------------------------------------------
-            var builder = new GlyphPathBuilderVxs(typeface);
+            var builder = new MyGlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
@@ -432,7 +426,15 @@ namespace SampleWinForms
             }
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
-            VertexStore vxs = builder.GetVxs();
+
+            var vxsShapeBuilder = new GlyphPathBuilderVxs();
+            builder.ReadShapes(vxsShapeBuilder);
+
+            var analyzer1 = new GlyphContourReader();
+            builder.ReadShapes(analyzer1);
+            VertexStore vxs = vxsShapeBuilder.GetVxs();
+
+
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
@@ -440,7 +442,7 @@ namespace SampleWinForms
 
             //master outline analysis
             {
-                List<GlyphContour> contours = builder.GetContours();
+                List<GlyphContour> contours = analyzer1.GetContours();
                 int j = contours.Count;
                 var analyzer = new GlyphPartAnalyzer();
                 analyzer.NSteps = 4;
@@ -453,43 +455,43 @@ namespace SampleWinForms
                 //draw each contour point
             }
             float scale = builder.GetPixelScale();
-            GlyphFitOutline glyphOutline = null;
-            {
-                //draw for debug ...
-                //draw control point
-                List<GlyphContour> contours = builder.GetContours();
-                glyphOutline = TessWithPolyTri(contours, scale);
-                int j = contours.Count;
-                List<GlyphContour> newFitContours = new List<GlyphContour>();
+            //GlyphFitOutline glyphOutline = null;
+            //{
+            //    //draw for debug ...
+            //    //draw control point
+            //    List<GlyphContour> contours = analyzer1.GetContours();
+            //    glyphOutline = TessWithPolyTri(contours, scale);
+            //    int j = contours.Count;
+            //    List<GlyphContour> newFitContours = new List<GlyphContour>();
 
-                for (int i = 0; i < j; ++i)
-                {
-                    newFitContours.Add(CreateFitContourVxs2(contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked));
-                }
-                p.FillColor = PixelFarm.Drawing.Color.Black;
-                //render with msdf gen 
-                //convert vxs to msdf coord and render
-                Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
-                double left, bottom, right, top;
-                shape.findBounds(out left, out bottom, out right, out top);
+            //    for (int i = 0; i < j; ++i)
+            //    {
+            //        newFitContours.Add(CreateFitContourVxs2(contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked));
+            //    }
+            //    p.FillColor = PixelFarm.Drawing.Color.Black;
+            //    //render with msdf gen 
+            //    //convert vxs to msdf coord and render
+            //    Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
+            //    double left, bottom, right, top;
+            //    shape.findBounds(out left, out bottom, out right, out top);
 
-                Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
-                Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
-                Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
-                //-----------------------------------
-                int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
-                //MsdfGen.SwapColorComponentFromBigEndianToWinGdi(buffer);
-                ActualImage actualImg = ActualImage.CreateFromBuffer(frgbBmp.Width, frgbBmp.Height, PixelFormat.ARGB32, buffer);
-                p.DrawImage(actualImg, 0, 0);
-                //-----------------------------------
-                //using (Bitmap bmp = new Bitmap(frgbBmp.Width, frgbBmp.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                //{
-                //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, frgbBmp.Width, frgbBmp.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
-                //    bmp.UnlockBits(bmpdata);
-                //    bmp.Save("d:\\WImageTest\\a001_xn2_.png");
-                //}
-            }
+            //    Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
+            //    Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
+            //    Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
+            //    //-----------------------------------
+            //    int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
+            //    //MsdfGen.SwapColorComponentFromBigEndianToWinGdi(buffer);
+            //    ActualImage actualImg = ActualImage.CreateFromBuffer(frgbBmp.Width, frgbBmp.Height, PixelFormat.ARGB32, buffer);
+            //    p.DrawImage(actualImg, 0, 0);
+            //    //-----------------------------------
+            //    //using (Bitmap bmp = new Bitmap(frgbBmp.Width, frgbBmp.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+            //    //{
+            //    //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, frgbBmp.Width, frgbBmp.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+            //    //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
+            //    //    bmp.UnlockBits(bmpdata);
+            //    //    bmp.Save("d:\\WImageTest\\a001_xn2_.png");
+            //    //}
+            //}
 
 
             if (chkShowGrid.Checked)
@@ -741,130 +743,114 @@ namespace SampleWinForms
             p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
 
-        static void AssignPointEdgeInvolvement(EdgeLine edge)
-        {
-            if (!edge.IsOutside)
-            {
-                return;
-            }
+        //static void AssignPointEdgeInvolvement(EdgeLine edge)
+        //{
+        //    if (!edge.IsOutside)
+        //    {
+        //        return;
+        //    }
 
-            switch (edge.SlopKind)
-            {
+        //    switch (edge.SlopKind)
+        //    {
 
-                case LineSlopeKind.Horizontal:
-                    {
-                        //horiontal edge
-                        //must check if this is upper horizontal 
-                        //or lower horizontal 
-                        //we know after do bone analysis
+        //        case LineSlopeKind.Horizontal:
+        //            {
+        //                //horiontal edge
+        //                //must check if this is upper horizontal 
+        //                //or lower horizontal 
+        //                //we know after do bone analysis
 
-                        //------------
-                        //both p and q of this edge is part of horizontal edge 
-                        var p = edge.p.userData as GlyphPoint2D;
-                        if (p != null)
-                        {
-                            //TODO: review here
-                            p.isPartOfHorizontalEdge = true;
-                            p.isUpperSide = edge.IsUpper;
-                            p.horizontalEdge = edge;
-                        }
+        //                //------------
+        //                //both p and q of this edge is part of horizontal edge 
+        //                var p = edge.p.userData as GlyphPoint2D;
+        //                if (p != null)
+        //                {
+        //                    //TODO: review here
+        //                    p.isPartOfHorizontalEdge = true;
+        //                    p.isUpperSide = edge.IsUpper;
+        //                    p.horizontalEdge = edge;
+        //                }
 
-                        var q = edge.q.userData as GlyphPoint2D;
-                        if (q != null)
-                        {
-                            //TODO: review here
-                            q.isPartOfHorizontalEdge = true;
-                            q.horizontalEdge = edge;
-                            q.isUpperSide = edge.IsUpper;
-                        }
-                    }
-                    break;
-                case LineSlopeKind.Vertical:
-                    {
-                        //both p and q of this edge is part of vertical edge 
-                        var p = edge.p.userData as GlyphPoint2D;
-                        if (p != null)
-                        {
-                            //TODO: review here 
-                            p.AddVerticalEdge(edge);
-                        }
+        //                var q = edge.q.userData as GlyphPoint2D;
+        //                if (q != null)
+        //                {
+        //                    //TODO: review here
+        //                    q.isPartOfHorizontalEdge = true;
+        //                    q.horizontalEdge = edge;
+        //                    q.isUpperSide = edge.IsUpper;
+        //                }
+        //            }
+        //            break;
+        //        case LineSlopeKind.Vertical:
+        //            {
+        //                //both p and q of this edge is part of vertical edge 
+        //                var p = edge.p.userData as GlyphPoint2D;
+        //                if (p != null)
+        //                {
+        //                    //TODO: review here 
+        //                    p.AddVerticalEdge(edge);
+        //                }
 
-                        var q = edge.q.userData as GlyphPoint2D;
-                        if (q != null)
-                        {   //TODO: review here
+        //                var q = edge.q.userData as GlyphPoint2D;
+        //                if (q != null)
+        //                {   //TODO: review here
 
-                            q.AddVerticalEdge(edge);
-                        }
-                    }
-                    break;
-            }
+        //                    q.AddVerticalEdge(edge);
+        //                }
+        //            }
+        //            break;
+        //    }
 
-        }
-        GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours, float pixelScale)
-        {
-            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
-            int cntCount = contours.Count;
-            GlyphContour cnt = contours[0];
-            Poly2Tri.Polygon polygon = CreatePolygon2(contours[0]);//first contour            
-            bool isHoleIf = !cnt.IsClockwise;
-            //if (cntCount > 0)
-            //{
-            //    //debug only
-            for (int n = 1; n < cntCount; ++n)
-            {
-                cnt = contours[n];
-                //IsHole is correct after we Analyze() the glyph contour
-                polygon.AddHole(CreatePolygon2(cnt));
-                //if (cnt.IsClockwise == isHoleIf)
-                //{
-                //     polygon.AddHole(CreatePolygon2(cnt));
-                //}
-                //else
-                //{
-                //    //eg i
-                //    //the is a complete separate dot  (i head) over i body 
-                //}
-            }
-            //}
+        //}
+        //GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours, float pixelScale)
+        //{
+        //    List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
+        //    int cntCount = contours.Count;
+        //    GlyphContour cnt = contours[0];
+        //    Poly2Tri.Polygon polygon = CreatePolygon2(contours[0]);//first contour            
+        //    bool isHoleIf = !cnt.IsClockwise;
+        //    //if (cntCount > 0)
+        //    //{
+        //    //    //debug only
+        //    for (int n = 1; n < cntCount; ++n)
+        //    {
+        //        cnt = contours[n];
+        //        //IsHole is correct after we Analyze() the glyph contour
+        //        polygon.AddHole(CreatePolygon2(cnt));
+        //        //if (cnt.IsClockwise == isHoleIf)
+        //        //{
+        //        //     polygon.AddHole(CreatePolygon2(cnt));
+        //        //}
+        //        //else
+        //        //{
+        //        //    //eg i
+        //        //    //the is a complete separate dot  (i head) over i body 
+        //        //}
+        //    }
+        //    //}
 
-            //------------------------------------------
-            Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated 
-            GlyphFitOutline glyphFitOutline = new GlyphFitOutline(polygon);
-            glyphFitOutline.Analyze();
-            //------------------------------------------
+        //    //------------------------------------------
+        //    Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated 
+        //    GlyphFitOutline glyphFitOutline = new GlyphFitOutline(polygon);
+        //    glyphFitOutline.Analyze();
+        //    //------------------------------------------
 
-            List<GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
-            int triangleCount = triAngles.Count;
+        //    List<GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
+        //    int triangleCount = triAngles.Count;
 
-            bool drawBone = this.chkDrawBone.Checked;
-            for (int i = 0; i < triangleCount; ++i)
-            {
-                //---------------
-                GlyphTriangle tri = triAngles[i];
-                AssignPointEdgeInvolvement(tri.e0);
-                AssignPointEdgeInvolvement(tri.e1);
-                AssignPointEdgeInvolvement(tri.e2);
-            }
+        //    bool drawBone = this.chkDrawBone.Checked;
+        //    for (int i = 0; i < triangleCount; ++i)
+        //    {
+        //        //---------------
+        //        GlyphTriangle tri = triAngles[i];
+        //        AssignPointEdgeInvolvement(tri.e0);
+        //        AssignPointEdgeInvolvement(tri.e1);
+        //        AssignPointEdgeInvolvement(tri.e2);
+        //    }
 
-            return glyphFitOutline;
-        }
-        struct TmpPoint
-        {
-            public readonly double x;
-            public readonly double y;
-            public TmpPoint(double x, double y)
-            {
-                this.x = x;
-                this.y = y;
-            }
-#if DEBUG
-            public override string ToString()
-            {
-                return x + "," + y;
-            }
-#endif
-        }
-
+        //    return glyphFitOutline;
+        //}
+    
 #if DEBUG
         void debugDrawTriangulatedGlyph(GlyphFitOutline glyphFitOutline, float pixelScale)
         {
@@ -942,112 +928,112 @@ namespace SampleWinForms
 
 #endif
 
-        /// <summary>
-        /// create polygon from flatten curve outline point
-        /// </summary>
-        /// <param name="cnt"></param>
-        /// <returns></returns>
-        static Poly2Tri.Polygon CreatePolygon2(GlyphContour cnt)
-        {
-            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
-            List<GlyphPart> allParts = cnt.parts;
-            //---------------------------------------
-            //merge all generated points
-            //also remove duplicated point too! 
-            List<GlyphPoint2D> mergedPoints = new List<GlyphPoint2D>();
-            cnt.mergedPoints = mergedPoints;
-            //---------------------------------------
-            {
-                int tt = 0;
-                int j = allParts.Count;
+        ///// <summary>
+        ///// create polygon from flatten curve outline point
+        ///// </summary>
+        ///// <param name="cnt"></param>
+        ///// <returns></returns>
+        //static Poly2Tri.Polygon CreatePolygon2(GlyphContour cnt)
+        //{
+        //    List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
+        //    List<GlyphPart> allParts = cnt.parts;
+        //    //---------------------------------------
+        //    //merge all generated points
+        //    //also remove duplicated point too! 
+        //    List<GlyphPoint2D> mergedPoints = new List<GlyphPoint2D>();
+        //    cnt.mergedPoints = mergedPoints;
+        //    //---------------------------------------
+        //    {
+        //        int tt = 0;
+        //        int j = allParts.Count;
 
-                for (int i = 0; i < j; ++i)
-                {
-                    GlyphPart p = allParts[i];
+        //        for (int i = 0; i < j; ++i)
+        //        {
+        //            GlyphPart p = allParts[i];
 
-                    List<GlyphPoint2D> fpoints = p.GetFlattenPoints();
-                    if (tt == 0)
-                    {
-                        int n = fpoints.Count;
-                        for (int m = 0; m < n; ++m)
-                        {
-                            //GlyphPoint2D fp = fpoints[m];
-                            mergedPoints.Add(fpoints[m]);
-                            //allPoints.Add((float)fp.x);
-                            //allPoints.Add((float)fp.y);
-                        }
-                        tt++;
-                    }
-                    else
-                    {
-                        //except first point
-                        int n = fpoints.Count;
-                        for (int m = 1; m < n; ++m)
-                        {
-                            //GlyphPoint2D fp = fpoints[m];
-                            mergedPoints.Add(fpoints[m]);
-                            //allPoints.Add((float)fp.x);
-                            //allPoints.Add((float)fp.y);
-                        }
-                    }
+        //            List<GlyphPoint2D> fpoints = p.GetFlattenPoints();
+        //            if (tt == 0)
+        //            {
+        //                int n = fpoints.Count;
+        //                for (int m = 0; m < n; ++m)
+        //                {
+        //                    //GlyphPoint2D fp = fpoints[m];
+        //                    mergedPoints.Add(fpoints[m]);
+        //                    //allPoints.Add((float)fp.x);
+        //                    //allPoints.Add((float)fp.y);
+        //                }
+        //                tt++;
+        //            }
+        //            else
+        //            {
+        //                //except first point
+        //                int n = fpoints.Count;
+        //                for (int m = 1; m < n; ++m)
+        //                {
+        //                    //GlyphPoint2D fp = fpoints[m];
+        //                    mergedPoints.Add(fpoints[m]);
+        //                    //allPoints.Add((float)fp.x);
+        //                    //allPoints.Add((float)fp.y);
+        //                }
+        //            }
 
-                }
+        //        }
 
-            }
-            //---------------------------------------
-            {
-                //check last (x,y) and first (x,y)
-                int lim = mergedPoints.Count - 1;
-                {
-                    if (mergedPoints[lim].IsEqualValues(mergedPoints[0]))
-                    {
-                        //remove last (x,y)
-                        mergedPoints.RemoveAt(lim);
-                        lim -= 1;
-                    }
-                }
+        //    }
+        //    //---------------------------------------
+        //    {
+        //        //check last (x,y) and first (x,y)
+        //        int lim = mergedPoints.Count - 1;
+        //        {
+        //            if (mergedPoints[lim].IsEqualValues(mergedPoints[0]))
+        //            {
+        //                //remove last (x,y)
+        //                mergedPoints.RemoveAt(lim);
+        //                lim -= 1;
+        //            }
+        //        }
 
-                //limitation: poly tri not accept duplicated points!
-                double prevX = 0;
-                double prevY = 0;
-                Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
-                lim = mergedPoints.Count;
+        //        //limitation: poly tri not accept duplicated points!
+        //        double prevX = 0;
+        //        double prevY = 0;
+        //        Dictionary<TmpPoint, bool> tmpPoints = new Dictionary<TmpPoint, bool>();
+        //        lim = mergedPoints.Count;
 
-                for (int i = 0; i < lim; ++i)
-                {
-                    GlyphPoint2D p = mergedPoints[i];
-                    double x = p.x;
-                    double y = p.y;
+        //        for (int i = 0; i < lim; ++i)
+        //        {
+        //            GlyphPoint2D p = mergedPoints[i];
+        //            double x = p.x;
+        //            double y = p.y;
 
-                    if (x == prevX && y == prevY)
-                    {
-                        throw new NotSupportedException();
-                    }
-                    else
-                    {
-                        TmpPoint tmp_point = new TmpPoint(x, y);
-                        if (!tmpPoints.ContainsKey(tmp_point))
-                        {
-                            //ensure no duplicated point
-                            tmpPoints.Add(tmp_point, true);
-                            var userTriangulationPoint = new Poly2Tri.TriangulationPoint(x, y) { userData = p };
-                            p.triangulationPoint = userTriangulationPoint;
-                            points.Add(userTriangulationPoint);
-                        }
-                        else
-                        {
-                            throw new NotSupportedException();
-                        }
+        //            if (x == prevX && y == prevY)
+        //            {
+        //                throw new NotSupportedException();
+        //            }
+        //            else
+        //            {
+        //                TmpPoint tmp_point = new TmpPoint(x, y);
+        //                if (!tmpPoints.ContainsKey(tmp_point))
+        //                {
+        //                    //ensure no duplicated point
+        //                    tmpPoints.Add(tmp_point, true);
+        //                    var userTriangulationPoint = new Poly2Tri.TriangulationPoint(x, y) { userData = p };
+        //                    p.triangulationPoint = userTriangulationPoint;
+        //                    points.Add(userTriangulationPoint);
+        //                }
+        //                else
+        //                {
+        //                    throw new NotSupportedException();
+        //                }
 
-                        prevX = x;
-                        prevY = y;
-                    }
-                }
+        //                prevX = x;
+        //                prevY = y;
+        //            }
+        //        }
 
-                Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
-                return polygon;
-            }
-        }
+        //        Poly2Tri.Polygon polygon = new Poly2Tri.Polygon(points.ToArray());
+        //        return polygon;
+        //    }
+        //}
 
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
@@ -1097,48 +1083,48 @@ namespace SampleWinForms
 
         void RenderWithPlugableGlyphRasterizer(Typeface typeface, char testChar, float sizeInPoint, int resolution)
         {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
-            ////credit:
-            ////http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
+            //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            //g.Clear(Color.White);
+            //////credit:
+            //////http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+            //g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            //g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
 
-            //2. glyph to gdi path
-            var gdiGlyphRasterizer = new GDIGlyphRasterizer();
-            var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
+            ////2. glyph to gdi path
+            //var gdiGlyphRasterizer = new GDIGlyphRasterizer();
+            //var builder = new GlyphPathBuilderGdi(typeface, gdiGlyphRasterizer);
 
-            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            builder.UseTrueTypeInstructions = false;//reset
-            builder.UseVerticalHinting = false;//reset
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInstructions = true;
-                    builder.UseVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    break;
-            }
-            //----------------------------------------------------
-            builder.Build(testChar, sizeInPoint);
+            //var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            //builder.UseTrueTypeInstructions = false;//reset
+            //builder.UseVerticalHinting = false;//reset
+            //switch (hintTech)
+            //{
+            //    case HintTechnique.TrueTypeInstruction:
+            //        builder.UseTrueTypeInstructions = true;
+            //        break;
+            //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
+            //        builder.UseTrueTypeInstructions = true;
+            //        builder.UseVerticalHinting = true;
+            //        break;
+            //    case HintTechnique.CustomAutoFit:
+            //        //custom agg autofit 
+            //        break;
+            //}
+            ////----------------------------------------------------
+            //builder.Build(testChar, sizeInPoint);
 
 
-            if (chkFillBackground.Checked)
-            {
-                gdiGlyphRasterizer.Fill(g, Brushes.Black);
-            }
-            if (chkBorder.Checked)
-            {
-                gdiGlyphRasterizer.Draw(g, Pens.Green);
-            }
-            //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+            //if (chkFillBackground.Checked)
+            //{
+            //    gdiGlyphRasterizer.Fill(g, Brushes.Black);
+            //}
+            //if (chkBorder.Checked)
+            //{
+            //    gdiGlyphRasterizer.Draw(g, Pens.Green);
+            //}
+            ////transform back
+            //g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            //g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
 
         }
         void RenderWithTextPrinterAndMiniAgg(Typeface typeface, string str, float sizeInPoint, int resolution)
@@ -1337,17 +1323,19 @@ namespace SampleWinForms
 
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
-                var builder = new GlyphPathBuilderVxs(typeface);
+                var builder = new MyGlyphPathBuilder(typeface);
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder2();
+                var analysis1 = new GlyphContourReader();
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
                 {
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
+                    builder.ReadShapes(analysis1);
                     float scale = builder.GetPixelScale();
                     scale = 1;
-                    List<GlyphContour> contours = builder.GetContours();
+                    List<GlyphContour> contours = analysis1.GetContours();
                     int j = contours.Count;
                     List<GlyphContour> newFitContours = new List<GlyphContour>();
                     for (int i = 0; i < j; ++i)
