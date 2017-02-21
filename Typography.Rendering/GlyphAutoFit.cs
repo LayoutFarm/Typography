@@ -36,6 +36,7 @@ namespace Typography.Rendering
 
             glyphOutline = TessWithPolyTri(contours, pxScale);
         }
+        public GlyphFitOutline FitOutput { get { return this.glyphOutline; } }
         /// <summary>
         /// read fitting output
         /// </summary>
@@ -57,7 +58,7 @@ namespace Typography.Rendering
             for (int i = 0; i < j; ++i)
             {
                 //new contour
-                CreateFitContourVxs(reader, contours[i], this.pxScale, false, true);
+                CreateFitShape(reader, contours[i], this.pxScale, false, true);
                 reader.CloseFigure();
             }
             reader.EndRead();
@@ -101,7 +102,7 @@ namespace Typography.Rendering
                 return integer1;
             }
         }
-        static void CreateFitContourVxs(IGlyphPathBuilder reader, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
+        static void CreateFitShape(IGlyphPathBuilder reader, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;

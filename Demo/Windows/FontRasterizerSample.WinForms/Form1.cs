@@ -318,6 +318,7 @@ namespace SampleWinForms
             //----------------------------------------------------
 
             builder.Build(testChar, sizeInPoint);
+
             var vxsShapeBuilder = new GlyphPathBuilderVxs();
             builder.ReadShapes(vxsShapeBuilder);
             VertexStore vxs = vxsShapeBuilder.GetVxs();
@@ -348,15 +349,14 @@ namespace SampleWinForms
                 //5.5 
                 p.Draw(vxs);
             }
+             
 
-            //------------------------------------------------------
-            GlyphPointF[] outputPoints = builder.GetOutputPoints();
-            ushort[] outputContours = builder.GetOutputContours();
-            //------------------------------------------------------
-
-            var autoFit = new GlyphAutoFit();
             float pxScale = builder.GetPixelScale();
-            autoFit.Hint(builder.GetOutputPoints(), builder.GetOutputContours(), pxScale);
+            //1. autofit
+            var autoFit = new GlyphAutoFit();
+            autoFit.Hint(
+                builder.GetOutputPoints(),
+                builder.GetOutputContours(), pxScale);
             var vxsShapeBuilder2 = new GlyphPathBuilderVxs();
             autoFit.ReadOutput(vxsShapeBuilder2);
             VertexStore vxs2 = vxsShapeBuilder2.GetVxs();
@@ -366,7 +366,7 @@ namespace SampleWinForms
             if (chkShowTess.Checked)
             {
 #if DEBUG
-                //debugDrawTriangulatedGlyph(glyphOutline, scale);
+                debugDrawTriangulatedGlyph(autoFit.FitOutput, pxScale);
 #endif
             }
 
@@ -376,16 +376,6 @@ namespace SampleWinForms
                 RenderGrid(800, 600, _gridSize, p);
             }
 
-            //if (chkShowControlPoints.Checked)
-            //{
-            //    List<GlyphContour> contours = builder.GetContours();
-            //    int j = contours.Count;
-            //    for (int i = 0; i < j; ++i)
-            //    {
-            //        GlyphContour cnt = contours[i];
-            //        DrawGlyphContour(cnt, p);
-            //    }
-            //} 
 
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
