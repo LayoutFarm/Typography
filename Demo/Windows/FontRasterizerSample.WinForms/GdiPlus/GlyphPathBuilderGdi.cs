@@ -6,8 +6,11 @@ using Typography.OpenFont;
 
 namespace SampleWinForms
 {
+    //this is Gdi+ version ***
+    //render with System.Drawing.Drawing2D.GraphicsPath
     public class GlyphPathBuilderGdi : IGlyphPathBuilder
     {
+        //this gdi+ version
         System.Drawing.Drawing2D.GraphicsPath ps = new System.Drawing.Drawing2D.GraphicsPath();
         float lastMoveX;
         float lastMoveY;
@@ -50,7 +53,6 @@ namespace SampleWinForms
         }
         public void Curve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
         {
-            // ps.Curve4(p2x, p2y, p3x, p3y, x, y);
 
             ps.AddBezier(
                 new PointF(lastX, lastY),

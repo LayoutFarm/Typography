@@ -39,6 +39,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FontAtlas\MsdfGlyphGen.cs" />
     <Compile Include="MyGlyphPathBuilder.cs" />
     <Compile Include="FontAtlas\BinPacker.cs" />
     <Compile Include="FontAtlas\SimpleFontAtlas.cs" />

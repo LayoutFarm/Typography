@@ -201,45 +201,6 @@ namespace SampleWinForms
         }
 
 
-        static int s_POINTS_PER_INCH = 72; //default value, 
-        static int s_PIXELS_PER_INCH = 96; //default value
-        public static float ConvEmSizeInPointsToPixels(float emsizeInPoint)
-        {
-            return (int)(((float)emsizeInPoint / (float)s_POINTS_PER_INCH) * (float)s_PIXELS_PER_INCH);
-        }
-
-        //-------------------
-        //https://www.microsoft.com/typography/otspec/TTCH01.htm
-        //Converting FUnits to pixels
-        //Values in the em square are converted to values in the pixel coordinate system by multiplying them by a scale. This scale is:
-        //pointSize * resolution / ( 72 points per inch * units_per_em )
-        //where pointSize is the size at which the glyph is to be displayed, and resolution is the resolution of the output device.
-        //The 72 in the denominator reflects the number of points per inch.
-        //For example, assume that a glyph feature is 550 FUnits in length on a 72 dpi screen at 18 point. 
-        //There are 2048 units per em. The following calculation reveals that the feature is 4.83 pixels long.
-        //550 * 18 * 72 / ( 72 * 2048 ) = 4.83
-        //-------------------
-        public static float ConvFUnitToPixels(ushort reqFUnit, float fontSizeInPoint, ushort unitPerEm)
-        {
-            //reqFUnit * scale             
-            return reqFUnit * GetFUnitToPixelsScale(fontSizeInPoint, unitPerEm);
-        }
-        public static float GetFUnitToPixelsScale(float fontSizeInPoint, ushort unitPerEm)
-        {
-            //reqFUnit * scale             
-            return ((fontSizeInPoint * s_PIXELS_PER_INCH) / (s_POINTS_PER_INCH * unitPerEm));
-        }
-
-        //from http://www.w3schools.com/tags/ref_pxtoemconversion.asp
-        //set default
-        // 16px = 1 em
-        //-------------------
-        //1. conv font design unit to em
-        // em = designUnit / unit_per_Em       
-        //2. conv font design unit to pixels 
-        // float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
-
-
 
         static Msdfgen.Shape CreateMsdfShape(List<GlyphContour> contours)
         {
@@ -349,7 +310,7 @@ namespace SampleWinForms
                 //5.5 
                 p.Draw(vxs);
             }
-             
+
 
             float pxScale = builder.GetPixelScale();
             //1. autofit
@@ -360,6 +321,7 @@ namespace SampleWinForms
             var vxsShapeBuilder2 = new GlyphPathBuilderVxs();
             autoFit.ReadOutput(vxsShapeBuilder2);
             VertexStore vxs2 = vxsShapeBuilder2.GetVxs();
+            //
             p.FillColor = PixelFarm.Drawing.Color.Black;
             p.Fill(vxs2);
 
@@ -388,11 +350,14 @@ namespace SampleWinForms
 
         void RenderWithMsdfImg(Typeface typeface, char testChar, float sizeInPoint)
         {
+            p.FillColor = PixelFarm.Drawing.Color.Black;
+            //p.UseSubPixelRendering = chkLcdTechnique.Checked;
+            p.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
             var builder = new MyGlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
-            builder.UseVerticalHinting = false;//reset
+            builder.UseVerticalHinting = false;//reset 
             switch (hintTech)
             {
                 case HintTechnique.TrueTypeInstruction:
@@ -408,73 +373,76 @@ namespace SampleWinForms
             }
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
+            //----------------------------------------------------
+            //var msdfBuilder = new MsdfGlyph();
+            //msdfBuilder.PxScale = builder.GetPixelScale();
+            //builder.ReadShapes(msdfBuilder);
+            //Msdfgen.Shape shape = msdfBuilder.ResultShape;
 
-            var vxsShapeBuilder = new GlyphPathBuilderVxs();
-            builder.ReadShapes(vxsShapeBuilder);
-
-            var analyzer1 = new GlyphContourReader();
-            builder.ReadShapes(analyzer1);
-            VertexStore vxs = vxsShapeBuilder.GetVxs();
-
-
-            p.UseSubPixelRendering = chkLcdTechnique.Checked;
-            //5. use PixelFarm's Agg to render to bitmap...
-            //5.1 clear background
-            p.Clear(PixelFarm.Drawing.Color.White);
-
-            //master outline analysis
-            {
-                List<GlyphContour> contours = analyzer1.GetContours();
-                int j = contours.Count;
-                var analyzer = new GlyphPartAnalyzer();
-                analyzer.NSteps = 4;
-                analyzer.PixelScale = builder.GetPixelScale();
-                for (int i = 0; i < j; ++i)
-                {
-                    //analyze each contour
-                    contours[i].Analyze(analyzer);
-                }
-                //draw each contour point
-            }
+            var cntBuilder = new GlyphContourReader();
+            builder.ReadShapes(cntBuilder);
+            List<GlyphContour> contours = cntBuilder.GetContours(); 
+            int j = contours.Count;
+            List<GlyphContour> newFitContours = new List<GlyphContour>();
             float scale = builder.GetPixelScale();
-            //GlyphFitOutline glyphOutline = null;
+
+            for (int i = 0; i < j; ++i)
+            {
+                newFitContours.Add(CreateFitContourVxs2(contours[i], scale, 
+                    chkXGridFitting.Checked, 
+                    chkYGridFitting.Checked));
+            }
+
+            //var msdfGlyphGen = new MsdfGlyphGen();
+
+            //Msdfgen.Shape shape = msdfGlyphGen.CreateMsdf(
+            //    builder.GetOutputPoints(),
+            //    builder.GetOutputContours(),
+            //    builder.GetPixelScale());
+
+            Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
+            //shape.InverseYAxis = false;
+            double left, bottom, right, top;
+            shape.findBounds(out left, out bottom, out right, out top);
+
+            Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
+            Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
+            Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);             
+            int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
+
+#if DEBUG
+            System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
+            
+            {
+                int nn = buffer.Length;
+                for (int mm = 0; mm < nn; ++mm)
+                {
+                    stbuilder.AppendLine(buffer[mm].ToString("X"));
+                }
+            }
+            File.WriteAllText("d:\\WImageTest\\a02.txt", stbuilder.ToString());
+#endif
+
+            int w = frgbBmp.Width;
+            int h = frgbBmp.Height;
+            if (w < 5)
+            {
+                w = 5;
+            }
+            if (h < 5)
+            {
+                h = 5;
+            }
+            ActualImage actualImg = ActualImage.CreateFromBuffer(w, h, PixelFormat.ARGB32, buffer);
+            p.DrawImage(actualImg, 0, 0);
+
+            //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
             //{
-            //    //draw for debug ...
-            //    //draw control point
-            //    List<GlyphContour> contours = analyzer1.GetContours();
-            //    glyphOutline = TessWithPolyTri(contours, scale);
-            //    int j = contours.Count;
-            //    List<GlyphContour> newFitContours = new List<GlyphContour>();
-
-            //    for (int i = 0; i < j; ++i)
-            //    {
-            //        newFitContours.Add(CreateFitContourVxs2(contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked));
-            //    }
-            //    p.FillColor = PixelFarm.Drawing.Color.Black;
-            //    //render with msdf gen 
-            //    //convert vxs to msdf coord and render
-            //    Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
-            //    double left, bottom, right, top;
-            //    shape.findBounds(out left, out bottom, out right, out top);
-
-            //    Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
-            //    Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
-            //    Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
-            //    //-----------------------------------
-            //    int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
-            //    //MsdfGen.SwapColorComponentFromBigEndianToWinGdi(buffer);
-            //    ActualImage actualImg = ActualImage.CreateFromBuffer(frgbBmp.Width, frgbBmp.Height, PixelFormat.ARGB32, buffer);
-            //    p.DrawImage(actualImg, 0, 0);
-            //    //-----------------------------------
-            //    //using (Bitmap bmp = new Bitmap(frgbBmp.Width, frgbBmp.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-            //    //{
-            //    //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, frgbBmp.Width, frgbBmp.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-            //    //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
-            //    //    bmp.UnlockBits(bmpdata);
-            //    //    bmp.Save("d:\\WImageTest\\a001_xn2_.png");
-            //    //}
+            //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+            //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
+            //    bmp.UnlockBits(bmpdata);
+            //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
             //}
-
 
             if (chkShowGrid.Checked)
             {
@@ -489,7 +457,6 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
-
         static GlyphContour CreateFitContourVxs2(GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
             GlyphContour newc = new GlyphContour();
@@ -973,26 +940,16 @@ namespace SampleWinForms
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder2();
-
-                var analysis1 = new GlyphContourReader();
+                var msdfBuilder = new MsdfGlyphGen();
 
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
                 {
                     //build glyph
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
-
-                    builder.ReadShapes(analysis1);
-                    float scale = builder.GetPixelScale();
-                    scale = 1;
-                    List<GlyphContour> contours = analysis1.GetContours();
-                    int j = contours.Count;
-                    List<GlyphContour> newFitContours = new List<GlyphContour>();
-                    for (int i = 0; i < j; ++i)
-                    {
-                        newFitContours.Add(CreateFitContourVxs2(contours[i], scale, false, false));
-                    }
-
-                    Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
+                    Msdfgen.Shape shape = msdfBuilder.CreateMsdf(
+                        builder.GetOutputPoints(),
+                        builder.GetOutputContours(),
+                        builder.GetPixelScale());
                     shape.InverseYAxis = true;
                     double left, bottom, right, top;
                     shape.findBounds(out left, out bottom, out right, out top);
