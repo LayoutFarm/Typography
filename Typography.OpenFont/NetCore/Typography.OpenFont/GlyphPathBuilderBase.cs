@@ -17,20 +17,32 @@ namespace Typography.OpenFont
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
-            this.UseTrueTypeInterpreter = false;//default?
+            this.UseTrueTypeInstructions = false;//default?
         }
-         
+        /// <summary>
+        /// speicific output glyph size (in points)
+        /// </summary>
+        public float SizeInPoints
+        {
+            get;
+            private set;
+        }
+        protected Typeface TypeFace
+        {
+            get { return _typeface; }
+        }
         /// <summary>
         /// use Maxim's Agg Vertical Hinting
         /// </summary>
         public bool UseVerticalHinting { get; set; }
-
-        public bool UseTrueTypeInterpreter
+        /// <summary>
+        /// process glyph with true type instructions
+        /// </summary>
+        public bool UseTrueTypeInstructions
         {
             get { return _useInterpreter; }
             set
             {
-
                 _useInterpreter = value;
                 if (value && _interpreter == null)
                 {
@@ -66,34 +78,30 @@ namespace Typography.OpenFont
         protected abstract void OnMoveTo(float x, float y);
         protected abstract void OnLineTo(float x, float y);
 
-        static Vector2 GetMid(Vector2 v1, float v2x, float v2y)
+        public void Build(char c, float sizeInPoints)
         {
-            return new Vector2(
-                ((v1.X + v2x) / 2f),
-                 ((v1.Y + v2y) / 2f));
+            BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints);
         }
-        static void ApplyScaleOnlyOnXAxis(GlyphPointF[] glyphPoints, float xscale)
+        public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
+            this.SizeInPoints = sizeInPoints;
 
-            for (int i = glyphPoints.Length - 1; i >= 0; --i)
-            {
-                glyphPoints[i].ApplyScaleOnlyOnXAxis(xscale);
-            }
-
+            Build(glyphIndex, _typeface.GetGlyphByIndex(glyphIndex));
         }
 
         void Build(ushort glyphIndex, Glyph glyph)
         {
             //-------------------------------------------
+            //1. start with original points/contours from glyph
             GlyphPointF[] glyphPoints = glyph.GlyphPoints;
             ushort[] contourEndPoints = glyph.EndPoints;
             //-------------------------------------------
             _passInterpreterModule = false;
-       
+
             Typeface currentTypeFace = this.TypeFace;
 
-            //
-            if (UseTrueTypeInterpreter &&
+            //2. process glyph points
+            if (UseTrueTypeInstructions &&
                 currentTypeFace.PrepProgramBuffer != null &&
                 glyph.GlyphInstructions != null)
             {
@@ -161,7 +169,7 @@ namespace Typography.OpenFont
                 _passInterpreterModule = true;
             }
 
-
+            //2. start build path
             int startContour = 0;
             int cpoint_index = 0;
             int todoContourCount = contourEndPoints.Length;
@@ -313,28 +321,21 @@ namespace Typography.OpenFont
 
         }
 
-        public void Build(char c, float sizeInPoints)
+        //----------------------------------------------------------------------------
+        static Vector2 GetMid(Vector2 v1, float v2x, float v2y)
         {
-            BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints);
+            return new Vector2(
+                ((v1.X + v2x) / 2f),
+                 ((v1.Y + v2y) / 2f));
         }
-        public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
+        static void ApplyScaleOnlyOnXAxis(GlyphPointF[] glyphPoints, float xscale)
         {
-            this.SizeInPoints = sizeInPoints;
+            //TODO: review performance here
+            for (int i = glyphPoints.Length - 1; i >= 0; --i)
+            {
+                glyphPoints[i].ApplyScaleOnlyOnXAxis(xscale);
+            }
 
-            Build(glyphIndex, _typeface.GetGlyphByIndex(glyphIndex));
-        }
-        public float SizeInPoints
-        {
-            get;
-            private set;
-        }
-        protected Typeface TypeFace
-        {
-            get { return _typeface; }
-        }
-        protected ushort TypeFaceUnitPerEm
-        {
-            get { return _typeface.UnitsPerEm; }
         }
 
     }

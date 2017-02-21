@@ -297,15 +297,15 @@ namespace SampleWinForms
             //----------------------------------------------------
             var builder = new GlyphPathBuilderVxs(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            builder.UseTrueTypeInterpreter = false;//reset
+            builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
             switch (hintTech)
             {
                 case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseTrueTypeInstructions = true;
                     break;
                 case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseTrueTypeInstructions = true;
                     builder.UseVerticalHinting = true;
                     break;
                 case HintTechnique.CustomAutoFit:
@@ -415,15 +415,15 @@ namespace SampleWinForms
             //----------------------------------------------------
             var builder = new GlyphPathBuilderVxs(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            builder.UseTrueTypeInterpreter = false;//reset
+            builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
             switch (hintTech)
             {
                 case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseTrueTypeInstructions = true;
                     break;
                 case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseTrueTypeInstructions = true;
                     builder.UseVerticalHinting = true;
                     break;
                 case HintTechnique.CustomAutoFit:
@@ -1109,15 +1109,15 @@ namespace SampleWinForms
             var builder = new GlyphPathBuilder(typeface, gdiGlyphRasterizer);
 
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            builder.UseTrueTypeInterpreter = false;//reset
+            builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
             switch (hintTech)
             {
                 case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseTrueTypeInstructions = true;
                     break;
                 case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInterpreter = true;
+                    builder.UseTrueTypeInstructions = true;
                     builder.UseVerticalHinting = true;
                     break;
                 case HintTechnique.CustomAutoFit:
