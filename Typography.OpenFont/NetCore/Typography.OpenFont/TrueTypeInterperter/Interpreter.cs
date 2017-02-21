@@ -1,11 +1,13 @@
 ﻿//MIT, 2015, Michael Popoloski's SharpFont
 using System;
 using System.Numerics;
-using Typography.OpenFont;
 
-namespace SharpFont
+namespace Typography.OpenFont
 {
-    class Interpreter
+    /// <summary>
+    /// SharpFont's TrueType Interpreter
+    /// </summary>
+    public class Interpreter
     {
         GraphicsState state;
         GraphicsState cvtState;
@@ -97,7 +99,9 @@ namespace SharpFont
             // reset all of our shared state
             state = cvtState;
             callStackSize = 0;
+#if DEBUG
             debugList.Clear();
+#endif
             stack.Clear();
             OnVectorsUpdated();
 
@@ -111,15 +115,18 @@ namespace SharpFont
             Execute(new InstructionStream(instructions), false, false);
         }
 
+#if DEBUG
         System.Collections.Generic.List<OpCode> debugList = new System.Collections.Generic.List<OpCode>();
-
+#endif
         void Execute(InstructionStream stream, bool inFunction, bool allowFunctionDefs)
         {
             // dispatch each instruction in the stream
             while (!stream.Done)
             {
                 var opcode = stream.NextOpCode();
+#if DEBUG
                 debugList.Add(opcode);
+#endif
                 switch (opcode)
                 {
                     // ==== PUSH INSTRUCTIONS ====
