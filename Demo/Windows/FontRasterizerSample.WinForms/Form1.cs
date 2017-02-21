@@ -34,7 +34,7 @@ namespace SampleWinForms
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
-            cmbRenderChoices.SelectedIndex = 2;
+            cmbRenderChoices.SelectedIndex = 0;
             cmbRenderChoices.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
             cmbPositionTech.Items.Add(PositionTecnhique.OpenFont);
@@ -238,6 +238,9 @@ namespace SampleWinForms
         // em = designUnit / unit_per_Em       
         //2. conv font design unit to pixels 
         // float scale = (float)(size * resolution) / (pointsPerInch * _typeface.UnitsPerEm);
+
+
+
         static Msdfgen.Shape CreateMsdfShape(List<GlyphContour> contours)
         {
             var shape = new Msdfgen.Shape();
@@ -346,31 +349,20 @@ namespace SampleWinForms
                 p.Draw(vxs);
             }
 
-            var analyzer1 = new GlyphContourReader();
-            builder.ReadShapes(analyzer1);
+            //------------------------------------------------------
+            GlyphPointF[] outputPoints = builder.GetOutputPoints();
+            ushort[] outputContours = builder.GetOutputContours();
+            //------------------------------------------------------
 
             var autoFit = new GlyphAutoFit();
-            autoFit.Hint(analyzer1, builder.GetPixelScale()); 
-            //float scale = builder.GetPixelScale();
+            float pxScale = builder.GetPixelScale();
+            autoFit.Hint(builder.GetOutputPoints(), builder.GetOutputContours(), pxScale);
+            var vxsShapeBuilder2 = new GlyphPathBuilderVxs();
+            autoFit.ReadOutput(vxsShapeBuilder2);
+            VertexStore vxs2 = vxsShapeBuilder2.GetVxs();
+            p.FillColor = PixelFarm.Drawing.Color.Black;
+            p.Fill(vxs2);
 
-            //GlyphFitOutline glyphOutline = null;
-            //{
-            //    //draw for debug ...
-            //    //draw control point
-            //    List<GlyphContour> contours = analyzer1.GetContours();
-            //    glyphOutline = TessWithPolyTri(contours, scale);
-            //    if (chkYGridFitting.Checked || chkXGridFitting.Checked)
-            //    {
-            //        PixelFarm.Agg.VertexStore vxs2 = new VertexStore();
-            //        int j = contours.Count;
-            //        for (int i = 0; i < j; ++i)
-            //        {
-            //            CreateFitContourVxs(vxs2, contours[i], scale, chkXGridFitting.Checked, chkYGridFitting.Checked);
-            //        }
-            //        p.FillColor = PixelFarm.Drawing.Color.Black;
-            //        p.Fill(vxs2);
-            //    }
-            //}
             if (chkShowTess.Checked)
             {
 #if DEBUG
@@ -555,7 +547,7 @@ namespace SampleWinForms
 
             return newc;
         }
- 
+
 
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
         {
@@ -620,7 +612,7 @@ namespace SampleWinForms
             }
             p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
         }
- 
+
 #if DEBUG
         void debugDrawTriangulatedGlyph(GlyphFitOutline glyphFitOutline, float pixelScale)
         {
@@ -697,7 +689,7 @@ namespace SampleWinForms
         }
 
 #endif
- 
+
         void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
         {
             //for debug
@@ -979,10 +971,11 @@ namespace SampleWinForms
         {
             //sample
             var reader = new OpenFontReader();
+
             using (var fs = new FileStream(fontfile, FileMode.Open))
             {
                 //1. read typeface from font file
-                Typeface typeface = reader.Read(fs); 
+                Typeface typeface = reader.Read(fs);
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
                 var builder = new MyGlyphPathBuilder(typeface);

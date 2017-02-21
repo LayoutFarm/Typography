@@ -7,7 +7,7 @@ using Poly2Tri;
 namespace Typography.Rendering
 {
      
-    //sample/test 
+    
     public class GlyphFitOutline
     {
         //this class store result of poly2tri

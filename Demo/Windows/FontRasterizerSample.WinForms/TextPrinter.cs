@@ -52,10 +52,11 @@ namespace SampleWinForms
         public void Print(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
         {
             //1. layout
-            _glyphLayout.Layout(typeface, size, str, glyphPlanBuffer); 
+            _glyphLayout.Layout(typeface, size, str, glyphPlanBuffer);
             var glyphPathBuilder = new MyGlyphPathBuilder(typeface);
             int j = glyphPlanBuffer.Count;
 
+            float pxScale = typeface.CalculateFromPointToPixelScale(size);
             for (int i = 0; i < j; ++i)
             {
 
@@ -66,9 +67,9 @@ namespace SampleWinForms
                 //-----------------------------------  
                 glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, size);
                 //-----------------------------------  
-                GlyphPathBuilderVxs vxsBuilder = new GlyphPathBuilderVxs();
-                glyphPathBuilder.ReadShapes(vxsBuilder);
-                glyphPlan.vxs = vxsBuilder.GetVxs();
+                var vxsBuilder = new GlyphPathBuilderVxs();
+                glyphPathBuilder.ReadShapes(vxsBuilder); 
+                glyphPlan.vxs = vxsBuilder.GetVxs(pxScale);
             }
 
         }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.VectorMath;
-
+using Typography.OpenFont;
 namespace Typography.Rendering
 {
     //This is PixelFarm's AutoFit
@@ -12,12 +12,19 @@ namespace Typography.Rendering
         //----------
         //implement glyph auto fit hint
         //----------
-
-        public void Hint(GlyphContourReader contourReader, float pxScale)
+        GlyphFitOutline glyphOutline;
+        List<GlyphContour> contours;
+        float pxScale = 1;
+        public void Hint(GlyphPointF[] glyphPoints, ushort[] glyphContours, float pxScale = 1)
         {
-            //master outline analysis
 
-            List<GlyphContour> contours = contourReader.GetContours();
+            this.pxScale = pxScale;
+            var analyzer1 = new GlyphContourReader();
+            analyzer1.Read(glyphPoints, glyphContours);
+
+
+            //master outline analysis 
+            contours = analyzer1.GetContours();
             int j = contours.Count;
             var analyzer = new GlyphPartAnalyzer();
             analyzer.NSteps = 4;
@@ -26,19 +33,34 @@ namespace Typography.Rendering
             {
                 contours[i].Analyze(analyzer);
             }
+
+            glyphOutline = TessWithPolyTri(contours, pxScale);
+        }
+        /// <summary>
+        /// read fitting output
+        /// </summary>
+        /// <param name="reader"></param>
+        public void ReadOutput(IGlyphPathBuilder reader)
+        {
+            if (glyphOutline == null) { return; }
+            //
             //-----------------------------------------------------------            
             //create fit contour
             //this version use only Agg's vertical hint only ****
             //(ONLY vertical fitting , NOT apply horizontal fit)
-            //-----------------------------------------------------------         
-            GlyphFitOutline glyphOutline = glyphOutline = TessWithPolyTri(contours, pxScale);
+            //-----------------------------------------------------------     
+            //create outline
+            //then create     
+
+            int j = contours.Count;
+            reader.BeginRead(j);
+            for (int i = 0; i < j; ++i)
             {
-                PixelFarm.Agg.VertexStore vxs2 = new PixelFarm.Agg.VertexStore();
-                for (int i = 0; i < j; ++i)
-                {
-                    CreateFitContourVxs(vxs2, contours[i], pxScale, false, true);
-                }
+                //new contour
+                CreateFitContourVxs(reader, contours[i], this.pxScale, false, true);
+                reader.CloseFigure();
             }
+            reader.EndRead();
         }
 
         const int GRID_SIZE = 1;
@@ -79,7 +101,7 @@ namespace Typography.Rendering
                 return integer1;
             }
         }
-        static void CreateFitContourVxs(PixelFarm.Agg.VertexStore vxs, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
+        static void CreateFitContourVxs(IGlyphPathBuilder reader, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
@@ -114,7 +136,7 @@ namespace Typography.Rendering
                     }
                     p_x = new_x;
                 }
-                vxs.AddMoveTo(p_x, p_y);
+                reader.MoveTo((float)p_x, (float)p_y);
                 //-------------
                 first_px = prev_px = p_x;
                 first_py = prev_py = p_y;
@@ -153,15 +175,14 @@ namespace Typography.Rendering
                     //}
                     p_x = new_x;
                 }
-                //
-                vxs.AddLineTo(p_x, p_y);
+                //                 
+                reader.LineTo((float)p_x, (float)p_y);
                 //
                 prev_px = p_x;
                 prev_py = p_y;
-
             }
-            vxs.AddLineTo(first_px, first_py);
 
+            reader.LineTo((float)first_px, (float)first_py);
         }
         static GlyphContour CreateFitContourVxs2(GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
@@ -247,7 +268,6 @@ namespace Typography.Rendering
             List<GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
             int triangleCount = triAngles.Count;
 
-
             for (int i = 0; i < triangleCount; ++i)
             {
                 //---------------
@@ -256,7 +276,6 @@ namespace Typography.Rendering
                 AssignPointEdgeInvolvement(tri.e1);
                 AssignPointEdgeInvolvement(tri.e2);
             }
-
             return glyphFitOutline;
         }
 

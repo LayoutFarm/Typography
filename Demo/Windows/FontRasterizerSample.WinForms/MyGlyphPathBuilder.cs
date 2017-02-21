@@ -103,6 +103,14 @@ namespace SampleWinForms
         {
             return _typeface.CalculateFromPointToPixelScale(SizeInPoints);
         }
+        public GlyphPointF[] GetOutputPoints()
+        {
+            return this._outputGlyphPoints;
+        }
+        public ushort[] GetOutputContours()
+        {
+            return this._outputContours;
+        }
     }
 
 }
