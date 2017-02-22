@@ -55,7 +55,6 @@
     <Compile Include="PixelFarm.Drawing.Fonts\GlyphPathBuilderVxs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextLayoutServices\SimpleTextLayoutService.cs" />
     <Compile Include="TextPrinter.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

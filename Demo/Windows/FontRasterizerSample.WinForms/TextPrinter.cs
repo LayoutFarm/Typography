@@ -1,16 +1,22 @@
 ﻿//MIT, 2016-2017, WinterDev
 
-using System.Collections.Generic;
-using Typography.OpenFont;
-using PixelFarm.Drawing.Fonts;
-using Typography.TextLayout;
 
+using System.Collections.Generic;
+using System.IO;
+
+using PixelFarm.Drawing.Fonts;
+using Typography.OpenFont;
+using Typography.TextLayout;
 namespace SampleWinForms
 {
 
     class TextPrinter
     {
+        Typeface _currentTypeface;
         GlyphLayout _glyphLayout = new GlyphLayout();
+        Dictionary<string, Typeface> _cachedTypefaces = new Dictionary<string, Typeface>();
+
+        string _currentFontFilename = "";
 
         public TextPrinter()
         {
@@ -43,6 +49,41 @@ namespace SampleWinForms
             set { this._glyphLayout.EnableLigature = value; }
         }
 
+        public string FontFile
+        {
+            get { return _currentFontFilename; }
+            set
+            {
+                if (value != _currentFontFilename)
+                {
+                    //switch to another font                   
+
+                    //store current typeface to cache
+                    if (_currentTypeface != null && !_cachedTypefaces.ContainsKey(value))
+                    {
+                        _cachedTypefaces[_currentFontFilename] = _currentTypeface;
+                    }
+
+                    //chkeck if we have this in cache ?
+                    _cachedTypefaces.TryGetValue(value, out _currentTypeface);
+
+                }
+                this._currentFontFilename = value;
+            }
+        }
+        public void Print(float size, string str, List<GlyphPlan> glyphPlanBuffer)
+        {
+            if (_currentTypeface == null)
+            {
+                OpenFontReader reader = new OpenFontReader();
+                using (FileStream fs = new FileStream(_currentFontFilename, FileMode.Open))
+                {
+                    _currentTypeface = reader.Read(fs);
+                }
+            }
+            //-----------
+            Print(_currentTypeface, size, str, glyphPlanBuffer);
+        }
         public void Print(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
             Print(typeface, size, str.ToCharArray(), glyphPlanBuffer);
@@ -68,11 +109,13 @@ namespace SampleWinForms
                 glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, size);
                 //-----------------------------------  
                 var vxsBuilder = new GlyphPathBuilderVxs();
-                glyphPathBuilder.ReadShapes(vxsBuilder); 
+                glyphPathBuilder.ReadShapes(vxsBuilder);
                 glyphPlan.vxs = vxsBuilder.GetVxs(pxScale);
             }
 
         }
+
+
 
     }
 
