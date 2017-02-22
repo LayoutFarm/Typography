@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+﻿//MIT, 2016-2017, WinterDev
 using System.Windows.Forms;
 
 namespace NoPixelFarmSample.WinForms

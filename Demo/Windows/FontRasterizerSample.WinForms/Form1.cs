@@ -93,7 +93,7 @@ namespace SampleWinForms
             //string selectedFontFileName="CompositeMS2.ttf"; 
 
             int fileIndexCount = 0;
-            foreach (string file in Directory.GetFiles("..\\..", "*.ttf"))
+            foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
             {
                 var tmpLocalFile = new TempLocalFontFile(file);
                 lstFontList.Items.Add(tmpLocalFile);
@@ -741,13 +741,13 @@ namespace SampleWinForms
         }
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
         {
-            string sampleFontFile = @"..\..\tahoma.ttf";
-            CreateSampleMsdfTextureFont(
-                sampleFontFile,
-                18,
-                0,
-                255,
-                "d:\\WImageTest\\sample_msdf.png");
+            //string sampleFontFile = @"..\..\tahoma.ttf";
+            //CreateSampleMsdfTextureFont(
+            //    sampleFontFile,
+            //    18,
+            //    0,
+            //    255,
+            //    "d:\\WImageTest\\sample_msdf.png");
 
         }
         static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
