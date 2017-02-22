@@ -45,6 +45,9 @@
     <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\MsdfGlyphGen.cs">
       <Link>FontAtlas\MsdfGlyphGen.cs</Link>
     </Compile>
+    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\MsdfGlyphGenExtension.cs">
+      <Link>FontAtlas\MsdfGlyphGenExtension.cs</Link>
+    </Compile>
     <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\SimpleFontAtlas.cs">
       <Link>FontAtlas\SimpleFontAtlas.cs</Link>
     </Compile>
@@ -63,7 +66,6 @@
     <Compile Include="..\NoPixelFarmSample.WinForms\Workspace\TempLocalFontFile.cs">
       <Link>Workspace\TempLocalFontFile.cs</Link>
     </Compile>
-    <Compile Include="MsdfGlyphGenExtension.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

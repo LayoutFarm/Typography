@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="FontAtlas\BinPacker.cs" />
     <Compile Include="FontAtlas\MsdfGlyphGen.cs" />
+    <Compile Include="FontAtlas\MsdfGlyphGenExtension.cs" />
     <Compile Include="FontAtlas\SimpleFontAtlas.cs" />
     <Compile Include="FontAtlas\SimpleFontAtlasBuilder2.cs" />
     <Compile Include="Form1.cs">

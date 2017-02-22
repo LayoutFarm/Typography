@@ -1,7 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev
 //-----------------------------------  
 using System;
-using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.Rendering;
 
@@ -33,8 +32,9 @@ namespace PixelFarm.Drawing.Fonts
             Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
             //-----------------------------------
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
-            return null;
-            //return Agg.ActualImage.CreateFromBuffer(w, h, Agg.PixelFormat.ARGB32, buffer);
+            GlyphImage2 img = new Typography.Rendering.GlyphImage2(w, h);
+            img.SetImageBuffer(buffer, false);
+            return img;
         }
 
 
