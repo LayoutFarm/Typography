@@ -1,6 +1,7 @@
 This is a simple example, 
 
-use
+demonstrates ...
+
 - Typography.OpenFont
 - Typography.Msdf
 - Typography.GlyphLayout
