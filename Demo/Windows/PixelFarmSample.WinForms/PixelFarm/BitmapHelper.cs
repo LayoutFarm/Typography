@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 namespace PixelFarm.Agg.Imaging
 {
-    public static class BitmapHelper
+    static class BitmapHelper
     {
 
 

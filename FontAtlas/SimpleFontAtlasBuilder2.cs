@@ -2,13 +2,14 @@
 //----------------------------------- 
 
 using System.Collections.Generic;
-using PixelFarm.Agg;
 using System.Xml;
-namespace PixelFarm.Drawing.Fonts
+
+namespace Typography.Rendering
 {
-    class GlyphImage2
+    public class GlyphImage2
     {
-        int[] pixelBuffer;
+        int[]
+        pixelBuffer;
         public GlyphImage2(int w, int h)
         {
             this.Width = w;
@@ -50,21 +51,21 @@ namespace PixelFarm.Drawing.Fonts
         }
     }
 
-    class CacheGlyph
+    public class CacheGlyph
     {
         public int borderX;
         public int borderY;
-        public ActualImage img;
+        public GlyphImage2 img;
         public Rectangle area;
         public char character;
         public int codePoint;
         public GlyphMatrix2 glyphMatrix;
     }
-    class SimpleFontAtlasBuilder2
+    public class SimpleFontAtlasBuilder2
     {
         GlyphImage2 latestGenGlyphImage;
         Dictionary<int, CacheGlyph> glyphs = new Dictionary<int, CacheGlyph>();
-        public void AddGlyph(int codePoint, ActualImage img)
+        public void AddGlyph(int codePoint, GlyphImage2 img)
         {
             var glyphCache = new CacheGlyph();
             glyphCache.codePoint = codePoint;
@@ -130,8 +131,8 @@ namespace PixelFarm.Drawing.Fonts
             {
                 CacheGlyph g = glyphList[i];
                 //copy data to totalBuffer
-                ActualImage img = g.img;
-                CopyToDest(ActualImage.GetBuffer2(img), img.Width, img.Height, totalBuffer, g.area.Left, g.area.Top, totalMaxLim);
+                GlyphImage2 img = g.img;
+                CopyToDest(img.GetImageBuffer(), img.Width, img.Height, totalBuffer, g.area.Left, g.area.Top, totalMaxLim);
             }
             //------------------
 
@@ -247,7 +248,7 @@ namespace PixelFarm.Drawing.Fonts
                 Rectangle area = ParseRect(glyphElem.GetAttribute("ltwh"));
                 var glyphData = new TextureFontGlyphData();
                 area.Y += area.Height;//*** 
-                glyphData.Rect = area;
+                glyphData.Rect = new OpenFont.Bounds((short)area.X, (short)area.Bottom, (short)area.Right, (short)area.Top);
                 float[] borderXY = ParseFloatArray(glyphElem.GetAttribute("borderXY"));
                 float[] matrix = ParseFloatArray(glyphElem.GetAttribute("mat"));
 

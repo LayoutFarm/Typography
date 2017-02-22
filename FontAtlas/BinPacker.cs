@@ -1,7 +1,7 @@
 ﻿//MIT, 2015-2016, Michael Popoloski
 
 using System;
-namespace PixelFarm.Drawing.Fonts
+namespace Typography.Rendering
 {
     public struct Rect
     { 

@@ -1,13 +1,13 @@
 ﻿//MIT, 2017, WinterDev
 using System;
 using System.Collections.Generic;
-using PixelFarm.VectorMath;
+
 
 using Poly2Tri;
 namespace Typography.Rendering
 {
-     
-    
+
+
     public class GlyphFitOutline
     {
         //this class store result of poly2tri
@@ -131,9 +131,9 @@ namespace Typography.Rendering
             this.p = p;
             this.q = q;
         }
-        static readonly double _85degreeToRad = MathHelper.DegreesToRadians(85);
-        static readonly double _15degreeToRad = MathHelper.DegreesToRadians(15);
-        static readonly double _90degreeToRad = MathHelper.DegreesToRadians(90);
+        static readonly double _85degreeToRad = MyMath.DegreesToRadians(85);
+        static readonly double _15degreeToRad = MyMath.DegreesToRadians(15);
+        static readonly double _90degreeToRad = MyMath.DegreesToRadians(90);
 
         public double SlopAngle { get; private set; }
         public LineSlopeKind SlopKind { get; private set; }
@@ -385,7 +385,7 @@ namespace Typography.Rendering
     }
     public class GlyphTriangle
     {
-      
+
         DelaunayTriangle _tri;
         public EdgeLine e0;
         public EdgeLine e1;
@@ -491,6 +491,21 @@ namespace Typography.Rendering
         Other
     }
 
+    static class MyMath
+    {
+
+        /// <summary>
+        /// Convert degrees to radians
+        /// </summary>
+        /// <param name="degrees">An angle in degrees</param>
+        /// <returns>The angle expressed in radians</returns>
+        public static double DegreesToRadians(double degrees)
+        {
+            const double degToRad = System.Math.PI / 180.0f;
+            return degrees * degToRad;
+        }
+
+    }
     public class EdgeLine
     {
         public double x0;
@@ -498,9 +513,9 @@ namespace Typography.Rendering
         public double x1;
         public double y1;
 
-        static readonly double _85degreeToRad = MathHelper.DegreesToRadians(85);
-        static readonly double _15degreeToRad = MathHelper.DegreesToRadians(15);
-        static readonly double _90degreeToRad = MathHelper.DegreesToRadians(90);
+        static readonly double _85degreeToRad = MyMath.DegreesToRadians(85);
+        static readonly double _15degreeToRad = MyMath.DegreesToRadians(15);
+        static readonly double _90degreeToRad = MyMath.DegreesToRadians(90);
 
         public Poly2Tri.TriangulationPoint p;
         public Poly2Tri.TriangulationPoint q;
