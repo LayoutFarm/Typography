@@ -16,11 +16,12 @@ namespace SampleWinForms
         float lastMoveY;
         float lastX;
         float lastY;
-
+         
         public GlyphPathBuilderGdi()
         {
 
         }
+       
         public void BeginRead(int countourCount)
         {
             ps.Reset();
@@ -28,6 +29,11 @@ namespace SampleWinForms
         public void EndRead()
         {
 
+        }
+        public void MoveTo(float x, float y)
+        {
+            lastX = lastMoveX = (float)x;
+            lastY = lastMoveY = (float)y;
         }
         public void CloseFigure()
         {
@@ -50,6 +56,7 @@ namespace SampleWinForms
                 new PointF(c1x, c1y),
                 new PointF(c2x, c2y),
                 new PointF(lastX = (float)x, lastY = (float)y));
+            
         }
         public void Curve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
         {
@@ -67,11 +74,10 @@ namespace SampleWinForms
                  new PointF(lastX, lastY),
                  new PointF(lastX = (float)x, lastY = (float)y));
         }
-        public void MoveTo(float x, float y)
-        {
-            lastX = lastMoveX = (float)x;
-            lastY = lastMoveY = (float)y;
-        }
+
+
+
+        public System.Drawing.Drawing2D.GraphicsPath ResultGraphicPath { get { return this.ps; } }
 
     }
 }

@@ -554,49 +554,61 @@ namespace SampleWinForms
 
         void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
         {
-            //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            //g.Clear(Color.White);
+
+            //render glyph path with Gdi+ path
+
+
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            g.Clear(Color.White);
             //////credit:
             //////http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            //g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            //g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
-
-            ////2. glyph to gdi path
-            //var gdiGlyphRasterizer = new GDIGlyphRasterizer();
-            //var builder = new GlyphPathBuilderGdi(typeface, gdiGlyphRasterizer);
-
-            //var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            //builder.UseTrueTypeInstructions = false;//reset
-            //builder.UseVerticalHinting = false;//reset
-            //switch (hintTech)
-            //{
-            //    case HintTechnique.TrueTypeInstruction:
-            //        builder.UseTrueTypeInstructions = true;
-            //        break;
-            //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
-            //        builder.UseTrueTypeInstructions = true;
-            //        builder.UseVerticalHinting = true;
-            //        break;
-            //    case HintTechnique.CustomAutoFit:
-            //        //custom agg autofit 
-            //        break;
-            //}
-            ////----------------------------------------------------
-            //builder.Build(testChar, sizeInPoint);
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
 
 
-            //if (chkFillBackground.Checked)
-            //{
-            //    gdiGlyphRasterizer.Fill(g, Brushes.Black);
-            //}
-            //if (chkBorder.Checked)
-            //{
-            //    gdiGlyphRasterizer.Draw(g, Pens.Green);
-            //}
-            ////transform back
-            //g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            //g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+            //----------------------------------------------------
+            var builder = new MyGlyphPathBuilder(typeface);
+            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            builder.UseTrueTypeInstructions = false;//reset
+            builder.UseVerticalHinting = false;//reset
+            switch (hintTech)
+            {
+                case HintTechnique.TrueTypeInstruction:
+                    builder.UseTrueTypeInstructions = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                    builder.UseTrueTypeInstructions = true;
+                    builder.UseVerticalHinting = true;
+                    break;
+                case HintTechnique.CustomAutoFit:
+                    //custom agg autofit 
+                    break;
+            }
+            //---------------------------------------------------- 
+            builder.Build(testChar, sizeInPoint);
+            var gdiPathBuilder = new GlyphPathBuilderGdi();
+            builder.ReadShapes(gdiPathBuilder);
+            float pxScale = builder.GetPixelScale();
 
+            System.Drawing.Drawing2D.GraphicsPath path = gdiPathBuilder.ResultGraphicPath;
+            path.Transform(
+                new System.Drawing.Drawing2D.Matrix(
+                    pxScale, 0,
+                    0, pxScale,
+                    0, 0
+                ));
+
+            if (chkFillBackground.Checked)
+            {
+                g.FillPath(Brushes.Black, path);
+            }
+            if (chkBorder.Checked)
+            {
+                g.DrawPath(Pens.Green, path);
+            }
+            //transform back
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
         void RenderWithTextPrinterAndMiniAgg(Typeface typeface, string str, float sizeInPoint, int resolution)
         {
@@ -740,7 +752,7 @@ namespace SampleWinForms
                     ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
                         builder.GetOutputPoints(),
                         builder.GetOutputContours(),
-                        builder.GetPixelScale());                     
+                        builder.GetPixelScale());
                     atlasBuilder.AddGlyph((int)n, actualImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
