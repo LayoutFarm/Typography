@@ -113,7 +113,7 @@ namespace SampleWinForms
             };
             //----------------
             //string inputstr = "ก้า";
-            string inputstr = "น้ำ";
+            string inputstr = "น้ำน้ำ";
             //string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
