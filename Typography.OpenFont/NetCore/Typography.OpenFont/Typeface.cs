@@ -42,6 +42,8 @@ namespace Typography.OpenFont
         internal byte[] PrepProgramBuffer { get; set; }
         internal byte[] FpgmProgramBuffer { get; set; }
         internal MaxProfile MaxProfile { get; set; }
+
+        public bool HasPrepProgramBuffer { get { return PrepProgramBuffer != null; } }
         internal Kern KernTable
         {
             get { return _kern; }
@@ -257,7 +259,7 @@ namespace Typography.OpenFont
         }
 
         public short xoffset;
-        public short yoffset; 
+        public short yoffset;
 
 #if DEBUG
         public override string ToString()
@@ -501,7 +503,7 @@ namespace Typography.OpenFont
             public string Lang { get; private set; }
             public void DoGlyphPosition(List<GlyphPos> glyphPositions)
             {
-                
+
                 if (lookupTables == null) { return; } //early exit if no lookup tables
                 //load
                 int j = lookupTables.Count;

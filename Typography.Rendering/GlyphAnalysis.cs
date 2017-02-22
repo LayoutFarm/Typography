@@ -2,12 +2,63 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.VectorMath;
-using PixelFarm.Agg.VertexSource;
 
 namespace Typography.Rendering
 {
+
     //this is PixelFarm version ***
     //render with MiniAgg
+
+    public class GlyphContourReader : OpenFont.IGlyphPathBuilder
+    {
+        List<GlyphContour> contours;
+        GlyphContourBuilder cntBuilder;
+        public GlyphContourReader()
+        {
+
+        }
+        public void BeginRead(int countourCount)
+        {
+            //-----------------------------------
+            contours = new List<GlyphContour>();
+            //start with blank contour
+            cntBuilder = new GlyphContourBuilder();
+        }
+        public void CloseFigure()
+        {
+            cntBuilder.CloseFigure();
+            GlyphContour cntContour = cntBuilder.CurrentContour;
+            cntContour.allPoints = cntBuilder.GetAllPoints();
+            cntBuilder.Reset();
+            contours.Add(cntContour);
+        }
+        public void Curve3(float p2x, float p2y, float x, float y)
+        {
+            cntBuilder.Curve3(p2x, p2y, x, y);
+        }
+        public void LineTo(float x, float y)
+        {
+            cntBuilder.LineTo(x, y);
+        }
+        public void Curve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
+        {
+            cntBuilder.Curve4(p2x, p2y, p3x, p3y, x, y);
+        }
+        public void MoveTo(float x, float y)
+        {
+            cntBuilder.MoveTo(x, y);
+        }
+        public void EndRead()
+        {
+            //do nothing
+        }
+        public List<GlyphContour> GetContours()
+        {
+            return contours;
+        }
+    }
+
+
 
     public class GlyphContourBuilder
     {
