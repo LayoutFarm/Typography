@@ -555,9 +555,7 @@ namespace SampleWinForms
         void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
         {
 
-            //render glyph path with Gdi+ path
-
-
+            //render glyph path with Gdi+ path 
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             g.Clear(Color.White);
             //////credit:

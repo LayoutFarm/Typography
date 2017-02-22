@@ -21,8 +21,6 @@ namespace Typography.Rendering
             this.pxScale = pxScale;
             var analyzer1 = new GlyphContourReader();
             analyzer1.Read(glyphPoints, glyphContours);
-
-
             //master outline analysis 
             contours = analyzer1.GetContours();
             int j = contours.Count;
@@ -184,53 +182,6 @@ namespace Typography.Rendering
             }
 
             reader.LineTo((float)first_px, (float)first_py);
-        }
-        static GlyphContour CreateFitContourVxs2(GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
-        {
-            GlyphContour newc = new GlyphContour();
-            List<GlyphPart> parts = contour.parts;
-            int m = parts.Count;
-            for (int n = 0; n < m; ++n)
-            {
-                GlyphPart p = parts[n];
-                switch (p.Kind)
-                {
-                    default: throw new NotSupportedException();
-                    case GlyphPartKind.Curve3:
-                        {
-                            GlyphCurve3 curve3 = (GlyphCurve3)p;
-                            newc.AddPart(new GlyphCurve3(
-                                curve3.x0 * pixelScale, curve3.y0 * pixelScale,
-                                curve3.p2x * pixelScale, curve3.p2y * pixelScale,
-                                curve3.x * pixelScale, curve3.y * pixelScale));
-
-                        }
-                        break;
-                    case GlyphPartKind.Curve4:
-                        {
-                            GlyphCurve4 curve4 = (GlyphCurve4)p;
-                            newc.AddPart(new GlyphCurve4(
-                                  curve4.x0 * pixelScale, curve4.y0 * pixelScale,
-                                  curve4.p2x * pixelScale, curve4.p2y * pixelScale,
-                                  curve4.p3x * pixelScale, curve4.p3y * pixelScale,
-                                  curve4.x * pixelScale, curve4.y * pixelScale
-                                ));
-                        }
-                        break;
-                    case GlyphPartKind.Line:
-                        {
-                            GlyphLine line = (GlyphLine)p;
-                            newc.AddPart(new GlyphLine(
-                                line.x0 * pixelScale, line.y0 * pixelScale,
-                                line.x1 * pixelScale, line.y1 * pixelScale
-                                ));
-                        }
-                        break;
-                }
-            }
-
-
-            return newc;
         }
 
         GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours, float pixelScale)

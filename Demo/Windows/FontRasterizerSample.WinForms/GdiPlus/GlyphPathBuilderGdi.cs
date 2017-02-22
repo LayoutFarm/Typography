@@ -1,29 +1,33 @@
 ﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
-using System;
+
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using Typography.OpenFont;
 
 namespace SampleWinForms
 {
+    //------------------
     //this is Gdi+ version ***
     //render with System.Drawing.Drawing2D.GraphicsPath
+    //------------------
+
     public class GlyphPathBuilderGdi : IGlyphPathBuilder
     {
         //this gdi+ version
-        System.Drawing.Drawing2D.GraphicsPath ps = new System.Drawing.Drawing2D.GraphicsPath();
+        GraphicsPath ps;
         float lastMoveX;
         float lastMoveY;
         float lastX;
         float lastY;
-         
+
         public GlyphPathBuilderGdi()
         {
 
         }
-       
         public void BeginRead(int countourCount)
         {
+            ps = new GraphicsPath();
             ps.Reset();
         }
         public void EndRead()
@@ -56,7 +60,7 @@ namespace SampleWinForms
                 new PointF(c1x, c1y),
                 new PointF(c2x, c2y),
                 new PointF(lastX = (float)x, lastY = (float)y));
-            
+
         }
         public void Curve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
         {
@@ -77,7 +81,7 @@ namespace SampleWinForms
 
 
 
-        public System.Drawing.Drawing2D.GraphicsPath ResultGraphicPath { get { return this.ps; } }
+        public GraphicsPath ResultGraphicPath { get { return this.ps; } }
 
     }
 }

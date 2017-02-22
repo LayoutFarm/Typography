@@ -5,11 +5,11 @@ using PixelFarm.VectorMath;
 
 namespace Typography.Rendering
 {
-    
+
     //this is PixelFarm version ***
     //render with MiniAgg
 
-    public class GlyphContourReader : Typography.OpenFont.IGlyphPathBuilder
+    public class GlyphContourReader : OpenFont.IGlyphPathBuilder
     {
         List<GlyphContour> contours;
         GlyphContourBuilder cntBuilder;
