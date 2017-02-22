@@ -3,15 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using Typography.OpenFont;
 
-
-namespace PixelFarm.Drawing.Fonts
+namespace Typography.Rendering
 {
 
 
-    class SimpleFontAtlas
+    public class SimpleFontAtlas
     {
-        GlyphImage totalGlyphImage;
+
         Dictionary<int, TextureFontGlyphData> codePointLocations = new Dictionary<int, TextureFontGlyphData>();
 
         public int Width { get; set; }
@@ -20,12 +20,6 @@ namespace PixelFarm.Drawing.Fonts
         public void AddGlyph(int codePoint, TextureFontGlyphData glyphData)
         {
             codePointLocations.Add(codePoint, glyphData);
-        }
-
-        public GlyphImage TotalGlyph
-        {
-            get { return totalGlyphImage; }
-            set { totalGlyphImage = value; }
         }
         public bool GetRectByCodePoint(int codepoint, out TextureFontGlyphData glyphdata)
         {
@@ -36,7 +30,6 @@ namespace PixelFarm.Drawing.Fonts
             }
             return true;
         }
-
     }
 
     public class TextureFontGlyphData
@@ -60,30 +53,14 @@ namespace PixelFarm.Drawing.Fonts
         public float VBearingX { get; set; }
         public float VBearingY { get; set; }
 
-
-        public Rectangle Rect
+        public Bounds Rect
         {
             get;
             set;
         }
 
     }
-    public class GlyphData
-    {
-        public FontGlyph fontGlyph;
-        public GlyphImage glyphImage;
-        public Rectangle pxArea;
-        public char character;
-        public int codePoint;
-        public GlyphData(int codePoint, char c, FontGlyph fontGlyph, GlyphImage glyphImage)
-        {
-            this.codePoint = codePoint;
-            this.character = c;
-            this.fontGlyph = fontGlyph;
-            this.glyphImage = glyphImage;
 
-        }
-    }
     public struct GlyphMatrix2
     {
         public short unit_per_em;

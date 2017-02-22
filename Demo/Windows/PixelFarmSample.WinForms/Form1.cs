@@ -91,9 +91,8 @@ namespace SampleWinForms
             string selectedFontFileName = "tahoma.ttf";
             //string selectedFontFileName="cambriaz.ttf";
             //string selectedFontFileName="CompositeMS2.ttf"; 
-
             int fileIndexCount = 0;
-            foreach (string file in Directory.GetFiles("..\\..", "*.ttf"))
+            foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
             {
                 var tmpLocalFile = new TempLocalFontFile(file);
                 lstFontList.Items.Add(tmpLocalFile);
@@ -124,25 +123,7 @@ namespace SampleWinForms
             this.chkFillBackground.Checked = true;
         }
 
-        class TempLocalFontFile
-        {
-            //temp only
-            public readonly string actualFileName;
-            public TempLocalFontFile(string actualFileName)
-            {
-                this.actualFileName = actualFileName;
-            }
-            public string OnlyFileName
-            {
-                get { return Path.GetFileName(actualFileName); }
-            }
-#if DEBUG
-            public override string ToString()
-            {
-                return this.OnlyFileName;
-            }
-#endif            
-        }
+
         enum RenderChoice
         {
             RenderWithMiniAgg,
@@ -352,11 +333,11 @@ namespace SampleWinForms
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
             var msdfGlyphGen = new MsdfGlyphGen();
-            ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
+            GlyphImage2 glyphImg = msdfGlyphGen.CreateMsdfImage(
                 builder.GetOutputPoints(),
                 builder.GetOutputContours(),
                 builder.GetPixelScale());
-
+            var actualImg = ActualImage.CreateFromBuffer(glyphImg.Width, glyphImg.Height, PixelFormat.ARGB32, glyphImg.GetImageBuffer());
             p.DrawImage(actualImg, 0, 0);
 
             //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -741,7 +722,8 @@ namespace SampleWinForms
         }
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
         {
-            string sampleFontFile = @"..\..\tahoma.ttf";
+
+            string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
             CreateSampleMsdfTextureFont(
                 sampleFontFile,
                 18,
@@ -774,7 +756,7 @@ namespace SampleWinForms
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
 
                     var msdfGlyphGen = new MsdfGlyphGen();
-                    ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
+                    var actualImg = msdfGlyphGen.CreateMsdfImage(
                         builder.GetOutputPoints(),
                         builder.GetOutputContours(),
                         builder.GetPixelScale());
@@ -792,7 +774,7 @@ namespace SampleWinForms
                 var glyphImg2 = atlasBuilder.BuildSingleImage();
                 using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                 {
-                    var bmpdata = bmp.LockBits(new Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
+                    var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
                         System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
                     int[] intBuffer = glyphImg2.GetImageBuffer();
 
