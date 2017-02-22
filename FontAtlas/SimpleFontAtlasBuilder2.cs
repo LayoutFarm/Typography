@@ -6,9 +6,10 @@ using System.Xml;
 
 namespace Typography.Rendering
 {
-    class GlyphImage2
+    public class GlyphImage2
     {
-        int[] pixelBuffer;
+        int[]
+        pixelBuffer;
         public GlyphImage2(int w, int h)
         {
             this.Width = w;
@@ -50,7 +51,7 @@ namespace Typography.Rendering
         }
     }
 
-    class CacheGlyph
+    public class CacheGlyph
     {
         public int borderX;
         public int borderY;
@@ -60,7 +61,7 @@ namespace Typography.Rendering
         public int codePoint;
         public GlyphMatrix2 glyphMatrix;
     }
-    class SimpleFontAtlasBuilder2
+    public class SimpleFontAtlasBuilder2
     {
         GlyphImage2 latestGenGlyphImage;
         Dictionary<int, CacheGlyph> glyphs = new Dictionary<int, CacheGlyph>();

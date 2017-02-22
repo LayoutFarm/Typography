@@ -39,21 +39,6 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\BinPacker.cs">
-      <Link>FontAtlas\BinPacker.cs</Link>
-    </Compile>
-    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\MsdfGlyphGen.cs">
-      <Link>FontAtlas\MsdfGlyphGen.cs</Link>
-    </Compile>
-    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\MsdfGlyphGenExtension.cs">
-      <Link>FontAtlas\MsdfGlyphGenExtension.cs</Link>
-    </Compile>
-    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\SimpleFontAtlas.cs">
-      <Link>FontAtlas\SimpleFontAtlas.cs</Link>
-    </Compile>
-    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\SimpleFontAtlasBuilder2.cs">
-      <Link>FontAtlas\SimpleFontAtlasBuilder2.cs</Link>
-    </Compile>
     <Compile Include="..\NoPixelFarmSample.WinForms\GdiPlus\GlyphPathBuilderGdi.cs">
       <Link>GdiPlus\GlyphPathBuilderGdi.cs</Link>
     </Compile>
@@ -101,6 +86,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\FontAtlas\FontAtlas.csproj">
+      <Project>{64c28aab-e2ef-45c1-a674-5660d462882f}</Project>
+      <Name>FontAtlas</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj">
       <Project>{1088370f-1a7e-421b-bbcb-400a8eda5f1f}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>

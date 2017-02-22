@@ -2,11 +2,10 @@
 //-----------------------------------  
 using System;
 using Typography.OpenFont;
-using Typography.Rendering;
 
-namespace PixelFarm.Drawing.Fonts
+namespace Typography.Rendering
 {
-    static class MsdfGlyphGenExtension
+    public static class MsdfGlyphGenExtension
     {
         public static GlyphImage2 CreateMsdfImage(
             this MsdfGlyphGen msdfGlyphGen,

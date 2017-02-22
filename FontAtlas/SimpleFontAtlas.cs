@@ -9,7 +9,7 @@ namespace Typography.Rendering
 {
 
 
-    class SimpleFontAtlas
+    public class SimpleFontAtlas
     {
 
         Dictionary<int, TextureFontGlyphData> codePointLocations = new Dictionary<int, TextureFontGlyphData>();
@@ -60,7 +60,7 @@ namespace Typography.Rendering
         }
 
     }
-  
+
     public struct GlyphMatrix2
     {
         public short unit_per_em;
