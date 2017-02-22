@@ -37,6 +37,7 @@
             this.cmbHintTechnique = new System.Windows.Forms.ComboBox();
             this.cmbPositionTech = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.cmdBuildMsdfTexture = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lstFontList
@@ -119,11 +120,22 @@
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
             // 
+            // cmdBuildMsdfTexture
+            // 
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(693, 418);
+            this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
+            this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 37);
+            this.cmdBuildMsdfTexture.TabIndex = 35;
+            this.cmdBuildMsdfTexture.Text = "Make MsdfTexture";
+            this.cmdBuildMsdfTexture.UseVisualStyleBackColor = true;
+            this.cmdBuildMsdfTexture.Click += new System.EventHandler(this.cmdBuildMsdfTexture_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(844, 567);
+            this.Controls.Add(this.cmdBuildMsdfTexture);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.cmbHintTechnique);
             this.Controls.Add(this.cmbPositionTech);
@@ -151,5 +163,6 @@
         private System.Windows.Forms.ComboBox cmbHintTechnique;
         private System.Windows.Forms.ComboBox cmbPositionTech;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button cmdBuildMsdfTexture;
     }
 }

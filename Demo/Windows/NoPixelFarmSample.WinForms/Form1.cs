@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 
 using Typography.OpenFont;
-using Typography.TextLayout;
+using Typography.TextLayout; 
 
 namespace SampleWinForms
 {
@@ -161,6 +161,68 @@ namespace SampleWinForms
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
 
+        private void cmdBuildMsdfTexture_Click(object sender, System.EventArgs e)
+        {
+            string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
+            CreateSampleMsdfTextureFont(
+                sampleFontFile,
+                18,
+                0,
+                255,
+                "d:\\WImageTest\\sample_msdf.png");
+        }
+        static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
+        {
+            //sample
+            var reader = new OpenFontReader();
 
+            using (var fs = new FileStream(fontfile, FileMode.Open))
+            {
+                ////1. read typeface from font file
+                //Typeface typeface = reader.Read(fs);
+                ////sample: create sample msdf texture 
+                ////-------------------------------------------------------------
+                //var builder = new MyGlyphPathBuilder(typeface);
+                ////builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
+                ////builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
+                ////-------------------------------------------------------------
+                //var atlasBuilder = new SimpleFontAtlasBuilder2();
+                //var msdfBuilder = new MsdfGlyphGen();
+
+                //for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
+                //{
+                //    //build glyph
+                //    builder.BuildFromGlyphIndex(n, sizeInPoint);
+
+                //    var msdfGlyphGen = new MsdfGlyphGen();
+                //    ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
+                //        builder.GetOutputPoints(),
+                //        builder.GetOutputContours(),
+                //        builder.GetPixelScale());
+                //    atlasBuilder.AddGlyph((int)n, actualImg);
+
+                //    //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                //    //{
+                //    //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+                //    //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
+                //    //    bmp.UnlockBits(bmpdata);
+                //    //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
+                //    //}
+                //}
+
+                //var glyphImg2 = atlasBuilder.BuildSingleImage();
+                //using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                //{
+                //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
+                //        System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+                //    int[] intBuffer = glyphImg2.GetImageBuffer();
+
+                //    System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
+                //    bmp.UnlockBits(bmpdata);
+                //    bmp.Save("d:\\WImageTest\\a_total.png");
+                //}
+                //atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
+            }
+        }
     }
 }

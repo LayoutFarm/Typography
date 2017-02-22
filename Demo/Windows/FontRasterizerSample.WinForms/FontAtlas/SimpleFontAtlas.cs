@@ -3,15 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using PixelFarm.Drawing;
+using PixelFarm.Drawing.Fonts;
 
-
-namespace PixelFarm.Drawing.Fonts
+namespace Typography.Rendering
 {
 
 
     class SimpleFontAtlas
     {
-        GlyphImage totalGlyphImage;
+        //GlyphImage totalGlyphImage;
         Dictionary<int, TextureFontGlyphData> codePointLocations = new Dictionary<int, TextureFontGlyphData>();
 
         public int Width { get; set; }
@@ -22,11 +23,11 @@ namespace PixelFarm.Drawing.Fonts
             codePointLocations.Add(codePoint, glyphData);
         }
 
-        public GlyphImage TotalGlyph
-        {
-            get { return totalGlyphImage; }
-            set { totalGlyphImage = value; }
-        }
+        //public GlyphImage TotalGlyph
+        //{
+        //    get { return totalGlyphImage; }
+        //    set { totalGlyphImage = value; }
+        //}
         public bool GetRectByCodePoint(int codepoint, out TextureFontGlyphData glyphdata)
         {
             if (!codePointLocations.TryGetValue(codepoint, out glyphdata))

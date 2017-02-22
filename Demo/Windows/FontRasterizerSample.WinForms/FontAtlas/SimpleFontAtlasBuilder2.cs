@@ -4,7 +4,9 @@
 using System.Collections.Generic;
 using PixelFarm.Agg;
 using System.Xml;
-namespace PixelFarm.Drawing.Fonts
+using PixelFarm.Drawing;
+
+namespace Typography.Rendering
 {
     class GlyphImage2
     {

@@ -51,10 +51,11 @@
     <Compile Include="..\NoPixelFarmSample.WinForms\Workspace\TempLocalFontFile.cs">
       <Link>Workspace\TempLocalFontFile.cs</Link>
     </Compile>
-    <Compile Include="FontAtlas\MsdfGlyphGen.cs" />
     <Compile Include="FontAtlas\BinPacker.cs" />
+    <Compile Include="FontAtlas\MsdfGlyphGen.cs" />
     <Compile Include="FontAtlas\SimpleFontAtlas.cs" />
     <Compile Include="FontAtlas\SimpleFontAtlasBuilder2.cs" />
+    <Compile Include="MsdfGlyphGenExtension.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
