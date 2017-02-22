@@ -34,6 +34,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurveGen.cs" />
     <Compile Include="GlyphAutoFit.cs" />
     <Compile Include="GlyphAnalysis.cs" />
     <Compile Include="GlyphFitOutline.cs" />
@@ -43,10 +44,6 @@
     <ProjectReference Include="..\PixelFarmMiniAgg\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
       <Name>PixelFarm.Triangulation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj">
-      <Project>{1088370f-1a7e-421b-bbcb-400a8eda5f1f}</Project>
-      <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
     <ProjectReference Include="..\Typography.OpenFont\N20\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>

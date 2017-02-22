@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System;
 using System.Collections.Generic;
-using PixelFarm.VectorMath;
+using System.Numerics;
 
 namespace Typography.Rendering
 {
@@ -267,16 +267,16 @@ namespace Typography.Rendering
             var curve = new BezierCurveCubic(
                 start, end,
                 control1, control2);
-            points.Add(new GlyphPoint2D(start.x, start.y, PointKind.C4Start));
+            points.Add(new GlyphPoint2D(start.X, start.Y, PointKind.C4Start));
             float eachstep = (float)1 / nsteps;
             float stepSum = eachstep;//start
             for (int i = 1; i < nsteps; ++i)
             {
                 var vector2 = curve.CalculatePoint(stepSum);
-                points.Add(new GlyphPoint2D(vector2.x, vector2.y, PointKind.CurveInbetween));
+                points.Add(new GlyphPoint2D(vector2.X, vector2.Y, PointKind.CurveInbetween));
                 stepSum += eachstep;
             }
-            points.Add(new GlyphPoint2D(end.x, end.y, PointKind.C4End));
+            points.Add(new GlyphPoint2D(end.X, end.Y, PointKind.C4End));
         }
         public void CreateBezierVxs3(
             int nsteps,
@@ -287,16 +287,16 @@ namespace Typography.Rendering
             var curve = new BezierCurveQuadric(
                 start, end,
                 control1);
-            points.Add(new GlyphPoint2D(start.x, start.y, PointKind.C3Start));
+            points.Add(new GlyphPoint2D(start.X, start.Y, PointKind.C3Start));
             float eachstep = (float)1 / nsteps;
             float stepSum = eachstep;//start
             for (int i = 1; i < nsteps; ++i)
             {
                 var vector2 = curve.CalculatePoint(stepSum);
-                points.Add(new GlyphPoint2D(vector2.x, vector2.y, PointKind.CurveInbetween));
+                points.Add(new GlyphPoint2D(vector2.X, vector2.Y, PointKind.CurveInbetween));
                 stepSum += eachstep;
             }
-            points.Add(new GlyphPoint2D(end.x, end.y, PointKind.C3End));
+            points.Add(new GlyphPoint2D(end.X, end.Y, PointKind.C3End));
         }
     }
     public abstract class GlyphPart

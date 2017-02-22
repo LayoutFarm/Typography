@@ -93,10 +93,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PixelFarmMiniAgg\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
-      <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
-      <Name>PixelFarm.Triangulation</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarmMiniAgg\x_autogen\PixelFarm.MiniAgg.One.csproj">
       <Project>{1088370f-1a7e-421b-bbcb-400a8eda5f1f}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
