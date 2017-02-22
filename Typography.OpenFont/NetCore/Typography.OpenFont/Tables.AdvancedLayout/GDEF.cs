@@ -190,7 +190,7 @@ namespace Typography.OpenFont.Tables
                         int gIndex = startGlyph;
                         for (int i = 0; i < len; ++i)
                         {
-                            inputGlyphs[gIndex].GlyphClassDef = (GlyphClassKind)classValues[i];
+                            inputGlyphs[gIndex].GlyphClass = (GlyphClassKind)classValues[i];
                             gIndex++;
                         }
 
@@ -205,7 +205,7 @@ namespace Typography.OpenFont.Tables
                             GlyphClassKind glyphKind = (GlyphClassKind)rec.classNo;
                             for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
                             {
-                                inputGlyphs[i].GlyphClassDef = glyphKind;
+                                inputGlyphs[i].GlyphClass = glyphKind;
                             }
                         }
                     }

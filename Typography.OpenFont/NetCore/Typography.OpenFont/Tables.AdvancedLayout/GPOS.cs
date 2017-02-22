@@ -773,19 +773,35 @@ namespace Typography.OpenFont.Tables
                                 {
                                     //eg. น้ำ
                                     prev_pos.yoffset += (short)(-mark1Anchor.ycoord);
+                                    int actualBasePos = FindActualBaseGlyphBackward(inputGlyphs, i - 1);
+                                    if (actualBasePos > -1)
+                                    {
+                                        GlyphPos prev_pos2 = inputGlyphs[actualBasePos];
+                                        glyphPos.xoffset += (short)((prev_pos2.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord)); 
+                                    }
                                 }
                                 else
                                 {
                                     glyphPos.yoffset += (short)(mark1Anchor.ycoord);
+                                    glyphPos.xoffset += (short)((prev_pos.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
                                 } 
-
-                                glyphPos.xoffset = (short)((prev_pos.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
                             }
                         }
                     }
                 }
             }
-
+            static int FindActualBaseGlyphBackward(List<GlyphPos> inputGlyphs, int startAt)
+            {
+                for (int i = startAt; i >= 0; --i)
+                {
+                    GlyphPos glyphPos = inputGlyphs[i];
+                    if (glyphPos._classKind <= GlyphClassKind.Base)
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
             /// <summary>
             /// Lookup Type 6: MarkToMark Attachment Positioning Subtable
             /// </summary>

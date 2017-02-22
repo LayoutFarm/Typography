@@ -252,14 +252,15 @@ namespace Typography.OpenFont
     {
         public readonly ushort glyphIndex;
         public readonly ushort advWidth;
-        public GlyphPos(ushort glyphIndex, ushort advWidth)
+        public short xoffset;
+        public short yoffset;
+        public GlyphClassKind _classKind;
+        public GlyphPos(ushort glyphIndex, GlyphClassKind classKind, ushort advWidth)
         {
             this.glyphIndex = glyphIndex;
             this.advWidth = advWidth;
+            this._classKind = classKind;
         }
-
-        public short xoffset;
-        public short yoffset;
 
 #if DEBUG
         public override string ToString()

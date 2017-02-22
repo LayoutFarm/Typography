@@ -160,7 +160,7 @@ namespace Typography.OpenFont
         }
 
 
-        internal GlyphClassKind GlyphClassDef { get; set; }
+        public GlyphClassKind GlyphClass { get; set; }
         internal ushort MarkClassDef { get; set; }
         public short MinX
         {
@@ -183,7 +183,7 @@ namespace Typography.OpenFont
         public override string ToString()
         {
             var stbuilder = new StringBuilder();
-            stbuilder.Append("class=" + GlyphClassDef.ToString());
+            stbuilder.Append("class=" + GlyphClass.ToString());
             if (MarkClassDef != 0)
             {
                 stbuilder.Append(",mark_class=" + MarkClassDef);
@@ -193,12 +193,12 @@ namespace Typography.OpenFont
 #endif
 
 
-        
+
 
     }
 
     //https://www.microsoft.com/typography/otspec/gdef.htm
-    enum GlyphClassKind
+    public enum GlyphClassKind:byte
     {
         //1 	Base glyph (single character, spacing glyph)
         //2 	Ligature glyph (multiple character, spacing glyph)
