@@ -219,7 +219,10 @@ namespace Typography.OpenFont.Tables
                 int j = subTables.Count;
                 for (int i = 0; i < j; ++i)
                 {
+
                     subTables[i].DoGlyphPosition(inputGlyphs, startAt, len);
+                    //update len
+                    len = inputGlyphs.Count;
                 }
             }
             public List<LookupSubTable> SubTables { get { return subTables; } }
@@ -749,10 +752,18 @@ namespace Typography.OpenFont.Tables
                 public Mark2ArrayTable Mark2ArrayTable { get; set; } // Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. 
                 public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    //find marker
-                    int x = 0;
-                    int j = inputGlyphs.Count;
-                    for (int i = 1; i < j; ++i) //start at 1
+                    //find marker 
+                    if (startAt == 0)
+                    {
+                        startAt++;
+                    }
+                    int lim = startAt + len;
+                    if (lim > inputGlyphs.Count)
+                    {
+                        lim = inputGlyphs.Count;
+                    }
+                    //
+                    for (int i = startAt; i < lim; ++i) //start at 1
                     {
                         GlyphPos glyphPos = inputGlyphs[i];
                         int markFound = MarkCoverage1.FindPosition(glyphPos.glyphIndex);
@@ -773,19 +784,35 @@ namespace Typography.OpenFont.Tables
                                 {
                                     //eg. น้ำ
                                     prev_pos.yoffset += (short)(-mark1Anchor.ycoord);
+                                    int actualBasePos = FindActualBaseGlyphBackward(inputGlyphs, i - 1);
+                                    if (actualBasePos > -1)
+                                    {
+                                        GlyphPos prev_pos2 = inputGlyphs[actualBasePos];
+                                        glyphPos.xoffset += (short)((prev_pos2.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
+                                    }
                                 }
                                 else
                                 {
                                     glyphPos.yoffset += (short)(mark1Anchor.ycoord);
-                                } 
-
-                                glyphPos.xoffset = (short)((prev_pos.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
+                                    glyphPos.xoffset += (short)((prev_pos.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
+                                }
                             }
                         }
                     }
                 }
             }
-
+            static int FindActualBaseGlyphBackward(List<GlyphPos> inputGlyphs, int startAt)
+            {
+                for (int i = startAt; i >= 0; --i)
+                {
+                    GlyphPos glyphPos = inputGlyphs[i];
+                    if (glyphPos._classKind <= GlyphClassKind.Base)
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
             /// <summary>
             /// Lookup Type 6: MarkToMark Attachment Positioning Subtable
             /// </summary>
