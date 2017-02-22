@@ -23,12 +23,16 @@ namespace SampleWinForms
         ActualImage destImg;
         Bitmap winBmp;
 
+        string _currentSelectedFontFile = "";
+        float fontSizeInPoint = 14; //default
 
         public Form1()
         {
             InitializeComponent();
             this.Load += new EventHandler(Form1_Load);
-
+            this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
+            //----------
+            txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //----------
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
@@ -49,6 +53,18 @@ namespace SampleWinForms
             cmbHintTechnique.Items.Add(HintTechnique.CustomAutoFit);
             cmbHintTechnique.SelectedIndex = 0;
             cmbHintTechnique.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            //---------- 
+
+            button1.Click += (s, e) => UpdateRenderOutput();
+            chkShowGrid.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkShowTess.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkXGridFitting.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkYGridFitting.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkFillBackground.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkLcdTechnique.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkDrawBone.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkGsubEnableLigature.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkShowTess.CheckedChanged += (s, e) => UpdateRenderOutput();
             //----------
             lstFontSizes.Items.AddRange(
                 new object[]{
@@ -59,7 +75,12 @@ namespace SampleWinForms
                     16,
                     18,20,22,24,26,28,36,48,72,240,300,360
                 });
-            this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
+            lstFontSizes.SelectedIndexChanged += (s, e) =>
+            {
+                //new font size
+                fontSizeInPoint = (int)lstFontSizes.SelectedItem;
+                UpdateRenderOutput();
+            };
 
             //----------
             //simple load test fonts from local test dir
@@ -102,11 +123,7 @@ namespace SampleWinForms
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
         }
-        string _currentSelectedFontFile = "";
-        private void CmbPositionTech_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
+
         class TempLocalFontFile
         {
             //temp only
@@ -142,10 +159,7 @@ namespace SampleWinForms
             this.lstFontSizes.SelectedIndex = 0;//select last one  
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
+
 
         void UpdateRenderOutput()
         {
@@ -160,7 +174,7 @@ namespace SampleWinForms
             ReadAndRender(_currentSelectedFontFile);
         }
 
-        float fontSizeInPoint = 14; //default
+
         void ReadAndRender(string fontfile)
         {
 
@@ -200,61 +214,6 @@ namespace SampleWinForms
             }
         }
 
-
-
-        static Msdfgen.Shape CreateMsdfShape(List<GlyphContour> contours)
-        {
-            var shape = new Msdfgen.Shape();
-            int j = contours.Count;
-            for (int i = 0; i < j; ++i)
-            {
-                var cnt = new Msdfgen.Contour();
-                shape.contours.Add(cnt);
-
-                GlyphContour contour = contours[i];
-                List<GlyphPart> parts = contour.parts;
-                int m = parts.Count;
-                for (int n = 0; n < m; ++n)
-                {
-                    GlyphPart p = parts[n];
-                    switch (p.Kind)
-                    {
-                        default: throw new NotSupportedException();
-                        case GlyphPartKind.Curve3:
-                            {
-                                GlyphCurve3 curve3 = (GlyphCurve3)p;
-                                cnt.AddQuadraticSegment(
-                                    curve3.x0, curve3.y0,
-                                    curve3.p2x, curve3.p2y,
-                                    curve3.x, curve3.y
-                                   );
-                            }
-                            break;
-                        case GlyphPartKind.Curve4:
-                            {
-                                GlyphCurve4 curve4 = (GlyphCurve4)p;
-                                cnt.AddCubicSegment(
-                                    curve4.x0, curve4.y0,
-                                    curve4.p2x, curve4.p2y,
-                                    curve4.p3x, curve4.p3y,
-                                    curve4.x, curve4.y);
-                            }
-                            break;
-                        case GlyphPartKind.Line:
-                            {
-                                GlyphLine line = (GlyphLine)p;
-                                cnt.AddLine(
-                                    line.x0, line.y0,
-                                    line.x1, line.y1);
-                            }
-                            break;
-                    }
-                }
-            }
-
-            return shape;
-
-        }
 
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
@@ -379,34 +338,6 @@ namespace SampleWinForms
             Msdfgen.Shape shape = msdfGlyphGen.CreateMsdf(builder.GetOutputPoints(),
                 builder.GetOutputContours(),
                 builder.GetPixelScale());
-
-            //var msdfBuilder = new MsdfGlyphGen();
-            //msdfBuilder = builder.GetPixelScale();
-            //builder.ReadShapes(msdfBuilder);
-            //Msdfgen.Shape shape = msdfBuilder.ResultShape;
-
-            //var cntBuilder = new GlyphContourReader();
-            //builder.ReadShapes(cntBuilder);
-            //List<GlyphContour> contours = cntBuilder.GetContours(); 
-            //int j = contours.Count;
-            //List<GlyphContour> newFitContours = new List<GlyphContour>();
-            //float scale = builder.GetPixelScale();
-
-            //for (int i = 0; i < j; ++i)
-            //{
-            //    newFitContours.Add(CreateFitContourVxs2(contours[i], scale, 
-            //        chkXGridFitting.Checked, 
-            //        chkYGridFitting.Checked));
-            //}
-
-            //var msdfGlyphGen = new MsdfGlyphGen();
-
-            //Msdfgen.Shape shape = msdfGlyphGen.CreateMsdf(
-            //    builder.GetOutputPoints(),
-            //    builder.GetOutputContours(),
-            //    builder.GetPixelScale());
-
-            //Msdfgen.Shape shape = CreateMsdfShape(newFitContours);
             //shape.InverseYAxis = false;
             double left, bottom, right, top;
             shape.findBounds(out left, out bottom, out right, out top);
@@ -414,6 +345,7 @@ namespace SampleWinForms
             Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
             Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
             Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
+            //
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
 
             //#if DEBUG
@@ -463,53 +395,7 @@ namespace SampleWinForms
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
-        static GlyphContour CreateFitContourVxs2(GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
-        {
-            GlyphContour newc = new GlyphContour();
-            List<GlyphPart> parts = contour.parts;
-            int m = parts.Count;
-            for (int n = 0; n < m; ++n)
-            {
-                GlyphPart p = parts[n];
-                switch (p.Kind)
-                {
-                    default: throw new NotSupportedException();
-                    case GlyphPartKind.Curve3:
-                        {
-                            GlyphCurve3 curve3 = (GlyphCurve3)p;
-                            newc.AddPart(new GlyphCurve3(
-                                curve3.x0 * pixelScale, curve3.y0 * pixelScale,
-                                curve3.p2x * pixelScale, curve3.p2y * pixelScale,
-                                curve3.x * pixelScale, curve3.y * pixelScale));
 
-                        }
-                        break;
-                    case GlyphPartKind.Curve4:
-                        {
-                            GlyphCurve4 curve4 = (GlyphCurve4)p;
-                            newc.AddPart(new GlyphCurve4(
-                                  curve4.x0 * pixelScale, curve4.y0 * pixelScale,
-                                  curve4.p2x * pixelScale, curve4.p2y * pixelScale,
-                                  curve4.p3x * pixelScale, curve4.p3y * pixelScale,
-                                  curve4.x * pixelScale, curve4.y * pixelScale
-                                ));
-                        }
-                        break;
-                    case GlyphPartKind.Line:
-                        {
-                            GlyphLine line = (GlyphLine)p;
-                            newc.AddPart(new GlyphLine(
-                                line.x0 * pixelScale, line.y0 * pixelScale,
-                                line.x1 * pixelScale, line.y1 * pixelScale
-                                ));
-                        }
-                        break;
-                }
-            }
-
-
-            return newc;
-        }
 
 
         void RenderGrid(int width, int height, int sqSize, AggCanvasPainter p)
@@ -826,41 +712,7 @@ namespace SampleWinForms
         }
 
 
-        private void txtInputChar_TextChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-
-        private void lstFontSizes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //new font size
-            fontSizeInPoint = (int)lstFontSizes.SelectedItem;
-            UpdateRenderOutput();
-        }
-
-        private void chkKern_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkTrueTypeHint_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkShowTess_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkShowGrid_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        int _gridSize = 5;//default
-
+        int _gridSize = 5;//default 
         private void TxtGridSize_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -883,42 +735,6 @@ namespace SampleWinForms
             }
 
         }
-
-        private void chkVerticalHinting_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkMasterOutlineAnalysis_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkDrawBone_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkYGridFitting_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkXGridFitting_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkFillBackground_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
-        private void chkLcdTechnique_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
-
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
         {
             string sampleFontFile = @"..\..\tahoma.ttf";
@@ -1002,9 +818,6 @@ namespace SampleWinForms
             }
         }
 
-        private void chkGsubEnableLigature_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateRenderOutput();
-        }
+
     }
 }
