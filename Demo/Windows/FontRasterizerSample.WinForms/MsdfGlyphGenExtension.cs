@@ -9,7 +9,7 @@ namespace PixelFarm.Drawing.Fonts
 {
     static class MsdfGlyphGenExtension
     {
-        public static Agg.ActualImage CreateMsdfImage(
+        public static GlyphImage2 CreateMsdfImage(
             this MsdfGlyphGen msdfGlyphGen,
             GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float pxScale = 1)
         {
@@ -33,7 +33,8 @@ namespace PixelFarm.Drawing.Fonts
             Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
             //-----------------------------------
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
-            return Agg.ActualImage.CreateFromBuffer(w, h, Agg.PixelFormat.ARGB32, buffer);
+            return null;
+            //return Agg.ActualImage.CreateFromBuffer(w, h, Agg.PixelFormat.ARGB32, buffer);
         }
 
 

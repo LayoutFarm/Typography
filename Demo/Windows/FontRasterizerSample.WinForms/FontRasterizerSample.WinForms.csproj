@@ -39,8 +39,17 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\BinPacker.cs">
+      <Link>FontAtlas\BinPacker.cs</Link>
+    </Compile>
+    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\MsdfGlyphGen.cs">
+      <Link>FontAtlas\MsdfGlyphGen.cs</Link>
+    </Compile>
     <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\SimpleFontAtlas.cs">
       <Link>FontAtlas\SimpleFontAtlas.cs</Link>
+    </Compile>
+    <Compile Include="..\NoPixelFarmSample.WinForms\FontAtlas\SimpleFontAtlasBuilder2.cs">
+      <Link>FontAtlas\SimpleFontAtlasBuilder2.cs</Link>
     </Compile>
     <Compile Include="..\NoPixelFarmSample.WinForms\GdiPlus\GlyphPathBuilderGdi.cs">
       <Link>GdiPlus\GlyphPathBuilderGdi.cs</Link>
@@ -54,9 +63,6 @@
     <Compile Include="..\NoPixelFarmSample.WinForms\Workspace\TempLocalFontFile.cs">
       <Link>Workspace\TempLocalFontFile.cs</Link>
     </Compile>
-    <Compile Include="FontAtlas\BinPacker.cs" />
-    <Compile Include="FontAtlas\MsdfGlyphGen.cs" />
-    <Compile Include="FontAtlas\SimpleFontAtlasBuilder2.cs" />
     <Compile Include="MsdfGlyphGenExtension.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

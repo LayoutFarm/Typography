@@ -123,7 +123,7 @@ namespace SampleWinForms
             this.chkFillBackground.Checked = true;
         }
 
-      
+
         enum RenderChoice
         {
             RenderWithMiniAgg,
@@ -333,11 +333,11 @@ namespace SampleWinForms
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
             var msdfGlyphGen = new MsdfGlyphGen();
-            ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
+            GlyphImage2 glyphImg = msdfGlyphGen.CreateMsdfImage(
                 builder.GetOutputPoints(),
                 builder.GetOutputContours(),
                 builder.GetPixelScale());
-
+            var actualImg = ActualImage.CreateFromBuffer(glyphImg.Width, glyphImg.Height, PixelFormat.ARGB32, glyphImg.GetImageBuffer());
             p.DrawImage(actualImg, 0, 0);
 
             //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -756,7 +756,7 @@ namespace SampleWinForms
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
 
                     var msdfGlyphGen = new MsdfGlyphGen();
-                    ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
+                    var actualImg = msdfGlyphGen.CreateMsdfImage(
                         builder.GetOutputPoints(),
                         builder.GetOutputContours(),
                         builder.GetPixelScale());
@@ -774,7 +774,7 @@ namespace SampleWinForms
                 var glyphImg2 = atlasBuilder.BuildSingleImage();
                 using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                 {
-                    var bmpdata = bmp.LockBits(new Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
+                    var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
                         System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
                     int[] intBuffer = glyphImg2.GetImageBuffer();
 

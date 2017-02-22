@@ -2,9 +2,7 @@
 //-----------------------------------  
 using System;
 using System.Collections.Generic;
-using Typography;
 using Typography.OpenFont;
-using Typography.Rendering;
 
 namespace Typography.Rendering
 {

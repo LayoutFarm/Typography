@@ -2,9 +2,7 @@
 //----------------------------------- 
 
 using System.Collections.Generic;
-using PixelFarm.Agg;
 using System.Xml;
-using PixelFarm.Drawing;
 
 namespace Typography.Rendering
 {
@@ -56,7 +54,7 @@ namespace Typography.Rendering
     {
         public int borderX;
         public int borderY;
-        public ActualImage img;
+        public GlyphImage2 img;
         public Rectangle area;
         public char character;
         public int codePoint;
@@ -66,7 +64,7 @@ namespace Typography.Rendering
     {
         GlyphImage2 latestGenGlyphImage;
         Dictionary<int, CacheGlyph> glyphs = new Dictionary<int, CacheGlyph>();
-        public void AddGlyph(int codePoint, ActualImage img)
+        public void AddGlyph(int codePoint, GlyphImage2 img)
         {
             var glyphCache = new CacheGlyph();
             glyphCache.codePoint = codePoint;
@@ -132,8 +130,8 @@ namespace Typography.Rendering
             {
                 CacheGlyph g = glyphList[i];
                 //copy data to totalBuffer
-                ActualImage img = g.img;
-                CopyToDest(ActualImage.GetBuffer2(img), img.Width, img.Height, totalBuffer, g.area.Left, g.area.Top, totalMaxLim);
+                GlyphImage2 img = g.img;
+                CopyToDest(img.GetImageBuffer(), img.Width, img.Height, totalBuffer, g.area.Left, g.area.Top, totalMaxLim);
             }
             //------------------
 

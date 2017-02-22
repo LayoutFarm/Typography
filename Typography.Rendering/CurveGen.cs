@@ -20,6 +20,7 @@ namespace Typography.Rendering
         }
     }
 
+   
     /// <summary>
     /// Represents a cubic bezier curve with two anchor and two control points.
     /// </summary>
