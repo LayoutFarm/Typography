@@ -463,8 +463,8 @@ namespace Typography.OpenFont.Tables
                 public SequenceTable[] SeqTables { get; set; }
                 public override void DoSubtitution(List<ushort> glyphIndices, int startAt, int len)
                 {
-                    int j = glyphIndices.Count;
-                    for (int i = 0; i < j; ++i)
+                    int lim = startAt + len;
+                    for (int i = startAt; i < lim; ++i)
                     {
                         int foundPos = CoverageTable.FindPosition(glyphIndices[i]);
                         if (foundPos > -1)
@@ -474,7 +474,7 @@ namespace Typography.OpenFont.Tables
                             int new_seqCount = seqTable.substitueGlyphs.Length;
                             glyphIndices.RemoveAt(i);
                             glyphIndices.InsertRange(i, seqTable.substitueGlyphs);
-                            len += (new_seqCount - 1);
+                            lim += (new_seqCount - 1);
                             i += (new_seqCount - 1);
                         }
                     }
@@ -568,7 +568,7 @@ namespace Typography.OpenFont.Tables
                         int iscovered = this.CoverageTable.FindPosition(glyphIndices[i]);
                     }
                     //this.CoverageTable.FindPosition()
-                    //Console.WriteLine("lksubtable3 is not  implemented");
+                    Console.WriteLine("lksubtable3 is not  implemented");
                 }
             }
             /// <summary>
