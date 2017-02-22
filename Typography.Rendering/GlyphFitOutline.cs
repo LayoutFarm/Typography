@@ -7,7 +7,7 @@ using Poly2Tri;
 namespace Typography.Rendering
 {
      
-    //sample/test 
+    
     public class GlyphFitOutline
     {
         //this class store result of poly2tri
@@ -385,7 +385,7 @@ namespace Typography.Rendering
     }
     public class GlyphTriangle
     {
-        GlyphTrianglePart part;
+      
         DelaunayTriangle _tri;
         public EdgeLine e0;
         public EdgeLine e1;

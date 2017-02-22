@@ -2,7 +2,7 @@
 
 using System;
 
-namespace SharpFont
+namespace Typography.OpenFont
 {
 
     class InvalidFontException : Exception

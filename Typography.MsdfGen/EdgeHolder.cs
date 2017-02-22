@@ -40,5 +40,11 @@ namespace Msdfgen
         {
             return edgeSegment.point(param);
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return edgeSegment.ToString();
+        }
+#endif
     }
 }

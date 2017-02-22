@@ -4,7 +4,7 @@
 using System;
 using System.Text;
 namespace Typography.OpenFont
-{ 
+{
 
     public class Glyph
     {
@@ -31,6 +31,7 @@ namespace Typography.OpenFont
             _contourEndPoints = contourEndPoints;
             _bounds = bounds;
             GlyphInstructions = glyphInstructions;
+
         }
 
 
@@ -58,6 +59,8 @@ namespace Typography.OpenFont
 
         }
         internal byte[] GlyphInstructions { get; set; }
+
+        public bool HasGlyphInstructions { get { return this.GlyphInstructions != null; } }
 
         internal static void TransformNormalWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
         {
@@ -188,6 +191,9 @@ namespace Typography.OpenFont
             return stbuilder.ToString();
         }
 #endif
+
+
+        
 
     }
 

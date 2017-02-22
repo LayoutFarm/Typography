@@ -69,6 +69,7 @@ namespace Msdfgen
                 (1 - weight) * a.y + (weight * b.y));
 
         }
+
     }
     public class LinearSegment : EdgeSegment
     {
@@ -118,7 +119,12 @@ namespace Msdfgen
         {
             return mix(p[0], p[1], param);
         }
-
+#if DEBUG
+        public override string ToString()
+        {
+            return "L:" + this.color.ToString() + ":" + p[0].ToString() + "," + p[1].ToString();
+        }
+#endif
     }
     public class QuadraticSegment : EdgeSegment
     {
@@ -213,7 +219,12 @@ namespace Msdfgen
             else
                 return new SignedDistance(minDistance, Math.Abs(Vector2.dotProduct((p[2] - p[1]).normalize(), (p[2] - origin).normalize())));
         }
-
+#if DEBUG
+        public override string ToString()
+        {
+            return "Q:" + this.color.ToString() + ":" + p[0].ToString() + "," + p[1].ToString() + "," + p[2].ToString();
+        }
+#endif
     }
     public class CubicSegment : EdgeSegment
     {
@@ -323,5 +334,11 @@ namespace Msdfgen
                 return new SignedDistance(minDistance,
                     EquationSolver.fabs(Vector2.dotProduct(direction(1).normalize(), (p[3] - origin).normalize())));
         }
-    } 
+#if DEBUG
+        public override string ToString()
+        {
+            return "C:" + this.color.ToString() + ":" + p[0].ToString() + "," + p[1].ToString() + "," + p[2].ToString() + "," + p[3].ToString();
+        }
+#endif
+    }
 }

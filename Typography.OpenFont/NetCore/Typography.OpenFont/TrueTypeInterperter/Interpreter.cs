@@ -1,11 +1,141 @@
 ﻿//MIT, 2015, Michael Popoloski's SharpFont
 using System;
 using System.Numerics;
-using Typography.OpenFont;
 
-namespace SharpFont
+namespace Typography.OpenFont
 {
-    class Interpreter
+
+
+    public class TrueTypeInterpreter
+    {
+        Typeface currentTypeFace;
+        SharpFontInterpreter _interpreter;
+        public void SetTypeFace(Typeface typeface)
+        {
+            this.currentTypeFace = typeface;
+            Tables.MaxProfile maximumProfile = currentTypeFace.MaxProfile;
+            _interpreter = new SharpFontInterpreter(
+                maximumProfile.MaxStackElements,
+                maximumProfile.MaxStorage,
+                maximumProfile.MaxFunctionDefs,
+                maximumProfile.MaxInstructionDefs,
+                maximumProfile.MaxTwilightPoints);
+            // the fpgm table optionally contains a program to run at initialization time 
+            if (currentTypeFace.FpgmProgramBuffer != null)
+            {
+                _interpreter.InitializeFunctionDefs(currentTypeFace.FpgmProgramBuffer);
+            }
+        }
+
+
+        public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPoints)
+        {
+
+            Glyph glyph = currentTypeFace.GetGlyphByIndex(glyphIndex);
+            //-------------------------------------------
+            //1. start with original points/contours from glyph 
+            int horizontalAdv = currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+            int hFrontSideBearing = currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
+
+            return HintGlyph(horizontalAdv,
+                hFrontSideBearing,
+                glyph.MinX,
+                glyph.MaxY,
+                glyph.GlyphPoints,
+                glyph.EndPoints,
+                glyph.GlyphInstructions,
+                glyphSizeInPoints);
+
+        }
+        public GlyphPointF[] HintGlyph(
+            int horizontalAdv,
+            int hFrontSideBearing,
+            int minX,
+            int maxY,
+            GlyphPointF[] glyphPoints,
+            ushort[] contourEndPoints,
+            byte[] instructions,
+            float glyphSizeInPoints)
+        {
+
+            //get glyph for its matrix
+
+            //TODO: review here again
+
+            int verticalAdv = 0;
+            int vFrontSideBearing = 0;
+            var pp1 = new GlyphPointF((minX - hFrontSideBearing), 0, true);
+            var pp2 = new GlyphPointF(pp1.X + horizontalAdv, 0, true);
+            var pp3 = new GlyphPointF(0, maxY + vFrontSideBearing, true);
+            var pp4 = new GlyphPointF(0, pp3.Y - verticalAdv, true);
+            //-------------------------
+
+            //2. use a clone version extend org with 4 elems
+            int orgLen = glyphPoints.Length;
+            GlyphPointF[] newGlyphPoints = Utils.CloneArray(glyphPoints, 4);
+            // add phantom points; these are used to define the extents of the glyph,
+            // and can be modified by hinting instructions
+            newGlyphPoints[orgLen] = pp1;
+            newGlyphPoints[orgLen + 1] = pp2;
+            newGlyphPoints[orgLen + 2] = pp3;
+            newGlyphPoints[orgLen + 3] = pp4;
+
+            //3. scale all point to target pixel size
+            float pxScale = currentTypeFace.CalculateFromPointToPixelScale(glyphSizeInPoints);
+            for (int i = orgLen + 4; i >= 0; --i)
+            {
+                newGlyphPoints[i].ApplyScale(pxScale);
+            }
+
+            //----------------------------------------------
+            //test : agg's vertical hint
+            //apply large scale on horizontal axis only 
+            //translate and then scale back
+            float agg_x_scale = 1000;
+            //
+            if (UseVerticalHinting)
+            {
+                ApplyScaleOnlyOnXAxis(newGlyphPoints, agg_x_scale);
+            }
+
+            //4. 
+            float sizeInPixels = Typeface.ConvPointsToPixels(glyphSizeInPoints);
+            _interpreter.SetControlValueTable(currentTypeFace.ControlValues,
+                pxScale,
+                sizeInPixels,
+                currentTypeFace.PrepProgramBuffer);
+            //--------------------------------------------------
+            //5. hint
+            _interpreter.HintGlyph(newGlyphPoints, contourEndPoints, instructions);
+
+            //6. scale back
+            if (UseVerticalHinting)
+            {
+                ApplyScaleOnlyOnXAxis(newGlyphPoints, 1f / agg_x_scale);
+            }
+            return newGlyphPoints;
+
+        }
+
+        public bool UseVerticalHinting { get; set; }
+
+        static void ApplyScaleOnlyOnXAxis(GlyphPointF[] glyphPoints, float xscale)
+        {
+            //TODO: review performance here
+            for (int i = glyphPoints.Length - 1; i >= 0; --i)
+            {
+                glyphPoints[i].ApplyScaleOnlyOnXAxis(xscale);
+            }
+
+        }
+
+    }
+
+
+    /// <summary>
+    /// SharpFont's TrueType Interpreter
+    /// </summary>
+    class SharpFontInterpreter
     {
         GraphicsState state;
         GraphicsState cvtState;
@@ -25,7 +155,7 @@ namespace SharpFont
         Zone zp0, zp1, zp2;
         Zone points, twilight;
 
-        public Interpreter(int maxStack, int maxStorage, int maxFunctions, int maxInstructionDefs, int maxTwilightPoints)
+        public SharpFontInterpreter(int maxStack, int maxStorage, int maxFunctions, int maxInstructionDefs, int maxTwilightPoints)
         {
             stack = new ExecutionStack(maxStack);
             storage = new int[maxStorage];
@@ -97,7 +227,9 @@ namespace SharpFont
             // reset all of our shared state
             state = cvtState;
             callStackSize = 0;
+#if DEBUG
             debugList.Clear();
+#endif
             stack.Clear();
             OnVectorsUpdated();
 
@@ -111,15 +243,18 @@ namespace SharpFont
             Execute(new InstructionStream(instructions), false, false);
         }
 
+#if DEBUG
         System.Collections.Generic.List<OpCode> debugList = new System.Collections.Generic.List<OpCode>();
-
+#endif
         void Execute(InstructionStream stream, bool inFunction, bool allowFunctionDefs)
         {
             // dispatch each instruction in the stream
             while (!stream.Done)
             {
                 var opcode = stream.NextOpCode();
+#if DEBUG
                 debugList.Add(opcode);
+#endif
                 switch (opcode)
                 {
                     // ==== PUSH INSTRUCTIONS ====

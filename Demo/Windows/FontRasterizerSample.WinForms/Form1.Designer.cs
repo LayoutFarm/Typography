@@ -59,7 +59,7 @@
             this.button1.TabIndex = 0;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+          
             // 
             // txtInputChar
             // 
@@ -68,7 +68,7 @@
             this.txtInputChar.Size = new System.Drawing.Size(101, 20);
             this.txtInputChar.TabIndex = 1;
             this.txtInputChar.Text = "I";
-            this.txtInputChar.TextChanged += new System.EventHandler(this.txtInputChar_TextChanged);
+           
             // 
             // label1
             // 
@@ -98,7 +98,7 @@
             this.chkFillBackground.TabIndex = 4;
             this.chkFillBackground.Text = "Fill BackGround";
             this.chkFillBackground.UseVisualStyleBackColor = true;
-            this.chkFillBackground.CheckedChanged += new System.EventHandler(this.chkFillBackground_CheckedChanged);
+            
             // 
             // cmbRenderChoices
             // 
@@ -116,7 +116,7 @@
             this.lstFontSizes.Name = "lstFontSizes";
             this.lstFontSizes.Size = new System.Drawing.Size(121, 212);
             this.lstFontSizes.TabIndex = 8;
-            this.lstFontSizes.SelectedIndexChanged += new System.EventHandler(this.lstFontSizes_SelectedIndexChanged);
+            
             // 
             // label2
             // 
@@ -148,7 +148,7 @@
             this.chkShowTess.TabIndex = 13;
             this.chkShowTess.Text = "Show Tesselation";
             this.chkShowTess.UseVisualStyleBackColor = true;
-            this.chkShowTess.CheckedChanged += new System.EventHandler(this.chkShowTess_CheckedChanged);
+             
             // 
             // chkShowGrid
             // 
@@ -159,7 +159,7 @@
             this.chkShowGrid.TabIndex = 14;
             this.chkShowGrid.Text = "Show Grid";
             this.chkShowGrid.UseVisualStyleBackColor = true;
-            this.chkShowGrid.CheckedChanged += new System.EventHandler(this.chkShowGrid_CheckedChanged);
+            
             // 
             // txtGridSize
             // 
@@ -180,7 +180,7 @@
             this.chkYGridFitting.TabIndex = 16;
             this.chkYGridFitting.Text = "Y Grid Auto Fitting";
             this.chkYGridFitting.UseVisualStyleBackColor = true;
-            this.chkYGridFitting.CheckedChanged += new System.EventHandler(this.chkYGridFitting_CheckedChanged);
+           
             // 
             // chkDrawBone
             // 
@@ -193,7 +193,7 @@
             this.chkDrawBone.TabIndex = 19;
             this.chkDrawBone.Text = "DrawBone";
             this.chkDrawBone.UseVisualStyleBackColor = true;
-            this.chkDrawBone.CheckedChanged += new System.EventHandler(this.chkDrawBone_CheckedChanged);
+             
             // 
             // chkXGridFitting
             // 
@@ -204,7 +204,7 @@
             this.chkXGridFitting.TabIndex = 20;
             this.chkXGridFitting.Text = "X Grid Auto Fitting";
             this.chkXGridFitting.UseVisualStyleBackColor = true;
-            this.chkXGridFitting.CheckedChanged += new System.EventHandler(this.chkXGridFitting_CheckedChanged);
+
             // 
             // chkLcdTechnique
             // 
@@ -215,7 +215,7 @@
             this.chkLcdTechnique.TabIndex = 21;
             this.chkLcdTechnique.Text = "LcdTechnique";
             this.chkLcdTechnique.UseVisualStyleBackColor = true;
-            this.chkLcdTechnique.CheckedChanged += new System.EventHandler(this.chkLcdTechnique_CheckedChanged);
+            
             // 
             // cmdBuildMsdfTexture
             // 
@@ -264,7 +264,7 @@
             this.chkGsubEnableLigature.TabIndex = 26;
             this.chkGsubEnableLigature.Text = "GSUB: Enable Ligature";
             this.chkGsubEnableLigature.UseVisualStyleBackColor = true;
-            this.chkGsubEnableLigature.CheckedChanged += new System.EventHandler(this.chkGsubEnableLigature_CheckedChanged);
+           
             // 
             // Form1
             // 

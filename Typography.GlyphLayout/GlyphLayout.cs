@@ -116,7 +116,7 @@ namespace Typography.TextLayout
                 glyphSetPos.DoGlyphPosition(glyphPositions);
             }
             //--------------
-            float scale = typeface.CalculateScale(size);
+            float scale = typeface.CalculateFromPointToPixelScale(size);
             float cx = 0;
             float cy = 0;
 

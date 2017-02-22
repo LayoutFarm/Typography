@@ -1,9 +1,9 @@
 ![PixelFarm's Typography](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title2.png)
 ===========
 
-Pure C# TrueType and OpenType Font Reader, Glyph Layout and Rendering.
+Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.
 
- * 1.Loads .ttf files, with OpenTypeReader (Big thanks go to NOpenType ,https://github.com/vidstige/NRasterizer)
+ * 1.Loads .ttf files, with OpenFontReader (Big thanks go to NOpenType ,https://github.com/vidstige/NRasterizer)
  
  * 2.Rasterizes char to bitmap with pure software renderer + Agg(anti grain geometry) Quality! with 
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
