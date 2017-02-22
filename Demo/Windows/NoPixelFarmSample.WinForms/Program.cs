@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace NoPixelFarmSample.WinForms
+namespace SampleWinForms
 {
     static class Program
     {

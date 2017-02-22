@@ -1,8 +1,11 @@
 This is a simple example, 
 
-use Typography.OpenFont
+use
+- Typography.OpenFont
+- Typography.Msdf
+- Typography.GlyphLayout
 
-and not need PixelFarm Rendering lib.
+and NOT NEED PixelFarm Rendering lib.
 
 
 

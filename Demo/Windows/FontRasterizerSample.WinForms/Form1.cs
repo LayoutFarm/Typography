@@ -91,7 +91,6 @@ namespace SampleWinForms
             string selectedFontFileName = "tahoma.ttf";
             //string selectedFontFileName="cambriaz.ttf";
             //string selectedFontFileName="CompositeMS2.ttf"; 
-
             int fileIndexCount = 0;
             foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
             {
@@ -124,25 +123,7 @@ namespace SampleWinForms
             this.chkFillBackground.Checked = true;
         }
 
-        class TempLocalFontFile
-        {
-            //temp only
-            public readonly string actualFileName;
-            public TempLocalFontFile(string actualFileName)
-            {
-                this.actualFileName = actualFileName;
-            }
-            public string OnlyFileName
-            {
-                get { return Path.GetFileName(actualFileName); }
-            }
-#if DEBUG
-            public override string ToString()
-            {
-                return this.OnlyFileName;
-            }
-#endif            
-        }
+      
         enum RenderChoice
         {
             RenderWithMiniAgg,
@@ -741,13 +722,14 @@ namespace SampleWinForms
         }
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
         {
-            //string sampleFontFile = @"..\..\tahoma.ttf";
-            //CreateSampleMsdfTextureFont(
-            //    sampleFontFile,
-            //    18,
-            //    0,
-            //    255,
-            //    "d:\\WImageTest\\sample_msdf.png");
+
+            string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
+            CreateSampleMsdfTextureFont(
+                sampleFontFile,
+                18,
+                0,
+                255,
+                "d:\\WImageTest\\sample_msdf.png");
 
         }
         static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
