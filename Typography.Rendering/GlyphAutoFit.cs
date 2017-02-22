@@ -1,7 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System;
 using System.Collections.Generic;
-using PixelFarm.VectorMath;
 using Typography.OpenFont;
 namespace Typography.Rendering
 {
