@@ -46,14 +46,8 @@
     <Compile Include="..\..\NetCore\Typography.OpenFont\Glyph.cs">
       <Link>Glyph.cs</Link>
     </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenFont\GlyphPathBuilder.cs">
-      <Link>GlyphPathBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenFont\GlyphPathBuilderBase.cs">
-      <Link>GlyphPathBuilderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenFont\IGlyphRasterizer.cs">
-      <Link>IGlyphRasterizer.cs</Link>
+    <Compile Include="..\..\NetCore\Typography.OpenFont\IGlyphPathBuilder.cs">
+      <Link>IGlyphPathBuilder.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenFont\IO\ByteOrderSwappingBinaryReader.cs">
       <Link>IO\ByteOrderSwappingBinaryReader.cs</Link>

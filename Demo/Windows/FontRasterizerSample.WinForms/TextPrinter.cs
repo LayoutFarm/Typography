@@ -53,11 +53,10 @@ namespace SampleWinForms
         {
             //1. layout
             _glyphLayout.Layout(typeface, size, str, glyphPlanBuffer);
-
-
-            var glyphPathBuilder = new GlyphPathBuilderVxs(typeface);
+            var glyphPathBuilder = new MyGlyphPathBuilder(typeface);
             int j = glyphPlanBuffer.Count;
 
+            float pxScale = typeface.CalculateFromPointToPixelScale(size);
             for (int i = 0; i < j; ++i)
             {
 
@@ -68,7 +67,9 @@ namespace SampleWinForms
                 //-----------------------------------  
                 glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, size);
                 //-----------------------------------  
-                glyphPlan.vxs = glyphPathBuilder.GetVxs();
+                var vxsBuilder = new GlyphPathBuilderVxs();
+                glyphPathBuilder.ReadShapes(vxsBuilder); 
+                glyphPlan.vxs = vxsBuilder.GetVxs(pxScale);
             }
 
         }

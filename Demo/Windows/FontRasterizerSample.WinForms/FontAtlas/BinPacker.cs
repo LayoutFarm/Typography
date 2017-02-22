@@ -4,7 +4,9 @@ using System;
 namespace PixelFarm.Drawing.Fonts
 {
     public struct Rect
-    {
+    { 
+        //TODO: review here 
+     
         public int X, Y, Width, Height;
         public int Right { get { return X + Width; } }
         public int Bottom { get { return Y + Height; } }
@@ -27,6 +29,9 @@ namespace PixelFarm.Drawing.Fonts
 
     struct ResizableArray<T>
     {
+        //TODO: review here 
+        //use List<T>
+
         public T[] Data;
         public int Count;
 
