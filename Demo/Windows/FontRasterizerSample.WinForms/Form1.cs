@@ -334,44 +334,11 @@ namespace SampleWinForms
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
             var msdfGlyphGen = new MsdfGlyphGen();
-
-            Msdfgen.Shape shape = msdfGlyphGen.CreateMsdf(builder.GetOutputPoints(),
+            ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
+                builder.GetOutputPoints(),
                 builder.GetOutputContours(),
                 builder.GetPixelScale());
-            //shape.InverseYAxis = false;
-            double left, bottom, right, top;
-            shape.findBounds(out left, out bottom, out right, out top);
 
-            Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
-            Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
-            Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
-            //
-            int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
-
-            //#if DEBUG
-            //            System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
-
-            //            {
-            //                int nn = buffer.Length;
-            //                for (int mm = 0; mm < nn; ++mm)
-            //                {
-            //                    stbuilder.AppendLine(buffer[mm].ToString("X"));
-            //                }
-            //            }
-            //            File.WriteAllText("d:\\WImageTest\\a02.txt", stbuilder.ToString());
-            //#endif
-
-            int w = frgbBmp.Width;
-            int h = frgbBmp.Height;
-            if (w < 5)
-            {
-                w = 5;
-            }
-            if (h < 5)
-            {
-                h = 5;
-            }
-            ActualImage actualImg = ActualImage.CreateFromBuffer(w, h, PixelFormat.ARGB32, buffer);
             p.DrawImage(actualImg, 0, 0);
 
             //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -768,30 +735,12 @@ namespace SampleWinForms
                 {
                     //build glyph
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
-                    Msdfgen.Shape shape = msdfBuilder.CreateMsdf(
+
+                    var msdfGlyphGen = new MsdfGlyphGen();
+                    ActualImage actualImg = msdfGlyphGen.CreateMsdfImage(
                         builder.GetOutputPoints(),
                         builder.GetOutputContours(),
-                        builder.GetPixelScale());
-                    shape.InverseYAxis = true;
-                    double left, bottom, right, top;
-                    shape.findBounds(out left, out bottom, out right, out top);
-
-                    Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp((int)Math.Ceiling((right - left)), (int)Math.Ceiling((top - bottom)));
-                    Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
-                    Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
-                    //-----------------------------------
-                    int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
-                    int w = frgbBmp.Width;
-                    int h = frgbBmp.Height;
-                    if (w < 5)
-                    {
-                        w = 5;
-                    }
-                    if (h < 5)
-                    {
-                        h = 5;
-                    }
-                    ActualImage actualImg = ActualImage.CreateFromBuffer(w, h, PixelFormat.ARGB32, buffer);
+                        builder.GetPixelScale());                     
                     atlasBuilder.AddGlyph((int)n, actualImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
