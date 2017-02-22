@@ -175,6 +175,7 @@ namespace SampleWinForms
         }
 
 
+
         void ReadAndRender(string fontfile)
         {
 
@@ -186,32 +187,49 @@ namespace SampleWinForms
             var reader = new OpenFontReader();
             char testChar = txtInputChar.Text[0];//only 1 char 
             int resolution = 96;
+            //1. read typeface from font file
 
-            using (var fs = new FileStream(fontfile, FileMode.Open))
+            RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
+            switch (renderChoice)
             {
-                //1. read typeface from font file
-                Typeface typeFace = reader.Read(fs);
+                case RenderChoice.RenderWithMiniAgg:
+                    {
+                        using (var fs = new FileStream(fontfile, FileMode.Open))
+                        {
+                            Typeface typeFace = reader.Read(fs);
+                            RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
+                        }
+                    }
+                    break;
+                case RenderChoice.RenderWithGdiPlusPath:
+                    {
+                        using (var fs = new FileStream(fontfile, FileMode.Open))
+                        {
+                            Typeface typeFace = reader.Read(fs);
+                            RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
+                        }
+                    }
+                    break;
+                case RenderChoice.RenderWithTextPrinterAndMiniAgg:
+                    {
 
-                RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
-                switch (renderChoice)
-                {
-                    case RenderChoice.RenderWithMiniAgg:
-                        RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
-                        break;
-                    case RenderChoice.RenderWithGdiPlusPath:
-                        RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
-                        break;
-                    case RenderChoice.RenderWithTextPrinterAndMiniAgg:
-                        RenderWithTextPrinterAndMiniAgg(typeFace, this.txtInputChar.Text, fontSizeInPoint, resolution);
-                        break;
-                    case RenderChoice.RenderWithMsdfGen:
-                    case RenderChoice.RenderWithSdfGen:
-                        RenderWithMsdfImg(typeFace, testChar, fontSizeInPoint);
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
+                        RenderWithTextPrinterAndMiniAgg(fontfile, this.txtInputChar.Text, fontSizeInPoint, resolution);
+                    }
+                    break;
+                case RenderChoice.RenderWithMsdfGen:
+                case RenderChoice.RenderWithSdfGen:
+                    {
+                        using (var fs = new FileStream(fontfile, FileMode.Open))
+                        {
+                            Typeface typeFace = reader.Read(fs);
+                            RenderWithMsdfImg(typeFace, testChar, fontSizeInPoint);
+                        }
+                    }
+                    break;
+                default:
+                    throw new NotSupportedException();
             }
+
         }
 
 
@@ -608,21 +626,30 @@ namespace SampleWinForms
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
-        void RenderWithTextPrinterAndMiniAgg(Typeface typeface, string str, float sizeInPoint, int resolution)
+
+
+        TextPrinter printer2;
+        void RenderWithTextPrinterAndMiniAgg(string fontfile, string str, float sizeInPoint, int resolution)
         {
             //1. 
-            TextPrinter printer = new TextPrinter();
-            printer.ScriptLang = ScriptLangs.Thai;
+            if (printer2 == null)
+            {
+                printer2 = new TextPrinter();
+                printer2.ScriptLang = ScriptLangs.Thai;
+            }
+
+
+            printer2.FontFile = fontfile;
             //
-            printer.EnableLigature = this.chkGsubEnableLigature.Checked;
-            printer.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
+            printer2.EnableLigature = this.chkGsubEnableLigature.Checked;
+            printer2.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
             //printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
             //
             int len = str.Length;
             //
             List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
-            printer.Print(typeface, sizeInPoint, str, glyphPlanList);
+            printer2.Print(sizeInPoint, str, glyphPlanList);
             //--------------------------
 
             //5. use PixelFarm's Agg to render to bitmap...
