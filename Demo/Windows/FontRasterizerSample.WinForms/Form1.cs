@@ -35,7 +35,7 @@ namespace SampleWinForms
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //----------
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithPlugableGlyphRasterizer);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
             cmbRenderChoices.SelectedIndex = 2;
@@ -146,7 +146,7 @@ namespace SampleWinForms
         enum RenderChoice
         {
             RenderWithMiniAgg,
-            RenderWithPlugableGlyphRasterizer,
+            RenderWithGdiPlusPath,
             RenderWithTextPrinterAndMiniAgg,
             RenderWithMsdfGen, //rendering with multi-channel signed distance field img
             RenderWithSdfGen//not support sdfgen
@@ -198,8 +198,8 @@ namespace SampleWinForms
                     case RenderChoice.RenderWithMiniAgg:
                         RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
                         break;
-                    case RenderChoice.RenderWithPlugableGlyphRasterizer:
-                        RenderWithPlugableGlyphRasterizer(typeFace, testChar, fontSizeInPoint, resolution);
+                    case RenderChoice.RenderWithGdiPlusPath:
+                        RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
                         break;
                     case RenderChoice.RenderWithTextPrinterAndMiniAgg:
                         RenderWithTextPrinterAndMiniAgg(typeFace, this.txtInputChar.Text, fontSizeInPoint, resolution);
@@ -552,7 +552,7 @@ namespace SampleWinForms
             }
         }
 
-        void RenderWithPlugableGlyphRasterizer(Typeface typeface, char testChar, float sizeInPoint, int resolution)
+        void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
         {
             //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             //g.Clear(Color.White);
