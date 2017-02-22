@@ -249,7 +249,7 @@ namespace Typography.Rendering
                 Rectangle area = ParseRect(glyphElem.GetAttribute("ltwh"));
                 var glyphData = new TextureFontGlyphData();
                 area.Y += area.Height;//*** 
-                glyphData.Rect = area;
+                glyphData.Rect = new OpenFont.Bounds((short)area.X, (short)area.Bottom, (short)area.Right, (short)area.Top);
                 float[] borderXY = ParseFloatArray(glyphElem.GetAttribute("borderXY"));
                 float[] matrix = ParseFloatArray(glyphElem.GetAttribute("mat"));
 
