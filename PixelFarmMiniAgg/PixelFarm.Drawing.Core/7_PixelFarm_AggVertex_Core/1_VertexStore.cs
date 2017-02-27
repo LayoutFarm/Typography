@@ -46,8 +46,6 @@ namespace PixelFarm.Agg
         }
 
 
-        internal bool HasMoreThanOnePart { get; set; }
-
         /// <summary>
         /// num of vertex
         /// </summary>
@@ -62,7 +60,7 @@ namespace PixelFarm.Agg
                 return GetCommand(m_num_vertices - 1);
             }
 
-            return VertexCmd.Stop;
+            return VertexCmd.NoMore;
         }
         public VertexCmd GetLastVertex(out double x, out double y)
         {
@@ -73,7 +71,7 @@ namespace PixelFarm.Agg
 
             x = 0;
             y = 0;
-            return VertexCmd.Stop;
+            return VertexCmd.NoMore;
         }
 
         public VertexCmd GetVertex(int index, out double x, out double y)
@@ -93,12 +91,11 @@ namespace PixelFarm.Agg
         {
             return (VertexCmd)m_cmds[index];
         }
-        //--------------------------------------------------
-        //mutable properties
+
         public void Clear()
         {
             m_num_vertices = 0;
-            System.Array.Clear(m_cmds, 0, m_cmds.Length); 
+            System.Array.Clear(m_cmds, 0, m_cmds.Length);
         }
         public void AddVertex(double x, double y, VertexCmd cmd)
         {
@@ -140,11 +137,17 @@ namespace PixelFarm.Agg
         }
         public void AddCloseFigure()
         {
-            AddVertex(0, 0, VertexCmd.CloseAndEndFigure);
+            AddVertex(0, 0, VertexCmd.Close);
         }
-        public void AddStop()
+
+        public void EndGroup()
         {
-            AddVertex(0, 0, VertexCmd.Stop);
+            if (m_num_vertices > 0)
+            {
+
+                m_cmds[m_num_vertices - 1] = (byte)VertexCmd.CloseAndEndFigure;
+            }
+
         }
         internal void ReplaceVertex(int index, double x, double y)
         {
@@ -244,21 +247,21 @@ namespace PixelFarm.Agg
         }
         //----------------------------------------------------------
 
-        public void AddSubVertices(VertexStore anotherVxs)
-        {
-            int j = anotherVxs.Count;
-            this.HasMoreThanOnePart = true;
-            for (int i = 0; i < j; ++i)
-            {
-                double x, y;
-                VertexCmd cmd = anotherVxs.GetVertex(i, out x, out y);
-                this.AddVertex(x, y, cmd);
-                if (cmd == VertexCmd.Stop)
-                {
-                    break;
-                }
-            }
-        }
+        //public void AddSubVertices(VertexStore anotherVxs)
+        //{
+        //    int j = anotherVxs.Count;
+        //    this.HasMoreThanOnePart = true;
+        //    for (int i = 0; i < j; ++i)
+        //    {
+        //        double x, y;
+        //        VertexCmd cmd = anotherVxs.GetVertex(i, out x, out y);
+        //        this.AddVertex(x, y, cmd);
+        //        if (cmd == VertexCmd.Stop)
+        //        {
+        //            break;
+        //        }
+        //    }
+        //}
         //internal use only!
         public static void UnsafeDirectSetData(
             VertexStore vstore,
@@ -287,6 +290,7 @@ namespace PixelFarm.Agg
 
         private VertexStore(VertexStore src)
         {
+            //for copy from src to this instance
 
             this.m_allocated_vertices = src.m_allocated_vertices;
             this.m_num_vertices = src.m_num_vertices;
@@ -326,6 +330,6 @@ namespace PixelFarm.Agg
 
 
 
-    
+
 
 }

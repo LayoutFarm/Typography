@@ -187,7 +187,7 @@ namespace SampleWinForms
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
-                var atlasBuilder = new SimpleFontAtlasBuilder2();
+                var atlasBuilder = new SimpleFontAtlasBuilder();
                 var msdfBuilder = new MsdfGlyphGen();
 
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)

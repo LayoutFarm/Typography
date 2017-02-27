@@ -47,6 +47,15 @@ namespace PixelFarm.Agg.Lines
 
         public byte GetProfileValue(int dist)
         {
+
+            //#if DEBUG
+            //            int tmp = dist + SUBPIX_SCALE * 2;
+            //            if (tmp < 0 || tmp > m_profile.Length)
+            //            {
+            //                //?
+            //                return 255;
+            //            }
+            //#endif
             return m_profile[dist + SUBPIX_SCALE * 2];
         }
 
@@ -93,6 +102,7 @@ namespace PixelFarm.Agg.Lines
             double base_val = 1.0;
             if (center_width == 0.0) center_width = 1.0 / SUBPIX_SCALE;
             if (smoother_width == 0.0) smoother_width = 1.0 / SUBPIX_SCALE;
+            //
             double width = center_width + smoother_width;
             if (width < m_min_width)
             {
@@ -104,10 +114,13 @@ namespace PixelFarm.Agg.Lines
 
             byte[] ch = GetProfileBuffer(center_width + smoother_width);
             int chIndex = 0;
+            //
             int subpixel_center_width = (int)(center_width * SUBPIX_SCALE);
             int subpixel_smoother_width = (int)(smoother_width * SUBPIX_SCALE);
+            //
             int ch_center = SUBPIX_SCALE * 2;
             int ch_smoother = ch_center + subpixel_center_width;
+            //
             int i;
             int val = m_gamma[(int)(base_val * AA_MASK)];
             chIndex = ch_center;

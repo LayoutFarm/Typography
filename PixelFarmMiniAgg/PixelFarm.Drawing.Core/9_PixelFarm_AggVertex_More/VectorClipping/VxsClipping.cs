@@ -75,23 +75,10 @@ namespace PixelFarm.Agg.VertexSource
                             }
                         }
                         output.CloseFigure();
-                    }
-
-                    //bool first = true;
-                    //foreach (IntPoint point in polygon)
-                    //{
-                    //    if (first)
-                    //    {
-                    //        output.AddVertex(point.X / 1000.0, point.Y / 1000.0, ShapePath.FlagsAndCommand.CommandMoveTo);
-                    //        first = false;
-                    //    }
-                    //    else
-                    //    {
-                    //        output.AddVertex(point.X / 1000.0, point.Y / 1000.0, ShapePath.FlagsAndCommand.CommandLineTo);
-                    //    }
-                    //} 
+                    } 
                 }
 
+                //TODO: review here
                 output.Stop();
                 resultList.Add(output.Vxs);
             }
@@ -136,7 +123,7 @@ namespace PixelFarm.Agg.VertexSource
                     }
                 }
                 cmd = snapIter.GetNextVertex(out x, out y);
-            } while (cmd != VertexCmd.Stop);
+            } while (cmd != VertexCmd.NoMore);
             return allPolys;
         }
     }

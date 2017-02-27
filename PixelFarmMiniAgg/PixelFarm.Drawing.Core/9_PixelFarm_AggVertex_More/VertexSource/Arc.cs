@@ -156,7 +156,7 @@ namespace PixelFarm.Agg.VertexSource
                 vertexData.x = endX;
                 vertexData.y = endY;
                 yield return vertexData;
-                vertexData.command = VertexCmd.Stop;
+                vertexData.command = VertexCmd.NoMore;
                 yield return vertexData;
             }
             else
@@ -180,7 +180,7 @@ namespace PixelFarm.Agg.VertexSource
                 vertexData.x = originX + Math.Cos(endAngle) * radiusX;
                 vertexData.y = originY + Math.Sin(endAngle) * radiusY;
                 yield return vertexData;
-                vertexData.command = VertexCmd.Stop;
+                vertexData.command = VertexCmd.NoMore;
                 yield return vertexData;
             }
         }

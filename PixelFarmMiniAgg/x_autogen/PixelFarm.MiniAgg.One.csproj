@@ -8,7 +8,6 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AssemblyName>PixelFarm.MiniAgg.One</AssemblyName>
-    <ProjectGuid>{1088370F-1A7E-421B-BBCB-400A8EDA5F1F}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -18,7 +17,7 @@
     <Optimize>false</Optimize>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG; TRACE</DefineConstants>
+    <DefineConstants>DEBUG; TRACE PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -27,7 +26,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <DefineConstants> TRACE</DefineConstants>
+    <DefineConstants> TRACE PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -44,9 +43,6 @@
     </Compile>
     <Compile Include="..\MiniAgg.Complements\0_CanvasPainter\dbugVertexSourceIO.cs">
       <Link>MiniAgg.Complements\0_CanvasPainter\dbugVertexSourceIO.cs</Link>
-    </Compile>
-    <Compile Include="..\MiniAgg.Complements\0_CanvasPainter\TextPrinter.cs">
-      <Link>MiniAgg.Complements\0_CanvasPainter\TextPrinter.cs</Link>
     </Compile>
     <Compile Include="..\MiniAgg.Complements\1_Base\BorderDouble.cs">
       <Link>MiniAgg.Complements\1_Base\BorderDouble.cs</Link>
@@ -258,26 +254,35 @@
     <Compile Include="..\MiniAgg\08_ImageResampling\ImageTransform.cs">
       <Link>MiniAgg\08_ImageResampling\ImageTransform.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\0_Start\ExtensionAttribute.cs">
-      <Link>PixelFarm.Drawing.Core\0_Start\ExtensionAttribute.cs</Link>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CubicBezier.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CubicBezier.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\0_Start\GraphicsPlatform.cs">
-      <Link>PixelFarm.Drawing.Core\0_Start\GraphicsPlatform.cs</Link>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveBuilder.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveFit.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveFit.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveFitBase.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveFitBase.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurvePreprocess.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurvePreprocess.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\Spline.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\Spline.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\SplineBuilder.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\SplineBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\VectorHelper.cs">
+      <Link>PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\VectorHelper.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\BasicGeometries.cs">
       <Link>PixelFarm.Drawing.Core\1_Drawing\BasicGeometries.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Brushes_Pens.cs">
       <Link>PixelFarm.Drawing.Core\1_Drawing\Brushes_Pens.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Canvas.cs">
-      <Link>PixelFarm.Drawing.Core\1_Drawing\Canvas.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\CanvasOptions.cs">
-      <Link>PixelFarm.Drawing.Core\1_Drawing\CanvasOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\CanvasPaintToOutputDelegate.cs">
-      <Link>PixelFarm.Drawing.Core\1_Drawing\CanvasPaintToOutputDelegate.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Color.cs">
       <Link>PixelFarm.Drawing.Core\1_Drawing\Color.cs</Link>
@@ -287,12 +292,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\DashStyle.cs">
       <Link>PixelFarm.Drawing.Core\1_Drawing\DashStyle.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\Fonts.cs">
-      <Link>PixelFarm.Drawing.Core\1_Drawing\Fonts.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\FontStyle.cs">
-      <Link>PixelFarm.Drawing.Core\1_Drawing\FontStyle.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\GraphicsPath.cs">
       <Link>PixelFarm.Drawing.Core\1_Drawing\GraphicsPath.cs</Link>
@@ -312,29 +311,8 @@
     <Compile Include="..\PixelFarm.Drawing.Core\1_Drawing\RenderVx.cs">
       <Link>PixelFarm.Drawing.Core\1_Drawing\RenderVx.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\ActualFont.cs">
-      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\ActualFont.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\FontFace.cs">
-      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\FontFace.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\FontGlyph.cs">
-      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\FontGlyph.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\FontKey.cs">
-      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\FontKey.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\3_Drawing_Fonts\NativeBridgeHB.cs">
-      <Link>PixelFarm.Drawing.Core\3_Drawing_Fonts\NativeBridgeHB.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\4_Drawing_Text\TextShapingAndLayoutService.cs">
-      <Link>PixelFarm.Drawing.Core\4_Drawing_Text\TextShapingAndLayoutService.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\5_PixelFarm_Agg\ActualImage.cs">
       <Link>PixelFarm.Drawing.Core\5_PixelFarm_Agg\ActualImage.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\5_PixelFarm_Agg\CanvasPainter.cs">
-      <Link>PixelFarm.Drawing.Core\5_PixelFarm_Agg\CanvasPainter.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\5_PixelFarm_Agg\PixelFormat.cs">
       <Link>PixelFarm.Drawing.Core\5_PixelFarm_Agg\PixelFormat.cs</Link>
@@ -432,30 +410,6 @@
     <Compile Include="..\PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\Viewport.cs">
       <Link>PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\Viewport.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CubicBezier.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CubicBezier.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveBuilder.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFit.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFit.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFitBase.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurveFitBase.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurvePreprocess.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\CurvePreprocess.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\Spline.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\Spline.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\SplineBuilder.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\SplineBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\VectorHelper.cs">
-      <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\CurveUtils\VectorHelper.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\HitTest\VertexHitTester.cs">
       <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\HitTest\VertexHitTester.cs</Link>
     </Compile>
@@ -507,11 +461,56 @@
     <Compile Include="..\PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexStoreBuilder.cs">
       <Link>PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexStoreBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Drawing.Core\ForNet20\ExtensionAttribute.cs">
+      <Link>PixelFarm.Drawing.Core\ForNet20\ExtensionAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\AggMemMx.cs">
       <Link>PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\AggMemMx.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\NativeBufferMx.cs">
       <Link>PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\NativeBufferMx.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\0_Start\GraphicsPlatform.cs">
+      <Link>PixelFarm.DrawingCanvas\0_Start\GraphicsPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\1_Canvas\Canvas.cs">
+      <Link>PixelFarm.DrawingCanvas\1_Canvas\Canvas.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\1_Canvas\CanvasOptions.cs">
+      <Link>PixelFarm.DrawingCanvas\1_Canvas\CanvasOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\1_Canvas\CanvasPainter.cs">
+      <Link>PixelFarm.DrawingCanvas\1_Canvas\CanvasPainter.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\1_Canvas\CanvasPaintToOutputDelegate.cs">
+      <Link>PixelFarm.DrawingCanvas\1_Canvas\CanvasPaintToOutputDelegate.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\2_Drawing\FontStyle.cs">
+      <Link>PixelFarm.DrawingCanvas\2_Drawing\FontStyle.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\2_Drawing\RequestFont.cs">
+      <Link>PixelFarm.DrawingCanvas\2_Drawing\RequestFont.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\3_Drawing_Fonts\ActualFont.cs">
+      <Link>PixelFarm.DrawingCanvas\3_Drawing_Fonts\ActualFont.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontFace.cs">
+      <Link>PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontFace.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontGlyph.cs">
+      <Link>PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontGlyph.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontKey.cs">
+      <Link>PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontKey.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\3_Drawing_Fonts\ITextPrinter.cs">
+      <Link>PixelFarm.DrawingCanvas\3_Drawing_Fonts\ITextPrinter.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\3_Drawing_Fonts\ScriptCode.cs">
+      <Link>PixelFarm.DrawingCanvas\3_Drawing_Fonts\ScriptCode.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\3_Drawing_Fonts\WriteDirection.cs">
+      <Link>PixelFarm.DrawingCanvas\3_Drawing_Fonts\WriteDirection.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

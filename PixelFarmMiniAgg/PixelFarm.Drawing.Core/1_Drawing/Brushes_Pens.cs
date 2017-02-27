@@ -243,12 +243,6 @@ namespace PixelFarm.Drawing
     }
 
 
-
-
-
-
-
-    //-------------------------------------------------------------------
     public abstract class PenBase : System.IDisposable
     {
         public abstract void Dispose();

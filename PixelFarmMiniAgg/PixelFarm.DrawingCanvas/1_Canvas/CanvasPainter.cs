@@ -22,10 +22,14 @@
 using PixelFarm.Drawing;
 namespace PixelFarm.Agg
 {
+
     public abstract class CanvasPainter
     {
-
         
+        public abstract float OriginX { get; }
+        public abstract float OriginY { get; }
+        public abstract void SetOrigin(float ox, float oy);
+        //-------------------------------------------------------
         public abstract int Width { get; }
         public abstract int Height { get; }
         public abstract RectInt ClipBox { get; set; }
@@ -33,11 +37,11 @@ namespace PixelFarm.Agg
         //-------------------------------------------------------
         public abstract double StrokeWidth { get; set; }
         public abstract SmoothingMode SmoothingMode { get; set; }
-        public abstract bool UseSubPixelRendering { get; set; } 
+        public abstract bool UseSubPixelRendering { get; set; }
         public abstract Color FillColor { get; set; }
         public abstract Color StrokeColor { get; set; }
         //-------------------------------------------------------
-        public abstract void Clear(Color color);                
+        public abstract void Clear(Color color);
         public abstract void FillCircle(double x, double y, double radius, Color color);
         public abstract void FillCircle(double x, double y, double radius);
         public abstract void FillEllipse(double left, double bottom, double right, double top);
@@ -58,14 +62,14 @@ namespace PixelFarm.Agg
         //-------------------------------------------------------
 
 
-       
+
 
         public abstract void DrawImage(ActualImage actualImage, double x, double y);
-        public abstract void DrawImage(ActualImage actualImage, params Transform.AffinePlan[] affinePlans); 
+        public abstract void DrawImage(ActualImage actualImage, params Transform.AffinePlan[] affinePlans);
         public abstract void DoFilterBlurStack(RectInt area, int r);
         public abstract void DoFilterBlurRecursive(RectInt area, int r);
         //-------------------------------------------------------
-      
+
 
         ////////////////////////////////////////////////////////////////////////////
         //vertext store/snap/rendervx
@@ -78,17 +82,15 @@ namespace PixelFarm.Agg
         public abstract void FillRenderVx(Brush brush, RenderVx renderVx);
         public abstract void FillRenderVx(RenderVx renderVx);
         public abstract void DrawRenderVx(RenderVx renderVx);
-        ////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////
         //text,string
         //TODO: review text drawing funcs 
+        
         public abstract RequestFont CurrentFont { get; set; }
         public abstract void DrawString(
            string text,
            double x,
-           double y);
-
-
-
+           double y); 
     }
 
 }

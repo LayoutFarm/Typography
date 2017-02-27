@@ -246,6 +246,8 @@ namespace PixelFarm.Agg.VertexSource
                             //-----------
                         }
                         break;
+
+                    case VertexCmd.Close:
                     case VertexCmd.CloseAndEndFigure:
                         {
                             latestCurveMode = CurvePointMode.NotCurve;
@@ -255,12 +257,7 @@ namespace PixelFarm.Agg.VertexSource
                             lasty = lastMoveY;
                         }
                         break;
-                    case VertexCmd.EndFigure:
-                        {
-                            latestCurveMode = CurvePointMode.NotCurve;
-                            vxs.AddVertex(x, y, cmd);
-                        }
-                        break;
+                     
                     default:
                         {
                             //move to, and end command
@@ -273,7 +270,7 @@ namespace PixelFarm.Agg.VertexSource
                         }
                         break;
                 }
-            } while (cmd != VertexCmd.Stop);
+            } while (cmd != VertexCmd.NoMore);
 
         }
         public VertexStore MakeVxs(VertexStore srcVxs, VertexStore outputVxs)
