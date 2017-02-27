@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -33,17 +33,34 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="0_Start\ExtensionAttribute.cs" />
-    <Compile Include="1_Drawing\RenderVx.cs" />
-    <Compile Include="3_Drawing_Fonts\FontGlyph.cs" />
-    <Compile Include="3_Drawing_Fonts\ActualFont.cs" />
-    <Compile Include="3_Drawing_Fonts\FontKey.cs" />
-    <Compile Include="3_Drawing_Fonts\NativeBridgeHB.cs" />
-    <Compile Include="4_Drawing_Text\TextShapingAndLayoutService.cs" />
+    <Compile Include="..\BurningMineCurve\CurveUtils\CubicBezier.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\CubicBezier.cs</Link>
+    </Compile>
+    <Compile Include="..\BurningMineCurve\CurveUtils\CurveBuilder.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\CurveBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\BurningMineCurve\CurveUtils\CurveFit.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\CurveFit.cs</Link>
+    </Compile>
+    <Compile Include="..\BurningMineCurve\CurveUtils\CurveFitBase.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\CurveFitBase.cs</Link>
+    </Compile>
+    <Compile Include="..\BurningMineCurve\CurveUtils\CurvePreprocess.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\CurvePreprocess.cs</Link>
+    </Compile>
+    <Compile Include="..\BurningMineCurve\CurveUtils\Spline.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\Spline.cs</Link>
+    </Compile>
+    <Compile Include="..\BurningMineCurve\CurveUtils\SplineBuilder.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\SplineBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\BurningMineCurve\CurveUtils\VectorHelper.cs">
+      <Link>9_PixelFarm_AggVertex_More\BurningMineCurves\VectorHelper.cs</Link>
+    </Compile>
     <Compile Include="5_PixelFarm_Agg\ActualImage.cs" />
-    <Compile Include="5_PixelFarm_Agg\CanvasPainter.cs" />
-    <Compile Include="3_Drawing_Fonts\FontFace.cs" />
     <Compile Include="5_PixelFarm_Agg\PixelFormat.cs" />
+    <Compile Include="ForNet20\ExtensionAttribute.cs" />
+    <Compile Include="1_Drawing\RenderVx.cs" />
     <Compile Include="6_PixelFarm_AggVectorMath\AggBasics.cs" />
     <Compile Include="6_PixelFarm_AggVectorMath\AggMath.cs" />
     <Compile Include="6_PixelFarm_AggVectorMath\AxisAlignedBoundingBox.cs" />
@@ -58,22 +75,16 @@
     <Compile Include="6_PixelFarm_AggVectorMath\Vector3.cs" />
     <Compile Include="6_PixelFarm_AggVectorMath\Vector3Float.cs" />
     <Compile Include="6_PixelFarm_AggVectorMath\Vector4.cs" />
-    <Compile Include="1_Drawing\CanvasPaintToOutputDelegate.cs" />
     <Compile Include="1_Drawing\CombineMode.cs" />
-    <Compile Include="1_Drawing\CanvasOptions.cs" />
     <Compile Include="1_Drawing\Brushes_Pens.cs" />
     <Compile Include="1_Drawing\Color.cs" />
     <Compile Include="1_Drawing\DashStyle.cs" />
-    <Compile Include="1_Drawing\Fonts.cs" />
     <Compile Include="1_Drawing\GraphicsPath.cs" />
-    <Compile Include="1_Drawing\FontStyle.cs" />
     <Compile Include="1_Drawing\Image_Bitmap.cs" />
     <Compile Include="1_Drawing\Rectangle.cs" />
     <Compile Include="1_Drawing\RectangleF.cs" />
     <Compile Include="1_Drawing\Region.cs" />
     <Compile Include="1_Drawing\BasicGeometries.cs" />
-    <Compile Include="0_Start\GraphicsPlatform.cs" />
-    <Compile Include="1_Drawing\Canvas.cs" />
     <Compile Include="7_PixelFarm_AggVertex_Core\0_VertexCommandAndOrientation.cs" />
     <Compile Include="7_PixelFarm_AggVertex_Core\1_VertexStore.cs" />
     <Compile Include="7_PixelFarm_AggVertex_Core\2_VertexStoreSnap.cs" />
@@ -91,14 +102,6 @@
     <Compile Include="7_PixelFarm_AggVertex_Core\RectD.cs" />
     <Compile Include="7_PixelFarm_AggVertex_Core\RectInt.cs" />
     <Compile Include="8_PixelFarm_AggTransforms\Viewport.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\CubicBezier.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\CurveBuilder.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\CurveFit.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\CurveFitBase.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\CurvePreprocess.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\Spline.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\SplineBuilder.cs" />
-    <Compile Include="9_PixelFarm_AggVertex_More\CurveUtils\VectorHelper.cs" />
     <Compile Include="9_PixelFarm_AggVertex_More\HitTest\VertexHitTester.cs" />
     <Compile Include="9_PixelFarm_AggVertex_More\VectorClipping\cliper.cs" />
     <Compile Include="9_PixelFarm_AggVertex_More\VectorClipping\VxsClipping.cs" />

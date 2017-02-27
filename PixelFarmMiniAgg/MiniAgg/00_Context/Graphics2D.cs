@@ -108,7 +108,7 @@ namespace PixelFarm.Agg
 
             dbug_v1.AddMoveTo(x1, y1);
             dbug_v1.AddLineTo(x2, y2);
-            dbug_v1.AddStop();
+            //dbug_v1.AddStop();
 
             dbugStroke.MakeVxs(dbug_v1, dbug_v2);
             Render(dbug_v2, color);

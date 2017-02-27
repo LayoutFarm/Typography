@@ -12,12 +12,17 @@ namespace PixelFarm.Agg
         //the order of these fields are significant!
         //---------------------------------
         //first lower 4 bits compact flags
-        Stop = 0x00,
-        //-----------------------
-        //end figure command 2 lower bits 
-        //is end command when 2 lower bit > HasMore
-        EndFigure = 0x02,
-        CloseAndEndFigure = 0x03,
+        /// <summary>
+        /// no more command
+        /// </summary>
+        NoMore = 0x00,
+        //-----------------------        
+        EndFigure = 0x01, //end current figure,( may not close eg line)
+        /// <summary>
+        /// close current polygon (but may not complete current figure)
+        /// </summary>
+        Close = 0x02,
+        CloseAndEndFigure = 0x03,//close current polygon + complete end figure
         //----------------------- 
         //start from move to is 
         MoveTo = 0x04,
@@ -36,25 +41,24 @@ namespace PixelFarm.Agg
     {
         public static bool IsVertextCommand(VertexCmd c)
         {
-            return c >= VertexCmd.MoveTo;
+            // return c >= VertexCmd.MoveTo;
+            return c > VertexCmd.NoMore;
         }
         public static bool IsEmpty(VertexCmd c)
         {
-            return c == VertexCmd.Stop;
+            return c == VertexCmd.NoMore;
         }
         public static bool IsMoveTo(VertexCmd c)
         {
             return c == VertexCmd.MoveTo;
         }
-        public static bool IsEndFigure(VertexCmd c)
+        public static bool IsCloseOrEnd(VertexCmd c)
         {
             //check only 2 lower bit
-            return ((int)c & 0x3) >= (int)VertexCmd.EndFigure;
+            //TODO: review here
+            return ((int)c & 0x3) >= (int)VertexCmd.Close;
         }
-        //public static bool IsClose(VertexCmd c)
-        //{
-        //    return c == VertexCmd.CloseAndEndFigure;
-        //}
+        
         public static bool IsNextPoly(VertexCmd c)
         {
             //?
@@ -150,8 +154,9 @@ namespace PixelFarm.Agg
                     int myvxs_count = myvxs.Count;
                     var orientFlags = isCW ? (int)EndVertexOrientation.CW : (int)EndVertexOrientation.CCW;
                     while (end < myvxs_count &&
-                          VertexHelper.IsEndFigure(flags = myvxs.GetCommand(end)))
+                          VertexHelper.IsCloseOrEnd(flags = myvxs.GetCommand(end)))
                     {
+                        //TODO: review hhere
                         myvxs.ReplaceVertex(end++, orientFlags, 0);
                         //myvxs.ReplaceCommand(end++, flags | orientFlags);// Path.set_orientation(cmd, orientation));
                     }

@@ -568,7 +568,7 @@ namespace PixelFarm.Agg.VertexSource
             {
                 x = 0;
                 y = 0;
-                return VertexCmd.Stop;
+                return VertexCmd.NoMore;
             }
 
             if (m_step == m_num_steps)
@@ -694,7 +694,7 @@ namespace PixelFarm.Agg.VertexSource
                 yield return vertexData;
             }
 
-            vertexData.command = VertexCmd.Stop;
+            vertexData.command = VertexCmd.NoMore;
             vertexData.position = new Vector2();
             yield return vertexData;
         }

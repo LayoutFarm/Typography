@@ -7,7 +7,7 @@ namespace Typography.Rendering
 {
     public static class MsdfGlyphGenExtension
     {
-        public static GlyphImage2 CreateMsdfImage(
+        public static GlyphImage CreateMsdfImage(
             this MsdfGlyphGen msdfGlyphGen,
             GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float pxScale = 1)
         {
@@ -31,7 +31,7 @@ namespace Typography.Rendering
             Msdfgen.MsdfGenerator.generateMSDF(frgbBmp, shape, 4, new Msdfgen.Vector2(1, 1), new Msdfgen.Vector2(), -1);
             //-----------------------------------
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
-            GlyphImage2 img = new Typography.Rendering.GlyphImage2(w, h);
+            GlyphImage img = new Typography.Rendering.GlyphImage(w, h);
             img.SetImageBuffer(buffer, false);
             return img;
         }

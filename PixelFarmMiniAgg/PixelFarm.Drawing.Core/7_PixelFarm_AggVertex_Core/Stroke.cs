@@ -89,15 +89,16 @@ namespace PixelFarm.Agg
             sourceVxs.GetVertex(0, out x, out y);
             strkgen.AddVertex(x, y, VertexCmd.MoveTo);
             double startX = x, startY = y;
-            bool hasMoreThanOnePart = false;
+           
             for (int i = 0; i < j; ++i)
             {
                 var cmd = sourceVxs.GetVertex(i, out x, out y);
                 switch (cmd)
                 {
-                    case VertexCmd.Stop:
+                    case VertexCmd.NoMore:
                         break;
-                    case VertexCmd.EndFigure:
+                    
+                    case VertexCmd.Close:
                     case VertexCmd.CloseAndEndFigure:
                         {
                             strkgen.AddVertex(x, y, cmd);
@@ -105,11 +106,9 @@ namespace PixelFarm.Agg
                             {
                                 strkgen.AddVertex(startX, startY, VertexCmd.LineTo);
                                 strkgen.WriteTo(vxs);
-                                strkgen.RemoveAll();
-                                hasMoreThanOnePart = true;
+                                strkgen.RemoveAll(); 
                             }
-                            //end this polygon
-
+                            //end this polygon 
                         }
                         break;
                     case VertexCmd.LineTo:
@@ -131,7 +130,7 @@ namespace PixelFarm.Agg
             }
             strkgen.WriteTo(vxs);
             strkgen.RemoveAll();
-            vxs.HasMoreThanOnePart = hasMoreThanOnePart;
+            //vxs.HasMoreThanOnePart = hasMoreThanOnePart;
 
             return vxs;
         }
