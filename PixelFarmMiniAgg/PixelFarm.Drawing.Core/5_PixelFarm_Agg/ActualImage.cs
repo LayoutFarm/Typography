@@ -19,8 +19,10 @@
 //----------------------------------------------------------------------------
 
 using System;
+
 namespace PixelFarm.Agg
 {
+
     public sealed class ActualImage : PixelFarm.Drawing.Image
     {
         int width;

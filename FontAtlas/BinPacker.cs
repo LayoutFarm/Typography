@@ -1,16 +1,16 @@
-﻿//MIT, 2015-2016, Michael Popoloski
+﻿//MIT, 2017, WinterDev
+//MIT, 2015-2016, Michael Popoloski
 
 using System;
 namespace Typography.Rendering
 {
-    public struct Rect
-    { 
+    public struct BinPackRect
+    {
         //TODO: review here 
-     
         public int X, Y, Width, Height;
         public int Right { get { return X + Width; } }
         public int Bottom { get { return Y + Height; } }
-        public Rect(int x, int y, int width, int height)
+        public BinPackRect(int x, int y, int width, int height)
         {
             X = x;
             Y = y;
@@ -18,7 +18,7 @@ namespace Typography.Rendering
             Height = height;
         }
 
-        public bool Contains(Rect rect)
+        public bool Contains(BinPackRect rect)
         {
             return rect.X >= X && rect.Y >= Y &&
                    rect.Right <= Right && rect.Bottom <= Bottom;
@@ -63,23 +63,23 @@ namespace Typography.Rendering
     // based on the "MAXRECTS" method developed by Jukka Jylänki: http://clb.demon.fi/files/RectangleBinPack.pdf
     public struct BinPacker
     {
-        ResizableArray<Rect> freeList;
+        ResizableArray<BinPackRect> freeList;
 
         public BinPacker(int width, int height)
         {
-            freeList = new ResizableArray<Rect>(16);
-            freeList.Add(new Rect(0, 0, width, height));
+            freeList = new ResizableArray<BinPackRect>(16);
+            freeList.Add(new BinPackRect(0, 0, width, height));
         }
 
         public void Clear(int width, int height)
         {
             freeList.Clear();
-            freeList.Add(new Rect(0, 0, width, height));
+            freeList.Add(new BinPackRect(0, 0, width, height));
         }
 
-        public Rect Insert(int width, int height)
+        public BinPackRect Insert(int width, int height)
         {
-            var bestNode = new Rect();
+            var bestNode = new BinPackRect();
             var bestShortFit = int.MaxValue;
             var bestLongFit = int.MaxValue;
 
@@ -98,7 +98,7 @@ namespace Typography.Rendering
 
                 if (shortFit < bestShortFit || (shortFit == bestShortFit && longFit < bestLongFit))
                 {
-                    bestNode = new Rect(rect.X, rect.Y, width, height);
+                    bestNode = new BinPackRect(rect.X, rect.Y, width, height);
                     bestShortFit = shortFit;
                     bestLongFit = longFit;
                 }
@@ -143,7 +143,7 @@ namespace Typography.Rendering
             return bestNode;
         }
 
-        bool SplitFreeNode(Rect freeNode, Rect usedNode)
+        bool SplitFreeNode(BinPackRect freeNode, BinPackRect usedNode)
         {
             // test if the rects even intersect
             var insideX = usedNode.X < freeNode.Right && usedNode.Right > freeNode.X;

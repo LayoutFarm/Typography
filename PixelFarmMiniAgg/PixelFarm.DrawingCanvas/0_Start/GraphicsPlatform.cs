@@ -4,22 +4,16 @@ namespace PixelFarm.Drawing
 {
 
     public abstract class GraphicsPlatform
-    {
-
+    { 
         public abstract Canvas CreateCanvas(
             int left,
             int top,
             int width,
             int height,
             CanvasInitParameters canvasInitPars = new CanvasInitParameters());
-
-
-
         //----------------------------------------------------------------------
         //set provider delegates before use it from comment graphics platform
-        //----------------------------------------------------------------------
-
-
+        //---------------------------------------------------------------------- 
         //----------------------
         //2. image buffer provider from filename
         static ImageBufferProviderDelegate s_imgBufferProviderDel;
@@ -43,5 +37,6 @@ namespace PixelFarm.Drawing
             return externalCanvas == null && canvasBackEnd == CanvasBackEnd.Software;
         }
     }
+
 
 }

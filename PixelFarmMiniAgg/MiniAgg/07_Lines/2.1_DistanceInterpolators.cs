@@ -91,31 +91,54 @@ namespace PixelFarm.Agg.Lines
         public void IncX(int dy)
         {
             m_dist += m_dy;
-            if (dy > 0) m_dist -= m_dx;
-            if (dy < 0) m_dist += m_dx;
+            if (dy > 0)
+            {
+                m_dist -= m_dx;
+            }
+            else if (dy < 0)
+            {
+                m_dist += m_dx;
+            }
         }
 
 
         public void DecX(int dy)
         {
             m_dist -= m_dy;
-            if (dy > 0) m_dist -= m_dx;
-            if (dy < 0) m_dist += m_dx;
+            if (dy > 0)
+            {
+                m_dist -= m_dx;
+            }
+            else if (dy < 0)
+            {
+                m_dist += m_dx;
+            }
         }
 
 
         public void IncY(int dx)
         {
             m_dist -= m_dx;
-            if (dx > 0) m_dist += m_dy;
-            if (dx < 0) m_dist -= m_dy;
+            if (dx > 0)
+            {
+                m_dist += m_dy;
+            }
+            else if (dx < 0)
+            {
+                m_dist -= m_dy;
+            }
         }
-
         public void DecY(int dx)
         {
             m_dist += m_dx;
-            if (dx > 0) m_dist += m_dy;
-            if (dx < 0) m_dist -= m_dy;
+            if (dx > 0)
+            {
+                m_dist += m_dy;
+            }
+            else if (dx < 0)
+            {
+                m_dist -= m_dy;
+            }
         }
         //---------------------------------------------------------------------
         public int Distance { get { return m_dist; } }
@@ -187,7 +210,7 @@ namespace PixelFarm.Agg.Lines
                 m_dist -= m_dx;
                 m_dist_start -= m_dx_start;
             }
-            if (dy < 0)
+            else if (dy < 0)
             {
                 m_dist += m_dx;
                 m_dist_start += m_dx_start;
@@ -204,7 +227,7 @@ namespace PixelFarm.Agg.Lines
                 m_dist -= m_dx;
                 m_dist_start -= m_dx_start;
             }
-            if (dy < 0)
+            else if (dy < 0)
             {
                 m_dist += m_dx;
                 m_dist_start += m_dx_start;
@@ -221,7 +244,7 @@ namespace PixelFarm.Agg.Lines
                 m_dist += m_dy;
                 m_dist_start += m_dy_start;
             }
-            if (dx < 0)
+            else if (dx < 0)
             {
                 m_dist -= m_dy;
                 m_dist_start -= m_dy_start;
@@ -238,7 +261,7 @@ namespace PixelFarm.Agg.Lines
                 m_dist += m_dy;
                 m_dist_start += m_dy_start;
             }
-            if (dx < 0)
+            else if (dx < 0)
             {
                 m_dist -= m_dy;
                 m_dist_start -= m_dy_start;

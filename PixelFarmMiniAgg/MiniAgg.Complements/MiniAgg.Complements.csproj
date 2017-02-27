@@ -38,7 +38,6 @@
     <Compile Include="0_CanvasPainter\AggRenderVx.cs" />
     <Compile Include="0_CanvasPainter\Canvas2dExtension.cs" />
     <Compile Include="0_CanvasPainter\dbugVertexSourceIO.cs" />
-    <Compile Include="0_CanvasPainter\TextPrinter.cs" />
     <Compile Include="1_Base\ScanlineRasToDestBitmapRendererExtension.cs" />
     <Compile Include="2_SpanGenerators\SpanGradient_GradientValueCalculators.cs" />
     <Compile Include="Image\FilterMan.cs" />
@@ -69,6 +68,10 @@
     <ProjectReference Include="..\PixelFarm.Drawing.Core\PixelFarm.Drawing.Core.csproj">
       <Project>{51D63482-5697-4B16-8401-506965624657}</Project>
       <Name>PixelFarm.Drawing.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PixelFarm.DrawingCanvas\PixelFarm.DrawingCanvas.csproj">
+      <Project>{0cc424d5-20ac-4849-993d-3a720dbae94f}</Project>
+      <Name>PixelFarm.DrawingCanvas</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

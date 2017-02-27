@@ -4,9 +4,8 @@ using System;
 using PixelFarm.Drawing.Fonts;
 namespace PixelFarm.Drawing
 {
-
     /// <summary>
-    ///font specification     
+    /// user request for font
     /// </summary>
     public sealed class RequestFont
     {
@@ -19,13 +18,16 @@ namespace PixelFarm.Drawing
         FontKey fontKey;
         public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
         {
-            HBDirection = Fonts.HBDirection.HB_DIRECTION_LTR;//default
-            ScriptCode = HBScriptCode.HB_SCRIPT_LATIN;//default 
-            Lang = "en";//default
+            WriteDirection = WriteDirection.LTR;
+            ScriptCode = ScriptLangs.Latin;//default
+
+            //Lang = "en";//default
             Name = facename;
             SizeInPoints = fontSizeInPts;
             Style = style;
             fontKey = new FontKey(facename, fontSizeInPts, style);
+
+            //TODO: review here ***
             //temp fix 
             //we need font height*** 
             //this.Height = SizeInPixels;
@@ -112,21 +114,24 @@ namespace PixelFarm.Drawing
                 }
                 else
                 {
-                    return ConvEmSizeInPointsToPixels(SizeInPoints);                     
+                    return ConvEmSizeInPointsToPixels(SizeInPoints);
                 }
             }
         }
         //--------------------------
-        //font shaping info (for native font/shaping engine)
-        public HBDirection HBDirection { get; set; }
-        public int ScriptCode { get; set; }
-        public string Lang { get; set; }
+        //data for shaping engine
+
+        public WriteDirection WriteDirection { get; set; }
+        public ScriptLang ScriptCode { get; set; }
         public static float ConvEmSizeInPointsToPixels(float emsizeInPoint)
         {
             return (int)(((float)emsizeInPoint / (float)s_POINTS_PER_INCH) * (float)s_PIXELS_PER_INCH);
         }
 
         //-------------
+        /// <summary>
+        /// resolved actual font
+        /// </summary>
         ActualFont _actualFont;
         internal static void SetCacheActualFont(RequestFont r, ActualFont f)
         {
@@ -137,4 +142,5 @@ namespace PixelFarm.Drawing
             return r._actualFont;
         }
     }
+
 }

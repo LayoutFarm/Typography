@@ -3,69 +3,17 @@
 
 using System.Collections.Generic;
 using System.Xml;
+using PixelFarm.Drawing.Fonts;
 
 namespace Typography.Rendering
 {
-    public class GlyphImage2
-    {
-        int[]
-        pixelBuffer;
-        public GlyphImage2(int w, int h)
-        {
-            this.Width = w;
-            this.Height = h;
-        }
-        public RectangleF OriginalGlyphBounds
-        {
-            get;
-            set;
-        }
-        public int Width
-        {
-            get;
-            private set;
-        }
-        public int Height
-        {
-            get;
-            private set;
-        }
-        public bool IsBigEndian
-        {
-            get;
-            private set;
-        }
-        public int BorderXY
-        {
-            get;
-            set;
-        }
-        public int[] GetImageBuffer()
-        {
-            return pixelBuffer;
-        }
-        public void SetImageBuffer(int[] pixelBuffer, bool isBigEndian)
-        {
-            this.pixelBuffer = pixelBuffer;
-            this.IsBigEndian = isBigEndian;
-        }
-    }
 
-    public class CacheGlyph
+    public class SimpleFontAtlasBuilder
     {
-        public int borderX;
-        public int borderY;
-        public GlyphImage2 img;
-        public Rectangle area;
-        public char character;
-        public int codePoint;
-        public GlyphMatrix2 glyphMatrix;
-    }
-    public class SimpleFontAtlasBuilder2
-    {
-        GlyphImage2 latestGenGlyphImage;
+        GlyphImage latestGenGlyphImage;
         Dictionary<int, CacheGlyph> glyphs = new Dictionary<int, CacheGlyph>();
-        public void AddGlyph(int codePoint, GlyphImage2 img)
+
+        public void AddGlyph(int codePoint, GlyphImage img)
         {
             var glyphCache = new CacheGlyph();
             glyphCache.codePoint = codePoint;
@@ -73,7 +21,7 @@ namespace Typography.Rendering
 
             glyphs[codePoint] = glyphCache;
         }
-        public GlyphImage2 BuildSingleImage()
+        public GlyphImage BuildSingleImage()
         {
             //1. add to list 
             var glyphList = new List<CacheGlyph>(glyphs.Count);
@@ -119,7 +67,7 @@ namespace Typography.Rendering
             for (int i = glyphList.Count - 1; i >= 0; --i)
             {
                 CacheGlyph g = glyphList[i];
-                Rect newRect = binPacker.Insert(g.img.Width, g.img.Height);
+                BinPackRect newRect = binPacker.Insert(g.img.Width, g.img.Height);
                 g.area = new Rectangle(newRect.X, newRect.Y,
                     g.img.Width, g.img.Height);
             }
@@ -131,12 +79,12 @@ namespace Typography.Rendering
             {
                 CacheGlyph g = glyphList[i];
                 //copy data to totalBuffer
-                GlyphImage2 img = g.img;
+                GlyphImage img = g.img;
                 CopyToDest(img.GetImageBuffer(), img.Width, img.Height, totalBuffer, g.area.Left, g.area.Top, totalMaxLim);
             }
             //------------------
 
-            GlyphImage2 glyphImage = new GlyphImage2(totalMaxLim, imgH);
+            GlyphImage glyphImage = new GlyphImage(totalMaxLim, imgH);
             glyphImage.SetImageBuffer(totalBuffer, true);
             latestGenGlyphImage = glyphImage;
             return glyphImage;
@@ -218,7 +166,29 @@ namespace Typography.Rendering
             xmldoc.Save(filename);
         }
 
+        public SimpleFontAtlas CreateSimpleFontAtlas()
+        {
+            SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
+            foreach (CacheGlyph g in glyphs.Values)
+            {
+                //convert char to hex
+                string unicode = ("0x" + ((int)g.character).ToString("X"));//code point
+                Rectangle area = g.area;
+                var glyphData = new TextureFontGlyphData();
+                area.Y += area.Height;//*** 
 
+                //set font matrix to glyph font data
+                glyphData.Rect = Rectangle.FromLTRB(area.X, area.Top, area.Right, area.Bottom);
+                glyphData.AdvanceY = g.glyphMatrix.advanceY;
+                glyphData.ImgWidth = g.img.Width;
+
+                simpleFontAtlas.AddGlyph(g.codePoint, glyphData);
+
+            }
+
+
+            return simpleFontAtlas;
+        }
         //read font info from xml document
         public SimpleFontAtlas LoadFontInfo(string filename)
         {
@@ -248,7 +218,8 @@ namespace Typography.Rendering
                 Rectangle area = ParseRect(glyphElem.GetAttribute("ltwh"));
                 var glyphData = new TextureFontGlyphData();
                 area.Y += area.Height;//*** 
-                glyphData.Rect = new OpenFont.Bounds((short)area.X, (short)area.Bottom, (short)area.Right, (short)area.Top);
+                //glyphData.Rect = Rectangle.c((short)area.X, (short)area.Bottom, (short)area.Right, (short)area.Top);
+                glyphData.Rect = Rectangle.FromLTRB(area.X, area.Top, area.Right, area.Bottom);
                 float[] borderXY = ParseFloatArray(glyphElem.GetAttribute("borderXY"));
                 float[] matrix = ParseFloatArray(glyphElem.GetAttribute("mat"));
 

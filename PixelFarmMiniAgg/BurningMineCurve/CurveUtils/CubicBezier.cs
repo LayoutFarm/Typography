@@ -16,8 +16,7 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 
-#define PIXEL_FARM
-#define PIXEL_FARM_NET20
+
 
 using System;
 using System.Globalization;

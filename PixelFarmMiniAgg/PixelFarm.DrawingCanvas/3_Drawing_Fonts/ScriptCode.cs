@@ -1,7 +1,11 @@
 ﻿//Apache2, 2016-2017, WinterDev
 using System.Collections.Generic;
-namespace Typography.OpenFont
+namespace PixelFarm.Drawing.Fonts
 {
+    public enum ScriptCode
+    {
+        Latin,
+    }
     public sealed class ScriptLang
     {
         public readonly string fullname;
@@ -225,12 +229,7 @@ namespace Typography.OpenFont
         }
 
 
-        public static ScriptLang GetRegisteredScriptLang(string shortname)
-        {
-            ScriptLang found;
-            registeredScriptTags.TryGetValue(shortname, out found);
-            return found;
-        }
+     
     }
 
 

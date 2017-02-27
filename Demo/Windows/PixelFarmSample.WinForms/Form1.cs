@@ -333,7 +333,7 @@ namespace SampleWinForms
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
             var msdfGlyphGen = new MsdfGlyphGen();
-            GlyphImage2 glyphImg = msdfGlyphGen.CreateMsdfImage(
+            GlyphImage glyphImg = msdfGlyphGen.CreateMsdfImage(
                 builder.GetOutputPoints(),
                 builder.GetOutputContours(),
                 builder.GetPixelScale());
@@ -616,7 +616,7 @@ namespace SampleWinForms
             if (printer2 == null)
             {
                 printer2 = new TextPrinter();
-                printer2.ScriptLang = ScriptLangs.Thai;
+                printer2.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
             }
 
 
@@ -747,7 +747,7 @@ namespace SampleWinForms
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
-                var atlasBuilder = new SimpleFontAtlasBuilder2();
+                var atlasBuilder = new SimpleFontAtlasBuilder();
                 var msdfBuilder = new MsdfGlyphGen();
 
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)

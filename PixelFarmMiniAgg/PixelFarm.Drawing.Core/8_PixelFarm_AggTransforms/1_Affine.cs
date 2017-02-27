@@ -921,6 +921,8 @@ namespace PixelFarm.Agg.Transform
                 this.Transform(ref x, ref y);
                 outputVxs.AddVertex(x, y, cmd);
             }
+
+            //outputVxs.HasMoreThanOnePart = src.HasMoreThanOnePart;
             return outputVxs;
         }
         /// <summary>
@@ -934,7 +936,7 @@ namespace PixelFarm.Agg.Transform
             var snapIter = src.GetVertexSnapIter();
             VertexCmd cmd;
             double x, y;
-            while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.Stop)
+            while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
             {
                 this.Transform(ref x, ref y);
                 outputVxs.AddVertex(x, y, cmd);
