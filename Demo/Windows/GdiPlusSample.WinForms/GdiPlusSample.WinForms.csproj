@@ -7,8 +7,8 @@
     <ProjectGuid>{0DABB64B-3D8C-4447-A129-619390ED0E87}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NoPixelFarmSample.WinForms</RootNamespace>
-    <AssemblyName>NoPixelFarmSample.WinForms</AssemblyName>
+    <RootNamespace>GdiPlusSample.WinForms</RootNamespace>
+    <AssemblyName>GdiPlusSample.WinForms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -62,6 +62,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
