@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 
 using System;
+using PixelFarm.Drawing;
 
 namespace PixelFarm.Agg
 {
@@ -100,7 +101,26 @@ namespace PixelFarm.Agg
         public PixelFormat PixelFormat { get { return this.pixelFormat; } }
         public int Stride { get { return this.stride; } }
         public int BitDepth { get { return this.bitDepth; } }
-
+        public bool IsBigEndian { get; set; }
+        ////----------------
+        //MyBitmapData lockingBmp;
+        //public override BitmapData LockBits()
+        //{
+        //    return this.lockingBmp = new Agg.ActualImage.MyBitmapData(pixelBuffer);
+        //}
+        //public override void UnlockBits(BitmapData bmpdata)
+        //{
+        //    if (bmpdata == lockingBmp)
+        //    {
+        //        this.lockingBmp.Dispose();
+        //        lockingBmp = null;
+        //    }
+        //    else
+        //    {
+        //        throw new System.NotSupportedException();
+        //    }
+        //}
+        //----------------
 
         public static byte[] GetBuffer(ActualImage img)
         {
@@ -137,6 +157,55 @@ namespace PixelFarm.Agg
             }
             return img;
         }
+        public static ActualImage CreateFromBuffer(int width, int height, PixelFormat format, byte[] buffer)
+        {
+            if (format != PixelFormat.ARGB32)
+            {
+                throw new NotSupportedException();
+            }
+            //
+            var img = new ActualImage(width, height, format);
+            unsafe
+            {
+                fixed (byte* header = &img.pixelBuffer[0])
+                {
+                    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, (IntPtr)header, buffer.Length);
+                }
+            }
+            return img;
+        }
+
+
+        //class MyBitmapData : PixelFarm.Drawing.BitmapData, IDisposable
+        //{
+        //    System.Runtime.InteropServices.GCHandle _gcHandle;
+        //    byte[] pixelBuffer;
+        //    unsafe byte* arrayHeader;
+        //    public MyBitmapData(byte[] pixelBuffer)
+        //    {
+        //        this.pixelBuffer = pixelBuffer;
+        //        _gcHandle = System.Runtime.InteropServices.GCHandle.Alloc(this.pixelBuffer);
+        //        unsafe
+        //        {
+        //            fixed (byte* h = &pixelBuffer[0])
+        //            {
+        //                this.arrayHeader = h;
+        //            }
+        //        }
+        //    }
+        //    public void Dispose()
+        //    {
+        //        _gcHandle.Free();
+        //        pixelBuffer = null;
+        //    }
+        //    public override IntPtr Scan0
+        //    {
+        //        get
+        //        {
+        //            return _gcHandle.AddrOfPinnedObject();
+        //        }
+        //    }
+        //}
 
     }
 }

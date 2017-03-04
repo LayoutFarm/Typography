@@ -38,16 +38,16 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\NoPixelFarmSample.WinForms\GdiPlus\GlyphPathBuilderGdi.cs">
+    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphPathBuilderGdi.cs">
       <Link>GdiPlus\GlyphPathBuilderGdi.cs</Link>
     </Compile>
-    <Compile Include="..\NoPixelFarmSample.WinForms\MyGlyphPathBuilder.cs">
+    <Compile Include="..\GdiPlusSample.WinForms\MyGlyphPathBuilder.cs">
       <Link>MyGlyphPathBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\NoPixelFarmSample.WinForms\TextPrinter.cs">
+    <Compile Include="..\GdiPlusSample.WinForms\TextPrinter.cs">
       <Link>TextPrinter.cs</Link>
     </Compile>
-    <Compile Include="..\NoPixelFarmSample.WinForms\Workspace\TempLocalFontFile.cs">
+    <Compile Include="..\GdiPlusSample.WinForms\Workspace\TempLocalFontFile.cs">
       <Link>Workspace\TempLocalFontFile.cs</Link>
     </Compile>
     <Compile Include="Form1.cs">

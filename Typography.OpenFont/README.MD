@@ -1,7 +1,7 @@
 Typography.OpenFont 
 ---
 
-This module is about reading OpenFont Format. Pure C#
+This module is about reading OpenFont Format.
 
 
 references:

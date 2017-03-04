@@ -1,5 +1,5 @@
 ﻿//MIT, 2016-2017, WinterDev
- 
+
 using PixelFarm.Agg;
 using PixelFarm.Agg.VertexSource;
 using Typography.OpenFont;
@@ -7,7 +7,7 @@ using Typography.OpenFont;
 
 namespace PixelFarm.Drawing.Fonts
 {
-     
+
     //this is PixelFarm version ***
     //render with MiniAgg 
     class GlyphPathBuilderVxs : IGlyphPathBuilder
@@ -25,29 +25,29 @@ namespace PixelFarm.Drawing.Fonts
         {
 
         }
-        public void CloseFigure()
+        public void CloseContour()
         {
 
             ps.CloseFigure();
         }
-        public void Curve3(float p2x, float p2y, float x, float y)
+        public void Curve3(float x1, float y1, float x2, float y2)
         {
 
-            ps.Curve3(p2x, p2y, x, y);
+            ps.Curve3(x1, y1, x2, y2);
         }
-        public void Curve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
+        public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
         {
-            ps.Curve4(p2x, p2y, p3x, p3y, x, y);
+            ps.Curve4(x1, y1, x2, y2, x3, y3);
         }
-        public void LineTo(float x, float y)
-        {
-
-            ps.LineTo(x, y);
-        }
-        public void MoveTo(float x, float y)
+        public void LineTo(float x1, float y1)
         {
 
-            ps.MoveTo(x, y);
+            ps.LineTo(x1, y1);
+        }
+        public void MoveTo(float x0, float y0)
+        {
+
+            ps.MoveTo(x0, y0);
         }
 
         /// <summary>

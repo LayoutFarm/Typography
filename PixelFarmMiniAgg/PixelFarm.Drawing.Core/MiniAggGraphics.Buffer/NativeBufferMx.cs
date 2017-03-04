@@ -35,6 +35,7 @@ namespace PixelFarm.Agg
             {
                 fixed (byte* pos = &dest[startAt])
                 {
+                    //TODO: review performance here
                     for (int i = count - 1; i >= 0; --i)
                     {
                         *(pos + i) = value;
