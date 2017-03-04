@@ -44,9 +44,9 @@ namespace Typography.Rendering
         {
             cntBuilder.Curve4(x1, y1, x2, y2, x3, y3);
         }
-        public void MoveTo(float x1, float y1)
+        public void MoveTo(float x0, float y0)
         {
-            cntBuilder.MoveTo(x1, y1);
+            cntBuilder.MoveTo(x0, y0);
         }
         public void EndRead()
         {

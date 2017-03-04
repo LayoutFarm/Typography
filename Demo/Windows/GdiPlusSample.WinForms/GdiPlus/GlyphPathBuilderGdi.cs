@@ -34,10 +34,10 @@ namespace SampleWinForms
         {
 
         }
-        public void MoveTo(float x1, float y1)
+        public void MoveTo(float x0, float y0)
         {
-            lastX = lastMoveX = (float)x1;
-            lastY = lastMoveY = (float)y1;
+            lastX = lastMoveX = (float)x0;
+            lastY = lastMoveY = (float)y0;
         }
         public void CloseContour()
         {
