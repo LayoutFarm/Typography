@@ -24,7 +24,7 @@ namespace Typography.Rendering
             //start with blank contour
             cntBuilder = new GlyphContourBuilder();
         }
-        public void CloseFigure()
+        public void CloseContour()
         {
             cntBuilder.CloseFigure();
             GlyphContour cntContour = cntBuilder.CurrentContour;
@@ -32,21 +32,21 @@ namespace Typography.Rendering
             cntBuilder.Reset();
             contours.Add(cntContour);
         }
-        public void Curve3(float p2x, float p2y, float x, float y)
+        public void Curve3(float x1, float y1, float x2, float y2)
         {
-            cntBuilder.Curve3(p2x, p2y, x, y);
+            cntBuilder.Curve3(x1, y1, x2, y2);
         }
-        public void LineTo(float x, float y)
+        public void LineTo(float x1, float y1)
         {
-            cntBuilder.LineTo(x, y);
+            cntBuilder.LineTo(x1, y1);
         }
-        public void Curve4(float p2x, float p2y, float p3x, float p3y, float x, float y)
+        public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
         {
-            cntBuilder.Curve4(p2x, p2y, p3x, p3y, x, y);
+            cntBuilder.Curve4(x1, y1, x2, y2, x3, y3);
         }
-        public void MoveTo(float x, float y)
+        public void MoveTo(float x1, float y1)
         {
-            cntBuilder.MoveTo(x, y);
+            cntBuilder.MoveTo(x1, y1);
         }
         public void EndRead()
         {

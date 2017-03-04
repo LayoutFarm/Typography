@@ -43,11 +43,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="1_Canvas\KnownColors.cs" />
     <Compile Include="3_Drawing_Fonts\ActualFont.cs" />
     <Compile Include="3_Drawing_Fonts\FontFace.cs" />
     <Compile Include="3_Drawing_Fonts\FontGlyph.cs" />
     <Compile Include="3_Drawing_Fonts\FontKey.cs" />
-    <Compile Include="0_Start\GraphicsPlatform.cs" />
+    <Compile Include="0_Start\IRootGraphics.cs" />
     <Compile Include="1_Canvas\Canvas.cs" />
     <Compile Include="1_Canvas\CanvasOptions.cs" />
     <Compile Include="1_Canvas\CanvasPainter.cs" />

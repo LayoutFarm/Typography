@@ -19,6 +19,12 @@ namespace Typography.TextLayout
         {
             this.glyphIndex = glyphIndex;
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + x + "," + y + "), adv:" + advX;
+        }
+#endif
     }
 
     class GlyphsCache

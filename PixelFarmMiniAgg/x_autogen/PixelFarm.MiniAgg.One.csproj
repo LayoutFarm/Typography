@@ -470,8 +470,8 @@
     <Compile Include="..\PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\NativeBufferMx.cs">
       <Link>PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\NativeBufferMx.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCanvas\0_Start\GraphicsPlatform.cs">
-      <Link>PixelFarm.DrawingCanvas\0_Start\GraphicsPlatform.cs</Link>
+    <Compile Include="..\PixelFarm.DrawingCanvas\0_Start\IRootGraphics.cs">
+      <Link>PixelFarm.DrawingCanvas\0_Start\IRootGraphics.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCanvas\1_Canvas\Canvas.cs">
       <Link>PixelFarm.DrawingCanvas\1_Canvas\Canvas.cs</Link>
@@ -484,6 +484,9 @@
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCanvas\1_Canvas\CanvasPaintToOutputDelegate.cs">
       <Link>PixelFarm.DrawingCanvas\1_Canvas\CanvasPaintToOutputDelegate.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCanvas\1_Canvas\KnownColors.cs">
+      <Link>PixelFarm.DrawingCanvas\1_Canvas\KnownColors.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCanvas\2_Drawing\FontStyle.cs">
       <Link>PixelFarm.DrawingCanvas\2_Drawing\FontStyle.cs</Link>

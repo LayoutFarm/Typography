@@ -1,4 +1,4 @@
-//BSD, 2014-2017, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -21,6 +21,30 @@
 using PixelFarm.VectorMath;
 namespace PixelFarm.Agg.VertexSource
 {
+
+
+    //https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+    //--------------------
+    //Line, has 2 points..
+    //  (x0,y0) begin point
+    //  (x1,y1) end point
+    //--------------------
+    //Curve3 (Quadratic Bézier curves), has 3 points
+    //  (x0,y0)  begin point
+    //  (x1,y1)  1st control point 
+    //  (x2,y2)  end point
+    //--------------------
+    //Curve4 (Cubic  Bézier curves), has 4 points
+    //  (x0,y0)  begin point
+    //  (x1,y1)  1st control point 
+    //  (x2,y2)  2nd control point
+    //  (x3,y3)  end point    
+    //-------------------- 
+    //please note that TrueType font
+    //compose of Quadractic Bezier Curve ***
+    //--------------------- 
+
+
     //---------------------------------------------------------------path_base
     // A container to store vertices with their flags. 
     // A path consists of a number of contours separated with "move_to" 
@@ -54,18 +78,28 @@ namespace PixelFarm.Agg.VertexSource
     /// </summary>
     public sealed class PathWriter
     {
-        double lastMoveX;
-        double lastMoveY;
-        double lastX;
-        double lastY;
+
+        double latest_moveTo_X;
+        double latest_moveTo_Y;
+
         /// <summary>
-        /// curve3 point2 (1st control point)
+        /// latest X
         /// </summary>
-        Vector2 c3p2;
+        double latest_x;
         /// <summary>
-        /// curve4 point3
+        /// latest Y
         /// </summary>
-        Vector2 c4p3;
+        double latest_y;
+
+        /// <summary>
+        /// 1st curve control point
+        /// </summary>
+        Vector2 c1;
+        /// <summary>
+        /// 2nd curve control point 
+        /// </summary>
+        Vector2 c2;
+        //
         SvgPathCommand latestSVGPathCmd;
         int figureCount = 0;
         VertexStore myvxs;
@@ -84,9 +118,9 @@ namespace PixelFarm.Agg.VertexSource
         public void Clear()
         {
             myvxs.Clear();
-            lastMoveX = lastMoveY = lastX = lastY = 0;
-            c3p2 = new Vector2();
-            c4p3 = new Vector2();
+            latest_moveTo_X = latest_moveTo_Y = latest_x = latest_y = 0;
+            c1 = new Vector2();
+            c2 = new Vector2();
             latestSVGPathCmd = SvgPathCommand.MoveTo;
             figureCount = 0;
         }
@@ -97,16 +131,17 @@ namespace PixelFarm.Agg.VertexSource
             Clear();
         }
         //-------------------------------------------------------------------
-        public double LastMoveX { get { return this.lastMoveX; } }
-        public double LastMoveY { get { return this.lastMoveY; } }
+        public double LastMoveX { get { return this.latest_moveTo_X; } }
+        public double LastMoveY { get { return this.latest_moveTo_Y; } }
         //-------------------------------------------------------------------
 
         public int StartFigure()
         {
             if (figureCount > 0)
             {
-               
-                myvxs.AddVertex(0, 0, VertexCmd.NoMore);        
+                //TODO: review here***
+                //NoMore cmd ?
+                myvxs.AddVertex(0, 0, VertexCmd.NoMore);
             }
             figureCount++;
             return myvxs.Count;
@@ -117,51 +152,123 @@ namespace PixelFarm.Agg.VertexSource
             myvxs.AddVertex(0, 0, VertexCmd.NoMore);
         }
         //--------------------------------------------------------------------
-        public void MoveTo(double x, double y)
+        public void MoveTo(double x0, double y0)
         {
             this.latestSVGPathCmd = SvgPathCommand.MoveTo;
             myvxs.AddMoveTo(
-                this.lastMoveX = this.lastX = x,
-                this.lastMoveY = this.lastY = y);
+                this.latest_moveTo_X = this.latest_x = x0,
+                this.latest_moveTo_Y = this.latest_y = y0);
         }
-        public void MoveToRel(double x, double y)
+        public void MoveToRel(double dx0, double dy0)
         {
+            //*** move to, relative to last(x,y) ***
             this.latestSVGPathCmd = SvgPathCommand.MoveTo;
             myvxs.AddMoveTo(
-                this.lastMoveX = (this.lastX += x),
-                this.lastMoveY = (this.lastY += y));
+                this.latest_moveTo_X = (this.latest_x += dx0),
+                this.latest_moveTo_Y = (this.latest_y += dy0));
         }
-        public void LineTo(double x, double y)
+        public void LineTo(double x1, double y1)
         {
             this.latestSVGPathCmd = SvgPathCommand.LineTo;
-            myvxs.AddLineTo(this.lastX = x, this.lastY = y);
+            myvxs.AddLineTo(this.latest_x = x1, this.latest_y = y1);
         }
-        public void LineToRel(double x, double y)
+        public void LineToRel(double dx1, double dy1)
         {
+            //*** line to to, relative to last(x,y) ***
             this.latestSVGPathCmd = SvgPathCommand.LineTo;
             myvxs.AddLineTo(
-                this.lastX += x,
-                this.lastY += y);
+                this.latest_x += dx1,
+                this.latest_y += dy1);
         }
-        public void HorizontalLineTo(double x)
+        public void HorizontalLineTo(double x1)
         {
             this.latestSVGPathCmd = SvgPathCommand.HorizontalLineTo;
-            myvxs.AddLineTo(this.lastX = x, lastY);
+            myvxs.AddLineTo(this.latest_x = x1, latest_y);
         }
-        public void HorizontalLineToRel(double x)
+        public void HorizontalLineToRel(double dx1)
         {
+            //relative ***
             this.latestSVGPathCmd = SvgPathCommand.HorizontalLineTo;
-            myvxs.AddLineTo(this.lastX += x, lastY);
+            myvxs.AddLineTo(this.latest_x += dx1, latest_y);
         }
-        public void VerticalLineTo(double y)
+        public void VerticalLineTo(double y1)
         {
             this.latestSVGPathCmd = SvgPathCommand.VerticalLineTo;
-            myvxs.AddLineTo(lastX, this.lastY = y);
+            myvxs.AddLineTo(latest_x, this.latest_y = y1);
         }
-        public void VerticalLineToRel(double y)
+        public void VerticalLineToRel(double dy1)
         {
+            //relative ***
             this.latestSVGPathCmd = SvgPathCommand.VerticalLineTo;
-            myvxs.AddLineTo(lastX, this.lastY += y);
+            myvxs.AddLineTo(latest_x, this.latest_y += dy1);
+        }
+
+        /// <summary>
+        ///  Draws a quadratic Bezier curve from the current point to (x,y) using (xControl,yControl) as the control point.
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        public void Curve3(double x1, double y1, double x2, double y2)
+        {
+            this.latestSVGPathCmd = SvgPathCommand.QuadraticBezierCurve;
+            this.c1.x = x1;
+            this.c1.y = y1;
+            myvxs.AddP2c(x1, y1);
+            myvxs.AddLineTo(this.latest_x = x2, this.latest_y = y2);
+        }
+        /// <summary>
+        /// Draws a quadratic Bezier curve from the current point to (x,y) using (xControl,yControl) as the control point.
+        /// </summary>
+        /// <param name="dx1"></param>
+        /// <param name="dy1"></param>
+        /// <param name="dx2"></param>
+        /// <param name="dy2"></param>
+        public void Curve3Rel(double dx1, double dy1, double dx2, double dy2)
+        {
+            this.latestSVGPathCmd = SvgPathCommand.QuadraticBezierCurve;
+            this.c1.x = this.latest_x + dx1;
+            this.c1.y = this.latest_y + dy1;
+            myvxs.AddP2c(this.latest_x + dx1, this.latest_y + dy1);
+            myvxs.AddLineTo(this.latest_x += dx2, this.latest_y += dy2);
+        }
+
+        /// <summary> 
+        /// <para>Draws a quadratic Bezier curve from the current point to (x,y).</para>
+        /// <para>The control point is assumed to be the reflection of the control point on the previous command relative to the current point.</para>
+        /// <para>(If there is no previous command or if the previous command was not a curve, assume the control point is coincident with the current point.)</para>
+        /// </summary>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        public void SmoothCurve3(double x2, double y2)
+        {
+            switch (this.latestSVGPathCmd)
+            {
+                case SvgPathCommand.QuadraticBezierCurve:
+                case SvgPathCommand.TSmoothQuadraticBezierCurveTo:
+                    {
+                        //curve3,
+                        //create new c1 from current c1
+                        Vector2 new_c1 = CreateMirrorPoint(this.c1, new Vector2(this.latest_x, this.latest_y));
+                        Curve3(new_c1.X, new_c1.Y, x2, y2);
+                    }
+                    break;
+                case SvgPathCommand.CurveTo:
+                case SvgPathCommand.SmoothCurveTo:
+                    {
+                        //curve4,
+                        //create new c1 from current c2
+                        Vector2 new_c1 = CreateMirrorPoint(this.c2, new Vector2(this.latest_x, this.latest_y));
+                        Curve3(new_c1.X, new_c1.Y, x2, y2);
+                    }
+                    break;
+                default:
+                    {
+                        Curve3(this.latest_x, this.latest_y, x2, y2);
+                    }
+                    break;
+            }
         }
 
         //-------------------------------------------------------------------
@@ -173,137 +280,73 @@ namespace PixelFarm.Agg.VertexSource
         }
         //--------------------------------------------------------------------
         /// <summary>
-        ///  Draws a quadratic Bezier curve from the current point to (x,y) using (xControl,yControl) as the control point.
-        /// </summary>
-        /// <param name="p2x"></param>
-        /// <param name="p2y"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void Curve3(double p2x, double p2y, double x, double y)
-        {
-            this.latestSVGPathCmd = SvgPathCommand.QuadraticBezierCurve;
-            this.c3p2.x = p2x;
-            this.c3p2.y = p2y;
-            myvxs.AddP2c(p2x, p2y);
-            myvxs.AddLineTo(this.lastX = x, this.lastY = y);
-        }
-        /// <summary>
-        /// Draws a quadratic Bezier curve from the current point to (x,y) using (xControl,yControl) as the control point.
-        /// </summary>
-        /// <param name="xControl"></param>
-        /// <param name="yControl"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void Curve3Rel(double p2x, double p2y, double x, double y)
-        {
-            this.latestSVGPathCmd = SvgPathCommand.QuadraticBezierCurve;
-            this.c3p2.x = this.lastX + p2x;
-            this.c3p2.y = this.lastY + p2y;
-            myvxs.AddP2c(this.lastX + p2x, this.lastY + p2y);
-            myvxs.AddLineTo(this.lastX += x, this.lastY += y);
-        }
-
-        /// <summary> 
         /// <para>Draws a quadratic Bezier curve from the current point to (x,y).</para>
         /// <para>The control point is assumed to be the reflection of the control point on the previous command relative to the current point.</para>
         /// <para>(If there is no previous command or if the previous command was not a curve, assume the control point is coincident with the current point.)</para>
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void SmoothCurve3(double x, double y)
+        /// <param name="dx1"></param>
+        /// <param name="dy1"></param>
+        public void SmoothCurve3Rel(double dx1, double dy1)
         {
-            switch (this.latestSVGPathCmd)
-            {
-                case SvgPathCommand.QuadraticBezierCurve:
-                case SvgPathCommand.TSmoothQuadraticBezierCurveTo:
-                    {
-                        //curve3
-                        Vector2 newC3 = CreateMirrorPoint(this.c3p2, new Vector2(this.lastX, this.lastY));
-                        Curve3(newC3.X, newC3.Y, x, y);
-                    }
-                    break;
-                case SvgPathCommand.CurveTo:
-                case SvgPathCommand.SmoothCurveTo:
-                    {
-                        //curve4
-                        Vector2 newC3 = CreateMirrorPoint(this.c4p3, new Vector2(this.lastX, this.lastY));
-                        Curve3(newC3.X, newC3.Y, x, y);
-                    }
-                    break;
-                default:
-                    {
-                        Curve3(this.lastX, this.lastY, x, y);
-                    }
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// <para>Draws a quadratic Bezier curve from the current point to (x,y).</para>
-        /// <para>The control point is assumed to be the reflection of the control point on the previous command relative to the current point.</para>
-        /// <para>(If there is no previous command or if the previous command was not a curve, assume the control point is coincident with the current point.)</para>
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void SmoothCurve3Rel(double x, double y)
-        {
-            this.SmoothCurve3(this.lastX + x, this.lastY + y);
+            this.SmoothCurve3(this.latest_x + dx1, this.latest_y + dy1);
         }
         //-----------------------------------------------------------------------
-        public void Curve4(double p2x, double p2y,
-                           double p3x, double p3y,
-                           double x, double y)
+        public void Curve4(double x1, double y1,
+                           double x2, double y2,
+                           double x3, double y3)
         {
             this.latestSVGPathCmd = SvgPathCommand.CurveTo;
-            myvxs.AddP3c(p2x, p2y);
-            myvxs.AddP3c(p3x, p3y);
-            myvxs.AddLineTo(this.lastX = x, this.lastY = y);
+            myvxs.AddP3c(x1, y1);
+            myvxs.AddP3c(x2, y2);
+            myvxs.AddLineTo(this.latest_x = x3, this.latest_y = y3);
         }
 
-        public void Curve4Rel(double p2x, double p2y,
-                              double p3x, double p3y,
-                              double x, double y)
+        public void Curve4Rel(double dx1, double dy1,
+                              double dx2, double dy2,
+                              double dx3, double dy3)
         {
             this.latestSVGPathCmd = SvgPathCommand.CurveTo;
-            myvxs.AddP3c(this.lastX + p2x, this.lastY + p2y);
-            myvxs.AddP3c(this.lastX + p3x, this.lastY + p3y);
-            myvxs.AddLineTo(this.lastX += x, this.lastY += y);
+            myvxs.AddP3c(this.latest_x + dx1, this.latest_y + dy1);
+            myvxs.AddP3c(this.latest_x + dx2, this.latest_y + dy2);
+            myvxs.AddLineTo(this.latest_x += dx3, this.latest_y += dy3);
         }
 
         //--------------------------------------------------------------------
-        public void SmoothCurve4(double p3x, double p3y,
-                       double x, double y)
+        public void SmoothCurve4(
+                       double x2, double y2,
+                       double x3, double y3)
         {
             switch (this.latestSVGPathCmd)
             {
                 case SvgPathCommand.QuadraticBezierCurve:
                 case SvgPathCommand.TSmoothQuadraticBezierCurveTo:
                     {
-                        //create c4p1 from c3p1
-                        Vector2 c4p2 = CreateMirrorPoint(this.c3p2, new Vector2(this.lastX, this.lastY));
-                        Curve4(c4p2.X, c4p2.Y, p3x, p3y, x, y);
+                        //create new c1 from current c1
+                        Vector2 new_c1 = CreateMirrorPoint(this.c1, new Vector2(this.latest_x, this.latest_y));
+                        Curve4(new_c1.X, new_c1.Y, x2, y2, x3, y3);
                     }
                     break;
                 case SvgPathCommand.CurveTo:
                 case SvgPathCommand.SmoothCurveTo:
                     {
-                        //curve4
-                        Vector2 c4p2 = CreateMirrorPoint(this.c4p3, new Vector2(this.lastX, this.lastY));
-                        Curve4(c4p2.X, c4p2.Y, p3x, p3y, x, y);
+                        //create new c1 from current c2
+                        Vector2 new_c1 = CreateMirrorPoint(this.c2, new Vector2(this.latest_x, this.latest_y));
+                        Curve4(new_c1.X, new_c1.Y, x2, y2, x3, y3);
                     }
                     break;
                 default:
                     {
-                        Curve4(this.lastX, this.lastY, p3x, p3y, x, y);
+                        Curve4(this.latest_x, this.latest_y, x2, y2, x3, y3);
                     }
                     break;
             }
         }
 
-        public void SmoothCurve4Rel(double p3x, double p3y,
-                                    double x, double y)
+        public void SmoothCurve4Rel(double dx2, double dy2,
+                                    double dx3, double dy3)
         {
-            SmoothCurve4(this.lastX + p3x, this.lastY + p3y, this.lastX + x, this.lastY + y);
+            //relative version
+            SmoothCurve4(this.latest_x + dx2, this.latest_y + dy2, this.latest_x + dx3, this.latest_y + dy3);
         }
 
         //=======================================================================
@@ -353,8 +396,7 @@ namespace PixelFarm.Agg.VertexSource
         {
             move_to(x, y);
         }
-    }
-
+    } 
     public void arc_rel(double rx, double ry,
                                 double angle,
                                 bool large_arc_flag,

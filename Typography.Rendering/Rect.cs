@@ -266,7 +266,7 @@ namespace Typography.Rendering
             return ((x >= Left) && (x < Right) &&
                 (y >= Top) && (y < Bottom));
         }
-         
+
 
 
 
@@ -315,6 +315,12 @@ namespace Typography.Rendering
             this.y += y;
         }
 
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + x + "," + y + "w:" + width + ",h:" + height + ")";
+        }
+#endif
 
     }
 
