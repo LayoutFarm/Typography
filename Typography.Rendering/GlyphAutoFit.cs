@@ -38,7 +38,7 @@ namespace Typography.Rendering
         /// read fitting output
         /// </summary>
         /// <param name="reader"></param>
-        public void ReadOutput(IGlyphPathBuilder reader)
+        public void ReadOutput(IGlyphReader reader)
         {
             if (glyphOutline == null) { return; }
             //
@@ -99,7 +99,7 @@ namespace Typography.Rendering
                 return integer1;
             }
         }
-        static void CreateFitShape(IGlyphPathBuilder reader, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
+        static void CreateFitShape(IGlyphReader reader, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
