@@ -9,12 +9,15 @@ namespace PixelFarm.Drawing.Fonts
 {
 
     //this is PixelFarm version ***
-    //render with MiniAgg 
-    class GlyphPathBuilderVxs : IGlyphPathBuilder
+
+    /// <summary>
+    /// read glyph and write the result to target vxs
+    /// </summary>
+    public class GlyphReaderVxs : IGlyphReader
     {
         CurveFlattener curveFlattener = new CurveFlattener();
         PathWriter ps = new PathWriter();
-        public GlyphPathBuilderVxs()
+        public GlyphReaderVxs()
         {
         }
         public void BeginRead(int countourCount)
@@ -27,12 +30,10 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void CloseContour()
         {
-
             ps.CloseFigure();
         }
         public void Curve3(float x1, float y1, float x2, float y2)
         {
-
             ps.Curve3(x1, y1, x2, y2);
         }
         public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
@@ -50,42 +51,13 @@ namespace PixelFarm.Drawing.Fonts
             ps.MoveTo(x0, y0);
         }
 
-        /// <summary>
-        /// get processed/scaled vxs
-        /// </summary>
-        /// <returns></returns>
-        public VertexStore GetVxs(float scale = 1)
+        public void Reset()
         {
-            //TODO: review here again
-            VertexStore vxs1 = new VertexStore();
-            if (scale == 1)
-            {
-                return curveFlattener.MakeVxs(ps.Vxs, vxs1);
-            }
-            else
-            {
-
-                VertexStore vxs2 = new VertexStore();
-                //float scale = TypeFace.CalculateFromPointToPixelScale(SizeInPoints);
-                var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
-                    new PixelFarm.Agg.Transform.AffinePlan(
-                        PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));
-                //transform -> flatten ->output
-                return curveFlattener.MakeVxs(mat.TransformToVxs(ps.Vxs, vxs1), vxs2);
-            }
-            //
-            //if (PassHintInterpreterModule)
-            //{
-            //    return curveFlattener.MakeVxs(ps.Vxs, vxs1);
-            //}
-            //else
-            //{
-            // 
-            //}
+            ps.Clear();
         }
-        public void GetVxs(VertexStore output, VertexStorePool vxsPool, float scale = 1)
-        {
 
+        public void WriteOutput(VertexStore output, VertexStorePool vxsPool, float scale = 1)
+        {
             if (scale == 1)
             {
                 curveFlattener.MakeVxs(ps.Vxs, output);
@@ -102,11 +74,5 @@ namespace PixelFarm.Drawing.Fonts
                 vxsPool.Release(ref tmpVxs);
             }
         }
-        public VertexStore GetUnscaledVxs()
-        {
-            return VertexStore.CreateCopy(ps.Vxs);
-        }
     }
-
-
 }
