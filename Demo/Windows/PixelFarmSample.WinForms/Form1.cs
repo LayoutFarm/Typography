@@ -213,11 +213,12 @@ namespace SampleWinForms
 
         }
 
+        VertexStorePool vxsPool2 = new VertexStorePool();
 
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
             //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
@@ -238,9 +239,11 @@ namespace SampleWinForms
 
             builder.Build(testChar, sizeInPoint);
 
-            var vxsShapeBuilder = new GlyphPathBuilderVxs();
-            builder.ReadShapes(vxsShapeBuilder);
-            VertexStore vxs = vxsShapeBuilder.GetVxs();
+            var glyphReader = new GlyphReaderVxs();
+            builder.ReadShapes(glyphReader);
+
+            VertexStore vxs = new VertexStore();
+            glyphReader.WriteOutput(vxs, vxsPool2);
 
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
 
@@ -276,9 +279,13 @@ namespace SampleWinForms
             autoFit.Hint(
                 builder.GetOutputPoints(),
                 builder.GetOutputContours(), pxScale);
-            var vxsShapeBuilder2 = new GlyphPathBuilderVxs();
-            autoFit.ReadOutput(vxsShapeBuilder2);
-            VertexStore vxs2 = vxsShapeBuilder2.GetVxs();
+            var glyphReader2 = new GlyphReaderVxs();
+            autoFit.ReadOutput(glyphReader2);
+
+
+            VertexStore vxs2 = new VertexStore();
+            glyphReader.WriteOutput(vxs2, vxsPool2);
+
             //
             p.FillColor = PixelFarm.Drawing.Color.Black;
             p.Fill(vxs2);
@@ -312,7 +319,7 @@ namespace SampleWinForms
             //p.UseSubPixelRendering = chkLcdTechnique.Checked;
             p.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset 
@@ -564,7 +571,7 @@ namespace SampleWinForms
 
 
             //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
@@ -583,11 +590,11 @@ namespace SampleWinForms
             }
             //---------------------------------------------------- 
             builder.Build(testChar, sizeInPoint);
-            var gdiPathBuilder = new GlyphPathBuilderGdi();
+            var gdiPathBuilder = new GlyphReaderForGdiPlus();
             builder.ReadShapes(gdiPathBuilder);
             float pxScale = builder.GetPixelScale();
 
-            System.Drawing.Drawing2D.GraphicsPath path = gdiPathBuilder.ResultGraphicPath;
+            System.Drawing.Drawing2D.GraphicsPath path = gdiPathBuilder.ResultGraphicsPath;
             path.Transform(
                 new System.Drawing.Drawing2D.Matrix(
                     pxScale, 0,
@@ -609,83 +616,91 @@ namespace SampleWinForms
         }
 
 
-        TextPrinter printer2;
+
+        string _latestFontFile = null;
+        Typeface _currentTypeface;
+        GlyphLayout _glyphLayout = new GlyphLayout();
+        GlyphPathBuilder _glyphPathBuilder;
+        VertexStorePool _vxsPool2 = new VertexStorePool();
+
         void RenderWithTextPrinterAndMiniAgg(string fontfile, string str, float sizeInPoint, int resolution)
         {
-            //1. 
-            if (printer2 == null)
+            //this method sample sample text printer in detail 
+            //-----------
+            //1.update font
+            if (_latestFontFile != fontfile)
             {
-                printer2 = new TextPrinter();
-                printer2.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
+                _latestFontFile = fontfile;
+                using (FileStream fs = new FileStream(fontfile, FileMode.Open))
+                {
+                    var reader = new OpenFontReader();
+                    _currentTypeface = reader.Read(fs);
+                }
+                _glyphPathBuilder = new SampleWinForms.GlyphPathBuilder(_currentTypeface);
             }
-
-
-            printer2.FontFile = fontfile;
-            //
-            printer2.EnableLigature = this.chkGsubEnableLigature.Checked;
-            printer2.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
+            //-----------
+            //2. set glyph layout properties
+            //for test with Thai (complex script) 
+            _glyphLayout.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
+            _glyphLayout.EnableLigature = this.chkGsubEnableLigature.Checked;
+            _glyphLayout.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
             //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
             //printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
-            //
-            int len = str.Length;
-            //
-            List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
-            printer2.Print(sizeInPoint, str, glyphPlanList);
-            //--------------------------
 
-            //5. use PixelFarm's Agg to render to bitmap...
-            //5.1 clear background
+
+            //3. create glyph-plan list
+            List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(str.Length);
+            _glyphLayout.Layout(_currentTypeface, sizeInPoint, str, glyphPlanList);
+            //---------------------------
+
+            int j = glyphPlanList.Count;
+            float pxScale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoint);
+            var glyphReader = new GlyphReaderVxs();
+
+
+            //clear background
+
+            float ox = p.OriginX; //save origin (x,y)
+            float oy = p.OriginY;
+            float cx = 0;
+            float cy = 10;
             p.Clear(PixelFarm.Drawing.Color.White);
-            //---------------------------
-            //TODO: review here
-            //fake subpixel rendering 
-            //not correct
-
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
-            //---------------------------
-            if (chkFillBackground.Checked)
-            {
-                //5.2 
-                p.FillColor = PixelFarm.Drawing.Color.Black;
-                //5.3 
-                int glyphListLen = glyphPlanList.Count;
 
-                float ox = p.OriginX;
-                float oy = p.OriginY;
-                float cx = 0;
-                float cy = 10;
-                for (int i = 0; i < glyphListLen; ++i)
-                {
-                    GlyphPlan glyphPlan = glyphPlanList[i];
-                    cx = glyphPlan.x;
-                    cy = glyphPlan.y;
-                    p.SetOrigin(cx, cy);
-                    p.Fill((VertexStore)glyphPlan.vxs);
-                }
-                p.SetOrigin(ox, oy);
 
-            }
-            if (chkBorder.Checked)
+            for (int i = 0; i < j; ++i)
             {
-                //5.4 
-                p.StrokeColor = PixelFarm.Drawing.Color.Green;
-                //user can specific border width here...
-                //p.StrokeWidth = 2;
-                //5.5 
-                int glyphListLen = glyphPlanList.Count;
-                float ox = p.OriginX;
-                float oy = p.OriginY;
-                float cx = 0;
-                float cy = 10;
-                for (int i = 0; i < glyphListLen; ++i)
+                //foreach glyph plan
+
+                GlyphPlan glyphPlan = glyphPlanList[i];
+                //-----------------------------------
+                //check if we static vxs/bmp for this glyph
+                //if not, create and cache
+                //-----------------------------------  
+                _glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoint);
+                //-----------------------------------  
+                glyphReader.Reset();
+                _glyphPathBuilder.ReadShapes(glyphReader);
+                var outputVxs = new VertexStore();
+                glyphReader.WriteOutput(outputVxs, vxsPool2, pxScale);
+
+                cx = glyphPlan.x;
+                cy = glyphPlan.y;
+                if (chkFillBackground.Checked)
                 {
-                    GlyphPlan glyphPlan = glyphPlanList[i];
-                    cx = glyphPlan.x;
+                    p.FillColor = PixelFarm.Drawing.Color.Black;
                     p.SetOrigin(cx, cy);
-                    p.Draw((VertexStore)glyphPlan.vxs);
+                    p.Fill(outputVxs);
                 }
-                p.SetOrigin(ox, oy);
+                if (chkBorder.Checked)
+                {
+
+                    p.StrokeColor = PixelFarm.Drawing.Color.Green;
+                    p.Draw(outputVxs);
+                }
             }
+            p.SetOrigin(ox, oy); //restore origin
+
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
@@ -743,7 +758,7 @@ namespace SampleWinForms
                 Typeface typeface = reader.Read(fs);
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
-                var builder = new MyGlyphPathBuilder(typeface);
+                var builder = new GlyphPathBuilder(typeface);
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------

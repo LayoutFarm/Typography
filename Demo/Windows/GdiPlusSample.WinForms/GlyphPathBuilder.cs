@@ -4,7 +4,7 @@ using Typography.OpenFont;
 namespace SampleWinForms
 {
     //-----------------------------------
-    //sample MyGlyphPathBuilder :
+    //sample GlyphPathBuilder :
     //for your flexiblity of glyph path builder.
     //-----------------------------------
 

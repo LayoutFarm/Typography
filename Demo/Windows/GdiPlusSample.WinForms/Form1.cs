@@ -2,7 +2,8 @@
 using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
-
+using System.Collections.Generic;
+//
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
@@ -13,7 +14,14 @@ namespace SampleWinForms
     {
         Graphics g;
         string _currentSelectedFontFile;
+        Typeface _currentTypeface;
+        GlyphPathBuilder _currentGlyphPathBuilder;
+        GlyphReaderForGdiPlus _glyphReaderForGdiPlus;
+        GlyphLayout _glyphLayout = new GlyphLayout();
+
+
         int fontSizeInPoint = 14;//default
+
         public Form1()
         {
             InitializeComponent();
@@ -55,6 +63,8 @@ namespace SampleWinForms
                 {
                     selectedFileIndex = fileIndexCount;
                     _currentSelectedFontFile = file;
+                    _currentTypeface = null;
+                    _currentGlyphPathBuilder = null;
                 }
                 fileIndexCount++;
             }
@@ -63,6 +73,9 @@ namespace SampleWinForms
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
                 _currentSelectedFontFile = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+                _currentTypeface = null;
+                _currentGlyphPathBuilder = null;
+
                 UpdateRenderOutput();
             };
             //----------
@@ -95,73 +108,127 @@ namespace SampleWinForms
             {
                 return;
             }
-            var reader = new OpenFontReader();
-            char testChar = txtInputChar.Text[0];//only 1 char 
-            int resolution = 96;
-            //1. read typeface from font file
-            using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
-            {
-                Typeface typeFace = reader.Read(fs);
-                RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
-            }
+            //----------------------- 
+            UpdateTypefaceAndBuilder();
+
+            //render at specific pos
+            float x_pos = 0, y_pos = 0;
+            RenderTextWithGdiPlusPath(_currentGlyphPathBuilder, txtInputChar.Text.ToCharArray(), fontSizeInPoint, x_pos, y_pos);
         }
-        void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
+        void UpdateTypefaceAndBuilder()
         {
+            if (_currentTypeface == null)
+            {
 
-            //render glyph path with Gdi+ path 
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
-            //////credit:
-            //////http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
+                //1. read typeface from font file
+                using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
+                {
+                    var reader = new OpenFontReader();
+                    _currentTypeface = reader.Read(fs);
+                }
+                //2. glyph builder
+                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
+                //3. glyph reader,output as Gdi+ GraphicsPath
+                _glyphReaderForGdiPlus = new GlyphReaderForGdiPlus();
+                //4. test with Thai script(for complex script), you can change to your own script.
+                _glyphLayout.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
+                _glyphLayout.PositionTechnique = PositionTecnhique.OpenFont;
 
+            }
 
-            //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
+            //2. 
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            builder.UseTrueTypeInstructions = false;//reset
-            builder.UseVerticalHinting = false;//reset
+            _currentGlyphPathBuilder.UseTrueTypeInstructions = false;//reset
+            _currentGlyphPathBuilder.UseVerticalHinting = false;//reset
             switch (hintTech)
             {
                 case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInstructions = true;
+                    _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
                     break;
                 case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInstructions = true;
-                    builder.UseVerticalHinting = true;
+                    _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
+                    _currentGlyphPathBuilder.UseVerticalHinting = true;
                     break;
                 case HintTechnique.CustomAutoFit:
                     //custom agg autofit 
                     break;
             }
-            //---------------------------------------------------- 
-            builder.Build(testChar, sizeInPoint);
-            var gdiPathBuilder = new GlyphPathBuilderGdi();
-            builder.ReadShapes(gdiPathBuilder);
-            float pxScale = builder.GetPixelScale();
+        }
 
-            System.Drawing.Drawing2D.GraphicsPath path = gdiPathBuilder.ResultGraphicPath;
-            path.Transform(
-                new System.Drawing.Drawing2D.Matrix(
-                    pxScale, 0,
-                    0, pxScale,
-                    0, 0
-                ));
+        List<GlyphPlan> _glyphPlanList = new List<GlyphPlan>();
+        void RenderTextWithGdiPlusPath(
+            GlyphPathBuilder builder,
+            char[] textBuffer,
+            float sizeInPoint,
+            float x,
+            float y)
+        {
+            //---------------------------------
+            //render glyph path with Gdi+ path 
+            //this code is demonstration only
+            //it is better to wrap it inside 'some class'  
+            //---------------------------------
+            //1. set some properties
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            g.Clear(Color.White);
+            //credit:
+            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
 
-            if (chkFillBackground.Checked)
+            //----------------------------------------------------
+            //2. layout
+            _glyphPlanList.Clear();
+            _glyphLayout.Layout(builder.Typeface, sizeInPoint, textBuffer, _glyphPlanList);
+            //
+            //3. render each glyph
+            int j = _glyphPlanList.Count;
+
+            System.Drawing.Drawing2D.Matrix scaleMat = null;
+            // 
+            float c_x = (float)x;
+            float baseline = (float)y;
+            //
+            for (int i = 0; i < j; ++i)
             {
-                g.FillPath(Brushes.Black, path);
+                GlyphPlan plan = _glyphPlanList[i];
+                builder.BuildFromGlyphIndex(plan.glyphIndex, sizeInPoint);
+                float pxScale = builder.GetPixelScale();
+
+                //first time
+                scaleMat = new System.Drawing.Drawing2D.Matrix(
+                    pxScale, 0,//scale x
+                    0, pxScale, //scale y
+                    c_x, baseline //xpos,ypos
+                );
+                c_x += (plan.advX);
+
+                //
+                _glyphReaderForGdiPlus.Reset();
+                builder.ReadShapes(_glyphReaderForGdiPlus);
+
+                System.Drawing.Drawing2D.GraphicsPath path = _glyphReaderForGdiPlus.ResultGraphicsPath;
+                path.Transform(scaleMat);
+
+                if (chkFillBackground.Checked)
+                {
+                    g.FillPath(Brushes.Black, path);
+                }
+                if (chkBorder.Checked)
+                {
+                    g.DrawPath(Pens.Green, path);
+                }
             }
-            if (chkBorder.Checked)
-            {
-                g.DrawPath(Pens.Green, path);
-            }
+
+
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
 
+
+        //=========================================================================
+        //msdf texture generator example
         private void cmdBuildMsdfTexture_Click(object sender, System.EventArgs e)
         {
             string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
@@ -183,7 +250,7 @@ namespace SampleWinForms
                 Typeface typeface = reader.Read(fs);
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
-                var builder = new MyGlyphPathBuilder(typeface);
+                var builder = new GlyphPathBuilder(typeface);
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------

@@ -44,12 +44,11 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GdiPlus\GlyphPathBuilderGdi.cs" />
+    <Compile Include="GdiPlus\GlyphReaderForGdiPlus.cs" />
     <Compile Include="GlyphPathBuilder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextPrinter.cs" />
-    <Compile Include="TextPrinter.Gdi.cs" />
+    <Compile Include="HintTechnique.cs" />
     <Compile Include="Workspace\TempLocalFontFile.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
