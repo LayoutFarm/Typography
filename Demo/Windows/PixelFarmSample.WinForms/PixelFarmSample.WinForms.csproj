@@ -41,8 +41,8 @@
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphPathBuilderGdi.cs">
       <Link>GdiPlus\GlyphPathBuilderGdi.cs</Link>
     </Compile>
-    <Compile Include="..\GdiPlusSample.WinForms\MyGlyphPathBuilder.cs">
-      <Link>MyGlyphPathBuilder.cs</Link>
+    <Compile Include="..\GdiPlusSample.WinForms\GlyphPathBuilder.cs">
+      <Link>GlyphPathBuilder.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\TextPrinter.cs">
       <Link>TextPrinter.cs</Link>
