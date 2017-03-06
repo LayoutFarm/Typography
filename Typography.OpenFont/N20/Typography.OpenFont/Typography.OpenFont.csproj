@@ -47,8 +47,8 @@
     <Compile Include="..\..\NetCore\Typography.OpenFont\Glyph.cs">
       <Link>Glyph.cs</Link>
     </Compile>
-    <Compile Include="..\..\NetCore\Typography.OpenFont\IGlyphReader.cs">
-      <Link>IGlyphReader.cs</Link>
+    <Compile Include="..\..\NetCore\Typography.OpenFont\IGlyphTranslator.cs">
+      <Link>IGlyphTranslator.cs</Link>
     </Compile>
     <Compile Include="..\..\NetCore\Typography.OpenFont\IO\ByteOrderSwappingBinaryReader.cs">
       <Link>IO\ByteOrderSwappingBinaryReader.cs</Link>

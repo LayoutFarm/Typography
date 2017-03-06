@@ -18,10 +18,10 @@ namespace Typography.Rendering
         {
 
             this.pxScale = pxScale;
-            var analyzer1 = new GlyphContourReader();
-            analyzer1.Read(glyphPoints, glyphContours);
+            var glyphToCountor = new GlyphTranslatorToContour();
+            glyphToCountor.Read(glyphPoints, glyphContours);
             //master outline analysis 
-            contours = analyzer1.GetContours();
+            contours = glyphToCountor.GetContours();
             int j = contours.Count;
             var analyzer = new GlyphPartAnalyzer();
             analyzer.NSteps = 4;
@@ -37,8 +37,8 @@ namespace Typography.Rendering
         /// <summary>
         /// read fitting output
         /// </summary>
-        /// <param name="reader"></param>
-        public void ReadOutput(IGlyphReader reader)
+        /// <param name="tx">glyph translator</param>
+        public void ReadOutput(IGlyphTranslator tx)
         {
             if (glyphOutline == null) { return; }
             //
@@ -51,14 +51,14 @@ namespace Typography.Rendering
             //then create     
 
             int j = contours.Count;
-            reader.BeginRead(j);
+            tx.BeginRead(j);
             for (int i = 0; i < j; ++i)
             {
                 //new contour
-                CreateFitShape(reader, contours[i], this.pxScale, false, true);
-                reader.CloseContour();
+                CreateFitShape(tx, contours[i], this.pxScale, false, true);
+                tx.CloseContour();
             }
-            reader.EndRead();
+            tx.EndRead();
         }
 
         const int GRID_SIZE = 1;
@@ -99,7 +99,7 @@ namespace Typography.Rendering
                 return integer1;
             }
         }
-        static void CreateFitShape(IGlyphReader reader, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
+        static void CreateFitShape(IGlyphTranslator tx, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
         {
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
@@ -134,7 +134,7 @@ namespace Typography.Rendering
                     }
                     p_x = new_x;
                 }
-                reader.MoveTo((float)p_x, (float)p_y);
+                tx.MoveTo((float)p_x, (float)p_y);
                 //-------------
                 first_px = prev_px = p_x;
                 first_py = prev_py = p_y;
@@ -174,13 +174,13 @@ namespace Typography.Rendering
                     p_x = new_x;
                 }
                 //                 
-                reader.LineTo((float)p_x, (float)p_y);
+                tx.LineTo((float)p_x, (float)p_y);
                 //
                 prev_px = p_x;
                 prev_py = p_y;
             }
 
-            reader.LineTo((float)first_px, (float)first_py);
+            tx.LineTo((float)first_px, (float)first_py);
         }
 
         GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours, float pixelScale)
