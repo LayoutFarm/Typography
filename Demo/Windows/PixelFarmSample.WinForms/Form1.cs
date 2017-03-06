@@ -51,7 +51,7 @@ namespace SampleWinForms
             //----------
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg_SingleGlyph);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
@@ -145,7 +145,7 @@ namespace SampleWinForms
 
         enum RenderChoice
         {
-            RenderWithMiniAgg,
+            RenderWithMiniAgg_SingleGlyph,//for test single glyph 
             RenderWithGdiPlusPath,
             RenderWithTextPrinterAndMiniAgg,
             RenderWithMsdfGen, //rendering with multi-channel signed distance field img
@@ -229,7 +229,7 @@ namespace SampleWinForms
                         }
                     }
                     break;
-                case RenderChoice.RenderWithMiniAgg:
+                case RenderChoice.RenderWithMiniAgg_SingleGlyph:
                     {
                         //for test only 1 char
                         char testChar = this.txtInputChar.Text[0];
