@@ -89,6 +89,8 @@ namespace SampleWinForms
                 currentTextPrinter.FontSizeInPoints = (int)lstFontSizes.SelectedItem;
                 UpdateRenderOutput();
             };
+
+            this.Text = "Gdi+ Sample";
         }
         void UpdateRenderOutput()
         {
