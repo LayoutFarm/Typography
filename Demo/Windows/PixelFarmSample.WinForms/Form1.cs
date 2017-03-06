@@ -315,11 +315,9 @@ namespace SampleWinForms
                 builder.GetOutputPoints(),
                 builder.GetOutputContours(), pxScale);
             var glyphReader2 = new GlyphReaderVxs();
-            autoFit.ReadOutput(glyphReader2);
-
-
+            autoFit.ReadOutput(glyphReader2); 
             VertexStore vxs2 = new VertexStore();
-            glyphReader.WriteOutput(vxs2, vxsPool2);
+            glyphReader2.WriteOutput(vxs2, vxsPool2);
 
             //
             p.FillColor = PixelFarm.Drawing.Color.Black;

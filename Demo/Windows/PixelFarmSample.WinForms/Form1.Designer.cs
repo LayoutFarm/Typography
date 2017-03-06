@@ -30,7 +30,6 @@
         {
             this.button1 = new System.Windows.Forms.Button();
             this.txtInputChar = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.chkBorder = new System.Windows.Forms.CheckBox();
             this.chkFillBackground = new System.Windows.Forms.CheckBox();
             this.cmbRenderChoices = new System.Windows.Forms.ComboBox();
@@ -59,25 +58,14 @@
             this.button1.TabIndex = 0;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
-          
             // 
             // txtInputChar
             // 
-            this.txtInputChar.Location = new System.Drawing.Point(79, 7);
+            this.txtInputChar.Location = new System.Drawing.Point(12, 11);
             this.txtInputChar.Name = "txtInputChar";
-            this.txtInputChar.Size = new System.Drawing.Size(101, 20);
+            this.txtInputChar.Size = new System.Drawing.Size(168, 20);
             this.txtInputChar.TabIndex = 1;
             this.txtInputChar.Text = "I";
-           
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 10);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(61, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Only 1 char";
             // 
             // chkBorder
             // 
@@ -98,7 +86,6 @@
             this.chkFillBackground.TabIndex = 4;
             this.chkFillBackground.Text = "Fill BackGround";
             this.chkFillBackground.UseVisualStyleBackColor = true;
-            
             // 
             // cmbRenderChoices
             // 
@@ -116,7 +103,6 @@
             this.lstFontSizes.Name = "lstFontSizes";
             this.lstFontSizes.Size = new System.Drawing.Size(121, 212);
             this.lstFontSizes.TabIndex = 8;
-            
             // 
             // label2
             // 
@@ -148,7 +134,6 @@
             this.chkShowTess.TabIndex = 13;
             this.chkShowTess.Text = "Show Tesselation";
             this.chkShowTess.UseVisualStyleBackColor = true;
-             
             // 
             // chkShowGrid
             // 
@@ -159,7 +144,6 @@
             this.chkShowGrid.TabIndex = 14;
             this.chkShowGrid.Text = "Show Grid";
             this.chkShowGrid.UseVisualStyleBackColor = true;
-            
             // 
             // txtGridSize
             // 
@@ -180,7 +164,6 @@
             this.chkYGridFitting.TabIndex = 16;
             this.chkYGridFitting.Text = "Y Grid Auto Fitting";
             this.chkYGridFitting.UseVisualStyleBackColor = true;
-           
             // 
             // chkDrawBone
             // 
@@ -193,7 +176,6 @@
             this.chkDrawBone.TabIndex = 19;
             this.chkDrawBone.Text = "DrawBone";
             this.chkDrawBone.UseVisualStyleBackColor = true;
-             
             // 
             // chkXGridFitting
             // 
@@ -204,7 +186,6 @@
             this.chkXGridFitting.TabIndex = 20;
             this.chkXGridFitting.Text = "X Grid Auto Fitting";
             this.chkXGridFitting.UseVisualStyleBackColor = true;
-
             // 
             // chkLcdTechnique
             // 
@@ -215,7 +196,6 @@
             this.chkLcdTechnique.TabIndex = 21;
             this.chkLcdTechnique.Text = "LcdTechnique";
             this.chkLcdTechnique.UseVisualStyleBackColor = true;
-            
             // 
             // cmdBuildMsdfTexture
             // 
@@ -264,7 +244,6 @@
             this.chkGsubEnableLigature.TabIndex = 26;
             this.chkGsubEnableLigature.Text = "GSUB: Enable Ligature";
             this.chkGsubEnableLigature.UseVisualStyleBackColor = true;
-           
             // 
             // Form1
             // 
@@ -289,7 +268,6 @@
             this.Controls.Add(this.cmbRenderChoices);
             this.Controls.Add(this.chkFillBackground);
             this.Controls.Add(this.chkBorder);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.txtInputChar);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
@@ -303,7 +281,6 @@
 
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox txtInputChar;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkBorder;
         private System.Windows.Forms.CheckBox chkFillBackground;
         private System.Windows.Forms.ComboBox cmbRenderChoices;
