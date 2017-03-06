@@ -9,11 +9,11 @@ namespace Typography.Rendering
     //this is PixelFarm version ***
     //render with MiniAgg
 
-    public class GlyphContourReader : OpenFont.IGlyphPathBuilder
+    public class GlyphTranslatorToContour : OpenFont.IGlyphTranslator
     {
         List<GlyphContour> contours;
         GlyphContourBuilder cntBuilder;
-        public GlyphContourReader()
+        public GlyphTranslatorToContour()
         {
 
         }

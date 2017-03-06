@@ -10,10 +10,10 @@ namespace Typography.Rendering
     {
         public Msdfgen.Shape CreateMsdfShape(GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float pxScale = 1)
         {
-            var contourBuilder = new GlyphContourReader();
-            contourBuilder.Read(glyphPoints, contourEndPoints);
+            var glyphToContour = new GlyphTranslatorToContour();
+            glyphToContour.Read(glyphPoints, contourEndPoints);
 
-            List<GlyphContour> cnts = contourBuilder.GetContours();
+            List<GlyphContour> cnts = glyphToContour.GetContours();
             List<GlyphContour> newFitContours = new List<GlyphContour>();
 
             int j = cnts.Count;

@@ -23,27 +23,44 @@ namespace SampleWinForms
         ActualImage destImg;
         Bitmap winBmp;
 
-        string _currentSelectedFontFile = "";
-        float fontSizeInPoint = 14; //default
 
+        DevTextPrinterBase selectedTextPrinter = null;
+        DevVxsTextPrinter _devVxsTextPrinter = null;
+        DevGdiTextPrinter _devGdiTextPrinter = null;
+
+        float _fontSizeInPts = 14;//default
+        string _selectedFontFilename;
         public Form1()
         {
             InitializeComponent();
+
+
+            _devVxsTextPrinter = new DevVxsTextPrinter();
+            _devGdiTextPrinter = new DevGdiTextPrinter();
+
+            selectedTextPrinter = _devVxsTextPrinter;
+            //default
+            //set script lang,
+            //test with Thai for 'complex script' 
+            _devGdiTextPrinter.ScriptLang = _devVxsTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
+            _devGdiTextPrinter.PositionTechnique = _devVxsTextPrinter.PositionTechnique = PositionTechnique.OpenFont;
+
+
             this.Load += new EventHandler(Form1_Load);
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
             //----------
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg_SingleGlyph);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
             cmbRenderChoices.SelectedIndex = 2;
             cmbRenderChoices.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbPositionTech.Items.Add(PositionTecnhique.OpenFont);
-            cmbPositionTech.Items.Add(PositionTecnhique.Kerning);
-            cmbPositionTech.Items.Add(PositionTecnhique.None);
+            cmbPositionTech.Items.Add(PositionTechnique.OpenFont);
+            cmbPositionTech.Items.Add(PositionTechnique.Kerning);
+            cmbPositionTech.Items.Add(PositionTechnique.None);
             cmbPositionTech.SelectedIndex = 0;
             cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
@@ -78,7 +95,7 @@ namespace SampleWinForms
             lstFontSizes.SelectedIndexChanged += (s, e) =>
             {
                 //new font size
-                fontSizeInPoint = (int)lstFontSizes.SelectedItem;
+                _fontSizeInPts = (int)lstFontSizes.SelectedItem;
                 UpdateRenderOutput();
             };
 
@@ -99,7 +116,7 @@ namespace SampleWinForms
                 if (selectedFileIndex < 0 && tmpLocalFile.OnlyFileName == selectedFontFileName)
                 {
                     selectedFileIndex = fileIndexCount;
-                    _currentSelectedFontFile = file;
+                    _selectedFontFilename = file;
                 }
                 fileIndexCount++;
             }
@@ -107,9 +124,10 @@ namespace SampleWinForms
             lstFontList.SelectedIndex = selectedFileIndex;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
-                _currentSelectedFontFile = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+                _selectedFontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
                 UpdateRenderOutput();
             };
+
             //----------------
             //string inputstr = "ก้า";
             string inputstr = "น้ำน้ำ";
@@ -124,9 +142,10 @@ namespace SampleWinForms
         }
 
 
+
         enum RenderChoice
         {
-            RenderWithMiniAgg,
+            RenderWithMiniAgg_SingleGlyph,//for test single glyph 
             RenderWithGdiPlusPath,
             RenderWithTextPrinterAndMiniAgg,
             RenderWithMsdfGen, //rendering with multi-channel signed distance field img
@@ -138,9 +157,9 @@ namespace SampleWinForms
             this.Text = "Render with PixelFarm";
             //this.lstFontSizes.SelectedIndex = lstFontSizes.Items.Count - 1;//select last one  
             this.lstFontSizes.SelectedIndex = 0;//select last one  
+            _selectedFontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+
         }
-
-
 
         void UpdateRenderOutput()
         {
@@ -151,59 +170,74 @@ namespace SampleWinForms
                 p = new AggCanvasPainter(imgGfx2d);
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
+
+                _devVxsTextPrinter.DefaultCanvasPainter = p;
+                _devGdiTextPrinter.DefaultTargetGraphics = g;
             }
-            ReadAndRender(_currentSelectedFontFile);
-        }
-
-
-
-        void ReadAndRender(string fontfile)
-        {
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
             {
-                p.Clear(PixelFarm.Drawing.Color.White);
                 return;
             }
-            var reader = new OpenFontReader();
-            char testChar = txtInputChar.Text[0];//only 1 char 
-            int resolution = 96;
-            //1. read typeface from font file
 
+
+            //1. read typeface from font file 
             RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
             switch (renderChoice)
             {
-                case RenderChoice.RenderWithMiniAgg:
-                    {
-                        using (var fs = new FileStream(fontfile, FileMode.Open))
-                        {
-                            Typeface typeFace = reader.Read(fs);
-                            RenderWithMiniAgg(typeFace, testChar, fontSizeInPoint);
-                        }
-                    }
-                    break;
+
                 case RenderChoice.RenderWithGdiPlusPath:
                     {
-                        using (var fs = new FileStream(fontfile, FileMode.Open))
-                        {
-                            Typeface typeFace = reader.Read(fs);
-                            RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
-                        }
+                        selectedTextPrinter = _devGdiTextPrinter;
+                        selectedTextPrinter.FontFilename = _selectedFontFilename;
+                        selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
+                        selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
                     }
                     break;
                 case RenderChoice.RenderWithTextPrinterAndMiniAgg:
                     {
+                        //clear previous draw
+                        p.Clear(PixelFarm.Drawing.Color.White);
+                        p.UseSubPixelRendering = chkLcdTechnique.Checked;
+                        p.FillColor = PixelFarm.Drawing.Color.Black;
 
-                        RenderWithTextPrinterAndMiniAgg(fontfile, this.txtInputChar.Text, fontSizeInPoint, resolution);
+                        selectedTextPrinter = _devVxsTextPrinter;
+                        selectedTextPrinter.FontFilename = _selectedFontFilename;
+                        selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
+                        selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
+
+                        //copy from Agg's memory buffer to gdi 
+                        PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+                        g.Clear(Color.White);
+                        g.DrawImage(winBmp, new Point(10, 0));
+
                     }
                     break;
+
+
+                //==============================================
+                //render 1 glyph for debug and test
                 case RenderChoice.RenderWithMsdfGen:
                 case RenderChoice.RenderWithSdfGen:
                     {
-                        using (var fs = new FileStream(fontfile, FileMode.Open))
+                        char testChar = this.txtInputChar.Text[0];
+                        using (var fs = new FileStream(_selectedFontFilename, FileMode.Open))
                         {
+                            var reader = new OpenFontReader();
                             Typeface typeFace = reader.Read(fs);
-                            RenderWithMsdfImg(typeFace, testChar, fontSizeInPoint);
+                            RenderWithMsdfImg(typeFace, testChar, _fontSizeInPts);
+                        }
+                    }
+                    break;
+                case RenderChoice.RenderWithMiniAgg_SingleGlyph:
+                    {
+                        //for test only 1 char
+                        char testChar = this.txtInputChar.Text[0];
+                        using (var fs = new FileStream(_selectedFontFilename, FileMode.Open))
+                        {
+                            var reader = new OpenFontReader();
+                            Typeface typeFace = reader.Read(fs);
+                            RenderWithMiniAgg(typeFace, testChar, _fontSizeInPts);
                         }
                     }
                     break;
@@ -211,13 +245,15 @@ namespace SampleWinForms
                     throw new NotSupportedException();
             }
 
+
         }
 
+        VertexStorePool _vxsPool = new VertexStorePool();
 
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
             //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
@@ -238,9 +274,11 @@ namespace SampleWinForms
 
             builder.Build(testChar, sizeInPoint);
 
-            var vxsShapeBuilder = new GlyphPathBuilderVxs();
-            builder.ReadShapes(vxsShapeBuilder);
-            VertexStore vxs = vxsShapeBuilder.GetVxs();
+            var txToVxs1 = new GlyphTranslatorToVxs();
+            builder.ReadShapes(txToVxs1);
+
+            VertexStore vxs = new VertexStore();
+            txToVxs1.WriteOutput(vxs, _vxsPool);
 
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
 
@@ -276,9 +314,13 @@ namespace SampleWinForms
             autoFit.Hint(
                 builder.GetOutputPoints(),
                 builder.GetOutputContours(), pxScale);
-            var vxsShapeBuilder2 = new GlyphPathBuilderVxs();
-            autoFit.ReadOutput(vxsShapeBuilder2);
-            VertexStore vxs2 = vxsShapeBuilder2.GetVxs();
+
+
+            txToVxs1.Reset();
+            autoFit.ReadOutput(txToVxs1);
+            VertexStore vxs2 = new VertexStore();
+            txToVxs1.WriteOutput(vxs2, _vxsPool);
+
             //
             p.FillColor = PixelFarm.Drawing.Color.Black;
             p.Fill(vxs2);
@@ -312,7 +354,7 @@ namespace SampleWinForms
             //p.UseSubPixelRendering = chkLcdTechnique.Checked;
             p.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder(typeface);
             var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset 
@@ -551,152 +593,11 @@ namespace SampleWinForms
             }
         }
 
-        void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
-        {
-
-            //render glyph path with Gdi+ path 
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
-            //////credit:
-            //////http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
 
 
-            //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
-            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            builder.UseTrueTypeInstructions = false;//reset
-            builder.UseVerticalHinting = false;//reset
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInstructions = true;
-                    builder.UseVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    break;
-            }
-            //---------------------------------------------------- 
-            builder.Build(testChar, sizeInPoint);
-            var gdiPathBuilder = new GlyphPathBuilderGdi();
-            builder.ReadShapes(gdiPathBuilder);
-            float pxScale = builder.GetPixelScale();
-
-            System.Drawing.Drawing2D.GraphicsPath path = gdiPathBuilder.ResultGraphicPath;
-            path.Transform(
-                new System.Drawing.Drawing2D.Matrix(
-                    pxScale, 0,
-                    0, pxScale,
-                    0, 0
-                ));
-
-            if (chkFillBackground.Checked)
-            {
-                g.FillPath(Brushes.Black, path);
-            }
-            if (chkBorder.Checked)
-            {
-                g.DrawPath(Pens.Green, path);
-            }
-            //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
-        }
 
 
-        TextPrinter printer2;
-        void RenderWithTextPrinterAndMiniAgg(string fontfile, string str, float sizeInPoint, int resolution)
-        {
-            //1. 
-            if (printer2 == null)
-            {
-                printer2 = new TextPrinter();
-                printer2.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
-            }
-
-
-            printer2.FontFile = fontfile;
-            //
-            printer2.EnableLigature = this.chkGsubEnableLigature.Checked;
-            printer2.PositionTechnique = (PositionTecnhique)cmbPositionTech.SelectedItem;
-            //printer.EnableTrueTypeHint = this.chkTrueTypeHint.Checked;
-            //printer.UseAggVerticalHinting = this.chkVerticalHinting.Checked;
-            //
-            int len = str.Length;
-            //
-            List<GlyphPlan> glyphPlanList = new List<GlyphPlan>(len);
-            printer2.Print(sizeInPoint, str, glyphPlanList);
-            //--------------------------
-
-            //5. use PixelFarm's Agg to render to bitmap...
-            //5.1 clear background
-            p.Clear(PixelFarm.Drawing.Color.White);
-            //---------------------------
-            //TODO: review here
-            //fake subpixel rendering 
-            //not correct
-
-            p.UseSubPixelRendering = chkLcdTechnique.Checked;
-            //---------------------------
-            if (chkFillBackground.Checked)
-            {
-                //5.2 
-                p.FillColor = PixelFarm.Drawing.Color.Black;
-                //5.3 
-                int glyphListLen = glyphPlanList.Count;
-
-                float ox = p.OriginX;
-                float oy = p.OriginY;
-                float cx = 0;
-                float cy = 10;
-                for (int i = 0; i < glyphListLen; ++i)
-                {
-                    GlyphPlan glyphPlan = glyphPlanList[i];
-                    cx = glyphPlan.x;
-                    cy = glyphPlan.y;
-                    p.SetOrigin(cx, cy);
-                    p.Fill((VertexStore)glyphPlan.vxs);
-                }
-                p.SetOrigin(ox, oy);
-
-            }
-            if (chkBorder.Checked)
-            {
-                //5.4 
-                p.StrokeColor = PixelFarm.Drawing.Color.Green;
-                //user can specific border width here...
-                //p.StrokeWidth = 2;
-                //5.5 
-                int glyphListLen = glyphPlanList.Count;
-                float ox = p.OriginX;
-                float oy = p.OriginY;
-                float cx = 0;
-                float cy = 10;
-                for (int i = 0; i < glyphListLen; ++i)
-                {
-                    GlyphPlan glyphPlan = glyphPlanList[i];
-                    cx = glyphPlan.x;
-                    p.SetOrigin(cx, cy);
-                    p.Draw((VertexStore)glyphPlan.vxs);
-                }
-                p.SetOrigin(ox, oy);
-            }
-            //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
-            //--------------- 
-            //7. just render our bitmap
-            g.Clear(Color.White);
-            g.DrawImage(winBmp, new Point(10, 0));
-            //--------------------------
-
-        }
-
-
+        VertexStorePool _vxsPool2 = new VertexStorePool();
         int _gridSize = 5;//default 
         private void TxtGridSize_KeyDown(object sender, KeyEventArgs e)
         {
@@ -743,7 +644,7 @@ namespace SampleWinForms
                 Typeface typeface = reader.Read(fs);
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
-                var builder = new MyGlyphPathBuilder(typeface);
+                var builder = new GlyphPathBuilder(typeface);
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
