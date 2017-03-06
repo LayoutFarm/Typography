@@ -81,14 +81,15 @@ namespace SampleWinForms
                     14,
                     16,
                     18,20,22,24,26,28,36,48,72,240,300,360
-                });
-            lstFontSizes.SelectedIndex = 0;
+                }); 
             lstFontSizes.SelectedIndexChanged += (s, e) =>
             {
                 //new font size
                 currentTextPrinter.FontSizeInPoints = (int)lstFontSizes.SelectedItem;
                 UpdateRenderOutput();
             };
+            lstFontSizes.SelectedIndex = 0;
+            this.Text = "Gdi+ Sample";
         }
         void UpdateRenderOutput()
         {
