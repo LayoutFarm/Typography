@@ -11,8 +11,10 @@ namespace SampleWinForms
     //this is Gdi+ version ***
     //render with System.Drawing.Drawing2D.GraphicsPath
     //------------------
-
-    public class GlyphPathBuilderGdi : IGlyphPathBuilder
+    /// <summary>
+    /// read result as Gdi+ GraphicsPath
+    /// </summary>
+    public class GlyphReaderForGdiPlus : IGlyphReader
     {
         //this gdi+ version
         GraphicsPath ps;
@@ -21,7 +23,7 @@ namespace SampleWinForms
         float lastX;
         float lastY;
 
-        public GlyphPathBuilderGdi()
+        public GlyphReaderForGdiPlus()
         {
 
         }
@@ -79,9 +81,12 @@ namespace SampleWinForms
                  new PointF(lastX = (float)x1, lastY = (float)y1));
         }
 
-
-
-        public GraphicsPath ResultGraphicPath { get { return this.ps; } }
+        public void Reset()
+        {
+            ps = null;
+            lastMoveX = lastMoveY = lastX = lastY;
+        }
+        public GraphicsPath ResultGraphicsPath { get { return this.ps; } }
 
     }
 }

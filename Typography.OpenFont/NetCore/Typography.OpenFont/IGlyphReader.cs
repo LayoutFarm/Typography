@@ -28,7 +28,7 @@ namespace Typography.OpenFont
     //please note that TrueType font
     //compose of Quadractic Bezier Curve ***
     //--------------------- 
-    public interface IGlyphPathBuilder
+    public interface IGlyphReader
     {
         /// <summary>
         /// begin read a glyph
@@ -76,9 +76,10 @@ namespace Typography.OpenFont
         void CloseContour();
     }
 
-    public static class IGlyphPathBuilderExtensions
+    public static class IGlyphReaderExtensions
     {
-        public static void Read(this IGlyphPathBuilder b, GlyphPointF[] glyphPoints, ushort[] contourEndPoints)
+
+        public static void Read(this IGlyphReader reader, GlyphPointF[] glyphPoints, ushort[] contourEndPoints)
         {
 
             int startContour = 0;
@@ -87,7 +88,7 @@ namespace Typography.OpenFont
             int todoContourCount = contourEndPoints.Length;
             //----------------------------------- 
             //1. start read data from a glyph
-            b.BeginRead(todoContourCount);
+            reader.BeginRead(todoContourCount);
             //-----------------------------------
             float lastMoveX = 0;
             float lastMoveY = 0;
@@ -141,7 +142,7 @@ namespace Typography.OpenFont
                             {
                                 case 1:
                                     {
-                                        b.Curve3(
+                                        reader.Curve3(
                                             c1.X, c1.Y,
                                             p_x, p_y);
                                     }
@@ -151,7 +152,7 @@ namespace Typography.OpenFont
                                         //for TrueType font 
                                         //we should not be here?
 
-                                        b.Curve4(
+                                        reader.Curve4(
                                              c1.X, c1.Y,
                                              c2.X, c2.Y,
                                              p_x, p_y);
@@ -175,11 +176,11 @@ namespace Typography.OpenFont
                             if (isFirstPoint)
                             {
                                 isFirstPoint = false;
-                                b.MoveTo(lastMoveX = (p_x), lastMoveY = (p_y));
+                                reader.MoveTo(lastMoveX = (p_x), lastMoveY = (p_y));
                             }
                             else
                             {
-                                b.LineTo(p_x, p_y);
+                                reader.LineTo(p_x, p_y);
                             }
 
                             //if (has_dropout)
@@ -224,7 +225,7 @@ namespace Typography.OpenFont
                                 Vector2 mid = GetMid(c1, p_x, p_y);
                                 //----------
                                 //2. generate curve3 ***
-                                b.Curve3(
+                                reader.Curve3(
                                     c1.X, c1.Y,
                                     mid.X, mid.Y);
                                 //------------------------
@@ -253,7 +254,7 @@ namespace Typography.OpenFont
                         case 0: break;
                         case 1:
                             {
-                                b.Curve3(c1.X, c1.Y,
+                                reader.Curve3(c1.X, c1.Y,
                                     lastMoveX, lastMoveY);
                             }
                             break;
@@ -261,7 +262,7 @@ namespace Typography.OpenFont
                             {
                                 //for TrueType font 
                                 //we should not be here? 
-                                b.Curve4(c1.X, c1.Y,
+                                reader.Curve4(c1.X, c1.Y,
                                     c2.X, c2.Y,
                                     lastMoveX, lastMoveY);
                             }
@@ -274,13 +275,13 @@ namespace Typography.OpenFont
                     curveControlPointCount = 0;
                 }
                 //--------      
-                b.CloseContour(); //***                            
+                reader.CloseContour(); //***                            
                 startContour++;
                 todoContourCount--;
                 //--------      
             }
             //finish
-            b.EndRead();
+            reader.EndRead();
         }
 
         static Vector2 GetMid(Vector2 v0, float x1, float y1)

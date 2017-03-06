@@ -2,7 +2,7 @@
 using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
-
+//
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
@@ -12,11 +12,17 @@ namespace SampleWinForms
     public partial class Form1 : Form
     {
         Graphics g;
-        string _currentSelectedFontFile;
-        int fontSizeInPoint = 14;//default
+        //for this sample code,
+        //create text printer env for developer.
+        DevGdiTextPrinter currentTextPrinter = new DevGdiTextPrinter();
+
         public Form1()
         {
             InitializeComponent();
+
+            //choose Thai script for 'complex script' testing.
+            //you can change this to test other script.
+            currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
@@ -25,9 +31,9 @@ namespace SampleWinForms
             chkBorder.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkFillBackground.CheckedChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbPositionTech.Items.Add(PositionTecnhique.OpenFont);
-            cmbPositionTech.Items.Add(PositionTecnhique.Kerning);
-            cmbPositionTech.Items.Add(PositionTecnhique.None);
+            cmbPositionTech.Items.Add(PositionTechnique.OpenFont);
+            cmbPositionTech.Items.Add(PositionTechnique.Kerning);
+            cmbPositionTech.Items.Add(PositionTechnique.None);
             cmbPositionTech.SelectedIndex = 0;
             cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
@@ -54,7 +60,8 @@ namespace SampleWinForms
                 if (selectedFileIndex < 0 && tmpLocalFile.OnlyFileName == selectedFontFileName)
                 {
                     selectedFileIndex = fileIndexCount;
-                    _currentSelectedFontFile = file;
+                    currentTextPrinter.FontFilename = file;
+
                 }
                 fileIndexCount++;
             }
@@ -62,7 +69,7 @@ namespace SampleWinForms
             lstFontList.SelectedIndex = selectedFileIndex;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
-                _currentSelectedFontFile = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+                currentTextPrinter.FontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
                 UpdateRenderOutput();
             };
             //----------
@@ -79,7 +86,7 @@ namespace SampleWinForms
             lstFontSizes.SelectedIndexChanged += (s, e) =>
             {
                 //new font size
-                fontSizeInPoint = (int)lstFontSizes.SelectedItem;
+                currentTextPrinter.FontSizeInPoints = (int)lstFontSizes.SelectedItem;
                 UpdateRenderOutput();
             };
         }
@@ -95,73 +102,22 @@ namespace SampleWinForms
             {
                 return;
             }
-            var reader = new OpenFontReader();
-            char testChar = txtInputChar.Text[0];//only 1 char 
-            int resolution = 96;
-            //1. read typeface from font file
-            using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
-            {
-                Typeface typeFace = reader.Read(fs);
-                RenderWithGdiPlusPath(typeFace, testChar, fontSizeInPoint, resolution);
-            }
-        }
-        void RenderWithGdiPlusPath(Typeface typeface, char testChar, float sizeInPoint, int resolution)
-        {
-
-            //render glyph path with Gdi+ path 
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
-            //////credit:
-            //////http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly  
+            //----------------------- 
 
 
-            //----------------------------------------------------
-            var builder = new MyGlyphPathBuilder(typeface);
-            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            builder.UseTrueTypeInstructions = false;//reset
-            builder.UseVerticalHinting = false;//reset
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInstructions = true;
-                    builder.UseVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    break;
-            }
-            //---------------------------------------------------- 
-            builder.Build(testChar, sizeInPoint);
-            var gdiPathBuilder = new GlyphPathBuilderGdi();
-            builder.ReadShapes(gdiPathBuilder);
-            float pxScale = builder.GetPixelScale();
-
-            System.Drawing.Drawing2D.GraphicsPath path = gdiPathBuilder.ResultGraphicPath;
-            path.Transform(
-                new System.Drawing.Drawing2D.Matrix(
-                    pxScale, 0,
-                    0, pxScale,
-                    0, 0
-                ));
-
-            if (chkFillBackground.Checked)
-            {
-                g.FillPath(Brushes.Black, path);
-            }
-            if (chkBorder.Checked)
-            {
-                g.DrawPath(Pens.Green, path);
-            }
-            //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+            //render at specific pos
+            float x_pos = 0, y_pos = 0;
+            currentTextPrinter.DrawString(g,
+                 txtInputChar.Text.ToCharArray(),
+                 x_pos,
+                 y_pos
+                );
         }
 
+
+
+        //=========================================================================
+        //msdf texture generator example
         private void cmdBuildMsdfTexture_Click(object sender, System.EventArgs e)
         {
             string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
@@ -183,7 +139,7 @@ namespace SampleWinForms
                 Typeface typeface = reader.Read(fs);
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
-                var builder = new MyGlyphPathBuilder(typeface);
+                var builder = new GlyphPathBuilder(typeface);
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
