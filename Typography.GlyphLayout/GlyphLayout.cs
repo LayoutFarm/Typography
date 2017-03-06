@@ -39,7 +39,7 @@ namespace Typography.TextLayout
         }
     }
 
-    public enum PositionTecnhique
+    public enum PositionTechnique
     {
         None,
         /// <summary>
@@ -59,10 +59,10 @@ namespace Typography.TextLayout
         Dictionary<Typeface, GlyphsCache> _glyphCaches = new Dictionary<Typeface, GlyphsCache>();
         public GlyphLayout()
         {
-            PositionTechnique = PositionTecnhique.OpenFont;
+            PositionTechnique = PositionTechnique.OpenFont;
             ScriptLang = ScriptLangs.Latin;
         }
-        public PositionTecnhique PositionTechnique { get; set; }
+        public PositionTechnique PositionTechnique { get; set; }
         public ScriptLang ScriptLang { get; set; }
         public bool EnableLigature { get; set; }
 
@@ -121,8 +121,8 @@ namespace Typography.TextLayout
                    );
             }
 
-            PositionTecnhique posTech = this.PositionTechnique;
-            if (j > 1 && posTech == PositionTecnhique.OpenFont)
+            PositionTechnique posTech = this.PositionTechnique;
+            if (j > 1 && posTech == PositionTechnique.OpenFont)
             {
                 GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, ScriptLang.shortname);
                 glyphSetPos.DoGlyphPosition(glyphPositions);
@@ -142,10 +142,10 @@ namespace Typography.TextLayout
                 //----------------------------------   
                 switch (posTech)
                 {
-                    case PositionTecnhique.None:
+                    case PositionTechnique.None:
                         glyphPlanBuffer.Add(new GlyphPlan(glyIndex, cx, cy, advWidth));
                         break;
-                    case PositionTecnhique.OpenFont:
+                    case PositionTechnique.OpenFont:
                         {
                             GlyphPos gpos_offset = glyphPositions[i];
                             glyphPlanBuffer.Add(new GlyphPlan(
@@ -155,7 +155,7 @@ namespace Typography.TextLayout
                                 advWidth));
                         }
                         break;
-                    case PositionTecnhique.Kerning:
+                    case PositionTechnique.Kerning:
                         {
                             glyphPlanBuffer.Add(new GlyphPlan(
                                glyIndex,
