@@ -13,11 +13,11 @@ namespace PixelFarm.Drawing.Fonts
     /// <summary>
     /// read glyph and write the result to target vxs
     /// </summary>
-    public class GlyphReaderVxs : IGlyphReader
+    public class GlyphTranslatorToVxs : IGlyphTranslator
     {
         CurveFlattener curveFlattener = new CurveFlattener();
         PathWriter ps = new PathWriter();
-        public GlyphReaderVxs()
+        public GlyphTranslatorToVxs()
         {
         }
         public void BeginRead(int countourCount)

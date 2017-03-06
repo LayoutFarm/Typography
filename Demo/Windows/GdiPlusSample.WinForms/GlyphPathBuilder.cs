@@ -92,9 +92,9 @@ namespace SampleWinForms
                 //you can change this to your own hint engine*** 
             }
         }
-        public void ReadShapes(IGlyphReader glyphReader)
+        public void ReadShapes(IGlyphTranslator tx)
         {
-            glyphReader.Read(this._outputGlyphPoints, this._outputContours);
+            tx.Read(this._outputGlyphPoints, this._outputContours);
         }
 
         public float GetPixelScale()

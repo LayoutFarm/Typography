@@ -46,7 +46,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="GdiPlus\DevGdiTextPrinter.cs" />
-    <Compile Include="GdiPlus\GlyphReaderForGdiPlus.cs" />
+    <Compile Include="GdiPlus\GlyphTranslatorToGdiPath.cs" />
     <Compile Include="GlyphPathBuilder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

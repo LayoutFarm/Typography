@@ -99,7 +99,7 @@ namespace SampleWinForms
 
         //-----------------------
         VertexStorePool _vxsPool = new VertexStorePool();
-        GlyphReaderVxs _glyphReader = new GlyphReaderVxs();
+        GlyphTranslatorToVxs _glyphReader = new GlyphTranslatorToVxs();
       
 
         void UpdateTypefaceAndGlyphBuilder()

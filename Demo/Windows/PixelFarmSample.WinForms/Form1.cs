@@ -51,7 +51,7 @@ namespace SampleWinForms
             //----------
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg);
+            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg_SingleGlyph);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
             cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
@@ -145,7 +145,7 @@ namespace SampleWinForms
 
         enum RenderChoice
         {
-            RenderWithMiniAgg,
+            RenderWithMiniAgg_SingleGlyph,//for test single glyph 
             RenderWithGdiPlusPath,
             RenderWithTextPrinterAndMiniAgg,
             RenderWithMsdfGen, //rendering with multi-channel signed distance field img
@@ -229,7 +229,7 @@ namespace SampleWinForms
                         }
                     }
                     break;
-                case RenderChoice.RenderWithMiniAgg:
+                case RenderChoice.RenderWithMiniAgg_SingleGlyph:
                     {
                         //for test only 1 char
                         char testChar = this.txtInputChar.Text[0];
@@ -248,7 +248,7 @@ namespace SampleWinForms
 
         }
 
-        VertexStorePool vxsPool2 = new VertexStorePool();
+        VertexStorePool _vxsPool = new VertexStorePool();
 
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
@@ -274,11 +274,11 @@ namespace SampleWinForms
 
             builder.Build(testChar, sizeInPoint);
 
-            var glyphReader = new GlyphReaderVxs();
-            builder.ReadShapes(glyphReader);
+            var txToVxs1 = new GlyphTranslatorToVxs();
+            builder.ReadShapes(txToVxs1);
 
             VertexStore vxs = new VertexStore();
-            glyphReader.WriteOutput(vxs, vxsPool2);
+            txToVxs1.WriteOutput(vxs, _vxsPool);
 
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
 
@@ -314,12 +314,12 @@ namespace SampleWinForms
             autoFit.Hint(
                 builder.GetOutputPoints(),
                 builder.GetOutputContours(), pxScale);
-            var glyphReader2 = new GlyphReaderVxs();
-            autoFit.ReadOutput(glyphReader2);
 
 
+            txToVxs1.Reset();
+            autoFit.ReadOutput(txToVxs1);
             VertexStore vxs2 = new VertexStore();
-            glyphReader.WriteOutput(vxs2, vxsPool2);
+            txToVxs1.WriteOutput(vxs2, _vxsPool);
 
             //
             p.FillColor = PixelFarm.Drawing.Color.Black;
