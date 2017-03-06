@@ -14,7 +14,7 @@ namespace SampleWinForms
     /// <summary>
     /// read result as Gdi+ GraphicsPath
     /// </summary>
-    public class GlyphReaderForGdiPlus : IGlyphReader
+    public class GlyphTranslatorToGdiPath : IGlyphTranslator
     {
         //this gdi+ version
         GraphicsPath ps;
@@ -23,7 +23,7 @@ namespace SampleWinForms
         float lastX;
         float lastY;
 
-        public GlyphReaderForGdiPlus()
+        public GlyphTranslatorToGdiPath()
         {
 
         }

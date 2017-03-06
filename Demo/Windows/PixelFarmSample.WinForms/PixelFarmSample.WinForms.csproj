@@ -44,8 +44,8 @@
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\DevGdiTextPrinter.cs">
       <Link>GdiPlus\DevGdiTextPrinter.cs</Link>
     </Compile>
-    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphReaderForGdiPlus.cs">
-      <Link>GdiPlus\GlyphReaderForGdiPlus.cs</Link>
+    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphTranslatorToGdiPath.cs">
+      <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder.cs</Link>
@@ -64,7 +64,7 @@
     </Compile>
     <Compile Include="PixelFarm\BitmapHelper.cs" />
     <Compile Include="PixelFarm\DevVxsTextPrinter.cs" />
-    <Compile Include="PixelFarm\GlyphReaderVxs.cs" />
+    <Compile Include="PixelFarm\GlyphTranslatorToVxs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

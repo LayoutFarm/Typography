@@ -18,7 +18,7 @@ namespace SampleWinForms
 
         Typeface _currentTypeface;
         GlyphPathBuilder _currentGlyphPathBuilder;
-        GlyphReaderForGdiPlus _glyphReaderForGdiPlus;
+        GlyphTranslatorToGdiPath _txToGdiPath;
         GlyphLayout _glyphLayout = new GlyphLayout();
         SolidBrush _fillBrush = new SolidBrush(Color.Black);
         Pen _outlinePen = new Pen(Color.Green);
@@ -57,7 +57,7 @@ namespace SampleWinForms
                 //2. glyph builder
                 _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
                 //3. glyph reader,output as Gdi+ GraphicsPath
-                _glyphReaderForGdiPlus = new GlyphReaderForGdiPlus();
+                _txToGdiPath = new GlyphTranslatorToGdiPath();
             }
 
 
@@ -139,9 +139,9 @@ namespace SampleWinForms
                 //c_x += (glyphPlan.advX); //move xpos
 
                 //
-                _glyphReaderForGdiPlus.Reset();
-                _currentGlyphPathBuilder.ReadShapes(_glyphReaderForGdiPlus);
-                System.Drawing.Drawing2D.GraphicsPath path = _glyphReaderForGdiPlus.ResultGraphicsPath;
+                _txToGdiPath.Reset();
+                _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
+                System.Drawing.Drawing2D.GraphicsPath path = _txToGdiPath.ResultGraphicsPath;
                 path.Transform(scaleMat);
 
                 if (FillBackground)
