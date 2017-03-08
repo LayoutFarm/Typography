@@ -180,6 +180,23 @@ namespace SampleWinForms
                 return;
             }
 
+            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            bool useTrueTypeInst = false;//reset
+            bool useVerticalHinting = false; //reset agg vertical-only hinting
+             
+            switch (hintTech)
+            {
+                case HintTechnique.TrueTypeInstruction:
+                    useTrueTypeInst = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                    useTrueTypeInst = true;
+                    useVerticalHinting = true;
+                    break;
+                case HintTechnique.CustomAutoFit:
+                    //custom agg autofit 
+                    break;
+            }
 
             //1. read typeface from font file 
             RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
@@ -191,7 +208,10 @@ namespace SampleWinForms
                         selectedTextPrinter = _devGdiTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
+                        selectedTextPrinter.UseTrueTypeInstructions = useTrueTypeInst;
+                        selectedTextPrinter.UseVerticalHint = useVerticalHinting;
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
+
                     }
                     break;
                 case RenderChoice.RenderWithTextPrinterAndMiniAgg:
@@ -204,6 +224,9 @@ namespace SampleWinForms
                         selectedTextPrinter = _devVxsTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
+                        selectedTextPrinter.UseTrueTypeInstructions = useTrueTypeInst;
+                        selectedTextPrinter.UseVerticalHint = useVerticalHinting;
+
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
 
                         //copy from Agg's memory buffer to gdi 
