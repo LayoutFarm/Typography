@@ -30,18 +30,20 @@ namespace SampleWinForms
                     //when we change new font, 
                     OnFontFilenameChanged();
                 }
-               
+
             }
         }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
-        public HintTechnique HintTechnique { get; set; }
+      
         public float FontSizeInPoints { get; set; }
         protected virtual void OnFontFilenameChanged() { }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
-
         public abstract void DrawString(char[] textBuffer, float xpos, float ypos);
+
+        public bool UseTrueTypeInstructions { get; set; }
+        public bool UseVerticalHint { get; set; }
     }
 }

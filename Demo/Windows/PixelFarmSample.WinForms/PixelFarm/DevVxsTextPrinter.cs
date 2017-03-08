@@ -64,8 +64,6 @@ namespace SampleWinForms
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(typeface, fontSizePoint, text, _outputGlyphPlans);
             //4. render each glyph
-            float pxScale = typeface.CalculateFromPointToPixelScale(fontSizePoint);
-
 
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
@@ -81,13 +79,13 @@ namespace SampleWinForms
                 //-----------------------------------  
                 _glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, fontSizePoint);
                 //-----------------------------------  
-                _glyphReader.Reset();
-                _glyphPathBuilder.ReadShapes(_glyphReader);
+                _tovxs.Reset();
+                _glyphPathBuilder.ReadShapes(_tovxs);
 
                 //TODO: review here, 
-
+                float pxScale = _glyphPathBuilder.GetPixelScale();
                 VertexStore outputVxs = _vxsPool.GetFreeVxs();
-                _glyphReader.WriteOutput(outputVxs, _vxsPool, pxScale);
+                _tovxs.WriteOutput(outputVxs, _vxsPool, pxScale);
                 canvasPainter.SetOrigin((float)(glyphPlan.x + x), (float)(glyphPlan.y + y));
                 canvasPainter.Fill(outputVxs);
                 _vxsPool.Release(ref outputVxs);
@@ -99,8 +97,8 @@ namespace SampleWinForms
 
         //-----------------------
         VertexStorePool _vxsPool = new VertexStorePool();
-        GlyphTranslatorToVxs _glyphReader = new GlyphTranslatorToVxs();
-      
+        GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
+
 
         void UpdateTypefaceAndGlyphBuilder()
         {
@@ -118,22 +116,10 @@ namespace SampleWinForms
 
             }
             //2.1 
-            var hintTech = this.HintTechnique;
-            _glyphPathBuilder.UseTrueTypeInstructions = false;//reset
-            _glyphPathBuilder.UseVerticalHinting = false;//reset
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    _glyphPathBuilder.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    _glyphPathBuilder.UseTrueTypeInstructions = true;
-                    _glyphPathBuilder.UseVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    break;
-            }
+
+            _glyphPathBuilder.UseTrueTypeInstructions = this.UseTrueTypeInstructions;//reset
+            _glyphPathBuilder.UseVerticalHinting = this.UseVerticalHint;//reset
+
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;

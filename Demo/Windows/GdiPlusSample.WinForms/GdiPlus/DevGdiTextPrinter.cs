@@ -62,22 +62,10 @@ namespace SampleWinForms
 
 
             //2.1 
-            var hintTech = this.HintTechnique;
-            _currentGlyphPathBuilder.UseTrueTypeInstructions = false;//reset
-            _currentGlyphPathBuilder.UseVerticalHinting = false;//reset
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
-                    _currentGlyphPathBuilder.UseVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    break;
-            }
+            
+            _currentGlyphPathBuilder.UseTrueTypeInstructions = this.UseTrueTypeInstructions;
+            _currentGlyphPathBuilder.UseVerticalHinting = this.UseVerticalHint;
+           
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
