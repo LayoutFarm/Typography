@@ -99,7 +99,7 @@ namespace SampleWinForms
 
         public float GetPixelScale()
         {
-            return _typeface.CalculateFromPointToPixelScale(SizeInPoints);
+            return _passInterpreterModule ? 1 : _typeface.CalculateFromPointToPixelScale(SizeInPoints);
         }
         public GlyphPointF[] GetOutputPoints()
         {
