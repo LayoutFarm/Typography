@@ -31,7 +31,7 @@ namespace Typography.OpenFont.Tables
 
     ////////////////////////////////////////////////////////////////
 
-    partial class GSUB : TableEntry
+    public partial class GSUB : TableEntry
     {
         //from https://www.microsoft.com/typography/otspec/GSUB.htm
 
@@ -205,7 +205,7 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
-        internal class LookupTable
+        public class LookupTable
         {
             //--------------------------
             long lookupTablePos;
@@ -568,7 +568,7 @@ namespace Typography.OpenFont.Tables
                         int iscovered = this.CoverageTable.FindPosition(glyphIndices[i]);
                     }
                     //this.CoverageTable.FindPosition()
-                   // Console.WriteLine("lksubtable3 is not  implemented");
+                    // Console.WriteLine("lksubtable3 is not  implemented");
                 }
             }
             /// <summary>

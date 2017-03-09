@@ -8,15 +8,15 @@ namespace Typography.OpenFont.Tables
     /// <summary>
     /// this is base class of all 'top' font table
     /// </summary>
-    abstract class TableEntry
+    public abstract class TableEntry
     {
         public TableEntry()
         {
         }
-        public TableHeader Header { get; set; }
+        internal TableHeader Header { get; set; }
         protected abstract void ReadContentFrom(BinaryReader reader);
         public abstract string Name { get; }
-        public void LoadDataFrom(BinaryReader reader)
+        internal void LoadDataFrom(BinaryReader reader)
         {
             reader.BaseStream.Seek(this.Header.Offset, SeekOrigin.Begin);
             ReadContentFrom(reader);

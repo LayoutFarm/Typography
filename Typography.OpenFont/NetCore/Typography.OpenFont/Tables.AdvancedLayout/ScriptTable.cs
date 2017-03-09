@@ -57,7 +57,7 @@ namespace Typography.OpenFont.Tables
     //USHORT 	ReqFeatureIndex 	Index of a feature required for this language system- if no required features = 0xFFFF
     //USHORT 	FeatureCount 	Number of FeatureIndex values for this language system-excludes the required feature
     //USHORT 	FeatureIndex[FeatureCount] 	Array of indices into the FeatureList-in arbitrary order
-    class ScriptTable
+    public class ScriptTable
     {
         public LangSysTable defaultLang;
         public LangSysTable[] langSysTables;

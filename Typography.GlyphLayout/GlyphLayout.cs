@@ -1,8 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
+using Typography.OpenFont; 
 
 
 namespace Typography.TextLayout

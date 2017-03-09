@@ -33,6 +33,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlyphPosition.cs" />
+    <Compile Include="GlyphSubtitution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GlyphLayout.cs" />
   </ItemGroup>

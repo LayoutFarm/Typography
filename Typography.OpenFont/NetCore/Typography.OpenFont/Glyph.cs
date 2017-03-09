@@ -190,15 +190,11 @@ namespace Typography.OpenFont
             }
             return stbuilder.ToString();
         }
-#endif
-
-
-
-
+#endif 
     }
 
     //https://www.microsoft.com/typography/otspec/gdef.htm
-    public enum GlyphClassKind:byte
+    public enum GlyphClassKind : byte
     {
         //1 	Base glyph (single character, spacing glyph)
         //2 	Ligature glyph (multiple character, spacing glyph)
