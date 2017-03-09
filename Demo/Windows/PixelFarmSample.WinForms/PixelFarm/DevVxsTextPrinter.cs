@@ -48,7 +48,7 @@ namespace PixelFarm.Drawing.Fonts
 
             DrawString(this.DefaultCanvasPainter, textBuffer, startAt, len, xpos, ypos);
         }
-        public void DrawString(CanvasPainter canvasPainter, char[] text, int start, int len, double x, double y)
+        public void DrawString(CanvasPainter canvasPainter, char[] text, int startAt, int len, double x, double y)
         {
 
             //1. update some props..
@@ -62,7 +62,7 @@ namespace PixelFarm.Drawing.Fonts
 
             float fontSizePoint = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, fontSizePoint, text, start, len, _outputGlyphPlans);
+            _glyphLayout.Layout(typeface, fontSizePoint, text, startAt, len, _outputGlyphPlans);
 
             //4. render each glyph
             float ox = canvasPainter.OriginX;
