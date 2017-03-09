@@ -45,9 +45,9 @@
             this.chkLcdTechnique = new System.Windows.Forms.CheckBox();
             this.cmdBuildMsdfTexture = new System.Windows.Forms.Button();
             this.cmbPositionTech = new System.Windows.Forms.ComboBox();
-            this.cmbHintTechnique = new System.Windows.Forms.ComboBox();
             this.lstFontList = new System.Windows.Forms.ListBox();
             this.chkGsubEnableLigature = new System.Windows.Forms.CheckBox();
+            this.lstHintList = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // button1
@@ -70,7 +70,7 @@
             // chkBorder
             // 
             this.chkBorder.AutoSize = true;
-            this.chkBorder.Location = new System.Drawing.Point(630, 117);
+            this.chkBorder.Location = new System.Drawing.Point(937, 41);
             this.chkBorder.Name = "chkBorder";
             this.chkBorder.Size = new System.Drawing.Size(57, 17);
             this.chkBorder.TabIndex = 3;
@@ -80,7 +80,7 @@
             // chkFillBackground
             // 
             this.chkFillBackground.AutoSize = true;
-            this.chkFillBackground.Location = new System.Drawing.Point(630, 140);
+            this.chkFillBackground.Location = new System.Drawing.Point(937, 64);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 4;
@@ -118,7 +118,7 @@
             this.chkShowControlPoints.AutoSize = true;
             this.chkShowControlPoints.Checked = true;
             this.chkShowControlPoints.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowControlPoints.Location = new System.Drawing.Point(630, 162);
+            this.chkShowControlPoints.Location = new System.Drawing.Point(937, 86);
             this.chkShowControlPoints.Name = "chkShowControlPoints";
             this.chkShowControlPoints.Size = new System.Drawing.Size(121, 17);
             this.chkShowControlPoints.TabIndex = 12;
@@ -128,7 +128,7 @@
             // chkShowTess
             // 
             this.chkShowTess.AutoSize = true;
-            this.chkShowTess.Location = new System.Drawing.Point(629, 198);
+            this.chkShowTess.Location = new System.Drawing.Point(936, 122);
             this.chkShowTess.Name = "chkShowTess";
             this.chkShowTess.Size = new System.Drawing.Size(110, 17);
             this.chkShowTess.TabIndex = 13;
@@ -138,7 +138,7 @@
             // chkShowGrid
             // 
             this.chkShowGrid.AutoSize = true;
-            this.chkShowGrid.Location = new System.Drawing.Point(630, 244);
+            this.chkShowGrid.Location = new System.Drawing.Point(937, 168);
             this.chkShowGrid.Name = "chkShowGrid";
             this.chkShowGrid.Size = new System.Drawing.Size(75, 17);
             this.chkShowGrid.TabIndex = 14;
@@ -147,7 +147,7 @@
             // 
             // txtGridSize
             // 
-            this.txtGridSize.Location = new System.Drawing.Point(700, 244);
+            this.txtGridSize.Location = new System.Drawing.Point(1007, 168);
             this.txtGridSize.Name = "txtGridSize";
             this.txtGridSize.Size = new System.Drawing.Size(51, 20);
             this.txtGridSize.TabIndex = 15;
@@ -158,7 +158,7 @@
             this.chkYGridFitting.AutoSize = true;
             this.chkYGridFitting.Checked = true;
             this.chkYGridFitting.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkYGridFitting.Location = new System.Drawing.Point(632, 296);
+            this.chkYGridFitting.Location = new System.Drawing.Point(939, 220);
             this.chkYGridFitting.Name = "chkYGridFitting";
             this.chkYGridFitting.Size = new System.Drawing.Size(111, 17);
             this.chkYGridFitting.TabIndex = 16;
@@ -170,7 +170,7 @@
             this.chkDrawBone.AutoSize = true;
             this.chkDrawBone.Checked = true;
             this.chkDrawBone.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkDrawBone.Location = new System.Drawing.Point(630, 221);
+            this.chkDrawBone.Location = new System.Drawing.Point(937, 145);
             this.chkDrawBone.Name = "chkDrawBone";
             this.chkDrawBone.Size = new System.Drawing.Size(76, 17);
             this.chkDrawBone.TabIndex = 19;
@@ -180,7 +180,7 @@
             // chkXGridFitting
             // 
             this.chkXGridFitting.AutoSize = true;
-            this.chkXGridFitting.Location = new System.Drawing.Point(632, 319);
+            this.chkXGridFitting.Location = new System.Drawing.Point(939, 243);
             this.chkXGridFitting.Name = "chkXGridFitting";
             this.chkXGridFitting.Size = new System.Drawing.Size(111, 17);
             this.chkXGridFitting.TabIndex = 20;
@@ -190,7 +190,7 @@
             // chkLcdTechnique
             // 
             this.chkLcdTechnique.AutoSize = true;
-            this.chkLcdTechnique.Location = new System.Drawing.Point(632, 342);
+            this.chkLcdTechnique.Location = new System.Drawing.Point(939, 266);
             this.chkLcdTechnique.Name = "chkLcdTechnique";
             this.chkLcdTechnique.Size = new System.Drawing.Size(95, 17);
             this.chkLcdTechnique.TabIndex = 21;
@@ -216,15 +216,6 @@
             this.cmbPositionTech.Size = new System.Drawing.Size(224, 21);
             this.cmbPositionTech.TabIndex = 23;
             // 
-            // cmbHintTechnique
-            // 
-            this.cmbHintTechnique.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbHintTechnique.FormattingEnabled = true;
-            this.cmbHintTechnique.Location = new System.Drawing.Point(523, 66);
-            this.cmbHintTechnique.Name = "cmbHintTechnique";
-            this.cmbHintTechnique.Size = new System.Drawing.Size(224, 21);
-            this.cmbHintTechnique.TabIndex = 24;
-            // 
             // lstFontList
             // 
             this.lstFontList.FormattingEnabled = true;
@@ -245,14 +236,22 @@
             this.chkGsubEnableLigature.Text = "GSUB: Enable Ligature";
             this.chkGsubEnableLigature.UseVisualStyleBackColor = true;
             // 
+            // lstHintList
+            // 
+            this.lstHintList.FormattingEnabled = true;
+            this.lstHintList.Location = new System.Drawing.Point(523, 71);
+            this.lstHintList.Name = "lstHintList";
+            this.lstHintList.Size = new System.Drawing.Size(224, 69);
+            this.lstHintList.TabIndex = 27;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1086, 526);
+            this.Controls.Add(this.lstHintList);
             this.Controls.Add(this.chkGsubEnableLigature);
             this.Controls.Add(this.lstFontList);
-            this.Controls.Add(this.cmbHintTechnique);
             this.Controls.Add(this.cmbPositionTech);
             this.Controls.Add(this.cmdBuildMsdfTexture);
             this.Controls.Add(this.chkLcdTechnique);
@@ -296,9 +295,10 @@
         private System.Windows.Forms.CheckBox chkLcdTechnique;
         private System.Windows.Forms.Button cmdBuildMsdfTexture;
         private System.Windows.Forms.ComboBox cmbPositionTech;
-        private System.Windows.Forms.ComboBox cmbHintTechnique;
+       
         private System.Windows.Forms.ListBox lstFontList;
         private System.Windows.Forms.CheckBox chkGsubEnableLigature;
+        private System.Windows.Forms.ListBox lstHintList;
     }
 }
 

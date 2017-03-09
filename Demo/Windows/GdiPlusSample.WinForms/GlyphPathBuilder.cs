@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 
-using Typography.OpenFont;
-namespace SampleWinForms
+using Typography.Rendering;
+namespace Typography.OpenFont
 {
     //-----------------------------------
     //sample GlyphPathBuilder :
@@ -12,11 +12,12 @@ namespace SampleWinForms
     {
         readonly Typeface _typeface;
         TrueTypeInterpreter _trueTypeInterpreter;
+        GlyphAutoFit _autoFit = new GlyphAutoFit();
         GlyphPointF[] _outputGlyphPoints;
         ushort[] _outputContours;
-
+        float _recentPixelScale;
         bool _useInterpreter;
-        bool _passInterpreterModule;
+        bool _useAutoHint;
 
         public GlyphPathBuilder(Typeface typeface)
         {
@@ -24,8 +25,10 @@ namespace SampleWinForms
             this.UseTrueTypeInstructions = false;//default?
             _trueTypeInterpreter = new TrueTypeInterpreter();
             _trueTypeInterpreter.SetTypeFace(typeface);
+            _recentPixelScale = 1;
         }
         public Typeface Typeface { get { return _typeface; } }
+
         /// <summary>
         /// specific output glyph size (in points)
         /// </summary>
@@ -49,11 +52,12 @@ namespace SampleWinForms
                 _useInterpreter = value;
             }
         }
-        public bool PassHintInterpreterModule
+      
+        public bool MinorAdjustFitYForAutoFit
         {
-            get { return this._passInterpreterModule; }
+            get { return this._autoFit.HalfPixel; }
+            set { this._autoFit.HalfPixel = value; }
         }
-
         public void Build(char c, float sizeInPoints)
         {
             BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints);
@@ -70,36 +74,55 @@ namespace SampleWinForms
             //1. start with original points/contours from glyph
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
-            //-------------------------------------------  
-            _passInterpreterModule = false;
+            //-------------------------------------------              
             Typeface currentTypeFace = this._typeface;
-
+            _recentPixelScale = currentTypeFace.CalculateFromPointToPixelScale(SizeInPoints); //***
+            _useAutoHint = false;//reset             
+            //-------------------------------------------  
             //2. process glyph points
             if (UseTrueTypeInstructions &&
                 currentTypeFace.HasPrepProgramBuffer &&
                 glyph.HasGlyphInstructions)
             {
-
-                GlyphPointF[] newGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, SizeInPoints);
-                this._outputGlyphPoints = newGlyphPoints;
-                _passInterpreterModule = true;
+                _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
+                //output as points
+                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, SizeInPoints);
+                _recentPixelScale = 1;
             }
             else
             {
 
                 //not use interperter so we need to scale it with our machnism
                 //this demonstrate our auto hint engine ***
-                //you can change this to your own hint engine*** 
+                //you can change this to your own hint engine***  
+                if (this.UseVerticalHinting)
+                {
+                    _useAutoHint = true;
+
+                    //1. autofit 
+                    _autoFit.Hint(
+                        this.GetOutputPoints(),
+                        this.GetOutputContours(), this.GetPixelScale());
+                    _recentPixelScale = 1;
+                }
             }
         }
         public void ReadShapes(IGlyphTranslator tx)
         {
-            tx.Read(this._outputGlyphPoints, this._outputContours);
+            if (_useAutoHint)
+            {
+                //read from our auto hint
+                _autoFit.ReadOutput(tx);
+            }
+            else
+            {
+                tx.Read(this._outputGlyphPoints, this._outputContours);
+            }
         }
 
         public float GetPixelScale()
         {
-            return _passInterpreterModule ? 1 : _typeface.CalculateFromPointToPixelScale(SizeInPoints);
+            return _recentPixelScale;
         }
         public GlyphPointF[] GetOutputPoints()
         {
