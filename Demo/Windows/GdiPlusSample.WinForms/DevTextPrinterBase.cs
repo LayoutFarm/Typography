@@ -35,15 +35,22 @@ namespace SampleWinForms
         }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
-      
+        public bool UseTrueTypeInstructions { get; set; }
+        public bool UseVerticalHint { get; set; }
+        //
         public float FontSizeInPoints { get; set; }
         protected virtual void OnFontFilenameChanged() { }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
-        public abstract void DrawString(char[] textBuffer, float xpos, float ypos);
+        public abstract void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos);
 
-        public bool UseTrueTypeInstructions { get; set; }
-        public bool UseVerticalHint { get; set; }
+        
+
+        public void DrawString(char[] textBuffer, float xpos, float ypos)
+        {
+            this.DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
+        }
+
     }
 }

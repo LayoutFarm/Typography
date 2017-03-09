@@ -111,7 +111,7 @@ namespace SampleWinForms
             switch (hintTech)
             {
                 default: throw new System.NotSupportedException();
-                case HintTechnique.None:break;
+                case HintTechnique.None: break;
                 case HintTechnique.CustomAutoFit:
                     currentTextPrinter.UseVerticalHint = true;
                     break;
@@ -126,8 +126,11 @@ namespace SampleWinForms
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 0;
+            char[] textBuffer = txtInputChar.Text.ToCharArray();
             currentTextPrinter.DrawString(g,
-                 txtInputChar.Text.ToCharArray(),
+                 textBuffer,
+                 0,
+                 textBuffer.Length,
                  x_pos,
                  y_pos
                 );

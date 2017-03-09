@@ -38,11 +38,11 @@ namespace SampleWinForms
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
         public Graphics DefaultTargetGraphics { get; set; }
-        public override void DrawString(char[] textBuffer, float xpos, float ypos)
-        {
-            this.DrawString(this.DefaultTargetGraphics, textBuffer, xpos, ypos);
-        }
 
+        public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
+        {
+            this.DrawString(this.DefaultTargetGraphics, textBuffer, startAt, len, xpos, ypos);
+        }
         void UpdateTypefaceAndGlyphBuilder()
         {
             if (_currentTypeface == null)
@@ -80,6 +80,8 @@ namespace SampleWinForms
         public void DrawString(
                 Graphics g,
                 char[] textBuffer,
+                int startAt,
+                int len,
                 float x,
                 float y)
         {
@@ -104,7 +106,7 @@ namespace SampleWinForms
             //3. layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, 0, textBuffer.Length, _outputGlyphPlans);
+            _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, startAt, len, _outputGlyphPlans);
 
             //
             //4. render each glyph
