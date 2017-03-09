@@ -4,34 +4,14 @@ using System.IO;
 using System.Collections.Generic;
 //
 using PixelFarm.Agg;
-using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
 
-namespace SampleWinForms
+namespace PixelFarm.Drawing.Fonts
 {
 
 
-    class HintedVxsGlyphCollection
-    {
-        //hint glyph collection        
-        //per typeface
-
-        public void SetRequestInfo(Typeface typeface, float sizeInPts, HintTechnique hintTech)
-        {
-            //check if we have create the context for this request parameters?
-            var key = new HintedVxsConvtextKey() { hintTech = hintTech, sizeInPts = sizeInPts, typeface = typeface }; 
-        } 
-        struct HintedVxsConvtextKey
-        {
-            public HintTechnique hintTech;
-            public Typeface typeface;
-            public float sizeInPts;
-
-        }
-
-    }
 
     class DevVxsTextPrinter : DevTextPrinterBase
     {
@@ -92,7 +72,7 @@ namespace SampleWinForms
 
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
-            //hintGlyphCollection.SetRequestInfo(typeface, fontSizePoint);
+            hintGlyphCollection.SetCacheInfo(typeface, fontSizePoint, this.HintTechnique);
             //---------------------------------------------------
             for (int i = 0; i < j; ++i)
             {
@@ -102,20 +82,24 @@ namespace SampleWinForms
                 //PERFORMANCE revisit here 
                 //if we have create a vxs we can cache it for later use?
                 //-----------------------------------  
-                //
-                _glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, fontSizePoint);
-                //-----------------------------------  
-                _tovxs.Reset();
-                _glyphPathBuilder.ReadShapes(_tovxs);
+                VertexStore glyphVxs;
+                if (!hintGlyphCollection.TryGetCacheGlyph(glyphPlan.glyphIndex, out glyphVxs))
+                {
+                    //if not found then create new glyph vxs and cache it
+                    _glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, fontSizePoint);
+                    //-----------------------------------  
+                    _tovxs.Reset();
+                    _glyphPathBuilder.ReadShapes(_tovxs);
 
-                //TODO: review here, 
-                float pxScale = _glyphPathBuilder.GetPixelScale();
-                VertexStore outputVxs = _vxsPool.GetFreeVxs();
-                _tovxs.WriteOutput(outputVxs, _vxsPool, pxScale);
+                    //TODO: review here, 
+                    float pxScale = _glyphPathBuilder.GetPixelScale();
+                    glyphVxs = new VertexStore();
+                    _tovxs.WriteOutput(glyphVxs, _vxsPool, pxScale);
+                    //
+                    hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
+                }
                 canvasPainter.SetOrigin((float)(glyphPlan.x + x), (float)(glyphPlan.y + y));
-                canvasPainter.Fill(outputVxs);
-                _vxsPool.Release(ref outputVxs);
-
+                canvasPainter.Fill(glyphVxs);
             }
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);

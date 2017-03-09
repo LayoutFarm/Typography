@@ -5,9 +5,9 @@ using System.Collections.Generic;
 //
 using Typography.OpenFont;
 using Typography.TextLayout;
-using System;
+using Typography.Rendering;
 
-namespace Typography.Rendering
+namespace SampleWinForms
 {
     /// <summary>
     /// developer's version Gdi+ text printer
