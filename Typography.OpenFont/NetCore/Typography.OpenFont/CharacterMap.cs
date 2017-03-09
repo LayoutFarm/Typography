@@ -8,8 +8,6 @@ namespace Typography.OpenFont
 {
 
 
-
-
     class CharacterMap
     {
         //https://www.microsoft.com/typography/otspec/cmap.htm

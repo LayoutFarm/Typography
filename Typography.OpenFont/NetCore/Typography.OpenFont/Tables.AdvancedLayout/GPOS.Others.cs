@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Typography.OpenFont.Tables
 {
-    partial class GPOS
+     partial class GPOS
     {
 
         static PosRuleSetTable[] CreateMultiplePosRuleSetTables(long initPos, short[] offsets, BinaryReader reader)
@@ -516,7 +516,7 @@ namespace Typography.OpenFont.Tables
                     }
 #endif
                     //each base has anchor point for mark glyph'class
-                   
+
                     AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[classCount];
                     for (int n = 0; n < classCount; ++n)
                     {

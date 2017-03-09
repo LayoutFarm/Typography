@@ -5,7 +5,7 @@ using System.IO;
 namespace Typography.OpenFont.Tables
 {
 
-    class ScriptList
+    public class ScriptList
     {
         //https://www.microsoft.com/typography/otspec/chapter2.htm
         //The ScriptList identifies the scripts in a font, 

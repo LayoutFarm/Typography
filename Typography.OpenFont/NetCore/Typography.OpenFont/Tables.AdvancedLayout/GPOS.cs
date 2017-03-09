@@ -6,7 +6,7 @@ namespace Typography.OpenFont.Tables
 {
     //https://www.microsoft.com/typography/otspec/GPOS.htm
 
-    partial class GPOS : TableEntry
+    public partial class GPOS : TableEntry
     {
         long gposTableStartAt;
         ScriptList scriptList = new ScriptList();

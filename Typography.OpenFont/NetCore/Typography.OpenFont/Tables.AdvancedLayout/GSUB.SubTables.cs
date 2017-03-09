@@ -9,7 +9,7 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// base class of lookup sub table
         /// </summary>
-        internal abstract class LookupSubTable
+        public abstract class LookupSubTable
         {
             public abstract void DoSubtitution(List<ushort> glyphIndices, int startAt, int len);
             public GSUB OwnerGSub;
