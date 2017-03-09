@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 
-using Typography.Rendering;
-namespace Typography.OpenFont
+using Typography.OpenFont;
+namespace Typography.Rendering
 {
     //-----------------------------------
     //sample GlyphPathBuilder :
@@ -52,7 +52,7 @@ namespace Typography.OpenFont
                 _useInterpreter = value;
             }
         }
-      
+
         public bool MinorAdjustFitYForAutoFit
         {
             get { return this._autoFit.HalfPixel; }

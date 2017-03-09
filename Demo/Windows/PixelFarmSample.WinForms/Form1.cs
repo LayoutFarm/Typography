@@ -181,23 +181,23 @@ namespace SampleWinForms
             }
 
             var hintTech = (HintTechnique)lstHintList.SelectedItem;
-            bool useTrueTypeInst = false;//reset
-            bool useVerticalHinting = false; //reset agg vertical-only hinting
+            //bool useTrueTypeInst = false;//reset
+            //bool useVerticalHinting = false; //reset agg vertical-only hinting
 
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    useTrueTypeInst = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    useTrueTypeInst = true;
-                    useVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    useVerticalHinting = true;
-                    break;
-            }
+            //switch (Typography.Rendering)
+            //{
+            //    case HintTechnique.TrueTypeInstruction:
+            //        useTrueTypeInst = true;
+            //        break;
+            //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
+            //        useTrueTypeInst = true;
+            //        useVerticalHinting = true;
+            //        break;
+            //    case HintTechnique.CustomAutoFit:
+            //        //custom agg autofit 
+            //        useVerticalHinting = true;
+            //        break;
+            //}
 
             //1. read typeface from font file 
             RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
@@ -209,8 +209,7 @@ namespace SampleWinForms
                         selectedTextPrinter = _devGdiTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.UseTrueTypeInstructions = useTrueTypeInst;
-                        selectedTextPrinter.UseVerticalHint = useVerticalHinting;
+                        selectedTextPrinter.HintTechnique = hintTech;
                         //
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
 
@@ -226,8 +225,7 @@ namespace SampleWinForms
                         selectedTextPrinter = _devVxsTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.UseTrueTypeInstructions = useTrueTypeInst;
-                        selectedTextPrinter.UseVerticalHint = useVerticalHinting;
+                        selectedTextPrinter.HintTechnique = hintTech;
 
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
 

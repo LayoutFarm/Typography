@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using Typography.OpenFont;
 
-namespace SampleWinForms
+namespace Typography.Rendering
 {
     //------------------
     //this is Gdi+ version ***

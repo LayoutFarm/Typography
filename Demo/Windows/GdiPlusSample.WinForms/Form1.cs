@@ -103,26 +103,8 @@ namespace SampleWinForms
             {
                 return;
             }
-            //----------------------- 
-
-            HintTechnique hintTech = (HintTechnique)lstHintList.SelectedItem;
-            currentTextPrinter.UseVerticalHint = false;//reset
-            currentTextPrinter.UseTrueTypeInstructions = false;//reset
-            switch (hintTech)
-            {
-                default: throw new System.NotSupportedException();
-                case HintTechnique.None: break;
-                case HintTechnique.CustomAutoFit:
-                    currentTextPrinter.UseVerticalHint = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction:
-                    currentTextPrinter.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    currentTextPrinter.UseTrueTypeInstructions = true;
-                    currentTextPrinter.UseVerticalHint = true;
-                    break;
-            }
+            //-----------------------  
+            currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 0;

@@ -7,7 +7,7 @@ using Typography.OpenFont;
 using Typography.TextLayout;
 using System;
 
-namespace SampleWinForms
+namespace Typography.Rendering
 {
     /// <summary>
     /// developer's version Gdi+ text printer
