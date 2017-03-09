@@ -103,31 +103,16 @@ namespace SampleWinForms
             {
                 return;
             }
-            //----------------------- 
-
-            HintTechnique hintTech = (HintTechnique)lstHintList.SelectedItem;
-            currentTextPrinter.UseVerticalHint = false;//reset
-            currentTextPrinter.UseTrueTypeInstructions = false;//reset
-            switch (hintTech)
-            {
-                default: throw new System.NotSupportedException();
-                case HintTechnique.None:break;
-                case HintTechnique.CustomAutoFit:
-                    currentTextPrinter.UseVerticalHint = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction:
-                    currentTextPrinter.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    currentTextPrinter.UseTrueTypeInstructions = true;
-                    currentTextPrinter.UseVerticalHint = true;
-                    break;
-            }
+            //-----------------------  
+            currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 0;
+            char[] textBuffer = txtInputChar.Text.ToCharArray();
             currentTextPrinter.DrawString(g,
-                 txtInputChar.Text.ToCharArray(),
+                 textBuffer,
+                 0,
+                 textBuffer.Length,
                  x_pos,
                  y_pos
                 );
@@ -163,19 +148,18 @@ namespace SampleWinForms
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder();
-                var msdfBuilder = new MsdfGlyphGen();
+
 
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
                 {
                     //build glyph
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
+                    var glyphToContour = new GlyphTranslatorToContour();
+                    builder.ReadShapes(glyphToContour);
+                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours()); 
 
-                    var msdfGlyphGen = new MsdfGlyphGen();
-                    var actualImg = msdfGlyphGen.CreateMsdfImage(
-                        builder.GetOutputPoints(),
-                        builder.GetOutputContours(),
-                        builder.GetPixelScale());
-                    atlasBuilder.AddGlyph((int)n, actualImg);
+                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
+                    atlasBuilder.AddGlyph(n, glyphImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     //{

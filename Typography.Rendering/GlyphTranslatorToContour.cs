@@ -256,7 +256,7 @@ namespace Typography.Rendering
             this.NSteps = 20;
         }
         public int NSteps { get; set; }
-        public float PixelScale { get; set; }
+        
 
         public void CreateBezierVxs4(
             int nsteps,

@@ -65,6 +65,7 @@
     <Compile Include="PixelFarm\BitmapHelper.cs" />
     <Compile Include="PixelFarm\DevVxsTextPrinter.cs" />
     <Compile Include="PixelFarm\GlyphTranslatorToVxs.cs" />
+    <Compile Include="PixelFarm\HintedVxsGlyphCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

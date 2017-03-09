@@ -1,19 +1,26 @@
 ﻿//MIT, 2016-2017, WinterDev
 
-using Typography.Rendering;
-namespace Typography.OpenFont
+using Typography.OpenFont;
+using System.Collections.Generic;
+
+namespace Typography.Rendering
 {
     //-----------------------------------
     //sample GlyphPathBuilder :
     //for your flexiblity of glyph path builder.
     //-----------------------------------
 
+
+
     public class GlyphPathBuilder
     {
         readonly Typeface _typeface;
         TrueTypeInterpreter _trueTypeInterpreter;
-        GlyphAutoFit _autoFit = new GlyphAutoFit();
+        GlyphFitOutlineAnalyzer _fitShapeAnalyzer = new GlyphFitOutlineAnalyzer();
+        Dictionary<ushort, GlyphFitOutline> _fitoutlineCollection = new Dictionary<ushort, GlyphFitOutline>();
+
         GlyphPointF[] _outputGlyphPoints;
+        GlyphFitOutline _fitOutline;
         ushort[] _outputContours;
         float _recentPixelScale;
         bool _useInterpreter;
@@ -21,6 +28,7 @@ namespace Typography.OpenFont
 
         public GlyphPathBuilder(Typeface typeface)
         {
+
             _typeface = typeface;
             this.UseTrueTypeInstructions = false;//default?
             _trueTypeInterpreter = new TrueTypeInterpreter();
@@ -52,16 +60,13 @@ namespace Typography.OpenFont
                 _useInterpreter = value;
             }
         }
-      
+
         public bool MinorAdjustFitYForAutoFit
         {
-            get { return this._autoFit.HalfPixel; }
-            set { this._autoFit.HalfPixel = value; }
+            get;
+            set;
         }
-        public void Build(char c, float sizeInPoints)
-        {
-            BuildFromGlyphIndex((ushort)_typeface.LookupIndex(c), sizeInPoints);
-        }
+
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
             this.SizeInPoints = sizeInPoints;
@@ -85,25 +90,27 @@ namespace Typography.OpenFont
                 glyph.HasGlyphInstructions)
             {
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
-                //output as points
+                //output as points,
                 this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, SizeInPoints);
+                //all points are scaled from _trueTypeInterpreter, 
+                //so not need further scale.=> set _recentPixelScale=1
                 _recentPixelScale = 1;
             }
             else
             {
-
                 //not use interperter so we need to scale it with our machnism
                 //this demonstrate our auto hint engine ***
                 //you can change this to your own hint engine***  
                 if (this.UseVerticalHinting)
                 {
                     _useAutoHint = true;
-
-                    //1. autofit 
-                    _autoFit.Hint(
-                        this.GetOutputPoints(),
-                        this.GetOutputContours(), this.GetPixelScale());
-                    _recentPixelScale = 1;
+                    if (!_fitoutlineCollection.TryGetValue(glyphIndex, out _fitOutline))
+                    {
+                        _fitOutline = _fitShapeAnalyzer.Analyze(
+                            this._outputGlyphPoints,
+                            this._outputContours);
+                        _fitoutlineCollection.Add(glyphIndex, _fitOutline);
+                    }
                 }
             }
         }
@@ -111,26 +118,23 @@ namespace Typography.OpenFont
         {
             if (_useAutoHint)
             {
-                //read from our auto hint
-                _autoFit.ReadOutput(tx);
+                //read from our auto hint fitoutline
+                //need scale from original.
+                _fitOutline.ReadOutput(tx, _recentPixelScale);
             }
             else
             {
-                tx.Read(this._outputGlyphPoints, this._outputContours);
+                //read output from glyph points
+                tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
             }
         }
+    }
 
-        public float GetPixelScale()
+    public static class GlyphPathBuilderExtensions
+    {
+        public static void Build(this GlyphPathBuilder builder, char c, float sizeInPoints)
         {
-            return _recentPixelScale;
-        }
-        public GlyphPointF[] GetOutputPoints()
-        {
-            return this._outputGlyphPoints;
-        }
-        public ushort[] GetOutputContours()
-        {
-            return this._outputContours;
+            builder.BuildFromGlyphIndex((ushort)builder.Typeface.LookupIndex(c), sizeInPoints);
         }
     }
 

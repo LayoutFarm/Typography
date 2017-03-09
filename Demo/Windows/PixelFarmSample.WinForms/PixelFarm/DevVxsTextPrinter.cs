@@ -4,21 +4,24 @@ using System.IO;
 using System.Collections.Generic;
 //
 using PixelFarm.Agg;
-using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.TextLayout;
+using Typography.Rendering;
 
-
-namespace SampleWinForms
+namespace PixelFarm.Drawing.Fonts
 {
 
+  
     class DevVxsTextPrinter : DevTextPrinterBase
     {
 
         GlyphPathBuilder _glyphPathBuilder;
         GlyphLayout _glyphLayout = new GlyphLayout();
         Dictionary<string, GlyphPathBuilder> _cacheGlyphPathBuilders = new Dictionary<string, GlyphPathBuilder>();
-        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>(20);
+        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
+        //
+        HintedVxsGlyphCollection hintGlyphCollection = new HintedVxsGlyphCollection();
+
 
         public DevVxsTextPrinter()
         {
@@ -27,28 +30,25 @@ namespace SampleWinForms
         protected override void OnFontFilenameChanged()
         {
 
-            //switch to another font  
-            //store current typeface to cache
+            //switch to another font              
             if (_glyphPathBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(_currentSelectedFontFile))
             {
+                //store current typeface to cache
                 _cacheGlyphPathBuilders[_currentSelectedFontFile] = _glyphPathBuilder;
             }
             //check if we have this in cache ?
             //if we don't have it, this _currentTypeface will set to null ***                  
             _cacheGlyphPathBuilders.TryGetValue(_currentSelectedFontFile, out _glyphPathBuilder);
-
         }
 
         public CanvasPainter DefaultCanvasPainter { get; set; }
-        public override void DrawString(char[] textBuffer, float xpos, float ypos)
+
+        public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
-            this.DrawString(this.DefaultCanvasPainter, textBuffer, xpos, ypos);
+
+            DrawString(this.DefaultCanvasPainter, textBuffer, startAt, len, xpos, ypos);
         }
-        public void DrawString(CanvasPainter canvasPainter, string text, double x, double y)
-        {
-            DrawString(canvasPainter, text.ToCharArray(), x, y);
-        }
-        public void DrawString(CanvasPainter canvasPainter, char[] text, double x, double y)
+        public void DrawString(CanvasPainter canvasPainter, char[] text, int start, int len, double x, double y)
         {
 
             //1. update some props..
@@ -62,34 +62,43 @@ namespace SampleWinForms
 
             float fontSizePoint = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, fontSizePoint, text, 0, text.Length, _outputGlyphPlans);
-            //4. render each glyph
+            _glyphLayout.Layout(typeface, fontSizePoint, text, start, len, _outputGlyphPlans);
 
+            //4. render each glyph
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
             int j = _outputGlyphPlans.Count;
+
+            //---------------------------------------------------
+            //consider use cached glyph, to increase performance 
+            hintGlyphCollection.SetCacheInfo(typeface, fontSizePoint, this.HintTechnique);
+            //---------------------------------------------------
             for (int i = 0; i < j; ++i)
             {
                 GlyphPlan glyphPlan = _outputGlyphPlans[i];
                 //-----------------------------------
-
                 //TODO: review here ***
                 //PERFORMANCE revisit here 
                 //if we have create a vxs we can cache it for later use?
                 //-----------------------------------  
-                _glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, fontSizePoint);
-                //-----------------------------------  
-                _tovxs.Reset();
-                _glyphPathBuilder.ReadShapes(_tovxs);
+                VertexStore glyphVxs;
+                if (!hintGlyphCollection.TryGetCacheGlyph(glyphPlan.glyphIndex, out glyphVxs))
+                {
+                    //if not found then create new glyph vxs and cache it
+                    _glyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, fontSizePoint);
+                    //-----------------------------------  
+                    _tovxs.Reset();
+                    _glyphPathBuilder.ReadShapes(_tovxs);
 
-                //TODO: review here, 
-                float pxScale = _glyphPathBuilder.GetPixelScale();
-                VertexStore outputVxs = _vxsPool.GetFreeVxs();
-                _tovxs.WriteOutput(outputVxs, _vxsPool, pxScale);
+                    //TODO: review here, 
+                    //float pxScale = _glyphPathBuilder.GetPixelScale();
+                    glyphVxs = new VertexStore();
+                    _tovxs.WriteOutput(glyphVxs, _vxsPool);
+                    //
+                    hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
+                }
                 canvasPainter.SetOrigin((float)(glyphPlan.x + x), (float)(glyphPlan.y + y));
-                canvasPainter.Fill(outputVxs);
-                _vxsPool.Release(ref outputVxs);
-
+                canvasPainter.Fill(glyphVxs);
             }
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
