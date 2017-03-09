@@ -7,7 +7,12 @@ using PixelFarm.Drawing.Fonts;
 
 namespace Typography.Rendering
 {
-
+    public enum TextureKind
+    {
+        AggGrayScale,
+        AggSubPixel,
+        Msdf
+    }
     public class SimpleFontAtlasBuilder
     {
         GlyphImage latestGenGlyphImage;
@@ -21,6 +26,7 @@ namespace Typography.Rendering
 
             glyphs[codePoint] = glyphCache;
         }
+        public TextureKind TextureKind { get; set; }
         public GlyphImage BuildSingleImage()
         {
             //1. add to list 
@@ -169,23 +175,24 @@ namespace Typography.Rendering
         public SimpleFontAtlas CreateSimpleFontAtlas()
         {
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
-            foreach (CacheGlyph g in glyphs.Values)
+            simpleFontAtlas.TextureKind = this.TextureKind;
+            foreach (CacheGlyph cacheGlyph in glyphs.Values)
             {
                 //convert char to hex
-                string unicode = ("0x" + ((int)g.character).ToString("X"));//code point
-                Rectangle area = g.area;
-                var glyphData = new TextureFontGlyphData();
+                string unicode = ("0x" + ((int)cacheGlyph.character).ToString("X"));//code point
+                Rectangle area = cacheGlyph.area;
+                TextureFontGlyphData glyphData = new TextureFontGlyphData();
                 area.Y += area.Height;//*** 
 
                 //set font matrix to glyph font data
                 glyphData.Rect = Rectangle.FromLTRB(area.X, area.Top, area.Right, area.Bottom);
-                glyphData.AdvanceY = g.glyphMatrix.advanceY;
-                glyphData.ImgWidth = g.img.Width;
+                glyphData.AdvanceY = cacheGlyph.glyphMatrix.advanceY;
+                glyphData.ImgWidth = cacheGlyph.img.Width;
+                glyphData.TextureXOffset = cacheGlyph.img.TextureOffsetX;
+                glyphData.TextureYOffset = cacheGlyph.img.TextureOffsetY;
 
-                simpleFontAtlas.AddGlyph(g.codePoint, glyphData);
-
+                simpleFontAtlas.AddGlyph(cacheGlyph.codePoint, glyphData);
             }
-
 
             return simpleFontAtlas;
         }
@@ -193,6 +200,7 @@ namespace Typography.Rendering
         public SimpleFontAtlas LoadFontInfo(string filename)
         {
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
+            simpleFontAtlas.TextureKind = this.TextureKind;
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.Load(filename);
             //read

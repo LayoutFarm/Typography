@@ -97,7 +97,7 @@ namespace Typography.Rendering
                 if (remaining > GRID_SIZE_66)
                 {
                     return (integer1 + 1f);
-                } 
+                }
                 else
                 {
                     return integer1;

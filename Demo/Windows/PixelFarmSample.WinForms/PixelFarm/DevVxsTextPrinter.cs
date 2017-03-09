@@ -62,7 +62,7 @@ namespace SampleWinForms
 
             float fontSizePoint = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, fontSizePoint, text, _outputGlyphPlans);
+            _glyphLayout.Layout(typeface, fontSizePoint, text, 0, text.Length, _outputGlyphPlans);
             //4. render each glyph
 
             float ox = canvasPainter.OriginX;

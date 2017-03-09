@@ -40,7 +40,7 @@ namespace Typography.OpenFont
         /// </summary>
         void EndRead();
         /// <summary>
-        /// set CURRENT pen position to (x0,y0) And set the position as latest MOVETO position
+        /// set CURRENT pen position to (x0,y0) And set the position as lastest MOVETO position
         /// </summary>
         /// <param name="x0"></param>
         /// <param name="y0"></param>
@@ -71,7 +71,7 @@ namespace Typography.OpenFont
         void Curve4(float x1, float y1, float x2, float y2, float x3, float y3);
 
         /// <summary>
-        /// close current contour, create line from CURRENT pen position to latest MOVETO position
+        /// close current contour, create line from CURRENT pen position to lastest MOVETO position
         /// </summary>
         void CloseContour();
     }
@@ -90,8 +90,8 @@ namespace Typography.OpenFont
             //1. start read data from a glyph
             tx.BeginRead(todoContourCount);
             //-----------------------------------
-            float latest_move_to_x = 0;
-            float latest_move_to_y = 0;
+            float lastMoveX = 0;
+            float lastMoveY = 0;
 
             int curveControlPointCount = 0; // 1 curve control point => Quadratic, 2 curve control points => Cubic
 
@@ -176,7 +176,7 @@ namespace Typography.OpenFont
                             if (isFirstPoint)
                             {
                                 isFirstPoint = false;
-                                tx.MoveTo(latest_move_to_x = p_x, latest_move_to_y = p_y);
+                                tx.MoveTo(lastMoveX = (p_x), lastMoveY = (p_y));
                             }
                             else
                             {
@@ -255,7 +255,7 @@ namespace Typography.OpenFont
                         case 1:
                             {
                                 tx.Curve3(c1.X, c1.Y,
-                                    latest_move_to_x, latest_move_to_y);
+                                    lastMoveX, lastMoveY);
                             }
                             break;
                         case 2:
@@ -264,7 +264,7 @@ namespace Typography.OpenFont
                                 //we should not be here? 
                                 tx.Curve4(c1.X, c1.Y,
                                     c2.X, c2.Y,
-                                    latest_move_to_x, latest_move_to_y);
+                                    lastMoveX, lastMoveY);
                             }
                             break;
                         default:

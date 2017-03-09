@@ -43,6 +43,14 @@ namespace Typography.Rendering
             this.pixelBuffer = pixelBuffer;
             this.IsBigEndian = isBigEndian;
         }
+        /// <summary>
+        /// texture offset X from original glyph
+        /// </summary>
+        public double TextureOffsetX { get; set; }
+        /// <summary>
+        /// texture offset Y from original glyph 
+        /// </summary>
+        public double TextureOffsetY { get; set; }
     }
 
     public class CacheGlyph
@@ -54,6 +62,7 @@ namespace Typography.Rendering
         public char character;
         public int codePoint;
         public GlyphMatrix2 glyphMatrix;
+    
     }
 
     public class TextureFontGlyphData
@@ -76,6 +85,9 @@ namespace Typography.Rendering
         public float VAdvance { get; set; }
         public float VBearingX { get; set; }
         public float VBearingY { get; set; }
+        //---
+        public double TextureXOffset { get; set; }
+        public double TextureYOffset { get; set; }
 
         public Rectangle Rect
         {

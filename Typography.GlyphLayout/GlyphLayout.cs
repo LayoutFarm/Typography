@@ -69,13 +69,15 @@ namespace Typography.TextLayout
 
         public void Layout(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
         {
-            Layout(typeface, size, str.ToCharArray(), glyphPlanBuffer);
+            char[] buffer = str.ToCharArray();
+            Layout(typeface, size, buffer, 0, buffer.Length, glyphPlanBuffer);
         }
-        List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
+
+        List<ushort> _inputGlyphs = new List<ushort>(); //not thread safe***
+        List<GlyphPos> _glyphPositions = new List<GlyphPos>();//not thread safe***
 
 
-
-        public void Layout(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
+        public void Layout(Typeface typeface, float size, char[] str, int startAt, int len, List<GlyphPlan> glyphPlanBuffer)
         {
             //---------------------------------------------- 
             //1. convert char[] to glyph[]
@@ -90,31 +92,35 @@ namespace Typography.TextLayout
                 glyphCache = new GlyphsCache(typeface);
                 _glyphCaches.Add(typeface, glyphCache);
             }
+            //----------------------------------------------  
 
-            //----------------------------------------------  
-            int j = str.Length;
-            inputGlyphs.Clear();
-            for (int i = 0; i < j; ++i)
+            _inputGlyphs.Clear(); //clear before use
+            for (int i = 0; i < len; ++i)
             {
-                //1. convert char[] to glyphIndex[]
-                inputGlyphs.Add((ushort)typeface.LookupIndex(str[i]));
+                //convert input char to input glyphs
+                _inputGlyphs.Add((ushort)typeface.LookupIndex(str[startAt + i]));
             }
             //----------------------------------------------  
-            //glyph substitution
-            if (j > 1)
+            //glyph substitution            
+            if (len > 1)
             {
-                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, this.ScriptLang.shortname);
+                //TODO: review perf here
+                var glyphSubstitution = new GlyphSubStitution(typeface, this.ScriptLang.shortname);
                 glyphSubstitution.EnableLigation = this.EnableLigature;
-                glyphSubstitution.DoSubstitution(inputGlyphs);
+                glyphSubstitution.DoSubstitution(_inputGlyphs);
             }
+            //----------------------------------------------  
+            //after glyph substitution,
+            //number of input glyph MAY changed (increase or decrease).
+            //so count again.
+            int finalGlyphCount = _inputGlyphs.Count;
             //----------------------------------------------  
             //glyph position
-            j = inputGlyphs.Count;
-            List<GlyphPos> glyphPositions = new List<GlyphPos>(j);
-            for (int i = 0; i < j; ++i)
+            _glyphPositions.Clear();
+            for (int i = 0; i < finalGlyphCount; ++i)
             {
-                ushort glyIndex = inputGlyphs[i];
-                glyphPositions.Add(new GlyphPos(
+                ushort glyIndex = _inputGlyphs[i];
+                _glyphPositions.Add(new GlyphPos(
                     glyIndex,
                     typeface.GetGlyphByIndex(glyIndex).GlyphClass,
                     typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex))
@@ -122,21 +128,20 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (j > 1 && posTech == PositionTechnique.OpenFont)
+            if (len > 1 && posTech == PositionTechnique.OpenFont)
             {
+                //TODO: review perf here
                 GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, ScriptLang.shortname);
-                glyphSetPos.DoGlyphPosition(glyphPositions);
+                glyphSetPos.DoGlyphPosition(_glyphPositions);
             }
             //--------------
             float scale = typeface.CalculateFromPointToPixelScale(size);
             float cx = 0;
             float cy = 0;
 
-            j = inputGlyphs.Count;
-
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < finalGlyphCount; ++i)
             {
-                ushort glyIndex = inputGlyphs[i];
+                ushort glyIndex = _inputGlyphs[i];
                 //this advWidth in font design unit   
                 float advWidth = typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex) * scale;
                 //----------------------------------   
@@ -147,7 +152,7 @@ namespace Typography.TextLayout
                         break;
                     case PositionTechnique.OpenFont:
                         {
-                            GlyphPos gpos_offset = glyphPositions[i];
+                            GlyphPos gpos_offset = _glyphPositions[i];
                             glyphPlanBuffer.Add(new GlyphPlan(
                                 glyIndex,
                                 cx + (scale * gpos_offset.xoffset),
@@ -169,7 +174,6 @@ namespace Typography.TextLayout
                         }
                         break;
                 }
-
                 //--------
                 cx += advWidth;
             }

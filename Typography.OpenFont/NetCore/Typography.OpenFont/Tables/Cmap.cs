@@ -115,7 +115,6 @@ namespace Typography.OpenFont.Tables
                         long tableStartEndAt = input.BaseStream.Position + length;
 
                         ushort language = input.ReadUInt16();
-                        //Note on the language field in 'cmap' subtables:
                         //Note on the language field in 'cmap' subtables: 
                         //The language field must be set to zero for all cmap subtables whose platform IDs are other than Macintosh (platform ID 1).
                         //For cmap subtables whose platform IDs are Macintosh, set this field to the Macintosh language ID of the cmap subtable plus one, 

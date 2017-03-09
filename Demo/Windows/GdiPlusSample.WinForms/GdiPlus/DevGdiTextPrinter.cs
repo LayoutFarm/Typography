@@ -104,7 +104,7 @@ namespace SampleWinForms
             //3. layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, _outputGlyphPlans);
+            _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, 0, textBuffer.Length, _outputGlyphPlans);
 
             //
             //4. render each glyph
