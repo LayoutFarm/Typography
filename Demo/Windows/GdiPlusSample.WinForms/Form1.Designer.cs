@@ -34,10 +34,10 @@
             this.txtInputChar = new System.Windows.Forms.TextBox();
             this.chkFillBackground = new System.Windows.Forms.CheckBox();
             this.chkBorder = new System.Windows.Forms.CheckBox();
-            this.cmbHintTechnique = new System.Windows.Forms.ComboBox();
             this.cmbPositionTech = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
             this.cmdBuildMsdfTexture = new System.Windows.Forms.Button();
+            this.lstHintList = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // lstFontList
@@ -51,7 +51,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(705, 184);
+            this.label2.Location = new System.Drawing.Point(690, 184);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(70, 13);
             this.label2.TabIndex = 28;
@@ -76,7 +76,7 @@
             // chkFillBackground
             // 
             this.chkFillBackground.AutoSize = true;
-            this.chkFillBackground.Location = new System.Drawing.Point(574, 128);
+            this.chkFillBackground.Location = new System.Drawing.Point(822, 65);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 31;
@@ -86,21 +86,12 @@
             // chkBorder
             // 
             this.chkBorder.AutoSize = true;
-            this.chkBorder.Location = new System.Drawing.Point(574, 105);
+            this.chkBorder.Location = new System.Drawing.Point(822, 42);
             this.chkBorder.Name = "chkBorder";
             this.chkBorder.Size = new System.Drawing.Size(57, 17);
             this.chkBorder.TabIndex = 30;
             this.chkBorder.Text = "Border";
             this.chkBorder.UseVisualStyleBackColor = true;
-            // 
-            // cmbHintTechnique
-            // 
-            this.cmbHintTechnique.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbHintTechnique.FormattingEnabled = true;
-            this.cmbHintTechnique.Location = new System.Drawing.Point(451, 65);
-            this.cmbHintTechnique.Name = "cmbHintTechnique";
-            this.cmbHintTechnique.Size = new System.Drawing.Size(224, 21);
-            this.cmbHintTechnique.TabIndex = 33;
             // 
             // cmbPositionTech
             // 
@@ -130,14 +121,22 @@
             this.cmdBuildMsdfTexture.UseVisualStyleBackColor = true;
             this.cmdBuildMsdfTexture.Click += new System.EventHandler(this.cmdBuildMsdfTexture_Click);
             // 
+            // lstHintList
+            // 
+            this.lstHintList.FormattingEnabled = true;
+            this.lstHintList.Location = new System.Drawing.Point(451, 65);
+            this.lstHintList.Name = "lstHintList";
+            this.lstHintList.Size = new System.Drawing.Size(224, 69);
+            this.lstHintList.TabIndex = 36;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(844, 567);
+            this.ClientSize = new System.Drawing.Size(935, 567);
+            this.Controls.Add(this.lstHintList);
             this.Controls.Add(this.cmdBuildMsdfTexture);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.cmbHintTechnique);
             this.Controls.Add(this.cmbPositionTech);
             this.Controls.Add(this.chkFillBackground);
             this.Controls.Add(this.chkBorder);
@@ -160,9 +159,9 @@
         private System.Windows.Forms.TextBox txtInputChar;
         private System.Windows.Forms.CheckBox chkFillBackground;
         private System.Windows.Forms.CheckBox chkBorder;
-        private System.Windows.Forms.ComboBox cmbHintTechnique;
         private System.Windows.Forms.ComboBox cmbPositionTech;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button cmdBuildMsdfTexture;
+        private System.Windows.Forms.ListBox lstHintList;
     }
 }

@@ -14,6 +14,8 @@ namespace Typography.Rendering
         GlyphFitOutline glyphOutline;
         List<GlyphContour> contours;
         float pxScale = 1;
+
+
         public void Hint(GlyphPointF[] glyphPoints, ushort[] glyphContours, float pxScale = 1)
         {
 
@@ -34,6 +36,7 @@ namespace Typography.Rendering
             glyphOutline = TessWithPolyTri(contours, pxScale);
         }
         public GlyphFitOutline FitOutput { get { return this.glyphOutline; } }
+        public bool HalfPixel { get; set; }
         /// <summary>
         /// read fitting output
         /// </summary>
@@ -55,7 +58,7 @@ namespace Typography.Rendering
             for (int i = 0; i < j; ++i)
             {
                 //new contour
-                CreateFitShape(tx, contours[i], this.pxScale, false, true);
+                CreateFitShape(tx, contours[i], this.pxScale, false, true, HalfPixel);
                 tx.CloseContour();
             }
             tx.EndRead();
@@ -69,19 +72,36 @@ namespace Typography.Rendering
         const float GRID_SIZE_33 = 1f / 3f;
         const float GRID_SIZE_66 = 2f / 3f;
 
-        static float RoundToNearestVerticalSide(float org)
+        static float RoundToNearestVerticalSide(float org, bool useHalfPixel)
         {
             float actual1 = org;
-            float integer1 = (int)(actual1);
-            float floatModulo = actual1 - integer1;
-
-            if (floatModulo >= (GRID_SIZE_50))
+            float integer1 = (int)(actual1);//floor 
+            float remaining = actual1 - integer1;
+            if (useHalfPixel)
             {
-                return (integer1 + 1);
+                if (remaining > GRID_SIZE_66)
+                {
+                    return (integer1 + 1f);
+                }
+                else if (remaining > (GRID_SIZE_33))
+                {
+                    return (integer1 + 0.5f);
+                }
+                else
+                {
+                    return integer1;
+                }
             }
             else
             {
-                return integer1;
+                if (remaining > GRID_SIZE_66)
+                {
+                    return (integer1 + 1f);
+                } 
+                else
+                {
+                    return integer1;
+                }
             }
         }
         static float RoundToNearestHorizontalSide(float org)
@@ -99,7 +119,12 @@ namespace Typography.Rendering
                 return integer1;
             }
         }
-        static void CreateFitShape(IGlyphTranslator tx, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
+        static void CreateFitShape(IGlyphTranslator tx,
+            GlyphContour contour,
+            float pixelScale,
+            bool x_axis,
+            bool y_axis,
+            bool useHalfPixel)
         {
             List<GlyphPoint2D> mergePoints = contour.mergedPoints;
             int j = mergePoints.Count;
@@ -120,7 +145,7 @@ namespace Typography.Rendering
                 {
                     //vertical fitting
                     //fit p_y to grid
-                    p_y = RoundToNearestVerticalSide((float)p_y);
+                    p_y = RoundToNearestVerticalSide((float)p_y, useHalfPixel);
                 }
 
                 if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)
@@ -151,7 +176,7 @@ namespace Typography.Rendering
                 {
                     //vertical fitting
                     //fit p_y to grid
-                    p_y = RoundToNearestVerticalSide((float)p_y);
+                    p_y = RoundToNearestVerticalSide((float)p_y, useHalfPixel);
                 }
 
                 if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)

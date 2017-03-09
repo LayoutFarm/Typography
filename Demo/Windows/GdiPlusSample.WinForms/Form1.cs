@@ -37,12 +37,13 @@ namespace SampleWinForms
             cmbPositionTech.SelectedIndex = 0;
             cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbHintTechnique.Items.Add(HintTechnique.None);
-            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction);
-            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
-            cmbHintTechnique.Items.Add(HintTechnique.CustomAutoFit);
-            cmbHintTechnique.SelectedIndex = 0;
-            cmbHintTechnique.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            lstHintList.Items.Add(HintTechnique.None);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
+            lstHintList.Items.Add(HintTechnique.CustomAutoFit);
+            lstHintList.SelectedIndex = 0;
+            lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            //---------- 
 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //
@@ -81,7 +82,7 @@ namespace SampleWinForms
                     14,
                     16,
                     18,20,22,24,26,28,36,48,72,240,300,360
-                }); 
+                });
             lstFontSizes.SelectedIndexChanged += (s, e) =>
             {
                 //new font size
@@ -96,7 +97,6 @@ namespace SampleWinForms
             //render glyph with gdi path
             if (g == null)
             {
-
                 g = this.CreateGraphics();
             }
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -105,7 +105,25 @@ namespace SampleWinForms
             }
             //----------------------- 
 
-
+            HintTechnique hintTech = (HintTechnique)lstHintList.SelectedItem;
+            currentTextPrinter.UseVerticalHint = false;//reset
+            currentTextPrinter.UseTrueTypeInstructions = false;//reset
+            switch (hintTech)
+            {
+                default: throw new System.NotSupportedException();
+                case HintTechnique.None:break;
+                case HintTechnique.CustomAutoFit:
+                    currentTextPrinter.UseVerticalHint = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction:
+                    currentTextPrinter.UseTrueTypeInstructions = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                    currentTextPrinter.UseTrueTypeInstructions = true;
+                    currentTextPrinter.UseVerticalHint = true;
+                    break;
+            }
+            currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 0;
             currentTextPrinter.DrawString(g,
