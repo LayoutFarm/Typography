@@ -20,7 +20,10 @@ namespace PixelFarm.Drawing.Fonts
         Dictionary<string, GlyphPathBuilder> _cacheGlyphPathBuilders = new Dictionary<string, GlyphPathBuilder>();
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
         //
-        HintedVxsGlyphCollection hintGlyphCollection = new HintedVxsGlyphCollection();
+        HintedVxsGlyphCollection hintGlyphCollection = new HintedVxsGlyphCollection(); 
+        VertexStorePool _vxsPool = new VertexStorePool();
+        GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
+
 
 
         public DevVxsTextPrinter()
@@ -104,11 +107,7 @@ namespace PixelFarm.Drawing.Fonts
             canvasPainter.SetOrigin(ox, oy);
         }
 
-        //-----------------------
-        VertexStorePool _vxsPool = new VertexStorePool();
-        GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
-
-
+      
         void UpdateTypefaceAndGlyphBuilder()
         {
             //1. update _glyphPathBuilder for current typeface 

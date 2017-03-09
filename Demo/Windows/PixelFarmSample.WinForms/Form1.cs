@@ -648,16 +648,16 @@ namespace SampleWinForms
                 var atlasBuilder = new SimpleFontAtlasBuilder();
 
 
-                for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
+                for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
                 {
                     //build glyph
-                    builder.BuildFromGlyphIndex(n, sizeInPoint);
+                    builder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
                     var glyphToContour = new GlyphTranslatorToContour();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     builder.ReadShapes(glyphToContour);
                     GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
-                    atlasBuilder.AddGlyph(n, glyphImg);
+                    atlasBuilder.AddGlyph(gindex, glyphImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     //{
