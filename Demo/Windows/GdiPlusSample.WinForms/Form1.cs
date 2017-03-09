@@ -37,12 +37,13 @@ namespace SampleWinForms
             cmbPositionTech.SelectedIndex = 0;
             cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbHintTechnique.Items.Add(HintTechnique.None);
-            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction);
-            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
-            cmbHintTechnique.Items.Add(HintTechnique.CustomAutoFit);
-            cmbHintTechnique.SelectedIndex = 0;
-            cmbHintTechnique.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            lstHintList.Items.Add(HintTechnique.None);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
+            lstHintList.Items.Add(HintTechnique.CustomAutoFit);
+            lstHintList.SelectedIndex = 0;
+            lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            //---------- 
 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //
@@ -81,7 +82,7 @@ namespace SampleWinForms
                     14,
                     16,
                     18,20,22,24,26,28,36,48,72,240,300,360
-                }); 
+                });
             lstFontSizes.SelectedIndexChanged += (s, e) =>
             {
                 //new font size
@@ -96,20 +97,22 @@ namespace SampleWinForms
             //render glyph with gdi path
             if (g == null)
             {
-
                 g = this.CreateGraphics();
             }
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
             {
                 return;
             }
-            //----------------------- 
-
-
+            //-----------------------  
+            currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
+            currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 0;
+            char[] textBuffer = txtInputChar.Text.ToCharArray();
             currentTextPrinter.DrawString(g,
-                 txtInputChar.Text.ToCharArray(),
+                 textBuffer,
+                 0,
+                 textBuffer.Length,
                  x_pos,
                  y_pos
                 );
@@ -145,19 +148,18 @@ namespace SampleWinForms
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder();
-                var msdfBuilder = new MsdfGlyphGen();
+
 
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
                 {
                     //build glyph
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
+                    var glyphToContour = new GlyphTranslatorToContour();
+                    builder.ReadShapes(glyphToContour);
+                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours()); 
 
-                    var msdfGlyphGen = new MsdfGlyphGen();
-                    var actualImg = msdfGlyphGen.CreateMsdfImage(
-                        builder.GetOutputPoints(),
-                        builder.GetOutputContours(),
-                        builder.GetPixelScale());
-                    atlasBuilder.AddGlyph((int)n, actualImg);
+                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
+                    atlasBuilder.AddGlyph(n, glyphImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     //{

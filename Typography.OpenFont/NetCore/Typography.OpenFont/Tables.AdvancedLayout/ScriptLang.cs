@@ -6,16 +6,19 @@ namespace Typography.OpenFont
     {
         public readonly string fullname;
         public readonly string shortname;
-        public ScriptLang(string fullname, string shortname)
+        public readonly int internalName;
+        internal ScriptLang(string fullname, string shortname, int internalName)
         {
             this.fullname = fullname;
             this.shortname = shortname;
+            this.internalName = internalName;
         }
     }
 
     public static class ScriptLangs
     {
-        static Dictionary<string, ScriptLang> registeredScriptTags = new Dictionary<string, ScriptLang>();
+        static Dictionary<string, int> s_registerNames = new Dictionary<string, int>();
+        static Dictionary<string, ScriptLang> s_registeredScriptTags = new Dictionary<string, ScriptLang>();
 
         //https://www.microsoft.com/typography/otspec/scripttags.htm
         //https://www.microsoft.com/typography/otspec/languagetags.htm
@@ -202,33 +205,40 @@ namespace Typography.OpenFont
 
         static ScriptLang _(string fullname, string shortname)
         {
-            var scriptLang = new ScriptLang(fullname, shortname);
+
+
             // 
-            if (registeredScriptTags.ContainsKey(shortname))
+            if (s_registeredScriptTags.ContainsKey(shortname))
             {
                 if (shortname == "kana")
                 {
                     //***
                     //Hiragana and Katakana 
-                    //both have same short name "kana"
+                    //both have same short name "kana"                     
+                    return new ScriptLang(fullname, shortname, s_registerNames[shortname]);
                 }
                 else
                 {
                     //errors
+                    throw new System.NotSupportedException();
                 }
             }
             else
             {
-                registeredScriptTags.Add(shortname, scriptLang);
+                int internalName = s_registerNames.Count;
+                s_registerNames[shortname] = internalName;
+                var scriptLang = new ScriptLang(fullname, shortname, internalName);
+                s_registeredScriptTags.Add(shortname, scriptLang);
+                return scriptLang;
             }
-            return scriptLang;
+
         }
 
 
         public static ScriptLang GetRegisteredScriptLang(string shortname)
         {
             ScriptLang found;
-            registeredScriptTags.TryGetValue(shortname, out found);
+            s_registeredScriptTags.TryGetValue(shortname, out found);
             return found;
         }
     }

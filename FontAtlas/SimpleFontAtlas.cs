@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 using Typography.Rendering;
 namespace PixelFarm.Drawing.Fonts
-{   
+{
 
     public class SimpleFontAtlas
     {
@@ -15,7 +15,7 @@ namespace PixelFarm.Drawing.Fonts
 
         public int Width { get; set; }
         public int Height { get; set; }
-
+        public TextureKind TextureKind { get; set; }
         public void AddGlyph(int codePoint, TextureFontGlyphData glyphData)
         {
             codePointLocations.Add(codePoint, glyphData);
@@ -26,7 +26,7 @@ namespace PixelFarm.Drawing.Fonts
             get { return totalGlyphImage; }
             set { totalGlyphImage = value; }
         }
-        public bool GetRectByCodePoint(int codepoint, out TextureFontGlyphData glyphdata)
+        public bool TryGetGlyphDataByCodePoint(int codepoint, out TextureFontGlyphData glyphdata)
         {
             if (!codePointLocations.TryGetValue(codepoint, out glyphdata))
             {
@@ -35,6 +35,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             return true;
         }
+        public bool IsMsdfTexture { get; set; }
 
     }
 

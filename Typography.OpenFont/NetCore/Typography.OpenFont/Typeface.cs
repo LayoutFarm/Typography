@@ -59,7 +59,10 @@ namespace Typography.OpenFont
             get;
             set;
         }
-
+        /// <summary>
+        /// actual font filename
+        /// </summary>
+        public string Filename { get; set; }
         /// <summary>
         /// OS2 sTypoAscender, in font designed unit
         /// </summary>
@@ -147,7 +150,11 @@ namespace Typography.OpenFont
             // TODO: What if there are none or several tables?
             return _cmaps[0].CharacterToGlyphIndex(character);
         }
-
+        //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
+        //{
+        //    // TODO: What if there are none or several tables?
+        //    _cmaps[0].CollectGlyphIndexListFromSampleChar(sampleChar, collector);
+        //}
         public Glyph Lookup(char character)
         {
             return _glyphs[LookupIndex(character)];
@@ -156,6 +163,7 @@ namespace Typography.OpenFont
         {
             return _glyphs[glyphIndex];
         }
+
         public ushort GetAdvanceWidth(char character)
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(character));
@@ -196,12 +204,12 @@ namespace Typography.OpenFont
             get;
             set;
         }
-        internal GSUB GSUBTable
+        public GSUB GSUBTable
         {
             get;
             set;
         }
-        internal GPOS GPOSTable
+        public GPOS GPOSTable
         {
             get;
             set;
@@ -328,191 +336,5 @@ namespace Typography.OpenFont
         }
 
 
-        //TODO: move to another file
-        public class GlyphSubStitution
-        {
-
-            Typeface typeface;
-            GSUB gsubTable;
-            List<GSUB.LookupTable> lookupTables;
-            public GlyphSubStitution(Typeface typeface, string lang)
-            {
-                this.EnableLigation = true;//enable by default
-                this.Lang = lang;
-                this.typeface = typeface;
-                //check if this lang has 
-                gsubTable = typeface.GSUBTable;
-                ScriptTable scriptTable = gsubTable.ScriptList.FindScriptTable(lang);
-                //---------
-                if (scriptTable == null) { return; }   //early exit if no lookup tables      
-
-                //---------
-                ScriptTable.LangSysTable selectedLang = null;
-                if (scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
-                {
-                    //TODO: review here
-
-                    selectedLang = scriptTable.langSysTables[0];
-                }
-                else
-                {
-                    selectedLang = scriptTable.defaultLang;
-                }
-
-                if (selectedLang.HasRequireFeature)
-                {
-                    //TODO: review here
-                }
-
-                //other feature
-                if (selectedLang.featureIndexList != null)
-                {
-                    //get features 
-                    var features = new List<FeatureList.FeatureTable>();
-                    for (int i = 0; i < selectedLang.featureIndexList.Length; ++i)
-                    {
-                        FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[selectedLang.featureIndexList[i]];
-                        switch (feature.TagName)
-                        {
-                            case "ccmp": //glyph composition/decomposition
-                                //this version we implement ccmp
-                                features.Add(feature);
-                                break;
-                            case "liga":
-                                //Standard Ligatures --enable by default
-                                features.Add(feature);
-                                break;
-                        }
-
-                    }
-                    //----------------------- 
-                    lookupTables = new List<GSUB.LookupTable>();
-                    int j = features.Count;
-                    for (int i = 0; i < j; ++i)
-                    {
-                        FeatureList.FeatureTable feature = features[i];
-                        ushort[] lookupListIndices = feature.LookupListIndice;
-                        foreach (ushort lookupIndex in lookupListIndices)
-                        {
-                            GSUB.LookupTable lktable = gsubTable.GetLookupTable(lookupIndex);
-                            lktable.ForUseWithFeatureId = feature.TagName;
-                            lookupTables.Add(gsubTable.GetLookupTable(lookupIndex));
-                        }
-                    }
-                }
-
-            }
-            public void DoSubstitution(List<ushort> outputCodePoints)
-            {
-                if (lookupTables == null) { return; } //early exit if no lookup tables
-                //
-                //load
-                int j = lookupTables.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    GSUB.LookupTable lookupTable = lookupTables[i];
-                    //
-                    if (!EnableLigation &&
-                        lookupTable.ForUseWithFeatureId == Features.liga.shortname)
-                    {
-                        //skip this feature
-                        continue;
-                    }
-
-                    lookupTable.DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
-                }
-            }
-            public string Lang { get; private set; }
-
-            /// <summary>
-            /// enable gsub type4, ligation
-            /// </summary>
-            public bool EnableLigation { get; set; }
-
-
-        }
-
-
-        public class GlyphSetPosition
-        {
-
-            Typeface typeface;
-            GPOS gposTable;
-            List<GPOS.LookupTable> lookupTables;
-            public GlyphSetPosition(Typeface typeface, string lang)
-            {
-                this.Lang = lang;
-                this.typeface = typeface;
-                //check if this lang has 
-                this.gposTable = typeface.GPOSTable;
-
-                if (gposTable == null) { return; }
-
-                ScriptTable scriptTable = gposTable.ScriptList.FindScriptTable(lang);
-                //---------
-                if (scriptTable == null) { return; }   //early exit if no lookup tables      
-                //---------
-
-                ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
-
-                if (defaultLang.HasRequireFeature)
-                {
-
-                }
-                //other feature
-                if (defaultLang.featureIndexList != null)
-                {
-                    //get features 
-                    var features = new List<FeatureList.FeatureTable>();
-                    for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
-                    {
-                        FeatureList.FeatureTable feature = gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
-
-                        switch (feature.TagName)
-                        {
-                            case "mark"://mark=> mark to base
-                            case "mkmk"://mkmk => mark to mask
-
-                                //current version we implement this 2 features
-                                features.Add(feature);
-                                break;
-                            default:
-                                {
-
-                                }
-                                break;
-                        }
-
-                    }
-
-                    //-----------------------
-
-                    lookupTables = new List<GPOS.LookupTable>();
-                    int j = features.Count;
-                    for (int i = 0; i < j; ++i)
-                    {
-                        FeatureList.FeatureTable feature = features[i];
-                        ushort[] lookupListIndices = feature.LookupListIndice;
-                        foreach (ushort lookupIndex in lookupListIndices)
-                        {
-                            lookupTables.Add(gposTable.GetLookupTable(lookupIndex));
-                        }
-                    }
-                }
-
-            }
-            public string Lang { get; private set; }
-            public void DoGlyphPosition(List<GlyphPos> glyphPositions)
-            {
-
-                if (lookupTables == null) { return; } //early exit if no lookup tables
-                //load
-                int j = lookupTables.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    lookupTables[i].DoGlyphPosition(glyphPositions, 0, glyphPositions.Count);
-                }
-            }
-        }
     }
 }

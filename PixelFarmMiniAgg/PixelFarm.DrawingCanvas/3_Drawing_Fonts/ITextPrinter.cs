@@ -21,7 +21,7 @@ namespace PixelFarm.Drawing.Fonts
     {
 
         void DrawString(string text, double x, double y);
-        void DrawString(char[] text, double x, double y);
+        void DrawString(char[] text, int startAt, int len, double x, double y);
         void ChangeFont(RequestFont font);
         void ChangeFontColor(Color fontColor);
     }

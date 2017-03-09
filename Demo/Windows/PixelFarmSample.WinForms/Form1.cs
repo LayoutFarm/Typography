@@ -63,13 +63,13 @@ namespace SampleWinForms
             cmbPositionTech.Items.Add(PositionTechnique.None);
             cmbPositionTech.SelectedIndex = 0;
             cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
-            //----------
-            cmbHintTechnique.Items.Add(HintTechnique.None);
-            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction);
-            cmbHintTechnique.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
-            cmbHintTechnique.Items.Add(HintTechnique.CustomAutoFit);
-            cmbHintTechnique.SelectedIndex = 0;
-            cmbHintTechnique.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+            //---------- 
+            lstHintList.Items.Add(HintTechnique.None);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
+            lstHintList.Items.Add(HintTechnique.CustomAutoFit);
+            lstHintList.SelectedIndex = 0;
+            lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
 
             button1.Click += (s, e) => UpdateRenderOutput();
@@ -180,23 +180,24 @@ namespace SampleWinForms
                 return;
             }
 
-            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
-            bool useTrueTypeInst = false;//reset
-            bool useVerticalHinting = false; //reset agg vertical-only hinting
-             
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    useTrueTypeInst = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    useTrueTypeInst = true;
-                    useVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    break;
-            }
+            var hintTech = (HintTechnique)lstHintList.SelectedItem;
+            //bool useTrueTypeInst = false;//reset
+            //bool useVerticalHinting = false; //reset agg vertical-only hinting
+
+            //switch (Typography.Rendering)
+            //{
+            //    case HintTechnique.TrueTypeInstruction:
+            //        useTrueTypeInst = true;
+            //        break;
+            //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
+            //        useTrueTypeInst = true;
+            //        useVerticalHinting = true;
+            //        break;
+            //    case HintTechnique.CustomAutoFit:
+            //        //custom agg autofit 
+            //        useVerticalHinting = true;
+            //        break;
+            //}
 
             //1. read typeface from font file 
             RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
@@ -208,8 +209,8 @@ namespace SampleWinForms
                         selectedTextPrinter = _devGdiTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.UseTrueTypeInstructions = useTrueTypeInst;
-                        selectedTextPrinter.UseVerticalHint = useVerticalHinting;
+                        selectedTextPrinter.HintTechnique = hintTech;
+                        //
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
 
                     }
@@ -224,8 +225,7 @@ namespace SampleWinForms
                         selectedTextPrinter = _devVxsTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.UseTrueTypeInstructions = useTrueTypeInst;
-                        selectedTextPrinter.UseVerticalHint = useVerticalHinting;
+                        selectedTextPrinter.HintTechnique = hintTech;
 
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
 
@@ -277,7 +277,7 @@ namespace SampleWinForms
         {
             //----------------------------------------------------
             var builder = new GlyphPathBuilder(typeface);
-            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            var hintTech = (HintTechnique)lstHintList.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset
             switch (hintTech)
@@ -291,18 +291,18 @@ namespace SampleWinForms
                     break;
                 case HintTechnique.CustomAutoFit:
                     //custom agg autofit 
+                    builder.UseVerticalHinting = true;
                     break;
             }
             //----------------------------------------------------
-
             builder.Build(testChar, sizeInPoint);
-
             var txToVxs1 = new GlyphTranslatorToVxs();
             builder.ReadShapes(txToVxs1);
 
             VertexStore vxs = new VertexStore();
             txToVxs1.WriteOutput(vxs, _vxsPool);
 
+            //----------------------------------------------------
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
 
             //5. use PixelFarm's Agg to render to bitmap...
@@ -314,10 +314,7 @@ namespace SampleWinForms
                 //5.2 
                 p.FillColor = PixelFarm.Drawing.Color.Black;
                 //5.3
-                if (!chkYGridFitting.Checked)
-                {
-                    p.Fill(vxs);
-                }
+                p.Fill(vxs);
             }
             if (chkBorder.Checked)
             {
@@ -331,29 +328,7 @@ namespace SampleWinForms
             }
 
 
-            float pxScale = builder.GetPixelScale();
-            //1. autofit
-            var autoFit = new GlyphAutoFit();
-            autoFit.Hint(
-                builder.GetOutputPoints(),
-                builder.GetOutputContours(), pxScale);
 
-
-            txToVxs1.Reset();
-            autoFit.ReadOutput(txToVxs1);
-            VertexStore vxs2 = new VertexStore();
-            txToVxs1.WriteOutput(vxs2, _vxsPool);
-
-            //
-            p.FillColor = PixelFarm.Drawing.Color.Black;
-            p.Fill(vxs2);
-
-            if (chkShowTess.Checked)
-            {
-#if DEBUG
-                debugDrawTriangulatedGlyph(autoFit.FitOutput, pxScale);
-#endif
-            }
 
             if (chkShowGrid.Checked)
             {
@@ -378,7 +353,7 @@ namespace SampleWinForms
             p.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
             var builder = new GlyphPathBuilder(typeface);
-            var hintTech = (HintTechnique)cmbHintTechnique.SelectedItem;
+            var hintTech = (HintTechnique)lstHintList.SelectedItem;
             builder.UseTrueTypeInstructions = false;//reset
             builder.UseVerticalHinting = false;//reset 
             switch (hintTech)
@@ -397,11 +372,10 @@ namespace SampleWinForms
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
-            var msdfGlyphGen = new MsdfGlyphGen();
-            GlyphImage glyphImg = msdfGlyphGen.CreateMsdfImage(
-                builder.GetOutputPoints(),
-                builder.GetOutputContours(),
-                builder.GetPixelScale());
+            var glyphToContour = new GlyphTranslatorToContour();
+            builder.ReadShapes(glyphToContour);
+            //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
+            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
             var actualImg = ActualImage.CreateFromBuffer(glyphImg.Width, glyphImg.Height, PixelFormat.ARGB32, glyphImg.GetImageBuffer());
             p.DrawImage(actualImg, 0, 0);
 
@@ -672,19 +646,18 @@ namespace SampleWinForms
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder();
-                var msdfBuilder = new MsdfGlyphGen();
 
-                for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
+
+                for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
                 {
                     //build glyph
-                    builder.BuildFromGlyphIndex(n, sizeInPoint);
+                    builder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
-                    var msdfGlyphGen = new MsdfGlyphGen();
-                    var actualImg = msdfGlyphGen.CreateMsdfImage(
-                        builder.GetOutputPoints(),
-                        builder.GetOutputContours(),
-                        builder.GetPixelScale());
-                    atlasBuilder.AddGlyph((int)n, actualImg);
+                    var glyphToContour = new GlyphTranslatorToContour();
+                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
+                    builder.ReadShapes(glyphToContour);
+                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
+                    atlasBuilder.AddGlyph(gindex, glyphImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     //{

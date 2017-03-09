@@ -6,184 +6,38 @@ namespace Typography.Rendering
 {
     //This is PixelFarm's AutoFit
     //NOT FREE TYPE AUTO FIT***
-    public class GlyphAutoFit
+    public class GlyphFitOutlineAnalyzer
     {
-        //----------
-        //implement glyph auto fit hint
-        //----------
-        GlyphFitOutline glyphOutline;
-        List<GlyphContour> contours;
-        float pxScale = 1;
-        public void Hint(GlyphPointF[] glyphPoints, ushort[] glyphContours, float pxScale = 1)
+       
+        public GlyphFitOutline Analyze(GlyphPointF[] glyphPoints, ushort[] glyphContours)
         {
-
-            this.pxScale = pxScale;
             var glyphToCountor = new GlyphTranslatorToContour();
             glyphToCountor.Read(glyphPoints, glyphContours);
             //master outline analysis 
-            contours = glyphToCountor.GetContours();
+            List<GlyphContour> contours = glyphToCountor.GetContours(); //analyzed contour             
             int j = contours.Count;
             var analyzer = new GlyphPartAnalyzer();
             analyzer.NSteps = 4;
-            analyzer.PixelScale = pxScale;
+
             for (int i = 0; i < j; ++i)
             {
                 contours[i].Analyze(analyzer);
             }
 
-            glyphOutline = TessWithPolyTri(contours, pxScale);
-        }
-        public GlyphFitOutline FitOutput { get { return this.glyphOutline; } }
-        /// <summary>
-        /// read fitting output
-        /// </summary>
-        /// <param name="tx">glyph translator</param>
-        public void ReadOutput(IGlyphTranslator tx)
-        {
-            if (glyphOutline == null) { return; }
-            //
-            //-----------------------------------------------------------            
-            //create fit contour
-            //this version use only Agg's vertical hint only ****
-            //(ONLY vertical fitting , NOT apply horizontal fit)
-            //-----------------------------------------------------------     
-            //create outline
-            //then create     
-
-            int j = contours.Count;
-            tx.BeginRead(j);
-            for (int i = 0; i < j; ++i)
+            if (j > 0)
             {
-                //new contour
-                CreateFitShape(tx, contours[i], this.pxScale, false, true);
-                tx.CloseContour();
-            }
-            tx.EndRead();
-        }
-
-        const int GRID_SIZE = 1;
-        const float GRID_SIZE_25 = 1f / 4f;
-        const float GRID_SIZE_50 = 2f / 4f;
-        const float GRID_SIZE_75 = 3f / 4f;
-
-        const float GRID_SIZE_33 = 1f / 3f;
-        const float GRID_SIZE_66 = 2f / 3f;
-
-        static float RoundToNearestVerticalSide(float org)
-        {
-            float actual1 = org;
-            float integer1 = (int)(actual1);
-            float floatModulo = actual1 - integer1;
-
-            if (floatModulo >= (GRID_SIZE_50))
-            {
-                return (integer1 + 1);
+                return TessWithPolyTri(contours);
             }
             else
             {
-                return integer1;
-            }
-        }
-        static float RoundToNearestHorizontalSide(float org)
-        {
-            float actual1 = org;
-            float integer1 = (int)(actual1);//lower
-            float floatModulo = actual1 - integer1;
-
-            if (floatModulo >= (GRID_SIZE_50))
-            {
-                return (integer1 + 1);
-            }
-            else
-            {
-                return integer1;
-            }
-        }
-        static void CreateFitShape(IGlyphTranslator tx, GlyphContour contour, float pixelScale, bool x_axis, bool y_axis)
-        {
-            List<GlyphPoint2D> mergePoints = contour.mergedPoints;
-            int j = mergePoints.Count;
-            //merge 0 = start
-            double prev_px = 0;
-            double prev_py = 0;
-            double p_x = 0;
-            double p_y = 0;
-            double first_px = 0;
-            double first_py = 0;
-
-            {
-                GlyphPoint2D p = mergePoints[0];
-                p_x = p.x * pixelScale;
-                p_y = p.y * pixelScale;
-
-                if (y_axis && p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
-                {
-                    //vertical fitting
-                    //fit p_y to grid
-                    p_y = RoundToNearestVerticalSide((float)p_y);
-                }
-
-                if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)
-                {
-                    float new_x = RoundToNearestHorizontalSide((float)p_x);
-                    //adjust right-side vertical edge
-                    EdgeLine rightside = p.GetMatchingVerticalEdge();
-                    if (rightside != null)
-                    {
-
-                    }
-                    p_x = new_x;
-                }
-                tx.MoveTo((float)p_x, (float)p_y);
-                //-------------
-                first_px = prev_px = p_x;
-                first_py = prev_py = p_y;
+                return null;
             }
 
-            for (int i = 1; i < j; ++i)
-            {
-                //all merge point is polygon point
-                GlyphPoint2D p = mergePoints[i];
-                p_x = p.x * pixelScale;
-                p_y = p.y * pixelScale;
-
-                if (y_axis && p.isPartOfHorizontalEdge && p.isUpperSide && p_y > 3)
-                {
-                    //vertical fitting
-                    //fit p_y to grid
-                    p_y = RoundToNearestVerticalSide((float)p_y);
-                }
-
-                if (x_axis && p.IsPartOfVerticalEdge && p.IsLeftSide)
-                {
-                    //horizontal fitting
-                    //fix p_x to grid
-                    float new_x = RoundToNearestHorizontalSide((float)p_x);
-                    ////adjust right-side vertical edge
-                    //PixelFarm.Agg.Typography.EdgeLine rightside = p.GetMatchingVerticalEdge();
-                    //if (rightside != null && !rightside.IsLeftSide && rightside.IsOutside)
-                    //{
-                    //    var rightSideP = rightside.p.userData as GlyphPoint2D;
-                    //    var rightSideQ = rightside.q.userData as GlyphPoint2D;
-                    //    //find move diff
-                    //    float movediff = (float)p_x - new_x;
-                    //    //adjust right side edge
-                    //    rightSideP.x = rightSideP.x + movediff;
-                    //    rightSideQ.x = rightSideQ.x + movediff;
-                    //}
-                    p_x = new_x;
-                }
-                //                 
-                tx.LineTo((float)p_x, (float)p_y);
-                //
-                prev_px = p_x;
-                prev_py = p_y;
-            }
-
-            tx.LineTo((float)first_px, (float)first_py);
         }
 
-        GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours, float pixelScale)
+
+
+        static GlyphFitOutline TessWithPolyTri(List<GlyphContour> contours)
         {
             List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
             int cntCount = contours.Count;
@@ -212,7 +66,7 @@ namespace Typography.Rendering
 
             //------------------------------------------
             Poly2Tri.P2T.Triangulate(polygon); //that poly is triangulated 
-            GlyphFitOutline glyphFitOutline = new GlyphFitOutline(polygon);
+            GlyphFitOutline glyphFitOutline = new GlyphFitOutline(polygon, contours);
             glyphFitOutline.Analyze();
             //------------------------------------------
 #if DEBUG

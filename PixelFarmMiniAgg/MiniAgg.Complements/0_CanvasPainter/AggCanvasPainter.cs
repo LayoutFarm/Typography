@@ -356,8 +356,7 @@ namespace PixelFarm.Agg
            double x,
            double y)
         {
-            //TODO: review drawing string  with agg here  
-            //textPrinter.Print(this, text.ToString(), x, y);
+            //TODO: review drawing string  with agg here   
             if (_textPrinter != null)
             {
                 _textPrinter.DrawString(text, x, y);

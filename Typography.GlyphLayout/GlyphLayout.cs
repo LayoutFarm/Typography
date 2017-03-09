@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
 
 
 namespace Typography.TextLayout
@@ -29,15 +28,6 @@ namespace Typography.TextLayout
 #endif
     }
 
-    class GlyphsCache
-    {
-
-        Typeface _typeface;
-        public GlyphsCache(Typeface typeface)
-        {
-            _typeface = typeface;
-        }
-    }
 
     public enum PositionTechnique
     {
@@ -52,69 +42,151 @@ namespace Typography.TextLayout
         OpenFont,
     }
 
+    class GlyphLayoutPlanCollection
+    {
+        Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext> collection = new Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext>();
+        /// <summary>
+        /// get glyph layout plan or create if not exists
+        /// </summary>
+        /// <param name="typeface"></param>
+        /// <param name="scriptLang"></param>
+        /// <returns></returns>
+        public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
+        {
+            GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang.internalName);
+            GlyphLayoutPlanContext context;
+            if (!collection.TryGetValue(key, out context))
+            {
+                var glyphSubstitution = new GlyphSubStitution(typeface, scriptLang.shortname);
+                var glyphPosition = new GlyphSetPosition(typeface, scriptLang.shortname);
+                collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
+            }
+            return context;
+        }
 
+    }
+    struct GlyphLayoutPlanKey
+    {
+        public Typeface t;
+        public int scriptInternameName;
+        public GlyphLayoutPlanKey(Typeface t, int scriptInternameName)
+        {
+            this.t = t;
+            this.scriptInternameName = scriptInternameName;
+        }
+    }
+    struct GlyphLayoutPlanContext
+    {
+        public readonly GlyphSubStitution _glyphSub;
+        public readonly GlyphSetPosition _glyphPos;
+        public GlyphLayoutPlanContext(GlyphSubStitution _glyphSub, GlyphSetPosition glyphPos)
+        {
+            this._glyphSub = _glyphSub;
+            this._glyphPos = glyphPos;
+        }
+    }
     public class GlyphLayout
     {
+        //glyph layout service
 
-        Dictionary<Typeface, GlyphsCache> _glyphCaches = new Dictionary<Typeface, GlyphsCache>();
+
+        //---------------------------
+        GlyphLayoutPlanCollection _layoutPlanCollection = new GlyphLayoutPlanCollection();
+        Typeface _typeface;
+        ScriptLang _scriptLang;
+        GlyphSubStitution _gsub;
+        GlyphSetPosition _gpos;
+        bool _needPlanUpdate;
+        //--------------------------- 
+
+        List<ushort> _inputGlyphs = new List<ushort>(); //not thread safe***
+        List<GlyphPos> _glyphPositions = new List<GlyphPos>();//not thread safe*** 
+
+
+
         public GlyphLayout()
         {
             PositionTechnique = PositionTechnique.OpenFont;
             ScriptLang = ScriptLangs.Latin;
         }
         public PositionTechnique PositionTechnique { get; set; }
-        public ScriptLang ScriptLang { get; set; }
+        public ScriptLang ScriptLang
+        {
+            get { return _scriptLang; }
+            set
+            {
+                if (_scriptLang != value)
+                {
+                    _needPlanUpdate = true;
+                }
+                _scriptLang = value;
+            }
+        }
         public bool EnableLigature { get; set; }
 
-
-        public void Layout(Typeface typeface, float size, string str, List<GlyphPlan> glyphPlanBuffer)
+        void UpdateLayoutPlan()
         {
-            Layout(typeface, size, str.ToCharArray(), glyphPlanBuffer);
+            GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(this._typeface, this._scriptLang);
+            this._gpos = context._glyphPos;
+            this._gsub = context._glyphSub;
+            _needPlanUpdate = false;
         }
-        List<ushort> inputGlyphs = new List<ushort>(); //not thread safe***
-
-
-
-        public void Layout(Typeface typeface, float size, char[] str, List<GlyphPlan> glyphPlanBuffer)
+        public void Layout(Typeface typeface,
+            float size,
+            char[] str,
+            int startAt,
+            int len,
+            List<GlyphPlan> outputGlyphPlanList)
         {
-            //---------------------------------------------- 
-            //1. convert char[] to glyph[]
-            //2. send to shaping engine
-            //3. layout position of each glyph 
-            //----------------------------------------------   
-            //check if we have created a glyph cache for the typeface
-            GlyphsCache glyphCache;
-            if (!_glyphCaches.TryGetValue(typeface, out glyphCache))
+            if (this._typeface != typeface)
             {
-                //create new 
-                glyphCache = new GlyphsCache(typeface);
-                _glyphCaches.Add(typeface, glyphCache);
+                this._typeface = typeface;
+                _needPlanUpdate = true;
             }
 
-            //----------------------------------------------  
-            int j = str.Length;
-            inputGlyphs.Clear();
-            for (int i = 0; i < j; ++i)
+            //get layout plan
+            if (_needPlanUpdate)
             {
-                //1. convert char[] to glyphIndex[]
-                inputGlyphs.Add((ushort)typeface.LookupIndex(str[i]));
+                UpdateLayoutPlan();
+            }
+
+
+            //GlyphLayoutPlan glyphCache;
+            //if (!_glyphCaches.TryGetValue(typeface, out glyphCache))
+            //{
+            //    //create new 
+            //    glyphCache = new GlyphLayoutPlan(typeface);
+            //    _glyphCaches.Add(typeface, glyphCache);
+            //}
+            //----------------------------------------------  
+
+            _inputGlyphs.Clear(); //clear before use
+            for (int i = 0; i < len; ++i)
+            {
+                //convert input char to input glyphs
+                _inputGlyphs.Add((ushort)typeface.LookupIndex(str[startAt + i]));
             }
             //----------------------------------------------  
-            //glyph substitution
-            if (j > 1)
+            //glyph substitution            
+            if (len > 1)
             {
-                GlyphSubStitution glyphSubstitution = new GlyphSubStitution(typeface, this.ScriptLang.shortname);
-                glyphSubstitution.EnableLigation = this.EnableLigature;
-                glyphSubstitution.DoSubstitution(inputGlyphs);
+                //TODO: review perf here
+                _gsub.EnableLigation = this.EnableLigature;
+                _gsub.DoSubstitution(_inputGlyphs);
             }
+            //----------------------------------------------  
+            //after glyph substitution,
+            //number of input glyph MAY changed (increase or decrease).
+
+            //so count again.
+            int finalGlyphCount = _inputGlyphs.Count;
             //----------------------------------------------  
             //glyph position
-            j = inputGlyphs.Count;
-            List<GlyphPos> glyphPositions = new List<GlyphPos>(j);
-            for (int i = 0; i < j; ++i)
+            _glyphPositions.Clear();
+            for (int i = 0; i < finalGlyphCount; ++i)
             {
-                ushort glyIndex = inputGlyphs[i];
-                glyphPositions.Add(new GlyphPos(
+                ushort glyIndex = _inputGlyphs[i];
+                _glyphPositions.Add(new GlyphPos(
                     glyIndex,
                     typeface.GetGlyphByIndex(glyIndex).GlyphClass,
                     typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex))
@@ -122,33 +194,30 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (j > 1 && posTech == PositionTechnique.OpenFont)
+            if (len > 1 && posTech == PositionTechnique.OpenFont)
             {
-                GlyphSetPosition glyphSetPos = new GlyphSetPosition(typeface, ScriptLang.shortname);
-                glyphSetPos.DoGlyphPosition(glyphPositions);
+                _gpos.DoGlyphPosition(_glyphPositions);
             }
             //--------------
             float scale = typeface.CalculateFromPointToPixelScale(size);
             float cx = 0;
             float cy = 0;
 
-            j = inputGlyphs.Count;
-
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < finalGlyphCount; ++i)
             {
-                ushort glyIndex = inputGlyphs[i];
+                ushort glyIndex = _inputGlyphs[i];
                 //this advWidth in font design unit   
                 float advWidth = typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex) * scale;
                 //----------------------------------   
                 switch (posTech)
                 {
                     case PositionTechnique.None:
-                        glyphPlanBuffer.Add(new GlyphPlan(glyIndex, cx, cy, advWidth));
+                        outputGlyphPlanList.Add(new GlyphPlan(glyIndex, cx, cy, advWidth));
                         break;
                     case PositionTechnique.OpenFont:
                         {
-                            GlyphPos gpos_offset = glyphPositions[i];
-                            glyphPlanBuffer.Add(new GlyphPlan(
+                            GlyphPos gpos_offset = _glyphPositions[i];
+                            outputGlyphPlanList.Add(new GlyphPlan(
                                 glyIndex,
                                 cx + (scale * gpos_offset.xoffset),
                                 cy + (scale * gpos_offset.yoffset),
@@ -157,19 +226,18 @@ namespace Typography.TextLayout
                         break;
                     case PositionTechnique.Kerning:
                         {
-                            glyphPlanBuffer.Add(new GlyphPlan(
+                            outputGlyphPlanList.Add(new GlyphPlan(
                                glyIndex,
                                cx,
                                cy,
                                advWidth));
                             if (i > 0)
                             {
-                                advWidth += typeface.GetKernDistance(glyphPlanBuffer[i - 1].glyphIndex, glyphPlanBuffer[i].glyphIndex) * scale;
+                                advWidth += typeface.GetKernDistance(outputGlyphPlanList[i - 1].glyphIndex, outputGlyphPlanList[i].glyphIndex) * scale;
                             }
                         }
                         break;
                 }
-
                 //--------
                 cx += advWidth;
             }

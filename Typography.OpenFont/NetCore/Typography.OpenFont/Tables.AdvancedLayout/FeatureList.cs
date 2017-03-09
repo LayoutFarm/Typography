@@ -1,6 +1,6 @@
 ﻿//Apache2, 2016-2017, WinterDev
- 
-using System.IO; 
+
+using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
@@ -25,7 +25,7 @@ namespace Typography.OpenFont.Tables
 
     //[GSUB = glyph substitution, GPOS = glyph positioning]
 
-    class FeatureList
+    public class FeatureList
     {
 
 

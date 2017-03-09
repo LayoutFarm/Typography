@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-2017, WinterDev
-namespace SampleWinForms
+namespace Typography.Rendering
 {
 
-    public enum HintTechnique
+    public enum HintTechnique : byte
     {
         /// <summary>
         /// no hinting
