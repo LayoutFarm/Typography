@@ -5,7 +5,10 @@ using Typography.OpenFont.Tables;
 namespace Typography.TextLayout
 {
 
-    public class GlyphSubStitution
+    /// <summary>
+    /// glyph subsitution manager
+    /// </summary>
+    class GlyphSubStitution
     {
 
         Typeface typeface;

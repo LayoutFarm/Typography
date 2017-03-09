@@ -4,8 +4,12 @@ using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 namespace Typography.TextLayout
 {
+ 
 
-    public class GlyphSetPosition
+    /// <summary>
+    /// glyph set position manager
+    /// </summary>
+    class GlyphSetPosition
     {
 
         Typeface typeface;
