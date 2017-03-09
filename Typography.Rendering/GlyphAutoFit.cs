@@ -32,8 +32,15 @@ namespace Typography.Rendering
             {
                 contours[i].Analyze(analyzer);
             }
+            if (j > 0)
+            {
+                glyphOutline = TessWithPolyTri(contours, pxScale);
+            }
+            else
+            {
+                glyphOutline = null;
+            }
 
-            glyphOutline = TessWithPolyTri(contours, pxScale);
         }
         public GlyphFitOutline FitOutput { get { return this.glyphOutline; } }
         public bool HalfPixel { get; set; }
@@ -94,7 +101,7 @@ namespace Typography.Rendering
             }
             else
             {
-                if (remaining > GRID_SIZE_66)
+                if (remaining > GRID_SIZE_50)
                 {
                     return (integer1 + 1f);
                 }
