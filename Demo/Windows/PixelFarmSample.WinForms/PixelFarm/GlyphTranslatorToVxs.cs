@@ -64,7 +64,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             else
             {
-                //float scale = TypeFace.CalculateFromPointToPixelScale(SizeInPoints);
+
                 var mat = PixelFarm.Agg.Transform.Affine.NewMatix(
                     new PixelFarm.Agg.Transform.AffinePlan(
                         PixelFarm.Agg.Transform.AffineMatrixCommand.Scale, scale, scale));

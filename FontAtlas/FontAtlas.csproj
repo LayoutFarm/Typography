@@ -38,7 +38,6 @@
   <ItemGroup>
     <Compile Include="BinPacker.cs" />
     <Compile Include="MsdfGlyphGen.cs" />
-    <Compile Include="MsdfGlyphGenExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleFontAtlas.cs" />
     <Compile Include="SimpleFontAtlasBuilder.cs" />

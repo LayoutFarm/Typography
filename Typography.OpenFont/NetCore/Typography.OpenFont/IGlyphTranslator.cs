@@ -79,7 +79,7 @@ namespace Typography.OpenFont
     public static class IGlyphReaderExtensions
     {
 
-        public static void Read(this IGlyphTranslator tx, GlyphPointF[] glyphPoints, ushort[] contourEndPoints)
+        public static void Read(this IGlyphTranslator tx, GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float scale = 1)
         {
 
             int startContour = 0;
@@ -115,8 +115,8 @@ namespace Typography.OpenFont
                 {
 
                     GlyphPointF p = glyphPoints[cpoint_index];
-                    float p_x = p.X;
-                    float p_y = p.Y;
+                    float p_x = p.X * scale;
+                    float p_y = p.Y * scale;
 
                     //int vtag = (int)flags[cpoint_index] & 0x1;
                     //bool has_dropout = (((vtag >> 2) & 0x1) != 0);

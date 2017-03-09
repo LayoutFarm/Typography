@@ -296,16 +296,11 @@ namespace SampleWinForms
             }
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
-
-
             var txToVxs1 = new GlyphTranslatorToVxs();
             builder.ReadShapes(txToVxs1);
 
             VertexStore vxs = new VertexStore();
-            txToVxs1.WriteOutput(vxs, _vxsPool, builder.GetPixelScale());
-
-
-
+            txToVxs1.WriteOutput(vxs, _vxsPool);
 
             //----------------------------------------------------
             p.UseSubPixelRendering = chkLcdTechnique.Checked;
@@ -377,11 +372,10 @@ namespace SampleWinForms
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
-            var msdfGlyphGen = new MsdfGlyphGen();
-            GlyphImage glyphImg = msdfGlyphGen.CreateMsdfImage(
-                builder.GetOutputPoints(),
-                builder.GetOutputContours(),
-                builder.GetPixelScale());
+            var glyphToContour = new GlyphTranslatorToContour();
+            builder.ReadShapes(glyphToContour);
+            //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
+            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
             var actualImg = ActualImage.CreateFromBuffer(glyphImg.Width, glyphImg.Height, PixelFormat.ARGB32, glyphImg.GetImageBuffer());
             p.DrawImage(actualImg, 0, 0);
 
@@ -652,19 +646,18 @@ namespace SampleWinForms
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder();
-                var msdfBuilder = new MsdfGlyphGen();
+
 
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
                 {
                     //build glyph
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
 
-                    var msdfGlyphGen = new MsdfGlyphGen();
-                    var actualImg = msdfGlyphGen.CreateMsdfImage(
-                        builder.GetOutputPoints(),
-                        builder.GetOutputContours(),
-                        builder.GetPixelScale());
-                    atlasBuilder.AddGlyph((int)n, actualImg);
+                    var glyphToContour = new GlyphTranslatorToContour();
+                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
+                    builder.ReadShapes(glyphToContour);
+                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
+                    atlasBuilder.AddGlyph(n, glyphImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     //{

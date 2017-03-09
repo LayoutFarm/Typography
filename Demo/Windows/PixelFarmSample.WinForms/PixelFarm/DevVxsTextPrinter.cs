@@ -11,8 +11,7 @@ using Typography.Rendering;
 namespace PixelFarm.Drawing.Fonts
 {
 
-
-
+  
     class DevVxsTextPrinter : DevTextPrinterBase
     {
 
@@ -64,8 +63,8 @@ namespace PixelFarm.Drawing.Fonts
             float fontSizePoint = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(typeface, fontSizePoint, text, start, len, _outputGlyphPlans);
-            //4. render each glyph
 
+            //4. render each glyph
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
             int j = _outputGlyphPlans.Count;
@@ -92,9 +91,9 @@ namespace PixelFarm.Drawing.Fonts
                     _glyphPathBuilder.ReadShapes(_tovxs);
 
                     //TODO: review here, 
-                    float pxScale = _glyphPathBuilder.GetPixelScale();
+                    //float pxScale = _glyphPathBuilder.GetPixelScale();
                     glyphVxs = new VertexStore();
-                    _tovxs.WriteOutput(glyphVxs, _vxsPool, pxScale);
+                    _tovxs.WriteOutput(glyphVxs, _vxsPool);
                     //
                     hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
                 }

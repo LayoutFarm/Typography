@@ -2,20 +2,16 @@
 //-----------------------------------  
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont;
+
 
 namespace Typography.Rendering
 {
-    public class MsdfGlyphGen
+    public static class MsdfGlyphGen
     {
-        public Msdfgen.Shape CreateMsdfShape(GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float pxScale = 1)
+        public static Msdfgen.Shape CreateMsdfShape(GlyphTranslatorToContour glyphToContour, float pxScale = 1)
         {
-            var glyphToContour = new GlyphTranslatorToContour();
-            glyphToContour.Read(glyphPoints, contourEndPoints);
-
             List<GlyphContour> cnts = glyphToContour.GetContours();
             List<GlyphContour> newFitContours = new List<GlyphContour>();
-
             int j = cnts.Count;
             for (int i = 0; i < j; ++i)
             {
@@ -123,5 +119,56 @@ namespace Typography.Rendering
             }
             return newc;
         }
+        //---------------------------------------------------------------------
+
+        public static GlyphImage CreateMsdfImage(
+             GlyphTranslatorToContour glyphToContour)
+        {
+            // create msdf shape , then convert to actual image
+            return CreateMsdfImage(CreateMsdfShape(glyphToContour, 1));
+        }
+        public static GlyphImage CreateMsdfImage(Msdfgen.Shape shape)
+        {
+            double left, bottom, right, top;
+            shape.findBounds(out left, out bottom, out right, out top);
+            int w = (int)Math.Ceiling((right - left));
+            int h = (int)Math.Ceiling((top - bottom));
+            if (w < 5)
+            {
+                w = 5;
+            }
+            if (h < 5)
+            {
+                h = 5;
+            }
+
+
+            int borderW = (int)((float)w / 5f);
+            var translate = new Msdfgen.Vector2(left < 0 ? -left + borderW : borderW, bottom < 0 ? -bottom + borderW : borderW);
+            w += borderW * 2; //borders,left- right
+            h += borderW * 2; //borders, top- bottom
+
+
+
+            Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp(w, h);
+            Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
+
+
+            Msdfgen.MsdfGenerator.generateMSDF(frgbBmp,
+                shape,
+                4,
+                new Msdfgen.Vector2(1, 1), //scale                 
+                translate,//translate to positive quadrant
+                -1);
+            //-----------------------------------
+            int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
+
+            GlyphImage img = new GlyphImage(w, h);
+            img.TextureOffsetX = translate.x;
+            img.TextureOffsetY = translate.y;
+            img.SetImageBuffer(buffer, false);
+            return img;
+        }
+
     }
 }

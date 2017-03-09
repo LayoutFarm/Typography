@@ -148,19 +148,18 @@ namespace SampleWinForms
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder();
-                var msdfBuilder = new MsdfGlyphGen();
+
 
                 for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
                 {
                     //build glyph
                     builder.BuildFromGlyphIndex(n, sizeInPoint);
+                    var glyphToContour = new GlyphTranslatorToContour();
+                    builder.ReadShapes(glyphToContour);
+                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours()); 
 
-                    var msdfGlyphGen = new MsdfGlyphGen();
-                    var actualImg = msdfGlyphGen.CreateMsdfImage(
-                        builder.GetOutputPoints(),
-                        builder.GetOutputContours(),
-                        builder.GetPixelScale());
-                    atlasBuilder.AddGlyph((int)n, actualImg);
+                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
+                    atlasBuilder.AddGlyph(n, glyphImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     //{

@@ -110,7 +110,7 @@ namespace SampleWinForms
 
             //
             //4. render each glyph
-            _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
+            
             System.Drawing.Drawing2D.Matrix scaleMat = null;
             // 
 
@@ -120,14 +120,13 @@ namespace SampleWinForms
                 GlyphPlan glyphPlan = _outputGlyphPlans[i];
                 _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
                 // 
-                float pxScale = _currentGlyphPathBuilder.GetPixelScale();
+               // float pxScale = _currentGlyphPathBuilder.GetPixelScale();
                 scaleMat = new System.Drawing.Drawing2D.Matrix(
-                    pxScale, 0,//scale x
-                    0, pxScale, //scale y
+                    1, 0,//scale x
+                    0, 1, //scale y
                     x + glyphPlan.x,
                     y + glyphPlan.y //xpos,ypos
                 );
-                //c_x += (glyphPlan.advX); //move xpos
 
                 //
                 _txToGdiPath.Reset();
