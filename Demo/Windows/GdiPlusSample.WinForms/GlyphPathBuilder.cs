@@ -136,6 +136,26 @@ namespace Typography.Rendering
         {
             builder.BuildFromGlyphIndex((ushort)builder.Typeface.LookupIndex(c), sizeInPoints);
         }
+        public static void SetHintTechnique(this GlyphPathBuilder builder, HintTechnique hintTech)
+        {
+
+            builder.UseTrueTypeInstructions = false;//reset
+            builder.UseVerticalHinting = false;//reset
+            switch (hintTech)
+            {
+                case HintTechnique.TrueTypeInstruction:
+                    builder.UseTrueTypeInstructions = true;
+                    break;
+                case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                    builder.UseTrueTypeInstructions = true;
+                    builder.UseVerticalHinting = true;
+                    break;
+                case HintTechnique.CustomAutoFit:
+                    //custom agg autofit 
+                    builder.UseVerticalHinting = true;
+                    break;
+            }
+        }
     }
 
 }

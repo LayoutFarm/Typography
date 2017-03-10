@@ -124,9 +124,8 @@ namespace PixelFarm.Drawing.Fonts
 
             }
             //2.1 
-
-            _glyphPathBuilder.UseTrueTypeInstructions = this.UseTrueTypeInstructions;//reset
-            _glyphPathBuilder.UseVerticalHinting = this.UseVerticalHint;//reset
+            _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
+             
 
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;

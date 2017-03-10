@@ -62,10 +62,8 @@ namespace SampleWinForms
             }
 
 
-            //2.1 
-
-            _currentGlyphPathBuilder.UseTrueTypeInstructions = this.UseTrueTypeInstructions;
-            _currentGlyphPathBuilder.UseVerticalHinting = this.UseVerticalHint;
+            //2.1  
+            _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
 
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;
