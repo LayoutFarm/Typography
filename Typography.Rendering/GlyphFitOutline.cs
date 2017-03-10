@@ -117,7 +117,7 @@ namespace Typography.Rendering
         /// <param name="tx">glyph translator</param>
         public static void ReadOutput(this GlyphFitOutline glyphOutline, IGlyphTranslator tx, float pxScale)
         {
-
+            if (glyphOutline == null) return;
             //
             //-----------------------------------------------------------            
             //create fit contour
