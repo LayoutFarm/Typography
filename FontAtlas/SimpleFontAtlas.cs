@@ -15,6 +15,10 @@ namespace PixelFarm.Drawing.Fonts
 
         public int Width { get; set; }
         public int Height { get; set; }
+        /// <summary>
+        /// original font size in point unit
+        /// </summary>
+        public float OriginalFontSizePts { get; set; }
         public TextureKind TextureKind { get; set; }
         public void AddGlyph(int codePoint, TextureFontGlyphData glyphData)
         {
@@ -35,7 +39,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             return true;
         }
-        public bool IsMsdfTexture { get; set; }
+        
 
     }
 

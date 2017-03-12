@@ -277,23 +277,7 @@ namespace SampleWinForms
         {
             //----------------------------------------------------
             var builder = new GlyphPathBuilder(typeface);
-            var hintTech = (HintTechnique)lstHintList.SelectedItem;
-            builder.UseTrueTypeInstructions = false;//reset
-            builder.UseVerticalHinting = false;//reset
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInstructions = true;
-                    builder.UseVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    builder.UseVerticalHinting = true;
-                    break;
-            }
+            builder.SetHintTechnique((HintTechnique)lstHintList.SelectedItem);
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             var txToVxs1 = new GlyphTranslatorToVxs();
@@ -353,22 +337,8 @@ namespace SampleWinForms
             p.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
             var builder = new GlyphPathBuilder(typeface);
-            var hintTech = (HintTechnique)lstHintList.SelectedItem;
-            builder.UseTrueTypeInstructions = false;//reset
-            builder.UseVerticalHinting = false;//reset 
-            switch (hintTech)
-            {
-                case HintTechnique.TrueTypeInstruction:
-                    builder.UseTrueTypeInstructions = true;
-                    break;
-                case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                    builder.UseTrueTypeInstructions = true;
-                    builder.UseVerticalHinting = true;
-                    break;
-                case HintTechnique.CustomAutoFit:
-                    //custom agg autofit 
-                    break;
-            }
+            builder.SetHintTechnique((HintTechnique)lstHintList.SelectedItem);
+
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------

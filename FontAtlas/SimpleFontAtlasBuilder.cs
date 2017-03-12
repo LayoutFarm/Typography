@@ -17,7 +17,8 @@ namespace Typography.Rendering
     {
         GlyphImage latestGenGlyphImage;
         Dictionary<int, CacheGlyph> glyphs = new Dictionary<int, CacheGlyph>();
-
+        public TextureKind TextureKind { get; private set; }
+        public float FontSizeInPoints { get; private set; }
         public void AddGlyph(int codePoint, GlyphImage img)
         {
             var glyphCache = new CacheGlyph();
@@ -26,7 +27,12 @@ namespace Typography.Rendering
 
             glyphs[codePoint] = glyphCache;
         }
-        public TextureKind TextureKind { get; set; }
+
+        public void SetAtlasInfo(TextureKind textureKind, float fontSizeInPts)
+        {
+            this.TextureKind = textureKind;
+            this.FontSizeInPoints = fontSizeInPts;
+        }
         public GlyphImage BuildSingleImage()
         {
             //1. add to list 
@@ -176,6 +182,7 @@ namespace Typography.Rendering
         {
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
             simpleFontAtlas.TextureKind = this.TextureKind;
+            simpleFontAtlas.OriginalFontSizePts = this.FontSizeInPoints;
             foreach (CacheGlyph cacheGlyph in glyphs.Values)
             {
                 //convert char to hex

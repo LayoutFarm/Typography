@@ -35,29 +35,29 @@ namespace Typography.Rendering
         }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
-        public bool UseTrueTypeInstructions { get; private set; }
-        public bool UseVerticalHint { get; private set; }
+        //public bool UseTrueTypeInstructions { get; private set; }
+        //public bool UseVerticalHint { get; private set; }
         public HintTechnique HintTechnique
         {
             get { return _hintTech; }
             set
             {
                 this._hintTech = value;
-                this.UseTrueTypeInstructions = false; //reset
-                this.UseVerticalHint = false; //reset
-                switch (value)
-                {
-                    case HintTechnique.TrueTypeInstruction:
-                        this.UseTrueTypeInstructions = true;
-                        break;
-                    case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                        this.UseTrueTypeInstructions = true;
-                        this.UseVerticalHint = true;
-                        break;
-                    case HintTechnique.CustomAutoFit:
-                        UseVerticalHint = true;
-                        break;
-                }
+                //this.UseTrueTypeInstructions = false; //reset
+                //this.UseVerticalHint = false; //reset
+                //switch (value)
+                //{
+                //    case HintTechnique.TrueTypeInstruction:
+                //        this.UseTrueTypeInstructions = true;
+                //        break;
+                //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                //        this.UseTrueTypeInstructions = true;
+                //        this.UseVerticalHint = true;
+                //        break;
+                //    case HintTechnique.CustomAutoFit:
+                //        UseVerticalHint = true;
+                //        break;
+                //}
             }
         }
         //
