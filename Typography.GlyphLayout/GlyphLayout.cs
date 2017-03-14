@@ -57,8 +57,8 @@ namespace Typography.TextLayout
             GlyphLayoutPlanContext context;
             if (!collection.TryGetValue(key, out context))
             {
-                var glyphSubstitution = new GlyphSubStitution(typeface, scriptLang.shortname);
-                var glyphPosition = new GlyphSetPosition(typeface, scriptLang.shortname);
+                var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubStitution(typeface, scriptLang.shortname) : null;
+                var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
                 collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
             }
             return context;
@@ -168,7 +168,7 @@ namespace Typography.TextLayout
             }
             //----------------------------------------------  
             //glyph substitution            
-            if (len > 1)
+            if (_gsub != null & len > 1)
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
@@ -194,7 +194,7 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (len > 1 && posTech == PositionTechnique.OpenFont)
+            if (_gpos != null && len > 1 && posTech == PositionTechnique.OpenFont)
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
