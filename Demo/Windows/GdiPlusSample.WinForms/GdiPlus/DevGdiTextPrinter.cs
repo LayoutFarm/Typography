@@ -74,8 +74,7 @@ namespace SampleWinForms
 
         protected override void OnFontSizeChanged()
         {
-            //update some font matrix property 
-
+            //update some font matrix property  
             if (_currentTypeface != null)
             {
                 float pointToPixelScale = _currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
@@ -86,10 +85,7 @@ namespace SampleWinForms
             }
         }
 
-        public float FontAscendingPx { get; private set; }
-        public float FontDescedingPx { get; private set; }
-        public float FontLineGapPx { get; private set; }
-        public float FontLineSpacingPx { get; private set; }
+     
 
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
