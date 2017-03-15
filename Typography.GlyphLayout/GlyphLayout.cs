@@ -94,7 +94,7 @@ namespace Typography.TextLayout
         GlyphSubStitution _gsub;
         GlyphSetPosition _gpos;
         bool _needPlanUpdate;
-        
+
         //--------------------------- 
 
         List<ushort> _inputGlyphs = new List<ushort>();
@@ -130,6 +130,20 @@ namespace Typography.TextLayout
             _needPlanUpdate = false;
         }
 
+        public Typeface Typeface
+        {
+            get { return _typeface; }
+            set
+            {
+                if (_typeface != value)
+                {
+                    _needPlanUpdate = true;
+                }
+            }
+        }
+
+
+
 
 
         public void Layout(Typeface typeface,
@@ -139,12 +153,7 @@ namespace Typography.TextLayout
             int len,
             List<GlyphPlan> outputGlyphPlanList)
         {
-            if (this._typeface != typeface)
-            {
-                this._typeface = typeface;
-                _needPlanUpdate = true;
-            }
-
+            this.Typeface = typeface;
 
             if (_needPlanUpdate)
             {
