@@ -88,15 +88,20 @@ namespace Typography.OpenFont
                 //advanced typography
                 GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
                 GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
-                GPOS gpos = ReadTableIfExists(tables, input, new GPOS());                
+                GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
+                VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
+                if (vhea != null)
+                {
+                    VerticalMatric vmtx = ReadTableIfExists(tables, input, new VerticalMatric(vhea.NumOfLongVerMatrics));
+                }
 
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
                 //---------------------------------------------
                 //about truetype instruction init
-              
 
-              
+
+
                 //--------------------------------------------- 
                 var typeface = new Typeface(
                     nameEntry,
@@ -120,7 +125,7 @@ namespace Typography.OpenFont
                 {
                     typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
                 }
-                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable()); 
+                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
                 if (propProgramTable != null)
                 {
                     typeface.PrepProgramBuffer = propProgramTable.programBuffer;

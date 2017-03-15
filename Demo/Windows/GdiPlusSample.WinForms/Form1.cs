@@ -107,15 +107,30 @@ namespace SampleWinForms
             currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
-            float x_pos = 0, y_pos = 0;
+            float x_pos = 0, y_pos = 100;
             char[] textBuffer = txtInputChar.Text.ToCharArray();
-            currentTextPrinter.DrawString(g,
+
+            //set some props ...
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            g.Clear(Color.White);
+
+            //test draw multiple lines
+            float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
+
+            for (int i = 0; i < 3; ++i)
+            {
+                currentTextPrinter.DrawString(g,
                  textBuffer,
                  0,
                  textBuffer.Length,
                  x_pos,
                  y_pos
                 );
+                //draw top to bottom
+
+                y_pos -= lineSpacingPx;
+            }
+
         }
 
 
