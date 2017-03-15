@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
-using System;
+ 
 
 namespace SampleWinForms
 {
     /// <summary>
-    /// developer's version Gdi+ text printer
+    /// developer's version, Gdi+ text printer
     /// </summary>
     class DevGdiTextPrinter : DevTextPrinterBase
     {
@@ -133,6 +133,8 @@ namespace SampleWinForms
             //note that we print to userGlyphPlanList
             //---------------- 
         }
+
+
         public void DrawString(Graphics g, List<GlyphPlan> userGlypgPlanList, float x, float y)
         {
             UpdateTypefaceAndGlyphBuilder();

@@ -87,20 +87,18 @@ namespace Typography.TextLayout
     }
     public class GlyphLayout
     {
-        //glyph layout service
 
-
-        //---------------------------
         GlyphLayoutPlanCollection _layoutPlanCollection = new GlyphLayoutPlanCollection();
         Typeface _typeface;
         ScriptLang _scriptLang;
         GlyphSubStitution _gsub;
         GlyphSetPosition _gpos;
         bool _needPlanUpdate;
+        
         //--------------------------- 
 
-        List<ushort> _inputGlyphs = new List<ushort>(); //not thread safe***
-        List<GlyphPos> _glyphPositions = new List<GlyphPos>();//not thread safe*** 
+        List<ushort> _inputGlyphs = new List<ushort>();
+        List<GlyphPos> _glyphPositions = new List<GlyphPos>();
 
 
 
@@ -131,6 +129,9 @@ namespace Typography.TextLayout
             this._gsub = context._glyphSub;
             _needPlanUpdate = false;
         }
+
+
+
         public void Layout(Typeface typeface,
             float fontSizeInPoint,
             char[] str,
@@ -144,23 +145,14 @@ namespace Typography.TextLayout
                 _needPlanUpdate = true;
             }
 
-            //get layout plan
+
             if (_needPlanUpdate)
             {
                 UpdateLayoutPlan();
             }
 
-
-            //GlyphLayoutPlan glyphCache;
-            //if (!_glyphCaches.TryGetValue(typeface, out glyphCache))
-            //{
-            //    //create new 
-            //    glyphCache = new GlyphLayoutPlan(typeface);
-            //    _glyphCaches.Add(typeface, glyphCache);
-            //}
-            //----------------------------------------------  
-
-            _inputGlyphs.Clear(); //clear before use
+            //clear before use
+            _inputGlyphs.Clear();
             for (int i = 0; i < len; ++i)
             {
                 //convert input char to input glyphs
