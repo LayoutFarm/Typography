@@ -141,14 +141,8 @@ namespace Typography.TextLayout
                     _needPlanUpdate = true;
                 }
             }
-        }
-
-
-
-
-
-        public void Layout(Typeface typeface,
-            float fontSizeInPoint,
+        } 
+        public void Layout(Typeface typeface, 
             char[] str,
             int startAt,
             int len,
