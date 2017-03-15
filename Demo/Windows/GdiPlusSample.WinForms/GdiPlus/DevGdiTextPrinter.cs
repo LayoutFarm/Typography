@@ -85,7 +85,7 @@ namespace SampleWinForms
             }
         }
 
-     
+
 
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
@@ -112,6 +112,9 @@ namespace SampleWinForms
         }
 
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
+
+
+
         public void DrawString(
                 Graphics g,
                 char[] textBuffer,
@@ -119,34 +122,18 @@ namespace SampleWinForms
                 int len,
                 float x,
                 float y)
-        {
-
-
-            //credit:
-            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
-
-
-            //--------------------------------- 
-            //2. update
+        {   
+            //1. update
             UpdateTypefaceAndGlyphBuilder();
             // 
-            //3. layout glyphs with selected layout technique
+            //2. layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, startAt, len, _outputGlyphPlans);
-
-
-
             //----------------
             //
-            //4. render each glyph
-
-
+            //3. render each glyph 
             System.Drawing.Drawing2D.Matrix scaleMat = null;
-            // 
-
             //this draw a single line text span***
             int j = _outputGlyphPlans.Count;
             for (int i = 0; i < j; ++i)
@@ -179,9 +166,6 @@ namespace SampleWinForms
             }
 
 
-            //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
 
     }

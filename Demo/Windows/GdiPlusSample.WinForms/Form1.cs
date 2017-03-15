@@ -113,10 +113,12 @@ namespace SampleWinForms
             //set some props ...
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             g.Clear(Color.White);
-
+            //credit:
+            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
             //test draw multiple lines
-            float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
-
+            float lineSpacingPx = currentTextPrinter.FontLineSpacingPx; 
             for (int i = 0; i < 3; ++i)
             {
                 currentTextPrinter.DrawString(g,
@@ -126,15 +128,14 @@ namespace SampleWinForms
                  x_pos,
                  y_pos
                 );
-                //draw top to bottom
-
+                //draw top to bottom 
                 y_pos -= lineSpacingPx;
-            }
-
+            } 
+            //transform back
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
-
-
-
+ 
         //=========================================================================
         //msdf texture generator example
         private void cmdBuildMsdfTexture_Click(object sender, System.EventArgs e)
