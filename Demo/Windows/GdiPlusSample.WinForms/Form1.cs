@@ -106,12 +106,6 @@ namespace SampleWinForms
                 return;
             }
             //-----------------------  
-            currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
-            currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
-            //render at specific pos
-            float x_pos = 0, y_pos = 100;
-            char[] textBuffer = txtInputChar.Text.ToCharArray();
-
             //set some props ...
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             g.Clear(Color.White);
@@ -119,6 +113,14 @@ namespace SampleWinForms
             //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+
+            //-----------------------  
+            currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
+            currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
+            //render at specific pos
+            float x_pos = 0, y_pos = 100;
+            char[] textBuffer = txtInputChar.Text.ToCharArray(); 
+
             //test draw multiple lines
             float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
             for (int i = 0; i < 3; ++i)
@@ -133,6 +135,8 @@ namespace SampleWinForms
                 //draw top to bottom 
                 y_pos -= lineSpacingPx;
             }
+            //
+            //-----------------------  
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
@@ -205,8 +209,13 @@ namespace SampleWinForms
 
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
-
-
+            //set some Gdi+ props... 
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            g.Clear(Color.White);
+            //credit:
+            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
 
             //--------------------------------
             //textspan measurement sample
@@ -216,18 +225,6 @@ namespace SampleWinForms
             //render at specific pos
             float x_pos = 0, y_pos = 100;
             char[] textBuffer = txtInputChar.Text.ToCharArray();
-
-
-            //set some props ...
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
-            //credit:
-            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
-            //test draw multiple lines
-            float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
-
 
             //Example 1: this is a basic draw sample
             currentTextPrinter.FillColor = Color.Black;
@@ -254,6 +251,8 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
+
+            //
             //-------------------------------------------------- 
             currentTextPrinter.FillColor = Color.Black;
             //transform back
