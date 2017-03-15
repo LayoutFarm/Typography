@@ -213,6 +213,8 @@ namespace SampleWinForms
                         //
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
 
+
+
                     }
                     break;
                 case RenderChoice.RenderWithTextPrinterAndMiniAgg:
@@ -227,7 +229,18 @@ namespace SampleWinForms
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
 
-                        selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
+
+                        //test print 3 lines
+
+                        char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
+                        float x_pos = 0, y_pos = 200;
+                        float lineSpacingPx = selectedTextPrinter.FontLineSpacingPx;
+                        for (int i = 0; i < 3; ++i)
+                        {
+                            selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
+                            y_pos -= lineSpacingPx;
+                        }
+
 
                         //copy from Agg's memory buffer to gdi 
                         PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);

@@ -54,9 +54,34 @@ namespace PixelFarm.Drawing.Fonts
                 //check if we have this in cache ?
                 //if we don't have it, this _currentTypeface will set to null ***                  
                 _cacheGlyphPathBuilders.TryGetValue(_currentSelectedFontFile, out _glyphPathBuilder);
+
+                //--------
+                if (_glyphPathBuilder == null)
+                {
+                    //TODO: review here about how to load font file and glyph builder 
+                    //1. read typeface ...   
+                    using (FileStream fs = new FileStream(_currentSelectedFontFile, FileMode.Open, FileAccess.Read))
+                    {
+                        var reader = new OpenFontReader();
+                        _glyphPathBuilder = new GlyphPathBuilder(reader.Read(fs));
+                    }
+                }
+                OnFontSizeChanged();
             }
         }
-        
+        protected override void OnFontSizeChanged()
+        {
+            //update some font matrix property  
+            if (_glyphPathBuilder != null)
+            {
+                Typeface currentTypeface = _glyphPathBuilder.Typeface;
+                float pointToPixelScale = currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+                this.FontAscendingPx = currentTypeface.Ascender * pointToPixelScale;
+                this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
+                this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
+                this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
+            }
+        }
 
         public CanvasPainter DefaultCanvasPainter { get; set; }
 
@@ -124,19 +149,7 @@ namespace PixelFarm.Drawing.Fonts
 
         void UpdateTypefaceAndGlyphBuilder()
         {
-            //1. update _glyphPathBuilder for current typeface 
-            if (_glyphPathBuilder == null)
-            {
-                //TODO: review here about how to load font file and glyph builder 
-                //1. read typeface ...   
 
-                using (FileStream fs = new FileStream(_currentSelectedFontFile, FileMode.Open, FileAccess.Read))
-                {
-                    var reader = new OpenFontReader();
-                    _glyphPathBuilder = new GlyphPathBuilder(reader.Read(fs));
-                }
-
-            }
             //2.1 
             _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
 
