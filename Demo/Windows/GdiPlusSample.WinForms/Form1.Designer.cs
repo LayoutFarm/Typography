@@ -38,6 +38,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.cmdBuildMsdfTexture = new System.Windows.Forms.Button();
             this.lstHintList = new System.Windows.Forms.ListBox();
+            this.cmdMeasureTextSpan = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lstFontList
@@ -110,7 +111,6 @@
             this.button1.TabIndex = 34;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
-            
             // 
             // cmdBuildMsdfTexture
             // 
@@ -130,11 +130,22 @@
             this.lstHintList.Size = new System.Drawing.Size(224, 69);
             this.lstHintList.TabIndex = 36;
             // 
+            // cmdMeasureTextSpan
+            // 
+            this.cmdMeasureTextSpan.Location = new System.Drawing.Point(206, 31);
+            this.cmdMeasureTextSpan.Name = "cmdMeasureTextSpan";
+            this.cmdMeasureTextSpan.Size = new System.Drawing.Size(153, 37);
+            this.cmdMeasureTextSpan.TabIndex = 37;
+            this.cmdMeasureTextSpan.Text = "MeasureTextSpan";
+            this.cmdMeasureTextSpan.UseVisualStyleBackColor = true;
+            this.cmdMeasureTextSpan.Click += new System.EventHandler(this.cmdMeasureTextSpan_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(935, 567);
+            this.Controls.Add(this.cmdMeasureTextSpan);
             this.Controls.Add(this.lstHintList);
             this.Controls.Add(this.cmdBuildMsdfTexture);
             this.Controls.Add(this.button1);
@@ -164,5 +175,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button cmdBuildMsdfTexture;
         private System.Windows.Forms.ListBox lstHintList;
+        private System.Windows.Forms.Button cmdMeasureTextSpan;
     }
 }
