@@ -34,7 +34,47 @@ namespace SampleWinForms
             //reset
             _currentTypeface = null;
             _currentGlyphPathBuilder = null;
+            //--------------------------------
+            //load new typeface 
+
+            //1. read typeface from font file
+            using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
+            {
+                var reader = new OpenFontReader();
+                _currentTypeface = reader.Read(fs);
+            }
+            //2. glyph builder
+            _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
+            _currentGlyphPathBuilder.MinorAdjustFitYForAutoFit = true;
+
+            //for gdi path***
+            //3. glyph reader,output as Gdi+ GraphicsPath
+            _txToGdiPath = new GlyphTranslatorToGdiPath();
+            //4.
+
+            OnFontSizeChanged();
         }
+
+
+        protected override void OnFontSizeChanged()
+        {
+            //update some font matrix property 
+
+            if (_currentTypeface != null)
+            {
+                float pointToPixelScale = _currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+                this.FontAscendingPx = _currentTypeface.Ascender * pointToPixelScale;
+                this.FontDescedingPx = _currentTypeface.Descender * pointToPixelScale;
+                this.FontLineGapPx = _currentTypeface.LineGap * pointToPixelScale;
+                this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
+            }
+        }
+
+        public float FontAscendingPx { get; private set; }
+        public float FontDescedingPx { get; private set; }
+        public float FontLineGapPx { get; private set; }
+        public float FontLineSpacingPx { get; private set; }
+
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
         public Graphics DefaultTargetGraphics { get; set; }
@@ -43,38 +83,23 @@ namespace SampleWinForms
         {
             this.DrawString(this.DefaultTargetGraphics, textBuffer, startAt, len, xpos, ypos);
         }
+
         void UpdateTypefaceAndGlyphBuilder()
         {
-            if (_currentTypeface == null)
-            {
 
-                //1. read typeface from font file
-                using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
-                {
-                    var reader = new OpenFontReader();
-                    _currentTypeface = reader.Read(fs);
-                }
-                //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
-                _currentGlyphPathBuilder.MinorAdjustFitYForAutoFit = true;//for gdi path***
-                //3. glyph reader,output as Gdi+ GraphicsPath
-                _txToGdiPath = new GlyphTranslatorToGdiPath();
-            }
-
-
-            //2.1  
+            //1  
             _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
-
-            //2.2
+            //2
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
             _glyphLayout.EnableLigature = this.EnableLigature;
             //3. 
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
-        }
-        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
 
+        }
+
+        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
         public void DrawString(
                 Graphics g,
                 char[] textBuffer,
@@ -106,19 +131,24 @@ namespace SampleWinForms
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, startAt, len, _outputGlyphPlans);
 
+
+
+            //----------------
             //
             //4. render each glyph
-            
+
+
             System.Drawing.Drawing2D.Matrix scaleMat = null;
             // 
 
+            //this draw a single line text span***
             int j = _outputGlyphPlans.Count;
             for (int i = 0; i < j; ++i)
             {
                 GlyphPlan glyphPlan = _outputGlyphPlans[i];
                 _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
                 // 
-               // float pxScale = _currentGlyphPathBuilder.GetPixelScale();
+                // float pxScale = _currentGlyphPathBuilder.GetPixelScale();
                 scaleMat = new System.Drawing.Drawing2D.Matrix(
                     1, 0,//scale x
                     0, 1, //scale y

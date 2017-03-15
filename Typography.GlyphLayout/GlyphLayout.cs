@@ -132,7 +132,7 @@ namespace Typography.TextLayout
             _needPlanUpdate = false;
         }
         public void Layout(Typeface typeface,
-            float size,
+            float fontSizeInPoint,
             char[] str,
             int startAt,
             int len,
@@ -199,7 +199,7 @@ namespace Typography.TextLayout
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
             //--------------
-            float scale = typeface.CalculateFromPointToPixelScale(size);
+            float scale = typeface.CalculateFromPointToPixelScale(fontSizeInPoint);
             float cx = 0;
             float cy = 0;
 

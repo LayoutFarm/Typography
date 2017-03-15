@@ -35,8 +35,7 @@ namespace Typography.Rendering
         }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
-        //public bool UseTrueTypeInstructions { get; private set; }
-        //public bool UseVerticalHint { get; private set; }
+
         public HintTechnique HintTechnique
         {
             get { return _hintTech; }
@@ -60,9 +59,23 @@ namespace Typography.Rendering
                 //}
             }
         }
-        //
-        public float FontSizeInPoints { get; set; }
+
+
+        float _fontSizeInPoints;
+        public float FontSizeInPoints
+        {
+            get { return _fontSizeInPoints; }
+            set
+            {
+                if (_fontSizeInPoints != value)
+                {
+                    _fontSizeInPoints = value;
+                    OnFontSizeChanged();
+                }
+            }
+        }
         protected virtual void OnFontFilenameChanged() { }
+        protected virtual void OnFontSizeChanged() { }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }

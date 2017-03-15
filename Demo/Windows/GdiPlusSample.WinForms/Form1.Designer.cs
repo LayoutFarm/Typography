@@ -110,6 +110,7 @@
             this.button1.TabIndex = 34;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
+            
             // 
             // cmdBuildMsdfTexture
             // 
