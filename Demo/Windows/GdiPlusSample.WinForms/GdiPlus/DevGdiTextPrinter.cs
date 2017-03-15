@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
- 
+
 
 namespace SampleWinForms
 {
@@ -142,6 +142,7 @@ namespace SampleWinForms
             //3. render each glyph 
             System.Drawing.Drawing2D.Matrix scaleMat = null;
             float sizeInPoints = this.FontSizeInPoints;
+            float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
             //this draw a single line text span***
             int j = userGlypgPlanList.Count;
             for (int i = 0; i < j; ++i)
@@ -149,13 +150,12 @@ namespace SampleWinForms
                 GlyphPlan glyphPlan = userGlypgPlanList[i];
                 _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
                 // 
-                // float pxScale = _currentGlyphPathBuilder.GetPixelScale();
                 scaleMat = new System.Drawing.Drawing2D.Matrix(
-                    1, 0,//scale x
-                    0, 1, //scale y
-                    x + glyphPlan.x,
-                    y + glyphPlan.y //xpos,ypos
-                );
+                   1, 0, //scale x
+                   0, 1, //scale y
+                   x + glyphPlan.x * scale,
+                   y + glyphPlan.y * scale //xpos,ypos
+               );
 
                 //
                 _txToGdiPath.Reset();
@@ -190,6 +190,7 @@ namespace SampleWinForms
             // 
             //2. layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
+            float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, startAt, len, _outputGlyphPlans);
             //----------------
@@ -203,12 +204,12 @@ namespace SampleWinForms
                 GlyphPlan glyphPlan = _outputGlyphPlans[i];
                 _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
                 // 
-                // float pxScale = _currentGlyphPathBuilder.GetPixelScale();
+                
                 scaleMat = new System.Drawing.Drawing2D.Matrix(
                     1, 0,//scale x
                     0, 1, //scale y
-                    x + glyphPlan.x,
-                    y + glyphPlan.y //xpos,ypos
+                    x + glyphPlan.x * scale,
+                    y + glyphPlan.y * scale //xpos,ypos
                 );
 
                 //

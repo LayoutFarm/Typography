@@ -9,11 +9,11 @@ namespace Typography.TextLayout
 
     public struct GlyphPlan
     {
-        public readonly ushort glyphIndex;
-        public readonly float x;
-        public readonly float y;
-        public readonly float advX;
-        public GlyphPlan(ushort glyphIndex, float x, float y, float advX)
+        public readonly ushort glyphIndex;//2
+        public readonly int x;//4
+        public readonly short y;//2
+        public readonly ushort advX;//2
+        public GlyphPlan(ushort glyphIndex, int x, short y, ushort advX)
         {
             this.glyphIndex = glyphIndex;
             this.x = x;
@@ -137,6 +137,7 @@ namespace Typography.TextLayout
             {
                 if (_typeface != value)
                 {
+                    _typeface = value;
                     _needPlanUpdate = true;
                 }
             }
@@ -200,30 +201,33 @@ namespace Typography.TextLayout
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
             //--------------
-            float scale = typeface.CalculateFromPointToPixelScale(fontSizeInPoint);
-            float cx = 0;
-            float cy = 0;
+           
+            int cx = 0;
+            short cy = 0;
 
             for (int i = 0; i < finalGlyphCount; ++i)
             {
                 ushort glyIndex = _inputGlyphs[i];
                 //this advWidth in font design unit   
-                float advWidth = typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex) * scale;
+                ushort advWidth = typeface.GetHAdvanceWidthFromGlyphIndex(glyIndex);
                 //----------------------------------   
                 switch (posTech)
                 {
+                    default: throw new NotSupportedException();
                     case PositionTechnique.None:
                         outputGlyphPlanList.Add(new GlyphPlan(glyIndex, cx, cy, advWidth));
+                        cx += advWidth;
                         break;
                     case PositionTechnique.OpenFont:
-                        {
-                            GlyphPos gpos_offset = _glyphPositions[i];
-                            outputGlyphPlanList.Add(new GlyphPlan(
-                                glyIndex,
-                                cx + (scale * gpos_offset.xoffset),
-                                cy + (scale * gpos_offset.yoffset),
-                                advWidth));
-                        }
+
+                        GlyphPos gpos_offset = _glyphPositions[i];
+                        outputGlyphPlanList.Add(new GlyphPlan(
+                            glyIndex,
+                            cx + gpos_offset.xoffset,
+                            (short)(cy + gpos_offset.yoffset),
+                            advWidth));
+                        cx += advWidth;
+
                         break;
                     case PositionTechnique.Kerning:
                         {
@@ -232,15 +236,15 @@ namespace Typography.TextLayout
                                cx,
                                cy,
                                advWidth));
+                            cx += advWidth;
                             if (i > 0)
                             {
-                                advWidth += typeface.GetKernDistance(outputGlyphPlanList[i - 1].glyphIndex, outputGlyphPlanList[i].glyphIndex) * scale;
+                                cx += typeface.GetKernDistance(outputGlyphPlanList[i - 1].glyphIndex, outputGlyphPlanList[i].glyphIndex);
                             }
                         }
                         break;
                 }
-                //--------
-                cx += advWidth;
+
             }
         }
 
