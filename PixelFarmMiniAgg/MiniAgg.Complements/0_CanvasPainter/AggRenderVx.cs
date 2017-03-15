@@ -10,4 +10,11 @@ namespace PixelFarm.Agg
             this.snap = snap;
         }
     }
+    class AggRenderVxFormattedString : PixelFarm.Drawing.RenderVxFormattedString
+    {
+        public AggRenderVxFormattedString(string str)
+        {
+            this.OriginalString = str;
+        }
+    }
 }

@@ -20,15 +20,9 @@ namespace PixelFarm.Agg.Lines
 {
     public abstract class LineRenderer
     {
-        Color m_color;
+
         public delegate bool CompareFunction(int value);
-        public Color Color
-        {
-            get { return m_color; }
-            set { this.m_color = value; }
-        }
-
-
+        public Color Color { get; set; }
         public abstract void SemiDot(CompareFunction cmp, int xc1, int yc1, int xc2, int yc2);
         public abstract void SemiDotHLine(CompareFunction cmp, int xc1, int yc1, int xc2, int yc2, int x1, int y1, int x2);
         public abstract void Pie(int xc, int yc, int x1, int y1, int x2, int y2);
@@ -39,7 +33,7 @@ namespace PixelFarm.Agg.Lines
     }
 
     //-----------------------------------------------------------line_coord_sat
-    public static class LineCoordSat
+    static class LineCoordSat
     {
         public static int Convert(double x)
         {

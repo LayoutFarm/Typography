@@ -82,7 +82,7 @@ namespace PixelFarm.Agg.Transform
     }
 
     //=================================================dda2_line_interpolator
-    public sealed class LineInterpolatorDDA2
+    sealed class LineInterpolatorDDA2
     {
         int m_cnt;
         int m_lft;

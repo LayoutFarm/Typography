@@ -19,12 +19,9 @@
 //----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using PixelFarm.Drawing;
-using PixelFarm.Agg.Transform;
 using PixelFarm.Agg.VertexSource;
 using PixelFarm.VectorMath;
-using PixelFarm.Drawing.Fonts;
 namespace PixelFarm.Agg
 {
     public static class Canvas2dExtension
@@ -32,7 +29,7 @@ namespace PixelFarm.Agg
         //helper tools, run in render thread***
         //not thread safe ***
 
-        //static MyTypeFacePrinter stringPrinter;
+      
         static Stroke stroke = new Stroke(1);
         static RoundedRect roundRect = new RoundedRect();
         static SimpleRect simpleRect = new SimpleRect();

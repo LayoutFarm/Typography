@@ -38,6 +38,7 @@
     <Compile Include="0_CanvasPainter\AggRenderVx.cs" />
     <Compile Include="0_CanvasPainter\Canvas2dExtension.cs" />
     <Compile Include="0_CanvasPainter\dbugVertexSourceIO.cs" />
+    <Compile Include="0_CanvasPainter\LineDashGenerator.cs" />
     <Compile Include="1_Base\ScanlineRasToDestBitmapRendererExtension.cs" />
     <Compile Include="2_SpanGenerators\SpanGradient_GradientValueCalculators.cs" />
     <Compile Include="Image\FilterMan.cs" />

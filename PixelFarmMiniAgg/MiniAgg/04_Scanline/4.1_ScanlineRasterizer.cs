@@ -261,11 +261,7 @@ namespace PixelFarm.Agg
 
             this.AddPath(new VertexStoreSnap(vxs));
         }
-        /// <summary>
-        /// use subpixel rendering or not
-        /// </summary>
-        public bool UseSubPixelRendering { get; set; }
-
+        public bool ExtendX3ForSubPixelRendering { get; set; }
         /// <summary>
         /// we do NOT store snap ***
         /// </summary>
@@ -289,33 +285,33 @@ namespace PixelFarm.Agg
 #if DEBUG
             int dbugVertexCount = 0;
 #endif
-            if (UseSubPixelRendering)
+
+            if (ExtendX3ForSubPixelRendering)
             {
                 while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
                 {
 #if DEBUG
                     dbugVertexCount++;
 #endif
-                    //AddVertext 3 of 4
+                    //---------------------------------------------
+                    //NOTE: we scale horizontal 3 times.
+                    //subpixel renderer will shrink it to 1 
+                    //---------------------------------------------
                     AddVertex(cmd, (x + offsetOrgX) * 3, y + offsetOrgY);
                 }
-
             }
             else
             {
-
                 while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
                 {
 #if DEBUG
                     dbugVertexCount++;
 #endif
-                    //AddVertext 4 of 4
+
                     AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
                 }
             }
-
-
-
+             
 
             //            if (snap.VxsHasMoreThanOnePart)
             //            {
