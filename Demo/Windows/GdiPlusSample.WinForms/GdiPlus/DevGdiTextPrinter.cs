@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
-using System;
+ 
 
 namespace SampleWinForms
 {
     /// <summary>
-    /// developer's version Gdi+ text printer
+    /// developer's version, Gdi+ text printer
     /// </summary>
     class DevGdiTextPrinter : DevTextPrinterBase
     {
@@ -85,7 +85,7 @@ namespace SampleWinForms
             }
         }
 
-     
+
 
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
@@ -112,6 +112,71 @@ namespace SampleWinForms
         }
 
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
+
+        public void PrintGlyphPlans(
+              List<GlyphPlan> userGlyphPlanList,
+              char[] textBuffer,
+              int startAt,
+              int len)
+        {
+
+            //after we set the this TextPrinter
+            //we can use this to print to formatted text buffer
+            //similar to DrawString(), but we don't draw it to the canvas surface
+            //--------------------------------- 
+            //1. update
+            UpdateTypefaceAndGlyphBuilder();
+            // 
+            //2. layout glyphs with selected layout technique
+            float sizeInPoints = this.FontSizeInPoints;
+            _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, startAt, len, userGlyphPlanList);
+            //note that we print to userGlyphPlanList
+            //---------------- 
+        }
+
+
+        public void DrawString(Graphics g, List<GlyphPlan> userGlypgPlanList, float x, float y)
+        {
+            UpdateTypefaceAndGlyphBuilder();
+            //draw data in glyph plan 
+            //3. render each glyph 
+            System.Drawing.Drawing2D.Matrix scaleMat = null;
+            float sizeInPoints = this.FontSizeInPoints;
+            //this draw a single line text span***
+            int j = userGlypgPlanList.Count;
+            for (int i = 0; i < j; ++i)
+            {
+                GlyphPlan glyphPlan = userGlypgPlanList[i];
+                _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
+                // 
+                // float pxScale = _currentGlyphPathBuilder.GetPixelScale();
+                scaleMat = new System.Drawing.Drawing2D.Matrix(
+                    1, 0,//scale x
+                    0, 1, //scale y
+                    x + glyphPlan.x,
+                    y + glyphPlan.y //xpos,ypos
+                );
+
+                //
+                _txToGdiPath.Reset();
+                _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
+                System.Drawing.Drawing2D.GraphicsPath path = _txToGdiPath.ResultGraphicsPath;
+                path.Transform(scaleMat);
+
+                if (FillBackground)
+                {
+                    g.FillPath(_fillBrush, path);
+                }
+                if (DrawOutline)
+                {
+                    g.DrawPath(_outlinePen, path);
+                }
+            }
+        }
+
+
+
+
         public void DrawString(
                 Graphics g,
                 char[] textBuffer,
@@ -120,33 +185,17 @@ namespace SampleWinForms
                 float x,
                 float y)
         {
-
-
-            //credit:
-            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
-
-
-            //--------------------------------- 
-            //2. update
+            //1. update
             UpdateTypefaceAndGlyphBuilder();
             // 
-            //3. layout glyphs with selected layout technique
+            //2. layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(_currentTypeface, sizeInPoints, textBuffer, startAt, len, _outputGlyphPlans);
-
-
-
             //----------------
             //
-            //4. render each glyph
-
-
+            //3. render each glyph 
             System.Drawing.Drawing2D.Matrix scaleMat = null;
-            // 
-
             //this draw a single line text span***
             int j = _outputGlyphPlans.Count;
             for (int i = 0; i < j; ++i)
@@ -178,10 +227,6 @@ namespace SampleWinForms
                 }
             }
 
-
-            //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
 
     }

@@ -1,11 +1,13 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.IO;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 //
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
+
 
 namespace SampleWinForms
 {
@@ -104,19 +106,23 @@ namespace SampleWinForms
                 return;
             }
             //-----------------------  
+            //set some props ...
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            g.Clear(Color.White);
+            //credit:
+            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+
+            //-----------------------  
             currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 100;
-            char[] textBuffer = txtInputChar.Text.ToCharArray();
-
-            //set some props ...
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.Clear(Color.White);
+            char[] textBuffer = txtInputChar.Text.ToCharArray(); 
 
             //test draw multiple lines
             float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
-
             for (int i = 0; i < 3; ++i)
             {
                 currentTextPrinter.DrawString(g,
@@ -126,14 +132,15 @@ namespace SampleWinForms
                  x_pos,
                  y_pos
                 );
-                //draw top to bottom
-
+                //draw top to bottom 
                 y_pos -= lineSpacingPx;
             }
-
+            //
+            //-----------------------  
+            //transform back
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
         }
-
-
 
         //=========================================================================
         //msdf texture generator example
@@ -198,6 +205,60 @@ namespace SampleWinForms
                 }
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
+        }
+
+        private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
+        {
+            //set some Gdi+ props... 
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            g.Clear(Color.White);
+            //credit:
+            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+
+            //--------------------------------
+            //textspan measurement sample
+            //--------------------------------  
+            currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
+            currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
+            //render at specific pos
+            float x_pos = 0, y_pos = 100;
+            char[] textBuffer = txtInputChar.Text.ToCharArray();
+
+            //Example 1: this is a basic draw sample
+            currentTextPrinter.FillColor = Color.Black;
+            currentTextPrinter.DrawString(g,
+                 textBuffer,
+                 0,
+                 textBuffer.Length,
+                 x_pos,
+                 y_pos
+                );
+            //
+            //--------------------------------------------------
+            //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
+            //you can create you own class to hold userGlyphPlans.***
+            //2.1
+            List<GlyphPlan> userGlyphPlans = new List<GlyphPlan>();
+            currentTextPrinter.PrintGlyphPlans(userGlyphPlans, textBuffer, 0, textBuffer.Length);
+            //2.2
+            //and we can print the formatted glyph plan later.
+            y_pos -= currentTextPrinter.FontLineSpacingPx;
+            currentTextPrinter.FillColor = Color.Red;
+            currentTextPrinter.DrawString(g,
+                  userGlyphPlans,
+                  x_pos,
+                  y_pos
+             );
+
+            //
+            //-------------------------------------------------- 
+            currentTextPrinter.FillColor = Color.Black;
+            //transform back
+            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+
         }
     }
 }
