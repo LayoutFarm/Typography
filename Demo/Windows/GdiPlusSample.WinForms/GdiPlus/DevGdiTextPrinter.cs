@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
+using System;
 
 namespace SampleWinForms
 {
@@ -23,36 +24,51 @@ namespace SampleWinForms
         SolidBrush _fillBrush = new SolidBrush(Color.Black);
         Pen _outlinePen = new Pen(Color.Green);
 
+        string _currentSelectedFontFile;
+
         public DevGdiTextPrinter()
         {
             FillBackground = true;
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
-        protected override void OnFontFilenameChanged()
+        public override string FontFilename
         {
-            //reset
-            _currentTypeface = null;
-            _currentGlyphPathBuilder = null;
-            //--------------------------------
-            //load new typeface 
-
-            //1. read typeface from font file
-            using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
+            get
             {
-                var reader = new OpenFontReader();
-                _currentTypeface = reader.Read(fs);
+                return _currentSelectedFontFile;
             }
-            //2. glyph builder
-            _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
-            _currentGlyphPathBuilder.MinorAdjustFitYForAutoFit = true;
+            set
+            {
+                if (value == this._currentSelectedFontFile)
+                {
+                    return;
+                }
 
-            //for gdi path***
-            //3. glyph reader,output as Gdi+ GraphicsPath
-            _txToGdiPath = new GlyphTranslatorToGdiPath();
-            //4.
+                //--------------------------------
+                //reset 
+                _currentTypeface = null;
+                _currentGlyphPathBuilder = null;
 
-            OnFontSizeChanged();
+                _currentSelectedFontFile = value;
+                //load new typeface 
+
+                //1. read typeface from font file
+                using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
+                {
+                    var reader = new OpenFontReader();
+                    _currentTypeface = reader.Read(fs);
+                }
+                //2. glyph builder
+                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
+                _currentGlyphPathBuilder.MinorAdjustFitYForAutoFit = true;
+
+                //for gdi path***
+                //3. glyph reader,output as Gdi+ GraphicsPath
+                _txToGdiPath = new GlyphTranslatorToGdiPath();
+                //4.
+                OnFontSizeChanged();
+            }
         }
 
 
@@ -108,8 +124,8 @@ namespace SampleWinForms
                 float x,
                 float y)
         {
-            
-         
+
+
             //credit:
             //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 

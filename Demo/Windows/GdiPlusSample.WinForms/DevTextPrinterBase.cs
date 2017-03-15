@@ -8,30 +8,17 @@ namespace Typography.Rendering
     public abstract class DevTextPrinterBase
     {
         HintTechnique _hintTech;
-        protected string _currentSelectedFontFile;
+       
         public DevTextPrinterBase()
         {
             FontSizeInPoints = 14;//
             ScriptLang = Typography.OpenFont.ScriptLangs.Latin;//default?
         }
 
-        public string FontFilename
+        public abstract string FontFilename
         {
-            get
-            {
-                return _currentSelectedFontFile;
-            }
-            set
-            {
-                if (_currentSelectedFontFile != value)
-                {
-                    _currentSelectedFontFile = value;
-                    //sample only ....
-                    //when we change new font, 
-                    OnFontFilenameChanged();
-                }
-
-            }
+            get;
+            set; 
         }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
@@ -74,7 +61,7 @@ namespace Typography.Rendering
                 }
             }
         }
-        protected virtual void OnFontFilenameChanged() { }
+     
         protected virtual void OnFontSizeChanged() { }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
