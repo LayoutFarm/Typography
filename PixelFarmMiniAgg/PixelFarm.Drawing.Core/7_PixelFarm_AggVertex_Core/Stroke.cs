@@ -26,114 +26,111 @@ namespace PixelFarm.Agg
 {
     public sealed class Stroke
     {
-        StrokeGenerator strokeGen;
+        StrokeGenerator _strokeGen;
         public Stroke(double inWidth)
         {
-            this.strokeGen = new StrokeGenerator();
+            this._strokeGen = new StrokeGenerator();
             this.Width = inWidth;
         }
 
         public LineCap LineCap
         {
-            get { return strokeGen.LineCap; }
-            set { strokeGen.LineCap = value; }
+            get { return _strokeGen.LineCap; }
+            set { _strokeGen.LineCap = value; }
         }
         public LineJoin LineJoin
         {
-            get { return strokeGen.LineJoin; }
-            set { strokeGen.LineJoin = value; }
+            get { return _strokeGen.LineJoin; }
+            set { _strokeGen.LineJoin = value; }
         }
         public InnerJoin InnerJoin
         {
-            get { return strokeGen.InnerJoin; }
-            set { strokeGen.InnerJoin = value; }
+            get { return _strokeGen.InnerJoin; }
+            set { _strokeGen.InnerJoin = value; }
         }
         public double MiterLimit
         {
-            get { return strokeGen.MiterLimit; }
-            set { strokeGen.MiterLimit = value; }
+            get { return _strokeGen.MiterLimit; }
+            set { _strokeGen.MiterLimit = value; }
         }
         public double InnerMiterLimit
         {
-            get { return strokeGen.InnerMiterLimit; }
-            set { strokeGen.InnerMiterLimit = value; }
+            get { return _strokeGen.InnerMiterLimit; }
+            set { _strokeGen.InnerMiterLimit = value; }
         }
         public double Width
         {
-            get { return strokeGen.Width; }
-            set { strokeGen.Width = value; }
+            get { return _strokeGen.Width; }
+            set { _strokeGen.Width = value; }
         }
 
         public void SetMiterLimitTheta(double t)
         {
-            strokeGen.SetMiterLimitTheta(t);
+            _strokeGen.SetMiterLimitTheta(t);
         }
         public double ApproximateScale
         {
-            get { return strokeGen.ApproximateScale; }
-            set { strokeGen.ApproximateScale = value; }
+            get { return _strokeGen.ApproximateScale; }
+            set { _strokeGen.ApproximateScale = value; }
         }
         public double Shorten
         {
-            get { return strokeGen.Shorten; }
-            set { strokeGen.Shorten = value; }
+            get { return _strokeGen.Shorten; }
+            set { _strokeGen.Shorten = value; }
         }
         public VertexStore MakeVxs(VertexStore sourceVxs, VertexStore vxs)
         {
-            StrokeGenerator strkgen = strokeGen;
+            StrokeGenerator strkgen = _strokeGen;
             int j = sourceVxs.Count;
-            double x, y;
-            strkgen.RemoveAll();
-            //1st vertex
+            strkgen.Reset();
+            //
+            //
+            VertexCmd cmd;
+            double x = 0, y = 0, startX = 0, startY = 0;
 
-            sourceVxs.GetVertex(0, out x, out y);
-            strkgen.AddVertex(x, y, VertexCmd.MoveTo);
-            double startX = x, startY = y;
-           
             for (int i = 0; i < j; ++i)
             {
-                var cmd = sourceVxs.GetVertex(i, out x, out y);
+                cmd = sourceVxs.GetVertex(i, out x, out y);
                 switch (cmd)
                 {
                     case VertexCmd.NoMore:
                         break;
-                    
+
                     case VertexCmd.Close:
                     case VertexCmd.CloseAndEndFigure:
+
+                        strkgen.AddVertex(x, y, cmd);
+                        if (i < j - 2)
                         {
-                            strkgen.AddVertex(x, y, cmd);
-                            if (i < j - 2)
-                            {
-                                strkgen.AddVertex(startX, startY, VertexCmd.LineTo);
-                                strkgen.WriteTo(vxs);
-                                strkgen.RemoveAll(); 
-                            }
-                            //end this polygon 
+                            strkgen.AddVertex(startX, startY, VertexCmd.LineTo);
+                            strkgen.WriteTo(vxs);
+                            strkgen.Reset();
                         }
+                        //end this polygon 
+
                         break;
                     case VertexCmd.LineTo:
-                    case VertexCmd.P2c:
-                    case VertexCmd.P3c:
-                        {
-                            strkgen.AddVertex(x, y, cmd);
-                        }
+                    case VertexCmd.P2c://user must flatten the curve before do stroke
+                    case VertexCmd.P3c://user must flatten the curve before do stroke
+
+                        strkgen.AddVertex(x, y, cmd);
+
                         break;
                     case VertexCmd.MoveTo:
-                        {
-                            strkgen.AddVertex(x, y, cmd);
-                            startX = x;
-                            startY = y;
-                        }
+
+                        strkgen.AddVertex(x, y, cmd);
+                        startX = x;
+                        startY = y;
+
                         break;
                     default: throw new System.NotSupportedException();
                 }
             }
             strkgen.WriteTo(vxs);
-            strkgen.RemoveAll();
-            //vxs.HasMoreThanOnePart = hasMoreThanOnePart;
+            strkgen.Reset();
 
             return vxs;
         }
     }
-     
+
 }

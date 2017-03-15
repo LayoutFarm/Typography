@@ -23,7 +23,7 @@ namespace PixelFarm.Agg
 {
     public struct GammaNone : IGammaFunction
     {
-        public float GetGamma(float x) { return x; }
+        public float GetGamma(float x) { return x; } 
     }
     //==============================================================gamma_power
     public class GammaPower : IGammaFunction

@@ -1,0 +1,356 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputType>Library</OutputType>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AssemblyName>PixelFarm.One.HtmlRenderer</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG; TRACE,NET20,PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <DefineConstants> TRACE,NET20,PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MiniAgg.Complements\0_CanvasPainter\AggCanvasPainter.cs" />
+    <Compile Include="MiniAgg.Complements\0_CanvasPainter\AggRenderVx.cs" />
+    <Compile Include="MiniAgg.Complements\0_CanvasPainter\Canvas2dExtension.cs" />
+    <Compile Include="MiniAgg.Complements\0_CanvasPainter\dbugVertexSourceIO.cs" />
+    <Compile Include="MiniAgg.Complements\1_Base\BorderDouble.cs" />
+    <Compile Include="MiniAgg.Complements\1_Base\ClipProxyImage.cs" />
+    <Compile Include="MiniAgg.Complements\1_Base\GammaFuntions.cs" />
+    <Compile Include="MiniAgg.Complements\1_Base\PixelBlenderRGB.cs" />
+    <Compile Include="MiniAgg.Complements\1_Base\ProxyImage.cs" />
+    <Compile Include="MiniAgg.Complements\1_Base\Queue.cs" />
+    <Compile Include="MiniAgg.Complements\1_Base\ScanlineRasToDestBitmapRendererExtension.cs" />
+    <Compile Include="MiniAgg.Complements\2_SpanGenerators\SpanGenGourand.cs" />
+    <Compile Include="MiniAgg.Complements\2_SpanGenerators\SpanGenGouraudRGBA.cs" />
+    <Compile Include="MiniAgg.Complements\2_SpanGenerators\SpanGradient.cs" />
+    <Compile Include="MiniAgg.Complements\2_SpanGenerators\SpanGradient_GradientValueCalculators.cs" />
+    <Compile Include="MiniAgg.Complements\Filter\ImageFilters.cs" />
+    <Compile Include="MiniAgg.Complements\Filter\PatternFilterBilnearColorRGBA.cs" />
+    <Compile Include="MiniAgg.Complements\Filter\RecursiveBlur.cs" />
+    <Compile Include="MiniAgg.Complements\Filter\StackBlur.cs" />
+    <Compile Include="MiniAgg.Complements\Image\AlphaMask.cs" />
+    <Compile Include="MiniAgg.Complements\Image\AlphaMaskAdaptor.cs" />
+    <Compile Include="MiniAgg.Complements\Image\FilterMan.cs" />
+    <Compile Include="MiniAgg.Complements\Image\FloodFiller.cs" />
+    <Compile Include="MiniAgg.Complements\Image\Transposer.cs" />
+    <Compile Include="MiniAgg\00_Context\Graphics2D.cs" />
+    <Compile Include="MiniAgg\00_Context\ImageGraphics2D.cs" />
+    <Compile Include="MiniAgg\00_Context\ImageGraphics2D_RenderImages.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\ChildImage.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\ColorOrder.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\ColorRGBAf.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\GammaLookUpTable.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\IImageReaderWriter.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\ImageHelper.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\ImageReaderWriterBase.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\PixelBlenderGray.cs" />
+    <Compile Include="MiniAgg\02_PixelBuffer\PixelBlenderRGBA.cs" />
+    <Compile Include="MiniAgg\03_SpanGenerators\0_ISpanGenerator.cs" />
+    <Compile Include="MiniAgg\03_SpanGenerators\1_ImgSpanGen.cs" />
+    <Compile Include="MiniAgg\03_SpanGenerators\2_ImgSpanGenRGB.cs" />
+    <Compile Include="MiniAgg\03_SpanGenerators\3_ImgSpanGenRGBA.cs" />
+    <Compile Include="MiniAgg\03_SpanGenerators\4_ImgSpanGenGray.cs" />
+    <Compile Include="MiniAgg\03_SpanGenerators\IGammaFunction.cs" />
+    <Compile Include="MiniAgg\03_SpanGenerators\ISpanInterpolator.cs" />
+    <Compile Include="MiniAgg\04_Scanline\0_ScanlineSpan.cs" />
+    <Compile Include="MiniAgg\04_Scanline\1_Scanline.cs" />
+    <Compile Include="MiniAgg\04_Scanline\2_ScanlinePacked8.cs" />
+    <Compile Include="MiniAgg\04_Scanline\3_ScanlineUnpacked8.cs" />
+    <Compile Include="MiniAgg\04_Scanline\4.1_ScanlineRasterizer.cs" />
+    <Compile Include="MiniAgg\04_Scanline\4.2_CellAARasterizer.cs" />
+    <Compile Include="MiniAgg\04_Scanline\4.3_VectorClipper.cs" />
+    <Compile Include="MiniAgg\04_Scanline\5_ScanlineRasToDestBitmapRenderer.cs" />
+    <Compile Include="MiniAgg\04_Scanline\6_ClipLiangBarsky.cs" />
+    <Compile Include="MiniAgg\07_ISpanInterpolator\LineInterpolators.cs" />
+    <Compile Include="MiniAgg\07_ISpanInterpolator\SpanInterpolatorLinear.cs" />
+    <Compile Include="MiniAgg\07_ISpanInterpolator\SpanInterpolatorPerspectiveLerp.cs" />
+    <Compile Include="MiniAgg\07_Lines\1.1_LinesAA.cs" />
+    <Compile Include="MiniAgg\07_Lines\1.2_PatternFilter.cs" />
+    <Compile Include="MiniAgg\07_Lines\1.3_LineParameters.cs" />
+    <Compile Include="MiniAgg\07_Lines\2.1_DistanceInterpolators.cs" />
+    <Compile Include="MiniAgg\07_Lines\2.2_LineInterpolators.cs" />
+    <Compile Include="MiniAgg\07_Lines\2.3_EllipseBrensenhemInterpolator.cs" />
+    <Compile Include="MiniAgg\07_Lines\3.1_LineRenderer.cs" />
+    <Compile Include="MiniAgg\07_Lines\3.2_OutlineRenderer.cs" />
+    <Compile Include="MiniAgg\07_Lines\3.3_ImageLineRenderer.cs" />
+    <Compile Include="MiniAgg\07_Lines\4_OutlineAARasterizer.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\FilterImageSpanGenerator.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\FilterImageSpanGenerator.ImageBufferAccessor.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\FilterRGBAImageSpanGen.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\FilterRGBImageSpanGen.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\IImageFilter.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\ImageFilterLookupTable.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\ImageFreeTransform.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\ImageInterpolationQuality.cs" />
+    <Compile Include="MiniAgg\08_ImageResampling\ImageTransform.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CubicBezier.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveBuilder.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveFit.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurveFitBase.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\CurvePreprocess.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\Spline.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\SplineBuilder.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\..\BurningMineCurve\CurveUtils\VectorHelper.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\BasicGeometries.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\Brushes_Pens.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\Color.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\CombineMode.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\DashStyle.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\GraphicsPath.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\Image_Bitmap.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\Rectangle.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\RectangleF.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\Region.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\1_Drawing\RenderVx.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\5_PixelFarm_Agg\ActualImage.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\5_PixelFarm_Agg\PixelFormat.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AggBasics.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AggMath.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\AxisAlignedBoundingBox.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurve.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurveCubic.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\BezierCurveQuadric.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\MathHelper.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Matrix4x4.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Quaternion.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Ray.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector2.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector3.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector3Float.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\6_PixelFarm_AggVectorMath\Vector4.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\0_VertexCommandAndOrientation.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\1_VertexStore.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\2_VertexStoreSnap.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\Collections.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\LineCapAndJoin.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\RectD.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\RectInt.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\Stroke.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\StrokeGenerator.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\StrokeMath.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\7_PixelFarm_AggVertex_Core\VertexDistanceList.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\0_ICoordTransformer.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\1_Affine.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\2_Bilinear.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\3_Perspective.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\4_SimulEqGeneral.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\8_PixelFarm_AggTransforms\Viewport.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\HitTest\VertexHitTester.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VectorClipping\cliper.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VectorClipping\VxsClipping.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Arc.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BezireCurve.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BoundingRect.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\BSpline.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Contour.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\ContourGenerator.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\CurveFlattener.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Curves.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\Ellipse.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\PathWriter.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\RoundedRect.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\SimpleRect.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexData.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\9_PixelFarm_AggVertex_More\VertexSource\VertexStoreBuilder.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\ForNet20\ExtensionAttribute.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\AggMemMx.cs" />
+    <Compile Include="PixelFarm.Drawing.Core\MiniAggGraphics.Buffer\NativeBufferMx.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\..\win32utils\MyWin32.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\..\win32utils\NativeTextWin32.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\..\win32utils\NativeWin32MemoryDc.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\0_Start\WinGdiPlusPlatform.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Canvas\1_MyGdiPlusCanvas_Specific.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Canvas\2_MyGdiPlusCanvas_CoordinateAndClip.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Canvas\3_MyGdiPlusCanvas_DrawGraphics.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Canvas\4_MyGdiPlusCanvas_TextAndFonts.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Canvas\Conv.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Implementation\BitmapHelper.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Implementation\GdiPlusBitmapBackBuffer.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Implementation\Region.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Implementation\WinGdiFont.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\MiniAggGraphics\BufferBitmapStore.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\MiniAggGraphics\GdiPlusCanvasPainter.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\MiniAggGraphics\GdiPlusRenderVx.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\MiniAggGraphics\VxsHelper.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Properties\Resources.Designer.cs" />
+    <Compile Include="PixelFarm.Drawing.GdiPlus\Properties\Settings.Designer.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\0_Start\GraphicsPlatform.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\1_Canvas\Canvas.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\1_Canvas\CanvasOptions.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\1_Canvas\CanvasPainter.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\1_Canvas\CanvasPaintToOutputDelegate.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\1_Canvas\KnownColors.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\2_Drawing\FontStyle.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\2_Drawing\RequestFont.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\3_Drawing_Fonts\ActualFont.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontFace.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontGlyph.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\3_Drawing_Fonts\FontKey.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\3_Drawing_Fonts\ITextPrinter.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\3_Drawing_Fonts\ScriptCode.cs" />
+    <Compile Include="PixelFarm.DrawingCanvas\3_Drawing_Fonts\WriteDirection.cs" />
+    <Compile Include="PixelFarm.Triangulation\P2T.cs" />
+    <Compile Include="PixelFarm.Triangulation\Polygon\Polygon.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\DelaunayTriangle.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\AdvancingFront.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweep.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepConstraint.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepContext.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\PointOnEdgeException.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\ITriangulatable.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Orientation.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Sets\ConstrainedPointSet.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Sets\PointSet.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\TriangulationAlgorithm.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\TriangulationContext.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\TriangulationDebugContext.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\TriangulationMode.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\TriangulationPoint.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\TriangulationUtil.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Util\PointGenerator.cs" />
+    <Compile Include="PixelFarm.Triangulation\Triangulation\Util\PolygonGenerator.cs" />
+    <Compile Include="PixelFarm.Triangulation\x_notused\DTSweepBasin.cs" />
+    <Compile Include="PixelFarm.Triangulation\x_notused\DTSweepEdgeEvent.cs" />
+    <Compile Include="PixelFarm.Triangulation\x_notused\DTSweepPointComparator.cs" />
+    <Compile Include="PixelFarm.Triangulation\x_notused\FixedArray3.cs" />
+    <Compile Include="PixelFarm.Triangulation\x_notused\FixedBitArray3.cs" />
+    <Compile Include="PixelFarm.Triangulation\x_notused\PolygonSet.cs" />
+    <Compile Include="PixelFarm.Triangulation\x_notused\TriangulationConstraint.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\FontAtlas\BinPacker.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\FontAtlas\MsdfGlyphGen.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\FontAtlas\MsdfGlyphGenExtension.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\FontAtlas\SimpleFontAtlas.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\FontAtlas\SimpleFontAtlasBuilder.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\Typography.MsdfGen\EdgeColor.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\Typography.MsdfGen\EdgeColoring.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\Typography.MsdfGen\EdgeHolder.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\Typography.MsdfGen\EdgeSegment.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\Typography.MsdfGen\EquationSolver.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\Typography.MsdfGen\MsdfGen.cs" />
+    <Compile Include="PixelFarm.Typography\..\Typography\Typography.MsdfGen\SignedDistance.cs" />
+    <Compile Include="PixelFarm.Typography\1_Drawing_Fonts\FontPreview.cs" />
+    <Compile Include="PixelFarm.Typography\1_Drawing_Fonts\GlyphPathBuilderVxs.cs" />
+    <Compile Include="PixelFarm.Typography\1_Drawing_Fonts\InstalledFontCollection.cs" />
+    <Compile Include="PixelFarm.Typography\1_Drawing_Fonts\MyGlyphPathBuilder.cs" />
+    <Compile Include="PixelFarm.Typography\1_Drawing_Fonts\TextPrinterImpl.cs" />
+    <Compile Include="PixelFarm.Typography\2_Drawing_Text\ManagedShapingService.cs" />
+    <Compile Include="PixelFarm.Typography\2_Drawing_Text\TextShapingAndLayoutService.cs" />
+    <Compile Include="PixelFarm.Typography\3_FontFaceImpl\ManagedFontFace.cs" />
+    <Compile Include="PixelFarm.Typography\3_FontFaceImpl\OpenFontLoader.cs" />
+    <Compile Include="PixelFarm.Typography\3_FontFaceImpl\TextureFontFace.cs" />
+    <Compile Include="PixelFarm.Typography\3_FontFaceImpl\TextureFontLoader.cs" />
+    <Compile Include="TypeMirror\SimpleReflectionHelper.cs" />
+    <Compile Include="Typography\FontAtlas\BinPacker.cs" />
+    <Compile Include="Typography\FontAtlas\MsdfGlyphGen.cs" />
+    <Compile Include="Typography\FontAtlas\MsdfGlyphGenExtension.cs" />
+    <Compile Include="Typography\FontAtlas\SimpleFontAtlas.cs" />
+    <Compile Include="Typography\FontAtlas\SimpleFontAtlasBuilder.cs" />
+    <Compile Include="Typography\Typography.GlyphLayout\GlyphLayout.cs" />
+    <Compile Include="Typography\Typography.MsdfGen\EdgeColor.cs" />
+    <Compile Include="Typography\Typography.MsdfGen\EdgeColoring.cs" />
+    <Compile Include="Typography\Typography.MsdfGen\EdgeHolder.cs" />
+    <Compile Include="Typography\Typography.MsdfGen\EdgeSegment.cs" />
+    <Compile Include="Typography\Typography.MsdfGen\EquationSolver.cs" />
+    <Compile Include="Typography\Typography.MsdfGen\MsdfGen.cs" />
+    <Compile Include="Typography\Typography.MsdfGen\SignedDistance.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Bounds.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\CharacterMap.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\fontcollection\InstalledFont.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Geometry.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Glyph.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\IGlyphPathBuilder.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\IO\ByteOrderSwappingBinaryReader.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\OpenFontReader.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\AttachmentListTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\Base.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\ClassDefTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\CoverageTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\FeatureInfo.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\FeatureList.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\GDEF.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\GPOS.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\GPOS.Others.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\GSUB.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\GSUB.SubTables.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\JustificationTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\LigatureCaretListTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\MathTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\ScriptLang.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\ScriptList.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.AdvancedLayout\ScriptTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\EBLCTable.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\HorizontalDeviceMatrics.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\Kern.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\LinearThreashold.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\Merge.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\Meta.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\STAT.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\VerticalDeviceMatrics.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\VerticalMatrics.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Others\VerticalMatricsHeader.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.TrueType\Cvt_Programs.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.TrueType\Gasp.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.TrueType\Glyf.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.TrueType\GlyphLocations.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Variations\AVar.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Variations\FVar.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Variations\GVar.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Variations\HVar.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Variations\MVar.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables.Variations\VVar.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\Cmap.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\Head.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\HorizontalHeader.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\HorizontalMetrics.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\MaxProfile.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\NameEntry.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\OS2.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\Post.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\TableEntry.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\TableEntryCollection.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\TableHeader.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Tables\Utils.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\TrueTypeInterperter\ForNet20.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\TrueTypeInterperter\Interpreter.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\TrueTypeInterperter\InvalidFontException.cs" />
+    <Compile Include="Typography\Typography.OpenFont\N20\Typography.OpenFont\..\..\NetCore\Typography.OpenFont\Typeface.cs" />
+    <Compile Include="Typography\Typography.Rendering\CurveGen.cs" />
+    <Compile Include="Typography\Typography.Rendering\GlyphAnalysis.cs" />
+    <Compile Include="Typography\Typography.Rendering\GlyphAutoFit.cs" />
+    <Compile Include="Typography\Typography.Rendering\GlyphFitOutline.cs" />
+    <Compile Include="Typography\Typography.Rendering\GlyphImages.cs" />
+    <Compile Include="Typography\Typography.Rendering\Rect.cs" />
+    <Compile Include="Win32Utils\MyWin32.cs" />
+    <Compile Include="Win32Utils\NativeTextWin32.cs" />
+    <Compile Include="Win32Utils\NativeWin32MemoryDc.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

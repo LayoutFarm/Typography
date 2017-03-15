@@ -19,7 +19,6 @@
 //----------------------------------------------------------------------------
 
 using System;
-using PixelFarm.Drawing;
 
 namespace PixelFarm.Agg
 {
