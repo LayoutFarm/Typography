@@ -8,7 +8,7 @@ namespace Typography.Rendering
     public abstract class DevTextPrinterBase
     {
         HintTechnique _hintTech;
-       
+
         public DevTextPrinterBase()
         {
             FontSizeInPoints = 14;//
@@ -18,10 +18,14 @@ namespace Typography.Rendering
         public abstract string FontFilename
         {
             get;
-            set; 
+            set;
         }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
+        public float FontAscendingPx { get; set; }
+        public float FontDescedingPx { get; set; }
+        public float FontLineGapPx { get; set; }
+        public float FontLineSpacingPx { get; set; }
 
         public HintTechnique HintTechnique
         {
@@ -61,7 +65,7 @@ namespace Typography.Rendering
                 }
             }
         }
-     
+
         protected virtual void OnFontSizeChanged() { }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
