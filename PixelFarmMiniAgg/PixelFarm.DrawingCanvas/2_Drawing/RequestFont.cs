@@ -19,7 +19,7 @@ namespace PixelFarm.Drawing
         public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
         {
             WriteDirection = WriteDirection.LTR;
-            ScriptCode = ScriptLangs.Latin;//default
+            ScriptLang = ScriptLangs.Latin;//default
 
             //Lang = "en";//default
             Name = facename;
@@ -122,7 +122,7 @@ namespace PixelFarm.Drawing
         //data for shaping engine
 
         public WriteDirection WriteDirection { get; set; }
-        public ScriptLang ScriptCode { get; set; }
+        public ScriptLang ScriptLang { get; set; }
         public static float ConvEmSizeInPointsToPixels(float emsizeInPoint)
         {
             return (int)(((float)emsizeInPoint / (float)s_POINTS_PER_INCH) * (float)s_PIXELS_PER_INCH);

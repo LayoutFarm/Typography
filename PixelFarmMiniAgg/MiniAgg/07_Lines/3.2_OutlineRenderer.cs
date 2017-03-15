@@ -26,28 +26,46 @@ namespace PixelFarm.Agg.Lines
     {
         const int SUBPIX_SHIFT = 8;
         const int SUBPIX_SCALE = 1 << SUBPIX_SHIFT;
+
         const int SUBPIX_MASK = SUBPIX_SCALE - 1;
         const int AA_SHIFT = 8;
         const int AA_SCALE = 1 << AA_SHIFT;
         const int AA_MASK = AA_SCALE - 1;
+
         byte[] m_profile = new byte[64];
-        byte[] m_gamma = new byte[AA_SCALE];
+        byte[] m_gamma;
         int m_subpixel_width;
         double m_min_width;
         double m_smoother_width;
+
+
+        static byte[] s_gamma_none;
+        static LineProfileAnitAlias()
+        {
+            //GammaNone => just return i***
+            s_gamma_none = new byte[AA_SCALE];
+            for (int i = AA_SCALE - 1; i >= 0; --i)
+            {
+                s_gamma_none[i] = (byte)(AggBasics.uround(((float)(i) / AA_MASK) * AA_MASK));
+            }
+        }
+
         public LineProfileAnitAlias(double w, IGammaFunction gamma_function)
         {
+            //1. init value
             m_subpixel_width = 0;
             m_min_width = 1.0;
             m_smoother_width = 1.0;
+
+            //2. set gamma before set width
             SetGamma(gamma_function);
+            //3. set width tabve
             SetWidth(w);
         }
         public int SubPixelWidth { get { return m_subpixel_width; } }
 
         public byte GetProfileValue(int dist)
         {
-
             //#if DEBUG
             //            int tmp = dist + SUBPIX_SCALE * 2;
             //            if (tmp < 0 || tmp > m_profile.Length)
@@ -58,7 +76,6 @@ namespace PixelFarm.Agg.Lines
             //#endif
             return m_profile[dist + SUBPIX_SCALE * 2];
         }
-
         byte[] GetProfileBuffer(double w)
         {
             m_subpixel_width = (int)AggBasics.uround(w * SUBPIX_SCALE);
@@ -73,10 +90,19 @@ namespace PixelFarm.Agg.Lines
         }
         void SetGamma(IGammaFunction gamma_function)
         {
-            int i;
-            for (i = 0; i < AA_SCALE; i++)
+            //TODO:review gamma again***
+            if (gamma_function == null)
             {
-                m_gamma[i] = (byte)(AggBasics.uround(gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK));
+                m_gamma = s_gamma_none;
+            }
+            else
+            {
+                m_gamma = new byte[AA_SCALE];
+                for (int i = AA_SCALE - 1; i >= 0; --i)
+                {
+                    //pass i to gamma func ***
+                    m_gamma[i] = (byte)(AggBasics.uround(gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK));
+                }
             }
         }
 
@@ -153,7 +179,7 @@ namespace PixelFarm.Agg.Lines
                 ch[--chIndex] = ch[ch_center++];
             }
 
-            for (i = 0; i < ch.Length; i++)
+            for (i = ch.Length - 1; i >= 0; --i)
             {
                 m_profile[i] = ch[i];
             }
@@ -361,17 +387,8 @@ namespace PixelFarm.Agg.Lines
             }
 
             LineInterpolatorAA0 li = new LineInterpolatorAA0(this, lp);
-            if (li.Count != 0)
-            {
-                if (li.IsVertical)
-                {
-                    while (li.StepV()) ;
-                }
-                else
-                {
-                    while (li.StepH()) ;
-                }
-            }
+            li.Loop();
+            
         }
 
         public override void Line0(LineParameters lp)
@@ -416,14 +433,7 @@ namespace PixelFarm.Agg.Lines
 
             LineAA.FixDegenBisectrixStart(lp, ref sx, ref sy);
             LineInterpolatorAA1 li = new LineInterpolatorAA1(this, lp, sx, sy);
-            if (li.IsVertical)
-            {
-                while (li.StepV()) ;
-            }
-            else
-            {
-                while (li.StepH()) ;
-            }
+            li.Loop();
         }
 
         public override void Line1(LineParameters lp, int sx, int sy)
@@ -481,14 +491,7 @@ namespace PixelFarm.Agg.Lines
 
             LineAA.FixDegenBisectrixEnd(lp, ref ex, ref ey);
             LineInterpolatorAA2 li = new LineInterpolatorAA2(this, lp, ex, ey);
-            if (li.IsVertical)
-            {
-                while (li.StepV()) ;
-            }
-            else
-            {
-                while (li.StepH()) ;
-            }
+            li.Loop();
         }
 
         public override void Line2(LineParameters lp, int ex, int ey)
@@ -550,14 +553,7 @@ namespace PixelFarm.Agg.Lines
             LineAA.FixDegenBisectrixStart(lp, ref sx, ref sy);
             LineAA.FixDegenBisectrixEnd(lp, ref ex, ref ey);
             LineInterpolatorAA3 li = new LineInterpolatorAA3(this, lp, sx, sy, ex, ey);
-            if (li.IsVertical)
-            {
-                while (li.StepV()) ;
-            }
-            else
-            {
-                while (li.StepH()) ;
-            }
+            li.Loop(); 
         }
 
         public override void Line3(LineParameters lp,

@@ -22,13 +22,13 @@ using PixelFarm.Agg.Imaging;
 using PixelFarm.Agg.Transform;
 namespace PixelFarm.Agg
 {
+    
     public abstract class Graphics2D
     {
         protected ActualImage destActualImage;
         protected ScanlineRasterizer sclineRas;
         Affine currentTxMatrix = Affine.IdentityMatrix;
-
-        //------------------------------------------------------------------------
+         
 
         public abstract void SetClippingRect(RectInt rect);
         public abstract RectInt GetClippingRect();
@@ -41,7 +41,7 @@ namespace PixelFarm.Agg
         /// <param name="c"></param>
         public abstract void Render(VertexStoreSnap vertexSource, Drawing.Color c);
         //------------------------------------------------------------------------
-        public abstract bool UseSubPixelRendering2 { get; set; }
+    
         /// <summary>
         /// we do NOT store vxs
         /// </summary>

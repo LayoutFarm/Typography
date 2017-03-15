@@ -17,7 +17,7 @@
 namespace PixelFarm.Agg.Lines
 {
     //===================================================distance_interpolator0
-    class DistanceInterpolator0
+    struct DistanceInterpolator0
     {
         readonly int m_dx;
         readonly int m_dy;
@@ -39,12 +39,12 @@ namespace PixelFarm.Agg.Lines
     }
 
     //==================================================distance_interpolator00
-    class DistanceInterpolator00
+    struct DistanceInterpolator00
     {
-        int m_dx1;
-        int m_dy1;
-        int m_dx2;
-        int m_dy2;
+        readonly int m_dx1;
+        readonly int m_dy1;
+        readonly int m_dx2;
+        readonly int m_dy2;
         int m_dist1;
         int m_dist2;
         public DistanceInterpolator00(int xc, int yc,
@@ -72,10 +72,10 @@ namespace PixelFarm.Agg.Lines
     }
 
     //===================================================distance_interpolator1
-    class DistanceInterpolator1
+    struct DistanceInterpolator1
     {
-        int m_dx;
-        int m_dy;
+        readonly int m_dx;
+        readonly int m_dy;
         int m_dist;
         public DistanceInterpolator1(int x1, int y1, int x2, int y2, int x, int y)
         {
@@ -151,15 +151,17 @@ namespace PixelFarm.Agg.Lines
         //public void inc_y() { m_dist -= m_dx; }
         //public void dec_y() { m_dist += m_dx; } 
         //---------------------------------------------------------------------
+
+    
     }
 
     //===================================================distance_interpolator2
-    public class DistanceInterpolator2
+    struct DistanceInterpolator2
     {
-        int m_dx;
-        int m_dy;
-        int m_dx_start;
-        int m_dy_start;
+        readonly int m_dx;
+        readonly int m_dy;
+        readonly int m_dx_start;
+        readonly int m_dy_start;
         int m_dist;
         int m_dist_start;
         //---------------------------------------------------------------------
@@ -291,14 +293,14 @@ namespace PixelFarm.Agg.Lines
 
 
     //===================================================distance_interpolator3
-    public class DistanceInterpolator3
+    struct DistanceInterpolator3
     {
-        int m_dx;
-        int m_dy;
-        int m_dx_start;
-        int m_dy_start;
-        int m_dx_end;
-        int m_dy_end;
+        readonly int m_dx;
+        readonly int m_dy;
+        readonly int m_dx_start;
+        readonly int m_dy_start;
+        readonly int m_dx_end;
+        readonly int m_dy_end;
         int m_dist;
         int m_dist_start;
         int m_dist_end;

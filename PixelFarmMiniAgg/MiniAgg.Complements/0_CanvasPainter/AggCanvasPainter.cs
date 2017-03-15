@@ -1,23 +1,4 @@
-﻿// 2016 ,BSD, WinterDev
-
-//----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.4
-//
-// C# Port port by: Lars Brubaker
-//                  larsbrubaker@gmail.com
-// Copyright (C) 2007-2011
-//
-// Permission to copy, use, modify, sell and distribute this software 
-// is granted provided this copyright notice appears in all copies. 
-// This software is provided "as is" without express or implied
-// warranty, and with no claim as to its suitability for any purpose.
-//
-//----------------------------------------------------------------------------
-//
-// Class StringPrinter.cs
-// 
-// Class to output the vertex source of a string as a run of glyphs.
-//----------------------------------------------------------------------------
+﻿//MIT, 2016-2017, WinterDev
 
 using System;
 using PixelFarm.Drawing;
@@ -27,9 +8,6 @@ using PixelFarm.Agg.VertexSource;
 
 namespace PixelFarm.Agg
 {
-
-
-
     public class AggCanvasPainter : CanvasPainter
     {
         ImageGraphics2D gx;
@@ -53,7 +31,7 @@ namespace PixelFarm.Agg
         RoundedRect roundRect = null;
         MyImageReaderWriter sharedImageWriterReader = new MyImageReaderWriter();
 
-
+        LineDashGenerator _lineDashGen;
         int ellipseGenNSteps = 10;
         SmoothingMode _smoothingMode;
 
@@ -64,12 +42,26 @@ namespace PixelFarm.Agg
             this.stroke = new Stroke(1);//default
             this.scline = graphic2d.ScanlinePacked8;
             this.sclineRasToBmp = graphic2d.ScanlineRasToDestBitmap;
+
+
         }
         public Graphics2D Graphics
         {
             get { return this.gx; }
         }
-
+        public override int Width
+        {
+            get
+            {
+                //TODO: review here
+                return 800;
+            }
+        }
+        public override int Height
+        {
+            //TODO: review here
+            get { return 600; }
+        }
         public override void Clear(Color color)
         {
             gx.Clear(color);
@@ -223,9 +215,25 @@ namespace PixelFarm.Agg
         }
         public override void Draw(VertexStore vxs)
         {
-            var v1 = GetFreeVxs();
-            gx.Render(stroke.MakeVxs(vxs, v1), this.strokeColor);
-            ReleaseVxs(ref v1);
+            if (_lineDashGen == null)
+            {
+                //no line dash
+                var v1 = GetFreeVxs();
+                gx.Render(stroke.MakeVxs(vxs, v1), this.strokeColor);
+                ReleaseVxs(ref v1);
+            }
+            else
+            {
+                var v1 = GetFreeVxs();
+                var v2 = GetFreeVxs();
+                _lineDashGen.CreateDash(vxs, v1);
+                stroke.MakeVxs(v1, v2);
+                gx.Render(v2, this.strokeColor);
+
+                ReleaseVxs(ref v1);
+                ReleaseVxs(ref v2);
+            }
+
         }
 
         /// <summary>
@@ -362,6 +370,26 @@ namespace PixelFarm.Agg
                 _textPrinter.DrawString(text, x, y);
             }
         }
+        public override void DrawString(RenderVxFormattedString renderVx, double x, double y)
+        {
+            //draw string from render vx
+            if (_textPrinter != null)
+            {
+                _textPrinter.DrawString(renderVx, x, y);
+            }
+        }
+        public override RenderVxFormattedString CreateRenderVx(string textspan)
+        {
+
+            var renderVxFmtStr = new AggRenderVxFormattedString(textspan);
+            if (_textPrinter != null)
+            {
+                char[] buffer = textspan.ToCharArray();
+                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, buffer, 0, buffer.Length);
+
+            }
+            return renderVxFmtStr;
+        }
 
         ITextPrinter _textPrinter;
         public ITextPrinter TextPrinter
@@ -399,23 +427,30 @@ namespace PixelFarm.Agg
             sclineRas.AddPath(vxs);
             sclineRasToBmp.RenderWithColor(this.gx.DestImage, sclineRas, scline, fillColor);
         }
+
+
         public override bool UseSubPixelRendering
         {
-            get { return sclineRasToBmp.ScanlineRenderMode == ScanlineRenderMode.SubPixelRendering; }
+            get
+            {
+                return this.sclineRasToBmp.ScanlineRenderMode == ScanlineRenderMode.SubPixelRendering;
+            }
             set
             {
                 if (value)
                 {
+                    //TODO: review here again             
+                    this.sclineRas.ExtendX3ForSubPixelRendering = true;
                     this.sclineRasToBmp.ScanlineRenderMode = ScanlineRenderMode.SubPixelRendering;
-                    this.sclineRas.UseSubPixelRendering = true;
                 }
                 else
                 {
+                    this.sclineRas.ExtendX3ForSubPixelRendering = false;
                     this.sclineRasToBmp.ScanlineRenderMode = ScanlineRenderMode.Default;
-                    this.sclineRas.UseSubPixelRendering = false;
                 }
             }
         }
+
 
         public override Color FillColor
         {
@@ -497,19 +532,7 @@ namespace PixelFarm.Agg
             ReleaseVxs(ref v2);
         }
 
-        public override int Width
-        {
-            get
-            {
-                //TODO: review here
-                return 800;
-            }
-        }
-        public override int Height
-        {
-            //TODO: review here
-            get { return 600; }
-        }
+
         public override RenderVx CreateRenderVx(VertexStoreSnap snap)
         {
             return new AggRenderVx(snap);
@@ -541,5 +564,29 @@ namespace PixelFarm.Agg
             AggRenderVx aggRenderVx = (AggRenderVx)renderVx;
             Fill(aggRenderVx.snap);
         }
+        public LineJoin LineJoin
+        {
+            get { return stroke.LineJoin; }
+            set
+            {
+                stroke.LineJoin = value;
+            }
+        }
+        public LineCap LineCap
+        {
+            get { return stroke.LineCap; }
+            set
+            {
+                stroke.LineCap = value;
+            }
+        }
+         
+        //--------------------------------------------------
+        public LineDashGenerator LineDashGen
+        {
+            get { return this._lineDashGen; }
+            set { this._lineDashGen = value; }
+        }
+        
     }
 }

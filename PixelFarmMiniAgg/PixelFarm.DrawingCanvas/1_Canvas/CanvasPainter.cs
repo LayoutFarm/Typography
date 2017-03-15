@@ -25,7 +25,7 @@ namespace PixelFarm.Agg
 
     public abstract class CanvasPainter
     {
-        
+
         public abstract float OriginX { get; }
         public abstract float OriginY { get; }
         public abstract void SetOrigin(float ox, float oy);
@@ -79,18 +79,20 @@ namespace PixelFarm.Agg
         public abstract void Draw(VertexStore vxs);
         public abstract void Draw(VertexStoreSnap vxs);
         public abstract RenderVx CreateRenderVx(VertexStoreSnap snap);
+        public abstract RenderVxFormattedString CreateRenderVx(string textspan);
         public abstract void FillRenderVx(Brush brush, RenderVx renderVx);
         public abstract void FillRenderVx(RenderVx renderVx);
         public abstract void DrawRenderVx(RenderVx renderVx);
         //////////////////////////////////////////////////////////////////////////////
         //text,string
         //TODO: review text drawing funcs 
-        
+
         public abstract RequestFont CurrentFont { get; set; }
         public abstract void DrawString(
            string text,
            double x,
-           double y); 
+           double y);
+        public abstract void DrawString(RenderVxFormattedString renderVx, double x, double y);
     }
 
 }
