@@ -1,5 +1,5 @@
 ﻿//Apache2, 2017, WinterDev
- 
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -56,6 +56,12 @@ namespace Typography.OpenFont.Tables
         //Type      Name                Description
         // int16    topSideBearing[]    The top sidebearing of the glyph. Signed integer in FUnits.
 
+        ushort _numOfLongVerMetrics;
+        AdvanceHeightAndTopSideBearing[] _advHeightAndTopSideBearings;
+        public VerticalMatric(ushort numOfLongVerMetrics)
+        {
+            this._numOfLongVerMetrics = numOfLongVerMetrics;
+        }
 
         public override string Name
         {
@@ -66,7 +72,33 @@ namespace Typography.OpenFont.Tables
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-
+            _advHeightAndTopSideBearings = new AdvanceHeightAndTopSideBearing[_numOfLongVerMetrics];
+            int m = 0;
+            for (int i = _numOfLongVerMetrics - 1; i >= 0; --i)
+            {
+                _advHeightAndTopSideBearings[m] = new AdvanceHeightAndTopSideBearing(
+                    reader.ReadUInt16(),
+                    reader.ReadInt16()
+                    );
+            }
         }
+
+        public struct AdvanceHeightAndTopSideBearing
+        {
+            public readonly ushort advanceHeight;
+            public readonly short topSideBearing;
+            public AdvanceHeightAndTopSideBearing(ushort advanceHeight, short topSideBearing)
+            {
+                this.advanceHeight = advanceHeight;
+                this.topSideBearing = topSideBearing;
+            }
+#if DEBUG
+            public override string ToString()
+            {
+                return advanceHeight + "," + topSideBearing;
+            }
+#endif
+        }
+
     }
 }

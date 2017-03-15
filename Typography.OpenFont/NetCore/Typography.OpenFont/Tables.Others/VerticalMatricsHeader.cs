@@ -23,8 +23,7 @@ namespace Typography.OpenFont.Tables
         //Version 1.0 of the vertical header table format is as follows:
         //Version 1.0
         //Type      Name        Description
-        //Fixed     version     Version number of the vertical header
-        //                      table; 0x00010000 for version 1.0
+        //Fixed     version     Version number of the vertical header table; 0x00010000 for version 1.0  
         //int16     ascent      Distance in FUnits from the centerline to the previous line’s descent.
         //int16     descent     Distance in FUnits from the centerline to the next line’s ascent.
         //int16     lineGap     Reserved; set to 0
@@ -52,6 +51,7 @@ namespace Typography.OpenFont.Tables
         //int16     vertTypoAscender    The vertical typographic ascender for this font.It is the distance in FUnits from the ideographic em-box center baseline for the vertical axis to the right of the ideographic em-box and is usually set to (head.unitsPerEm)/2. For example, a font with an em of 1000 fUnits will set this field to 500. See the baseline section of the OpenType Tag Registry for a description of the ideographic em-box.
         //int16     vertTypoDescender   The vertical typographic descender for this font.It is the distance in FUnits from the ideographic em-box center baseline for the horizontal axis to the left of the ideographic em-box and is usually set to (head.unitsPerEm)/2. For example, a font with an em of 1000 fUnits will set this field to 500.
         //int16     vertTypoLineGap     The vertical typographic gap for this font.An application can determine the recommended line spacing for single spaced vertical text for an OpenType font by the following expression: ideo embox width + vhea.vertTypoLineGap
+        //
         //int16     advanceHeightMax    The maximum advance height measurement -in FUnits found in the font.This value must be consistent with the entries in the vertical metrics table.
         //int16     minTop_SideBearing  The minimum top sidebearing measurement found in the font, in FUnits.This value must be consistent with the entries in the vertical metrics table.
         //int16     minBottom_SideBearing The minimum bottom sidebearing measurement found in the font,in FUnits.        
@@ -74,9 +74,47 @@ namespace Typography.OpenFont.Tables
                 return "vhea";
             }
         }
+
+
+        public byte VersionMajor { get; set; }
+        public byte VersionMinor { get; set; }
+        public short VertTypoAscender { get; set; }
+        public short VertTypoDescender { get; set; }
+        public short VertTypoLineGap { get; set; }
+        //
+        public short AdvanceHeightMax { get; set; }
+        public short MinTopSideBearing { get; set; }
+        public short MinBottomSideBearing { get; set; }
+        //
+        public short YMaxExtend { get; set; }
+        public short CaretSlopeRise { get; set; }
+        public short CaretSlopeRun { get; set; }
+        public short CaretOffset { get; set; }
+        public ushort NumOfLongVerMatrics { get; set; }
         protected override void ReadContentFrom(BinaryReader reader)
         {
+            uint version = reader.ReadUInt32();
+            VersionMajor = (byte)(version >> 16);
+            VersionMinor = (byte)(version >> 8);
 
+            VertTypoAscender = reader.ReadInt16();
+            VertTypoDescender = reader.ReadInt16();
+            VertTypoLineGap = reader.ReadInt16();
+            //
+            AdvanceHeightMax = reader.ReadInt16();
+            MinTopSideBearing = reader.ReadInt16();
+            MinBottomSideBearing = reader.ReadInt16();
+            //
+            YMaxExtend = reader.ReadInt16();
+            CaretSlopeRise = reader.ReadInt16();
+            CaretSlopeRun = reader.ReadInt16();
+            CaretOffset = reader.ReadInt16();
+            //
+            //skip 5 int16 =>  4 reserve field + 1 metricDataFormat            
+            reader.BaseStream.Position += (2 * (4 + 1)); //short = 2 byte, 
+            //
+            NumOfLongVerMatrics = reader.ReadUInt16();
         }
+
     }
 }
