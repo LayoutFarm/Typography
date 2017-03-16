@@ -119,7 +119,7 @@ namespace SampleWinForms
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 100;
-            char[] textBuffer = txtInputChar.Text.ToCharArray(); 
+            char[] textBuffer = txtInputChar.Text.ToCharArray();
 
             //test draw multiple lines
             float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
@@ -251,13 +251,77 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
+            //Example 3: MeasureString
+            //3.1
+            SizeF sizeF = currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
+            //draw rect 
+            g.DrawRectangle(Pens.Red, x_pos, y_pos, sizeF.Width, sizeF.Height);
+            //3.2
+            MeasuredStringBox strBox;
+            currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length, out strBox);
+            //draw line mark
+            float x_pos2 = x_pos + sizeF.Width + 10;
+            g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
+            g.DrawLine(Pens.Green, x_pos, y_pos + strBox.descending, x_pos2, y_pos + strBox.descending);//descending
+            g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending
 
             //
+            //Example 4:wrap glyph plan to the 'textrun'
+            y_pos -= currentTextPrinter.FontLineSpacingPx;
+            currentTextPrinter.FillColor = Color.Blue;
+            TextRun textRun = new TextRun(
+                textBuffer,
+                0,
+                textBuffer.Length);
+
+            //set presentation elements
+            textRun.SetGlyphPlan(userGlyphPlans, 0, userGlyphPlans.Count);
+
+
+
+
             //-------------------------------------------------- 
             currentTextPrinter.FillColor = Color.Black;
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+        }
+
+
+
+
+        class TextRun
+        {
+            char[] _srcTextBuffer;
+            int _startAt;
+            int _len;
+
+            GlyphPlanListCache _glyphPlanListCache;
+
+            public TextRun(char[] srcTextBuffer, int startAt, int len)
+            {
+                this._srcTextBuffer = srcTextBuffer;
+                this._startAt = startAt;
+                this._len = len;
+            }
+            public void SetGlyphPlan(List<GlyphPlan> glyphPlans, int startAt, int len)
+            {
+                _glyphPlanListCache = new GlyphPlanListCache(glyphPlans, startAt, len);
+            }
+
+            struct GlyphPlanListCache
+            {
+                public readonly List<GlyphPlan> glyphPlans;
+                public readonly int startAt;
+                public readonly int len;
+                public GlyphPlanListCache(List<GlyphPlan> glyphPlans, int startAt, int len)
+                {
+                    this.glyphPlans = glyphPlans;
+                    this.startAt = startAt;
+                    this.len = len;
+                }
+
+            }
 
         }
     }
