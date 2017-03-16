@@ -181,23 +181,6 @@ namespace SampleWinForms
             }
 
             var hintTech = (HintTechnique)lstHintList.SelectedItem;
-            //bool useTrueTypeInst = false;//reset
-            //bool useVerticalHinting = false; //reset agg vertical-only hinting
-
-            //switch (Typography.Rendering)
-            //{
-            //    case HintTechnique.TrueTypeInstruction:
-            //        useTrueTypeInst = true;
-            //        break;
-            //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
-            //        useTrueTypeInst = true;
-            //        useVerticalHinting = true;
-            //        break;
-            //    case HintTechnique.CustomAutoFit:
-            //        //custom agg autofit 
-            //        useVerticalHinting = true;
-            //        break;
-            //}
 
             //1. read typeface from font file 
             RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
@@ -210,9 +193,10 @@ namespace SampleWinForms
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
+                        selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
                         //
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
-
+                        
                     }
                     break;
                 case RenderChoice.RenderWithTextPrinterAndMiniAgg:
@@ -225,9 +209,20 @@ namespace SampleWinForms
                         selectedTextPrinter = _devVxsTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.HintTechnique = hintTech;
+                        selectedTextPrinter.HintTechnique = hintTech; 
+                        selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
 
-                        selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
+                        //test print 3 lines
+
+                        char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
+                        float x_pos = 0, y_pos = 200;
+                        float lineSpacingPx = selectedTextPrinter.FontLineSpacingPx;
+                        for (int i = 0; i < 3; ++i)
+                        {
+                            selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
+                            y_pos -= lineSpacingPx;
+                        }
+
 
                         //copy from Agg's memory buffer to gdi 
                         PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);

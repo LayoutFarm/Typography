@@ -11,7 +11,7 @@ using Typography.Rendering;
 namespace PixelFarm.Drawing.Fonts
 {
 
-  
+
     class DevVxsTextPrinter : DevTextPrinterBase
     {
 
@@ -20,28 +20,67 @@ namespace PixelFarm.Drawing.Fonts
         Dictionary<string, GlyphPathBuilder> _cacheGlyphPathBuilders = new Dictionary<string, GlyphPathBuilder>();
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
         //
-        HintedVxsGlyphCollection hintGlyphCollection = new HintedVxsGlyphCollection(); 
+        HintedVxsGlyphCollection hintGlyphCollection = new HintedVxsGlyphCollection();
         VertexStorePool _vxsPool = new VertexStorePool();
         GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
 
 
-
+        string _currentSelectedFontFile;
         public DevVxsTextPrinter()
         {
 
         }
-        protected override void OnFontFilenameChanged()
+        public override string FontFilename
         {
-
-            //switch to another font              
-            if (_glyphPathBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(_currentSelectedFontFile))
+            get
             {
-                //store current typeface to cache
-                _cacheGlyphPathBuilders[_currentSelectedFontFile] = _glyphPathBuilder;
+                return _currentSelectedFontFile;
             }
-            //check if we have this in cache ?
-            //if we don't have it, this _currentTypeface will set to null ***                  
-            _cacheGlyphPathBuilders.TryGetValue(_currentSelectedFontFile, out _glyphPathBuilder);
+
+            set
+            {
+                if (_currentSelectedFontFile == value)
+                {
+                    return;
+                }
+
+                //switch to another font              
+                if (_glyphPathBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(_currentSelectedFontFile))
+                {
+                    //store current typeface to cache
+                    _cacheGlyphPathBuilders[_currentSelectedFontFile] = _glyphPathBuilder;
+                }
+                _currentSelectedFontFile = value;
+                //check if we have this in cache ?
+                //if we don't have it, this _currentTypeface will set to null ***                  
+                _cacheGlyphPathBuilders.TryGetValue(_currentSelectedFontFile, out _glyphPathBuilder);
+
+                //--------
+                if (_glyphPathBuilder == null)
+                {
+                    //TODO: review here about how to load font file and glyph builder 
+                    //1. read typeface ...   
+                    using (FileStream fs = new FileStream(_currentSelectedFontFile, FileMode.Open, FileAccess.Read))
+                    {
+                        var reader = new OpenFontReader();
+                        _glyphPathBuilder = new GlyphPathBuilder(reader.Read(fs));
+                    }
+                }
+                OnFontSizeChanged();
+            }
+        }
+        protected override void OnFontSizeChanged()
+        {
+            //update some font matrix property  
+            if (_glyphPathBuilder != null)
+            {
+                Typeface currentTypeface = _glyphPathBuilder.Typeface;
+                float pointToPixelScale = currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+                this.FontAscendingPx = currentTypeface.Ascender * pointToPixelScale;
+                this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
+                this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
+                this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
+            }
         }
 
         public CanvasPainter DefaultCanvasPainter { get; set; }
@@ -64,8 +103,9 @@ namespace PixelFarm.Drawing.Fonts
             //TODO: review this again, we should use pixel?
 
             float fontSizePoint = this.FontSizeInPoints;
+            float scale = typeface.CalculateFromPointToPixelScale(fontSizePoint);
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, fontSizePoint, text, startAt, len, _outputGlyphPlans);
+            _glyphLayout.Layout(typeface, text, startAt, len, _outputGlyphPlans);
 
             //4. render each glyph
             float ox = canvasPainter.OriginX;
@@ -100,32 +140,20 @@ namespace PixelFarm.Drawing.Fonts
                     //
                     hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
                 }
-                canvasPainter.SetOrigin((float)(glyphPlan.x + x), (float)(glyphPlan.y + y));
+                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + x), (float)(glyphPlan.y * scale + y));
                 canvasPainter.Fill(glyphVxs);
             }
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
         }
 
-      
+
         void UpdateTypefaceAndGlyphBuilder()
         {
-            //1. update _glyphPathBuilder for current typeface 
-            if (_glyphPathBuilder == null)
-            {
-                //TODO: review here about how to load font file and glyph builder 
-                //1. read typeface ...   
 
-                using (FileStream fs = new FileStream(_currentSelectedFontFile, FileMode.Open, FileAccess.Read))
-                {
-                    var reader = new OpenFontReader();
-                    _glyphPathBuilder = new GlyphPathBuilder(reader.Read(fs));
-                }
-
-            }
             //2.1 
             _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
-             
+
 
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;

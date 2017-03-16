@@ -8,35 +8,25 @@ namespace Typography.Rendering
     public abstract class DevTextPrinterBase
     {
         HintTechnique _hintTech;
-        protected string _currentSelectedFontFile;
+
         public DevTextPrinterBase()
         {
             FontSizeInPoints = 14;//
             ScriptLang = Typography.OpenFont.ScriptLangs.Latin;//default?
         }
 
-        public string FontFilename
+        public abstract string FontFilename
         {
-            get
-            {
-                return _currentSelectedFontFile;
-            }
-            set
-            {
-                if (_currentSelectedFontFile != value)
-                {
-                    _currentSelectedFontFile = value;
-                    //sample only ....
-                    //when we change new font, 
-                    OnFontFilenameChanged();
-                }
-
-            }
+            get;
+            set;
         }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
-        //public bool UseTrueTypeInstructions { get; private set; }
-        //public bool UseVerticalHint { get; private set; }
+        public float FontAscendingPx { get; set; }
+        public float FontDescedingPx { get; set; }
+        public float FontLineGapPx { get; set; }
+        public float FontLineSpacingPx { get; set; }
+
         public HintTechnique HintTechnique
         {
             get { return _hintTech; }
@@ -60,9 +50,23 @@ namespace Typography.Rendering
                 //}
             }
         }
-        //
-        public float FontSizeInPoints { get; set; }
-        protected virtual void OnFontFilenameChanged() { }
+
+
+        float _fontSizeInPoints;
+        public float FontSizeInPoints
+        {
+            get { return _fontSizeInPoints; }
+            set
+            {
+                if (_fontSizeInPoints != value)
+                {
+                    _fontSizeInPoints = value;
+                    OnFontSizeChanged();
+                }
+            }
+        }
+
+        protected virtual void OnFontSizeChanged() { }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }

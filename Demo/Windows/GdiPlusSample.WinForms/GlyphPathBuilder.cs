@@ -128,6 +128,10 @@ namespace Typography.Rendering
                 tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
             }
         }
+        public float RecentPixelScale
+        {
+            get { return _recentPixelScale; }
+        }
     }
 
     public static class GlyphPathBuilderExtensions
