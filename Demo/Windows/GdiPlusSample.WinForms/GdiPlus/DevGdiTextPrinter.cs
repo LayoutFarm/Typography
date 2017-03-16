@@ -129,7 +129,7 @@ namespace SampleWinForms
             // 
             //2. layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
-            _glyphLayout.Layout(_currentTypeface,   textBuffer, startAt, len, userGlyphPlanList);
+            _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, userGlyphPlanList);
             //note that we print to userGlyphPlanList
             //---------------- 
         }
@@ -192,7 +192,7 @@ namespace SampleWinForms
             float sizeInPoints = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(_currentTypeface,   textBuffer, startAt, len, _outputGlyphPlans);
+            _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, _outputGlyphPlans);
             //----------------
             //
             //3. render each glyph 
@@ -204,7 +204,7 @@ namespace SampleWinForms
                 GlyphPlan glyphPlan = _outputGlyphPlans[i];
                 _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
                 // 
-                
+
                 scaleMat = new System.Drawing.Drawing2D.Matrix(
                     1, 0,//scale x
                     0, 1, //scale y
