@@ -98,7 +98,7 @@ namespace Typography.TextLayout
         GlyphSetPosition _gpos;
         bool _needPlanUpdate;
 
-        GlyphIndexList _inputGlyphs = new GlyphIndexList();
+        internal GlyphIndexList _inputGlyphs = new GlyphIndexList();
         internal List<GlyphPos> _glyphPositions = new List<GlyphPos>();
 
         public GlyphLayout()
