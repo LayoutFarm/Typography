@@ -103,8 +103,9 @@ namespace PixelFarm.Drawing.Fonts
             //TODO: review this again, we should use pixel?
 
             float fontSizePoint = this.FontSizeInPoints;
+            float scale = typeface.CalculateFromPointToPixelScale(fontSizePoint);
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, fontSizePoint, text, startAt, len, _outputGlyphPlans);
+            _glyphLayout.Layout(typeface, text, startAt, len, _outputGlyphPlans);
 
             //4. render each glyph
             float ox = canvasPainter.OriginX;
@@ -139,7 +140,7 @@ namespace PixelFarm.Drawing.Fonts
                     //
                     hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
                 }
-                canvasPainter.SetOrigin((float)(glyphPlan.x + x), (float)(glyphPlan.y + y));
+                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + x), (float)(glyphPlan.y * scale + y));
                 canvasPainter.Fill(glyphVxs);
             }
             //restore prev origin
