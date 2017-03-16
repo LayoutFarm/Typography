@@ -98,7 +98,7 @@ namespace Typography.TextLayout
         GlyphSetPosition _gpos;
         bool _needPlanUpdate;
 
-        List<ushort> _inputGlyphs = new List<ushort>();
+        GlyphIndexList _inputGlyphs = new GlyphIndexList();
         internal List<GlyphPos> _glyphPositions = new List<GlyphPos>();
 
         public GlyphLayout()
@@ -164,7 +164,8 @@ namespace Typography.TextLayout
             for (int i = 0; i < len; ++i)
             {
                 //convert input char to input glyphs
-                _inputGlyphs.Add((ushort)typeface.LookupIndex(str[startAt + i]));
+                char c = str[startAt + i];
+                _inputGlyphs.AddGlyph(c, (ushort)typeface.LookupIndex(c));
             }
             //----------------------------------------------  
             //glyph substitution            
