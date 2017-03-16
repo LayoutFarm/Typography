@@ -205,8 +205,7 @@ namespace SampleWinForms
                 }
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
-        }
-
+        } 
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -265,22 +264,8 @@ namespace SampleWinForms
             g.DrawLine(Pens.Green, x_pos, y_pos + strBox.descending, x_pos2, y_pos + strBox.descending);//descending
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending
 
-            //
-            //Example 4:wrap glyph plan to the 'textrun'
-            y_pos -= currentTextPrinter.FontLineSpacingPx;
-            currentTextPrinter.FillColor = Color.Blue;
-            TextRun textRun = new TextRun(
-                textBuffer,
-                0,
-                textBuffer.Length);
 
-            //set presentation elements
-            textRun.SetGlyphPlan(userGlyphPlans, 0, userGlyphPlans.Count);
-
-
-
-
-            //-------------------------------------------------- 
+           
             currentTextPrinter.FillColor = Color.Black;
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
@@ -290,39 +275,10 @@ namespace SampleWinForms
 
 
 
-        class TextRun
+
+        private void chkShowSampleTextBox_CheckedChanged(object sender, System.EventArgs e)
         {
-            char[] _srcTextBuffer;
-            int _startAt;
-            int _len;
-
-            GlyphPlanListCache _glyphPlanListCache;
-
-            public TextRun(char[] srcTextBuffer, int startAt, int len)
-            {
-                this._srcTextBuffer = srcTextBuffer;
-                this._startAt = startAt;
-                this._len = len;
-            }
-            public void SetGlyphPlan(List<GlyphPlan> glyphPlans, int startAt, int len)
-            {
-                _glyphPlanListCache = new GlyphPlanListCache(glyphPlans, startAt, len);
-            }
-
-            struct GlyphPlanListCache
-            {
-                public readonly List<GlyphPlan> glyphPlans;
-                public readonly int startAt;
-                public readonly int len;
-                public GlyphPlanListCache(List<GlyphPlan> glyphPlans, int startAt, int len)
-                {
-                    this.glyphPlans = glyphPlans;
-                    this.startAt = startAt;
-                    this.len = len;
-                }
-
-            }
-
+            this.sampleTextBox1.Visible = this.chkShowSampleTextBox.Checked;
         }
     }
 }
