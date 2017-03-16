@@ -98,7 +98,7 @@ namespace Typography.TextLayout
         GlyphSetPosition _gpos;
         bool _needPlanUpdate;
 
-        GlyphIndexList _inputGlyphs = new GlyphIndexList();
+        internal GlyphIndexList _inputGlyphs = new GlyphIndexList();
         internal List<GlyphPos> _glyphPositions = new List<GlyphPos>();
 
         public GlyphLayout()
@@ -186,6 +186,8 @@ namespace Typography.TextLayout
             _glyphPositions.Clear();
             for (int i = 0; i < finalGlyphCount; ++i)
             {
+                //at this stage _inputGlyphs and _glyphPositions 
+                //has member 1:1
                 ushort glyIndex = _inputGlyphs[i];
                 _glyphPositions.Add(new GlyphPos(
                     glyIndex,
