@@ -96,19 +96,19 @@ namespace SampleWinForms
             this.DrawString(this.DefaultTargetGraphics, textBuffer, startAt, len, xpos, ypos);
         }
 
-        void UpdateTypefaceAndGlyphBuilder()
+
+        void UpdateGlyphLayoutSettings()
         {
 
-            //1  
-            _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
-            //2
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
             _glyphLayout.EnableLigature = this.EnableLigature;
-            //3. 
+        }
+        void UpdateVisualOutputSettings()
+        {
+            _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
-
         }
 
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
@@ -125,19 +125,17 @@ namespace SampleWinForms
             //similar to DrawString(), but we don't draw it to the canvas surface
             //--------------------------------- 
             //1. update
-            UpdateTypefaceAndGlyphBuilder();
+            UpdateGlyphLayoutSettings();
             // 
-            //2. layout glyphs with selected layout technique
-            float sizeInPoints = this.FontSizeInPoints;
+            //2. layout glyphs with selected layout technique 
             _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, userGlyphPlanList);
             //note that we print to userGlyphPlanList
             //---------------- 
         }
-
-
         public void DrawString(Graphics g, List<GlyphPlan> userGlypgPlanList, float x, float y)
         {
-            UpdateTypefaceAndGlyphBuilder();
+            UpdateVisualOutputSettings();
+
             //draw data in glyph plan 
             //3. render each glyph 
             System.Drawing.Drawing2D.Matrix scaleMat = null;
@@ -173,10 +171,6 @@ namespace SampleWinForms
                 }
             }
         }
-
-
-
-
         public void DrawString(
                 Graphics g,
                 char[] textBuffer,
@@ -186,7 +180,8 @@ namespace SampleWinForms
                 float y)
         {
             //1. update
-            UpdateTypefaceAndGlyphBuilder();
+            UpdateGlyphLayoutSettings();
+
             // 
             //2. layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
@@ -194,8 +189,10 @@ namespace SampleWinForms
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, _outputGlyphPlans);
             //----------------
+            //3. update visual output settings
+            UpdateVisualOutputSettings();
             //
-            //3. render each glyph 
+            //4. render each glyph 
             System.Drawing.Drawing2D.Matrix scaleMat = null;
             //this draw a single line text span***
             int j = _outputGlyphPlans.Count;
@@ -227,8 +224,51 @@ namespace SampleWinForms
                     g.DrawPath(_outlinePen, path);
                 }
             }
-
         }
 
+        //-------------------
+        /// <summary>
+        /// measure part of string based on current text printer's setting
+        /// </summary>
+        public SizeF MeasureString(char[] textBuffer,
+                int startAt,
+                int len)
+        {
+            //TODO: consider extension method
+            _outputGlyphPlans.Clear();
+            PrintGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            int j = _outputGlyphPlans.Count;
+            if (j == 0)
+            {
+                return new SizeF(0, this.FontLineSpacingPx);
+            }
+            //get last one
+            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
+            float scale = _currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+            return new SizeF((lastOne.x + lastOne.advX) * scale, this.FontLineSpacingPx);
+        }
+        public void MeasureString(char[] textBuffer,
+                int startAt,
+                int len, out MeasuredStringBox strBox)
+        {
+            //TODO: consider extension method
+            _outputGlyphPlans.Clear();
+            PrintGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            int j = _outputGlyphPlans.Count;
+            if (j == 0)
+            {
+                strBox = new MeasuredStringBox(0,
+                    this.FontAscendingPx,
+                    this.FontDescedingPx,
+                    this.FontLineGapPx);
+            }
+            //get last one
+            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
+            float scale = _currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+            strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
+                    this.FontAscendingPx,
+                    this.FontDescedingPx,
+                    this.FontLineGapPx);
+        }
     }
 }

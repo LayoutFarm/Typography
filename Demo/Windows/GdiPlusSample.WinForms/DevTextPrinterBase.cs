@@ -80,4 +80,26 @@ namespace Typography.Rendering
         }
 
     }
+
+    public struct MeasuredStringBox
+    {
+        
+        public float width; 
+        public float ascending; 
+        public float descending; 
+        public float lineGap;
+
+        public MeasuredStringBox(float width, float ascending, float descending, float lineGap)
+        {
+            this.width = width;
+            this.ascending = ascending;
+            this.descending = descending;
+            this.lineGap = lineGap;
+        }
+        public float CalculatedLineHeight
+        {
+            get { return ascending - descending + lineGap; }
+        }
+    }
+
 }
