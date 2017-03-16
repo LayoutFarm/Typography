@@ -9,13 +9,23 @@ namespace Typography.OpenFont.Tables
     public class GlyphIndexList
     {
         System.Collections.Generic.List<ushort> _glyphIndices = new System.Collections.Generic.List<ushort>();
+        System.Collections.Generic.List<char> _originalChars = new System.Collections.Generic.List<char>();
         public void Clear()
         {
             _glyphIndices.Clear();
+            _originalChars.Clear();
         }
-        public void AddGlyphIndex(ushort glyphIndex)
+        /// <summary>
+        /// add original char and its glyph index
+        /// </summary>
+        /// <param name="glyphIndex"></param>
+        public void AddGlyph(char originalChar, ushort glyphIndex)
         {
+            //so we can monitor what substituion process
+            _originalChars.Add(originalChar);
+            //
             _glyphIndices.Add(glyphIndex);
+
         }
         public int Count { get { return _glyphIndices.Count; } }
         public ushort this[int index] { get { return _glyphIndices[index]; } }
