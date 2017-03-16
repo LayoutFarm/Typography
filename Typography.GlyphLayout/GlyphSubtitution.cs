@@ -81,7 +81,7 @@ namespace Typography.TextLayout
             }
 
         }
-        public void DoSubstitution(List<ushort> outputCodePoints)
+        public void DoSubstitution(GlyphIndexList outputCodePoints)
         {
             if (lookupTables == null) { return; } //early exit if no lookup tables
                                                   //
