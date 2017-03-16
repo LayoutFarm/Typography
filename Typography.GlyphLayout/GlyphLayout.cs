@@ -85,6 +85,10 @@ namespace Typography.TextLayout
             this._glyphPos = glyphPos;
         }
     }
+
+
+
+
     public class GlyphLayout
     {
         GlyphLayoutPlanCollection _layoutPlanCollection = new GlyphLayoutPlanCollection();
@@ -92,10 +96,10 @@ namespace Typography.TextLayout
         ScriptLang _scriptLang;
         GlyphSubStitution _gsub;
         GlyphSetPosition _gpos;
-        bool _needPlanUpdate; 
+        bool _needPlanUpdate;
 
         List<ushort> _inputGlyphs = new List<ushort>();
-        List<GlyphPos> _glyphPositions = new List<GlyphPos>();
+        internal List<GlyphPos> _glyphPositions = new List<GlyphPos>();
 
         public GlyphLayout()
         {
@@ -138,7 +142,12 @@ namespace Typography.TextLayout
             }
         }
 
-
+        /// <summary>
+        /// do glyph shaping and glyph out
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="startAt"></param>
+        /// <param name="len"></param>
         public void Layout(
             char[] str,
             int startAt,
@@ -187,39 +196,41 @@ namespace Typography.TextLayout
             if (_gpos != null && len > 1 && posTech == PositionTechnique.OpenFont)
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
-            } 
+            }
         }
 
+    }
 
 
-        public void Layout(Typeface typeface,
-            char[] str,
-            int startAt,
-            int len,
-            List<GlyphPlan> outputGlyphPlanList)
+    public delegate void GlyphReadOutputDelegate(int index, GlyphPlan glyphPlan);
+
+    public static class GlyphLayoutExtensions
+    {
+
+        /// <summary>
+        /// read latest layout output
+        /// </summary>
+        public static void ReadOutput(this GlyphLayout glyphOut, List<GlyphPlan> outputGlyphPlanList)
         {
-            //1. set typeface
-            this.Typeface = typeface;
-            //2. layout
-            Layout(str, startAt, len);
-
+            Typeface typeface = glyphOut.Typeface;
+            List<GlyphPos> glyphPositions = glyphOut._glyphPositions;
             //3.read back
-            int finalGlyphCount = _glyphPositions.Count;
+            int finalGlyphCount = glyphPositions.Count;
             int cx = 0;
             short cy = 0;
 
-            PositionTechnique posTech = this.PositionTechnique;
+            PositionTechnique posTech = glyphOut.PositionTechnique;
+            ushort prev_index = 0;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
 
-                GlyphPos glyphPos = _glyphPositions[i]; 
+                GlyphPos glyphPos = glyphPositions[i];
                 //----------------------------------   
                 switch (posTech)
                 {
                     default: throw new NotSupportedException();
                     case PositionTechnique.None:
                         outputGlyphPlanList.Add(new GlyphPlan(glyphPos.glyphIndex, cx, cy, glyphPos.advWidth));
-                        cx += glyphPos.advWidth;
                         break;
                     case PositionTechnique.OpenFont:
                         outputGlyphPlanList.Add(new GlyphPlan(
@@ -227,25 +238,96 @@ namespace Typography.TextLayout
                             cx + glyphPos.xoffset,
                             (short)(cy + glyphPos.yoffset),
                             glyphPos.advWidth));
-                        cx += glyphPos.advWidth;
                         break;
                     case PositionTechnique.Kerning:
+
+                        if (i > 0)
                         {
-                            outputGlyphPlanList.Add(new GlyphPlan(
-                               glyphPos.glyphIndex,
-                               cx,
-                               cy,
-                                glyphPos.advWidth));
-                            cx += glyphPos.advWidth;
-                            if (i > 0)
-                            {
-                                cx += typeface.GetKernDistance(outputGlyphPlanList[i - 1].glyphIndex, outputGlyphPlanList[i].glyphIndex);
-                            }
+                            cx += typeface.GetKernDistance(prev_index, glyphPos.glyphIndex);
                         }
+                        outputGlyphPlanList.Add(new GlyphPlan(
+                           prev_index = glyphPos.glyphIndex,
+                           cx,
+                           cy,
+                           glyphPos.advWidth));
+
                         break;
                 }
+                cx += glyphPos.advWidth;
+            }
+        }
+        /// <summary>
+        /// read latest layout output
+        /// </summary>
+        /// <param name="glyphOut"></param>
+        /// <param name="readDel"></param>
+        public static void ReadOutput(this GlyphLayout glyphOut, GlyphReadOutputDelegate readDel)
+        {
+            Typeface typeface = glyphOut.Typeface;
+            List<GlyphPos> glyphPositions = glyphOut._glyphPositions;
+            //3.read back
+            int finalGlyphCount = glyphPositions.Count;
+            int cx = 0;
+            short cy = 0;
+
+            PositionTechnique posTech = glyphOut.PositionTechnique;
+            ushort prev_index = 0;
+            for (int i = 0; i < finalGlyphCount; ++i)
+            {
+
+                GlyphPos glyphPos = glyphPositions[i];
+                //----------------------------------   
+                switch (posTech)
+                {
+                    default: throw new NotSupportedException();
+                    case PositionTechnique.None:
+                        readDel(i, new GlyphPlan(glyphPos.glyphIndex, cx, cy, glyphPos.advWidth));
+                        break;
+                    case PositionTechnique.OpenFont:
+                        readDel(i, new GlyphPlan(
+                            glyphPos.glyphIndex,
+                            cx + glyphPos.xoffset,
+                            (short)(cy + glyphPos.yoffset),
+                            glyphPos.advWidth));
+                        break;
+                    case PositionTechnique.Kerning:
+
+                        if (i > 0)
+                        {
+                            cx += typeface.GetKernDistance(prev_index, glyphPos.glyphIndex);
+                        }
+                        readDel(i, new GlyphPlan(
+                             prev_index = glyphPos.glyphIndex,
+                           cx,
+                           cy,
+                           glyphPos.advWidth));
+
+                        break;
+                }
+                cx += glyphPos.advWidth;
             }
         }
 
+
+
+
+        public static void Layout(this GlyphLayout glyphOut, Typeface typeface, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
+        {
+            glyphOut.Typeface = typeface;
+            glyphOut.Layout(str, startAt, len);
+            glyphOut.ReadOutput(outputGlyphList);
+        }
+        public static void Layout(this GlyphLayout glyphOut, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
+        {
+            glyphOut.Layout(str, startAt, len);
+            glyphOut.ReadOutput(outputGlyphList);
+        }
+        public static void Layout(this GlyphLayout glyphOut, char[] str, int startAt, int len, GlyphReadOutputDelegate readDel)
+        {
+            glyphOut.Layout(str, startAt, len);
+            glyphOut.ReadOutput(readDel);
+
+        }
     }
+
 }
