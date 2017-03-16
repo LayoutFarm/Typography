@@ -1138,10 +1138,12 @@ namespace Typography.OpenFont.Tables
                                         //do substitution
                                         ushort replaceAt = SubstLookupRecords[0].sequenceIndex;
                                         ushort lookupIndex = SubstLookupRecords[0].lookupListIndex;
+#if DEBUG
                                         if (replaceAt != 0)
                                         {
 
                                         }
+#endif
                                         LookupTable anotherLookup = this.OwnerGSub.GetLookupTable(lookupIndex);
                                         anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?          
                                         //****
@@ -1160,10 +1162,12 @@ namespace Typography.OpenFont.Tables
                                         //do substitution
                                         ushort replaceAt = SubstLookupRecords[0].sequenceIndex;
                                         ushort lookupIndex = SubstLookupRecords[0].lookupListIndex;
+#if DEBUG
                                         if (replaceAt != 0)
                                         {
 
                                         }
+#endif
                                         LookupTable anotherLookup = this.OwnerGSub.GetLookupTable(lookupIndex);
                                         anotherLookup.DoSubstitution(glyphIndices, i + replaceAt, 1);//?                                         
                                         //****

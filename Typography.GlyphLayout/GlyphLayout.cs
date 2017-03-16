@@ -176,7 +176,7 @@ namespace Typography.TextLayout
             }
             //----------------------------------------------  
             //after glyph substitution,
-            //number of input glyph MAY changed (increase or decrease).
+            //number of input glyph MAY changed (increase or decrease).***
 
             //so count again.
             int finalGlyphCount = _inputGlyphs.Count;
