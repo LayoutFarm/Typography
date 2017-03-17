@@ -1,5 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev
-
+using System.Collections.Generic;
+using Typography.TextLayout;
 namespace Typography.Rendering
 {
     /// <summary>
@@ -73,21 +74,26 @@ namespace Typography.Rendering
         public bool EnableLigature { get; set; }
         public abstract void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos);
 
-
+        public abstract void GenerateGlyphPlans(
+              List<GlyphPlan> userGlyphPlanList,
+              char[] textBuffer,
+              int startAt,
+              int len);
 
         public void DrawString(char[] textBuffer, float xpos, float ypos)
         {
             this.DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
         }
 
+
     }
 
     public struct MeasuredStringBox
     {
-        
-        public float width; 
-        public float ascending; 
-        public float descending; 
+
+        public float width;
+        public float ascending;
+        public float descending;
         public float lineGap;
 
         public MeasuredStringBox(float width, float ascending, float descending, float lineGap)

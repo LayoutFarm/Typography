@@ -119,7 +119,7 @@ namespace SampleWinForms
 
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
 
-        public void GenerateGlyphPlans(
+        public override void GenerateGlyphPlans(
               List<GlyphPlan> userGlyphPlanList,
               char[] textBuffer,
               int startAt,

@@ -30,13 +30,19 @@ namespace PixelFarm.Drawing.Fonts
         {
 
         }
+        public override Typeface Typeface
+        {
+            get
+            {
+                return _glyphPathBuilder.Typeface;
+            }
+        }
         public override string FontFilename
         {
             get
             {
                 return _currentSelectedFontFile;
             }
-
             set
             {
                 if (_currentSelectedFontFile == value)
@@ -96,9 +102,8 @@ namespace PixelFarm.Drawing.Fonts
             //1. update some props..
 
             //2. update current type face
-            UpdateTypefaceAndGlyphBuilder();
-            Typeface typeface = _glyphPathBuilder.Typeface;
-
+            UpdateGlyphLayoutSettings();
+            Typeface typeface = _glyphPathBuilder.Typeface; 
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel?
 
@@ -147,14 +152,31 @@ namespace PixelFarm.Drawing.Fonts
             canvasPainter.SetOrigin(ox, oy);
         }
 
+        public override void GenerateGlyphPlans(
+             List<GlyphPlan> userGlyphPlanList,
+             char[] textBuffer,
+             int startAt,
+             int len)
+        {
 
-        void UpdateTypefaceAndGlyphBuilder()
+            //after we set the this TextPrinter
+            //we can use this to print to formatted text buffer
+            //similar to DrawString(), but we don't draw it to the canvas surface
+            //--------------------------------- 
+            //1. update
+            UpdateGlyphLayoutSettings();
+            // 
+            //2. layout glyphs with selected layout technique 
+            _glyphLayout.Layout(Typeface, textBuffer, startAt, len, userGlyphPlanList);
+            //note that we print to userGlyphPlanList
+            //---------------- 
+        }
+
+        void UpdateGlyphLayoutSettings()
         {
 
             //2.1 
-            _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
-
-
+            _glyphPathBuilder.SetHintTechnique(this.HintTechnique); 
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
