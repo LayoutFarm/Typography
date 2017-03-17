@@ -46,7 +46,10 @@ namespace SampleWinForms
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
-
+            //share text printer to our sample textbox
+            //but you can create another text printer that specific to text textbox control
+            this.sampleTextBox1.SetTextPrinter(currentTextPrinter);
+            //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //
             int selectedFileIndex = -1;
@@ -64,7 +67,8 @@ namespace SampleWinForms
                 {
                     selectedFileIndex = fileIndexCount;
                     currentTextPrinter.FontFilename = file;
-
+                    //sample text box
+                     
                 }
                 fileIndexCount++;
             }
@@ -73,7 +77,9 @@ namespace SampleWinForms
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
                 currentTextPrinter.FontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+                //sample text box 
                 UpdateRenderOutput();
+
             };
             //----------
             lstFontSizes.Items.AddRange(
@@ -93,6 +99,9 @@ namespace SampleWinForms
             };
             lstFontSizes.SelectedIndex = 0;
             this.Text = "Gdi+ Sample";
+            //------
+            
+
         }
         void UpdateRenderOutput()
         {
@@ -119,7 +128,7 @@ namespace SampleWinForms
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 100;
-            char[] textBuffer = txtInputChar.Text.ToCharArray(); 
+            char[] textBuffer = txtInputChar.Text.ToCharArray();
 
             //test draw multiple lines
             float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
@@ -140,6 +149,12 @@ namespace SampleWinForms
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+            //-----------------------  
+
+            if (sampleTextBox1.Visible)
+            {
+                sampleTextBox1.Refresh();
+            }
         }
 
         //=========================================================================
@@ -206,7 +221,6 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
-
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -251,14 +265,31 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
+            //Example 3: MeasureString
+            //3.1
+            SizeF sizeF = currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
+            //draw rect 
+            g.DrawRectangle(Pens.Red, x_pos, y_pos, sizeF.Width, sizeF.Height);
+            //3.2
+            MeasuredStringBox strBox;
+            currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length, out strBox);
+            //draw line mark
+            float x_pos2 = x_pos + sizeF.Width + 10;
+            g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
+            g.DrawLine(Pens.Green, x_pos, y_pos + strBox.descending, x_pos2, y_pos + strBox.descending);//descending
+            g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending
 
-            //
-            //-------------------------------------------------- 
+
+
             currentTextPrinter.FillColor = Color.Black;
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
-
+        }
+        private void chkShowSampleTextBox_CheckedChanged(object sender, System.EventArgs e)
+        {
+            sampleTextBox1.Visible = this.chkShowSampleTextBox.Checked;
+            sampleTextBox1.Focus();
         }
     }
 }
