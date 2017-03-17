@@ -236,7 +236,7 @@ namespace SampleWinForms
         /// <summary>
         /// measure part of string based on current text printer's setting
         /// </summary>
-        public SizeF MeasureString(char[] textBuffer,
+        public override MeasureStringSize MeasureString(char[] textBuffer,
                 int startAt,
                 int len)
         {
@@ -246,14 +246,14 @@ namespace SampleWinForms
             int j = _outputGlyphPlans.Count;
             if (j == 0)
             {
-                return new SizeF(0, this.FontLineSpacingPx);
+                return new MeasureStringSize(0, this.FontLineSpacingPx);
             }
             //get last one
             GlyphPlan lastOne = _outputGlyphPlans[j - 1];
             float scale = _currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
-            return new SizeF((lastOne.x + lastOne.advX) * scale, this.FontLineSpacingPx);
+            return new MeasureStringSize((lastOne.x + lastOne.advX) * scale, this.FontLineSpacingPx);
         }
-        public void MeasureString(char[] textBuffer,
+        public override void MeasureString(char[] textBuffer,
                 int startAt,
                 int len, out MeasuredStringBox strBox)
         {

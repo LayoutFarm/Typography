@@ -85,9 +85,28 @@ namespace Typography.Rendering
             this.DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
         }
 
-
+        //-------------------
+        /// <summary>
+        /// measure part of string based on current text printer's setting
+        /// </summary>
+        public abstract MeasureStringSize MeasureString(char[] textBuffer,
+                int startAt,
+                int len);
+        public abstract void MeasureString(char[] textBuffer,
+                int startAt,
+                int len, out MeasuredStringBox strBox);
     }
 
+    public struct MeasureStringSize
+    {
+        public float Width;
+        public float Height;
+        public MeasureStringSize(float w, float h)
+        {
+            this.Width = w;
+            this.Height = h;
+        }
+    }
     public struct MeasuredStringBox
     {
 

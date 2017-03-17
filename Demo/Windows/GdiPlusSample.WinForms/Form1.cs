@@ -68,7 +68,7 @@ namespace SampleWinForms
                     selectedFileIndex = fileIndexCount;
                     currentTextPrinter.FontFilename = file;
                     //sample text box
-                     
+
                 }
                 fileIndexCount++;
             }
@@ -100,7 +100,7 @@ namespace SampleWinForms
             lstFontSizes.SelectedIndex = 0;
             this.Text = "Gdi+ Sample";
             //------
-            
+
 
         }
         void UpdateRenderOutput()
@@ -267,7 +267,7 @@ namespace SampleWinForms
              );
             //Example 3: MeasureString
             //3.1
-            SizeF sizeF = currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
+            MeasureStringSize sizeF = currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
             //draw rect 
             g.DrawRectangle(Pens.Red, x_pos, y_pos, sizeF.Width, sizeF.Height);
             //3.2

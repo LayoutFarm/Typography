@@ -103,7 +103,7 @@ namespace PixelFarm.Drawing.Fonts
 
             //2. update current type face
             UpdateGlyphLayoutSettings();
-            Typeface typeface = _glyphPathBuilder.Typeface; 
+            Typeface typeface = _glyphPathBuilder.Typeface;
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel?
 
@@ -176,13 +176,57 @@ namespace PixelFarm.Drawing.Fonts
         {
 
             //2.1 
-            _glyphPathBuilder.SetHintTechnique(this.HintTechnique); 
+            _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
             _glyphLayout.EnableLigature = this.EnableLigature;
             //3.
             //color...
+        }
+        //-------------------
+        /// <summary>
+        /// measure part of string based on current text printer's setting
+        /// </summary>
+        public override MeasureStringSize MeasureString(char[] textBuffer,
+                int startAt,
+                int len)
+        {
+            //TODO: consider extension method
+            _outputGlyphPlans.Clear();
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            int j = _outputGlyphPlans.Count;
+            if (j == 0)
+            {
+                return new MeasureStringSize(0, this.FontLineSpacingPx);
+            }
+            //get last one
+            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
+            float scale = Typeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+            return new MeasureStringSize((lastOne.x + lastOne.advX) * scale, this.FontLineSpacingPx);
+        }
+        public override void MeasureString(char[] textBuffer,
+                int startAt,
+                int len, out MeasuredStringBox strBox)
+        {
+            //TODO: consider extension method
+            _outputGlyphPlans.Clear();
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            int j = _outputGlyphPlans.Count;
+            if (j == 0)
+            {
+                strBox = new MeasuredStringBox(0,
+                    this.FontAscendingPx,
+                    this.FontDescedingPx,
+                    this.FontLineGapPx);
+            }
+            //get last one
+            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
+            float scale = Typeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+            strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
+                    this.FontAscendingPx,
+                    this.FontDescedingPx,
+                    this.FontLineGapPx);
         }
     }
 
