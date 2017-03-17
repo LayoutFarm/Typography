@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using Typography.TextLayout;
-
+using Typography.Rendering;
 
 namespace SampleWinForms.UI
 {
@@ -542,14 +542,14 @@ namespace SampleWinForms.UI
     {
 
         Line _line;
-        DevGdiTextPrinter _printer;
+        DevTextPrinterBase _printer;
         List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
         float toPxScale = 1;
         public void BindLine(Line line)
         {
             this._line = line;
         }
-        public void BindPrinter(DevGdiTextPrinter printer)
+        public void BindPrinter(DevTextPrinterBase printer)
         {
             _printer = printer;
         }

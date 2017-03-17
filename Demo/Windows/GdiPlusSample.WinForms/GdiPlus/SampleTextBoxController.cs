@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using Typography.TextLayout;
-
+using Typography.Rendering;
 namespace SampleWinForms.UI
 {
 
