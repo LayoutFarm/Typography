@@ -92,7 +92,7 @@ namespace SampleWinForms
         }
 
 
-        public Typeface CurrentTypeface { get { return _currentTypeface; } }
+         
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
         public Graphics DefaultTargetGraphics { get; set; }

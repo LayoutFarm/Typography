@@ -725,7 +725,7 @@ namespace SampleWinForms.UI
                 char[] textBuffer = _line._charBuffer.ToArray();
                 _glyphPlans.Clear();
                 _printer.GenerateGlyphPlans(_glyphPlans, textBuffer, 0, textBuffer.Length);
-                toPxScale = _printer.CurrentTypeface.CalculateFromPointToPixelScale(_printer.FontSizeInPoints);
+                toPxScale = _printer.Typeface.CalculateFromPointToPixelScale(_printer.FontSizeInPoints);
             }
 
             if (_glyphPlans.Count > 0)
