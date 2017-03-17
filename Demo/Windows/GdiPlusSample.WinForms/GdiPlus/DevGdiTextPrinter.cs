@@ -101,7 +101,7 @@ namespace SampleWinForms
             _outputGlyphPlans.Clear();
             GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
             //2. draw
-            DrawString(_outputGlyphPlans, xpos, ypos);
+            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
         }
 
 
@@ -140,9 +140,7 @@ namespace SampleWinForms
             //note that we print to userGlyphPlanList
             //---------------- 
         }
-
-
-        public void DrawString(List<GlyphPlan> userGlypgPlanList, float x, float y)
+        public override void DrawGlyphPlanList(List<GlyphPlan> userGlypgPlanList, float x, float y)
         {
             UpdateVisualOutputSettings();
 

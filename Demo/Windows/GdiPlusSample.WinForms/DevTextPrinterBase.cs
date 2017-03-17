@@ -35,21 +35,6 @@ namespace Typography.Rendering
             set
             {
                 this._hintTech = value;
-                //this.UseTrueTypeInstructions = false; //reset
-                //this.UseVerticalHint = false; //reset
-                //switch (value)
-                //{
-                //    case HintTechnique.TrueTypeInstruction:
-                //        this.UseTrueTypeInstructions = true;
-                //        break;
-                //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                //        this.UseTrueTypeInstructions = true;
-                //        this.UseVerticalHint = true;
-                //        break;
-                //    case HintTechnique.CustomAutoFit:
-                //        UseVerticalHint = true;
-                //        break;
-                //}
             }
         }
 
@@ -73,6 +58,7 @@ namespace Typography.Rendering
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
         public abstract void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos);
+        public abstract void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos);
 
         public abstract void GenerateGlyphPlans(
               List<GlyphPlan> userGlyphPlanList,
