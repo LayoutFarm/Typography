@@ -113,7 +113,7 @@ namespace SampleWinForms
 
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
 
-        public void PrintGlyphPlans(
+        public void GenerateGlyphPlans(
               List<GlyphPlan> userGlyphPlanList,
               char[] textBuffer,
               int startAt,
@@ -236,7 +236,7 @@ namespace SampleWinForms
         {
             //TODO: consider extension method
             _outputGlyphPlans.Clear();
-            PrintGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
             int j = _outputGlyphPlans.Count;
             if (j == 0)
             {
@@ -253,7 +253,7 @@ namespace SampleWinForms
         {
             //TODO: consider extension method
             _outputGlyphPlans.Clear();
-            PrintGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
             int j = _outputGlyphPlans.Count;
             if (j == 0)
             {

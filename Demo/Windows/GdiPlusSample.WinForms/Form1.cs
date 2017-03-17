@@ -255,7 +255,7 @@ namespace SampleWinForms
             //you can create you own class to hold userGlyphPlans.***
             //2.1
             List<GlyphPlan> userGlyphPlans = new List<GlyphPlan>();
-            currentTextPrinter.PrintGlyphPlans(userGlyphPlans, textBuffer, 0, textBuffer.Length);
+            currentTextPrinter.GenerateGlyphPlans(userGlyphPlans, textBuffer, 0, textBuffer.Length);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= currentTextPrinter.FontLineSpacingPx;
