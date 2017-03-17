@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
-
+using System;
 
 namespace SampleWinForms
 {
@@ -71,7 +71,13 @@ namespace SampleWinForms
             }
         }
 
-
+        public override Typeface Typeface
+        {
+            get
+            {
+                return _currentTypeface;
+            }
+        }
         protected override void OnFontSizeChanged()
         {
             //update some font matrix property  
