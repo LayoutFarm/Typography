@@ -90,9 +90,7 @@ namespace SampleWinForms
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
             }
         }
-
-
-         
+        
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
         public Graphics DefaultTargetGraphics { get; set; }
@@ -185,51 +183,12 @@ namespace SampleWinForms
                 float x,
                 float y)
         {
-            //1. update
-            UpdateGlyphLayoutSettings();
 
-            // 
-            //2. layout glyphs with selected layout technique
-            float sizeInPoints = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
+            //1. generate glyph plan
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, _outputGlyphPlans);
-            //----------------
-            //3. update visual output settings
-            UpdateVisualOutputSettings();
-            //
-            //4. render each glyph 
-            System.Drawing.Drawing2D.Matrix scaleMat = null;
-            //this draw a single line text span***
-            int j = _outputGlyphPlans.Count;
-            for (int i = 0; i < j; ++i)
-            {
-                GlyphPlan glyphPlan = _outputGlyphPlans[i];
-                _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
-                // 
-
-                scaleMat = new System.Drawing.Drawing2D.Matrix(
-                    1, 0,//scale x
-                    0, 1, //scale y
-                    x + glyphPlan.x * scale,
-                    y + glyphPlan.y * scale //xpos,ypos
-                );
-
-                //
-                _txToGdiPath.Reset();
-                _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
-                System.Drawing.Drawing2D.GraphicsPath path = _txToGdiPath.ResultGraphicsPath;
-                path.Transform(scaleMat);
-
-                if (FillBackground)
-                {
-                    g.FillPath(_fillBrush, path);
-                }
-                if (DrawOutline)
-                {
-                    g.DrawPath(_outlinePen, path);
-                }
-            }
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            //2. draw
+            DrawString(g, _outputGlyphPlans, x, y);
         }
 
         //-------------------
