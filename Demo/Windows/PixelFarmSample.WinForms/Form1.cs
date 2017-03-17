@@ -172,7 +172,7 @@ namespace SampleWinForms
                 g = this.CreateGraphics();
 
                 _devVxsTextPrinter.DefaultCanvasPainter = p;
-                _devGdiTextPrinter.DefaultTargetGraphics = g;
+                _devGdiTextPrinter.TargetGraphics = g;
             }
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))

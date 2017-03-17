@@ -90,14 +90,18 @@ namespace SampleWinForms
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
             }
         }
-        
+
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
-        public Graphics DefaultTargetGraphics { get; set; }
+        public Graphics TargetGraphics { get; set; }
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
-            this.DrawString(this.DefaultTargetGraphics, textBuffer, startAt, len, xpos, ypos);
+            //1. generate glyph plan
+            _outputGlyphPlans.Clear();
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            //2. draw
+            DrawString(this.TargetGraphics, _outputGlyphPlans, xpos, ypos);
         }
 
 
@@ -175,21 +179,7 @@ namespace SampleWinForms
                 }
             }
         }
-        public void DrawString(
-                Graphics g,
-                char[] textBuffer,
-                int startAt,
-                int len,
-                float x,
-                float y)
-        {
 
-            //1. generate glyph plan
-            _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
-            //2. draw
-            DrawString(g, _outputGlyphPlans, x, y);
-        }
 
         //-------------------
         /// <summary>

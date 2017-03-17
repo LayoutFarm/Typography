@@ -126,6 +126,7 @@ namespace SampleWinForms
             //-----------------------  
             currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
+            currentTextPrinter.TargetGraphics = g;
             //render at specific pos
             float x_pos = 0, y_pos = 100;
             char[] textBuffer = txtInputChar.Text.ToCharArray();
@@ -134,7 +135,7 @@ namespace SampleWinForms
             float lineSpacingPx = currentTextPrinter.FontLineSpacingPx;
             for (int i = 0; i < 3; ++i)
             {
-                currentTextPrinter.DrawString(g,
+                currentTextPrinter.DrawString(
                  textBuffer,
                  0,
                  textBuffer.Length,
@@ -242,8 +243,9 @@ namespace SampleWinForms
 
             //Example 1: this is a basic draw sample
             currentTextPrinter.FillColor = Color.Black;
-            currentTextPrinter.DrawString(g,
-                 textBuffer,
+            currentTextPrinter.TargetGraphics = g;
+            currentTextPrinter.DrawString(
+                textBuffer,
                  0,
                  textBuffer.Length,
                  x_pos,

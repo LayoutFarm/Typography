@@ -93,7 +93,6 @@ namespace PixelFarm.Drawing.Fonts
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
-
             DrawString(this.DefaultCanvasPainter, textBuffer, startAt, len, xpos, ypos);
         }
         public void DrawString(CanvasPainter canvasPainter, char[] text, int startAt, int len, double x, double y)
