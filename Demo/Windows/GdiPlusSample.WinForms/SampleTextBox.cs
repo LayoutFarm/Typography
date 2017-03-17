@@ -8,140 +8,89 @@ using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
 using System;
-// 
+
 namespace SampleWinForms
 {
-    public partial class SampleTextBox : UserControl
+    using SampleWinForms.UI;
+    partial class SampleTextBox : UserControl
     {
         //-----------------
-        //Sample code only.
-        //so just 1 text run :)
+        //Sample code only.       
         //-----------------
 
-        TextRun _sampleTextRun;
-        TextBoxEventManager _eventManager;
-        Graphics _g;
+         
+        SampleTextBoxController _txtBoxController;
+        Graphics _hostControlGraphics;
         public SampleTextBox()
         {
             InitializeComponent();
-            _eventManager = new TextBoxEventManager();
-            _eventManager.Bind(this);
+            _txtBoxController = new SampleTextBoxController();
+            _txtBoxController.BindHostGraphics(_hostControlGraphics = this.CreateGraphics());
         }
-        protected override void OnLoad(EventArgs e)
+        public void SetTextPrinter(DevGdiTextPrinter printer)
         {
-            _g = this.CreateGraphics();
-            base.OnLoad(e);
-        }
+            _txtBoxController.TextPrinter = printer;
+        } 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
 
+            _txtBoxController.HostInvokeKeyDown((UIKeys)e.KeyCode);
+            base.OnKeyDown(e);
+        }
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            _txtBoxController.HostInvokeKeyUp((UIKeys)e.KeyCode);
+            base.OnKeyUp(e);
+        }
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            _txtBoxController.HostInvokeKeyPress(e.KeyChar);
+            base.OnKeyPress(e);
+        }
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            _txtBoxController.HostInvokeMouseDown(e.X, e.Y, (UIMouseButtons)e.Button);
+            base.OnMouseDown(e);
+        }
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            _txtBoxController.HostInvokeMouseMove(e.X, e.Y, (UIMouseButtons)e.Button);
+            base.OnMouseMove(e);
+        }
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            _txtBoxController.HostInvokeMouseUp(e.X, e.Y, (UIMouseButtons)e.Button);
+            base.OnMouseUp(e);
+        }
+        protected override void OnDoubleClick(EventArgs e)
+        {
+            _txtBoxController.HostInvokeDoubleClick();
+            base.OnDoubleClick(e);
+        }
+         
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Left:
+                case Keys.Right:
+                case Keys.Up:
+                case Keys.Down:
+                    _txtBoxController.HostInvokeKeyDown((UIKeys)keyData);
+                    return true;
+            }
+            return base.ProcessDialogKey(keyData);
+        }
         protected override void OnPaint(PaintEventArgs e)
         {
-            _g.Clear(Color.White);
-            ////we handle paint here
-            ////-------------------------------------------------- 
-            ////we test the text run, selection, 
-            //this._sampleTextRun = textRun;
-            ////-------------------------------------------------- 
-
-            ////set presentation elements
-            //textRun.SetGlyphPlan(userGlyphPlans, 0, userGlyphPlans.Count);
-            ////-------------------------------------------------- 
+            if (!this.DesignMode)
+            {
+                _txtBoxController.UpdateOutput();
+            }
             base.OnPaint(e);
         }
 
 
-        class TextBoxEventManager
-        {
-            UserControl _hostControl;
-            bool _isMouseDown;
 
-            public void Bind(UserControl hostControl)
-            {
-                _hostControl = hostControl;
-                _hostControl.KeyDown += _hostControl_KeyDown;
-                _hostControl.KeyUp += _hostControl_KeyUp;
-                _hostControl.KeyPress += _hostControl_KeyPress;
-                //mouse
-                _hostControl.MouseDown += _hostControl_MouseDown;
-                _hostControl.MouseUp += _hostControl_MouseUp;
-                _hostControl.MouseMove += _hostControl_MouseMove;
-                _hostControl.DoubleClick += _hostControl_DoubleClick;
-            }
-
-            private void _hostControl_DoubleClick(object sender, System.EventArgs e)
-            {
-
-            }
-
-            private void _hostControl_MouseMove(object sender, MouseEventArgs e)
-            {
-                if (_isMouseDown)
-                {
-                    //dragging ...
-
-                }
-            }
-
-            private void _hostControl_MouseUp(object sender, MouseEventArgs e)
-            {
-                _isMouseDown = false;
-            }
-
-            private void _hostControl_MouseDown(object sender, MouseEventArgs e)
-            {
-                _isMouseDown = true;
-                //find mouse down position
-                
-            }
-            private void _hostControl_KeyPress(object sender, KeyPressEventArgs e)
-            {
-                //sample only
-
-
-            }
-            private void _hostControl_KeyUp(object sender, KeyEventArgs e)
-            {
-
-            }
-
-            private void _hostControl_KeyDown(object sender, KeyEventArgs e)
-            {
-
-            }
-        }
-
-
-
-        class TextRun
-        {
-            char[] _srcTextBuffer;
-            int _startAt;
-            int _len;
-
-            GlyphPlanListCache _glyphPlanListCache;
-
-            public TextRun(char[] srcTextBuffer, int startAt, int len)
-            {
-                this._srcTextBuffer = srcTextBuffer;
-                this._startAt = startAt;
-                this._len = len;
-            }
-            public void SetGlyphPlan(List<GlyphPlan> glyphPlans, int startAt, int len)
-            {
-                _glyphPlanListCache = new GlyphPlanListCache(glyphPlans, startAt, len);
-            }
-            struct GlyphPlanListCache
-            {
-                public readonly List<GlyphPlan> glyphPlans;
-                public readonly int startAt;
-                public readonly int len;
-                public GlyphPlanListCache(List<GlyphPlan> glyphPlans, int startAt, int len)
-                {
-                    this.glyphPlans = glyphPlans;
-                    this.startAt = startAt;
-                    this.len = len;
-                }
-
-            }
-        }
     }
 }

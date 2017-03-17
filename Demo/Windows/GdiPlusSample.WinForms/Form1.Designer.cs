@@ -158,7 +158,7 @@
             this.sampleTextBox1.BackColor = System.Drawing.Color.Gray;
             this.sampleTextBox1.Location = new System.Drawing.Point(12, 113);
             this.sampleTextBox1.Name = "sampleTextBox1";
-            this.sampleTextBox1.Size = new System.Drawing.Size(259, 299);
+            this.sampleTextBox1.Size = new System.Drawing.Size(433, 388);
             this.sampleTextBox1.TabIndex = 39;
             this.sampleTextBox1.Visible = false;
             // 
@@ -166,7 +166,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(935, 567);
+            this.ClientSize = new System.Drawing.Size(935, 753);
             this.Controls.Add(this.sampleTextBox1);
             this.Controls.Add(this.chkShowSampleTextBox);
             this.Controls.Add(this.cmdMeasureTextSpan);

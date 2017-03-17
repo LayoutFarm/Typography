@@ -46,7 +46,10 @@ namespace SampleWinForms
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
-
+            //share text printer to our sample textbox
+            //but you can create another text printer that specific to text textbox control
+            this.sampleTextBox1.SetTextPrinter(currentTextPrinter);
+            //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //
             int selectedFileIndex = -1;
@@ -64,7 +67,8 @@ namespace SampleWinForms
                 {
                     selectedFileIndex = fileIndexCount;
                     currentTextPrinter.FontFilename = file;
-
+                    //sample text box
+                     
                 }
                 fileIndexCount++;
             }
@@ -73,7 +77,9 @@ namespace SampleWinForms
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
                 currentTextPrinter.FontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+                //sample text box 
                 UpdateRenderOutput();
+
             };
             //----------
             lstFontSizes.Items.AddRange(
@@ -93,6 +99,9 @@ namespace SampleWinForms
             };
             lstFontSizes.SelectedIndex = 0;
             this.Text = "Gdi+ Sample";
+            //------
+            
+
         }
         void UpdateRenderOutput()
         {
@@ -140,6 +149,12 @@ namespace SampleWinForms
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
+            //-----------------------  
+
+            if (sampleTextBox1.Visible)
+            {
+                sampleTextBox1.Refresh();
+            }
         }
 
         //=========================================================================
@@ -205,7 +220,7 @@ namespace SampleWinForms
                 }
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
-        } 
+        }
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -265,20 +280,16 @@ namespace SampleWinForms
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending
 
 
-           
+
             currentTextPrinter.FillColor = Color.Black;
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
         }
-
-
-
-
-
         private void chkShowSampleTextBox_CheckedChanged(object sender, System.EventArgs e)
         {
-            this.sampleTextBox1.Visible = this.chkShowSampleTextBox.Checked;
+            sampleTextBox1.Visible = this.chkShowSampleTextBox.Checked;
+            sampleTextBox1.Focus();
         }
     }
 }
