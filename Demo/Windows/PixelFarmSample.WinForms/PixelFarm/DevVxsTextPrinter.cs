@@ -89,19 +89,16 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
-        public CanvasPainter DefaultCanvasPainter { get; set; }
+        public CanvasPainter TargetCanvasPainter { get; set; }
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
-        {
-            DrawString(this.DefaultCanvasPainter, textBuffer, startAt, len, xpos, ypos);
-        }
-        public void DrawString(CanvasPainter canvasPainter, char[] text, int startAt, int len, double x, double y)
         {
 
             //1. update some props..
 
             //2. update current type face
             UpdateGlyphLayoutSettings();
+            CanvasPainter canvasPainter = this.TargetCanvasPainter;
             Typeface typeface = _glyphPathBuilder.Typeface;
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel?
@@ -109,7 +106,7 @@ namespace PixelFarm.Drawing.Fonts
             float fontSizePoint = this.FontSizeInPoints;
             float scale = typeface.CalculateFromPointToPixelScale(fontSizePoint);
             _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, text, startAt, len, _outputGlyphPlans);
+            _glyphLayout.Layout(typeface, textBuffer, startAt, len, _outputGlyphPlans);
 
             //4. render each glyph
             float ox = canvasPainter.OriginX;
@@ -144,12 +141,13 @@ namespace PixelFarm.Drawing.Fonts
                     //
                     hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
                 }
-                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + x), (float)(glyphPlan.y * scale + y));
+                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + xpos), (float)(glyphPlan.y * scale + ypos));
                 canvasPainter.Fill(glyphVxs);
             }
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
         }
+
 
         public override void GenerateGlyphPlans(
              List<GlyphPlan> userGlyphPlanList,

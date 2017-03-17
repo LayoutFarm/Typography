@@ -171,7 +171,7 @@ namespace SampleWinForms
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
 
-                _devVxsTextPrinter.DefaultCanvasPainter = p;
+                _devVxsTextPrinter.TargetCanvasPainter = p;
                 _devGdiTextPrinter.TargetGraphics = g;
             }
 
