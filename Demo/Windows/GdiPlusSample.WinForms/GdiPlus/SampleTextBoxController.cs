@@ -1,9 +1,6 @@
 ﻿//MIT, 2014-2017, WinterDev
 
-using System.Collections.Generic;
 using System.Drawing;
-using Typography.TextLayout;
-using Typography.Rendering;
 namespace SampleWinForms.UI
 {
 
@@ -52,6 +49,7 @@ namespace SampleWinForms.UI
             //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+
 
             _printer.TargetGraphics = g;
             _visualLine.Draw();

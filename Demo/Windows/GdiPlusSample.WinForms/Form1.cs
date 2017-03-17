@@ -99,9 +99,7 @@ namespace SampleWinForms
             };
             lstFontSizes.SelectedIndex = 0;
             this.Text = "Gdi+ Sample";
-            //------
-
-
+            //------ 
         }
         void UpdateRenderOutput()
         {
