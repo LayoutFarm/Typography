@@ -59,6 +59,13 @@
     <Compile Include="..\GdiPlusSample.WinForms\HintTechnique.cs">
       <Link>HintTechnique.cs</Link>
     </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\SampleTextBox.cs">
+      <Link>SampleTextBox.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\SampleTextBox.Designer.cs">
+      <Link>SampleTextBox.Designer.cs</Link>
+    </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\Workspace\TempLocalFontFile.cs">
       <Link>Workspace\TempLocalFontFile.cs</Link>
     </Compile>
@@ -74,6 +81,9 @@
     <Compile Include="PixelFarm\HintedVxsGlyphCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="..\GdiPlusSample.WinForms\SampleTextBox.resx">
+      <Link>SampleTextBox.resx</Link>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
