@@ -262,7 +262,7 @@ namespace SampleWinForms
             //and we can print the formatted glyph plan later.
             y_pos -= currentTextPrinter.FontLineSpacingPx;
             currentTextPrinter.FillColor = Color.Red;
-            currentTextPrinter.DrawString(g,
+            currentTextPrinter.DrawString(
                   userGlyphPlans,
                   x_pos,
                   y_pos

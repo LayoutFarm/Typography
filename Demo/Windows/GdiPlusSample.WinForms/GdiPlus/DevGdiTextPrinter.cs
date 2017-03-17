@@ -101,7 +101,7 @@ namespace SampleWinForms
             _outputGlyphPlans.Clear();
             GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
             //2. draw
-            DrawString(this.TargetGraphics, _outputGlyphPlans, xpos, ypos);
+            DrawString(_outputGlyphPlans, xpos, ypos);
         }
 
 
@@ -140,7 +140,9 @@ namespace SampleWinForms
             //note that we print to userGlyphPlanList
             //---------------- 
         }
-        public void DrawString(Graphics g, List<GlyphPlan> userGlypgPlanList, float x, float y)
+
+
+        public void DrawString(List<GlyphPlan> userGlypgPlanList, float x, float y)
         {
             UpdateVisualOutputSettings();
 
@@ -151,6 +153,7 @@ namespace SampleWinForms
             float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
             //this draw a single line text span***
             int j = userGlypgPlanList.Count;
+            Graphics g = this.TargetGraphics;
             for (int i = 0; i < j; ++i)
             {
                 GlyphPlan glyphPlan = userGlypgPlanList[i];
