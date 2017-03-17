@@ -98,7 +98,11 @@ namespace PixelFarm.Drawing.Fonts
             DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
 
         }
+        public override void DrawCaret(float xpos, float ypos)
+        {
 
+            this.TargetCanvasPainter.Line(xpos, ypos, xpos, ypos + this.FontAscendingPx);
+        }
         public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
         {
 

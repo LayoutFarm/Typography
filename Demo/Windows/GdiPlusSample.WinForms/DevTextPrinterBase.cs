@@ -71,6 +71,7 @@ namespace Typography.Rendering
             this.DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
         }
 
+        public abstract void DrawCaret(float xpos, float ypos);
         //-------------------
         /// <summary>
         /// measure part of string based on current text printer's setting

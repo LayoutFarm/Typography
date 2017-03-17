@@ -47,6 +47,12 @@
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\SampleTextBoxController.cs">
+      <Link>GdiPlus\SampleTextBoxController.cs</Link>
+    </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\SampleTextBoxLineModel.cs">
+      <Link>GdiPlus\SampleTextBoxLineModel.cs</Link>
+    </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder.cs</Link>
     </Compile>

@@ -95,6 +95,10 @@ namespace SampleWinForms
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
 
+        public override void DrawCaret(float xpos, float ypos)
+        {
+            this.TargetGraphics.DrawLine(Pens.Red, xpos, ypos, xpos, ypos + this.FontAscendingPx);
+        }
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
             //1. generate glyph plan
