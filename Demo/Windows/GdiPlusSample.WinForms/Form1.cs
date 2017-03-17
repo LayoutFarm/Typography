@@ -17,6 +17,7 @@ namespace SampleWinForms
         //for this sample code,
         //create text printer env for developer.
         DevGdiTextPrinter currentTextPrinter = new DevGdiTextPrinter();
+        SampleWinForms.UI.SampleTextBoxControllerForGdi _controllerForGdi = new UI.SampleTextBoxControllerForGdi();
 
         public Form1()
         {
@@ -45,10 +46,15 @@ namespace SampleWinForms
             lstHintList.Items.Add(HintTechnique.CustomAutoFit);
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
+
             //---------- 
             //share text printer to our sample textbox
             //but you can create another text printer that specific to text textbox control
-            this.sampleTextBox1.SetTextPrinter(currentTextPrinter);
+            _controllerForGdi.TextPrinter = currentTextPrinter;
+            _controllerForGdi.BindHostGraphics(this.sampleTextBox1.CreateGraphics());
+            //---------- 
+            this.sampleTextBox1.SetController(_controllerForGdi);
+
             //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //

@@ -16,12 +16,16 @@ namespace SampleWinForms
         public SampleTextBox()
         {
             InitializeComponent();
-            _txtBoxController = new SampleTextBoxController();
-            _txtBoxController.BindHostGraphics(_hostControlGraphics = this.CreateGraphics());
+            
+            //_txtBoxController.BindHostGraphics(_hostControlGraphics = this.CreateGraphics());
         }
-        public void SetTextPrinter(DevGdiTextPrinter printer)
+        //public void SetTextPrinter(DevGdiTextPrinter printer)
+        //{
+        //    _txtBoxController.TextPrinter = printer;
+        //}
+        public void SetController(SampleTextBoxController txtBoxController)
         {
-            _txtBoxController.TextPrinter = printer;
+            _txtBoxController = txtBoxController;
         }
         protected override void OnKeyDown(KeyEventArgs e)
         {

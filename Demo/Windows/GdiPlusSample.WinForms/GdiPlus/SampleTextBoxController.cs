@@ -4,41 +4,18 @@ using System.Drawing;
 namespace SampleWinForms.UI
 {
 
-    class SampleTextBoxController
+    class SampleTextBoxControllerForGdi : SampleTextBoxController
     {
-
-        bool _isMouseDown;
-        bool _isKeyDown;
-        int _mousedown_X;
-        int _mousedown_Y;
-
-        Line _line;//controller
-        VisualLine _visualLine;
-        DevGdiTextPrinter _printer;
         Graphics g;
-
-        public SampleTextBoxController()
-        {
-            _line = new Line();
-            _visualLine = new VisualLine();
-            _visualLine.BindLine(_line);
-            _visualLine.Y = 100;
+        DevGdiTextPrinter _printer;
+        public SampleTextBoxControllerForGdi()
+        { 
         }
         public void BindHostGraphics(Graphics hostControlGraphics)
         {
             g = hostControlGraphics;
         }
-
-        public DevGdiTextPrinter TextPrinter
-        {
-            get { return _printer; }
-            set
-            {
-                _printer = value;
-                _visualLine.BindPrinter(value);
-            }
-        }
-        public void UpdateOutput()
+        public override void UpdateOutput()
         {
             //TODO: review here again 
             //----------
@@ -64,7 +41,39 @@ namespace SampleWinForms.UI
             g.FillRectangle(Brushes.Green, _mousedown_X, _mousedown_Y, 5, 5);
 #endif
         }
+        public DevGdiTextPrinter TextPrinter
+        {
+            get { return _printer; }
+            set
+            {
+                _printer = value;
+                _visualLine.BindPrinter(value);
+            }
+        }
+    }
+    abstract class SampleTextBoxController
+    {
 
+        bool _isMouseDown;
+        bool _isKeyDown;
+        protected int _mousedown_X;
+        protected int _mousedown_Y;
+
+        Line _line;//controller
+        protected VisualLine _visualLine;
+
+
+
+        public SampleTextBoxController()
+        {
+            _line = new Line();
+            _visualLine = new VisualLine();
+            _visualLine.BindLine(_line);
+            _visualLine.Y = 100;
+        }
+
+         
+        public abstract void UpdateOutput(); 
         public void HostInvokeDoubleClick()
         {
 
