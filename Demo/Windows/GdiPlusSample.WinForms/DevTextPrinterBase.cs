@@ -58,27 +58,37 @@ namespace Typography.Rendering
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
+        /// <summary>
+        /// draw string at (xpos,ypos) of baseline 
+        /// </summary>
+        /// <param name="textBuffer"></param>
+        /// <param name="startAt"></param>
+        /// <param name="len"></param>
+        /// <param name="xpos"></param>
+        /// <param name="ypos"></param>
         public abstract void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos);
+        /// <summary>
+        /// draw glyph plan list at (xpos,ypos) of baseline
+        /// </summary>
+        /// <param name="glyphPlanList"></param>
+        /// <param name="xpos"></param>
+        /// <param name="ypos"></param>
         public abstract void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos);
 
-      
+        /// <summary>
+        /// draw caret at xpos,ypos (sample only)
+        /// </summary>
+        /// <param name="xpos"></param>
+        /// <param name="ypos"></param>
+        public abstract void DrawCaret(float xpos, float ypos);
+
+
+        //----------------------------------------------------
+        //helper methods
         public void DrawString(char[] textBuffer, float xpos, float ypos)
         {
             this.DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
         }
-
-        public abstract void DrawCaret(float xpos, float ypos);
-        
     }
-
-    public struct MeasureStringSize
-    {
-        public float Width;
-        public float Height;
-        public MeasureStringSize(float w, float h)
-        {
-            this.Width = w;
-            this.Height = h;
-        }
-    }
+     
 }
