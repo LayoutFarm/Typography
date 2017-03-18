@@ -38,6 +38,7 @@
     <Compile Include="GlyphSubtitution.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GlyphLayout.cs" />
+    <Compile Include="UserCharToGlyphIndexMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Typography.OpenFont\N20\Typography.OpenFont\Typography.OpenFont.csproj">
