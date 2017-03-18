@@ -1,5 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev
-
+using System.Collections.Generic;
+using Typography.TextLayout;
 namespace Typography.Rendering
 {
     /// <summary>
@@ -20,6 +21,8 @@ namespace Typography.Rendering
             get;
             set;
         }
+        public abstract GlyphLayout GlyphLayoutMan { get; }
+        public abstract Typography.OpenFont.Typeface Typeface { get; }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
         public float FontAscendingPx { get; set; }
@@ -33,21 +36,6 @@ namespace Typography.Rendering
             set
             {
                 this._hintTech = value;
-                //this.UseTrueTypeInstructions = false; //reset
-                //this.UseVerticalHint = false; //reset
-                //switch (value)
-                //{
-                //    case HintTechnique.TrueTypeInstruction:
-                //        this.UseTrueTypeInstructions = true;
-                //        break;
-                //    case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                //        this.UseTrueTypeInstructions = true;
-                //        this.UseVerticalHint = true;
-                //        break;
-                //    case HintTechnique.CustomAutoFit:
-                //        UseVerticalHint = true;
-                //        break;
-                //}
             }
         }
 
@@ -70,14 +58,42 @@ namespace Typography.Rendering
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
+        /// <summary>
+        /// draw string at (xpos,ypos) of baseline 
+        /// </summary>
+        /// <param name="textBuffer"></param>
+        /// <param name="startAt"></param>
+        /// <param name="len"></param>
+        /// <param name="xpos"></param>
+        /// <param name="ypos"></param>
         public abstract void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos);
+        /// <summary>
+        /// draw glyph plan list at (xpos,ypos) of baseline
+        /// </summary>
+        /// <param name="glyphPlanList"></param>
+        /// <param name="xpos"></param>
+        /// <param name="ypos"></param>
+        public abstract void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos);
+
+        /// <summary>
+        /// draw caret at xpos,ypos (sample only)
+        /// </summary>
+        /// <param name="xpos"></param>
+        /// <param name="ypos"></param>
+        public abstract void DrawCaret(float xpos, float ypos);
 
 
-
+        //----------------------------------------------------
+        //helper methods
         public void DrawString(char[] textBuffer, float xpos, float ypos)
         {
-            this.DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
+            DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
+        }
+        public void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
+        {
+            DrawGlyphPlanList(glyphPlanList, 0, glyphPlanList.Count, xpos, ypos);
         }
 
     }
+
 }

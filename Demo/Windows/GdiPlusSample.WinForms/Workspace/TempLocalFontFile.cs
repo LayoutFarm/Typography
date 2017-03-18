@@ -1,6 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
-using System;
-using System.Collections.Generic;
+﻿//MIT, 2016-2017, WinterDev 
 using System.IO;
 
 namespace SampleWinForms

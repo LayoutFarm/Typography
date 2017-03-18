@@ -4,7 +4,6 @@ using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 namespace Typography.TextLayout
 {
-
     /// <summary>
     /// glyph subsitution manager
     /// </summary>
@@ -29,8 +28,7 @@ namespace Typography.TextLayout
             ScriptTable.LangSysTable selectedLang = null;
             if (scriptTable.langSysTables != null && scriptTable.langSysTables.Length > 0)
             {
-                //TODO: review here
-
+                //TODO: review here 
                 selectedLang = scriptTable.langSysTables[0];
             }
             else
@@ -42,7 +40,6 @@ namespace Typography.TextLayout
             {
                 //TODO: review here
             }
-
             //other feature
             if (selectedLang.featureIndexList != null)
             {
@@ -81,11 +78,12 @@ namespace Typography.TextLayout
             }
 
         }
-        public void DoSubstitution(List<ushort> outputCodePoints)
+        public void DoSubstitution(IGlyphIndexList outputCodePoints)
         {
             if (lookupTables == null) { return; } //early exit if no lookup tables
-                                                  //
-                                                  //load
+
+            //
+            //load
             int j = lookupTables.Count;
             for (int i = 0; i < j; ++i)
             {
@@ -100,6 +98,8 @@ namespace Typography.TextLayout
 
                 lookupTable.DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
             }
+            
+
         }
         public string Lang { get; private set; }
 

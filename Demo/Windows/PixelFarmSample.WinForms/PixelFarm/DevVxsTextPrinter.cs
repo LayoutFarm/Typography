@@ -30,13 +30,26 @@ namespace PixelFarm.Drawing.Fonts
         {
 
         }
+        public override Typeface Typeface
+        {
+            get
+            {
+                return _glyphPathBuilder.Typeface;
+            }
+        }
+        public override GlyphLayout GlyphLayoutMan
+        {
+            get
+            {
+                return _glyphLayout;
+            }
+        }
         public override string FontFilename
         {
             get
             {
                 return _currentSelectedFontFile;
             }
-
             set
             {
                 if (_currentSelectedFontFile == value)
@@ -83,42 +96,48 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
-        public CanvasPainter DefaultCanvasPainter { get; set; }
-
+        public CanvasPainter TargetCanvasPainter { get; set; }
+        public override void DrawCaret(float xpos, float ypos)
+        {
+            CanvasPainter p = this.TargetCanvasPainter;
+            PixelFarm.Drawing.Color prevColor = p.StrokeColor;
+            p.StrokeColor = PixelFarm.Drawing.Color.Red;
+            p.Line(xpos, ypos, xpos, ypos + this.FontAscendingPx);
+            p.StrokeColor = prevColor;
+        }
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
+            UpdateGlyphLayoutSettings();
+            _outputGlyphPlans.Clear();
+            _glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
+            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
 
-            DrawString(this.DefaultCanvasPainter, textBuffer, startAt, len, xpos, ypos);
         }
-        public void DrawString(CanvasPainter canvasPainter, char[] text, int startAt, int len, double x, double y)
+
+        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos)
         {
 
-            //1. update some props..
-
-            //2. update current type face
-            UpdateTypefaceAndGlyphBuilder();
+            CanvasPainter canvasPainter = this.TargetCanvasPainter;
             Typeface typeface = _glyphPathBuilder.Typeface;
-
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel?
 
             float fontSizePoint = this.FontSizeInPoints;
             float scale = typeface.CalculateFromPointToPixelScale(fontSizePoint);
-            _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, text, startAt, len, _outputGlyphPlans);
+
 
             //4. render each glyph
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
-            int j = _outputGlyphPlans.Count;
+            int endBefore = startAt + len;
 
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
             hintGlyphCollection.SetCacheInfo(typeface, fontSizePoint, this.HintTechnique);
             //---------------------------------------------------
-            for (int i = 0; i < j; ++i)
+            for (int i = startAt; i < endBefore; ++i)
             {
-                GlyphPlan glyphPlan = _outputGlyphPlans[i];
+                GlyphPlan glyphPlan = glyphPlanList[i];
                 //-----------------------------------
                 //TODO: review here ***
                 //PERFORMANCE revisit here 
@@ -140,28 +159,27 @@ namespace PixelFarm.Drawing.Fonts
                     //
                     hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
                 }
-                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + x), (float)(glyphPlan.y * scale + y));
+                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + xpos), (float)(glyphPlan.y * scale + ypos));
                 canvasPainter.Fill(glyphVxs);
             }
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
         }
 
-
-        void UpdateTypefaceAndGlyphBuilder()
+        void UpdateGlyphLayoutSettings()
         {
 
             //2.1 
             _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
-
-
             //2.2
+            _glyphLayout.Typeface = this.Typeface;
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
             _glyphLayout.EnableLigature = this.EnableLigature;
             //3.
             //color...
         }
+
     }
 
 }

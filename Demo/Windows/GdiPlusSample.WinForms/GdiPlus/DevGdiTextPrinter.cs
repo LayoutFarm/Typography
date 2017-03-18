@@ -10,13 +10,12 @@ using Typography.Rendering;
 
 namespace SampleWinForms
 {
+
     /// <summary>
     /// developer's version, Gdi+ text printer
     /// </summary>
     class DevGdiTextPrinter : DevTextPrinterBase
     {
-
-
         Typeface _currentTypeface;
         GlyphPathBuilder _currentGlyphPathBuilder;
         GlyphTranslatorToGdiPath _txToGdiPath;
@@ -70,8 +69,20 @@ namespace SampleWinForms
                 OnFontSizeChanged();
             }
         }
-
-
+        public override GlyphLayout GlyphLayoutMan
+        {
+            get
+            {
+                return _glyphLayout;
+            }
+        }
+        public override Typeface Typeface
+        {
+            get
+            {
+                return _currentTypeface;
+            }
+        }
         protected override void OnFontSizeChanged()
         {
             //update some font matrix property  
@@ -85,69 +96,57 @@ namespace SampleWinForms
             }
         }
 
-
-
         public Color FillColor { get; set; }
         public Color OutlineColor { get; set; }
-        public Graphics DefaultTargetGraphics { get; set; }
+        public Graphics TargetGraphics { get; set; }
 
-        public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
+        public override void DrawCaret(float xpos, float ypos)
         {
-            this.DrawString(this.DefaultTargetGraphics, textBuffer, startAt, len, xpos, ypos);
+            this.TargetGraphics.DrawLine(Pens.Red, xpos, ypos, xpos, ypos + this.FontAscendingPx);
         }
 
-        void UpdateTypefaceAndGlyphBuilder()
+        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();//for internal use
+        public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
+            UpdateGlyphLayoutSettings();
+            _outputGlyphPlans.Clear();
+            this._glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
+            //2. draw
+            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
+        }
 
-            //1  
-            _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
-            //2
+
+        void UpdateGlyphLayoutSettings()
+        {
+            _glyphLayout.Typeface = this.Typeface;
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
             _glyphLayout.EnableLigature = this.EnableLigature;
-            //3. 
+        }
+        void UpdateVisualOutputSettings()
+        {
+            _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
-
-        }
-
-        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
-
-        public void PrintGlyphPlans(
-              List<GlyphPlan> userGlyphPlanList,
-              char[] textBuffer,
-              int startAt,
-              int len)
-        {
-
-            //after we set the this TextPrinter
-            //we can use this to print to formatted text buffer
-            //similar to DrawString(), but we don't draw it to the canvas surface
-            //--------------------------------- 
-            //1. update
-            UpdateTypefaceAndGlyphBuilder();
-            // 
-            //2. layout glyphs with selected layout technique
-            float sizeInPoints = this.FontSizeInPoints;
-            _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, userGlyphPlanList);
-            //note that we print to userGlyphPlanList
-            //---------------- 
         }
 
 
-        public void DrawString(Graphics g, List<GlyphPlan> userGlypgPlanList, float x, float y)
+        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, int startAt, int len, float x, float y)
         {
-            UpdateTypefaceAndGlyphBuilder();
+            UpdateVisualOutputSettings();
+
             //draw data in glyph plan 
             //3. render each glyph 
             System.Drawing.Drawing2D.Matrix scaleMat = null;
             float sizeInPoints = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
             //this draw a single line text span***
-            int j = userGlypgPlanList.Count;
-            for (int i = 0; i < j; ++i)
+            int endBefore = startAt + len;
+
+            Graphics g = this.TargetGraphics;
+            for (int i = startAt; i < endBefore; ++i)
             {
-                GlyphPlan glyphPlan = userGlypgPlanList[i];
+                GlyphPlan glyphPlan = glyphPlanList[i];
                 _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
                 // 
                 scaleMat = new System.Drawing.Drawing2D.Matrix(
@@ -173,62 +172,5 @@ namespace SampleWinForms
                 }
             }
         }
-
-
-
-
-        public void DrawString(
-                Graphics g,
-                char[] textBuffer,
-                int startAt,
-                int len,
-                float x,
-                float y)
-        {
-            //1. update
-            UpdateTypefaceAndGlyphBuilder();
-            // 
-            //2. layout glyphs with selected layout technique
-            float sizeInPoints = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
-            _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, _outputGlyphPlans);
-            //----------------
-            //
-            //3. render each glyph 
-            System.Drawing.Drawing2D.Matrix scaleMat = null;
-            //this draw a single line text span***
-            int j = _outputGlyphPlans.Count;
-            for (int i = 0; i < j; ++i)
-            {
-                GlyphPlan glyphPlan = _outputGlyphPlans[i];
-                _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
-                // 
-
-                scaleMat = new System.Drawing.Drawing2D.Matrix(
-                    1, 0,//scale x
-                    0, 1, //scale y
-                    x + glyphPlan.x * scale,
-                    y + glyphPlan.y * scale //xpos,ypos
-                );
-
-                //
-                _txToGdiPath.Reset();
-                _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
-                System.Drawing.Drawing2D.GraphicsPath path = _txToGdiPath.ResultGraphicsPath;
-                path.Transform(scaleMat);
-
-                if (FillBackground)
-                {
-                    g.FillPath(_fillBrush, path);
-                }
-                if (DrawOutline)
-                {
-                    g.DrawPath(_outlinePen, path);
-                }
-            }
-
-        }
-
     }
 }
