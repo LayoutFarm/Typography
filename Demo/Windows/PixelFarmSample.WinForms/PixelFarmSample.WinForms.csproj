@@ -47,11 +47,24 @@
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\SampleTextBoxController.cs">
+      <Link>GdiPlus\SampleTextBoxController.cs</Link>
+    </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\SampleTextBoxLineModel.cs">
+      <Link>GdiPlus\SampleTextBoxLineModel.cs</Link>
+    </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\HintTechnique.cs">
       <Link>HintTechnique.cs</Link>
+    </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\SampleTextBox.cs">
+      <Link>SampleTextBox.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\SampleTextBox.Designer.cs">
+      <Link>SampleTextBox.Designer.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\Workspace\TempLocalFontFile.cs">
       <Link>Workspace\TempLocalFontFile.cs</Link>
@@ -66,8 +79,12 @@
     <Compile Include="PixelFarm\DevVxsTextPrinter.cs" />
     <Compile Include="PixelFarm\GlyphTranslatorToVxs.cs" />
     <Compile Include="PixelFarm\HintedVxsGlyphCollection.cs" />
+    <Compile Include="PixelFarm\SampleTextBoxControllerForPixelFarm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="..\GdiPlusSample.WinForms\SampleTextBox.resx">
+      <Link>SampleTextBox.resx</Link>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

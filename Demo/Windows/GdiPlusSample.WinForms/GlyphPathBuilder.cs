@@ -10,8 +10,6 @@ namespace Typography.Rendering
     //for your flexiblity of glyph path builder.
     //-----------------------------------
 
-
-
     public class GlyphPathBuilder
     {
         readonly Typeface _typeface;

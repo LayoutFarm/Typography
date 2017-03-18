@@ -30,13 +30,19 @@ namespace PixelFarm.Drawing.Fonts
         {
 
         }
+        public override Typeface Typeface
+        {
+            get
+            {
+                return _glyphPathBuilder.Typeface;
+            }
+        }
         public override string FontFilename
         {
             get
             {
                 return _currentSelectedFontFile;
             }
-
             set
             {
                 if (_currentSelectedFontFile == value)
@@ -83,34 +89,39 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
-        public CanvasPainter DefaultCanvasPainter { get; set; }
+        public CanvasPainter TargetCanvasPainter { get; set; }
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
+            _outputGlyphPlans.Clear();
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
 
-            DrawString(this.DefaultCanvasPainter, textBuffer, startAt, len, xpos, ypos);
         }
-        public void DrawString(CanvasPainter canvasPainter, char[] text, int startAt, int len, double x, double y)
+        public override void DrawCaret(float xpos, float ypos)
+        {
+            CanvasPainter p = this.TargetCanvasPainter;
+            PixelFarm.Drawing.Color prevColor = p.StrokeColor;
+            p.StrokeColor = PixelFarm.Drawing.Color.Red;
+            p.Line(xpos, ypos, xpos, ypos + this.FontAscendingPx);
+            p.StrokeColor = prevColor;
+        }
+        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
         {
 
-            //1. update some props..
-
-            //2. update current type face
-            UpdateTypefaceAndGlyphBuilder();
+            CanvasPainter canvasPainter = this.TargetCanvasPainter;
             Typeface typeface = _glyphPathBuilder.Typeface;
-
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel?
 
             float fontSizePoint = this.FontSizeInPoints;
             float scale = typeface.CalculateFromPointToPixelScale(fontSizePoint);
-            _outputGlyphPlans.Clear();
-            _glyphLayout.Layout(typeface, text, startAt, len, _outputGlyphPlans);
+
 
             //4. render each glyph
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
-            int j = _outputGlyphPlans.Count;
+            int j = glyphPlanList.Count;
 
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
@@ -118,7 +129,7 @@ namespace PixelFarm.Drawing.Fonts
             //---------------------------------------------------
             for (int i = 0; i < j; ++i)
             {
-                GlyphPlan glyphPlan = _outputGlyphPlans[i];
+                GlyphPlan glyphPlan = glyphPlanList[i];
                 //-----------------------------------
                 //TODO: review here ***
                 //PERFORMANCE revisit here 
@@ -140,27 +151,87 @@ namespace PixelFarm.Drawing.Fonts
                     //
                     hintGlyphCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, glyphVxs);
                 }
-                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + x), (float)(glyphPlan.y * scale + y));
+                canvasPainter.SetOrigin((float)(glyphPlan.x * scale + xpos), (float)(glyphPlan.y * scale + ypos));
                 canvasPainter.Fill(glyphVxs);
             }
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
         }
+        public override void GenerateGlyphPlans(
+             List<GlyphPlan> userGlyphPlanList,
+             char[] textBuffer,
+             int startAt,
+             int len)
+        {
 
+            //after we set the this TextPrinter
+            //we can use this to print to formatted text buffer
+            //similar to DrawString(), but we don't draw it to the canvas surface
+            //--------------------------------- 
+            //1. update
+            UpdateGlyphLayoutSettings();
+            // 
+            //2. layout glyphs with selected layout technique 
+            _glyphLayout.Layout(Typeface, textBuffer, startAt, len, userGlyphPlanList);
+            //note that we print to userGlyphPlanList
+            //---------------- 
+        }
 
-        void UpdateTypefaceAndGlyphBuilder()
+        void UpdateGlyphLayoutSettings()
         {
 
             //2.1 
             _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
-
-
             //2.2
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
             _glyphLayout.EnableLigature = this.EnableLigature;
             //3.
             //color...
+        }
+        //-------------------
+        /// <summary>
+        /// measure part of string based on current text printer's setting
+        /// </summary>
+        public override MeasureStringSize MeasureString(char[] textBuffer,
+                int startAt,
+                int len)
+        {
+            //TODO: consider extension method
+            _outputGlyphPlans.Clear();
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            int j = _outputGlyphPlans.Count;
+            if (j == 0)
+            {
+                return new MeasureStringSize(0, this.FontLineSpacingPx);
+            }
+            //get last one
+            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
+            float scale = Typeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+            return new MeasureStringSize((lastOne.x + lastOne.advX) * scale, this.FontLineSpacingPx);
+        }
+        public override void MeasureString(char[] textBuffer,
+                int startAt,
+                int len, out MeasuredStringBox strBox)
+        {
+            //TODO: consider extension method
+            _outputGlyphPlans.Clear();
+            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            int j = _outputGlyphPlans.Count;
+            if (j == 0)
+            {
+                strBox = new MeasuredStringBox(0,
+                    this.FontAscendingPx,
+                    this.FontDescedingPx,
+                    this.FontLineGapPx);
+            }
+            //get last one
+            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
+            float scale = Typeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+            strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
+                    this.FontAscendingPx,
+                    this.FontDescedingPx,
+                    this.FontLineGapPx);
         }
     }
 

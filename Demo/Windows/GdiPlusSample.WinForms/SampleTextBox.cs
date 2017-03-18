@@ -1,14 +1,8 @@
-﻿//MIT, 2016-2017, WinterDev
-using System.IO;
-using System.Collections.Generic;
+﻿//MIT, 2016-2017, WinterDev 
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-//
-using Typography.OpenFont;
-using Typography.TextLayout;
 using Typography.Rendering;
-using System;
-
 namespace SampleWinForms
 {
     using SampleWinForms.UI;
@@ -16,21 +10,17 @@ namespace SampleWinForms
     {
         //-----------------
         //Sample code only.       
-        //-----------------
-
-         
+        //----------------- 
         SampleTextBoxController _txtBoxController;
-        Graphics _hostControlGraphics;
+
         public SampleTextBox()
         {
             InitializeComponent();
-            _txtBoxController = new SampleTextBoxController();
-            _txtBoxController.BindHostGraphics(_hostControlGraphics = this.CreateGraphics());
         }
-        public void SetTextPrinter(DevGdiTextPrinter printer)
+        public void SetController(SampleTextBoxController txtBoxController)
         {
-            _txtBoxController.TextPrinter = printer;
-        } 
+            _txtBoxController = txtBoxController;
+        }
         protected override void OnKeyDown(KeyEventArgs e)
         {
 
@@ -67,7 +57,7 @@ namespace SampleWinForms
             _txtBoxController.HostInvokeDoubleClick();
             base.OnDoubleClick(e);
         }
-         
+
         protected override bool ProcessDialogKey(Keys keyData)
         {
             switch (keyData)
