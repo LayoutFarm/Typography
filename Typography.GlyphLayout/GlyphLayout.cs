@@ -120,7 +120,7 @@ namespace Typography.TextLayout
         public bool EnableLigature { get; set; }
 
         void UpdateLayoutPlan()
-        {
+        {   
             GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(this._typeface, this._scriptLang);
             this._gpos = context._glyphPos;
             this._gsub = context._glyphSub;
@@ -201,6 +201,9 @@ namespace Typography.TextLayout
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
         }
+
+        //
+        internal List<GlyphPlan> _myGlyphPlans = new List<GlyphPlan>();
 
     }
 
@@ -320,11 +323,7 @@ namespace Typography.TextLayout
                 }
                 cx += glyphPos.advWidth;
             }
-        }
-
-
-
-
+        } 
         public static void Layout(this GlyphLayout glyphLayout, Typeface typeface, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
         {
             glyphLayout.Typeface = typeface;
@@ -342,6 +341,55 @@ namespace Typography.TextLayout
             glyphLayout.ReadOutput(readDel);
 
         }
+        public static void GenerateGlyphPlans(this GlyphLayout glyphLayout,
+                  char[] textBuffer,
+                  int startAt,
+                  int len,
+                  List<GlyphPlan> userGlyphPlanList,
+                  List<UserCharToGlyphIndexMap> charToGlyphMapList)
+        {
+            //generate glyph plan based on its current setting
+            glyphLayout.Layout(textBuffer, startAt, len, userGlyphPlanList);
+            //note that we print to userGlyphPlanList
+            //---------------- 
+            //3. user char to glyph index map
+            if (charToGlyphMapList != null)
+            {
+                glyphLayout.ReadOutput(charToGlyphMapList);
+            }
+
+        }
+        public static void MeasureString(
+                this GlyphLayout glyphLayout,
+                char[] textBuffer,
+                int startAt,
+                int len, out MeasuredStringBox strBox, float scale = 1)
+        {
+            //TODO: consider extension method
+            List<GlyphPlan> outputGlyphPlans = glyphLayout._myGlyphPlans;
+            outputGlyphPlans.Clear();
+            glyphLayout.Layout(textBuffer, startAt, len, outputGlyphPlans);
+            //
+            int j = outputGlyphPlans.Count;
+
+            Typeface currentTypeface = glyphLayout.Typeface;
+            if (j == 0)
+            {
+                //not scale
+                strBox = new MeasuredStringBox(0,
+                    currentTypeface.Ascender * scale,
+                    currentTypeface.Descender * scale,
+                    currentTypeface.LineGap * scale);
+            }
+            //get last one
+            GlyphPlan lastOne = outputGlyphPlans[j - 1];
+            strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
+                    currentTypeface.Ascender * scale,
+                    currentTypeface.Descender * scale,
+                    currentTypeface.LineGap * scale);
+        }
     }
+
+
 
 }
