@@ -28,6 +28,11 @@ namespace SampleWinForms
         DevVxsTextPrinter _devVxsTextPrinter = null;
         DevGdiTextPrinter _devGdiTextPrinter = null;
 
+        SampleWinForms.UI.SampleTextBoxControllerForGdi _controllerForGdi = new UI.SampleTextBoxControllerForGdi();
+        //
+        SampleWinForms.UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new UI.SampleTextBoxControllerForPixelFarm();
+
+
         float _fontSizeInPts = 14;//default
         string _selectedFontFilename;
         public Form1()
@@ -37,6 +42,7 @@ namespace SampleWinForms
 
             _devVxsTextPrinter = new DevVxsTextPrinter();
             _devGdiTextPrinter = new DevGdiTextPrinter();
+            this.sampleTextBox1.Visible = false;
 
             selectedTextPrinter = _devVxsTextPrinter;
             //default
@@ -47,6 +53,7 @@ namespace SampleWinForms
 
 
             this.Load += new EventHandler(Form1_Load);
+
             this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
             //----------
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
@@ -71,6 +78,19 @@ namespace SampleWinForms
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
+
+            //---------- 
+            //share text printer to our sample textbox
+            //but you can create another text printer that specific to text textbox control
+            Graphics gx = this.sampleTextBox1.CreateGraphics(); 
+            _controllerForGdi.TextPrinter = _devGdiTextPrinter;
+            _controllerForGdi.BindHostGraphics(gx);
+            //---------- 
+            _controllerForPixelFarm.TextPrinter = _devVxsTextPrinter;
+            _controllerForPixelFarm.BindHostGraphics(gx);
+            //---------- 
+            this.sampleTextBox1.SetController(_controllerForPixelFarm);
+
 
             button1.Click += (s, e) => UpdateRenderOutput();
             chkShowGrid.CheckedChanged += (s, e) => UpdateRenderOutput();
@@ -196,7 +216,7 @@ namespace SampleWinForms
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
                         //
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
-                        
+
                     }
                     break;
                 case RenderChoice.RenderWithTextPrinterAndMiniAgg:
@@ -209,7 +229,7 @@ namespace SampleWinForms
                         selectedTextPrinter = _devVxsTextPrinter;
                         selectedTextPrinter.FontFilename = _selectedFontFilename;
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.HintTechnique = hintTech; 
+                        selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
 
                         //test print 3 lines
@@ -648,6 +668,12 @@ namespace SampleWinForms
             }
         }
 
-
+        private void chkShowSampleTextBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.sampleTextBox1.Visible = chkShowSampleTextBox.Visible)
+            {
+                this.sampleTextBox1.Focus();
+            }
+        }
     }
 }
