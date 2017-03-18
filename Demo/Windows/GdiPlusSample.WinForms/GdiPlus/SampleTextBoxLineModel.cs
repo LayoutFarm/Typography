@@ -406,7 +406,6 @@ namespace SampleWinForms.UI
 
     class Line
     {
-        //left most =0
 
         int _caretCharIndex = 0;//default
         internal List<char> _charBuffer = new List<char>();
@@ -492,6 +491,13 @@ namespace SampleWinForms.UI
             {
                 //this is on the end
                 _caretCharIndex--;
+
+                //check if the caret can rest on this glyph?
+                if (_caretCharIndex > 0 && _glyphPlans[_caretCharIndex].advX <= 0)
+                {
+                    //recursive ***
+                    DoLeft();
+                }
             }
             else
             {
@@ -510,6 +516,13 @@ namespace SampleWinForms.UI
             {
                 //this is on the end
                 _caretCharIndex++;
+
+                //check if the caret can rest on this glyph?
+                if (_caretCharIndex < count && _glyphPlans[_caretCharIndex].advX <= 0)
+                {
+                    //recursive ***
+                    DoRight(); //
+                }
             }
             else
             {
@@ -540,9 +553,9 @@ namespace SampleWinForms.UI
 
         public void SetCharIndexFromPos(float x, float y, float toPxScale)
         {
-            int j = _glyphPlans.Count;
+            int count = _glyphPlans.Count;
             float accum_x = 0;
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < count; ++i)
             {
                 float thisGlyphW = _glyphPlans[i].advX * toPxScale;
                 accum_x += thisGlyphW;
@@ -556,10 +569,23 @@ namespace SampleWinForms.UI
                     if (xoffset_on_glyph >= (thisGlyphW / 3))
                     {
                         _caretCharIndex = i + 1;
+                        //check if the caret can rest on this pos or not
+                        if (_caretCharIndex < count && _glyphPlans[_caretCharIndex].advX <= 0)
+                        {
+                            //recursive ***
+                            DoRight(); //
+                        }
                     }
                     else
                     {
                         _caretCharIndex = i;
+                        //check if the caret can rest on this pos or not
+                        if (_caretCharIndex > 0 && _glyphPlans[_caretCharIndex].advX <= 0)
+                        {
+                            //recursive ***
+                            DoLeft();
+                        }
+
                     }
                     //stop
                     break;
