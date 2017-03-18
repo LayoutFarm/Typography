@@ -61,10 +61,12 @@ namespace Typography.Rendering
         public abstract void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos);
 
         public abstract void GenerateGlyphPlans(
-              List<GlyphPlan> userGlyphPlanList,
               char[] textBuffer,
               int startAt,
-              int len);
+              int len,
+              List<GlyphPlan> userGlyphPlanList,
+              List<UserCharToGlyphIndexMap> charToGlyphMapList
+             );
 
         public void DrawString(char[] textBuffer, float xpos, float ypos)
         {

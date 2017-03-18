@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-
-
 namespace Typography.TextLayout
 {
 
@@ -169,11 +167,13 @@ namespace Typography.TextLayout
             }
             //----------------------------------------------  
             //glyph substitution            
-            if (_gsub != null & len > 1)
+            if (_gsub != null & len > 0)
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
                 _gsub.DoSubstitution(_inputGlyphs);
+                //
+                _inputGlyphs.CreateMapFromUserCharToGlyphIndics();
             }
             //----------------------------------------------  
             //after glyph substitution,
@@ -209,20 +209,28 @@ namespace Typography.TextLayout
 
     public static class GlyphLayoutExtensions
     {
-
         /// <summary>
-        /// read latest layout output
+        /// read UserCharToGlyphIndexMap from latest layout output
         /// </summary>
-        public static void ReadOutput(this GlyphLayout glyphOut, List<GlyphPlan> outputGlyphPlanList)
+        /// <param name="glyphLayout"></param>
+        /// <param name="outputGlyphPlanList"></param>
+        public static void ReadOutput(this GlyphLayout glyphLayout, List<UserCharToGlyphIndexMap> outputGlyphPlanList)
         {
-            Typeface typeface = glyphOut.Typeface;
-            List<GlyphPos> glyphPositions = glyphOut._glyphPositions;
+            outputGlyphPlanList.AddRange(glyphLayout._inputGlyphs._mapUserCharToGlyphIndics);
+        }
+        /// <summary>
+        /// read GlyphPlan latest layout output
+        /// </summary>
+        public static void ReadOutput(this GlyphLayout glyphLayout, List<GlyphPlan> outputGlyphPlanList)
+        {
+            Typeface typeface = glyphLayout.Typeface;
+            List<GlyphPos> glyphPositions = glyphLayout._glyphPositions;
             //3.read back
             int finalGlyphCount = glyphPositions.Count;
             int cx = 0;
             short cy = 0;
 
-            PositionTechnique posTech = glyphOut.PositionTechnique;
+            PositionTechnique posTech = glyphLayout.PositionTechnique;
             ushort prev_index = 0;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
@@ -259,21 +267,24 @@ namespace Typography.TextLayout
                 cx += glyphPos.advWidth;
             }
         }
+
+
+
         /// <summary>
         /// read latest layout output
         /// </summary>
-        /// <param name="glyphOut"></param>
+        /// <param name="glyphLayout"></param>
         /// <param name="readDel"></param>
-        public static void ReadOutput(this GlyphLayout glyphOut, GlyphReadOutputDelegate readDel)
+        public static void ReadOutput(this GlyphLayout glyphLayout, GlyphReadOutputDelegate readDel)
         {
-            Typeface typeface = glyphOut.Typeface;
-            List<GlyphPos> glyphPositions = glyphOut._glyphPositions;
+            Typeface typeface = glyphLayout.Typeface;
+            List<GlyphPos> glyphPositions = glyphLayout._glyphPositions;
             //3.read back
             int finalGlyphCount = glyphPositions.Count;
             int cx = 0;
             short cy = 0;
 
-            PositionTechnique posTech = glyphOut.PositionTechnique;
+            PositionTechnique posTech = glyphLayout.PositionTechnique;
             ushort prev_index = 0;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
@@ -314,21 +325,21 @@ namespace Typography.TextLayout
 
 
 
-        public static void Layout(this GlyphLayout glyphOut, Typeface typeface, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
+        public static void Layout(this GlyphLayout glyphLayout, Typeface typeface, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
         {
-            glyphOut.Typeface = typeface;
-            glyphOut.Layout(str, startAt, len);
-            glyphOut.ReadOutput(outputGlyphList);
+            glyphLayout.Typeface = typeface;
+            glyphLayout.Layout(str, startAt, len);
+            glyphLayout.ReadOutput(outputGlyphList);
         }
-        public static void Layout(this GlyphLayout glyphOut, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
+        public static void Layout(this GlyphLayout glyphLayout, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
         {
-            glyphOut.Layout(str, startAt, len);
-            glyphOut.ReadOutput(outputGlyphList);
+            glyphLayout.Layout(str, startAt, len);
+            glyphLayout.ReadOutput(outputGlyphList);
         }
-        public static void Layout(this GlyphLayout glyphOut, char[] str, int startAt, int len, GlyphReadOutputDelegate readDel)
+        public static void Layout(this GlyphLayout glyphLayout, char[] str, int startAt, int len, GlyphReadOutputDelegate readDel)
         {
-            glyphOut.Layout(str, startAt, len);
-            glyphOut.ReadOutput(readDel);
+            glyphLayout.Layout(str, startAt, len);
+            glyphLayout.ReadOutput(readDel);
 
         }
     }

@@ -81,8 +81,9 @@ namespace Typography.TextLayout
         public void DoSubstitution(IGlyphIndexList outputCodePoints)
         {
             if (lookupTables == null) { return; } //early exit if no lookup tables
-                                                  //
-                                                  //load
+
+            //
+            //load
             int j = lookupTables.Count;
             for (int i = 0; i < j; ++i)
             {
@@ -97,6 +98,8 @@ namespace Typography.TextLayout
 
                 lookupTable.DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
             }
+            
+
         }
         public string Lang { get; private set; }
 

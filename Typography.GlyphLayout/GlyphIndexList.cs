@@ -1,9 +1,9 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
-using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 namespace Typography.TextLayout
 {
+
     /// <summary>
     /// impl replaceable glyph index list
     /// </summary>
@@ -13,6 +13,7 @@ namespace Typography.TextLayout
         List<char> _originalChars = new List<char>();
         ushort _originalOffset = 0;
         List<GlyphIndexToUserChar> _mapGlyphIndexToUserChar = new List<GlyphIndexToUserChar>();
+        internal List<UserCharToGlyphIndexMap> _mapUserCharToGlyphIndics = new List<UserCharToGlyphIndexMap>();
 
         /// <summary>
         /// map from glyph index to original user char
@@ -29,13 +30,14 @@ namespace Typography.TextLayout
 #endif
             public GlyphIndexToUserChar(ushort o_user_charOffset, ushort len)
             {
-                this.len = 0;
+                this.len = 1;
                 this.o_user_charOffset = o_user_charOffset;
 #if DEBUG
                 this.dbug_glyphIndex = 0;
 #endif
             }
         }
+
         public void Clear()
         {
             _glyphIndices.Clear();
@@ -43,6 +45,7 @@ namespace Typography.TextLayout
             _originalChars.Clear();
 
             _mapGlyphIndexToUserChar.Clear();
+            _mapUserCharToGlyphIndics.Clear();
         }
         /// <summary>
         /// add original char and its glyph index
@@ -143,6 +146,41 @@ namespace Typography.TextLayout
                 _mapGlyphIndexToUserChar.Insert(index, newglyph);
             }
         }
+
+
+        public void CreateMapFromUserCharToGlyphIndics()
+        {
+            //(optional)
+            //this method should be called after we finish the substitution process
+            _mapUserCharToGlyphIndics.Clear();
+            //--------------------------------------
+            int userCharCount = _originalChars.Count;
+            for (int i = 0; i < userCharCount; ++i)
+            {
+                var charToGlyphMap = new UserCharToGlyphIndexMap();
+#if DEBUG
+                charToGlyphMap.dbug_userCharIndex = (ushort)i;
+                charToGlyphMap.dbug_userChar = _originalChars[i];
+#endif
+                _mapUserCharToGlyphIndics.Add(charToGlyphMap);
+            }
+            //--------------------------------------
+            //then fill with glyphindex to user char information 
+
+            int glyphIndexCount = _glyphIndices.Count;
+            for (int i = 0; i < glyphIndexCount; ++i)
+            {
+                GlyphIndexToUserChar glyphIndexToUserChar = _mapGlyphIndexToUserChar[i];
+                //
+                UserCharToGlyphIndexMap charToGlyphIndexMap = _mapUserCharToGlyphIndics[glyphIndexToUserChar.o_user_charOffset];
+                charToGlyphIndexMap.AppendData((ushort)(i + 1), (glyphIndexToUserChar.len));
+                //replace with the changed value
+                _mapUserCharToGlyphIndics[glyphIndexToUserChar.o_user_charOffset] = charToGlyphIndexMap;
+
+            }
+
+        }
+
     }
 
 }
