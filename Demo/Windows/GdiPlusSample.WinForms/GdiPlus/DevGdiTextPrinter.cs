@@ -104,6 +104,8 @@ namespace SampleWinForms
         {
             this.TargetGraphics.DrawLine(Pens.Red, xpos, ypos, xpos, ypos + this.FontAscendingPx);
         }
+
+        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();//for internal use
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
             UpdateGlyphLayoutSettings();
@@ -128,10 +130,8 @@ namespace SampleWinForms
             _outlinePen.Color = this.OutlineColor;
         }
 
-        List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();
 
-
-        public override void DrawGlyphPlanList(List<GlyphPlan> userGlypgPlanList, float x, float y)
+        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, int startAt, int len, float x, float y)
         {
             UpdateVisualOutputSettings();
 
@@ -141,11 +141,12 @@ namespace SampleWinForms
             float sizeInPoints = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
             //this draw a single line text span***
-            int j = userGlypgPlanList.Count;
+            int endBefore = startAt + len;
+
             Graphics g = this.TargetGraphics;
-            for (int i = 0; i < j; ++i)
+            for (int i = startAt; i < endBefore; ++i)
             {
-                GlyphPlan glyphPlan = userGlypgPlanList[i];
+                GlyphPlan glyphPlan = glyphPlanList[i];
                 _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
                 // 
                 scaleMat = new System.Drawing.Drawing2D.Matrix(

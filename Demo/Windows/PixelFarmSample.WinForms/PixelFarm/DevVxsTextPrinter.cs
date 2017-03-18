@@ -113,8 +113,8 @@ namespace PixelFarm.Drawing.Fonts
             DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
 
         }
-        
-        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
+
+        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos)
         {
 
             CanvasPainter canvasPainter = this.TargetCanvasPainter;
@@ -129,13 +129,13 @@ namespace PixelFarm.Drawing.Fonts
             //4. render each glyph
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
-            int j = glyphPlanList.Count;
+            int endBefore = startAt + len;
 
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
             hintGlyphCollection.SetCacheInfo(typeface, fontSizePoint, this.HintTechnique);
             //---------------------------------------------------
-            for (int i = 0; i < j; ++i)
+            for (int i = startAt; i < endBefore; ++i)
             {
                 GlyphPlan glyphPlan = glyphPlanList[i];
                 //-----------------------------------
