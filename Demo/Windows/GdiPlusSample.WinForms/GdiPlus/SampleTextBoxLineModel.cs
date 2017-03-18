@@ -442,6 +442,11 @@ namespace SampleWinForms.UI
         }
         public void DoBackspace()
         {
+            if (_caretCharIndex == 0)
+            {
+                return;
+            }
+            //
             int count = _charBuffer.Count;
             if (count == 0)
             {
@@ -494,10 +499,30 @@ namespace SampleWinForms.UI
                 _caretCharIndex--;
 
                 //check if the caret can rest on this glyph?
-                if (_caretCharIndex > 0 && _glyphPlans[_caretCharIndex].advX <= 0)
+                if (_caretCharIndex > 0)
                 {
-                    //recursive ***
-                    DoLeft();
+                    //find its mapping to glyph index
+                    UserCharToGlyphIndexMap userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
+                    int mapToGlyphIndex = userCharToGlyphMap.glyphIndexListOffset_plus1;
+                    //
+                    if (mapToGlyphIndex == 0)
+                    {
+                        //no map 
+                        DoLeft();   //recursive ***
+                        return;
+                    }
+                    //-------------------------
+                    //we -1 ***
+                    GlyphPlan glyphPlan = _glyphPlans[userCharToGlyphMap.glyphIndexListOffset_plus1 - 1];
+                    if (glyphPlan.advX <= 0)
+                    {
+                        //caret can't rest here
+                        //so
+                        DoLeft();   //recursive ***
+                        return;
+                    }
+                    //---------------------
+                    // 
                 }
             }
             else
@@ -519,10 +544,29 @@ namespace SampleWinForms.UI
                 _caretCharIndex++;
 
                 //check if the caret can rest on this glyph?
-                if (_caretCharIndex < count && _glyphPlans[_caretCharIndex].advX <= 0)
+                if (_caretCharIndex < count)
                 {
-                    //recursive ***
-                    DoRight(); //
+
+                    //find its mapping to glyph index
+                    UserCharToGlyphIndexMap userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
+                    int mapToGlyphIndex = userCharToGlyphMap.glyphIndexListOffset_plus1;
+                    //
+                    if (mapToGlyphIndex == 0)
+                    {
+                        //no map 
+                        DoRight();   //recursive ***
+                        return;
+                    }
+                    //-------------------------
+                    //we -1 ***
+                    GlyphPlan glyphPlan = _glyphPlans[userCharToGlyphMap.glyphIndexListOffset_plus1 - 1];
+                    if (glyphPlan.advX <= 0)
+                    {
+                        //caret can't rest here
+                        //so
+                        DoRight();   //recursive ***
+                        return;
+                    }
                 }
             }
             else
@@ -594,6 +638,10 @@ namespace SampleWinForms.UI
             }
         }
 
+        public UserCharToGlyphIndexMap GetCurrentCharToGlyphMap()
+        {
+            return _userCharToGlyphMap[_caretCharIndex];
+        }
     }
 
 
@@ -623,14 +671,14 @@ namespace SampleWinForms.UI
         {
 
             List<GlyphPlan> glyphPlans = _line._glyphPlans;
-
+            List<UserCharToGlyphIndexMap> userCharToGlyphIndexMap = _line._userCharToGlyphMap;
             if (_line.ContentChanged)
             {
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
                 glyphPlans.Clear();
 
-                List<UserCharToGlyphIndexMap> userCharToGlyphIndexMap = _line._userCharToGlyphMap;
+
                 userCharToGlyphIndexMap.Clear();
 
                 //read glyph plan and userCharToGlyphIndexMap
@@ -650,22 +698,22 @@ namespace SampleWinForms.UI
                 int caret_index = _line.CaretCharIndex;
                 //find caret pos based on glyph plan
                 //TODO: check when do gsub (glyph number may not match with user char number)                 
-                float xpos = X;
+
                 if (caret_index == 0)
                 {
-                    _printer.DrawCaret(xpos, this.Y);
+                    _printer.DrawCaret(X, this.Y);
                 }
                 else
                 {
-                    GlyphPlan p = glyphPlans[caret_index - 1];
-                    xpos += ((p.x + p.advX) * toPxScale);
-                    _printer.DrawCaret(xpos, this.Y);
+                    UserCharToGlyphIndexMap map = userCharToGlyphIndexMap[caret_index - 1];
+                    GlyphPlan p = glyphPlans[map.glyphIndexListOffset_plus1 + map.len - 2];
+                    _printer.DrawCaret(X + ((p.x + p.advX) * toPxScale), this.Y);
                 }
             }
             else
             {
-                float xpos = X;
-                _printer.DrawCaret(xpos, this.Y);
+
+                _printer.DrawCaret(X, this.Y);
             }
 
 
