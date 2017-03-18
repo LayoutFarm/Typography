@@ -167,7 +167,7 @@ namespace Typography.TextLayout
             }
             //----------------------------------------------  
             //glyph substitution            
-            if (_gsub != null & len > 1)
+            if (_gsub != null & len > 0)
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
