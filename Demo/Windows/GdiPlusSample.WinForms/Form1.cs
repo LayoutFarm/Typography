@@ -261,7 +261,8 @@ namespace SampleWinForms
             //you can create you own class to hold userGlyphPlans.***
             //2.1
             List<GlyphPlan> userGlyphPlans = new List<GlyphPlan>();
-            _currentTextPrinter.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
+
+            _currentTextPrinter.GlyphLayoutMan.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
@@ -271,16 +272,14 @@ namespace SampleWinForms
                   x_pos,
                   y_pos
              );
-            //Example 3: MeasureString
-            //3.1
-            MeasureStringSize sizeF = _currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
-            //draw rect 
-            g.DrawRectangle(Pens.Red, x_pos, y_pos, sizeF.Width, sizeF.Height);
-            //3.2
+            //Example 3: MeasureString        
+            float scale = _currentTextPrinter.Typeface.CalculateFromPointToPixelScale(_currentTextPrinter.FontSizeInPoints);
             MeasuredStringBox strBox;
-            _currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length, out strBox);
+            _currentTextPrinter.GlyphLayoutMan.MeasureString(textBuffer, 0, textBuffer.Length, out strBox, scale);
             //draw line mark
-            float x_pos2 = x_pos + sizeF.Width + 10;
+
+            float x_pos2 = x_pos + strBox.width + 10;
+            g.DrawRectangle(Pens.Red, x_pos, y_pos, strBox.width, strBox.CalculateLineHeight());
             g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
             g.DrawLine(Pens.Green, x_pos, y_pos + strBox.descending, x_pos2, y_pos + strBox.descending);//descending
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending

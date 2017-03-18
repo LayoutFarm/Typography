@@ -37,6 +37,13 @@ namespace PixelFarm.Drawing.Fonts
                 return _glyphPathBuilder.Typeface;
             }
         }
+        public override GlyphLayout GlyphLayoutMan
+        {
+            get
+            {
+                return _glyphLayout;
+            }
+        }
         public override string FontFilename
         {
             get
@@ -90,14 +97,6 @@ namespace PixelFarm.Drawing.Fonts
         }
 
         public CanvasPainter TargetCanvasPainter { get; set; }
-
-        public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
-        {
-            _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
-            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
-
-        }
         public override void DrawCaret(float xpos, float ypos)
         {
             CanvasPainter p = this.TargetCanvasPainter;
@@ -106,6 +105,15 @@ namespace PixelFarm.Drawing.Fonts
             p.Line(xpos, ypos, xpos, ypos + this.FontAscendingPx);
             p.StrokeColor = prevColor;
         }
+        public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
+        {
+            UpdateGlyphLayoutSettings();
+            _outputGlyphPlans.Clear();
+            _glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
+            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
+
+        }
+        
         public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
         {
 
@@ -157,32 +165,6 @@ namespace PixelFarm.Drawing.Fonts
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
         }
-        public override void GenerateGlyphPlans(
-             char[] textBuffer,
-             int startAt,
-             int len,
-             List<GlyphPlan> userGlyphPlanList,
-             List<UserCharToGlyphIndexMap> charToGlyphMapList
-          )
-        {
-
-            //after we set the this TextPrinter
-            //we can use this to print to formatted text buffer
-            //similar to DrawString(), but we don't draw it to the canvas surface
-            //--------------------------------- 
-            //1. update
-            UpdateGlyphLayoutSettings();
-            // 
-            //2. layout glyphs with selected layout technique 
-            _glyphLayout.Layout(Typeface, textBuffer, startAt, len, userGlyphPlanList);
-            //note that we print to userGlyphPlanList
-            //---------------- 
-            //3. user char to glyph index map
-            if (charToGlyphMapList != null)
-            {
-                _glyphLayout.ReadOutput(charToGlyphMapList);
-            }
-        }
 
         void UpdateGlyphLayoutSettings()
         {
@@ -190,56 +172,14 @@ namespace PixelFarm.Drawing.Fonts
             //2.1 
             _glyphPathBuilder.SetHintTechnique(this.HintTechnique);
             //2.2
+            _glyphLayout.Typeface = this.Typeface;
             _glyphLayout.ScriptLang = this.ScriptLang;
             _glyphLayout.PositionTechnique = this.PositionTechnique;
             _glyphLayout.EnableLigature = this.EnableLigature;
             //3.
             //color...
         }
-        //-------------------
-        /// <summary>
-        /// measure part of string based on current text printer's setting
-        /// </summary>
-        public override MeasureStringSize MeasureString(char[] textBuffer,
-                int startAt,
-                int len)
-        {
-            //TODO: consider extension method
-            _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
-            int j = _outputGlyphPlans.Count;
-            if (j == 0)
-            {
-                return new MeasureStringSize(0, this.FontLineSpacingPx);
-            }
-            //get last one
-            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
-            float scale = Typeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
-            return new MeasureStringSize((lastOne.x + lastOne.advX) * scale, this.FontLineSpacingPx);
-        }
-        public override void MeasureString(char[] textBuffer,
-                int startAt,
-                int len, out MeasuredStringBox strBox)
-        {
-            //TODO: consider extension method
-            _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
-            int j = _outputGlyphPlans.Count;
-            if (j == 0)
-            {
-                strBox = new MeasuredStringBox(0,
-                    this.FontAscendingPx,
-                    this.FontDescedingPx,
-                    this.FontLineGapPx);
-            }
-            //get last one
-            GlyphPlan lastOne = _outputGlyphPlans[j - 1];
-            float scale = Typeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
-            strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
-                    this.FontAscendingPx,
-                    this.FontDescedingPx,
-                    this.FontLineGapPx);
-        }
+
     }
 
 }

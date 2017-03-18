@@ -21,6 +21,7 @@ namespace Typography.Rendering
             get;
             set;
         }
+        public abstract GlyphLayout GlyphLayoutMan { get; }
         public abstract Typography.OpenFont.Typeface Typeface { get; }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
@@ -60,30 +61,14 @@ namespace Typography.Rendering
         public abstract void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos);
         public abstract void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos);
 
-        public abstract void GenerateGlyphPlans(
-              char[] textBuffer,
-              int startAt,
-              int len,
-              List<GlyphPlan> userGlyphPlanList,
-              List<UserCharToGlyphIndexMap> charToGlyphMapList
-             );
-
+      
         public void DrawString(char[] textBuffer, float xpos, float ypos)
         {
             this.DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
         }
 
         public abstract void DrawCaret(float xpos, float ypos);
-        //-------------------
-        /// <summary>
-        /// measure part of string based on current text printer's setting
-        /// </summary>
-        public abstract MeasureStringSize MeasureString(char[] textBuffer,
-                int startAt,
-                int len);
-        public abstract void MeasureString(char[] textBuffer,
-                int startAt,
-                int len, out MeasuredStringBox strBox);
+        
     }
 
     public struct MeasureStringSize
@@ -96,25 +81,4 @@ namespace Typography.Rendering
             this.Height = h;
         }
     }
-    public struct MeasuredStringBox
-    {
-
-        public float width;
-        public float ascending;
-        public float descending;
-        public float lineGap;
-
-        public MeasuredStringBox(float width, float ascending, float descending, float lineGap)
-        {
-            this.width = width;
-            this.ascending = ascending;
-            this.descending = descending;
-            this.lineGap = lineGap;
-        }
-        public float CalculatedLineHeight
-        {
-            get { return ascending - descending + lineGap; }
-        }
-    }
-
 }
