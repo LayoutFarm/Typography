@@ -62,6 +62,7 @@ namespace Typography.Rendering
 
         public abstract void GenerateGlyphPlans(
               List<GlyphPlan> userGlyphPlanList,
+              List<UserCharToGlyphIndexMap> charToGlyphMapList,
               char[] textBuffer,
               int startAt,
               int len);

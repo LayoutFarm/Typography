@@ -13,7 +13,7 @@ namespace Typography.TextLayout
         List<char> _originalChars = new List<char>();
         ushort _originalOffset = 0;
         List<GlyphIndexToUserChar> _mapGlyphIndexToUserChar = new List<GlyphIndexToUserChar>();
-        List<UserCharToGlyphIndexMap> _mapUserCharToGlyphIndics = new List<UserCharToGlyphIndexMap>();
+        internal List<UserCharToGlyphIndexMap> _mapUserCharToGlyphIndics = new List<UserCharToGlyphIndexMap>();
 
         /// <summary>
         /// map from glyph index to original user char

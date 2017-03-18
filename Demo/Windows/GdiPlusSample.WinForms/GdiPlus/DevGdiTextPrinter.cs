@@ -101,7 +101,7 @@ namespace SampleWinForms
         {
             //1. generate glyph plan
             _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            GenerateGlyphPlans(_outputGlyphPlans, null, textBuffer, startAt, len);
             //2. draw
             DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
         }
@@ -125,6 +125,7 @@ namespace SampleWinForms
 
         public override void GenerateGlyphPlans(
               List<GlyphPlan> userGlyphPlanList,
+              List<UserCharToGlyphIndexMap> charToGlyphMap,
               char[] textBuffer,
               int startAt,
               int len)
@@ -194,7 +195,7 @@ namespace SampleWinForms
         {
             //TODO: consider extension method
             _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            GenerateGlyphPlans(_outputGlyphPlans, null, textBuffer, startAt, len);
             int j = _outputGlyphPlans.Count;
             if (j == 0)
             {
@@ -211,7 +212,7 @@ namespace SampleWinForms
         {
             //TODO: consider extension method
             _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(_outputGlyphPlans, textBuffer, startAt, len);
+            GenerateGlyphPlans(_outputGlyphPlans, null, textBuffer, startAt, len);
             int j = _outputGlyphPlans.Count;
             if (j == 0)
             {

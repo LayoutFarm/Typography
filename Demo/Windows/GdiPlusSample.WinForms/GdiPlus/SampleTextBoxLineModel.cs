@@ -410,6 +410,7 @@ namespace SampleWinForms.UI
         int _caretCharIndex = 0;//default
         internal List<char> _charBuffer = new List<char>();
         internal List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
+        internal List<UserCharToGlyphIndexMap> _userCharToGlyphMap = new List<UserCharToGlyphIndexMap>();
 
         bool _contentChanged = true;
 
@@ -620,13 +621,17 @@ namespace SampleWinForms.UI
 
         public void Draw()
         {
+
             List<GlyphPlan> glyphPlans = _line._glyphPlans;
+
             if (_line.ContentChanged)
             {
-
+                //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
                 glyphPlans.Clear();
-                _printer.GenerateGlyphPlans(glyphPlans, textBuffer, 0, textBuffer.Length);
+                _printer.GenerateGlyphPlans(glyphPlans, null, textBuffer, 0, textBuffer.Length);
+
+
                 toPxScale = _printer.Typeface.CalculateFromPointToPixelScale(_printer.FontSizeInPoints);
                 _line.ContentChanged = false;
             }
