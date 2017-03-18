@@ -47,7 +47,7 @@ namespace SampleWinForms.UI
             _printer.TargetCanvasPainter = p;
             _visualLine.Draw();
 
-             
+
             //----------
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
@@ -60,7 +60,10 @@ namespace SampleWinForms.UI
             //7. just render our bitmap
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
-
+#if DEBUG
+            //draw latest mousedown (x,y)
+            g.FillRectangle(Brushes.Green, _mousedown_X, _mousedown_Y, 5, 5);
+#endif
         }
         public DevVxsTextPrinter TextPrinter
         {
