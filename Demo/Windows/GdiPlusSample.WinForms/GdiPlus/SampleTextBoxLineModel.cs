@@ -454,22 +454,10 @@ namespace SampleWinForms.UI
                 return;
             }
 
-            //---------------------------------
-            if (_caretCharIndex == count)
-            {
-                //end
-                _charBuffer.RemoveAt(count - 1);
-                _caretCharIndex--;
-            }
-            else if (_caretCharIndex < count)
-            {
-                _charBuffer.RemoveAt(_caretCharIndex);
-                _caretCharIndex--;
-            }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
+            //end
+            _caretCharIndex--;
+            _charBuffer.RemoveAt(_caretCharIndex); 
+
             _contentChanged = true;
         }
         public void DoDelete()
@@ -659,7 +647,7 @@ namespace SampleWinForms.UI
                                 //recursive ***
                                 DoLeft();
                             }
-                        } 
+                        }
 
                     }
                     //stop
