@@ -177,6 +177,11 @@ namespace PixelFarm.Drawing.Fonts
             _glyphLayout.Layout(Typeface, textBuffer, startAt, len, userGlyphPlanList);
             //note that we print to userGlyphPlanList
             //---------------- 
+            //3. user char to glyph index map
+            if (charToGlyphMapList != null)
+            {
+                _glyphLayout.ReadOutput(charToGlyphMapList);
+            }
         }
 
         void UpdateGlyphLayoutSettings()

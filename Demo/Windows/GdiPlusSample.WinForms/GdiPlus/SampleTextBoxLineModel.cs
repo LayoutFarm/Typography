@@ -629,7 +629,12 @@ namespace SampleWinForms.UI
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
                 glyphPlans.Clear();
-                _printer.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, glyphPlans, null);
+
+                List<UserCharToGlyphIndexMap> userCharToGlyphIndexMap = _line._userCharToGlyphMap;
+                userCharToGlyphIndexMap.Clear();
+
+                //read glyph plan and userCharToGlyphIndexMap
+                _printer.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, glyphPlans, userCharToGlyphIndexMap);
 
 
                 toPxScale = _printer.Typeface.CalculateFromPointToPixelScale(_printer.FontSizeInPoints);

@@ -128,7 +128,7 @@ namespace SampleWinForms
               int startAt,
               int len,
               List<GlyphPlan> userGlyphPlanList,
-              List<UserCharToGlyphIndexMap> charToGlyphMap
+              List<UserCharToGlyphIndexMap> charToGlyphMapList
              )
         {
 
@@ -143,6 +143,12 @@ namespace SampleWinForms
             _glyphLayout.Layout(_currentTypeface, textBuffer, startAt, len, userGlyphPlanList);
             //note that we print to userGlyphPlanList
             //---------------- 
+            //3. user char to glyph index map
+            if (charToGlyphMapList != null)
+            {
+                _glyphLayout.ReadOutput(charToGlyphMapList);
+            }
+
         }
         public override void DrawGlyphPlanList(List<GlyphPlan> userGlypgPlanList, float x, float y)
         {
