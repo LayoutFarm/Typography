@@ -15,8 +15,6 @@ namespace SampleWinForms
     /// </summary>
     class DevGdiTextPrinter : DevTextPrinterBase
     {
-
-
         Typeface _currentTypeface;
         GlyphPathBuilder _currentGlyphPathBuilder;
         GlyphTranslatorToGdiPath _txToGdiPath;

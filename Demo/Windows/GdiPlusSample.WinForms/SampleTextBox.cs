@@ -12,17 +12,11 @@ namespace SampleWinForms
         //Sample code only.       
         //----------------- 
         SampleTextBoxController _txtBoxController;
-        Graphics _hostControlGraphics;
+
         public SampleTextBox()
         {
             InitializeComponent();
-            
-            //_txtBoxController.BindHostGraphics(_hostControlGraphics = this.CreateGraphics());
         }
-        //public void SetTextPrinter(DevGdiTextPrinter printer)
-        //{
-        //    _txtBoxController.TextPrinter = printer;
-        //}
         public void SetController(SampleTextBoxController txtBoxController)
         {
             _txtBoxController = txtBoxController;

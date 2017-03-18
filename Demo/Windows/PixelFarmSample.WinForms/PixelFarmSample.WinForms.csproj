@@ -79,6 +79,7 @@
     <Compile Include="PixelFarm\DevVxsTextPrinter.cs" />
     <Compile Include="PixelFarm\GlyphTranslatorToVxs.cs" />
     <Compile Include="PixelFarm\HintedVxsGlyphCollection.cs" />
+    <Compile Include="PixelFarm\SampleTextBoxControllerForPixelFarm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="..\GdiPlusSample.WinForms\SampleTextBox.resx">

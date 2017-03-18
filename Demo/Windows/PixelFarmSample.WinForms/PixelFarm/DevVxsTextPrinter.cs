@@ -100,8 +100,11 @@ namespace PixelFarm.Drawing.Fonts
         }
         public override void DrawCaret(float xpos, float ypos)
         {
-
-            this.TargetCanvasPainter.Line(xpos, ypos, xpos, ypos + this.FontAscendingPx);
+            CanvasPainter p = this.TargetCanvasPainter;
+            PixelFarm.Drawing.Color prevColor = p.StrokeColor;
+            p.StrokeColor = PixelFarm.Drawing.Color.Red;
+            p.Line(xpos, ypos, xpos, ypos + this.FontAscendingPx);
+            p.StrokeColor = prevColor;
         }
         public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
         {
@@ -118,7 +121,7 @@ namespace PixelFarm.Drawing.Fonts
             //4. render each glyph
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
-            int j = _outputGlyphPlans.Count;
+            int j = glyphPlanList.Count;
 
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
@@ -126,7 +129,7 @@ namespace PixelFarm.Drawing.Fonts
             //---------------------------------------------------
             for (int i = 0; i < j; ++i)
             {
-                GlyphPlan glyphPlan = _outputGlyphPlans[i];
+                GlyphPlan glyphPlan = glyphPlanList[i];
                 //-----------------------------------
                 //TODO: review here ***
                 //PERFORMANCE revisit here 
