@@ -94,7 +94,7 @@ namespace PixelFarm.Drawing.Fonts
         public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
         {
             _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(_outputGlyphPlans, null, textBuffer, startAt, len);
+            GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
             DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
 
         }
@@ -158,11 +158,12 @@ namespace PixelFarm.Drawing.Fonts
             canvasPainter.SetOrigin(ox, oy);
         }
         public override void GenerateGlyphPlans(
-             List<GlyphPlan> userGlyphPlanList,
-             List<UserCharToGlyphIndexMap> charToGlyphMapList,
              char[] textBuffer,
              int startAt,
-             int len)
+             int len,
+             List<GlyphPlan> userGlyphPlanList,
+             List<UserCharToGlyphIndexMap> charToGlyphMapList
+          )
         {
 
             //after we set the this TextPrinter
@@ -200,7 +201,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             //TODO: consider extension method
             _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(_outputGlyphPlans, null, textBuffer, startAt, len);
+            GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
             int j = _outputGlyphPlans.Count;
             if (j == 0)
             {
@@ -217,7 +218,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             //TODO: consider extension method
             _outputGlyphPlans.Clear();
-            GenerateGlyphPlans(_outputGlyphPlans, null, textBuffer, startAt, len);
+            GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
             int j = _outputGlyphPlans.Count;
             if (j == 0)
             {
