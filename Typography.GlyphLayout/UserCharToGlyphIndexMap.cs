@@ -12,6 +12,10 @@ namespace Typography.TextLayout
 #if DEBUG
         public ushort dbug_userCharIndex;
         public char dbug_userChar;
+        public override string ToString()
+        {
+            return glyphIndexListOffset_plus1 + ":" + len;
+        }
 #endif
         internal void AppendData(ushort glyphIndexListOffset_plus1, ushort len)
         {
