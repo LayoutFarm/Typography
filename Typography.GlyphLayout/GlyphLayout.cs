@@ -174,6 +174,8 @@ namespace Typography.TextLayout
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
                 _gsub.DoSubstitution(_inputGlyphs);
+                //
+                _inputGlyphs.CreateMapFromUserCharToGlyphIndics();
             }
             //----------------------------------------------  
             //after glyph substitution,

@@ -541,7 +541,7 @@ namespace SampleWinForms.UI
         {
             get { return 0; }
         }
-        public bool ContentChanged { get { return _contentChanged; } }
+        public bool ContentChanged { get { return _contentChanged; } set { _contentChanged = value; } }
         public int CaretCharIndex { get { return _caretCharIndex; } }
         public void SetCaretCharIndex(int newindex)
         {
@@ -592,6 +592,7 @@ namespace SampleWinForms.UI
                 }
             }
         }
+
     }
 
 
@@ -627,6 +628,7 @@ namespace SampleWinForms.UI
                 glyphPlans.Clear();
                 _printer.GenerateGlyphPlans(glyphPlans, textBuffer, 0, textBuffer.Length);
                 toPxScale = _printer.Typeface.CalculateFromPointToPixelScale(_printer.FontSizeInPoints);
+                _line.ContentChanged = false;
             }
 
             if (glyphPlans.Count > 0)

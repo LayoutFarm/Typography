@@ -13,6 +13,7 @@ namespace Typography.TextLayout
         List<char> _originalChars = new List<char>();
         ushort _originalOffset = 0;
         List<GlyphIndexToUserChar> _mapGlyphIndexToUserChar = new List<GlyphIndexToUserChar>();
+        List<UserCharToGlyphIndexMap> _mapUserCharToGlyphIndics = new List<UserCharToGlyphIndexMap>();
 
         /// <summary>
         /// map from glyph index to original user char
@@ -29,11 +30,58 @@ namespace Typography.TextLayout
 #endif
             public GlyphIndexToUserChar(ushort o_user_charOffset, ushort len)
             {
-                this.len = 0;
+                this.len = 1;
                 this.o_user_charOffset = o_user_charOffset;
 #if DEBUG
                 this.dbug_glyphIndex = 0;
 #endif
+            }
+        }
+        struct UserCharToGlyphIndexMap
+        {
+            //from user char index to offset in _glyphIndics     
+            //this index is 1-based ***
+            //if glyphIndexListOffset_1==0 then no map data in  _glyphIndices*** 
+            public ushort glyphIndexListOffset_plus1;
+            public ushort len;
+#if DEBUG
+            public ushort dbug_userCharIndex;
+            public char dbug_userChar;
+#endif 
+            public void AppendData(ushort glyphIndexListOffset_plus1, ushort len)
+            {
+
+#if DEBUG
+                if (len != 1)
+                {
+
+                }
+#endif
+                if (this.glyphIndexListOffset_plus1 != 0)
+                {
+                    //extend ***
+                    //some user char may be represented by >1 glyphs
+                    if (this.glyphIndexListOffset_plus1 + 1 == glyphIndexListOffset_plus1)
+                    {
+                        //ok
+                        if (len == 1)
+                        {
+                            this.len += 1;
+                            return; //***
+                        }
+                        else
+                        {
+                            throw new System.NotSupportedException();
+                        }
+                    }
+                    else
+                    {
+                        throw new System.NotSupportedException();
+                    }
+                }
+
+                this.glyphIndexListOffset_plus1 = glyphIndexListOffset_plus1;
+                this.len = len;
             }
         }
         public void Clear()
@@ -43,6 +91,7 @@ namespace Typography.TextLayout
             _originalChars.Clear();
 
             _mapGlyphIndexToUserChar.Clear();
+            _mapUserCharToGlyphIndics.Clear();
         }
         /// <summary>
         /// add original char and its glyph index
@@ -143,6 +192,41 @@ namespace Typography.TextLayout
                 _mapGlyphIndexToUserChar.Insert(index, newglyph);
             }
         }
+
+
+        public void CreateMapFromUserCharToGlyphIndics()
+        {
+            //(optional)
+            //this method should be called after we finish the substitution process
+            _mapUserCharToGlyphIndics.Clear();
+            //--------------------------------------
+            int userCharCount = _originalChars.Count;
+            for (int i = 0; i < userCharCount; ++i)
+            {
+                var charToGlyphMap = new UserCharToGlyphIndexMap();
+#if DEBUG
+                charToGlyphMap.dbug_userCharIndex = (ushort)i;
+                charToGlyphMap.dbug_userChar = _originalChars[i];
+#endif
+                _mapUserCharToGlyphIndics.Add(charToGlyphMap);
+            }
+            //--------------------------------------
+            //then fill with glyphindex to user char information 
+
+            int glyphIndexCount = _glyphIndices.Count;
+            for (int i = 0; i < glyphIndexCount; ++i)
+            {
+                GlyphIndexToUserChar glyphIndexToUserChar = _mapGlyphIndexToUserChar[i];
+                //
+                UserCharToGlyphIndexMap charToGlyphIndexMap = _mapUserCharToGlyphIndics[glyphIndexToUserChar.o_user_charOffset];
+                charToGlyphIndexMap.AppendData((ushort)(i + 1), (glyphIndexToUserChar.len));
+                //replace with the changed value
+                _mapUserCharToGlyphIndics[glyphIndexToUserChar.o_user_charOffset] = charToGlyphIndexMap;
+
+            }
+
+        }
+
     }
 
 }
