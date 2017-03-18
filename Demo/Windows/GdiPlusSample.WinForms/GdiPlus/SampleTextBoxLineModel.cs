@@ -598,6 +598,7 @@ namespace SampleWinForms.UI
 
         public void SetCharIndexFromPos(float x, float y, float toPxScale)
         {
+
             int count = _glyphPlans.Count;
             float accum_x = 0;
             for (int i = 0; i < count; ++i)
@@ -611,25 +612,54 @@ namespace SampleWinForms.UI
                     //glyph may not match with actual user char in the _line    
 
                     float xoffset_on_glyph = (x - (accum_x - thisGlyphW));
-                    if (xoffset_on_glyph >= (thisGlyphW / 3))
+                    if (xoffset_on_glyph >= (thisGlyphW / 2))
                     {
                         _caretCharIndex = i + 1;
                         //check if the caret can rest on this pos or not
-                        if (_caretCharIndex < count && _glyphPlans[_caretCharIndex].advX <= 0)
+                        UserCharToGlyphIndexMap map = _userCharToGlyphMap[_caretCharIndex];
+                        if (map.glyphIndexListOffset_plus1 == 0)
                         {
-                            //recursive ***
-                            DoRight(); //
+                            //no map
+                            //cant rest here
+                            if (_caretCharIndex < count)
+                            {
+                                DoRight();
+                            }
+                        }
+                        else
+                        {
+                            //has map
+                            if (_caretCharIndex < count && _glyphPlans[map.glyphIndexListOffset_plus1 - 1].advX <= 0)
+                            {
+                                //recursive ***
+                                DoRight(); //
+                            }
                         }
                     }
                     else
                     {
                         _caretCharIndex = i;
                         //check if the caret can rest on this pos or not
-                        if (_caretCharIndex > 0 && _glyphPlans[_caretCharIndex].advX <= 0)
+                        UserCharToGlyphIndexMap map = _userCharToGlyphMap[_caretCharIndex];
+                        if (map.glyphIndexListOffset_plus1 == 0)
                         {
-                            //recursive ***
-                            DoLeft();
+                            //no map
+                            //cant rest here
+                            if (_caretCharIndex > 0)
+                            {
+                                //recursive ***
+                                DoLeft();
+                            }
                         }
+                        else
+                        {
+                            //has map
+                            if (_caretCharIndex < count && _glyphPlans[map.glyphIndexListOffset_plus1 - 1].advX <= 0)
+                            {
+                                //recursive ***
+                                DoLeft();
+                            }
+                        } 
 
                     }
                     //stop
