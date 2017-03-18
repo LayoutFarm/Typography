@@ -406,10 +406,11 @@ namespace SampleWinForms.UI
 
     class Line
     {
-        //left most =0
 
         int _caretCharIndex = 0;//default
         internal List<char> _charBuffer = new List<char>();
+        internal List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
+
         bool _contentChanged = true;
 
         /// <summary>
@@ -490,6 +491,13 @@ namespace SampleWinForms.UI
             {
                 //this is on the end
                 _caretCharIndex--;
+
+                //check if the caret can rest on this glyph?
+                if (_caretCharIndex > 0 && _glyphPlans[_caretCharIndex].advX <= 0)
+                {
+                    //recursive ***
+                    DoLeft();
+                }
             }
             else
             {
@@ -508,6 +516,13 @@ namespace SampleWinForms.UI
             {
                 //this is on the end
                 _caretCharIndex++;
+
+                //check if the caret can rest on this glyph?
+                if (_caretCharIndex < count && _glyphPlans[_caretCharIndex].advX <= 0)
+                {
+                    //recursive ***
+                    DoRight(); //
+                }
             }
             else
             {
@@ -535,32 +550,12 @@ namespace SampleWinForms.UI
                 _caretCharIndex = newindex;
             }
         }
-    }
 
-
-    class VisualLine
-    {
-
-        Line _line;
-        DevTextPrinterBase _printer;
-        List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
-        float toPxScale = 1;
-        public void BindLine(Line line)
+        public void SetCharIndexFromPos(float x, float y, float toPxScale)
         {
-            this._line = line;
-        }
-        public void BindPrinter(DevTextPrinterBase printer)
-        {
-            _printer = printer;
-        }
-        public float X { get; set; }
-        public float Y { get; set; }
-
-        public void SetCharIndexFromPos(float x, float y)
-        {
-            int j = _glyphPlans.Count;
+            int count = _glyphPlans.Count;
             float accum_x = 0;
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < count; ++i)
             {
                 float thisGlyphW = _glyphPlans[i].advX * toPxScale;
                 accum_x += thisGlyphW;
@@ -573,33 +568,71 @@ namespace SampleWinForms.UI
                     float xoffset_on_glyph = (x - (accum_x - thisGlyphW));
                     if (xoffset_on_glyph >= (thisGlyphW / 3))
                     {
-                        _line.SetCaretCharIndex(i + 1);
+                        _caretCharIndex = i + 1;
+                        //check if the caret can rest on this pos or not
+                        if (_caretCharIndex < count && _glyphPlans[_caretCharIndex].advX <= 0)
+                        {
+                            //recursive ***
+                            DoRight(); //
+                        }
                     }
                     else
                     {
-                        _line.SetCaretCharIndex(i);
+                        _caretCharIndex = i;
+                        //check if the caret can rest on this pos or not
+                        if (_caretCharIndex > 0 && _glyphPlans[_caretCharIndex].advX <= 0)
+                        {
+                            //recursive ***
+                            DoLeft();
+                        }
+
                     }
                     //stop
                     break;
                 }
-
             }
-
         }
+    }
+
+
+    class VisualLine
+    {
+
+        Line _line;
+        DevTextPrinterBase _printer;
+
+        float toPxScale = 1;
+        public void BindLine(Line line)
+        {
+            this._line = line;
+        }
+        public void BindPrinter(DevTextPrinterBase printer)
+        {
+            _printer = printer;
+        }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public void SetCharIndexFromPos(float x, float y)
+        {
+            _line.SetCharIndexFromPos(x, y, toPxScale);
+        }
+
         public void Draw()
         {
+            List<GlyphPlan> glyphPlans = _line._glyphPlans;
             if (_line.ContentChanged)
             {
+
                 char[] textBuffer = _line._charBuffer.ToArray();
-                _glyphPlans.Clear();
-                _printer.GenerateGlyphPlans(_glyphPlans, textBuffer, 0, textBuffer.Length);
+                glyphPlans.Clear();
+                _printer.GenerateGlyphPlans(glyphPlans, textBuffer, 0, textBuffer.Length);
                 toPxScale = _printer.Typeface.CalculateFromPointToPixelScale(_printer.FontSizeInPoints);
             }
 
-            if (_glyphPlans.Count > 0)
+            if (glyphPlans.Count > 0)
             {
 
-                _printer.DrawGlyphPlanList(_glyphPlans, X, Y);
+                _printer.DrawGlyphPlanList(glyphPlans, X, Y);
                 //draw caret 
                 //not blink in this version
                 int caret_index = _line.CaretCharIndex;
@@ -612,7 +645,7 @@ namespace SampleWinForms.UI
                 }
                 else
                 {
-                    GlyphPlan p = _glyphPlans[caret_index - 1];
+                    GlyphPlan p = glyphPlans[caret_index - 1];
                     xpos += ((p.x + p.advX) * toPxScale);
                     _printer.DrawCaret(xpos, this.Y);
                 }
