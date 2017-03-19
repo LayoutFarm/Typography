@@ -82,7 +82,7 @@ namespace SampleWinForms
             //---------- 
             //share text printer to our sample textbox
             //but you can create another text printer that specific to text textbox control
-            Graphics gx = this.sampleTextBox1.CreateGraphics(); 
+            Graphics gx = this.sampleTextBox1.CreateGraphics();
             _controllerForGdi.TextPrinter = _devGdiTextPrinter;
             _controllerForGdi.BindHostGraphics(gx);
             //---------- 
@@ -291,7 +291,7 @@ namespace SampleWinForms
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
             //----------------------------------------------------
-            var builder = new GlyphPathBuilder(typeface);
+            var builder = new PixelFarmGlyphPathBuilder(typeface);
             builder.SetHintTechnique((HintTechnique)lstHintList.SelectedItem);
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
@@ -351,7 +351,7 @@ namespace SampleWinForms
             //p.UseSubPixelRendering = chkLcdTechnique.Checked;
             p.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
-            var builder = new GlyphPathBuilder(typeface);
+            var builder = new PixelFarmGlyphPathBuilder(typeface);
             builder.SetHintTechnique((HintTechnique)lstHintList.SelectedItem);
 
             //----------------------------------------------------
@@ -626,7 +626,7 @@ namespace SampleWinForms
                 Typeface typeface = reader.Read(fs);
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
-                var builder = new GlyphPathBuilder(typeface);
+                var builder = new PixelFarmGlyphPathBuilder(typeface);
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------
