@@ -7,7 +7,7 @@ Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.
 During developing the [PixelFarm](https://github.com/PaintLab/PixelFarm),
 I think _'How-to-render-a-font-glyph'_ may be useful for other libs.
 
-So, I spin off  _'How-to-render-a-font-glyph'_ part to the **Typography project** here. 
+So, I spin off  _'How-to-render-a-font-glyph'_ part to here,the **Typography**.
 
 The Typography lib dose NOT NEED PixelFarm Rendering lib.
 
@@ -15,15 +15,14 @@ The Typography lib dose NOT NEED PixelFarm Rendering lib.
 
 _pic 1:  Typography project's Solution Explorer View_
 
-see pic1, I provide the example that use Typography and WinGdiPlus (1)
-and the example the use Typography and PixelFarm Rendering Lib(2).
-since it is a spin-off project, I include a 'mini' snapshot version of PixelRendering lib(3)
-that should be used during development.
+see pic1, I provide the example(1) that uses Typography with WinGdiPlus,
+
+and the example(2) the uses Typography with 'mini' snapshot of PixelFarm Rendering Lib(3). 
 
 Concept
 ---
 
- * 1.Loads .ttf files, with OpenFontReader (Big thanks go to NOpenType ,https://github.com/vidstige/NRasterizer)
+ * 1.Loads .ttf files, with OpenFontReader.
  
  * 2.Rasterizes char to bitmap with pure software renderer + Agg(anti grain geometry) Quality! with 
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
@@ -36,7 +35,7 @@ License
 
 Apache2, 2016-2017, WinterDev
 
-Apache2, 2014-2016, Samuel Carlsson, from https://github.com/vidstige/NRasterizer
+Apache2, 2014-2016, Samuel Carlsson, Big thanks for https://github.com/vidstige/NRasterizer
 
 MIT, 2015, Michael Popoloski, from https://github.com/MikePopoloski/SharpFont
 
@@ -44,7 +43,7 @@ The FreeType Project LICENSE (3-clauses BSD),2003-2016, David Turner, Robert Wil
 
 BSD, 2009-2010, Poly2Tri Contributors, from https://github.com/PaintLab/poly2tri-cs
 
-BSD, 2002-2005, Maxim Shemanarev (http://www.antigrain.com)Anti-Grain Geometry - Version 2.4,
+BSD, 2002-2005, Maxim Shemanarev, Anti-Grain Geometry - Version 2.4 from http://www.antigrain.com
 
 BSD, 2007-2014, Lars Brubaker, agg-sharp, from  https://github.com/MatterHackers/agg-sharp 
 
