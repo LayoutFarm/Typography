@@ -98,9 +98,41 @@ Msdf Texture
 ![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/23061146/423cd040-f533-11e6-9f1a-a7fc3d60a14a.png)
 
 ---
-GSUB: ligature feature
+**Advance OpenFont Text Shaping**
 
-![ligature1](https://cloud.githubusercontent.com/assets/7447159/23093970/f7f879a8-f622-11e6-8539-8cdbcf1026d7.png)
+**1. GSUB :  ligature feature** 
+ 
+![ligature](https://cloud.githubusercontent.com/assets/7447159/23093970/f7f879a8-f622-11e6-8539-8cdbcf1026d7.png)
+
+_pic 1: show GSUB's  glyph ligature, see f-i_
+
+---
+
+**2. GPOS**
+ 
+ 
+![gpos](https://cloud.githubusercontent.com/assets/7447159/23071092/d53c89c2-f55f-11e6-8b6d-a9353345f77c.png)
+
+_pic 2: test with Thai (complex script) glyph that require gpos table_
+ 
+---
+**3. GSUB** : ccmp
+ 
+
+
+![gsub](https://cloud.githubusercontent.com/assets/7447159/23079342/1efa46c0-f57f-11e6-869e-fc9700037feb.png)
+
+_pic 3: test with Thai glyph (complex script) , shows glyph substitution_
+
+--- 
+
+**4. GSUB -  GPOS** 
+
+![th_glyph](https://cloud.githubusercontent.com/assets/7447159/23125153/f96d8608-f7a2-11e6-921d-d9bb132c179c.png)
+ 
+ ![th_glyph2](https://cloud.githubusercontent.com/assets/7447159/23194740/7b778fd2-f8e2-11e6-9aa1-1d62ad93de06.png)
+
+_pic 4: test with Thai glyph (complex script)_
 
 
 
