@@ -11,7 +11,7 @@ So, I spin off  _'How-to-render-a-font-glyph'_ part to here,the **Typography**.
 
 The Typography lib dose NOT NEED PixelFarm Rendering lib.
 
-![typo_1](https://cloud.githubusercontent.com/assets/7447159/23438561/f4bf870c-fe44-11e6-9882-a92796902822.png)
+![gdiplus_sample1](https://cloud.githubusercontent.com/assets/7447159/24084514/1969489e-0d1e-11e7-8748-965e9e84693b.png)
 
 _pic 1:  Typography project's Solution Explorer View_
 
