@@ -1,7 +1,27 @@
-![Typography](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title2.png)
+![Typography, this img was rendered with this lib, in subpixel rendering mode](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title2.png)
 ===========
 
 Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.
+---
+
+During developing the [PixelFarm](https://github.com/PaintLab/PixelFarm),
+I think _'How-to-render-a-font-glyph'_ may be useful for other libs.
+
+So, I spin off  _'How-to-render-a-font-glyph'_ part to the **Typography project** here. 
+
+The Typography lib dose NOT NEED PixelFarm Rendering lib.
+
+![typo_1](https://cloud.githubusercontent.com/assets/7447159/23438561/f4bf870c-fe44-11e6-9882-a92796902822.png)
+
+_pic 1:  Typography project's Solution Explorer View_
+
+see pic1, I provide the example that use Typography and WinGdiPlus (1)
+and the example the use Typography and PixelFarm Rendering Lib(2).
+since it is a spin-off project, I include a 'mini' snapshot version of PixelRendering lib(3)
+that should be used during development.
+
+Concept
+---
 
  * 1.Loads .ttf files, with OpenFontReader (Big thanks go to NOpenType ,https://github.com/vidstige/NRasterizer)
  
