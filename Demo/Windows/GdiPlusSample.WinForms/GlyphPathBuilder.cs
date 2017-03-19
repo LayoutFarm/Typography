@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 
 using Typography.OpenFont;
-using System.Collections.Generic;
+
 
 namespace Typography.Rendering
 {
@@ -10,19 +10,16 @@ namespace Typography.Rendering
     //for your flexiblity of glyph path builder.
     //-----------------------------------
 
+
     public class GlyphPathBuilder
     {
         readonly Typeface _typeface;
         TrueTypeInterpreter _trueTypeInterpreter;
-        GlyphFitOutlineAnalyzer _fitShapeAnalyzer = new GlyphFitOutlineAnalyzer();
-        Dictionary<ushort, GlyphFitOutline> _fitoutlineCollection = new Dictionary<ushort, GlyphFitOutline>();
-
-        GlyphPointF[] _outputGlyphPoints;
-        GlyphFitOutline _fitOutline;
-        ushort[] _outputContours;
+        protected GlyphPointF[] _outputGlyphPoints;
+        protected ushort[] _outputContours;
         float _recentPixelScale;
         bool _useInterpreter;
-        bool _useAutoHint;
+
 
         public GlyphPathBuilder(Typeface typeface)
         {
@@ -58,33 +55,26 @@ namespace Typography.Rendering
                 _useInterpreter = value;
             }
         }
-
-        public bool MinorAdjustFitYForAutoFit
-        {
-            get;
-            set;
-        }
-
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-            this.SizeInPoints = sizeInPoints;
-            Build(glyphIndex, _typeface.GetGlyphByIndex(glyphIndex));
-        }
 
-        void Build(ushort glyphIndex, Glyph glyph)
-        {
-            //-------------------------------------------
-            //1. start with original points/contours from glyph
+            this.SizeInPoints = sizeInPoints;
+            //
+            Glyph glyph = _typeface.GetGlyphByIndex(glyphIndex);
+            //
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
-            //-------------------------------------------              
+            //
             Typeface currentTypeFace = this._typeface;
-            _recentPixelScale = currentTypeFace.CalculateFromPointToPixelScale(SizeInPoints); //***
-            _useAutoHint = false;//reset             
-            //-------------------------------------------  
+            _recentPixelScale = this._typeface.CalculateFromPointToPixelScale(SizeInPoints); //***
+
+            FitCurrentGlyph(glyphIndex, glyph);
+        }
+        protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph)
+        {
             //2. process glyph points
             if (UseTrueTypeInstructions &&
-                currentTypeFace.HasPrepProgramBuffer &&
+                this._typeface.HasPrepProgramBuffer &&
                 glyph.HasGlyphInstructions)
             {
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
@@ -94,42 +84,13 @@ namespace Typography.Rendering
                 //so not need further scale.=> set _recentPixelScale=1
                 _recentPixelScale = 1;
             }
-            else
-            {
-                //not use interperter so we need to scale it with our machnism
-                //this demonstrate our auto hint engine ***
-                //you can change this to your own hint engine***  
-                if (this.UseVerticalHinting)
-                {
-                    _useAutoHint = true;
-                    if (!_fitoutlineCollection.TryGetValue(glyphIndex, out _fitOutline))
-                    {
-                        _fitOutline = _fitShapeAnalyzer.Analyze(
-                            this._outputGlyphPoints,
-                            this._outputContours);
-                        _fitoutlineCollection.Add(glyphIndex, _fitOutline);
-                    }
-                }
-            }
         }
-        public void ReadShapes(IGlyphTranslator tx)
+        public virtual void ReadShapes(IGlyphTranslator tx)
         {
-            if (_useAutoHint)
-            {
-                //read from our auto hint fitoutline
-                //need scale from original.
-                _fitOutline.ReadOutput(tx, _recentPixelScale);
-            }
-            else
-            {
-                //read output from glyph points
-                tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
-            }
+            //read output from glyph points
+            tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
         }
-        public float RecentPixelScale
-        {
-            get { return _recentPixelScale; }
-        }
+        protected float RecentPixelScale { get { return _recentPixelScale; } }
     }
 
     public static class GlyphPathBuilderExtensions
@@ -159,5 +120,4 @@ namespace Typography.Rendering
             }
         }
     }
-
 }

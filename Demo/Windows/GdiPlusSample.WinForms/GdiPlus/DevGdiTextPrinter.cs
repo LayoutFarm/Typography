@@ -59,9 +59,7 @@ namespace SampleWinForms
                     _currentTypeface = reader.Read(fs);
                 }
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
-                _currentGlyphPathBuilder.MinorAdjustFitYForAutoFit = true;
-
+                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface); 
                 //for gdi path***
                 //3. glyph reader,output as Gdi+ GraphicsPath
                 _txToGdiPath = new GlyphTranslatorToGdiPath();
