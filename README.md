@@ -1,12 +1,13 @@
 ![Typography, this img was rendered with this lib, in subpixel rendering mode](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title2.png)
 ===========
 
-**Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.**
+Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.
+---
 
 During developing the [PixelFarm](https://github.com/PaintLab/PixelFarm),
-I think 'How-to-render-a-font-glyph' may be useful for other libs.
+I think _'How-to-render-a-font-glyph'_ may be useful for other libs.
 
-So, I spin off  'How-to-render-a-font-glyph' part to the **Typography project** here. 
+So, I spin off  _'How-to-render-a-font-glyph'_ part to the **Typography project** here. 
 
 The Typography lib dose NOT NEED PixelFarm Rendering lib.
 
