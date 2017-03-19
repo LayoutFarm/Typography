@@ -15,11 +15,9 @@ The Typography lib dose NOT NEED PixelFarm Rendering lib.
 
 _pic 1:  Typography project's Solution Explorer View_
 
-see pic1, I provide the example that uses Typography with WinGdiPlus(1) and
-and the example the uses Typography with PixelFarm Rendering Lib(2).
+see pic1, I provide the example(1) that uses Typography with WinGdiPlus,
 
-Since this is a spin-off project, I include a 'mini' snapshot version of PixelFarm Rendering lib(3)
-that should be used during development.
+and the example(2) the uses Typography with 'mini' snapshot of PixelFarm Rendering Lib(3). 
 
 Concept
 ---
