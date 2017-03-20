@@ -117,11 +117,15 @@ namespace Typography.OpenFont.Tables
             //
 
             //https://www.microsoft.com/typography/otspec/chapter2.htm
+            //-----------------------
             //LookupList table
-            //Type 	Name 	Description
-            //USHORT 	LookupCount 	Number of lookups in this table
-            //Offset 	Lookup[LookupCount] 	Array of offsets to Lookup tables-from beginning of LookupList -zero based (first lookup is Lookup index = 0)
-
+            //-----------------------
+            //Type 	    Name 	        Description
+            //uint16 	LookupCount 	Number of lookups in this table
+            //Offset16 	Lookup[LookupCount] 	Array of offsets to Lookup tables-from beginning of LookupList -zero based (first lookup is Lookup index = 0)
+            //-----------------------
+            //
+            //
             //Lookup Table
             //A Lookup table (Lookup) defines the specific conditions, type, 
             //and results of a substitution or positioning action that is used to implement a feature. 
@@ -150,16 +154,18 @@ namespace Typography.OpenFont.Tables
             //The SubTable array specifies offsets, measured from the beginning of the Lookup table, to each SubTable enumerated in the SubTable array.
             //
             //Lookup table
-            //Type 	Name 	Description
-            //USHORT 	LookupType 	Different enumerations for GSUB and GPOS
-            //USHORT 	LookupFlag 	Lookup qualifiers
-            //USHORT 	SubTableCount 	Number of SubTables for this lookup
-            //Offset 	SubTable
-            //[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
-            //unit16 	MarkFilteringSet
+            //--------------------------------
+            //Type  	Name 	        Description
+            //unit16 	LookupType  	Different enumerations for GSUB and GPOS
+            //unit16 	LookupFlag 	    Lookup qualifiers
+            //unit16 	SubTableCount 	Number of SubTables for this lookup
+            //Offset16 	SubTable[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
+            //unit16 	MarkFilteringSet   Index (base 0) into GDEF mark glyph sets structure. 
+            //                             *** This field is only present if bit UseMarkFilteringSet of lookup flags is set.
+            //--------------------------------
             lookupRecords.Clear();
             ushort lookupCount = reader.ReadUInt16();
-            short[] lookupTableOffsets = Utils.ReadInt16Array(reader, lookupCount);
+            ushort[] lookupTableOffsets = Utils.ReadUInt16Array(reader, lookupCount);
 
             //----------------------------------------------
             //load each sub table
@@ -174,7 +180,7 @@ namespace Typography.OpenFont.Tables
                 ushort subTableCount = reader.ReadUInt16();
                 //Each LookupType is defined with one or more subtables, and each subtable definition provides a different representation format
                 //
-                short[] subTableOffsets = Utils.ReadInt16Array(reader, subTableCount);
+                ushort[] subTableOffsets = Utils.ReadUInt16Array(reader, subTableCount);
 
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
@@ -214,14 +220,24 @@ namespace Typography.OpenFont.Tables
         /// sub table of a lookup list
         /// </summary>
         public class LookupTable
-        {
+        {   
+            //Lookup table
+            //--------------------------------
+            //Type  	Name 	        Description
+            //unit16 	LookupType  	Different enumerations for GSUB and GPOS
+            //unit16 	LookupFlag 	    Lookup qualifiers
+            //unit16 	SubTableCount 	Number of SubTables for this lookup
+            //Offset16 	SubTable[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
+            //unit16 	MarkFilteringSet   Index (base 0) into GDEF mark glyph sets structure. 
+            //                             *** This field is only present if bit UseMarkFilteringSet of lookup flags is set.
+            //--------------------------------
             //--------------------------
             long lookupTablePos;
             //--------------------------
             public readonly ushort lookupType;
             public readonly ushort lookupFlags;
             public readonly ushort subTableCount;
-            public readonly short[] subTableOffsets;
+            public readonly ushort[] subTableOffsets;
             public readonly ushort markFilteringSet;
             //--------------------------
             List<LookupSubTable> subTables = new List<LookupSubTable>();
@@ -230,7 +246,7 @@ namespace Typography.OpenFont.Tables
                 ushort lookupType,
                 ushort lookupFlags,
                 ushort subTableCount,
-                short[] subTableOffsets,
+                ushort[] subTableOffsets,
                 ushort markFilteringSet
                  )
             {
