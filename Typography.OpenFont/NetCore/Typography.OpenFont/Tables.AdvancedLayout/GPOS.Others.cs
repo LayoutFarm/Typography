@@ -8,10 +8,10 @@ using System.Text;
 
 namespace Typography.OpenFont.Tables
 {
-     partial class GPOS
+    partial class GPOS
     {
 
-        static PosRuleSetTable[] CreateMultiplePosRuleSetTables(long initPos, short[] offsets, BinaryReader reader)
+        static PosRuleSetTable[] CreateMultiplePosRuleSetTables(long initPos, ushort[] offsets, BinaryReader reader)
         {
             int j = offsets.Length;
             PosRuleSetTable[] results = new PosRuleSetTable[j];
