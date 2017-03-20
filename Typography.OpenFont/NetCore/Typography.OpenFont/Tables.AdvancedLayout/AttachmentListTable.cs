@@ -36,9 +36,9 @@ namespace Typography.OpenFont.Tables
             AttachmentListTable attachmentListTable = new AttachmentListTable();
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //
-            short coverageOffset = reader.ReadInt16();
+            ushort coverageOffset = reader.ReadUInt16();
             ushort glyphCount = reader.ReadUInt16();
-            short[] attachPointOffsets = Utils.ReadInt16Array(reader, glyphCount);
+            ushort[] attachPointOffsets = Utils.ReadUInt16Array(reader, glyphCount);
             //-----------------------
             attachmentListTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
             attachmentListTable.attachPoints = new AttachPoint[glyphCount];

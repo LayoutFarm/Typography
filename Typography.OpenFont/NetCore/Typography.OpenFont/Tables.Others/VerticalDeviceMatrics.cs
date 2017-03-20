@@ -1,6 +1,6 @@
 ﻿//Apache2, 2016-2017, WinterDev 
- 
-using System.IO; 
+
+using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
@@ -25,17 +25,18 @@ namespace Typography.OpenFont.Tables
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            //USHORT 	version 	Version number (0 or 1).
-            //USHORT 	numRecs 	Number of VDMX groups present
-            //USHORT 	numRatios 	Number of aspect ratio groupings
-            //Ratio 	ratRange[numRatios] 	Ratio ranges (see below for more info)
-            //USHORT 	offset[numRatios] 	Offset from start of this table to the VDMX group for this ratio range.
-            //Vdmx 	groups 	The actual VDMX groupings (documented below)
-            //Ratio Record Type 	Name 	Description
-            //BYTE 	bCharSet 	Character set (see below).
-            //BYTE 	xRatio 	Value to use for x-Ratio
-            //BYTE 	yStartRatio 	Starting y-Ratio value.
-            //BYTE 	yEndRatio 	Ending y-Ratio value.
+            //uint16 	version 	Version number (0 or 1).
+            //uint16 	numRecs 	Number of VDMX groups present
+            //uint16 	numRatios 	Number of aspect ratio groupings
+            //RatioRange 	ratRange[numRatios] 	Ratio ranges (see below for more info)
+            //Offset16 	offset[numRatios] 	Offset from start of this table to the VDMX group for this ratio range.
+            //---
+            //RatioRange Record:
+            //Type  	Name 	        Description
+            //uint8 	bCharSet 	    Character set (see below).
+            //uint8 	xRatio 	        Value to use for x-Ratio
+            //uint8 	yStartRatio 	Starting y-Ratio value.
+            //uint8 	yEndRatio 	    Ending y-Ratio value.
             ushort version = reader.ReadUInt16();
             ushort numRecs = reader.ReadUInt16();
             ushort numRatios = reader.ReadUInt16();
@@ -48,7 +49,7 @@ namespace Typography.OpenFont.Tables
                     reader.ReadByte(),
                     reader.ReadByte());
             }
-            short[] offsets = Utils.ReadInt16Array(reader, numRatios);
+            ushort[] offsets = Utils.ReadUInt16Array(reader, numRatios);
             //------
             //actual vdmx group
             //TODO: implement this
@@ -65,13 +66,7 @@ namespace Typography.OpenFont.Tables
                 this.xRatio = xRatio;
                 this.yStartRatio = yStartRatio;
                 this.yEndRatio = yEndRatio;
-            }
-            // BYTE 	bCharSet 	Character set (see below).
-            //BYTE 	xRatio 	Value to use for x-Ratio
-            //BYTE 	yStartRatio 	Starting y-Ratio value.
-            //BYTE 	yEndRatio 	Ending y-Ratio value.
+            } 
         }
-    }
-
-
+    } 
 }

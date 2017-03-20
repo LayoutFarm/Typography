@@ -887,11 +887,13 @@ namespace Typography.OpenFont.Tables
             class ChainSubRuleSetTable
             {
                 //ChainSubRuleSet table: All contexts beginning with the same glyph
-                //Type 	Name 	Description
-                //USHORT 	ChainSubRuleCount 	Number of ChainSubRule tables
-                //Offset 	ChainSubRule
-                //[ChainSubRuleCount] 	Array of offsets to ChainSubRule tables-from beginning of ChainSubRuleSet table-ordered by preference
-
+                //-------------------------------------------------------------------------
+                //Type  	Name 	                            Description
+                //-------------------------------------------------------------------------
+                //uint16 	ChainSubRuleCount 	                Number of ChainSubRule tables
+                //Offset16 	ChainSubRule[ChainSubRuleCount] 	Array of offsets to ChainSubRule tables-from beginning of ChainSubRuleSet table-ordered by preference
+                //-------------------------------------------------------------------------
+                //
                 //A ChainSubRule table consists of a count of the glyphs to be matched in the backtrack,
                 //input, and lookahead context sequences, including the first glyph in each sequence, 
                 //and an array of glyph indices that describe each portion of the contexts. 
@@ -909,7 +911,7 @@ namespace Typography.OpenFont.Tables
                     //---
                     ChainSubRuleSetTable table = new ChainSubRuleSetTable();
                     ushort subRuleCount = reader.ReadUInt16();
-                    short[] subRuleOffsets = Utils.ReadInt16Array(reader, subRuleCount);
+                    ushort[] subRuleOffsets = Utils.ReadUInt16Array(reader, subRuleCount);
                     ChainSubRuleSubTable[] chainSubRuleSubTables = table.chainSubRuleSubTables = new ChainSubRuleSubTable[subRuleCount];
                     for (int i = 0; i < subRuleCount; ++i)
                     {
@@ -919,12 +921,13 @@ namespace Typography.OpenFont.Tables
                     return table;
                 }
             }
-
+            //---------------------
             //SubstLookupRecord
-            //Type 	Name 	Description
-            //USHORT 	SequenceIndex 	Index into current glyph sequence-first glyph = 0
-            //USHORT 	LookupListIndex 	Lookup to apply to that position-zero-based
-
+            //---------------------
+            //Type 	    Name 	            Description
+            //uint16 	SequenceIndex 	    Index into current glyph sequence-first glyph = 0
+            //uint16 	LookupListIndex 	Lookup to apply to that position-zero-based
+            //---------------------
             //The SequenceIndex in a SubstLookupRecord must take into consideration the order 
             //in which lookups are applied to the entire glyph sequence.
             //Because multiple substitutions may occur per context,
@@ -973,13 +976,13 @@ namespace Typography.OpenFont.Tables
 
                 //ChainSubRule subtable
                 //Type 	Name 	Description
-                //USHORT 	BacktrackGlyphCount 	Total number of glyphs in the backtrack sequence (number of glyphs to be matched before the first glyph)
-                //GlyphID 	Backtrack[BacktrackGlyphCount] 	Array of backtracking GlyphID's (to be matched before the input sequence)
-                //USHORT 	InputGlyphCount 	Total number of glyphs in the input sequence (includes the first glyph)
-                //GlyphID 	Input[InputGlyphCount - 1] 	Array of input GlyphIDs (start with second glyph)
-                //USHORT 	LookaheadGlyphCount 	Total number of glyphs in the look ahead sequence (number of glyphs to be matched after the input sequence)
-                //GlyphID 	LookAhead[LookAheadGlyphCount] 	Array of lookahead GlyphID's (to be matched after the input sequence)
-                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                //uint16 	BacktrackGlyphCount 	Total number of glyphs in the backtrack sequence (number of glyphs to be matched before the first glyph)
+                //uint16 	Backtrack[BacktrackGlyphCount] 	Array of backtracking GlyphID's (to be matched before the input sequence)
+                //uint16 	InputGlyphCount 	Total number of glyphs in the input sequence (includes the first glyph)
+                //uint16 	Input[InputGlyphCount - 1] 	Array of input GlyphIDs (start with second glyph)
+                //uint16 	LookaheadGlyphCount 	Total number of glyphs in the look ahead sequence (number of glyphs to be matched after the input sequence)
+                //uint16 	LookAhead[LookAheadGlyphCount] 	Array of lookahead GlyphID's (to be matched after the input sequence)
+                //uint16 	SubstCount 	Number of SubstLookupRecords
                 //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords (in design order)
 
                 ushort[] backTrackingGlyphs;
@@ -1013,16 +1016,18 @@ namespace Typography.OpenFont.Tables
             class ChainSubClassSet
             {
 
-                //ChainSubClassSet subtable
-                //Type 	Name 	Description
-                //USHORT 	ChainSubClassRuleCnt 	Number of ChainSubClassRule tables
-                //Offset 	ChainSubClassRule[ChainSubClassRuleCount] 	Array of offsets to ChainSubClassRule tables-from beginning of ChainSubClassSet-ordered by preference
-
+                //----------------------------------
+                //ChainSubRuleSet table: All contexts beginning with the same glyph
+                //----------------------------------
+                //Type 	    Name 	                Description
+                //uint16 	ChainSubClassRuleCnt 	Number of ChainSubClassRule tables
+                //Offset16 	ChainSubClassRule[ChainSubClassRuleCount] 	Array of offsets to ChainSubClassRule tables-from beginning of ChainSubClassSet-ordered by preference
+                //----------------------------------
                 //For each context, a ChainSubClassRule table contains a count of the glyph classes in the context sequence (GlyphCount),
                 //including the first class. 
                 //A Class array lists the classes, beginning with the second class (array index = 1), that follow the first class in the context.
 
-                //    Note: Text order depends on the writing direction of the text. For text written from right to left, the right-most class will be first. Conversely, for text written from left to right, the left-most class will be first.
+                //Note: Text order depends on the writing direction of the text. For text written from right to left, the right-most class will be first. Conversely, for text written from left to right, the left-most class will be first.
 
                 //The values specified in the Class array are the values defined in the ClassDef table. 
                 //The first class in the sequence,
@@ -1038,7 +1043,7 @@ namespace Typography.OpenFont.Tables
                     //
                     ChainSubClassSet chainSubClassSet = new ChainSubClassSet();
                     ushort count = reader.ReadUInt16();
-                    short[] subClassRuleOffsets = Utils.ReadInt16Array(reader, count);
+                    ushort[] subClassRuleOffsets = Utils.ReadUInt16Array(reader, count);
 
                     ChainSubClassRuleTable[] subClassRuleTables = chainSubClassSet.subClassRuleTables = new ChainSubClassRuleTable[count];
                     for (int i = 0; i < count; ++i)
@@ -1380,6 +1385,6 @@ namespace Typography.OpenFont.Tables
                 throw new NotImplementedException();
             }
         }
- 
+
     }
 }
