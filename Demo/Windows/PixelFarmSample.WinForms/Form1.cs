@@ -291,7 +291,7 @@ namespace SampleWinForms
         void RenderWithMiniAgg(Typeface typeface, char testChar, float sizeInPoint)
         {
             //----------------------------------------------------
-            var builder = new PixelFarmGlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder(typeface);
             builder.SetHintTechnique((HintTechnique)lstHintList.SelectedItem);
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
@@ -351,7 +351,7 @@ namespace SampleWinForms
             //p.UseSubPixelRendering = chkLcdTechnique.Checked;
             p.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
-            var builder = new PixelFarmGlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder(typeface);
             builder.SetHintTechnique((HintTechnique)lstHintList.SelectedItem);
 
             //----------------------------------------------------
@@ -626,7 +626,7 @@ namespace SampleWinForms
                 Typeface typeface = reader.Read(fs);
                 //sample: create sample msdf texture 
                 //-------------------------------------------------------------
-                var builder = new PixelFarmGlyphPathBuilder(typeface);
+                var builder = new GlyphPathBuilder(typeface);
                 //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
                 //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
                 //-------------------------------------------------------------

@@ -53,8 +53,8 @@
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\SampleTextBoxLineModel.cs">
       <Link>GdiPlus\SampleTextBoxLineModel.cs</Link>
     </Compile>
-    <Compile Include="..\GdiPlusSample.WinForms\GlyphPathBuilder.cs">
-      <Link>GlyphPathBuilder.cs</Link>
+    <Compile Include="..\GdiPlusSample.WinForms\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilderBase.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\HintTechnique.cs">
       <Link>HintTechnique.cs</Link>

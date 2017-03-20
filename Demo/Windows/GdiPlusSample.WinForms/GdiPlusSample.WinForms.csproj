@@ -50,6 +50,7 @@
     <Compile Include="GdiPlus\SampleTextBoxController.cs" />
     <Compile Include="GdiPlus\SampleTextBoxLineModel.cs" />
     <Compile Include="GlyphPathBuilder.cs" />
+    <Compile Include="GlyphPathBuilderBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HintTechnique.cs" />

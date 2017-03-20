@@ -76,7 +76,7 @@ namespace PixelFarm.Drawing.Fonts
                     using (FileStream fs = new FileStream(_currentSelectedFontFile, FileMode.Open, FileAccess.Read))
                     {
                         var reader = new OpenFontReader();
-                        _glyphPathBuilder = new PixelFarmGlyphPathBuilder(reader.Read(fs));
+                        _glyphPathBuilder = new GlyphPathBuilder(reader.Read(fs));
                     }
                 }
                 OnFontSizeChanged();
