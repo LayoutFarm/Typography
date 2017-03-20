@@ -302,10 +302,10 @@ namespace Typography.OpenFont.Tables
             {
                 public LkSubTableT1Fmt1(ushort coverageOffset, short deltaGlyph)
                 {
-                    this.CoverateOffset = coverageOffset;
+                    this.CoverageOffset = coverageOffset;
                     this.DeltaGlyph = deltaGlyph;
                 }
-                public ushort CoverateOffset { get; set; }
+                public ushort CoverageOffset { get; set; }
                 /// <summary>
                 /// Add to original GlyphID to get substitute GlyphID
                 /// </summary>
