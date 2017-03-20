@@ -1,6 +1,6 @@
 ﻿//Apache2, 2016-2017, WinterDev
-using System; 
-using System.IO; 
+using System;
+using System.IO;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //from https://www.microsoft.com/typography/developers/opentype/detail.htm
@@ -107,11 +107,11 @@ namespace Typography.OpenFont.Tables
             this.MajorVersion = reader.ReadUInt16();
             this.MinorVersion = reader.ReadUInt16();
             //
-            short glyphClassDefOffset = reader.ReadInt16();
-            short attachListOffset = reader.ReadInt16();
-            short ligCaretListOffset = reader.ReadInt16();
-            short markAttachClassDefOffset = reader.ReadInt16();
-            short markGlyphSetsDefOffset = 0;
+            ushort glyphClassDefOffset = reader.ReadUInt16();
+            ushort attachListOffset = reader.ReadUInt16();
+            ushort ligCaretListOffset = reader.ReadUInt16();
+            ushort markAttachClassDefOffset = reader.ReadUInt16();
+            ushort markGlyphSetsDefOffset = 0;
             uint itemVarStoreOffset = 0;
             //
             switch (MinorVersion)
@@ -119,10 +119,10 @@ namespace Typography.OpenFont.Tables
                 default: throw new NotSupportedException();
                 case 0: break;
                 case 2:
-                    markGlyphSetsDefOffset = reader.ReadInt16();
+                    markGlyphSetsDefOffset = reader.ReadUInt16();
                     break;
                 case 3:
-                    markGlyphSetsDefOffset = reader.ReadInt16();
+                    markGlyphSetsDefOffset = reader.ReadUInt16();
                     itemVarStoreOffset = reader.ReadUInt32();
                     break;
             }
@@ -194,7 +194,8 @@ namespace Typography.OpenFont.Tables
                             gIndex++;
                         }
 
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         ClassDefTable.ClassRangeRecord[] records = classDef.records;
@@ -254,7 +255,8 @@ namespace Typography.OpenFont.Tables
                             gIndex++;
                         }
 
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         ClassDefTable.ClassRangeRecord[] records = markAttachmentClassDef.records;
@@ -286,7 +288,6 @@ namespace Typography.OpenFont.Tables
             //Console.WriteLine("please implement FillMarkGlyphSets()");
 
             throw new NotImplementedException();
-
         }
     }
 }

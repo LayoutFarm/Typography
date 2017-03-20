@@ -4,6 +4,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
+    //from https://www.microsoft.com/typography/otspec/gdef.htm
     //Ligature Caret List Table
     //The Ligature Caret List table (LigCaretList) defines caret positions for all the ligatures in a font. 
     //The table consists of an offset to a Coverage table that lists all the ligature glyphs (Coverage),
@@ -16,9 +17,9 @@ namespace Typography.OpenFont.Tables
     //Example 4 at the end of this chapter shows a LigCaretList table.
     //LigCaretList table
     //Type 	    Name 	        Description
-    //Offset 	Coverage 	    Offset to Coverage table - from beginning of LigCaretList table
-    //USHORT 	LigGlyphCount 	Number of ligature glyphs
-    //Offset 	LigGlyph[LigGlyphCount] 	Array of offsets to LigGlyph tables-from beginning of LigCaretList table-in Coverage Index order
+    //Offset16 	Coverage 	    Offset to Coverage table - from beginning of LigCaretList table
+    //uint16 	LigGlyphCount 	Number of ligature glyphs
+    //Offset16 	LigGlyph[LigGlyphCount] 	Array of offsets to LigGlyph tables-from beginning of LigCaretList table-in Coverage Index order
 
     /// <summary>
     /// Ligature Caret List Table, defines caret positions for all the ligatures in a font
@@ -33,9 +34,9 @@ namespace Typography.OpenFont.Tables
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //----
             LigCaretList ligcaretList = new LigCaretList();
-            short coverageOffset = reader.ReadInt16();
+            ushort coverageOffset = reader.ReadUInt16();
             ushort ligGlyphCount = reader.ReadUInt16();
-            short[] ligGlyphOffsets = Utils.ReadInt16Array(reader, ligGlyphCount);
+            ushort[] ligGlyphOffsets = Utils.ReadUInt16Array(reader, ligGlyphCount);
             LigGlyph[] ligGlyphs = new LigGlyph[ligGlyphCount];
             for (int i = 0; i < ligGlyphCount; ++i)
             {
@@ -47,8 +48,6 @@ namespace Typography.OpenFont.Tables
         }
     }
 
-
-
     //A Ligature Glyph table (LigGlyph) contains the caret coordinates for a single ligature glyph.
     //The number of coordinate values, each defined in a separate CaretValue table,
     //equals the number of components in the ligature minus one (1).***
@@ -59,15 +58,15 @@ namespace Typography.OpenFont.Tables
     //Example 4 at the end of the chapter shows a LigGlyph table.
     //LigGlyph table
     //Type 	Name 	Description
-    //USHORT 	CaretCount 	Number of CaretValues for this ligature (components - 1)
-    //Offset 	CaretValue[CaretCount] 	Array of offsets to CaretValue tables-from beginning of LigGlyph table-in increasing coordinate order Caret Values Table
+    //uint16 	CaretCount 	Number of CaretValues for this ligature (components - 1)
+    //Offset16 	CaretValue[CaretCount] 	Array of offsets to CaretValue tables-from beginning of LigGlyph table-in increasing coordinate order Caret Values Table
 
     /// <summary>
     /// A Ligature Glyph table (LigGlyph) contains the caret coordinates for a single ligature glyph.
     /// </summary>
     class LigGlyph
     {
-        short[] caretValueOffsets;
+        ushort[] caretValueOffsets;
 
         public static LigGlyph CreateFrom(BinaryReader reader, long beginAt)
         {
@@ -75,8 +74,7 @@ namespace Typography.OpenFont.Tables
             //----------
             LigGlyph ligGlyph = new LigGlyph();
             ushort caretCount = reader.ReadUInt16();
-            ligGlyph.caretValueOffsets = Utils.ReadInt16Array(reader, caretCount);
-
+            ligGlyph.caretValueOffsets = Utils.ReadUInt16Array(reader, caretCount);
             return ligGlyph;
         }
     }
@@ -90,7 +88,7 @@ namespace Typography.OpenFont.Tables
     //to reference variation data for adjustment of the caret position for the current variation instance, as needed.
     //Caret coordinates are either X or Y values, depending upon the text direction.
 
-    //CaretValue Format 1
+
     /// <summary>
     /// A Caret Values table (CaretValues)
     /// </summary>
@@ -100,18 +98,27 @@ namespace Typography.OpenFont.Tables
 
     }
 
+    //-------------------------
+    //CaretValue Format 1
+    //-------------------------
     //The first format (CaretValueFormat1) consists of a format identifier (CaretValueFormat), 
     //followed by a single coordinate for the caret position (Coordinate). The Coordinate is in design units.
 
     //This format has the benefits of small size and simplicity, but the Coordinate value cannot be hinted for fine adjustments at different device resolutions.
 
     //Example 4 at the end of this chapter shows a CaretValueFormat1 table.
+    //-------------------------
     //CaretValueFormat1 table: Design units only
-    //Type 	Name 	Description
-    //USHORT 	CaretValueFormat 	Format identifier-format = 1
-    //SHORT 	Coordinate 	X or Y value, in design units
+    //-------------------------
+    //Type 	    Name 	            Description
+    //uint16 	CaretValueFormat 	Format identifier-format = 1
+    //int16 	Coordinate 	        X or Y value, in design units
+    //-------------------------
+    //NOTE: int16 
+    //
+    //
     //CaretValue Format 2
-
+    //
     //The second format (CaretValueFormat2) specifies the caret coordinate in terms of a contour point index on a specific glyph.
     //During font hinting, the contour point on the glyph outline may move. 
     //The point's final position after hinting provides the final value for rendering a given font size.
@@ -119,11 +126,14 @@ namespace Typography.OpenFont.Tables
     //The table contains a format identifier (CaretValueFormat) and a contour point index (CaretValuePoint).
 
     //Example 5 at the end of this chapter demonstrates a CaretValueFormat2 table.
-    //CaretValueFormat2 table: Contour point
-    //Type 	Name 	Description
-    //USHORT 	CaretValueFormat 	Format identifier-format = 2
-    //USHORT 	CaretValuePoint 	Contour point index on glyph
 
+    //-------------------------
+    //CaretValueFormat2 table: Contour point
+    //Type 	    Name 	            Description
+    //uint16 	CaretValueFormat 	Format identifier-format = 2
+    //uint16 	CaretValuePoint 	Contour point index on glyph
+    //-------------------------
+    //
     //CaretValue Format 3
 
     //The third format (CaretValueFormat3) also specifies the value in design units, but,
@@ -144,14 +154,16 @@ namespace Typography.OpenFont.Tables
 
     //Example 6 at the end of this chapter shows a CaretValueFormat3 table.
 
-
+    //-------------------------
     //CaretValueFormat3 table: Design units plus Device or VariationIndex table
-    //Type 	Name 	Description
-    //USHORT 	CaretValueFormat 	Format identifier-format = 3
-    //SHORT 	Coordinate 	X or Y value, in design units
-    //Offset 	DeviceTable 	Offset to Device table (non-variable font) / Variation Index table (variable font) for X or Y value-from beginning of CaretValue table
-
+    //Type  	Name 	            Description
+    //uint16 	CaretValueFormat 	Format identifier-format = 3
+    //int16 	Coordinate      	X or Y value, in design units
+    //Offset16 	DeviceTable 	    Offset to Device table (non-variable font) / Variation Index table (variable font) for X or Y value-from beginning of CaretValue table
     //-------------------------------------------------------------------------------
+    //NOTE:  Offset16
+    //-------------------------------------------------------------------------------
+    //
     //Mark Attachment Class Definition Table
 
     //A Mark Attachment Class Definition Table defines the class to which a mark glyph may belong.
@@ -163,12 +175,14 @@ namespace Typography.OpenFont.Tables
     //Mark glyph sets are used in GSUB and GPOS lookups to filter which marks in a string are considered or ignored.
     //Mark glyph sets are defined in a MarkGlyphSets table, which contains offsets to individual sets each represented by a standard Coverage table:
 
+    //---------------------------------------------------------
     //MarkGlyphSetsTable
+    //---------------------------------------------------------
     //Type 	Name 	Description
-    //USHORT 	MarkSetTableFormat 	Format identifier == 1
-    //USHORT 	MarkSetCount 	Number of mark sets defined
-    //ULONG 	Coverage [MarkSetCount] 	Array of offsets to mark set coverage tables.
-
+    //uint16 	MarkSetTableFormat 	Format identifier == 1
+    //uint16 	MarkSetCount 	Number of mark sets defined
+    //Offset32 	Coverage [MarkSetCount] 	Array of offsets to mark set coverage tables.
+    //---------------------------------------------------------
     //Mark glyph sets are used for the same purpose as mark attachment classes, which is as filters for GSUB and GPOS lookups. 
     //Mark glyph sets differ from mark attachment classes, however,
     //in that mark glyph sets may intersect as needed by the font developer. 

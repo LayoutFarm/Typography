@@ -76,17 +76,36 @@ namespace Typography.OpenFont.Tables
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //---------------------------------------------------
             var coverageTable = new CoverageTable();
-            //1. format  
+
+            //CoverageFormat1 table: Individual glyph indices
+            //Type      Name                       Description
+            //uint16    CoverageFormat             Format identifier-format = 1
+            //uint16    GlyphCount  	           Number of glyphs in the GlyphArray
+            //uint16    GlyphArray[GlyphCount] 	   Array of glyph IDs — in numerical order
+            //---------------------------------
+            //CoverageFormat2 table: Range of glyphs 
+            //Type      Name                       Description           
+            //uint16    CoverageFormat             Format identifier-format = 2
+            //uint16    RangeCount                 Number of RangeRecords
+            //struct    RangeRecord[RangeCount]    Array of glyph ranges — ordered by StartGlyphID.
+            //------------
+            //RangeRecord
+            //----------
+            //Type      Name                Description
+            //uint16    StartGlyphID        First glyph ID in the range
+            //uint16    EndGlyphID          Last glyph ID in the range
+            //uint16    StartCoverageIndex  Coverage Index of first glyph ID in range
+            //----------
+
             switch (coverageTable._format = reader.ReadUInt16())
             {
                 default:
                     throw new NotSupportedException();
-                case 1:
+                case 1:    //CoverageFormat1 table: Individual glyph indices
                     {
-                        //CoverageFormat1 table: Individual glyph indices
                         ushort glyphCount = reader.ReadUInt16();
-                        //GlyphID 	GlyphArray[GlyphCount] 	Array of GlyphIDs-in numerical order ***
                         ushort[] orderedGlyphIdList = new ushort[glyphCount];
+                        //
                         for (int i = 0; i < glyphCount; ++i)
                         {
                             orderedGlyphIdList[i] = reader.ReadUInt16();
@@ -94,9 +113,9 @@ namespace Typography.OpenFont.Tables
                         coverageTable.orderedGlyphIdList = orderedGlyphIdList;
                     }
                     break;
-                case 2:
+                case 2:  //CoverageFormat2 table: Range of glyphs
                     {
-                        //CoverageFormat2 table: Range of glyphs
+
                         ushort rangeCount = reader.ReadUInt16();
                         RangeRecord[] ranges = new RangeRecord[rangeCount];
                         for (int i = 0; i < rangeCount; ++i)
@@ -136,7 +155,7 @@ namespace Typography.OpenFont.Tables
 
         }
 
-        public static CoverageTable[] CreateMultipleCoverageTables(long initPos, short[] offsets, BinaryReader reader)
+        public static CoverageTable[] CreateMultipleCoverageTables(long initPos, ushort[] offsets, BinaryReader reader)
         {
             int j = offsets.Length;
             CoverageTable[] results = new CoverageTable[j];
@@ -149,9 +168,14 @@ namespace Typography.OpenFont.Tables
 
         struct RangeRecord
         {
-            //GlyphID 	Start 	First GlyphID in the range
-            //GlyphID 	End 	Last GlyphID in the range
-            //USHORT 	StartCoverageIndex 	Coverage Index of first GlyphID in range
+            //------------
+            //RangeRecord
+            //----------
+            //Type      Name                Description
+            //uint16    StartGlyphID        First glyph ID in the range
+            //uint16    EndGlyphID          Last glyph ID in the range
+            //uint16    StartCoverageIndex  Coverage Index of first glyph ID in range
+            //----------
             public readonly ushort start;
             public readonly ushort end;
             public readonly ushort startCoverageIndex;

@@ -17,21 +17,22 @@ namespace Typography.OpenFont.Tables
     //Fixed =>	32-bit signed fixed-point number (16.16)
 
     //The table begins as follows:
-    //Type 	Name 	Description
-    //Fixed 	Version 	0x00010000 for version 1.0
-    //0x00020000 for version 2.0
-    //0x00025000 for version 2.5 (deprecated)
-    //0x00030000 for version 3.0
+    //Type 	        Name 	    Description
+    //Fixed 	    Version 	  0x00010000 for version 1.0
+    //                            0x00020000 for version 2.0
+    //                            0x00025000 for version 2.5 (deprecated)
+    //                            0x00030000 for version 3.0
     //Fixed 	italicAngle 	Italic angle in counter-clockwise degrees from the vertical. Zero for upright text, negative for text that leans to the right (forward).
     //FWord 	underlinePosition 	This is the suggested distance of the top of the underline from the baseline (negative values indicate below baseline).   
     //                              The PostScript definition of this FontInfo dictionary key (the y coordinate of the center of the stroke) is not used for historical reasons.
     //                              The value of the PostScript key may be calculated by subtracting half the underlineThickness from the value of this field.
     //FWord 	underlineThickness 	Suggested values for the underline thickness.
-    //ULONG 	isFixedPitch 	Set to 0 if the font is proportionally spaced, non-zero if the font is not proportionally spaced (i.e. monospaced).
-    //ULONG 	minMemType42 	Minimum memory usage when an OpenType font is downloaded.
-    //ULONG 	maxMemType42 	Maximum memory usage when an OpenType font is downloaded.
-    //ULONG 	minMemType1 	Minimum memory usage when an OpenType font is downloaded as a Type 1 font.
-    //ULONG 	maxMemType1 	Maximum memory usage when an OpenType font is downloaded as a Type 1 font.
+    //uint32 	isFixedPitch 	Set to 0 if the font is proportionally spaced, non-zero if the font is not proportionally spaced (i.e. monospaced).
+    //uint32 	minMemType42 	Minimum memory usage when an OpenType font is downloaded.
+    //uint32 	maxMemType42 	Maximum memory usage when an OpenType font is downloaded.
+    //uint32 	minMemType1 	Minimum memory usage when an OpenType font is downloaded as a Type 1 font.
+    //uint32 	maxMemType1 	Maximum memory usage when an OpenType font is downloaded as a Type 1 font.
+    //---------
     //The last four entries in the table are present because PostScript drivers can do better memory management
     //if the virtual memory (VM) requirements of a downloadable OpenType font are known before the font is downloaded.
     //This information should be supplied if known.

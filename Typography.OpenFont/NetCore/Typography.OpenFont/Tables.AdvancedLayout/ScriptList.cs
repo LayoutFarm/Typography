@@ -18,8 +18,8 @@ namespace Typography.OpenFont.Tables
         struct ScriptRecord
         {
             public readonly uint scriptTag;//4-byte ScriptTag identifier
-            public readonly short offset; //Script Offset to Script table-from beginning of ScriptList
-            public ScriptRecord(uint scriptTag, short offset)
+            public readonly ushort offset; //Script Offset to Script table-from beginning of ScriptList
+            public ScriptRecord(uint scriptTag, ushort offset)
             {
                 this.scriptTag = scriptTag;
                 this.offset = offset;
@@ -58,26 +58,24 @@ namespace Typography.OpenFont.Tables
 
             //https://www.microsoft.com/typography/otspec/chapter2.htm
             //ScriptList table
-            //Type 	Name 	Description
-            //USHORT 	ScriptCount 	Number of ScriptRecords
-            //struct 	ScriptRecord
-            //[ScriptCount] 	Array of ScriptRecords
-            //-listed alphabetically by ScriptTag
+            //Type 	    Name 	                    Description
+            //uint16 	ScriptCount             	Number of ScriptRecords
+            //struct 	ScriptRecord[ScriptCount] 	Array of ScriptRecords
+            //                                      -listed alphabetically by ScriptTag
             //ScriptRecord
-            //Type 	Name 	Description
-            //Tag 	ScriptTag 	4-byte ScriptTag identifier
-            //Offset 	Script 	Offset to Script table-from beginning of ScriptList
+            //Type 	    Name 	       Description
+            //Tag 	    ScriptTag 	   4-byte ScriptTag identifier
+            //Offset16 	Script 	       Offset to Script table-from beginning of ScriptList
 
             ScriptList scriptList = new ScriptList();
             ushort scriptCount = reader.ReadUInt16();
             ScriptRecord[] scRecords = new ScriptRecord[scriptCount];
-
             for (int i = 0; i < scriptCount; ++i)
             {
                 //read script record
                 scRecords[i] = new ScriptRecord(
-                    reader.ReadUInt32(), //tag
-                    reader.ReadInt16());//offset                 
+                    reader.ReadUInt32(),//tag (4-byte ScriptTag identifier, so I read as UInt32
+                    reader.ReadUInt16());//offset                 
             }
             //-------------
             ScriptTable[] scriptTables = scriptList.scriptTables = new ScriptTable[scriptCount];

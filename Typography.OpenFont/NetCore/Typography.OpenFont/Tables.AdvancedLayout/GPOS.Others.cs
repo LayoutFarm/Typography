@@ -8,10 +8,10 @@ using System.Text;
 
 namespace Typography.OpenFont.Tables
 {
-     partial class GPOS
+    partial class GPOS
     {
 
-        static PosRuleSetTable[] CreateMultiplePosRuleSetTables(long initPos, short[] offsets, BinaryReader reader)
+        static PosRuleSetTable[] CreateMultiplePosRuleSetTables(long initPos, ushort[] offsets, BinaryReader reader)
         {
             int j = offsets.Length;
             PosRuleSetTable[] results = new PosRuleSetTable[j];
@@ -71,24 +71,25 @@ namespace Typography.OpenFont.Tables
         class ValueRecord
         {
             //ValueRecord (all fields are optional)
-            //Value 	Type 	Description
-            //SHORT 	XPlacement 	Horizontal adjustment for placement-in design units
-            //SHORT 	YPlacement 	Vertical adjustment for placement, in design units
-            //SHORT 	XAdvance 	Horizontal adjustment for advance, in design units (only used for horizontal writing)
-            //SHORT 	YAdvance 	Vertical adjustment for advance, in design units (only used for vertical writing)
-            //Offset 	XPlaDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for horizontal placement, from beginning of PosTable (may be NULL)
-            //Offset 	YPlaDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for vertical placement, from beginning of PosTable (may be NULL)
-            //Offset 	XAdvDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for horizontal advance, from beginning of PosTable (may be NULL)
-            //Offset 	YAdvDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for vertical advance, from beginning of PosTable (may be NULL)
+            //Value 	Type 	    Description
+            //--------------------------------
+            //int16 	XPlacement 	Horizontal adjustment for placement-in design units
+            //int16 	YPlacement 	Vertical adjustment for placement, in design units
+            //int16 	XAdvance 	Horizontal adjustment for advance, in design units (only used for horizontal writing)
+            //int16 	YAdvance 	Vertical adjustment for advance, in design units (only used for vertical writing)
+            //Offset16 	XPlaDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for horizontal placement, from beginning of PosTable (may be NULL)
+            //Offset16 	YPlaDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for vertical placement, from beginning of PosTable (may be NULL)
+            //Offset16 	XAdvDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for horizontal advance, from beginning of PosTable (may be NULL)
+            //Offset16 	YAdvDevice 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for vertical advance, from beginning of PosTable (may be NULL)
 
             public short XPlacement;
             public short YPlacement;
             public short XAdvance;
             public short YAdvance;
-            public short XPlaDevice;
-            public short YPlaDevice;
-            public short XAdvDevice;
-            public short YAdvDevice;
+            public ushort XPlaDevice;
+            public ushort YPlaDevice;
+            public ushort XAdvDevice;
+            public ushort YAdvDevice;
 
             public ushort valueFormat;
             public void ReadFrom(BinaryReader reader, ushort valueFormat)
@@ -112,19 +113,19 @@ namespace Typography.OpenFont.Tables
                 }
                 if (HasFormat(valueFormat, FMT_XPlaDevice))
                 {
-                    this.XPlaDevice = reader.ReadInt16();
+                    this.XPlaDevice = reader.ReadUInt16();
                 }
                 if (HasFormat(valueFormat, FMT_YPlaDevice))
                 {
-                    this.YPlaDevice = reader.ReadInt16();
+                    this.YPlaDevice = reader.ReadUInt16();
                 }
                 if (HasFormat(valueFormat, FMT_XAdvDevice))
                 {
-                    this.XAdvDevice = reader.ReadInt16();
+                    this.XAdvDevice = reader.ReadUInt16();
                 }
                 if (HasFormat(valueFormat, FMT_YAdvDevice))
                 {
-                    this.YAdvDevice = reader.ReadInt16();
+                    this.YAdvDevice = reader.ReadUInt16();
                 }
             }
             static bool HasFormat(ushort value, int flags)
@@ -184,8 +185,8 @@ namespace Typography.OpenFont.Tables
             /// an index to a glyph contour point (AnchorPoint)
             /// </summary>
             public ushort refGlyphContourPoint;
-            public short xdeviceTableOffset;
-            public short ydeviceTableOffset;
+            public ushort xdeviceTableOffset;
+            public ushort ydeviceTableOffset;
             public static AnchorPoint CreateFrom(BinaryReader reader, long beginAt)
             {
                 AnchorPoint anchorPoint = new AnchorPoint();
@@ -202,9 +203,9 @@ namespace Typography.OpenFont.Tables
                             //This format has the benefits of small size and simplicity,
                             //but the anchor point cannot be hinted to adjust its position for different device resolutions.
                             //Value 	Type 	Description
-                            //USHORT 	AnchorFormat 	Format identifier, = 1
-                            //SHORT 	XCoordinate 	Horizontal value, in design units
-                            //SHORT 	YCoordinate 	Vertical value, in design units
+                            //uint16 	AnchorFormat 	Format identifier, = 1
+                            //int16 	XCoordinate 	Horizontal value, in design units
+                            //int16 	YCoordinate 	Vertical value, in design units
                             anchorPoint.xcoord = reader.ReadInt16();
                             anchorPoint.ycoord = reader.ReadInt16();
                         }
@@ -227,10 +228,10 @@ namespace Typography.OpenFont.Tables
 
                             //AnchorFormat2 table: Design units plus contour point
                             //Value 	Type 	Description
-                            //USHORT 	AnchorFormat 	Format identifier, = 2
-                            //SHORT 	XCoordinate 	Horizontal value, in design units
-                            //SHORT 	YCoordinate 	Vertical value, in design units
-                            //USHORT 	AnchorPoint 	Index to glyph contour point
+                            //uint16 	AnchorFormat 	Format identifier, = 2
+                            //int16 	XCoordinate 	Horizontal value, in design units
+                            //int16 	YCoordinate 	Vertical value, in design units
+                            //uint16 	AnchorPoint 	Index to glyph contour point
 
                             anchorPoint.xcoord = reader.ReadInt16();
                             anchorPoint.ycoord = reader.ReadInt16();
@@ -268,16 +269,16 @@ namespace Typography.OpenFont.Tables
 
                             //AnchorFormat3 table: Design units plus Device or VariationIndex tables
                             //Value 	Type 	Description
-                            //USHORT 	AnchorFormat 	Format identifier, = 3
-                            //SHORT 	XCoordinate 	Horizontal value, in design units
-                            //SHORT 	YCoordinate 	Vertical value, in design units
-                            //Offset 	XDeviceTable 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for X coordinate, from beginning of Anchor table (may be NULL)
-                            //Offset 	YDeviceTable 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for Y coordinate, from beginning of Anchor table (may be NULL)
+                            //uint16 	AnchorFormat 	Format identifier, = 3
+                            //int16 	XCoordinate 	Horizontal value, in design units
+                            //int16 	YCoordinate 	Vertical value, in design units
+                            //Offset16 	XDeviceTable 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for X coordinate, from beginning of Anchor table (may be NULL)
+                            //Offset16 	YDeviceTable 	Offset to Device table (non-variable font) / VariationIndex table (variable font) for Y coordinate, from beginning of Anchor table (may be NULL)
 
                             anchorPoint.xcoord = reader.ReadInt16();
                             anchorPoint.ycoord = reader.ReadInt16();
-                            anchorPoint.xdeviceTableOffset = reader.ReadInt16();
-                            anchorPoint.ydeviceTableOffset = reader.ReadInt16();
+                            anchorPoint.xdeviceTableOffset = reader.ReadUInt16();
+                            anchorPoint.ydeviceTableOffset = reader.ReadUInt16();
                         }
                         break;
                 }
@@ -318,13 +319,16 @@ namespace Typography.OpenFont.Tables
             //The GPOS subtables that refer to MarkArray tables use the class assignments for indexing zero-based arrays that contain data for each mark class.
 
             // MarkArray table
+            //-------------------
             //Value 	Type 	                Description
-            //USHORT 	MarkCount 	            Number of MarkRecords
+            //uint16 	MarkCount 	            Number of MarkRecords
             //struct 	MarkRecord[MarkCount] 	Array of MarkRecords in Coverage order
+            //
             //MarkRecord
             //Value 	Type 	                Description
-            //USHORT 	Class 	                Class defined for this mark
-            //Offset 	MarkAnchor 	            Offset to Anchor table-from beginning of MarkArray table
+            //-------------------
+            //uint16 	Class 	                Class defined for this mark
+            //Offset16 	MarkAnchor 	            Offset to Anchor table-from beginning of MarkArray table
             MarkRecord[] records;
             AnchorPoint[] anchorPoints;
             public AnchorPoint GetAnchorPoint(int index)
@@ -345,7 +349,7 @@ namespace Typography.OpenFont.Tables
                     //1 mark : 1 anchor
                     records[i] = new MarkRecord(
                         reader.ReadUInt16(),//mark class
-                        reader.ReadInt16()); //offset to anchor table
+                        reader.ReadUInt16()); //offset to anchor table
                 }
                 //---------------------------
                 //read anchor
@@ -390,8 +394,8 @@ namespace Typography.OpenFont.Tables
             /// <summary>
             /// Offset to Anchor table-from beginning of MarkArray table
             /// </summary>
-            public readonly short offset;
-            public MarkRecord(ushort markClass, short offset)
+            public readonly ushort offset;
+            public MarkRecord(ushort markClass, ushort offset)
             {
                 this.markClass = markClass;
                 this.offset = offset;
@@ -408,7 +412,7 @@ namespace Typography.OpenFont.Tables
         {
             ///Mark2Array table
             //Value 	Type 	Description
-            //USHORT 	Mark2Count 	Number of Mark2 records
+            //uint16 	Mark2Count 	Number of Mark2 records
             //struct 	Mark2Record[Mark2Count] 	Array of Mark2 records-in Coverage order
 
             //Each Mark2Record contains an array of offsets to Anchor tables (Mark2Anchor).
@@ -431,22 +435,19 @@ namespace Typography.OpenFont.Tables
                 mark2ArrTable.mark2Records = new Mark2Record[mark2Count];
                 for (int i = 0; i < mark2Count; ++i)
                 {
-                    mark2ArrTable.mark2Records[i] = new Mark2Record(Utils.ReadInt16Array(reader, classCount));
+                    mark2ArrTable.mark2Records[i] = new Mark2Record(Utils.ReadUInt16Array(reader, classCount));
                 }
                 //read mark2 anchor
                 for (int i = 0; i < mark2Count; ++i)
                 {
-                    short[] offsets = mark2ArrTable.mark2Records[i].offsets;
+                    ushort[] offsets = mark2ArrTable.mark2Records[i].offsets;
                     AnchorPoint[] anchors = mark2ArrTable.mark2Records[i].anchorPoints;
                     int offsetCount = anchors.Length;
                     for (int c = 0; c < offsetCount; ++c)
                     {
                         anchors[c] = AnchorPoint.CreateFrom(reader, beginAt + offsets[c]);
                     }
-
                 }
-
-
                 return mark2ArrTable;
             }
             public AnchorPoint GetAnchorPoint(int index, int markClassId)
@@ -459,22 +460,20 @@ namespace Typography.OpenFont.Tables
         {
             //Mark2Record
             //Value 	Type 	Description
-            //Offset 	Mark2Anchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
-            public readonly short[] offsets;
+            //Offset16 	Mark2Anchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
+            public readonly ushort[] offsets;
             public readonly AnchorPoint[] anchorPoints;
-            public Mark2Record(short[] offsets)
+            public Mark2Record(ushort[] offsets)
             {
                 this.offsets = offsets;
                 anchorPoints = new AnchorPoint[offsets.Length];
             }
         }
-
-
         class BaseArrayTable
         {
             //BaseArray table
             //Value 	Type 	Description
-            //USHORT 	BaseCount 	Number of BaseRecords
+            //uint16 	BaseCount 	Number of BaseRecords
             //struct 	BaseRecord[BaseCount] 	Array of BaseRecords-in order of BaseCoverage Index
 
             //A BaseRecord declares one Anchor table for each mark class (including Class 0)
@@ -502,13 +501,13 @@ namespace Typography.OpenFont.Tables
                 BaseRecord[] baseRecs = baseArrTable.records = new BaseRecord[baseCount];
                 for (int i = 0; i < baseCount; ++i)
                 {
-                    baseArrTable.records[i] = new BaseRecord(Utils.ReadInt16Array(reader, classCount));
+                    baseArrTable.records[i] = new BaseRecord(Utils.ReadUInt16Array(reader, classCount));
                 }
                 //read anchor table 
                 for (int i = 0; i < baseCount; ++i)
                 {
 
-                    short[] offsets = baseRecs[i].offsets;
+                    ushort[] offsets = baseRecs[i].offsets;
 #if DEBUG
                     if (classCount != offsets.Length)
                     {
@@ -520,7 +519,7 @@ namespace Typography.OpenFont.Tables
                     AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[classCount];
                     for (int n = 0; n < classCount; ++n)
                     {
-                        short offset = offsets[n];
+                        ushort offset = offsets[n];
                         if (offset < 0)
                         {
                             //TODO: review here 
@@ -545,12 +544,12 @@ namespace Typography.OpenFont.Tables
         {
             //BaseRecord
             //Value 	Type 	Description
-            //Offset 	BaseAnchor[ClassCount] 	Array of offsets (one per class) to 
+            //Offset16 	BaseAnchor[ClassCount] 	Array of offsets (one per class) to 
             //Anchor tables-from beginning of BaseArray table-ordered by class-zero-based
 
-            public short[] offsets;
+            public ushort[] offsets;
             public AnchorPoint[] anchors;
-            public BaseRecord(short[] offsets)
+            public BaseRecord(ushort[] offsets)
             {
                 this.offsets = offsets;
                 anchors = null;
@@ -592,20 +591,21 @@ namespace Typography.OpenFont.Tables
         //[LigatureCount] 	Array of offsets to LigatureAttach tables-from beginning of LigatureArray table-ordered by LigatureCoverage Index
 
         //Each LigatureAttach table consists of an array (ComponentRecord) and count (ComponentCount) of the component glyphs in a ligature. The array stores the ComponentRecords in the same order as the components in the ligature. The order of the records also corresponds to the writing direction of the text. For text written left to right, the first component is on the left; for text written right to left, the first component is on the right.
+        //-------------------------------
         //LigatureAttach table
-        //Value 	Type 	Description
-        //USHORT 	ComponentCount 	Number of ComponentRecords in this ligature
+        //Value 	Type 	                            Description
+        //uint16 	ComponentCount 	                    Number of ComponentRecords in this ligature
         //struct 	ComponentRecord[ComponentCount] 	Array of Component records-ordered in writing direction
-
+        //-------------------------------
         //A ComponentRecord, one for each component in the ligature, contains an array of offsets to the Anchor tables that define all the attachment points used to attach marks to the component (LigatureAnchor). For each mark class (including Class 0) identified in the MarkArray records, an Anchor table specifies the point used to attach all the marks in a particular class to the ligature base glyph, relative to the component.
 
         //In a ComponentRecord, the zero-based LigatureAnchor array lists offsets to Anchor tables by mark class. If a component does not define an attachment point for a particular class of marks, then the offset to the corresponding Anchor table will be NULL.
 
         //Example 8 at the end of this chapter shows a MarkLisPosFormat1 subtable used to attach mark accents to a ligature glyph in the Arabic script.
+        //-------------------
         //ComponentRecord
         //Value 	Type 	Description
-        //Offset 	LigatureAnchor
-        //[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of LigatureAttach table-ordered by class-NULL if a component does not have an attachment for a class-zero-based array
+        //Offset16 	LigatureAnchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of LigatureAttach table-ordered by class-NULL if a component does not have an attachment for a class-zero-based array
         class LigatureArrayTable
         {
             LigatureAttachTable[] ligatures;
@@ -613,7 +613,7 @@ namespace Typography.OpenFont.Tables
             {
                 long startPos = reader.BaseStream.Position;
                 ushort ligatureCount = reader.ReadUInt16();
-                short[] offsets = Utils.ReadInt16Array(reader, ligatureCount);
+                ushort[] offsets = Utils.ReadUInt16Array(reader, ligatureCount);
 
                 ligatures = new LigatureAttachTable[ligatureCount];
 
@@ -627,6 +627,11 @@ namespace Typography.OpenFont.Tables
         }
         class LigatureAttachTable
         {
+            //LigatureAttach table
+            //Value 	Type 	                            Description
+            //uint16 	ComponentCount 	                    Number of ComponentRecords in this ligature
+            //struct 	ComponentRecord[ComponentCount] 	Array of Component records-ordered in writing direction
+            //-------------------------------
             ComponentRecord[] records;
             public static LigatureAttachTable ReadFrom(BinaryReader reader, ushort classCount)
             {
@@ -637,16 +642,19 @@ namespace Typography.OpenFont.Tables
                 for (int i = 0; i < componentCount; ++i)
                 {
                     componentRecs[i] = new ComponentRecord(
-                        Utils.ReadInt16Array(reader, classCount));
+                        Utils.ReadUInt16Array(reader, classCount));
                 }
                 return table;
             }
-
         }
         struct ComponentRecord
         {
-            public short[] offsets;
-            public ComponentRecord(short[] offsets)
+            //ComponentRecord
+            //Value         Type                          Description
+            //Offset16      LigatureAnchor[ClassCount]    Array of offsets(one per class) to Anchor tables-from beginning of LigatureAttach table-ordered by class-NULL if a component does not have an attachment for a class-zero-based array
+
+            public ushort[] offsets;
+            public ComponentRecord(ushort[] offsets)
             {
                 this.offsets = offsets;
             }
@@ -684,9 +692,8 @@ namespace Typography.OpenFont.Tables
 
             //PosRuleSet table: All contexts beginning with the same glyph
             // Value 	Type 	Description
-            //USHORT 	PosRuleCount 	Number of PosRule tables
-            //Offset 	PosRule
-            //[PosRuleCount] 	Array of offsets to PosRule tables-from beginning of PosRuleSet-ordered by preference
+            //uint16 	PosRuleCount 	Number of PosRule tables
+            //Offset16 	PosRule[PosRuleCount] 	Array of offsets to PosRule tables-from beginning of PosRuleSet-ordered by preference
             //
             //A PosRule table consists of a count of the glyphs to be matched in the input context sequence (GlyphCount), 
             //including the first glyph in the sequence, and an array of glyph indices that describe the context (Input). 
@@ -701,7 +708,7 @@ namespace Typography.OpenFont.Tables
             {
                 long tableStartAt = reader.BaseStream.Position;
                 ushort posRuleCount = reader.ReadUInt16();
-                short[] posRuleTableOffsets = Utils.ReadInt16Array(reader, posRuleCount);
+                ushort[] posRuleTableOffsets = Utils.ReadUInt16Array(reader, posRuleCount);
                 int j = posRuleTableOffsets.Length;
                 posRuleTables = new PosRuleTable[posRuleCount];
                 for (int i = 0; i < j; ++i)
@@ -729,9 +736,9 @@ namespace Typography.OpenFont.Tables
 
             //PosRule subtable
             //Value 	Type 	Description
-            //USHORT 	GlyphCount 	Number of glyphs in the Input glyph sequence
-            //USHORT 	PosCount 	Number of PosLookupRecords
-            //GlyphID 	Input[GlyphCount - 1]  Array of input GlyphIDs-starting with the second glyph***
+            //uint16 	GlyphCount 	Number of glyphs in the Input glyph sequence
+            //uint16 	PosCount 	Number of PosLookupRecords
+            //uint16 	Input[GlyphCount - 1]  Array of input GlyphIDs-starting with the second glyph***
             //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
             PosLookupRecord[] posLookupRecords;
             ushort[] inputGlyphIds;
@@ -747,11 +754,13 @@ namespace Typography.OpenFont.Tables
 
         class PosClassSetTable
         {
-            // PosClassSet table: All contexts beginning with the same class
-            //Value 	Type 	Description
-            //USHORT 	PosClassRuleCnt 	Number of PosClassRule tables
-            //Offset 	PosClassRule[PosClassRuleCnt] 	Array of offsets to PosClassRule tables-from beginning of PosClassSet-ordered by preference
-
+            //PosClassSet table: All contexts beginning with the same class
+            //Value 	Type 	                        Description
+            //----------------------
+            //uint16 	PosClassRuleCnt 	            Number of PosClassRule tables
+            //Offset16 	PosClassRule[PosClassRuleCnt] 	Array of offsets to PosClassRule tables-from beginning of PosClassSet-ordered by preference
+            //----------------------
+            //
             //For each context, a PosClassRule table contains a count of the glyph classes in a given context (GlyphCount), including the first class in the context sequence. A class array lists the classes, beginning with the second class, that follow the first class in the context. The first class listed indicates the second position in the context sequence.
 
             //    Note: Text order depends on the writing direction of the text. For text written from right to left, the right-most glyph will be first. Conversely, for text written from left to right, the left-most glyph will be first.
@@ -761,12 +770,15 @@ namespace Typography.OpenFont.Tables
             //A PosClassRule also contains a count of the positioning operations to be performed on the context (PosCount) and an array of PosLookupRecords (PosLookupRecord) that supply the positioning data. For each position in the context that requires a positioning operation, a PosLookupRecord specifies a LookupList index and a position in the input glyph class sequence where the lookup is applied. The PosLookupRecord array lists PosLookupRecords in design order, or the order in which lookups are applied to the entire glyph sequence.
 
             //Example 11 at the end of this chapter demonstrates a ContextPosFormat2 subtable that uses glyph classes to modify accent positions in glyph strings.
+            //----------------------
             //PosClassRule table: One class context definition
+            //----------------------
             //Value 	Type 	Description
-            //USHORT 	GlyphCount 	Number of glyphs to be matched
-            //USHORT 	PosCount 	Number of PosLookupRecords
-            //USHORT 	Class[GlyphCount - 1] 	Array of classes-beginning with the second class-to be matched to the input glyph sequence
+            //uint16 	GlyphCount 	Number of glyphs to be matched
+            //uint16 	PosCount 	Number of PosLookupRecords
+            //uint16 	Class[GlyphCount - 1] 	Array of classes-beginning with the second class-to be matched to the input glyph sequence
             //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
+            //----------------------
 
             PosClassRule[] posClasses;
             void ReadFrom(BinaryReader reader)
@@ -774,7 +786,7 @@ namespace Typography.OpenFont.Tables
                 long tableStartAt = reader.BaseStream.Position;
                 //
                 ushort posClassRuleCnt = reader.ReadUInt16();
-                short[] posClassRuleOffsets = Utils.ReadInt16Array(reader, posClassRuleCnt);
+                ushort[] posClassRuleOffsets = Utils.ReadUInt16Array(reader, posClassRuleCnt);
                 int j = posClassRuleOffsets.Length;
 
                 posClasses = new PosClassRule[posClassRuleCnt];

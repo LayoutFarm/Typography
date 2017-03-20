@@ -33,14 +33,20 @@ namespace Typography.OpenFont.Tables
         public static FeatureList CreateFrom(BinaryReader reader, long beginAt)
         {
             //https://www.microsoft.com/typography/otspec/chapter2.htm
-            //FeatureList table         
-            //Type 	Name 	Description
-            //USHORT 	FeatureCount 	Number of FeatureRecords in this table
+
+            //------------------
+            //FeatureList table                      
+            //------------------
+            //Type 	    Name 	        Description
+            //uint16 	FeatureCount 	Number of FeatureRecords in this table
             //struct 	FeatureRecord[FeatureCount] 	Array of FeatureRecords-zero-based (first feature has FeatureIndex = 0)-listed alphabetically by FeatureTag
+            //------------------
             //FeatureRecord
-            //Type 	Name 	Description
-            //Tag 	FeatureTag 	4-byte feature identification tag
-            //Offset 	Feature 	Offset to Feature table-from beginning of FeatureList
+            //------------------
+            //Type 	    Name 	        Description
+            //Tag 	    FeatureTag 	    4-byte feature identification tag
+            //Offset16 	Feature 	    Offset to Feature table-from beginning of FeatureList
+            //----------------------------------------------------
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
             //
             FeatureList featureList = new FeatureList();
@@ -51,7 +57,7 @@ namespace Typography.OpenFont.Tables
                 //read script record
                 featureRecords[i] = new FeatureRecord(
                     reader.ReadUInt32(), //feature tag
-                    reader.ReadInt16()); //offset 
+                    reader.ReadUInt16()); //Offset16 
             }
             //read each feature table
             FeatureTable[] featureTables = featureList.featureTables = new FeatureTable[featureCount];
@@ -65,8 +71,8 @@ namespace Typography.OpenFont.Tables
         struct FeatureRecord
         {
             public readonly uint featureTag;//4-byte ScriptTag identifier
-            public readonly short offset; //Script Offset to Script table-from beginning of ScriptList
-            public FeatureRecord(uint featureTag, short offset)
+            public readonly ushort offset; //Script Offset to Script table-from beginning of ScriptList
+            public FeatureRecord(uint featureTag, ushort offset)
             {
                 this.featureTag = featureTag;
                 this.offset = offset;
@@ -114,21 +120,26 @@ namespace Typography.OpenFont.Tables
         //Finally, the client applies the lookup data to substitute or position glyphs.
 
         //Example 3 at the end of this chapter shows the FeatureList and Feature tables used to substitute ligatures in two languages.
-        //Feature table
-        //Type 	Name 	Description
-        //Offset 	FeatureParams 	= NULL (reserved for offset to FeatureParams)
-        //USHORT 	LookupCount 	Number of LookupList indices for this feature
-        //USHORT 	LookupListIndex[LookupCount] 	Array of LookupList indices for this feature -zero-based (first lookup is LookupListIndex = 0)
+        //
+
 
         public class FeatureTable
         {
+            //--------------------------
+            //Feature table
+            //--------------------------
+            //Type 	    Name 	        Description
+            //Offset16 	FeatureParams 	= NULL (reserved for offset to FeatureParams)
+            //uint16 	LookupCount 	Number of LookupList indices for this feature
+            //uint16 	LookupListIndex[LookupCount] 	Array of LookupList indices for this feature -zero-based (first lookup is LookupListIndex = 0)
+            //--------------------------
 
             ushort[] lookupListIndice;
             public static FeatureTable CreateFrom(BinaryReader reader, long beginAt)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
                 //
-                short featureParams = reader.ReadInt16();//null, should be 0
+                ushort featureParams = reader.ReadUInt16();
                 ushort lookupCount = reader.ReadUInt16();
 
                 FeatureTable featureTable = new FeatureTable();
@@ -157,16 +168,7 @@ namespace Typography.OpenFont.Tables
             {
                 return this.TagName;
             }
-#endif
-
-
+#endif 
         }
-
     }
-
-
-
-
-
-
 }
