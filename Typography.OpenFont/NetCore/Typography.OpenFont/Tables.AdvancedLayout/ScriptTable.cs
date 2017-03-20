@@ -19,17 +19,19 @@ namespace Typography.OpenFont.Tables
     //If no language-specific script behavior is defined, the LangSysCount is set to zero (0), and no LangSysRecords are allocated.
     //-----------------------
     //Script table
-    //Type 	Name 	Description
-    //Offset 	DefaultLangSys 	Offset to DefaultLangSys table-from beginning of Script table-may be NULL
-    //USHORT 	LangSysCount 	Number of LangSysRecords for this script-excluding the DefaultLangSys
+    //Type 	    Name 	        Description
+    //Offset16 	DefaultLangSys 	Offset to DefaultLangSys table-from beginning of Script table-may be NULL
+    //uint16 	LangSysCount 	Number of LangSysRecords for this script-excluding the DefaultLangSys
     //struct 	LangSysRecord[LangSysCount] 	Array of LangSysRecords-listed alphabetically by LangSysTag
     //-----------------------
     //LangSysRecord
-    //Type 	Name 	Description
-    //Tag 	LangSysTag 	4-byte LangSysTag identifier
-    //Offset 	LangSys 	Offset to LangSys table-from beginning of Script table
+    //Type 	    Name 	    Description
+    //Tag 	    LangSysTag 	4-byte LangSysTag identifier
+    //Offset16 	LangSys 	Offset to LangSys table-from beginning of Script table
+    //-----------------------
+    //
     //Language System Table
-
+    //-----------------------
     //The Language System table (LangSys) identifies language-system features 
     //used to render the glyphs in a script. (The LookupOrder offset is reserved for future use.)
 
@@ -67,17 +69,18 @@ namespace Typography.OpenFont.Tables
             get { return Utils.TagToString(this.scriptTag); }
         }
 
-
-
         public static ScriptTable CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
-            //
-            //
+            //---------------
+            //Script table
+            //Type 	    Name 	        Description
+            //Offset16 	DefaultLangSys 	Offset to DefaultLangSys table-from beginning of Script table-may be NULL
+            //uint16 	LangSysCount 	Number of LangSysRecords for this script-excluding the DefaultLangSys
+            //struct 	LangSysRecord[LangSysCount] 	Array of LangSysRecords-listed alphabetically by LangSysTag
+            //---------------
             ScriptTable scriptTable = new ScriptTable();
-            short defaultLangSysOffset = reader.ReadInt16();
-            //           
-
+            ushort defaultLangSysOffset = reader.ReadUInt16();
             ushort langSysCount = reader.ReadUInt16();
             LangSysTable[] langSysTables = scriptTable.langSysTables = new LangSysTable[langSysCount];
             for (int i = 0; i < langSysCount; ++i)

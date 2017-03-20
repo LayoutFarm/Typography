@@ -62,20 +62,20 @@ namespace Typography.OpenFont.Tables
             //Example 1 at the end of this chapter shows a GPOS Header table definition.
             //GPOS Header, Version 1.0
             //Value 	Type 	Description
-            //USHORT 	MajorVersion 	Major version of the GPOS table, = 1
-            //USHORT 	MinorVersion 	Minor version of the GPOS table, = 0
-            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GPOS table
-            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GPOS table
-            //Offset 	LookupList 	Offset to LookupList table, from beginning of GPOS table
+            //uint16 	MajorVersion 	Major version of the GPOS table, = 1
+            //uint16 	MinorVersion 	Minor version of the GPOS table, = 0
+            //Offset16 	ScriptList 	Offset to ScriptList table, from beginning of GPOS table
+            //Offset16 	FeatureList 	Offset to FeatureList table, from beginning of GPOS table
+            //Offset16 	LookupList 	Offset to LookupList table, from beginning of GPOS table
 
             //GPOS Header, Version 1.1
             //Value 	Type 	Description
-            //USHORT 	MajorVersion 	Major version of the GPOS table, = 1
-            //USHORT 	MinorVersion 	Minor version of the GPOS table, = 1
-            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GPOS table
-            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GPOS table
-            //Offset 	LookupList 	Offset to LookupList table, from beginning of GPOS table
-            //ULONG 	FeatureVariations 	Offset to FeatureVariations table, from beginning of GPOS table (may be NULL) 
+            //uint16 	MajorVersion 	Major version of the GPOS table, = 1
+            //uint16 	MinorVersion 	Minor version of the GPOS table, = 1
+            //Offset16 	ScriptList 	Offset to ScriptList table, from beginning of GPOS table
+            //Offset16 	FeatureList 	Offset to FeatureList table, from beginning of GPOS table
+            //Offset16 	LookupList 	Offset to LookupList table, from beginning of GPOS table
+            //Offset32 	FeatureVariations 	Offset to FeatureVariations table, from beginning of GPOS table (may be NULL) 
 
             this.MajorVersion = reader.ReadUInt16();
             this.MinorVersion = reader.ReadUInt16();
