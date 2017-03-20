@@ -79,11 +79,12 @@ namespace Typography.OpenFont.Tables
                     {
                         //Format 0: Byte encoding table
                         //This is the Apple standard character to glyph index mapping table.
-                        //Type 	Name 	Description
-                        //USHORT 	format 	Format number is set to 0.
-                        //USHORT 	length 	This is the length in bytes of the subtable.
-                        //USHORT 	language 	Please see “Note on the language field in 'cmap' subtables“ in this document.
-                        //BYTE 	glyphIdArray[256] 	An array that maps character codes to glyph index values.
+                        //Type  	Name 	        Description
+                        //uint16 	format 	        Format number is set to 0.
+                        //uint16 	length 	        This is the length in bytes of the subtable.
+                        //uint16 	language 	    Please see “Note on the language field in 'cmap' subtables“ in this document.
+                        //uint8 	glyphIdArray[256] 	An array that maps character codes to glyph index values.
+                        //-----------
                         //This is a simple 1 to 1 mapping of character codes to glyph indices. 
                         //The glyph set is limited to 256. Note that if this format is used to index into a larger glyph set,
                         //only the first 256 glyphs will be accessible. 
@@ -145,13 +146,13 @@ namespace Typography.OpenFont.Tables
                     {
 
                         //Format 6: Trimmed table mapping
-                        //Type    Name Description
-                        //USHORT format  Format number is set to 6.
-                        //USHORT  length This is the length in bytes of the subtable.
-                        //USHORT language    Please see “Note on the language field in 'cmap' subtables“ in this document.
-                        //USHORT firstCode   First character code of subrange.
-                        //USHORT entryCount  Number of character codes in subrange.
-                        //USHORT glyphIdArray[entryCount]   Array of glyph index values for character codes in the range.
+                        //Type      Name        Description
+                        //uint16    format      Format number is set to 6.
+                        //uint16    length      This is the length in bytes of the subtable.
+                        //uint16    language    Please see “Note on the language field in 'cmap' subtables“ in this document.
+                        //uint16    firstCode   First character code of subrange.
+                        //uint16    entryCount  Number of character codes in subrange.
+                        //uint16    glyphIdArray[entryCount]   Array of glyph index values for character codes in the range.
 
                         //The firstCode and entryCount values specify a subrange(beginning at firstCode, length = entryCount) within the range of possible character codes.
                         //Codes outside of this subrange are mapped to glyph index 0.
@@ -172,18 +173,18 @@ namespace Typography.OpenFont.Tables
 
         struct CMapEntry
         {
-            readonly UInt16 _platformId;
-            readonly UInt16 _encodingId;
-            readonly UInt32 _offset;
-            public CMapEntry(UInt16 platformId, UInt16 encodingId, UInt32 offset)
+            readonly ushort _platformId;
+            readonly ushort _encodingId;
+            readonly uint _offset;
+            public CMapEntry(ushort platformId, ushort encodingId, uint offset)
             {
                 _platformId = platformId;
                 _encodingId = encodingId;
                 _offset = offset;
             }
-            public UInt16 PlatformId { get { return _platformId; } }
-            public UInt16 EncodingId { get { return _encodingId; } }
-            public UInt32 Offset { get { return _offset; } }
+            public ushort PlatformId { get { return _platformId; } }
+            public ushort EncodingId { get { return _encodingId; } }
+            public uint Offset { get { return _offset; } }
         }
     }
 }

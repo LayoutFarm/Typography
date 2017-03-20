@@ -1,12 +1,14 @@
 ﻿//Apache2, 2016-2017, WinterDev
-using System; 
-using System.IO; 
+using System;
+using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
     //https://www.microsoft.com/typography/otspec/chapter2.htm
+    //----------------------------
     //Class Definition Table
-
+    //----------------------------
+    //
     //In OpenType Layout, index values identify glyphs. For efficiency and ease of representation, a font developer can group glyph indices to form glyph classes.
     //Class assignments vary in meaning from one lookup subtable to another. 
     //For example, in the GSUB and GPOS tables, classes are used to describe glyph contexts. 
@@ -26,8 +28,11 @@ namespace Typography.OpenFont.Tables
     //The ClassDef table can have either of two formats: 
     //one that assigns a range of consecutive glyph indices to different classes,
     //or one that puts groups of consecutive glyph indices into the same class.
+    //
+    //
     //Class Definition Table Format 1
-
+    //
+    //
     //The first class definition format (ClassDefFormat1) specifies
     //a range of consecutive glyph indices and a list of corresponding glyph class values.
     //This table is useful for assigning each glyph to a different class because
@@ -41,14 +46,21 @@ namespace Typography.OpenFont.Tables
     //Any glyph not included in the range of covered GlyphIDs automatically belongs to Class 0.
 
     //Example 7 at the end of this chapter uses Format 1 to assign class values to the lowercase, x-height, ascender, and descender glyphs in a font.
+    //
+    //----------------------------
     //ClassDefFormat1 table: Class array
-    //Type 	Name 	Description
-    //USHORT 	ClassFormat 	Format identifier-format = 1
-    //GlyphID 	StartGlyph 	First GlyphID of the ClassValueArray
-    //USHORT 	GlyphCount 	Size of the ClassValueArray
-    //USHORT 	ClassValueArray[GlyphCount] 	Array of Class Values-one per GlyphID
+    //----------------------------
+    //Type 	    Name 	        Description
+    //uint16 	ClassFormat 	Format identifier-format = 1
+    //uint16 	StartGlyph 	    First glyph ID of the ClassValueArray
+    //uint16 	GlyphCount 	    Size of the ClassValueArray
+    //uint16 	ClassValueArray[GlyphCount] 	Array of Class Values-one per GlyphID   
+    //----------------------------------
+    //
+    //
     //Class Definition Table Format 2
-
+    //
+    //
     //The second class definition format (ClassDefFormat2) defines multiple groups of glyph indices that belong to the same class.
     //Each group consists of a discrete range of glyph indices in consecutive order (ranges cannot overlap).
 
@@ -62,18 +74,22 @@ namespace Typography.OpenFont.Tables
     //Any glyph not covered by a ClassRangeRecord is assumed to belong to Class 0.
 
     //Example 8 at the end of this chapter uses Format 2 to assign class values to four types of glyphs in the Arabic script.
+    //---------------------------------------
     //ClassDefFormat2 table: Class ranges
-    //Type 	Name 	Description
-    //USHORT 	ClassFormat 	Format identifier-format = 2
-    //USHORT 	ClassRangeCount 	Number of ClassRangeRecords
+    //---------------------------------------
+    //Type 	    Name 	            Description
+    //uint16 	ClassFormat 	    Format identifier-format = 2
+    //uint16 	ClassRangeCount 	Number of ClassRangeRecords
     //struct 	ClassRangeRecord[ClassRangeCount] 	Array of ClassRangeRecords-ordered by Start GlyphID
-
+    //---------------------------------------
+    //
     //ClassRangeRecord
-    //Type 	Name 	Descriptionc
-    //GlyphID 	Start 	First GlyphID in the range
-    //GlyphID 	End 	Last GlyphID in the range
-    //USHORT 	Class 	Applied to all glyphs in the range
-
+    //---------------------------------------
+    //Type 	    Name 	            Descriptionc
+    //uint16 	Start 	            First glyph ID in the range
+    //uint16 	End 	            Last glyph ID in the range
+    //uint16 	Class 	            Applied to all glyphs in the range
+    //---------------------------------------
     class ClassDefTable
     {
         public int Format { get; private set; }
@@ -98,9 +114,9 @@ namespace Typography.OpenFont.Tables
                     {
                         classDefTable.startGlyph = reader.ReadUInt16();
                         ushort glyphCount = reader.ReadUInt16();
-                        classDefTable.classValueArray = Utils.ReadUInt16Array(reader, glyphCount);
-
-                    } break;
+                        classDefTable.classValueArray = Utils.ReadUInt16Array(reader, glyphCount); 
+                    }
+                    break;
                 case 2:
                     {
                         ushort classRangeCount = reader.ReadUInt16();
@@ -113,12 +129,22 @@ namespace Typography.OpenFont.Tables
                                 reader.ReadUInt16()); //classNo
                         }
                         classDefTable.records = records;
-                    } break;
+                    }
+                    break;
             }
             return classDefTable;
         }
         internal struct ClassRangeRecord
         {
+            //---------------------------------------
+            //
+            //ClassRangeRecord
+            //---------------------------------------
+            //Type 	    Name 	            Descriptionc
+            //uint16 	Start 	            First glyph ID in the range
+            //uint16 	End 	            Last glyph ID in the range
+            //uint16 	Class 	            Applied to all glyphs in the range
+            //---------------------------------------
             public readonly ushort startGlyphId;
             public readonly ushort endGlyphId;
             public readonly ushort classNo;

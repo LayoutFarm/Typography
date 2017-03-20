@@ -59,20 +59,20 @@ namespace Typography.OpenFont.Tables
 
             //GSUB Header, Version 1.0
             //Type 	Name 	Description
-            //USHORT 	MajorVersion 	Major version of the GSUB table, = 1
-            //USHORT 	MinorVersion 	Minor version of the GSUB table, = 0
-            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GSUB table
-            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GSUB table
-            //Offset 	LookupList 	Offset to LookupList table, from beginning of GSUB table
+            //uint16 	MajorVersion 	Major version of the GSUB table, = 1
+            //uint16 	MinorVersion 	Minor version of the GSUB table, = 0
+            //Offset16 	ScriptList 	Offset to ScriptList table, from beginning of GSUB table
+            //Offset16 	FeatureList 	Offset to FeatureList table, from beginning of GSUB table
+            //Offset16 	LookupList 	Offset to LookupList table, from beginning of GSUB table
 
             //GSUB Header, Version 1.1
             //Type 	Name 	Description
-            //USHORT 	MajorVersion 	Major version of the GSUB table, = 1
-            //USHORT 	MinorVersion 	Minor version of the GSUB table, = 1
-            //Offset 	ScriptList 	Offset to ScriptList table, from beginning of GSUB table
-            //Offset 	FeatureList 	Offset to FeatureList table, from beginning of GSUB table
-            //Offset 	LookupList 	Offset to LookupList table, from beginning of GSUB table
-            //ULONG 	FeatureVariations 	Offset to FeatureVariations table, from beginning of the GSUB table (may be NULL)
+            //uint16 	MajorVersion 	Major version of the GSUB table, = 1
+            //uint16 	MinorVersion 	Minor version of the GSUB table, = 1
+            //Offset16 	ScriptList 	Offset to ScriptList table, from beginning of GSUB table
+            //Offset16 	FeatureList 	Offset to FeatureList table, from beginning of GSUB table
+            //Offset16 	LookupList 	Offset to LookupList table, from beginning of GSUB table
+            //Offset32 	FeatureVariations 	Offset to FeatureVariations table, from beginning of the GSUB table (may be NULL)
             //--------------------
             MajorVersion = reader.ReadUInt16();
             MinorVersion = reader.ReadUInt16();
@@ -116,12 +116,14 @@ namespace Typography.OpenFont.Tables
             //
             //------
             //https://www.microsoft.com/typography/otspec/chapter2.htm
+            //------------------------------
             //LookupList table
-            //Type 	Name 	Description
-            //USHORT 	LookupCount 	Number of lookups in this table
-            //Offset 	Lookup[LookupCount] 	Array of offsets to Lookup tables-from beginning of LookupList -zero based (first lookup is Lookup index = 0)
+            //------------------------------
+            //Type 	    Name 	            Description
+            //uint16 	LookupCount 	    Number of lookups in this table
+            //Offset16 	Lookup[LookupCount] Array of offsets to Lookup tables-from beginning of LookupList -zero based (first lookup is Lookup index = 0)
+            //------------------------------
             //Lookup Table
-
             //A Lookup table (Lookup) defines the specific conditions, type, and results of a substitution or positioning action that is used to implement a feature. For example, a substitution operation requires a list of target glyph indices to be replaced, a list of replacement glyph indices, and a description of the type of substitution action.
 
             //Each Lookup table may contain only one type of information (LookupType), determined by whether the lookup is part of a GSUB or GPOS table. GSUB supports eight LookupTypes, and GPOS supports nine LookupTypes (for details about LookupTypes, see the GSUB and GPOS chapters of the document).
@@ -131,15 +133,16 @@ namespace Typography.OpenFont.Tables
             //During text processing, a client applies a lookup to each glyph in the string before moving to the next lookup. A lookup is finished for a glyph after the client makes the substitution/positioning operation. To move to the “next” glyph, the client will typically skip all the glyphs that participated in the lookup operation: glyphs that were substituted/positioned as well as any other glyphs that formed a context for the operation. However, in the case of pair positioning operations (i.e., kerning), the “next” glyph in a sequence may be the second glyph of the positioned pair (see pair positioning lookup for details).
 
             //A Lookup table contains a LookupType, specified as an integer, that defines the type of information stored in the lookup. The LookupFlag specifies lookup qualifiers that assist a text-processing client in substituting or positioning glyphs. The SubTableCount specifies the total number of SubTables. The SubTable array specifies offsets, measured from the beginning of the Lookup table, to each SubTable enumerated in the SubTable array.
+            //------------------------------
             //Lookup table
-            //Type 	Name 	Description
-            //USHORT 	LookupType 	Different enumerations for GSUB and GPOS
-            //USHORT 	LookupFlag 	Lookup qualifiers
-            //USHORT 	SubTableCount 	Number of SubTables for this lookup
-            //Offset 	SubTable
-            //[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
+            //------------------------------
+            //Type 	    Name 	        Description
+            //uint16 	LookupType 	    Different enumerations for GSUB and GPOS
+            //uint16 	LookupFlag 	    Lookup qualifiers
+            //uint16 	SubTableCount 	Number of SubTables for this lookup
+            //Offset16 	SubTable[SubTableCount] 	Array of offsets to SubTables-from beginning of Lookup table
             //unit16 	MarkFilteringSet
-
+            //------------------------------
             ushort lookupCount = reader.ReadUInt16();
             lookupTables = new LookupTable[lookupCount];
             int[] subTableOffset = new int[lookupCount];
@@ -160,11 +163,7 @@ namespace Typography.OpenFont.Tables
                 ushort subTableCount = reader.ReadUInt16();
                 //Each LookupType is defined with one or more subtables, and each subtable definition provides a different representation format
                 //
-                ushort[] subTableOffsets = new ushort[subTableCount];
-                for (int m = 0; m < subTableCount; ++m)
-                {
-                    subTableOffsets[m] = reader.ReadUInt16();
-                }
+                ushort[] subTableOffsets = Utils.ReadUInt16Array(reader, subTableCount);
 
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
@@ -301,13 +300,12 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt1 : LookupSubTable
             {
-                public LkSubTableT1Fmt1(short coverageOffset, short deltaGlyph)
+                public LkSubTableT1Fmt1(ushort coverageOffset, short deltaGlyph)
                 {
-
-                    this.CoverateOffset = coverageOffset;
+                    this.CoverageOffset = coverageOffset;
                     this.DeltaGlyph = deltaGlyph;
                 }
-                public short CoverateOffset { get; set; }
+                public ushort CoverageOffset { get; set; }
                 /// <summary>
                 /// Add to original GlyphID to get substitute GlyphID
                 /// </summary>
@@ -333,12 +331,12 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt2 : LookupSubTable
             {
-                public LkSubTableT1Fmt2(short coverageOffset, ushort[] substitueGlyphs)
+                public LkSubTableT1Fmt2(ushort coverageOffset, ushort[] substitueGlyphs)
                 {
                     this.CoverageOffset = coverageOffset;
                     this.SubstitueGlyphs = substitueGlyphs;
                 }
-                public short CoverageOffset { get; set; }
+                public ushort CoverageOffset { get; set; }
                 /// <summary>
                 /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
                 /// </summary>
@@ -396,11 +394,13 @@ namespace Typography.OpenFont.Tables
 
                 //Example 2 at the end of this chapter uses Format 1 to replace standard numerals with lining numerals. 
 
+                //---------------------------------
                 //SingleSubstFormat1 subtable: Calculated output glyph indices
-                //Type 	Name 	Description
-                //USHORT 	SubstFormat 	Format identifier-format = 1
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                //SHORT 	DeltaGlyphID 	Add to original GlyphID to get substitute GlyphID
+                //---------------------------------
+                //Type 	    Name 	        Description
+                //uint16 	SubstFormat 	Format identifier-format = 1
+                //Offset16 	Coverage 	    Offset to Coverage table-from beginning of Substitution table
+                //uint16 	DeltaGlyphID 	Add to original GlyphID to get substitute GlyphID
 
                 //------------------------------------
                 //1.2 Single Substitution Format 2
@@ -412,13 +412,15 @@ namespace Typography.OpenFont.Tables
                 //The Substitute array must contain the same number of glyph indices as the Coverage table. To locate the corresponding output glyph index in the Substitute array, this format uses the Coverage Index returned from the Coverage table.
 
                 //Example 3 at the end of this chapter uses Format 2 to substitute vertically oriented glyphs for horizontally oriented glyphs. 
+                //---------------------------------
                 //SingleSubstFormat2 subtable: Specified output glyph indices
-                //Type 	Name 	Description
+                //---------------------------------
+                //Type 	    Name 	        Description
                 //USHORT 	SubstFormat 	Format identifier-format = 2
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array
+                //Offset 	Coverage 	    Offset to Coverage table-from beginning of Substitution table
+                //USHORT 	GlyphCount 	    Number of GlyphIDs in the Substitute array
                 //GlyphID 	Substitute[GlyphCount] 	Array of substitute GlyphIDs-ordered by Coverage Index 
-
+                //---------------------------------
 
                 int j = subTableOffsets.Length;
                 for (int i = 0; i < j; ++i)
@@ -429,7 +431,7 @@ namespace Typography.OpenFont.Tables
                     //-----------------------
 
                     ushort format = reader.ReadUInt16();
-                    short coverage = reader.ReadInt16();
+                    ushort coverage = reader.ReadUInt16();
                     switch (format)
                     {
                         default: throw new NotSupportedException();
@@ -505,17 +507,20 @@ namespace Typography.OpenFont.Tables
                 //The use of multiple substitution for deletion of an input glyph is prohibited. GlyphCount should always be greater than 0. 
                 //Example 4 at the end of this chapter shows how to replace a single ligature with three glyphs. 
 
+                //----------------------
                 //MultipleSubstFormat1 subtable: Multiple output glyphs
-                //Type 	Name 	Description
-                //USHORT 	SubstFormat 	Format identifier-format = 1
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                //USHORT 	SequenceCount 	Number of Sequence table offsets in the Sequence array
-                //Offset 	Sequence[SequenceCount] 	Array of offsets to Sequence tables-from beginning of Substitution table-ordered by Coverage Index
+                //----------------------
+                //Type 	    Name 	                Description
+                //uint16 	SubstFormat 	        Format identifier-format = 1
+                //Offset16 	Coverage    	        Offset to Coverage table-from beginning of Substitution table
+                //uint16 	SequenceCount 	        Number of Sequence table offsets in the Sequence array
+                //Offset16 	Sequence[SequenceCount] Array of offsets to Sequence tables-from beginning of Substitution table-ordered by Coverage Index
+                ////----------------------
                 //Sequence table
-                //Type 	Name 	Description
-                //USHORT 	GlyphCount 	Number of GlyphIDs in the Substitute array. This should always be greater than 0.
-                //GlyphID 	Substitute[GlyphCount]  String of GlyphIDs to substitute
-
+                //Type 	    Name 	                Description
+                //uint16 	GlyphCount 	            Number of glyph IDs  in the Substitute array. This should always be greater than 0.
+                //uint16 	Substitute[GlyphCount]  String of glyph IDs  to substitute
+                //----------------------
                 int j = subTableOffsets.Length;
                 for (int i = 0; i < j; ++i)
                 {
@@ -528,9 +533,9 @@ namespace Typography.OpenFont.Tables
                         default: throw new NotSupportedException();
                         case 1:
                             {
-                                short coverageOffset = reader.ReadInt16();
+                                ushort coverageOffset = reader.ReadUInt16();
                                 ushort seqCount = reader.ReadUInt16();
-                                short[] seqOffsets = Utils.ReadInt16Array(reader, seqCount);
+                                ushort[] seqOffsets = Utils.ReadUInt16Array(reader, seqCount);
 
                                 var subTable = new LkSubTableT2();
                                 subTable.SeqTables = new SequenceTable[seqCount];
@@ -597,17 +602,20 @@ namespace Typography.OpenFont.Tables
 
                 //Example 5 at the end of this chapter shows how to replace the default ampersand glyph with alternative glyphs.
 
+                //-----------------------
                 //AlternateSubstFormat1 subtable: Alternative output glyphs
-                //Type    Name    Description
-                //uint16  SubstFormat Format identifier - format = 1
-                //Offset16    Coverage    Offset to Coverage table - from beginning of Substitution table
-                //uint16  AlternateSetCount   Number of AlternateSet tables
-                //Offset16    AlternateSet[AlternateSetCount] Array of offsets to AlternateSet tables - from beginning of Substitution table - ordered by Coverage Index
+                //-----------------------
+                //Type          Name                Description
+                //uint16        SubstFormat         Format identifier - format = 1
+                //Offset16      Coverage            Offset to Coverage table - from beginning of Substitution table
+                //uint16        AlternateSetCount   Number of AlternateSet tables
+                //Offset16      AlternateSet[AlternateSetCount] Array of offsets to AlternateSet tables - from beginning of Substitution table - ordered by Coverage Index
                 //
                 //AlternateSet table
                 //Type    Name    Description
                 //uint16  GlyphCount  Number of glyph IDs in the Alternate array
                 //uint16  Alternate[GlyphCount]   Array of alternate glyph IDs -in arbitrary order
+                //-----------------------
 
                 int j = subTableOffsets.Length;
                 for (int i = 0; i < j; ++i)
@@ -622,9 +630,9 @@ namespace Typography.OpenFont.Tables
                         default: throw new NotSupportedException();
                         case 1:
                             {
-                                short coverageOffset = reader.ReadInt16();
+                                ushort coverageOffset = reader.ReadUInt16();
                                 ushort alternativeSetCount = reader.ReadUInt16();
-                                short[] alternativeTableOffsets = Utils.ReadInt16Array(reader, alternativeSetCount);
+                                ushort[] alternativeTableOffsets = Utils.ReadUInt16Array(reader, alternativeSetCount);
 
                                 LkSubTableT3 subTable = new LkSubTableT3();
                                 AlternativeSetTable[] alternativeSetTables = new AlternativeSetTable[alternativeSetCount];
@@ -708,9 +716,9 @@ namespace Typography.OpenFont.Tables
             class LigatureSetTable
             {
                 //LigatureSet table: All ligatures beginning with the same glyph
-                //Type 	Name 	Description
-                //USHORT 	LigatureCount 	Number of Ligature tables
-                //Offset 	Ligature[LigatureCount] 	Array of offsets to Ligature tables-from beginning of LigatureSet table-ordered by preference
+                //Type 	    Name 	        Description
+                //uint16 	LigatureCount 	Number of Ligature tables
+                //Offset16 	Ligature[LigatureCount] 	Array of offsets to Ligature tables-from beginning of LigatureSet table-ordered by preference
 
                 public LigatureTable[] Ligatures { get; set; }
                 public static LigatureSetTable CreateFrom(BinaryReader reader, long beginAt)
@@ -719,7 +727,7 @@ namespace Typography.OpenFont.Tables
                     reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
                     //
                     ushort ligCount = reader.ReadUInt16(); //Number of Ligature tables
-                    short[] ligOffsets = Utils.ReadInt16Array(reader, ligCount);
+                    ushort[] ligOffsets = Utils.ReadUInt16Array(reader, ligCount);
                     //
                     LigatureTable[] ligTables = ligSetTable.Ligatures = new LigatureTable[ligCount];
                     for (int i = 0; i < ligCount; ++i)
@@ -732,9 +740,9 @@ namespace Typography.OpenFont.Tables
             }
             struct LigatureTable
             {
-                //GlyphID 	LigGlyph 	GlyphID of ligature to substitute
-                //USHORT 	CompCount 	Number of components in the ligature
-                //GlyphID 	Component[CompCount - 1] 	Array of component GlyphIDs-start with the second component-ordered in writing direction
+                //uint16 	LigGlyph 	GlyphID of ligature to substitute
+                //uint16 	CompCount 	Number of components in the ligature
+                //uint16 	Component[CompCount - 1] 	Array of component GlyphIDs-start with the second component-ordered in writing direction
                 /// <summary>
                 /// output glyph
                 /// </summary>
@@ -790,13 +798,15 @@ namespace Typography.OpenFont.Tables
                 //and an array of offsets to LigatureSet tables (LigatureSet).
                 //The Coverage table specifies only the index of the first glyph component of each ligature set.
 
-
+                //-----------------------------
                 //LigatureSubstFormat1 subtable: All ligature substitutions in a script
-                //Type 	Name 	Description
-                //USHORT 	SubstFormat 	Format identifier-format = 1
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                //USHORT 	LigSetCount 	Number of LigatureSet tables
-                //Offset 	LigatureSet[LigSetCount] 	Array of offsets to LigatureSet tables-from beginning of Substitution table-ordered by Coverage Index
+                //-----------------------------
+                //Type 	    Name 	        Description
+                //uint16 	SubstFormat 	Format identifier-format = 1
+                //Offset16 	Coverage 	    Offset to Coverage table-from beginning of Substitution table
+                //uint16 	LigSetCount 	Number of LigatureSet tables
+                //Offset16 	LigatureSet[LigSetCount] 	Array of offsets to LigatureSet tables-from beginning of Substitution table-ordered by Coverage Index
+                //-----------------------------
 
                 //A LigatureSet table, one for each covered glyph, 
                 //specifies all the ligature strings that begin with the covered glyph.
@@ -810,12 +820,13 @@ namespace Typography.OpenFont.Tables
                 //which define the glyphs in each ligature (Ligature). 
                 //The order in the Ligature offset array defines the preference for using the ligatures.
                 //For example, if the “ffl” ligature is preferable to the “ff” ligature, then the Ligature array would list the offset to the “ffl” Ligature table before the offset to the “ff” Ligature table.
-
+                //-----------------------------
                 //LigatureSet table: All ligatures beginning with the same glyph
+                //-----------------------------
                 //Type 	Name 	Description
-                //USHORT 	LigatureCount 	Number of Ligature tables
-                //Offset 	Ligature[LigatureCount] 	Array of offsets to Ligature tables-from beginning of LigatureSet table-ordered by preference
-
+                //uint16 	LigatureCount 	Number of Ligature tables
+                //Offset16 	Ligature[LigatureCount] 	Array of offsets to Ligature tables-from beginning of LigatureSet table-ordered by preference
+                //-----------------------------
 
                 //For each ligature in the set, a Ligature table specifies the GlyphID of the output ligature glyph (LigGlyph);
                 // count of the total number of component glyphs in the ligature, including the first component (CompCount); 
@@ -828,13 +839,14 @@ namespace Typography.OpenFont.Tables
                 //Conversely, for text written left to right, the left-most glyph will be first.
 
                 //Example 6 at the end of this chapter shows how to replace a string of glyphs with a single ligature.
-
+                //-----------------------------
                 //Ligature table: Glyph components for one ligature
-                //Type 	Name 	Description
-                //GlyphID 	LigGlyph 	GlyphID of ligature to substitute
-                //USHORT 	CompCount 	Number of components in the ligature
-                //GlyphID 	Component[CompCount - 1] 	Array of component GlyphIDs-start with the second component-ordered in writing direction
-
+                //-----------------------------
+                //Type 	    Name 	    Description
+                //uint16 	LigGlyph 	GlyphID of ligature to substitute
+                //uint16 	CompCount 	Number of components in the ligature
+                //uint16 	Component[CompCount - 1] 	Array of component GlyphIDs-start with the second component-ordered in writing direction
+                //-----------------------------
                 int j = subTableOffsets.Length;
                 for (int i = 0; i < j; ++i)
                 {
@@ -847,9 +859,9 @@ namespace Typography.OpenFont.Tables
                         default: throw new NotSupportedException();
                         case 1:
                             {
-                                short coverageOffset = reader.ReadInt16();
+                                ushort coverageOffset = reader.ReadUInt16();
                                 ushort ligSetCount = reader.ReadUInt16();
-                                short[] ligSetOffsets = Utils.ReadInt16Array(reader, ligSetCount);
+                                ushort[] ligSetOffsets = Utils.ReadUInt16Array(reader, ligSetCount);
                                 LkSubTableT4 subTable = new LkSubTableT4();
                                 LigatureSetTable[] ligSetTables = subTable.LigatureSetTables = new LigatureSetTable[ligSetCount];
                                 for (int n = 0; n < ligSetCount; ++n)
@@ -872,18 +884,16 @@ namespace Typography.OpenFont.Tables
             {
                 throw new NotImplementedException();
             }
-
-
-
-
             class ChainSubRuleSetTable
             {
                 //ChainSubRuleSet table: All contexts beginning with the same glyph
-                //Type 	Name 	Description
-                //USHORT 	ChainSubRuleCount 	Number of ChainSubRule tables
-                //Offset 	ChainSubRule
-                //[ChainSubRuleCount] 	Array of offsets to ChainSubRule tables-from beginning of ChainSubRuleSet table-ordered by preference
-
+                //-------------------------------------------------------------------------
+                //Type  	Name 	                            Description
+                //-------------------------------------------------------------------------
+                //uint16 	ChainSubRuleCount 	                Number of ChainSubRule tables
+                //Offset16 	ChainSubRule[ChainSubRuleCount] 	Array of offsets to ChainSubRule tables-from beginning of ChainSubRuleSet table-ordered by preference
+                //-------------------------------------------------------------------------
+                //
                 //A ChainSubRule table consists of a count of the glyphs to be matched in the backtrack,
                 //input, and lookahead context sequences, including the first glyph in each sequence, 
                 //and an array of glyph indices that describe each portion of the contexts. 
@@ -901,7 +911,7 @@ namespace Typography.OpenFont.Tables
                     //---
                     ChainSubRuleSetTable table = new ChainSubRuleSetTable();
                     ushort subRuleCount = reader.ReadUInt16();
-                    short[] subRuleOffsets = Utils.ReadInt16Array(reader, subRuleCount);
+                    ushort[] subRuleOffsets = Utils.ReadUInt16Array(reader, subRuleCount);
                     ChainSubRuleSubTable[] chainSubRuleSubTables = table.chainSubRuleSubTables = new ChainSubRuleSubTable[subRuleCount];
                     for (int i = 0; i < subRuleCount; ++i)
                     {
@@ -911,12 +921,13 @@ namespace Typography.OpenFont.Tables
                     return table;
                 }
             }
-
+            //---------------------
             //SubstLookupRecord
-            //Type 	Name 	Description
-            //USHORT 	SequenceIndex 	Index into current glyph sequence-first glyph = 0
-            //USHORT 	LookupListIndex 	Lookup to apply to that position-zero-based
-
+            //---------------------
+            //Type 	    Name 	            Description
+            //uint16 	SequenceIndex 	    Index into current glyph sequence-first glyph = 0
+            //uint16 	LookupListIndex 	Lookup to apply to that position-zero-based
+            //---------------------
             //The SequenceIndex in a SubstLookupRecord must take into consideration the order 
             //in which lookups are applied to the entire glyph sequence.
             //Because multiple substitutions may occur per context,
@@ -965,13 +976,13 @@ namespace Typography.OpenFont.Tables
 
                 //ChainSubRule subtable
                 //Type 	Name 	Description
-                //USHORT 	BacktrackGlyphCount 	Total number of glyphs in the backtrack sequence (number of glyphs to be matched before the first glyph)
-                //GlyphID 	Backtrack[BacktrackGlyphCount] 	Array of backtracking GlyphID's (to be matched before the input sequence)
-                //USHORT 	InputGlyphCount 	Total number of glyphs in the input sequence (includes the first glyph)
-                //GlyphID 	Input[InputGlyphCount - 1] 	Array of input GlyphIDs (start with second glyph)
-                //USHORT 	LookaheadGlyphCount 	Total number of glyphs in the look ahead sequence (number of glyphs to be matched after the input sequence)
-                //GlyphID 	LookAhead[LookAheadGlyphCount] 	Array of lookahead GlyphID's (to be matched after the input sequence)
-                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                //uint16 	BacktrackGlyphCount 	Total number of glyphs in the backtrack sequence (number of glyphs to be matched before the first glyph)
+                //uint16 	Backtrack[BacktrackGlyphCount] 	Array of backtracking GlyphID's (to be matched before the input sequence)
+                //uint16 	InputGlyphCount 	Total number of glyphs in the input sequence (includes the first glyph)
+                //uint16 	Input[InputGlyphCount - 1] 	Array of input GlyphIDs (start with second glyph)
+                //uint16 	LookaheadGlyphCount 	Total number of glyphs in the look ahead sequence (number of glyphs to be matched after the input sequence)
+                //uint16 	LookAhead[LookAheadGlyphCount] 	Array of lookahead GlyphID's (to be matched after the input sequence)
+                //uint16 	SubstCount 	Number of SubstLookupRecords
                 //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords (in design order)
 
                 ushort[] backTrackingGlyphs;
@@ -1005,16 +1016,18 @@ namespace Typography.OpenFont.Tables
             class ChainSubClassSet
             {
 
-                //ChainSubClassSet subtable
-                //Type 	Name 	Description
-                //USHORT 	ChainSubClassRuleCnt 	Number of ChainSubClassRule tables
-                //Offset 	ChainSubClassRule[ChainSubClassRuleCount] 	Array of offsets to ChainSubClassRule tables-from beginning of ChainSubClassSet-ordered by preference
-
+                //----------------------------------
+                //ChainSubRuleSet table: All contexts beginning with the same glyph
+                //----------------------------------
+                //Type 	    Name 	                Description
+                //uint16 	ChainSubClassRuleCnt 	Number of ChainSubClassRule tables
+                //Offset16 	ChainSubClassRule[ChainSubClassRuleCount] 	Array of offsets to ChainSubClassRule tables-from beginning of ChainSubClassSet-ordered by preference
+                //----------------------------------
                 //For each context, a ChainSubClassRule table contains a count of the glyph classes in the context sequence (GlyphCount),
                 //including the first class. 
                 //A Class array lists the classes, beginning with the second class (array index = 1), that follow the first class in the context.
 
-                //    Note: Text order depends on the writing direction of the text. For text written from right to left, the right-most class will be first. Conversely, for text written from left to right, the left-most class will be first.
+                //Note: Text order depends on the writing direction of the text. For text written from right to left, the right-most class will be first. Conversely, for text written from left to right, the left-most class will be first.
 
                 //The values specified in the Class array are the values defined in the ClassDef table. 
                 //The first class in the sequence,
@@ -1030,7 +1043,7 @@ namespace Typography.OpenFont.Tables
                     //
                     ChainSubClassSet chainSubClassSet = new ChainSubClassSet();
                     ushort count = reader.ReadUInt16();
-                    short[] subClassRuleOffsets = Utils.ReadInt16Array(reader, count);
+                    ushort[] subClassRuleOffsets = Utils.ReadUInt16Array(reader, count);
 
                     ChainSubClassRuleTable[] subClassRuleTables = chainSubClassSet.subClassRuleTables = new ChainSubClassRuleTable[count];
                     for (int i = 0; i < count; ++i)
@@ -1208,17 +1221,20 @@ namespace Typography.OpenFont.Tables
                         case 1:
                             {
                                 //6.1 Chaining Context Substitution Format 1: Simple Chaining Context Glyph Substitution 
+                                //-------------------------------
                                 //ChainContextSubstFormat1 subtable: Simple context glyph substitution
-                                //Type 	Name 	Description
-                                //USHORT 	SubstFormat 	Format identifier-format = 1
-                                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                                //USHORT 	ChainSubRuleSetCount 	Number of ChainSubRuleSet tables-must equal GlyphCount in Coverage table
-                                //Offset 	ChainSubRuleSet[ChainSubRuleSetCount] 	Array of offsets to ChainSubRuleSet tables-from beginning of Substitution table-ordered by Coverage Index
+                                //-------------------------------
+                                //Type  	Name 	        Description
+                                //uint16 	SubstFormat 	Format identifier-format = 1
+                                //Offset16 	Coverage 	    Offset to Coverage table-from beginning of Substitution table
+                                //uint16 	ChainSubRuleSetCount 	Number of ChainSubRuleSet tables-must equal GlyphCount in Coverage table
+                                //Offset16 	ChainSubRuleSet[ChainSubRuleSetCount] 	Array of offsets to ChainSubRuleSet tables-from beginning of Substitution table-ordered by Coverage Index
+                                //-------------------------------
 
                                 var subTable = new LkSubTableT6Fmt1();
-                                short coverage = reader.ReadInt16();
+                                ushort coverage = reader.ReadUInt16();
                                 ushort chainSubRulesetCount = reader.ReadUInt16();
-                                short[] chainSubRulesetOffsets = Utils.ReadInt16Array(reader, chainSubRulesetCount);
+                                ushort[] chainSubRulesetOffsets = Utils.ReadUInt16Array(reader, chainSubRulesetCount);
                                 ChainSubRuleSetTable[] subRuleSets = subTable.SubRuleSets = new ChainSubRuleSetTable[chainSubRulesetCount];
                                 for (int n = 0; n < chainSubRulesetCount; ++n)
                                 {
@@ -1231,22 +1247,25 @@ namespace Typography.OpenFont.Tables
                             break;
                         case 2:
                             {
+                                //-------------------
                                 //ChainContextSubstFormat2 subtable: Class-based chaining context glyph substitution
-                                //Type 	Name 	Description
-                                //USHORT 	SubstFormat 	Format identifier-format = 2
-                                //Offset 	Coverage 	Offset to Coverage table-from beginning of Substitution table
-                                //Offset 	BacktrackClassDef 	Offset to glyph ClassDef table containing backtrack sequence data-from beginning of Substitution table
-                                //Offset 	InputClassDef 	Offset to glyph ClassDef table containing input sequence data-from beginning of Substitution table
-                                //Offset 	LookaheadClassDef 	Offset to glyph ClassDef table containing lookahead sequence data-from beginning of Substitution table
-                                //USHORT 	ChainSubClassSetCnt 	Number of ChainSubClassSet tables
-                                //Offset 	ChainSubClassSet[ChainSubClassSetCnt] 	Array of offsets to ChainSubClassSet tables-from beginning of Substitution table-ordered by input class-may be NULL
+                                //-------------------
+                                //Type 	    Name 	            Description
+                                //uint16 	SubstFormat 	    Format identifier-format = 2
+                                //Offset16 	Coverage 	        Offset to Coverage table-from beginning of Substitution table
+                                //Offset16 	BacktrackClassDef 	Offset to glyph ClassDef table containing backtrack sequence data-from beginning of Substitution table
+                                //Offset16 	InputClassDef 	    Offset to glyph ClassDef table containing input sequence data-from beginning of Substitution table
+                                //Offset16 	LookaheadClassDef 	Offset to glyph ClassDef table containing lookahead sequence data-from beginning of Substitution table
+                                //uint16 	ChainSubClassSetCnt 	Number of ChainSubClassSet tables
+                                //Offset16 	ChainSubClassSet[ChainSubClassSetCnt] 	Array of offsets to ChainSubClassSet tables-from beginning of Substitution table-ordered by input class-may be NULL
+                                //-------------------
                                 var subTable = new LkSubTableT6Fmt2();
-                                short coverage = reader.ReadInt16();
-                                short backtrackClassDefOffset = reader.ReadInt16();
-                                short inputClassDefOffset = reader.ReadInt16();
-                                short lookaheadClassDefOffset = reader.ReadInt16();
+                                ushort coverage = reader.ReadUInt16();
+                                ushort backtrackClassDefOffset = reader.ReadUInt16();
+                                ushort inputClassDefOffset = reader.ReadUInt16();
+                                ushort lookaheadClassDefOffset = reader.ReadUInt16();
                                 ushort chainSubClassSetCount = reader.ReadUInt16();
-                                short[] chainSubClassSetOffsets = Utils.ReadInt16Array(reader, chainSubClassSetCount);
+                                ushort[] chainSubClassSetOffsets = Utils.ReadUInt16Array(reader, chainSubClassSetCount);
                                 //
                                 subTable.BacktrackClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + backtrackClassDefOffset);
                                 subTable.InputClassDef = ClassDefTable.CreateFrom(reader, subTableStartAt + inputClassDefOffset);
@@ -1266,23 +1285,25 @@ namespace Typography.OpenFont.Tables
                             break;
                         case 3:
                             {
+                                //-------------------
                                 //6.3 Chaining Context Substitution Format 3: Coverage-based Chaining Context Glyph Substitution
-                                //
-                                //USHORT 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
-                                //Offset 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
-                                //USHORT 	InputGlyphCount 	Number of glyphs in input sequence
-                                //Offset 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
-                                //USHORT 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
-                                //Offset 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
-                                //USHORT 	SubstCount 	Number of SubstLookupRecords
+                                //-------------------
+                                //uint16 	BacktrackGlyphCount 	Number of glyphs in the backtracking sequence
+                                //Offset16 	Coverage[BacktrackGlyphCount] 	Array of offsets to coverage tables in backtracking sequence, in glyph sequence order
+                                //uint16 	InputGlyphCount 	Number of glyphs in input sequence
+                                //Offset16 	Coverage[InputGlyphCount] 	Array of offsets to coverage tables in input sequence, in glyph sequence order
+                                //uint16 	LookaheadGlyphCount 	Number of glyphs in lookahead sequence
+                                //Offset16 	Coverage[LookaheadGlyphCount] 	Array of offsets to coverage tables in lookahead sequence, in glyph sequence order
+                                //uint16 	SubstCount 	Number of SubstLookupRecords
                                 //struct 	SubstLookupRecord[SubstCount] 	Array of SubstLookupRecords, in design order
+                                //-------------------
                                 LkSubTableT6Fmt3 subTable = new LkSubTableT6Fmt3();
                                 ushort backtrackingGlyphCount = reader.ReadUInt16();
-                                short[] backtrackingCoverageOffsets = Utils.ReadInt16Array(reader, backtrackingGlyphCount);
+                                ushort[] backtrackingCoverageOffsets = Utils.ReadUInt16Array(reader, backtrackingGlyphCount);
                                 ushort inputGlyphCount = reader.ReadUInt16();
-                                short[] inputGlyphCoverageOffsets = Utils.ReadInt16Array(reader, inputGlyphCount);
+                                ushort[] inputGlyphCoverageOffsets = Utils.ReadUInt16Array(reader, inputGlyphCount);
                                 ushort lookAheadGlyphCount = reader.ReadUInt16();
-                                short[] lookAheadCoverageOffsets = Utils.ReadInt16Array(reader, lookAheadGlyphCount);
+                                ushort[] lookAheadCoverageOffsets = Utils.ReadUInt16Array(reader, lookAheadGlyphCount);
                                 ushort substCount = reader.ReadUInt16();
                                 subTable.SubstLookupRecords = SubstLookupRecord.CreateSubstLookupRecords(reader, substCount);
                                 //
@@ -1310,13 +1331,14 @@ namespace Typography.OpenFont.Tables
                 //This lookup provides a mechanism whereby any other lookup type's subtables are stored at a 32-bit offset location in the 'GSUB' table. 
                 //This is needed if the total size of the subtables exceeds the 16-bit limits of the various other offsets in the 'GSUB' table.
                 //In this specification, the subtable stored at the 32-bit offset location is termed the “extension” subtable.
-
+                //----------------------------
                 //ExtensionSubstFormat1 subtable
+                //----------------------------
                 //Type      Name                Description
-                //USHORT    SubstFormat         Format identifier.Set to 1.
-                //USHORT    ExtensionLookupType Lookup type of subtable referenced by ExtensionOffset (i.e.the extension subtable).
-                //ULONG     ExtensionOffset     Offset to the extension subtable, of lookup type ExtensionLookupType, relative to the start of the ExtensionSubstFormat1 subtable.
-
+                //uint16    SubstFormat         Format identifier.Set to 1.
+                //uint16    ExtensionLookupType Lookup type of subtable referenced by ExtensionOffset (i.e.the extension subtable).
+                //Offset32     ExtensionOffset     Offset to the extension subtable, of lookup type ExtensionLookupType, relative to the start of the ExtensionSubstFormat1 subtable.
+                //----------------------------
                 //ExtensionLookupType must be set to any lookup type other than 7.
                 //All subtables in a LookupType 7 lookup must have the same ExtensionLookupType.
                 //All offsets in the extension subtables are set in the usual way, 
@@ -1363,28 +1385,6 @@ namespace Typography.OpenFont.Tables
                 throw new NotImplementedException();
             }
         }
-
-        //public bool CheckSubstitution(int inputGlyph)
-        //{
-        //    List<GSUB.LookupResult> foundResults = new List<LookupResult>();
-        //    for (int i = lookupTables.Length - 1; i >= 0; --i)
-        //    {
-        //        LookupTable lookup = lookupTables[i];
-        //        if (lookup.lookupType != 1)
-        //        {
-        //            //this version, handle only type1
-        //            //TODO: implement more
-        //            continue;
-        //        }
-        //        int foundIndex = lookup.FindGlyphIndex(inputGlyph);
-        //        if (foundIndex > -1)
-        //        {
-        //            //found here 
-        //            lookup.FindGlyphIndexAll(inputGlyph, foundResults);
-        //        }
-        //    }
-        //    return false;
-        //}
 
     }
 }

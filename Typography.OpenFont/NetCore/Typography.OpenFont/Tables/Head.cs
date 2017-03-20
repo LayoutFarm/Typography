@@ -10,6 +10,7 @@ namespace Typography.OpenFont.Tables
         short _indexToLocFormat;
         Bounds _bounds;
 
+       
 
         public Head()
         {
