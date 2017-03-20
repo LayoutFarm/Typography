@@ -75,7 +75,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="PixelFarmGlyphPathBuilder.cs" />
+    <Compile Include="GlyphPathBuilder.cs" />
     <Compile Include="PixelFarm\BitmapHelper.cs" />
     <Compile Include="PixelFarm\DevVxsTextPrinter.cs" />
     <Compile Include="PixelFarm\GlyphTranslatorToVxs.cs" />
