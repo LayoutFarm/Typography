@@ -5,14 +5,16 @@ using System.Collections.Generic;
 
 namespace Typography.Rendering
 {
-    public class PixelFarmGlyphPathBuilder : GlyphPathBuilder
+
+
+    public class GlyphPathBuilder : GlyphPathBuilderBase
     {
         GlyphFitOutlineAnalyzer _fitShapeAnalyzer = new GlyphFitOutlineAnalyzer();
         Dictionary<ushort, GlyphFitOutline> _fitoutlineCollection = new Dictionary<ushort, GlyphFitOutline>();
         GlyphFitOutline _fitOutline;
         bool _useAutoHint;
 
-        public PixelFarmGlyphPathBuilder(Typeface typeface)
+        public GlyphPathBuilder(Typeface typeface)
             : base(typeface)
         {
         }
