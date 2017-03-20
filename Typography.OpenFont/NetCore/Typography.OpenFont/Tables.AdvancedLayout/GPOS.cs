@@ -4,6 +4,34 @@ using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
+
+    //from https://www.microsoft.com/typography/otspec/otff.htm#otttables
+    //Data Types
+
+    //The following data types are used in the OpenType font file.All OpenType fonts use Motorola-style byte ordering (Big Endian):
+    //Data Type   Description
+    //uint8   8-bit unsigned integer.
+    //int8	8-bit signed integer.
+    //uint16	16-bit unsigned integer.
+    //int16	16-bit signed integer.
+    //uint24	24-bit unsigned integer.
+    //uint32	32-bit unsigned integer.
+    //int32	32-bit signed integer.
+    //Fixed	32-bit signed fixed-point number(16.16)
+    //FWORD   int16 that describes a quantity in font design units.
+    //UFWORD  uint16 that describes a quantity in font design units.
+    //F2DOT14 16 - bit signed fixed number with the low 14 bits of fraction(2.14).
+    //LONGDATETIME    Date represented in number of seconds since 12:00 midnight, January 1, 1904.The value is represented as a signed 64 - bit integer.
+    //Tag Array of four uint8s(length = 32 bits) used to identify a script, language system, feature, or baseline
+    //Offset16    Short offset to a table, same as uint16, NULL offset = 0x0000
+    //Offset32    Long offset to a table, same as uint32, NULL offset = 0x00000000
+    //-------
+    //NOTE***
+    //Offset16 => same as uint16
+    //Offset16 => same as uint32
+
+
+
     //https://www.microsoft.com/typography/otspec/GPOS.htm
 
     public partial class GPOS : TableEntry
@@ -383,15 +411,53 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType2(BinaryReader reader)
             {
+
+
+                //A pair adjustment positioning subtable(PairPos) is used to adjust the positions of two glyphs
+                //in relation to one another-for instance, 
+                //to specify kerning data for pairs of glyphs.
+                //
+                //Compared to a typical kerning table, however, a PairPos subtable offers more flexiblity and 
+                //precise control over glyph positioning.
+
+                //The PairPos subtable can adjust each glyph in a pair independently in both the X and Y directions, 
+                //and it can explicitly describe the particular type of adjustment applied to each glyph.
+                //
+                //PairPos subtables can be either of two formats: 
+                //1) one that identifies glyphs individually by index(Format 1),
+                //or 2) one that identifies glyphs by class (Format 2).
                 //-----------------------------------------------
+                //FORMAT1:
+                //Format 1 uses glyph indices to access positioning data for one or more specific pairs of glyphs
+                //All pairs are specified in the order determined by the layout direction of the text.
+                //
+                //Note: For text written from right to left, the right - most glyph will be the first glyph in a pair;
+                //conversely, for text written from left to right, the left - most glyph will be first.
+                //
+                //  A PairPosFormat1 subtable contains a format identifier(PosFormat) and two ValueFormats:
+                //ValueFormat1 applies to the ValueRecord of the first glyph in each pair.
+                //ValueRecords for all first glyphs must use ValueFormat1.
+                //If ValueFormat1 is set to zero(0), 
+                //the corresponding glyph has no ValueRecord and, therefore, should not be repositioned.
+                //
+                //ValueFormat2 applies to the ValueRecord of the second glyph in each pair.
+                //ValueRecords for all second glyphs must use ValueFormat2.
+                //If ValueFormat2 is set to null, then the second glyph of the pair is the “next” glyph for which a lookup should be performed.
+                //
+                //A PairPos subtable also defines an offset to a Coverage table(Coverage) that lists the indices of the first glyphs in each pair.
+                //More than one pair can have the same first glyph, but the Coverage table will list that glyph only once.
+                //
+                //The subtable also contains an array of offsets to PairSet tables(PairSet) and a count of the defined tables(PairSetCount).
+                //The PairSet array contains one offset for each glyph listed in the Coverage table and uses the same order as the Coverage Index.
+
                 // USHORT 	PosFormat 	Format identifier-format = 1
                 //Offset 	Coverage 	Offset to Coverage table-from beginning of PairPos subtable-only the first glyph in each pair
                 //USHORT 	ValueFormat1 	Defines the types of data in ValueRecord1-for the first glyph in the pair -may be zero (0)
                 //USHORT 	ValueFormat2 	Defines the types of data in ValueRecord2-for the second glyph in the pair -may be zero (0)
                 //USHORT 	PairSetCount 	Number of PairSet tables
-                //Offset 	PairSetOffset
-                //[PairSetCount] 	Array of offsets to PairSet tables-from beginning of PairPos subtable-ordered by Coverage Index
-                //                PairSet table
+                //Offset 	PairSetOffset[PairSetCount] Array of offsets to PairSet tables-from beginning of PairPos subtable-ordered by Coverage Index                // 	
+                //
+                //PairSet table
                 //Value 	Type 	Description
                 //USHORT 	PairValueCount 	Number of PairValueRecords
                 //struct 	PairValueRecord
@@ -445,8 +511,7 @@ namespace Typography.OpenFont.Tables
                     long subTableStartAt = lookupTablePos + subTableOffsets[i];
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
 
-                    //-----------------------
-
+                    //----------------------- 
                     ushort format = reader.ReadUInt16();
 
                     switch (format)
@@ -454,7 +519,7 @@ namespace Typography.OpenFont.Tables
                         default: throw new NotSupportedException();
                         case 1:
                             {
-                                short coverage = reader.ReadInt16();
+                                ushort coverage = reader.ReadUInt16();
                                 ushort value1Format = reader.ReadUInt16();
                                 ushort value2Format = reader.ReadUInt16();
                                 ushort pairSetCount = reader.ReadUInt16();
@@ -462,16 +527,14 @@ namespace Typography.OpenFont.Tables
                                 PairSetTable[] pairSetTables = new PairSetTable[pairSetCount];
                                 for (int n = 0; n < pairSetCount; ++n)
                                 {
-                                    //read each pair set table
-                                    reader.BaseStream.Seek(thisLookupTablePos + pairSetOffsetArray[i], SeekOrigin.Begin);
+                                    reader.BaseStream.Seek(subTableStartAt + pairSetOffsetArray[i], SeekOrigin.Begin);
                                     var pairSetTable = new PairSetTable();
                                     pairSetTable.ReadFrom(reader, value1Format, value2Format);
                                     pairSetTables[n] = pairSetTable;
                                 }
                                 var subTable = new LkSubTableType2(pairSetTables);
-                                //coverage                                 
+                                //coverage        
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
-
                                 subTables.Add(subTable);
                             }
                             break;
