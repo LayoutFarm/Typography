@@ -9,22 +9,22 @@ namespace Typography.OpenFont.Tables
     //Data Types
 
     //The following data types are used in the OpenType font file.All OpenType fonts use Motorola-style byte ordering (Big Endian):
-    //Data Type   Description
-    //uint8   8-bit unsigned integer.
-    //int8	8-bit signed integer.
+    //Data      Type   Description
+    //uint8     8-bit unsigned integer.
+    //int8	    8-bit signed integer.
     //uint16	16-bit unsigned integer.
-    //int16	16-bit signed integer.
+    //int16	    16-bit signed integer.
     //uint24	24-bit unsigned integer.
     //uint32	32-bit unsigned integer.
-    //int32	32-bit signed integer.
-    //Fixed	32-bit signed fixed-point number(16.16)
-    //FWORD   int16 that describes a quantity in font design units.
-    //UFWORD  uint16 that describes a quantity in font design units.
-    //F2DOT14 16 - bit signed fixed number with the low 14 bits of fraction(2.14).
-    //LONGDATETIME    Date represented in number of seconds since 12:00 midnight, January 1, 1904.The value is represented as a signed 64 - bit integer.
+    //int32	    32-bit signed integer.
+    //Fixed	    32-bit signed fixed-point number(16.16)
+    //FWORD     int16 that describes a quantity in font design units.
+    //UFWORD    uint16 that describes a quantity in font design units.
+    //F2DOT14   16 - bit signed fixed number with the low 14 bits of fraction(2.14).
+    //LONGDATETIME   Date represented in number of seconds since 12:00 midnight, January 1, 1904.The value is represented as a signed 64 - bit integer.
     //Tag Array of four uint8s(length = 32 bits) used to identify a script, language system, feature, or baseline
-    //Offset16    Short offset to a table, same as uint16, NULL offset = 0x0000
-    //Offset32    Long offset to a table, same as uint32, NULL offset = 0x00000000
+    //Offset16   Short offset to a table, same as uint16, NULL offset = 0x0000
+    //Offset32   Long offset to a table, same as uint32, NULL offset = 0x00000000
     //-------
     //NOTE***
     //Offset16 => same as uint16
@@ -220,7 +220,7 @@ namespace Typography.OpenFont.Tables
         /// sub table of a lookup list
         /// </summary>
         public class LookupTable
-        {   
+        {
             //Lookup table
             //--------------------------------
             //Type  	Name 	        Description
@@ -231,7 +231,7 @@ namespace Typography.OpenFont.Tables
             //unit16 	MarkFilteringSet   Index (base 0) into GDEF mark glyph sets structure. 
             //                             *** This field is only present if bit UseMarkFilteringSet of lookup flags is set.
             //--------------------------------
-           
+
             long lookupTablePos;
             //--------------------------
             public readonly ushort lookupType;
@@ -354,18 +354,18 @@ namespace Typography.OpenFont.Tables
                     //-----------------------
 
                     ushort format = reader.ReadUInt16();
-
                     switch (format)
                     {
                         default: throw new NotSupportedException();
                         case 1:
                             {
                                 //Single Adjustment Positioning: Format 1
-                                // USHORT 	PosFormat 	Format identifier-format = 1
-                                //Offset 	Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
-                                //USHORT 	ValueFormat 	Defines the types of data in the ValueRecord
+                                //Value 	Type 	    Description                                
+                                //uint16 	PosFormat 	Format identifier-format = 1
+                                //Offset16 	Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
+                                //uint16 	ValueFormat 	Defines the types of data in the ValueRecord
                                 //ValueRecord 	Value 	Defines positioning value(s)-applied to all glyphs in the Coverage table 
-                                short coverage = reader.ReadInt16();
+                                ushort coverage = reader.ReadUInt16();
                                 ushort valueFormat = reader.ReadUInt16();
                                 var subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
                                 //-------                                 
@@ -377,13 +377,13 @@ namespace Typography.OpenFont.Tables
                         case 2:
                             {
                                 //Single Adjustment Positioning: Format 2
-                                //USHORT 	PosFormat 	Format identifier-format = 2
-                                //Offset 	Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
-                                //USHORT 	ValueFormat 	Defines the types of data in the ValueRecord
-                                //USHORT 	ValueCount 	Number of ValueRecords
-                                //ValueRecord 	Value
-                                //[ValueCount] 	Array of ValueRecords-positioning values applied to glyphs
-                                short coverage = reader.ReadInt16();
+                                //Value 	    Type 	        Description
+                                //USHORT 	    PosFormat 	    Format identifier-format = 2
+                                //Offset16 	    Coverage 	    Offset to Coverage table-from beginning of SinglePos subtable
+                                //uint16 	    ValueFormat 	Defines the types of data in the ValueRecord
+                                //uint16 	    ValueCount 	    Number of ValueRecords
+                                //ValueRecord 	Value[ValueCount] 	Array of ValueRecords-positioning values applied to glyphs
+                                ushort coverage = reader.ReadUInt16();
                                 ushort valueFormat = reader.ReadUInt16();
                                 ushort valueCount = reader.ReadUInt16();
                                 var values = new ValueRecord[valueCount];
@@ -392,8 +392,6 @@ namespace Typography.OpenFont.Tables
                                     values[n] = ValueRecord.CreateFrom(reader, valueFormat);
                                 }
                                 var subTable = new LkSubTableType1(values);
-                                //-------
-
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 //-------
                                 this.subTables.Add(subTable);
@@ -403,7 +401,9 @@ namespace Typography.OpenFont.Tables
                 }
             }
 
-
+            /// <summary>
+            /// Lookup Type 2: Pair Adjustment Positioning Subtable
+            /// </summary>
             class LkSubTableType2 : LookupSubTable
             {
                 PairSetTable[] pairSetTables;
@@ -427,8 +427,6 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType2(BinaryReader reader)
             {
-
-
                 //A pair adjustment positioning subtable(PairPos) is used to adjust the positions of two glyphs
                 //in relation to one another-for instance, 
                 //to specify kerning data for pairs of glyphs.
@@ -450,7 +448,7 @@ namespace Typography.OpenFont.Tables
                 //Note: For text written from right to left, the right - most glyph will be the first glyph in a pair;
                 //conversely, for text written from left to right, the left - most glyph will be first.
                 //
-                //  A PairPosFormat1 subtable contains a format identifier(PosFormat) and two ValueFormats:
+                //A PairPosFormat1 subtable contains a format identifier(PosFormat) and two ValueFormats:
                 //ValueFormat1 applies to the ValueRecord of the first glyph in each pair.
                 //ValueRecords for all first glyphs must use ValueFormat1.
                 //If ValueFormat1 is set to zero(0), 
@@ -466,19 +464,21 @@ namespace Typography.OpenFont.Tables
                 //The subtable also contains an array of offsets to PairSet tables(PairSet) and a count of the defined tables(PairSetCount).
                 //The PairSet array contains one offset for each glyph listed in the Coverage table and uses the same order as the Coverage Index.
 
-                // USHORT 	PosFormat 	Format identifier-format = 1
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of PairPos subtable-only the first glyph in each pair
-                //USHORT 	ValueFormat1 	Defines the types of data in ValueRecord1-for the first glyph in the pair -may be zero (0)
-                //USHORT 	ValueFormat2 	Defines the types of data in ValueRecord2-for the second glyph in the pair -may be zero (0)
-                //USHORT 	PairSetCount 	Number of PairSet tables
-                //Offset 	PairSetOffset[PairSetCount] Array of offsets to PairSet tables-from beginning of PairPos subtable-ordered by Coverage Index                // 	
+                //-----------------
+                //PairPosFormat1 subtable: Adjustments for glyph pairs
+                //uint16 	PosFormat 	    Format identifier-format = 1
+                //Offset16 	Coverage 	    Offset to Coverage table-from beginning of PairPos subtable-only the first glyph in each pair
+                //uint16 	ValueFormat1 	Defines the types of data in ValueRecord1-for the first glyph in the pair -may be zero (0)
+                //uint16 	ValueFormat2 	Defines the types of data in ValueRecord2-for the second glyph in the pair -may be zero (0)
+                //uint16 	PairSetCount 	Number of PairSet tables
+                //Offset16 	PairSetOffset[PairSetCount] Array of offsets to PairSet tables-from beginning of PairPos subtable-ordered by Coverage Index                // 	
+                //-----------------
                 //
                 //PairSet table
-                //Value 	Type 	Description
-                //USHORT 	PairValueCount 	Number of PairValueRecords
-                //struct 	PairValueRecord
-                //[PairValueCount] 	Array of PairValueRecords-ordered by GlyphID of the second glyph
-
+                //Value 	Type 	            Description
+                //uint16 	PairValueCount 	    Number of PairValueRecords
+                //struct 	PairValueRecord[PairValueCount] 	Array of PairValueRecords-ordered by GlyphID of the second glyph
+                //-----------------
                 //A PairValueRecord specifies the second glyph in a pair (SecondGlyph) and defines a ValueRecord for each glyph (Value1 and Value2). If ValueFormat1 is set to zero (0) in the PairPos subtable, ValueRecord1 will be empty; similarly, if ValueFormat2 is 0, Value2 will be empty.
 
                 //Example 4 at the end of this chapter shows a PairPosFormat1 subtable that defines two cases of pair kerning.
@@ -489,24 +489,25 @@ namespace Typography.OpenFont.Tables
                 //ValueRecord 	Value2 	Positioning data for the second glyph in the pair
                 //-----------------------------------------------
 
-                // PairPosFormat2 subtable: Class pair adjustment
-                //Value 	Type 	Description
-                //USHORT 	PosFormat 	Format identifier-format = 2
-                //Offset 	Coverage 	Offset to Coverage table-from beginning of PairPos subtable-for the first glyph of the pair
-                //USHORT 	ValueFormat1 	ValueRecord definition-for the first glyph of the pair-may be zero (0)
-                //USHORT 	ValueFormat2 	ValueRecord definition-for the second glyph of the pair-may be zero (0)
-                //Offset 	ClassDef1 	Offset to ClassDef table-from beginning of PairPos subtable-for the first glyph of the pair
-                //Offset 	ClassDef2 	Offset to ClassDef table-from beginning of PairPos subtable-for the second glyph of the pair
-                //USHORT 	Class1Count 	Number of classes in ClassDef1 table-includes Class0
-                //USHORT 	Class2Count 	Number of classes in ClassDef2 table-includes Class0
-                //struct 	Class1Record
-                //[Class1Count] 	Array of Class1 records-ordered by Class1
+                //PairPosFormat2 subtable: Class pair adjustment
+                //Value 	Type 	            Description
+                //uint16 	PosFormat 	        Format identifier-format = 2
+                //Offset16 	Coverage 	        Offset to Coverage table-from beginning of PairPos subtable-for the first glyph of the pair
+                //uint16 	ValueFormat1 	    ValueRecord definition-for the first glyph of the pair-may be zero (0)
+                //uint16 	ValueFormat2 	    ValueRecord definition-for the second glyph of the pair-may be zero (0)
+                //Offset16 	ClassDef1 	        Offset to ClassDef table-from beginning of PairPos subtable-for the first glyph of the pair
+                //Offset16 	ClassDef2 	        Offset to ClassDef table-from beginning of PairPos subtable-for the second glyph of the pair
+                //uint16 	Class1Count 	    Number of classes in ClassDef1 table-includes Class0
+                //uint16 	Class2Count 	    Number of classes in ClassDef2 table-includes Class0
+                //struct 	Class1Record[Class1Count] 	Array of Class1 records-ordered by Class1
 
                 //Each Class1Record contains an array of Class2Records (Class2Record), which also are ordered by class value. 
                 //One Class2Record must be declared for each class in the ClassDef2 table, including Class 0.
+                //--------------------------------
                 //Class1Record
                 //Value 	Type 	Description
                 //struct 	Class2Record[Class2Count] 	Array of Class2 records-ordered by Class2
+                //--------------------------------
 
                 //A Class2Record consists of two ValueRecords,
                 //one for the first glyph in a class pair (Value1) and one for the second glyph (Value2).
@@ -515,9 +516,11 @@ namespace Typography.OpenFont.Tables
 
                 //Example 5 at the end of this chapter demonstrates pair kerning with glyph classes in a PairPosFormat2 subtable.
                 //Class2Record
-                //Value 	Type 	Description
+                //--------------------------------
+                //Value 	    Type 	Description
                 //ValueRecord 	Value1 	Positioning for first glyph-empty if ValueFormat1 = 0
                 //ValueRecord 	Value2 	Positioning for second glyph-empty if ValueFormat2 = 0
+                //--------------------------------
                 long thisLookupTablePos = reader.BaseStream.Position;
                 int j = subTableOffsets.Length;
 
@@ -539,7 +542,7 @@ namespace Typography.OpenFont.Tables
                                 ushort value1Format = reader.ReadUInt16();
                                 ushort value2Format = reader.ReadUInt16();
                                 ushort pairSetCount = reader.ReadUInt16();
-                                short[] pairSetOffsetArray = Utils.ReadInt16Array(reader, pairSetCount);
+                                ushort[] pairSetOffsetArray = Utils.ReadUInt16Array(reader, pairSetCount);
                                 PairSetTable[] pairSetTables = new PairSetTable[pairSetCount];
                                 for (int n = 0; n < pairSetCount; ++n)
                                 {
@@ -556,13 +559,13 @@ namespace Typography.OpenFont.Tables
                             break;
                         case 2:
                             {
+                                //....
 
-
-                                short coverage = reader.ReadInt16();
+                                ushort coverage = reader.ReadUInt16();
                                 ushort value1Format = reader.ReadUInt16();
                                 ushort value2Format = reader.ReadUInt16();
-                                short classDef1Offset = reader.ReadInt16();
-                                short classDef2Offset = reader.ReadInt16();
+                                ushort classDef1Offset = reader.ReadUInt16();
+                                ushort classDef2Offset = reader.ReadUInt16();
                                 ushort class1Count = reader.ReadUInt16();
                                 ushort class2Count = reader.ReadUInt16();
 
@@ -572,8 +575,6 @@ namespace Typography.OpenFont.Tables
                             }
                             break;
                     }
-
-
                 }
             }
 
@@ -583,9 +584,9 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType3(BinaryReader reader)
             {
+                //TODO: implement this
                 throw new NotImplementedException();
             }
-
             //-------------------------------------------------------------------------
             /// <summary>
             /// Lookup Type 4:MarkToBase Attachment Positioning, or called (MarkBasePos) table
@@ -699,6 +700,7 @@ namespace Typography.OpenFont.Tables
                 //The MarkBasePosFormat1 subtable also contains an offset to a BaseArray table (BaseArray).
 
                 //MarkBasePosFormat1 subtable: MarkToBase attachment point
+                //----------------------------------------------
                 //Value 	Type 	Description
                 //USHORT 	PosFormat 	Format identifier-format = 1
                 //Offset 	MarkCoverage 	Offset to MarkCoverage table-from beginning of MarkBasePos subtable ( all the mark glyphs referenced in the subtable)
@@ -706,6 +708,7 @@ namespace Typography.OpenFont.Tables
                 //USHORT 	ClassCount 	Number of classes defined for marks
                 //Offset 	MarkArray 	Offset to MarkArray table-from beginning of MarkBasePos subtable
                 //Offset 	BaseArray 	Offset to BaseArray table-from beginning of MarkBasePos subtable
+                //----------------------------------------------
 
                 //The BaseArray table consists of an array (BaseRecord) and count (BaseCount) of BaseRecords. 
                 //The array stores the BaseRecords in the same order as the BaseCoverage Index. 

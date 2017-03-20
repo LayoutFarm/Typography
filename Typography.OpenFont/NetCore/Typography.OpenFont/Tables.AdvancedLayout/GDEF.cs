@@ -1,6 +1,6 @@
 ﻿//Apache2, 2016-2017, WinterDev
-using System; 
-using System.IO; 
+using System;
+using System.IO;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //from https://www.microsoft.com/typography/developers/opentype/detail.htm
@@ -194,7 +194,8 @@ namespace Typography.OpenFont.Tables
                             gIndex++;
                         }
 
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         ClassDefTable.ClassRangeRecord[] records = classDef.records;
@@ -254,7 +255,8 @@ namespace Typography.OpenFont.Tables
                             gIndex++;
                         }
 
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         ClassDefTable.ClassRangeRecord[] records = markAttachmentClassDef.records;
@@ -286,7 +288,6 @@ namespace Typography.OpenFont.Tables
             //Console.WriteLine("please implement FillMarkGlyphSets()");
 
             throw new NotImplementedException();
-
         }
     }
 }
