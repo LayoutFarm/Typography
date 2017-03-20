@@ -231,7 +231,7 @@ namespace Typography.OpenFont.Tables
             //unit16 	MarkFilteringSet   Index (base 0) into GDEF mark glyph sets structure. 
             //                             *** This field is only present if bit UseMarkFilteringSet of lookup flags is set.
             //--------------------------------
-            //--------------------------
+           
             long lookupTablePos;
             //--------------------------
             public readonly ushort lookupType;
