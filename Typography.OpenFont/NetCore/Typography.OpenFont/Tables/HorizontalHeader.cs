@@ -7,6 +7,27 @@ namespace Typography.OpenFont.Tables
 {
     class HorizontalHeader : TableEntry
     {
+        //-----
+        // Type     Name            Description
+        //uint16    majorVersion    Major version number of the horizontal header table — set to 1.
+        //uint16    minorVersion    Minor version number of the horizontal header table — set to 0.
+        //FWORD     Ascender        Typographic ascent(Distance from baseline of highest ascender).
+        //FWORD     Descender       Typographic descent(Distance from baseline of lowest descender).
+        //FWORD     LineGap         Typographic line gap.
+        //Negative  LineGap         values are treated as zero in Windows 3.1, and in Mac OS System 6 and System 7.
+        //UFWORD    advanceWidthMax     Maximum advance width value in 'hmtx' table.
+        //FWORD     minLeftSideBearing  Minimum left sidebearing value in 'hmtx' table.
+        //FWORD     minRightSideBearing     Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).
+        //FWORD     xMaxExtent          Max(lsb + (xMax - xMin)).
+        //int16     caretSlopeRise  Used to calculate the slope of the cursor(rise/run); 1 for vertical.
+        //int16     caretSlopeRun 	0 for vertical.
+        //int16     caretOffset     The amount by which a slanted highlight on a glyph needs to be shifted to produce the best appearance.Set to 0 for non-slanted fonts
+        //int16(reserved)  set to 0
+        //int16(reserved)  set to 0
+        //int16(reserved)  set to 0
+        //int16(reserved)  set to 0
+        //int16 metricDataFormat 	0 for current format.
+        //uint16  numberOfHMetrics Number of hMetric entries in 'hmtx' table
 
         public HorizontalHeader()
         {
@@ -17,7 +38,7 @@ namespace Typography.OpenFont.Tables
         }
         protected override void ReadContentFrom(BinaryReader input)
         {
-            Version = input.ReadUInt32();
+            Version = input.ReadUInt32(); //major + minor
             Ascent = input.ReadInt16();
             Descent = input.ReadInt16();
             LineGap = input.ReadInt16();

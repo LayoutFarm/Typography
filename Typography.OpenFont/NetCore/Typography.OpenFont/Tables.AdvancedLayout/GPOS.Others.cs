@@ -442,11 +442,8 @@ namespace Typography.OpenFont.Tables
                     for (int c = 0; c < offsetCount; ++c)
                     {
                         anchors[c] = AnchorPoint.CreateFrom(reader, beginAt + offsets[c]);
-                    }
-
-                }
-
-
+                    } 
+                } 
                 return mark2ArrTable;
             }
             public AnchorPoint GetAnchorPoint(int index, int markClassId)
@@ -467,9 +464,7 @@ namespace Typography.OpenFont.Tables
                 this.offsets = offsets;
                 anchorPoints = new AnchorPoint[offsets.Length];
             }
-        }
-
-
+        } 
         class BaseArrayTable
         {
             //BaseArray table
