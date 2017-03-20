@@ -1,5 +1,6 @@
 ﻿//Apache2, 2016-2017, WinterDev
 //https://www.microsoft.com/typography/otspec/chapter2.htm
+//https://www.microsoft.com/typography/OTSpec/delta180to181/chapter2.htm
 
 using System.IO;
 
@@ -53,12 +54,15 @@ namespace Typography.OpenFont.Tables
     //Features are specified in full in the FeatureList table, FeatureRecord, and Feature table, 
     //which are described later in this chapter.
     //Example 2 at the end of this chapter shows a Script table, LangSysRecord, and LangSys table used for contextual positioning in the Arabic script.
+
+    //---------------------
     //LangSys table
-    //Type 	Name 	Description
-    //Offset 	LookupOrder 	= NULL (reserved for an offset to a reordering table)
-    //USHORT 	ReqFeatureIndex 	Index of a feature required for this language system- if no required features = 0xFFFF
-    //USHORT 	FeatureCount 	Number of FeatureIndex values for this language system-excludes the required feature
-    //USHORT 	FeatureIndex[FeatureCount] 	Array of indices into the FeatureList-in arbitrary order
+    //Type 	    Name 	        Description
+    //Offset16 	LookupOrder 	= NULL (reserved for an offset to a reordering table)
+    //uint16 	ReqFeatureIndex Index of a feature required for this language system- if no required features = 0xFFFF
+    //uint16 	FeatureCount 	Number of FeatureIndex values for this language system-excludes the required feature
+    //uint16 	FeatureIndex[FeatureCount] 	Array of indices into the FeatureList-in arbitrary order
+    //---------------------
     public class ScriptTable
     {
         public LangSysTable defaultLang;
@@ -85,9 +89,16 @@ namespace Typography.OpenFont.Tables
             LangSysTable[] langSysTables = scriptTable.langSysTables = new LangSysTable[langSysCount];
             for (int i = 0; i < langSysCount; ++i)
             {
+                //-----------------------
+                //LangSysRecord
+                //Type 	    Name 	    Description
+                //Tag 	    LangSysTag 	4-byte LangSysTag identifier
+                //Offset16 	LangSys 	Offset to LangSys table-from beginning of Script table
+                //-----------------------
+
                 langSysTables[i] = new LangSysTable(
-                    reader.ReadUInt32(), //langSysTagIdentifier 
-                    reader.ReadInt16());//offset
+                    reader.ReadUInt32(),  //	4-byte LangSysTag identifier
+                    reader.ReadUInt16()); //offset
             }
 
             //-----------
@@ -126,25 +137,28 @@ namespace Typography.OpenFont.Tables
             //used to render the glyphs in a script. (The LookupOrder offset is reserved for future use.)
             //
             public uint langSysTagIden { get; private set; }
-            public readonly short offset;
+            public readonly ushort offset;
 
             //
             public ushort[] featureIndexList { get; private set; }
             public ushort RequireFeatureIndex { get; private set; }
 
-            public LangSysTable(uint langSysTagIden, short offset)
+            public LangSysTable(uint langSysTagIden, ushort offset)
             {
                 this.offset = offset;
                 this.langSysTagIden = langSysTagIden;
             }
             public void ReadFrom(BinaryReader reader)
             {
-                //Name 	Description
-                //Offset 	LookupOrder 	= NULL (reserved for an offset to a reordering table)
-                //USHORT 	ReqFeatureIndex 	Index of a feature required for this language system- if no required features = 0xFFFF
-                //USHORT 	FeatureCount 	Number of FeatureIndex values for this language system-excludes the required feature
-                //USHORT 	FeatureIndex[FeatureCount] 	Array of indices into the FeatureList-in arbitrary order
-                short lookupOrder = reader.ReadInt16();//reserve
+                //---------------------
+                //LangSys table
+                //Type 	    Name 	        Description
+                //Offset16 	LookupOrder 	= NULL (reserved for an offset to a reordering table)
+                //uint16 	ReqFeatureIndex Index of a feature required for this language system- if no required features = 0xFFFF
+                //uint16 	FeatureCount 	Number of FeatureIndex values for this language system-excludes the required feature
+                //uint16 	FeatureIndex[FeatureCount] 	Array of indices into the FeatureList-in arbitrary order
+                //---------------------
+                ushort lookupOrder = reader.ReadUInt16();//reserve
                 RequireFeatureIndex = reader.ReadUInt16();
                 ushort featureCount = reader.ReadUInt16();
                 featureIndexList = Utils.ReadUInt16Array(reader, featureCount);
