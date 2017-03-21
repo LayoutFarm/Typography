@@ -51,12 +51,12 @@ namespace Typography.OpenFont
         }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
-        public int CharacterToGlyphIndex(UInt32 character)
+        public ushort CharacterToGlyphIndex(char character)
         {
-            return (int)RawCharacterToGlyphIndex(character);
+            return RawCharacterToGlyphIndex(character);
         }
 
-        uint RawCharacterToGlyphIndex(UInt32 character)
+        ushort RawCharacterToGlyphIndex(ushort character)
         {
             // TODO: Fast segment lookup using bit operations?
             switch (this._cmapFormat)
@@ -71,8 +71,8 @@ namespace Typography.OpenFont
 
                                 if (_idRangeOffset[i] == 0)
                                 {
-
-                                    return (character + _idDelta[i]) % 65536;
+                                    //TODO: review 65536 => use bitflags 
+                                    return (ushort)((character + _idDelta[i]) % 65536);
                                 }
                                 else
                                 {

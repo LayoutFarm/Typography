@@ -145,7 +145,7 @@ namespace Typography.OpenFont
         {
             get { return _nameEntry.FontSubFamily; }
         }
-        public int LookupIndex(char character)
+        public ushort LookupIndex(char character)
         {
             // TODO: What if there are none or several tables?
             return _cmaps[0].CharacterToGlyphIndex(character);
