@@ -32,14 +32,7 @@ namespace Typography.Rendering
         }
         public Typeface Typeface { get { return _typeface; } }
 
-        /// <summary>
-        /// specific output glyph size (in points)
-        /// </summary>
-        public float SizeInPoints
-        {
-            get;
-            private set;
-        }
+
         /// <summary>
         /// use Maxim's Agg Vertical Hinting
         /// </summary>
@@ -57,20 +50,24 @@ namespace Typography.Rendering
         }
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-
-            this.SizeInPoints = sizeInPoints;
             //
             Glyph glyph = _typeface.GetGlyphByIndex(glyphIndex);
             //
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
             //
-            Typeface currentTypeFace = this._typeface;
-            _recentPixelScale = this._typeface.CalculateFromPointToPixelScale(SizeInPoints); //***
 
-            FitCurrentGlyph(glyphIndex, glyph);
+            if (sizeInPoints > 0)
+            {
+                _recentPixelScale = this._typeface.CalculateFromPointToPixelScale(sizeInPoints); //***
+                FitCurrentGlyph(glyphIndex, glyph, sizeInPoints);
+            }
+            else
+            {
+                _recentPixelScale = 1;
+            }
         }
-        protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph)
+        protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph, float sizeInPoints)
         {
             //2. process glyph points
             if (UseTrueTypeInstructions &&
@@ -79,7 +76,7 @@ namespace Typography.Rendering
             {
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                 //output as points,
-                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, SizeInPoints);
+                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, sizeInPoints);
                 //all points are scaled from _trueTypeInterpreter, 
                 //so not need further scale.=> set _recentPixelScale=1
                 _recentPixelScale = 1;
