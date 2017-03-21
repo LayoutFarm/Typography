@@ -45,6 +45,7 @@ namespace Typography.Rendering
                 _useInterpreter = value;
             }
         }
+
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
             //
@@ -52,19 +53,19 @@ namespace Typography.Rendering
             //
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
-            //
-
+            // 
             if (sizeInPoints > 0)
             {
-                _recentPixelScale = this._typeface.CalculateToPixelScaleFromPointSize(sizeInPoints); //***
-                FitCurrentGlyph(glyphIndex, glyph, sizeInPoints);
+                //no fit current glyph occur if user not specific sizeInPoints or use invalid size                
+                _recentPixelScale = _typeface.CalculateToPixelScaleFromPointSize(sizeInPoints); //***
+                FitCurrentGlyph(glyphIndex, glyph, Typeface.ConvPointsToPixels(sizeInPoints));
             }
             else
             {
                 _recentPixelScale = 1;
             }
         }
-        protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph, float sizeInPoints)
+        protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph, float sizeInPixels)
         {
             //2. process glyph points
             if (UseTrueTypeInstructions &&
@@ -73,7 +74,7 @@ namespace Typography.Rendering
             {
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                 //output as points,
-                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, sizeInPoints);
+                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, sizeInPixels);
                 //all points are scaled from _trueTypeInterpreter, 
                 //so not need further scale.=> set _recentPixelScale=1
                 _recentPixelScale = 1;

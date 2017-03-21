@@ -18,7 +18,7 @@ namespace Typography.Rendering
             : base(typeface)
         {
         }
-        protected override void FitCurrentGlyph(ushort glyphIndex, Glyph glyph,float sizeInPoints)
+        protected override void FitCurrentGlyph(ushort glyphIndex, Glyph glyph, float sizeInPixels)
         {
             //not use interperter so we need to scale it with our machnism
             //this demonstrate our auto hint engine ***
