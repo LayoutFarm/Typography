@@ -145,7 +145,7 @@ namespace Typography.OpenFont
         {
             get { return _nameEntry.FontSubFamily; }
         }
-        public int LookupIndex(char character)
+        public ushort LookupIndex(char character)
         {
             // TODO: What if there are none or several tables?
             return _cmaps[0].CharacterToGlyphIndex(character);
@@ -187,18 +187,44 @@ namespace Typography.OpenFont
 
 
         const int pointsPerInch = 72;
-        public float CalculateFromPointToPixelScale(float sizeInPointUnit, int resolution = 96)
-        {
-            return ((sizeInPointUnit * resolution) / (pointsPerInch * this.UnitsPerEm));
-        }
-        public static float ConvPointsToPixels(float pointsValue, int resolution = 96)
+        /// <summary>
+        /// convert from point-unit value to pixel value
+        /// </summary>
+        /// <param name="targetPointSize"></param>
+        /// <param name="resolution"></param>
+        /// <returns></returns>
+        public static float ConvPointsToPixels(float targetPointSize, int resolution = 96)
         {
             //http://stackoverflow.com/questions/139655/convert-pixels-to-points
             //points = pixels * 72 / 96
-            //pixels = points * 96 /72
-            //pixels = points * resolution / pointPerInch
-            return pointsValue * resolution / pointsPerInch;
+            //------------------------------------------------
+            //pixels = targetPointSize * 96 /72
+            //pixels = targetPointSize * resolution / pointPerInch
+            return targetPointSize * resolution / pointsPerInch;
         }
+        /// <summary>
+        /// calculate scale to target pixel size based on current typeface's UnitsPerEm
+        /// </summary>
+        /// <param name="targetPixelSize">target font size in point unit</param>
+        /// <returns></returns>
+        public float CalculateToPixelScale(float targetPixelSize)
+        {
+            //1. return targetPixelSize / UnitsPerEm
+            return targetPixelSize / this.UnitsPerEm;
+        }
+        /// <summary>
+        ///  calculate scale to target pixel size based on current typeface's UnitsPerEm
+        /// </summary>
+        /// <param name="targetPointSize">target font size in point unit</param>
+        /// <param name="resolution"></param>
+        /// <returns></returns>
+        public float CalculateToPixelScaleFromPointSize(float targetPointSize, int resolution = 96)
+        {
+            //1. var sizeInPixels = ConvPointsToPixels(sizeInPointUnit);
+            //2. return  sizeInPixels / UnitsPerEm
+            return (targetPointSize * resolution / pointsPerInch) / this.UnitsPerEm;
+        }
+         
         internal GDEF GDEFTable
         {
             get;
