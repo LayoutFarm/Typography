@@ -28,7 +28,7 @@ namespace Typography.OpenFont
         }
 
 
-        public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPoints)
+        public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPixel)
         {
 
             Glyph glyph = currentTypeFace.GetGlyphByIndex(glyphIndex);
@@ -44,7 +44,7 @@ namespace Typography.OpenFont
                 glyph.GlyphPoints,
                 glyph.EndPoints,
                 glyph.GlyphInstructions,
-                glyphSizeInPoints);
+                glyphSizeInPixel);
 
         }
         public GlyphPointF[] HintGlyph(
@@ -55,7 +55,7 @@ namespace Typography.OpenFont
             GlyphPointF[] glyphPoints,
             ushort[] contourEndPoints,
             byte[] instructions,
-            float glyphSizeInPoints)
+            float glyphSizeInPixel)
         {
 
             //get glyph for its matrix
@@ -81,7 +81,7 @@ namespace Typography.OpenFont
             newGlyphPoints[orgLen + 3] = pp4;
 
             //3. scale all point to target pixel size
-            float pxScale = currentTypeFace.CalculateFromPointToPixelScale(glyphSizeInPoints);
+            float pxScale = currentTypeFace.CalculateToPixelScale(glyphSizeInPixel);
             for (int i = orgLen + 3; i >= 0; --i)
             {
                 newGlyphPoints[i].ApplyScale(pxScale);
@@ -98,11 +98,10 @@ namespace Typography.OpenFont
                 ApplyScaleOnlyOnXAxis(newGlyphPoints, agg_x_scale);
             }
 
-            //4. 
-            float sizeInPixels = Typeface.ConvPointsToPixels(glyphSizeInPoints);
+            //4.  
             _interpreter.SetControlValueTable(currentTypeFace.ControlValues,
                 pxScale,
-                sizeInPixels,
+                glyphSizeInPixel,
                 currentTypeFace.PrepProgramBuffer);
             //--------------------------------------------------
             //5. hint

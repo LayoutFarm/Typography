@@ -17,13 +17,13 @@ namespace Typography.Rendering
         TrueTypeInterpreter _trueTypeInterpreter;
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
+        /// <summary>
+        /// scale for converting latest glyph points to latest request font size
+        /// </summary>
         float _recentPixelScale;
         bool _useInterpreter;
-
-
         public GlyphPathBuilderBase(Typeface typeface)
         {
-
             _typeface = typeface;
             this.UseTrueTypeInstructions = false;//default?
             _trueTypeInterpreter = new TrueTypeInterpreter();
@@ -31,15 +31,6 @@ namespace Typography.Rendering
             _recentPixelScale = 1;
         }
         public Typeface Typeface { get { return _typeface; } }
-
-        /// <summary>
-        /// specific output glyph size (in points)
-        /// </summary>
-        public float SizeInPoints
-        {
-            get;
-            private set;
-        }
         /// <summary>
         /// use Maxim's Agg Vertical Hinting
         /// </summary>
@@ -55,42 +46,54 @@ namespace Typography.Rendering
                 _useInterpreter = value;
             }
         }
+
+        /// <summary>
+        /// build glyph shape from glyphIndex and 
+        /// </summary>
+        /// <param name="glyphIndex"></param>
+        /// <param name="sizeInPoints"></param>
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-
-            this.SizeInPoints = sizeInPoints;
             //
             Glyph glyph = _typeface.GetGlyphByIndex(glyphIndex);
-            //
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
-            //
-            Typeface currentTypeFace = this._typeface;
-            _recentPixelScale = this._typeface.CalculateFromPointToPixelScale(SizeInPoints); //***
 
+            if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)
+            {
+                //convert to pixel size
+                //if size< 0 then set _recentPixelScale = 1;
+                //mean that no scaling at all, we use original point value
+                _recentPixelScale = 1;
+            }
+            else
+            {
+                _recentPixelScale = Typeface.CalculateToPixelScale(RecentFontSizeInPixels);
+            }
+            //-------------------------------------
             FitCurrentGlyph(glyphIndex, glyph);
         }
+        protected float RecentFontSizeInPixels { get; private set; }
         protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph)
         {
-            //2. process glyph points
-            if (UseTrueTypeInstructions &&
-                this._typeface.HasPrepProgramBuffer &&
-                glyph.HasGlyphInstructions)
+            if (RecentFontSizeInPixels > 0 && UseTrueTypeInstructions &&
+                  this._typeface.HasPrepProgramBuffer &&
+                  glyph.HasGlyphInstructions)
             {
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                 //output as points,
-                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, SizeInPoints);
+                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, RecentFontSizeInPixels);
+                //***
                 //all points are scaled from _trueTypeInterpreter, 
                 //so not need further scale.=> set _recentPixelScale=1
                 _recentPixelScale = 1;
-            }
+            } 
         }
         public virtual void ReadShapes(IGlyphTranslator tx)
         {
             //read output from glyph points
             tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
         }
-        protected float RecentPixelScale { get { return _recentPixelScale; } }
     }
 
     public static class GlyphPathBuilderExtensions
