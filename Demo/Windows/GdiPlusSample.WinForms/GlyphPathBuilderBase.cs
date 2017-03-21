@@ -19,11 +19,8 @@ namespace Typography.Rendering
         protected ushort[] _outputContours;
         float _recentPixelScale;
         bool _useInterpreter;
-
-
         public GlyphPathBuilderBase(Typeface typeface)
         {
-
             _typeface = typeface;
             this.UseTrueTypeInstructions = false;//default?
             _trueTypeInterpreter = new TrueTypeInterpreter();
@@ -59,7 +56,7 @@ namespace Typography.Rendering
 
             if (sizeInPoints > 0)
             {
-                _recentPixelScale = this._typeface.CalculateFromPointToPixelScale(sizeInPoints); //***
+                _recentPixelScale = this._typeface.CalculateToPixelScaleFromPointSize(sizeInPoints); //***
                 FitCurrentGlyph(glyphIndex, glyph, sizeInPoints);
             }
             else

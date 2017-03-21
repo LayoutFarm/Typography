@@ -86,7 +86,7 @@ namespace SampleWinForms
             //update some font matrix property  
             if (_currentTypeface != null)
             {
-                float pointToPixelScale = _currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+                float pointToPixelScale = _currentTypeface.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
                 this.FontAscendingPx = _currentTypeface.Ascender * pointToPixelScale;
                 this.FontDescedingPx = _currentTypeface.Descender * pointToPixelScale;
                 this.FontLineGapPx = _currentTypeface.LineGap * pointToPixelScale;
@@ -137,7 +137,7 @@ namespace SampleWinForms
             //3. render each glyph 
             System.Drawing.Drawing2D.Matrix scaleMat = null;
             float sizeInPoints = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateFromPointToPixelScale(sizeInPoints);
+            float scale = _currentTypeface.CalculateToPixelScaleFromPointSize(sizeInPoints);
             //this draw a single line text span***
             int endBefore = startAt + len;
 

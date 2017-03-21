@@ -88,7 +88,7 @@ namespace PixelFarm.Drawing.Fonts
             if (_glyphPathBuilder != null)
             {
                 Typeface currentTypeface = _glyphPathBuilder.Typeface;
-                float pointToPixelScale = currentTypeface.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+                float pointToPixelScale = currentTypeface.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
                 this.FontAscendingPx = currentTypeface.Ascender * pointToPixelScale;
                 this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
                 this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
@@ -123,7 +123,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO: review this again, we should use pixel?
 
             float fontSizePoint = this.FontSizeInPoints;
-            float scale = typeface.CalculateFromPointToPixelScale(fontSizePoint);
+            float scale = typeface.CalculateToPixelScaleFromPointSize(fontSizePoint);
 
 
             //4. render each glyph
