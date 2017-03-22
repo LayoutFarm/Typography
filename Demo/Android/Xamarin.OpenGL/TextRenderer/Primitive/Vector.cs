@@ -1,4 +1,5 @@
-﻿namespace Typography.Rendering
+﻿//MIT, 2017, Zou Wei(github/zwcloud)
+namespace Typography.Rendering
 {
     public struct Vector
     {

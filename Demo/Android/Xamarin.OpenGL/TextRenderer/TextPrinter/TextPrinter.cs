@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
+using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 

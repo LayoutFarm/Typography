@@ -1,4 +1,5 @@
-﻿using System;
+﻿//MIT, 2015-2017, bitzhuwei, https://github.com/bitzhuwei/CSharpGL
+using System;
 
 namespace CSharpGLES
 {
