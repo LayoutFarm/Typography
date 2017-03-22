@@ -1,3 +1,4 @@
+//MIT, 2017, Zou Wei(github/zwcloud)
 using System;
 using OpenTK;
 using OpenTK.Platform.Android;

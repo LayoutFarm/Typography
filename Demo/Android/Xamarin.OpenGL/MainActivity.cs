@@ -1,4 +1,5 @@
-﻿using System;
+﻿//MIT, 2017, Zou Wei(github/zwcloud)
+using System;
 using Android.App;
 using Android.Content;
 using Android.Runtime;

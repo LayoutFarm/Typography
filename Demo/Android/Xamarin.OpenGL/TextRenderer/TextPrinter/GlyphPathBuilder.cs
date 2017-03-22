@@ -1,4 +1,6 @@
-﻿using Typography.OpenFont;
+﻿//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
+
+using Typography.OpenFont;
 using System.Collections.Generic;
 
 namespace Typography.Rendering

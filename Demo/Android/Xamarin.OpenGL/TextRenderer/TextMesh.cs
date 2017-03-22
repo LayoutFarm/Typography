@@ -1,4 +1,5 @@
-﻿using Typography.Rendering;
+﻿//MIT, 2017, Zou Wei(github/zwcloud)
+using Typography.Rendering;
 
 namespace Xamarin.OpenGL
 {

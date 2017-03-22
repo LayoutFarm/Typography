@@ -1,4 +1,5 @@
-﻿using System;
+﻿//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
+using System;
 using Typography.OpenFont;
 
 namespace Typography.Rendering
