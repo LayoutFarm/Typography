@@ -71,7 +71,7 @@ namespace Typography.Rendering
             this._outputContours = glyph.EndPoints;
             //-------------------------------------------              
             Typeface currentTypeFace = this._typeface;
-            _recentPixelScale = currentTypeFace.CalculateFromPointToPixelScale(SizeInPoints); //***
+            _recentPixelScale = currentTypeFace.CalculateToPixelScaleFromPointSize(SizeInPoints); //***
             _useAutoHint = false;//reset             
             //-------------------------------------------  
             //2. process glyph points

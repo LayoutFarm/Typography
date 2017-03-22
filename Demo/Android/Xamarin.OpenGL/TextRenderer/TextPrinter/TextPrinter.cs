@@ -30,10 +30,10 @@ namespace Typography.Rendering
             get { return currentFontFile; }
             set
             {
-                if (currentFontFile != value) 
+                if (currentFontFile != value)
                 {
                     currentFontFile = value;
-                    
+
                     using (var fs = Xamarin.OpenGL.Utility.ReadFile(currentFontFile))
                     {
                         var reader = new OpenFontReader();
@@ -92,7 +92,7 @@ namespace Typography.Rendering
             glyphLayout.GenerateGlyphPlans(text.ToCharArray(), 0, text.Length, outputGlyphPlans, null);
 
             // render each glyph
-            var scale = CurrentTypeFace.CalculateFromPointToPixelScale(sizeInPoints);
+            var scale = CurrentTypeFace.CalculateToPixelScaleFromPointSize(sizeInPoints);
             pathTranslator.PathBuilder = g;
             for (var i = 0; i < outputGlyphPlans.Count; ++i)
             {
@@ -106,7 +106,7 @@ namespace Typography.Rendering
         public void Measure(string text, int startAt, int len, out float width, out float height)
         {
             glyphLayout.Typeface = this.CurrentTypeFace;
-            var scale = CurrentTypeFace.CalculateFromPointToPixelScale(this.FontSizeInPoints);
+            var scale = CurrentTypeFace.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
             MeasuredStringBox strBox;
             glyphLayout.MeasureString(text.ToCharArray(), startAt, len, out strBox, scale);
             width = strBox.width;
