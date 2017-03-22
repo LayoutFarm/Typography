@@ -284,6 +284,211 @@ namespace Typography.OpenFont
             tx.EndRead();
         }
 
+        public static void Read(this IGlyphTranslator tx, GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float sizeInPoints, float scale = 1, float offsetX = 0, float offsetY = 0)
+        {
+            int startContour = 0;
+            int cpoint_index = 0;//current point index
+
+            int todoContourCount = contourEndPoints.Length;
+            //----------------------------------- 
+            //1. start read data from a glyph
+            tx.BeginRead(todoContourCount);
+            //-----------------------------------
+            float latest_moveto_x = 0;
+            float latest_moveto_y = 0;
+
+            int curveControlPointCount = 0; // 1 curve control point => Quadratic, 2 curve control points => Cubic
+
+
+            while (todoContourCount > 0)
+            {
+                //foreach contour...
+
+                //next contour will begin at...
+                int nextCntBeginAtIndex = contourEndPoints[startContour] + 1;
+
+                //reset  ...
+                Vector2 c1 = new Vector2();
+                Vector2 c2 = new Vector2();
+                bool curveMode = false;
+                bool isFirstPoint = true;  //first point of this contour
+
+
+                //for each point in this contour
+                for (; cpoint_index < nextCntBeginAtIndex; ++cpoint_index)
+                {
+
+                    GlyphPointF p = glyphPoints[cpoint_index];
+                    float p_x = p.X * scale;
+                    float p_y = p.Y * -scale;
+                    p_x = p_x + offsetX;
+                    p_y = p_y + sizeInPoints + offsetY;
+
+                    //int vtag = (int)flags[cpoint_index] & 0x1;
+                    //bool has_dropout = (((vtag >> 2) & 0x1) != 0);
+                    //int dropoutMode = vtag >> 3;
+
+                    if (p.onCurve)
+                    {
+                        //point p is an on-curve point (on outline). (not curve control point)
+                        //possible ways..
+                        //1. if we are in curve mode, then p is end point
+                        //   we must decide which curve to create (Curve3 or Curve4)
+                        //   easy, ... 
+                        //      if  curveControlPointCount == 1 , then create Curve3
+                        //      else curveControlPointCount ==2 , then create Curve4
+                        //2. if we are NOT in curve mode, 
+                        //      if p is first point then set this to x0,y0
+                        //      else then p is end point of a line.
+
+                        if (curveMode)
+                        {
+                            switch (curveControlPointCount)
+                            {
+                                case 1:
+                                    {
+                                        tx.Curve3(
+                                            c1.X, c1.Y,
+                                            p_x, p_y);
+                                    }
+                                    break;
+                                case 2:
+                                    {
+                                        //for TrueType font 
+                                        //we should not be here?
+
+                                        tx.Curve4(
+                                             c1.X, c1.Y,
+                                             c2.X, c2.Y,
+                                             p_x, p_y);
+                                    }
+                                    break;
+                                default:
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                            }
+
+                            //reset curve control point count
+                            curveControlPointCount = 0;
+                            //exist from curve mode
+                            curveMode = false;
+                        }
+                        else
+                        {
+                            //as describe above,...
+
+                            if (isFirstPoint)
+                            {
+                                isFirstPoint = false;
+                                tx.MoveTo(latest_moveto_x = (p_x), latest_moveto_y = (p_y));
+                            }
+                            else
+                            {
+                                tx.LineTo(p_x, p_y);
+                            }
+
+                            //if (has_dropout)
+                            //{
+                            //    //printf("[%d] on,dropoutMode=%d: %d,y:%d \n", mm, dropoutMode, vpoint.x, vpoint.y);
+                            //}
+                            //else
+                            //{
+                            //    //printf("[%d] on,x: %d,y:%d \n", mm, vpoint.x, vpoint.y);
+                            //}
+                        }
+                    }
+                    else
+                    {
+                        //this point is curve control point***
+                        //so set curve mode = true
+                        curveMode = true;
+                        //check number if existing curve control 
+
+                        switch (curveControlPointCount)
+                        {
+
+                            case 0:
+                                c1 = new Vector2(p_x, p_y);
+                                //this point may be part 1st control point of a curve,
+                                //store it and wait for next point before make decision *** 
+                                break;
+                            case 1:
+                                //we already have previous 1st control point (c1)
+                                //------------------------------------- 
+                                //please note that TrueType font
+                                //compose of Quadractic Bezier Curve (Curve3) *** 
+                                //------------------------------------- 
+                                //in this case, this is NOT Cubic,
+                                //this is 2 CONNECTED Quadractic Bezier Curves***
+                                //
+                                //we must create 'end point' of the first curve
+                                //and set it as 'begin point of the second curve.
+                                //
+                                //this is done by ...
+                                //1. calculate mid point between c1 and the latest point (p_x,p_y)
+                                Vector2 mid = GetMid(c1, p_x, p_y);
+                                //----------
+                                //2. generate curve3 ***
+                                tx.Curve3(
+                                    c1.X, c1.Y,
+                                    mid.X, mid.Y);
+                                //------------------------
+                                //3. so curve control point number is reduce by 1***
+                                curveControlPointCount--;
+                                //------------------------
+                                //4. and set (p_x,p_y) as 1st control point for the new curve
+                                c1 = new Vector2(p_x, p_y);
+                                //
+                                //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y); 
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
+                        //count
+                        curveControlPointCount++;
+                    }
+                }
+                //--------
+                //when finish,                 
+                //ensure that the contour is closed.
+                if (curveMode)
+                {
+                    switch (curveControlPointCount)
+                    {
+                        case 0: break;
+                        case 1:
+                            {
+                                tx.Curve3(c1.X, c1.Y,
+                                    latest_moveto_x, latest_moveto_y);
+                            }
+                            break;
+                        case 2:
+                            {
+                                //for TrueType font 
+                                //we should not be here? 
+                                tx.Curve4(c1.X, c1.Y,
+                                    c2.X, c2.Y,
+                                    latest_moveto_x, latest_moveto_y);
+                            }
+                            break;
+                        default:
+                            { throw new NotSupportedException(); }
+                    }
+                    //reset
+                    curveMode = false;
+                    curveControlPointCount = 0;
+                }
+                //--------      
+                tx.CloseContour(); //***                            
+                startContour++;
+                todoContourCount--;
+                //--------      
+            }
+            //finish
+            tx.EndRead();
+        }
+
         static Vector2 GetMid(Vector2 v0, float x1, float y1)
         {
             //mid point between v0 and (x1,y1)
