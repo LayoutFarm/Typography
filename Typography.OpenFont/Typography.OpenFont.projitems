@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>235a071b-8d06-40ae-a5c5-b1ce59715ee9</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Typography.OpenFont</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Bounds.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CharacterMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontCollection\InstalledFont.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Glyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IGlyphTranslator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\ByteOrderSwappingBinaryReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenFontReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\AttachmentListTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\Base.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ClassDefTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CoverageTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\FeatureInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\FeatureList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GDEF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GPOS.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GPOS.Others.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GSUB.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GSUB.SubTables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\JustificationTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\LigatureCaretListTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\MathTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptLang.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\EBLCTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\HorizontalDeviceMatrics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Kern.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\LinearThreashold.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Merge.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Meta.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\STAT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\VerticalDeviceMatrics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\VerticalMatrics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\VerticalMatricsHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.TrueType\Cvt_Programs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.TrueType\Gasp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.TrueType\Glyf.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.TrueType\GlyphLocations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\AVar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\FVar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\GVar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\HVar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\MVar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\VVar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\BoundsReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\Cmap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\Head.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\HorizontalHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\HorizontalMetrics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\MaxProfile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\NameEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\OS2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\Post.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\TableEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\TableEntryCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\TableHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\Utils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\ForNet20.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\Interpreter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidFontException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Typeface.cs" />
+  </ItemGroup>
+</Project>

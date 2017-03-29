@@ -1,6 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.IO;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Collections.Generic;
 //
 using Typography.OpenFont;
@@ -10,6 +11,7 @@ using Typography.Rendering;
 
 namespace SampleWinForms
 {
+
 
     /// <summary>
     /// developer's version, Gdi+ text printer
@@ -22,6 +24,7 @@ namespace SampleWinForms
         GlyphLayout _glyphLayout = new GlyphLayout();
         SolidBrush _fillBrush = new SolidBrush(Color.Black);
         Pen _outlinePen = new Pen(Color.Green);
+        GlyphMeshCollection<GraphicsPath> _glyphMeshCollections = new GlyphMeshCollection<GraphicsPath>();
 
         string _currentSelectedFontFile;
 
@@ -48,18 +51,18 @@ namespace SampleWinForms
                 //reset 
                 _currentTypeface = null;
                 _currentGlyphPathBuilder = null;
-
                 _currentSelectedFontFile = value;
                 //load new typeface 
 
                 //1. read typeface from font file
+                //TODO: review how to read font data again ***
                 using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
                 {
                     var reader = new OpenFontReader();
                     _currentTypeface = reader.Read(fs);
                 }
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface); 
+                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
                 //for gdi path***
                 //3. glyph reader,output as Gdi+ GraphicsPath
                 _txToGdiPath = new GlyphTranslatorToGdiPath();
@@ -109,11 +112,9 @@ namespace SampleWinForms
             UpdateGlyphLayoutSettings();
             _outputGlyphPlans.Clear();
             this._glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
-            //2. draw
-            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
+
+            DrawFromGlyphPlans(_outputGlyphPlans, xpos, ypos);
         }
-
-
         void UpdateGlyphLayoutSettings()
         {
             _glyphLayout.Typeface = this.Typeface;
@@ -127,9 +128,7 @@ namespace SampleWinForms
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
         }
-
-
-        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, int startAt, int len, float x, float y)
+        public override void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float x, float y)
         {
             UpdateVisualOutputSettings();
 
@@ -138,6 +137,10 @@ namespace SampleWinForms
             System.Drawing.Drawing2D.Matrix scaleMat = null;
             float sizeInPoints = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateToPixelScaleFromPointSize(sizeInPoints);
+            //
+            _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.HintTechnique);
+
+
             //this draw a single line text span***
             int endBefore = startAt + len;
 
@@ -145,29 +148,38 @@ namespace SampleWinForms
             for (int i = startAt; i < endBefore; ++i)
             {
                 GlyphPlan glyphPlan = glyphPlanList[i];
-                _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
-                // 
-                scaleMat = new System.Drawing.Drawing2D.Matrix(
-                   1, 0, //scale x
-                   0, 1, //scale y
-                   x + glyphPlan.x * scale,
-                   y + glyphPlan.y * scale //xpos,ypos
-               );
 
-                //
-                _txToGdiPath.Reset();
-                _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
-                System.Drawing.Drawing2D.GraphicsPath path = _txToGdiPath.ResultGraphicsPath;
-                path.Transform(scaleMat);
+                //check if we have a cache of this glyph
+                //if not -> create it
+
+                GraphicsPath foundPath;
+                if (!_glyphMeshCollections.TryGetCacheGlyph(glyphPlan.glyphIndex, out foundPath))
+                {
+                    //if not found then create a new one
+                    _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
+                    _txToGdiPath.Reset();
+                    _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
+                    foundPath = _txToGdiPath.ResultGraphicsPath;
+
+                    //register
+                    _glyphMeshCollections.RegisterCachedGlyph(glyphPlan.glyphIndex, foundPath);
+                } 
+                //------
+                //then move pen point to the position we want to draw a glyph
+                float tx = x + glyphPlan.x * scale;
+                float ty = y + glyphPlan.y * scale;
+                g.TranslateTransform(tx, ty);
 
                 if (FillBackground)
                 {
-                    g.FillPath(_fillBrush, path);
+                    g.FillPath(_fillBrush, foundPath);
                 }
                 if (DrawOutline)
                 {
-                    g.DrawPath(_outlinePen, path);
+                    g.DrawPath(_outlinePen, foundPath);
                 }
+                //and then we reset back ***
+                g.TranslateTransform(-tx, -ty);
             }
         }
     }

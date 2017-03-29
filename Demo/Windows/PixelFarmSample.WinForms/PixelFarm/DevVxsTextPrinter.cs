@@ -110,13 +110,11 @@ namespace PixelFarm.Drawing.Fonts
             UpdateGlyphLayoutSettings();
             _outputGlyphPlans.Clear();
             _glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
-            DrawGlyphPlanList(_outputGlyphPlans, xpos, ypos);
+            DrawFromGlyphPlans(_outputGlyphPlans, xpos, ypos);
 
         }
-
-        public override void DrawGlyphPlanList(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos)
+        public override void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos)
         {
-
             CanvasPainter canvasPainter = this.TargetCanvasPainter;
             Typeface typeface = _glyphPathBuilder.Typeface;
             //3. layout glyphs with selected layout technique
@@ -165,6 +163,7 @@ namespace PixelFarm.Drawing.Fonts
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
         }
+
 
         void UpdateGlyphLayoutSettings()
         {

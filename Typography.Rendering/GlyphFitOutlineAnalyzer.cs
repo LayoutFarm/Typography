@@ -8,7 +8,7 @@ namespace Typography.Rendering
     //NOT FREE TYPE AUTO FIT***
     public class GlyphFitOutlineAnalyzer
     {
-       
+
         public GlyphFitOutline Analyze(GlyphPointF[] glyphPoints, ushort[] glyphContours)
         {
             var glyphToCountor = new GlyphTranslatorToContour();
@@ -181,7 +181,10 @@ namespace Typography.Rendering
 
                     if (x == prevX && y == prevY)
                     {
-                        throw new NotSupportedException();
+                        if (i > 0)
+                        {
+                            throw new NotSupportedException();
+                        }
                     }
                     else
                     {

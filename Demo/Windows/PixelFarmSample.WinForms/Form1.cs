@@ -82,7 +82,7 @@ namespace SampleWinForms
             //---------- 
             //share text printer to our sample textbox
             //but you can create another text printer that specific to text textbox control
-            Graphics gx = this.sampleTextBox1.CreateGraphics();
+            Graphics gx = this.sampleTextBox1.CreateGraphics(); 
             _controllerForGdi.TextPrinter = _devGdiTextPrinter;
             _controllerForGdi.BindHostGraphics(gx);
             //---------- 

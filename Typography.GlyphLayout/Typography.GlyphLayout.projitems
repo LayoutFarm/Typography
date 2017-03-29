@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>d8861cf8-c506-472b-8a57-632bd6ca6496</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Typography.GlyphLayout</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphIndexList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPosition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphSubtitution.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MeasureStringBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCharToGlyphIndexMap.cs" />
+  </ItemGroup>
+</Project>
