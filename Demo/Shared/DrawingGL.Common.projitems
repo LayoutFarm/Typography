@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2e1e828f-6d2c-4b0e-a2e2-ddf24798cacf</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>DrawingGL.Common</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\GlyphMeshCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ActiveRegion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ContourVertex.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\DevTextPrinterBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\CurveFlattener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Path.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Primitives.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\TessTool.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\FontEnums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\GlyphTranslatorToPath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\TextPrinter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\TypographyTextContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL.Text\Utils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\ES2Utils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\GeometryUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\MiniShaderProgram.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilderBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\HintTechnique.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Dictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Face.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\HalfEdge.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\MaxFirstList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\mesh.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Tesselator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Tesselate\" />
+  </ItemGroup>
+</Project>

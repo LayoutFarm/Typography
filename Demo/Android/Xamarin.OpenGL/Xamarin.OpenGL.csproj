@@ -5,17 +5,17 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{882A1B46-C17C-4652-AF72-90406F8C7338}</ProjectGuid>
+    <ProjectGuid>{B824FFB2-D057-490A-8967-892C0E20C0B6}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Xamarin.OpenGL</RootNamespace>
-    <AssemblyName>Xamarin.OpenGL</AssemblyName>
+    <RootNamespace>Xamarin_OpenGL</RootNamespace>
+    <AssemblyName>Xamarin_OpenGL</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -45,50 +45,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
-    <Reference Include="OpenTK" />
     <Reference Include="mscorlib" />
+    <Reference Include="OpenTK-1.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainActivity.cs" />
+    <Compile Include="App\CustomApp.cs" />
+    <Compile Include="App\Color.cs" />
+    <Compile Include="App\Shaders.cs" />
     <Compile Include="GLView1.cs" />
-    <Compile Include="TextRenderer\Graphics\DrawBuffer.cs" />
-    <Compile Include="TextRenderer\Graphics\Material.cs" />
-    <Compile Include="TextRenderer\ITextContext.cs" />
-    <Compile Include="TextRenderer\ITextPathBuilder.cs" />
-    <Compile Include="TextRenderer\Graphics\OpenGLESRenderer.cs" />
-    <Compile Include="TextRenderer\OpenTKExtension\Shader.cs" />
-    <Compile Include="TextRenderer\OpenTKExtension\ShaderCompilationException.cs" />
-    <Compile Include="TextRenderer\OpenTKExtension\ShaderProgram.cs" />
-    <Compile Include="TextRenderer\Primitive\Color.cs" />
-    <Compile Include="TextRenderer\Graphics\DrawIndex.cs" />
-    <Compile Include="TextRenderer\Graphics\DrawVertex.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\Dict.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\Geom.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\Mesh.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\MeshUtils.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\PriorityHeap.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\PriorityQueue.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\Sweep.cs" />
-    <Compile Include="TextRenderer\LibTessDotNet\Tess.cs" />
-    <Compile Include="TextRenderer\List.cs" />
-    <Compile Include="TextRenderer\Primitive\Point.cs" />
-    <Compile Include="TextRenderer\Primitive\Vector.cs" />
-    <Compile Include="TextRenderer\Primitive\Rect.cs" />
-    <Compile Include="TextRenderer\Primitive\Size.cs" />
-    <Compile Include="TextRenderer\FontEnums.cs" />
-    <Compile Include="TextRenderer\TextMesh.cs" />
-    <Compile Include="TextRenderer\TextPrinter\GlyphPathBuilder.cs" />
-    <Compile Include="TextRenderer\TextPrinter\GlyphTranslatorToPath.cs" />
-    <Compile Include="TextRenderer\TextPrinter\HintTechnique.cs" />
-    <Compile Include="TextRenderer\TextPrinter\TextPrinter.cs" />
-    <Compile Include="TextRenderer\Utility.cs" />
-    <Compile Include="TextRenderer\TypographyTextContext.cs" />
+    <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="App\SimpleCanvas.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\DroidSans.ttf" />
+    <None Include="Resources\AboutResources.txt" />
+    <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Main.axml">
@@ -102,20 +79,19 @@
     <AndroidResource Include="Resources\drawable\Icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\DroidSans.ttf" />
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>
+    <ProjectReference Include="..\..\..\Build\Android\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{6abd1c6e-866d-42a8-99d0-7780b4ad08d3}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Typography.OpenFont\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
+    <ProjectReference Include="..\..\..\Build\Android\Typography.OpenFont\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{9e204a4b-f9b8-4f7f-a792-184260b3494d}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\..\Shared\DrawingGL.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
      Other similar extension points exist, see Microsoft.Common.targets.

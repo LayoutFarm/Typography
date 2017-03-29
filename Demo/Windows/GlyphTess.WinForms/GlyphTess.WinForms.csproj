@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{56DCAE82-671D-409E-A3B3-BF4834756D3F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Test_WinForm_TessGlyph</RootNamespace>
+    <AssemblyName>Test_WinForm_TessGlyph</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Shared\DrawingGL.Text\GlyphTranslatorToPath.cs">
+      <Link>DrawingGL.Text\GlyphTranslatorToPath.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\DrawingGL\CurveFlattener.cs">
+      <Link>DrawingGL\CurveFlattener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\DrawingGL\Path.cs">
+      <Link>DrawingGL\Path.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\DrawingGL\Primitives.cs">
+      <Link>DrawingGL\Primitives.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\DrawingGL\TessTool.cs">
+      <Link>DrawingGL\TessTool.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\GlyphPathBuilder\HintTechnique.cs">
+      <Link>GlyphPathBuilder\HintTechnique.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\ActiveRegion.cs">
+      <Link>Tess\ActiveRegion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\ContourVertex.cs">
+      <Link>Tess\ContourVertex.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\Dictionary.cs">
+      <Link>Tess\Dictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\Face.cs">
+      <Link>Tess\Face.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\HalfEdge.cs">
+      <Link>Tess\HalfEdge.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\MaxFirstList.cs">
+      <Link>Tess\MaxFirstList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\mesh.cs">
+      <Link>Tess\mesh.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\Tesselate\Tesselator.cs">
+      <Link>Tess\Tesselator.cs</Link>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Name>Typography.GlyphLayout</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+      <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

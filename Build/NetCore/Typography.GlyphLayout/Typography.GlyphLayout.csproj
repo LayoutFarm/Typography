@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont\Typography.OpenFont.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" />
+
+</Project>

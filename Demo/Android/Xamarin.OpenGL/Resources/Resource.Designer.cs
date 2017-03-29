@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("Xamarin.OpenGL.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("Xamarin_OpenGL.Resource", IsApplication=true)]
 
-namespace Xamarin.OpenGL
+namespace Xamarin_OpenGL
 {
 	
 	
@@ -26,6 +26,10 @@ namespace Xamarin.OpenGL
 		
 		public static void UpdateIdValues()
 		{
+			global::ClassLibrary1.Resource.String.ApplicationName = global::Xamarin_OpenGL.Resource.String.ApplicationName;
+			global::ClassLibrary1.Resource.String.Hello = global::Xamarin_OpenGL.Resource.String.Hello;
+			global::Typography.GlyphLayout.Resource.String.ApplicationName = global::Xamarin_OpenGL.Resource.String.ApplicationName;
+			global::Typography.GlyphLayout.Resource.String.Hello = global::Xamarin_OpenGL.Resource.String.Hello;
 		}
 		
 		public partial class Attribute
