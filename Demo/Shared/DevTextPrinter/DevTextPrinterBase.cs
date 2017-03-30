@@ -1,6 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
 using Typography.TextLayout;
+
 namespace Typography.Rendering
 {
     /// <summary>
@@ -9,20 +10,14 @@ namespace Typography.Rendering
     public abstract class DevTextPrinterBase
     {
         HintTechnique _hintTech;
-
         public DevTextPrinterBase()
         {
             FontSizeInPoints = 14;//
             ScriptLang = Typography.OpenFont.ScriptLangs.Latin;//default?
         }
 
-        public abstract string FontFilename
-        {
-            get;
-            set;
-        }
         public abstract Typography.TextLayout.GlyphLayout GlyphLayoutMan { get; }
-        public abstract Typography.OpenFont.Typeface Typeface { get; }
+        public abstract Typography.OpenFont.Typeface Typeface { get; set; }
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
         public float FontAscendingPx { get; set; }
@@ -38,7 +33,6 @@ namespace Typography.Rendering
                 this._hintTech = value;
             }
         }
-
 
         float _fontSizeInPoints;
         public float FontSizeInPoints
