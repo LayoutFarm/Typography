@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev
+﻿//MIT, 2016-2017, WinterDev
 //MIT, 2015, Michael Popoloski 
 //FTL, 3-clauses BSD, FreeType project
 //-----------------------------------------------------

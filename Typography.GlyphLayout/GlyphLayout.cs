@@ -8,7 +8,7 @@ namespace Typography.TextLayout
     public struct GlyphPlan
     {
         public readonly ushort glyphIndex;//2
-        public readonly int x;//4
+        public readonly int x;//4, //TODO: review here=> change to short ?
         public readonly short y;//2
         public readonly ushort advX;//2
         public GlyphPlan(ushort glyphIndex, int x, short y, ushort advX)

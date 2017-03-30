@@ -39,6 +39,9 @@
     <Compile Include="..\..\Shared\DevTextPrinter\DevTextPrinterBase.cs">
       <Link>DevTextPrinter\DevTextPrinterBase.cs</Link>
     </Compile>
+    <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
+      <Link>DevTextPrinter\FontManagement.cs</Link>
+    </Compile>
     <Compile Include="..\..\Shared\DevTextPrinter\GlyphMeshCollection.cs">
       <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
     </Compile>
@@ -56,9 +59,6 @@
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
-    </Compile>
-    <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\TempLocalFontFile.cs">
-      <Link>GdiPlus\TempLocalFontFile.cs</Link>
     </Compile>
     <Compile Include="Form2.cs">
       <SubType>Form</SubType>

@@ -32,9 +32,11 @@ namespace SampleWinForms
         //
         SampleWinForms.UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new UI.SampleTextBoxControllerForPixelFarm();
 
-
+        InstalledFontCollection installedFontCollection;
+        TypefaceStore _typefaceStore;
         float _fontSizeInPts = 14;//default
-        string _selectedFontFilename;
+        InstalledFont _selectedInstallFont;
+
         public Form1()
         {
             InitializeComponent();
@@ -82,7 +84,7 @@ namespace SampleWinForms
             //---------- 
             //share text printer to our sample textbox
             //but you can create another text printer that specific to text textbox control
-            Graphics gx = this.sampleTextBox1.CreateGraphics(); 
+            Graphics gx = this.sampleTextBox1.CreateGraphics();
             _controllerForGdi.TextPrinter = _devGdiTextPrinter;
             _controllerForGdi.BindHostGraphics(gx);
             //---------- 
@@ -103,48 +105,71 @@ namespace SampleWinForms
             chkGsubEnableLigature.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkShowTess.CheckedChanged += (s, e) => UpdateRenderOutput();
             //----------
+
+
+            //1. create font collection             
+            installedFontCollection = new InstalledFontCollection();
+            //2. set some essential handler
+            installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
+            foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
+            {
+                //eg. this is our custom font folder  
+                installedFontCollection.AddFont(new FontFileStreamProvider(file));
+            }
+            //---------- 
+            //show result
+            InstalledFont selectedFF = null;
+            int selected_index = 0;
+            int ffcount = 0;
+            bool found = false;
+            foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
+            {
+                if (!found && ff.FontName == "Tahoma")
+                {
+                    selectedFF = ff;
+                    selected_index = ffcount;
+                    _selectedInstallFont = ff;
+                    found = true;
+                }
+                lstFontList.Items.Add(ff);
+                ffcount++;
+            }
+            //set default font for current text printer
+            //
+            _typefaceStore = new TypefaceStore();
+            _typefaceStore.FontCollection = installedFontCollection;
+            //set default font for current text printer
+            selectedTextPrinter.Typeface = _typefaceStore.GetTypeface("tahoma", InstalledFontStyle.Regular);
+            //---------- 
+
+
+            if (selected_index < 0) { selected_index = 0; }
+            lstFontList.SelectedIndex = selected_index;
+            lstFontList.SelectedIndexChanged += (s, e) =>
+            {
+                InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
+                if (ff != null)
+                {
+                    selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(ff.FontName, InstalledFontStyle.Regular);
+                    //sample text box 
+                    UpdateRenderOutput();
+                }
+            };
+            //----------
+            //----------
             lstFontSizes.Items.AddRange(
-                new object[]{
+              new object[]{
                     8, 9,
                     10,11,
                     12,
                     14,
                     16,
                     18,20,22,24,26,28,36,48,72,240,300,360
-                });
+              });
             lstFontSizes.SelectedIndexChanged += (s, e) =>
             {
                 //new font size
                 _fontSizeInPts = (int)lstFontSizes.SelectedItem;
-                UpdateRenderOutput();
-            };
-
-            //----------
-            //simple load test fonts from local test dir
-            //and send it into test list
-
-            int selectedFileIndex = -1;
-            //string selectedFontFileName = "pala.ttf";
-            string selectedFontFileName = "tahoma.ttf";
-            //string selectedFontFileName="cambriaz.ttf";
-            //string selectedFontFileName="CompositeMS2.ttf"; 
-            int fileIndexCount = 0;
-            foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
-            {
-                var tmpLocalFile = new TempLocalFontFile(file);
-                lstFontList.Items.Add(tmpLocalFile);
-                if (selectedFileIndex < 0 && tmpLocalFile.OnlyFileName == selectedFontFileName)
-                {
-                    selectedFileIndex = fileIndexCount;
-                    _selectedFontFilename = file;
-                }
-                fileIndexCount++;
-            }
-            if (selectedFileIndex < 0) { selectedFileIndex = 0; }
-            lstFontList.SelectedIndex = selectedFileIndex;
-            lstFontList.SelectedIndexChanged += (s, e) =>
-            {
-                _selectedFontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
                 UpdateRenderOutput();
             };
 
@@ -159,6 +184,8 @@ namespace SampleWinForms
             //----------------
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
+
+
         }
 
 
@@ -177,7 +204,11 @@ namespace SampleWinForms
             this.Text = "Render with PixelFarm";
             //this.lstFontSizes.SelectedIndex = lstFontSizes.Items.Count - 1;//select last one  
             this.lstFontSizes.SelectedIndex = 0;//select last one  
-            _selectedFontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
+            var installedFont = lstFontList.SelectedItem as InstalledFont;
+            if (installedFont != null)
+            {
+                _selectedInstallFont = installedFont;
+            }
 
         }
 
@@ -210,7 +241,7 @@ namespace SampleWinForms
                 case RenderChoice.RenderWithGdiPlusPath:
                     {
                         selectedTextPrinter = _devGdiTextPrinter;
-                        selectedTextPrinter.FontFilename = _selectedFontFilename;
+                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
@@ -227,7 +258,7 @@ namespace SampleWinForms
                         p.FillColor = PixelFarm.Drawing.Color.Black;
 
                         selectedTextPrinter = _devVxsTextPrinter;
-                        selectedTextPrinter.FontFilename = _selectedFontFilename;
+                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
@@ -259,24 +290,18 @@ namespace SampleWinForms
                 case RenderChoice.RenderWithSdfGen:
                     {
                         char testChar = this.txtInputChar.Text[0];
-                        using (var fs = new FileStream(_selectedFontFilename, FileMode.Open))
-                        {
-                            var reader = new OpenFontReader();
-                            Typeface typeFace = reader.Read(fs);
-                            RenderWithMsdfImg(typeFace, testChar, _fontSizeInPts);
-                        }
+                        Typeface typeFace = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
+                        RenderWithMsdfImg(typeFace, testChar, _fontSizeInPts);
+
                     }
                     break;
                 case RenderChoice.RenderWithMiniAgg_SingleGlyph:
                     {
                         //for test only 1 char
                         char testChar = this.txtInputChar.Text[0];
-                        using (var fs = new FileStream(_selectedFontFilename, FileMode.Open))
-                        {
-                            var reader = new OpenFontReader();
-                            Typeface typeFace = reader.Read(fs);
-                            RenderWithMiniAgg(typeFace, testChar, _fontSizeInPts);
-                        }
+                        Typeface typeFace = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
+                        RenderWithMiniAgg(typeFace, testChar, _fontSizeInPts);
+
                     }
                     break;
                 default:

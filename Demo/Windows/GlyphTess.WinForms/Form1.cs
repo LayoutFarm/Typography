@@ -29,7 +29,8 @@ namespace Test_WinForm_TessGlyph
         {
             g = this.pnlGlyph.CreateGraphics();
 
-            string testFont = "d:\\WImageTest\\DroidSans.ttf";
+            //string testFont = "d:\\WImageTest\\DroidSans.ttf";
+            string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
                 OpenFontReader reader = new OpenFontReader();

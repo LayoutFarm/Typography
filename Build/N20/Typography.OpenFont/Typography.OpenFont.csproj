@@ -40,9 +40,6 @@
     <Compile Include="..\..\..\Typography.OpenFont\CharacterMap.cs">
       <Link>CharacterMap.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\FontCollection\InstalledFont.cs">
-      <Link>FontCollection\InstalledFont.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Geometry.cs">
       <Link>Geometry.cs</Link>
     </Compile>

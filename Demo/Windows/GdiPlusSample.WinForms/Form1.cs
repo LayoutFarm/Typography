@@ -3,11 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-//
-using Typography.OpenFont;
+// 
 using Typography.TextLayout;
 using Typography.Rendering;
-
 
 namespace SampleWinForms
 {
@@ -17,7 +15,8 @@ namespace SampleWinForms
         //for this sample code,
         //create text printer env for developer.
         DevGdiTextPrinter _currentTextPrinter = new DevGdiTextPrinter();
-       
+        InstalledFontCollection installedFontCollection;
+        TypefaceStore _typefaceStore;
         public Form1()
         {
             InitializeComponent();
@@ -45,40 +44,56 @@ namespace SampleWinForms
             lstHintList.Items.Add(HintTechnique.CustomAutoFit);
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
-
-         
-
             //---------- 
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //
-            int selectedFileIndex = -1;
-            //string selectedFontFileName = "pala.ttf";
-            string selectedFontFileName = "tahoma.ttf";
-            //string selectedFontFileName="cambriaz.ttf";
-            //string selectedFontFileName="CompositeMS2.ttf"; 
-            int fileIndexCount = 0;
 
+            //1. create font collection             
+            installedFontCollection = new InstalledFontCollection();
+            //2. set some essential handler
+            installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
             foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
             {
-                var tmpLocalFile = new TempLocalFontFile(file);
-                lstFontList.Items.Add(tmpLocalFile);
-                if (selectedFileIndex < 0 && tmpLocalFile.OnlyFileName == selectedFontFileName)
-                {
-                    selectedFileIndex = fileIndexCount;
-                    _currentTextPrinter.FontFilename = file;
-                    //sample text box
-
-                }
-                fileIndexCount++;
+                //eg. this is our custom font folder  
+                installedFontCollection.AddFont(new FontFileStreamProvider(file));
             }
-            if (selectedFileIndex < 0) { selectedFileIndex = 0; }
-            lstFontList.SelectedIndex = selectedFileIndex;
+            //---------- 
+            //show result
+            InstalledFont selectedFF = null;
+            int selected_index = 0;
+            int ffcount = 0;
+            bool found = false;
+            foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
+            {
+                if (!found && ff.FontName == "Tahoma")
+                {
+                    selectedFF = ff;
+                    selected_index = ffcount;
+                    found = true;
+                }
+                lstFontList.Items.Add(ff);
+                ffcount++;
+            }
+            //set default font for current text printer
+            //
+            _typefaceStore = new TypefaceStore();
+            _typefaceStore.FontCollection = installedFontCollection;
+            //set default font for current text printer
+            _currentTextPrinter.Typeface = _typefaceStore.GetTypeface("tahoma", InstalledFontStyle.Regular);
+            //---------- 
+            
+
+            if (selected_index < 0) { selected_index = 0; }
+            lstFontList.SelectedIndex = selected_index;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
-                _currentTextPrinter.FontFilename = ((TempLocalFontFile)lstFontList.SelectedItem).actualFileName;
-                //sample text box 
-                UpdateRenderOutput();
-
+                InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
+                if (ff != null)
+                {
+                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff.FontName, InstalledFontStyle.Regular);
+                    //sample text box 
+                    UpdateRenderOutput();
+                }
             };
             //----------
             lstFontSizes.Items.AddRange(
@@ -147,9 +162,9 @@ namespace SampleWinForms
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
-            //-----------------------  
+                                                    //-----------------------  
 
-            
+
         }
 
         ////=========================================================================
@@ -281,6 +296,6 @@ namespace SampleWinForms
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
         }
-       
+
     }
 }
