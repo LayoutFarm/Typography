@@ -103,9 +103,7 @@ namespace Typography.Rendering
         public InstalledFontCollection FontCollection { get; set; }
 
 
-        //check if we have create this typeface or not
-
-
+        //check if we have create this typeface or not 
 
         public Typeface GetTypeface(string fontname, InstalledFontStyle style)
         {
@@ -143,6 +141,7 @@ namespace Typography.Rendering
 
         public InstalledFontCollection()
         {
+            //init
             regular_Fonts = CreateNewFontGroup("normal", "regular");
             italic_Fonts = CreateNewFontGroup("italic", "italique");
             bold_Fonts = CreateNewFontGroup("bold");
@@ -184,16 +183,16 @@ namespace Typography.Rendering
                 return RegisterFont(new InstalledFont(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
             }
         }
-
         bool RegisterFont(InstalledFont f)
         {
             Dictionary<string, InstalledFont> selectedFontGroup;
             if (!_fontGroups.TryGetValue(f.FontSubFamily.ToUpper(), out selectedFontGroup))
             {
-                throw new NotSupportedException();
-                //TODO: implement a mising group
+                //create new group
+                selectedFontGroup = new Dictionary<string, InstalledFont>();
+                _fontGroups.Add(f.FontSubFamily.ToUpper(), selectedFontGroup);
             }
-
+            //
             string fontNameUpper = f.FontName.ToUpper();
             InstalledFont found;
             if (selectedFontGroup.TryGetValue(fontNameUpper, out found))
@@ -274,29 +273,7 @@ namespace Typography.Rendering
                     }
             }
         }
-        public static List<InstalledFont> ReadPreviewFontData(IEnumerable<string> getFontFileIter)
-        {
-            //-------------------------------------------------
-            //TODO: review here, this is not platform depend
-            //-------------------------------------------------
-            //check if MAC or linux font folder too
-            //------------------------------------------------- 
-            List<InstalledFont> installedFonts = new List<InstalledFont>();
-            foreach (string fontFilename in getFontFileIter)
-            {
-                using (Stream stream = new FileStream(fontFilename, FileMode.Open, FileAccess.Read))
-                {
-                    var reader = new OpenFontReader();
-                    PreviewFontInfo previewInfo = reader.ReadPreview(stream);
-                    InstalledFont installedFont =
-                        new InstalledFont(previewInfo.fontName, previewInfo.fontSubFamily, fontFilename);
 
-                    installedFont.FontPath = fontFilename;
-                    installedFonts.Add(installedFont);
-                }
-            }
-            return installedFonts;
-        }
 
         public IEnumerable<InstalledFont> GetInstalledFontIter()
         {
@@ -334,9 +311,23 @@ namespace Typography.Rendering
     public static class InstalledFontCollectionExtension
     {
 
-        public static void LoadWinSystemFonts(this InstalledFontCollection fontCollection)
+        public static void LoadWindowsSystemFonts(this InstalledFontCollection fontCollection)
         {
-            //implement
+            //1. font dir
+            foreach (string file in Directory.GetFiles("c:\\Windows\\Fonts"))
+            {
+                //eg. this is our custom font folder
+                string ext = Path.GetExtension(file).ToLower();
+                switch (ext)
+                {
+                    default: break;
+                    case ".ttf":
+                    case ".otf":
+                        fontCollection.AddFont(new FontFileStreamProvider(file));
+                        break;
+                }
+
+            }
         }
         public static void LoadMacSystemFonts(this InstalledFontCollection fontCollection)
         {

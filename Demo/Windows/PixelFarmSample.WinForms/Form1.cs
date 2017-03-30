@@ -116,6 +116,8 @@ namespace SampleWinForms
                 //eg. this is our custom font folder  
                 installedFontCollection.AddFont(new FontFileStreamProvider(file));
             }
+            //3.
+            installedFontCollection.LoadWindowsSystemFonts();
             //---------- 
             //show result
             InstalledFont selectedFF = null;

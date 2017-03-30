@@ -45,7 +45,7 @@
             this.lstFontList.FormattingEnabled = true;
             this.lstFontList.Location = new System.Drawing.Point(693, 39);
             this.lstFontList.Name = "lstFontList";
-            this.lstFontList.Size = new System.Drawing.Size(121, 121);
+            this.lstFontList.Size = new System.Drawing.Size(379, 121);
             this.lstFontList.TabIndex = 29;
             // 
             // label2
@@ -76,7 +76,7 @@
             // chkFillBackground
             // 
             this.chkFillBackground.AutoSize = true;
-            this.chkFillBackground.Location = new System.Drawing.Point(822, 65);
+            this.chkFillBackground.Location = new System.Drawing.Point(756, 12);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 31;
@@ -86,7 +86,7 @@
             // chkBorder
             // 
             this.chkBorder.AutoSize = true;
-            this.chkBorder.Location = new System.Drawing.Point(822, 42);
+            this.chkBorder.Location = new System.Drawing.Point(693, 12);
             this.chkBorder.Name = "chkBorder";
             this.chkBorder.Size = new System.Drawing.Size(57, 17);
             this.chkBorder.TabIndex = 30;
@@ -133,7 +133,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(935, 750);
+            this.ClientSize = new System.Drawing.Size(1185, 750);
             this.Controls.Add(this.cmdMeasureTextSpan);
             this.Controls.Add(this.lstHintList);
             this.Controls.Add(this.button1);
