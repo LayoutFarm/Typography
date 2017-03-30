@@ -9,6 +9,7 @@
     <Import_RootNamespace>DrawingGL.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\FontManagement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\GlyphMeshCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ActiveRegion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ContourVertex.cs" />
