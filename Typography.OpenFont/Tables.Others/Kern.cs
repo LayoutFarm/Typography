@@ -65,7 +65,7 @@ namespace Typography.OpenFont.Tables
 #if DEBUG
             if ((remainingBytes % 6) != 0)
             {
-                throw new System.Exception();
+              //  throw new System.Exception();
             }
             int calNpairs = remainingBytes / 6;
 #endif
@@ -78,7 +78,7 @@ namespace Typography.OpenFont.Tables
                 ushort right = reader.ReadUInt16();
                 short value = reader.ReadInt16();
                 ksubTable.AddKernPair(
-                    reader.ReadUInt16(), //left
+                    reader.ReadUInt16(), //left//
                     reader.ReadUInt16(),//right
                     reader.ReadInt16());//value
 
