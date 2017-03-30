@@ -6,6 +6,19 @@ using Typography.OpenFont;
 
 namespace Typography.Rendering
 {
+
+    public interface IFontface
+    {
+        string FontName { get; }
+        string FontSubFamily { get; }
+    }
+
+    public class FontRequest
+    {
+        public string FontName { get; set; }
+        public InstalledFontStyle Style { get; set; }
+    }
+
     public class InstalledFont
     {
         public InstalledFont(string fontName, string fontSubFamily, string fontPath)
