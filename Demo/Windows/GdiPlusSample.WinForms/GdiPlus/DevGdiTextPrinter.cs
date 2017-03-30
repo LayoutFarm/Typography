@@ -24,9 +24,10 @@ namespace SampleWinForms
         GlyphLayout _glyphLayout = new GlyphLayout();
         SolidBrush _fillBrush = new SolidBrush(Color.Black);
         Pen _outlinePen = new Pen(Color.Green);
+        //
+        //for optimization
         GlyphMeshCollection<GraphicsPath> _glyphMeshCollections = new GlyphMeshCollection<GraphicsPath>();
 
-        string _currentSelectedFontFile;
 
         public DevGdiTextPrinter()
         {
@@ -34,42 +35,7 @@ namespace SampleWinForms
             FillColor = Color.Black;
             OutlineColor = Color.Green;
         }
-        public override string FontFilename
-        {
-            get
-            {
-                return _currentSelectedFontFile;
-            }
-            set
-            {
-                if (value == this._currentSelectedFontFile)
-                {
-                    return;
-                }
 
-                //--------------------------------
-                //reset 
-                _currentTypeface = null;
-                _currentGlyphPathBuilder = null;
-                _currentSelectedFontFile = value;
-                //load new typeface 
-
-                //1. read typeface from font file
-                //TODO: review how to read font data again ***
-                using (var fs = new FileStream(_currentSelectedFontFile, FileMode.Open))
-                {
-                    var reader = new OpenFontReader();
-                    _currentTypeface = reader.Read(fs);
-                }
-                //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
-                //for gdi path***
-                //3. glyph reader,output as Gdi+ GraphicsPath
-                _txToGdiPath = new GlyphTranslatorToGdiPath();
-                //4.
-                OnFontSizeChanged();
-            }
-        }
         public override GlyphLayout GlyphLayoutMan
         {
             get
@@ -83,6 +49,30 @@ namespace SampleWinForms
             {
                 return _currentTypeface;
             }
+            set
+            {
+                //check if we change it or not
+                if (value == _currentTypeface) return;
+                //change ...
+                //check if we have used this typeface before?
+                //if not, create a proper glyph builder for it
+                //--------------------------------
+                //reset 
+                _currentTypeface = value;
+                _currentGlyphPathBuilder = null;
+                //--------------------------------
+                if (value == null) return;
+                //--------------------------------
+
+                //2. glyph builder
+                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
+                //for gdi path***
+                //3. glyph reader,output as Gdi+ GraphicsPath
+                _txToGdiPath = new GlyphTranslatorToGdiPath();
+                //4.
+                OnFontSizeChanged();
+            }
+
         }
         protected override void OnFontSizeChanged()
         {
@@ -163,7 +153,7 @@ namespace SampleWinForms
 
                     //register
                     _glyphMeshCollections.RegisterCachedGlyph(glyphPlan.glyphIndex, foundPath);
-                } 
+                }
                 //------
                 //then move pen point to the position we want to draw a glyph
                 float tx = x + glyphPlan.x * scale;
