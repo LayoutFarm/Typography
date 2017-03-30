@@ -17,6 +17,17 @@ namespace Typography.OpenFont
         Variation = 1 << 4
     }
 
+    public struct PreviewFontInfo
+    {
+        public readonly string fontName;
+        public readonly string fontSubFamily;
+        public PreviewFontInfo(string fontName, string fontSubFam)
+        {
+            this.fontName = fontName;
+            this.fontSubFamily = fontSubFam;
+        }
+
+    }
     public class OpenFontReader
     {
         /// <summary>
@@ -24,7 +35,7 @@ namespace Typography.OpenFont
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public InstalledFont ReadPreview(Stream stream)
+        public PreviewFontInfo ReadPreview(Stream stream)
         {
             var little = BitConverter.IsLittleEndian;
             using (var input = new ByteOrderSwappingBinaryReader(stream))
@@ -43,7 +54,7 @@ namespace Typography.OpenFont
 
                 //translate...
                 NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
-                return new InstalledFont(nameEntry.FontName, nameEntry.FontSubFamily);
+                return new PreviewFontInfo(nameEntry.FontName, nameEntry.FontSubFamily);
             }
         }
 
