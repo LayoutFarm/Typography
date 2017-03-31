@@ -414,11 +414,10 @@ namespace Typography.Rendering
 
     public static class InstalledFontCollectionExtension
     {
-
-        public static void LoadWindowsSystemFonts(this InstalledFontCollection fontCollection)
+        public static void LoadFontsFromFolder(this InstalledFontCollection fontCollection, string folder)
         {
             //1. font dir
-            foreach (string file in Directory.GetFiles("c:\\Windows\\Fonts"))
+            foreach (string file in Directory.GetFiles(folder))
             {
                 //eg. this is our custom font folder
                 string ext = Path.GetExtension(file).ToLower();
@@ -432,6 +431,10 @@ namespace Typography.Rendering
                 }
 
             }
+        }
+        public static void LoadWindowsSystemFonts(this InstalledFontCollection fontCollection)
+        {
+            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts"); 
         }
         public static void LoadMacSystemFonts(this InstalledFontCollection fontCollection)
         {

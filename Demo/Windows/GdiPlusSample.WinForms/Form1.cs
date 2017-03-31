@@ -52,12 +52,10 @@ namespace SampleWinForms
             installedFontCollection = new InstalledFontCollection();
             //2. set some essential handler
             installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-            foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
-            {
-                //eg. this is our custom font folder  
-                installedFontCollection.AddFont(new FontFileStreamProvider(file));
-            }
+            installedFontCollection.LoadFontsFromFolder("..\\..\\..\\TestFonts_Err");
+            installedFontCollection.LoadFontsFromFolder("..\\..\\..\\TestFonts");
             //installedFontCollection.LoadWindowsSystemFonts();
+
             //---------- 
             //show result
             InstalledFont selectedFF = null;
