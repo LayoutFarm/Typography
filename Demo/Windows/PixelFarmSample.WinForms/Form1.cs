@@ -116,6 +116,8 @@ namespace SampleWinForms
                 //eg. this is our custom font folder  
                 installedFontCollection.AddFont(new FontFileStreamProvider(file));
             }
+            //3.
+            installedFontCollection.LoadWindowsSystemFonts();
             //---------- 
             //show result
             InstalledFont selectedFF = null;
@@ -139,7 +141,7 @@ namespace SampleWinForms
             _typefaceStore = new TypefaceStore();
             _typefaceStore.FontCollection = installedFontCollection;
             //set default font for current text printer
-            selectedTextPrinter.Typeface = _typefaceStore.GetTypeface("tahoma", InstalledFontStyle.Regular);
+            selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF);
             //---------- 
 
 
@@ -150,7 +152,7 @@ namespace SampleWinForms
                 InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
                 if (ff != null)
                 {
-                    selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(ff.FontName, InstalledFontStyle.Regular);
+                    selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
                     //sample text box 
                     UpdateRenderOutput();
                 }
@@ -241,7 +243,7 @@ namespace SampleWinForms
                 case RenderChoice.RenderWithGdiPlusPath:
                     {
                         selectedTextPrinter = _devGdiTextPrinter;
-                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
+                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont);
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
@@ -258,7 +260,7 @@ namespace SampleWinForms
                         p.FillColor = PixelFarm.Drawing.Color.Black;
 
                         selectedTextPrinter = _devVxsTextPrinter;
-                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
+                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont);
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
@@ -290,7 +292,7 @@ namespace SampleWinForms
                 case RenderChoice.RenderWithSdfGen:
                     {
                         char testChar = this.txtInputChar.Text[0];
-                        Typeface typeFace = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
+                        Typeface typeFace = _typefaceStore.GetTypeface(_selectedInstallFont);
                         RenderWithMsdfImg(typeFace, testChar, _fontSizeInPts);
 
                     }
@@ -299,7 +301,7 @@ namespace SampleWinForms
                     {
                         //for test only 1 char
                         char testChar = this.txtInputChar.Text[0];
-                        Typeface typeFace = _typefaceStore.GetTypeface(_selectedInstallFont.FontName, InstalledFontStyle.Regular);
+                        Typeface typeFace = _typefaceStore.GetTypeface(_selectedInstallFont);
                         RenderWithMiniAgg(typeFace, testChar, _fontSizeInPts);
 
                     }

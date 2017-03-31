@@ -36,12 +36,17 @@ namespace Typography.OpenFont.Tables
                 ushort subTableVersion = reader.ReadUInt16();
                 ushort len = reader.ReadUInt16(); //Length of the subtable, in bytes (including this header).
                 KernCoverage kerCoverage = new KernCoverage(reader.ReadUInt16());//What type of information is contained in this table.
+
                 //The coverage field is divided into the following sub-fields, with sizes given in bits:
                 //----------------------------------------------
+                //Format of the subtable.
+                //Only formats 0 and 2 have been defined.
+                //Formats 1 and 3 through 255 are reserved for future use.
+
                 switch (kerCoverage.format)
                 {
                     case 0:
-                        ReadSubTableFormat0(reader, len - (7 * 2));//7 fields * 2 byte each
+                        ReadSubTableFormat0(reader, len - (3 * 2));//3 header field * 2 byte each
                         break;
                     case 2:
                         //TODO: implement
@@ -49,7 +54,6 @@ namespace Typography.OpenFont.Tables
                     default:
                         throw new System.NotSupportedException();
                 }
-
             }
         }
 
@@ -59,30 +63,16 @@ namespace Typography.OpenFont.Tables
             ushort searchRange = reader.ReadUInt16();
             ushort entrySelector = reader.ReadUInt16();
             ushort rangeShift = reader.ReadUInt16();
-            //----------------------------------------------
-
-            //check 
-#if DEBUG
-            if ((remainingBytes % 6) != 0)
-            {
-              //  throw new System.Exception();
-            }
-            int calNpairs = remainingBytes / 6;
-#endif
+            //----------------------------------------------  
             var ksubTable = new KerningSubTable(npairs);
             this.kernSubTables.Add(ksubTable);
-
-            while (remainingBytes > 0)
+            while (npairs > 0)
             {
-                ushort left = reader.ReadUInt16();
-                ushort right = reader.ReadUInt16();
-                short value = reader.ReadInt16();
                 ksubTable.AddKernPair(
                     reader.ReadUInt16(), //left//
                     reader.ReadUInt16(),//right
-                    reader.ReadInt16());//value
-
-                remainingBytes -= 6;
+                    reader.ReadInt16());//value 
+                npairs--;
             }
         }
         struct KerningPair
@@ -118,9 +108,17 @@ namespace Typography.OpenFont.Tables
             //minimum 	1 	1 	If this bit is set to 1, the table has minimum values. If set to 0, the table has kerning values.
             //cross-stream 	2 	1 	If set to 1, kerning is perpendicular to the flow of the text.
 
-            //If the text is normally written horizontally, kerning will be done in the up and down directions. If kerning values are positive, the text will be kerned upwards; if they are negative, the text will be kerned downwards.
+            //horizontal ...            
+            //If the text is normally written horizontally,
+            //kerning will be done in the up and down directions. 
+            //If kerning values are positive, the text will be kerned upwards; 
+            //if they are negative, the text will be kerned downwards.
 
-            //If the text is normally written vertically, kerning will be done in the left and right directions. If kerning values are positive, the text will be kerned to the right; if they are negative, the text will be kerned to the left.
+            //vertical ...
+            //If the text is normally written vertically, 
+            //kerning will be done in the left and right directions. 
+            //If kerning values are positive, the text will be kerned to the right; 
+            //if they are negative, the text will be kerned to the left.
 
             //The value 0x8000 in the kerning data resets the cross-stream kerning back to 0.
             //override 	3 	1 	If this bit is set to 1 the value in this table should replace the value currently being accumulated.
@@ -145,7 +143,7 @@ namespace Typography.OpenFont.Tables
                 //bit 3,len 1, If this bit is set to 1 the value in this table should replace the value currently being accumulated.
                 _override = ((coverage >> 3) & 0x1) == 1;
                 //bit 4-7 => 	Reserved. This should be set to zero.
-                format = (byte)((coverage >> 7) & 0xff);
+                format = (byte)((coverage >> 8) & 0xff);
             }
         }
 
