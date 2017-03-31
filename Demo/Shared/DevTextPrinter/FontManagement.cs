@@ -7,17 +7,6 @@ using Typography.OpenFont;
 namespace Typography.Rendering
 {
 
-    public interface IFontface
-    {
-        string FontName { get; }
-        string FontSubFamily { get; }
-    }
-
-    public class FontRequest
-    {
-        public string FontName { get; set; }
-        public InstalledFontStyle Style { get; set; }
-    }
 
     public class InstalledFont
     {
@@ -40,14 +29,6 @@ namespace Typography.Rendering
             return FontName + " " + FontSubFamily;
         }
 #endif
-    }
-    public interface IInstalledFontProvider
-    {
-        IEnumerable<string> GetInstalledFontIter();
-    }
-    public interface IFontLoader
-    {
-        InstalledFont GetFont(string fontName, InstalledFontStyle style);
     }
 
 
@@ -434,7 +415,7 @@ namespace Typography.Rendering
         }
         public static void LoadWindowsSystemFonts(this InstalledFontCollection fontCollection)
         {
-            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts"); 
+            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
         }
         public static void LoadMacSystemFonts(this InstalledFontCollection fontCollection)
         {
