@@ -89,7 +89,7 @@ namespace SampleWinForms
                 ffcount++;
             }
             //set default font for current text printer
-            _currentTextPrinter.Typeface = _typefaceStore.GetTypeface("tahoma", InstalledFontStyle.Regular);
+            _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF.FontName, selectedFF.FontSubFamily);
             //---------- 
 
             if (selected_index < 0) { selected_index = 0; }
@@ -100,7 +100,7 @@ namespace SampleWinForms
                 if (ff != null)
                 {
                     //direct set
-                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff.FontName, InstalledFontStyle.Regular);
+                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
                     //sample text box 
                     UpdateRenderOutput();
                 }
