@@ -36,12 +36,17 @@ namespace Typography.OpenFont.Tables
                 ushort subTableVersion = reader.ReadUInt16();
                 ushort len = reader.ReadUInt16(); //Length of the subtable, in bytes (including this header).
                 KernCoverage kerCoverage = new KernCoverage(reader.ReadUInt16());//What type of information is contained in this table.
+
                 //The coverage field is divided into the following sub-fields, with sizes given in bits:
                 //----------------------------------------------
+                //Format of the subtable.
+                //Only formats 0 and 2 have been defined.
+                //Formats 1 and 3 through 255 are reserved for future use.
+
                 switch (kerCoverage.format)
                 {
                     case 0:
-                        ReadSubTableFormat0(reader, len - (7 * 2));//7 fields * 2 byte each
+                        ReadSubTableFormat0(reader, len - (3 * 2));//3 header field * 2 byte each
                         break;
                     case 2:
                         //TODO: implement
@@ -49,7 +54,6 @@ namespace Typography.OpenFont.Tables
                     default:
                         throw new System.NotSupportedException();
                 }
-
             }
         }
 
@@ -59,30 +63,16 @@ namespace Typography.OpenFont.Tables
             ushort searchRange = reader.ReadUInt16();
             ushort entrySelector = reader.ReadUInt16();
             ushort rangeShift = reader.ReadUInt16();
-            //----------------------------------------------
-
-            //check 
-#if DEBUG
-            if ((remainingBytes % 6) != 0)
-            {
-                //  throw new System.Exception();
-            }
-            int calNpairs = remainingBytes / 6;
-#endif
+            //----------------------------------------------  
             var ksubTable = new KerningSubTable(npairs);
             this.kernSubTables.Add(ksubTable);
-
-            while (remainingBytes > 0)
+            while (npairs > 0)
             {
-                ushort left = reader.ReadUInt16();
-                ushort right = reader.ReadUInt16();
-                short value = reader.ReadInt16();
                 ksubTable.AddKernPair(
                     reader.ReadUInt16(), //left//
                     reader.ReadUInt16(),//right
-                    reader.ReadInt16());//value
-
-                remainingBytes -= 6;
+                    reader.ReadInt16());//value 
+                npairs--;
             }
         }
         struct KerningPair
