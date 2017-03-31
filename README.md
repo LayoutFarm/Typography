@@ -132,8 +132,9 @@ _pic 4: test with Thai glyph (complex script)_
 
 License
 -----------
-Source code from multiple projects,
-here... 
+Source code from multiple projects.
+I select ONLY PERMISSIVE license.
+Here... 
 
  
 **Font** 
