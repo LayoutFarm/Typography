@@ -28,26 +28,7 @@ Concept
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
 	  
  * .Net >=2.0 
-
  
-License
------------
-
-Apache2, 2016-2017, WinterDev
-
-Apache2, 2014-2016, Samuel Carlsson, Big thanks for https://github.com/vidstige/NRasterizer
-
-MIT, 2015, Michael Popoloski, from https://github.com/MikePopoloski/SharpFont
-
-The FreeType Project LICENSE (3-clauses BSD),2003-2016, David Turner, Robert Wilhelm, and Werner Lemberg. from https://www.freetype.org/
-
-BSD, 2009-2010, Poly2Tri Contributors, from https://github.com/PaintLab/poly2tri-cs
-
-BSD, 2002-2005, Maxim Shemanarev, Anti-Grain Geometry - Version 2.4 from http://www.antigrain.com
-
-BSD, 2007-2014, Lars Brubaker, agg-sharp, from  https://github.com/MatterHackers/agg-sharp 
-
-MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
 
 Screenshots
 -----------
@@ -97,6 +78,19 @@ Msdf Texture
 ![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/23061146/423cd040-f533-11e6-9f1a-a7fc3d60a14a.png)
 
 ---
+
+Android GLES2-based
+
+![gles_android_emu](https://cloud.githubusercontent.com/assets/7447159/24420575/8725debe-141d-11e7-8ff2-0170334fa1f7.png)
+_pic 1: GLES2-based android demo, DroidSans.ttf. Each glyph is tesselated to GlyphRun mesh (with C#  Tesselator), and is rendered directly to GLES2 shader._
+
+
+![gles_android_emu](https://cloud.githubusercontent.com/assets/7447159/24421237/bbd1df9e-141f-11e7-82d7-b22f2e5d9fe0.png)
+_pic 2: same technique as pic1, msjh.ttf_, '啊rAbc' , 
+
+please note that baseline of 啊 is not correct
+
+---
 **Advance OpenFont Text Shaping**
 
 **1. GSUB :  ligature feature** 
@@ -134,6 +128,47 @@ _pic 3: test with Thai glyph (complex script) , shows glyph substitution_
 _pic 4: test with Thai glyph (complex script)_
 
 
+---
+
+License
+-----------
+Source code from multiple projects,
+here... 
+
+ 
+**Font** 
+
+Apache2, 2014-2016, Samuel Carlsson, Big thanks for https://github.com/vidstige/NRasterizer
+
+MIT, 2015, Michael Popoloski MIT, from https://github.com/MikePopoloski/SharpFont
+
+The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robert Wilhelm, and Werner Lemberg and others, from https://www.freetype.org/
+
+MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
 
 
+**Geometry**
 
+BSD, 2009-2010, Poly2Tri Contributors, from https://github.com/PaintLab/poly2tri-cs
+
+BSD, 2002-2005, Maxim Shemanarev, Anti-Grain Geometry - Version 2.4 from http://www.antigrain.com
+
+BSD, 2007-2014, Lars Brubaker, agg-sharp, from  https://github.com/MatterHackers/agg-sharp 
+
+MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
+
+Apache2, 2016-2017, WinterDev, from https://github.com/PaintLab/PixelFarm
+
+**Platforms**
+
+MIT, 2015-2015, Xamarin, Inc., from https://github.com/mono/SkiaSharp
+
+MIT, 2006-2009,  Stefanos Apostolopoulos and other Open Tool Kit Contributors, from https://github.com/opentk/opentk
+
+MIT, 2013, Antonie Blom, from  https://github.com/andykorth/Pencil.Gaming
+
+MIT, 2004,2007, Novell Inc., for System.Drawing 
+
+**Demo**
+
+MIT, 2017, Zou Wei, https://github.com/zwcloud
