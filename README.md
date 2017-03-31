@@ -82,10 +82,12 @@ Msdf Texture
 Android GLES2-based
 
 ![gles_android_emu](https://cloud.githubusercontent.com/assets/7447159/24420575/8725debe-141d-11e7-8ff2-0170334fa1f7.png)
+
 _pic 1: GLES2-based android demo, DroidSans.ttf. Each glyph is tesselated to GlyphRun mesh (with C#  Tesselator), and is rendered directly to GLES2 shader._
 
 
 ![gles_android_emu](https://cloud.githubusercontent.com/assets/7447159/24421237/bbd1df9e-141f-11e7-82d7-b22f2e5d9fe0.png)
+
 _pic 2: same technique as pic1, msjh.ttf_, '啊rAbc' , 
 
 please note that baseline of 啊 is not correct
