@@ -560,7 +560,11 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT3 : LookupSubTable
             {
-                public CoverageTable CoverageTable { get; set; }
+                public CoverageTable CoverageTable
+                {
+                    get;
+                    set;
+                }
                 public AlternativeSetTable[] AlternativeSetTables { get; set; }
                 public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {

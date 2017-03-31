@@ -57,6 +57,7 @@ namespace SampleWinForms
                 //eg. this is our custom font folder  
                 installedFontCollection.AddFont(new FontFileStreamProvider(file));
             }
+            //installedFontCollection.LoadWindowsSystemFonts();
             //---------- 
             //show result
             InstalledFont selectedFF = null;
@@ -79,9 +80,9 @@ namespace SampleWinForms
             _typefaceStore = new TypefaceStore();
             _typefaceStore.FontCollection = installedFontCollection;
             //set default font for current text printer
-            _currentTextPrinter.Typeface = _typefaceStore.GetTypeface("tahoma", InstalledFontStyle.Regular);
+            _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF);
             //---------- 
-            
+
 
             if (selected_index < 0) { selected_index = 0; }
             lstFontList.SelectedIndex = selected_index;
@@ -90,7 +91,7 @@ namespace SampleWinForms
                 InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
                 if (ff != null)
                 {
-                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff.FontName, InstalledFontStyle.Regular);
+                    _currentTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
                     //sample text box 
                     UpdateRenderOutput();
                 }
