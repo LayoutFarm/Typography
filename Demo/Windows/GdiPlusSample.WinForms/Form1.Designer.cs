@@ -71,7 +71,7 @@
             this.txtInputChar.Name = "txtInputChar";
             this.txtInputChar.Size = new System.Drawing.Size(101, 20);
             this.txtInputChar.TabIndex = 26;
-            this.txtInputChar.Text = "I";
+            this.txtInputChar.Text = "0123456789";
             // 
             // chkFillBackground
             // 
