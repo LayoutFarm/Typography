@@ -431,6 +431,7 @@ namespace Typography.OpenFont.Tables
                 }
 
             } while (HasFlag(flags, CompositeGlyphFlags.MORE_COMPONENTS));
+            //
             if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_INSTRUCTIONS))
             {
                 ushort numInstr = reader.ReadUInt16();

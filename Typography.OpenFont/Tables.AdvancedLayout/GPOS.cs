@@ -559,19 +559,26 @@ namespace Typography.OpenFont.Tables
                             break;
                         case 2:
                             {
-                                //....
-
+                                //.... 
                                 ushort coverage = reader.ReadUInt16();
                                 ushort value1Format = reader.ReadUInt16();
                                 ushort value2Format = reader.ReadUInt16();
-                                ushort classDef1Offset = reader.ReadUInt16();
-                                ushort classDef2Offset = reader.ReadUInt16();
+                                ushort classDef1_offset = reader.ReadUInt16();
+                                ushort classDef2_offset = reader.ReadUInt16();
                                 ushort class1Count = reader.ReadUInt16();
                                 ushort class2Count = reader.ReadUInt16();
 
+                                for (int c1 = 0; c1 < class1Count; ++c1)
+                                {
+                                    //for each c1 record
+                                    for (int c2 = 0; c2 < class2Count; ++c2)
+                                    {
 
+                                    }
+
+                                }
+                                //TODO: impl more
                                 throw new NotImplementedException();
-
                             }
                             break;
                     }
