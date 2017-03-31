@@ -65,7 +65,7 @@ namespace Typography.OpenFont.Tables
 #if DEBUG
             if ((remainingBytes % 6) != 0)
             {
-              //  throw new System.Exception();
+                //  throw new System.Exception();
             }
             int calNpairs = remainingBytes / 6;
 #endif
@@ -118,9 +118,17 @@ namespace Typography.OpenFont.Tables
             //minimum 	1 	1 	If this bit is set to 1, the table has minimum values. If set to 0, the table has kerning values.
             //cross-stream 	2 	1 	If set to 1, kerning is perpendicular to the flow of the text.
 
-            //If the text is normally written horizontally, kerning will be done in the up and down directions. If kerning values are positive, the text will be kerned upwards; if they are negative, the text will be kerned downwards.
+            //horizontal ...            
+            //If the text is normally written horizontally,
+            //kerning will be done in the up and down directions. 
+            //If kerning values are positive, the text will be kerned upwards; 
+            //if they are negative, the text will be kerned downwards.
 
-            //If the text is normally written vertically, kerning will be done in the left and right directions. If kerning values are positive, the text will be kerned to the right; if they are negative, the text will be kerned to the left.
+            //vertical ...
+            //If the text is normally written vertically, 
+            //kerning will be done in the left and right directions. 
+            //If kerning values are positive, the text will be kerned to the right; 
+            //if they are negative, the text will be kerned to the left.
 
             //The value 0x8000 in the kerning data resets the cross-stream kerning back to 0.
             //override 	3 	1 	If this bit is set to 1 the value in this table should replace the value currently being accumulated.
@@ -145,7 +153,7 @@ namespace Typography.OpenFont.Tables
                 //bit 3,len 1, If this bit is set to 1 the value in this table should replace the value currently being accumulated.
                 _override = ((coverage >> 3) & 0x1) == 1;
                 //bit 4-7 => 	Reserved. This should be set to zero.
-                format = (byte)((coverage >> 7) & 0xff);
+                format = (byte)((coverage >> 8) & 0xff);
             }
         }
 
