@@ -58,10 +58,9 @@ namespace Typography.Rendering
     [Flags]
     public enum InstalledFontStyle
     {
-        Others = 0,
-        Normal = 1,
-        Bold = 1 << 2,
-        Italic = 1 << 3,
+        Normal = 0,
+        Bold = 1 << 1,
+        Italic = 1 << 2,
     }
 
     public delegate InstalledFont FontNotFoundHandler(InstalledFontCollection fontCollection, string fontName, string fontSubFam, InstalledFontStyle wellknownStyle);
@@ -199,7 +198,7 @@ namespace Typography.Rendering
         {
             switch (subFamName.ToUpper())
             {
-                default: return InstalledFontStyle.Others;
+                default:
                 case "NORMAL":
                 case "REGULAR":
                     return InstalledFontStyle.Normal;
