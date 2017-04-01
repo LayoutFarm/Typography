@@ -380,13 +380,16 @@ namespace Typography.TextLayout
                     currentTypeface.Ascender * scale,
                     currentTypeface.Descender * scale,
                     currentTypeface.LineGap * scale);
+
             }
-            //get last one
-            GlyphPlan lastOne = outputGlyphPlans[j - 1];
-            strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
-                    currentTypeface.Ascender * scale,
-                    currentTypeface.Descender * scale,
-                    currentTypeface.LineGap * scale);
+            else
+            {
+                GlyphPlan lastOne = outputGlyphPlans[j - 1];
+                strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
+                        currentTypeface.Ascender * scale,
+                        currentTypeface.Descender * scale,
+                        currentTypeface.LineGap * scale);
+            }
         }
     }
 
