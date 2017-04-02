@@ -68,13 +68,6 @@
     <Compile Include="..\..\Shared\GlyphPathBuilder\HintTechnique.cs">
       <Link>GlyphPathBuilder\HintTechnique.cs</Link>
     </Compile>
-    <Compile Include="..\TextBoxSample.WinForms\SampleTextBox.cs">
-      <Link>SampleTextBox.cs</Link>
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="..\TextBoxSample.WinForms\SampleTextBox.Designer.cs">
-      <Link>SampleTextBox.Designer.cs</Link>
-    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,9 +81,12 @@
     <Compile Include="PixelFarm\SampleTextBoxControllerForPixelFarm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="..\TextBoxSample.WinForms\SampleTextBox.resx">
-      <Link>SampleTextBox.resx</Link>
-    </EmbeddedResource>
+    <Compile Include="SampleTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SampleTextBox.Designer.cs">
+      <DependentUpon>SampleTextBox.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -104,6 +100,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SampleTextBox.resx">
+      <DependentUpon>SampleTextBox.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
