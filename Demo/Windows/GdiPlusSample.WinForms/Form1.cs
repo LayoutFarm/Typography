@@ -23,8 +23,9 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
-            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai; //for complex script
-            //_currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Hebrew;
+            //_currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai; //for complex script
+            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Hebrew;
+
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
