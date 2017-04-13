@@ -240,6 +240,7 @@ namespace Typography.OpenFont
                                 //------------------------
                                 //4. and set (p_x,p_y) as 1st control point for the new curve
                                 c1 = new Vector2(p_x, p_y);
+                                curveMode = true;
                                 //
                                 //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y); 
                                 break;
