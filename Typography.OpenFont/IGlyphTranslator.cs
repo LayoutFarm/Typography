@@ -195,11 +195,6 @@ namespace Typography.OpenFont
                     }
                     else
                     {
-                        //this point is curve control point***
-                        //so set curve mode = true
-                        curveMode = true;
-                        //check number if existing curve control 
-
                         switch (curveControlPointCount)
                         {
 
@@ -207,6 +202,17 @@ namespace Typography.OpenFont
                                 c1 = new Vector2(p_x, p_y);
                                 //this point may be part 1st control point of a curve,
                                 //store it and wait for next point before make decision *** 
+                                //------------------- 
+                                if (!isFirstPoint)
+                                {
+                                    curveMode = true;
+                                }
+                                else
+                                {
+                                    //this point is curve control point***
+                                    //so set curve mode = true 
+                                    //check number if existing curve control  
+                                }
                                 break;
                             case 1:
                                 //we already have previous 1st control point (c1)
@@ -234,6 +240,7 @@ namespace Typography.OpenFont
                                 //------------------------
                                 //4. and set (p_x,p_y) as 1st control point for the new curve
                                 c1 = new Vector2(p_x, p_y);
+                                curveMode = true;
                                 //
                                 //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y); 
                                 break;

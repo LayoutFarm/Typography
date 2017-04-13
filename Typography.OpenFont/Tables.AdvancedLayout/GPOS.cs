@@ -639,7 +639,7 @@ namespace Typography.OpenFont.Tables
 
                                 }
 #endif
-                                glyphPos.yoffset += markAnchorPoint.ycoord;
+                                glyphPos.yoffset += (short)(basePointForMark.ycoord - markAnchorPoint.ycoord);
 
                             }
                         }
