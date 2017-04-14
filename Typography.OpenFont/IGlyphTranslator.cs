@@ -176,7 +176,27 @@ namespace Typography.OpenFont
                             if (isFirstPoint)
                             {
                                 isFirstPoint = false;
-                                tx.MoveTo(latest_moveto_x = (p_x), latest_moveto_y = (p_y));
+
+                                switch (curveControlPointCount)
+                                {
+                                    case 0:
+                                        {
+                                            tx.MoveTo(latest_moveto_x = (p_x), latest_moveto_y = (p_y));
+                                        }
+                                        break;
+                                    case 1:
+                                        {
+                                            tx.MoveTo(latest_moveto_x = (c1.X), latest_moveto_y = (c1.Y));
+                                            tx.LineTo(p_x, p_y);
+                                            curveControlPointCount--;
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            throw new NotSupportedException();
+                                        }
+                                }
+
                             }
                             else
                             {
@@ -205,13 +225,16 @@ namespace Typography.OpenFont
                                 //------------------- 
                                 if (!isFirstPoint)
                                 {
-                                    curveMode = true;
-                                }
-                                else
-                                {
                                     //this point is curve control point***
                                     //so set curve mode = true 
                                     //check number if existing curve control  
+
+                                    curveMode = true;
+
+                                }
+                                else
+                                {
+
                                 }
                                 break;
                             case 1:
@@ -243,6 +266,7 @@ namespace Typography.OpenFont
                                 curveMode = true;
                                 //
                                 //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y); 
+
                                 break;
                             default:
                                 throw new NotSupportedException();
