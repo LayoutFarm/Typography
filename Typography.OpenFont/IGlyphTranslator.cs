@@ -60,7 +60,7 @@ namespace Typography.OpenFont
         /// <param name="y2">end point y</param>
         void Curve3(float x1, float y1, float x2, float y2);
         /// <summary>
-        /// add Quadratic Bézier curve,begin from CURRENT pen pos, to (x3,y3), then set (x3,y3) as CURRENT pen pos
+        /// add Cubic Bézier curve,begin from CURRENT pen pos, to (x3,y3), then set (x3,y3) as CURRENT pen pos
         /// </summary>
         /// <param name="x1">x of 1st control point</param>
         /// <param name="y1">y of 1st control point</param>
