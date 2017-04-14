@@ -92,27 +92,40 @@ namespace Typography.OpenFont
             //-----------------------------------
             float latest_moveto_x = 0;
             float latest_moveto_y = 0;
-
             int curveControlPointCount = 0; // 1 curve control point => Quadratic, 2 curve control points => Cubic
 
 
             while (todoContourCount > 0)
             {
                 //foreach contour...
-
                 //next contour will begin at...
                 int nextCntBeginAtIndex = contourEndPoints[startContour] + 1;
 
                 //reset  ...
-                Vector2 c1 = new Vector2();
-                Vector2 c2 = new Vector2();
-                bool curveMode = false;
-                bool isFirstPoint = true;  //first point of this contour
+
+                bool has_c_begin = false;  //see below [A]
+                Vector2 c_begin = new Vector2(); //special point if the glyph starts with 'off-curve' control point                 
+                Vector2 c1 = new Vector2(); //control point of quadratic curve
+                //-------------------------------------------------------------------
+                bool offCurveMode = false;
+                bool isFirstOnCurvePoint = true; //first point of this contour
+
+                //-------------------------------------------------------------------
+                //[A]
+                //first point may start with 'ON CURVE" or 'OFF-CURVE'
+                //1. if first point is 'ON-CURVE' => we just set moveto command to it
+                //
+                //2. if first point is 'OFF-CURVE' => we store it into c_begin and set has_c_begin= true
+                //   the c_begin will be use when we close the contour   
+                //
+                //
+                //eg. glyph '2' in Century font starts with 'OFF-CURVE' point, and ends with 'OFF-CURVE'
+                //-------------------------------------------------------------------
 
 
-                //for each point in this contour
+
                 for (; cpoint_index < nextCntBeginAtIndex; ++cpoint_index)
-                {
+                {    //for each point in this contour
 
                     GlyphPointF p = glyphPoints[cpoint_index];
                     float p_x = p.X * scale;
@@ -122,81 +135,81 @@ namespace Typography.OpenFont
                     //bool has_dropout = (((vtag >> 2) & 0x1) != 0);
                     //int dropoutMode = vtag >> 3;
 
+
                     if (p.onCurve)
                     {
-                        //point p is an on-curve point (on outline). (not curve control point)
+                        //-------------------------------------------------------------------
+                        //[B]
+                        //point p is an 'on-curve' point (on outline).
+                        //(not curve control point)***
+                        //the point touch the outline.
+
                         //possible ways..
-                        //1. if we are in curve mode, then p is end point
+                        //1. if we are in offCurveMode, then p is a curve end point.
                         //   we must decide which curve to create (Curve3 or Curve4)
                         //   easy, ... 
                         //      if  curveControlPointCount == 1 , then create Curve3
-                        //      else curveControlPointCount ==2 , then create Curve4
-                        //2. if we are NOT in curve mode, 
-                        //      if p is first point then set this to x0,y0
-                        //      else then p is end point of a line.
+                        //      else curveControlPointCount ==2 , then create Curve4 (BUT SHOULD NOT BE FOUND IN TRUE TYPEFONT'(
+                        //2. if we are NOT in offCurveMode, 
+                        //      if p is first point then set this to =>moveto(x0,y0)
+                        //      else then p is end point of a line => lineto(x1,y1)
+                        //-------------------------------------------------------------------
 
-
-                        if (curveMode)
+                        if (offCurveMode)
                         {
+                            //as describe above [B.1] ,...
+
                             switch (curveControlPointCount)
                             {
                                 case 1:
-                                    {
-                                        tx.Curve3(
-                                            c1.X, c1.Y,
-                                            p_x, p_y);
-                                    }
-                                    break;
-                                case 2:
-                                    {
-                                        //for TrueType font 
-                                        //we should not be here?
 
-                                        tx.Curve4(
-                                             c1.X, c1.Y,
-                                             c2.X, c2.Y,
-                                             p_x, p_y);
-                                    }
+                                    tx.Curve3(
+                                        c1.X, c1.Y,
+                                        p_x, p_y);
+
                                     break;
                                 default:
-                                    {
-                                        throw new NotSupportedException();
-                                    }
+
+                                    //for TrueType font 
+                                    //we should not be here?
+                                    throw new NotSupportedException();
+
                             }
 
                             //reset curve control point count
                             curveControlPointCount = 0;
-                            //exist from curve mode
-                            curveMode = false;
+                            //we touch the curve, set offCurveMode= false
+                            offCurveMode = false;
                         }
                         else
                         {
-                            //as describe above,...
-
-                            if (isFirstPoint)
+                            // p is ON CURVE, but now we are in OFF-CURVE mode.
+                            //
+                            //as describe above [B.2] ,... 
+                            if (isFirstOnCurvePoint)
                             {
-                                isFirstPoint = false;
-
+                                //special treament for first point
+                                isFirstOnCurvePoint = false;
                                 switch (curveControlPointCount)
                                 {
                                     case 0:
-                                        {
-                                            tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
-                                        }
+                                        //describe above, see [A.1]
+                                        tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
                                         break;
                                     case 1:
-                                        {
-                                            tx.MoveTo(latest_moveto_x = c1.X, latest_moveto_y = c1.Y);
-                                            tx.LineTo(p_x, p_y);
-                                            curveControlPointCount--;
-                                        }
-                                        break;
-                                    default:
-                                        {
-                                            throw new NotSupportedException();
-                                        }
-                                }
 
+                                        //describe above, see [A.2]
+                                        c_begin = c1;
+                                        has_c_begin = true;
+                                        //since c1 is off curve
+                                        //we skip the c1 for and use it when we close the curve 
+                                        //tx.MoveTo(latest_moveto_x = c1.X, latest_moveto_y = c1.Y);
+                                        //tx.LineTo(p_x, p_y); 
+                                        tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
+                                        curveControlPointCount--;
+                                        break;
+                                    default: throw new NotSupportedException();
+                                }
                             }
                             else
                             {
@@ -215,59 +228,56 @@ namespace Typography.OpenFont
                     }
                     else
                     {
+                        //p is OFF-CURVE point (this is curve control point)
+                        //
                         switch (curveControlPointCount)
                         {
 
                             case 0:
                                 c1 = new Vector2(p_x, p_y);
-                                //this point may be part 1st control point of a curve,
-                                //or from moveto command,
-                                //store it and wait for next point before make decision *** 
-                                //------------------- 
-                                if (!isFirstPoint)
+                                if (!isFirstOnCurvePoint)
                                 {
                                     //this point is curve control point***
                                     //so set curve mode = true 
-                                    //check number if existing curve control  
-
-                                    curveMode = true;
-
+                                    //check number if existing curve control   
+                                    offCurveMode = true;
                                 }
                                 else
                                 {
-
+                                    //describe above, see [A.2]
                                 }
                                 break;
                             case 1:
-                                //we already have previous 1st control point (c1)
-                                //------------------------------------- 
-                                //please note that TrueType font
-                                //compose of Quadractic Bezier Curve (Curve3) *** 
-                                //------------------------------------- 
-                                //in this case, this is NOT Cubic,
-                                //this is 2 CONNECTED Quadractic Bezier Curves***
-                                //
-                                //we must create 'end point' of the first curve
-                                //and set it as 'begin point of the second curve.
-                                //
-                                //this is done by ...
-                                //1. calculate mid point between c1 and the latest point (p_x,p_y)
-                                Vector2 mid = GetMidPoint(c1, p_x, p_y);
-                                //----------
-                                //2. generate curve3 ***
-                                tx.Curve3(
-                                    c1.X, c1.Y,
-                                    mid.X, mid.Y);
-                                //------------------------
-                                //3. so curve control point number is reduce by 1***
-                                curveControlPointCount--;
-                                //------------------------
-                                //4. and set (p_x,p_y) as 1st control point for the new curve
-                                c1 = new Vector2(p_x, p_y);
-                                curveMode = true;
-                                //
-                                //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y); 
-
+                                {
+                                    //we already have previous 1st control point (c1)
+                                    //------------------------------------- 
+                                    //please note that TrueType font
+                                    //compose of Quadractic Bezier Curve (Curve3) *** 
+                                    //------------------------------------- 
+                                    //in this case, this is NOT Cubic,
+                                    //this is 2 CONNECTED Quadractic Bezier Curves***
+                                    //
+                                    //we must create 'end point' of the first curve
+                                    //and set it as 'begin point of the second curve.
+                                    //
+                                    //this is done by ...
+                                    //1. calculate mid point between c1 and the latest point (p_x,p_y)
+                                    Vector2 mid = GetMidPoint(c1, p_x, p_y);
+                                    //----------
+                                    //2. generate curve3 ***
+                                    tx.Curve3(
+                                        c1.X, c1.Y,
+                                        mid.X, mid.Y);
+                                    //------------------------
+                                    //3. so curve control point number is reduce by 1***
+                                    curveControlPointCount--;
+                                    //------------------------
+                                    //4. and set (p_x,p_y) as 1st control point for the new curve
+                                    c1 = new Vector2(p_x, p_y);
+                                    offCurveMode = true;
+                                    //
+                                    //printf("[%d] bzc2nd,  x: %d,y:%d \n", mm, vpoint.x, vpoint.y); 
+                                }
                                 break;
                             default:
                                 throw new NotSupportedException();
@@ -279,35 +289,49 @@ namespace Typography.OpenFont
                 //--------
                 //when finish,                 
                 //ensure that the contour is closed.
-                if (curveMode)
+                if (offCurveMode)
                 {
                     switch (curveControlPointCount)
                     {
                         case 0: break;
                         case 1:
                             {
-                                tx.Curve3(
-                                    c1.X, c1.Y,
-                                    latest_moveto_x, latest_moveto_y);
-                            }
-                            break;
-                        case 2:
-                            {
-                                //for TrueType font 
-                                //we should not be here? 
-                                tx.Curve4(
-                                    c1.X, c1.Y,
-                                    c2.X, c2.Y,
-                                    latest_moveto_x, latest_moveto_y);
+
+                                if (has_c_begin)
+                                {
+                                    Vector2 mid = GetMidPoint(c1, c_begin.X, c_begin.Y);
+                                    //----------
+                                    //2. generate curve3 ***
+                                    tx.Curve3(
+                                        c1.X, c1.Y,
+                                        mid.X, mid.Y);
+                                    //------------------------
+                                    //3. so curve control point number is reduce by 1***
+                                    curveControlPointCount--;
+                                    //------------------------
+                                    tx.Curve3(
+                                         c_begin.X, c_begin.Y,
+                                         latest_moveto_x, latest_moveto_y);
+                                }
+                                else
+                                {
+                                    tx.Curve3(
+                                        c1.X, c1.Y,
+                                        latest_moveto_x, latest_moveto_y);
+                                }
                             }
                             break;
                         default:
-                            { throw new NotSupportedException(); }
+                            {//for TrueType font 
+                                //we should not be here? 
+                                throw new NotSupportedException();
+                            }
                     }
                     //reset
-                    curveMode = false;
+                    offCurveMode = false;
                     curveControlPointCount = 0;
                 }
+
                 //--------      
                 tx.CloseContour(); //***                            
                 startContour++;
