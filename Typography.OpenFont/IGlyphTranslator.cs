@@ -110,7 +110,7 @@ namespace Typography.OpenFont
                 bool isFirstPoint = true;  //first point of this contour
 
 
-                ///for each point in this contour
+                //for each point in this contour
                 for (; cpoint_index < nextCntBeginAtIndex; ++cpoint_index)
                 {
 
@@ -181,12 +181,12 @@ namespace Typography.OpenFont
                                 {
                                     case 0:
                                         {
-                                            tx.MoveTo(latest_moveto_x = (p_x), latest_moveto_y = (p_y));
+                                            tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
                                         }
                                         break;
                                     case 1:
                                         {
-                                            tx.MoveTo(latest_moveto_x = (c1.X), latest_moveto_y = (c1.Y));
+                                            tx.MoveTo(latest_moveto_x = c1.X, latest_moveto_y = c1.Y);
                                             tx.LineTo(p_x, p_y);
                                             curveControlPointCount--;
                                         }
@@ -221,6 +221,7 @@ namespace Typography.OpenFont
                             case 0:
                                 c1 = new Vector2(p_x, p_y);
                                 //this point may be part 1st control point of a curve,
+                                //or from moveto command,
                                 //store it and wait for next point before make decision *** 
                                 //------------------- 
                                 if (!isFirstPoint)
@@ -251,7 +252,7 @@ namespace Typography.OpenFont
                                 //
                                 //this is done by ...
                                 //1. calculate mid point between c1 and the latest point (p_x,p_y)
-                                Vector2 mid = GetMid(c1, p_x, p_y);
+                                Vector2 mid = GetMidPoint(c1, p_x, p_y);
                                 //----------
                                 //2. generate curve3 ***
                                 tx.Curve3(
@@ -285,7 +286,8 @@ namespace Typography.OpenFont
                         case 0: break;
                         case 1:
                             {
-                                tx.Curve3(c1.X, c1.Y,
+                                tx.Curve3(
+                                    c1.X, c1.Y,
                                     latest_moveto_x, latest_moveto_y);
                             }
                             break;
@@ -293,7 +295,8 @@ namespace Typography.OpenFont
                             {
                                 //for TrueType font 
                                 //we should not be here? 
-                                tx.Curve4(c1.X, c1.Y,
+                                tx.Curve4(
+                                    c1.X, c1.Y,
                                     c2.X, c2.Y,
                                     latest_moveto_x, latest_moveto_y);
                             }
@@ -308,6 +311,7 @@ namespace Typography.OpenFont
                 //--------      
                 tx.CloseContour(); //***                            
                 startContour++;
+                //--------   
                 todoContourCount--;
                 //--------      
             }
@@ -315,7 +319,7 @@ namespace Typography.OpenFont
             tx.EndRead();
         }
 
-        static Vector2 GetMid(Vector2 v0, float x1, float y1)
+        static Vector2 GetMidPoint(Vector2 v0, float x1, float y1)
         {
             //mid point between v0 and (x1,y1)
             return new Vector2(
