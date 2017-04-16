@@ -249,7 +249,7 @@
             // chkShowSampleTextBox
             // 
             this.chkShowSampleTextBox.AutoSize = true;
-            this.chkShowSampleTextBox.Location = new System.Drawing.Point(12, 99);
+            this.chkShowSampleTextBox.Location = new System.Drawing.Point(371, 14);
             this.chkShowSampleTextBox.Name = "chkShowSampleTextBox";
             this.chkShowSampleTextBox.Size = new System.Drawing.Size(133, 17);
             this.chkShowSampleTextBox.TabIndex = 39;

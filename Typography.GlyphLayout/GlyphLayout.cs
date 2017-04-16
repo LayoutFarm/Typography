@@ -120,7 +120,7 @@ namespace Typography.TextLayout
         public bool EnableLigature { get; set; }
 
         void UpdateLayoutPlan()
-        {   
+        {
             GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(this._typeface, this._scriptLang);
             this._gpos = context._glyphPos;
             this._gsub = context._glyphSub;
@@ -323,7 +323,7 @@ namespace Typography.TextLayout
                 }
                 cx += glyphPos.advWidth;
             }
-        } 
+        }
         public static void Layout(this GlyphLayout glyphLayout, Typeface typeface, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
         {
             glyphLayout.Typeface = typeface;
@@ -345,17 +345,17 @@ namespace Typography.TextLayout
                   char[] textBuffer,
                   int startAt,
                   int len,
-                  List<GlyphPlan> userGlyphPlanList,
-                  List<UserCharToGlyphIndexMap> charToGlyphMapList)
+                  List<GlyphPlan> outputGlyphPlanList,
+                  List<UserCharToGlyphIndexMap> outputCharToGlyphIndexMaps)
         {
             //generate glyph plan based on its current setting
-            glyphLayout.Layout(textBuffer, startAt, len, userGlyphPlanList);
+            glyphLayout.Layout(textBuffer, startAt, len, outputGlyphPlanList);
             //note that we print to userGlyphPlanList
             //---------------- 
             //3. user char to glyph index map
-            if (charToGlyphMapList != null)
+            if (outputCharToGlyphIndexMaps != null)
             {
-                glyphLayout.ReadOutput(charToGlyphMapList);
+                glyphLayout.ReadOutput(outputCharToGlyphIndexMaps);
             }
 
         }
@@ -380,13 +380,16 @@ namespace Typography.TextLayout
                     currentTypeface.Ascender * scale,
                     currentTypeface.Descender * scale,
                     currentTypeface.LineGap * scale);
+
             }
-            //get last one
-            GlyphPlan lastOne = outputGlyphPlans[j - 1];
-            strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
-                    currentTypeface.Ascender * scale,
-                    currentTypeface.Descender * scale,
-                    currentTypeface.LineGap * scale);
+            else
+            {
+                GlyphPlan lastOne = outputGlyphPlans[j - 1];
+                strBox = new MeasuredStringBox((lastOne.x + lastOne.advX) * scale,
+                        currentTypeface.Ascender * scale,
+                        currentTypeface.Descender * scale,
+                        currentTypeface.LineGap * scale);
+            }
         }
     }
 
