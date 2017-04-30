@@ -19,12 +19,13 @@ namespace Typography.Rendering
         public int minImgHeight = 5;
 
         public double angleThreshold = 3; //default
-        public double range = 4;
-        public double edgeThreshold = 1;
+        public double pxRange = 4; //default
+        public double edgeThreshold = 1.00000001;//default,(from original code)
 
 
         public MsdfGenParams()
         {
+
         }
         public void SetScale(float scaleX, float scaleY)
         {
@@ -176,17 +177,22 @@ namespace Typography.Rendering
             var translate = new Msdfgen.Vector2(left < 0 ? -left + borderW : borderW, bottom < 0 ? -bottom + borderW : borderW);
             w += borderW * 2; //borders,left- right
             h += borderW * 2; //borders, top- bottom
- 
+
             double edgeThreshold = genParams.edgeThreshold;
+            if (edgeThreshold < 0)
+            {
+                edgeThreshold = 1.00000001; //use default if  edgeThreshold <0
+            }
 
-
+            var scale = new Msdfgen.Vector2(genParams.scaleX, genParams.scaleY); //scale               
+            double range = genParams.pxRange / Math.Min(scale.x, scale.y);
             //---------
             Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp(w, h);
             Msdfgen.EdgeColoring.edgeColoringSimple(shape, genParams.angleThreshold);
             Msdfgen.MsdfGenerator.generateMSDF(frgbBmp,
                 shape,
-                genParams.range,
-                new Msdfgen.Vector2(genParams.scaleX, genParams.scaleY), //scale                 
+                range,
+                scale,
                 translate,//translate to positive quadrant
                 edgeThreshold);
             //-----------------------------------
