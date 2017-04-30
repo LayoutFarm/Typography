@@ -75,7 +75,7 @@ Multi-channel signed distance field (Msdf) Texture (https://github.com/Chlumsky/
 ---
 Msdf Texture
 
-![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/23061146/423cd040-f533-11e6-9f1a-a7fc3d60a14a.png)
+![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/25565003/7cdde83a-2de9-11e7-9ff8-3740cd37c40a.png)
 
 ---
 
