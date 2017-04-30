@@ -663,8 +663,8 @@ namespace SampleWinForms
                 for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
                 {
                     //build glyph
-                    builder.BuildFromGlyphIndex(gindex, sizeInPoint);
-
+                    //builder.BuildFromGlyphIndex(gindex, sizeInPoint);
+                    builder.BuildFromGlyphIndex(gindex, -1);
                     var glyphToContour = new GlyphTranslatorToContour();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     builder.ReadShapes(glyphToContour);
