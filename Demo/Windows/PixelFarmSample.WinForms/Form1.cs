@@ -387,7 +387,8 @@ namespace SampleWinForms
             var glyphToContour = new GlyphTranslatorToContour();
             builder.ReadShapes(glyphToContour);
             //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
-            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
+            MsdfGenParams genParams = new MsdfGenParams();
+            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
             var actualImg = ActualImage.CreateFromBuffer(glyphImg.Width, glyphImg.Height, PixelFormat.ARGB32, glyphImg.GetImageBuffer());
             p.DrawImage(actualImg, 0, 0);
 
@@ -659,16 +660,19 @@ namespace SampleWinForms
                 //-------------------------------------------------------------
                 var atlasBuilder = new SimpleFontAtlasBuilder();
 
+                MsdfGenParams genParams = new MsdfGenParams();
 
                 for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
                 {
                     //build glyph
                     //builder.BuildFromGlyphIndex(gindex, sizeInPoint);
-                    builder.BuildFromGlyphIndex(gindex, -1);
+                    builder.BuildFromGlyphIndex(gindex, -1); //use original glyph size (assign -1)
                     var glyphToContour = new GlyphTranslatorToContour();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     builder.ReadShapes(glyphToContour);
-                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
+
+                    genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
+                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
                     atlasBuilder.AddGlyph(gindex, glyphImg);
 
                     //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))

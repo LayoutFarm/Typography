@@ -6,9 +6,38 @@ using System.Collections.Generic;
 
 namespace Typography.Rendering
 {
+
+    /// <summary>
+    /// parameter for msdf generation
+    /// </summary>
+    public class MsdfGenParams
+    {
+        public float scaleX = 1;
+        public float scaleY = 1;
+        public float shapeScale = 1;
+        public int minImgWidth = 5;
+        public int minImgHeight = 5;
+
+        public double angleThreshold = 3; //default
+        public double pxRange = 4; //default
+        public double edgeThreshold = 1.00000001;//default,(from original code)
+
+
+        public MsdfGenParams()
+        {
+
+        }
+        public void SetScale(float scaleX, float scaleY)
+        {
+            this.scaleX = scaleX;
+            this.scaleY = scaleY;
+        }
+
+
+    }
     public static class MsdfGlyphGen
     {
-        public static Msdfgen.Shape CreateMsdfShape(GlyphTranslatorToContour glyphToContour, float pxScale = 1)
+        public static Msdfgen.Shape CreateMsdfShape(GlyphTranslatorToContour glyphToContour, float pxScale)
         {
             List<GlyphContour> cnts = glyphToContour.GetContours();
             List<GlyphContour> newFitContours = new List<GlyphContour>();
@@ -122,24 +151,25 @@ namespace Typography.Rendering
         //---------------------------------------------------------------------
 
         public static GlyphImage CreateMsdfImage(
-             GlyphTranslatorToContour glyphToContour)
+             GlyphTranslatorToContour glyphToContour, MsdfGenParams genParams)
         {
             // create msdf shape , then convert to actual image
-            return CreateMsdfImage(CreateMsdfShape(glyphToContour, 1f / 64));
+            return CreateMsdfImage(CreateMsdfShape(glyphToContour, genParams.shapeScale), genParams);
         }
-        public static GlyphImage CreateMsdfImage(Msdfgen.Shape shape)
+        public static GlyphImage CreateMsdfImage(Msdfgen.Shape shape, MsdfGenParams genParams)
         {
             double left, bottom, right, top;
             shape.findBounds(out left, out bottom, out right, out top);
             int w = (int)Math.Ceiling((right - left));
             int h = (int)Math.Ceiling((top - bottom));
-            if (w < 5)
+
+            if (w < genParams.minImgWidth)
             {
-                w = 5;
+                w = genParams.minImgWidth;
             }
-            if (h < 5)
+            if (h < genParams.minImgHeight)
             {
-                h = 5;
+                h = genParams.minImgHeight;
             }
 
 
@@ -148,18 +178,23 @@ namespace Typography.Rendering
             w += borderW * 2; //borders,left- right
             h += borderW * 2; //borders, top- bottom
 
+            double edgeThreshold = genParams.edgeThreshold;
+            if (edgeThreshold < 0)
+            {
+                edgeThreshold = 1.00000001; //use default if  edgeThreshold <0
+            }
 
-
+            var scale = new Msdfgen.Vector2(genParams.scaleX, genParams.scaleY); //scale               
+            double range = genParams.pxRange / Math.Min(scale.x, scale.y);
+            //---------
             Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp(w, h);
-            Msdfgen.EdgeColoring.edgeColoringSimple(shape, 3);
-
-
+            Msdfgen.EdgeColoring.edgeColoringSimple(shape, genParams.angleThreshold);
             Msdfgen.MsdfGenerator.generateMSDF(frgbBmp,
                 shape,
-                4,
-                new Msdfgen.Vector2(1, 1), //scale                 
+                range,
+                scale,
                 translate,//translate to positive quadrant
-                -1);
+                edgeThreshold);
             //-----------------------------------
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
 
