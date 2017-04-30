@@ -173,6 +173,14 @@ namespace Typography.Rendering
             }
 
 
+            //temp, for debug with glyph 'I', tahoma font
+            //double edgeThreshold = 1.00000001;//default, if edgeThreshold < 0 then  set  edgeThreshold=1 
+            //Msdfgen.Vector2 scale = new Msdfgen.Vector2(0.98714652956298199, 0.98714652956298199);
+            //double pxRange = 4;
+            //translate = new Msdfgen.Vector2(12.552083333333332, 4.0520833333333330);
+            //double range = pxRange / Math.Min(scale.x, scale.y);
+
+
             int borderW = (int)((float)w / 5f);
             var translate = new Msdfgen.Vector2(left < 0 ? -left + borderW : borderW, bottom < 0 ? -bottom + borderW : borderW);
             w += borderW * 2; //borders,left- right
