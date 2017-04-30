@@ -125,7 +125,7 @@ namespace Typography.Rendering
              GlyphTranslatorToContour glyphToContour)
         {
             // create msdf shape , then convert to actual image
-            return CreateMsdfImage(CreateMsdfShape(glyphToContour, 1));
+            return CreateMsdfImage(CreateMsdfShape(glyphToContour, 1f / 64));
         }
         public static GlyphImage CreateMsdfImage(Msdfgen.Shape shape)
         {

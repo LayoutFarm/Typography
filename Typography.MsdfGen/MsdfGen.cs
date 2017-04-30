@@ -315,10 +315,19 @@ namespace Msdfgen
                     //----------------------------------
                     Msdfgen.FloatRGB pixel = input.GetPixel(x, y);
                     //a b g r
+                    //for big-endian color
+                    //int abgr = (255 << 24) |
+                    //    Msdfgen.Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
+                    //    Msdfgen.Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                    //    Msdfgen.Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
+
+                    //for little-endian color
+
                     int abgr = (255 << 24) |
-                        (Msdfgen.Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16) |
-                        (Msdfgen.Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8) |
-                        Msdfgen.Vector2.Clamp((int)(pixel.r * 0x100), 0xff);
+                        Msdfgen.Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
+                        Msdfgen.Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                        Msdfgen.Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
+
                     output[(y * width) + x] = abgr;
                     //----------------------------------
                     /**it++ = clamp(int(bitmap(x, y).r*0x100), 0xff);
