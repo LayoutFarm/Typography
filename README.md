@@ -78,6 +78,11 @@ Msdf Texture
 ![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/25565003/7cdde83a-2de9-11e7-9ff8-3740cd37c40a.png)
 
 ---
+Msdf Texture Sample
+![msdf_test_03](https://cloud.githubusercontent.com/assets/7447159/25564423/3686e0dc-2ddd-11e7-97f5-c34ba2d21762.png)
+ 
+
+---
 
 Android GLES2-based
 
@@ -143,7 +148,7 @@ Here...
 
 Apache2, 2014-2016, Samuel Carlsson, Big thanks for https://github.com/vidstige/NRasterizer
 
-MIT, 2015, Michael Popoloski MIT, from https://github.com/MikePopoloski/SharpFont
+MIT, 2015, Michael Popoloski, from https://github.com/MikePopoloski/SharpFont
 
 The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robert Wilhelm, and Werner Lemberg and others, from https://www.freetype.org/
 
@@ -152,13 +157,13 @@ MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
 
 **Geometry**
 
-BSD, 2009-2010, Poly2Tri Contributors, from https://github.com/PaintLab/poly2tri-cs
-
 BSD, 2002-2005, Maxim Shemanarev, Anti-Grain Geometry - Version 2.4 from http://www.antigrain.com
 
 BSD, 2007-2014, Lars Brubaker, agg-sharp, from  https://github.com/MatterHackers/agg-sharp 
 
 MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
+
+BSD, 2009-2010, Poly2Tri Contributors, from https://github.com/PaintLab/poly2tri-cs
 
 Apache2, 2016-2017, WinterDev, from https://github.com/PaintLab/PixelFarm
 
