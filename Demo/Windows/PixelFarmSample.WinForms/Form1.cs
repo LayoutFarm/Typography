@@ -636,20 +636,20 @@ namespace SampleWinForms
             //samples...
             //1. create texture from specific glyph index range
             string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
-            CreateSampleMsdfTextureFont(
-                sampleFontFile,
-                18,
-                0,
-                255,
-                "d:\\WImageTest\\sample_msdf.png");
+            //CreateSampleMsdfTextureFont(
+            //    sampleFontFile,
+            //    18,
+            //    0,
+            //    255,
+            //    "d:\\WImageTest\\sample_msdf.png");
             //---------------------------------------------------------
             //2. for debug, create from some unicode chars
             //
-            //CreateSampleMsdfTextureFont(
-            //   sampleFontFile,
-            //   18,
-            //  new char[] { 'I' },
-            //  "d:\\WImageTest\\sample_msdf.png");
+            CreateSampleMsdfTextureFont(
+               sampleFontFile,
+               18,
+              new char[] { 'j' },
+              "d:\\WImageTest\\sample_msdf2.png");
             //---------------------------------------------------------
             ////3.
             //GlyphTranslatorToContour tx = new GlyphTranslatorToContour();
@@ -693,12 +693,25 @@ namespace SampleWinForms
                 {
                     //build glyph
                     ushort gindex = typeface.LookupIndex(chars[i]);
-                    builder.BuildFromGlyphIndex(gindex, -1);
+                    //-----------------------------------
+                    //get exact bounds of glyphs
+                    Glyph glyph = typeface.GetGlyphByIndex(gindex);
+                    Bounds bounds = glyph.Bounds;  //exact bounds
 
+                    //-----------------------------------
+                    builder.BuildFromGlyphIndex(gindex, -1);
                     var glyphToContour = new GlyphTranslatorToContour();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     builder.ReadShapes(glyphToContour);
-                    msdfGenParams.shapeScale = 1f / 64;
+                    float scale = 1f / 64;
+                    msdfGenParams.shapeScale = scale;
+                    float s_xmin = bounds.XMin * scale;
+                    float s_xmax = bounds.XMax * scale;
+                    float s_ymin = bounds.YMin * scale;
+                    float s_ymax = bounds.YMax * scale;
+
+
+                    //-----------------------------------
                     GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, msdfGenParams);
                     atlasBuilder.AddGlyph(gindex, glyphImg);
                     int w = glyphImg.Width;
