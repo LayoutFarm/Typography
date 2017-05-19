@@ -31,7 +31,11 @@ namespace PixelFarm.Agg
                            int num,
                            out RectD boundingRect)
         {
-            return GetBoundingRect(vxs, gi, num, out boundingRect.Left, out boundingRect.Bottom, out boundingRect.Right, out boundingRect.Top);
+            return GetBoundingRect(vxs, gi, num,
+                out boundingRect.Left,
+                out boundingRect.Bottom, 
+                out boundingRect.Right,
+                out boundingRect.Top);
         }
         public static bool GetBoundingRect(VertexStoreSnap vs, ref RectD rect)
         {

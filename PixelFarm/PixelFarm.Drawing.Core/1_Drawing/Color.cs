@@ -141,6 +141,7 @@ namespace PixelFarm.Drawing
         public static readonly Color White = new Color(255, 255, 255, 255);
         public static readonly Color Black = new Color(255, 0, 0, 0);
         public static readonly Color Blue = new Color(255, 0, 0, 255);
+        public static readonly Color Aqua = new Color(255, 0, 255, 255);
         public static readonly Color Red = new Color(255, 255, 0, 0);
         public static readonly Color Yellow = new Color(255, 255, 255, 0);
         public static readonly Color LightGray = new Color(0xFF, 0xD3, 0xD3, 0xD3);
@@ -149,7 +150,7 @@ namespace PixelFarm.Drawing
         public static readonly Color OrangeRed = new Color(0xFF, 0xFF, 0x45, 0x00);//0xFF FF 45 00
         public static readonly Color DeepPink = new Color(0xFF, 0xFF, 0x14, 0x93);
         public static readonly Color Magenta = new Color(0xFF, 0xFF, 0, 0xFF);
-        
+
         public override int GetHashCode()
         {
             return base.GetHashCode();

@@ -28,7 +28,7 @@ namespace PixelFarm.Agg
 {
     public struct Vertex2d
     {
-        //TODO: change this to common Vector2
+
 
         public readonly double x;
         public readonly double y;
@@ -56,12 +56,18 @@ namespace PixelFarm.Agg
             //    return true;
             //}
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + x + "," + y + ")";
+        }
+#endif
     }
 
 
     public class StrokeMath
     {
-       
+
         double m_width;
         double m_width_abs;
         double m_width_eps;
@@ -152,7 +158,7 @@ namespace PixelFarm.Agg
         public void CreateCap(VertexStore output, Vertex2d v0, Vertex2d v1, double len)
         {
             output.Clear();
-            double dx1 = (v1.y - v0.y) / len;
+            double dx1 = (v1.y - v0.y) / len;  
             double dy1 = (v1.x - v0.x) / len;
             double dx2 = 0;
             double dy2 = 0;
@@ -170,6 +176,7 @@ namespace PixelFarm.Agg
             }
             else
             {
+                //round cap
                 double da = Math.Acos(m_width_abs / (m_width_abs + 0.125 / m_approx_scale)) * 2;
                 double a1;
                 int i;
