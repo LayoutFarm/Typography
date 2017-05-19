@@ -9,12 +9,12 @@ namespace SampleWinForms.UI
     class SampleTextBoxControllerForPixelFarm : SampleTextBoxController
     {
         Graphics g;
-        DevVxsTextPrinter _printer;
+        VxsTextPrinter _printer;
         ActualImage destImg;
         ImageGraphics2D imgGfx2d;
         AggCanvasPainter p;
         Bitmap winBmp;
-        //
+        VisualLine _visualLine;
         public SampleTextBoxControllerForPixelFarm()
         {
         }
@@ -27,7 +27,15 @@ namespace SampleWinForms.UI
             p = new AggCanvasPainter(imgGfx2d);
             winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-
+            _printer = new VxsTextPrinter(p, null);
+            _visualLine = new VisualLine();
+            _visualLine.BindLine(_line);
+            _visualLine.Y = 100;
+        }
+        public override void HostInvokeMouseDown(int xpos, int ypos, UIMouseButtons button)
+        {
+            _visualLine.SetCharIndexFromPos(xpos, ypos);
+            base.HostInvokeMouseDown(xpos, ypos, button);
         }
         public override void UpdateOutput()
         {
@@ -44,7 +52,7 @@ namespace SampleWinForms.UI
             p.FillColor = PixelFarm.Drawing.Color.Black;
             p.Clear(PixelFarm.Drawing.Color.White);
 
-            _printer.TargetCanvasPainter = p;
+            //_printer.TargetCanvasPainter = p;
             _visualLine.Draw();
 
 
@@ -65,7 +73,7 @@ namespace SampleWinForms.UI
             g.FillRectangle(Brushes.Green, _mousedown_X, _mousedown_Y, 5, 5);
 #endif
         }
-        public DevVxsTextPrinter TextPrinter
+        public VxsTextPrinter TextPrinter
         {
             get { return _printer; }
             set
