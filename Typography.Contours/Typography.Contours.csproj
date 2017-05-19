@@ -7,8 +7,8 @@
     <ProjectGuid>{E4A1C3C3-1C1C-4E11-A2E6-A1FAFD6652C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Typography.Rendering</RootNamespace>
-    <AssemblyName>Typography.Rendering</AssemblyName>
+    <RootNamespace>Typography.Contours</RootNamespace>
+    <AssemblyName>Typography.Contours</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

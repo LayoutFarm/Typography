@@ -10,7 +10,7 @@
 
 using System.Numerics;
 
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     static class Vector2Extensions
     {

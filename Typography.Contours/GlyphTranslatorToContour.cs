@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Typography.Rendering
+namespace Typography.Contours
 {
 
     //this is PixelFarm version ***

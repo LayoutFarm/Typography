@@ -2,7 +2,7 @@
 //MIT, 2015-2016, Michael Popoloski
 
 using System;
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     public struct BinPackRect
     {

@@ -2,7 +2,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Typography.Rendering;
+using Typography.Contours;
 namespace SampleWinForms
 {
     using SampleWinForms.UI;

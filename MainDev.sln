@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.MsdfGen", "Typography.MsdfGen\Typography.MsdfGen.csproj", "{8F69AB8D-174A-4912-9328-CAE8EDA5564B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.Rendering", "Typography.Rendering\Typography.Rendering.csproj", "{E4A1C3C3-1C1C-4E11-A2E6-A1FAFD6652C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.Contours", "Typography.Contours\Typography.Contours.csproj", "{E4A1C3C3-1C1C-4E11-A2E6-A1FAFD6652C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{EFD3FB30-FFF6-4717-9D2A-A909E6D01DEE}"
 EndProject

@@ -37,7 +37,7 @@ namespace Test_WinForm_TessGlyph
                 Typeface typeface = reader.Read(fs);
 
                 //--
-                var builder = new Typography.Rendering.GlyphPathBuilder(typeface);
+                var builder = new Typography.Contours.GlyphPathBuilder(typeface);
                 builder.BuildFromGlyphIndex(typeface.LookupIndex('a'), 256);
 
                 var txToPath = new GlyphTranslatorToPath();

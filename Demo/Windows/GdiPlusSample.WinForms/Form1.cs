@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 // 
 using Typography.TextLayout;
-using Typography.Rendering;
+using Typography.Contours;
 
 namespace SampleWinForms
 {
