@@ -335,28 +335,22 @@ namespace Typography.OpenFont
     }
 
 
-    //------------------------------------------------------------------------------------------------------
-    public class GlyphPos
+    public interface IGlyphPositions
     {
-        public readonly ushort glyphIndex;
-        public readonly ushort advWidth;
-        public short xoffset;
-        public short yoffset;
-        public GlyphClassKind _classKind;
-        public GlyphPos(ushort glyphIndex, GlyphClassKind classKind, ushort advWidth)
-        {
-            this.glyphIndex = glyphIndex;
-            this.advWidth = advWidth;
-            this._classKind = classKind;
-        }
+        int Count { get; }
 
-#if DEBUG
-        public override string ToString()
-        {
-            return glyphIndex.ToString() + "(" + xoffset + "," + yoffset + ")";
-        }
-#endif
+        GlyphClassKind GetGlyphClassKind(int index);
+        void AppendGlyphOffset(int index, short appendOffsetX, short appendOffsetY);
+        void AppendGlyphAdvance(int index, short appendAdvX, short appendAdvY);
+
+        ushort GetGlyph(int index, out ushort advW);
+        ushort GetGlyph(int index, out short offsetX, out short offsetY, out short advW);
+        //
+        void GetOffset(int index, out short offsetX, out short offsetY);
     }
+
+
+
 
     namespace Extensions
     {

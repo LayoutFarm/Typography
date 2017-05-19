@@ -42,9 +42,7 @@ namespace System.Numerics
         {
             this.X = x;
             this.Y = y;
-
         }
-
         public static Vector2 operator +(Vector2 v1, Vector2 v2)
         {
             return new Vector2(v1.X + v2.X, v1.Y + v2.Y);
@@ -151,6 +149,27 @@ namespace System.Numerics
             return "(" + X + "," + Y + ")";
         }
 #endif
+
+
+        public Vector2 Rotate(int degree)
+        {
+            double radian = degree * Math.PI / 180.0;
+            double sin = Math.Sin(radian);
+            double cos = Math.Cos(radian);
+            double nx = X * cos - Y * sin;
+            double ny = X * sin + Y * cos;
+
+            return new Vector2((float)nx, (float)ny);
+        }
+        public Vector2 NewLength(double newLength)
+        {
+            //radian
+            double atan = Math.Atan2(Y, X);
+            return new Vector2(
+                      (float)(Math.Cos(atan) * newLength),
+                      (float)(Math.Sin(atan) * newLength));
+        }
+
     }
 
     public struct Matrix3x2
