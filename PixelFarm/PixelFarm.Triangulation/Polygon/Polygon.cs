@@ -70,54 +70,49 @@ namespace Poly2Tri
             }
         }
 
+
+
         private Polygon()
         {
             //for clean clone
         }
-        public Polygon CleanClone()
-        {
-            //recursive
 
-            Polygon newPolygon = new Polygon();
-            var myPoints = this._points;
-            int j = myPoints.Length;
-            TriangulationPoint[] clonePoints = new TriangulationPoint[j];
-            newPolygon._points = clonePoints;
-            for (int i = j - 1; i >= 0; --i)
-            {
-                var p = myPoints[i];
-                clonePoints[i] = new TriangulationPoint(p.X, p.Y) { userData = p.userData };
-            }
-
-            //-----------------------------------------------------------------
-            Polygon[] myHoles = this._holes;
-            if (myHoles != null)
-            {
-                j = myHoles.Length;
-                Polygon[] cloneHoles = new Polygon[j];
-                newPolygon._holes = cloneHoles;
-                for (int i = j - 1; i >= 0; --i)
-                {
-                    cloneHoles[i] = myHoles[i].CleanClone();
-                }
-
-                //for (int i = 0; i < j; ++i)
-                //{
-                //    cloneHoles.Add(myHoles[i].CleanClone());
-                //}
-            }
-            return newPolygon;
-        }
-        ///// <summary>
-        ///// Create a polygon from a list of at least 3 points with no duplicates.
-        ///// </summary>
-        ///// <param name="points">A list of unique points.</param>
-        //public Polygon(  PolygonPoint[] points) :
-        //    this((IList<PolygonPoint>)points)
+   
+        //public Polygon CleanClone()
         //{
+        //    //recursive
 
+        //    Polygon newPolygon = new Polygon();
+        //    var myPoints = this._points;
+        //    int j = myPoints.Length;
+        //    TriangulationPoint[] clonePoints = new TriangulationPoint[j];
+        //    newPolygon._points = clonePoints;
+        //    for (int i = j - 1; i >= 0; --i)
+        //    {
+        //        TriangulationPoint p = myPoints[i];
+        //        clonePoints[i] = new TriangulationPoint(p.X, p.Y) { userData = p.userData };
+        //    }
+
+        //    //-----------------------------------------------------------------
+        //    Polygon[] myHoles = this._holes;
+        //    if (myHoles != null)
+        //    {
+        //        j = myHoles.Length;
+        //        Polygon[] cloneHoles = new Polygon[j];
+        //        newPolygon._holes = cloneHoles;
+        //        for (int i = j - 1; i >= 0; --i)
+        //        {
+        //            cloneHoles[i] = myHoles[i].CleanClone();
+        //        }
+
+        //        //for (int i = 0; i < j; ++i)
+        //        //{
+        //        //    cloneHoles.Add(myHoles[i].CleanClone());
+        //        //}
+        //    }
+        //    return newPolygon;
         //}
-
+         
         public TriangulationMode TriangulationMode { get { return TriangulationMode.Polygon; } }
 
         //public void AddSteinerPoint(TriangulationPoint point)
