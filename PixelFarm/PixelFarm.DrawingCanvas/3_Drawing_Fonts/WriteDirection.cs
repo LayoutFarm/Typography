@@ -10,7 +10,7 @@ namespace PixelFarm.Drawing.Fonts
         /// </summary>
         LTR = 4,
         /// <summary>
-        /// left-to-right
+        /// right-to-right
         /// </summary>
         RTL,
         /// <summary>
