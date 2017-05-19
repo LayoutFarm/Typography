@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 // 
 using Typography.TextLayout;
-using Typography.Contours;
+using Typography.Rendering;
 
 namespace SampleWinForms
 {
@@ -23,9 +23,7 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
-            //_currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai; //for complex script
-            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Hebrew;
-
+            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
@@ -43,7 +41,7 @@ namespace SampleWinForms
             lstHintList.Items.Add(HintTechnique.None);
             lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
             lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
-            lstHintList.Items.Add(HintTechnique.CustomAutoFit);
+            //lstHintList.Items.Add(HintTechnique.CustomAutoFit);
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
@@ -64,13 +62,9 @@ namespace SampleWinForms
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
-            string defaultFont = "Alef";
-            //eg.
-            // Thai, tested with"Tahoma"
-            // Hebrew, tested with font 'Alef'
             foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
             {
-                if (!found && ff.FontName == defaultFont)
+                if (!found && ff.FontName == "Tahoma")
                 {
                     selectedFF = ff;
                     selected_index = ffcount;
