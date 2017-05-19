@@ -2,7 +2,7 @@
 
 
 
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     //-----------------------------------
     //sample GlyphPathBuilder :

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     public class GlyphImage
     {

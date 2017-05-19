@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Xml;
 using PixelFarm.Drawing.Fonts;
 
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     public enum TextureKind
     {

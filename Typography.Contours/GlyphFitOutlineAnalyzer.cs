@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     //This is PixelFarm's AutoFit
     //NOT FREE TYPE AUTO FIT***
