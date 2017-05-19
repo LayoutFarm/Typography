@@ -3,8 +3,9 @@
 using System;
 using System.Collections.Generic;
 
+using Typography.Contours;
 
-namespace Typography.Contours
+namespace Typography.Rendering
 {
 
     /// <summary>
@@ -37,7 +38,7 @@ namespace Typography.Contours
     }
     public static class MsdfGlyphGen
     {
-        public static Msdfgen.Shape CreateMsdfShape(GlyphTranslatorToContour glyphToContour, float pxScale)
+        public static Msdfgen.Shape CreateMsdfShape(GlyphContourBuilder glyphToContour, float pxScale)
         {
             List<GlyphContour> cnts = glyphToContour.GetContours();
             List<GlyphContour> newFitContours = new List<GlyphContour>();
@@ -74,9 +75,9 @@ namespace Typography.Contours
                             {
                                 GlyphCurve3 curve3 = (GlyphCurve3)p;
                                 cnt.AddQuadraticSegment(
-                                    curve3.x0, curve3.y0,
-                                    curve3.p2x, curve3.p2y,
-                                    curve3.x, curve3.y
+                                    curve3.FirstPoint.X, curve3.FirstPoint.Y,
+                                    curve3.x1, curve3.y1,
+                                    curve3.x2, curve3.y2
                                    );
                             }
                             break;
@@ -84,17 +85,17 @@ namespace Typography.Contours
                             {
                                 GlyphCurve4 curve4 = (GlyphCurve4)p;
                                 cnt.AddCubicSegment(
-                                    curve4.x0, curve4.y0,
-                                    curve4.p2x, curve4.p2y,
-                                    curve4.p3x, curve4.p3y,
-                                    curve4.x, curve4.y);
+                                    curve4.FirstPoint.X, curve4.FirstPoint.Y,
+                                    curve4.x1, curve4.y1,
+                                    curve4.x2, curve4.y2,
+                                    curve4.x3, curve4.y3);
                             }
                             break;
                         case GlyphPartKind.Line:
                             {
                                 GlyphLine line = (GlyphLine)p;
                                 cnt.AddLine(
-                                    line.x0, line.y0,
+                                    line.FirstPoint.X, line.FirstPoint.Y,
                                     line.x1, line.y1);
                             }
                             break;
@@ -118,9 +119,9 @@ namespace Typography.Contours
                         {
                             GlyphCurve3 curve3 = (GlyphCurve3)p;
                             newc.AddPart(new GlyphCurve3(
-                                curve3.x0 * pixelScale, curve3.y0 * pixelScale,
-                                curve3.p2x * pixelScale, curve3.p2y * pixelScale,
-                                curve3.x * pixelScale, curve3.y * pixelScale));
+                                    curve3.FirstPoint.X * pixelScale, curve3.FirstPoint.Y * pixelScale,
+                                    curve3.x1 * pixelScale, curve3.y1 * pixelScale,
+                                    curve3.x2 * pixelScale, curve3.y2 * pixelScale));
 
                         }
                         break;
@@ -128,10 +129,10 @@ namespace Typography.Contours
                         {
                             GlyphCurve4 curve4 = (GlyphCurve4)p;
                             newc.AddPart(new GlyphCurve4(
-                                  curve4.x0 * pixelScale, curve4.y0 * pixelScale,
-                                  curve4.p2x * pixelScale, curve4.p2y * pixelScale,
-                                  curve4.p3x * pixelScale, curve4.p3y * pixelScale,
-                                  curve4.x * pixelScale, curve4.y * pixelScale
+                                  curve4.FirstPoint.X * pixelScale, curve4.FirstPoint.Y * pixelScale,
+                                  curve4.x1 * pixelScale, curve4.y1 * pixelScale,
+                                  curve4.x2 * pixelScale, curve4.y2 * pixelScale,
+                                  curve4.x3 * pixelScale, curve4.y3 * pixelScale
                                 ));
                         }
                         break;
@@ -139,7 +140,7 @@ namespace Typography.Contours
                         {
                             GlyphLine line = (GlyphLine)p;
                             newc.AddPart(new GlyphLine(
-                                line.x0 * pixelScale, line.y0 * pixelScale,
+                                line.FirstPoint.X * pixelScale, line.FirstPoint.Y * pixelScale,
                                 line.x1 * pixelScale, line.y1 * pixelScale
                                 ));
                         }
@@ -151,7 +152,7 @@ namespace Typography.Contours
         //---------------------------------------------------------------------
 
         public static GlyphImage CreateMsdfImage(
-             GlyphTranslatorToContour glyphToContour, MsdfGenParams genParams)
+             GlyphContourBuilder glyphToContour, MsdfGenParams genParams)
         {
             // create msdf shape , then convert to actual image
             return CreateMsdfImage(CreateMsdfShape(glyphToContour, genParams.shapeScale), genParams);
