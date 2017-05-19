@@ -32,7 +32,7 @@
 // 
 //----------------------------------------------------------------------------
 
-using poly_subpix = PixelFarm.Agg.AggBasics.PolySubPix;
+using poly_subpix = PixelFarm.Agg.PolySubPix;
 namespace PixelFarm.Agg
 {
     //==================================================rasterizer_scanline_aa
@@ -311,7 +311,7 @@ namespace PixelFarm.Agg
                     AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
                 }
             }
-             
+
 
             //            if (snap.VxsHasMoreThanOnePart)
             //            {
@@ -428,7 +428,7 @@ namespace PixelFarm.Agg
             {
                 cover = AA_MASK;
             }
-
+            //look up from gamma
             return m_gammaLut[cover];
         }
 
@@ -477,6 +477,7 @@ namespace PixelFarm.Agg
                                 //-----------------------------------------------
                                 //single cell, for antialias look
                                 //-----------------------------------------------
+                                //calculate alpha from coverage value
                                 int alpha = CalculateAlpha((cover << (poly_subpix.SHIFT + 1)) - area);
                                 if (alpha != 0)
                                 {
@@ -491,6 +492,7 @@ namespace PixelFarm.Agg
                                 //-----------------------------------------------
                                 //this is long span , continuous color, solid look
                                 //-----------------------------------------------
+                                //calculate alpha from coverage value
                                 int alpha = CalculateAlpha(cover << (poly_subpix.SHIFT + 1));
                                 if (alpha != 0)
                                 {

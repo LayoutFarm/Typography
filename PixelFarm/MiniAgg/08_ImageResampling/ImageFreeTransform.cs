@@ -1,5 +1,4 @@
 ﻿//MIT, 2014-2017, WinterDev
-
 //---------------------------------------------
 //some code from CodeProject: 'Free Image Transformation'
 //YLS CS 
@@ -9,166 +8,6 @@ using System;
 using PixelFarm.VectorMath;
 namespace PixelFarm.Agg.Imaging
 {
-    public struct PointF
-    {
-        public float X;
-        public float Y;
-        public PointF(float x, float y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
-        public void Offset(float dx, float dy)
-        {
-            this.X += dx;
-            this.Y += dy;
-        }
-    }
-    public struct Point
-    {
-        public int x;
-        public int y;
-        public Point(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-        public void Offset(int dx, int dy)
-        {
-            this.x += dx;
-            this.y += dy;
-        }
-#if DEBUG
-        public override string ToString()
-        {
-            return "(" + x + "," + y + ")";
-        }
-#endif
-    }
-
-    public struct Vector
-    {
-        double _x, _y;
-        public Vector(double x, double y)
-        {
-            _x = x; _y = y;
-        }
-        public Vector(PointF pt)
-        {
-            _x = pt.X;
-            _y = pt.Y;
-        }
-        public Vector(PointF st, PointF end)
-        {
-            _x = end.X - st.X;
-            _y = end.Y - st.Y;
-        }
-
-        public double X
-        {
-            get { return _x; }
-            set { _x = value; }
-        }
-
-        public double Y
-        {
-            get { return _y; }
-            set { _y = value; }
-        }
-
-        public double Magnitude
-        {
-            get { return Math.Sqrt(X * X + Y * Y); }
-        }
-
-        public static Vector operator +(Vector v1, Vector v2)
-        {
-            return new Vector(v1.X + v2.X, v1.Y + v2.Y);
-        }
-
-        public static Vector operator -(Vector v1, Vector v2)
-        {
-            return new Vector(v1.X - v2.X, v1.Y - v2.Y);
-        }
-
-        public static Vector operator -(Vector v)
-        {
-            return new Vector(-v.X, -v.Y);
-        }
-
-        public static Vector operator *(double c, Vector v)
-        {
-            return new Vector(c * v.X, c * v.Y);
-        }
-
-        public static Vector operator *(Vector v, double c)
-        {
-            return new Vector(c * v.X, c * v.Y);
-        }
-
-        public static Vector operator /(Vector v, double c)
-        {
-            return new Vector(v.X / c, v.Y / c);
-        }
-
-        // A * B =|A|.|B|.sin(angle AOB)
-        public double CrossProduct(Vector v)
-        {
-            return _x * v.Y - v.X * _y;
-        }
-
-        // A. B=|A|.|B|.cos(angle AOB)
-        public double DotProduct(Vector v)
-        {
-            return _x * v.X + _y * v.Y;
-        }
-
-        public static bool IsClockwise(PointF pt1, PointF pt2, PointF pt3)
-        {
-            Vector V21 = new Vector(pt2, pt1);
-            Vector v23 = new Vector(pt2, pt3);
-            return V21.CrossProduct(v23) < 0; // sin(angle pt1 pt2 pt3) > 0, 0<angle pt1 pt2 pt3 <180
-        }
-
-        public static bool IsCCW(PointF pt1, PointF pt2, PointF pt3)
-        {
-            Vector V21 = new Vector(pt2, pt1);
-            Vector v23 = new Vector(pt2, pt3);
-            return V21.CrossProduct(v23) > 0;  // sin(angle pt2 pt1 pt3) < 0, 180<angle pt2 pt1 pt3 <360
-        }
-
-        public static double DistancePointLine(PointF pt, PointF lnA, PointF lnB)
-        {
-            Vector v1 = new Vector(lnA, lnB);
-            Vector v2 = new Vector(lnA, pt);
-            v1 /= v1.Magnitude;
-            return Math.Abs(v2.CrossProduct(v1));
-        }
-
-        public void Rotate(int Degree)
-        {
-            double radian = Degree * Math.PI / 180.0;
-            double sin = Math.Sin(radian);
-            double cos = Math.Cos(radian);
-            double nx = _x * cos - _y * sin;
-            double ny = _x * sin + _y * cos;
-            _x = nx;
-            _y = ny;
-        }
-
-        public PointF ToPointF()
-        {
-            return new PointF((float)_x, (float)_y);
-        }
-
-        public Vector NewLength(double newLength)
-        {
-            //radian
-            double atan = Math.Atan2(_y, _x);
-            return new Vector(Math.Cos(atan) * newLength,
-                        Math.Sin(atan) * newLength);
-        }
-    }
 
     public class FreeTransform
     {
@@ -212,7 +51,7 @@ namespace PixelFarm.Agg.Imaging
         public Point ImageLocation
         {
             //left bottom?
-            get { return new Point(rect.Left, rect.Bottom); } 
+            get { return new Point(rect.Left, rect.Bottom); }
         }
 
         bool isBilinear = false;
@@ -281,10 +120,10 @@ namespace PixelFarm.Agg.Imaging
             }
 
             rect = new RectInt((int)xmin, (int)ymin, (int)(xmax - xmin), (int)(ymax - ymin));
-            AB = new Vector(vertex[0], vertex[1]);
-            BC = new Vector(vertex[1], vertex[2]);
-            CD = new Vector(vertex[2], vertex[3]);
-            DA = new Vector(vertex[3], vertex[0]);
+            AB = MyVectorHelper.NewFromTwoPoints(vertex[0], vertex[1]);
+            BC = MyVectorHelper.NewFromTwoPoints(vertex[1], vertex[2]);
+            CD = MyVectorHelper.NewFromTwoPoints(vertex[2], vertex[3]);
+            DA = MyVectorHelper.NewFromTwoPoints(vertex[3], vertex[0]);
             // get unit vector
             AB /= AB.Magnitude;
             BC /= BC.Magnitude;
@@ -294,13 +133,13 @@ namespace PixelFarm.Agg.Imaging
 
         private bool IsOnPlaneABCD(PointF pt) //  including point on border
         {
-            if (!Vector.IsCCW(pt, vertex[0], vertex[1]))
+            if (!MyVectorHelper.IsCCW(pt, vertex[0], vertex[1]))
             {
-                if (!Vector.IsCCW(pt, vertex[1], vertex[2]))
+                if (!MyVectorHelper.IsCCW(pt, vertex[1], vertex[2]))
                 {
-                    if (!Vector.IsCCW(pt, vertex[2], vertex[3]))
+                    if (!MyVectorHelper.IsCCW(pt, vertex[2], vertex[3]))
                     {
-                        if (Vector.IsCCW(pt, vertex[3], vertex[0]))
+                        if (MyVectorHelper.IsCCW(pt, vertex[3], vertex[0]))
                             return true;
                     }
                 }
@@ -355,10 +194,10 @@ namespace PixelFarm.Agg.Imaging
                     y1 = (int)ptInPlane.Y;
                     destWriter.SetPixel(x, y, srcCB.GetPixel(x1, y1));
                     //-------------------------------------
-                    dab = Math.Abs((new Vector(vertex[0], srcPt)).CrossProduct(ab_vec));
-                    dbc = Math.Abs((new Vector(vertex[1], srcPt)).CrossProduct(bc_vec));
-                    dcd = Math.Abs((new Vector(vertex[2], srcPt)).CrossProduct(cd_vec));
-                    dda = Math.Abs((new Vector(vertex[3], srcPt)).CrossProduct(da_vec));
+                    dab = Math.Abs((MyVectorHelper.NewFromTwoPoints(vertex[0], srcPt)).CrossProduct(ab_vec));
+                    dbc = Math.Abs((MyVectorHelper.NewFromTwoPoints(vertex[1], srcPt)).CrossProduct(bc_vec));
+                    dcd = Math.Abs((MyVectorHelper.NewFromTwoPoints(vertex[2], srcPt)).CrossProduct(cd_vec));
+                    dda = Math.Abs((MyVectorHelper.NewFromTwoPoints(vertex[3], srcPt)).CrossProduct(da_vec));
                     ptInPlane.X = (float)(srcW * (dda / (dda + dbc)));
                     ptInPlane.Y = (float)(srcH * (dab / (dab + dcd)));
                 }
@@ -395,10 +234,10 @@ namespace PixelFarm.Agg.Imaging
                         continue;
                     }
                     //-------------------------------------
-                    dab = Math.Abs(new Vector(vertex[0], srcPt).CrossProduct(ab_vec));
-                    dbc = Math.Abs(new Vector(vertex[1], srcPt).CrossProduct(bc_vec));
-                    dcd = Math.Abs(new Vector(vertex[2], srcPt).CrossProduct(cd_vec));
-                    dda = Math.Abs(new Vector(vertex[3], srcPt).CrossProduct(da_vec));
+                    dab = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[0], srcPt).CrossProduct(ab_vec));
+                    dbc = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[1], srcPt).CrossProduct(bc_vec));
+                    dcd = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[2], srcPt).CrossProduct(cd_vec));
+                    dda = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[3], srcPt).CrossProduct(da_vec));
                     ptInPlane.X = (float)(srcW * (dda / (dda + dbc)));
                     ptInPlane.Y = (float)(srcH * (dab / (dab + dcd)));
                     x1 = (int)ptInPlane.X;
@@ -490,10 +329,10 @@ namespace PixelFarm.Agg.Imaging
                         continue;
                     }
                     //-------------------------------------
-                    dab = Math.Abs(new Vector(vertex[0], srcPt).CrossProduct(ab_vec));
-                    dbc = Math.Abs(new Vector(vertex[1], srcPt).CrossProduct(bc_vec));
-                    dcd = Math.Abs(new Vector(vertex[2], srcPt).CrossProduct(cd_vec));
-                    dda = Math.Abs(new Vector(vertex[3], srcPt).CrossProduct(da_vec));
+                    dab = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[0], srcPt).CrossProduct(ab_vec));
+                    dbc = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[1], srcPt).CrossProduct(bc_vec));
+                    dcd = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[2], srcPt).CrossProduct(cd_vec));
+                    dda = Math.Abs(MyVectorHelper.NewFromTwoPoints(vertex[3], srcPt).CrossProduct(da_vec));
                     ptInPlane.X = (float)(srcW * (dda / (dda + dbc)));
                     ptInPlane.Y = (float)(srcH * (dab / (dab + dcd)));
                     x1 = (int)ptInPlane.X;

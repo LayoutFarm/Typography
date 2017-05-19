@@ -38,6 +38,8 @@ namespace PixelFarm.Agg
         Round,
         Bevel,
         MiterRound
+
+        //TODO: implement svg arg join
     }
 
     public enum InnerJoin

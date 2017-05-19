@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{680463FF-7656-4B1C-853C-A820DC59BC87}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PixelFarm.Vectors</RootNamespace>
+    <AssemblyName>PixelFarm.Vectors</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="1_PixelFarm_AggVectorMath\AggBasics.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\AggMath.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\AxisAlignedBoundingBox.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\BezierCurve.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\BezierCurveCubic.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\BezierCurveQuadric.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\MathHelper.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\Matrix4x4.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\MyVector2.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\Quaternion.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\Ray.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\Vector2.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\Vector3.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\Vector3Float.cs" />
+    <Compile Include="1_PixelFarm_AggVectorMath\Vector4.cs" />
+    <Compile Include="Agg_Transform\2_Bilinear.cs" />
+    <Compile Include="Agg_Transform\3_Perspective.cs" />
+    <Compile Include="Agg_Transform\4_SimulEqGeneral.cs" />
+    <Compile Include="Agg_Transform\ICoordTransformer.cs" />
+    <Compile Include="Agg_Transform\1_Affine.cs" />
+    <Compile Include="Agg_Transform\Viewport.cs" />
+    <Compile Include="Geometry\Arc.cs" />
+    <Compile Include="Geometry\BasicGeometries.cs" />
+    <Compile Include="Geometry\BezireCurve.cs" />
+    <Compile Include="Geometry\BSpline.cs" />
+    <Compile Include="Geometry\Collections.cs" />
+    <Compile Include="Geometry\Curves.cs" />
+    <Compile Include="Geometry\Ellipse.cs" />
+    <Compile Include="Geometry\Rectangle.cs" />
+    <Compile Include="Geometry\RectangleF.cs" />
+    <Compile Include="Geometry\RectD.cs" />
+    <Compile Include="Geometry\RectInt.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

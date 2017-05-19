@@ -18,7 +18,7 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-#define UNSAFE_VER
+#define UNSAFE_VER 
 
 namespace PixelFarm.Agg
 {
@@ -76,16 +76,16 @@ namespace PixelFarm.Agg
 
         public VertexCmd GetVertex(int index, out double x, out double y)
         {
-            int i = index << 1;
-            x = m_coord_xy[i];
-            y = m_coord_xy[i + 1];
+             
+            x = m_coord_xy[index << 1];
+            y = m_coord_xy[(index << 1) + 1];
             return (VertexCmd)m_cmds[index];
         }
         public void GetVertexXY(int index, out double x, out double y)
         {
-            int i = index << 1;
-            x = m_coord_xy[i];
-            y = m_coord_xy[i + 1];
+           
+            x = m_coord_xy[index << 1];
+            y = m_coord_xy[(index << 1) + 1];
         }
         public VertexCmd GetCommand(int index)
         {
@@ -109,42 +109,12 @@ namespace PixelFarm.Agg
             m_num_vertices++;
         }
         //--------------------------------------------------
-        /// <summary>
-        /// add 2nd curve point (for C3,C4 curve)
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void AddP2c(double x, double y)
-        {
-            AddVertex(x, y, VertexCmd.P2c);
-        }
-        /// <summary>
-        /// add 3rd curve point (for C4 curve)
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void AddP3c(double x, double y)
-        {
-            AddVertex(x, y, VertexCmd.P3c);
-        }
-        public void AddMoveTo(double x, double y)
-        {
-            AddVertex(x, y, VertexCmd.MoveTo);
-        }
-        public void AddLineTo(double x, double y)
-        {
-            AddVertex(x, y, VertexCmd.LineTo);
-        }
-        public void AddCloseFigure()
-        {
-            AddVertex(0, 0, VertexCmd.Close);
-        }
+
 
         public void EndGroup()
         {
             if (m_num_vertices > 0)
             {
-
                 m_cmds[m_num_vertices - 1] = (byte)VertexCmd.CloseAndEndFigure;
             }
 
@@ -226,42 +196,12 @@ namespace PixelFarm.Agg
                                 m_num_vertices);
                         }
                     }
-                    //------------------------------------
-                    //line by line version
-                    //for (int i = actualLen - 1; i >= 0; )
-                    //{
-                    //    new_xy[i] = m_coord_xy[i];
-                    //    i--;
-                    //    new_xy[i] = m_coord_xy[i];
-                    //    i--;
-                    //}
-                    //for (int i = m_num_vertices - 1; i >= 0; --i)
-                    //{
-                    //    newCmd[i] = m_cmds[i];
-                    //}
                 }
                 m_coord_xy = new_xy;
                 m_cmds = newCmd;
                 m_allocated_vertices = newSize;
             }
         }
-        //----------------------------------------------------------
-
-        //public void AddSubVertices(VertexStore anotherVxs)
-        //{
-        //    int j = anotherVxs.Count;
-        //    this.HasMoreThanOnePart = true;
-        //    for (int i = 0; i < j; ++i)
-        //    {
-        //        double x, y;
-        //        VertexCmd cmd = anotherVxs.GetVertex(i, out x, out y);
-        //        this.AddVertex(x, y, cmd);
-        //        if (cmd == VertexCmd.Stop)
-        //        {
-        //            break;
-        //        }
-        //    }
-        //}
         //internal use only!
         public static void UnsafeDirectSetData(
             VertexStore vstore,
@@ -329,7 +269,72 @@ namespace PixelFarm.Agg
     }
 
 
+    public static class VertexStoreExtensions
+    {
+        /// <summary>
+        /// add 2nd curve point (for C3,C4 curve)
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        internal static void AddP2c(this VertexStore vxs, double x, double y)
+        {
+            vxs.AddVertex(x, y, VertexCmd.P2c);
+        }
+        /// <summary>
+        /// add 3rd curve point (for C4 curve)
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        internal static void AddP3c(this VertexStore vxs, double x, double y)
+        {
+            vxs.AddVertex(x, y, VertexCmd.P3c);
+        }
+        public static void AddMoveTo(this VertexStore vxs, double x0, double y0)
+        {
+            vxs.AddVertex(x0, y0, VertexCmd.MoveTo);
+        }
+        public static void AddLineTo(this VertexStore vxs, double x1, double y1)
+        {
+            vxs.AddVertex(x1, y1, VertexCmd.LineTo);
+        }
+        public static void AddCurve4To(this VertexStore vxs,
+            double x1, double y1,
+            double x2, double y2,
+            double x3, double y3)
+        {
+            vxs.AddVertex(x1, y1, VertexCmd.P3c);
+            vxs.AddVertex(x2, y2, VertexCmd.P3c);
+            vxs.AddVertex(x3, y3, VertexCmd.LineTo);
 
+        }
+        public static void AddCloseFigure(this VertexStore vxs)
+        {
+            vxs.AddVertex(0, 0, VertexCmd.Close);
+        }
+
+        /// <summary>
+        /// copy + translate vertext data from src to outputVxs
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dx"></param>
+        /// <param name="dy"></param>
+        /// <param name="outputVxs"></param>
+        /// <returns></returns>
+        public static VertexStore TranslateToNewVxs(this VertexStore src, double dx, double dy, VertexStore outputVxs)
+        {
+            int count = src.Count;
+            VertexCmd cmd;
+            double x, y;
+            for (int i = 0; i < count; ++i)
+            {
+                cmd = src.GetVertex(i, out x, out y);
+                x += dx;
+                y += dy;
+                outputVxs.AddVertex(x, y, cmd);
+            }
+            return outputVxs;
+        }
+    }
 
 
 }

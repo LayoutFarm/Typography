@@ -58,6 +58,11 @@ namespace Typography.TextLayout
                             //Standard Ligatures --enable by default
                             features.Add(feature);
                             break;
+                        default:
+                            {
+
+                            }
+                            break;
                     }
 
                 }
@@ -98,7 +103,7 @@ namespace Typography.TextLayout
 
                 lookupTable.DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
             }
-            
+
 
         }
         public string Lang { get; private set; }

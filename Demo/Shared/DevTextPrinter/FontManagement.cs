@@ -4,9 +4,20 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 
-namespace Typography.Contours
+namespace Typography.Rendering
 {
 
+    public interface IFontface
+    {
+        string FontName { get; }
+        string FontSubFamily { get; }
+    }
+
+    public class FontRequest
+    {
+        public string FontName { get; set; }
+        public InstalledFontStyle Style { get; set; }
+    }
 
     public class InstalledFont
     {
@@ -29,6 +40,14 @@ namespace Typography.Contours
             return FontName + " " + FontSubFamily;
         }
 #endif
+    }
+    public interface IInstalledFontProvider
+    {
+        IEnumerable<string> GetInstalledFontIter();
+    }
+    public interface IFontLoader
+    {
+        InstalledFont GetFont(string fontName, InstalledFontStyle style);
     }
 
 
@@ -58,9 +77,10 @@ namespace Typography.Contours
     [Flags]
     public enum InstalledFontStyle
     {
-        Normal = 0,
-        Bold = 1 << 1,
-        Italic = 1 << 2,
+        Others = 0,
+        Normal = 1,
+        Bold = 1 << 2,
+        Italic = 1 << 3,
     }
 
     public delegate InstalledFont FontNotFoundHandler(InstalledFontCollection fontCollection, string fontName, string fontSubFam, InstalledFontStyle wellknownStyle);
@@ -198,7 +218,7 @@ namespace Typography.Contours
         {
             switch (subFamName.ToUpper())
             {
-                default:
+                default: return InstalledFontStyle.Others;
                 case "NORMAL":
                 case "REGULAR":
                     return InstalledFontStyle.Normal;
@@ -414,7 +434,7 @@ namespace Typography.Contours
         }
         public static void LoadWindowsSystemFonts(this InstalledFontCollection fontCollection)
         {
-            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
+            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts"); 
         }
         public static void LoadMacSystemFonts(this InstalledFontCollection fontCollection)
         {

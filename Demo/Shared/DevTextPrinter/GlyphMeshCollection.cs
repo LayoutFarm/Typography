@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Typography.OpenFont;
 
-namespace Typography.Contours
+namespace Typography.Rendering
 {
 
     //see also: PixelFarm's  class HintedVxsGlyphCollection 

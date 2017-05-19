@@ -8,12 +8,21 @@ namespace SampleWinForms.UI
     {
         Graphics g;
         DevGdiTextPrinter _printer;
+        VisualLine _visualLine;
         public SampleTextBoxControllerForGdi()
-        { 
+        {
+            _visualLine = new VisualLine();
+            _visualLine.BindLine(_line);
+            _visualLine.Y = 100;
         }
         public void BindHostGraphics(Graphics hostControlGraphics)
         {
             g = hostControlGraphics;
+        }
+        public override void HostInvokeMouseDown(int xpos, int ypos, UIMouseButtons button)
+        {
+            _visualLine.SetCharIndexFromPos(xpos, ypos);
+            base.HostInvokeMouseDown(xpos, ypos, button);
         }
         public override void UpdateOutput()
         {
@@ -51,6 +60,8 @@ namespace SampleWinForms.UI
             }
         }
     }
+
+
     abstract class SampleTextBoxController
     {
 
@@ -59,21 +70,14 @@ namespace SampleWinForms.UI
         protected int _mousedown_X;
         protected int _mousedown_Y;
 
-        Line _line;//controller
-        protected VisualLine _visualLine;
-
-
-
+        protected Line _line;//controller 
         public SampleTextBoxController()
         {
             _line = new Line();
-            _visualLine = new VisualLine();
-            _visualLine.BindLine(_line);
-            _visualLine.Y = 100;
         }
 
-         
-        public abstract void UpdateOutput(); 
+
+        public abstract void UpdateOutput();
         public void HostInvokeDoubleClick()
         {
 
@@ -118,12 +122,12 @@ namespace SampleWinForms.UI
         {
             _isKeyDown = false;
         }
-        public void HostInvokeMouseDown(int xpos, int ypos, UIMouseButtons button)
+        public virtual void HostInvokeMouseDown(int xpos, int ypos, UIMouseButtons button)
         {
 
             this._mousedown_X = xpos;
             this._mousedown_Y = ypos;
-            _visualLine.SetCharIndexFromPos(xpos, ypos);
+
             _isMouseDown = true;
             UpdateOutput();
 
