@@ -293,6 +293,7 @@ namespace SampleWinForms.UI
         {
             if (!_clearInfoView) { return; }
             //-------------- 
+#if DEBUG
             EdgeLine p_contactEdge = joint.dbugGetEdge_Q();
             //mid point
             var jointPos = joint.OriginalJointPos;
@@ -311,6 +312,7 @@ namespace SampleWinForms.UI
             {
                 jointNode.Nodes.Add(new TreeNode() { Text = "tip_q:" + joint.TipPointQ, Tag = new NodeInfo(NodeInfoKind.RibEndPoint, joint.TipPointQ) });
             }
+#endif
         }
         public void ShowEdge(EdgeLine edge)
         {
@@ -335,6 +337,7 @@ namespace SampleWinForms.UI
             NodeInfo nodeInfo = new NodeInfo(NodeInfoKind.TessEdge, edge, _edgeLines.Count);
             TreeNode nodeEdge = new TreeNode();
             nodeEdge.Tag = nodeInfo;
+#if DEBUG
             nodeEdge.Text = "e id=" + edge.dbugId + ",count="
                 + _testEdgeCount + " : " + pnt_P.ToString() +
                 "=>" + pnt_Q.ToString();
@@ -343,6 +346,7 @@ namespace SampleWinForms.UI
             {
                 nodeEdge.Text += "_X_ (no perpendicular_bone)";
             }
+#endif
              
             _tessEdgesNode.Nodes.Add(nodeEdge);
             //------------------------------- 
