@@ -99,7 +99,10 @@ namespace Typography.Contours
 #endif
 
         }
-        void DrawBoneLinks(CentroidLine line)
+
+        //
+#if DEBUG
+         void DrawBoneLinks(CentroidLine line)
         {
             List<GlyphBone> glyphBones = line.bones;
             int glyphBoneCount = glyphBones.Count;
@@ -129,7 +132,6 @@ namespace Typography.Contours
             //     PixelFarm.Drawing.Color.Red);
 
         }
-        //
         protected abstract void OnTriangle(int triAngleId, EdgeLine e0, EdgeLine e1, EdgeLine e2, double centroidX, double centroidY);
 
         protected abstract void OnCentroidLine(double px, double py, double qx, double qy);
@@ -143,6 +145,7 @@ namespace Typography.Contours
         protected abstract void OnEndLineHub(float centerX, float centerY, GlyphBoneJoint joint);
 
         protected abstract void OnGlyphEdgeN(EdgeLine edge);
-        //
+#endif
+
     }
 }
