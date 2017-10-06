@@ -120,7 +120,8 @@ namespace Typography.OpenFont
     /// </summary>
     class NullCharMap : CharacterMap
     {
-        protected override ushort RawCharacterToGlyphIndex(ushort character) { return 0; }
+        protected override ushort RawCharacterToGlyphIndex(int character) { return 0; }
+ 
     }
 
     abstract class CharacterMap
