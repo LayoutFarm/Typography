@@ -169,7 +169,7 @@ namespace Typography.OpenFont
 
         private CharacterMap _selectedCmap;
 
-        public ushort LookupIndex(char character)
+        public ushort LookupIndex(int codepoint)
         {
             // TODO: What if there are several tables?
 
@@ -199,31 +199,34 @@ namespace Typography.OpenFont
                 }
             }
 
-            return _selectedCmap.CharacterToGlyphIndex(character);
+            return _selectedCmap.CharacterToGlyphIndex(codepoint);
         }
 
-        public Glyph Lookup(char character)
+        public Glyph Lookup(int codepoint)
         {
-            return _glyphs[LookupIndex(character)];
+            return _glyphs[LookupIndex(codepoint)];
         }
+
         public Glyph GetGlyphByIndex(int glyphIndex)
         {
             return _glyphs[glyphIndex];
         }
 
-        public ushort GetAdvanceWidth(char character)
+        public ushort GetAdvanceWidth(int codepoint)
         {
-            return _horizontalMetrics.GetAdvanceWidth(LookupIndex(character));
+            return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
         }
+
         public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
         {
-
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
+
         public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
+
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
             return _kern.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
@@ -299,10 +302,17 @@ namespace Typography.OpenFont
         {
             //do shaping here?
             //1. do look up and substitution 
-            int j = buffer.Length;
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < buffer.Length; ++i)
             {
-                output.Add(LookupIndex(buffer[i]));
+                char ch = buffer[i];
+                int codepoint = ch;
+                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < buffer.Length)
+                {
+                    ++i;
+                    codepoint = char.ConvertToUtf32(ch, buffer[i]);
+                }
+
+                output.Add(LookupIndex(codepoint));
             }
             //tmp disable here
             //check for glyph substitution

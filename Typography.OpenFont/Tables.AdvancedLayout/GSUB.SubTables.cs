@@ -13,7 +13,7 @@ namespace Typography.OpenFont.Tables
         /// add original char and its glyph index
         /// </summary>
         /// <param name="glyphIndex"></param>
-        void AddGlyph(char originalChar, ushort glyphIndex); 
+        void AddGlyph(int originalChar, ushort glyphIndex);
         int Count { get; }
         ushort this[int index] { get; }
 
