@@ -162,8 +162,14 @@ namespace Typography.TextLayout
             for (int i = 0; i < len; ++i)
             {
                 //convert input char to input glyphs
-                char c = str[startAt + i];
-                _inputGlyphs.AddGlyph(c, (ushort)typeface.LookupIndex(c));
+                char ch = str[startAt + i];
+                int codepoint = ch;
+                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)
+                {
+                    ++i;
+                    codepoint = char.ConvertToUtf32(ch, str[startAt + i]);
+                }
+                _inputGlyphs.AddGlyph(codepoint, typeface.LookupIndex(codepoint));
             }
             //----------------------------------------------  
             //glyph substitution            

@@ -10,7 +10,7 @@ namespace Typography.TextLayout
     class GlyphIndexList : IGlyphIndexList
     {
         List<ushort> _glyphIndices = new List<ushort>();
-        List<char> _originalChars = new List<char>();
+        List<int> _originalChars = new List<int>();
         ushort _originalOffset = 0;
         List<GlyphIndexToUserChar> _mapGlyphIndexToUserChar = new List<GlyphIndexToUserChar>();
         internal List<UserCharToGlyphIndexMap> _mapUserCharToGlyphIndics = new List<UserCharToGlyphIndexMap>();
@@ -51,7 +51,7 @@ namespace Typography.TextLayout
         /// add original char and its glyph index
         /// </summary>
         /// <param name="glyphIndex"></param>
-        public void AddGlyph(char originalChar, ushort glyphIndex)
+        public void AddGlyph(int originalChar, ushort glyphIndex)
         {
             _glyphIndices.Add(glyphIndex);
             //so we can monitor what substituion process

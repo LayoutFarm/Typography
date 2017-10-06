@@ -11,7 +11,7 @@ namespace Typography.TextLayout
         public ushort len;
 #if DEBUG
         public ushort dbug_userCharIndex;
-        public char dbug_userChar;
+        public int dbug_userChar;
         public override string ToString()
         {
             return glyphIndexListOffset_plus1 + ":" + len;
