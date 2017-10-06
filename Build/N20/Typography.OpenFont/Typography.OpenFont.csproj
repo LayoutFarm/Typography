@@ -166,9 +166,6 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.Variations\VVar.cs">
       <Link>Tables.Variations\VVar.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables\BoundsReader.cs">
-      <Link>Tables\BoundsReader.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables\Cmap.cs">
       <Link>Tables\Cmap.cs</Link>
     </Compile>
