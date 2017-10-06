@@ -152,6 +152,7 @@ namespace SampleWinForms
                 InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
                 if (ff != null)
                 {
+                    _selectedInstallFont = ff;
                     selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
                     //sample text box 
                     UpdateRenderOutput();
