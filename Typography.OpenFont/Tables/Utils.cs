@@ -1,8 +1,10 @@
 ﻿//Apache2, 2017, WinterDev
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev 
+
 using System;
 using System.Text;
 using System.IO;
+
 namespace Typography.OpenFont
 {
     static class Utils
@@ -44,6 +46,14 @@ namespace Typography.OpenFont
             Array.Copy(arr2, 0, newArr, arr1.Length, arr2.Length);
             return newArr;
         }
+
+        public static void WarnUnimplemented(string format, params object[] args)
+        {
+#if DEBUG
+            Console.WriteLine("!STUB! " + format, args);
+#endif
+        }
+
 #if DEBUG
         public static bool dbugIsDiff(GlyphPointF[] set1, GlyphPointF[] set2)
         {
@@ -65,6 +75,5 @@ namespace Typography.OpenFont
             return false;
         }
 #endif
-
     }
 }
