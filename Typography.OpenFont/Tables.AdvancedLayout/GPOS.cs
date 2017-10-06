@@ -25,10 +25,6 @@ namespace Typography.OpenFont.Tables
     //Tag Array of four uint8s(length = 32 bits) used to identify a script, language system, feature, or baseline
     //Offset16   Short offset to a table, same as uint16, NULL offset = 0x0000
     //Offset32   Long offset to a table, same as uint32, NULL offset = 0x00000000
-    //-------
-    //NOTE***
-    //Offset16 => same as uint16
-    //Offset16 => same as uint32
 
 
 

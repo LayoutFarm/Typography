@@ -53,7 +53,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\HVar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\MVar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\VVar.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tables\BoundsReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\Cmap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\Head.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\HorizontalHeader.cs" />
