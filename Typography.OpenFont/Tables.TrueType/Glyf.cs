@@ -187,6 +187,7 @@ namespace Typography.OpenFont.Tables
             XSignOrSame = 1 << 4,
             YSignOrSame = 1 << 5
         }
+
         static Glyph ReadSimpleGlyph(BinaryReader reader, int contourCount, Bounds bounds)
         {
             //https://www.microsoft.com/typography/OTSPEC/glyf.htm
@@ -301,9 +302,7 @@ namespace Typography.OpenFont.Tables
                 }
                 else
                 {
-                    byte a1 = reader.ReadByte();
-                    byte a2 = reader.ReadByte();
-                    arg1and2 = (ushort)((a1 << 8) | a2);
+                    arg1and2 = reader.ReadUInt16();
                 }
                 //-----------------------------------------
                 float xscale = 1;
@@ -469,10 +468,7 @@ namespace Typography.OpenFont.Tables
             //------------------------------------------------------------ 
 
 
-            return (finalGlyph == null) ? Glyph.Empty : finalGlyph;
-
+            return finalGlyph ?? Glyph.Empty;
         }
-
-
     }
 }

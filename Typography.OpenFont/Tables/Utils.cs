@@ -9,9 +9,10 @@ namespace Typography.OpenFont
     {
         public static Bounds ReadBounds(BinaryReader input)
         {
-            //xmin, ymin,xmax,ymax
-            return new Bounds(input.ReadInt16(), input.ReadInt16(), input.ReadInt16(), input.ReadInt16());
+            short xmin = input.ReadInt16(), ymin = input.ReadInt16(), xmax = input.ReadInt16(), ymax = input.ReadInt16();
+            return new Bounds(xmin, ymin, xmax, ymax);
         }
+
         public static string TagToString(uint tag)
         {
             byte[] bytes = BitConverter.GetBytes(tag);
