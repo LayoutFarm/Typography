@@ -116,8 +116,11 @@ namespace Typography.OpenFont.Tables
             //
             switch (MinorVersion)
             {
-                default: throw new NotSupportedException();
-                case 0: break;
+                default:
+                    Utils.WarnUnimplemented("GDEF Minor Version {0}", MinorVersion);
+                    return;
+                case 0:
+                    break;
                 case 2:
                     markGlyphSetsDefOffset = reader.ReadUInt16();
                     break;
@@ -140,8 +143,8 @@ namespace Typography.OpenFont.Tables
 
             if (itemVarStoreOffset != 0)
             {
-                //not support
-                throw new NotSupportedException();
+                //not supported
+                Utils.WarnUnimplemented("GDEF ItemVarStore");
                 reader.BaseStream.Seek(this.Header.Offset + itemVarStoreOffset, SeekOrigin.Begin);
             }
         }
@@ -181,7 +184,8 @@ namespace Typography.OpenFont.Tables
             switch (classDef.Format)
             {
                 default:
-                    throw new NotSupportedException();
+                    Utils.WarnUnimplemented("GDEF GlyphClassDef Format {0}", classDef.Format);
+                    break;
                 case 1:
                     {
                         ushort startGlyph = classDef.startGlyph;
@@ -218,7 +222,8 @@ namespace Typography.OpenFont.Tables
             AttachmentListTable attachmentListTable = this.AttachmentListTable;
             if (attachmentListTable == null) { return; }
             //-----------------------------------------
-            throw new NotSupportedException();
+
+            Utils.WarnUnimplemented("please implement GDEF.FillAttachPoints()");
         }
         void FillLigatureCarets(Glyph[] inputGlyphs)
         {
@@ -238,7 +243,8 @@ namespace Typography.OpenFont.Tables
             switch (markAttachmentClassDef.Format)
             {
                 default:
-                    throw new NotSupportedException();
+                    Utils.WarnUnimplemented("GDEF MarkAttachmentClassDef Table Format {0}", markAttachmentClassDef.Format);
+                    break;
                 case 1:
                     {
                         ushort startGlyph = markAttachmentClassDef.startGlyph;
@@ -284,10 +290,9 @@ namespace Typography.OpenFont.Tables
             //see the description of lookup flags in the “Lookup Table” section of the chapter, OpenType Layout Common Table Formats.
             MarkGlyphSetsTable markGlyphSets = this.MarkGlyphSetsTable;
             if (markGlyphSets == null) return;
-            //-------           
-            //Console.WriteLine("please implement FillMarkGlyphSets()");
+            //-----------------------------------------
 
-            throw new NotImplementedException();
+            Utils.WarnUnimplemented("please implement GDEF.FillMarkGlyphSets()");
         }
     }
 }
