@@ -167,42 +167,35 @@ namespace Typography.OpenFont
         }
 
 
-        CharacterMap _selectedCmap;
+        private CharacterMap _selectedCmap;
 
         public ushort LookupIndex(char character)
         {
-            // TODO: What if there are none or several tables?
+            // TODO: What if there are several tables?
 
             if (_selectedCmap == null)
             {
-                int j = _cmaps.Length;
-                if (j > 1)
+                // https://www.microsoft.com/typography/OTSPEC/cmap.htm
+                // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
+                if (_cmaps.Length == 0)
                 {
-                    //find proper cmap , what proper?
-                    //https://www.microsoft.com/typography/OTSPEC/cmap.htm
-                    //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
-
-                    for (int i = 0; i < j; ++i)
-                    {
-                        CharacterMap cmap = _cmaps[i];
-                        if (cmap.PlatformId == 3 && cmap.EncodingId == 1)
-                        {
-                            //platform 3 = font for Windows
-                            _selectedCmap = cmap;
-                            break;
-                        }
-                    }
-
-                    if (_selectedCmap == null)
-                    {
-                        //not found
-                        throw new System.NotSupportedException();
-                    }
-                    //
+                    return 0;
                 }
-                else
+
+                // Default to the first one
+                _selectedCmap = _cmaps[0];
+
+                //find proper cmap , what proper?
+                //https://www.microsoft.com/typography/OTSPEC/cmap.htm
+                //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
+                foreach (CharacterMap cmap in _cmaps)
                 {
-                    _selectedCmap = _cmaps[0];
+                    if (cmap.PlatformId == 3 && cmap.EncodingId == 1)
+                    {
+                        //platform 3 = font for Windows
+                        _selectedCmap = cmap;
+                        break;
+                    }
                 }
             }
 
@@ -363,7 +356,7 @@ namespace Typography.OpenFont
 
         public static class TypefaceExtensions
         {
-            public static bool DoseSupportUnicode(
+            public static bool DoesSupportUnicode(
                 this Typeface typeface,
                 UnicodeLangBits unicodeLangBits)
             {
@@ -402,6 +395,7 @@ namespace Typography.OpenFont
                 }
             }
         }
+
         public static class UnicodeLangBitsExtension
         {
             public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
@@ -414,7 +408,5 @@ namespace Typography.OpenFont
                     lower32 & 0xFFFF);
             }
         }
-
-
     }
 }
