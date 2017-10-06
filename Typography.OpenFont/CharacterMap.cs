@@ -64,8 +64,6 @@ namespace Typography.OpenFont
         }
     }
 
-
-
     class CharMapFormat12 : CharacterMap
     {
         uint[] startCharCodes, endCharCodes, startGlyphIds;
@@ -75,13 +73,15 @@ namespace Typography.OpenFont
             this.startCharCodes = startCharCodes;
             this.endCharCodes = endCharCodes;
             this.startGlyphIds = startGlyphIds;
-
         }
+
         protected override ushort RawCharacterToGlyphIndex(int codepoint)
         {
-            throw new NotImplementedException();
+            Utils.WarnUnimplemented("cmap subtable format 12");
+            return 0;
         }
     }
+
     class CharMapFormat6 : CharacterMap
     {
         //
@@ -114,6 +114,15 @@ namespace Typography.OpenFont
         }
 
     }
+
+    /// <summary>
+    /// An empty character map that maps all characters to glyph 0
+    /// </summary>
+    class NullCharMap : CharacterMap
+    {
+        protected override ushort RawCharacterToGlyphIndex(ushort character) { return 0; }
+    }
+
     abstract class CharacterMap
     {
         //https://www.microsoft.com/typography/otspec/cmap.htm
