@@ -70,26 +70,18 @@ namespace Typography.OpenFont.Tables
             //--------------------------------
             //resolve composte glyphs 
             //--------------------------------
-            int compositeGlyphCount = compositeGlyphs.Count;
-            for (int i = 0; i < compositeGlyphCount; ++i)
+            foreach (int glyphIndex in compositeGlyphs)
             {
-                //move to composite glyph position
-                int glyphIndex = compositeGlyphs[i];
-                reader.BaseStream.Seek(tableOffset + locations.Offsets[glyphIndex], SeekOrigin.Begin);//reset     
-                //------------------------
-                short contoursCount = reader.ReadInt16();
-                Bounds bounds = Utils.ReadBounds(reader);
-
 #if DEBUG
                 if (glyphIndex == 7)
                 {
 
                 }
 #endif
-                _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, -contoursCount, bounds);
+                _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, tableOffset, glyphIndex);
             }
-
         }
+
         static bool HasFlag(SimpleGlyphFlag target, SimpleGlyphFlag test)
         {
             return (target & test) == test;
@@ -259,11 +251,8 @@ namespace Typography.OpenFont.Tables
             UNSCALED_COMPONENT_OFFSET = 1 << 12
         }
 
-
-
-        static Glyph ReadCompositeGlyph(Glyph[] createdGlyhps, BinaryReader reader, int contourCount, Bounds bounds)
+        Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, uint tableOffset, int compositeGlyphIndex)
         {
-
             //------------------------------------------------------ 
             //https://www.microsoft.com/typography/OTSPEC/glyf.htm
             //Composite Glyph Description
@@ -280,15 +269,29 @@ namespace Typography.OpenFont.Tables
             //see more at https://fontforge.github.io/assets/old/Composites/index.html
             //---------
 
+            //move to composite glyph position
+            reader.BaseStream.Seek(tableOffset + GlyphLocations.Offsets[compositeGlyphIndex], SeekOrigin.Begin);//reset
+            //------------------------
+            short contoursCount = reader.ReadInt16(); // ignored
+            Bounds bounds = Utils.ReadBounds(reader);
+
             Glyph finalGlyph = null;
             CompositeGlyphFlags flags;
 
             do
             {
-
                 flags = (CompositeGlyphFlags)reader.ReadUInt16();
                 ushort glyphIndex = reader.ReadUInt16();
-                Glyph newGlyph = Glyph.Clone(createdGlyhps[glyphIndex]);
+                if (createdGlyphs[glyphIndex] == null)
+                {
+                    // This glyph is not read yet, resolve it first!
+                    long storedOffset = reader.BaseStream.Position;
+                    Glyph missingGlyph = ReadCompositeGlyph(createdGlyphs, reader, tableOffset, glyphIndex);
+                    createdGlyphs[glyphIndex] = missingGlyph;
+                    reader.BaseStream.Position = storedOffset;
+                }
+
+                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex]);
 
                 short arg1 = 0;
                 short arg2 = 0;
