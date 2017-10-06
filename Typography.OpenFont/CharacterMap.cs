@@ -27,17 +27,17 @@ namespace Typography.OpenFont
             _glyphIdArray = glyphIdArray;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(ushort character)
+        protected override ushort RawCharacterToGlyphIndex(int codepoint)
         {
             for (int i = 0; i < _segCount; i++)
             {
-                if (_endCode[i] >= character && _startCode[i] <= character)
+                if (_endCode[i] >= codepoint && _startCode[i] <= codepoint)
                 {
 
                     if (_idRangeOffset[i] == 0)
                     {
                         //TODO: review 65536 => use bitflags 
-                        return (ushort)((character + _idDelta[i]) % 65536);
+                        return (ushort)((codepoint + _idDelta[i]) % 65536);
                     }
                     else
                     {
@@ -52,7 +52,7 @@ namespace Typography.OpenFont
                         //+ (c - startCount[i]) 
                         //+ &idRangeOffset[i])
 
-                        var offset = _idRangeOffset[i] / 2 + (character - _startCode[i]);
+                        var offset = _idRangeOffset[i] / 2 + (codepoint - _startCode[i]);
                         // I want to thank Microsoft for this clever pointer trick
                         // TODO: What if the value fetched is inside the _idRangeOffset table?
                         // TODO: e.g. (offset - _idRangeOffset.Length + i < 0)
@@ -75,7 +75,7 @@ namespace Typography.OpenFont
             this.startGlyphIds = startGlyphIds;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(ushort character)
+        protected override ushort RawCharacterToGlyphIndex(int codepoint)
         {
             Utils.WarnUnimplemented("cmap subtable format 12");
             return 0;
@@ -95,17 +95,17 @@ namespace Typography.OpenFont
             this._fmt6_end = (ushort)(startCode + glyphIdArray.Length);
             this._fmt6_start = startCode;
         }
-        protected override ushort RawCharacterToGlyphIndex(ushort character)
+        protected override ushort RawCharacterToGlyphIndex(int codepoint)
         {
             //The firstCode and entryCount values specify a subrange (beginning at firstCode, length = entryCount)
             //within the range of possible character codes.
             //Codes outside of this subrange are mapped to glyph index 0.
             //The offset of the code (from the first code) within this subrange is used as index to the glyphIdArray,
             //which provides the glyph index value. 
-            if (character >= _fmt6_start && character <= _fmt6_end)
+            if (codepoint >= _fmt6_start && codepoint <= _fmt6_end)
             {
                 //in range                            
-                return _glyphIdArray[character - _fmt6_start];
+                return _glyphIdArray[codepoint - _fmt6_start];
             }
             else
             {
@@ -131,12 +131,12 @@ namespace Typography.OpenFont
         public ushort Format { get; protected set; }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
-        public ushort CharacterToGlyphIndex(char character)
+        public ushort CharacterToGlyphIndex(int codepoint)
         {
-            return RawCharacterToGlyphIndex(character);
+            return RawCharacterToGlyphIndex(codepoint);
         }
 
-        protected abstract ushort RawCharacterToGlyphIndex(ushort character);
+        protected abstract ushort RawCharacterToGlyphIndex(int codepoint);
 
         //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
         //{
