@@ -2,9 +2,9 @@
 
 using System;
 using System.IO;
+
 namespace Typography.OpenFont.IO
 {
-
     class ByteOrderSwappingBinaryReader : BinaryReader
     {
         //All OpenType fonts use Motorola-style byte ordering (Big Endian)
@@ -12,34 +12,6 @@ namespace Typography.OpenFont.IO
         public ByteOrderSwappingBinaryReader(Stream input)
             : base(input)
         {
-        }
-
-        static ushort SwapBytes(ushort x)
-        {
-            return (ushort)((ushort)((x & 0xff) << 8) | ((x >> 8) & 0xff));
-        }
-
-        static uint SwapBytes(uint x)
-        {
-            return ((x & 0x000000ff) << 24) +
-                ((x & 0x0000ff00) << 8) +
-                ((x & 0x00ff0000) >> 8) +
-                ((x & 0xff000000) >> 24);
-        }
-
-        static ulong SwapBytes(ulong value)
-        {
-            ulong uvalue = value;
-            ulong swapped =
-                ((0x00000000000000FF) & (uvalue >> 56)
-                | (0x000000000000FF00) & (uvalue >> 40)
-                | (0x0000000000FF0000) & (uvalue >> 24)
-                | (0x00000000FF000000) & (uvalue >> 8)
-                | (0x000000FF00000000) & (uvalue << 8)
-                | (0x0000FF0000000000) & (uvalue << 24)
-                | (0x00FF000000000000) & (uvalue << 40)
-                | (0xFF00000000000000) & (uvalue << 56));
-            return swapped;
         }
 
         public override Stream BaseStream { get { return base.BaseStream; } }
@@ -56,23 +28,22 @@ namespace Typography.OpenFont.IO
         public override char[] ReadChars(int count) { throw new NotImplementedException(); }
         //public override decimal ReadDecimal() { throw new NotImplementedException(); }
         public override double ReadDouble() { throw new NotImplementedException(); }
-        public override short ReadInt16() { return (short)SwapBytes(base.ReadUInt16()); }
+        public override short ReadInt16() { return BitConverter.ToInt16(ReadBytesAndReverse(2), 0); }
         public override int ReadInt32() { throw new NotImplementedException(); }
         public override long ReadInt64() { throw new NotImplementedException(); }
         public override sbyte ReadSByte() { throw new NotImplementedException(); }
         public override float ReadSingle() { throw new NotImplementedException(); }
         public override string ReadString() { throw new NotImplementedException(); }
-        public override ushort ReadUInt16() { return SwapBytes(base.ReadUInt16()); }
-        public override uint ReadUInt32() { return SwapBytes(base.ReadUInt32()); }
-        public override ulong ReadUInt64() { return SwapBytes(base.ReadUInt64()); }
+        public override ushort ReadUInt16() { return BitConverter.ToUInt16(ReadBytesAndReverse(2), 0); }
+        public override uint ReadUInt32() { return BitConverter.ToUInt32(ReadBytesAndReverse(4), 0); }
+        public override ulong ReadUInt64() { return BitConverter.ToUInt64(ReadBytesAndReverse(8), 0); }
+
+        private byte[] ReadBytesAndReverse(int count) { var b = ReadBytes(count); Array.Reverse(b); return b; }
 
         protected override void Dispose(bool disposing)
         {
-
             GC.SuppressFinalize(this);
             base.Dispose(disposing);
         }
-
-
     }
 }
