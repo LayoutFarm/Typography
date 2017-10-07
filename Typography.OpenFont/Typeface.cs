@@ -166,40 +166,32 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
-
-        private CharacterMap _selectedCmap;
+        private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         public ushort LookupIndex(int codepoint)
         {
-            // TODO: What if there are several tables?
+            // https://www.microsoft.com/typography/OTSPEC/cmap.htm
+            // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
+            ushort ret = 0;
 
-            if (_selectedCmap == null)
+            if (!_codepointToGlyphs.TryGetValue(codepoint, out ret))
             {
-                // https://www.microsoft.com/typography/OTSPEC/cmap.htm
-                // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
-                if (_cmaps.Length == 0)
-                {
-                    return 0;
-                }
-
-                // Default to the first one
-                _selectedCmap = _cmaps[0];
-
-                //find proper cmap , what proper?
-                //https://www.microsoft.com/typography/OTSPEC/cmap.htm
-                //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
                 foreach (CharacterMap cmap in _cmaps)
                 {
-                    if (cmap.PlatformId == 3 && cmap.EncodingId == 1)
+                    ushort gid = cmap.CharacterToGlyphIndex(codepoint);
+
+                    //https://www.microsoft.com/typography/OTSPEC/cmap.htm
+                    //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
+                    if (ret == 0 || (gid != 0 && cmap.PlatformId == 3 && cmap.EncodingId == 1))
                     {
-                        //platform 3 = font for Windows
-                        _selectedCmap = cmap;
-                        break;
+                        ret = gid;
                     }
                 }
+
+                _codepointToGlyphs[codepoint] = ret;
             }
 
-            return _selectedCmap.CharacterToGlyphIndex(codepoint);
+            return ret;
         }
 
         public Glyph Lookup(int codepoint)
