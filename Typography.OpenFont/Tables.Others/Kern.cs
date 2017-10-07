@@ -28,7 +28,7 @@ namespace Typography.OpenFont.Tables
             //TODO: review here
             if (nTables > 1)
             {
-                throw new System.NotSupportedException();
+                Utils.WarnUnimplemented("Support for {0} kerning tables", nTables);
             }
 
             for (int i = 0; i < nTables; ++i)
@@ -50,9 +50,9 @@ namespace Typography.OpenFont.Tables
                         break;
                     case 2:
                         //TODO: implement
-                        throw new System.NotImplementedException();
                     default:
-                        throw new System.NotSupportedException();
+                        Utils.WarnUnimplemented("Kerning Coverage Format {0}", kerCoverage.format);
+                        break;
                 }
             }
         }
