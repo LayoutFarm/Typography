@@ -542,7 +542,7 @@ namespace Typography.OpenFont.Tables
                                 PairSetTable[] pairSetTables = new PairSetTable[pairSetCount];
                                 for (int n = 0; n < pairSetCount; ++n)
                                 {
-                                    reader.BaseStream.Seek(subTableStartAt + pairSetOffsetArray[i], SeekOrigin.Begin);
+                                    reader.BaseStream.Seek(subTableStartAt + pairSetOffsetArray[n], SeekOrigin.Begin);
                                     var pairSetTable = new PairSetTable();
                                     pairSetTable.ReadFrom(reader, value1Format, value2Format);
                                     pairSetTables[n] = pairSetTable;
@@ -1201,7 +1201,7 @@ namespace Typography.OpenFont.Tables
                                 subTable.PosClassSetTables = posClassSetTables;
                                 for (int n = 0; n < chainPosClassSetCnt; ++n)
                                 {
-                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + chainPosClassSetOffsetArray[i]);
+                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + chainPosClassSetOffsetArray[n]);
                                 }
                                 //----------
 
