@@ -77,7 +77,14 @@ namespace Typography.OpenFont
 
         protected override ushort RawCharacterToGlyphIndex(int codepoint)
         {
-            Utils.WarnUnimplemented("cmap subtable format 12");
+            for (int i = 0; i < startCharCodes.Length; ++i)
+            {
+                if (startCharCodes[i] <= codepoint && codepoint <= endCharCodes[i])
+                {
+                    return (ushort)(startGlyphIds[i] + codepoint - startCharCodes[i]);
+                }
+            }
+
             return 0;
         }
     }
