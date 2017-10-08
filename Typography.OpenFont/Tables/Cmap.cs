@@ -89,7 +89,9 @@ namespace Typography.OpenFont.Tables
                 only256UInt16Glyphs[i] = only256Glyphs[i];
             }
             //convert to format4 cmap table
-            return new CharMapFormat4(1, new ushort[] { 0 }, new ushort[] { 255 }, null, null, only256UInt16Glyphs);
+            ushort[] array_0 = new ushort[] { 0 };
+            ushort[] array_255 = new ushort[] { 255 };
+            return new CharMapFormat4(1, array_0, array_255, array_0, array_0, only256UInt16Glyphs);
         }
 
         static CharacterMap ReadFormat_2(BinaryReader input)
