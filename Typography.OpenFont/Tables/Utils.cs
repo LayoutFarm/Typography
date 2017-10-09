@@ -21,15 +21,24 @@ namespace Typography.OpenFont
             Array.Reverse(bytes);
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
-        
+
         public static ushort[] ReadUInt16Array(BinaryReader reader, int nRecords)
         {
             ushort[] arr = new ushort[nRecords];
-            int i = 0;
-            for (int n = nRecords - 1; n >= 0; --n)
+            for (int i = 0; i < nRecords; ++i)
             {
-                arr[i++] = reader.ReadUInt16();
-            } 
+                arr[i] = reader.ReadUInt16();
+            }
+            return arr;
+        }
+
+        public static uint[] ReadUInt32Array(BinaryReader reader, int nRecords)
+        {
+            uint[] arr = new uint[nRecords];
+            for (int i = 0; i < nRecords; ++i)
+            {
+                arr[i] = reader.ReadUInt32();
+            }
             return arr;
         }
 
@@ -40,6 +49,7 @@ namespace Typography.OpenFont
             Array.Copy(original, newClone, orgLen);
             return newClone;
         }
+
         public static T[] ConcatArray<T>(T[] arr1, T[] arr2)
         {
             T[] newArr = new T[arr1.Length + arr2.Length];
