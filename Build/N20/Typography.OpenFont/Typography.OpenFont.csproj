@@ -64,8 +64,14 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\ClassDefTable.cs">
       <Link>Tables.AdvanceLayout\ClassDefTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\COLR.cs">
+      <Link>Tables.AdvanceLayout\COLR.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\CoverageTable.cs">
       <Link>Tables.AdvanceLayout\CoverageTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\CPAL.cs">
+      <Link>Tables.AdvanceLayout\CPAL.cs</Link>
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\FeatureInfo.cs">
       <Link>Tables.AdvanceLayout\FeatureInfo.cs</Link>
