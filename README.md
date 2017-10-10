@@ -137,7 +137,7 @@ _pic 4: test with Thai glyph (complex script)_
 
 ---
 
-** Fun with Emoji !**
+**Fun with Emoji !**
 --- 
 
 The Emoji and related features are contributed by [@samhocevar](https://github.com/samhocevar)
