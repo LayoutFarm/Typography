@@ -155,9 +155,9 @@ _pic 2: FireFoxEmoji.ttf from https://github.com/mozilla/fxemoji_
 
 ![typo_symbol3](https://user-images.githubusercontent.com/245089/31382300-77f4a52c-adb7-11e7-9510-1e07a76f41ab.png)
 
-_pic 3: Segoe UI Normal, Win 10
+_pic 3: Segoe UI Normal, Win 10_
 
---
+---
 
 
 License
