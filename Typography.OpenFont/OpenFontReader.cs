@@ -101,6 +101,8 @@ namespace Typography.OpenFont
                 GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
                 GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
                 BASE baseTable = ReadTableIfExists(tables, input, new BASE());
+                COLR colr = ReadTableIfExists(tables, input, new COLR());
+                CPAL cpal = ReadTableIfExists(tables, input, new CPAL());
                 VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
                 if (vhea != null)
                 {
@@ -146,7 +148,9 @@ namespace Typography.OpenFont
                     gdef,
                     gsub,
                     gpos,
-                    baseTable);
+                    baseTable,
+                    colr,
+                    cpal);
                 return typeface;
             }
         }

@@ -101,7 +101,7 @@
             // lstFontSizes
             // 
             this.lstFontSizes.FormattingEnabled = true;
-            this.lstFontSizes.Location = new System.Drawing.Point(800, 162);
+            this.lstFontSizes.Location = new System.Drawing.Point(776, 27);
             this.lstFontSizes.Name = "lstFontSizes";
             this.lstFontSizes.Size = new System.Drawing.Size(121, 212);
             this.lstFontSizes.TabIndex = 8;
@@ -109,7 +109,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(797, 146);
+            this.label2.Location = new System.Drawing.Point(773, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(70, 13);
             this.label2.TabIndex = 9;
@@ -201,7 +201,7 @@
             // 
             // cmdBuildMsdfTexture
             // 
-            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(800, 379);
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(776, 245);
             this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
             this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 37);
             this.cmdBuildMsdfTexture.TabIndex = 22;
@@ -221,9 +221,9 @@
             // lstFontList
             // 
             this.lstFontList.FormattingEnabled = true;
-            this.lstFontList.Location = new System.Drawing.Point(800, 12);
+            this.lstFontList.Location = new System.Drawing.Point(523, 146);
             this.lstFontList.Name = "lstFontList";
-            this.lstFontList.Size = new System.Drawing.Size(121, 121);
+            this.lstFontList.Size = new System.Drawing.Size(224, 316);
             this.lstFontList.TabIndex = 25;
             // 
             // chkGsubEnableLigature
@@ -241,7 +241,7 @@
             // lstHintList
             // 
             this.lstHintList.FormattingEnabled = true;
-            this.lstHintList.Location = new System.Drawing.Point(523, 71);
+            this.lstHintList.Location = new System.Drawing.Point(523, 66);
             this.lstHintList.Name = "lstHintList";
             this.lstHintList.Size = new System.Drawing.Size(224, 69);
             this.lstHintList.TabIndex = 27;

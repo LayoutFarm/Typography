@@ -267,26 +267,13 @@ namespace Typography.OpenFont
             return (targetPointSize * resolution / pointsPerInch) / this.UnitsPerEm;
         }
 
-        internal GDEF GDEFTable
-        {
-            get;
-            set;
-        }
-        public GSUB GSUBTable
-        {
-            get;
-            set;
-        }
-        public GPOS GPOSTable
-        {
-            get;
-            set;
-        }
-        internal BASE BaseTable
-        {
-            get;
-            set;
-        }
+        internal BASE BaseTable { get; set; }
+        internal GDEF GDEFTable { get; set; }
+
+        public COLR COLRTable { get; set; }
+        public CPAL CPALTable { get; set; }
+        public GPOS GPOSTable { get; set; }
+        public GSUB GSUBTable { get; set; }
 
         //-------------------------------------------------------
 
@@ -312,7 +299,7 @@ namespace Typography.OpenFont
         }
         //-------------------------------------------------------
         //experiment
-        internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable)
+        internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
         {
 
             //***
@@ -320,6 +307,8 @@ namespace Typography.OpenFont
             this.GSUBTable = gsubTable;
             this.GPOSTable = gposTable;
             this.BaseTable = baseTable;
+            this.COLRTable = colrTable;
+            this.CPALTable = cpalTable;
             //---------------------------
             //1. fill glyph definition            
             if (gdefTable != null)
