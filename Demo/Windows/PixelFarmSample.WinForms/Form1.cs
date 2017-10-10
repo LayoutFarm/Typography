@@ -274,7 +274,7 @@ namespace SampleWinForms
                         for (int i = 0; i < 3; ++i)
                         {
                             selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
-                            y_pos -= lineSpacingPx;
+                            y_pos -= lineSpacingPx * 1.5f;
                         }
 
 
