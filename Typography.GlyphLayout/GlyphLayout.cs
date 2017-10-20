@@ -4,21 +4,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 namespace Typography.TextLayout
 {
-    public struct ABC
-    {
-        public short a;
-        public short b;
-        public short c;
-        public short w;
-        public short x_offset;
-        public bool IsEmpty
-        {
-            get
-            {
-                return a == 0 && (b == 0) && (c == 0) && (w == 0) && (x_offset == 0);
-            }
-        }
-    }
+    
 
     public interface IPixelScaleLayout
     {
@@ -61,6 +47,7 @@ namespace Typography.TextLayout
         }
 #endif
     }
+
 
 
     public enum PositionTechnique
@@ -742,7 +729,6 @@ namespace Typography.TextLayout
         Typeface _typeface;
         public GlyphPosStream() { }
 
-<<<<<<< HEAD
         public int Count
         {
             get
@@ -839,7 +825,6 @@ namespace Typography.TextLayout
         //    _glyphs[lim] = p_next;//set back
         //}
     }
-
     struct GlyphPos
     {
 
@@ -875,6 +860,3 @@ namespace Typography.TextLayout
 #endif
     }
 }
-=======
-}
->>>>>>> refs/remotes/origin/master
