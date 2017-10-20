@@ -23,6 +23,7 @@ namespace SampleWinForms
         ActualImage destImg;
         Bitmap winBmp;
 
+        OpenFontStore _openFontStore;
 
         DevTextPrinterBase selectedTextPrinter = null;
         DevVxsTextPrinter _devVxsTextPrinter = null;
@@ -36,22 +37,24 @@ namespace SampleWinForms
         TypefaceStore _typefaceStore;
         float _fontSizeInPts = 14;//default
         InstalledFont _selectedInstallFont;
+        Typography.OpenFont.ScriptLang _current_script;
 
         public Form1()
         {
             InitializeComponent();
 
 
-            _devVxsTextPrinter = new DevVxsTextPrinter();
+
             _devGdiTextPrinter = new DevGdiTextPrinter();
             this.sampleTextBox1.Visible = false;
+            _openFontStore = new OpenFontStore();
 
-            selectedTextPrinter = _devVxsTextPrinter;
             //default
             //set script lang,
             //test with Thai for 'complex script' 
-            _devGdiTextPrinter.ScriptLang = _devVxsTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;
-            _devGdiTextPrinter.PositionTechnique = _devVxsTextPrinter.PositionTechnique = PositionTechnique.OpenFont;
+            _current_script = Typography.OpenFont.ScriptLangs.Latin;
+            _devGdiTextPrinter.ScriptLang = _current_script;
+            _devGdiTextPrinter.PositionTechnique = PositionTechnique.OpenFont;
 
 
             this.Load += new EventHandler(Form1_Load);
@@ -85,11 +88,13 @@ namespace SampleWinForms
             //share text printer to our sample textbox
             //but you can create another text printer that specific to text textbox control
             Graphics gx = this.sampleTextBox1.CreateGraphics();
-            _controllerForGdi.TextPrinter = _devGdiTextPrinter;
             _controllerForGdi.BindHostGraphics(gx);
+            _controllerForGdi.TextPrinter = _devGdiTextPrinter;
+            
             //---------- 
-            _controllerForPixelFarm.TextPrinter = _devVxsTextPrinter;
             _controllerForPixelFarm.BindHostGraphics(gx);
+            _controllerForPixelFarm.TextPrinter = _devVxsTextPrinter;
+            
             //---------- 
             this.sampleTextBox1.SetController(_controllerForPixelFarm);
 
@@ -140,10 +145,7 @@ namespace SampleWinForms
             //
             _typefaceStore = new TypefaceStore();
             _typefaceStore.FontCollection = installedFontCollection;
-            //set default font for current text printer
-            selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(selectedFF);
-            //---------- 
-
+            
 
             if (selected_index < 0) { selected_index = 0; }
             lstFontList.SelectedIndex = selected_index;
@@ -161,13 +163,15 @@ namespace SampleWinForms
             //----------
             //----------
             lstFontSizes.Items.AddRange(
-              new object[]{
+           new object[]{
                     8, 9,
                     10,11,
                     12,
                     14,
                     16,
-                    18,20,22,24,26,28,36,48,72,240,300,360
+                    18,20,22,24,26,28,36,48,72,
+                    240,280,300,360,400,420,460,
+                    620,720,860,920,1024
               });
             lstFontSizes.SelectedIndexChanged += (s, e) =>
             {
@@ -175,20 +179,43 @@ namespace SampleWinForms
                 _fontSizeInPts = (int)lstFontSizes.SelectedItem;
                 UpdateRenderOutput();
             };
-
             //----------------
             //string inputstr = "ก้า";
-            string inputstr = "น้ำน้ำ";
+            //string inputstr = "น้ำน้ำ";
+            //string inputstr = "example";
+            //string inputstr = "lllll";
+            //string inputstr = "e";
+            //string inputstr = "T";
+            //string inputstr = "u";
+            //string inputstr = "t";
+            //string inputstr = "2";
+            //string inputstr = "3";
+            //string inputstr = "o";
+            //string inputstr = "l";
+            //string inputstr = "k";
+            //string inputstr = "8";
+            //string inputstr = "#";
+            //string inputstr = "a";
+            //string inputstr = "e";
+            //string inputstr = "l";
+            //string inputstr = "t";
+            //string inputstr = "i";
+            string inputstr = "ma";
+            //string inputstr = "po";
+            //string inputstr = "Å";
             //string inputstr = "fi";
             //string inputstr = "ก่นกิ่น";
             //string inputstr = "ญญู";
             //string inputstr = "ป่า"; //for gpos test 
             //string inputstr = "快速上手";
+            //string inputstr = "啊";
+
             //----------------
+
             this.txtInputChar.Text = inputstr;
             this.chkFillBackground.Checked = true;
 
-
+            _readyToRender = true;
         }
 
 
@@ -214,9 +241,10 @@ namespace SampleWinForms
             }
 
         }
-
+        bool _readyToRender;
         void UpdateRenderOutput()
         {
+            if (!_readyToRender) return;
             if (g == null)
             {
                 destImg = new ActualImage(400, 300, PixelFormat.ARGB32);
@@ -225,8 +253,14 @@ namespace SampleWinForms
                 winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
 
+                //
+                _devVxsTextPrinter = new DevVxsTextPrinter(p, _openFontStore);
                 _devVxsTextPrinter.TargetCanvasPainter = p;
+                _devVxsTextPrinter.ScriptLang = _current_script;
+                _devVxsTextPrinter.PositionTechnique = _devGdiTextPrinter.PositionTechnique;
                 _devGdiTextPrinter.TargetGraphics = g;
+
+
             }
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -385,7 +419,7 @@ namespace SampleWinForms
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
-            var glyphToContour = new GlyphTranslatorToContour();
+            var glyphToContour = new GlyphContourBuilder();
             builder.ReadShapes(glyphToContour);
             //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
             MsdfGenParams genParams = new MsdfGenParams();
@@ -431,178 +465,179 @@ namespace SampleWinForms
                 y += sqSize;
             }
         }
-        static void DrawEdge(AggCanvasPainter p, EdgeLine edge, float scale)
-        {
-            if (edge.IsOutside)
-            {
-                //free side                
-                switch (edge.SlopKind)
-                {
-                    default:
-                        p.StrokeColor = PixelFarm.Drawing.Color.Green;
-                        break;
-                    case LineSlopeKind.Vertical:
-                        if (edge.IsLeftSide)
-                        {
-                            p.StrokeColor = PixelFarm.Drawing.Color.Blue;
-                        }
-                        else
-                        {
-                            p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
-                        }
-                        break;
-                    case LineSlopeKind.Horizontal:
-                        if (edge.IsUpper)
-                        {
-                            p.StrokeColor = PixelFarm.Drawing.Color.Red;
-                        }
-                        else
-                        {
-                            p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
-                        }
-                        break;
-                }
-            }
-            else
-            {
-                switch (edge.SlopKind)
-                {
-                    default:
-                        p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
-                        break;
-                    case LineSlopeKind.Vertical:
-                        p.StrokeColor = PixelFarm.Drawing.Color.Blue;
-                        break;
-                    case LineSlopeKind.Horizontal:
-                        p.StrokeColor = PixelFarm.Drawing.Color.Yellow;
-                        break;
-                }
-            }
-            p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
-        }
+        //static void DrawEdge(AggCanvasPainter p, EdgeLine edge, float scale)
+        //{
+        //    if (edge.IsOutside)
+        //    {
+
+        //        //free side                
+        //        switch (edge.SlopeKind)
+        //        {
+        //            default:
+        //                p.StrokeColor = PixelFarm.Drawing.Color.Green;
+        //                break;
+        //            case LineSlopeKind.Vertical:
+        //                if (edge.IsLeftSide)
+        //                {
+        //                    p.StrokeColor = PixelFarm.Drawing.Color.Blue;
+        //                }
+        //                else
+        //                {
+        //                    p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
+        //                }
+        //                break;
+        //            case LineSlopeKind.Horizontal:
+        //                if (edge.IsUpper)
+        //                {
+        //                    p.StrokeColor = PixelFarm.Drawing.Color.Red;
+        //                }
+        //                else
+        //                {
+        //                    p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
+        //                }
+        //                break;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        switch (edge.SlopeKind)
+        //        {
+        //            default:
+        //                p.StrokeColor = PixelFarm.Drawing.Color.LightGray;
+        //                break;
+        //            case LineSlopeKind.Vertical:
+        //                p.StrokeColor = PixelFarm.Drawing.Color.Blue;
+        //                break;
+        //            case LineSlopeKind.Horizontal:
+        //                p.StrokeColor = PixelFarm.Drawing.Color.Yellow;
+        //                break;
+        //        }
+        //    }
+        //    p.Line(edge.x0 * scale, edge.y0 * scale, edge.x1 * scale, edge.y1 * scale);
+        //}
 
 #if DEBUG
-        void debugDrawTriangulatedGlyph(GlyphFitOutline glyphFitOutline, float pixelScale)
-        {
-            p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
-            List<GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
-            int j = triAngles.Count;
-            //
-            double prev_cx = 0, prev_cy = 0;
-            // 
-            bool drawBone = this.chkDrawBone.Checked;
+        //void debugDrawTriangulatedGlyph(GlyphFitOutline glyphFitOutline, float pixelScale)
+        //{
+        //    p.StrokeColor = PixelFarm.Drawing.Color.Magenta;
+        //    List<GlyphTriangle> triAngles = glyphFitOutline.dbugGetTriangles();
+        //    int j = triAngles.Count;
+        //    //
+        //    double prev_cx = 0, prev_cy = 0;
+        //    // 
+        //    bool drawBone = this.chkDrawBone.Checked;
 
-            for (int i = 0; i < j; ++i)
-            {
-                //---------------
-                GlyphTriangle tri = triAngles[i];
-                EdgeLine e0 = tri.e0;
-                EdgeLine e1 = tri.e1;
-                EdgeLine e2 = tri.e2;
-                //---------------
-                //draw each triangles
-                DrawEdge(p, e0, pixelScale);
-                DrawEdge(p, e1, pixelScale);
-                DrawEdge(p, e2, pixelScale);
-                //---------------
-                //draw centroid
-                double cen_x = tri.CentroidX;
-                double cen_y = tri.CentroidY;
-                //---------------
-                p.FillColor = PixelFarm.Drawing.Color.Yellow;
-                p.FillRectLBWH(cen_x * pixelScale, cen_y * pixelScale, 2, 2);
-                if (!drawBone)
-                {
-                    //if not draw bone then draw connected lines
-                    if (i == 0)
-                    {
-                        //start mark
-                        p.FillColor = PixelFarm.Drawing.Color.Yellow;
-                        p.FillRectLBWH(cen_x * pixelScale, cen_y * pixelScale, 7, 7);
-                    }
-                    else
-                    {
-                        p.StrokeColor = PixelFarm.Drawing.Color.Red;
-                        p.Line(
-                            prev_cx * pixelScale, prev_cy * pixelScale,
-                           cen_x * pixelScale, cen_y * pixelScale);
-                    }
-                    prev_cx = cen_x;
-                    prev_cy = cen_y;
-                }
-            }
-            //---------------
-            //draw bone 
-            if (drawBone)
-            {
-                List<GlyphBone> bones = glyphFitOutline.dbugGetBones();
-                j = bones.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    GlyphBone b = bones[i];
-                    if (i == 0)
-                    {
-                        //start mark
-                        p.FillColor = PixelFarm.Drawing.Color.Yellow;
-                        p.FillRectLBWH(b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale, 7, 7);
-                    }
-                    //draw each bone
-                    p.StrokeColor = PixelFarm.Drawing.Color.Red;
-                    p.Line(
-                        b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale,
-                        b.q.CentroidX * pixelScale, b.q.CentroidY * pixelScale);
-                }
-            }
-            //---------------
-        }
+        //    for (int i = 0; i < j; ++i)
+        //    {
+        //        //---------------
+        //        GlyphTriangle tri = triAngles[i];
+        //        EdgeLine e0 = tri.e0;
+        //        EdgeLine e1 = tri.e1;
+        //        EdgeLine e2 = tri.e2;
+        //        //---------------
+        //        //draw each triangles
+        //        DrawEdge(p, e0, pixelScale);
+        //        DrawEdge(p, e1, pixelScale);
+        //        DrawEdge(p, e2, pixelScale);
+        //        //---------------
+        //        //draw centroid
+        //        double cen_x = tri.CentroidX;
+        //        double cen_y = tri.CentroidY;
+        //        //---------------
+        //        p.FillColor = PixelFarm.Drawing.Color.Yellow;
+        //        p.FillRectLBWH(cen_x * pixelScale, cen_y * pixelScale, 2, 2);
+        //        if (!drawBone)
+        //        {
+        //            //if not draw bone then draw connected lines
+        //            if (i == 0)
+        //            {
+        //                //start mark
+        //                p.FillColor = PixelFarm.Drawing.Color.Yellow;
+        //                p.FillRectLBWH(cen_x * pixelScale, cen_y * pixelScale, 7, 7);
+        //            }
+        //            else
+        //            {
+        //                p.StrokeColor = PixelFarm.Drawing.Color.Red;
+        //                p.Line(
+        //                    prev_cx * pixelScale, prev_cy * pixelScale,
+        //                   cen_x * pixelScale, cen_y * pixelScale);
+        //            }
+        //            prev_cx = cen_x;
+        //            prev_cy = cen_y;
+        //        }
+        //    }
+        //    //---------------
+        //    //draw bone 
+        //    if (drawBone)
+        //    {
+        //        List<GlyphBone> bones = glyphFitOutline.dbugGetBones();
+        //        j = bones.Count;
+        //        for (int i = 0; i < j; ++i)
+        //        {
+        //            GlyphBone b = bones[i];
+        //            if (i == 0)
+        //            {
+        //                //start mark
+        //                p.FillColor = PixelFarm.Drawing.Color.Yellow;
+        //                p.FillRectLBWH(b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale, 7, 7);
+        //            }
+        //            //draw each bone
+        //            p.StrokeColor = PixelFarm.Drawing.Color.Red;
+        //            p.Line(
+        //                b.p.CentroidX * pixelScale, b.p.CentroidY * pixelScale,
+        //                b.q.CentroidX * pixelScale, b.q.CentroidY * pixelScale);
+        //        }
+        //    }
+        //    //---------------
+        //}
 
 #endif
 
-        void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
-        {
-            //for debug
-            List<GlyphPart> parts = cnt.parts;
-            int j = parts.Count;
-            for (int i = 0; i < j; ++i)
-            {
-                GlyphPart part = parts[i];
-                switch (part.Kind)
-                {
-                    default: throw new NotSupportedException();
-                    case GlyphPartKind.Line:
-                        {
-                            GlyphLine line = (GlyphLine)part;
-                            p.FillColor = PixelFarm.Drawing.Color.Red;
-                            p.FillRectLBWH(line.x0, line.y0, 2, 2);
-                            p.FillRectLBWH(line.x1, line.y1, 2, 2);
-                        }
-                        break;
-                    case GlyphPartKind.Curve3:
-                        {
-                            GlyphCurve3 c = (GlyphCurve3)part;
-                            p.FillColor = PixelFarm.Drawing.Color.Red;
-                            p.FillRectLBWH(c.x0, c.y0, 2, 2);
-                            p.FillColor = PixelFarm.Drawing.Color.Blue;
-                            p.FillRectLBWH(c.p2x, c.p2y, 2, 2);
-                            p.FillColor = PixelFarm.Drawing.Color.Red;
-                            p.FillRectLBWH(c.x, c.y, 2, 2);
-                        }
-                        break;
-                    case GlyphPartKind.Curve4:
-                        {
-                            GlyphCurve4 c = (GlyphCurve4)part;
-                            p.FillColor = PixelFarm.Drawing.Color.Red;
-                            p.FillRectLBWH(c.x0, c.y0, 2, 2);
-                            p.FillColor = PixelFarm.Drawing.Color.Blue;
-                            p.FillRectLBWH(c.p2x, c.p2y, 2, 2);
-                            p.FillRectLBWH(c.p3x, c.p3y, 2, 2);
-                            p.FillColor = PixelFarm.Drawing.Color.Red;
-                            p.FillRectLBWH(c.x, c.y, 2, 2);
-                        }
-                        break;
-                }
-            }
-        }
+        //void DrawGlyphContour(GlyphContour cnt, AggCanvasPainter p)
+        //{
+        //    //for debug
+        //    List<GlyphPart> parts = cnt.parts;
+        //    int j = parts.Count;
+        //    for (int i = 0; i < j; ++i)
+        //    {
+        //        GlyphPart part = parts[i];
+        //        switch (part.Kind)
+        //        {
+        //            default: throw new NotSupportedException();
+        //            case GlyphPartKind.Line:
+        //                {
+        //                    GlyphLine line = (GlyphLine)part;
+        //                    p.FillColor = PixelFarm.Drawing.Color.Red;
+        //                    p.FillRectLBWH(line.x0, line.y0, 2, 2);
+        //                    p.FillRectLBWH(line.x1, line.y1, 2, 2);
+        //                }
+        //                break;
+        //            case GlyphPartKind.Curve3:
+        //                {
+        //                    GlyphCurve3 c = (GlyphCurve3)part;
+        //                    p.FillColor = PixelFarm.Drawing.Color.Red;
+        //                    p.FillRectLBWH(c.x0, c.y0, 2, 2);
+        //                    p.FillColor = PixelFarm.Drawing.Color.Blue;
+        //                    p.FillRectLBWH(c.p2x, c.p2y, 2, 2);
+        //                    p.FillColor = PixelFarm.Drawing.Color.Red;
+        //                    p.FillRectLBWH(c.x, c.y, 2, 2);
+        //                }
+        //                break;
+        //            case GlyphPartKind.Curve4:
+        //                {
+        //                    GlyphCurve4 c = (GlyphCurve4)part;
+        //                    p.FillColor = PixelFarm.Drawing.Color.Red;
+        //                    p.FillRectLBWH(c.x0, c.y0, 2, 2);
+        //                    p.FillColor = PixelFarm.Drawing.Color.Blue;
+        //                    p.FillRectLBWH(c.p2x, c.p2y, 2, 2);
+        //                    p.FillRectLBWH(c.p3x, c.p3y, 2, 2);
+        //                    p.FillColor = PixelFarm.Drawing.Color.Red;
+        //                    p.FillRectLBWH(c.x, c.y, 2, 2);
+        //                }
+        //                break;
+        //        }
+        //    }
+        //}
 
 
 
@@ -701,7 +736,7 @@ namespace SampleWinForms
 
                     //-----------------------------------
                     builder.BuildFromGlyphIndex(gindex, -1);
-                    var glyphToContour = new GlyphTranslatorToContour();
+                    var glyphToContour = new GlyphContourBuilder();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     builder.ReadShapes(glyphToContour);
                     float scale = 1f / 64;
@@ -744,7 +779,7 @@ namespace SampleWinForms
 
 
 
-        static void CreateSampleMsdfImg(GlyphTranslatorToContour tx, string outputFile)
+        static void CreateSampleMsdfImg(GlyphContourBuilder tx, string outputFile)
         {
             //sample
 
@@ -786,7 +821,7 @@ namespace SampleWinForms
                     //build glyph
                     //builder.BuildFromGlyphIndex(gindex, sizeInPoint);
                     builder.BuildFromGlyphIndex(gindex, -1); //use original glyph size (assign -1)
-                    var glyphToContour = new GlyphTranslatorToContour();
+                    var glyphToContour = new GlyphContourBuilder();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     builder.ReadShapes(glyphToContour);
 

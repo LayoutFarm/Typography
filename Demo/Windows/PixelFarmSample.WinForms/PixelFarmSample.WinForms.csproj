@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="PixelFarm\BitmapHelper.cs" />
     <Compile Include="PixelFarm\DevVxsTextPrinter.cs" />
+    <Compile Include="PixelFarm\HintedVxsGlyphCollection.cs" />
     <Compile Include="PixelFarm\MouseButtonsAndKeys.cs" />
     <Compile Include="PixelFarm\SampleTextBoxControllerForPixelFarm.cs" />
     <Compile Include="PixelFarm\VisualLine.cs" />
