@@ -89,11 +89,13 @@ namespace Typography.OpenFont.Tables
                 only256UInt16Glyphs[i] = only256Glyphs[i];
             }
             //convert to format4 cmap table
-            return new CharMapFormat4(1, new ushort[] { 0 }, new ushort[] { 255 }, null, null, only256UInt16Glyphs);
+            ushort[] array_0 = new ushort[] { 0 };
+            ushort[] array_255 = new ushort[] { 255 };
+            return new CharMapFormat4(1, array_0, array_255, array_0, array_0, only256UInt16Glyphs);
         }
+
         static CharacterMap ReadFormat_2(BinaryReader input)
         {
-
             //Format 2: High - byte mapping through table
 
             //This subtable is useful for the national character code standards used for Japanese, Chinese, and Korean characters.
@@ -136,8 +138,11 @@ namespace Typography.OpenFont.Tables
             //The value idDelta permits the same subarray to be used for several different subheaders.
             //The idDelta arithmetic is modulo 65536.
 
-            throw new System.NotImplementedException();
+            Utils.WarnUnimplemented("cmap subtable format 2");
+
+            return null;
         }
+
         static CharMapFormat4 ReadFormat_4(BinaryReader input)
         {
             ushort lenOfSubTable = input.ReadUInt16(); //This is the length in bytes of the subtable. ****
@@ -204,9 +209,10 @@ namespace Typography.OpenFont.Tables
             ushort[] glyphIdArray = Utils.ReadUInt16Array(input, entryCount);
             return new CharMapFormat6(firstCode, glyphIdArray);
         }
+
         static CharacterMap ReadFormat_12(BinaryReader input)
         {
-            //TODO: test this agina
+            //TODO: test this again
             // Format 12: Segmented coverage
             //This is the Microsoft standard character to glyph index mapping table for fonts supporting the UCS - 4 characters 
             //in the Unicode Surrogates Area(U + D800 - U + DFFF).
@@ -267,14 +273,15 @@ namespace Typography.OpenFont.Tables
             }
             return new CharMapFormat12(startCharCodes, endCharCodes, startGlyphIds);
         }
+
         static CharacterMap ReadCharacterMap(CMapEntry entry, BinaryReader input)
         {
-
             ushort format = input.ReadUInt16();
             switch (format)
             {
                 default:
-                    throw new Exception("Unknown cmap subtable: " + format); // TODO: Replace all application exceptions 
+                    Utils.WarnUnimplemented("cmap subtable format {0}", format);
+                    return new NullCharMap();
                 case 0: return ReadFormat_0(input);
                 case 2: return ReadFormat_2(input);
                 case 4: return ReadFormat_4(input);

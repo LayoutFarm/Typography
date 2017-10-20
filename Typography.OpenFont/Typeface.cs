@@ -166,71 +166,59 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
+        private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
-        CharacterMap _selectedCmap;
-
-        public ushort LookupIndex(char character)
+        public ushort LookupIndex(int codepoint)
         {
-            // TODO: What if there are none or several tables?
+            // https://www.microsoft.com/typography/OTSPEC/cmap.htm
+            // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
+            ushort ret = 0;
 
-            if (_selectedCmap == null)
+            if (!_codepointToGlyphs.TryGetValue(codepoint, out ret))
             {
-                int j = _cmaps.Length;
-                if (j > 1)
+                foreach (CharacterMap cmap in _cmaps)
                 {
-                    //find proper cmap , what proper?
+                    ushort gid = cmap.CharacterToGlyphIndex(codepoint);
+
                     //https://www.microsoft.com/typography/OTSPEC/cmap.htm
                     //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
-
-                    for (int i = 0; i < j; ++i)
+                    if (ret == 0 || (gid != 0 && cmap.PlatformId == 3 && cmap.EncodingId == 1))
                     {
-                        CharacterMap cmap = _cmaps[i];
-                        if (cmap.PlatformId == 3 && cmap.EncodingId == 1)
-                        {
-                            //platform 3 = font for Windows
-                            _selectedCmap = cmap;
-                            break;
-                        }
+                        ret = gid;
                     }
+                }
 
-                    if (_selectedCmap == null)
-                    {
-                        //not found
-                        throw new System.NotSupportedException();
-                    }
-                    //
-                }
-                else
-                {
-                    _selectedCmap = _cmaps[0];
-                }
+                _codepointToGlyphs[codepoint] = ret;
             }
 
-            return _selectedCmap.CharacterToGlyphIndex(character);
+            return ret;
         }
 
-        public Glyph Lookup(char character)
+        public Glyph Lookup(int codepoint)
         {
-            return _glyphs[LookupIndex(character)];
+            return _glyphs[LookupIndex(codepoint)];
         }
+
         public Glyph GetGlyphByIndex(int glyphIndex)
         {
             return _glyphs[glyphIndex];
         }
 
-        public ushort GetAdvanceWidth(char character)
+        public ushort GetAdvanceWidth(int codepoint)
         {
-            return _horizontalMetrics.GetAdvanceWidth(LookupIndex(character));
+            return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
         }
+
         public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
         {
-
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
+
         public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
+
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
             return _kern.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
@@ -279,26 +267,13 @@ namespace Typography.OpenFont
             return (targetPointSize * resolution / pointsPerInch) / this.UnitsPerEm;
         }
 
-        internal GDEF GDEFTable
-        {
-            get;
-            set;
-        }
-        public GSUB GSUBTable
-        {
-            get;
-            set;
-        }
-        public GPOS GPOSTable
-        {
-            get;
-            set;
-        }
-        internal BASE BaseTable
-        {
-            get;
-            set;
-        }
+        internal BASE BaseTable { get; set; }
+        internal GDEF GDEFTable { get; set; }
+
+        public COLR COLRTable { get; set; }
+        public CPAL CPALTable { get; set; }
+        public GPOS GPOSTable { get; set; }
+        public GSUB GSUBTable { get; set; }
 
         //-------------------------------------------------------
 
@@ -306,10 +281,17 @@ namespace Typography.OpenFont
         {
             //do shaping here?
             //1. do look up and substitution 
-            int j = buffer.Length;
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < buffer.Length; ++i)
             {
-                output.Add(LookupIndex(buffer[i]));
+                char ch = buffer[i];
+                int codepoint = ch;
+                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < buffer.Length)
+                {
+                    ++i;
+                    codepoint = char.ConvertToUtf32(ch, buffer[i]);
+                }
+
+                output.Add(LookupIndex(codepoint));
             }
             //tmp disable here
             //check for glyph substitution
@@ -317,7 +299,7 @@ namespace Typography.OpenFont
         }
         //-------------------------------------------------------
         //experiment
-        internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable)
+        internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
         {
 
             //***
@@ -325,6 +307,8 @@ namespace Typography.OpenFont
             this.GSUBTable = gsubTable;
             this.GPOSTable = gposTable;
             this.BaseTable = baseTable;
+            this.COLRTable = colrTable;
+            this.CPALTable = cpalTable;
             //---------------------------
             //1. fill glyph definition            
             if (gdefTable != null)
@@ -357,7 +341,7 @@ namespace Typography.OpenFont
 
         public static class TypefaceExtensions
         {
-            public static bool DoseSupportUnicode(
+            public static bool DoesSupportUnicode(
                 this Typeface typeface,
                 UnicodeLangBits unicodeLangBits)
             {
@@ -396,6 +380,7 @@ namespace Typography.OpenFont
                 }
             }
         }
+
         public static class UnicodeLangBitsExtension
         {
             public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
@@ -408,7 +393,5 @@ namespace Typography.OpenFont
                     lower32 & 0xFFFF);
             }
         }
-
-
     }
 }

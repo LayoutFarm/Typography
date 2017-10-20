@@ -75,9 +75,9 @@ namespace Typography.TextLayout
                     ushort[] lookupListIndices = feature.LookupListIndice;
                     foreach (ushort lookupIndex in lookupListIndices)
                     {
-                        GSUB.LookupTable lktable = gsubTable.GetLookupTable(lookupIndex);
+                        GSUB.LookupTable lktable = gsubTable.LookupList[lookupIndex];
                         lktable.ForUseWithFeatureId = feature.TagName;
-                        lookupTables.Add(gsubTable.GetLookupTable(lookupIndex));
+                        lookupTables.Add(gsubTable.LookupList[lookupIndex]);
                     }
                 }
             }

@@ -25,10 +25,7 @@ namespace Typography.OpenFont.Tables
     //Tag Array of four uint8s(length = 32 bits) used to identify a script, language system, feature, or baseline
     //Offset16   Short offset to a table, same as uint16, NULL offset = 0x0000
     //Offset32   Long offset to a table, same as uint32, NULL offset = 0x00000000
-    //-------
-    //NOTE***
-    //Offset16 => same as uint16
-    //Offset16 => same as uint32
+
 
 
     //https://www.microsoft.com/typography/otspec/GPOS.htm
@@ -212,7 +209,7 @@ namespace Typography.OpenFont.Tables
         {
             public GPOS OwnerGPos;
 
-            public abstract void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len);
+            public abstract void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len);
         }
 
         /// <summary>
@@ -256,7 +253,7 @@ namespace Typography.OpenFont.Tables
                 this.subTableOffsets = subTableOffsets;
                 this.markFilteringSet = markFilteringSet;
             }
-            public void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+            public void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
             {
 
                 int j = subTables.Count;
@@ -280,7 +277,9 @@ namespace Typography.OpenFont.Tables
             {
                 switch (lookupType)
                 {
-                    default: throw new NotSupportedException();
+                    default:
+                        Utils.WarnUnimplemented("Lookup Type {0}", lookupType);
+                        break;
                     case 1:
                         ReadLookupType1(reader);
                         break;
@@ -331,11 +330,12 @@ namespace Typography.OpenFont.Tables
                     private set;
                 }
                 public CoverageTable CoverageTable { get; set; }
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 1");
                 }
             }
+
             /// <summary>
             /// Lookup Type 1: Single Adjustment Positioning Subtable
             /// </summary>
@@ -401,12 +401,12 @@ namespace Typography.OpenFont.Tables
             }
 
             /// <summary>
-            /// Lookup Type 2, Format1: Pair Adjustment Positioning Subtable
+            /// Lookup Type 2: Pair Adjustment Positioning Subtable
             /// </summary>
-            class LkSubTableType2Fmt1 : LookupSubTable
+            class LkSubTableType2 : LookupSubTable
             {
                 PairSetTable[] pairSetTables;
-                public LkSubTableType2Fmt1(PairSetTable[] pairSetTables)
+                public LkSubTableType2(PairSetTable[] pairSetTables)
                 {
                     this.pairSetTables = pairSetTables;
                 }
@@ -415,36 +415,12 @@ namespace Typography.OpenFont.Tables
                     get;
                     set;
                 }
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    //find marker   
-                    CoverageTable covTable = this.CoverageTable;
-                    int lim = inputGlyphs.Count - 1;
-                    for (int i = 0; i < lim; ++i) //start at 0
-                    {
-                        ushort glyph_advW;
-                        int firstGlyphFound = covTable.FindPosition(inputGlyphs.GetGlyph(i, out glyph_advW));
-                        if (firstGlyphFound > -1)
-                        {
-                            //test this with Palatino A-Y sequence
-                            PairSetTable pairSet = this.pairSetTables[firstGlyphFound];
-                            //check second glyph 
-                            ushort second_glyph_w;
-                            ushort second_glyph_index = inputGlyphs.GetGlyph(i + 1, out second_glyph_w);
-                            PairSet foundPairSet;
-                            if (pairSet.FindPairSet(second_glyph_index, out foundPairSet))
-                            {
-                                ValueRecord v1 = foundPairSet.value1;
-                                ValueRecord v2 = foundPairSet.value2;
-                                //TODO: recheck for vertical writing ...
-                                inputGlyphs.AppendGlyphAdvance(i, v1.XAdvance, 0);
-                                inputGlyphs.AppendGlyphAdvance(i + 1, v2.XAdvance, 0);
-                            }
-                        }
-                    }
-
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 2");
                 }
             }
+
             /// <summary>
             ///  Lookup Type 2: Pair Adjustment Positioning Subtable
             /// </summary>
@@ -503,15 +479,14 @@ namespace Typography.OpenFont.Tables
                 //uint16 	PairValueCount 	    Number of PairValueRecords
                 //struct 	PairValueRecord[PairValueCount] 	Array of PairValueRecords-ordered by GlyphID of the second glyph
                 //-----------------
-                //A PairValueRecord specifies the second glyph in a pair (SecondGlyph) and defines a ValueRecord for each glyph (Value1 and Value2). 
-                //If ValueFormat1 is set to zero (0) in the PairPos subtable, ValueRecord1 will be empty; similarly, if ValueFormat2 is 0, Value2 will be empty.
+                //A PairValueRecord specifies the second glyph in a pair (SecondGlyph) and defines a ValueRecord for each glyph (Value1 and Value2). If ValueFormat1 is set to zero (0) in the PairPos subtable, ValueRecord1 will be empty; similarly, if ValueFormat2 is 0, Value2 will be empty.
 
                 //Example 4 at the end of this chapter shows a PairPosFormat1 subtable that defines two cases of pair kerning.
                 //PairValueRecord
-                //Value 	    Type 	        Description
-                //GlyphID 	    SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
-                //ValueRecord 	Value1 	        Positioning data for the first glyph in the pair
-                //ValueRecord 	Value2 	        Positioning data for the second glyph in the pair
+                //Value 	Type 	Description
+                //GlyphID 	SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
+                //ValueRecord 	Value1 	Positioning data for the first glyph in the pair
+                //ValueRecord 	Value2 	Positioning data for the second glyph in the pair
                 //-----------------------------------------------
 
                 //PairPosFormat2 subtable: Class pair adjustment
@@ -560,7 +535,9 @@ namespace Typography.OpenFont.Tables
 
                     switch (format)
                     {
-                        default: throw new NotSupportedException();
+                        default:
+                            Utils.WarnUnimplemented("Pair Adjustment Positioning Subtable Format {0}", format);
+                            break;
                         case 1:
                             {
                                 ushort coverage = reader.ReadUInt16();
@@ -571,12 +548,12 @@ namespace Typography.OpenFont.Tables
                                 PairSetTable[] pairSetTables = new PairSetTable[pairSetCount];
                                 for (int n = 0; n < pairSetCount; ++n)
                                 {
-                                    reader.BaseStream.Seek(subTableStartAt + pairSetOffsetArray[i], SeekOrigin.Begin);
+                                    reader.BaseStream.Seek(subTableStartAt + pairSetOffsetArray[n], SeekOrigin.Begin);
                                     var pairSetTable = new PairSetTable();
                                     pairSetTable.ReadFrom(reader, value1Format, value2Format);
                                     pairSetTables[n] = pairSetTable;
                                 }
-                                var subTable = new LkSubTableType2Fmt1(pairSetTables);
+                                var subTable = new LkSubTableType2(pairSetTables);
                                 //coverage        
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 subTables.Add(subTable);
@@ -584,7 +561,7 @@ namespace Typography.OpenFont.Tables
                             break;
                         case 2:
                             {
-                                //.... TODO: implement this
+                                //.... 
                                 ushort coverage = reader.ReadUInt16();
                                 ushort value1Format = reader.ReadUInt16();
                                 ushort value2Format = reader.ReadUInt16();
@@ -602,8 +579,9 @@ namespace Typography.OpenFont.Tables
                                     }
 
                                 }
+
                                 //TODO: impl more
-                                throw new NotImplementedException();
+                                Utils.WarnUnimplemented("Pair Adjustment Positioning Subtable Format 2");
                             }
                             break;
                     }
@@ -617,8 +595,9 @@ namespace Typography.OpenFont.Tables
             void ReadLookupType3(BinaryReader reader)
             {
                 //TODO: implement this
-                throw new NotImplementedException();
+                Utils.WarnUnimplemented("Lookup Table Type 3");
             }
+
             //-------------------------------------------------------------------------
             /// <summary>
             /// Lookup Type 4:MarkToBase Attachment Positioning, or called (MarkBasePos) table
@@ -633,23 +612,21 @@ namespace Typography.OpenFont.Tables
                 public BaseArrayTable BaseArrayTable { get; set; }
                 public MarkArrayTable MarkArrayTable { get; set; }
 
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
                     int xpos = 0;
-                    //find marker  
-
+                    //find marker
+                    int x = 0;
                     int j = inputGlyphs.Count;
                     for (int i = 1; i < j; ++i) //start at 1
                     {
-
-                        ushort glyph_advW;
-                        int markFound = MarkCoverageTable.FindPosition(inputGlyphs.GetGlyph(i, out glyph_advW));
+                        GlyphPos glyphPos = inputGlyphs[i];
+                        int markFound = MarkCoverageTable.FindPosition(glyphPos.glyphIndex);
                         if (markFound > -1)
                         {
                             //this is mark glyph
                             //then-> look back for base
-                            ushort prev_glyph_adv_w;
-                            int baseFound = BaseCoverageTable.FindPosition(inputGlyphs.GetGlyph(i - 1, out prev_glyph_adv_w));
+                            int baseFound = BaseCoverageTable.FindPosition(inputGlyphs[i - 1].glyphIndex);
                             if (baseFound > -1)
                             {
                                 ushort markClass = this.MarkArrayTable.GetMarkClass(markFound);
@@ -657,14 +634,20 @@ namespace Typography.OpenFont.Tables
                                 AnchorPoint markAnchorPoint = this.MarkArrayTable.GetAnchorPoint(markFound);
                                 BaseRecord baseRecord = BaseArrayTable.GetBaseRecords(baseFound);
                                 AnchorPoint basePointForMark = baseRecord.anchors[markClass];
-                                inputGlyphs.AppendGlyphOffset(
-                                    i,
-                                    (short)((-prev_glyph_adv_w + basePointForMark.xcoord - markAnchorPoint.xcoord)),
-                                    (short)(basePointForMark.ycoord - markAnchorPoint.ycoord)
-                                    );
+
+                                glyphPos.xoffset += (short)((-inputGlyphs[i - 1].advWidth + basePointForMark.xcoord - markAnchorPoint.xcoord));
+
+#if DEBUG
+                                if (markAnchorPoint.ycoord != 0)
+                                {
+
+                                }
+#endif
+                                glyphPos.yoffset += (short)(basePointForMark.ycoord - markAnchorPoint.ycoord);
+
                             }
                         }
-                        xpos += glyph_advW;
+                        xpos += glyphPos.advWidth;
                     }
                 }
 
@@ -793,9 +776,9 @@ namespace Typography.OpenFont.Tables
                 public CoverageTable LigatureCoverage { get; set; }
                 public MarkArrayTable MarkArrayTable { get; set; }
                 public LigatureArrayTable LigatureArrayTable { get; set; }
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 5");
                 }
             }
             /// <summary>
@@ -824,7 +807,8 @@ namespace Typography.OpenFont.Tables
                     ushort format = reader.ReadUInt16();
                     if (format != 1)
                     {
-                        throw new NotSupportedException();
+                        Utils.WarnUnimplemented("Lookup Sub Table Type 5 Format {0}", format);
+                        return;
                     }
                     ushort markCoverageOffset = reader.ReadUInt16(); //from beginning of MarkLigPos subtable
                     ushort ligatureCoverageOffset = reader.ReadUInt16();
@@ -860,7 +844,7 @@ namespace Typography.OpenFont.Tables
                 public CoverageTable MarkCoverage2 { get; set; }
                 public MarkArrayTable Mark1ArrayTable { get; set; }
                 public Mark2ArrayTable Mark2ArrayTable { get; set; } // Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. 
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
                     //find marker 
                     if (startAt == 0)
@@ -875,56 +859,48 @@ namespace Typography.OpenFont.Tables
                     //
                     for (int i = startAt; i < lim; ++i) //start at 1
                     {
-                        ushort glyph_adv_w;
-                        int markFound = MarkCoverage1.FindPosition(inputGlyphs.GetGlyph(i, out glyph_adv_w));
+                        GlyphPos glyphPos = inputGlyphs[i];
+                        int markFound = MarkCoverage1.FindPosition(glyphPos.glyphIndex);
                         if (markFound > -1)
                         {
                             //this is mark glyph
                             //then-> look back for base 
-                            ushort prev_pos_adv_w;
-                            int baseFound = MarkCoverage2.FindPosition(inputGlyphs.GetGlyph(i - 1, out prev_pos_adv_w));
+                            GlyphPos prev_pos = inputGlyphs[i - 1];
+                            int baseFound = MarkCoverage2.FindPosition(prev_pos.glyphIndex);
                             if (baseFound > -1)
                             {
                                 int markClassId = this.Mark1ArrayTable.GetMarkClass(markFound);
                                 AnchorPoint mark2BaseAnchor = this.Mark2ArrayTable.GetAnchorPoint(baseFound, markClassId);
                                 AnchorPoint mark1Anchor = this.Mark1ArrayTable.GetAnchorPoint(markFound);
 
-                                //TODO: review here 
+                                //TODO: review here
                                 if (mark1Anchor.ycoord < 0)
                                 {
                                     //eg. น้ำ
-                                    //change yoffset of prev pos 
-                                    inputGlyphs.AppendGlyphOffset(i - 1 /*PREV*/, 0, (short)(-mark1Anchor.ycoord));
+                                    prev_pos.yoffset += (short)(-mark1Anchor.ycoord);
                                     int actualBasePos = FindActualBaseGlyphBackward(inputGlyphs, i - 1);
                                     if (actualBasePos > -1)
                                     {
-                                        short actual_base_offset_x, acutal_base_offset_y;
-                                        inputGlyphs.GetOffset(actualBasePos, out actual_base_offset_x, out acutal_base_offset_y);
-                                        inputGlyphs.AppendGlyphOffset(
-                                            i,
-                                            (short)(actual_base_offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
-                                            0);
+                                        GlyphPos prev_pos2 = inputGlyphs[actualBasePos];
+                                        glyphPos.xoffset += (short)((prev_pos2.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
                                     }
                                 }
                                 else
                                 {
-                                    short offset_x, offset_y;
-                                    inputGlyphs.GetOffset(i - 1/*PREV*/, out offset_x, out offset_y);
-                                    inputGlyphs.AppendGlyphOffset(
-                                         i,
-                                         (short)(offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
-                                         mark1Anchor.ycoord);
+                                    glyphPos.yoffset += (short)(mark1Anchor.ycoord);
+                                    glyphPos.xoffset += (short)((prev_pos.xoffset + mark2BaseAnchor.xcoord - mark1Anchor.xcoord));
                                 }
                             }
                         }
                     }
                 }
             }
-            static int FindActualBaseGlyphBackward(IGlyphPositions inputGlyphs, int startAt)
+            static int FindActualBaseGlyphBackward(List<GlyphPos> inputGlyphs, int startAt)
             {
                 for (int i = startAt; i >= 0; --i)
                 {
-                    if (inputGlyphs.GetGlyphClassKind(i) <= GlyphClassKind.Base)
+                    GlyphPos glyphPos = inputGlyphs[i];
+                    if (glyphPos._classKind <= GlyphClassKind.Base)
                     {
                         return i;
                     }
@@ -959,7 +935,8 @@ namespace Typography.OpenFont.Tables
                     ushort format = reader.ReadUInt16();
                     if (format != 1)
                     {
-                        throw new NotSupportedException();
+                        Utils.WarnUnimplemented("Lookup Sub Table Type 6 Format {0}", format);
+                        return;
                     }
                     ushort mark1CoverageOffset = reader.ReadUInt16();
                     ushort mark2CoverageOffset = reader.ReadUInt16();
@@ -998,7 +975,9 @@ namespace Typography.OpenFont.Tables
                     ushort format = reader.ReadUInt16();
                     switch (format)
                     {
-                        default: throw new NotSupportedException();
+                        default:
+                            Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format {0}", format);
+                            return;
                         case 1:
                             {
                                 //Context Positioning Subtable: Format 1
@@ -1080,12 +1059,11 @@ namespace Typography.OpenFont.Tables
 
             class LkSubTableType7Fmt1 : LookupSubTable
             {
-
                 public CoverageTable CoverageTable { get; set; }
                 public PosRuleSetTable[] PosRuleSetTables { get; set; }
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format 1");
                 }
             }
 
@@ -1094,9 +1072,9 @@ namespace Typography.OpenFont.Tables
                 public ushort ClassDefOffset { get; set; }
                 public CoverageTable CoverageTable { get; set; }
                 public PosClassSetTable[] PosClassSetTables { get; set; }
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format 2");
                 }
 
             }
@@ -1104,9 +1082,9 @@ namespace Typography.OpenFont.Tables
             {
                 public CoverageTable[] CoverageTables { get; set; }
                 public PosLookupRecord[] PosLookupRecords { get; set; }
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format 3");
                 }
             }
             //----------------------------------------------------------------
@@ -1115,9 +1093,9 @@ namespace Typography.OpenFont.Tables
 
                 public CoverageTable CoverageTable { get; set; }
                 public PosRuleSetTable[] PosRuleSetTables { get; set; }
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 8 Format 1");
                 }
             }
 
@@ -1136,9 +1114,9 @@ namespace Typography.OpenFont.Tables
                 public ushort LookaheadClassDefOffset { get; set; }
 
 
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 8 Format 2");
                 }
             }
             class LkSubTableType8Fmt3 : LookupSubTable
@@ -1160,9 +1138,9 @@ namespace Typography.OpenFont.Tables
                 //struct 	PosLookupRecord[PosCount] 	Array of PosLookupRecords,in design order
 
 
-                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                public override void DoGlyphPosition(List<GlyphPos> inputGlyphs, int startAt, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Sub Table Type 8 Format 3");
                 }
             }
 
@@ -1185,7 +1163,9 @@ namespace Typography.OpenFont.Tables
                     ushort format = reader.ReadUInt16();
                     switch (format)
                     {
-                        default: throw new NotSupportedException();
+                        default:
+                            Utils.WarnUnimplemented("Lookup Table Type 8 Format {0}", format);
+                            return;
                         case 1:
                             {
                                 //Chaining Context Positioning Format 1: Simple Chaining Context Glyph Positioning
@@ -1234,7 +1214,7 @@ namespace Typography.OpenFont.Tables
                                 subTable.PosClassSetTables = posClassSetTables;
                                 for (int n = 0; n < chainPosClassSetCnt; ++n)
                                 {
-                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + chainPosClassSetOffsetArray[i]);
+                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + chainPosClassSetOffsetArray[n]);
                                 }
                                 //----------
 

@@ -137,6 +137,29 @@ _pic 4: test with Thai glyph (complex script)_
 
 ---
 
+**Fun with Emoji !**
+--- 
+
+The Emoji and related features are contributed by [@samhocevar](https://github.com/samhocevar)
+
+![typo_symbol](https://user-images.githubusercontent.com/7447159/31386243-515fdace-adf0-11e7-8644-f7c4632d9856.png)
+
+_pic 1: Segoe UI Symbol Normal, on Win7_
+ 
+ 
+ 
+![typo_symbol2](https://user-images.githubusercontent.com/7447159/31386781-3a8b85f8-adf2-11e7-8791-c19abe1fee8f.png)
+
+_pic 2: FireFoxEmoji.ttf from https://github.com/mozilla/fxemoji_
+
+
+![typo_symbol3](https://user-images.githubusercontent.com/245089/31382300-77f4a52c-adb7-11e7-9510-1e07a76f41ab.png)
+
+_pic 3: Segoe UI Emoji Normal, Win 10_
+
+---
+
+
 License
 -----------
 Source code from multiple projects.
