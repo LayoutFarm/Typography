@@ -7,8 +7,8 @@ using System.IO;
 using System.Windows.Forms;
 
 using Typography.OpenFont;
+using Typography.Contours;
 using Typography.Rendering;
-
 using PixelFarm.Agg;
 using Typography.TextLayout;
 using PixelFarm.Drawing.Fonts;
