@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev, 
+﻿//MIT, 2016-2017, WinterDev
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -7,13 +7,12 @@ using PixelFarm.Agg;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
-using Typography.Contours;
 
 namespace PixelFarm.Drawing.Fonts
 {
 
 
-    class DevVxsTextPrinter : VxsTextPrinter
+    class DevVxsTextPrinter : DevTextPrinterBase
     {
 
         GlyphPathBuilder _glyphPathBuilder;
@@ -26,8 +25,8 @@ namespace PixelFarm.Drawing.Fonts
         GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
         Typeface _currentTypeface;
 
-        public DevVxsTextPrinter(CanvasPainter canvasPainter, IFontLoader fontLoader)
-            : base(canvasPainter, fontLoader)
+
+        public DevVxsTextPrinter()
         {
 
         }
@@ -88,7 +87,7 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
-
+        public CanvasPainter TargetCanvasPainter { get; set; }
         public override void DrawCaret(float xpos, float ypos)
         {
             CanvasPainter p = this.TargetCanvasPainter;
@@ -106,87 +105,99 @@ namespace PixelFarm.Drawing.Fonts
 
         }
 
-        //public override void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos)
-        //{
-        //    CanvasPainter canvasPainter = this.TargetCanvasPainter;
-        //    Typeface typeface = _glyphPathBuilder.Typeface;
-        //    //3. layout glyphs with selected layout technique
-        //    //TODO: review this again, we should use pixel?
+        VertexStore GetGlyphOrCreateNew(ushort glyphIndex)
+        {
+            VertexStore glyphVxs;
+            if (!hintGlyphCollection.TryGetCacheGlyph(glyphIndex, out glyphVxs))
+            {
+                //if not found then create new glyph vxs and cache it
+                _glyphPathBuilder.BuildFromGlyphIndex(glyphIndex, this.FontSizeInPoints);
+                //-----------------------------------
+                _tovxs.Reset();
+                _glyphPathBuilder.ReadShapes(_tovxs);
 
-        //    float fontSizePoint = this.FontSizeInPoints;
-        //    float scale = typeface.CalculateToPixelScaleFromPointSize(fontSizePoint);
+                //TODO: review here,
+                //float pxScale = _glyphPathBuilder.GetPixelScale();
+                glyphVxs = new VertexStore();
+                _tovxs.WriteOutput(glyphVxs, _vxsPool);
+                //
+                hintGlyphCollection.RegisterCachedGlyph(glyphIndex, glyphVxs);
+            }
+            return glyphVxs;
+        }
+
+        public override void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos)
+        {
+            CanvasPainter canvasPainter = this.TargetCanvasPainter;
+            Typeface typeface = _glyphPathBuilder.Typeface;
+            //3. layout glyphs with selected layout technique
+            //TODO: review this again, we should use pixel?
+
+            float fontSizePoint = this.FontSizeInPoints;
+            float scale = typeface.CalculateToPixelScaleFromPointSize(fontSizePoint);
 
 
-        //    //4. render each glyph
-        //    Color originalFillColor = canvasPainter.FillColor;
-        //    float ox = canvasPainter.OriginX;
-        //    float oy = canvasPainter.OriginY;
-        //    int endBefore = startAt + len;
+            //4. render each glyph
+            Color originalFillColor = canvasPainter.FillColor;
+            float ox = canvasPainter.OriginX;
+            float oy = canvasPainter.OriginY;
+            int endBefore = startAt + len;
 
-        //    Typography.OpenFont.Tables.COLR COLR = _currentTypeface.COLRTable;
-        //    Typography.OpenFont.Tables.CPAL CPAL = _currentTypeface.CPALTable;
-        //    bool hasColorGlyphs = (COLR != null) && (CPAL != null);
+            Typography.OpenFont.Tables.COLR COLR = _currentTypeface.COLRTable;
+            Typography.OpenFont.Tables.CPAL CPAL = _currentTypeface.CPALTable;
+            bool hasColorGlyphs = (COLR != null) && (CPAL != null);
 
-        //    //---------------------------------------------------
-        //    //consider use cached glyph, to increase performance 
-        //    hintGlyphCollection.SetCacheInfo(typeface, fontSizePoint, this.HintTechnique);
-        //    //---------------------------------------------------
-        //    foreach (GlyphPlan glyphPlan in glyphPlanList)
-        //    {
-        //        canvasPainter.SetOrigin(glyphPlan.ExactX + xpos, glyphPlan.ExactY + ypos);
+            //---------------------------------------------------
+            //consider use cached glyph, to increase performance 
+            hintGlyphCollection.SetCacheInfo(typeface, fontSizePoint, this.HintTechnique);
+            //---------------------------------------------------
 
-        //        List<ushort> glyphIndices = new List<ushort>();
-        //        List<Color> glyphColors = new List<Color>();
+            if (!hasColorGlyphs)
+            {
+                //no color info, simple render each glyph plan
+                foreach (GlyphPlan glyphPlan in glyphPlanList)
+                {
+                    canvasPainter.SetOrigin(glyphPlan.x * scale + xpos, glyphPlan.y * scale + ypos);
+                    canvasPainter.Fill(GetGlyphOrCreateNew(glyphPlan.glyphIndex));
+                }
+            }
+            else
+            {
+                //has some color
+                foreach (GlyphPlan glyphPlan in glyphPlanList)
+                {
+                    canvasPainter.SetOrigin(glyphPlan.x * scale + xpos, glyphPlan.y * scale + ypos);
+                    //
+                    ushort colorLayerStart;
+                    if (COLR.LayerIndices.TryGetValue(glyphPlan.glyphIndex, out colorLayerStart))
+                    {
+                        //we found color info for this glyph 
+                        ushort colorLayerCount = COLR.LayerCounts[glyphPlan.glyphIndex];
+                        byte r, g, b, a;
+                        for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                        {
+                            ushort gIndex = COLR.GlyphLayers[c];
 
-        //        ushort colorLayerStart, colorLayerCount;
-        //        if (hasColorGlyphs && COLR.LayerIndices.TryGetValue(glyphPlan.glyphIndex, out colorLayerStart))
-        //        {
-        //            colorLayerCount = _currentTypeface.COLRTable.LayerCounts[glyphPlan.glyphIndex];
-        //            for (int i = colorLayerStart; i < colorLayerStart + colorLayerCount; ++i)
-        //            {
-        //                glyphIndices.Add(COLR.GlyphLayers[i]);
-        //                int palette = 0; // FIXME: assume palette 0 for now
-        //                byte[] rgba = CPAL.Colors[CPAL.Palettes[palette] + COLR.GlyphPalettes[i]];
-        //                glyphColors.Add(new Color(rgba[0], rgba[1], rgba[2]));
-        //            }
-        //        }
-        //        else
-        //        {
-        //            glyphIndices.Add(glyphPlan.glyphIndex);
-        //            glyphColors.Add(originalFillColor);
-        //        }
+                            int palette = 0; // FIXME: assume palette 0 for now 
+                            CPAL.GetColor(
+                                CPAL.Palettes[palette] + COLR.GlyphPalettes[c], //index
+                                out r, out g, out b, out a);
+                            canvasPainter.FillColor = new Color(r, g, b);//? a component
+                            canvasPainter.Fill(GetGlyphOrCreateNew(gIndex));
+                        }
+                    }
+                    else
+                    {
+                        //no color info for this glyph
+                        canvasPainter.Fill(GetGlyphOrCreateNew(glyphPlan.glyphIndex));
+                    }
+                }
+            }
 
-        //        //-----------------------------------
-        //        //TODO: review here ***
-        //        //PERFORMANCE revisit here
-        //        //if we have create a vxs we can cache it for later use?
-        //        //-----------------------------------
-        //        for (int i = 0; i < glyphIndices.Count; ++i)
-        //        {
-        //            VertexStore glyphVxs;
-        //            if (!hintGlyphCollection.TryGetCacheGlyph(glyphIndices[i], out glyphVxs))
-        //            {
-        //                //if not found then create new glyph vxs and cache it
-        //                _glyphPathBuilder.BuildFromGlyphIndex(glyphIndices[i], fontSizePoint);
-        //                //-----------------------------------
-        //                _tovxs.Reset();
-        //                _glyphPathBuilder.ReadShapes(_tovxs);
-
-        //                //TODO: review here,
-        //                //float pxScale = _glyphPathBuilder.GetPixelScale();
-        //                glyphVxs = new VertexStore();
-        //                _tovxs.WriteOutput(glyphVxs, _vxsPool);
-        //                //
-        //                hintGlyphCollection.RegisterCachedGlyph(glyphIndices[i], glyphVxs);
-        //            }
-        //            canvasPainter.FillColor = glyphColors[i];
-        //            canvasPainter.Fill(glyphVxs);
-        //        }
-        //    }
-        //    //restore prev origin
-        //    canvasPainter.SetOrigin(ox, oy);
-        //    canvasPainter.FillColor = originalFillColor;
-        //}
+            //restore prev origin
+            canvasPainter.SetOrigin(ox, oy);
+            canvasPainter.FillColor = originalFillColor;
+        }
 
         void UpdateGlyphLayoutSettings()
         {

@@ -163,12 +163,32 @@ namespace Typography.OpenFont.Tables
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
 
+
+                //
+                //https://www.microsoft.com/typography/otspec/gsub.htm#ES
+                //LookupType 7: Extension Substitution
+                //This lookup provides a mechanism whereby any other lookup type's subtables are stored 
+                //at a 32-bit offset location in the 'GSUB' table. 
+                //This is needed if the total size of the subtables exceeds the 16-bit
+                //limits of the various other offsets in the 'GSUB' table. 
+                //In this specification,
+                //the subtable stored at the 32-bit offset location is termed the “extension” subtable.
+                //---
+                //This subtable type uses one format: ExtensionSubstFormat1.
+                //7.1 Extension Substitution Subtable Format 1
+                //Type Name    Description
+                //uint16  substFormat Format identifier.Set to 1.
+                //uint16 extensionLookupType     Lookup type of subtable referenced by extensionOffset(that is, the extension subtable).
+                //Offset32 extensionOffset     Offset to the extension subtable, of lookup type extensionLookupType, relative to the start of the ExtensionSubstFormat1 subtable.
+                //---
+                //
                 // Substitution Lookup Record
                 //
                 // When an OpenType layout engine encounters a LookupType 7 Lookup table, it shall:
                 //
                 // Proceed as though the Lookup table's LookupType field were set to the ExtensionLookupType of the subtables.
                 // Proceed as though each extension subtable referenced by ExtensionOffset replaced the LookupType 7 subtable that referenced it.
+
                 if (lookupType == 7)
                 {
                     for (int j = 0; j < subTableCount; ++j)
