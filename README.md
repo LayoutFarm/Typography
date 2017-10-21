@@ -1,4 +1,4 @@
-![Typography, this img was rendered with this lib, in subpixel rendering mode](https://github.com/LayoutFarm/Typography/blob/master/screenshots/title2.png)
+![Typography, this img was rendered with this lib, in subpixel rendering mode](https://user-images.githubusercontent.com/7447159/31848163-cc9e00fe-b655-11e7-8a40-69258e440c7a.png)
 ===========
 
 Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.
