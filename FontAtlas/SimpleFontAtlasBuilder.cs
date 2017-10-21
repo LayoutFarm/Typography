@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using PixelFarm.Drawing.Fonts;
+using Typography.Contours;
 
 namespace Typography.Rendering
 {

@@ -56,7 +56,7 @@
     <Compile Include="GlyphAnalysis\Rect.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
+    <ProjectReference Include="..\PixelFarm\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
       <Name>PixelFarm.Triangulation</Name>
     </ProjectReference>
