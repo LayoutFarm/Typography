@@ -2,6 +2,9 @@
 
 namespace PixelFarm.Drawing
 {
+    /// <summary>
+    /// review this name again
+    /// </summary>
     public interface IFonts
     {
         float MeasureWhitespace(RequestFont f);
@@ -11,7 +14,7 @@ namespace PixelFarm.Drawing
             out int charFitWidth);
         void CalculateGlyphAdvancePos(char[] str, int startAt,
             int len, RequestFont font, int[] glyphXAdvances);
-        void Dispose();
+         
     }
 
 }

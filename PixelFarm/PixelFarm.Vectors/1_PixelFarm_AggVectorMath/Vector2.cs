@@ -75,7 +75,13 @@ namespace PixelFarm.VectorMath
             this.x = vector.x;
             this.y = vector.y;
         }
-
+        public Vector2 NewLength(double newLength)
+        {
+            //radian
+            double atan = Math.Atan2(y, x);
+            return new Vector2(Math.Cos(atan) * newLength,
+                        Math.Sin(atan) * newLength);
+        }
         #endregion
 
         #region Properties
@@ -153,9 +159,16 @@ namespace PixelFarm.VectorMath
 
         #endregion
 
-        public void Rotate(double radians)
+        public Vector2 RotateInDegree(double deg)
         {
-            this = Vector2.Rotate(this, radians);
+           
+            double rad = deg * (System.Math.PI / 180.0f); //convert from degree to rad 
+            double sin = System.Math.Sin(rad);
+            double cos = System.Math.Cos(rad);
+
+            return new Vector2(
+                x * cos - y * sin, 
+                x * sin + y * cos);
         }
 
         public double GetAngle()
@@ -544,21 +557,21 @@ namespace PixelFarm.VectorMath
         #endregion
 
         #region Rotate
-        public static Vector2 Rotate(Vector2 toRotate, double radians)
-        {
-            Vector2 temp;
-            Rotate(ref toRotate, radians, out temp);
-            return temp;
-        }
+        //public static Vector2 Rotate(Vector2 toRotate, double radians)
+        //{
+        //    Vector2 temp;
+        //    Rotate(ref toRotate, radians, out temp);
+        //    return temp;
+        //}
 
-        public static void Rotate(ref Vector2 input, double radians, out Vector2 output)
-        {
-            double Cos, Sin;
-            Cos = (double)System.Math.Cos(radians);
-            Sin = (double)System.Math.Sin(radians);
-            output.x = input.x * Cos - input.y * Sin;
-            output.y = input.y * Cos + input.x * Sin;
-        }
+        //public static void Rotate(ref Vector2 input, double radians, out Vector2 output)
+        //{
+        //    double Cos, Sin;
+        //    Cos = (double)System.Math.Cos(radians);
+        //    Sin = (double)System.Math.Sin(radians);
+        //    output.x = input.x * Cos - input.y * Sin;
+        //    output.y = input.y * Cos + input.x * Sin;
+        //}
         #endregion
 
         #region Lerp

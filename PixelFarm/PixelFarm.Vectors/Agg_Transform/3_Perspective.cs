@@ -62,11 +62,7 @@ namespace PixelFarm.Agg.Transform
             tx = a.tx; ty = a.ty; w2 = a.w2;
         }
 
-        // Rectangle to quadrilateral
-        public Perspective(RectD r, double[] quad)
-            : this(r.Left, r.Bottom, r.Right, r.Top, quad)
-        {
-        }
+        // Rectangle to quadrilateral s
         public Perspective(double x1, double y1, double x2, double y2, double[] quad)
         {
             unsafe
@@ -622,31 +618,6 @@ namespace PixelFarm.Agg.Transform
             y = Math.Sqrt(shy * shy + sy * sy);
         }
 
-        public VertexStore TransformToVxs(VertexStoreSnap snap, VertexStore vxs)
-        {
-            var vsnapIter = snap.GetVertexSnapIter();
-            double x, y;
-            VertexCmd cmd;
-            do
-            {
-                cmd = vsnapIter.GetNextVertex(out x, out y);
-                this.Transform(ref x, ref y);
-                vxs.AddVertex(x, y, cmd);
-            } while (!VertexHelper.IsEmpty(cmd));
-            return vxs;
-        }
-        public VertexStore TransformToVxs(VertexStore src,VertexStore vxs)
-        {
-            VertexCmd cmd;
-            double x, y;
-            int count = src.Count;             
-            for (int i = 0; i < count; ++i)
-            {
-                cmd = src.GetVertex(i, out x, out y);
-                this.Transform(ref x, ref y);
-                vxs.AddVertex(x, y, cmd);
-            }
-            return vxs;
-        }
+        
     }
 }

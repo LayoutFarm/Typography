@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 namespace PixelFarm.Agg.VertexSource
 {
     //=====================================================================arc
@@ -40,7 +39,7 @@ namespace PixelFarm.Agg.VertexSource
         double endAngle;
         double m_Scale;
         ArcDirection m_Direction;
-        double flatenDeltaAngle;
+        double flattenDeltaAngle;
         bool m_IsInitialized;
         //------------        
         double startX;
@@ -101,11 +100,30 @@ namespace PixelFarm.Agg.VertexSource
             this.endX = endX;
             this.endY = endY;
         }
+        //
+        public double StartX { get { return this.startX; } }
+        public double StartY { get { return this.startY; } }
+        //
+        public double EndX { get { return this.endX; } }
+        public double EndY { get { return this.endY; } }
+        //
+        public double OriginX { get { return this.originX; } }
+        public double OriginY { get { return this.originY; } }
+        //
+        public double StartAngle { get { return this.startAngle; } }
+        public double EndAngle { get { return this.endAngle; } }
+        //
+        public double RadiusX { get { return this.radiusX; } }
+        public double RadiusY { get { return this.radiusY; } }
+        //
+        public int CalculateNSteps { get { return this.calculateNSteps; } }
+        public double FlattenDeltaAngle { get { return this.flattenDeltaAngle; } }
         public bool UseStartEndLimit
         {
             get;
             set;
         }
+
         public double ApproximateScale
         {
             get { return this.m_Scale; }
@@ -119,76 +137,10 @@ namespace PixelFarm.Agg.VertexSource
             }
         }
 
-        public IEnumerable<VertexData> GetVertexIter()
-        {
-            // go to the start
-            if (UseStartEndLimit)
-            {
-                //---------------------------------------------------------
-                VertexData vertexData = new VertexData();
-                vertexData.command = VertexCmd.MoveTo;
-                vertexData.x = startX;
-                vertexData.y = startY;
-                yield return vertexData;
-                //---------------------------------------------------------
-                double angle = startAngle;
-                vertexData.command = VertexCmd.LineTo;
-                //calculate nsteps
-                int n = 0;
-                while (n < calculateNSteps - 1)
-                {
-                    angle += flatenDeltaAngle;
-                    vertexData.x = originX + Math.Cos(angle) * radiusX;
-                    vertexData.y = originY + Math.Sin(angle) * radiusY;
-                    yield return vertexData;
-                    n++;
-                }
-
-                //while ((angle < endAngle - flatenDeltaAngle / 4) == (((int)ArcDirection.CounterClockWise) == 1))
-                //{
-                //    angle += flatenDeltaAngle;
-                //    vertexData.x = originX + Math.Cos(angle) * radiusX;
-                //    vertexData.y = originY + Math.Sin(angle) * radiusY;
-
-                //    yield return vertexData;
-                //}
-                //---------------------------------------------------------
-                vertexData.x = endX;
-                vertexData.y = endY;
-                yield return vertexData;
-                vertexData.command = VertexCmd.NoMore;
-                yield return vertexData;
-            }
-            else
-            {
-                VertexData vertexData = new VertexData();
-                vertexData.command = VertexCmd.MoveTo;
-                vertexData.x = originX + Math.Cos(startAngle) * radiusX;
-                vertexData.y = originY + Math.Sin(startAngle) * radiusY;
-                yield return vertexData;
-                //---------------------------------------------------------
-                double angle = startAngle;
-                vertexData.command = VertexCmd.LineTo;
-                while ((angle < endAngle - flatenDeltaAngle / 4) == (((int)ArcDirection.CounterClockWise) == 1))
-                {
-                    angle += flatenDeltaAngle;
-                    vertexData.x = originX + Math.Cos(angle) * radiusX;
-                    vertexData.y = originY + Math.Sin(angle) * radiusY;
-                    yield return vertexData;
-                }
-                //---------------------------------------------------------
-                vertexData.x = originX + Math.Cos(endAngle) * radiusX;
-                vertexData.y = originY + Math.Sin(endAngle) * radiusY;
-                yield return vertexData;
-                vertexData.command = VertexCmd.NoMore;
-                yield return vertexData;
-            }
-        }
-
         void Normalize(double angle1, double angle2, ArcDirection direction)
         {
             double ra = (Math.Abs(radiusX) + Math.Abs(radiusY)) / 2;
-            flatenDeltaAngle = Math.Acos(ra / (ra + 0.125 / m_Scale)) * 2;
+            flattenDeltaAngle = Math.Acos(ra / (ra + 0.125 / m_Scale)) * 2;
             if (direction == ArcDirection.CounterClockWise)
             {
                 while (angle2 < angle1)
@@ -202,13 +154,13 @@ namespace PixelFarm.Agg.VertexSource
                 {
                     angle1 += Math.PI * 2.0;
                 }
-                flatenDeltaAngle = -flatenDeltaAngle;
+                flattenDeltaAngle = -flattenDeltaAngle;
             }
             m_Direction = direction;
             startAngle = angle1;
             endAngle = angle2;
             m_IsInitialized = true;
-            calculateNSteps = (int)Math.Floor(((endAngle - startAngle) / flatenDeltaAngle));
+            calculateNSteps = (int)Math.Floor(((endAngle - startAngle) / flattenDeltaAngle));
         }
     }
 }

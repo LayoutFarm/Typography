@@ -13,7 +13,6 @@
 // Contact: mcseem@antigrain.com
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
-//----------------------------------------------------------------------------
 
 using System;
 using PixelFarm.Drawing;
@@ -27,6 +26,7 @@ namespace PixelFarm.Agg
     }
 
 
+
     public partial class ScanlineSubPixelRasterizer
     {
         //this class design for render 32 bits RGBA  
@@ -34,13 +34,22 @@ namespace PixelFarm.Agg
         TempForwardAccumBuffer _forwardTempBuff = new TempForwardAccumBuffer();
         /// grey scale 4, 1/9 lcd lookup table
         /// </summary> 
-        static readonly LcdDistributionLut s_g4_1_3LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 3f, 2f / 9f, 1f / 9f);
+        static readonly LcdDistributionLut s_g9_3_2_1 = LcdDistributionLut.EasyLut(255, 3, 2, 1);
+        //---------------------------------
+        //Mixim's:
+        // Try to play with different coefficients for the primary,
+        // secondary, and tertiary distribution weights.
+        // Steve Gibson recommends 1/3, 2/9, and 1/9, but it produces 
+        // too blur edges. It's better to increase the weight of the 
+        // primary and secondary pixel, then the text looks much crisper 
+        // with inconsiderably increased "color fringing".
+        //---------------------------------
         /// <summary>
         /// grey scale 4, 1/8 lcd lookup table
         /// </summary>
-        static readonly LcdDistributionLut s_g4_1_2LcdLut = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray4, 1f / 2f, 1f / 4f, 1f / 8f);
+        //static readonly LcdDistributionLut s_g8_4_2_1 = new LcdDistributionLut(LcdDistributionLut.GrayLevels.Gray64, 4f / 8f, 2f / 8f, 0.0001f / 8f);
+        static readonly LcdDistributionLut s_g8_4_2_1 = new LcdDistributionLut(255, 4f / 8f, 2f / 8f, 1f / 8f);
         Color _color;
-
         const int BASE_MASK = 255;
         //in this case EXISTING_A (existing alpha always 0) 
         //const int EXISTING_A = 0; 
@@ -54,12 +63,40 @@ namespace PixelFarm.Agg
         SingleLineBuffer _grayScaleLine = new SingleLineBuffer();
         LcdDistributionLut _currentLcdLut = null;
 
+        ////----------------
+        //InternalBrightnessAndContrastAdjustment _brightnessAndContrast = new InternalBrightnessAndContrastAdjustment();
+
+
         internal ScanlineSubPixelRasterizer()
         {
             //default
-            _currentLcdLut = s_g4_1_2LcdLut;
+            _currentLcdLut = s_g9_3_2_1;
+            //
+            //I try adjust color distribution with img filter
+            //set contrast =0 => disable this filter
+            //_brightnessAndContrast.Contrast = 30;
         }
-        public void RenderScanline(
+        public LcdDistributionLut LcdLut
+        {
+            get { return _currentLcdLut; }
+            set
+            {
+                _currentLcdLut = value;
+            }
+        }
+        //public int ContrastAdjustmentValue
+        //{
+        //    get { return _brightnessAndContrast.Contrast; }
+        //    set { _brightnessAndContrast.Contrast = value; }
+
+        //}
+        //public int BrightnessAdjustmentValue
+        //{
+        //    get { return _brightnessAndContrast.Brightness; }
+        //    set { _brightnessAndContrast.Brightness = value; } 
+        //}
+
+        public void RenderScanlines(
             IImageReaderWriter dest,
             ScanlineRasterizer sclineRas,
             Scanline scline,
@@ -69,19 +106,17 @@ namespace PixelFarm.Agg
 #if DEBUG
             int dbugMinScanlineCount = 0;
 #endif
+            //----------------------------------------------------------------------------
+            //_brightnessAndContrast.UpdateIfNeed(); //update values if need
+            //----------------------------------------------------------------------------
 
             //1. ensure single line buffer width
             _grayScaleLine.EnsureLineStride(dest.Width + 4);
             //2. setup vars
             byte[] dest_buffer = dest.GetBuffer();
-            int dest_w = dest.Width;
-            int dest_h = dest.Height;
-            int dest_stride = dest.Stride;
-            int src_w = dest_w;
-            int src_stride = dest_stride;
+            int dest_stride = this._destImgStride = dest.Stride;
             //*** set color before call Blend()
             this._color = color;
-
             byte color_alpha = color.alpha;
             //---------------------------
             //3. loop, render single scanline with subpixel rendering 
@@ -115,22 +150,20 @@ namespace PixelFarm.Agg
                         _grayScaleLine.BlendHL(x, x2, color_alpha, covers[span.cover_index]);
                     }
                 }
+
                 //
-                BlendScanlineForAggSubPix(dest_buffer, dest_stride, scline.Y, src_w, src_stride, lineBuff); //for agg subpixel rendering
+                BlendScanlineForAggSubPix(
+                    dest_buffer,
+                    (dest_stride * scline.Y) + (0 * 4), //4 color component, TODO: review destX again, this version we write entire a scanline                 
+                    lineBuff,
+                    sclineRas.MaxX); //for agg subpixel rendering
 #if DEBUG
                 dbugMinScanlineCount++;
 #endif
             }
         }
 
-        public LcdDistributionLut LcdLut
-        {
-            get { return _currentLcdLut; }
-            set
-            {
-                _currentLcdLut = value;
-            }
-        }
+        int _destImgStride;
 
         /// <summary>
         /// blend gray-scale line buffer to destImgBuffer, with the subpixel rendering technique
@@ -141,15 +174,15 @@ namespace PixelFarm.Agg
         /// <param name="srcW"></param>
         /// <param name="srcStride"></param>
         /// <param name="grayScaleLineBuffer"></param>
-        void BlendScanlineForAggSubPix(byte[] destImgBuffer, int destStride, int y, int srcW, int srcStride, byte[] grayScaleLineBuffer)
+        void BlendScanlineForAggSubPix(byte[] destImgBuffer,
+            int destImgIndex, //dest index or write buffer 
+            byte[] grayScaleLineBuffer,
+            int srcMaxX)
         {
             //backup
             LcdDistributionLut lcdLut = _currentLcdLut;
             _tempForwardAccumBuffer.Reset();
-            int srcIndex = 0;
-            //start pixel
-            int destImgIndex = 0;
-            int destX = 0;
+
             //-----------------
             //TODO: review color order here
             //B-G-R-A?   
@@ -159,12 +192,53 @@ namespace PixelFarm.Agg
             byte color_alpha = _color.alpha;
             //-----------------
             //single line 
-            srcIndex = 0;
-            destImgIndex = (destStride * y) + (destX * 4); //4 color component
+            //from tripple width (x3) grayScaleLineBuffer
+            //scale (merge) down to x1 destIndex 
+            //-----------------
+            int srcIndex = 0;
+#if DEBUG
+            int dbugDestImgIndex = destImgIndex;
+            //int dbugSrcW = srcW; //temp store this for debug
+#endif
 
 
-            int nwidth = srcW;
-            while (nwidth > 3)
+            int srcW = Math.Min(srcMaxX + 8, grayScaleLineBuffer.Length);
+            {
+                //start with pre-accum ***, no writing occurs
+                byte e_0, e_1, e_2; //energy 0,1,2 
+                {
+
+                    byte write0 = grayScaleLineBuffer[srcIndex];
+                    byte write1 = grayScaleLineBuffer[srcIndex + 1];
+                    byte write2 = grayScaleLineBuffer[srcIndex + 2];
+
+                    //0
+                    _tempForwardAccumBuffer.WriteAccumAndReadBack(
+                        lcdLut.TertiaryFromRaw255(write0),
+                        lcdLut.SecondaryFromRaw255(write0),
+                        lcdLut.PrimaryFromRaw255(write0),
+                        out e_0);
+                    //1
+                    _tempForwardAccumBuffer.WriteAccumAndReadBack(
+                        lcdLut.TertiaryFromRaw255(write1),
+                        lcdLut.SecondaryFromRaw255(write1),
+                        lcdLut.PrimaryFromRaw255(write1),
+                        out e_1);
+                    //2
+                    _tempForwardAccumBuffer.WriteAccumAndReadBack(
+                        lcdLut.TertiaryFromRaw255(write2),
+                        lcdLut.SecondaryFromRaw255(write2),
+                        lcdLut.PrimaryFromRaw255(write2),
+                        out e_2);
+                }
+                srcIndex += 3;
+                srcW -= 3;
+
+            }
+
+            //bool useContrastFilter = this.ContrastAdjustmentValue != 0;
+            //useContrastFilter = false;
+            while (srcW > 3)
             {
                 //------------
                 //TODO: add release mode code (optimized version)
@@ -176,49 +250,58 @@ namespace PixelFarm.Agg
 
                 byte e_0, e_1, e_2; //energy 0,1,2 
                 {
-                    byte write0 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex]);
-                    byte write1 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 1]);
-                    byte write2 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 2]);
+
+                    byte write0 = grayScaleLineBuffer[srcIndex];
+                    byte write1 = grayScaleLineBuffer[srcIndex + 1];
+                    byte write2 = grayScaleLineBuffer[srcIndex + 2];
 
                     //0
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write0),
-                        lcdLut.Secondary(write0),
-                        lcdLut.Primary(write0),
+                        lcdLut.TertiaryFromRaw255(write0),
+                        lcdLut.SecondaryFromRaw255(write0),
+                        lcdLut.PrimaryFromRaw255(write0),
                         out e_0);
                     //1
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write1),
-                        lcdLut.Secondary(write1),
-                        lcdLut.Primary(write1),
+                        lcdLut.TertiaryFromRaw255(write1),
+                        lcdLut.SecondaryFromRaw255(write1),
+                        lcdLut.PrimaryFromRaw255(write1),
                         out e_1);
                     //2
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write2),
-                        lcdLut.Secondary(write2),
-                        lcdLut.Primary(write2),
+                        lcdLut.TertiaryFromRaw255(write2),
+                        lcdLut.SecondaryFromRaw255(write2),
+                        lcdLut.PrimaryFromRaw255(write2),
                         out e_2);
+
                 }
 
+                //if (useContrastFilter)
+                //{
+                //    _brightnessAndContrast.ApplyBytes(ref e_2, ref e_1, ref e_0);
+                //}
+
+                //
                 //4. blend 3 pixels 
                 byte exc0 = destImgBuffer[destImgIndex];//existing color
                 byte exc1 = destImgBuffer[destImgIndex + 1];//existing color
                 byte exc2 = destImgBuffer[destImgIndex + 2];//existing color  
+
                 //byte exc0 = 255;// destImgBuffer[destImgIndex];//existing color
                 //byte exc1 = 255;// destImgBuffer[destImgIndex + 1];//existing color
                 //byte exc2 = 255;// destImgBuffer[destImgIndex + 2];//existing color  
                 //--------------------------------------------------------
                 //note: that we swap e_2 and e_0 on the fly***
-                //-------------------------------------------------------- 
+                //--------------------------------------------------------      
+
                 //write the 3 color-component of current pixel.
                 destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (e_2 * color_alpha)) + (exc0 << 16)) >> 16); //swap on the fly
                 destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - exc1) * (e_1 * color_alpha)) + (exc1 << 16)) >> 16);
                 destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - exc2) * (e_0 * color_alpha)) + (exc2 << 16)) >> 16);//swap on the fly
                 //---------------------------------------------------------
                 destImgIndex += 4;
-
                 srcIndex += 3;
-                nwidth -= 3;
+                srcW -= 3;
             }
             //---------
             //when finish each line
@@ -230,7 +313,7 @@ namespace PixelFarm.Agg
                 _tempForwardAccumBuffer.ReadRemaining4(out ec_r1, out ec_r2, out ec_r3, out ec_r4);
 
                 //we need 2 pixels,  
-                int remaining_dest = Math.Min((srcStride - (destImgIndex + 4)), 5);
+                int remaining_dest = Math.Min((this._destImgStride - (destImgIndex + 4)), 5);
                 if (remaining_dest < 1)
                 {
                     return;
@@ -241,6 +324,13 @@ namespace PixelFarm.Agg
                     default: throw new NotSupportedException();
                     case 5:
                         {
+
+
+                            //if (useContrastFilter)
+                            //{
+                            //    _brightnessAndContrast.ApplyBytes(ref ec_r3, ref ec_r2, ref ec_r1);
+                            //}
+
                             //1st round
                             byte exc0 = destImgBuffer[destImgIndex];//existing color
                             byte exc1 = destImgBuffer[destImgIndex + 1];//existing color
@@ -249,6 +339,7 @@ namespace PixelFarm.Agg
                             //--------------------------------------------------------
                             //note: that we swap ec_r3 and ec_r1 on the fly***
 
+                            //--------------------------------------------------------
                             destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (ec_r3 * color_alpha)) + (exc0 << 16)) >> 16); //swap on the fly
                             destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - exc1) * (ec_r2 * color_alpha)) + (exc1 << 16)) >> 16);
                             destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - exc2) * (ec_r1 * color_alpha)) + (exc2 << 16)) >> 16);//swap on the fly
@@ -264,6 +355,11 @@ namespace PixelFarm.Agg
                         break;
                     case 4:
                         {
+                            //if (useContrastFilter)
+                            //{
+                            //    _brightnessAndContrast.ApplyBytes(ref ec_r3, ref ec_r2, ref ec_r1);
+                            //}
+
                             //1st round
                             byte ec0 = destImgBuffer[destImgIndex];//existing color
                             byte ec1 = destImgBuffer[destImgIndex + 1];//existing color
@@ -289,6 +385,7 @@ namespace PixelFarm.Agg
                 }
             }
         }
+
 
 
 
@@ -343,27 +440,49 @@ namespace PixelFarm.Agg
 
                 byte e_0, e_1, e_2; //energy 0,1,2 
                 {
-                    byte write0 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex]);
-                    byte write1 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 1]);
-                    byte write2 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 2]);
+                    //byte write0 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex]);
+                    //byte write1 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 1]);
+                    //byte write2 = lcdLut.Convert255ToLevel(grayScaleLineBuffer[srcIndex + 2]);
+
+                    ////0
+                    //_tempForwardAccumBuffer.WriteAccumAndReadBack(
+                    //    lcdLut.TertiaryFromLevel(write0),
+                    //    lcdLut.SecondaryFromLevel(write0),
+                    //    lcdLut.PrimaryFromLevel(write0),
+                    //    out e_0);
+                    ////1
+                    //_tempForwardAccumBuffer.WriteAccumAndReadBack(
+                    //    lcdLut.TertiaryFromLevel(write1),
+                    //    lcdLut.SecondaryFromLevel(write1),
+                    //    lcdLut.PrimaryFromLevel(write1),
+                    //    out e_1);
+                    ////2
+                    //_tempForwardAccumBuffer.WriteAccumAndReadBack(
+                    //    lcdLut.TertiaryFromLevel(write2),
+                    //    lcdLut.SecondaryFromLevel(write2),
+                    //    lcdLut.PrimaryFromLevel(write2),
+                    //    out e_2);
+                    byte write0 = grayScaleLineBuffer[srcIndex];
+                    byte write1 = grayScaleLineBuffer[srcIndex + 1];
+                    byte write2 = grayScaleLineBuffer[srcIndex + 2];
 
                     //0
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write0),
-                        lcdLut.Secondary(write0),
-                        lcdLut.Primary(write0),
+                        lcdLut.TertiaryFromRaw255(write0),
+                        lcdLut.SecondaryFromRaw255(write0),
+                        lcdLut.PrimaryFromRaw255(write0),
                         out e_0);
                     //1
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write1),
-                        lcdLut.Secondary(write1),
-                        lcdLut.Primary(write1),
+                        lcdLut.TertiaryFromRaw255(write1),
+                        lcdLut.SecondaryFromRaw255(write1),
+                        lcdLut.PrimaryFromRaw255(write1),
                         out e_1);
                     //2
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write2),
-                        lcdLut.Secondary(write2),
-                        lcdLut.Primary(write2),
+                        lcdLut.TertiaryFromRaw255(write2),
+                        lcdLut.SecondaryFromRaw255(write2),
+                        lcdLut.PrimaryFromRaw255(write2),
                         out e_2);
                 }
 
@@ -505,21 +624,21 @@ namespace PixelFarm.Agg
 
                     //0
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write0),
-                        lcdLut.Secondary(write0),
-                        lcdLut.Primary(write0),
+                        lcdLut.TertiaryFromLevel(write0),
+                        lcdLut.SecondaryFromLevel(write0),
+                        lcdLut.PrimaryFromLevel(write0),
                         out e_0);
                     //1
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write1),
-                        lcdLut.Secondary(write1),
-                        lcdLut.Primary(write1),
+                        lcdLut.TertiaryFromLevel(write1),
+                        lcdLut.SecondaryFromLevel(write1),
+                        lcdLut.PrimaryFromLevel(write1),
                         out e_1);
                     //2
                     _tempForwardAccumBuffer.WriteAccumAndReadBack(
-                        lcdLut.Tertiary(write2),
-                        lcdLut.Secondary(write2),
-                        lcdLut.Primary(write2),
+                        lcdLut.TertiaryFromLevel(write2),
+                        lcdLut.SecondaryFromLevel(write2),
+                        lcdLut.PrimaryFromLevel(write2),
                         out e_2);
                 }
 
@@ -820,6 +939,10 @@ namespace PixelFarm.Agg
                 //default
                 EnsureLineStride(4);
             }
+            public int Stride
+            {
+                get { return this.stride; }
+            }
             public void EnsureLineStride(int stride8Bits)
             {
                 this.stride = stride8Bits;
@@ -1055,6 +1178,12 @@ namespace PixelFarm.Agg
         }
     }
 
+
+
+
+
+
+
     /// <summary>
     /// scanline rasterizer TO DESTINATION bitmap
     /// </summary>  
@@ -1110,7 +1239,7 @@ namespace PixelFarm.Agg
                     }
                     break;
                 case Agg.ScanlineRenderMode.SubPixelRendering:
-                    scSubPixRas.RenderScanline(dest, sclineRas, scline, color);
+                    scSubPixRas.RenderScanlines(dest, sclineRas, scline, color);
                     break;
                 case Agg.ScanlineRenderMode.Custom:
                     while (sclineRas.SweepScanline(scline))
@@ -1186,6 +1315,9 @@ namespace PixelFarm.Agg
     public class LcdDistributionLut
     {
 
+        //----------------------------------------------------------------------------
+        //port from original soure: http://antigrain.com/stuff/lcd_font.zip (MIT) 
+        //----------------------------------------------------------------------------
         // Sub-pixel energy distribution lookup table.
         // See description by Steve Gibson: http://grc.com/cttech.htm
         // The class automatically normalizes the coefficients
@@ -1233,73 +1365,85 @@ namespace PixelFarm.Agg
         //struct ggo_gray8 { enum { num_levels = 65, format = GGO_GRAY8_BITMAP }; };
 
 
-        public enum GrayLevels
-        {
-            /// <summary>
-            /// 4 level grey scale (0-3)
-            /// </summary>
-            Gray2,
-            /// <summary>
-            /// 16 levels grey scale (0-15)
-            /// </summary>
-            Gray4,
-            /// <summary>
-            /// 65 levels grey scale (0-64)
-            /// </summary>
-            Gray8
-        }
+        //public enum GrayLevels : byte
+        //{
+        //    /// <summary>
+        //    /// 4 level grey scale (0-3)
+        //    /// </summary>
+        //    Gray4 = 4,
+        //    /// <summary>
+        //    /// 16 levels grey scale (0-15)
+        //    /// </summary>
+        //    Gray16 = 16,
+        //    /// <summary>
+        //    /// 65 levels grey scale (0-64)
+        //    /// </summary>
+        //    Gray64 = 64
+        //}
 
-        GrayLevels grayLevel;
+
+        //look up table 
         byte[] m_primary;
         byte[] m_secondary;
         byte[] m_tertiary;
 
-        //--------------------------------
-        //coverage to primary,seconday,tertiary
-        //this is my extension
-        byte[] coverage_primary;
-        byte[] coverage_secondary;
-        byte[] coverage_tertiary;
-        //--------------------------------
-        int numLevel;
+        byte[] _primary_255;
+        byte[] _secondary_255;
+        byte[] _tertiary_255;
 
-        public LcdDistributionLut(LcdDistributionLut.GrayLevels grayLevel, double prim, double second, double tert)
+
+        int _nLevel;
+        public LcdDistributionLut(byte grayLevel, double prim, double second, double tert)
         {
-            this.grayLevel = grayLevel;
-
-            switch (grayLevel)
-            {
-                default: throw new System.NotSupportedException();
-                case GrayLevels.Gray2: numLevel = 5; break;
-                case GrayLevels.Gray4: numLevel = 17; break;
-                case GrayLevels.Gray8: numLevel = 65; break;
-            }
-            m_primary = new byte[numLevel];
-            m_secondary = new byte[numLevel];
-            m_tertiary = new byte[numLevel];
-
-            double norm = (255.0 / (numLevel - 1)) / (prim + second * 2 + tert * 2);
+            this._nLevel = grayLevel;
+            //switch (grayLevel)
+            //{
+            //    default: throw new System.NotSupportedException();
+            //    case GrayLevels.Gray4: _nLevel = (byte)grayLevel; break;
+            //    case GrayLevels.Gray16: _nLevel = (byte)grayLevel; break;
+            //    case GrayLevels.Gray64: _nLevel = (byte)grayLevel; break;
+            //}
+            //---------------------------------------------------------
+            m_primary = new byte[_nLevel + 1];
+            m_secondary = new byte[_nLevel + 1];
+            m_tertiary = new byte[_nLevel + 1];
+            //---------------------------------------------------------
+            double norm = (255.0 / (_nLevel)) / (prim + second * 2 + tert * 2);
             prim *= norm;
             second *= norm;
             tert *= norm;
-            for (int i = 0; i < numLevel; ++i)
+            for (int i = _nLevel; i >= 0; --i)
             {
                 m_primary[i] = (byte)Math.Floor(prim * i);
                 m_secondary[i] = (byte)Math.Floor(second * i);
                 m_tertiary[i] = (byte)Math.Floor(tert * i);
             }
 
-            coverage_primary = new byte[256];
-            coverage_secondary = new byte[256];
-            coverage_tertiary = new byte[256];
+            //0-255
+            _primary_255 = new byte[256];
+            _secondary_255 = new byte[256];
+            _tertiary_255 = new byte[256];
+            //--------------------------------
+
+            int n_level = _nLevel;
             for (int i = 0; i < 256; ++i)
             {
-                int toGreyScaleLevel = (byte)(((float)(i + 1) / 256f) * ((float)numLevel - 1));
-                coverage_primary[i] = m_primary[toGreyScaleLevel];
-                coverage_secondary[i] = m_secondary[toGreyScaleLevel];
-                coverage_tertiary[i] = m_tertiary[toGreyScaleLevel];
+                //convert to level;
+                //(byte)((orgLevel / 255f) * _nLevel);
+                byte level = (byte)((i / 255f) * n_level); //TODO: review here
+                _primary_255[i] = m_primary[level];
+                _secondary_255[i] = m_secondary[level];
+                _tertiary_255[i] = m_tertiary[level];
             }
+            //--------------------------------
+            //send lut to our contrast filter
+            //_contrastAdjustment.SetParameters(0, 30);
+            //_contrastAdjustment.ApplyGrayScale(_primary_255, _primary_255);
+            //_contrastAdjustment.ApplyGrayScale(_secondary_255, _secondary_255);
+            //_contrastAdjustment.ApplyGrayScale(_tertiary_255, _tertiary_255);
+            //--------------------------------
         }
+
         /// <summary>
         /// convert from original 0-255 to level for this lut
         /// </summary>
@@ -1307,35 +1451,42 @@ namespace PixelFarm.Agg
         /// <returns></returns>
         public byte Convert255ToLevel(byte orgLevel)
         {
-            return (byte)((((float)orgLevel + 1) / 256f) * (float)(numLevel - 1));
+            return (byte)(((orgLevel + 1f) / 256f) * _nLevel);
         }
-        public byte Primary(int greyLevelIndex)
+        //
+        public byte PrimaryFromLevel(int greyLevelIndex)
         {
             return m_primary[greyLevelIndex];
         }
-        public byte Secondary(int greyLevelIndex)
+        public byte SecondaryFromLevel(int greyLevelIndex)
         {
             return m_secondary[greyLevelIndex];
         }
-        public byte Tertiary(int greyLevelIndex)
+        public byte TertiaryFromLevel(int greyLevelIndex)
         {
             return m_tertiary[greyLevelIndex];
         }
-
-        //
-        public byte PrimaryFromCoverage(int coverage)
+        //-----------------------------------------------
+        public byte PrimaryFromRaw255(byte raw)
         {
-            return coverage_primary[coverage];
+            return _primary_255[raw];
+        }
+        public byte SecondaryFromRaw255(byte raw)
+        {
+            return _secondary_255[raw];
+        }
+        public byte TertiaryFromRaw255(byte raw)
+        {
+            return _tertiary_255[raw];
         }
 
-        public byte SecondayFromCoverage(int coverage)
+        public static LcdDistributionLut EasyLut(byte nlevel, float prim, float second, float tert)
         {
-            return coverage_secondary[coverage];
+            float total = prim + (2 * second) + (2 * tert);
+            return new LcdDistributionLut(nlevel, prim / total, second / total, tert / total);
         }
-        public byte TertiaryFromCoverage(int coverage)
-        {
-            return coverage_tertiary[coverage];
-        }
+
+
     }
 
 

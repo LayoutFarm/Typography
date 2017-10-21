@@ -1,4 +1,4 @@
-//BSD, 2014-2017, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -17,19 +17,21 @@
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
+//
+// Affine transformation classes.
+//
+//----------------------------------------------------------------------------
+//#ifndef AGG_TRANS_AFFINE_INCLUDED
+//#define AGG_TRANS_AFFINE_INCLUDED
+
+//#include <math.h>
+//#include "agg_basics.h"
+
 
 namespace PixelFarm.Agg.Transform
 {
     public interface ICoordTransformer
     {
         void Transform(ref double x, ref double y);
-    }
-    public static class ITransformExtension
-    {
-        public static void TransformToVertexSnap(this Affine affine, VertexStore src, VertexStore output)
-        {
-            affine.TransformToVxs(src, output); 
-        }
-
     }
 }

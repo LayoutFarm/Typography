@@ -1,4 +1,4 @@
-//BSD, 2014-2017, WinterDev
+﻿//BSD, 2014-2017, WinterDev
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -99,7 +99,7 @@ namespace PixelFarm.Agg.Transform
         Translate,
         Invert
     }
-
+ 
     public struct AffinePlan
     {
         public readonly AffineMatrixCommand cmd;
@@ -141,8 +141,6 @@ namespace PixelFarm.Agg.Transform
             return new AffinePlan(AffineMatrixCommand.Scale, both, both);
         }
     }
-
-
 
     public sealed class Affine : ICoordTransformer
     {
@@ -905,66 +903,7 @@ namespace PixelFarm.Agg.Transform
         {
             return Math.Abs(v1 - v2) <= (EPSILON);
         }
-        /// <summary>
-        /// we do NOT store vxs, return original outputVxs
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="outputVxs"></param>
-        public VertexStore TransformToVxs(VertexStore src, VertexStore outputVxs)
-        {
-            int count = src.Count;
-            VertexCmd cmd;
-            double x, y;
-            for (int i = 0; i < count; ++i)
-            {
-                cmd = src.GetVertex(i, out x, out y);
-                this.Transform(ref x, ref y);
-                outputVxs.AddVertex(x, y, cmd);
-            }
-
-            //outputVxs.HasMoreThanOnePart = src.HasMoreThanOnePart;
-            return outputVxs;
-        }
-        /// <summary>
-        /// we do NOT store vxs, return original outputVxs
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="outputVxs"></param>
-        /// <returns></returns>
-        public VertexStore TransformToVxs(VertexStoreSnap src, VertexStore outputVxs)
-        {
-            var snapIter = src.GetVertexSnapIter();
-            VertexCmd cmd;
-            double x, y;
-            while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
-            {
-                this.Transform(ref x, ref y);
-                outputVxs.AddVertex(x, y, cmd);
-            }
-            return outputVxs;
-        }
-        /// <summary>
-        ///we do NOT store vxs, return original outputVxs
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="dx"></param>
-        /// <param name="dy"></param>
-        /// <param name="outputVxs"></param>
-        /// <returns></returns>
-        public static VertexStore TranslateToVxs(VertexStore src, double dx, double dy, VertexStore outputVxs)
-        {
-            int count = src.Count;
-            VertexCmd cmd;
-            double x, y;
-            for (int i = 0; i < count; ++i)
-            {
-                cmd = src.GetVertex(i, out x, out y);
-                x += dx;
-                y += dy;
-                outputVxs.AddVertex(x, y, cmd);
-            }
-            return outputVxs;
-        }
+      
 
 
 
@@ -1040,6 +979,5 @@ namespace PixelFarm.Agg.Transform
         //    y = Math.Sqrt(shy * shy + sy * sy);
         //}
     }
-
 
 }

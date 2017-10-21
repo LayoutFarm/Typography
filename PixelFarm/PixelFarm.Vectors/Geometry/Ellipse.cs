@@ -22,9 +22,7 @@
 //
 //----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using PixelFarm.VectorMath;
+using System; 
 namespace PixelFarm.Agg.VertexSource
 {
     public class Ellipse
@@ -35,7 +33,7 @@ namespace PixelFarm.Agg.VertexSource
         public double radiusY;
         double m_scale = 1;
         int numSteps;
-        bool m_cw;
+        public bool m_cw;
         public Ellipse()
         {
             Set(0, 0, 1, 1, 4, false);
@@ -63,6 +61,7 @@ namespace PixelFarm.Agg.VertexSource
                 CalculateNumSteps();
             }
         }
+
         public double ApproximateScale
         {
             get { return this.m_scale; }
@@ -73,43 +72,7 @@ namespace PixelFarm.Agg.VertexSource
             }
         }
 
-        IEnumerable<VertexData> GetVertexIter()
-        {
-            VertexData vertexData = new VertexData();
-            vertexData.command = VertexCmd.MoveTo;
-            vertexData.x = originX + radiusX;
-            vertexData.y = originY;
-            yield return vertexData;
-            double anglePerStep = MathHelper.Tau / (double)numSteps;
-            double angle = 0;
-            vertexData.command = VertexCmd.LineTo;
-            if (m_cw)
-            {
-                for (int i = 1; i < numSteps; i++)
-                {
-                    angle += anglePerStep;
-                    vertexData.x = originX + Math.Cos(MathHelper.Tau - angle) * radiusX;
-                    vertexData.y = originY + Math.Sin(MathHelper.Tau - angle) * radiusY;
-                    yield return vertexData;
-                }
-            }
-            else
-            {
-                for (int i = 1; i < numSteps; i++)
-                {
-                    angle += anglePerStep;
-                    vertexData.x = originX + Math.Cos(angle) * radiusX;
-                    vertexData.y = originY + Math.Sin(angle) * radiusY;
-                    yield return vertexData;
-                }
-            }
-            vertexData.x = (int)EndVertexOrientation.CCW;
-            vertexData.y = 0;
-            vertexData.command = VertexCmd.Close;
-            yield return vertexData;
-            vertexData.command = VertexCmd.NoMore;
-            yield return vertexData;
-        }
+        public int NumSteps { get { return this.numSteps; } }
 
         void CalculateNumSteps()
         {
@@ -118,16 +81,6 @@ namespace PixelFarm.Agg.VertexSource
             numSteps = (int)Math.Round(2 * Math.PI / da);
         }
 
-        //-------------------------------------------------------
-        public VertexStoreSnap MakeVertexSnap(VertexStore vxs)
-        {
-            return new VertexStoreSnap(MakeVxs(vxs));
-        }
-        public VertexStore MakeVxs(VertexStore vxs)
-        {
-            //TODO: review here
-            return VertexStoreBuilder.CreateVxs(this.GetVertexIter(), vxs);
-        }
-        //-------------------------------------------------------
+
     }
 }

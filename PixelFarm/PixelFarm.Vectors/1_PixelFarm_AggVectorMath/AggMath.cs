@@ -136,6 +136,20 @@ namespace PixelFarm.Agg
         }
 
         //-------------------------------------------------------calc_intersection
+        /// <summary>
+        /// calculate line intersection
+        /// </summary>
+        /// <param name="aX1"></param>
+        /// <param name="aY1"></param>
+        /// <param name="aX2"></param>
+        /// <param name="aY2"></param>
+        /// <param name="bX1"></param>
+        /// <param name="bY1"></param>
+        /// <param name="bX2"></param>
+        /// <param name="bY2"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static bool CalcIntersect(double aX1, double aY1, double aX2, double aY2,
                                           double bX1, double bY1, double bX2, double bY2,
                                           out double x, out double y)
