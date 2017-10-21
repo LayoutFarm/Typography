@@ -31,9 +31,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Numerics;
 
-namespace Typography.Rendering
+
+namespace Typography.Contours
 {
     public struct Rectangle
     {
