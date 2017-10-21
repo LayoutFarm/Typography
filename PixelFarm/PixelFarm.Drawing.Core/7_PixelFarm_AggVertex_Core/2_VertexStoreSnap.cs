@@ -10,7 +10,7 @@ namespace PixelFarm.Agg
         VertexStore vxs;
         internal VertexSnapIter(VertexStoreSnap vsnap)
         {
-            this.vxs = vsnap.GetInternalVxs();
+            this.vxs = VertexStoreSnap.GetInternalVxs(vsnap);
             this.currentIterIndex = vsnap.StartAt;
         }
 
@@ -34,10 +34,7 @@ namespace PixelFarm.Agg
             this.vxs = vxs;
             this.startAt = startAt;
         }
-        public VertexStore GetInternalVxs()
-        {
-            return this.vxs;
-        }
+
         public int StartAt
         {
             get { return this.startAt; }
@@ -49,6 +46,10 @@ namespace PixelFarm.Agg
         public VertexSnapIter GetVertexSnapIter()
         {
             return new VertexSnapIter(this);
+        }
+        public static VertexStore GetInternalVxs(VertexStoreSnap snap)
+        {
+            return snap.vxs;
         }
     }
 

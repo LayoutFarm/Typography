@@ -111,8 +111,7 @@ namespace Typography.OpenFont
 
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
                 //---------------------------------------------
-                //about truetype instruction init
-                 
+                //about truetype instruction init 
 
                 //--------------------------------------------- 
                 var typeface = new Typeface(
@@ -131,8 +130,10 @@ namespace Typography.OpenFont
                 FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
                 //control values table
                 CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
-
-                typeface.ControlValues = cvtTable.controlValues;
+                if (cvtTable != null)
+                {
+                    typeface.ControlValues = cvtTable.controlValues;
+                }
                 if (fpgmTable != null)
                 {
                     typeface.FpgmProgramBuffer = fpgmTable.programBuffer;

@@ -31,7 +31,15 @@ namespace Typography.OpenFont
             }
             return arr;
         }
-
+        public static uint[] ReadUInt16ArrayAsUInt32Array(BinaryReader reader, int nRecords)
+        {
+            uint[] arr = new uint[nRecords];
+            for (int i = 0; i < nRecords; ++i)
+            {
+                arr[i] = reader.ReadUInt16();
+            }
+            return arr;
+        }
         public static uint[] ReadUInt32Array(BinaryReader reader, int nRecords)
         {
             uint[] arr = new uint[nRecords];

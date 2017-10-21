@@ -3,7 +3,7 @@
 using Typography.OpenFont;
 
 
-namespace Typography.Contours
+namespace Typography.Rendering
 {
     //-----------------------------------
     //sample GlyphPathBuilder :

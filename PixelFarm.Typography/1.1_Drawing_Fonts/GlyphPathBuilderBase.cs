@@ -26,7 +26,7 @@ namespace Typography.Contours
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
-            this.UseTrueTypeInstructions = false;//default?
+            this.UseTrueTypeInstructions = true;//default?
             _trueTypeInterpreter = new TrueTypeInterpreter();
             _trueTypeInterpreter.SetTypeFace(typeface);
             _recentPixelScale = 1;

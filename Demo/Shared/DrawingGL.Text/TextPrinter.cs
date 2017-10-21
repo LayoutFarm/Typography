@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
-using Typography.Contours;
 using Typography.Rendering;
+
 namespace DrawingGL.Text
 {
     /// <summary>

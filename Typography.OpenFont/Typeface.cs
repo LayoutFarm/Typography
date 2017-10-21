@@ -166,6 +166,8 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
+
+       
         private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         public ushort LookupIndex(int codepoint)
@@ -197,8 +199,7 @@ namespace Typography.OpenFont
         public Glyph Lookup(int codepoint)
         {
             return _glyphs[LookupIndex(codepoint)];
-        }
-
+        } 
         public Glyph GetGlyphByIndex(int glyphIndex)
         {
             return _glyphs[glyphIndex];
@@ -208,17 +209,15 @@ namespace Typography.OpenFont
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
         }
-
         public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
         {
+
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
-
         public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
-
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
             return _kern.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
@@ -380,7 +379,6 @@ namespace Typography.OpenFont
                 }
             }
         }
-
         public static class UnicodeLangBitsExtension
         {
             public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
@@ -393,5 +391,7 @@ namespace Typography.OpenFont
                     lower32 & 0xFFFF);
             }
         }
+
+
     }
 }

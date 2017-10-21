@@ -79,6 +79,9 @@ namespace Typography.Contours
         /// <param name="fontSizeInPoints"></param>
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
+            //temp fix,            
+
+
             if (_currentGlyphBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(typeface))
             {
                 //store current typeface to cache
@@ -98,6 +101,10 @@ namespace Typography.Contours
             }
             //----------------------------------------------
             this._currentFontSizeInPoints = fontSizeInPoints;
+
+            //@prepare'note, 2017-10-20
+            //temp fix, temp disable customfit if we build emoji font
+            _currentGlyphBuilder.TemporaryDisableCustomFit = (typeface.COLRTable != null) && (typeface.CPALTable != null);
             //------------------------------------------ 
             _hintGlyphCollection.SetCacheInfo(typeface, this._currentFontSizeInPoints, _currentHintTech);
         }
@@ -117,11 +124,14 @@ namespace Typography.Contours
                 GlyphDynamicOutline dynamicOutline = _currentGlyphBuilder.LatestGlyphFitOutline;
                 //-----------------------------------  
                 glyphMeshData = new GlyphMeshData();
-                glyphMeshData.avgXOffsetToFit = dynamicOutline.AvgXFitOffset;
-                glyphMeshData.orgBounds = dynamicOutline.OriginalGlyphControlBounds;
-                glyphMeshData.dynamicOutline = dynamicOutline;
-                Bounds orgGlyphBounds = dynamicOutline.OriginalGlyphControlBounds;
 
+                if (dynamicOutline != null)
+                {
+                    //has dynamic outline data
+                    glyphMeshData.avgXOffsetToFit = dynamicOutline.AvgXFitOffset;
+                    glyphMeshData.orgBounds = dynamicOutline.OriginalGlyphControlBounds;
+                    glyphMeshData.dynamicOutline = dynamicOutline;
+                }
                 _hintGlyphCollection.RegisterCachedGlyph(glyphIndex, glyphMeshData);
                 //-----------------------------------    
             }
@@ -149,13 +159,24 @@ namespace Typography.Contours
             {
                 //build vxs
                 _tovxs.Reset();
-
                 float pxscale = _currentTypeface.CalculateToPixelScaleFromPointSize(_currentFontSizeInPoints);
                 GlyphDynamicOutline dynamicOutline = glyphMeshData.dynamicOutline;
-                dynamicOutline.GenerateOutput(_tovxs, pxscale);
-                glyphMeshData.vxsStore = new VertexStore();
-                //----------------
-                _tovxs.WriteOutput(glyphMeshData.vxsStore, _vxsPool);
+                if (dynamicOutline != null)
+                {
+                    dynamicOutline.GenerateOutput(_tovxs, pxscale);
+                    glyphMeshData.vxsStore = new VertexStore();
+                    _tovxs.WriteOutput(glyphMeshData.vxsStore, _vxsPool);
+                }
+                else
+                {
+                    //no dynamic outline
+                    glyphMeshData.vxsStore = new VertexStore();
+                    _currentGlyphBuilder.ReadShapes(_tovxs);
+                    //TODO: review here,
+                    //float pxScale = _glyphPathBuilder.GetPixelScale(); 
+                    _tovxs.WriteOutput(glyphMeshData.vxsStore, _vxsPool);
+                }
+
 
             }
             return glyphMeshData.vxsStore;
@@ -170,7 +191,9 @@ namespace Typography.Contours
         float _fontSizeInPoints;
         public PixelScaleLayoutEngine()
         {
+            UseWithLcdSubPixelRenderingTechnique = true;//default
         }
+
         public GlyphMeshStore HintedFontStore
         {
             get { return _hintedFontStore; }
@@ -181,6 +204,10 @@ namespace Typography.Contours
         }
 
         public bool UseWithLcdSubPixelRenderingTechnique { get; set; }
+        /// <summary>
+        /// fit the glyph along alignment direction (horizontal, vertical)
+        /// </summary>
+        public bool UseWritingDirectionFitAligment { get; set; }
 
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
@@ -220,11 +247,11 @@ namespace Typography.Contours
             /// </summary>
             public float s_xmax;
             /// <summary>
-            /// scaled a part
+            /// distance, scaled a part
             /// </summary>
             public float s_a;
             /// <summary>
-            /// scaled c part
+            /// distance, scaled c part
             /// </summary>
             public float s_c;
 
@@ -234,21 +261,29 @@ namespace Typography.Contours
             public int final_advW;
 
 
-            public float c_diff;
-            public float s_xmax_to_final_advance;
+            public float m_c;
+            public float m_a;
+            public short m_a_adjust; //-1,0,1
+            public short m_c_adjust; //-1,0,1
 
+
+            public float m_max;
             public void SetData(float pxscale, GlyphControlParameters controlPars, short offsetX, short offsetY, ushort orgAdvW)
             {
 
+#if DEBUG
+                dbugIsPrev = false;
+#endif
                 s_avg_x_ToFit = controlPars.avgXOffsetToFit;
+
+
                 float o_a = controlPars.minX;
                 float o_c = (short)(orgAdvW - controlPars.maxX);
-
                 if (o_c < 0)
                 {
                     //TODO: review here ...
                     //? 
-                    o_c = 0;
+                    //o_c = 0;
                 }
                 //-----------------
                 //calculate...  
@@ -259,23 +294,100 @@ namespace Typography.Contours
                 s_xmax = pxscale * controlPars.maxX;
                 s_a = pxscale * o_a;
                 s_c = pxscale * o_c;
-                //--------------------------------------   
+
                 final_advW = ((s_advW - (int)s_advW) > 0.5) ?
                                 (int)(s_advW + 1) : //round
                                 (int)(s_advW);
-                s_xmax_to_final_advance = final_advW - s_xmax;
-                c_diff = final_advW - s_advW;
-            }
 
+                //
+                m_c = final_advW - (s_xmax + s_avg_x_ToFit);
+                m_a = s_avg_x_ToFit + s_xmin;
+
+                if (m_a < 0.5f)
+                {
+                    m_a_adjust = 1;
+                }
+                else
+                {
+                    m_a_adjust = 0;
+                }
+
+                if (final_advW - m_c > 1f)
+                {
+                    m_c_adjust = -1;
+                }
+                else
+                {
+                    m_c = 0;
+                }
+
+
+                m_max = s_xmax + s_avg_x_ToFit;
+
+            }
+#if DEBUG
+            public bool dbugIsPrev;
+            float dbug_M_C_Diff { get { return m_c - s_c; } }
+            float dbug_M_A_Diff { get { return m_a - s_a; } }
+            public override string ToString()
+            {
+                if (dbugIsPrev)
+                {
+                    return "m_c:" + m_c + ",diff:" + dbug_M_C_Diff;
+                }
+                else
+                {
+                    return "m_a" + m_a + ",diff:" + dbug_M_A_Diff;
+                }
+            }
+#endif
         }
+
+
+
+        void LayoutWithoutHorizontalFitAlign(IGlyphPositions posStream, List<GlyphPlan> outputGlyphPlanList)
+        {
+            //the default OpenFont layout without fit-to-writing alignment
+            int finalGlyphCount = posStream.Count;
+            float pxscale = _typeface.CalculateToPixelScaleFromPointSize(this._fontSizeInPoints);
+            double cx = 0;
+            short cy = 0;
+
+            for (int i = 0; i < finalGlyphCount; ++i)
+            {
+                short offsetX, offsetY, advW; //all from pen-pos
+                ushort glyphIndex = posStream.GetGlyph(i, out offsetX, out offsetY, out advW);
+
+                float s_advW = advW * pxscale;
+                float exact_x = (float)(cx + offsetX * pxscale);
+                float exact_y = (float)(cy + offsetY * pxscale);
+
+                outputGlyphPlanList.Add(new GlyphPlan(
+                   glyphIndex,
+                    exact_x,
+                    exact_y,
+                    advW));
+                cx += s_advW;
+            }
+        }
+
         public void Layout(IGlyphPositions posStream, List<GlyphPlan> outputGlyphPlanList)
         {
 
+            if (!UseWithLcdSubPixelRenderingTechnique)
+            {
+                //layout without fit to alignment direction
+                LayoutWithoutHorizontalFitAlign(posStream, outputGlyphPlanList);
+                return; //early exit
+            }
+            //------------------------------
             int finalGlyphCount = posStream.Count;
             float pxscale = _typeface.CalculateToPixelScaleFromPointSize(this._fontSizeInPoints);
-            float onepx = 1 / pxscale;
+#if DEBUG
+            float dbug_onepx = 1 / pxscale;
+#endif
             //
-            double cx = 0;
+            int cx = 0;
             short cy = 0;
             //
             //at this state, we need exact info at this specific pxscale
@@ -291,64 +403,59 @@ namespace Typography.Contours
                 GlyphControlParameters controlPars = _hintedFontStore.GetControlPars(glyphIndex);
                 current_ABC.SetData(pxscale, controlPars, offsetX, offsetY, (ushort)advW);
                 //-------------------------------------------------------------
+
                 if (i > 0)
                 {
-                    //ideal interspace
-                    //float idealInterGlyphSpace = -prev_ABC.s_avgToFit + prev_ABC.s_c + current_ABC.s_a + current_ABC.s_avgToFit;
-                    //float idealInterGlyphSpace = -prev_ABC.s_avgToFit + prev_ABC.s_c + current_ABC.s_a + current_ABC.s_avgToFit;
-                    float idealInterGlyphSpace = prev_ABC.s_c + current_ABC.s_a;
-                    if (idealInterGlyphSpace > 1 - 0.5f)
+                    //inter-glyph space
+                    //ideal space
+                    float ideal_space = prev_ABC.s_c + current_ABC.s_a;
+                    //actual space
+                    float actual_space = prev_ABC.m_c + current_ABC.m_a;
+
+                    if (ideal_space < 0)
                     {
-                        //please ensure that we have interspace atleast 1px
-                        //if not we just insert 1 px  ***
-
-                        //TODO: review here,
-                        //0.66f come from  2/3f of a pixel  
-                        if (idealInterGlyphSpace < 1 + 0.66f)
+                        //f-f
+                        //f-o 
+                        if (prev_ABC.s_c < 0)
                         {
-                            float fine_h = -prev_ABC.s_avg_x_ToFit + prev_ABC.c_diff + current_ABC.s_a + current_ABC.s_avg_x_ToFit;
-                            if (fine_h < 0)
-                            {
-                                //need more space
-                                //i-o
-                                cx += 1;
-                            }
-                            else
-                            {
-
-                                if (fine_h > 1)
-                                {
-                                    //o-i
-                                    cx -= 1;
-                                }
-                            }
+                            ideal_space = 0 + current_ABC.s_a;
+                        }
+                        if (ideal_space < 0)
+                        {
+                            ideal_space = 0;
+                        }
+                    }
+                    if (ideal_space >= 0)
+                    {
+                        //m-a
+                        //i-i
+                        //o-p 
+                        if (actual_space > 1.5 && actual_space - 0.5 > ideal_space)
+                        {
+                            cx--;
                         }
                         else
                         {
-                            if (-prev_ABC.s_avg_x_ToFit + current_ABC.s_avg_x_ToFit > 0.5f)
+                            if (actual_space < ideal_space)
                             {
-                                cx--;
+                                if (prev_ABC.final_advW + prev_ABC.m_c_adjust < prev_ABC.m_max)
+                                {
+                                    cx += current_ABC.m_a_adjust;
+                                }
+                            }
+                            else
+                            {
+                                if (prev_ABC.final_advW - prev_ABC.m_c + prev_ABC.m_c_adjust > prev_ABC.m_max)
+                                {
+                                    cx += prev_ABC.m_c_adjust;
+                                }
                             }
                         }
                     }
                     else
                     {
-                        float idealInterGlyphSpace2 = -prev_ABC.s_avg_x_ToFit + prev_ABC.s_c + current_ABC.s_a + current_ABC.s_avg_x_ToFit;
+                        //this should not occur?
 
-                        if (idealInterGlyphSpace2 < 0)
-                        {
-                            // eg i-j seq
-                            cx++;
-                        }
-                        else
-                        {
-
-                            if (prev_ABC.s_xmax_to_final_advance < 0)
-                            {
-                                //f-f
-                                cx++;
-                            }
-                        }
                     }
                 }
                 //------------------------------------------------------------- 
@@ -357,9 +464,7 @@ namespace Typography.Contours
 
                 //check if the current position can create a sharp glyph
                 int exact_x_floor = (int)exact_x;
-                float x_offset_to_fit = controlPars.avgXOffsetToFit;
-                //offset range that can produce sharp glyph (by observation)
-                //is between x_offset_to_fit - 0.3f to x_offset_to_fit + 0.3f 
+                float x_offset_to_fit = current_ABC.s_avg_x_ToFit;
 
                 float final_x = exact_x_floor + x_offset_to_fit;
                 if (UseWithLcdSubPixelRenderingTechnique)
@@ -376,10 +481,14 @@ namespace Typography.Contours
                 //
                 cx += current_ABC.final_advW;
                 //-----------------------------------------------
-                prev_ABC = current_ABC;//add to prev
-
+                prev_ABC = current_ABC;//copy current to prev
+#if DEBUG
+                prev_ABC.dbugIsPrev = true;
+#endif
                 // Console.WriteLine(exact_x + "+" + (x_offset_to_fit) + "=>" + final_x);
             }
         }
+
+
     }
 }

@@ -49,7 +49,7 @@ namespace Typography.OpenFont.Tables
                         ReadSubTableFormat0(reader, len - (3 * 2));//3 header field * 2 byte each
                         break;
                     case 2:
-                        //TODO: implement
+                    //TODO: implement
                     default:
                         Utils.WarnUnimplemented("Kerning Coverage Format {0}", kerCoverage.format);
                         break;

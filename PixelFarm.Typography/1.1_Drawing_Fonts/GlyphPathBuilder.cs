@@ -23,10 +23,9 @@ namespace Typography.Contours
 
 #if DEBUG
         public bool dbugAlwaysDoCurveAnalysis;
-
 #endif
 
-
+        internal bool TemporaryDisableCustomFit { get; set; }
         /// <summary>
         /// glyph dynamic edge offset
         /// </summary>
@@ -44,6 +43,12 @@ namespace Typography.Contours
             }
             else
             {
+                //
+                if (TemporaryDisableCustomFit)
+                {
+                    return;
+                }
+                //
                 if (this.UseVerticalHinting)
                 {
                     if (!_fitoutlineCollection.TryGetValue(glyphIndex, out _latestDynamicOutline))
@@ -83,8 +88,6 @@ namespace Typography.Contours
                             IsSizeChanged = false;
                         }
                     }
-
-
                 }
             }
         }
@@ -97,11 +100,10 @@ namespace Typography.Contours
                 base.ReadShapes(tx);
                 return;
             }
-            if (this.UseVerticalHinting)
+            if (!TemporaryDisableCustomFit && this.UseVerticalHinting)
             {
                 //read from our auto hint fitoutline
-                //need scale from original.
-
+                //need scale from original. 
                 float toPixelScale = Typeface.CalculateToPixelScale(RecentFontSizeInPixels);
                 if (toPixelScale < 0)
                 {

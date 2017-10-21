@@ -316,7 +316,8 @@ namespace SampleWinForms.UI
         }
         public void ShowEdge(EdgeLine edge)
         {
-            HasDebugMark = false; //reset for this 
+#if DEBUG
+            HasDebugMark = false; //reset for this  
 
             //---------------
             if (_testEdgeCount == _addDebugMarkOnEdgeNo)
@@ -337,7 +338,6 @@ namespace SampleWinForms.UI
             NodeInfo nodeInfo = new NodeInfo(NodeInfoKind.TessEdge, edge, _edgeLines.Count);
             TreeNode nodeEdge = new TreeNode();
             nodeEdge.Tag = nodeInfo;
-#if DEBUG
             nodeEdge.Text = "e id=" + edge.dbugId + ",count="
                 + _testEdgeCount + " : " + pnt_P.ToString() +
                 "=>" + pnt_Q.ToString();
@@ -346,12 +346,12 @@ namespace SampleWinForms.UI
             {
                 nodeEdge.Text += "_X_ (no perpendicular_bone)";
             }
-#endif
              
             _tessEdgesNode.Nodes.Add(nodeEdge);
             //------------------------------- 
 
             _edgeLines.Add(edge);
+#endif
         }
         public void ShowGlyphEdge(EdgeLine e, float x0, float y0, float x1, float y1)
         {

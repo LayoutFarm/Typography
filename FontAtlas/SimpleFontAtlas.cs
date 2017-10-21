@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 
 using Typography.Rendering;
-using Typography.Contours;
 
 namespace PixelFarm.Drawing.Fonts
 {
@@ -41,7 +40,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             return true;
         }
-        
+
 
     }
 

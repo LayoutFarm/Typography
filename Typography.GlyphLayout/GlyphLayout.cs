@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 namespace Typography.TextLayout
 {
-    
-
     public interface IPixelScaleLayout
     {
         void SetFont(Typeface typeface, float fontSizeInPoints);
@@ -14,32 +12,22 @@ namespace Typography.TextLayout
 
     public struct GlyphPlan
     {
-        public readonly ushort glyphIndex;//2 
-        public GlyphPlan(ushort glyphIndex, float exactX, float exactY, float extactAdvX)
+
+        public readonly ushort glyphIndex;
+        public GlyphPlan(ushort glyphIndex, float exactX, float exactY, float exactAdvX)
         {
             this.glyphIndex = glyphIndex;
             this.ExactX = exactX;
             this.ExactY = exactY;
-            this.AdvanceX = extactAdvX;
+            this.AdvanceX = exactAdvX;
         }
+        public float AdvanceX { get; private set; }
         public float ExactY { get; private set; }
         public float ExactX { get; private set; }
-        public float ExactRight
-        {
-            get
-            {
-                return ExactX + AdvanceX;
-            }
-        }
-        public float AdvanceX
-        {
-            get;
-            private set;
-        }
-        public bool AdvanceMoveForward
-        {
-            get { return this.AdvanceX > 0; }
-        }
+
+        public float ExactRight { get { return ExactX + AdvanceX; } }
+        public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
+
 #if DEBUG
         public override string ToString()
         {
@@ -47,7 +35,6 @@ namespace Typography.TextLayout
         }
 #endif
     }
-
 
 
     public enum PositionTechnique
@@ -207,7 +194,6 @@ namespace Typography.TextLayout
                 //-----------------------
 
                 //convert input char to input glyphs
- 
                 char ch = str[startAt + i];
                 int codepoint = ch;
                 if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)
@@ -216,7 +202,6 @@ namespace Typography.TextLayout
                     codepoint = char.ConvertToUtf32(ch, str[startAt + i]);
                 }
                 _inputGlyphs.AddGlyph(codepoint, typeface.LookupIndex(codepoint));
-				
             }
             //----------------------------------------------  
             //glyph substitution            
@@ -340,262 +325,6 @@ namespace Typography.TextLayout
                 }
             }
         }
-        //    /// <summary>
-        //    /// read latest layout output into outputGlyphPlanList
-        //    /// </summary>
-        //    public static void ReadOutput(this GlyphLayout glyphLayout, List<GlyphPlan> outputGlyphPlanList)
-        //{
-
-        //    GlyphPosStream glyphPositions = glyphLayout._glyphPositions; //from opentype's layout result, 
-        //    int finalGlyphCount = glyphPositions.Count;
-
-        //    short cy = 0;
-
-        //    PositionTechnique posTech = glyphLayout.PositionTechnique;
-        //    float pxscale = glyphLayout.PixelScale;
-
-        //    switch (posTech)
-        //    {
-        //        default: throw new NotSupportedException();
-        //        case PositionTechnique.OpenFont:
-        //            {
-        //                //--------------------------------------
-        //                //if the glyph is modified by some fitting engine
-        //                //the position of it may be changed from original glyph info
-        //                //(eg left, right bearing).
-        //                //so we need a modified glyph metrix info from the fitting engine.
-        //                //--------------------------------------
-        //                IGridFittingEngine gridFittingEngine = glyphLayout.GridFittingEngine;
-        //                gridFittingEngine = null;
-
-        //                if (gridFittingEngine != null)
-        //                {
-        //                    //use grid fitting engine
-        //                    gridFittingEngine.SetPixelScale(pxscale);
-        //                    //use original
-        //                    double cx = 0;
-        //                    for (int i = 0; i < finalGlyphCount; ++i)
-        //                    {
-        //                        //get glyph's ABC from grid fitting engine
-
-        //                        //InternalGlyphPos glyph_pos = glyphPositions[i];
-        //                        //ABC abc = gridFittingEngine.GetABC(glyph_pos.GlyphIndex);
-
-        //                        //if (!abc.IsEmpty)
-        //                        //{
-
-        //                        //    int advW = (int)(abc.w + abc.x_offset * pxscale);
-        //                        //    outputGlyphPlanList.Add(new GlyphPlan(
-        //                        //        glyph_pos.GlyphIndex,
-        //                        //        cx + abc.x_offset * pxscale + glyph_pos.OffsetX * pxscale,
-        //                        //        (short)(cy + glyph_pos.OffsetY),
-        //                        //        advW));
-
-        //                        //    cx += advW;
-        //                        //}
-        //                        //else
-        //                        //{
-        //                        //    //--------------------------------------------------
-        //                        //    //version 1:
-        //                        //    //original, no horizontal grid fit
-        //                        //    int advW = (int)(glyph_pos.AdvWidth * pxscale);
-        //                        //    outputGlyphPlanList.Add(new GlyphPlan(
-        //                        //        glyph_pos.GlyphIndex,
-        //                        //        cx + glyph_pos.OffsetX * pxscale,
-        //                        //        (short)(cy + glyph_pos.OffsetY * pxscale),
-        //                        //        advW));
-
-        //                        //    cx += advW;
-        //                        //}
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    //use original
-        //                    //glyphW can be float
-        //                    //
-        //                    double cx = 0;
-        //                    for (int i = 0; i < finalGlyphCount; ++i)
-        //                    {
-        //                        InternalGlyphPos glyph_pos = glyphPositions[i];
-        //                        float advW = glyph_pos.AdvWidth * pxscale;
-        //                        float exact_x = (float)(cx + glyph_pos.OffsetX * pxscale);
-        //                        float exact_y = (float)(cy + glyph_pos.OffsetY * pxscale);
-
-        //                        outputGlyphPlanList.Add(new GlyphPlan(
-        //                            glyph_pos.GlyphIndex,
-        //                            exact_x,
-        //                            exact_y,
-        //                            advW));
-        //                        cx += advW;
-        //                    }
-        //                }
-        //            }
-        //            break;
-        //    }
-        //}
-        ///// <summary>
-        ///// read latest layout output into outputGlyphPlanList
-        ///// </summary>
-        //public static void ReadOutput(this GlyphLayout glyphLayout, List<GlyphPlan> outputGlyphPlanList)
-        //{
-        //    Typeface typeface = glyphLayout.Typeface;
-        //    List<GlyphPos> glyphPositions = glyphLayout._glyphPositions;
-        //    //3.read back
-        //    int finalGlyphCount = glyphPositions.Count;
-        //    int cx = 0;
-        //    short cy = 0;
-
-        //    PositionTechnique posTech = glyphLayout.PositionTechnique;
-        //    ushort prev_index = 0;
-
-        //    float pxscale = glyphLayout.PixelScale;
-
-        //    for (int i = 0; i < finalGlyphCount; ++i)
-        //    {
-
-        //        GlyphPos glyphPos = glyphPositions[i];
-        //        //----------------------------------   
-        //        switch (posTech)
-        //        {
-        //            default: throw new NotSupportedException();
-        //            case PositionTechnique.None:
-        //                {
-        //                    throw new NotSupportedException();
-        //                    //outputGlyphPlanList.Add(new GlyphPlan(glyphPos.glyphIndex, cx, cy, glyphPos.AdvWidth));
-        //                    //cx += glyphPos.AdvWidth;
-        //                }
-        //                break;
-        //            case PositionTechnique.OpenFont:
-        //                {
-        //                    //if want grid fitting
-        //                    //in this version  we must ensure
-        //                    //that we fit each grid to integer pos 
-
-        //                    //--------------------------------------------------
-        //                    //version 1:
-        //                    //original, no horizontal grid fit
-        //                    //outputGlyphPlanList.Add(new GlyphPlan(
-        //                    //    glyphPos.glyphIndex,
-        //                    //    cx + glyphPos.xoffset,
-        //                    //    (short)(cy + glyphPos.yoffset),
-        //                    //    glyphPos.advWidth));
-        //                    //cx += glyphPos.advWidth; 
-        //                    //--------------------------------------------------
-        //                    //version 2:
-
-        //                    //float actual_adv = glyphPos.AdvWidth * pxscale;
-        //                    //float fitting_adv = SnapInteger(actual_adv);
-
-        //                    //short leftBearing, rightBearing;
-        //                    //glyphPos.GetLeftAndRightBearing(out leftBearing, out rightBearing);
-        //                    //float scaled_leftBearing = leftBearing * pxscale;
-        //                    //float scaled_rightBearing = rightBearing * pxscale;
-        //                    ////
-        //                    ////for good readable we should ensure
-        //                    ////left bearing space at least 1 px 
-        //                    ////if not then we need to adjust it.
-        //                    //int floor_left_bearing = (int)scaled_leftBearing;
-        //                    //int floor_right_bearing = (int)scaled_rightBearing;
-        //                    //int bearing_sum = (int)(scaled_leftBearing + scaled_rightBearing);
-        //                    //float left_bearind_adjust = 0;
-
-        //                    //if (bearing_sum == 0)
-        //                    //{
-        //                    //    //this could cause congest glyph
-        //                    //    //so we adjust it
-        //                    //    left_bearind_adjust = 1 - (scaled_leftBearing);
-        //                    //    fitting_adv += left_bearind_adjust;
-        //                    //}
-
-        //                    //outputGlyphPlanList.Add(new GlyphPlan(
-        //                    //    glyphPos.glyphIndex,
-        //                    //    cx + glyphPos.xoffset + (int)(left_bearind_adjust / pxscale),
-        //                    //    (short)(cy + glyphPos.yoffset),
-        //                    //    glyphPos.AdvWidth));
-        //                    ////this will be scaled again later
-        //                    //cx += (int)(fitting_adv / pxscale);
-        //                    //--------------------------------------------------
-        //                    //version 3:
-        //                    //acutal value after scale
-        //                    float actual_adv = glyphPos.AdvWidth * pxscale;
-        //                    Bounds glyphBounds = glyphPos.Bounds;
-        //                    short leftBearing, rightBearing;
-        //                    glyphPos.GetLeftAndRightBearing(out leftBearing, out rightBearing);
-        //                    float scaled_leftBearing = leftBearing * pxscale;
-        //                    float scaled_rightBearing = rightBearing * pxscale;
-        //                    float scaled_xmin = glyphBounds.XMin * pxscale;
-        //                    float scaled_xmax = glyphBounds.XMax * pxscale;
-
-        //                    //--------------------------------------------------
-        //                    //preview fitting values
-        //                    float preview_adv_width = SnapToFitInteger(actual_adv);
-
-        //                    float adv_width_diff = preview_adv_width - actual_adv;
-        //                    if (adv_width_diff < 0)
-        //                    {
-        //                        //actual diff is shorter than expect 
-        //                        float diff_from_xmax = preview_adv_width - scaled_xmax;
-
-        //                    }
-        //                    else
-        //                    {
-        //                        //actual diff is longer than expect
-        //                    }
-        //                    //for good readable we should ensure
-        //                    //left bearing space at least 1 px 
-        //                    //if not then we need to adjust it.
-        //                    //int floor_left_bearing = (int)scaled_leftBearing;
-        //                    //int floor_right_bearing = (int)scaled_rightBearing;
-        //                    //int bearing_sum = (int)(scaled_leftBearing + scaled_rightBearing);
-        //                    //float left_bearing_adjust = 1.3f;
-
-        //                    //if (bearing_sum == 0)
-        //                    //{
-        //                    //    //this could cause congest glyph
-        //                    //    //so we adjust it
-        //                    //    //left_bearing_adjust = 1 - (scaled_leftBearing);
-        //                    //    preview_adv_width += left_bearing_adjust;
-        //                    //}
-
-        //                    int x_pos = cx + glyphPos.xoffset;
-        //                    if (scaled_leftBearing < 0.5f)
-        //                    {
-        //                        x_pos += 1;
-        //                    }
-        //                    //-----------------------
-        //                    outputGlyphPlanList.Add(new GlyphPlan(
-        //                        glyphPos.glyphIndex,
-        //                        x_pos,
-        //                        (short)(cy + glyphPos.yoffset),
-        //                        glyphPos.AdvWidth));
-
-        //                    cx += (int)preview_adv_width;
-
-        //                }
-        //                break;
-        //            case PositionTechnique.Kerning:
-        //                {
-        //                    throw new NotSupportedException();
-        //                    ////TODO: review this again, this should be merged with openfont layout
-        //                    //if (i > 0)
-        //                    //{
-        //                    //    cx += typeface.GetKernDistance(prev_index, glyphPos.glyphIndex);
-        //                    //}
-        //                    //outputGlyphPlanList.Add(new GlyphPlan(
-        //                    //   prev_index = glyphPos.glyphIndex,
-        //                    //   cx,
-        //                    //   cy,
-        //                    //   glyphPos.AdvWidth));
-        //                    //cx += glyphPos.AdvWidth;
-        //                }
-        //                break;
-        //        } 
-        //    }
-        //}
-
-
-
         /// <summary>
         /// read latest layout output
         /// </summary>
@@ -650,7 +379,7 @@ namespace Typography.TextLayout
             //}
         }
         public static void Layout(this GlyphLayout glyphLayout, Typeface typeface, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
-        {
+        {   
             glyphLayout.Typeface = typeface;
             glyphLayout.Layout(str, startAt, len);
             glyphLayout.ReadOutput(outputGlyphList);
@@ -659,13 +388,7 @@ namespace Typography.TextLayout
         {
             glyphLayout.Layout(str, startAt, len);
             glyphLayout.ReadOutput(outputGlyphList);
-        }
-        //public static void Layout(this GlyphLayout glyphLayout, char[] str, int startAt, int len, GlyphReadOutputDelegate readDel)
-        //{
-        //    glyphLayout.Layout(str, startAt, len);
-        //    glyphLayout.ReadOutput(readDel);
-
-        //}
+        } 
         public static void GenerateGlyphPlans(this GlyphLayout glyphLayout,
                   char[] textBuffer,
                   int startAt,
@@ -825,6 +548,7 @@ namespace Typography.TextLayout
         //    _glyphs[lim] = p_next;//set back
         //}
     }
+
     struct GlyphPos
     {
 

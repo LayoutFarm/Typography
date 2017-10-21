@@ -1,7 +1,7 @@
 ﻿// Copyright © 2017 Sam Hocevar <sam@hocevar.net>, WinterDev
 // Apache2
 
- 
+
 using System.IO;
 
 namespace Typography.OpenFont.Tables

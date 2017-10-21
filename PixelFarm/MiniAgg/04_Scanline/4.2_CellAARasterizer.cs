@@ -157,8 +157,10 @@ namespace PixelFarm.Agg
                 cCell_y = 0x7FFFFFFF;
                 cCell_cover = 0;
                 cCell_area = 0;
+#if DEBUG
                 cCell_left = -1;
                 cCell_right = -1;
+#endif
             }
 
             public void Reset()

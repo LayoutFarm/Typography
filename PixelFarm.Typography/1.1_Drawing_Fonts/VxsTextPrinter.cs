@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev 
+﻿//MIT, 2016-2017, WinterDev, Sam Hocevar
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -245,34 +245,84 @@ namespace PixelFarm.Drawing.Fonts
             float scale = _currentTypeface.CalculateToPixelScaleFromPointSize(fontSizePoint);
 
 
-            //4. render each glyph
+            //4. render each glyph 
             float ox = canvasPainter.OriginX;
             float oy = canvasPainter.OriginY;
             int endBefore = startAt + len;
 
+            Typography.OpenFont.Tables.COLR colrTable = _currentTypeface.COLRTable;
+            Typography.OpenFont.Tables.CPAL cpalTable = _currentTypeface.CPALTable;
+            bool hasColorGlyphs = (colrTable != null) && (cpalTable != null);
+
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
-            //_hintGlyphCollection.SetCacheInfo(typeface, fontSizePoint, this.HintTechnique);
             //---------------------------------------------------
 
             float g_x = 0;
             float g_y = 0;
             float baseY = (int)y;
-            for (int i = startAt; i < endBefore; ++i)
+            if (!hasColorGlyphs)
             {
-                GlyphPlan glyphPlan = glyphPlanList[i];
-                //-----------------------------------
-                //TODO: review here ***
-                //PERFORMANCE revisit here 
-                //if we have create a vxs we can cache it for later use?
-                //-----------------------------------  
-                VertexStore vxs = _glyphMeshStore.GetGlyphMesh(glyphPlan.glyphIndex);
-                g_x = glyphPlan.ExactX + x;
-                g_y = glyphPlan.ExactY;
+                for (int i = startAt; i < endBefore; ++i)
+                {   //-----------------------------------
+                    //TODO: review here ***
+                    //PERFORMANCE revisit here 
+                    //if we have create a vxs we can cache it for later use?
+                    //-----------------------------------   
+                    GlyphPlan glyphPlan = glyphPlanList[i]; 
+                    g_x = glyphPlan.ExactX + x;
+                    g_y = glyphPlan.ExactY + y;
+                    canvasPainter.SetOrigin(g_x, g_y);
+                    //-----------------------------------   
+                    canvasPainter.Fill(_glyphMeshStore.GetGlyphMesh(glyphPlan.glyphIndex));
+                }
+            }
+            else
+            {
+                //-------------    
+                //this glyph has color information
+                //-------------
+                Color originalFillColor = canvasPainter.FillColor;
 
-                canvasPainter.SetOrigin(g_x, g_y);
-                canvasPainter.Fill(vxs);
+                for (int i = startAt; i < endBefore; ++i)
+                {
+                    GlyphPlan glyphPlan = glyphPlanList[i];
+                    g_x = glyphPlan.ExactX + x;
+                    g_y = glyphPlan.ExactY + y;
+                    canvasPainter.SetOrigin(g_x, g_y);
+                    //-----------------------------------  
+                    ushort colorLayerStart;
+                    if (colrTable.LayerIndices.TryGetValue(glyphPlan.glyphIndex, out colorLayerStart))
+                    {
+                        //TODO: optimize this                        
+                        //we found color info for this glyph 
+                        ushort colorLayerCount = colrTable.LayerCounts[glyphPlan.glyphIndex];
+                        byte r, g, b, a;
+                        for (int c = colorLayerStart; c < colorLayerStart + colorLayerCount; ++c)
+                        {
+                            ushort gIndex = colrTable.GlyphLayers[c];
+
+                            int palette = 0; // FIXME: assume palette 0 for now 
+                            cpalTable.GetColor(
+                                cpalTable.Palettes[palette] + colrTable.GlyphPalettes[c], //index
+                                out r, out g, out b, out a);
+                            //-----------  
+                            canvasPainter.FillColor = new Color(r, g, b);//? a component
+                            canvasPainter.Fill(_glyphMeshStore.GetGlyphMesh(gIndex));
+                        }
+                    }
+                    else
+                    {
+                        //-----------------------------------
+                        //TODO: review here ***
+                        //PERFORMANCE revisit here 
+                        //if we have create a vxs we can cache it for later use?
+                        //----------------------------------- 
+                        canvasPainter.Fill(_glyphMeshStore.GetGlyphMesh(glyphPlan.glyphIndex));
+                    }
+                }
+                canvasPainter.FillColor = originalFillColor; //restore color
             }
             //restore prev origin
             canvasPainter.SetOrigin(ox, oy);
