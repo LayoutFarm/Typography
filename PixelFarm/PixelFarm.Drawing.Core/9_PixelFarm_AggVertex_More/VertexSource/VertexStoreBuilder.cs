@@ -25,7 +25,7 @@ namespace PixelFarm.Agg
     {
         public static VertexStore CreateVxs(IEnumerable<VertexData> iter, VertexStore vxs)
         {
-             
+
             foreach (VertexData v in iter)
             {
                 vxs.AddVertex(v.x, v.y, v.command);

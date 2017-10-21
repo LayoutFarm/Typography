@@ -647,12 +647,169 @@ namespace Typography.OpenFont
                     case OpCode.UTP: zp0.TouchState[stack.Pop()] &= ~GetTouchState(); break;
                     case OpCode.IUP0:
                     case OpCode.IUP1:
+                        // bail if no contours (empty outline)
+                        if (contours.Length == 0)
+                        {
+                            break;
+                        }
+
+                        //{
+
+                        //    //WinterDev's new managed version
+                        //    GlyphPointF[] currentPnts = points.Current;
+                        //    GlyphPointF[] originalPnts = points.Original;
+
+                        //    int cnt_count = contours.Length;
+                        //    int point = 0;
+                        //    // opcode controls whether we care about X or Y direction
+                        //    // do some pointer trickery so we can operate on the
+                        //    // points in a direction-agnostic manner
+                        //    TouchState touchMask;
+
+                        //    if (opcode == OpCode.IUP0)
+                        //    {
+                        //        //y -axis
+                        //        touchMask = TouchState.Y;
+
+                        //        //
+                        //        for (int i = 0; i < cnt_count; ++i)
+                        //        {
+                        //            int endPoint = contours[i];
+                        //            int firstPoint = point;
+                        //            int firstTouched = -1;
+                        //            int lastTouched = -1;
+
+                        //            for (; point <= endPoint; point++)
+                        //            {
+                        //                // check whether this point has been touched
+                        //                if ((points.TouchState[point] & touchMask) != 0)
+                        //                {
+                        //                    // if this is the first touched point in the contour, note it and continue
+                        //                    if (firstTouched < 0)
+                        //                    {
+                        //                        firstTouched = point;
+                        //                        lastTouched = point;
+                        //                        continue;
+                        //                    }
+
+                        //                    // otherwise, interpolate all untouched points
+                        //                    // between this point and our last touched point
+                        //                    InterpolatePointsYAxis(currentPnts, originalPnts, lastTouched + 1, point - 1, lastTouched, point);
+                        //                    lastTouched = point;
+                        //                }
+                        //            }
+
+                        //            // check if we had any touched points at all in this contour
+                        //            if (firstTouched >= 0)
+                        //            {
+                        //                // there are two cases left to handle:
+                        //                // 1. there was only one touched point in the whole contour, in
+                        //                //    which case we want to shift everything relative to that one
+                        //                // 2. several touched points, in which case handle the gap from the
+                        //                //    beginning to the first touched point and the gap from the last
+                        //                //    touched point to the end of the contour
+                        //                if (lastTouched == firstTouched)
+                        //                {
+                        //                    float delta = currentPnts[lastTouched].Y - originalPnts[lastTouched].Y;
+                        //                    if (delta != 0.0f)
+                        //                    {
+                        //                        for (int n = firstPoint; n < lastTouched; n++)
+                        //                        {
+                        //                            currentPnts[n].OffsetY(delta);
+                        //                        }
+                        //                        for (int n = lastTouched + 1; n <= endPoint; n++)
+                        //                        {
+                        //                            currentPnts[n].OffsetY(delta);
+                        //                        }
+
+                        //                    }
+                        //                }
+                        //                else
+                        //                {
+                        //                    InterpolatePointsYAxis(currentPnts, originalPnts, lastTouched + 1, endPoint, lastTouched, firstTouched);
+                        //                    if (firstTouched > 0)
+                        //                    {
+                        //                        InterpolatePointsYAxis(currentPnts, originalPnts, firstPoint, firstTouched - 1, lastTouched, firstTouched);
+                        //                    }
+                        //                }
+                        //            }
+
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        //x-axis
+                        //        touchMask = TouchState.X;
+                        //        //
+                        //        for (int i = 0; i < cnt_count; ++i)
+                        //        {
+                        //            int endPoint = contours[i];
+                        //            int firstPoint = point;
+                        //            int firstTouched = -1;
+                        //            int lastTouched = -1;
+
+                        //            for (; point <= endPoint; point++)
+                        //            {
+                        //                // check whether this point has been touched
+                        //                if ((points.TouchState[point] & touchMask) != 0)
+                        //                {
+                        //                    // if this is the first touched point in the contour, note it and continue
+                        //                    if (firstTouched < 0)
+                        //                    {
+                        //                        firstTouched = point;
+                        //                        lastTouched = point;
+                        //                        continue;
+                        //                    }
+
+                        //                    // otherwise, interpolate all untouched points
+                        //                    // between this point and our last touched point
+                        //                    InterpolatePointsXAxis(currentPnts, originalPnts, lastTouched + 1, point - 1, lastTouched, point);
+                        //                    lastTouched = point;
+                        //                }
+                        //            }
+
+                        //            // check if we had any touched points at all in this contour
+                        //            if (firstTouched >= 0)
+                        //            {
+                        //                // there are two cases left to handle:
+                        //                // 1. there was only one touched point in the whole contour, in
+                        //                //    which case we want to shift everything relative to that one
+                        //                // 2. several touched points, in which case handle the gap from the
+                        //                //    beginning to the first touched point and the gap from the last
+                        //                //    touched point to the end of the contour
+                        //                if (lastTouched == firstTouched)
+                        //                {
+                        //                    float delta = currentPnts[lastTouched].X - originalPnts[lastTouched].X;
+                        //                    if (delta != 0.0f)
+                        //                    {
+                        //                        for (int n = firstPoint; n < lastTouched; ++n)
+                        //                        {
+                        //                            currentPnts[n].OffsetX(delta);
+                        //                        }
+                        //                        for (int n = lastTouched + 1; n <= endPoint; ++n)
+                        //                        {
+                        //                            currentPnts[n].OffsetX(delta);
+                        //                        }
+                        //                    }
+                        //                }
+                        //                else
+                        //                {
+                        //                    InterpolatePointsXAxis(currentPnts, originalPnts, lastTouched + 1, endPoint, lastTouched, firstTouched);
+                        //                    if (firstTouched > 0)
+                        //                    {
+                        //                        InterpolatePointsXAxis(currentPnts, originalPnts, firstPoint, firstTouched - 1, lastTouched, firstTouched);
+                        //                    }
+                        //                }
+                        //            }
+                        //        }
+                        //    }
+                        //}
+                        //-----------------------------------------
                         unsafe
                         {
-                            // bail if no contours (empty outline)
-                            if (contours.Length == 0)
-                                break;
 
+                            //unsafe version 
+                            //TODO: provide manage version 
                             fixed (GlyphPointF* currentPtr = points.Current)
                             fixed (GlyphPointF* originalPtr = points.Original)
                             {
@@ -1472,8 +1629,8 @@ namespace Typography.OpenFont
             // figure out how much the two reference points
             // have been shifted from their original positions
             float delta1, delta2;
-            var lower = *GetPoint(original, ref1);
-            var upper = *GetPoint(original, ref2);
+            float lower = *GetPoint(original, ref1);
+            float upper = *GetPoint(original, ref2);
             if (lower > upper)
             {
                 var temp = lower;
@@ -1489,31 +1646,138 @@ namespace Typography.OpenFont
                 delta2 = *GetPoint(current, ref2) - upper;
             }
 
-            var lowerCurrent = delta1 + lower;
-            var upperCurrent = delta2 + upper;
-            var scale = (upperCurrent - lowerCurrent) / (upper - lower);
+            float lowerCurrent = delta1 + lower;
+            float upperCurrent = delta2 + upper;
+            float scale = (upperCurrent - lowerCurrent) / (upper - lower);
 
             for (int i = start; i <= end; i++)
             {
                 // three cases: if it's to the left of the lower reference point or to
                 // the right of the upper reference point, do a shift based on that ref point.
                 // otherwise, interpolate between the two of them
-                var pos = *GetPoint(original, i);
+                float pos = *GetPoint(original, i);
                 if (pos <= lower)
+                {
                     pos += delta1;
+                }
                 else if (pos >= upper)
+                {
                     pos += delta2;
+                }
                 else
+                {
                     pos = lowerCurrent + (pos - lower) * scale;
+                }
                 *GetPoint(current, i) = pos;
             }
         }
 
+        static void InterpolatePointsXAxis(GlyphPointF[] current, GlyphPointF[] original, int start, int end, int ref1, int ref2)
+        {
+            if (start > end)
+                return;
+
+            // figure out how much the two reference points
+            // have been shifted from their original positions
+            float delta1, delta2;
+            float lower = original[ref1].X;
+            float upper = original[ref2].X;
+            if (lower > upper)
+            {
+                var temp = lower;
+                lower = upper;
+                upper = temp;
+
+                delta1 = current[ref2].X - lower;
+                delta2 = current[ref1].X - upper;
+            }
+            else
+            {
+                delta1 = current[ref1].X - lower;
+                delta2 = current[ref2].X - upper;
+            }
+
+            float lowerCurrent = delta1 + lower;
+            float upperCurrent = delta2 + upper;
+            float scale = (upperCurrent - lowerCurrent) / (upper - lower);
+
+            for (int i = start; i <= end; i++)
+            {
+                // three cases: if it's to the left of the lower reference point or to
+                // the right of the upper reference point, do a shift based on that ref point.
+                // otherwise, interpolate between the two of them
+                float pos = original[i].X;
+                if (pos <= lower)
+                {
+                    pos += delta1;
+                }
+                else if (pos >= upper)
+                {
+                    pos += delta2;
+                }
+                else
+                {
+                    pos = lowerCurrent + (pos - lower) * scale;
+                }
+                current[i].UpdateX(pos);
+            }
+        }
+        static void InterpolatePointsYAxis(GlyphPointF[] current, GlyphPointF[] original, int start, int end, int ref1, int ref2)
+        {
+            if (start > end)
+                return;
+
+            // figure out how much the two reference points
+            // have been shifted from their original positions
+            float delta1, delta2;
+            float lower = original[ref1].Y;
+            float upper = original[ref2].Y;
+            if (lower > upper)
+            {
+                float temp = lower; //swap
+                lower = upper;
+                upper = temp;
+
+                delta1 = current[ref2].Y - lower;
+                delta2 = current[ref1].Y - upper;
+            }
+            else
+            {
+                delta1 = current[ref1].Y - lower;
+                delta2 = current[ref2].Y - upper;
+            }
+
+            float lowerCurrent = delta1 + lower;
+            float upperCurrent = delta2 + upper;
+            float scale = (upperCurrent - lowerCurrent) / (upper - lower);
+
+            for (int i = start; i <= end; i++)
+            {
+                // three cases: if it's to the left of the lower reference point or to
+                // the right of the upper reference point, do a shift based on that ref point.
+                // otherwise, interpolate between the two of them
+                float pos = original[i].Y;
+                if (pos <= lower)
+                {
+                    pos += delta1;
+                }
+                else if (pos >= upper)
+                {
+                    pos += delta2;
+                }
+                else
+                {
+                    pos = lowerCurrent + (pos - lower) * scale;
+                }
+                current[i].UpdateY(pos);
+            }
+        }
         static float F2Dot14ToFloat(int value) { return (short)value / 16384.0f; }
         static int FloatToF2Dot14(float value) { return (int)(uint)(short)Math.Round(value * 16384.0f); }
         static float F26Dot6ToFloat(int value) { return value / 64.0f; }
         static int FloatToF26Dot6(float value) { return (int)Math.Round(value * 64.0f); }
 
+        //TODO: review here again
         unsafe static float* GetPoint(byte* data, int index) { return (float*)(data + sizeof(GlyphPointF) * index); }
 
         static readonly float Sqrt2Over2 = (float)(Math.Sqrt(2) / 2);

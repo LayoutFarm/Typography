@@ -4,7 +4,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Tables;
 namespace Typography.TextLayout
 {
- 
+
 
     /// <summary>
     /// glyph set position manager
@@ -47,15 +47,21 @@ namespace Typography.TextLayout
                     switch (feature.TagName)
                     {
                         case "mark"://mark=> mark to base
-                        case "mkmk"://mkmk => mark to mask
-
+                        case "mkmk"://mkmk => mark to mask 
                             //current version we implement this 2 features
                             features.Add(feature);
                             break;
-                        default:
-                            {
+                        case "kern":
+                            //test with Candara font
+                            features.Add(feature);
+                            //If palt is activated, there is no requirement that kern must also be activated. 
+                            //If kern is activated, palt must also be activated if it exists.
+                            //https://www.microsoft.com/typography/OTSpec/features_pt.htm#palt
+                            break;
+                        case "palt":
 
-                            }
+                            break;
+                        default:
                             break;
                     }
 
@@ -78,11 +84,12 @@ namespace Typography.TextLayout
 
         }
         public string Lang { get; private set; }
-        public void DoGlyphPosition(List<GlyphPos> glyphPositions)
+        public void DoGlyphPosition(IGlyphPositions glyphPositions)
         {
-
-            if (lookupTables == null) { return; } //early exit if no lookup tables
-                                                  //load
+            //early exit if no lookup tables
+            //load
+            if (lookupTables == null) { return; }
+            //
             int j = lookupTables.Count;
             for (int i = 0; i < j; ++i)
             {

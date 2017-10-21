@@ -34,11 +34,9 @@
 /// Changes from the Java version
 ///   attributification
 /// Future possibilities
-///   Flattening out the number of indirections
-///     Replacing arrays of 3 with fixed-length arrays?
-///     Replacing bool[3] with a bit array of some sort?
+///   Flattening out the number of indirections 
 ///     Bundling everything into an AoS mess?
-///     Hardcode them all as ABC ?
+
 
 
 using System;
@@ -46,9 +44,12 @@ using System.Diagnostics;
 using System.Collections.Generic;
 namespace Poly2Tri
 {
-    public class DelaunayTriangle
+    public sealed class DelaunayTriangle
     {
         public TriangulationPoint P0, P1, P2;
+        /// <summary>
+        /// neighbors 
+        /// </summary>
         public DelaunayTriangle N0, N1, N2;
         //edge Delaunay  mark
         internal bool D0, D1, D2;
@@ -58,6 +59,11 @@ namespace Poly2Tri
         //next 4 bits for EdgeIsConstrained
         //int edgedNoteFlags;
         public bool isActualTriangle;
+
+        /// <summary>
+        /// store general purpose data 
+        /// </summary>
+        public object userData;
 #if DEBUG
 
         static int dbugTotalId;
@@ -726,11 +732,11 @@ namespace Poly2Tri
             return Math.Abs((b * h * 0.5f));
         }
 
-     
-        public void Centroid2(out double cx, out double cy)
+
+        public void GetCentroid(out float cx, out float cy)
         {
-            cx = (P0.X + P1.X + P2.X) / 3f;
-            cy = (P0.Y + P1.Y + P2.Y) / 3f;
+            cx = (float)((P0.X + P1.X + P2.X) / 3f);
+            cy = (float)((P0.Y + P1.Y + P2.Y) / 3f);
         }
         /// <summary>
         /// Get the index of the neighbor that shares this edge (or -1 if it isn't shared)

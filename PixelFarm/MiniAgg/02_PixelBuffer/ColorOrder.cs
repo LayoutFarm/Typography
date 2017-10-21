@@ -26,7 +26,8 @@ namespace PixelFarm.Agg
     public static class CO
     {
 
-#if WIN
+#if BGRA 
+        //eg OpenGL, 
         /// <summary>
         /// order b
         /// </summary>
@@ -44,6 +45,8 @@ namespace PixelFarm.Agg
         /// </summary>
         public const int A = 3;
 #else
+        //RGBA (Windows GDI+)
+
         /// <summary>
         /// order b
         /// </summary>

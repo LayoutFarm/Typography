@@ -63,7 +63,6 @@ namespace PixelFarm.Agg
             get { return _strokeGen.Width; }
             set { _strokeGen.Width = value; }
         }
-
         public void SetMiterLimitTheta(double t)
         {
             _strokeGen.SetMiterLimitTheta(t);
@@ -83,8 +82,6 @@ namespace PixelFarm.Agg
             StrokeGenerator strkgen = _strokeGen;
             int j = sourceVxs.Count;
             strkgen.Reset();
-            //
-            //
             VertexCmd cmd;
             double x = 0, y = 0, startX = 0, startY = 0;
 
@@ -99,13 +96,15 @@ namespace PixelFarm.Agg
                     case VertexCmd.Close:
                     case VertexCmd.CloseAndEndFigure:
 
-                        strkgen.AddVertex(x, y, cmd);
-                        if (i < j - 2)
+
+                        if (i < j)
                         {
-                            strkgen.AddVertex(startX, startY, VertexCmd.LineTo);
+                            //strkgen.AddVertex(startX, startY, VertexCmd.LineTo);
+                            strkgen.AddVertex(startX, startY, VertexCmd.Close);
                             strkgen.WriteTo(vxs);
                             strkgen.Reset();
                         }
+                        strkgen.AddVertex(x, y, cmd);
                         //end this polygon 
 
                         break;

@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="EdgeColor.cs" />
     <Compile Include="EdgeColoring.cs" />
     <Compile Include="EdgeHolder.cs" />

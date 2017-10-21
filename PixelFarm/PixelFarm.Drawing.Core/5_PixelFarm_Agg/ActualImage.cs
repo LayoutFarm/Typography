@@ -158,7 +158,7 @@ namespace PixelFarm.Agg
         }
         public static ActualImage CreateFromBuffer(int width, int height, PixelFormat format, byte[] buffer)
         {
-            if (format != PixelFormat.ARGB32)
+            if (format != PixelFormat.ARGB32 && format != PixelFormat.RGB24)
             {
                 throw new NotSupportedException();
             }

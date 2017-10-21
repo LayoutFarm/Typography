@@ -21,7 +21,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ClassDefTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\COLR.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CoverageTable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\FeatureInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\FeatureList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GDEF.cs" />
@@ -35,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptLang.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\EBLCTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\HorizontalDeviceMatrics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Kern.cs" />

@@ -42,16 +42,14 @@ namespace PixelFarm.Agg
         public abstract Color StrokeColor { get; set; }
         //-------------------------------------------------------
         public abstract void Clear(Color color);
-        public abstract void FillCircle(double x, double y, double radius, Color color);
+
         public abstract void FillCircle(double x, double y, double radius);
         public abstract void FillEllipse(double left, double bottom, double right, double top);
         public abstract void DrawEllipse(double left, double bottom, double right, double top);
 
-        public abstract void Line(double x1, double y1, double x2, double y2, Color color);
+
         public abstract void Line(double x1, double y1, double x2, double y2);
-        public abstract void Rectangle(double left, double bottom, double right, double top, Color color);
         public abstract void Rectangle(double left, double bottom, double right, double top);
-        public abstract void FillRectangle(double left, double bottom, double right, double top, Color fillColor);
         public abstract void FillRectangle(double left, double bottom, double right, double top);
         public abstract void FillRectLBWH(double left, double bottom, double width, double height);
         public abstract void FillRoundRectangle(double left, double bottom, double right, double top, double radius);
@@ -59,11 +57,7 @@ namespace PixelFarm.Agg
         public abstract void DrawBezierCurve(float startX, float startY, float endX, float endY,
          float controlX1, float controlY1,
          float controlX2, float controlY2);
-        //-------------------------------------------------------
-
-
-
-
+        //------------------------------------------------------- 
         public abstract void DrawImage(ActualImage actualImage, double x, double y);
         public abstract void DrawImage(ActualImage actualImage, params Transform.AffinePlan[] affinePlans);
         public abstract void DoFilterBlurStack(RectInt area, int r);
@@ -93,6 +87,76 @@ namespace PixelFarm.Agg
            double x,
            double y);
         public abstract void DrawString(RenderVxFormattedString renderVx, double x, double y);
+    }
+
+
+    public static class CanvasPainterExtensions
+    {
+
+        public static void Line(this CanvasPainter p, double x1, double y1, double x2, double y2, Color color)
+        {
+            Color prevColor = p.StrokeColor;
+            p.StrokeColor = color;
+            p.Line(x1, y1, x2, y2);
+            p.StrokeColor = prevColor;
+        }
+        public static void Rectangle(this CanvasPainter p, double left, double bottom, double right, double top, Color color)
+        {
+            Color prevColor = p.StrokeColor;
+            p.StrokeColor = color;
+            p.Rectangle(left, bottom, right, top);
+            p.StrokeColor = prevColor;
+        }
+        public static void FillCircle(this CanvasPainter p, double x, double y, double radius, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.FillCircle(x, y, radius);
+            p.FillColor = prevColor;
+        }
+        public static void FillRectangle(this CanvasPainter p, double left, double bottom, double right, double top, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.FillRectangle(left, bottom, right, top);
+            p.FillColor = prevColor;
+        }
+        public static void FillRectLBWH(this CanvasPainter p, double left, double bottom, double width, double height, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.FillRectLBWH(left, bottom, width, height);
+            p.FillColor = prevColor;
+        }
+        public static void Fill(this CanvasPainter p, VertexStoreSnap snap, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.Fill(snap);
+            p.FillColor = prevColor;
+        }
+        public static void Fill(this CanvasPainter p, VertexStore vxs, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.Fill(vxs);
+            p.FillColor = prevColor;
+        }
+        public static void Draw(this CanvasPainter p, VertexStore vxs, Color color)
+        {
+            Color prevColor = p.StrokeColor;
+            p.StrokeColor = color;
+            p.Draw(vxs);
+            p.StrokeColor = prevColor;
+        }
+        public static void Draw(this CanvasPainter p, VertexStoreSnap vxs, Color color)
+        {
+            Color prevColor = p.StrokeColor;
+            p.StrokeColor = color;
+            p.Draw(vxs);
+            p.StrokeColor = prevColor;
+        }
+
     }
 
 }
