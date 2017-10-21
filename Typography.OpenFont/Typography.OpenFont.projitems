@@ -21,7 +21,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ClassDefTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\COLR.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CoverageTable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\FeatureInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\FeatureList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GDEF.cs" />
@@ -71,5 +70,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\Interpreter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidFontException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Typeface.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
   </ItemGroup>
 </Project>

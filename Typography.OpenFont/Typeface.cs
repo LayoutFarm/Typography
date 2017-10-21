@@ -166,6 +166,8 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
+
+       
         private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         public ushort LookupIndex(int codepoint)
@@ -197,8 +199,7 @@ namespace Typography.OpenFont
         public Glyph Lookup(int codepoint)
         {
             return _glyphs[LookupIndex(codepoint)];
-        }
-
+        } 
         public Glyph GetGlyphByIndex(int glyphIndex)
         {
             return _glyphs[glyphIndex];
@@ -208,17 +209,15 @@ namespace Typography.OpenFont
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
         }
-
         public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
         {
+
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
-
         public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
-
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
             return _kern.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
@@ -319,28 +318,22 @@ namespace Typography.OpenFont
     }
 
 
-    //------------------------------------------------------------------------------------------------------
-    public class GlyphPos
+    public interface IGlyphPositions
     {
-        public readonly ushort glyphIndex;
-        public readonly ushort advWidth;
-        public short xoffset;
-        public short yoffset;
-        public GlyphClassKind _classKind;
-        public GlyphPos(ushort glyphIndex, GlyphClassKind classKind, ushort advWidth)
-        {
-            this.glyphIndex = glyphIndex;
-            this.advWidth = advWidth;
-            this._classKind = classKind;
-        }
+        int Count { get; }
 
-#if DEBUG
-        public override string ToString()
-        {
-            return glyphIndex.ToString() + "(" + xoffset + "," + yoffset + ")";
-        }
-#endif
+        GlyphClassKind GetGlyphClassKind(int index);
+        void AppendGlyphOffset(int index, short appendOffsetX, short appendOffsetY);
+        void AppendGlyphAdvance(int index, short appendAdvX, short appendAdvY);
+
+        ushort GetGlyph(int index, out ushort advW);
+        ushort GetGlyph(int index, out short offsetX, out short offsetY, out short advW);
+        //
+        void GetOffset(int index, out short offsetX, out short offsetY);
     }
+
+
+
 
     namespace Extensions
     {
@@ -386,7 +379,6 @@ namespace Typography.OpenFont
                 }
             }
         }
-
         public static class UnicodeLangBitsExtension
         {
             public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
@@ -399,5 +391,7 @@ namespace Typography.OpenFont
                     lower32 & 0xFFFF);
             }
         }
+
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿//Apache2, 2016-2017, WinterDev
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -36,10 +35,11 @@ namespace Typography.OpenFont.Tables
 
         class PairSetTable
         {
-            List<PairSet> pairSets = new List<PairSet>();
+            PairSet[] pairSets;
             public void ReadFrom(BinaryReader reader, ushort v1format, ushort v2format)
             {
                 ushort rowCount = reader.ReadUInt16();
+                pairSets = new PairSet[rowCount];
                 for (int i = 0; i < rowCount; ++i)
                 {
                     //GlyphID 	SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
@@ -48,8 +48,25 @@ namespace Typography.OpenFont.Tables
                     ushort secondGlyph = reader.ReadUInt16();
                     ValueRecord v1 = ValueRecord.CreateFrom(reader, v1format);
                     ValueRecord v2 = ValueRecord.CreateFrom(reader, v2format);
-                    PairSet pset = new PairSet(secondGlyph, v1, v2);
+                    //
+                    pairSets[i] = new PairSet(secondGlyph, v1, v2);
                 }
+            }
+            public bool FindPairSet(ushort secondGlyphIndex, out PairSet foundPairSet)
+            {
+                int j = pairSets.Length;
+                for (int i = 0; i < j; ++i)
+                {
+                    if (pairSets[i].secondGlyph == secondGlyphIndex)
+                    {
+                        //found
+                        foundPairSet = pairSets[i];
+                        return true;
+                    }
+                }
+                //
+                foundPairSet = new PairSet();//empty
+                return false;
             }
         }
 
@@ -65,6 +82,12 @@ namespace Typography.OpenFont.Tables
                 this.value1 = v1;
                 this.value2 = v2;
             }
+#if DEBUG
+            public override string ToString()
+            {
+                return "second_glyph:" + secondGlyph;
+            }
+#endif
         }
 
 
@@ -827,5 +850,26 @@ namespace Typography.OpenFont.Tables
 
 
     }
+
+
+    //struct GlyphPos
+    //{
+    //    IGlyphPositions glyphPositions;
+    //    int index;
+    //    public GlyphPos(IGlyphPositions glyphPositions, int index)
+    //    {
+    //        this.glyphPositions = glyphPositions;
+    //        this.index = index;
+    //    }
+    //}
+
+    //static class IGlyphPositionsExtensions
+    //{
+    //    public static GlyphPos GetGlyphPos(this IGlyphPositions glyphPositions, int index)
+    //    {
+    //        return new GlyphPos(glyphPositions, index);
+    //    }
+    //}
+
 
 }

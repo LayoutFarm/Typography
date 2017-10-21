@@ -5,7 +5,7 @@
 using System.Numerics;
 namespace Typography.OpenFont
 {
-
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct GlyphPointF
     {
         internal Vector2 P;
@@ -22,7 +22,7 @@ namespace Typography.OpenFont
         }
         public float X { get { return this.P.X; } }
         public float Y { get { return this.P.Y; } }
-        
+
         public static GlyphPointF operator *(GlyphPointF p, float n)
         {
             return new GlyphPointF(p.P * n, p.onCurve);
@@ -41,6 +41,22 @@ namespace Typography.OpenFont
             P = new Vector2(P.X * scale, P.Y);
         }
 
+        internal void UpdateX(float x)
+        {
+            this.P.X = x;
+        }
+        internal void UpdateY(float y)
+        {
+            this.P.Y = y;
+        }
+        internal void OffsetY(float dy)
+        {
+            this.P.Y += dy;
+        }
+        internal void OffsetX(float dx)
+        {
+            this.P.X += dx;
+        }
 #if DEBUG
         internal bool dbugIsEqualsWith(GlyphPointF another)
         {
