@@ -89,6 +89,10 @@
       <Project>{9e204a4b-f9b8-4f7f-a792-184260b3494d}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\Shared\DrawingGL.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
