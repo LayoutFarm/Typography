@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptLang.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\_CPAL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\EBLCTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\HorizontalDeviceMatrics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Kern.cs" />
@@ -70,8 +71,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\Interpreter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidFontException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Typeface.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
   </ItemGroup>
 </Project>
