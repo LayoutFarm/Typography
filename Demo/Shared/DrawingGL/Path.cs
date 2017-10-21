@@ -122,11 +122,11 @@ namespace DrawingGL
         }
         public float OffsetX
         {
-            get { return glyphPlan.x; }
+            get { return glyphPlan.ExactX; }
         }
         public float OffsetY
         {
-            get { return glyphPlan.y; }
+            get { return glyphPlan.ExactY; }
         }
 
     }
