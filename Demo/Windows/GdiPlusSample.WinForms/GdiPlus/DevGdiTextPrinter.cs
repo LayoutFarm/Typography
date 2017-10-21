@@ -1,5 +1,5 @@
 ﻿//MIT, 2016-2017, WinterDev
-using System.IO;
+
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Rendering;
-
+using Typography.Contours;
 
 namespace SampleWinForms
 {
@@ -91,19 +91,18 @@ namespace SampleWinForms
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
 
-        public override void DrawCaret(float xpos, float ypos)
+        public override void DrawCaret(float x, float y)
         {
-            this.TargetGraphics.DrawLine(Pens.Red, xpos, ypos, xpos, ypos + this.FontAscendingPx);
+            this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
         }
 
         List<GlyphPlan> _outputGlyphPlans = new List<GlyphPlan>();//for internal use
-        public override void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos)
+        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
             UpdateGlyphLayoutSettings();
-            _outputGlyphPlans.Clear();
-            this._glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
-
-            DrawFromGlyphPlans(_outputGlyphPlans, xpos, ypos);
+            _outputGlyphPlans.Clear(); 
+            this._glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null); 
+            DrawFromGlyphPlans(_outputGlyphPlans, x, y);
         }
         void UpdateGlyphLayoutSettings()
         {
@@ -124,7 +123,7 @@ namespace SampleWinForms
 
             //draw data in glyph plan 
             //3. render each glyph 
-            System.Drawing.Drawing2D.Matrix scaleMat = null;
+
             float sizeInPoints = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateToPixelScaleFromPointSize(sizeInPoints);
             //
@@ -156,8 +155,8 @@ namespace SampleWinForms
                 }
                 //------
                 //then move pen point to the position we want to draw a glyph
-                float tx = x + glyphPlan.x * scale;
-                float ty = y + glyphPlan.y * scale;
+                float tx = x + glyphPlan.ExactX;
+                float ty = y + glyphPlan.ExactY;
                 g.TranslateTransform(tx, ty);
 
                 if (FillBackground)

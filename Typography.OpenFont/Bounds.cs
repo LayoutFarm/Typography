@@ -3,6 +3,9 @@
 
 namespace Typography.OpenFont
 {
+    /// <summary>
+    /// original glyph bounds
+    /// </summary>
     public struct Bounds
     {
         readonly short _xmin;
@@ -22,6 +25,11 @@ namespace Typography.OpenFont
         public short YMin { get { return _ymin; } }
         public short XMax { get { return _xmax; } }
         public short YMax { get { return _ymax; } }
-
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + _xmin + "," + _ymin + "," + _xmax + "," + _ymax + ")";
+        }
+#endif
     }
 }

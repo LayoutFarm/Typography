@@ -122,10 +122,31 @@ namespace Typography.OpenFont
                 //eg. glyph '2' in Century font starts with 'OFF-CURVE' point, and ends with 'OFF-CURVE'
                 //-------------------------------------------------------------------
 
+#if DEBUG
+                int dbug_cmdcount = 0;
+#endif
 
 
                 for (; cpoint_index < nextCntBeginAtIndex; ++cpoint_index)
-                {    //for each point in this contour
+                {
+
+
+#if DEBUG
+                    dbug_cmdcount++;
+
+#endif
+                    //for each point in this contour
+
+                    //point p is an on-curve point (on outline). (not curve control point)
+                    //possible ways..
+                    //1. if we are in curve mode, then p is end point
+                    //   we must decide which curve to create (Curve3 or Curve4)
+                    //   easy, ... 
+                    //      if  curveControlPointCount == 1 , then create Curve3
+                    //      else curveControlPointCount ==2 , then create Curve4
+                    //2. if we are NOT in curve mode, 
+                    //      if p is first point then set this to x0,y0
+                    //      else then p is end point of a line.
 
                     GlyphPointF p = glyphPoints[cpoint_index];
                     float p_x = p.X * scale;
@@ -203,8 +224,7 @@ namespace Typography.OpenFont
                                         has_c_begin = true;
                                         //since c1 is off curve
                                         //we skip the c1 for and use it when we close the curve 
-                                        //tx.MoveTo(latest_moveto_x = c1.X, latest_moveto_y = c1.Y);
-                                        //tx.LineTo(p_x, p_y); 
+
                                         tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
                                         curveControlPointCount--;
                                         break;
@@ -322,10 +342,10 @@ namespace Typography.OpenFont
                             }
                             break;
                         default:
-                            {//for TrueType font 
-                                //we should not be here? 
-                                throw new NotSupportedException();
-                            }
+                            //for TrueType font 
+                            //we should not be here? 
+                            throw new NotSupportedException();
+
                     }
                     //reset
                     offCurveMode = false;

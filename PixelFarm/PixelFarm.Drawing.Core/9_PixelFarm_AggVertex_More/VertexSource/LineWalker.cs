@@ -127,13 +127,11 @@ namespace PixelFarm.Agg.VertexSource
             Init,
             PolyLine,
         }
-
-
-
+         
 
         class WalkStateManager
         {
-
+             
             List<LineWalkerMark> _segmentMarks = new List<LineWalkerMark>();
             LineWalkerMark _currentMarker;
             int _nextMarkNo;

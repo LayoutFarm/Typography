@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E4A1C3C3-1C1C-4E11-A2E6-A1FAFD6652C7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Typography.Contours</RootNamespace>
+    <AssemblyName>Typography.Contours</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET20</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GlyphAnalysis\CurveGen.cs" />
+    <Compile Include="GlyphAnalysis\1_EdgeLine.cs" />
+    <Compile Include="GlyphAnalysis\3_GlyphBoneJoint.cs" />
+    <Compile Include="GlyphAnalysis\4_GlyphBone.cs" />
+    <Compile Include="GlyphAnalysis\5_CentroidLineAndHub.cs" />
+    <Compile Include="GlyphAnalysis\GlyphContour.cs" />
+    <Compile Include="GlyphDynamicOutline.cs" />
+    <Compile Include="GlyphAnalysis\GlyphOutlineAnalyzer.cs" />
+    <Compile Include="GlyphAnalysis\2_GlyphCentroidPair.cs" />
+    <Compile Include="GlyphAnalysis\GlyphPartFlattener.cs" />
+    <Compile Include="GlyphAnalysis\GlyphIntermediateOutline.cs" />
+    <Compile Include="GlyphAnalysis\GlyphOutlineWalker.cs" />
+    <Compile Include="GlyphAnalysis\GlyphParts.cs" />
+    <Compile Include="GlyphAnalysis\GlyphPoint.cs" />
+    <Compile Include="GlyphAnalysis\GlyphContourBuilder.cs" />
+    <Compile Include="GlyphAnalysis\0_GlyphTriangle.cs" />
+    <Compile Include="GlyphAnalysis\MyMath.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GlyphAnalysis\Rect.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+      <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PixelFarm\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
+      <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
+      <Name>PixelFarm.Triangulation</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

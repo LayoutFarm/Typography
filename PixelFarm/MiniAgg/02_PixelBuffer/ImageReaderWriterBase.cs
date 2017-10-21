@@ -32,7 +32,7 @@ namespace PixelFarm.Agg
         int[] xTableArray;
         //--------------------------------------------
         protected byte[] m_ByteBuffer;
-        ActualImage ownerByteBuffer;
+
         //--------------------------------------------
         // Pointer to first pixel depending on strideInBytes and image position
         protected int bufferFirstPixel;
@@ -220,7 +220,7 @@ namespace PixelFarm.Agg
                 {
                     //go last
                     int* cur = first + height - 1;
-                    for (int i = height - 1; i >= 0; )
+                    for (int i = height - 1; i >= 0;)
                     {
                         //--------------------
                         *cur = i * strideInBytes;
@@ -234,7 +234,7 @@ namespace PixelFarm.Agg
                     //go last
                     int* cur = first + width - 1;
                     //even
-                    for (int i = width - 1; i >= 0; )
+                    for (int i = width - 1; i >= 0;)
                     {
                         //--------------------
                         *cur = i * m_DistanceInBytesBetweenPixelsInclusive;
@@ -620,7 +620,7 @@ namespace PixelFarm.Agg
     public class MyImageReaderWriter : ImageReaderWriterBase
     {
         ActualImage actualImage;
-        PixelBlenderBGRA pixelBlenderRGBA;
+        IPixelBlender pixelBlenderRGBA;
         PixelBlenderGray pixelBlenderGray;
 
         public MyImageReaderWriter()
@@ -639,12 +639,16 @@ namespace PixelFarm.Agg
             {
                 case PixelFormat.ARGB32:
                     {
-
                         Attach(actualImage.Width,
-                            actualImage.Height,
-                            actualImage.BitDepth,
-                            ActualImage.GetBuffer(actualImage),
-                            pixelBlenderRGBA ?? (pixelBlenderRGBA = new PixelBlenderBGRA()));
+                           actualImage.Height,
+                           actualImage.BitDepth,
+                           ActualImage.GetBuffer(actualImage),
+                           pixelBlenderRGBA ?? (pixelBlenderRGBA = new PixelBlenderBGRA()));
+                        //Attach(actualImage.Width,
+                        //    actualImage.Height,
+                        //    actualImage.BitDepth,
+                        //    ActualImage.GetBuffer(actualImage),
+                        //    pixelBlenderRGBA ?? (pixelBlenderRGBA = new PixelBlenderGammaBGRA(0.8f)));
                     }
                     break;
                 case PixelFormat.GrayScale8:

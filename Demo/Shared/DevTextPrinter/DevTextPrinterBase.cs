@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
 using Typography.TextLayout;
-
+using Typography.Contours;
 namespace Typography.Rendering
 {
     /// <summary>
@@ -24,7 +24,7 @@ namespace Typography.Rendering
         public float FontDescedingPx { get; set; }
         public float FontLineGapPx { get; set; }
         public float FontLineSpacingPx { get; set; }
-
+        
         public HintTechnique HintTechnique
         {
             get { return _hintTech; }
@@ -58,34 +58,34 @@ namespace Typography.Rendering
         /// <param name="textBuffer"></param>
         /// <param name="startAt"></param>
         /// <param name="len"></param>
-        /// <param name="xpos"></param>
-        /// <param name="ypos"></param>
-        public abstract void DrawString(char[] textBuffer, int startAt, int len, float xpos, float ypos);
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public abstract void DrawString(char[] textBuffer, int startAt, int len, float x, float y);
         /// <summary>
         /// draw glyph plan list at (xpos,ypos) of baseline
         /// </summary>
         /// <param name="glyphPlanList"></param>
-        /// <param name="xpos"></param>
-        /// <param name="ypos"></param>
-        public abstract void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos);
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public abstract void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float x, float y);
 
         /// <summary>
         /// draw caret at xpos,ypos (sample only)
         /// </summary>
-        /// <param name="xpos"></param>
-        /// <param name="ypos"></param>
-        public abstract void DrawCaret(float xpos, float ypos);
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public abstract void DrawCaret(float x, float y);
 
 
         //----------------------------------------------------
         //helper methods
-        public void DrawString(char[] textBuffer, float xpos, float ypos)
+        public void DrawString(char[] textBuffer, float x, float y)
         {
-            DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
+            DrawString(textBuffer, 0, textBuffer.Length, x, y);
         }
-        public void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
+        public void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, float x, float y)
         {
-            DrawFromGlyphPlans(glyphPlanList, 0, glyphPlanList.Count, xpos, ypos);
+            DrawFromGlyphPlans(glyphPlanList, 0, glyphPlanList.Count, x, y);
         }
 
     }
