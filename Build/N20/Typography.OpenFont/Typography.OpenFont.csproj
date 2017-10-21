@@ -71,6 +71,9 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\CoverageTable.cs">
       <Link>Tables.AdvanceLayout\CoverageTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\CPAL.cs">
+      <Link>Tables.AdvanceLayout\CPAL.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\FeatureInfo.cs">
       <Link>Tables.AdvanceLayout\FeatureInfo.cs</Link>
     </Compile>
@@ -109,9 +112,6 @@
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\ScriptTable.cs">
       <Link>Tables.AdvanceLayout\ScriptTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\_CPAL.cs">
-      <Link>Tables.AdvanceLayout\_CPAL.cs</Link>
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\EBLCTable.cs">
       <Link>Tables.Others\EBLCTable.cs</Link>
