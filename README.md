@@ -34,9 +34,7 @@ Screenshots
 -----------
 Some screenshots of the current master.
 
-![Screenshot](screenshots/3.png "Screenshot 3") 
-
----
+ 
 
 Enable TrueType Hinting, Tahoma , 8 pts
 
