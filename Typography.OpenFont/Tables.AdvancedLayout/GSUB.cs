@@ -719,22 +719,19 @@ namespace Typography.OpenFont.Tables
                         if (foundPos > -1)
                         {
                             LigatureSetTable ligTable = LigatureSetTables[foundPos];
-                            LigatureTable[] ligs = ligTable.Ligatures;
-                            int j = ligs.Length;
-                            for (int i = 0; i < j; ++i)
+                            foreach (LigatureTable lig in ligTable.Ligatures)
                             {
-                                LigatureTable lig = ligs[i];
                                 int remainingLen = lim - (c + 1);
                                 int compLen = lig.ComponentGlyphs.Length;
                                 if (compLen > remainingLen)
-                                {   //skip tp next component
+                                {   // skip to next component
                                     continue;
                                 }
                                 bool allMatched = true;
                                 int tmp_i = c + 1;
                                 for (int p = 0; p < compLen; ++p)
                                 {
-                                    if (glyphIndices[tmp_i] != lig.ComponentGlyphs[p])
+                                    if (glyphIndices[tmp_i + p] != lig.ComponentGlyphs[p])
                                     {
                                         allMatched = false;
                                         break; //exit from loop
@@ -742,7 +739,7 @@ namespace Typography.OpenFont.Tables
                                 }
                                 if (allMatched)
                                 {
-                                    //remove all match and replace with selected glyph                                     
+                                    // remove all matches and replace with selected glyph
                                     glyphIndices.Replace(c, compLen + 1, lig.GlyphId);
                                     lim -= compLen;
                                     break;
