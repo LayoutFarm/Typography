@@ -45,7 +45,7 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         public abstract class LookupSubTable
         {
-            public abstract void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len);
+            public abstract bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len);
             public GSUB OwnerGSub;
         }
     }

@@ -89,23 +89,31 @@ namespace Typography.TextLayout
 
             //
             //load
-            int j = lookupTables.Count;
-            for (int i = 0; i < j; ++i)
+            for (int pos = 0; pos < outputCodePoints.Count; ++pos)
             {
-                GSUB.LookupTable lookupTable = lookupTables[i];
-                //
-                if (!EnableLigation &&
-                    lookupTable.ForUseWithFeatureId == Features.liga.shortname)
+                bool hasChanged = false;
+                foreach (GSUB.LookupTable lookupTable in lookupTables)
                 {
-                    //skip this feature
-                    continue;
+                    if (!EnableLigation &&
+                        lookupTable.ForUseWithFeatureId == Features.liga.shortname)
+                    {
+                        //skip this feature
+                        continue;
+                    }
+
+                    if (lookupTable.DoSubstitutionAt(outputCodePoints, pos, outputCodePoints.Count - pos))
+                    {
+                        hasChanged = true;
+                    }
                 }
 
-                lookupTable.DoSubstitution(outputCodePoints, 0, outputCodePoints.Count);
+                if (!hasChanged)
+                {
+                    ++pos;
+                }
             }
-
-
         }
+
         public string Lang { get; private set; }
 
         /// <summary>
