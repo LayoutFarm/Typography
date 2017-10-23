@@ -26,7 +26,7 @@ namespace PixelFarm.Agg
     public static class CO
     {
 
-#if BGRA 
+#if !RGBA
         //eg OpenGL, 
         /// <summary>
         /// order b
