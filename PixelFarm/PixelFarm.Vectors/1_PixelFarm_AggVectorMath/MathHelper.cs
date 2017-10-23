@@ -61,7 +61,7 @@ namespace PixelFarm.VectorMath
         /// </summary>
         public const double PiOver3 = Pi / 3;
         /// <summary>
-        /// Definesthe value of  Pi divided by four as a <see cref="System.Single"/>.
+        /// Defines the value of Pi divided by four as a <see cref="System.Single"/>.
         /// </summary>
         public const double PiOver4 = Pi / 4;
         /// <summary>

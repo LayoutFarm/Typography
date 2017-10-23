@@ -1091,7 +1091,7 @@ namespace PixelFarm.Agg
             }
 
             /// <summary>
-            /// expand accumulaton data to 5 bytes
+            /// expand accumulation data to 5 bytes
             /// </summary>
             /// <param name="v0">tertiary</param>
             /// <param name="v1">secondary</param>

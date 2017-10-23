@@ -200,4 +200,4 @@ MIT, 2004,2007, Novell Inc., for System.Drawing
 
 **Demo**
 
-MIT, 2017, Zou Wei, https://github.com/zwcloud
+MIT, 2017, Zou Wei, https://github.com/zwcloud, see more Zou Wei's GUI works at ![here](https://zwcloud.net/#project/imgui) and ![here](https://github.com/zwcloud/ImGui)

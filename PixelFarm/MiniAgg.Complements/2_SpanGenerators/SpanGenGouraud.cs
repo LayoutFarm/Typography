@@ -20,9 +20,9 @@
 
 namespace PixelFarm.Agg
 {
-    //Gourand shading
+    //Gouraud shading
     //============================================================span_gouraud
-    public abstract class SpanGenGourand
+    public abstract class SpanGenGouraud
     {
         CoordAndColor m_coord_0;
         CoordAndColor m_coord_1;
@@ -37,12 +37,12 @@ namespace PixelFarm.Agg
             public Drawing.Color color;
         }
 
-        public SpanGenGourand()
+        public SpanGenGouraud()
         {
             m_cmd[0] = VertexCmd.NoMore;
         }
 
-        public SpanGenGourand(Drawing.Color c1,
+        public SpanGenGouraud(Drawing.Color c1,
                      Drawing.Color c2,
                      Drawing.Color c3,
                      double x1, double y1,

@@ -32,7 +32,7 @@
  */
 
 /*
- * Sweep-line, Constrained Delauney Triangulation (CDT) See: Domiter, V. and
+ * Sweep-line, Constrained Delaunay Triangulation (CDT) See: Domiter, V. and
  * Zalik, B.(2008)'Sweep-line algorithm for constrained Delaunay triangulation',
  * International Journal of Geographical Information Science
  * 

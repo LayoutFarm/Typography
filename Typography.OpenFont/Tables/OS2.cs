@@ -6,7 +6,7 @@ namespace Typography.OpenFont.Tables
 
     //https://www.microsoft.com/typography/otspec/os2.htm
     /// <summary>
-    /// OS2 and Windows matrics
+    /// OS2 and Windows metrics
     /// </summary>
     class OS2Table : TableEntry
     {
@@ -602,8 +602,8 @@ namespace Typography.OpenFont.Tables
         //3 	Latin Extended-B 	0180-024F
         BasicLatin = (0 << 32) | (0x0000 << 16) | 0x007F,
         Latin1Supplement = (1 << 32) | (0x0080 << 16) | 0x00FF,
-        LatinExtenedA = (2 << 32) | (0x0100 << 16) | 0x017F,
-        LatinExtenedB = (3 << 32) | (0x0180 << 16) | 0x024F,
+        LatinExtendedA = (2 << 32) | (0x0100 << 16) | 0x017F,
+        LatinExtendedB = (3 << 32) | (0x0180 << 16) | 0x024F,
         //4 	IPA Extensions 	0250-02AF
         //    Phonetic Extensions 	1D00-1D7F
         //    Phonetic Extensions Supplement 	1D80-1DBF

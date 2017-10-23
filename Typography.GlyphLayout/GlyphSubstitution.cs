@@ -7,13 +7,13 @@ namespace Typography.TextLayout
     /// <summary>
     /// glyph subsitution manager
     /// </summary>
-    class GlyphSubStitution
+    class GlyphSubstitution
     {
 
         Typeface typeface;
         GSUB gsubTable;
         List<GSUB.LookupTable> lookupTables;
-        public GlyphSubStitution(Typeface typeface, string lang)
+        public GlyphSubstitution(Typeface typeface, string lang)
         {
             this.EnableLigation = true;//enable by default
             this.Lang = lang;

@@ -367,31 +367,23 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt2 : LookupSubTable
             {
-                public LkSubTableT1Fmt2(ushort coverageOffset, ushort[] substitueGlyphs)
+                public LkSubTableT1Fmt2(ushort coverageOffset, ushort[] substituteGlyphs)
                 {
                     this.CoverageOffset = coverageOffset;
-                    this.SubstitueGlyphs = substitueGlyphs;
+                    this.SubstituteGlyphs = substituteGlyphs;
                 }
                 public ushort CoverageOffset { get; set; }
                 /// <summary>
                 /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
                 /// </summary>
-                public ushort[] SubstitueGlyphs
-                {
-                    get;
-                    private set;
-                }
-                public CoverageTable CoverageTable
-                {
-                    get;
-                    set;
-                }
+                public ushort[] SubstituteGlyphs { get; private set; }
+                public CoverageTable CoverageTable { get; set; }
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
                     int foundAt = CoverageTable.FindPosition(glyphIndices[pos]);
                     if (foundAt > -1)
                     {
-                        glyphIndices.Replace(pos, SubstitueGlyphs[foundAt]);
+                        glyphIndices.Replace(pos, SubstituteGlyphs[foundAt]);
                         return true;
                     }
                     return false;
@@ -480,8 +472,8 @@ namespace Typography.OpenFont.Tables
                         case 2:
                             {
                                 ushort glyphCount = reader.ReadUInt16();
-                                ushort[] substitueGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
-                                var subTable = new LkSubTableT1Fmt2(coverage, substitueGlyphs);
+                                ushort[] substituteGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
+                                var subTable = new LkSubTableT1Fmt2(coverage, substituteGlyphs);
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 this.subTables.Add(subTable);
                             }
@@ -503,8 +495,8 @@ namespace Typography.OpenFont.Tables
                     {
                         SequenceTable seqTable = SeqTables[foundPos];
                         //replace current glyph index with new seq
-                        int new_seqCount = seqTable.substitueGlyphs.Length;
-                        glyphIndices.Replace(pos, seqTable.substitueGlyphs);
+                        int new_seqCount = seqTable.substituteGlyphs.Length;
+                        glyphIndices.Replace(pos, seqTable.substituteGlyphs);
                         return true;
                     }
                     return false;
@@ -512,10 +504,10 @@ namespace Typography.OpenFont.Tables
             }
             struct SequenceTable
             {
-                public ushort[] substitueGlyphs;
-                public SequenceTable(ushort[] substitueGlyphs)
+                public ushort[] substituteGlyphs;
+                public SequenceTable(ushort[] substituteGlyphs)
                 {
-                    this.substitueGlyphs = substitueGlyphs;
+                    this.substituteGlyphs = substituteGlyphs;
                 }
             }
             /// <summary>
@@ -704,22 +696,19 @@ namespace Typography.OpenFont.Tables
                     if (foundPos > -1)
                     {
                         LigatureSetTable ligTable = LigatureSetTables[foundPos];
-                        LigatureTable[] ligs = ligTable.Ligatures;
-                        int j = ligs.Length;
-                        for (int i = 0; i < j; ++i)
+                        foreach (LigatureTable lig in ligTable.Ligatures)
                         {
-                            LigatureTable lig = ligs[i];
                             int remainingLen = len - 1;
                             int compLen = lig.ComponentGlyphs.Length;
                             if (compLen > remainingLen)
-                            {   //skip tp next component
+                            {   // skip tp next component
                                 continue;
                             }
                             bool allMatched = true;
                             int tmp_i = pos + 1;
                             for (int p = 0; p < compLen; ++p)
                             {
-                                if (glyphIndices[tmp_i] != lig.ComponentGlyphs[p])
+                                if (glyphIndices[tmp_i + p] != lig.ComponentGlyphs[p])
                                 {
                                     allMatched = false;
                                     break; //exit from loop
@@ -727,7 +716,7 @@ namespace Typography.OpenFont.Tables
                             }
                             if (allMatched)
                             {
-                                //remove all match and replace with selected glyph                                     
+                                // remove all matches and replace with selected glyph                                     
                                 glyphIndices.Replace(pos, compLen + 1, lig.GlyphId);
                                 return true;
                             }

@@ -46,8 +46,8 @@
     <Compile Include="..\..\..\Typography.GlyphLayout\GlyphPosition.cs">
       <Link>GlyphPosition.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.GlyphLayout\GlyphSubtitution.cs">
-      <Link>GlyphSubtitution.cs</Link>
+    <Compile Include="..\..\..\Typography.GlyphLayout\GlyphSubstitution.cs">
+      <Link>GlyphSubstitution.cs</Link>
     </Compile>
     <Compile Include="..\..\..\Typography.GlyphLayout\MeasureStringBox.cs">
       <Link>MeasureStringBox.cs</Link>

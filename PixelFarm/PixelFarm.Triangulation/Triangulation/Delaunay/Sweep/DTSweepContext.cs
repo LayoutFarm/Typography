@@ -42,7 +42,7 @@ namespace Poly2Tri
     {
         //*** share object !
 
-        // Inital triangle factor, seed triangle will extend 30% of 
+        // Initial triangle factor, seed triangle will extend 30% of 
         // PointSet width to both left and right.
         private const float ALPHA = 0.3f;
         internal AdvancingFront Front;

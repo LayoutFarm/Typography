@@ -90,7 +90,7 @@ namespace Typography.OpenFont.Tables
         public short CaretSlopeRise { get; set; }
         public short CaretSlopeRun { get; set; }
         public short CaretOffset { get; set; }
-        public ushort NumOfLongVerMatrics { get; set; }
+        public ushort NumOfLongVerMetrics { get; set; }
         protected override void ReadContentFrom(BinaryReader reader)
         {
             uint version = reader.ReadUInt32();
@@ -113,7 +113,7 @@ namespace Typography.OpenFont.Tables
             //skip 5 int16 =>  4 reserve field + 1 metricDataFormat            
             reader.BaseStream.Position += (2 * (4 + 1)); //short = 2 byte, 
             //
-            NumOfLongVerMatrics = reader.ReadUInt16();
+            NumOfLongVerMetrics = reader.ReadUInt16();
         }
 
     }

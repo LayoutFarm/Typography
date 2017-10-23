@@ -5,7 +5,7 @@ using System.IO;
 namespace Typography.OpenFont.Tables
 {
 
-    class HorizontalDeviceMatrics : TableEntry
+    class HorizontalDeviceMetrics : TableEntry
     {
         //https://www.microsoft.com/typography/otspec/hdmx.htm
         //The hdmx table relates to OpenType™ fonts with TrueType outlines. 

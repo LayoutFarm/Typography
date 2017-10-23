@@ -126,8 +126,7 @@ namespace Typography.TextLayout
         /// remove: add_new 1:>=1
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="removeLen"></param>
-        /// <param name="newGlyhIndex"></param>
+        /// <param name="newGlyphIndices"></param>
         public void Replace(int index, ushort[] newGlyphIndices)
         {
             _glyphIndices.RemoveAt(index);

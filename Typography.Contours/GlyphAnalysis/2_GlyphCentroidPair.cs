@@ -17,7 +17,7 @@ namespace Typography.Contours
         {
 
             //each triangle has 1 centroid point
-            //a centrod line connects between 2 adjacent triangles via centroid 
+            //a centroid line connects between 2 adjacent triangles via centroid 
 
             //p triangle=> (x0,y0)  (centroid of p)
             //q triangle=> (x1,y1)  (centroid of q)

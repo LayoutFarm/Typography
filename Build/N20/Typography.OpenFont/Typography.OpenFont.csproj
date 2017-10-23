@@ -116,8 +116,8 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\EBLCTable.cs">
       <Link>Tables.Others\EBLCTable.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\HorizontalDeviceMatrics.cs">
-      <Link>Tables.Others\HorizontalDeviceMatrics.cs</Link>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\HorizontalDeviceMetrics.cs">
+      <Link>Tables.Others\HorizontalDeviceMetrics.cs</Link>
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\Kern.cs">
       <Link>Tables.Others\Kern.cs</Link>
@@ -134,14 +134,14 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\STAT.cs">
       <Link>Tables.Others\STAT.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\VerticalDeviceMatrics.cs">
-      <Link>Tables.Others\VerticalDeviceMatrics.cs</Link>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\VerticalDeviceMetrics.cs">
+      <Link>Tables.Others\VerticalDeviceMetrics.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\VerticalMatrics.cs">
-      <Link>Tables.Others\VerticalMatrics.cs</Link>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\VerticalMetrics.cs">
+      <Link>Tables.Others\VerticalMetrics.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\VerticalMatricsHeader.cs">
-      <Link>Tables.Others\VerticalMatricsHeader.cs</Link>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\VerticalMetricsHeader.cs">
+      <Link>Tables.Others\VerticalMetricsHeader.cs</Link>
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.TrueType\Cvt_Programs.cs">
       <Link>Tables.TrueType\Cvt_Programs.cs</Link>

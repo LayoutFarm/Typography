@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    class VerticalDeviceMatrics : TableEntry
+    class VerticalDeviceMetrics : TableEntry
     {
         //https://www.microsoft.com/typography/otspec/vdmx.htm
         //VDMX - Vertical Device Metrics 

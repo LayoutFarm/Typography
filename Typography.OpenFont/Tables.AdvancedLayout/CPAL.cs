@@ -11,7 +11,7 @@ namespace Typography.OpenFont.Tables
         public override string Name { get { return "CPAL"; } }
 
 
-        byte[] _colorRBGABuffer;
+        byte[] _colorBGRABuffer;
         // Read the CPAL table
         // https://www.microsoft.com/typography/otspec/cpal.htm
         protected override void ReadContentFrom(BinaryReader reader)
@@ -27,18 +27,25 @@ namespace Typography.OpenFont.Tables
             Palettes = Utils.ReadUInt16Array(reader, paletteCount);
 
             reader.BaseStream.Seek(offset + colorsOffset, SeekOrigin.Begin);
-            _colorRBGABuffer = reader.ReadBytes(4 * ColorCount);
+            _colorBGRABuffer = reader.ReadBytes(4 * ColorCount);
         }
         public ushort[] Palettes { get; private set; }
         public ushort ColorCount { get; private set; }
         public void GetColor(int colorIndex, out byte r, out byte g, out byte b, out byte a)
         {
-            byte[] colorRBGABuffer = _colorRBGABuffer;
-            int startAt = colorIndex * 4;//rgba
-            r = colorRBGABuffer[startAt];
-            g = colorRBGABuffer[startAt + 1];
-            b = colorRBGABuffer[startAt + 2];
-            a = colorRBGABuffer[startAt + 3];
+            //Each color record has BGRA values. The color space for these values is sRGB.
+            //Type Name    Description
+            //uint8   blue    Blue value(B0).
+            //uint8   green   Green value(B1).
+            //uint8   red     Red value(B2).
+            //uint8   alpha   Alpha value(B3).
+
+            byte[] colorBGRABuffer = _colorBGRABuffer;
+            int startAt = colorIndex * 4;//bgra
+            b = colorBGRABuffer[startAt];
+            g = colorBGRABuffer[startAt + 1];
+            r = colorBGRABuffer[startAt + 2];
+            a = colorBGRABuffer[startAt + 3]; 
         }
     }
 }

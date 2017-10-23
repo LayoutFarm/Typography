@@ -550,7 +550,7 @@ namespace PixelFarm.Agg.Transform
             parl_to_parl(src, dst);
         }
 
-        //---------------------------------- Parellelogram transformations
+        //---------------------------------- Parallelogram transformations
         // transform a parallelogram to another one. Src and dst are 
         // pointers to arrays of three points (double[6], x1,y1,...) that 
         // identify three corners of the parallelograms assuming implicit 

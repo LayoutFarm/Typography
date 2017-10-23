@@ -200,7 +200,7 @@ namespace SampleWinForms.UI
                 if (accum_x > x)
                 {
                     //TODO: review here 
-                    //for some glyph that has been substitued 
+                    //for some glyph that has been substituted 
                     //glyph may not match with actual user char in the _line    
 
                     float xoffset_on_glyph = (x - (accum_x - thisGlyphW));

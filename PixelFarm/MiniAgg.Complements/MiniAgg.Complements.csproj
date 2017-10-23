@@ -57,7 +57,7 @@
     <Compile Include="Filter\RecursiveBlur.cs" />
     <Compile Include="Filter\StackBlur.cs" />
     <Compile Include="Image\Transposer.cs" />
-    <Compile Include="2_SpanGenerators\SpanGenGourand.cs" />
+    <Compile Include="2_SpanGenerators\SpanGenGouraud.cs" />
     <Compile Include="2_SpanGenerators\SpanGenGouraudRGBA.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

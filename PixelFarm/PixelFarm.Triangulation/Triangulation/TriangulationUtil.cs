@@ -122,7 +122,7 @@ namespace Poly2Tri
             //return true;
         }
 
-        /// Forumla to calculate signed area
+        /// Formula to calculate signed area
         /// Positive if CCW
         /// Negative if CW
         /// 0 if collinear

@@ -101,7 +101,7 @@ namespace PixelFarm.Drawing.Fonts
 
         protected override void OnFontSizeChanged()
         {
-            //update some font matrics property   
+            //update some font metrics property   
             Typeface currentTypeface = _currentTypeface;
             if (currentTypeface != null)
             {

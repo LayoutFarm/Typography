@@ -28,15 +28,14 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         /// <param name="index"></param>
         /// <param name="removeLen"></param>
-        /// <param name="newGlyhIndex"></param>
-        void Replace(int index, int removeLen, ushort newGlyhIndex);
+        /// <param name="newGlyphIndex"></param>
+        void Replace(int index, int removeLen, ushort newGlyphIndex);
         /// <summary>
         /// remove: add_new 1:>=1
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="removeLen"></param>
-        /// <param name="newGlyhIndex"></param>
-        void Replace(int index, ushort[] newGlyhIndices);
+        /// <param name="newGlyphIndices"></param>
+        void Replace(int index, ushort[] newGlyphIndices);
     }
 
     partial class GSUB : TableEntry
