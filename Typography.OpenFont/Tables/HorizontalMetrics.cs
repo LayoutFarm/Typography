@@ -1,4 +1,4 @@
-﻿//Apahce2, 2017, WinterDev
+﻿//Apache2, 2017, WinterDev
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
@@ -21,14 +21,14 @@ namespace Typography.OpenFont.Tables
 
         List<ushort> _advanceWidths; //in font design unit
         List<short> _leftSideBearings;//lsb, in font design unit
-        int _numOfHMatrics;
+        int _numOfHMetrics;
         int _numGlyphs;
-        public HorizontalMetrics(UInt16 numOfHMatrics, UInt16 numGlyphs)
+        public HorizontalMetrics(UInt16 numOfHMetrics, UInt16 numGlyphs)
         {
             //The value numOfHMetrics comes from the 'hhea' table**   
             _advanceWidths = new List<ushort>(numGlyphs);
             _leftSideBearings = new List<short>(numGlyphs);
-            _numOfHMatrics = numOfHMatrics;
+            _numOfHMetrics = numOfHMetrics;
             _numGlyphs = numGlyphs;
         }
         public override string Name
@@ -51,14 +51,14 @@ namespace Typography.OpenFont.Tables
         protected override void ReadContentFrom(BinaryReader input)
         {
             //===============================================================================
-            //1. hMatrics : have both advance width and leftSideBearing(lsb)
+            //1. hMetrics : have both advance width and leftSideBearing(lsb)
             //Paired advance width and left side bearing values for each glyph. 
             //The value numOfHMetrics comes from the 'hhea' table**
             //If the font is monospaced, only one entry need be in the array, 
             //but that entry is required. The last entry applies to all subsequent glyphs
 
-            int numOfHMatrics = _numOfHMatrics;
-            for (int i = 0; i < numOfHMatrics; i++)
+            int numOfHMetrics = _numOfHMetrics;
+            for (int i = 0; i < numOfHMetrics; i++)
             {
                 _advanceWidths.Add(input.ReadUInt16());
                 _leftSideBearings.Add(input.ReadInt16());
@@ -69,8 +69,8 @@ namespace Typography.OpenFont.Tables
             //Here the advanceWidth is assumed to be the same as the advanceWidth for the last entry above.
             //The number of entries in this array is derived from numGlyphs (from 'maxp' table) minus numberOfHMetrics.
             int numGlyphs = _numGlyphs;
-            int nEntries = numGlyphs - numOfHMatrics;
-            ushort advanceWidth = _advanceWidths[numOfHMatrics - 1];
+            int nEntries = numGlyphs - numOfHMetrics;
+            ushort advanceWidth = _advanceWidths[numOfHMetrics - 1];
 
             for (int i = 0; i < nEntries; i++)
             {

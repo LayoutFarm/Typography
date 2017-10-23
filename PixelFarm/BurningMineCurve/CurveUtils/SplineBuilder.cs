@@ -48,7 +48,7 @@ namespace burningmime.curves
     public sealed class SplineBuilder
     {
         private readonly CurveBuilder _builder;      // Underlying curve fitter
-        private readonly Spline _spline;             // Underlyig spline
+        private readonly Spline _spline;             // Underlying spline
         public SplineBuilder(FLOAT pointDistance, FLOAT error, int samplesPerCurve)
         {
             _builder = new CurveBuilder(pointDistance, error);

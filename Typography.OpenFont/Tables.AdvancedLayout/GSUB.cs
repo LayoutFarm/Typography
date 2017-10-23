@@ -283,7 +283,7 @@ namespace Typography.OpenFont.Tables
                 int j = subTables.Count;
                 for (int i = 0; i < j; ++i)
                 {
-                    subTables[i].DoSubtitution(inputGlyphs, startAt, len);
+                    subTables[i].DoSubstitution(inputGlyphs, startAt, len);
                 }
             }
 #if DEBUG
@@ -356,7 +356,7 @@ namespace Typography.OpenFont.Tables
                     set;
                 }
 
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
                     throw new NotImplementedException();
                 }
@@ -366,16 +366,16 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt2 : LookupSubTable
             {
-                public LkSubTableT1Fmt2(ushort coverageOffset, ushort[] substitueGlyphs)
+                public LkSubTableT1Fmt2(ushort coverageOffset, ushort[] substituteGlyphs)
                 {
                     this.CoverageOffset = coverageOffset;
-                    this.SubstitueGlyphs = substitueGlyphs;
+                    this.SubstituteGlyphs = substituteGlyphs;
                 }
                 public ushort CoverageOffset { get; set; }
                 /// <summary>
                 /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
                 /// </summary>
-                public ushort[] SubstitueGlyphs
+                public ushort[] SubstituteGlyphs
                 {
                     get;
                     private set;
@@ -385,7 +385,7 @@ namespace Typography.OpenFont.Tables
                     get;
                     set;
                 }
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
                     int endBefore = startAt + len;
                     for (int i = startAt; i < endBefore; ++i)
@@ -393,7 +393,7 @@ namespace Typography.OpenFont.Tables
                         int foundAt = CoverageTable.FindPosition(glyphIndices[i]);
                         if (foundAt > -1)
                         {
-                            glyphIndices.Replace(i, SubstitueGlyphs[foundAt]);
+                            glyphIndices.Replace(i, SubstituteGlyphs[foundAt]);
                         }
                     }
                 }
@@ -481,8 +481,8 @@ namespace Typography.OpenFont.Tables
                         case 2:
                             {
                                 ushort glyphCount = reader.ReadUInt16();
-                                ushort[] substitueGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
-                                var subTable = new LkSubTableT1Fmt2(coverage, substitueGlyphs);
+                                ushort[] substituteGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
+                                var subTable = new LkSubTableT1Fmt2(coverage, substituteGlyphs);
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                                 this.subTables.Add(subTable);
                             }
@@ -497,7 +497,7 @@ namespace Typography.OpenFont.Tables
 
                 public CoverageTable CoverageTable { get; set; }
                 public SequenceTable[] SeqTables { get; set; }
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
                     int lim = startAt + len;
                     for (int i = startAt; i < lim; ++i)
@@ -507,8 +507,8 @@ namespace Typography.OpenFont.Tables
                         {
                             SequenceTable seqTable = SeqTables[foundPos];
                             //replace current glyph index with new seq
-                            int new_seqCount = seqTable.substitueGlyphs.Length;
-                            glyphIndices.Replace(i, seqTable.substitueGlyphs);
+                            int new_seqCount = seqTable.substituteGlyphs.Length;
+                            glyphIndices.Replace(i, seqTable.substituteGlyphs);
                             lim += (new_seqCount - 1);
                             i += (new_seqCount - 1);
                         }
@@ -517,10 +517,10 @@ namespace Typography.OpenFont.Tables
             }
             struct SequenceTable
             {
-                public ushort[] substitueGlyphs;
-                public SequenceTable(ushort[] substitueGlyphs)
+                public ushort[] substituteGlyphs;
+                public SequenceTable(ushort[] substituteGlyphs)
                 {
-                    this.substitueGlyphs = substitueGlyphs;
+                    this.substituteGlyphs = substituteGlyphs;
                 }
             }
             /// <summary>
@@ -601,7 +601,7 @@ namespace Typography.OpenFont.Tables
                     set;
                 }
                 public AlternativeSetTable[] AlternativeSetTables { get; set; }
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
                     //Coverage table containing the indices of glyphs with alternative forms(Coverage),
                     int end = startAt + len;
@@ -708,7 +708,7 @@ namespace Typography.OpenFont.Tables
                 public CoverageTable CoverageTable { get; set; }
                 public LigatureSetTable[] LigatureSetTables { get; set; }
 
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
                     //check coverage
                     int lim = startAt + len;
@@ -1131,7 +1131,7 @@ namespace Typography.OpenFont.Tables
 
                 public CoverageTable CoverageTable { get; set; }
                 public ChainSubRuleSetTable[] SubRuleSets { get; set; }
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
                     throw new NotImplementedException();
                 }
@@ -1146,7 +1146,7 @@ namespace Typography.OpenFont.Tables
                 public ClassDefTable InputClassDef { get; set; }
                 public ClassDefTable LookaheadClassDef { get; set; }
                 public ChainSubClassSet[] ChainSubClassSets { get; set; }
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
                     throw new NotImplementedException();
                 }
@@ -1160,7 +1160,7 @@ namespace Typography.OpenFont.Tables
                 public CoverageTable[] InputCoverages { get; set; }
                 public CoverageTable[] LookaheadCoverages { get; set; }
                 public SubstLookupRecord[] SubstLookupRecords { get; set; }
-                public override void DoSubtitution(IGlyphIndexList glyphIndices, int startAt, int len)
+                public override void DoSubstitution(IGlyphIndexList glyphIndices, int startAt, int len)
                 {
 
                     int endBefore = startAt + len;

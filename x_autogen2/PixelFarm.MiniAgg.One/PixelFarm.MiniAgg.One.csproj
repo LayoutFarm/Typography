@@ -68,8 +68,8 @@
     <Compile Include="..\..\PixelFarm\MiniAgg.Complements\1_Base\ScanlineRasToDestBitmapRendererExtension.cs">
       <Link>PixelFarm\MiniAgg.Complements\1_Base\ScanlineRasToDestBitmapRendererExtension.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\MiniAgg.Complements\2_SpanGenerators\SpanGenGourand.cs">
-      <Link>PixelFarm\MiniAgg.Complements\2_SpanGenerators\SpanGenGourand.cs</Link>
+    <Compile Include="..\..\PixelFarm\MiniAgg.Complements\2_SpanGenerators\SpanGenGouraud.cs">
+      <Link>PixelFarm\MiniAgg.Complements\2_SpanGenerators\SpanGenGouraud.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\MiniAgg.Complements\2_SpanGenerators\SpanGenGouraudRGBA.cs">
       <Link>PixelFarm\MiniAgg.Complements\2_SpanGenerators\SpanGenGouraudRGBA.cs</Link>

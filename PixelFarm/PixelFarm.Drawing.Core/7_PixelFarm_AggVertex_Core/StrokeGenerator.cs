@@ -144,7 +144,7 @@ namespace PixelFarm.Agg
             //y = mx + b ...(1)
             //b = y- mx
 
-            //substitue with known value to gett b 
+            //substitute with known value to gett b 
             //double b0 = p0.Y - (slope_m) * p0.X;
             //double b1 = p1.Y - (slope_m) * p1.X;
             //return b0;
