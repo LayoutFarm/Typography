@@ -91,7 +91,7 @@ namespace PixelFarm.Agg
     //                                    // grayscale image 1-byte per pixel.
     //     do
     //     {
-    //         *dst++ = *covers++;        // Hypotetical rendering. 
+    //         *dst++ = *covers++;        // Hypothetical rendering. 
     //     }
     //     while(--num_pix);
     //

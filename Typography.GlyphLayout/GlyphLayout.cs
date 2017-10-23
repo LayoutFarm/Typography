@@ -65,7 +65,7 @@ namespace Typography.TextLayout
             GlyphLayoutPlanContext context;
             if (!collection.TryGetValue(key, out context))
             {
-                var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubStitution(typeface, scriptLang.shortname) : null;
+                var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.shortname) : null;
                 var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
                 collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
             }
@@ -85,9 +85,9 @@ namespace Typography.TextLayout
     }
     struct GlyphLayoutPlanContext
     {
-        public readonly GlyphSubStitution _glyphSub;
+        public readonly GlyphSubstitution _glyphSub;
         public readonly GlyphSetPosition _glyphPos;
-        public GlyphLayoutPlanContext(GlyphSubStitution _glyphSub, GlyphSetPosition glyphPos)
+        public GlyphLayoutPlanContext(GlyphSubstitution _glyphSub, GlyphSetPosition glyphPos)
         {
             this._glyphSub = _glyphSub;
             this._glyphPos = glyphPos;
@@ -103,7 +103,7 @@ namespace Typography.TextLayout
         GlyphLayoutPlanCollection _layoutPlanCollection = new GlyphLayoutPlanCollection();
         Typeface _typeface;
         ScriptLang _scriptLang;
-        GlyphSubStitution _gsub;
+        GlyphSubstitution _gsub;
         GlyphSetPosition _gpos;
         bool _needPlanUpdate;
         IPixelScaleLayout _pxscaleLayout;
@@ -556,7 +556,7 @@ namespace Typography.TextLayout
         public readonly ushort glyphIndex;
         public short xoffset;
         public short yoffset;
-        public short advanceW; //acutally this value is ushort, TODO: review here
+        public short advanceW; // actually this value is ushort, TODO: review here
 
         public GlyphPos(
             ushort glyphIndex,

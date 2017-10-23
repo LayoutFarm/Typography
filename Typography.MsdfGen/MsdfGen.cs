@@ -414,11 +414,11 @@ namespace Msdfgen
                         }
 
                         if (r.nearEdge != null)
-                            r.nearEdge.edgeSegment.distanceToPsedoDistance(ref r.minDistance, p, r.nearParam);
+                            r.nearEdge.edgeSegment.distanceToPseudoDistance(ref r.minDistance, p, r.nearParam);
                         if (g.nearEdge != null)
-                            g.nearEdge.edgeSegment.distanceToPsedoDistance(ref g.minDistance, p, g.nearParam);
+                            g.nearEdge.edgeSegment.distanceToPseudoDistance(ref g.minDistance, p, g.nearParam);
                         if (b.nearEdge != null)
-                            b.nearEdge.edgeSegment.distanceToPsedoDistance(ref b.minDistance, p, b.nearParam);
+                            b.nearEdge.edgeSegment.distanceToPseudoDistance(ref b.minDistance, p, b.nearParam);
                         //--------------
                         medMinDistance = median(r.minDistance.distance, g.minDistance.distance, b.minDistance.distance);
                         contourSD[n].r = r.minDistance.distance;
@@ -431,11 +431,11 @@ namespace Msdfgen
                             negDist = medMinDistance;
                     }
                     if (sr.nearEdge != null)
-                        sr.nearEdge.edgeSegment.distanceToPsedoDistance(ref sr.minDistance, p, sr.nearParam);
+                        sr.nearEdge.edgeSegment.distanceToPseudoDistance(ref sr.minDistance, p, sr.nearParam);
                     if (sg.nearEdge != null)
-                        sg.nearEdge.edgeSegment.distanceToPsedoDistance(ref sg.minDistance, p, sg.nearParam);
+                        sg.nearEdge.edgeSegment.distanceToPseudoDistance(ref sg.minDistance, p, sg.nearParam);
                     if (sb.nearEdge != null)
-                        sb.nearEdge.edgeSegment.distanceToPsedoDistance(ref sb.minDistance, p, sb.nearParam);
+                        sb.nearEdge.edgeSegment.distanceToPseudoDistance(ref sb.minDistance, p, sb.nearParam);
 
                     MultiDistance msd;
                     msd.r = msd.g = msd.b = msd.med = SignedDistance.INFINITE.distance;
@@ -533,15 +533,15 @@ namespace Msdfgen
                         }
                         if (r.nearEdge != null)
                         {
-                            r.nearEdge.edgeSegment.distanceToPsedoDistance(ref r.minDistance, p, r.nearParam);
+                            r.nearEdge.edgeSegment.distanceToPseudoDistance(ref r.minDistance, p, r.nearParam);
                         }
                         if (g.nearEdge != null)
                         {
-                            g.nearEdge.edgeSegment.distanceToPsedoDistance(ref g.minDistance, p, g.nearParam);
+                            g.nearEdge.edgeSegment.distanceToPseudoDistance(ref g.minDistance, p, g.nearParam);
                         }
                         if (b.nearEdge != null)
                         {
-                            b.nearEdge.edgeSegment.distanceToPsedoDistance(ref b.minDistance, p, b.nearParam);
+                            b.nearEdge.edgeSegment.distanceToPseudoDistance(ref b.minDistance, p, b.nearParam);
                         }
 
                         output.SetPixel(x, row,

@@ -133,7 +133,7 @@ namespace Typography.Contours
         /// </summary>
         public Bounds OriginalGlyphControlBounds { get; set; }
         /// <summary>
-        /// orignal glyph advance width
+        /// original glyph advance width
         /// </summary>
         public int OriginalAdvanceWidth { get; set; }
 
@@ -161,7 +161,7 @@ namespace Typography.Contours
             {
                 if (_needRefreshBoneGroup)
                 {
-                    //change scale not affact the grid fit ***
+                    //change scale not affect the grid fit ***
                     AnalyzeBoneGroups(GridBoxWidth, GridBoxHeight);
                     _needRefreshBoneGroup = false;
                 }

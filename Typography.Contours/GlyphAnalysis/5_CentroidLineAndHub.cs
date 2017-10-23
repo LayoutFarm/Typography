@@ -361,7 +361,7 @@ namespace Typography.Contours
             for (int n = this.count - 1; n >= 0; --n)
             {
                 GlyphBone bone = ownerCentroidLine.bones[index];
-                //collect all outside edge arround  glyph bone
+                //collect all outside edge around glyph bone
                 bone.CollectOutsideEdge(tmpEdges);
                 index++;
             }

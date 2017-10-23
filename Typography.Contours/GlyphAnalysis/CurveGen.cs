@@ -51,7 +51,7 @@ namespace Typography.Contours
         /// <remarks>This value defines whether the curve should be calculated as a
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f i.e. stands for a curve that has always a distance
-        /// of 5.f to the orignal curve at any point.</remarks>
+        /// of 5.f to the original curve at any point.</remarks>
         public float Parallel;
         #endregion
 
@@ -181,7 +181,7 @@ namespace Typography.Contours
         /// <remarks>This value defines whether the curve should be calculated as a
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f i.e. stands for a curve that has always a distance
-        /// of 5.f to the orignal curve at any point.</remarks>
+        /// of 5.f to the original curve at any point.</remarks>
         public float Parallel;
         #endregion
 

@@ -12,7 +12,7 @@ namespace Typography.Contours
         }
 
         /// <summary>
-        /// calculate distance to fit interger grid pos, assum grid size=1
+        /// calculate distance to fit integer grid pos, assum grid size=1
         /// </summary>
         /// <param name="value">diff distance to fit grid position</param>
         /// <returns></returns>
@@ -602,7 +602,7 @@ namespace Typography.Contours
             //y = mx + b ...(1)
             //b = y- mx
 
-            //substitue with known value to gett b 
+            //substitute with known value to gett b 
             //double b0 = p0.Y - (slope_m) * p0.X;
             //double b1 = p1.Y - (slope_m) * p1.X;
             //return b0;

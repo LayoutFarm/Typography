@@ -91,7 +91,7 @@ namespace Typography.OpenFont
                 Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
-                VerticalDeviceMatrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMatrics());
+                VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
                 //--------------
                 PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
@@ -106,7 +106,7 @@ namespace Typography.OpenFont
                 VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
                 if (vhea != null)
                 {
-                    VerticalMatric vmtx = ReadTableIfExists(tables, input, new VerticalMatric(vhea.NumOfLongVerMatrics));
+                    VerticalMatric vmtx = ReadTableIfExists(tables, input, new VerticalMatric(vhea.NumOfLongVerMetrics));
                 }
 
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());

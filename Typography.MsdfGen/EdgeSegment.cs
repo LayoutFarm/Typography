@@ -16,7 +16,7 @@ namespace Msdfgen
             this.color = edgeColor;
         }
         public abstract void findBounds(ref double left, ref double bottom, ref double right, ref double top);
-        public void distanceToPsedoDistance(ref SignedDistance distance, Vector2 origin, double param)
+        public void distanceToPseudoDistance(ref SignedDistance distance, Vector2 origin, double param)
         {
             if (param < 0)
             {

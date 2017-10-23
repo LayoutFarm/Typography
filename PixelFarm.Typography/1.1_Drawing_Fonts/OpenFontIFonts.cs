@@ -12,7 +12,7 @@ namespace LayoutFarm
 
         IFontLoader _fontloader;
         TypefaceStore typefaceStore;
-        GlyphLayout glyhLayout;
+        GlyphLayout glyphLayout;
         List<GlyphPlan> userGlyphPlanList;
         List<UserCharToGlyphIndexMap> userCharToGlyphMapList;
 
@@ -21,10 +21,10 @@ namespace LayoutFarm
             this._fontloader = fontloader;
             typefaceStore = new TypefaceStore();
             typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(null);
-            glyhLayout = new GlyphLayout();
+            glyphLayout = new GlyphLayout();
 
-            glyhLayout.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;//test conplex script
-            glyhLayout.PositionTechnique = PositionTechnique.OpenFont;
+            glyphLayout.ScriptLang = Typography.OpenFont.ScriptLangs.Thai;//test conplex script
+            glyphLayout.PositionTechnique = PositionTechnique.OpenFont;
             //assign fitting engine
 
 
@@ -42,8 +42,8 @@ namespace LayoutFarm
             //userCharToGlyphMapList.Clear();
             //// 
             //Typeface typeface = typefaceStore.GetTypeface(font.Name, InstalledFontStyle.Normal);
-            //glyhLayout.Typeface = typeface;
-            //glyhLayout.GenerateGlyphPlans(str, startAt, len, userGlyphPlanList, userCharToGlyphMapList);
+            //glyphLayout.Typeface = typeface;
+            //glyphLayout.GenerateGlyphPlans(str, startAt, len, userGlyphPlanList, userCharToGlyphMapList);
             ////
             ////
             //float scale = typeface.CalculateToPixelScaleFromPointSize(font.SizeInPoints);
@@ -64,12 +64,12 @@ namespace LayoutFarm
         {
             //resolve type face
             Typeface typeface = typefaceStore.GetTypeface(font.Name, InstalledFontStyle.Normal);
-            glyhLayout.Typeface = typeface;
+            glyphLayout.Typeface = typeface;
             MeasuredStringBox result;
             float scale = typeface.CalculateToPixelScaleFromPointSize(font.SizeInPoints);
 
             //measure string at specific px scale
-            glyhLayout.MeasureString(str, startAt, len, out result, scale);
+            glyphLayout.MeasureString(str, startAt, len, out result, scale);
 
             return new Size((int)result.width, (int)result.CalculateLineHeight());
 
