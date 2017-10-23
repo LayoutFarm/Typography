@@ -11,66 +11,31 @@ namespace Typography.OpenFont.Tables
         ushort _format;
         ushort[] orderedGlyphIdList; //for format1
         //----------------------------------
-        int[] rangeOffsets;
         RangeRecord[] ranges;//for format2
         //----------------------------------
 
-        private CoverageTable()
-        {
-        }
-        public int FindPosition(int glyphIndex)
+        public int FindPosition(ushort glyphIndex)
         {
             switch (_format)
             {
                 //should not occur here
                 default: throw new NotSupportedException();
                 case 1:
-                    {
-                        //TODO: imple fast search here                       
-
-                        for (int i = orderedGlyphIdList.Length - 1; i >= 0; --i)
-                        {
-                            ushort gly = orderedGlyphIdList[i];
-                            if (gly < glyphIndex)
-                            {
-                                //TODO: review here
-                                //we assume that the glyph list is ordered (lesser to greater)
-                                //since we seach backward,so if gly is lesser than glyphIndex 
-                                return -1;//not found
-                            }
-                            else if (gly == glyphIndex)
-                            {
-                                return i;
-                            }
-                        }
-                    }
-                    break;
+                    // "The glyph indices must be in numerical order for binary searching of the list"
+                    // (https://www.microsoft.com/typography/otspec/chapter2.htm#coverageFormat1)
+                    return Array.BinarySearch(orderedGlyphIdList, glyphIndex);
                 case 2:
+                    // Ranges must be in glyph ID order, and they must be distinct, with no overlapping.
+                    // [...] quick calculation of the Coverage Index for any glyph in any range using the
+                    // formula: Coverage Index (glyphID) = startCoverageIndex + glyphID - startGlyphID.
+                    // (https://www.microsoft.com/typography/otspec/chapter2.htm#coverageFormat2)
                     {
-                        //return 'logical' coverage index 
-                        int len = rangeOffsets.Length;
-                        int pos_s = 0;
-                        for (int i = 0; i < len; ++i)
-                        {
-                            RangeRecord range = ranges[i];
-                            int pos = range.FindPosition(glyphIndex);
-                            if (pos > -1)
-                            {
-                                return pos_s + pos;
-                            }
-                            if (range.start > glyphIndex)
-                            {
-                                //just stop
-                                return -1;
-                            }
-                            pos_s += range.Width;
-                        }
-                        return -1;
+                        int n = Array.BinarySearch(ranges, glyphIndex);
+                        return n < 0 ? -1 : ranges[n].startCoverageIndex + glyphIndex - ranges[n].start;
                     }
-
             }
-            return -1;//not found
         }
+
         public static CoverageTable CreateFrom(BinaryReader reader, long beginAt)
         {
             reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -104,13 +69,7 @@ namespace Typography.OpenFont.Tables
                 case 1:    //CoverageFormat1 table: Individual glyph indices
                     {
                         ushort glyphCount = reader.ReadUInt16();
-                        ushort[] orderedGlyphIdList = new ushort[glyphCount];
-                        //
-                        for (int i = 0; i < glyphCount; ++i)
-                        {
-                            orderedGlyphIdList[i] = reader.ReadUInt16();
-                        }
-                        coverageTable.orderedGlyphIdList = orderedGlyphIdList;
+                        coverageTable.orderedGlyphIdList = Utils.ReadUInt16Array(reader, glyphCount);
                     }
                     break;
                 case 2:  //CoverageFormat2 table: Range of glyphs
@@ -126,33 +85,11 @@ namespace Typography.OpenFont.Tables
                                 reader.ReadUInt16());
                         }
                         coverageTable.ranges = ranges;
-                        coverageTable.UpdateRangeOffsets();
                     }
                     break;
 
             }
             return coverageTable;
-        }
-
-        void UpdateRangeOffsets()
-        {
-            //for format 2
-#if DEBUG
-            if (this._format != 2)
-            {
-                throw new NotSupportedException();
-            }
-#endif
-            int j = ranges.Length;
-            int total = 0;
-            rangeOffsets = new int[j];
-            for (int i = 0; i < j; ++i)
-            {
-                RangeRecord r = ranges[i];
-                rangeOffsets[i] = total;
-                total += r.Width;
-            }
-
         }
 
         public static CoverageTable[] CreateMultipleCoverageTables(long initPos, ushort[] offsets, BinaryReader reader)
@@ -166,7 +103,7 @@ namespace Typography.OpenFont.Tables
             return results;
         }
 
-        struct RangeRecord
+        struct RangeRecord : IComparable
         {
             //------------
             //RangeRecord
@@ -185,23 +122,26 @@ namespace Typography.OpenFont.Tables
                 this.end = end;
                 this.startCoverageIndex = startCoverageIndex;
             }
-            public bool Contains(int glyphIndex)
+            public bool Contains(ushort glyphIndex)
             {
                 return glyphIndex >= start && glyphIndex <= end;
             }
-            public int FindPosition(int glyphIndex)
+            public int FindPosition(ushort glyphIndex)
             {
-                if (glyphIndex >= start && glyphIndex <= end)
+                return Contains(glyphIndex) ? glyphIndex - start : -1;
+            }
+
+            // This special comparator allows for binary searching inside all the ranges.
+            public int CompareTo(object obj)
+            {
+                if (obj is ushort)
                 {
-                    return glyphIndex - start;
+                    ushort n = (ushort)obj;
+                    return n < start ? 1 : n > end ? -1 : 0;
                 }
-                //not found in this range
-                return -1;
+                throw new NotImplementedException();
             }
-            public int Width
-            {
-                get { return end - start + 1; }
-            }
+
 #if DEBUG
             public override string ToString()
             {
