@@ -94,7 +94,7 @@ namespace Typography.OpenFont.Tables
             if (featureVariations > 0)
             {
                 reader.BaseStream.Seek(this.Header.Offset + featureVariations, SeekOrigin.Begin);
-                ReadFeaureVariations(reader);
+                ReadFeatureVariations(reader);
             }
 
         }
@@ -224,9 +224,9 @@ namespace Typography.OpenFont.Tables
             }
             //----------------------------------------------
         }
-        void ReadFeaureVariations(BinaryReader reader)
+        void ReadFeatureVariations(BinaryReader reader)
         {
-            throw new NotImplementedException();
+            Utils.WarnUnimplemented("GSUB feature variations");
         }
 
 
