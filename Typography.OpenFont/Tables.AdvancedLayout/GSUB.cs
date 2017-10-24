@@ -887,7 +887,7 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType5(BinaryReader reader)
             {
-                throw new NotImplementedException();
+                Utils.WarnUnimplemented("Lookup Subtable Type 5");
             }
             class ChainSubRuleSetTable
             {
