@@ -1116,7 +1116,8 @@ namespace Typography.OpenFont.Tables
                 public ChainSubClassSet[] ChainSubClassSets { get; set; }
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Subtable Type 6 Format 2");
+                    return false;
                 }
             }
 
