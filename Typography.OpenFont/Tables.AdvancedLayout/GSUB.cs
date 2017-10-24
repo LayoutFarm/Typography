@@ -1077,6 +1077,8 @@ namespace Typography.OpenFont.Tables
                 SubstLookupRecord[] subsLookupRecords;
                 public static ChainSubClassRuleTable CreateFrom(BinaryReader reader, long beginAt)
                 {
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+
                     ChainSubClassRuleTable subClassRuleTable = new ChainSubClassRuleTable();
                     ushort backtrackingCount = reader.ReadUInt16();
                     subClassRuleTable.backtrakcingClassDefs = Utils.ReadUInt16Array(reader, backtrackingCount);
