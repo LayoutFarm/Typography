@@ -521,36 +521,27 @@ namespace Typography.OpenFont.Tables
                 //---
                 var baseArrTable = new BaseArrayTable();
                 ushort baseCount = reader.ReadUInt16();
-                BaseRecord[] baseRecs = baseArrTable.records = new BaseRecord[baseCount];
+                baseArrTable.records = new BaseRecord[baseCount];
+                // Read all baseAnchorOffsets in one go
+                ushort[] baseAnchorOffsets = Utils.ReadUInt16Array(reader, classCount * baseCount);
                 for (int i = 0; i < baseCount; ++i)
                 {
-                    baseArrTable.records[i] = new BaseRecord(Utils.ReadUInt16Array(reader, classCount));
-                }
-                //read anchor table 
-                for (int i = 0; i < baseCount; ++i)
-                {
+                    BaseRecord baseRec = new BaseRecord(classCount);
 
-                    ushort[] offsets = baseRecs[i].offsets;
-#if DEBUG
-                    if (classCount != offsets.Length)
-                    {
-                        throw new NotSupportedException();
-                    }
-#endif
                     //each base has anchor point for mark glyph'class
-
-                    AnchorPoint[] anchors = baseRecs[i].anchors = new AnchorPoint[classCount];
                     for (int n = 0; n < classCount; ++n)
                     {
-                        ushort offset = offsets[n];
-                        if (offset < 0)
+                        ushort offset = baseAnchorOffsets[i * classCount + n];
+                        if (offset <= 0)
                         {
                             //TODO: review here 
                             //bug?
                             continue;
                         }
-                        anchors[n] = AnchorPoint.CreateFrom(reader, beginAt + offsets[n]);
+                        baseRec.anchors[n] = AnchorPoint.CreateFrom(reader, beginAt + offset);
                     }
+
+                    baseArrTable.records[i] = baseRec;
                 }
                 return baseArrTable;
             }
@@ -561,8 +552,8 @@ namespace Typography.OpenFont.Tables
                 return records.Length;
             }
 #endif
-
         }
+
         struct BaseRecord
         {
             //BaseRecord
@@ -570,12 +561,11 @@ namespace Typography.OpenFont.Tables
             //Offset16 	BaseAnchor[ClassCount] 	Array of offsets (one per class) to 
             //Anchor tables-from beginning of BaseArray table-ordered by class-zero-based
 
-            public ushort[] offsets;
-            public AnchorPoint[] anchors;
-            public BaseRecord(ushort[] offsets)
+            public readonly AnchorPoint[] anchors;
+
+            public BaseRecord(int classCount)
             {
-                this.offsets = offsets;
-                anchors = null;
+                anchors = new AnchorPoint[classCount];
             }
 #if DEBUG
             public override string ToString()
@@ -603,7 +593,6 @@ namespace Typography.OpenFont.Tables
                 return stbuilder.ToString();
             }
 #endif
-
         }
 
 

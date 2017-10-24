@@ -94,9 +94,8 @@ namespace Typography.OpenFont.Tables
             if (featureVariations > 0)
             {
                 reader.BaseStream.Seek(this.Header.Offset + featureVariations, SeekOrigin.Begin);
-                ReadFeaureVariations(reader);
+                ReadFeatureVariations(reader);
             }
-
         }
 
         public ushort MajorVersion { get; private set; }
@@ -224,9 +223,9 @@ namespace Typography.OpenFont.Tables
             }
             //----------------------------------------------
         }
-        void ReadFeaureVariations(BinaryReader reader)
+        void ReadFeatureVariations(BinaryReader reader)
         {
-            throw new NotImplementedException();
+            Utils.WarnUnimplemented("GSUB feature variations");
         }
 
 
@@ -888,7 +887,7 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType5(BinaryReader reader)
             {
-                throw new NotImplementedException();
+                Utils.WarnUnimplemented("Lookup Subtable Type 5");
             }
             class ChainSubRuleSetTable
             {
@@ -1078,6 +1077,8 @@ namespace Typography.OpenFont.Tables
                 SubstLookupRecord[] subsLookupRecords;
                 public static ChainSubClassRuleTable CreateFrom(BinaryReader reader, long beginAt)
                 {
+                    reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
+
                     ChainSubClassRuleTable subClassRuleTable = new ChainSubClassRuleTable();
                     ushort backtrackingCount = reader.ReadUInt16();
                     subClassRuleTable.backtrakcingClassDefs = Utils.ReadUInt16Array(reader, backtrackingCount);
@@ -1115,7 +1116,8 @@ namespace Typography.OpenFont.Tables
                 public ChainSubClassSet[] ChainSubClassSets { get; set; }
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Subtable Type 6 Format 2");
+                    return false;
                 }
             }
 
@@ -1192,11 +1194,10 @@ namespace Typography.OpenFont.Tables
                 //-----------------------
                 //TODO: impl here
 
-                int j = subTableOffsets.Length;
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     ushort format = reader.ReadUInt16();
                     switch (format)
@@ -1259,7 +1260,7 @@ namespace Typography.OpenFont.Tables
                                     ChainSubClassSet[] chainSubClassSets = subTable.ChainSubClassSets = new ChainSubClassSet[chainSubClassSetCount];
                                     for (int n = 0; n < chainSubClassSetCount; ++n)
                                     {
-                                        chainSubClassSets[n] = ChainSubClassSet.CreateFrom(reader, subTableStartAt + chainSubClassSetOffsets[i]);
+                                        chainSubClassSets[n] = ChainSubClassSet.CreateFrom(reader, subTableStartAt + chainSubClassSetOffsets[n]);
                                     }
                                 }
 
