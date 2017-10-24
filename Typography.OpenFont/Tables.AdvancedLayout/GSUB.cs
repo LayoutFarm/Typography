@@ -96,7 +96,6 @@ namespace Typography.OpenFont.Tables
                 reader.BaseStream.Seek(this.Header.Offset + featureVariations, SeekOrigin.Begin);
                 ReadFeatureVariations(reader);
             }
-
         }
 
         public ushort MajorVersion { get; private set; }
@@ -1192,11 +1191,10 @@ namespace Typography.OpenFont.Tables
                 //-----------------------
                 //TODO: impl here
 
-                int j = subTableOffsets.Length;
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     ushort format = reader.ReadUInt16();
                     switch (format)
@@ -1259,7 +1257,7 @@ namespace Typography.OpenFont.Tables
                                     ChainSubClassSet[] chainSubClassSets = subTable.ChainSubClassSets = new ChainSubClassSet[chainSubClassSetCount];
                                     for (int n = 0; n < chainSubClassSetCount; ++n)
                                     {
-                                        chainSubClassSets[n] = ChainSubClassSet.CreateFrom(reader, subTableStartAt + chainSubClassSetOffsets[i]);
+                                        chainSubClassSets[n] = ChainSubClassSet.CreateFrom(reader, subTableStartAt + chainSubClassSetOffsets[n]);
                                     }
                                 }
 
