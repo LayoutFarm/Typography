@@ -26,10 +26,11 @@ namespace Typography.TextLayout
 
             ScriptTable scriptTable = gposTable.ScriptList.FindScriptTable(lang);
             //---------
-            if (scriptTable == null) { return; }   //early exit if no lookup tables      
+            if (scriptTable == null) { return; }   // early exit if no lookup tables
                                                    //---------
 
             ScriptTable.LangSysTable defaultLang = scriptTable.defaultLang;
+            if (defaultLang == null) { return; }   // early exit if no default language
 
             if (defaultLang.HasRequireFeature)
             {
