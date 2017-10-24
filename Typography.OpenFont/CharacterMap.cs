@@ -8,16 +8,15 @@ namespace Typography.OpenFont
 {
     class CharMapFormat4 : CharacterMap
     {
-        readonly int _segCount;
+        public override ushort Format { get { return 4; } }
+
         readonly ushort[] _startCode; //Starting character code for each segment
         readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
         readonly ushort[] _idDelta; //Delta for all character codes in segment
         readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
         readonly ushort[] _glyphIdArray;
-        public CharMapFormat4(int segCount, ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
+        public CharMapFormat4(ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
         {
-            this.Format = 4;
-            _segCount = segCount;
             _startCode = startCode;
             _endCode = endCode;
             _idDelta = idDelta;
@@ -80,10 +79,11 @@ namespace Typography.OpenFont
 
     class CharMapFormat12 : CharacterMap
     {
+        public override ushort Format { get { return 12; } }
+
         uint[] startCharCodes, endCharCodes, startGlyphIds;
         internal CharMapFormat12(uint[] startCharCodes, uint[] endCharCodes, uint[] startGlyphIds)
         {
-            this.Format = 12;
             this.startCharCodes = startCharCodes;
             this.endCharCodes = endCharCodes;
             this.startGlyphIds = startGlyphIds;
@@ -107,13 +107,14 @@ namespace Typography.OpenFont
 
     class CharMapFormat6 : CharacterMap
     {
+        public override ushort Format { get { return 6; } }
+
         //
         ushort _fmt6_start;
         ushort _fmt6_end;
         ushort[] _glyphIdArray;
         internal CharMapFormat6(ushort startCode, ushort[] glyphIdArray)
         {
-            Format = 6;
             _glyphIdArray = glyphIdArray;
             this._fmt6_end = (ushort)(startCode + glyphIdArray.Length);
             this._fmt6_start = startCode;
@@ -142,6 +143,8 @@ namespace Typography.OpenFont
     /// </summary>
     class NullCharMap : CharacterMap
     {
+        public override ushort Format { get { return 0; } }
+
         protected override ushort RawCharacterToGlyphIndex(int character) { return 0; }
     }
 
@@ -149,8 +152,7 @@ namespace Typography.OpenFont
     {
         //https://www.microsoft.com/typography/otspec/cmap.htm
 
-
-        public ushort Format { get; protected set; }
+        public abstract ushort Format { get; }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
         public ushort CharacterToGlyphIndex(int codepoint)

@@ -89,9 +89,11 @@ namespace Typography.OpenFont.Tables
                 only256UInt16Glyphs[i] = only256Glyphs[i];
             }
             //convert to format4 cmap table
-            ushort[] array_0 = new ushort[] { 0 };
-            ushort[] array_255 = new ushort[] { 255 };
-            return new CharMapFormat4(1, array_0, array_255, array_0, array_0, only256UInt16Glyphs);
+            ushort[] startArray = new ushort[] { 0, 0xFFFF };
+            ushort[] endArray = new ushort[] { 255, 0xFFFF };
+            ushort[] deltaArray = new ushort[] { 0, 1 };
+            ushort[] offsetArray = new ushort[] { 4, 0 };
+            return new CharMapFormat4(startArray, endArray, deltaArray, offsetArray, only256UInt16Glyphs);
         }
 
         static CharacterMap ReadFormat_2(BinaryReader input)
@@ -176,7 +178,7 @@ namespace Typography.OpenFont.Tables
                                                                       //>To ensure that the search will terminate, the final endCode value must be 0xFFFF.
                                                                       //>This segment need not contain any valid mappings. It can simply map the single character code 0xFFFF to the missing character glyph, glyph 0.
 
-            input.ReadUInt16(); // Reserved = 0               
+            ushort Reserved = input.ReadUInt16(); // always 0
             ushort[] startCode = Utils.ReadUInt16Array(input, segCount); //Starting character code for each segment
             ushort[] idDelta = Utils.ReadUInt16Array(input, segCount); //Delta for all character codes in segment
             ushort[] idRangeOffset = Utils.ReadUInt16Array(input, segCount); //Offset in bytes to glyph indexArray, or 0   
@@ -184,7 +186,7 @@ namespace Typography.OpenFont.Tables
             long remainingLen = tableStartEndAt - input.BaseStream.Position;
             int recordNum2 = (int)(remainingLen / 2);
             ushort[] glyphIdArray = Utils.ReadUInt16Array(input, recordNum2);//Glyph index array                          
-            return new CharMapFormat4(segCount, startCode, endCode, idDelta, idRangeOffset, glyphIdArray);
+            return new CharMapFormat4(startCode, endCode, idDelta, idRangeOffset, glyphIdArray);
         }
         static CharMapFormat6 ReadFormat_6(BinaryReader input)
         {
