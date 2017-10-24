@@ -336,30 +336,25 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt1 : LookupSubTable
             {
-                public LkSubTableT1Fmt1(ushort coverageOffset, short deltaGlyph)
+                public LkSubTableT1Fmt1(CoverageTable coverageTable, short deltaGlyph)
                 {
-                    this.CoverageOffset = coverageOffset;
+                    this.CoverageTable = coverageTable;
                     this.DeltaGlyph = deltaGlyph;
                 }
-                public ushort CoverageOffset { get; set; }
                 /// <summary>
                 /// Add to original GlyphID to get substitute GlyphID
                 /// </summary>
-                public short DeltaGlyph
-                {
-                    //format1
-                    get;
-                    private set;
-                }
-                public CoverageTable CoverageTable
-                {
-                    get;
-                    set;
-                }
+                public short DeltaGlyph { get; private set; }
+                public CoverageTable CoverageTable { get; private set; }
 
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
-                    throw new NotImplementedException();
+                    if (CoverageTable.FindPosition(glyphIndices[pos]) > -1)
+                    {
+                        glyphIndices.Replace(pos, (ushort)(glyphIndices[pos] + DeltaGlyph));
+                        return true;
+                    }
+                    return false;
                 }
             }
             /// <summary>
@@ -367,17 +362,16 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt2 : LookupSubTable
             {
-                public LkSubTableT1Fmt2(ushort coverageOffset, ushort[] substituteGlyphs)
+                public LkSubTableT1Fmt2(CoverageTable coverageTable, ushort[] substituteGlyphs)
                 {
-                    this.CoverageOffset = coverageOffset;
+                    this.CoverageTable = coverageTable;
                     this.SubstituteGlyphs = substituteGlyphs;
                 }
-                public ushort CoverageOffset { get; set; }
                 /// <summary>
                 /// It provides an array of output glyph indices (Substitute) explicitly matched to the input glyph indices specified in the Coverage table
                 /// </summary>
                 public ushort[] SubstituteGlyphs { get; private set; }
-                public CoverageTable CoverageTable { get; set; }
+                public CoverageTable CoverageTable { get; private set; }
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
                     int foundAt = CoverageTable.FindPosition(glyphIndices[pos]);
@@ -464,8 +458,8 @@ namespace Typography.OpenFont.Tables
                         case 1:
                             {
                                 short deltaGlyph = reader.ReadInt16();
-                                var subTable = new LkSubTableT1Fmt1(coverage, deltaGlyph);
-                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                CoverageTable coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                var subTable = new LkSubTableT1Fmt1(coverageTable, deltaGlyph);
                                 this.subTables.Add(subTable);
                             }
                             break;
@@ -473,8 +467,8 @@ namespace Typography.OpenFont.Tables
                             {
                                 ushort glyphCount = reader.ReadUInt16();
                                 ushort[] substituteGlyphs = Utils.ReadUInt16Array(reader, glyphCount); // 	Array of substitute GlyphIDs-ordered by Coverage Index                                 
-                                var subTable = new LkSubTableT1Fmt2(coverage, substituteGlyphs);
-                                subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                CoverageTable coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                                var subTable = new LkSubTableT1Fmt2(coverageTable, substituteGlyphs);
                                 this.subTables.Add(subTable);
                             }
                             break;
