@@ -138,7 +138,7 @@ namespace Typography.OpenFont
                 Utils.CloneArray(original.glyphPoints),
                 Utils.CloneArray(original._contourEndPoints),
                 original.Bounds,
-                Utils.CloneArray(original.GlyphInstructions));
+                original.GlyphInstructions != null ? Utils.CloneArray(original.GlyphInstructions) : null);
         }
 
         /// <summary>
