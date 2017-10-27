@@ -141,13 +141,13 @@ namespace SampleWinForms
             installedFontCollection = new InstalledFontCollection();
             //2. set some essential handler
             installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-            foreach (string file in Directory.GetFiles("..\\..\\..\\TestFonts", "*.ttf"))
+            foreach (string file in Directory.GetFiles(Path.Combine("..", "..", "..", "TestFonts"), "*.ttf"))
             {
                 //eg. this is our custom font folder  
                 installedFontCollection.AddFont(new FontFileStreamProvider(file));
             }
             //3.
-            //installedFontCollection.LoadWindowsSystemFonts();
+            //installedFontCollection.LoadSystemFonts();
             //---------- 
             //show result
             InstalledFont selectedFF = null;
@@ -562,7 +562,7 @@ namespace SampleWinForms
 
             //samples...
             //1. create texture from specific glyph index range
-            string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
+            string sampleFontFile = Path.Combine("..", "..", "..", "TestFonts", "tahoma.ttf");
             CreateSampleMsdfTextureFont(
                 sampleFontFile,
                 18,
