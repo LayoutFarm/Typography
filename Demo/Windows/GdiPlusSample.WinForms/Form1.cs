@@ -52,9 +52,9 @@ namespace SampleWinForms
             installedFontCollection = new InstalledFontCollection();
             //2. set some essential handler
             installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-            installedFontCollection.LoadFontsFromFolder("..\\..\\..\\TestFonts_Err");
-            installedFontCollection.LoadFontsFromFolder("..\\..\\..\\TestFonts");
-            //installedFontCollection.LoadWindowsSystemFonts();
+            installedFontCollection.LoadFontsFromFolder(Path.Combine("..", "..", "..", "TestFonts_Err"));
+            installedFontCollection.LoadFontsFromFolder(Path.Combine("..", "..", "..", "TestFonts"));
+            //installedFontCollection.LoadSystemFonts();
 
             //---------- 
             //show result
@@ -170,7 +170,7 @@ namespace SampleWinForms
         ////msdf texture generator example
         //private void cmdBuildMsdfTexture_Click(object sender, System.EventArgs e)
         //{
-        //    string sampleFontFile = @"..\..\..\TestFonts\tahoma.ttf";
+        //    string sampleFontFile = Path.Combine("..", "..", "..", "TestFonts", "tahoma.ttf");
         //    CreateSampleMsdfTextureFont(
         //        sampleFontFile,
         //        18,

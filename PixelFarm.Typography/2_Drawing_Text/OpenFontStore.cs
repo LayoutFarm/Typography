@@ -11,7 +11,7 @@ namespace PixelFarm.Drawing.Fonts
             installFontCollection = InstalledFontCollection.GetSharedFontCollection(fontCollection =>
             {
                 fontCollection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-                fontCollection.LoadWindowsSystemFonts();
+                fontCollection.LoadSystemFonts();
             });
 
 
