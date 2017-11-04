@@ -52,8 +52,9 @@ namespace SampleWinForms
             installedFontCollection = new InstalledFontCollection();
             //2. set some essential handler
             installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-            installedFontCollection.LoadFontsFromFolder(Path.Combine("..", "..", "..", "TestFonts_Err"));
-            installedFontCollection.LoadFontsFromFolder(Path.Combine("..", "..", "..", "TestFonts"));
+             
+            installedFontCollection.LoadFontsFromFolder("../../../TestFonts_Err");
+            installedFontCollection.LoadFontsFromFolder("../../../TestFonts");
             //installedFontCollection.LoadSystemFonts();
 
             //---------- 
