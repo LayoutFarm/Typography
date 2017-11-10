@@ -32,7 +32,6 @@ namespace Typography.OpenFont.Tables
 
     public partial class GPOS : TableEntry
     {
-        long gposTableStartAt;
         ScriptList scriptList = new ScriptList();
         FeatureList featureList = new FeatureList();
         List<LookupTable> lookupRecords = new List<LookupTable>();
@@ -48,7 +47,7 @@ namespace Typography.OpenFont.Tables
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            gposTableStartAt = reader.BaseStream.Position;
+            long gposTableStartAt = reader.BaseStream.Position;
             //-------------------------------------------
             // GPOS Header
             //The GPOS table begins with a header that contains a version number for the table. Two versions are defined. 
@@ -192,11 +191,8 @@ namespace Typography.OpenFont.Tables
             }
             //----------------------------------------------
             //read each lookup record content ...
-            for (int i = 0; i < lookupCount; ++i)
+            foreach (LookupTable lookupTable in lookupRecords)
             {
-                LookupTable lookupTable = lookupRecords[i];
-                //set origin
-                reader.BaseStream.Seek(lookupListBeginAt + lookupTableOffsets[i], SeekOrigin.Begin);
                 lookupTable.ReadRecordContent(reader);
                 foreach (var subT in lookupTable.SubTables)
                 {
@@ -255,12 +251,9 @@ namespace Typography.OpenFont.Tables
             }
             public void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
             {
-
-                int j = subTables.Count;
-                for (int i = 0; i < j; ++i)
+                foreach (LookupSubTable subTable in subTables)
                 {
-
-                    subTables[i].DoGlyphPosition(inputGlyphs, startAt, len);
+                    subTable.DoGlyphPosition(inputGlyphs, startAt, len);
                     //update len
                     len = inputGlyphs.Count;
                 }
@@ -278,7 +271,7 @@ namespace Typography.OpenFont.Tables
                 switch (lookupType)
                 {
                     default:
-                        Utils.WarnUnimplemented("Lookup Type {0}", lookupType);
+                        Utils.WarnUnimplemented("GPOS Lookup Type {0}", lookupType);
                         break;
                     case 1:
                         ReadLookupType1(reader);
@@ -332,7 +325,7 @@ namespace Typography.OpenFont.Tables
                 public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 1");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 1");
                 }
             }
             /// <summary>
@@ -341,13 +334,10 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType1(BinaryReader reader)
             {
-                long thisLookupTablePos = reader.BaseStream.Position;
-                int j = subTableOffsets.Length;
-
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subTableStartAt = reader.BaseStream.Position + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
 
@@ -545,13 +535,10 @@ namespace Typography.OpenFont.Tables
                 //ValueRecord 	Value1 	Positioning for first glyph-empty if ValueFormat1 = 0
                 //ValueRecord 	Value2 	Positioning for second glyph-empty if ValueFormat2 = 0
                 //--------------------------------
-                long thisLookupTablePos = reader.BaseStream.Position;
-                int j = subTableOffsets.Length;
-
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
 
                     //----------------------- 
@@ -560,7 +547,7 @@ namespace Typography.OpenFont.Tables
                     switch (format)
                     {
                         default:
-                            Utils.WarnUnimplemented("Pair Adjustment Positioning Subtable Format {0}", format);
+                            Utils.WarnUnimplemented("GPOS Lookup Table Type 2 Format {0}", format);
                             break;
                         case 1:
                             {
@@ -603,7 +590,7 @@ namespace Typography.OpenFont.Tables
                                     }
 
                                 }
-                                Utils.WarnUnimplemented("Pair Adjustment Positioning Subtable Format 2");
+                                Utils.WarnUnimplemented("GPOS Lookup Table Type 2 Format 2");
                             }
                             break;
                     }
@@ -617,7 +604,7 @@ namespace Typography.OpenFont.Tables
             void ReadLookupType3(BinaryReader reader)
             {
                 //TODO: implement this
-                Utils.WarnUnimplemented("Lookup Table Type 3");
+                Utils.WarnUnimplemented("GPOS Lookup Table Type 3");
             }
             //-------------------------------------------------------------------------
             /// <summary>
@@ -746,12 +733,10 @@ namespace Typography.OpenFont.Tables
                 //Value 	Type 	Description
                 //uint16 	BaseCount 	Number of BaseRecords
                 //struct 	BaseRecord[BaseCount] 	Array of BaseRecords-in order of BaseCoverage Index
-                long thisSubTablePos = reader.BaseStream.Position;
-                int j = subTableOffsets.Length;
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subtableStart = thisSubTablePos + subTableOffsets[i]; //beginning of MarkBasePos subtable ***
+                    long subtableStart = lookupTablePos + subTableOffset; //beginning of MarkBasePos subtable ***
                     reader.BaseStream.Seek(subtableStart, SeekOrigin.Begin);
 
                     //----------------------- 
@@ -795,7 +780,7 @@ namespace Typography.OpenFont.Tables
                 public LigatureArrayTable LigatureArrayTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 5");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 5");
                 }
             }
             /// <summary>
@@ -810,21 +795,16 @@ namespace Typography.OpenFont.Tables
                 //uint16 	ClassCount 	Number of defined mark classes
                 //Offset16 	MarkArray 	Offset to MarkArray table-from beginning of MarkLigPos subtable
                 //Offset16 	LigatureArray 	Offset to LigatureArray table-from beginning of MarkLigPos subtable
-
-                long thisLookupTablePos = reader.BaseStream.Position;
-                int j = subTableOffsets.Length;
-
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
-
-                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
 
                     ushort format = reader.ReadUInt16();
                     if (format != 1)
                     {
-                        Utils.WarnUnimplemented("Lookup Sub Table Type 5 Format {0}", format);
+                        Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 5 Format {0}", format);
                         return;
                     }
                     ushort markCoverageOffset = reader.ReadUInt16(); //from beginning of MarkLigPos subtable
@@ -946,13 +926,10 @@ namespace Typography.OpenFont.Tables
                 //Offset16 	Mark1Array 	Offset to MarkArray table for Mark1-from beginning of MarkMarkPos subtable
                 //Offset16 	Mark2Array 	Offset to Mark2Array table for Mark2-from beginning of MarkMarkPos subtable
 
-                long thisLookupTablePos = reader.BaseStream.Position;
-                int j = subTableOffsets.Length;
-
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
 
                     //-----------------------
@@ -960,7 +937,7 @@ namespace Typography.OpenFont.Tables
                     ushort format = reader.ReadUInt16();
                     if (format != 1)
                     {
-                        Utils.WarnUnimplemented("Lookup Sub Table Type 6 Format {0}", format);
+                        Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 6 Format {0}", format);
                         return;
                     }
                     ushort mark1CoverageOffset = reader.ReadUInt16();
@@ -986,14 +963,10 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType7(BinaryReader reader)
             {
-
-                long thisLookupTablePos = reader.BaseStream.Position;
-                int j = subTableOffsets.Length;
-
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
 
@@ -1001,7 +974,7 @@ namespace Typography.OpenFont.Tables
                     switch (format)
                     {
                         default:
-                            Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format {0}", format);
+                            Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format {0}", format);
                             return;
                         case 1:
                             {
@@ -1089,7 +1062,7 @@ namespace Typography.OpenFont.Tables
                 public PosRuleSetTable[] PosRuleSetTables { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format 1");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 1");
                 }
             }
 
@@ -1100,7 +1073,7 @@ namespace Typography.OpenFont.Tables
                 public PosClassSetTable[] PosClassSetTables { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format 2");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 2");
                 }
 
             }
@@ -1110,7 +1083,7 @@ namespace Typography.OpenFont.Tables
                 public PosLookupRecord[] PosLookupRecords { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 7 Format 3");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format 3");
                 }
             }
             //----------------------------------------------------------------
@@ -1121,7 +1094,7 @@ namespace Typography.OpenFont.Tables
                 public PosRuleSetTable[] PosRuleSetTables { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 8 Format 1");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 8 Format 1");
                 }
             }
 
@@ -1142,7 +1115,7 @@ namespace Typography.OpenFont.Tables
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 8 Format 2");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 8 Format 2");
                 }
             }
             class LkSubTableType8Fmt3 : LookupSubTable
@@ -1166,7 +1139,7 @@ namespace Typography.OpenFont.Tables
 
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
-                    Utils.WarnUnimplemented("Lookup Sub Table Type 8 Format 3");
+                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 8 Format 3");
                 }
             }
 
@@ -1176,13 +1149,10 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType8(BinaryReader reader)
             {
-                long thisLookupTablePos = reader.BaseStream.Position;
-                int j = subTableOffsets.Length;
-
-                for (int i = 0; i < j; ++i)
+                foreach (long subTableOffset in subTableOffsets)
                 {
                     //move to read pos
-                    long subTableStartAt = lookupTablePos + subTableOffsets[i];
+                    long subTableStartAt = lookupTablePos + subTableOffset;
                     reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
                     //-----------------------
 
@@ -1190,7 +1160,7 @@ namespace Typography.OpenFont.Tables
                     switch (format)
                     {
                         default:
-                            Utils.WarnUnimplemented("Lookup Table Type 8 Format {0}", format);
+                            Utils.WarnUnimplemented("GPOS Lookup Table Type 8 Format {0}", format);
                             return;
                         case 1:
                             {
@@ -1295,7 +1265,7 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType9(BinaryReader reader)
             {
-                //Console.WriteLine("skip lookup type 9");
+                Utils.WarnUnimplemented("GPOS Lookup Table Type 9");
             }
         }
     }
