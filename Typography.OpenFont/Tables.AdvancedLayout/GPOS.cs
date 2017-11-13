@@ -1019,7 +1019,7 @@ namespace Typography.OpenFont.Tables
                                 subTable.PosClassSetTables = posClassSetTables;
                                 for (int n = 0; n < posClassSetCount; ++n)
                                 {
-                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, coverageOffset);
+                                    posClassSetTables[n] = PosClassSetTable.CreateFrom(reader, subTableStartAt + posClassSetOffsets[n]);
                                 }
                                 //----------                                  
                                 subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverageOffset);
