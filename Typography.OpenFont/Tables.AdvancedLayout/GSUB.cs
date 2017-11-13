@@ -39,7 +39,6 @@ namespace Typography.OpenFont.Tables
         FeatureList featureList = new FeatureList();
         List<LookupTable> lookupList = new List<LookupTable>();
 
-        long gsubTableStartAt;
         public override string Name
         {
             get { return "GSUB"; }
@@ -47,7 +46,7 @@ namespace Typography.OpenFont.Tables
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //----------
-            gsubTableStartAt = reader.BaseStream.Position;
+            long gsubTableStartAt = reader.BaseStream.Position;
             //----------
             //1. header
             //GSUB Header
@@ -144,9 +143,9 @@ namespace Typography.OpenFont.Tables
             //----------------------------------------------
             //load each sub table
             //https://www.microsoft.com/typography/otspec/chapter2.htm
-            for (int i = 0; i < lookupCount; ++i)
+            foreach (long lookupOffset in lookupOffsets)
             {
-                long lookupTablePos = lookupListHeadPos + lookupOffsets[i];
+                long lookupTablePos = lookupListHeadPos + lookupOffset;
                 reader.BaseStream.Seek(lookupTablePos, SeekOrigin.Begin);
 
                 ushort lookupType = reader.ReadUInt16();//Each Lookup table may contain only one type of information (LookupType)
@@ -158,43 +157,6 @@ namespace Typography.OpenFont.Tables
 
                 ushort markFilteringSet =
                     ((lookupFlags & 0x0010) == 0x0010) ? reader.ReadUInt16() : (ushort)0;
-
-                //
-                //https://www.microsoft.com/typography/otspec/gsub.htm#ES
-                //LookupType 7: Extension Substitution
-                //This lookup provides a mechanism whereby any other lookup type's subtables are stored 
-                //at a 32-bit offset location in the 'GSUB' table. 
-                //This is needed if the total size of the subtables exceeds the 16-bit
-                //limits of the various other offsets in the 'GSUB' table. 
-                //In this specification,
-                //the subtable stored at the 32-bit offset location is termed the “extension” subtable.
-                //---
-                //This subtable type uses one format: ExtensionSubstFormat1.
-                //7.1 Extension Substitution Subtable Format 1
-                //Type Name    Description
-                //uint16  substFormat Format identifier.Set to 1.
-                //uint16 extensionLookupType     Lookup type of subtable referenced by extensionOffset(that is, the extension subtable).
-                //Offset32 extensionOffset     Offset to the extension subtable, of lookup type extensionLookupType, relative to the start of the ExtensionSubstFormat1 subtable.
-                //---
-                //
-                // Substitution Lookup Record
-                //
-                // When an OpenType layout engine encounters a LookupType 7 Lookup table, it shall:
-                //
-                // Proceed as though the Lookup table's LookupType field were set to the ExtensionLookupType of the subtables.
-                // Proceed as though each extension subtable referenced by ExtensionOffset replaced the LookupType 7 subtable that referenced it.
-
-                if (lookupType == 7)
-                {
-                    for (int j = 0; j < subTableCount; ++j)
-                    {
-                        reader.BaseStream.Seek(lookupTablePos + subTableOffsets[j], SeekOrigin.Begin);
-                        ushort version = reader.ReadUInt16(); // must be 1
-                        lookupType = reader.ReadUInt16(); // must all be the same and != 7
-                        subTableOffsets[j] += reader.ReadUInt32();
-                    }
-                }
-
 
                 lookupList.Add(
                     new LookupTable(
@@ -208,11 +170,8 @@ namespace Typography.OpenFont.Tables
             }
             //----------------------------------------------
             //read each lookup record content ...
-            for (int i = 0; i < lookupCount; ++i)
+            foreach (LookupTable lookupRecord in lookupList)
             {
-                LookupTable lookupRecord = lookupList[i];
-                //set origin
-                reader.BaseStream.Seek(lookupListHeadPos + lookupOffsets[i], SeekOrigin.Begin);
                 lookupRecord.ReadRecordContent(reader);
 
                 //assign gsub owner**
@@ -237,7 +196,7 @@ namespace Typography.OpenFont.Tables
             //--------------------------
             long lookupTablePos;
             //--------------------------
-            public readonly ushort lookupType;
+            public ushort lookupType { get; private set; }
             public readonly ushort lookupFlags;
             public readonly ushort subTableCount;
 
@@ -1310,8 +1269,8 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             void ReadLookupType7(BinaryReader reader)
             {
-
                 //LookupType 7: Extension Substitution
+                //https://www.microsoft.com/typography/otspec/gsub.htm#ES
 
                 //This lookup provides a mechanism whereby any other lookup type's subtables are stored at a 32-bit offset location in the 'GSUB' table. 
                 //This is needed if the total size of the subtables exceeds the 16-bit limits of the various other offsets in the 'GSUB' table.
@@ -1342,8 +1301,7 @@ namespace Typography.OpenFont.Tables
                 //In addition, a LookupListIndex identifies the lookup to be applied at the glyph position specified by the SequenceIndex.
 
                 //The contextual substitution subtables defined in Examples 7, 8, and 9 at the end of this chapter show SubstLookupRecords.
-                int j = subTableOffsets.Length;
-                for (int i = 0; i < j; ++i)
+                for (int i = 0; i < subTableOffsets.Length; ++i)
                 {
                     //move to read pos
                     long subTableStartAt = lookupTablePos + subTableOffsets[i];
@@ -1355,10 +1313,12 @@ namespace Typography.OpenFont.Tables
                     {
                         throw new NotSupportedException();
                     }
+                    lookupType = extensionLookupType;
+                    subTableOffsets[i] += extensionOffset;
                 }
-                //TODO: impl more , this is not complete!
-                return;
-                throw new NotImplementedException();
+
+                // Simply read the lookup table again with updated offsets
+                ReadRecordContent(reader);
             }
 
             /// <summary>

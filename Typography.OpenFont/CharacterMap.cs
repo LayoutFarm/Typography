@@ -109,33 +109,25 @@ namespace Typography.OpenFont
     {
         public override ushort Format { get { return 6; } }
 
-        //
-        ushort _fmt6_start;
-        ushort _fmt6_end;
-        ushort[] _glyphIdArray;
         internal CharMapFormat6(ushort startCode, ushort[] glyphIdArray)
         {
             _glyphIdArray = glyphIdArray;
-            this._fmt6_end = (ushort)(startCode + glyphIdArray.Length);
-            this._fmt6_start = startCode;
+            _startCode = startCode;
         }
+
         protected override ushort RawCharacterToGlyphIndex(int codepoint)
         {
-            //The firstCode and entryCount values specify a subrange (beginning at firstCode, length = entryCount)
-            //within the range of possible character codes.
-            //Codes outside of this subrange are mapped to glyph index 0.
-            //The offset of the code (from the first code) within this subrange is used as index to the glyphIdArray,
-            //which provides the glyph index value. 
-            if (codepoint >= _fmt6_start && codepoint <= _fmt6_end)
-            {
-                //in range                            
-                return _glyphIdArray[codepoint - _fmt6_start];
-            }
-            else
-            {
-                return 0;
-            }
+            // The firstCode and entryCount values specify a subrange (beginning at firstCode,
+            // length = entryCount) within the range of possible character codes.
+            // Codes outside of this subrange are mapped to glyph index 0.
+            // The offset of the code (from the first code) within this subrange is used as
+            // index to the glyphIdArray, which provides the glyph index value.
+            int i = codepoint - _startCode;
+            return i >= 0 && i < _glyphIdArray.Length ? _glyphIdArray[i] : (ushort)0;
         }
+
+        private readonly ushort _startCode;
+        private readonly ushort[] _glyphIdArray;
     }
 
     /// <summary>
@@ -234,13 +226,13 @@ namespace Typography.OpenFont
         //                //Codes outside of this subrange are mapped to glyph index 0.
         //                //The offset of the code (from the first code) within this subrange is used as index to the glyphIdArray,
         //                //which provides the glyph index value. 
-        //                if (sampleChar >= _fmt6_start && sampleChar <= _fmt6_end)
+        //                if (sampleChar >= _fmt6_start && sampleChar < _fmt6_end)
         //                {
         //                    //in range            
         //                    if (!collector.HasRegisterSegment(0))
         //                    {
         //                        List<ushort> glyphIndexList = new List<ushort>();
-        //                        for (ushort m = _fmt6_start; m <= _fmt6_end; ++m)
+        //                        for (ushort m = _fmt6_start; m < _fmt6_end; ++m)
         //                        {
         //                            glyphIndexList.Add((ushort)(m - _fmt6_start));
         //                        }

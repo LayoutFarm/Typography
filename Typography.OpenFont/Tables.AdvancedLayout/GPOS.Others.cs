@@ -439,59 +439,49 @@ namespace Typography.OpenFont.Tables
             //struct 	Mark2Record[Mark2Count] 	Array of Mark2 records-in Coverage order
 
             //Each Mark2Record contains an array of offsets to Anchor tables (Mark2Anchor).
-            //The array of zero-based offsets, measured from the beginning of the Mark2Array table, 
-            //defines the entire set of Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. 
+            //The array of zero-based offsets, measured from the beginning of the Mark2Array table,
+            //defines the entire set of Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph.
             //The Anchor tables in the Mark2Anchor array are ordered by Mark1 class value.
 
             //A Mark2Record declares one Anchor table for each mark class (including Class 0)
             //identified in the MarkRecords of the MarkArray.
-            //Each Anchor table specifies one Mark2 attachment point used to attach all 
+            //Each Anchor table specifies one Mark2 attachment point used to attach all
             //the Mark1 glyphs in a particular class to the Mark2 glyph.
 
-            Mark2Record[] mark2Records;
+            //Mark2Record
+            //Value 	Type 	Description
+            //Offset16 	Mark2Anchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
+
             public static Mark2ArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
                 //---
-                var mark2ArrTable = new Mark2ArrayTable();
                 ushort mark2Count = reader.ReadUInt16();
-                mark2ArrTable.mark2Records = new Mark2Record[mark2Count];
-                for (int i = 0; i < mark2Count; ++i)
+                ushort[] offsets = Utils.ReadUInt16Array(reader, mark2Count * classCount);
+                //read mark2 anchors
+                AnchorPoint[] anchors = new AnchorPoint[mark2Count * classCount];
+                for (int i = 0; i < mark2Count * classCount; ++i)
                 {
-                    mark2ArrTable.mark2Records[i] = new Mark2Record(Utils.ReadUInt16Array(reader, classCount));
+                    anchors[i] = AnchorPoint.CreateFrom(reader, beginAt + offsets[i]);
                 }
-                //read mark2 anchor
-                for (int i = 0; i < mark2Count; ++i)
-                {
-                    ushort[] offsets = mark2ArrTable.mark2Records[i].offsets;
-                    AnchorPoint[] anchors = mark2ArrTable.mark2Records[i].anchorPoints;
-                    int offsetCount = anchors.Length;
-                    for (int c = 0; c < offsetCount; ++c)
-                    {
-                        anchors[c] = AnchorPoint.CreateFrom(reader, beginAt + offsets[c]);
-                    }
-                }
-                return mark2ArrTable;
+                return new Mark2ArrayTable(classCount, anchors);
             }
+
             public AnchorPoint GetAnchorPoint(int index, int markClassId)
             {
-                return mark2Records[index].anchorPoints[markClassId];
+                return _anchorPoints[index * _classCount + markClassId];
             }
+
+            private Mark2ArrayTable(ushort classCount, AnchorPoint[] anchorPoints)
+            {
+                _classCount = classCount;
+                _anchorPoints = anchorPoints;
+            }
+
+            private readonly ushort _classCount;
+            private readonly AnchorPoint[] _anchorPoints;
         }
 
-        struct Mark2Record
-        {
-            //Mark2Record
-            //Value 	Type 	Description
-            //Offset16 	Mark2Anchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
-            public readonly ushort[] offsets;
-            public readonly AnchorPoint[] anchorPoints;
-            public Mark2Record(ushort[] offsets)
-            {
-                this.offsets = offsets;
-                anchorPoints = new AnchorPoint[offsets.Length];
-            }
-        }
         class BaseArrayTable
         {
             //BaseArray table
