@@ -286,8 +286,12 @@ namespace Typography.OpenFont
                 int codepoint = ch;
                 if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < buffer.Length)
                 {
-                    ++i;
-                    codepoint = char.ConvertToUtf32(ch, buffer[i]);
+                    char nextCh = buffer[i + 1];
+                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
+                    {
+                        ++i;
+                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                    }
                 }
 
                 output.Add(LookupIndex(codepoint));

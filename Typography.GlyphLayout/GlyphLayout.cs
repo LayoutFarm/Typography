@@ -198,8 +198,12 @@ namespace Typography.TextLayout
                 int codepoint = ch;
                 if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)
                 {
-                    ++i;
-                    codepoint = char.ConvertToUtf32(ch, str[startAt + i]);
+                    char nextCh = str[startAt + i + 1];
+                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
+                    {
+                        ++i;
+                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                    }
                 }
                 _inputGlyphs.AddGlyph(codepoint, typeface.LookupIndex(codepoint));
             }
