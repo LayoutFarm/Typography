@@ -30,15 +30,13 @@ namespace Typography.OpenFont.Tables
 
     public abstract class GXXX : TableEntry
     {
-      
+
         public ushort MajorVersion { get; private set; }
         public ushort MinorVersion { get; private set; }
 
-        public ScriptList ScriptList { get { return _scriptList; } }
-        public FeatureList FeatureList { get { return _featureList; } }
+        public ScriptList ScriptList { get; private set; }
+        public FeatureList FeatureList { get; private set; }
 
-        private ScriptList _scriptList = new ScriptList();
-        private FeatureList _featureList = new FeatureList();
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -79,10 +77,10 @@ namespace Typography.OpenFont.Tables
 
             //-----------------------
             //1. scriptlist
-            _scriptList = ScriptList.CreateFrom(reader, tableStartAt + scriptListOffset);
+            ScriptList = ScriptList.CreateFrom(reader, tableStartAt + scriptListOffset);
             //-----------------------
             //2. feature list
-            _featureList = FeatureList.CreateFrom(reader, tableStartAt + featureListOffset);
+            FeatureList = FeatureList.CreateFrom(reader, tableStartAt + featureListOffset);
             //-----------------------
             //3. lookup list
             ReadLookupListTable(reader, tableStartAt + lookupListOffset);
@@ -179,6 +177,6 @@ namespace Typography.OpenFont.Tables
                                                 ushort[] subTableOffsets, ushort markFilteringSet);
         protected abstract void ReadFeatureVariations(BinaryReader reader, long featureVariationsBeginAt);
 
-       
+
     }
 }
