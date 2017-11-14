@@ -109,9 +109,10 @@ namespace Typography.TextLayout
                 _tmpGlypIndexBackup.Add(_mapGlyphIndexToUserChar[i]);
             }
             //------------------------------------------------ 
+            GlyphIndexToUserChar firstRemove = _tmpGlypIndexBackup[0];
             _tmpGlypIndexBackup.RemoveRange(index, removeLen);
             //add new data
-            GlyphIndexToUserChar firstRemove = _tmpGlypIndexBackup[0];
+            
             //TODO: check if removeLen > ushort.Max
             GlyphIndexToUserChar newMap = new GlyphIndexToUserChar(firstRemove.o_user_charOffset, (ushort)removeLen);
 #if DEBUG
