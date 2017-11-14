@@ -28,6 +28,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GPOS.Others.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GSUB.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GSUB.SubTables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\GlyphShapingTableEntry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\JustificationTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\LigatureCaretListTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\MathTable.cs" />
