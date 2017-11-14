@@ -93,7 +93,7 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        protected void ReadLookupListTable(BinaryReader reader, long lookupListBeginAt)
+        void ReadLookupListTable(BinaryReader reader, long lookupListBeginAt)
         {
             // https://www.microsoft.com/typography/otspec/chapter2.htm
             // -----------------------
