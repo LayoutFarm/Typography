@@ -7,19 +7,15 @@
 //language system, or feature in a font.
 
 using System.IO;
+
 namespace Typography.OpenFont.Tables
 {
-
     class BASE : TableEntry
     {
-        long baseTableStartAt;
-        public override string Name
-        {
-            get { return "BASE"; }
-        }
+        public override string Name { get { return "BASE"; } }
+
         protected override void ReadContentFrom(BinaryReader reader)
         {
-
         }
     }
 }
