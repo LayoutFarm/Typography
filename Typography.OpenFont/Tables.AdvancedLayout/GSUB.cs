@@ -31,7 +31,7 @@ namespace Typography.OpenFont.Tables
 
     ////////////////////////////////////////////////////////////////
 
-    public partial class GSUB : GXXX
+    public partial class GSUB : GlyphShapingTableEntry
     {
         public override string Name { get { return "GSUB"; } }
 

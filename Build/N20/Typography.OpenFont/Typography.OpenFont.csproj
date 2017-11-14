@@ -83,6 +83,9 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\GDEF.cs">
       <Link>Tables.AdvanceLayout\GDEF.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\GlyphShapingTableEntry.cs">
+      <Link>Tables.AdvanceLayout\GlyphShapingTableEntry.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\GPOS.cs">
       <Link>Tables.AdvanceLayout\GPOS.cs</Link>
     </Compile>
@@ -94,9 +97,6 @@
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\GSUB.SubTables.cs">
       <Link>Tables.AdvanceLayout\GSUB.SubTables.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\GXXX.cs">
-      <Link>Tables.AdvanceLayout\GXXX.cs</Link>
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\JustificationTable.cs">
       <Link>Tables.AdvanceLayout\JustificationTable.cs</Link>

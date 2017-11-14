@@ -7,7 +7,7 @@ using System.IO;
 namespace Typography.OpenFont.Tables
 {
     // https://www.microsoft.com/typography/otspec/GPOS.htm
-    public partial class GPOS : GXXX
+    public partial class GPOS : GlyphShapingTableEntry
     {
         public override string Name { get { return "GPOS"; } }
 

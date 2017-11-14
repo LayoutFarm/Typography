@@ -28,7 +28,7 @@ namespace Typography.OpenFont.Tables
     // https://www.microsoft.com/typography/otspec/GPOS.htm
     // https://www.microsoft.com/typography/otspec/GSUB.htm
 
-    public abstract class GXXX : TableEntry
+    public abstract class GlyphShapingTableEntry : TableEntry
     {
 
         public ushort MajorVersion { get; private set; }
