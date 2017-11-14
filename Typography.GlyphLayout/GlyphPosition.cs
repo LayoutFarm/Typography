@@ -24,7 +24,7 @@ namespace Typography.TextLayout
 
             if (gposTable == null) { return; }
 
-            ScriptTable scriptTable = gposTable.ScriptList.FindScriptTable(lang);
+            ScriptTable scriptTable = gposTable.ScriptList[lang];
             //---------
             if (scriptTable == null) { return; }   // early exit if no lookup tables
                                                    //---------

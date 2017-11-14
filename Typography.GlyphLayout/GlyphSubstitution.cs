@@ -20,7 +20,7 @@ namespace Typography.TextLayout
             this.typeface = typeface;
             //check if this lang has 
             gsubTable = typeface.GSUBTable;
-            ScriptTable scriptTable = gsubTable.ScriptList.FindScriptTable(lang);
+            ScriptTable scriptTable = gsubTable.ScriptList[lang];
             //---------
             if (scriptTable == null) { return; }   //early exit if no lookup tables      
 
