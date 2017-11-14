@@ -313,6 +313,7 @@ namespace SampleWinForms
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
+                        selectedTextPrinter.EnableLigature = this.chkGsubEnableLigature.Checked;
 
 #if DEBUG
                         GlyphDynamicOutline.dbugTestNewGridFitting = chkTestGridFit.Checked;
@@ -336,6 +337,7 @@ namespace SampleWinForms
                         selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
+                        selectedTextPrinter.EnableLigature = this.chkGsubEnableLigature.Checked;
 
                         //test print 3 lines
 #if DEBUG
