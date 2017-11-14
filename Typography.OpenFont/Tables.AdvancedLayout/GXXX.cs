@@ -30,7 +30,15 @@ namespace Typography.OpenFont.Tables
 
     public abstract class GXXX : TableEntry
     {
-        public abstract override string Name { get; }
+      
+        public ushort MajorVersion { get; private set; }
+        public ushort MinorVersion { get; private set; }
+
+        public ScriptList ScriptList { get { return _scriptList; } }
+        public FeatureList FeatureList { get { return _featureList; } }
+
+        private ScriptList _scriptList = new ScriptList();
+        private FeatureList _featureList = new FeatureList();
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -142,7 +150,7 @@ namespace Typography.OpenFont.Tables
             //----------------------------------------------
             //load each sub table
             //https://www.microsoft.com/typography/otspec/chapter2.htm
-            foreach (long lookupTableOffset in lookupTableOffsets)
+            foreach (ushort lookupTableOffset in lookupTableOffsets)
             {
                 long lookupTablePos = lookupListBeginAt + lookupTableOffset;
                 reader.BaseStream.Seek(lookupTablePos, SeekOrigin.Begin);
@@ -171,13 +179,6 @@ namespace Typography.OpenFont.Tables
                                                 ushort[] subTableOffsets, ushort markFilteringSet);
         protected abstract void ReadFeatureVariations(BinaryReader reader, long featureVariationsBeginAt);
 
-        public ushort MajorVersion { get; private set; }
-        public ushort MinorVersion { get; private set; }
-
-        public ScriptList ScriptList { get { return _scriptList; } }
-        public FeatureList FeatureList { get { return _featureList; } }
-
-        private ScriptList _scriptList = new ScriptList();
-        private FeatureList _featureList = new FeatureList();
+       
     }
 }
