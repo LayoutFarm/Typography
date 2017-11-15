@@ -81,12 +81,16 @@ namespace Typography.OpenFont.Tables
             }
             public bool DoSubstitutionAt(IGlyphIndexList inputGlyphs, int pos, int len)
             {
-                bool hasChanged = false;
                 foreach (LookupSubTable subTable in SubTables)
                 {
-                    hasChanged = subTable.DoSubstitutionAt(inputGlyphs, pos, len) || hasChanged;
+                    // We return after the first substitution, as explained in the spec:
+                    // "A lookup is finished for a glyph after the client locates the target
+                    // glyph or glyph context and performs a substitution, if specified."
+                    // https://www.microsoft.com/typography/otspec/gsub.htm
+                    if (subTable.DoSubstitutionAt(inputGlyphs, pos, len))
+                        return true;
                 }
-                return hasChanged;
+                return false;
             }
 #if DEBUG
             public override string ToString()
@@ -94,8 +98,6 @@ namespace Typography.OpenFont.Tables
                 return lookupType.ToString();
             }
 #endif
-
-            public string ForUseWithFeatureId { get; set; }
 
             public LookupSubTable ReadSubTable(BinaryReader reader, long subTableStartAt)
             {

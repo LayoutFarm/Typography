@@ -24,7 +24,7 @@ namespace Typography.TextLayout
 
             if (gposTable == null) { return; }
 
-            ScriptTable scriptTable = gposTable.ScriptList.FindScriptTable(lang);
+            ScriptTable scriptTable = gposTable.ScriptList[lang];
             //---------
             if (scriptTable == null) { return; }   // early exit if no lookup tables
                                                    //---------
@@ -75,8 +75,7 @@ namespace Typography.TextLayout
                 for (int i = 0; i < j; ++i)
                 {
                     FeatureList.FeatureTable feature = features[i];
-                    ushort[] lookupListIndices = feature.LookupListIndice;
-                    foreach (ushort lookupIndex in lookupListIndices)
+                    foreach (ushort lookupIndex in feature.LookupListIndices)
                     {
                         lookupTables.Add(gposTable.LookupList[lookupIndex]);
                     }
