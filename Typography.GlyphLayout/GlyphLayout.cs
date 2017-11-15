@@ -112,12 +112,14 @@ namespace Typography.TextLayout
         internal GlyphPosStream _glyphPositions = new GlyphPosStream();
         internal List<GlyphPlan> _myGlyphPlans = new List<GlyphPlan>();
 
-
         public GlyphLayout()
         {
             PositionTechnique = PositionTechnique.OpenFont;
+            EnableLigature = true;
+            EnableComposition = true;
             ScriptLang = ScriptLangs.Latin;
         }
+
         public float FontSizeInPoints { get; set; }
         public float PixelScale
         {
@@ -142,6 +144,7 @@ namespace Typography.TextLayout
         }
 
         public bool EnableLigature { get; set; }
+        public bool EnableComposition { get; set; }
         public Typeface Typeface
         {
             get { return _typeface; }
@@ -213,6 +216,7 @@ namespace Typography.TextLayout
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
+                _gsub.EnableComposition = this.EnableComposition;
                 _gsub.DoSubstitution(_inputGlyphs);
                 //
                 _inputGlyphs.CreateMapFromUserCharToGlyphIndics();

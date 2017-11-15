@@ -75,8 +75,7 @@ namespace Typography.TextLayout
                 for (int i = 0; i < j; ++i)
                 {
                     FeatureList.FeatureTable feature = features[i];
-                    ushort[] lookupListIndices = feature.LookupListIndice;
-                    foreach (ushort lookupIndex in lookupListIndices)
+                    foreach (ushort lookupIndex in feature.LookupListIndices)
                     {
                         lookupTables.Add(gposTable.LookupList[lookupIndex]);
                     }
