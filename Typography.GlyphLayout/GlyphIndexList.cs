@@ -110,7 +110,7 @@ namespace Typography.TextLayout
             }
             //------------------------------------------------ 
             GlyphIndexToUserChar firstRemove = _tmpGlypIndexBackup[0];
-            _tmpGlypIndexBackup.RemoveRange(index, removeLen);
+            _tmpGlypIndexBackup.RemoveRange(0, removeLen);
             //add new data
             
             //TODO: check if removeLen > ushort.Max
