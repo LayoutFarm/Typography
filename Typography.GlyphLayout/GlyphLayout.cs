@@ -219,7 +219,7 @@ namespace Typography.TextLayout
                 _gsub.EnableComposition = this.EnableComposition;
                 _gsub.DoSubstitution(_inputGlyphs);
                 //
-                _inputGlyphs.CreateMapFromUserCharToGlyphIndics();
+                _inputGlyphs.CreateMapFromUserCharToGlyphIndices();
             }
             //----------------------------------------------  
             //after glyph substitution,
@@ -293,7 +293,7 @@ namespace Typography.TextLayout
         /// <param name="outputGlyphPlanList"></param>
         public static void ReadOutput(this GlyphLayout glyphLayout, List<UserCharToGlyphIndexMap> outputGlyphPlanList)
         {
-            outputGlyphPlanList.AddRange(glyphLayout._inputGlyphs._mapUserCharToGlyphIndics);
+            outputGlyphPlanList.AddRange(glyphLayout._inputGlyphs._mapUserCharToGlyphIndices);
         }
         /// <summary>
         /// read latest layout output into outputGlyphPlanList
