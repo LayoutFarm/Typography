@@ -851,19 +851,17 @@ namespace Typography.OpenFont.Tables
             //-------------------------------------------------------------
             class LkSubTableT6Fmt1 : LookupSubTable
             {
-
                 public CoverageTable CoverageTable { get; set; }
                 public ChainSubRuleSetTable[] SubRuleSets { get; set; }
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
-                    throw new NotImplementedException();
+                    Utils.WarnUnimplemented("Lookup Subtable Type 6 Format 1");
+                    return false;
                 }
             }
 
-
             class LkSubTableT6Fmt2 : LookupSubTable
             {
-
                 public CoverageTable CoverageTable { get; set; }
                 public ClassDefTable BacktrackClassDef { get; set; }
                 public ClassDefTable InputClassDef { get; set; }
@@ -876,61 +874,64 @@ namespace Typography.OpenFont.Tables
                 }
             }
 
-
             class LkSubTableT6Fmt3 : LookupSubTable
             {
-
                 public CoverageTable[] BacktrackingCoverages { get; set; }
                 public CoverageTable[] InputCoverages { get; set; }
                 public CoverageTable[] LookaheadCoverages { get; set; }
                 public SubstLookupRecord[] SubstLookupRecords { get; set; }
+
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
-                    ushort cur_glyphIndex = glyphIndices[pos];
-                    //check if this is in input coverage or not
-                    if (CoverageTable.IsInRange(InputCoverages, cur_glyphIndex))
+                    int inputLength = InputCoverages.Length;
+
+                    // Check that there are enough context glyphs
+                    if (pos < BacktrackingCoverages.Length ||
+                        pos + inputLength + LookaheadCoverages.Length > len)
                     {
-                        //check back tracking or look ahead
-                        if (BacktrackingCoverages.Length > 0 && LookaheadCoverages.Length > 0)
+                        return false;
+                    }
+
+                    // Check all coverages: if any of them does not match, abort substitution
+                    for (int i = 0; i < InputCoverages.Length; ++i)
+                    {
+                        if (InputCoverages[i].FindPosition(glyphIndices[pos + i]) == -1)
                         {
-                            throw new NotSupportedException();
-                        }
-
-                        //has previous glyph
-                        if (pos > 0 && CoverageTable.IsInRange(BacktrackingCoverages, glyphIndices[pos - 1]))
-                        {
-                            //match!, then
-                            //do substitution
-                            ushort replaceAt = SubstLookupRecords[0].sequenceIndex;
-                            ushort lookupIndex = SubstLookupRecords[0].lookupListIndex;
-#if DEBUG
-                            if (replaceAt != 0)
-                            {
-
-                            }
-#endif
-                            LookupTable anotherLookup = this.OwnerGSub.LookupList[lookupIndex];
-                            return anotherLookup.DoSubstitutionAt(glyphIndices, pos + replaceAt, 1);//?
-                        }
-
-                        //has next glyph
-                        if (len > 1 && CoverageTable.IsInRange(LookaheadCoverages, glyphIndices[pos + 1]))
-                        {
-                            //match!, then
-                            //do substitution
-                            ushort replaceAt = SubstLookupRecords[0].sequenceIndex;
-                            ushort lookupIndex = SubstLookupRecords[0].lookupListIndex;
-#if DEBUG
-                            if (replaceAt != 0)
-                            {
-
-                            }
-#endif
-                            LookupTable anotherLookup = this.OwnerGSub.LookupList[lookupIndex];
-                            return anotherLookup.DoSubstitutionAt(glyphIndices, pos + replaceAt, 1);//?
+                            return false;
                         }
                     }
-                    return false;
+
+                    for (int i = 0; i < BacktrackingCoverages.Length; ++i)
+                    {
+                        if (BacktrackingCoverages[i].FindPosition(glyphIndices[pos - 1 - i]) == -1)
+                        {
+                            return false;
+                        }
+                    }
+
+                    for (int i = 0; i < LookaheadCoverages.Length; ++i)
+                    {
+                        if (LookaheadCoverages[i].FindPosition(glyphIndices[pos + inputLength + i]) == -1)
+                        {
+                            return false;
+                        }
+                    }
+
+                    // It's a match! Perform substitutions and return true if anything changed
+                    bool hasChanged = false;
+                    foreach (SubstLookupRecord lookupRecord in SubstLookupRecords)
+                    {
+                        ushort replaceAt = lookupRecord.sequenceIndex;
+                        ushort lookupIndex = lookupRecord.lookupListIndex;
+
+                        LookupTable anotherLookup = OwnerGSub.LookupList[lookupIndex];
+                        if (anotherLookup.DoSubstitutionAt(glyphIndices, pos + replaceAt, len - replaceAt))
+                        {
+                            hasChanged = true;
+                        }
+                    }
+
+                    return hasChanged;
                 }
             }
 
