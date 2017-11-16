@@ -30,7 +30,7 @@ namespace Typography.TextLayout
 #endif
             public GlyphIndexToUserChar(ushort o_user_charOffset, ushort len)
             {
-                this.len = 1;
+                this.len = len;
                 this.o_user_charOffset = o_user_charOffset;
 #if DEBUG
                 this.dbug_glyphIndex = 0;
@@ -110,7 +110,7 @@ namespace Typography.TextLayout
             _glyphIndices.RemoveRange(index, removeLen);
             _glyphIndices.Insert(index, newGlyphIndex);
             //------------------------------------------------  
-
+             
             GlyphIndexToUserChar firstRemove = _mapGlyphIndexToUserChar[index];
 
 #if DEBUG
