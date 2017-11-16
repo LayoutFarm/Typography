@@ -87,7 +87,9 @@ namespace Typography.TextLayout
             _glyphIndices[index] = newGlyphIndex;
         }
 
+#if DEBUG
         List<GlyphIndexToUserChar> _tmpGlypIndexBackup = new List<GlyphIndexToUserChar>();
+#endif
         /// <summary>
         /// remove:add_new >=1:1
         /// </summary>
@@ -101,18 +103,19 @@ namespace Typography.TextLayout
             //and then replace with a single glyph 
             _glyphIndices.RemoveRange(index, removeLen);
             _glyphIndices.Insert(index, newGlyphIndex);
-            //------------------------------------------------ 
+            //------------------------------------------------  
+
+            GlyphIndexToUserChar firstRemove = _mapGlyphIndexToUserChar[index];
+
+#if DEBUG
             _tmpGlypIndexBackup.Clear();
             int endAt = index + removeLen;
             for (int i = index; i < endAt; ++i)
             {
                 _tmpGlypIndexBackup.Add(_mapGlyphIndexToUserChar[i]);
             }
-            //------------------------------------------------ 
-            GlyphIndexToUserChar firstRemove = _tmpGlypIndexBackup[0];
-            _tmpGlypIndexBackup.RemoveRange(0, removeLen);
-            //add new data
-            
+            _tmpGlypIndexBackup.Clear();
+#endif
             //TODO: check if removeLen > ushort.Max
             GlyphIndexToUserChar newMap = new GlyphIndexToUserChar(firstRemove.o_user_charOffset, (ushort)removeLen);
 #if DEBUG
@@ -121,7 +124,7 @@ namespace Typography.TextLayout
 
             //------------------------------------------------ 
             _mapGlyphIndexToUserChar.Insert(index, newMap);
-            _tmpGlypIndexBackup.Clear();
+
         }
         /// <summary>
         /// remove: add_new 1:>=1
