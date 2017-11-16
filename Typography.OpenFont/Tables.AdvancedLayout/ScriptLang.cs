@@ -13,6 +13,10 @@ namespace Typography.OpenFont
             this.shortname = shortname;
             this.internalName = internalName;
         }
+        public override string ToString()
+        {
+            return this.fullname;
+        }
     }
 
     public static class ScriptLangs
@@ -240,6 +244,13 @@ namespace Typography.OpenFont
             ScriptLang found;
             s_registeredScriptTags.TryGetValue(shortname, out found);
             return found;
+        }
+        public static IEnumerable<ScriptLang> GetRegiteredScriptLangIter()
+        {
+            foreach (ScriptLang scriptLang in s_registeredScriptTags.Values)
+            {
+                yield return scriptLang;
+            }
         }
     }
 

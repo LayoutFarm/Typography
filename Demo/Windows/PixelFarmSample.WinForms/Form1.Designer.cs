@@ -49,7 +49,6 @@
             this.chkGsubEnableLigature = new System.Windows.Forms.CheckBox();
             this.lstHintList = new System.Windows.Forms.ListBox();
             this.chkShowSampleTextBox = new System.Windows.Forms.CheckBox();
-            this.sampleTextBox1 = new SampleWinForms.SampleTextBox();
             this.chkDrawGlyphBone = new System.Windows.Forms.CheckBox();
             this.chkDynamicOutline = new System.Windows.Forms.CheckBox();
             this.chkDrawTriangles = new System.Windows.Forms.CheckBox();
@@ -63,6 +62,8 @@
             this.chkWriteFitOutputToConsole = new System.Windows.Forms.CheckBox();
             this.chkUseHorizontalFitAlign = new System.Windows.Forms.CheckBox();
             this.chkSetPrinterLayoutForLcdSubPix = new System.Windows.Forms.CheckBox();
+            this.cmbScriptLangs = new System.Windows.Forms.ComboBox();
+            this.sampleTextBox1 = new SampleWinForms.SampleTextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -86,7 +87,7 @@
             // chkBorder
             // 
             this.chkBorder.AutoSize = true;
-            this.chkBorder.Location = new System.Drawing.Point(1155, 41);
+            this.chkBorder.Location = new System.Drawing.Point(1170, 123);
             this.chkBorder.Name = "chkBorder";
             this.chkBorder.Size = new System.Drawing.Size(57, 17);
             this.chkBorder.TabIndex = 3;
@@ -96,7 +97,7 @@
             // chkFillBackground
             // 
             this.chkFillBackground.AutoSize = true;
-            this.chkFillBackground.Location = new System.Drawing.Point(1155, 64);
+            this.chkFillBackground.Location = new System.Drawing.Point(1170, 146);
             this.chkFillBackground.Name = "chkFillBackground";
             this.chkFillBackground.Size = new System.Drawing.Size(101, 17);
             this.chkFillBackground.TabIndex = 4;
@@ -134,7 +135,7 @@
             this.chkShowControlPoints.AutoSize = true;
             this.chkShowControlPoints.Checked = true;
             this.chkShowControlPoints.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowControlPoints.Location = new System.Drawing.Point(1155, 86);
+            this.chkShowControlPoints.Location = new System.Drawing.Point(1170, 168);
             this.chkShowControlPoints.Name = "chkShowControlPoints";
             this.chkShowControlPoints.Size = new System.Drawing.Size(121, 17);
             this.chkShowControlPoints.TabIndex = 12;
@@ -213,7 +214,7 @@
             // 
             // cmdBuildMsdfTexture
             // 
-            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1155, 135);
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1191, 453);
             this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
             this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 28);
             this.cmdBuildMsdfTexture.TabIndex = 22;
@@ -233,9 +234,9 @@
             // lstFontList
             // 
             this.lstFontList.FormattingEnabled = true;
-            this.lstFontList.Location = new System.Drawing.Point(1018, 12);
+            this.lstFontList.Location = new System.Drawing.Point(981, 12);
             this.lstFontList.Name = "lstFontList";
-            this.lstFontList.Size = new System.Drawing.Size(121, 121);
+            this.lstFontList.Size = new System.Drawing.Size(139, 121);
             this.lstFontList.TabIndex = 25;
             // 
             // chkGsubEnableLigature
@@ -243,7 +244,7 @@
             this.chkGsubEnableLigature.AutoSize = true;
             this.chkGsubEnableLigature.Checked = true;
             this.chkGsubEnableLigature.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkGsubEnableLigature.Location = new System.Drawing.Point(1156, 14);
+            this.chkGsubEnableLigature.Location = new System.Drawing.Point(1171, 96);
             this.chkGsubEnableLigature.Name = "chkGsubEnableLigature";
             this.chkGsubEnableLigature.Size = new System.Drawing.Size(136, 17);
             this.chkGsubEnableLigature.TabIndex = 26;
@@ -268,15 +269,6 @@
             this.chkShowSampleTextBox.Text = "Show Sample TextBox";
             this.chkShowSampleTextBox.UseVisualStyleBackColor = true;
             this.chkShowSampleTextBox.CheckedChanged += new System.EventHandler(this.chkShowSampleTextBox_CheckedChanged);
-            // 
-            // sampleTextBox1
-            // 
-            this.sampleTextBox1.BackColor = System.Drawing.Color.Silver;
-            this.sampleTextBox1.Location = new System.Drawing.Point(12, 71);
-            this.sampleTextBox1.Name = "sampleTextBox1";
-            this.sampleTextBox1.Size = new System.Drawing.Size(505, 774);
-            this.sampleTextBox1.TabIndex = 40;
-            this.sampleTextBox1.Visible = false;
             // 
             // chkDrawGlyphBone
             // 
@@ -419,11 +411,30 @@
             this.chkSetPrinterLayoutForLcdSubPix.Text = "Layout For LcdSubPix";
             this.chkSetPrinterLayoutForLcdSubPix.UseVisualStyleBackColor = true;
             // 
+            // cmbScriptLangs
+            // 
+            this.cmbScriptLangs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbScriptLangs.FormattingEnabled = true;
+            this.cmbScriptLangs.Location = new System.Drawing.Point(1147, 12);
+            this.cmbScriptLangs.Name = "cmbScriptLangs";
+            this.cmbScriptLangs.Size = new System.Drawing.Size(200, 21);
+            this.cmbScriptLangs.TabIndex = 66;
+            // 
+            // sampleTextBox1
+            // 
+            this.sampleTextBox1.BackColor = System.Drawing.Color.Silver;
+            this.sampleTextBox1.Location = new System.Drawing.Point(12, 71);
+            this.sampleTextBox1.Name = "sampleTextBox1";
+            this.sampleTextBox1.Size = new System.Drawing.Size(505, 774);
+            this.sampleTextBox1.TabIndex = 40;
+            this.sampleTextBox1.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1393, 857);
+            this.Controls.Add(this.cmbScriptLangs);
             this.Controls.Add(this.chkSetPrinterLayoutForLcdSubPix);
             this.Controls.Add(this.chkUseHorizontalFitAlign);
             this.Controls.Add(this.chkWriteFitOutputToConsole);
@@ -504,6 +515,7 @@
         private System.Windows.Forms.CheckBox chkWriteFitOutputToConsole;
         private System.Windows.Forms.CheckBox chkUseHorizontalFitAlign;
         private System.Windows.Forms.CheckBox chkSetPrinterLayoutForLcdSubPix;
+        private System.Windows.Forms.ComboBox cmbScriptLangs;
     }
 }
 

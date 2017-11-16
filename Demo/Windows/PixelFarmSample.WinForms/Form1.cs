@@ -80,6 +80,9 @@ namespace SampleWinForms
             cmbPositionTech.SelectedIndex = 0;
             cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //---------- 
+            SetupScriptLangComboBox();
+
+            //---------- 
             lstHintList.Items.Add(HintTechnique.None);
             lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
             lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
@@ -246,6 +249,38 @@ namespace SampleWinForms
             _readyToRender = true;
         }
 
+
+
+        int _defaultScriptLangComboBoxIndex = 0;
+        void SetupScriptLangComboBox()
+        {
+
+            //for debug, set default script lang here
+
+            _current_script = Typography.OpenFont.ScriptLangs.Latin;
+            //
+            int index = 0;
+            foreach (Typography.OpenFont.ScriptLang scriptLang in Typography.OpenFont.ScriptLangs.GetRegiteredScriptLangIter())
+            {
+                this.cmbScriptLangs.Items.Add(scriptLang);
+                //
+                if (scriptLang == _current_script)
+                {
+                    //found default script lang
+                    _defaultScriptLangComboBoxIndex = index;
+                }
+                index++;
+            }
+
+            this.cmbScriptLangs.SelectedIndex = _defaultScriptLangComboBoxIndex; //set before** attach event
+
+            this.cmbScriptLangs.SelectedIndexChanged += (s, e) =>
+            {
+                _current_script = (Typography.OpenFont.ScriptLang)this.cmbScriptLangs.SelectedItem;
+                UpdateRenderOutput();
+            };
+        }
+
         enum RenderChoice
         {
             RenderWithMiniAgg_SingleGlyph,//for test single glyph 
@@ -265,6 +300,7 @@ namespace SampleWinForms
             {
                 _selectedInstallFont = installedFont;
             }
+
 
         }
         bool _readyToRender;
@@ -314,6 +350,7 @@ namespace SampleWinForms
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
                         selectedTextPrinter.EnableLigature = this.chkGsubEnableLigature.Checked;
+                        selectedTextPrinter.ScriptLang = _current_script;
 
 #if DEBUG
                         GlyphDynamicOutline.dbugTestNewGridFitting = chkTestGridFit.Checked;
@@ -338,7 +375,7 @@ namespace SampleWinForms
                         selectedTextPrinter.HintTechnique = hintTech;
                         selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
                         selectedTextPrinter.EnableLigature = this.chkGsubEnableLigature.Checked;
-
+                        selectedTextPrinter.ScriptLang = _current_script;
                         //test print 3 lines
 #if DEBUG
                         GlyphDynamicOutline.dbugTestNewGridFitting = chkTestGridFit.Checked;
