@@ -36,6 +36,12 @@ namespace Typography.TextLayout
                 this.dbug_glyphIndex = 0;
 #endif
             }
+#if DEBUG
+            public override string ToString()
+            {
+                return "char_offset: " + o_user_charOffset + " : len" + len;
+            }
+#endif
         }
 
         public void Clear()
@@ -123,6 +129,7 @@ namespace Typography.TextLayout
 #endif
 
             //------------------------------------------------ 
+            _mapGlyphIndexToUserChar.RemoveRange(index, removeLen);
             _mapGlyphIndexToUserChar.Insert(index, newMap);
 
         }
@@ -151,13 +158,14 @@ namespace Typography.TextLayout
         }
 
 
-        public void CreateMapFromUserCharToGlyphIndics()
+        public void CreateMapFromUserCharToGlyphIndices()
         {
             //(optional)
             //this method should be called after we finish the substitution process
             _mapUserCharToGlyphIndics.Clear();
             //--------------------------------------
             int userCharCount = _originalChars.Count;
+
             for (int i = 0; i < userCharCount; ++i)
             {
                 var charToGlyphMap = new UserCharToGlyphIndexMap();

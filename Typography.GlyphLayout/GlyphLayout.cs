@@ -219,7 +219,7 @@ namespace Typography.TextLayout
                 _gsub.EnableComposition = this.EnableComposition;
                 _gsub.DoSubstitution(_inputGlyphs);
                 //
-                _inputGlyphs.CreateMapFromUserCharToGlyphIndics();
+                _inputGlyphs.CreateMapFromUserCharToGlyphIndices();
             }
             //----------------------------------------------  
             //after glyph substitution,
