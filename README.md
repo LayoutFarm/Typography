@@ -134,6 +134,7 @@ _pic 3: test with Thai glyph (complex script) , shows glyph substitution_
 
 _pic 4: test with Thai glyph (complex script)_
 
+(see more: https://github.com/LayoutFarm/Typography/issues/82#issue-274483803)
 
 ---
 
