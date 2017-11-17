@@ -104,6 +104,8 @@ please note that baseline of 啊 is not correct
 
 _pic 1: show GSUB's  glyph ligature, see f-i_
 
+(see more : https://github.com/LayoutFarm/Typography/issues/80#issuecomment-344943446)
+
 ---
 
 **2. GPOS**
