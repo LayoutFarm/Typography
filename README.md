@@ -158,6 +158,8 @@ _pic 2: FireFoxEmoji.ttf from https://github.com/mozilla/fxemoji_
 
 _pic 3: Segoe UI Emoji Normal, Win 10_
 
+(see more sam's work at https://github.com/samhocevar/emoji.wpf)
+
 ---
 
 
