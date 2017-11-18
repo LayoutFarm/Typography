@@ -2,6 +2,7 @@
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
@@ -28,15 +29,37 @@ namespace Typography.OpenFont.Tables
 
     class Cmap : TableEntry
     {
-        CharacterMap[] charMaps;
-        public override string Name
+        public override string Name { get { return "cmap"; } }
+
+        public ushort LookupIndex(int codepoint)
         {
-            get { return "cmap"; }
+            // https://www.microsoft.com/typography/OTSPEC/cmap.htm
+            // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
+            ushort ret = 0;
+
+            if (!_codepointToGlyphs.TryGetValue(codepoint, out ret))
+            {
+                foreach (CharacterMap cmap in _charMaps)
+                {
+                    ushort gid = cmap.CharacterToGlyphIndex(codepoint);
+
+                    //https://www.microsoft.com/typography/OTSPEC/cmap.htm
+                    //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
+                    if (ret == 0 || (gid != 0 && cmap.PlatformId == 3 && cmap.EncodingId == 1))
+                    {
+                        ret = gid;
+                    }
+                }
+
+                _codepointToGlyphs[codepoint] = ret;
+            }
+
+            return ret;
         }
-        public CharacterMap[] CharMaps
-        {
-            get { return charMaps; }
-        }
+
+        private List<CharacterMap> _charMaps = new List<CharacterMap>();
+        private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
+
         protected override void ReadContentFrom(BinaryReader input)
         {
             //https://www.microsoft.com/typography/otspec/cmap.htm
@@ -45,23 +68,23 @@ namespace Typography.OpenFont.Tables
             ushort version = input.ReadUInt16(); // 0
             ushort tableCount = input.ReadUInt16();
 
-            var entries = new CMapEntry[tableCount];
+            ushort[] platformIds = new ushort[tableCount];
+            ushort[] encodingIds = new ushort[tableCount];
+            uint[] offsets = new uint[tableCount];
             for (int i = 0; i < tableCount; i++)
             {
-                ushort platformId = input.ReadUInt16();
-                ushort encodingId = input.ReadUInt16();
-                uint offset = input.ReadUInt32();
-                entries[i] = new CMapEntry(platformId, encodingId, offset);
+                platformIds[i] = input.ReadUInt16();
+                encodingIds[i] = input.ReadUInt16();
+                offsets[i] = input.ReadUInt32();
             }
 
-            charMaps = new CharacterMap[tableCount];
             for (int i = 0; i < tableCount; i++)
             {
-                CMapEntry entry = entries[i];
-                input.BaseStream.Seek(beginAt + entry.Offset, SeekOrigin.Begin);
-                CharacterMap cmap = charMaps[i] = ReadCharacterMap(entry, input);
-                cmap.PlatformId = entry.PlatformId;
-                cmap.EncodingId = entry.EncodingId;
+                input.BaseStream.Seek(beginAt + offsets[i], SeekOrigin.Begin);
+                CharacterMap cmap = ReadCharacterMap(input);
+                cmap.PlatformId = platformIds[i];
+                cmap.EncodingId = encodingIds[i];
+                _charMaps.Add(cmap);
             }
         }
 
@@ -187,6 +210,7 @@ namespace Typography.OpenFont.Tables
             ushort[] glyphIdArray = Utils.ReadUInt16Array(input, recordNum2);//Glyph index array                          
             return new CharMapFormat4(startCode, endCode, idDelta, idRangeOffset, glyphIdArray);
         }
+
         static CharMapFormat6 ReadFormat_6(BinaryReader input)
         {
             //Format 6: Trimmed table mapping
@@ -275,7 +299,7 @@ namespace Typography.OpenFont.Tables
             return new CharMapFormat12(startCharCodes, endCharCodes, startGlyphIds);
         }
 
-        static CharacterMap ReadCharacterMap(CMapEntry entry, BinaryReader input)
+        private static CharacterMap ReadCharacterMap(BinaryReader input)
         {
             ushort format = input.ReadUInt16();
             switch (format)
@@ -290,22 +314,6 @@ namespace Typography.OpenFont.Tables
                 case 12: return ReadFormat_12(input);
                 case 14: return CharMapFormat14.Create(input);
             }
-        }
-
-        struct CMapEntry
-        {
-            readonly ushort _platformId;
-            readonly ushort _encodingId;
-            readonly uint _offset;
-            public CMapEntry(ushort platformId, ushort encodingId, uint offset)
-            {
-                _platformId = platformId;
-                _encodingId = encodingId;
-                _offset = offset;
-            }
-            public ushort PlatformId { get { return _platformId; } }
-            public ushort EncodingId { get { return _encodingId; } }
-            public uint Offset { get { return _offset; } }
         }
     }
 }
