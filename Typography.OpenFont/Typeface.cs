@@ -164,9 +164,9 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
-        public ushort LookupIndex(int codepoint)
+        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
-            return CmapTable.LookupIndex(codepoint);
+            return CmapTable.LookupIndex(codepoint, nextCodepoint);
         }
 
         public Glyph Lookup(int codepoint)

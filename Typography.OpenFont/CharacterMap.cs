@@ -145,6 +145,33 @@ namespace Typography.OpenFont
     {
         public override ushort Format { get { return 14; } }
 
+        public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
+        {
+            // Only check codepoint if nextCodepoint is a variation selector
+            VariationSelector sel;
+            if (_variationSelectors.TryGetValue(nextCodepoint, out sel))
+            {
+                // If the sequence is a non-default UVS, return the mapped glyph
+                ushort ret = 0;
+                if (sel.UVSMappings.TryGetValue(codepoint, out ret))
+                {
+                    return ret;
+                }
+
+                // If the sequence is a default UVS, return the default glyph
+                for (int i = 0; i < sel.DefaultStartCodes.Count; ++i)
+                {
+                    if (codepoint >= sel.DefaultStartCodes[i] && codepoint < sel.DefaultEndCodes[i])
+                    {
+                        return defaultGlyphIndex;
+                    }
+                }
+            }
+
+            // In all other cases, return 0
+            return 0;
+        }
+
         public static CharMapFormat14 Create(BinaryReader reader)
         {
             // 'cmap' Subtable Format 14:
@@ -179,16 +206,16 @@ namespace Typography.OpenFont
 
             long beginAt = reader.BaseStream.Position - 2; // account for header format entry
 
-            var variationSelectors = new Dictionary<uint, VariationSelector>();
+            var variationSelectors = new Dictionary<int, VariationSelector>();
 
             uint length = reader.ReadUInt32(); // Byte length of this subtable (including the header)
             uint numVarSelectorRecords = reader.ReadUInt32();
-            uint[] varSelectors = new uint[numVarSelectorRecords];
+            int[] varSelectors = new int[numVarSelectorRecords];
             uint[] defaultUVSOffsets = new uint[numVarSelectorRecords];
             uint[] nonDefaultUVSOffsets = new uint[numVarSelectorRecords];
             for (int i = 0; i < numVarSelectorRecords; ++i)
             {
-                varSelectors[i] = Utils.ReadUInt24(reader);
+                varSelectors[i] = (int)Utils.ReadUInt24(reader);
                 defaultUVSOffsets[i] = reader.ReadUInt32();
                 nonDefaultUVSOffsets[i] = reader.ReadUInt32();
             }
@@ -230,7 +257,7 @@ namespace Typography.OpenFont
                     uint numUnicodeValueRanges = reader.ReadUInt32();
                     for (int n = 0; n < numUnicodeValueRanges; ++n)
                     {
-                        uint startCode = Utils.ReadUInt24(reader);
+                        int startCode = (int)Utils.ReadUInt24(reader);
                         sel.DefaultStartCodes.Add(startCode);
                         sel.DefaultEndCodes.Add(startCode + reader.ReadByte());
                     }
@@ -267,7 +294,7 @@ namespace Typography.OpenFont
                     uint numUVSMappings = reader.ReadUInt32();
                     for (int n = 0; n < numUVSMappings; ++n)
                     {
-                        uint unicodeValue = Utils.ReadUInt24(reader);
+                        int unicodeValue = (int)Utils.ReadUInt24(reader);
                         ushort glyphID = reader.ReadUInt16();
                         sel.UVSMappings.Add(unicodeValue, glyphID);
                     }
@@ -281,12 +308,12 @@ namespace Typography.OpenFont
 
         private class VariationSelector
         {
-            public List<uint> DefaultStartCodes = new List<uint>();
-            public List<uint> DefaultEndCodes = new List<uint>();
-            public Dictionary<uint, ushort> UVSMappings = new Dictionary<uint, ushort>();
+            public List<int> DefaultStartCodes = new List<int>();
+            public List<int> DefaultEndCodes = new List<int>();
+            public Dictionary<int, ushort> UVSMappings = new Dictionary<int, ushort>();
         }
 
-        private Dictionary<uint, VariationSelector> _variationSelectors;
+        private Dictionary<int, VariationSelector> _variationSelectors;
     }
 
     /// <summary>

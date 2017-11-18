@@ -31,7 +31,7 @@ namespace Typography.OpenFont.Tables
     {
         public override string Name { get { return "cmap"; } }
 
-        public ushort LookupIndex(int codepoint)
+        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
             // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
@@ -52,6 +52,27 @@ namespace Typography.OpenFont.Tables
                 }
 
                 _codepointToGlyphs[codepoint] = ret;
+            }
+
+            // If there is a second codepoint, we are asked whether this is an UVS sequence
+            //  -> if true, return a glyph ID
+            //  -> otherwise, return 0
+            if (nextCodepoint > 0)
+            {
+                foreach (CharacterMap cmap in _charMaps)
+                {
+                    if (cmap is CharMapFormat14)
+                    {
+                        CharMapFormat14 cmap14 = cmap as CharMapFormat14;
+                        ushort gid = cmap14.CharacterPairToGlyphIndex(codepoint, ret, nextCodepoint);
+                        if (gid > 0)
+                        {
+                            return gid;
+                        }
+                    }
+                }
+
+                return 0;
             }
 
             return ret;
