@@ -141,8 +141,7 @@ namespace Typography.OpenFont.Tables
             //The idDelta arithmetic is modulo 65536.
 
             Utils.WarnUnimplemented("cmap subtable format 2");
-
-            return null;
+            return new NullCharMap();
         }
 
         static CharMapFormat4 ReadFormat_4(BinaryReader input)
@@ -289,6 +288,7 @@ namespace Typography.OpenFont.Tables
                 case 4: return ReadFormat_4(input);
                 case 6: return ReadFormat_6(input);
                 case 12: return ReadFormat_12(input);
+                case 14: return CharMapFormat14.Create(input);
             }
         }
 
