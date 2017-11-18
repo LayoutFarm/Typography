@@ -159,6 +159,19 @@ _pic 2: FireFoxEmoji.ttf from https://github.com/mozilla/fxemoji_
 _pic 3: Segoe UI Emoji Normal, Win 10_
 
 
+**Advanced Emoji Ligature**
+
+>This is 👩🏾‍👨🏾‍👧🏾‍👶🏾  “Family - Woman: Medium-Dark Skin Tone, Man: Medium-Dark Skin Tone, Girl: Medium-Dark Skin Tone, Baby: Medium-Dark Skin Tone” without `ccmp` ligatures:
+
+>![image](https://user-images.githubusercontent.com/245089/32985721-fb7cef62-ccc0-11e7-8bef-90ee4ae27a04.png)
+
+>And here it is with `ccmp`:
+
+>![image](https://user-images.githubusercontent.com/245089/32985742-954ab2d2-ccc1-11e7-9521-06ba7bf13293.png)
+
+_pic 4: still missing some GPOS features_
+
+
 (see: https://github.com/LayoutFarm/Typography/issues/18)
 
 (see more sam's work at https://github.com/samhocevar/emoji.wpf)
