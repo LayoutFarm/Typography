@@ -22,9 +22,9 @@ namespace Typography.OpenFont
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
-        public static uint ReadUInt24(BinaryReader reader)
+        public static int ReadUInt24(BinaryReader reader)
         {
-            uint highByte = reader.ReadByte();
+            byte highByte = reader.ReadByte();
             return (highByte << 16) | reader.ReadUInt16();
         }
 
