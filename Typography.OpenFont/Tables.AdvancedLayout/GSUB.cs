@@ -887,7 +887,7 @@ namespace Typography.OpenFont.Tables
 
                     // Check that there are enough context glyphs
                     if (pos < BacktrackingCoverages.Length ||
-                        pos + inputLength + LookaheadCoverages.Length > len)
+                        inputLength + LookaheadCoverages.Length > len)
                     {
                         return false;
                     }
