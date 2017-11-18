@@ -131,6 +131,8 @@ namespace Typography.OpenFont
         private readonly ushort[] _glyphIdArray;
     }
 
+
+    //https://www.microsoft.com/typography/otspec/cmap.htm#format14
     // Subtable format 14 specifies the Unicode Variation Sequences(UVSes) supported by the font.
     // A Variation Sequence, according to the Unicode Standard, comprises a base character followed
     // by a variation selector; e.g. <U+82A6, U+E0101>.
@@ -141,9 +143,10 @@ namespace Typography.OpenFont
     // glyph to use for that sequence, then the sequence is a “default” UVS; otherwise it is a
     // “non-default” UVS, and the glyph to use for that sequence is specified in the format 14
     // subtable itself.
-    class CharMapFormat14 : NullCharMap
+    class CharMapFormat14 : CharacterMap
     {
         public override ushort Format { get { return 14; } }
+        protected override ushort RawCharacterToGlyphIndex(int character) { throw new NotSupportedException(); }
 
         public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
         {
@@ -175,13 +178,12 @@ namespace Typography.OpenFont
         public static CharMapFormat14 Create(BinaryReader reader)
         {
             // 'cmap' Subtable Format 14:
-            // Type       Name        Description
-            // uint16     format      Subtable format.Set to 14.
-            // uint32     length      Byte length of this subtable (including this header)
-            // uint32     numVarSelectorRecords
-            //                        Number of variation Selector Records
-            // VariationSelector   varSelector[numVarSelectorRecords]
-            //                        Array of VariationSelector records.
+            // Type                 Name                                Description
+            // uint16               format                              Subtable format.Set to 14.
+            // uint32               length                              Byte length of this subtable (including this header)
+            // uint32               numVarSelectorRecords               Number of variation Selector Records 
+            // VariationSelector    varSelector[numVarSelectorRecords]  Array of VariationSelector records.
+            // ---                       
             //
             // Each variation selector records specifies a variation selector character, and
             // offsets to “default” and “non-default” tables used to map variation sequences using
@@ -204,21 +206,21 @@ namespace Typography.OpenFont
             // non-default UVSes.
             // Glyph IDs to be used for non-default UVSes are specified in the Non-Default UVS table.
 
-            long beginAt = reader.BaseStream.Position - 2; // account for header format entry
-
-            var variationSelectors = new Dictionary<int, VariationSelector>();
-
+            long beginAt = reader.BaseStream.Position - 2; // account for header format entry 
             uint length = reader.ReadUInt32(); // Byte length of this subtable (including the header)
             uint numVarSelectorRecords = reader.ReadUInt32();
+
+            var variationSelectors = new Dictionary<int, VariationSelector>();
             int[] varSelectors = new int[numVarSelectorRecords];
             uint[] defaultUVSOffsets = new uint[numVarSelectorRecords];
             uint[] nonDefaultUVSOffsets = new uint[numVarSelectorRecords];
             for (int i = 0; i < numVarSelectorRecords; ++i)
             {
-                varSelectors[i] = (int)Utils.ReadUInt24(reader);
+                varSelectors[i] = Utils.ReadUInt24(reader);
                 defaultUVSOffsets[i] = reader.ReadUInt32();
                 nonDefaultUVSOffsets[i] = reader.ReadUInt32();
             }
+
 
             for (int i = 0; i < numVarSelectorRecords; ++i)
             {
