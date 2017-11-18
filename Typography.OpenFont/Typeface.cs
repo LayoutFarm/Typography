@@ -10,7 +10,6 @@ namespace Typography.OpenFont
         readonly Bounds _bounds;
         readonly ushort _unitsPerEm;
         readonly Glyph[] _glyphs;
-        readonly CharacterMap[] _cmaps;
         //TODO: implement vertical metrics
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
@@ -22,7 +21,6 @@ namespace Typography.OpenFont
             Bounds bounds,
             ushort unitsPerEm,
             Glyph[] glyphs,
-            CharacterMap[] cmaps,
             HorizontalMetrics horizontalMetrics,
             OS2Table os2Table)
         {
@@ -30,7 +28,6 @@ namespace Typography.OpenFont
             _bounds = bounds;
             _unitsPerEm = unitsPerEm;
             _glyphs = glyphs;
-            _cmaps = cmaps;
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
 
@@ -67,6 +64,7 @@ namespace Typography.OpenFont
         internal MaxProfile MaxProfile { get; set; }
 
         public bool HasPrepProgramBuffer { get { return PrepProgramBuffer != null; } }
+        internal Cmap CmapTable { get; set; }
         internal Kern KernTable
         {
             get { return _kern; }
@@ -166,34 +164,9 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
-
-       
-        private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
-
-        public ushort LookupIndex(int codepoint)
+        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
-            // https://www.microsoft.com/typography/OTSPEC/cmap.htm
-            // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
-            ushort ret = 0;
-
-            if (!_codepointToGlyphs.TryGetValue(codepoint, out ret))
-            {
-                foreach (CharacterMap cmap in _cmaps)
-                {
-                    ushort gid = cmap.CharacterToGlyphIndex(codepoint);
-
-                    //https://www.microsoft.com/typography/OTSPEC/cmap.htm
-                    //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
-                    if (ret == 0 || (gid != 0 && cmap.PlatformId == 3 && cmap.EncodingId == 1))
-                    {
-                        ret = gid;
-                    }
-                }
-
-                _codepointToGlyphs[codepoint] = ret;
-            }
-
-            return ret;
+            return CmapTable.LookupIndex(codepoint, nextCodepoint);
         }
 
         public Glyph Lookup(int codepoint)

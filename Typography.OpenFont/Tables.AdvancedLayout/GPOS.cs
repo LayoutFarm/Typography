@@ -437,14 +437,14 @@ namespace Typography.OpenFont.Tables
                 public void dbugTest()
                 {
                     //count base covate
-                    ushort[] expandedMarks = MarkCoverageTable.dbugGetExpandedGlyphs();
-                    if (expandedMarks.Length != MarkArrayTable.dbugGetAnchorCount())
+                    List<ushort> expandedMarks = new List<ushort>(MarkCoverageTable.dbugGetExpandedGlyphs());
+                    if (expandedMarks.Count != MarkArrayTable.dbugGetAnchorCount())
                     {
                         throw new NotSupportedException();
                     }
                     //--------------------------
-                    ushort[] expandedBase = BaseCoverageTable.dbugGetExpandedGlyphs();
-                    if (expandedBase.Length != BaseArrayTable.dbugGetRecordCount())
+                    List<ushort> expandedBase = new List<ushort>(BaseCoverageTable.dbugGetExpandedGlyphs());
+                    if (expandedBase.Count != BaseArrayTable.dbugGetRecordCount())
                     {
                         throw new NotSupportedException();
                     }
