@@ -181,22 +181,17 @@ namespace Typography.TextLayout
                 UpdateLayoutPlan();
             }
 
-            Typeface typeface = this._typeface;
-            //clear before use
-            _inputGlyphs.Clear();
+            // this is important!
+            // -----------------------
+            //  from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // In many places, "char" is not a valid type to handle characters, because it
+            // only supports 16 bits.In order to handle the full range of Unicode characters,
+            // we need to use "int".
+            // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
+            // though they are encoded as two "char"s in a C# string.
+            List<int> codepoints = new List<int>();
             for (int i = 0; i < len; ++i)
             {
-                //this is important!
-                //-----------------------
-                // from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
-                //In many places, "char" is not a valid type to handle characters, because it
-                //only supports 16 bits.In order to handle the full range of Unicode characters,
-                //we need to use "int".
-                //This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
-                //though they are encoded as two "char"s in a C# string.
-                //-----------------------
-
-                //convert input char to input glyphs
                 char ch = str[startAt + i];
                 int codepoint = ch;
                 if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)
@@ -208,8 +203,31 @@ namespace Typography.TextLayout
                         codepoint = char.ConvertToUtf32(ch, nextCh);
                     }
                 }
-                _inputGlyphs.AddGlyph(codepoint, typeface.LookupIndex(codepoint));
+                codepoints.Add(codepoint);
             }
+
+            // clear before use
+            _inputGlyphs.Clear();
+
+            // convert codepoints to input glyphs
+            for (int i = 0; i < codepoints.Count; ++i)
+            {
+                int codepoint = codepoints[i];
+                ushort glyphIndex = _typeface.LookupIndex(codepoint);
+                if (i + 1 < codepoints.Count)
+                {
+                    // Maybe this is a UVS sequence; in that case, skip the second codepoint
+                    int nextCodepoint = codepoints[i + 1];
+                    ushort variationGlyphIndex = _typeface.LookupIndex(codepoint, nextCodepoint);
+                    if (variationGlyphIndex > 0)
+                    {
+                        ++i;
+                        glyphIndex = variationGlyphIndex;
+                    }
+                }
+                _inputGlyphs.AddGlyph(codepoint, glyphIndex);
+            }
+
             //----------------------------------------------  
             //glyph substitution            
             if (_gsub != null & len > 0)
@@ -229,14 +247,14 @@ namespace Typography.TextLayout
             //----------------------------------------------  
             //glyph position
             _glyphPositions.Clear();
-            _glyphPositions.Typeface = typeface;
+            _glyphPositions.Typeface = _typeface;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
                 //at this stage _inputGlyphs and _glyphPositions 
                 //has member 1:1
                 ushort glyIndex = _inputGlyphs[i];
                 //
-                Glyph orgGlyph = typeface.GetGlyphByIndex(glyIndex);
+                Glyph orgGlyph = _typeface.GetGlyphByIndex(glyIndex);
                 //this is original value WITHOUT fit-to-grid adjust
                 _glyphPositions.AddGlyph(glyIndex, orgGlyph);
             }

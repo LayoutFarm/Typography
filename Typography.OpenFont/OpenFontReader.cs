@@ -119,10 +119,10 @@ namespace Typography.OpenFont
                     header.Bounds,
                     header.UnitsPerEm,
                     glyf.Glyphs,
-                    cmaps.CharMaps,
                     horizontalMetrics,
                     os2Table);
                 //----------------------------
+                typeface.CmapTable = cmaps;
                 typeface.KernTable = kern;
                 typeface.GaspTable = gaspTable;
                 typeface.MaxProfile = maximumProfile;
