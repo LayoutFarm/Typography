@@ -795,7 +795,7 @@ namespace Typography.OpenFont.Tables
                 for (int i = 0; i < j; ++i)
                 {
                     //move to and read                     
-                    posClasses[i] = PosClassRule.CreateFrom(reader, tableStartAt = posClassRuleOffsets[i]);
+                    posClasses[i] = PosClassRule.CreateFrom(reader, tableStartAt + posClassRuleOffsets[i]);
                 }
             }
 
