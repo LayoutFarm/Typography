@@ -166,10 +166,11 @@ _pic 3: Segoe UI Emoji Normal, Win 10_
 >![image](https://user-images.githubusercontent.com/245089/32985721-fb7cef62-ccc0-11e7-8bef-90ee4ae27a04.png)
 
 >And here it is with `ccmp`:
+ 
 
->![image](https://user-images.githubusercontent.com/245089/32985742-954ab2d2-ccc1-11e7-9521-06ba7bf13293.png)
+![image](https://user-images.githubusercontent.com/245089/32996108-a9f01da4-cd7e-11e7-84b4-d5bca20c3313.png)
 
-_pic 4: still missing some GPOS features_
+_pic 4: Do you want to say with Emoji ?_
 
 
 (see: https://github.com/LayoutFarm/Typography/issues/18)
