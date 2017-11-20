@@ -56,7 +56,7 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         public class LookupTable
         {
-            public readonly ushort lookupType;
+            public ushort lookupType { get; private set; }
             public readonly ushort lookupFlags;
             public readonly ushort markFilteringSet;
             //--------------------------
@@ -974,10 +974,22 @@ namespace Typography.OpenFont.Tables
             /// LookupType 9: Extension Positioning
             /// </summary>
             /// <param name="reader"></param>
-            static LookupSubTable ReadLookupType9(BinaryReader reader, long subTableStartAt)
+            LookupSubTable ReadLookupType9(BinaryReader reader, long subTableStartAt)
             {
-                Utils.WarnUnimplemented("GPOS Lookup Table Type 9");
-                return new NullLookupSubTable();
+                reader.BaseStream.Seek(subTableStartAt, SeekOrigin.Begin);
+                ushort format = reader.ReadUInt16();
+                ushort extensionLookupType = reader.ReadUInt16();
+                uint extensionOffset = reader.ReadUInt32();
+                if (extensionLookupType == 9)
+                {
+                    throw new NotSupportedException();
+                }
+                // Simply read the lookup table again with updated offsets
+                lookupType = extensionLookupType;
+                LookupSubTable subTable = ReadSubTable(reader, subTableStartAt + extensionOffset);
+                // FIXME: this is a bit hackish, try to find a better construct
+                lookupType = 9;
+                return subTable;
             }
         }
     }
