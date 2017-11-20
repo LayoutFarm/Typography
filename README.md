@@ -170,7 +170,7 @@ _pic 3: Segoe UI Emoji Normal, Win 10_
 
 ![image](https://user-images.githubusercontent.com/7447159/32997655-5a380fbe-cdc5-11e7-87ba-18f51c44e2ef.png)
 
-_pic 4: Say with Emoji_  :)
+_pic 4: Say with Emoji?_
 
 
 (see: https://github.com/LayoutFarm/Typography/issues/18)
