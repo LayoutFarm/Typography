@@ -168,9 +168,9 @@ _pic 3: Segoe UI Emoji Normal, Win 10_
 >And here it is with `ccmp`:
  
 
-![image](https://user-images.githubusercontent.com/245089/32996108-a9f01da4-cd7e-11e7-84b4-d5bca20c3313.png)
+![image](https://user-images.githubusercontent.com/7447159/32997655-5a380fbe-cdc5-11e7-87ba-18f51c44e2ef.png)
 
-_pic 4: Do you want to say with Emoji ?_
+_pic 4: Say with Emoji_  :)
 
 
 (see: https://github.com/LayoutFarm/Typography/issues/18)
