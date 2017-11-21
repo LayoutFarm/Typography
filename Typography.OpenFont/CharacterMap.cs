@@ -169,6 +169,12 @@ namespace Typography.OpenFont
                         return defaultGlyphIndex;
                     }
                 }
+
+                // At this point we are neither a non-default UVS nor a default UVS,
+                // but we know the nextCodepoint is a variation selector. Unicode says
+                // this glyph should be invisible: “no visible rendering for the VS”
+                // (http://unicode.org/faq/unsup_char.html#4)
+                return defaultGlyphIndex;
             }
 
             // In all other cases, return 0
