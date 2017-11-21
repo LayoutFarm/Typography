@@ -33,7 +33,8 @@ namespace Typography.OpenFont.Tables
             {
                 // "The glyph indices must be in numerical order for binary searching of the list"
                 // (https://www.microsoft.com/typography/otspec/chapter2.htm#coverageFormat1)
-                return Array.BinarySearch(_orderedGlyphIdList, glyphIndex);
+                int n = Array.BinarySearch(_orderedGlyphIdList, glyphIndex);
+                return n < 0 ? -1 : n;
             }
 
 #if DEBUG
