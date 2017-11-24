@@ -28,11 +28,6 @@ namespace SampleWinForms
 
         DevTextPrinterBase selectedTextPrinter = null;
         VxsTextPrinter _devVxsTextPrinter = null;
-        //DevGdiTextPrinter _devGdiTextPrinter = null;
-
-        //UI.SampleTextBoxControllerForGdi _controllerForGdi = new UI.SampleTextBoxControllerForGdi(); 
-        //UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new UI.SampleTextBoxControllerForPixelFarm();
-
 
         UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
         TypographyTest.BasicFontOptions _basicOptions;
@@ -42,10 +37,6 @@ namespace SampleWinForms
         public Form1()
         {
             InitializeComponent();
-            //
-            //
-            //set default values
-            //_devGdiTextPrinter = new DevGdiTextPrinter();
 
             //
             _basicOptions = openFontOptions1.Options;
@@ -66,30 +57,8 @@ namespace SampleWinForms
             _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
 
 
-
-            //_devGdiTextPrinter.ScriptLang = _basicOptions.ScriptLang;
-            //_devGdiTextPrinter.PositionTechnique = _basicOptions.PositionTech;
-
-
             this.Load += new EventHandler(Form1_Load);
-
-
-            //----------
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
-            //----------
-
-
-            //share text printer to our sample textbox
-            //but you can create another text printer that specific to text textbox control
-            //Graphics gx = this.sampleTextBox1.CreateGraphics();
-            //_controllerForGdi.BindHostGraphics(gx);
-            //_controllerForGdi.TextPrinter = _devGdiTextPrinter;
-            ////---------- 
-            //_controllerForPixelFarm.BindHostGraphics(gx);
-            //_controllerForPixelFarm.TextPrinter = _devVxsTextPrinter;
-
-            //---------- 
-            //this.sampleTextBox1.SetController(_controllerForPixelFarm);
             button1.Click += (s, e) => UpdateRenderOutput();
 
             //----------------
@@ -174,27 +143,6 @@ namespace SampleWinForms
             switch (renderChoice)
             {
 
-                //                case TypographyTest.RenderChoice.RenderWithGdiPlusPath:
-                //                    {
-                //                        selectedTextPrinter = _devGdiTextPrinter;
-                //                        selectedTextPrinter.Typeface = _basicOptions.Typeface;
-                //                        selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
-                //                        selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
-                //                        selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
-                //                        //
-                //                        selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
-                //                        selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
-
-                //#if DEBUG
-                //                        GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-                //                        GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-                //                        GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
-                //#endif
-
-                //                        selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
-
-                //                    }
-                //                    break;
                 case TypographyTest.RenderChoice.RenderWithGdiPlusPath:
                     //not render in this example
                     //see more at ...
@@ -507,9 +455,7 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
-
-
-
+         
         static void CreateSampleMsdfImg(GlyphContourBuilder tx, string outputFile)
         {
             //sample
