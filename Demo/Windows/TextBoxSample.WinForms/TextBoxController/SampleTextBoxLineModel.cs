@@ -188,11 +188,14 @@ namespace SampleWinForms.UI
             }
         }
 
-        public void SetCharIndexFromPos(float x, float y, float toPxScale)
+        public void SetCharIndexFromPos(float x, float y)
         {
 
             int count = _glyphPlans.Count;
             float accum_x = 0;
+            
+          
+
             for (int i = 0; i < count; ++i)
             {
                 float thisGlyphW = _glyphPlans[i].AdvanceX;
@@ -206,8 +209,16 @@ namespace SampleWinForms.UI
                     float xoffset_on_glyph = (x - (accum_x - thisGlyphW));
                     if (xoffset_on_glyph >= (thisGlyphW / 2))
                     {
+                        if (i + 1 >= _userCharToGlyphMap.Count)
+                        {
+                            //break here
+                            _caretCharIndex = i + 1;
+                            return;
+                        }
+
                         _caretCharIndex = i + 1;
                         //check if the caret can rest on this pos or not
+
                         UserCharToGlyphIndexMap map = _userCharToGlyphMap[_caretCharIndex];
                         if (map.glyphIndexListOffset_plus1 == 0)
                         {

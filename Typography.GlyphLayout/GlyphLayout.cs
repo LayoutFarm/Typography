@@ -126,6 +126,7 @@ namespace Typography.TextLayout
             get
             {
                 //to pixel scale from size in point
+                if (_typeface == null) return 1;
                 return _typeface.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
             }
         }

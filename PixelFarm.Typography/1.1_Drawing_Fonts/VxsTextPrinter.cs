@@ -155,17 +155,13 @@ namespace PixelFarm.Drawing.Fonts
 
         public override void DrawCaret(float x, float y)
         {
-
-            //        public override void DrawCaret(float xpos, float ypos)
-            //        {
-            //            CanvasPainter p = this.TargetCanvasPainter;
-            //            PixelFarm.Drawing.Color prevColor = p.StrokeColor;
-            //            p.StrokeColor = PixelFarm.Drawing.Color.Red;
-            //            p.Line(xpos, ypos, xpos, ypos + this.FontAscendingPx);
-            //            p.StrokeColor = prevColor;
-            //        }
-
-            //throw new NotImplementedException();
+           
+            CanvasPainter p = this.TargetCanvasPainter;
+            PixelFarm.Drawing.Color prevColor = p.StrokeColor;
+            p.StrokeColor = PixelFarm.Drawing.Color.Red;
+            p.Line(x, y, x, y + this.FontAscendingPx);
+            p.StrokeColor = prevColor;
+             
         }
 
         void UpdateTypefaceAndGlyphBuilder()
@@ -173,7 +169,7 @@ namespace PixelFarm.Drawing.Fonts
             //1. update _glyphPathBuilder for current typeface
             UpdateGlyphLayoutSettings();
         }
-        void UpdateGlyphLayoutSettings()
+        public void UpdateGlyphLayoutSettings()
         {
             if (this._reqFont == null)
             {
@@ -270,7 +266,7 @@ namespace PixelFarm.Drawing.Fonts
                     //PERFORMANCE revisit here 
                     //if we have create a vxs we can cache it for later use?
                     //-----------------------------------   
-                    GlyphPlan glyphPlan = glyphPlanList[i]; 
+                    GlyphPlan glyphPlan = glyphPlanList[i];
                     g_x = glyphPlan.ExactX + x;
                     g_y = glyphPlan.ExactY + y;
                     canvasPainter.SetOrigin(g_x, g_y);

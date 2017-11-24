@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6C9262B6-F6DD-4C42-A3EF-D8574B324E7A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>PixelFarmTextBox.WinForms</RootNamespace>
+    <AssemblyName>PixelFarmTextBox.WinForms</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TypographyTest.WinForms">
+      <HintPath>..\TypographyTest.WinForms\obj\Debug\TypographyTest.WinForms.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\gdiplussample.winforms\gdiplus\DevGdiTextPrinter.cs">
+      <Link>GdiPlus\DevGdiTextPrinter.cs</Link>
+    </Compile>
+    <Compile Include="..\gdiplussample.winforms\gdiplus\GlyphTranslatorToGdiPath.cs">
+      <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
+    </Compile>
+    <Compile Include="..\textboxsample.winforms\textboxcontroller\SampleTextBoxController.cs">
+      <Link>GdiPlus\SampleTextBoxController.cs</Link>
+    </Compile>
+    <Compile Include="..\textboxsample.winforms\textboxcontroller\SampleTextBoxLineModel.cs">
+      <Link>GdiPlus\SampleTextBoxLineModel.cs</Link>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PixelFarm\BitmapHelper.cs" />
+    <Compile Include="PixelFarm\MouseButtonsAndKeys.cs" />
+    <Compile Include="PixelFarm\SampleTextBoxControllerForPixelFarm.cs" />
+    <Compile Include="PixelFarm\VisualLine.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SampleTextBox.Designer.cs">
+      <DependentUpon>SampleTextBox.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="SampleTextBox.resx">
+      <DependentUpon>SampleTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Name>Typography.GlyphLayout</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+      <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
+      <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
+      <Name>PixelFarm.Typography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
