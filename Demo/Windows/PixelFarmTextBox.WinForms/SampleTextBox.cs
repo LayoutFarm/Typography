@@ -74,7 +74,7 @@ namespace SampleWinForms
         protected override void OnPaint(PaintEventArgs e)
         {
             if (!this.DesignMode)
-            {
+            {  
                 _txtBoxController.UpdateOutput();
             }
             base.OnPaint(e);

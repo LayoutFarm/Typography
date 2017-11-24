@@ -31,7 +31,7 @@ namespace SampleWinForms.UI
         public float Y { get; set; }
         public void SetCharIndexFromPos(float x, float y)
         {
-            _line.SetCharIndexFromPos(x, y, toPxScale);
+            _line.SetCharIndexFromPos(x, y);
         }
 
         public void Draw()
@@ -43,8 +43,7 @@ namespace SampleWinForms.UI
             {
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
-                glyphPlans.Clear();
-
+                glyphPlans.Clear(); 
 
                 userCharToGlyphIndexMap.Clear();
 

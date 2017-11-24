@@ -15,9 +15,11 @@ namespace SampleWinForms.UI
         AggCanvasPainter p;
         Bitmap winBmp;
         VisualLine _visualLine;
+         
         public SampleTextBoxControllerForPixelFarm()
         {
         }
+        public bool ReadyToRender { get; set; }
         public void BindHostGraphics(Graphics hostControlGraphics)
         {
             g = hostControlGraphics;
@@ -39,6 +41,7 @@ namespace SampleWinForms.UI
         }
         public override void UpdateOutput()
         {
+            if (!ReadyToRender) return;
             //TODO: review here again 
             //----------
             //set some Gdi+ props... 
@@ -52,7 +55,7 @@ namespace SampleWinForms.UI
             p.FillColor = PixelFarm.Drawing.Color.Black;
             p.Clear(PixelFarm.Drawing.Color.White);
 
-            //_printer.TargetCanvasPainter = p;
+            _printer.TargetCanvasPainter = p;
             _visualLine.Draw();
 
 
