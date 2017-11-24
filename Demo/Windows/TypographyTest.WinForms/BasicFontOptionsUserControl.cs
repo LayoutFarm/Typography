@@ -1,10 +1,6 @@
-﻿//Apache2, 2017, WinterDev
+﻿//MIT, 2017, WinterDev
 using System;
-using System.IO;
-using System.Text;
 using System.Windows.Forms;
-
-
 
 using Typography.TextLayout;
 using PixelFarm.Drawing.Fonts;
