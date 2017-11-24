@@ -32,6 +32,7 @@ namespace SampleWinForms.UI
 
         public event EventHandler RequestGlyphRender;
         SimpleAction _flushOutput;
+
         bool _clearInfoView;
         int _testEdgeCount;
         TreeNode _latestSelectedTreeNode;
@@ -346,7 +347,7 @@ namespace SampleWinForms.UI
             {
                 nodeEdge.Text += "_X_ (no perpendicular_bone)";
             }
-             
+
             _tessEdgesNode.Nodes.Add(nodeEdge);
             //------------------------------- 
 

@@ -100,11 +100,11 @@ namespace SampleWinForms
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
             UpdateGlyphLayoutSettings();
-            _outputGlyphPlans.Clear(); 
-            this._glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null); 
+            _outputGlyphPlans.Clear();
+            this._glyphLayout.GenerateGlyphPlans(textBuffer, startAt, len, _outputGlyphPlans, null);
             DrawFromGlyphPlans(_outputGlyphPlans, x, y);
         }
-        void UpdateGlyphLayoutSettings()
+        public void UpdateGlyphLayoutSettings()
         {
             _glyphLayout.Typeface = this.Typeface;
             _glyphLayout.ScriptLang = this.ScriptLang;

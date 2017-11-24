@@ -28,11 +28,10 @@ namespace SampleWinForms
 
         DevTextPrinterBase selectedTextPrinter = null;
         VxsTextPrinter _devVxsTextPrinter = null;
-        DevGdiTextPrinter _devGdiTextPrinter = null;
+        //DevGdiTextPrinter _devGdiTextPrinter = null;
 
-        UI.SampleTextBoxControllerForGdi _controllerForGdi = new UI.SampleTextBoxControllerForGdi();
-
-        UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new UI.SampleTextBoxControllerForPixelFarm();
+        //UI.SampleTextBoxControllerForGdi _controllerForGdi = new UI.SampleTextBoxControllerForGdi(); 
+        //UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new UI.SampleTextBoxControllerForPixelFarm();
 
 
         UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
@@ -46,11 +45,18 @@ namespace SampleWinForms
             //
             //
             //set default values
-            _devGdiTextPrinter = new DevGdiTextPrinter();
+            //_devGdiTextPrinter = new DevGdiTextPrinter();
 
             //
             _basicOptions = openFontOptions1.Options;
-            _basicOptions.TypefaceChanged += (s, e) => _devGdiTextPrinter.Typeface = e.SelectedTypeface;
+            _basicOptions.TypefaceChanged += (s, e) =>
+            {
+                if (_devVxsTextPrinter != null)
+                {
+                    _devVxsTextPrinter.Typeface = e.SelectedTypeface;
+                }
+            };
+
             _basicOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
             //
             _glyphRenderOptions = glyphRenderOptionsUserControl1.Options;
@@ -61,8 +67,8 @@ namespace SampleWinForms
 
 
 
-            _devGdiTextPrinter.ScriptLang = _basicOptions.ScriptLang;
-            _devGdiTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+            //_devGdiTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+            //_devGdiTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
 
             this.Load += new EventHandler(Form1_Load);
@@ -147,8 +153,8 @@ namespace SampleWinForms
                 _devVxsTextPrinter = new VxsTextPrinter(painter, _basicOptions.OpenFontStore);
                 _devVxsTextPrinter.TargetCanvasPainter = painter;
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
-                _devVxsTextPrinter.PositionTechnique = _devGdiTextPrinter.PositionTechnique;
-                _devGdiTextPrinter.TargetGraphics = g;
+                _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
+                //_devGdiTextPrinter.TargetGraphics = g;
             }
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -168,26 +174,30 @@ namespace SampleWinForms
             switch (renderChoice)
             {
 
+                //                case TypographyTest.RenderChoice.RenderWithGdiPlusPath:
+                //                    {
+                //                        selectedTextPrinter = _devGdiTextPrinter;
+                //                        selectedTextPrinter.Typeface = _basicOptions.Typeface;
+                //                        selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
+                //                        selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+                //                        selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+                //                        //
+                //                        selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+                //                        selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
+
+                //#if DEBUG
+                //                        GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+                //                        GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+                //                        GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+                //#endif
+
+                //                        selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
+
+                //                    }
+                //                    break;
                 case TypographyTest.RenderChoice.RenderWithGdiPlusPath:
-                    {
-                        selectedTextPrinter = _devGdiTextPrinter;
-                        selectedTextPrinter.Typeface = _basicOptions.Typeface;
-                        selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
-                        selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
-                        selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
-                        //
-                        selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
-                        selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
-
-#if DEBUG
-                        GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-                        GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-                        GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
-#endif
-
-                        selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
-
-                    }
+                    //not render in this example
+                    //see more at ...
                     break;
                 case TypographyTest.RenderChoice.RenderWithTextPrinterAndMiniAgg:
                     {
