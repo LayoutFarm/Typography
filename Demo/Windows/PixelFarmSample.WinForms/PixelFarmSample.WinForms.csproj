@@ -126,6 +126,10 @@
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TypographyTest.WinForms\TypographyTest.WinForms.csproj">
+      <Project>{9d2f3501-7705-4401-be13-a7613ca0c4bd}</Project>
+      <Name>TypographyTest.WinForms</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

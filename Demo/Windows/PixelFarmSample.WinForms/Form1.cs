@@ -25,82 +25,54 @@ namespace SampleWinForms
         ActualImage destImg;
         Bitmap winBmp;
 
-        OpenFontStore _openFontStore;
+
 
         DevTextPrinterBase selectedTextPrinter = null;
         VxsTextPrinter _devVxsTextPrinter = null;
         DevGdiTextPrinter _devGdiTextPrinter = null;
 
         UI.SampleTextBoxControllerForGdi _controllerForGdi = new UI.SampleTextBoxControllerForGdi();
-        //
+
         UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new UI.SampleTextBoxControllerForPixelFarm();
 
-        InstalledFontCollection installedFontCollection;
-        TypefaceStore _typefaceStore;
-        float _fontSizeInPts = 14;//default
-        InstalledFont _selectedInstallFont;
 
-        UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
-        Typography.OpenFont.ScriptLang _current_script;
+        UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer(); 
+        TypographyTest.BasicFontOptions _basicOptions;
+        TypographyTest.GlyphRenderOptions _glyphRenderOptions;
+        TypographyTest.ContourAnalysisOptions _contourAnalysisOpts;
 
         public Form1()
         {
             InitializeComponent();
-
-
-
+            //
+            //
+            //set default values
             _devGdiTextPrinter = new DevGdiTextPrinter();
-            this.sampleTextBox1.Visible = false;
-            _openFontStore = new OpenFontStore();
 
-            //default
-            //set script lang,
-            //test with Thai for 'complex script' 
-            _current_script = Typography.OpenFont.ScriptLangs.Latin;
-            _devGdiTextPrinter.ScriptLang = _current_script;
-            _devGdiTextPrinter.PositionTechnique = PositionTechnique.OpenFont;
+            //
+            _basicOptions = openFontOptions1.Options;
+            _basicOptions.TypefaceChanged += (s, e) => _devGdiTextPrinter.Typeface = e.SelectedTypeface;
+            _basicOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
+            //
+            _glyphRenderOptions = glyphRenderOptionsUserControl1.Options;
+            _glyphRenderOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
+            //
+            _contourAnalysisOpts = glyphContourAnalysisOptionsUserControl1.Options;
+            _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput(); 
+            this.sampleTextBox1.Visible = false;
+
+
+            _devGdiTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+            _devGdiTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
 
             this.Load += new EventHandler(Form1_Load);
 
-            this.txtGridSize.KeyDown += TxtGridSize_KeyDown;
+
             //----------
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             //----------
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithTextPrinterAndMiniAgg);
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMiniAgg_SingleGlyph);
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithGdiPlusPath);
-            cmbRenderChoices.Items.Add(RenderChoice.RenderWithMsdfGen);
-            cmbRenderChoices.SelectedIndex = 0;
-            cmbRenderChoices.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
-            //----------
-            cmbPositionTech.Items.Add(PositionTechnique.OpenFont);
-            cmbPositionTech.Items.Add(PositionTechnique.Kerning);
-            cmbPositionTech.Items.Add(PositionTechnique.None);
-            cmbPositionTech.SelectedIndex = 0;
-            cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
-            //---------- 
-            SetupScriptLangComboBox();
 
-            //---------- 
-            lstHintList.Items.Add(HintTechnique.None);
-            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
-            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
-            lstHintList.Items.Add(HintTechnique.CustomAutoFit);
-            lstHintList.SelectedIndex = 0;
-            lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
-            //edge offset
-            lstEdgeOffset.Items.Add(0f);
-            lstEdgeOffset.Items.Add(-10f);
-            lstEdgeOffset.Items.Add(-8f);
-            lstEdgeOffset.Items.Add(-6f);
-            lstEdgeOffset.Items.Add(-4f);
-            lstEdgeOffset.Items.Add(4f);
-            lstEdgeOffset.Items.Add(6f);
-            lstEdgeOffset.Items.Add(8f);
-            lstEdgeOffset.Items.Add(10f);
-            lstEdgeOffset.SelectedIndex = 0;
-            lstEdgeOffset.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
 
             //share text printer to our sample textbox
             //but you can create another text printer that specific to text textbox control
@@ -113,104 +85,7 @@ namespace SampleWinForms
 
             //---------- 
             this.sampleTextBox1.SetController(_controllerForPixelFarm);
-
-
             button1.Click += (s, e) => UpdateRenderOutput();
-            chkShowGrid.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkShowTess.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkXGridFitting.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkYGridFitting.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkFillBackground.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkLcdTechnique.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkGsubEnableLigature.CheckedChanged += (s, e) => UpdateRenderOutput();
-            //----------
-            chkShowTess.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDrawCentroidBone.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDrawGlyphBone.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDynamicOutline.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkSetPrinterLayoutForLcdSubPix.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDrawTriangles.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDrawRegenerateOutline.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkBorder.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDrawLineHubConn.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDrawPerpendicularLine.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkDrawGlyphPoint.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkTestGridFit.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkUseHorizontalFitAlign.CheckedChanged += (s, e) => UpdateRenderOutput();
-            chkWriteFitOutputToConsole.CheckedChanged += (s, e) => UpdateRenderOutput();
-
-            //---------- 
-            //1. create font collection             
-            installedFontCollection = new InstalledFontCollection();
-            //2. set some essential handler
-            installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-            foreach (string file in Directory.GetFiles("../../../TestFonts", "*.ttf"))
-            {
-                //eg. this is our custom font folder  
-                installedFontCollection.AddFont(new FontFileStreamProvider(file));
-            }
-            //3.
-            //installedFontCollection.LoadSystemFonts();
-            //---------- 
-            //show result
-            InstalledFont selectedFF = null;
-            int selected_index = 0;
-            int ffcount = 0;
-            bool found = false;
-
-            string defaultFont = "Tahoma";
-            //string defaultFont = "Alef"; //test hebrew
-            //string defaultFont = "Century";
-            foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
-            {
-                if (!found && ff.FontName == defaultFont)
-                {
-                    selectedFF = ff;
-                    selected_index = ffcount;
-                    _selectedInstallFont = ff;
-                    found = true;
-                }
-                lstFontList.Items.Add(ff);
-                ffcount++;
-            }
-            //set default font for current text printer
-            //
-            _typefaceStore = new TypefaceStore();
-            _typefaceStore.FontCollection = installedFontCollection;
-
-
-            if (selected_index < 0) { selected_index = 0; }
-            lstFontList.SelectedIndex = selected_index;
-            lstFontList.SelectedIndexChanged += (s, e) =>
-            {
-                InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
-                if (ff != null)
-                {
-                    _selectedInstallFont = ff;
-                    selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(ff);
-                    //sample text box 
-                    UpdateRenderOutput();
-                }
-            };
-            //----------
-
-            lstFontSizes.Items.AddRange(
-              new object[]{
-                    8, 9,
-                    10,11,
-                    12,
-                    14,
-                    16,
-                    18,20,22,24,26,28,36,48,72,
-                    240,280,300,360,400,420,460,
-                    620,720,860,920,1024
-              });
-            lstFontSizes.SelectedIndexChanged += (s, e) =>
-            {
-                //new font size
-                _fontSizeInPts = (int)lstFontSizes.SelectedItem;
-                UpdateRenderOutput();
-            };
 
             //----------------
             //string inputstr = "ก้า";
@@ -245,63 +120,15 @@ namespace SampleWinForms
 
             //----------------
             this.txtInputChar.Text = inputstr;
-            this.chkFillBackground.Checked = true;
             _readyToRender = true;
         }
 
 
 
-        int _defaultScriptLangComboBoxIndex = 0;
-        void SetupScriptLangComboBox()
-        {
-
-            //for debug, set default script lang here
-
-            _current_script = Typography.OpenFont.ScriptLangs.Latin;
-            //
-            int index = 0;
-            foreach (Typography.OpenFont.ScriptLang scriptLang in Typography.OpenFont.ScriptLangs.GetRegiteredScriptLangIter())
-            {
-                this.cmbScriptLangs.Items.Add(scriptLang);
-                //
-                if (scriptLang == _current_script)
-                {
-                    //found default script lang
-                    _defaultScriptLangComboBoxIndex = index;
-                }
-                index++;
-            }
-
-            this.cmbScriptLangs.SelectedIndex = _defaultScriptLangComboBoxIndex; //set before** attach event
-
-            this.cmbScriptLangs.SelectedIndexChanged += (s, e) =>
-            {
-                _current_script = (Typography.OpenFont.ScriptLang)this.cmbScriptLangs.SelectedItem;
-                UpdateRenderOutput();
-            };
-        }
-
-        enum RenderChoice
-        {
-            RenderWithMiniAgg_SingleGlyph,//for test single glyph 
-            RenderWithGdiPlusPath,
-            RenderWithTextPrinterAndMiniAgg,
-            RenderWithMsdfGen, //rendering with multi-channel signed distance field img
-            RenderWithSdfGen//not support sdfgen
-        }
 
         void Form1_Load(object sender, EventArgs e)
         {
             this.Text = "Render with PixelFarm";
-            this.lstFontSizes.SelectedIndex = 0;// lstFontSizes.Items.Count - 3;
-
-            var installedFont = lstFontList.SelectedItem as InstalledFont;
-            if (installedFont != null)
-            {
-                _selectedInstallFont = installedFont;
-            }
-
-
         }
         bool _readyToRender;
         void UpdateRenderOutput()
@@ -318,9 +145,9 @@ namespace SampleWinForms
 
                 painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
-                _devVxsTextPrinter = new VxsTextPrinter(painter, _openFontStore);
+                _devVxsTextPrinter = new VxsTextPrinter(painter, _basicOptions.OpenFontStore);
                 _devVxsTextPrinter.TargetCanvasPainter = painter;
-                _devVxsTextPrinter.ScriptLang = _current_script;
+                _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = _devGdiTextPrinter.PositionTechnique;
                 _devGdiTextPrinter.TargetGraphics = g;
             }
@@ -332,55 +159,58 @@ namespace SampleWinForms
 
             //test option use be used with lcd subpixel rendering.
             //this demonstrate how we shift a pixel for subpixel rendering tech
-            _devVxsTextPrinter.UseWithLcdSubPixelRenderingTechnique = chkSetPrinterLayoutForLcdSubPix.Checked;
+            _devVxsTextPrinter.UseWithLcdSubPixelRenderingTechnique = _contourAnalysisOpts.SetupPrinterLayoutForLcdSubPix;
 
 
-            var hintTech = (HintTechnique)lstHintList.SelectedItem;
+
 
             //1. read typeface from font file 
-            RenderChoice renderChoice = (RenderChoice)this.cmbRenderChoices.SelectedItem;
+            TypographyTest.RenderChoice renderChoice = _basicOptions.RenderChoice;
             switch (renderChoice)
             {
 
-                case RenderChoice.RenderWithGdiPlusPath:
+                case TypographyTest.RenderChoice.RenderWithGdiPlusPath:
                     {
                         selectedTextPrinter = _devGdiTextPrinter;
-                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont);
-                        selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.HintTechnique = hintTech;
-                        selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
-                        selectedTextPrinter.EnableLigature = this.chkGsubEnableLigature.Checked;
-                        selectedTextPrinter.ScriptLang = _current_script;
+                        selectedTextPrinter.Typeface = _basicOptions.Typeface;
+                        selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
+                        selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+                        selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+                        //
+                        selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+                        selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
 
 #if DEBUG
-                        GlyphDynamicOutline.dbugTestNewGridFitting = chkTestGridFit.Checked;
-                        GlyphDynamicOutline.dbugActualPosToConsole = chkWriteFitOutputToConsole.Checked;
-                        GlyphDynamicOutline.dbugUseHorizontalFitValue = chkUseHorizontalFitAlign.Checked;
+                        GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+                        GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+                        GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
                         selectedTextPrinter.DrawString(this.txtInputChar.Text.ToCharArray(), 0, 0);
 
                     }
                     break;
-                case RenderChoice.RenderWithTextPrinterAndMiniAgg:
+                case TypographyTest.RenderChoice.RenderWithTextPrinterAndMiniAgg:
                     {
                         //clear previous draw
                         painter.Clear(PixelFarm.Drawing.Color.White);
-                        painter.UseSubPixelRendering = chkLcdTechnique.Checked;
+                        painter.UseSubPixelRendering = _contourAnalysisOpts.LcdTechnique;
                         painter.FillColor = PixelFarm.Drawing.Color.Black;
 
                         selectedTextPrinter = _devVxsTextPrinter;
-                        selectedTextPrinter.Typeface = _typefaceStore.GetTypeface(_selectedInstallFont);
-                        selectedTextPrinter.FontSizeInPoints = _fontSizeInPts;
-                        selectedTextPrinter.HintTechnique = hintTech;
-                        selectedTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
-                        selectedTextPrinter.EnableLigature = this.chkGsubEnableLigature.Checked;
-                        selectedTextPrinter.ScriptLang = _current_script;
+                        selectedTextPrinter.Typeface = _basicOptions.Typeface;
+                        selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
+                        selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+                        selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+
+                        selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+                        selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
+
                         //test print 3 lines
 #if DEBUG
-                        GlyphDynamicOutline.dbugTestNewGridFitting = chkTestGridFit.Checked;
-                        GlyphDynamicOutline.dbugActualPosToConsole = chkWriteFitOutputToConsole.Checked;
-                        GlyphDynamicOutline.dbugUseHorizontalFitValue = chkUseHorizontalFitAlign.Checked;
+                        GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+                        GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+                        GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
@@ -403,23 +233,23 @@ namespace SampleWinForms
 
                 //==============================================
                 //render 1 glyph for debug and test
-                case RenderChoice.RenderWithMsdfGen:
-                case RenderChoice.RenderWithSdfGen:
+                case TypographyTest.RenderChoice.RenderWithMsdfGen:
+                case TypographyTest.RenderChoice.RenderWithSdfGen:
                     {
                         char testChar = this.txtInputChar.Text[0];
-                        Typeface typeFace = _typefaceStore.GetTypeface(_selectedInstallFont);
-                        RenderWithMsdfImg(typeFace, testChar, _fontSizeInPts);
+                        Typeface typeFace = _basicOptions.Typeface;
+                        RenderWithMsdfImg(typeFace, testChar, _basicOptions.FontSizeInPoints);
 
                     }
                     break;
-                case RenderChoice.RenderWithMiniAgg_SingleGlyph:
+                case TypographyTest.RenderChoice.RenderWithMiniAgg_SingleGlyph:
                     {
                         selectedTextPrinter = _devVxsTextPrinter;
                         //for test only 1 char 
                         RenderSingleCharWithMiniAgg(
-                            _typefaceStore.GetTypeface(_selectedInstallFont),
+                             _basicOptions.Typeface,
                             this.txtInputChar.Text[0],
-                            _fontSizeInPts);
+                            _basicOptions.FontSizeInPoints);
                     }
                     break;
                 default:
@@ -437,7 +267,7 @@ namespace SampleWinForms
             if (vinfo == null)
             {
                 vinfo = new UI.DebugGlyphVisualizerInfoView();
-                vinfo.SetTreeView(this.treeView1);
+                vinfo.SetTreeView(glyphContourAnalysisOptionsUserControl1.DebugTreeView);
                 vinfo.SetFlushOutputHander(() =>
                 {
                     painter.SetOrigin(0, 0);
@@ -455,37 +285,38 @@ namespace SampleWinForms
             //---------------
             //we use the debugGlyphVisualize the render it
             this.debugGlyphVisualizer.SetFont(typeface, sizeInPoint);
-
-            debugGlyphVisualizer.UseLcdTechnique = this.chkLcdTechnique.Checked;
             debugGlyphVisualizer.CanvasPainter = painter;
-            debugGlyphVisualizer.FillBackGround = chkFillBackground.Checked;
-            debugGlyphVisualizer.DrawBorder = chkBorder.Checked;
+            debugGlyphVisualizer.UseLcdTechnique = _contourAnalysisOpts.LcdTechnique;
+            debugGlyphVisualizer.FillBackGround = _glyphRenderOptions.FillBackground;
+            debugGlyphVisualizer.DrawBorder = _glyphRenderOptions.DrawBorder;
 
-            debugGlyphVisualizer.ShowTess = chkShowTess.Checked;
-            debugGlyphVisualizer.WalkTrianglesAndEdges = this.chkDrawTriangles.Checked;
-            debugGlyphVisualizer.DrawEndLineHub = this.chkDrawLineHubConn.Checked;
-            debugGlyphVisualizer.DrawPerpendicularLine = this.chkDrawPerpendicularLine.Checked;
-            debugGlyphVisualizer.WalkCentroidBone = this.chkDrawCentroidBone.Checked;
-            debugGlyphVisualizer.WalkGlyphBone = this.chkDrawGlyphBone.Checked;
-            debugGlyphVisualizer.GlyphEdgeOffset = (float)this.lstEdgeOffset.SelectedItem;
-            debugGlyphVisualizer.DrawDynamicOutline = chkDynamicOutline.Checked;
-            debugGlyphVisualizer.DrawRegenerateOutline = chkDrawRegenerateOutline.Checked;
-            debugGlyphVisualizer.DrawGlyphPoint = chkDrawGlyphPoint.Checked;
+            debugGlyphVisualizer.ShowTess = _contourAnalysisOpts.ShowTess;
+            debugGlyphVisualizer.WalkTrianglesAndEdges = _contourAnalysisOpts.ShowTriangle;
+            debugGlyphVisualizer.DrawEndLineHub = _contourAnalysisOpts.DrawLineHubConn;
+            debugGlyphVisualizer.DrawPerpendicularLine = _contourAnalysisOpts.DrawPerpendicularLine;
+            debugGlyphVisualizer.WalkCentroidBone = _contourAnalysisOpts.DrawCentroidBone;
+            debugGlyphVisualizer.WalkGlyphBone = _contourAnalysisOpts.DrawGlyphBone;
+
+            debugGlyphVisualizer.GlyphEdgeOffset = _contourAnalysisOpts.EdgeOffset;
+
+            debugGlyphVisualizer.DrawDynamicOutline = _contourAnalysisOpts.DynamicOutline;
+            debugGlyphVisualizer.DrawRegenerateOutline = _contourAnalysisOpts.DrawRegenerationOutline;
+            debugGlyphVisualizer.DrawGlyphPoint = _contourAnalysisOpts.DrawGlyphPoint;
 
 #if DEBUG
-            GlyphDynamicOutline.dbugTestNewGridFitting = chkTestGridFit.Checked;
-            GlyphDynamicOutline.dbugActualPosToConsole = chkWriteFitOutputToConsole.Checked;
-            GlyphDynamicOutline.dbugUseHorizontalFitValue = chkUseHorizontalFitAlign.Checked;
+            GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+            GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+            GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
 
             //------------------------------------------------------
 
-            debugGlyphVisualizer.RenderChar(testChar, (HintTechnique)lstHintList.SelectedItem);
+            debugGlyphVisualizer.RenderChar(testChar, _glyphRenderOptions.HintTechnique);
             //---------------------------------------------------- 
 
             //--------------------------
-            if (chkShowGrid.Checked)
+            if (_contourAnalysisOpts.ShowGrid)
             {
                 //render grid
                 RenderGrids(800, 600, _gridSize, painter);
@@ -507,7 +338,7 @@ namespace SampleWinForms
             painter.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
             var builder = new GlyphPathBuilder(typeface);
-            builder.SetHintTechnique((HintTechnique)lstHintList.SelectedItem);
+            builder.SetHintTechnique(_glyphRenderOptions.HintTechnique);
 
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
@@ -531,7 +362,7 @@ namespace SampleWinForms
             //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
             //}
 
-            if (chkShowGrid.Checked)
+            if (_contourAnalysisOpts.ShowGrid)
             {
                 //render grid
                 RenderGrids(800, 600, _gridSize, painter);
@@ -570,32 +401,7 @@ namespace SampleWinForms
 
         VertexStorePool _vxsPool2 = new VertexStorePool();
         int _gridSize = 5;//default 
-        private void TxtGridSize_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                int result = this._gridSize;
-                if (int.TryParse(this.txtGridSize.Text, out result))
-                {
-                    if (result < 5)
-                    {
-                        _gridSize = 5;
-                    }
-                    else if (result > 800)
-                    {
-                        _gridSize = 800;
-                    }
-                }
-                this._gridSize = result;
 
-                this.txtGridSize.Text = _gridSize.ToString();
-#if DEBUG
-                Typography.Contours.GlyphDynamicOutline.dbugGridHeight = _gridSize;
-#endif
-                UpdateRenderOutput();
-            }
-
-        }
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
         {
 
@@ -767,15 +573,9 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
-
-        private void chkShowSampleTextBox_CheckedChanged(object sender, EventArgs e)
+        private void Form1_Load_1(object sender, EventArgs e)
         {
-            //if (this.sampleTextBox1.Visible = chkShowSampleTextBox.Visible)
-            //{
-            //    this.sampleTextBox1.Focus();
-            //}
+
         }
-
-
     }
 }
