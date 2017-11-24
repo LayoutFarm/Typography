@@ -12,7 +12,6 @@ using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.Rendering;
 using Typography.Contours;
-using Typography.TextLayout;
 
 
 namespace SampleWinForms
@@ -36,7 +35,7 @@ namespace SampleWinForms
         UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new UI.SampleTextBoxControllerForPixelFarm();
 
 
-        UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer(); 
+        UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
         TypographyTest.BasicFontOptions _basicOptions;
         TypographyTest.GlyphRenderOptions _glyphRenderOptions;
         TypographyTest.ContourAnalysisOptions _contourAnalysisOpts;
@@ -58,8 +57,8 @@ namespace SampleWinForms
             _glyphRenderOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
             //
             _contourAnalysisOpts = glyphContourAnalysisOptionsUserControl1.Options;
-            _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput(); 
-            this.sampleTextBox1.Visible = false;
+            _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
+
 
 
             _devGdiTextPrinter.ScriptLang = _basicOptions.ScriptLang;
@@ -76,15 +75,15 @@ namespace SampleWinForms
 
             //share text printer to our sample textbox
             //but you can create another text printer that specific to text textbox control
-            Graphics gx = this.sampleTextBox1.CreateGraphics();
-            _controllerForGdi.BindHostGraphics(gx);
-            _controllerForGdi.TextPrinter = _devGdiTextPrinter;
-            //---------- 
-            _controllerForPixelFarm.BindHostGraphics(gx);
-            _controllerForPixelFarm.TextPrinter = _devVxsTextPrinter;
+            //Graphics gx = this.sampleTextBox1.CreateGraphics();
+            //_controllerForGdi.BindHostGraphics(gx);
+            //_controllerForGdi.TextPrinter = _devGdiTextPrinter;
+            ////---------- 
+            //_controllerForPixelFarm.BindHostGraphics(gx);
+            //_controllerForPixelFarm.TextPrinter = _devVxsTextPrinter;
 
             //---------- 
-            this.sampleTextBox1.SetController(_controllerForPixelFarm);
+            //this.sampleTextBox1.SetController(_controllerForPixelFarm);
             button1.Click += (s, e) => UpdateRenderOutput();
 
             //----------------

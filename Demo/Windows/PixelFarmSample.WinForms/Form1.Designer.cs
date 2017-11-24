@@ -34,7 +34,6 @@
             this.glyphContourAnalysisOptionsUserControl1 = new TypographyTest.WinForms.GlyphContourAnalysisOptionsUserControl();
             this.glyphRenderOptionsUserControl1 = new TypographyTest.WinForms.GlyphRenderOptionsUserControl();
             this.openFontOptions1 = new TypographyTest.WinForms.BasicFontOptionsUserControl();
-            this.sampleTextBox1 = new SampleWinForms.SampleTextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -89,15 +88,6 @@
             this.openFontOptions1.Size = new System.Drawing.Size(199, 428);
             this.openFontOptions1.TabIndex = 67;
             // 
-            // sampleTextBox1
-            // 
-            this.sampleTextBox1.BackColor = System.Drawing.Color.Silver;
-            this.sampleTextBox1.Location = new System.Drawing.Point(12, 71);
-            this.sampleTextBox1.Name = "sampleTextBox1";
-            this.sampleTextBox1.Size = new System.Drawing.Size(505, 774);
-            this.sampleTextBox1.TabIndex = 40;
-            this.sampleTextBox1.Visible = false;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -106,7 +96,6 @@
             this.Controls.Add(this.glyphContourAnalysisOptionsUserControl1);
             this.Controls.Add(this.glyphRenderOptionsUserControl1);
             this.Controls.Add(this.openFontOptions1);
-            this.Controls.Add(this.sampleTextBox1);
             this.Controls.Add(this.cmdBuildMsdfTexture);
             this.Controls.Add(this.txtInputChar);
             this.Controls.Add(this.button1);
@@ -123,7 +112,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox txtInputChar;
         private System.Windows.Forms.Button cmdBuildMsdfTexture;
-        private SampleTextBox sampleTextBox1;
         private TypographyTest.WinForms.BasicFontOptionsUserControl openFontOptions1;
         private TypographyTest.WinForms.GlyphRenderOptionsUserControl glyphRenderOptionsUserControl1;
         private TypographyTest.WinForms.GlyphContourAnalysisOptionsUserControl glyphContourAnalysisOptionsUserControl1;

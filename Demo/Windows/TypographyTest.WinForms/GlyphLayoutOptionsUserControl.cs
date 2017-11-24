@@ -1,4 +1,5 @@
-﻿using System;
+﻿//MIT, 2017, WinterDev
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;

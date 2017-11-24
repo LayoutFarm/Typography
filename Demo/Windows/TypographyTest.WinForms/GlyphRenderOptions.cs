@@ -1,11 +1,5 @@
-﻿//Apache2, 2017, WinterDev
+﻿//MIT, 2017, WinterDev
 using System;
-using System.Collections.Generic;
-using System.IO;
-using Typography.OpenFont;
-using Typography.TextLayout;
-
-using PixelFarm.Drawing.Fonts;
 using Typography.Contours;
 namespace TypographyTest
 {
