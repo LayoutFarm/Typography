@@ -25,7 +25,10 @@ namespace Typography.TextLayout
             get { return _lineNumber; }
             set { _lineNumber = value; }
         }
-        public LexWordSpan EndLineSpan
+        /// <summary>
+        /// explicit end line
+        /// </summary>
+        internal bool ExplicitEnd
         {
             get;
             set;

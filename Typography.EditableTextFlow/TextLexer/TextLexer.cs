@@ -1,11 +1,11 @@
 ﻿//MIT, 2014-2017, WinterDev
 using System.Collections.Generic;
 
-namespace Typography.TextLayout
+using Typography.TextLayout;
+namespace Typography.WordBreaks
 {
     public class TextBlockLexer
     {
-
         List<LexWordSpan> spans = new List<LexWordSpan>();
         public List<LexWordSpan> ResultSpans
         {
@@ -171,17 +171,8 @@ namespace Typography.TextLayout
 
         }
     }
-    //default textblock lexer
-    public enum WordSpanKind : ushort
-    {
-        Unknown,
-        Custom,
-        WhiteSpace,
-        NewLine,
-        Text,
-        Tab, 
-    }
 
+    
     public struct LexWordSpan
     {
         public int start;

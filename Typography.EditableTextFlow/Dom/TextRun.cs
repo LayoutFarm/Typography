@@ -11,6 +11,15 @@ namespace Typography.TextLayout
         public string Name { get; set; }
         public float SizeInPoints { get; set; }
     }
+    public enum WordSpanKind : ushort
+    {
+        Unknown,
+        Custom,
+        WhiteSpace,
+        NewLine,
+        Text,
+        Tab,
+    }
 
     public class TextRun : IRun
     {

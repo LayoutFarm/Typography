@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using Typography.OpenFont;
+using Typography.WordBreaks;
 namespace Typography.TextLayout
 {
     /// <summary>
@@ -72,12 +73,10 @@ namespace Typography.TextLayout
                 LexWordSpan sp = spanLists[i];
                 if (sp.kind == WordSpanKind.NewLine)
                 {
-                    //begin 'hard' new line                    
-                    line.EndLineSpan = sp;
+                    line.ExplicitEnd = true;
                     line = new EditableTextLine();
                     line.LineNumber = _lines.Count;
                     _lines.Add(line);
-
                 }
                 else
                 {
