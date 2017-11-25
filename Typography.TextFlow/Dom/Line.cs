@@ -1,20 +1,19 @@
 ﻿//MIT, 2014-2017, WinterDev
-
 using System.Collections.Generic;
-using Typography.TextLayout;
-using Typography.Rendering;
 
-namespace SampleWinForms.UI
+namespace Typography.TextLayout
 {
 
-
-    class Line
+    public class Line
     {
 
         int _caretCharIndex = 0;//default
-        internal List<char> _charBuffer = new List<char>();
-        internal List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
-        internal List<UserCharToGlyphIndexMap> _userCharToGlyphMap = new List<UserCharToGlyphIndexMap>();
+
+
+        //TODO: temp public, review accessibility here again
+        public List<char> _charBuffer = new List<char>();
+        public List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
+        public List<UserCharToGlyphIndexMap> _userCharToGlyphMap = new List<UserCharToGlyphIndexMap>();
 
         bool _contentChanged = true;
 
@@ -193,8 +192,8 @@ namespace SampleWinForms.UI
 
             int count = _glyphPlans.Count;
             float accum_x = 0;
-            
-          
+
+
 
             for (int i = 0; i < count; ++i)
             {
@@ -278,36 +277,6 @@ namespace SampleWinForms.UI
     }
 
 
-    class TextRun
-    {
-        char[] _srcTextBuffer;
-        int _startAt;
-        int _len;
+   
 
-        GlyphPlanListCache _glyphPlanListCache;
-
-        public TextRun(char[] srcTextBuffer, int startAt, int len)
-        {
-            this._srcTextBuffer = srcTextBuffer;
-            this._startAt = startAt;
-            this._len = len;
-        }
-        public void SetGlyphPlan(List<GlyphPlan> glyphPlans, int startAt, int len)
-        {
-            _glyphPlanListCache = new GlyphPlanListCache(glyphPlans, startAt, len);
-        }
-        struct GlyphPlanListCache
-        {
-            public readonly List<GlyphPlan> glyphPlans;
-            public readonly int startAt;
-            public readonly int len;
-            public GlyphPlanListCache(List<GlyphPlan> glyphPlans, int startAt, int len)
-            {
-                this.glyphPlans = glyphPlans;
-                this.startAt = startAt;
-                this.len = len;
-            }
-
-        }
-    }
 }

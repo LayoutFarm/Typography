@@ -1,6 +1,7 @@
 ﻿//MIT, 2014-2017, WinterDev
 
 using System.Drawing;
+using Typography.TextLayout;
 namespace SampleWinForms.UI
 {
 
