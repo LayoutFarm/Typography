@@ -33,9 +33,15 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dom\Line.cs" />
+    <Compile Include="Dom\IRun.cs" />
+    <Compile Include="Dom\EditableTextBlockLayoutEngine.cs" />
+    <Compile Include="Dom\TextBuffer.cs" />
+    <Compile Include="Layout\SingleLineLayoutEngine.cs" />
+    <Compile Include="Simple\SmallLine.cs" />
     <Compile Include="Dom\TextRun.cs" />
+    <Compile Include="Dom\EditableTextLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextLexer\TextLexer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
@@ -47,5 +53,6 @@
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

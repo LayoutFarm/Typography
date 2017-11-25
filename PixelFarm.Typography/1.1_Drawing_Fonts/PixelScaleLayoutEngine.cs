@@ -11,17 +11,14 @@ using Typography.TextLayout;
 
 
 namespace Typography.Contours
-{
-
-
+{   
     public struct GlyphControlParameters
     {
         public float avgXOffsetToFit;
         public short minX;
         public short minY;
         public short maxX;
-        public short maxY;
-
+        public short maxY; 
     }
     class GlyphMeshStore
     {

@@ -4,12 +4,10 @@ using System.Collections.Generic;
 namespace Typography.TextLayout
 {
 
-    public class Line
+    public class SmallLine
     {
 
-        int _caretCharIndex = 0;//default
-
-
+        int _caretCharIndex = 0;//default  
         //TODO: temp public, review accessibility here again
         public List<char> _charBuffer = new List<char>();
         public List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
@@ -269,14 +267,6 @@ namespace Typography.TextLayout
                 }
             }
         }
-
-        public UserCharToGlyphIndexMap GetCurrentCharToGlyphMap()
-        {
-            return _userCharToGlyphMap[_caretCharIndex];
-        }
     }
-
-
-   
 
 }

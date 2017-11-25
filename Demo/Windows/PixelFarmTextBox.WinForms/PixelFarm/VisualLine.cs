@@ -10,15 +10,13 @@ namespace SampleWinForms.UI
     class VisualLine
     {
 
-        Line _line;
-        DevTextPrinterBase _printer;
-
-         
+        SmallLine _line;
+        DevTextPrinterBase _printer; 
         public VisualLine()
         {
 
         }
-        public void BindLine(Line line)
+        public void BindLine(SmallLine line)
         {
             this._line = line;
         }
