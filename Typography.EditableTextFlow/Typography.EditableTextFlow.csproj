@@ -7,8 +7,8 @@
     <ProjectGuid>{A17B5A62-09AF-45D5-9D9F-1FD1B9AB50F7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Typography.TextFlow</RootNamespace>
-    <AssemblyName>Typography.TextFlow</AssemblyName>
+    <RootNamespace>Typography.EditableTextFlow</RootNamespace>
+    <AssemblyName>Typography.EditableTextFlow</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -75,7 +75,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypographyTest.WinForms", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarmTextBox.WinForms", "Demo\Windows\PixelFarmTextBox.WinForms\PixelFarmTextBox.WinForms.csproj", "{6C9262B6-F6DD-4C42-A3EF-D8574B324E7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextFlow", "Typography.TextFlow\Typography.TextFlow.csproj", "{A17B5A62-09AF-45D5-9D9F-1FD1B9AB50F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.EditableTextFlow", "Typography.EditableTextFlow\Typography.EditableTextFlow.csproj", "{A17B5A62-09AF-45D5-9D9F-1FD1B9AB50F7}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
