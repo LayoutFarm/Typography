@@ -166,6 +166,11 @@ namespace Typography.TextLayout
                 _pxscaleLayout = value;
             }
         }
+
+        /// <summary>
+        /// reusable codepoint list buffer
+        /// </summary>
+        List<int> _codepoints = new List<int>();//not thread-safe***
         /// <summary>
         /// do glyph shaping and glyph out
         /// </summary>
@@ -190,7 +195,7 @@ namespace Typography.TextLayout
             // we need to use "int".
             // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
             // though they are encoded as two "char"s in a C# string.
-            List<int> codepoints = new List<int>();
+            _codepoints.Clear();
             for (int i = 0; i < len; ++i)
             {
                 char ch = str[startAt + i];
@@ -204,21 +209,21 @@ namespace Typography.TextLayout
                         codepoint = char.ConvertToUtf32(ch, nextCh);
                     }
                 }
-                codepoints.Add(codepoint);
+                _codepoints.Add(codepoint);
             }
 
             // clear before use
             _inputGlyphs.Clear();
 
             // convert codepoints to input glyphs
-            for (int i = 0; i < codepoints.Count; ++i)
+            for (int i = 0; i < _codepoints.Count; ++i)
             {
-                int codepoint = codepoints[i];
+                int codepoint = _codepoints[i];
                 ushort glyphIndex = _typeface.LookupIndex(codepoint);
-                if (i + 1 < codepoints.Count)
+                if (i + 1 < _codepoints.Count)
                 {
                     // Maybe this is a UVS sequence; in that case, skip the second codepoint
-                    int nextCodepoint = codepoints[i + 1];
+                    int nextCodepoint = _codepoints[i + 1];
                     ushort variationGlyphIndex = _typeface.LookupIndex(codepoint, nextCodepoint);
                     if (variationGlyphIndex > 0)
                     {
@@ -406,7 +411,7 @@ namespace Typography.TextLayout
             //}
         }
         public static void Layout(this GlyphLayout glyphLayout, Typeface typeface, char[] str, int startAt, int len, List<GlyphPlan> outputGlyphList)
-        {   
+        {
             glyphLayout.Typeface = typeface;
             glyphLayout.Layout(str, startAt, len);
             glyphLayout.ReadOutput(outputGlyphList);
@@ -415,7 +420,7 @@ namespace Typography.TextLayout
         {
             glyphLayout.Layout(str, startAt, len);
             glyphLayout.ReadOutput(outputGlyphList);
-        } 
+        }
         public static void GenerateGlyphPlans(this GlyphLayout glyphLayout,
                   char[] textBuffer,
                   int startAt,
