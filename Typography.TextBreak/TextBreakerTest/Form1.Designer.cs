@@ -74,7 +74,7 @@
             // 
             // cmdIcuTest
             // 
-            this.cmdIcuTest.Location = new System.Drawing.Point(283, 85);
+            this.cmdIcuTest.Location = new System.Drawing.Point(12, 44);
             this.cmdIcuTest.Name = "cmdIcuTest";
             this.cmdIcuTest.Size = new System.Drawing.Size(130, 35);
             this.cmdIcuTest.TabIndex = 5;

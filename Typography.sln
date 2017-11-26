@@ -77,11 +77,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelFarmTextBox.WinForms",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextFlow", "Typography.TextFlow\Typography.TextFlow.csproj", "{A17B5A62-09AF-45D5-9D9F-1FD1B9AB50F7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Typography.TextBreak", "Typography.TextBreak", "{548A7FB1-834E-4197-B0BB-E32BF886D511}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Typography.I18N", "Typography.I18N", "{548A7FB1-834E-4197-B0BB-E32BF886D511}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextBreak", "Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.csproj", "{09EC5531-D272-40DB-87A4-B2D353846CC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextBreak.Icu", "Typography.TextBreak\TextBreak.Icu\TextBreak.Icu.csproj", "{777178CA-C706-406F-856D-62CC40AC63E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reference_TextBreak.Icu", "Typography.TextBreak\Reference_TextBreak.Icu\Reference_TextBreak.Icu.csproj", "{777178CA-C706-406F-856D-62CC40AC63E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Typography.TextBreak\TextBreakerTest\Tests.csproj", "{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0}"
 EndProject
