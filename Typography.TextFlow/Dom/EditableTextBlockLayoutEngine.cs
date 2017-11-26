@@ -5,7 +5,7 @@ using System.IO;
 using Typography.OpenFont;
 using Typography.WordBreaks;
 namespace Typography.TextLayout
-{
+{   
     /// <summary>
     /// collect and managed editable text line
     /// </summary>
