@@ -29,7 +29,7 @@ namespace TextBreakerTest
             //thai
             //currentLocale = "th-TH";
             //string test1 = "ผู้ใหญ่บหาผ้าใหม่ให้สะใภ้ใช้คล้องคอใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาให้เคียงเล่าเท่าอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
-           // string test1 = "ขาย =";
+            // string test1 = "ขาย =";
             //string test1 = "แป้นพิมลาว";            
             //string test1 = "ผ้าใหม่";
             //string test1 = "ประ";
@@ -39,7 +39,8 @@ namespace TextBreakerTest
             //lao
             icu_currentLocale = "lo-LA";
             //string test1 = "ແປ້ນພິມລາວ";
-            string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
+            //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
+            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
             //----------------
             this.textBox1.Text = test1;
 
@@ -79,14 +80,20 @@ namespace TextBreakerTest
         private void cmdManaged_Click(object sender, EventArgs e)
         {
 
+            //some lang eg. Thai, Lao, need dictionary breaking
+            //we use dic data from icu-project
+
+            //1. create dictionary based breaking engine 
             CustomBreakerBuilder.DataDir = "../../../icu58/brkitr_src/dictionaries";
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
-            //2. create dictionary based breaking engine 
-            // 
+
+
             char[] test = this.textBox1.Text.ToCharArray();
             this.listBox1.Items.Clear();
+
+
             breaker1.BreakWords(test, 0);
-            foreach (var span in breaker1.GetBreakSpanIter())
+            foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             {
                 string s = new string(test, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
