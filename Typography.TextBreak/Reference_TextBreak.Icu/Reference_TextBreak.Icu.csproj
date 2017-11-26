@@ -8,8 +8,8 @@
     <ProjectGuid>{777178CA-C706-406F-856D-62CC40AC63E4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LayoutFarm.TextBreaker.Native</RootNamespace>
-    <AssemblyName>LayoutFarm.TextBreaker.Native</AssemblyName>
+    <RootNamespace>Reference_TextBreak.Icu</RootNamespace>
+    <AssemblyName>Reference_TextBreak.Icu</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
