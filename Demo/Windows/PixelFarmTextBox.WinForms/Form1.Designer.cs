@@ -29,8 +29,9 @@
         private void InitializeComponent()
         {
             this.basicFontOptionsUserControl1 = new TypographyTest.WinForms.BasicFontOptionsUserControl();
-            this.sampleTextBox1 = new SampleWinForms.SampleTextBox();
             this.glyphRenderOptionsUserControl1 = new TypographyTest.WinForms.GlyphRenderOptionsUserControl();
+            this.sampleTextBox1 = new SampleWinForms.SampleTextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // basicFontOptionsUserControl1
@@ -40,14 +41,6 @@
             this.basicFontOptionsUserControl1.Size = new System.Drawing.Size(196, 443);
             this.basicFontOptionsUserControl1.TabIndex = 0;
             // 
-            // sampleTextBox1
-            // 
-            this.sampleTextBox1.BackColor = System.Drawing.Color.Gray;
-            this.sampleTextBox1.Location = new System.Drawing.Point(12, 12);
-            this.sampleTextBox1.Name = "sampleTextBox1";
-            this.sampleTextBox1.Size = new System.Drawing.Size(551, 595);
-            this.sampleTextBox1.TabIndex = 1;
-            // 
             // glyphRenderOptionsUserControl1
             // 
             this.glyphRenderOptionsUserControl1.BackColor = System.Drawing.Color.White;
@@ -56,11 +49,30 @@
             this.glyphRenderOptionsUserControl1.Size = new System.Drawing.Size(261, 146);
             this.glyphRenderOptionsUserControl1.TabIndex = 69;
             // 
+            // sampleTextBox1
+            // 
+            this.sampleTextBox1.BackColor = System.Drawing.Color.Gray;
+            this.sampleTextBox1.Location = new System.Drawing.Point(12, 12);
+            this.sampleTextBox1.Name = "sampleTextBox1";
+            this.sampleTextBox1.Size = new System.Drawing.Size(551, 595);
+            this.sampleTextBox1.TabIndex = 1;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 680);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(154, 56);
+            this.button1.TabIndex = 70;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(838, 619);
+            this.ClientSize = new System.Drawing.Size(838, 748);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.glyphRenderOptionsUserControl1);
             this.Controls.Add(this.sampleTextBox1);
             this.Controls.Add(this.basicFontOptionsUserControl1);
@@ -76,6 +88,7 @@
         private TypographyTest.WinForms.BasicFontOptionsUserControl basicFontOptionsUserControl1;
         private SampleWinForms.SampleTextBox sampleTextBox1;
         private TypographyTest.WinForms.GlyphRenderOptionsUserControl glyphRenderOptionsUserControl1;
+        private System.Windows.Forms.Button button1;
     }
 }
 

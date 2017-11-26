@@ -1,6 +1,7 @@
 ﻿//MIT, 2014-2017, WinterDev
 
 using System.Drawing;
+using Typography.TextLayout;
 namespace SampleWinForms.UI
 {
 
@@ -70,10 +71,10 @@ namespace SampleWinForms.UI
         protected int _mousedown_X;
         protected int _mousedown_Y;
 
-        protected Line _line;//controller 
+        protected SmallLine _line;//controller 
         public SampleTextBoxController()
         {
-            _line = new Line();
+            _line = new SmallLine();
         }
 
 

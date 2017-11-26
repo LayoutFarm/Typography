@@ -10,7 +10,7 @@ namespace SampleWinForms.UI
     class VisualLine
     {
 
-        Line _line;
+        SmallLine _line;
         DevTextPrinterBase _printer;
 
         float toPxScale = 1;
@@ -18,7 +18,7 @@ namespace SampleWinForms.UI
         {
 
         }
-        public void BindLine(Line line)
+        public void BindLine(SmallLine line)
         {
             this._line = line;
         }

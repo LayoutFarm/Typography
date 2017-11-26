@@ -51,9 +51,6 @@
     <Compile Include="..\textboxsample.winforms\textboxcontroller\SampleTextBoxController.cs">
       <Link>GdiPlus\SampleTextBoxController.cs</Link>
     </Compile>
-    <Compile Include="..\textboxsample.winforms\textboxcontroller\SampleTextBoxLineModel.cs">
-      <Link>GdiPlus\SampleTextBoxLineModel.cs</Link>
-    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,6 +106,10 @@
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Typography.TextFlow\Typography.TextFlow.csproj">
+      <Project>{a17b5a62-09af-45d5-9d9f-1fd1b9ab50f7}</Project>
+      <Name>Typography.TextFlow</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>

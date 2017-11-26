@@ -76,7 +76,6 @@
     </Compile>
     <Compile Include="TextBoxController\MouseButtonsAndKeys.cs" />
     <Compile Include="TextBoxController\SampleTextBoxController.cs" />
-    <Compile Include="TextBoxController\SampleTextBoxLineModel.cs" />
     <Compile Include="TextBoxController\VisualLine.cs" />
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
@@ -115,6 +114,10 @@
     <ProjectReference Include="..\..\..\Typography.Contours\Typography.Contours.csproj">
       <Project>{e4a1c3c3-1c1c-4e11-a2e6-a1fafd6652c7}</Project>
       <Name>Typography.Contours</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Typography.TextFlow\Typography.TextFlow.csproj">
+      <Project>{a17b5a62-09af-45d5-9d9f-1fd1b9ab50f7}</Project>
+      <Name>Typography.TextFlow</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -13,8 +13,9 @@ using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.Rendering;
 using Typography.Contours;
+using Typography.TextLayout;
 
-using SampleWinForms;
+
 
 
 namespace PixelFarmTextBox.WinForms
@@ -74,7 +75,7 @@ namespace PixelFarmTextBox.WinForms
             painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
             _devVxsTextPrinter = new VxsTextPrinter(painter, _basicOptions.OpenFontStore);
-            _devVxsTextPrinter.TargetCanvasPainter = painter;
+
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
             _devVxsTextPrinter.FontSizeInPoints = 10;
@@ -124,11 +125,11 @@ namespace PixelFarmTextBox.WinForms
                         selectedTextPrinter.HintTechnique = HintTechnique.None;
                         selectedTextPrinter.EnableLigature = true;
                         _devVxsTextPrinter.UpdateGlyphLayoutSettings();
+                        //
                         _controllerForPixelFarm.ReadyToRender = true;
-
-
                         _controllerForPixelFarm.UpdateOutput();
 
+                        //----------------
                         //copy from Agg's memory buffer to gdi 
                         PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
                         g.Clear(Color.White);
@@ -139,6 +140,79 @@ namespace PixelFarmTextBox.WinForms
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+
+            selectedTextPrinter = _devVxsTextPrinter;
+            selectedTextPrinter.Typeface = _basicOptions.Typeface;
+            selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
+            selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+            selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+            selectedTextPrinter.HintTechnique = HintTechnique.None;
+            selectedTextPrinter.EnableLigature = true;
+            _devVxsTextPrinter.UpdateGlyphLayoutSettings();
+
+            //------- 
+            var editableTextBlockLayoutEngine = new EditableTextBlockLayoutEngine();
+            editableTextBlockLayoutEngine.DefaultTypeface = _basicOptions.Typeface;
+            editableTextBlockLayoutEngine.FontSizeInPts = _basicOptions.FontSizeInPoints;
+            editableTextBlockLayoutEngine.LoadText("ABCD\r\n   EFGH!");
+            editableTextBlockLayoutEngine.DoLayout();
+            
+            //then we render the output to the screen  
+            //see UpdateRenderOutput() code 
+            //clear previous draw
+            //----------------
+
+            //-------------
+            painter.Clear(PixelFarm.Drawing.Color.White);
+            painter.UseSubPixelRendering = false;
+            painter.FillColor = PixelFarm.Drawing.Color.Black;
+            _devVxsTextPrinter.TargetCanvasPainter = painter;
+
+            List<EditableTextLine> textlines = editableTextBlockLayoutEngine.UnsafeGetEditableTextLine();
+            //render eachline with painter
+            int lineCount = textlines.Count;
+
+            float x = 0;
+            int y = 200;
+            int lineSpacing = (int)_devVxsTextPrinter.FontLineSpacingPx;
+
+            for (int i = 0; i < lineCount; ++i)
+            {
+                EditableTextLine line = textlines[i];
+                List<IRun> runs = line.UnsageGetTextRunList();
+                int runCount = runs.Count;
+
+                for (int r = 0; r < runCount; ++r)
+                {
+                    IRun run = runs[r];
+                    TextRun textRun = run as TextRun;
+                    if (textRun == null) continue;
+                    //
+                    GlyphPlanSequence seq = textRun.GetGlyphPlanSeq();
+                    _devVxsTextPrinter.DrawFromGlyphPlans(
+                        seq.UnsafeGetInteralGlyphPlanList(),
+                        seq.startAt,
+                        seq.len,
+                        x, y);
+                    x += run.Width;
+                    y -= lineSpacing; //next line?
+                }
+                x = 0;//reset at newline
+            }
+            //----------
+
+            //use this util to copy image from Agg actual image to System.Drawing.Bitmap 
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(painter.Graphics.DestActualImage, winBmp);
+            //----------------
+            //copy from Agg's memory buffer to gdi 
+            //PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            g.Clear(Color.White);
+            g.DrawImage(winBmp, new Point(10, 0));
         }
     }
 }

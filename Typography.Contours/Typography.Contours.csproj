@@ -32,9 +32,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="GlyphAnalysis\CurveGen.cs" />
     <Compile Include="GlyphAnalysis\1_EdgeLine.cs" />
     <Compile Include="GlyphAnalysis\3_GlyphBoneJoint.cs" />
