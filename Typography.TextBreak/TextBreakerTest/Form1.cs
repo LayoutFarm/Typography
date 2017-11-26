@@ -22,7 +22,7 @@ namespace TextBreakerTest
         }
 
 
-        string currentLocale = "th-TH";
+        string icu_currentLocale = "th-TH";
         private void Form1_Load(object sender, EventArgs e)
         {
             InitIcuLib();
@@ -37,7 +37,7 @@ namespace TextBreakerTest
             //----------------
             //
             //lao
-            //currentLocale = "lo-LA";
+            icu_currentLocale = "lo-LA";
             //string test1 = "ແປ້ນພິມລາວ";
             string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
             //----------------
@@ -62,7 +62,7 @@ namespace TextBreakerTest
 
             if (nativeTextBreak == null)
             {
-                nativeTextBreak = new NativeTextBreaker(Typography.TextBreak.ICU.TextBreakKind.Word, currentLocale);
+                nativeTextBreak = new NativeTextBreaker(Typography.TextBreak.ICU.TextBreakKind.Word, icu_currentLocale);
             }
 
             char[] textBuffer = this.textBox1.Text.ToCharArray();
@@ -141,7 +141,7 @@ namespace TextBreakerTest
             //-------------------
             if (nativeTextBreak == null)
             {
-                nativeTextBreak = new NativeTextBreaker(Typography.TextBreak.ICU.TextBreakKind.Word, currentLocale);
+                nativeTextBreak = new NativeTextBreaker(Typography.TextBreak.ICU.TextBreakKind.Word, icu_currentLocale);
             }
 
             char[] textBuffer = this.textBox1.Text.ToCharArray();
