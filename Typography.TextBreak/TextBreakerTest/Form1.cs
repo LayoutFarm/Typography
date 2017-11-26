@@ -29,7 +29,7 @@ namespace TextBreakerTest
             //thai
             //currentLocale = "th-TH";
             //string test1 = "ผู้ใหญ่บหาผ้าใหม่ให้สะใภ้ใช้คล้องคอใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาให้เคียงเล่าเท่าอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
-            string test1 = "ขาย =";
+           // string test1 = "ขาย =";
             //string test1 = "แป้นพิมลาว";            
             //string test1 = "ผ้าใหม่";
             //string test1 = "ประ";
@@ -39,7 +39,7 @@ namespace TextBreakerTest
             //lao
             //currentLocale = "lo-LA";
             //string test1 = "ແປ້ນພິມລາວ";
-            //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
+            string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
             //----------------
             this.textBox1.Text = test1;
 

@@ -72,9 +72,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TextBreak.Icu\TextBreak.Icu.csproj">
+    <ProjectReference Include="..\Reference_TextBreak.Icu\Reference_TextBreak.Icu.csproj">
       <Project>{777178ca-c706-406f-856d-62cc40ac63e4}</Project>
-      <Name>TextBreak.Icu</Name>
+      <Name>Reference_TextBreak.Icu</Name>
     </ProjectReference>
     <ProjectReference Include="..\Typography.TextBreak\Typography.TextBreak.csproj">
       <Project>{09ec5531-d272-40db-87a4-b2d353846cc2}</Project>
