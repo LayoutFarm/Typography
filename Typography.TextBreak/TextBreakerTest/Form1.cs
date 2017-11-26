@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
+﻿//MIT, 2016-2017, WinterDev
+using System;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -35,7 +33,7 @@ namespace TextBreakerTest
             //string test1 = "แป้นพิมลาว";            
             //string test1 = "ผ้าใหม่";
             //string test1 = "ประ";
-            
+
             //----------------
             //
             //lao
