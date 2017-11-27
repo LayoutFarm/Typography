@@ -21,9 +21,9 @@ namespace Typography.TextLayout
             this.ExactY = exactY;
             this.AdvanceX = exactAdvX;
         }
-        public float AdvanceX { get; private set; } //4
-        public float ExactX { get; private set; } //4
-        public float ExactY { get; private set; } //4
+        public float AdvanceX { get; set; } //4
+        public float ExactX { get; set; } //4
+        public float ExactY { get; set; } //4
 
         public float ExactRight { get { return ExactX + AdvanceX; } }
         public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }

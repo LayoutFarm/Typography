@@ -201,7 +201,8 @@ namespace Typography.TextServices
                 planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
                 seqCol.Register(hashValue, planSeq);
             }
-
+            //---
+            //
             return planSeq;
         }
     }
