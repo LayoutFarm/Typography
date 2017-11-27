@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 
-//MIT, 2017, WinterDev
+
 namespace Typography.TextService
-{ 
+{
     public class InstalledFont
     {
         internal InstalledFont(string fontName,
