@@ -177,7 +177,7 @@ namespace Typography.TextServices
             int post_count = planList.Count;
             return new GlyphPlanSequence(_glyphPlanBuffer, pre_count, post_count - pre_count);
         }
-        int CalculateHash(TextBuffer buffer, int startAt, int len)
+        static int CalculateHash(TextBuffer buffer, int startAt, int len)
         {
             //reference,
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
@@ -200,7 +200,7 @@ namespace Typography.TextServices
             //not found  then create glyph plan seq
             planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
             seqCol.Register(hashValue, planSeq);
-            return planSeq; 
+            return planSeq;
         }
     }
 
