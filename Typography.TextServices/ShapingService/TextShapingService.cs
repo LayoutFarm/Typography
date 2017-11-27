@@ -81,11 +81,13 @@ namespace Typography.TextServices
             return _currentShapingContext.Layout(_glyphLayout, buffer, start, len);
         }
 
+
         struct TextShapingContextKey
         {
 
             readonly InstalledFont _installedFont;
             readonly ScriptLang _scLang;
+
             public TextShapingContextKey(InstalledFont installedFont, ScriptLang scLang)
             {
                 this._installedFont = installedFont;
@@ -101,28 +103,19 @@ namespace Typography.TextServices
     }
 
 
-    class TextShapingContext
+    class GlyphPlanSeqSet
     {
-        GlyphPlanBuffer _glyphPlanBuffer;
-        Typeface _typeface;
-        ScriptLang _scLang;
-
+        //TODO: consider this value, make this a variable (static int)
+        const int PREDEFINE_LEN = 10;
         /// <summary>
         /// common len 0-10?
         /// </summary>
         GlyphPlanSeqCollection[] _cacheSeqCollection1;
         //other len
         Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
-
-        //TODO: consider this value, make this a variable (static int)
-        const int PREDEFINE_LEN = 10;
-        public TextShapingContext(Typeface typeface, ScriptLang scLang)
+        public GlyphPlanSeqSet()
         {
-            _typeface = typeface;
-            _scLang = scLang;
-            _glyphPlanBuffer = new GlyphPlanBuffer(new List<GlyphPlan>());
             _cacheSeqCollection1 = new GlyphPlanSeqCollection[PREDEFINE_LEN];
-
             //TODO:
             //what is the proper number of cache word ?
             //init free dic
@@ -130,6 +123,45 @@ namespace Typography.TextServices
             {
                 _cacheSeqCollection1[i] = new GlyphPlanSeqCollection(i);
             }
+        }
+        public GlyphPlanSeqCollection GetSeqCollectionOrCreateIfNotExist(int len)
+        {
+            if (len < PREDEFINE_LEN)
+            {
+                return _cacheSeqCollection1[len];
+            }
+            else
+            {
+                if (_cacheSeqCollection2 == null)
+                {
+                    _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
+                }
+                GlyphPlanSeqCollection seqCol;
+                if (!_cacheSeqCollection2.TryGetValue(len, out seqCol))
+                {
+                    //new one if not exist
+                    seqCol = new GlyphPlanSeqCollection(len);
+                    _cacheSeqCollection2.Add(len, seqCol);
+                }
+                return seqCol;
+            }
+        }
+    }
+
+    class TextShapingContext
+    {
+        GlyphPlanBuffer _glyphPlanBuffer;
+        Typeface _typeface;
+        ScriptLang _scLang;
+        GlyphPlanSeqSet _glyphPlanSeqSet;
+
+        public TextShapingContext(Typeface typeface, ScriptLang scLang)
+        {
+            _typeface = typeface;
+            _scLang = scLang;
+            _glyphPlanBuffer = new GlyphPlanBuffer(new List<GlyphPlan>());
+            _glyphPlanSeqSet = new GlyphPlanSeqSet();
+
         }
         GlyphPlanSequence CreateGlyphPlanSeq(GlyphLayout glyphLayout, TextBuffer buffer, int startAt, int len)
         {
@@ -151,6 +183,7 @@ namespace Typography.TextServices
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
             return CRC32.CalculateCRC32(TextBuffer.UnsafeGetCharBuffer(buffer), startAt, len);
         }
+
         public GlyphPlanSequence Layout(GlyphLayout glyphLayout, TextBuffer buffer, int startAt, int len)
         {
             //this func get the raw char from buffer
@@ -158,49 +191,16 @@ namespace Typography.TextServices
             //check if we have the string cache in specific value 
             //---------
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
-            //look in the cache
-            if (len < PREDEFINE_LEN)
+            GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(len);
+            int hashValue = CalculateHash(buffer, startAt, len);
+            if (seqCol.TryGetCacheGlyphPlanSeq(hashValue, out planSeq))
             {
-                GlyphPlanSeqCollection seqCol = _cacheSeqCollection1[len];
-                //check if we have the cache plan or not
-                int hashValue = CalculateHash(buffer, startAt, len);
-                if (seqCol.TryGetCacheGlyphPlanSeq(hashValue, out planSeq))
-                {
-                    return planSeq;
-                }
-                //not found  then create glyph plan seq
-                planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
-                seqCol.Register(hashValue, planSeq);
                 return planSeq;
             }
-            else
-            {
-                //please look in the dic
-                //if not found the create a new dic
-                //and store the value 
-                int hashValue = CalculateHash(buffer, startAt, len);
-                if (_cacheSeqCollection2 == null)
-                {
-                    _cacheSeqCollection2 = new Dictionary<int, GlyphPlanSeqCollection>();
-                }
-
-                GlyphPlanSeqCollection seqCol;
-                if (!_cacheSeqCollection2.TryGetValue(len, out seqCol))
-                {
-                    //new one if not exist
-                    seqCol = new GlyphPlanSeqCollection(len);
-                    _cacheSeqCollection2.Add(len, seqCol);
-                }
-
-                if (seqCol.TryGetCacheGlyphPlanSeq(hashValue, out planSeq))
-                {
-                    return planSeq;
-                }
-                planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
-                seqCol.Register(hashValue, planSeq);
-                return planSeq;
-            }
-
+            //not found  then create glyph plan seq
+            planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
+            seqCol.Register(hashValue, planSeq);
+            return planSeq; 
         }
     }
 
