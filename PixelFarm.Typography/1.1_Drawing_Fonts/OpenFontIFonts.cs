@@ -5,6 +5,8 @@ using PixelFarm.Drawing;
 using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.TextLayout;
+using Typography.TextService;
+
 namespace LayoutFarm
 {
     public class OpenFontIFonts : IFonts

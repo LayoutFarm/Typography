@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 using Typography.TextLayout;
+using Typography.TextService;
 
-using PixelFarm.Drawing.Fonts;
 
 namespace TypographyTest
 {

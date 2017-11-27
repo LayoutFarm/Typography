@@ -1,8 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
-using PixelFarm.Drawing.Fonts;
 using Typography.TextLayout;
-namespace PixelFarm.Drawing.Text
+namespace PixelFarm.Drawing.Fonts
 {
     public abstract class TextShapingService
     {

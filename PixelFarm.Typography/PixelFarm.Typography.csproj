@@ -48,6 +48,10 @@
       <Project>{e4a1c3c3-1c1c-4e11-a2e6-a1fafd6652c7}</Project>
       <Name>Typography.Contours</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{fe23e283-a667-4e68-b381-c7d8598d3688}</Project>
+      <Name>Typography.TextServices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
@@ -98,16 +102,11 @@
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphMeshCollection.cs" />
     <Compile Include="1.1_Drawing_Fonts\HintTechnique.cs" />
-    <Compile Include="1.1_Drawing_Fonts\FontManagement.cs" />
     <Compile Include="1.1_Drawing_Fonts\OpenFontIFonts.cs" />
     <Compile Include="1.1_Drawing_Fonts\PixelScaleLayoutEngine.cs" />
-    <Compile Include="1.2_\IInstalledFontProvider.cs" />
-    <Compile Include="2_Drawing_Text\IFontLoader.cs" />
-    <Compile Include="2_Drawing_Text\ManagedShapingService.cs" />
-    <Compile Include="2_Drawing_Text\OpenFontStore.cs" />
+    <Compile Include="1.2_\TextShapingAndLayoutService.cs" />
     <Compile Include="3_FontFaceImpl\NOpenFontFace.cs" />
     <Compile Include="3_FontFaceImpl\OpenFontLoader.cs" />
-    <Compile Include="2_Drawing_Text\TextShapingAndLayoutService.cs" />
     <Compile Include="1.1_Drawing_Fonts\VxsTextPrinter.cs" />
     <Compile Include="3_FontFaceImpl\ScriptLangConv.cs" />
     <Compile Include="3_FontFaceImpl\TextureFontLoader.cs" />

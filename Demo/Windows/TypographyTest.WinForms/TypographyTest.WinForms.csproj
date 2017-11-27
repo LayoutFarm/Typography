@@ -82,6 +82,10 @@
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{fe23e283-a667-4e68-b381-c7d8598d3688}</Project>
+      <Name>Typography.TextServices</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BasicFontOptionsUserControl.resx">

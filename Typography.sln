@@ -85,6 +85,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reference_TextBreak.Icu", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Typography.TextBreak\TextBreakerTest\Tests.csproj", "{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextServices", "Typography.TextServices\Typography.TextServices.csproj", "{FE23E283-A667-4E68-B381-C7D8598D3688}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Typography.OpenFont\Typography.OpenFont.projitems*{235a071b-8d06-40ae-a5c5-b1ce59715ee9}*SharedItemsImports = 13
@@ -1167,6 +1169,46 @@ Global
 		{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0}.Release64|iPhoneSimulator.Build.0 = Release|x86
 		{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0}.Release64|x86.ActiveCfg = Release|x86
 		{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0}.Release64|x86.Build.0 = Release|x86
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|Any CPU.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|Any CPU.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|iPhone.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|iPhoneSimulator.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|x86.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Ad-Hoc|x86.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|Any CPU.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|iPhone.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|iPhone.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|iPhoneSimulator.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|x86.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.AppStore|x86.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|iPhone.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|x86.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release|x86.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|Any CPU.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|Any CPU.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|iPhone.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|iPhone.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|iPhoneSimulator.Build.0 = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|x86.ActiveCfg = Release|Any CPU
+		{FE23E283-A667-4E68-B381-C7D8598D3688}.Release64|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
