@@ -72,7 +72,7 @@ namespace Typography.TextServices
         GlyphPlanSeqCollection[] _cacheSeqCollection1;
         //other len
         Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
-        CRC32 _myCRC32;
+       
 
         //TODO: consider this value, make this a variable (static int)
         const int PREDEFINE_LEN = 10;
@@ -80,7 +80,7 @@ namespace Typography.TextServices
         {
             _typeface = typeface;
             _glyphPlanBuffer = new GlyphPlanBuffer(new List<GlyphPlan>());
-            _myCRC32 = new CRC32();
+            
 
             _cacheSeqCollection1 = new GlyphPlanSeqCollection[PREDEFINE_LEN];
             //TODO:
@@ -108,7 +108,7 @@ namespace Typography.TextServices
         {
             //reference,
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
-            return _myCRC32.CalculateCRC32(TextBuffer.UnsafeGetCharBuffer(buffer), startAt, len);
+            return CRC32.CalculateCRC32(TextBuffer.UnsafeGetCharBuffer(buffer), startAt, len);             
         }
         public GlyphPlanSequence Layout(GlyphLayout glyphLayout, TextBuffer buffer, int startAt, int len)
         {

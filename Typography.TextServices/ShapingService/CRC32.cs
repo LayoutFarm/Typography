@@ -42,37 +42,41 @@ namespace Typography.TextServices
     /// </remarks>
 
 
-    class CRC32
+
+
+
+    static class CRC32
     {
 
         /// <summary>
-        /// Indicates the current CRC for all blocks slurped in.
+        /// calculate crc32, not reverver bits
         /// </summary>
-        public Int32 Crc32Result
+        /// <param name="charBuffer"></param>
+        /// <param name="startAt"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
+        public static int CalculateCRC32(char[] charBuffer, int startAt, int len)
         {
-            get
-            {
-                return unchecked((Int32)(~_register));
-            }
+            //calculate CRC32 
+            uint register = SlurpBlock2_(charBuffer, startAt, len);
+            return (Int32)(~register);
         }
-
-
-
-        public int CalculateCRC32(char[] charBuffer, int startAt, int len)
+        /// <summary>
+        /// calculate with reverse bit
+        /// </summary>
+        /// <param name="charBuffer"></param>
+        /// <param name="startAt"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
+        public static int CalculateCRC32_ReverseBit(char[] charBuffer, int startAt, int len)
         {
             //calculate CRC32
-            SlurpBlock2(charBuffer, startAt, len);
-            return (Int32)(~_register);
+            uint register = SlurpBlock2_ReverseBits(charBuffer, startAt, len);
+            return (Int32)(~register);
         }
-
-
-
-        void SlurpBlock2(char[] block, int offset, int count)
+        static uint SlurpBlock2_(char[] block, int offset, int count)
         {
-            if (block == null)
-                throw new Exception("The data buffer must not be null.");
-
-            _register = 0;
+            uint _register = RESET_REGISTER;
             // bzip algorithm
             for (int i = 0; i < count; i++)
             {
@@ -80,31 +84,38 @@ namespace Typography.TextServices
                 char ch = block[offset + i];
                 byte b0 = (byte)(ch >> 8);
                 byte b1 = (byte)ch;
+                //b0
+                UInt32 temp = (_register & 0x000000FF) ^ b0;
+                _register = (_register >> 8) ^ s_crc32[temp];
+                //b1
+                temp = (_register & 0x000000FF) ^ b1;
+                _register = (_register >> 8) ^ s_crc32[temp];
 
-                //
-                if (this.reverseBits)
-                {
-                    //b0
-                    //b1
-                    UInt32 temp = (_register >> 24) ^ b0;
-                    _register = (_register << 8) ^ crc32Table[temp];
-                    //
-                    temp = (_register >> 24) ^ b1;
-                    _register = (_register << 8) ^ crc32Table[temp];
-                }
-                else
-                {
-                    //b0
-                    UInt32 temp = (_register & 0x000000FF) ^ b0;
-                    _register = (_register >> 8) ^ crc32Table[temp];
-                    //b1
-                    temp = (_register & 0x000000FF) ^ b1;
-                    _register = (_register >> 8) ^ crc32Table[temp];
-                }
             }
+            return _register;
         }
+        static uint SlurpBlock2_ReverseBits(char[] block, int offset, int count)
+        {
+            uint _register = RESET_REGISTER;
+            // bzip algorithm
+            for (int i = 0; i < count; i++)
+            {
 
-        private static uint ReverseBits(uint data)
+                char ch = block[offset + i];
+                byte b0 = (byte)(ch >> 8);
+                byte b1 = (byte)ch;
+                //b0
+                //b1
+                UInt32 temp = (_register >> 24) ^ b0;
+                _register = (_register << 8) ^ s_crc32_reverse_bits[temp];
+                //
+                temp = (_register >> 24) ^ b1;
+                _register = (_register << 8) ^ s_crc32_reverse_bits[temp];
+
+            }
+            return _register;
+        }
+        static uint ReverseBits(uint data)
         {
             unchecked
             {
@@ -117,7 +128,7 @@ namespace Typography.TextServices
             }
         }
 
-        private static byte ReverseBits(byte data)
+        static byte ReverseBits(byte data)
         {
             unchecked
             {
@@ -131,9 +142,65 @@ namespace Typography.TextServices
 
 
 
-        private void GenerateLookupTable()
+        static readonly UInt32[] s_crc32;
+        static readonly UInt32[] s_crc32_reverse_bits;
+        static CRC32()
         {
-            crc32Table = new UInt32[256];
+            /// <summary>
+            ///   Create an instance of the CRC32 class, specifying the polynomial and
+            ///   whether to reverse data bits or not.
+            /// </summary>
+            /// <param name='polynomial'>
+            ///   The polynomial to use for the CRC, expressed in the reversed (LSB)
+            ///   format: the highest ordered bit in the polynomial value is the
+            ///   coefficient of the 0th power; the second-highest order bit is the
+            ///   coefficient of the 1 power, and so on. Expressed this way, the
+            ///   polynomial for the CRC-32C used in IEEE 802.3, is 0xEDB88320.
+            /// </param>
+            /// <param name='reverseBits'>
+            ///   specify true if the instance should reverse data bits.
+            /// </param>
+            ///
+            /// <remarks>
+            ///   <para>
+            ///     In the CRC-32 used by BZip2, the bits are reversed. Therefore if you
+            ///     want a CRC32 with compatibility with BZip2, you should pass true
+            ///     here for the <c>reverseBits</c> parameter. In the CRC-32 used by
+            ///     GZIP and PKZIP, the bits are not reversed; Therefore if you want a
+            ///     CRC32 with compatibility with those, you should pass false for the
+            ///     <c>reverseBits</c> parameter.
+            ///   </para>
+            /// </remarks>
+            /// 
+            //----------
+            /// <summary>
+            ///   Create an instance of the CRC32 class, specifying whether to reverse
+            ///   data bits or not.
+            /// </summary>
+            /// <param name='reverseBits'>
+            ///   specify true if the instance should reverse data bits.
+            /// </param>
+            /// <remarks>
+            ///   <para>
+            ///     In the CRC-32 used by BZip2, the bits are reversed. Therefore if you
+            ///     want a CRC32 with compatibility with BZip2, you should pass true
+            ///     here. In the CRC-32 used by GZIP and PKZIP, the bits are not
+            ///     reversed; Therefore if you want a CRC32 with compatibility with
+            ///     those, you should pass false.
+            ///   </para>
+            /// </remarks>
+            /// 
+
+            s_crc32 = new uint[256];
+            GenerateLookupTable(unchecked(0xEDB88320), s_crc32, false);
+
+            //
+            s_crc32_reverse_bits = new uint[256];
+            GenerateLookupTable(unchecked(0xEDB88320), s_crc32_reverse_bits, true);
+        }
+
+        static void GenerateLookupTable(uint dwPolynomial, UInt32[] crc32Table, bool reverseBits)
+        {
             unchecked
             {
                 UInt32 dwCrc;
@@ -163,129 +230,10 @@ namespace Typography.TextServices
                     i++;
                 } while (i != 0);
             }
+        } 
 
-#if VERBOSE
-            Console.WriteLine();
-            Console.WriteLine("private static readonly UInt32[] crc32Table = {");
-            for (int i = 0; i < crc32Table.Length; i+=4)
-            {
-                Console.Write("   ");
-                for (int j=0; j < 4; j++)
-                {
-                    Console.Write(" 0x{0:X8}U,", crc32Table[i+j]);
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine("};");
-            Console.WriteLine();
-#endif
-        }
-
-
-        private uint gf2_matrix_times(uint[] matrix, uint vec)
-        {
-            uint sum = 0;
-            int i = 0;
-            while (vec != 0)
-            {
-                if ((vec & 0x01) == 0x01)
-                    sum ^= matrix[i];
-                vec >>= 1;
-                i++;
-            }
-            return sum;
-        }
-
-        private void gf2_matrix_square(uint[] square, uint[] mat)
-        {
-            for (int i = 0; i < 32; i++)
-                square[i] = gf2_matrix_times(mat, mat[i]);
-        }
-
-
-
-        /// <summary>
-        ///   Create an instance of the CRC32 class using the default settings: no
-        ///   bit reversal, and a polynomial of 0xEDB88320.
-        /// </summary>
-        public CRC32() : this(false)
-        {
-        }
-
-        /// <summary>
-        ///   Create an instance of the CRC32 class, specifying whether to reverse
-        ///   data bits or not.
-        /// </summary>
-        /// <param name='reverseBits'>
-        ///   specify true if the instance should reverse data bits.
-        /// </param>
-        /// <remarks>
-        ///   <para>
-        ///     In the CRC-32 used by BZip2, the bits are reversed. Therefore if you
-        ///     want a CRC32 with compatibility with BZip2, you should pass true
-        ///     here. In the CRC-32 used by GZIP and PKZIP, the bits are not
-        ///     reversed; Therefore if you want a CRC32 with compatibility with
-        ///     those, you should pass false.
-        ///   </para>
-        /// </remarks>
-        public CRC32(bool reverseBits) :
-            this(unchecked((int)0xEDB88320), reverseBits)
-        {
-        }
-
-
-        /// <summary>
-        ///   Create an instance of the CRC32 class, specifying the polynomial and
-        ///   whether to reverse data bits or not.
-        /// </summary>
-        /// <param name='polynomial'>
-        ///   The polynomial to use for the CRC, expressed in the reversed (LSB)
-        ///   format: the highest ordered bit in the polynomial value is the
-        ///   coefficient of the 0th power; the second-highest order bit is the
-        ///   coefficient of the 1 power, and so on. Expressed this way, the
-        ///   polynomial for the CRC-32C used in IEEE 802.3, is 0xEDB88320.
-        /// </param>
-        /// <param name='reverseBits'>
-        ///   specify true if the instance should reverse data bits.
-        /// </param>
-        ///
-        /// <remarks>
-        ///   <para>
-        ///     In the CRC-32 used by BZip2, the bits are reversed. Therefore if you
-        ///     want a CRC32 with compatibility with BZip2, you should pass true
-        ///     here for the <c>reverseBits</c> parameter. In the CRC-32 used by
-        ///     GZIP and PKZIP, the bits are not reversed; Therefore if you want a
-        ///     CRC32 with compatibility with those, you should pass false for the
-        ///     <c>reverseBits</c> parameter.
-        ///   </para>
-        /// </remarks>
-        public CRC32(int polynomial, bool reverseBits)
-        {
-            this.reverseBits = reverseBits;
-            this.dwPolynomial = (uint)polynomial;
-            this.GenerateLookupTable();
-        }
-
-        /// <summary>
-        ///   Reset the CRC-32 class - clear the CRC "remainder register."
-        /// </summary>
-        /// <remarks>
-        ///   <para>
-        ///     Use this when employing a single instance of this class to compute
-        ///     multiple, distinct CRCs on multiple, distinct data blocks.
-        ///   </para>
-        /// </remarks>
-        public void Reset()
-        {
-            _register = 0xFFFFFFFFU;
-        }
-
-        // private member vars
-        private UInt32 dwPolynomial;
-        private bool reverseBits;
-        private UInt32[] crc32Table;
-        private const int BUFFER_SIZE = 8192;
-        private UInt32 _register = 0xFFFFFFFFU;
+        const uint RESET_REGISTER = 0xFFFFFFFFU;
+       
     }
 
 
