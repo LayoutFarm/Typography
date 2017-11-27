@@ -3,7 +3,7 @@ using System;
 using System.Windows.Forms;
 
 using Typography.TextLayout;
-using Typography.TextService;
+using Typography.TextServices;
 
 namespace TypographyTest.WinForms
 {

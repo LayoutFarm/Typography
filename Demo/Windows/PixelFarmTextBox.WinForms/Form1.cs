@@ -10,13 +10,11 @@ using System.Windows.Forms;
 using PixelFarm.Agg;
 using PixelFarm.Drawing.Fonts;
 
-using Typography.OpenFont;
+
 using Typography.Rendering;
 using Typography.Contours;
 using Typography.TextLayout;
-
-
-
+using Typography.TextServices;
 
 namespace PixelFarmTextBox.WinForms
 {
@@ -161,22 +159,23 @@ namespace PixelFarmTextBox.WinForms
             editableTextBlockLayoutEngine.FontSizeInPts = _basicOptions.FontSizeInPoints;
             editableTextBlockLayoutEngine.LoadText("ABCD\r\n   EFGH!");
             editableTextBlockLayoutEngine.DoLayout();
-            
+
             //then we render the output to the screen  
             //see UpdateRenderOutput() code 
             //clear previous draw
             //----------------
 
             //-------------
+            //pre-render
             painter.Clear(PixelFarm.Drawing.Color.White);
             painter.UseSubPixelRendering = false;
             painter.FillColor = PixelFarm.Drawing.Color.Black;
-            _devVxsTextPrinter.TargetCanvasPainter = painter;
+            _devVxsTextPrinter.TargetCanvasPainter = painter; //*** essential ***
 
-            List<EditableTextLine> textlines = editableTextBlockLayoutEngine.UnsafeGetEditableTextLine();
+            //
             //render eachline with painter
+            List<EditableTextLine> textlines = editableTextBlockLayoutEngine.UnsafeGetEditableTextLine();
             int lineCount = textlines.Count;
-
             float x = 0;
             int y = 200;
             int lineSpacing = (int)_devVxsTextPrinter.FontLineSpacingPx;
@@ -204,8 +203,58 @@ namespace PixelFarmTextBox.WinForms
                 }
                 x = 0;//reset at newline
             }
-            //----------
+            //---------- 
+            //use this util to copy image from Agg actual image to System.Drawing.Bitmap 
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(painter.Graphics.DestActualImage, winBmp);
+            //----------------
+            //copy from Agg's memory buffer to gdi 
+            //PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            g.Clear(Color.White);
+            g.DrawImage(winBmp, new Point(10, 0));
+        }
 
+
+        TextServiceHub _textService;
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //test text service
+            if (_textService == null)
+            {
+                _textService = new TextServiceHub();
+            }
+
+            Typography.TextServices.TextShapingService shapingService = _textService.ShapingService;
+            shapingService.SetCurrentFont(_basicOptions.Typeface.Name, InstalledFontStyle.Normal);
+            shapingService.SetCurrentScriptLang(Typography.OpenFont.ScriptLangs.Latin);
+            GlyphPlanSequence seq = shapingService.ShapeText("Hello");
+
+
+            //----
+            // test render the output
+            selectedTextPrinter = _devVxsTextPrinter;
+            selectedTextPrinter.Typeface = _basicOptions.Typeface;
+            selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
+            selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+            selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+            selectedTextPrinter.HintTechnique = HintTechnique.None;
+            selectedTextPrinter.EnableLigature = true;
+            _devVxsTextPrinter.UpdateGlyphLayoutSettings();
+
+            //-------------
+            //pre-render
+            painter.Clear(PixelFarm.Drawing.Color.White);
+            painter.UseSubPixelRendering = false;
+            painter.FillColor = PixelFarm.Drawing.Color.Black;
+            _devVxsTextPrinter.TargetCanvasPainter = painter; //*** essential ***
+
+            //render!,
+            float x = 20, y = 200;
+            _devVxsTextPrinter.DrawFromGlyphPlans(
+                        seq.UnsafeGetInteralGlyphPlanList(),
+                        seq.startAt,
+                        seq.len,
+                        x, y);
+            //---------- 
             //use this util to copy image from Agg actual image to System.Drawing.Bitmap 
             PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(painter.Graphics.DestActualImage, winBmp);
             //----------------

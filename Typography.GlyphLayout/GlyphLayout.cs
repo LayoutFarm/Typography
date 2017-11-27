@@ -118,6 +118,8 @@ namespace Typography.TextLayout
             EnableLigature = true;
             EnableComposition = true;
             ScriptLang = ScriptLangs.Latin;
+            FontSizeInPoints = 14;//default
+
         }
 
         public float FontSizeInPoints { get; set; }

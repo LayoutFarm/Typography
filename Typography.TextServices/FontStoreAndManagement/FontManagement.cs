@@ -5,7 +5,7 @@ using System.IO;
 using Typography.OpenFont;
 
 
-namespace Typography.TextService
+namespace Typography.TextServices
 {
     public class InstalledFont
     {

@@ -83,10 +83,16 @@ namespace Typography.TextLayout
 
     public class GlyphPlanBuffer
     {
-        internal List<GlyphPlan> glyphPlans;
+        List<GlyphPlan> _glyphPlans;
         public GlyphPlanBuffer(List<GlyphPlan> glyphPlans)
         {
-            this.glyphPlans = glyphPlans;
+            this._glyphPlans = glyphPlans;
+        }
+        public int GlyphPlanCount { get { return _glyphPlans.Count; } }
+
+        public static List<GlyphPlan> UnsafeGetGlyphPlanList(GlyphPlanBuffer buffer)
+        {
+            return buffer._glyphPlans;
         }
     }
 
@@ -121,7 +127,7 @@ namespace Typography.TextLayout
         }
         public List<GlyphPlan> UnsafeGetInteralGlyphPlanList()
         {
-            return this.glyphBuffer.glyphPlans;
+            return GlyphPlanBuffer.UnsafeGetGlyphPlanList(this.glyphBuffer);
         }
     }
 

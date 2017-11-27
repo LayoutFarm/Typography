@@ -9,7 +9,7 @@ using Typography.Contours;
 using Typography.OpenFont;
 using Typography.Rendering;
 using Typography.TextLayout;
-using Typography.TextService;
+using Typography.TextServices;
 
 namespace PixelFarm.Drawing.Fonts
 {

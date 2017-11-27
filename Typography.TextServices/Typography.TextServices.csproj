@@ -33,12 +33,14 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ShapingService\CRC32.cs" />
     <Compile Include="FontStoreAndManagement\FontManagement.cs" />
     <Compile Include="FontStoreAndManagement\IFontLoader.cs" />
     <Compile Include="FontStoreAndManagement\IInstalledFontProvider.cs" />
     <Compile Include="FontStoreAndManagement\OpenFontStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextServiceInstance.cs" />
+    <Compile Include="ShapingService\TextShapingService.cs" />
+    <Compile Include="TextServiceHub.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
@@ -62,8 +64,6 @@
       <Name>Typography.TextFlow</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ShapingEngine\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,5 +1,5 @@
 ﻿//MIT, 2017, WinterDev
-namespace Typography.TextService
+namespace Typography.TextServices
 {
     public interface IFontLoader
     {
