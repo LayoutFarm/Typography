@@ -14,37 +14,31 @@ namespace Typography.TextServices
         TextShapingContext _currentShapingContext;
         Dictionary<TextShapingContextKey, TextShapingContext> _registerShapingContexts = new Dictionary<TextShapingContextKey, TextShapingContext>();
         GlyphLayout _glyphLayout;
-        ScriptLang _currentScriptLang;
+
 
         internal TextShapingService(TextServiceHub hub)
         {
             this._hub = hub;
             //create glyph layout instance with default setting
             _glyphLayout = new GlyphLayout();
-            _currentScriptLang = ScriptLangs.Latin;//default?
         }
 
         public ScriptLang CurrentScriptLang
         {
-            get { return _currentScriptLang; }
-            set
-            {
-                //must not be null              
-                _currentScriptLang = value;
-            }
+            get { return _glyphLayout.ScriptLang; }
         }
 
-        public void SetCurrentFont(string fontname, InstalledFontStyle fontStyle, ScriptLang scLang = null)
+        public void SetCurrentFont(string fontname, InstalledFontStyle fontStyle, float fontSizeInPts, ScriptLang scLang = null)
         {
             InstalledFont installedFont = _hub._openFontStore.GetFont(fontname, fontStyle);
             if (installedFont == null) return;//not found request font
 
             if (scLang != null)
             {
-                _currentScriptLang = scLang;
+                _glyphLayout.ScriptLang = scLang;
             }
 
-            var key = new TextShapingContextKey(installedFont, _currentScriptLang);
+            var key = new TextShapingContextKey(installedFont, _glyphLayout.ScriptLang);
             if (!_registerShapingContexts.TryGetValue(key, out _currentShapingContext))
             {
                 //not found
@@ -55,28 +49,31 @@ namespace Typography.TextServices
                     var reader = new OpenFontReader();
                     typeface = reader.Read(fs);
                 }
-                var shapingContext = new TextShapingContext(typeface, _currentScriptLang);
+                var shapingContext = new TextShapingContext(typeface, _glyphLayout.ScriptLang);
                 //shaping context setup ...
                 _registerShapingContexts.Add(key, shapingContext);
                 _currentShapingContext = shapingContext;
             }
+
+            _glyphLayout.FontSizeInPoints = fontSizeInPts;
         }
         public void SetCurrentScriptLang(ScriptLang scLang)
         {
             _glyphLayout.ScriptLang = scLang;
         }
+
         /// <summary>
         /// shaping input string with current font and current script         
         /// </summary>
         /// <param name="inputString"></param>
-        public GlyphPlanSequence ShapeText(string inputString)
+        public GlyphPlanSequence LayoutText(string inputString)
         {
             //output is glyph plan for this input string 
             //input string need to be splited into 'words'. 
             TextBuffer textBuffer = new TextBuffer(inputString.ToCharArray());
             return _currentShapingContext.Layout(_glyphLayout, textBuffer, 0, textBuffer.Len);
         }
-        public GlyphPlanSequence ShapeText(TextBuffer buffer, int start, int len)
+        public GlyphPlanSequence LayoutText(TextBuffer buffer, int start, int len)
         {
             return _currentShapingContext.Layout(_glyphLayout, buffer, start, len);
         }

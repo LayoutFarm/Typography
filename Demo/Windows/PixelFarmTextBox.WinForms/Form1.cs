@@ -224,9 +224,9 @@ namespace PixelFarmTextBox.WinForms
             }
 
             Typography.TextServices.TextShapingService shapingService = _textService.ShapingService;
-            shapingService.SetCurrentFont(_basicOptions.Typeface.Name, InstalledFontStyle.Normal);
+            shapingService.SetCurrentFont(_basicOptions.Typeface.Name, InstalledFontStyle.Normal, 8);
             shapingService.SetCurrentScriptLang(Typography.OpenFont.ScriptLangs.Latin);
-            GlyphPlanSequence seq = shapingService.ShapeText("Hello");
+            GlyphPlanSequence seq = shapingService.LayoutText("Hello");
 
 
             //----
