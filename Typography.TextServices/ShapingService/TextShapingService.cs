@@ -197,7 +197,7 @@ namespace Typography.TextServices
             {
                 return planSeq;
             }
-            //not found  then create glyph plan seq
+            //not found then create glyph plan seq
             planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
             seqCol.Register(hashValue, planSeq);
             return planSeq;
