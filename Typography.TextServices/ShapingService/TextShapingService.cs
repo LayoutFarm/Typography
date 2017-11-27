@@ -195,13 +195,13 @@ namespace Typography.TextServices
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
             GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(len);
             int hashValue = CalculateHash(buffer, startAt, len);
-            if (seqCol.TryGetCacheGlyphPlanSeq(hashValue, out planSeq))
+            if (!seqCol.TryGetCacheGlyphPlanSeq(hashValue, out planSeq))
             {
-                return planSeq;
+                //not found then create glyph plan seq
+                planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
+                seqCol.Register(hashValue, planSeq);
             }
-            //not found then create glyph plan seq
-            planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
-            seqCol.Register(hashValue, planSeq);
+
             return planSeq;
         }
     }
