@@ -12,19 +12,40 @@ namespace Typography.TextServices
         // 
         TextServiceHub _hub;
         TextShapingContext _currentShapingContext;
-        Dictionary<InstalledFont, TextShapingContext> _registerShapingContexts = new Dictionary<InstalledFont, TextShapingContext>();
+        Dictionary<TextShapingContextKey, TextShapingContext> _registerShapingContexts = new Dictionary<TextShapingContextKey, TextShapingContext>();
         GlyphLayout _glyphLayout;
+        ScriptLang _currentScriptLang;
+
         internal TextShapingService(TextServiceHub hub)
         {
             this._hub = hub;
             //create glyph layout instance with default setting
             _glyphLayout = new GlyphLayout();
+            _currentScriptLang = ScriptLangs.Latin;//default?
         }
-        public void SetCurrentFont(string fontname, InstalledFontStyle fontStyle)
+
+        public ScriptLang CurrentScriptLang
+        {
+            get { return _currentScriptLang; }
+            set
+            {
+                //must not be null              
+                _currentScriptLang = value;
+            }
+        }
+
+        public void SetCurrentFont(string fontname, InstalledFontStyle fontStyle, ScriptLang scLang = null)
         {
             InstalledFont installedFont = _hub._openFontStore.GetFont(fontname, fontStyle);
             if (installedFont == null) return;//not found request font
-            if (!_registerShapingContexts.TryGetValue(installedFont, out _currentShapingContext))
+
+            if (scLang != null)
+            {
+                _currentScriptLang = scLang;
+            }
+
+            var key = new TextShapingContextKey(installedFont, _currentScriptLang);
+            if (!_registerShapingContexts.TryGetValue(key, out _currentShapingContext))
             {
                 //not found
                 //the create the new one
@@ -34,9 +55,9 @@ namespace Typography.TextServices
                     var reader = new OpenFontReader();
                     typeface = reader.Read(fs);
                 }
-                TextShapingContext shapingContext = new TextShapingContext(typeface);
+                var shapingContext = new TextShapingContext(typeface, _currentScriptLang);
                 //shaping context setup ...
-                _registerShapingContexts.Add(installedFont, shapingContext);
+                _registerShapingContexts.Add(key, shapingContext);
                 _currentShapingContext = shapingContext;
             }
         }
@@ -59,30 +80,49 @@ namespace Typography.TextServices
         {
             return _currentShapingContext.Layout(_glyphLayout, buffer, start, len);
         }
+
+        struct TextShapingContextKey
+        {
+
+            readonly InstalledFont _installedFont;
+            readonly ScriptLang _scLang;
+            public TextShapingContextKey(InstalledFont installedFont, ScriptLang scLang)
+            {
+                this._installedFont = installedFont;
+                this._scLang = scLang;
+            }
+#if DEBUG
+            public override string ToString()
+            {
+                return _installedFont + " " + _scLang;
+            }
+#endif
+        }
     }
 
 
     class TextShapingContext
     {
         GlyphPlanBuffer _glyphPlanBuffer;
-        Typeface _typeface; 
+        Typeface _typeface;
+        ScriptLang _scLang;
+
         /// <summary>
         /// common len 0-10?
         /// </summary>
         GlyphPlanSeqCollection[] _cacheSeqCollection1;
         //other len
         Dictionary<int, GlyphPlanSeqCollection> _cacheSeqCollection2; //lazy init
-       
 
         //TODO: consider this value, make this a variable (static int)
         const int PREDEFINE_LEN = 10;
-        public TextShapingContext(Typeface typeface)
+        public TextShapingContext(Typeface typeface, ScriptLang scLang)
         {
             _typeface = typeface;
+            _scLang = scLang;
             _glyphPlanBuffer = new GlyphPlanBuffer(new List<GlyphPlan>());
-            
-
             _cacheSeqCollection1 = new GlyphPlanSeqCollection[PREDEFINE_LEN];
+
             //TODO:
             //what is the proper number of cache word ?
             //init free dic
@@ -96,6 +136,7 @@ namespace Typography.TextServices
             List<GlyphPlan> planList = GlyphPlanBuffer.UnsafeGetGlyphPlanList(_glyphPlanBuffer);
             int pre_count = planList.Count;
             glyphLayout.Typeface = _typeface;
+            glyphLayout.ScriptLang = _scLang;
             glyphLayout.Layout(
                 TextBuffer.UnsafeGetCharBuffer(buffer),
                 startAt,
@@ -108,7 +149,7 @@ namespace Typography.TextServices
         {
             //reference,
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
-            return CRC32.CalculateCRC32(TextBuffer.UnsafeGetCharBuffer(buffer), startAt, len);             
+            return CRC32.CalculateCRC32(TextBuffer.UnsafeGetCharBuffer(buffer), startAt, len);
         }
         public GlyphPlanSequence Layout(GlyphLayout glyphLayout, TextBuffer buffer, int startAt, int len)
         {
