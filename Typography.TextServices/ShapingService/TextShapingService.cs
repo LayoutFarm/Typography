@@ -82,6 +82,11 @@ namespace Typography.TextServices
         }
 
 
+        internal void ClearAllRegisteredShapingContext()
+        {
+            _registerShapingContexts.Clear();
+        }
+
         struct TextShapingContextKey
         {
 
