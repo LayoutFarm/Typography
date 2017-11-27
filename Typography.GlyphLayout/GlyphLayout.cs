@@ -13,7 +13,7 @@ namespace Typography.TextLayout
     public struct GlyphPlan
     {
 
-        public readonly ushort glyphIndex;
+        public readonly ushort glyphIndex; //2
         public GlyphPlan(ushort glyphIndex, float exactX, float exactY, float exactAdvX)
         {
             this.glyphIndex = glyphIndex;
@@ -21,9 +21,9 @@ namespace Typography.TextLayout
             this.ExactY = exactY;
             this.AdvanceX = exactAdvX;
         }
-        public float AdvanceX { get; private set; }
-        public float ExactY { get; private set; }
-        public float ExactX { get; private set; }
+        public float AdvanceX { get; private set; } //4
+        public float ExactX { get; private set; } //4
+        public float ExactY { get; private set; } //4
 
         public float ExactRight { get { return ExactX + AdvanceX; } }
         public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
@@ -218,7 +218,8 @@ namespace Typography.TextLayout
             _inputGlyphs.Clear();
 
             // convert codepoints to input glyphs
-            for (int i = 0; i < _codepoints.Count; ++i)
+            int countpoints_count = _codepoints.Count;
+            for (int i = 0; i < countpoints_count; ++i)
             {
                 int codepoint = _codepoints[i];
                 ushort glyphIndex = _typeface.LookupIndex(codepoint);

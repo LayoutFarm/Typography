@@ -50,10 +50,8 @@ namespace Typography.TextServices
         /// <param name="inputString"></param>
         public GlyphPlanSequence ShapeText(string inputString)
         {
-            //output is glyph plan for this input string
-
-            //input string need to be splited into 'words'.
-
+            //output is glyph plan for this input string 
+            //input string need to be splited into 'words'. 
             TextBuffer textBuffer = new TextBuffer(inputString.ToCharArray());
             return _currentShapingContext.Layout(_glyphLayout, textBuffer, 0, textBuffer.Len);
         }
@@ -62,12 +60,12 @@ namespace Typography.TextServices
             return _currentShapingContext.Layout(_glyphLayout, buffer, start, len);
         }
     }
+
+
     class TextShapingContext
     {
         GlyphPlanBuffer _glyphPlanBuffer;
-        Typeface _typeface;
-
-
+        Typeface _typeface; 
         /// <summary>
         /// common len 0-10?
         /// </summary>
@@ -116,8 +114,7 @@ namespace Typography.TextServices
         {
             //this func get the raw char from buffer
             //and create glyph list 
-            //check if we have the string cache in specific value
-
+            //check if we have the string cache in specific value 
             //---------
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
             //look in the cache
