@@ -38,7 +38,7 @@ namespace TextBreakerTest
             //
             //lao
             icu_currentLocale = "lo-LA";
-            //string test1 = "ແປ້ນພິມລາວ";
+            //string test1 = "ສະບາຍດີແປ້ນພິມລາວ";
             //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
             string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
             //----------------
