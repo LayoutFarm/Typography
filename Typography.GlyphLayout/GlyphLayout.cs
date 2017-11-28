@@ -119,8 +119,9 @@ namespace Typography.TextLayout
             EnableComposition = true;
             ScriptLang = ScriptLangs.Latin;
             FontSizeInPoints = 14;//default
-
+            UsePxScaleOnReadOutput = true;
         }
+
 
         public float FontSizeInPoints { get; set; }
         public float PixelScale
@@ -168,6 +169,10 @@ namespace Typography.TextLayout
                 _pxscaleLayout = value;
             }
         }
+        /// <summary>
+        /// when read output, please scale to pixel unitd
+        /// </summary>
+        public bool UsePxScaleOnReadOutput { get; set; }
 
         /// <summary>
         /// reusable codepoint list buffer
@@ -280,6 +285,7 @@ namespace Typography.TextLayout
 
         }
 
+
         void UpdateLayoutPlan()
         {
             GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(this._typeface, this._scriptLang);
@@ -330,11 +336,35 @@ namespace Typography.TextLayout
             GlyphPosStream glyphPositions = glyphLayout._glyphPositions; //from opentype's layout result, 
             int finalGlyphCount = glyphPositions.Count;
             //------------------------ 
+
+            if (!glyphLayout.UsePxScaleOnReadOutput)
+            {
+                //use original size, design unit
+                //default scale 
+                double cx = 0;
+                short cy = 0;
+                for (int i = 0; i < finalGlyphCount; ++i)
+                {
+                    GlyphPos glyph_pos = glyphPositions[i];
+                    float advW = glyph_pos.advanceW * 1;
+                    float exact_x = (float)(cx + glyph_pos.OffsetX * 1);
+                    float exact_y = (float)(cy + glyph_pos.OffsetY * 1);
+
+                    outputGlyphPlanList.Add(new GlyphPlan(
+                        glyph_pos.glyphIndex,
+                        exact_x,
+                        exact_y,
+                        advW));
+                    cx += advW;
+                }
+                return;
+            }
+
+            //
             IPixelScaleLayout pxscaleLayout = glyphLayout.PxScaleLayout;
             if (pxscaleLayout != null)
             {
-                //use custom pixel scale layout engine 
-
+                //use custom pixel scale layout engine  
                 pxscaleLayout.SetFont(glyphLayout.Typeface, glyphLayout.FontSizeInPoints);
                 pxscaleLayout.Layout(glyphPositions, outputGlyphPlanList);
             }

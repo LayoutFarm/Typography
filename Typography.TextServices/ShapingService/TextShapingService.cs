@@ -175,7 +175,9 @@ namespace Typography.TextServices
                 TextBuffer.UnsafeGetCharBuffer(buffer),
                 startAt,
                 len);
+
             glyphLayout.ReadOutput(planList);
+
             int post_count = planList.Count;
             return new GlyphPlanSequence(_glyphPlanBuffer, pre_count, post_count - pre_count);
         }
@@ -198,11 +200,19 @@ namespace Typography.TextServices
             if (!seqCol.TryGetCacheGlyphPlanSeq(hashValue, out planSeq))
             {
                 //not found then create glyph plan seq
+                bool useOutputScale = glyphLayout.UsePxScaleOnReadOutput;//save 
+                //some font may have 'special' glyph x,y at some font size(eg. for subpixel-rendering position)
+                //but in general we store the new glyph plan seq with unscale glyph pos
+                glyphLayout.UsePxScaleOnReadOutput = false;
                 planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
+                glyphLayout.UsePxScaleOnReadOutput = useOutputScale;//restore
                 seqCol.Register(hashValue, planSeq);
             }
             //---
-            //
+            //on unscale font=> we scale it to final font size
+            
+
+
             return planSeq;
         }
     }

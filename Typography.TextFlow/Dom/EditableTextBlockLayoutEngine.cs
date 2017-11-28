@@ -132,7 +132,7 @@ namespace Typography.TextLayout
                     //
 
                     TextRunFontStyle fontStyle = tt.FontStyle;
-                    //resolve to actual font face
+                   
                     TextBuffer buffer = tt.TextBuffer;
                     char[] rawBuffer = buffer.UnsafeGetInternalBuffer();
 

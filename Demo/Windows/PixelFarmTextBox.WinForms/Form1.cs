@@ -194,7 +194,7 @@ namespace PixelFarmTextBox.WinForms
                     //
                     GlyphPlanSequence seq = textRun.GetGlyphPlanSeq();
                     _devVxsTextPrinter.DrawFromGlyphPlans(
-                        seq.UnsafeGetInteralGlyphPlanList(),
+                        GlyphPlanSequence.UnsafeGetInteralGlyphPlanList(seq),
                         seq.startAt,
                         seq.len,
                         x, y);
@@ -250,7 +250,7 @@ namespace PixelFarmTextBox.WinForms
             //render!,
             float x = 20, y = 200;
             _devVxsTextPrinter.DrawFromGlyphPlans(
-                        seq.UnsafeGetInteralGlyphPlanList(),
+                        GlyphPlanSequence.UnsafeGetInteralGlyphPlanList(seq),
                         seq.startAt,
                         seq.len,
                         x, y);
