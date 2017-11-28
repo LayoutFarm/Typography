@@ -8,9 +8,7 @@ namespace PixelFarm.Drawing.Fonts
     public static class OpenFontLoader
     {
         public static FontFace LoadFont(
-            Typeface typeface,
-            ScriptLang scriptLang,
-            WriteDirection writeDirection = WriteDirection.LTR)
+            Typeface typeface)
         {
             //read font file 
             //TODO:...
@@ -19,10 +17,7 @@ namespace PixelFarm.Drawing.Fonts
             var openFont = new NOpenFontFace(typeface, typeface.Name, typeface.Filename);
             return openFont;
         }
-        public static FontFace LoadFont(
-            string fontpath,
-            ScriptLang scriptLang,
-            WriteDirection writeDirection = WriteDirection.LTR)
+        public static FontFace LoadFont(string fontpath)
         {
 
             using (FileStream fs = new FileStream(fontpath, FileMode.Open, FileAccess.Read))
@@ -30,7 +25,7 @@ namespace PixelFarm.Drawing.Fonts
                 var reader = new OpenFontReader();
                 Typeface t = reader.Read(fs);
                 t.Filename = fontpath;
-                return LoadFont(t, scriptLang, writeDirection);
+                return LoadFont(t);
             }
         }
     }
