@@ -23,7 +23,7 @@ namespace Typography.OpenFont.IO
         //
         //public override byte ReadByte() { return base.ReadByte(); } 
         // 
-        //we override the 4 methods hered
+        //we override the 4 methods here
         //
         public override short ReadInt16() { return BitConverter.ToInt16(RR(2), 8 - 2); }
         public override ushort ReadUInt16() { return BitConverter.ToUInt16(RR(2), 8 - 2); }
