@@ -36,7 +36,6 @@
     <Compile Include="ShapingService\CRC32.cs" />
     <Compile Include="FontStoreAndManagement\FontManagement.cs" />
     <Compile Include="FontStoreAndManagement\IFontLoader.cs" />
-    <Compile Include="FontStoreAndManagement\IInstalledFontProvider.cs" />
     <Compile Include="FontStoreAndManagement\OpenFontStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShapingService\TextShapingService.cs" />
