@@ -156,13 +156,13 @@ namespace PixelFarm.Drawing.Fonts
 
         public override void DrawCaret(float x, float y)
         {
-           
+
             CanvasPainter p = this.TargetCanvasPainter;
             PixelFarm.Drawing.Color prevColor = p.StrokeColor;
             p.StrokeColor = PixelFarm.Drawing.Color.Red;
             p.Line(x, y, x, y + this.FontAscendingPx);
             p.StrokeColor = prevColor;
-             
+
         }
 
         void UpdateTypefaceAndGlyphBuilder()
@@ -252,7 +252,7 @@ namespace PixelFarm.Drawing.Fonts
             bool hasColorGlyphs = (colrTable != null) && (cpalTable != null);
 
             //---------------------------------------------------
-            
+
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
             //---------------------------------------------------
 
@@ -331,7 +331,7 @@ namespace PixelFarm.Drawing.Fonts
             _outputGlyphPlans.Clear();
 
             //
-            float pxscale = _currentTypeface.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
+            //float pxscale = _currentTypeface.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
             _glyphLayout.GenerateGlyphPlans(text, startAt, len, _outputGlyphPlans, null);
             //-----
             //we (fine) adjust horizontal fit here
