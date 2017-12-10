@@ -56,7 +56,7 @@ namespace DrawingGL.Text
         public void Measure(char[] textBuffer, int startAt, int len, out float width, out float height)
         {
             glyphLayout.Typeface = this.CurrentTypeFace;
-            var scale = CurrentTypeFace.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
+            var scale = CurrentTypeFace.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
             MeasuredStringBox strBox;
             glyphLayout.MeasureString(textBuffer, startAt, len, out strBox, scale);
             width = strBox.width;

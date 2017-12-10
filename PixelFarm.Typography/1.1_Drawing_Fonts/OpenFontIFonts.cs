@@ -60,7 +60,7 @@ namespace LayoutFarm
             Typeface typeface = typefaceStore.GetTypeface(font.Name, InstalledFontStyle.Normal);
             glyphLayout.Typeface = typeface;
             MeasuredStringBox result;
-            float scale = typeface.CalculateToPixelScaleFromPointSize(font.SizeInPoints);
+            float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
 
             //measure string at specific px scale
             glyphLayout.MeasureString(str, startAt, len, out result, scale);

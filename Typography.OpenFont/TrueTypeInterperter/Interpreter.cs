@@ -81,7 +81,7 @@ namespace Typography.OpenFont
             newGlyphPoints[orgLen + 3] = pp4;
 
             //3. scale all point to target pixel size
-            float pxScale = currentTypeFace.CalculateToPixelScale(glyphSizeInPixel);
+            float pxScale = currentTypeFace.CalculateScaleToPixel(glyphSizeInPixel);
             for (int i = orgLen + 3; i >= 0; --i)
             {
                 newGlyphPoints[i].ApplyScale(pxScale);

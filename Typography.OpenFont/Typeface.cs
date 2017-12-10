@@ -221,7 +221,7 @@ namespace Typography.OpenFont
         /// </summary>
         /// <param name="targetPixelSize">target font size in point unit</param>
         /// <returns></returns>
-        public float CalculateToPixelScale(float targetPixelSize)
+        public float CalculateScaleToPixel(float targetPixelSize)
         {
             //1. return targetPixelSize / UnitsPerEm
             return targetPixelSize / this.UnitsPerEm;
@@ -232,7 +232,7 @@ namespace Typography.OpenFont
         /// <param name="targetPointSize">target font size in point unit</param>
         /// <param name="resolution"></param>
         /// <returns></returns>
-        public float CalculateToPixelScaleFromPointSize(float targetPointSize, int resolution = 96)
+        public float CalculateScaleToPixelFromPointSize(float targetPointSize, int resolution = 96)
         {
             //1. var sizeInPixels = ConvPointsToPixels(sizeInPointUnit);
             //2. return  sizeInPixels / UnitsPerEm

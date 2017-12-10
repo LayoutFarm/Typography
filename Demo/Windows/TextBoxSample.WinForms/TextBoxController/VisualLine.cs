@@ -50,7 +50,7 @@ namespace SampleWinForms.UI
                 //read glyph plan and userCharToGlyphIndexMap                 
                 _printer.GlyphLayoutMan.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, glyphPlans, userCharToGlyphIndexMap);
 
-                toPxScale = _printer.Typeface.CalculateToPixelScaleFromPointSize(_printer.FontSizeInPoints);
+                toPxScale = _printer.Typeface.CalculateScaleToPixelFromPointSize(_printer.FontSizeInPoints);
                 _line.ContentChanged = false;
             }
 

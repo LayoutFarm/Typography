@@ -68,7 +68,7 @@ namespace Typography.Rendering
             }
             else
             {
-                _recentPixelScale = Typeface.CalculateToPixelScale(RecentFontSizeInPixels);
+                _recentPixelScale = Typeface.CalculateScaleToPixel(RecentFontSizeInPixels);
             }
             //-------------------------------------
             FitCurrentGlyph(glyphIndex, glyph);

@@ -278,7 +278,7 @@ namespace SampleWinForms
                   y_pos
              );
             //Example 3: MeasureString        
-            float scale = _currentTextPrinter.Typeface.CalculateToPixelScaleFromPointSize(_currentTextPrinter.FontSizeInPoints);
+            float scale = _currentTextPrinter.Typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
             MeasuredStringBox strBox;
             _currentTextPrinter.GlyphLayoutMan.MeasureString(textBuffer, 0, textBuffer.Length, out strBox, scale);
             //draw line mark

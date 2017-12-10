@@ -76,7 +76,7 @@ namespace Typography.Contours
                         _fitoutlineCollection.Add(glyphIndex, _latestDynamicOutline);
                         //-------------------
                         //
-                        _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateToPixelScale(RecentFontSizeInPixels));
+                        _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateScaleToPixel(RecentFontSizeInPixels));
                         //-------------------
 
                     }
@@ -84,7 +84,7 @@ namespace Typography.Contours
                     {
                         if (IsSizeChanged)
                         {
-                            _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateToPixelScale(RecentFontSizeInPixels));
+                            _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateScaleToPixel(RecentFontSizeInPixels));
                             IsSizeChanged = false;
                         }
                     }
@@ -104,7 +104,7 @@ namespace Typography.Contours
             {
                 //read from our auto hint fitoutline
                 //need scale from original. 
-                float toPixelScale = Typeface.CalculateToPixelScale(RecentFontSizeInPixels);
+                float toPixelScale = Typeface.CalculateScaleToPixel(RecentFontSizeInPixels);
                 if (toPixelScale < 0)
                 {
                     toPixelScale = 1;

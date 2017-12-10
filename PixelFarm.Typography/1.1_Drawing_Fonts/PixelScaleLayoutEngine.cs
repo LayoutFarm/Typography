@@ -156,7 +156,7 @@ namespace Typography.Contours
             {
                 //build vxs
                 _tovxs.Reset();
-                float pxscale = _currentTypeface.CalculateToPixelScaleFromPointSize(_currentFontSizeInPoints);
+                float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_currentFontSizeInPoints);
                 GlyphDynamicOutline dynamicOutline = glyphMeshData.dynamicOutline;
                 if (dynamicOutline != null)
                 {
@@ -346,7 +346,7 @@ namespace Typography.Contours
         {
             //the default OpenFont layout without fit-to-writing alignment
             int finalGlyphCount = posStream.Count;
-            float pxscale = _typeface.CalculateToPixelScaleFromPointSize(this._fontSizeInPoints);
+            float pxscale = _typeface.CalculateScaleToPixelFromPointSize(this._fontSizeInPoints);
             double cx = 0;
             short cy = 0;
 
@@ -379,7 +379,7 @@ namespace Typography.Contours
             }
             //------------------------------
             int finalGlyphCount = posStream.Count;
-            float pxscale = _typeface.CalculateToPixelScaleFromPointSize(this._fontSizeInPoints);
+            float pxscale = _typeface.CalculateScaleToPixelFromPointSize(this._fontSizeInPoints);
 #if DEBUG
             float dbug_onepx = 1 / pxscale;
 #endif

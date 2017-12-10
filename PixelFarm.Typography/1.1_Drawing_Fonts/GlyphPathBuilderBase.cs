@@ -71,7 +71,7 @@ namespace Typography.Contours
             }
             else
             {
-                _recentPixelScale = Typeface.CalculateToPixelScale(RecentFontSizeInPixels);
+                _recentPixelScale = Typeface.CalculateScaleToPixel(RecentFontSizeInPixels);
                 IsSizeChanged = true;
             }
             //-------------------------------------

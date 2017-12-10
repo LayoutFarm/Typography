@@ -106,7 +106,7 @@ namespace PixelFarm.Drawing.Fonts
             Typeface currentTypeface = _currentTypeface;
             if (currentTypeface != null)
             {
-                float pointToPixelScale = currentTypeface.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
+                float pointToPixelScale = currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
                 this.FontAscendingPx = currentTypeface.Ascender * pointToPixelScale;
                 this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
                 this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
@@ -148,7 +148,7 @@ namespace PixelFarm.Drawing.Fonts
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel?
 
-            float pxscale = typeface.CalculateToPixelScaleFromPointSize(FontSizeInPoints);
+            float pxscale = typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
             _outputGlyphPlans.Clear();
             _glyphLayout.Layout(typeface, text, startAt, len, _outputGlyphPlans);
             TextPrinterHelper.CopyGlyphPlans(renderVx, _outputGlyphPlans, pxscale);
@@ -201,7 +201,7 @@ namespace PixelFarm.Drawing.Fonts
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel? 
             float fontSizePoint = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateToPixelScaleFromPointSize(fontSizePoint);
+            float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
             RenderVxGlyphPlan[] glyphPlans = renderVx.glyphList;
             int j = glyphPlans.Length;
             //---------------------------------------------------
@@ -239,7 +239,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO: review this again, we should use pixel?
 
             float fontSizePoint = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateToPixelScaleFromPointSize(fontSizePoint);
+            float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
 
 
             //4. render each glyph 

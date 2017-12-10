@@ -130,7 +130,7 @@ namespace Typography.TextLayout
             {
                 //to pixel scale from size in point
                 if (_typeface == null) return 1;
-                return _typeface.CalculateToPixelScaleFromPointSize(this.FontSizeInPoints);
+                return _typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
             }
         }
         public PositionTechnique PositionTechnique { get; set; }
