@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.Drawing;
-using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.TextServices;
