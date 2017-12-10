@@ -466,7 +466,7 @@ namespace Typography.TextServices
 
 
 
-            //for Windows , how to find Windows' Fonr Directory from Windows Registry
+            //for Windows , how to find Windows' Font Directory from Windows Registry
             //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
             //        // get parent of System folder to have Windows folder
             //        DirectoryInfo dirWindowsFolder = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System));
