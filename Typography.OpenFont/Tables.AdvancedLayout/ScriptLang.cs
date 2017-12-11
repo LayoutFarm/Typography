@@ -626,10 +626,8 @@ namespace Typography.OpenFont
                 //
                 s_registerScriptFromFullNames[fullname] = scriptLang;
                 return scriptLang;
-            }
-
+            } 
         }
-
 
         public static ScriptLang GetRegisteredScriptLang(string shortname)
         {
