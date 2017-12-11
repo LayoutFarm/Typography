@@ -75,6 +75,11 @@ namespace Typography.OpenFont
             get;
             set;
         }
+        internal HorizontalHeader HheaTable
+        {
+            get;
+            set;
+        }
         internal OS2Table OS2Table
         {
             get;
@@ -112,6 +117,25 @@ namespace Typography.OpenFont
         {
             get
             {
+                //The typographic line gap for this font.
+                //Remember that this is not the same as the LineGap value in the 'hhea' table, 
+                //which Apple defines in a far different manner.
+                //The suggested usage for sTypoLineGap is 
+                //that it be used in conjunction with unitsPerEm 
+                //to compute a typographically correct default line spacing.
+                //
+                //Typical values average 7 - 10 % of units per em.
+                //The goal is to free applications from Macintosh or Windows - specific metrics
+                //which are constrained by backward compatability requirements
+                //(see chapter, “Recommendations for OpenType Fonts”).
+                //These new metrics, when combined with the character design widths,
+                //will allow applications to lay out documents in a typographically correct and portable fashion. 
+                //These metrics will be exposed through Windows APIs.
+                //Macintosh applications will need to access the 'sfnt' resource and 
+                //parse it to extract this data from the “OS / 2” table
+                //(unless Apple exposes the 'OS/2' table through a new API)
+
+
                 return OS2Table.sTypoLineGap;
             }
         }
@@ -172,7 +196,7 @@ namespace Typography.OpenFont
         public Glyph Lookup(int codepoint)
         {
             return _glyphs[LookupIndex(codepoint)];
-        } 
+        }
         public Glyph GetGlyphByIndex(int glyphIndex)
         {
             return _glyphs[glyphIndex];
@@ -354,6 +378,57 @@ namespace Typography.OpenFont
                 {
                     throw new System.NotSupportedException();
                 }
+            }
+
+            /// <summary>
+            /// calculate Baseline-to-Baseline Distance (BTBD) for Windows
+            /// </summary>
+            /// <param name="typeface"></param>
+            /// <returns>return 'unscaled-to-pixel' BTBD value</returns>
+            public static int Calculate_BTBD_Windows(this Typeface typeface)
+            {
+                //from https://www.microsoft.com/typography/otspec/recom.htm#tad
+
+
+                //Windows Metric         OpenType Metric
+                //ascent                    usWinAscent
+                //descent                   usWinDescent
+                //internal leading          usWinAscent + usWinDescent - unitsPerEm
+                //external leading          MAX(0, LineGap - ((usWinAscent + usWinDescent) - (Ascender - Descender)))
+
+                //The suggested BTBD = ascent + descent + external leading
+
+                //It should be clear that the “external leading” can never be less than zero. 
+                //Pixels above the ascent or below the descent will be clipped from the character; 
+                //this is true for all output devices.
+
+                //The usWinAscent and usWinDescent are values 
+                //from the 'OS/2' table.
+                //The unitsPerEm value is from the 'head' table.
+                //The LineGap, Ascender and Descender values are from the 'hhea' table.
+
+                int usWinAscent = typeface.OS2Table.usWinAscent;
+                int usWinDescent = typeface.OS2Table.usWinDescent;
+                int internal_leading = usWinAscent + usWinDescent - typeface.UnitsPerEm;
+                HorizontalHeader hhea = typeface.HheaTable;
+                int external_leading = System.Math.Max(0, hhea.LineGap - ((usWinAscent + usWinDescent) - (hhea.Ascent - hhea.Descent)));
+                return usWinAscent + usWinDescent + external_leading;
+            }
+            /// <summary>
+            /// calculate Baseline-to-Baseline Distance (BTBD) for macOS
+            /// </summary>
+            /// <param name="typeface"></param>
+            /// <returns></returns>
+            public static float CalculateBTBD_Mac(this Typeface typeface)
+            {
+                //from https://www.microsoft.com/typography/otspec/recom.htm#tad
+
+                //Macintosh Metric      OpenType Metric
+                //ascender                  Ascender
+                //descender                 Descender
+                //leading                   LineGap
+
+                return 0;
             }
         }
         public static class UnicodeLangBitsExtension

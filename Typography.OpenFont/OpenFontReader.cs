@@ -124,8 +124,9 @@ namespace Typography.OpenFont
                 //----------------------------
                 typeface.CmapTable = cmaps;
                 typeface.KernTable = kern;
-                typeface.GaspTable = gaspTable;
+                typeface.GaspTable = gaspTable;               
                 typeface.MaxProfile = maximumProfile;
+                typeface.HheaTable = horizontalHeader;
                 //----------------------------
                 FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
                 //control values table

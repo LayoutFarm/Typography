@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
-
+    /// <summary>
+    /// hmtx
+    /// </summary>
     class HorizontalMetrics : TableEntry
     {
         //https://www.microsoft.com/typography/otspec/hmtx.htm

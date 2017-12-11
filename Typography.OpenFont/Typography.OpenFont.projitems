@@ -9,6 +9,7 @@
     <Import_RootNamespace>Typography.OpenFont</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\OS2_IBMFontClassParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Bounds.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CharacterMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry.cs" />
