@@ -11,15 +11,15 @@ namespace LayoutFarm
     public class OpenFontIFonts : IFonts
     {
 
-        IFontLoader _fontloader;
+
         TypefaceStore typefaceStore;
         GlyphLayout glyphLayout;
         List<GlyphPlan> userGlyphPlanList;
         List<UserCharToGlyphIndexMap> userCharToGlyphMapList;
 
-        public OpenFontIFonts(IFontLoader fontloader)
+        public OpenFontIFonts()
         {
-            this._fontloader = fontloader;
+
             typefaceStore = new TypefaceStore();
             typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(null);
             glyphLayout = new GlyphLayout(); //create glyph layout with default value
