@@ -40,7 +40,7 @@ namespace TextBreakerTest
             icu_currentLocale = "lo-LA";
             //string test1 = "ສະບາຍດີແປ້ນພິມລາວ";
             //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
-            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
+            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่";
             //----------------
             this.textBox1.Text = test1;
 

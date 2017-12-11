@@ -19,7 +19,11 @@ namespace Typography.TextBreak
     public class WordVisitor
     {
         CustomBreaker ownerBreak;
+        //
         List<int> breakAtList = new List<int>();
+        List<ushort> _breakerEngineCode = new List<ushort>();
+
+        //
         char[] buffer;
         int bufferLen;
         int startIndex;
@@ -58,11 +62,13 @@ namespace Typography.TextBreak
         }
 
 
+
         public bool IsEnd
         {
             get { return currentIndex >= bufferLen - 1; }
         }
 
+        internal BreakingEngine CurrentBreakingEngine { get; set; }
 
         public void AddWordBreakAt(int index)
         {
