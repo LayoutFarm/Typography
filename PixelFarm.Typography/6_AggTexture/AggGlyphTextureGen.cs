@@ -1,9 +1,8 @@
 ﻿//MIT, 2016-2017, WinterDev
 //-----------------------------------  
 using System;
-using Typography.Contours;
-
-namespace Typography.Rendering
+using Typography.Rendering;
+namespace Typography.Contours
 {
     /// <summary>
     /// agg glyph texture generator

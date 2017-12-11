@@ -6,7 +6,8 @@ using System.Windows.Forms;
 //
 using Typography.OpenFont;
 using Typography.TextLayout;
-using Typography.Rendering;
+using Typography.Contours;
+using Typography.TextServices;
 
 
 namespace SampleWinForms
@@ -53,7 +54,7 @@ namespace SampleWinForms
             //but you can create another text printer that specific to text textbox control
             _textBoxControllerForGdi.TextPrinter = _currentTextPrinter;
             _textBoxControllerForGdi.BindHostGraphics(this.sampleTextBox1.CreateGraphics());
-          
+
             this.sampleTextBox1.SetController(_textBoxControllerForGdi);
 
             //---------- 

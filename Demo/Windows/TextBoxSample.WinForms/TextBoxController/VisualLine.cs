@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using Typography.TextLayout;
-using Typography.Rendering;
+using Typography.Contours;
 
 namespace SampleWinForms.UI
 {
@@ -43,7 +43,7 @@ namespace SampleWinForms.UI
             {
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
-                glyphPlans.Clear(); 
+                glyphPlans.Clear();
 
                 userCharToGlyphIndexMap.Clear();
 

@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using Typography.TextLayout;
-using Typography.Rendering;
+using Typography.Contours;
 
 namespace SampleWinForms.UI
 {

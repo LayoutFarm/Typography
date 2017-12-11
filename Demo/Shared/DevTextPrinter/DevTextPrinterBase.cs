@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
-using Typography.TextLayout;
+using Typography.TextLayout; 
 
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     /// <summary>
     /// base TextPrinter class for developer only, 

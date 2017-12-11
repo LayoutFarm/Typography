@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 // 
-using Typography.TextLayout;
-using Typography.Rendering;
+using Typography.TextLayout; 
+using Typography.Contours;
+using Typography.TextServices;
 
 namespace SampleWinForms
 {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 
-namespace Typography.Rendering
+namespace Typography.TextServices
 {
 
 

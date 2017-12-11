@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using Typography.TextLayout;
 
-namespace Typography.Rendering
+
+namespace Typography.Contours
 {
     /// <summary>
     /// base TextPrinter class for developer only, 

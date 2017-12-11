@@ -1,5 +1,5 @@
 ﻿//MIT, 2016-2017, WinterDev
-namespace Typography.Rendering
+namespace Typography.Contours
 {
 
     public enum HintTechnique : byte
