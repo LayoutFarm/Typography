@@ -66,13 +66,10 @@ namespace Typography.TextBreak
         public bool IsEnd
         {
             get { return currentIndex >= bufferLen - 1; }
-        }
-
-        internal BreakingEngine CurrentBreakingEngine { get; set; }
-
+        } 
         public void AddWordBreakAt(int index)
         {
-
+            
 #if DEBUG
             if (index == latestBreakAt)
             {

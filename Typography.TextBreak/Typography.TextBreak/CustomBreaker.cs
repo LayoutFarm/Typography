@@ -64,9 +64,7 @@ namespace Typography.TextBreak
             //select breaking engine
             for (; ; )
             {
-                //----------------------------------------
-                visitor.CurrentBreakingEngine = currentEngine;
-                //
+                 
                 currentEngine.BreakWord(visitor, charBuff, startAt, charBuff.Length - startAt);
                 switch (visitor.State)
                 {
