@@ -84,7 +84,7 @@ namespace TextBreakerTest
             //we use dic data from icu-project
 
             //1. create dictionary based breaking engine 
-            CustomBreakerBuilder.DataDir = "../../../icu58/brkitr_src/dictionaries";
+            CustomBreakerBuilder.Setup("../../../icu58/brkitr_src/dictionaries");
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
 
 
@@ -129,7 +129,7 @@ namespace TextBreakerTest
         {
 
             //-------------------
-            CustomBreakerBuilder.DataDir = "../../../icu58/brkitr_src/dictionaries";
+            CustomBreakerBuilder.Setup("../../../icu58/brkitr_src/dictionaries");
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
             char[] test = this.textBox1.Text.ToCharArray();
             //-------------
