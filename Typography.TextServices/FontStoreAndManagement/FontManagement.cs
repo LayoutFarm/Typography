@@ -422,7 +422,13 @@ namespace Typography.TextServices
         {
             try
             {
-                // 1. font dir
+                //font dir
+                if (!Directory.Exists(folder))
+                {
+                    //not found
+                    return;
+                }
+                
                 foreach (string file in Directory.GetFiles(folder))
                 {
                     //eg. this is our custom font folder
