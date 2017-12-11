@@ -19,7 +19,18 @@ namespace Typography.OpenFont
         }
     }
 
-
+    public static class UnicodeLangBitsExtension
+    {
+        public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
+        {
+            long bits = (long)unicodeLangBits;
+            int bitpos = (int)(bits >> 32);
+            int lower32 = (int)(bits & 0xFFFFFFFF);
+            return new UnicodeRangeInfo(bitpos,
+                lower32 >> 16,
+                lower32 & 0xFFFF);
+        }
+    }
     //unicode range 
     public struct UnicodeRangeInfo
     {
