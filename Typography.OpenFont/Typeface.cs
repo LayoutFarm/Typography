@@ -348,8 +348,14 @@ namespace Typography.OpenFont
                 //
                 //fsSelection ...
                 //
-                //bit     name                Description
-                //7       USE_TYPO_METRICS    If set, it is strongly recommended to use OS / 2.sTypoAscender - OS / 2.sTypoDescender + OS / 2.sTypoLineGap as a value for default line spacing for this font.
+                //bit     name                
+                //7       USE_TYPO_METRICS   
+                //  
+                //        Description
+                //        If set, it is strongly recommended to use
+                //        OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap 
+                //        as a value for default line spacing for this font.
+
                 return ((typeface.OS2Table.fsSelection >> 7) & 1) != 0;
             }
             /// <summary>
@@ -511,9 +517,7 @@ namespace Typography.OpenFont
             TypoMetric,
             Windows,
             Mac
-        }
-
-
+        } 
         public enum CurrentOSName
         {
             None,//not evaluate yet
