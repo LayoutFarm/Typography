@@ -23,6 +23,7 @@ namespace Typography.OpenFont
     {
         static Dictionary<string, int> s_registerNames = new Dictionary<string, int>();
         static Dictionary<string, ScriptLang> s_registeredScriptTags = new Dictionary<string, ScriptLang>();
+        static Dictionary<string, ScriptLang> s_registerScriptFromFullNames = new Dictionary<string, ScriptLang>();
 
         //https://www.microsoft.com/typography/otspec/scripttags.htm
         //https://www.microsoft.com/typography/otspec/languagetags.htm
@@ -210,8 +211,6 @@ namespace Typography.OpenFont
         static ScriptLang _(string fullname, string shortname)
         {
 
-
-            // 
             if (s_registeredScriptTags.ContainsKey(shortname))
             {
                 if (shortname == "kana")
@@ -233,6 +232,9 @@ namespace Typography.OpenFont
                 s_registerNames[shortname] = internalName;
                 var scriptLang = new ScriptLang(fullname, shortname, internalName);
                 s_registeredScriptTags.Add(shortname, scriptLang);
+                //
+                //
+                s_registerScriptFromFullNames[fullname] = scriptLang;
                 return scriptLang;
             }
 
@@ -245,14 +247,25 @@ namespace Typography.OpenFont
             s_registeredScriptTags.TryGetValue(shortname, out found);
             return found;
         }
+        public static ScriptLang GetRegisteredScriptLangFromLanguageName(string languageName)
+        {
+            ScriptLang found;
+            s_registerScriptFromFullNames.TryGetValue(languageName, out found);
+            return found;
+        }
         public static IEnumerable<ScriptLang> GetRegiteredScriptLangIter()
         {
+
             foreach (ScriptLang scriptLang in s_registeredScriptTags.Values)
             {
                 yield return scriptLang;
             }
         }
+
+
     }
+
+
 
 
 }

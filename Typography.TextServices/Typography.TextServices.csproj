@@ -33,6 +33,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IcuData\IcuLangCodes.cs" />
     <Compile Include="ShapingService\CRC32.cs" />
     <Compile Include="FontStoreAndManagement\FontManagement.cs" />
     <Compile Include="FontStoreAndManagement\IFontLoader.cs" />
