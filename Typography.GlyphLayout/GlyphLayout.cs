@@ -13,7 +13,7 @@ namespace Typography.TextLayout
     public struct GlyphPlan
     {
 
-        public readonly ushort glyphIndex; //2
+        public readonly ushort glyphIndex;
         public GlyphPlan(ushort glyphIndex, float exactX, float exactY, float exactAdvX)
         {
             this.glyphIndex = glyphIndex;
@@ -21,9 +21,9 @@ namespace Typography.TextLayout
             this.ExactY = exactY;
             this.AdvanceX = exactAdvX;
         }
-        public float AdvanceX { get; set; } //4
-        public float ExactX { get; set; } //4
-        public float ExactY { get; set; } //4
+        public float AdvanceX { get; private set; }
+        public float ExactY { get; private set; }
+        public float ExactX { get; private set; }
 
         public float ExactRight { get { return ExactX + AdvanceX; } }
         public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
@@ -39,14 +39,20 @@ namespace Typography.TextLayout
     public class GlyphPlanList
     {
         List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
+        float _accumAdvanceX;
+
         public void Clear()
         {
             _glyphPlans.Clear();
+            _accumAdvanceX = 0;
         }
-        public void Append(GlyphPlan g)
+        public void Append(GlyphPlan glyphPlan)
         {
-            _glyphPlans.Add(g);
+            _glyphPlans.Add(glyphPlan);
+            _accumAdvanceX += glyphPlan.AdvanceX;
         }
+        public float AccumAdvanceX { get { return _accumAdvanceX; } }
+
         public GlyphPlan this[int index]
         {
             get
@@ -61,8 +67,10 @@ namespace Typography.TextLayout
                 return _glyphPlans.Count;
             }
         }
-    }
 
+
+
+    }
     public enum PositionTechnique
     {
         None,
@@ -144,10 +152,7 @@ namespace Typography.TextLayout
             EnableLigature = true;
             EnableComposition = true;
             ScriptLang = ScriptLangs.Latin;
-            FontSizeInPoints = 14;//default
-            UsePxScaleOnReadOutput = true;
         }
-
 
         public float FontSizeInPoints { get; set; }
         public float PixelScale
@@ -172,6 +177,10 @@ namespace Typography.TextLayout
                 _scriptLang = value;
             }
         }
+        /// <summary>
+        /// when read output, please scale to pixel unitd
+        /// </summary>
+        public bool UsePxScaleOnReadOutput { get; set; }
 
         public bool EnableLigature { get; set; }
         public bool EnableComposition { get; set; }
@@ -195,10 +204,6 @@ namespace Typography.TextLayout
                 _pxscaleLayout = value;
             }
         }
-        /// <summary>
-        /// when read output, please scale to pixel unitd
-        /// </summary>
-        public bool UsePxScaleOnReadOutput { get; set; }
 
         /// <summary>
         /// reusable codepoint list buffer
@@ -249,8 +254,7 @@ namespace Typography.TextLayout
             _inputGlyphs.Clear();
 
             // convert codepoints to input glyphs
-            int countpoints_count = _codepoints.Count;
-            for (int i = 0; i < countpoints_count; ++i)
+            for (int i = 0; i < _codepoints.Count; ++i)
             {
                 int codepoint = _codepoints[i];
                 ushort glyphIndex = _typeface.LookupIndex(codepoint);
@@ -311,7 +315,6 @@ namespace Typography.TextLayout
 
         }
 
-
         void UpdateLayoutPlan()
         {
             GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(this._typeface, this._scriptLang);
@@ -362,7 +365,6 @@ namespace Typography.TextLayout
             GlyphPosStream glyphPositions = glyphLayout._glyphPositions; //from opentype's layout result, 
             int finalGlyphCount = glyphPositions.Count;
             //------------------------ 
-
             if (!glyphLayout.UsePxScaleOnReadOutput)
             {
                 //use original size, design unit
@@ -484,11 +486,11 @@ namespace Typography.TextLayout
                   char[] textBuffer,
                   int startAt,
                   int len,
-                  GlyphPlanList userGlyphPlanList,
+                  GlyphPlanList outputGlyphPlanList,
                   List<UserCharToGlyphIndexMap> charToGlyphMapList)
         {
             //generate glyph plan based on its current setting
-            glyphLayout.Layout(textBuffer, startAt, len, userGlyphPlanList);
+            glyphLayout.Layout(textBuffer, startAt, len, outputGlyphPlanList);
             //note that we print to userGlyphPlanList
             //---------------- 
             //3. user char to glyph index map
@@ -512,23 +514,38 @@ namespace Typography.TextLayout
             //
             int j = outputGlyphPlans.Count;
             Typeface currentTypeface = glyphLayout.Typeface;
-
             if (j == 0)
             {
                 //not scale
+
                 strBox = new MeasuredStringBox(0,
                     currentTypeface.Ascender * scale,
                     currentTypeface.Descender * scale,
-                    currentTypeface.LineGap * scale);
+                    currentTypeface.LineGap * scale,
+                    Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(currentTypeface) * scale);
 
             }
             else
             {
-                GlyphPlan lastOne = outputGlyphPlans[j - 1];
-                strBox = new MeasuredStringBox((lastOne.ExactRight) * scale,
+                //TEST, 
+                //if you want to snap each glyph to grid (1px or 0.5px) by ROUNDING
+                //we can do it here,this produces a predictable caret position result
+                //
+
+                int accumW = 0;
+                for (int i = 0; i < j; ++i)
+                {
+                    GlyphPlan glyphPlan = outputGlyphPlans[i];
+                    float scaleW = glyphPlan.AdvanceX * scale;
+                    //select proper integer version
+                    accumW += (int)Math.Round(scaleW);
+                }
+
+                strBox = new MeasuredStringBox(accumW,
                         currentTypeface.Ascender * scale,
                         currentTypeface.Descender * scale,
-                        currentTypeface.LineGap * scale);
+                        currentTypeface.LineGap * scale,
+                        Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(currentTypeface) * scale);
             }
         }
     }
