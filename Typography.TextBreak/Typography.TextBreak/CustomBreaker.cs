@@ -17,7 +17,7 @@ namespace Typography.TextBreak
         List<BreakingEngine> otherEngines = new List<BreakingEngine>();
 
         WordVisitor visitor;
-        int textLength;
+        int _endAt;
 
         public CustomBreaker()
         {
@@ -58,10 +58,10 @@ namespace Typography.TextBreak
             int j = charBuff.Length;
             if (j < 1)
             {
-                textLength = 0;
+                _endAt = 0;
                 return;
             }
-            textLength = j;
+            _endAt = startAt + len;
             visitor.LoadText(charBuff, startAt);
             //---------------------------------------- 
             BreakingEngine currentEngine = breakingEngine = SelectEngine(charBuff[startAt]);
@@ -134,11 +134,11 @@ namespace Typography.TextBreak
                 yield return sp;
             }
             //-------------------
-            if (c_index < textLength)
+            if (c_index < _endAt)
             {
                 BreakSpan sp = new BreakSpan();
                 sp.startAt = c_index;
-                sp.len = (ushort)(textLength - c_index);
+                sp.len = (ushort)(_endAt - c_index);
                 yield return sp;
             }
         }
