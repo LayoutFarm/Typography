@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
-using Typography.Contours; 
+using Typography.Contours;
 
 namespace DrawingGL.Text
 {
@@ -18,7 +18,7 @@ namespace DrawingGL.Text
 
 
         readonly GlyphLayout glyphLayout = new GlyphLayout();
-        readonly List<GlyphPlan> outputGlyphPlans = new List<GlyphPlan>();
+        readonly GlyphPlanList outputGlyphPlans = new GlyphPlanList();
         GlyphTranslatorToPath pathTranslator;
         string currentFontFile;
         GlyphPathBuilder currentGlyphPathBuilder;

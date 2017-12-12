@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 // 
-using Typography.TextLayout; 
+using Typography.TextLayout;
 using Typography.Contours;
 using Typography.TextServices;
 
@@ -53,7 +53,7 @@ namespace SampleWinForms
             installedFontCollection = new InstalledFontCollection();
             //2. set some essential handler
             installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-             
+
             installedFontCollection.LoadFontsFromFolder("../../../TestFonts_Err");
             installedFontCollection.LoadFontsFromFolder("../../../TestFonts");
             //installedFontCollection.LoadSystemFonts();
@@ -266,7 +266,7 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-            List<GlyphPlan> userGlyphPlans = new List<GlyphPlan>();
+            GlyphPlanList userGlyphPlans = new GlyphPlanList();
 
             _currentTextPrinter.GlyphLayoutMan.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
             //2.2

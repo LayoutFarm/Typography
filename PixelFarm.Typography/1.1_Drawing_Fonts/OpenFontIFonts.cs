@@ -14,7 +14,7 @@ namespace LayoutFarm
 
         TypefaceStore typefaceStore;
         GlyphLayout glyphLayout;
-        List<GlyphPlan> userGlyphPlanList;
+        GlyphPlanList userGlyphPlanList;
         List<UserCharToGlyphIndexMap> userCharToGlyphMapList;
 
         public OpenFontIFonts()
@@ -23,7 +23,7 @@ namespace LayoutFarm
             typefaceStore = new TypefaceStore();
             typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(null);
             glyphLayout = new GlyphLayout(); //create glyph layout with default value
-            userGlyphPlanList = new List<GlyphPlan>();
+            userGlyphPlanList = new GlyphPlanList();
             userCharToGlyphMapList = new List<UserCharToGlyphIndexMap>();
         }
         public void CalculateGlyphAdvancePos(char[] str, int startAt, int len, RequestFont font, int[] glyphXAdvances)

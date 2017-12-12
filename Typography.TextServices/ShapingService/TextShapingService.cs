@@ -161,13 +161,13 @@ namespace Typography.TextServices
         {
             _typeface = typeface;
             _scLang = scLang;
-            _glyphPlanBuffer = new GlyphPlanBuffer(new List<GlyphPlan>());
+            _glyphPlanBuffer = new GlyphPlanBuffer(new GlyphPlanList());
             _glyphPlanSeqSet = new GlyphPlanSeqSet();
 
         }
         GlyphPlanSequence CreateGlyphPlanSeq(GlyphLayout glyphLayout, TextBuffer buffer, int startAt, int len)
         {
-            List<GlyphPlan> planList = GlyphPlanBuffer.UnsafeGetGlyphPlanList(_glyphPlanBuffer);
+            GlyphPlanList planList = GlyphPlanBuffer.UnsafeGetGlyphPlanList(_glyphPlanBuffer);
             int pre_count = planList.Count;
             glyphLayout.Typeface = _typeface;
             glyphLayout.ScriptLang = _scLang;

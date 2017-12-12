@@ -11,14 +11,14 @@ using Typography.TextLayout;
 
 
 namespace Typography.Contours
-{   
+{
     public struct GlyphControlParameters
     {
         public float avgXOffsetToFit;
         public short minX;
         public short minY;
         public short maxX;
-        public short maxY; 
+        public short maxY;
     }
     class GlyphMeshStore
     {
@@ -342,7 +342,7 @@ namespace Typography.Contours
 
 
 
-        void LayoutWithoutHorizontalFitAlign(IGlyphPositions posStream, List<GlyphPlan> outputGlyphPlanList)
+        void LayoutWithoutHorizontalFitAlign(IGlyphPositions posStream, GlyphPlanList outputGlyphPlanList)
         {
             //the default OpenFont layout without fit-to-writing alignment
             int finalGlyphCount = posStream.Count;
@@ -359,7 +359,7 @@ namespace Typography.Contours
                 float exact_x = (float)(cx + offsetX * pxscale);
                 float exact_y = (float)(cy + offsetY * pxscale);
 
-                outputGlyphPlanList.Add(new GlyphPlan(
+                outputGlyphPlanList.Append(new GlyphPlan(
                    glyphIndex,
                     exact_x,
                     exact_y,
@@ -368,7 +368,7 @@ namespace Typography.Contours
             }
         }
 
-        public void Layout(IGlyphPositions posStream, List<GlyphPlan> outputGlyphPlanList)
+        public void Layout(IGlyphPositions posStream, GlyphPlanList outputGlyphPlanList)
         {
 
             if (!UseWithLcdSubPixelRenderingTechnique)
@@ -469,7 +469,7 @@ namespace Typography.Contours
                     final_x += 0.33f;
                 }
 
-                outputGlyphPlanList.Add(new GlyphPlan(
+                outputGlyphPlanList.Append(new GlyphPlan(
                     glyphIndex,
                     final_x,
                     exact_y,

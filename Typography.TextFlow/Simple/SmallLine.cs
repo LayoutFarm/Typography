@@ -10,7 +10,7 @@ namespace Typography.TextLayout
         int _caretCharIndex = 0;//default  
         //TODO: temp public, review accessibility here again
         public List<char> _charBuffer = new List<char>();
-        public List<GlyphPlan> _glyphPlans = new List<GlyphPlan>();
+        public GlyphPlanList _glyphPlans = new GlyphPlanList();
         public List<UserCharToGlyphIndexMap> _userCharToGlyphMap = new List<UserCharToGlyphIndexMap>();
 
         bool _contentChanged = true;

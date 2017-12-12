@@ -113,7 +113,7 @@ namespace Typography.TextLayout
 
             int lineCount = _lines.Count;
 
-            List<GlyphPlan> outputGlyphPlan = new List<GlyphPlan>();
+            GlyphPlanList outputGlyphPlan = new GlyphPlanList();
             GlyphPlanBuffer glyphPlanBuffer = new GlyphPlanBuffer(outputGlyphPlan);
             Typeface selectedTypeface = this.DefaultTypeface;
 

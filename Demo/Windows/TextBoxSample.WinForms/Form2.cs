@@ -279,7 +279,7 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-            List<GlyphPlan> userGlyphPlans = new List<GlyphPlan>();
+            GlyphPlanList userGlyphPlans = new GlyphPlanList();
 
             _currentTextPrinter.GlyphLayoutMan.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
             //2.2

@@ -68,7 +68,7 @@ namespace Typography.Contours
         /// <param name="glyphPlanList"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public abstract void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float x, float y);
+        public abstract void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, int startAt, int len, float x, float y);
 
         /// <summary>
         /// draw caret at xpos,ypos (sample only)
@@ -84,7 +84,7 @@ namespace Typography.Contours
         {
             DrawString(textBuffer, 0, textBuffer.Length, x, y);
         }
-        public void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, float x, float y)
+        public void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, float x, float y)
         {
             DrawFromGlyphPlans(glyphPlanList, 0, glyphPlanList.Count, x, y);
         }
