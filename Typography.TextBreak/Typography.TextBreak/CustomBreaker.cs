@@ -52,20 +52,27 @@ namespace Typography.TextBreak
                 return engBreakingEngine;
             }
         }
-        public void BreakWords(char[] charBuff, int startAt)
+        public void BreakWords(char[] charBuff, int startAt, int len)
         {
             //conver to char buffer 
             int j = charBuff.Length;
+            if (j < 1)
+            {
+                textLength = 0;
+                return;
+            }
             textLength = j;
-            visitor.LoadText(charBuff, 0);
+            visitor.LoadText(charBuff, startAt);
             //---------------------------------------- 
             BreakingEngine currentEngine = breakingEngine = SelectEngine(charBuff[startAt]);
             //----------------------------------------
             //select breaking engine
+            int endAt = startAt + len;
+
             for (; ; )
             {
-                 
-                currentEngine.BreakWord(visitor, charBuff, startAt, charBuff.Length - startAt);
+                //----------------------------------------
+                currentEngine.BreakWord(visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
                 switch (visitor.State)
                 {
                     default: throw new NotSupportedException();
@@ -95,7 +102,9 @@ namespace Typography.TextBreak
 
         public void BreakWords(string inputstr)
         {
-            BreakWords(inputstr.ToCharArray(), 0);
+            //TODO: review here
+            char[] buffer = inputstr.ToCharArray();
+            BreakWords(buffer, 0, inputstr.Length); //all
         }
         public void LoadBreakAtList(List<int> outputList)
         {

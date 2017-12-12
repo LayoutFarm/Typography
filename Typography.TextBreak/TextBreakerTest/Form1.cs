@@ -92,7 +92,7 @@ namespace TextBreakerTest
             this.listBox1.Items.Clear();
 
 
-            breaker1.BreakWords(test, 0);
+            breaker1.BreakWords(test, 0, test.Length);
             foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             {
                 string s = new string(test, span.startAt, span.len);
@@ -135,7 +135,7 @@ namespace TextBreakerTest
             //-------------
             for (int i = ntimes - 1; i >= 0; --i)
             {
-                breaker1.BreakWords(test, 0);
+                breaker1.BreakWords(test, 0, test.Length);
                 foreach (var span in breaker1.GetBreakSpanIter())
                 {
 
