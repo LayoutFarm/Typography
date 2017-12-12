@@ -196,9 +196,9 @@ namespace Typography.TextBreak
             {
                 //some remaining data
                 breakBounds.length = (start + len) - breakBounds.startIndex;
-                onbreak(breakBounds);
-                visitor.State = VisitorState.End;
+                onbreak(breakBounds);             
             }
+            visitor.State = VisitorState.End;
         }
     }
 }
