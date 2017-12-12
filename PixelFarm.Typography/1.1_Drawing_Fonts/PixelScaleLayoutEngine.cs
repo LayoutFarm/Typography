@@ -359,11 +359,17 @@ namespace Typography.Contours
                 float exact_x = (float)(cx + offsetX * pxscale);
                 float exact_y = (float)(cy + offsetY * pxscale);
 
+                //outputGlyphPlanList.Append(new GlyphPlan(
+                //   glyphIndex,
+                //    exact_x,
+                //    exact_y,
+                //    advW)); //old?
                 outputGlyphPlanList.Append(new GlyphPlan(
                    glyphIndex,
                     exact_x,
                     exact_y,
-                    advW));
+                    s_advW));
+
                 cx += s_advW;
             }
         }
