@@ -494,7 +494,11 @@ namespace Typography.OpenFont
                     }
                 }
             }
-
+            public static int CalculateRecommendLineSpacing(this Typeface typeface)
+            {
+                LineSpacingChoice selectedChoice;
+                return CalculateRecommendLineSpacing(typeface, out selectedChoice);
+            }
 
 
             public static int CalculateLineSpacing(this Typeface typeface, LineSpacingChoice choice)
@@ -517,7 +521,7 @@ namespace Typography.OpenFont
             TypoMetric,
             Windows,
             Mac
-        } 
+        }
         public enum CurrentOSName
         {
             None,//not evaluate yet
@@ -529,6 +533,6 @@ namespace Typography.OpenFont
         public static class CurrentEnv
         {
             public static CurrentOSName CurrentOSName;
-        } 
+        }
     }
 }
