@@ -99,6 +99,8 @@ namespace Typography.TextLayout
             GlyphLayoutPlanContext context;
             if (!collection.TryGetValue(key, out context))
             {
+                //create substitution manager and glyph-set-position manager
+                //for each script lang and cache it.
                 var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.shortname) : null;
                 var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
                 collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
