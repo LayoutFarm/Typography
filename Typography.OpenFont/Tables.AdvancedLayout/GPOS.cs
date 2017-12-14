@@ -647,7 +647,7 @@ namespace Typography.OpenFont.Tables
                                     inputGlyphs.AppendGlyphOffset(
                                          i,
                                          (short)(offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
-                                         mark1Anchor.ycoord);
+                                         (short)(offset_y + mark2BaseAnchor.ycoord - mark1Anchor.ycoord));
                                 }
                             }
                         }
