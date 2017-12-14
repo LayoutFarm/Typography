@@ -11,7 +11,7 @@ namespace Typography.TextLayout
     /// </summary>
     class GlyphSubstitution
     {
-        public GlyphSubstitution(Typeface typeface, string lang = "DFLT")
+        public GlyphSubstitution(Typeface typeface, string lang)
         {
             _language = lang;
             _typeface = typeface;
@@ -39,11 +39,9 @@ namespace Typography.TextLayout
                 }
             }
         }
-
         public string Lang
         {
             get { return _language; }
-            set { _language = value; _mustRebuildTables = true; }
         }
 
         /// <summary>
@@ -52,7 +50,11 @@ namespace Typography.TextLayout
         public bool EnableLigation
         {
             get { return _enableLigation; }
-            set { _enableLigation = value; _mustRebuildTables = true; }
+            set
+            {
+                _mustRebuildTables = value != _enableLigation;//test change before accept value
+                _enableLigation = value;
+            }
         }
 
         /// <summary>
@@ -61,10 +63,14 @@ namespace Typography.TextLayout
         public bool EnableComposition
         {
             get { return _enableComposition; }
-            set { _enableComposition = value; _mustRebuildTables = true; }
+            set
+            {
+                _mustRebuildTables = value != _enableComposition;//test change before accept value
+                _enableComposition = value;
+            }
         }
 
-        private string _language;
+        private readonly string _language;
         private bool _enableLigation = true; // enable by default
         private bool _enableComposition = true;
 
@@ -82,6 +88,7 @@ namespace Typography.TextLayout
             ScriptTable scriptTable = gsubTable.ScriptList[_language];
             if (scriptTable == null)
             {
+                //no script table for request lang-> no lookup process here
                 return;
             }
 
@@ -106,15 +113,15 @@ namespace Typography.TextLayout
                 return;
             }
 
-            // Enumerate features we want and add the corresponding lookup tables
-            foreach (int featureIndex in selectedLang.featureIndexList)
+            //(one lang may has many features)
+            //Enumerate features we want and add the corresponding lookup tables
+            foreach (ushort featureIndex in selectedLang.featureIndexList)
             {
                 FeatureList.FeatureTable feature = gsubTable.FeatureList.featureTables[featureIndex];
                 bool featureIsNeeded = false;
                 switch (feature.TagName)
                 {
-                    case "ccmp": // glyph composition/decomposition
-                                 // this version we implement ccmp
+                    case "ccmp": // glyph composition/decomposition 
                         featureIsNeeded = EnableComposition;
                         break;
                     case "liga": // Standard Ligatures --enable by default

@@ -138,7 +138,22 @@ namespace Typography.OpenFont.Tables
 
             //A Mark Attachment Class Definition Table defines the class to which a mark glyph may belong.
             //This table uses the same format as the Class Definition table (for details, see the chapter, Common Table Formats ).
+
+
+#if DEBUG
+            if (markAttachClassDefOffset == 2)
+            {
+                //temp debug invalid font                
+                this.MarkAttachmentClassDef = (markAttachClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, reader.BaseStream.Position);
+            }
+            else
+            {
+                this.MarkAttachmentClassDef = (markAttachClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, tableStartAt + markAttachClassDefOffset);
+            }
+#else
             this.MarkAttachmentClassDef = (markAttachClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, tableStartAt + markAttachClassDefOffset);
+#endif
+
             this.MarkGlyphSetsTable = (markGlyphSetsDefOffset == 0) ? null : MarkGlyphSetsTable.CreateFrom(reader, tableStartAt + markGlyphSetsDefOffset);
 
             if (itemVarStoreOffset != 0)
