@@ -377,6 +377,7 @@ namespace Typography.OpenFont.Tables
                     int iscovered = this.CoverageTable.FindPosition(glyphIndices[pos]);
                     //this.CoverageTable.FindPosition()
                     // Console.WriteLine("lksubtable3 is not  implemented");
+                    Utils.WarnUnimplemented("Lookup Subtable Type 3");
                     return false;
                 }
             }
