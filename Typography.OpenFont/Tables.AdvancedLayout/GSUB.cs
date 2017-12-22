@@ -32,7 +32,7 @@ namespace Typography.OpenFont.Tables
     ////////////////////////////////////////////////////////////////
 
     public class GSUB : GlyphShapingTableEntry
-    {   
+    {
         public override string Name { get { return "GSUB"; } }
 
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
@@ -59,17 +59,25 @@ namespace Typography.OpenFont.Tables
         public IList<LookupTable> LookupList { get { return _lookupList; } }
 
 
-
-
-
-        //----------------------------------------------------------------------------------------
+        //--------------------------
         /// <summary>
         /// base class of lookup sub table
         /// </summary>
         public abstract class LookupSubTable
         {
-            public abstract bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len);
             public GSUB OwnerGSub;
+
+            public abstract bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len);
+
+            //collect all substitution glyphs
+            //
+            //if we lookup glyph index from the unicode char
+            // (eg. building pre-built glyph texture)
+            //we may miss some glyph that is needed for substitution process.
+            //                
+            //so, we collect it here, based on current script lang.
+            public abstract void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs);
+
         }
 
         /// <summary>
@@ -81,8 +89,11 @@ namespace Typography.OpenFont.Tables
             {
                 return false;
             }
+            public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+            {
+                Utils.WarnUnimplemented("collect-assoc-sub-glyph: " + this.ToString());
+            }
         }
-
 
 
 
@@ -119,6 +130,22 @@ namespace Typography.OpenFont.Tables
                         return true;
                 }
                 return false;
+            }
+
+            public void CollectAssociatedSubstitutionGlyph(List<ushort> outputAssocGlyphs)
+            {
+
+                //collect all substitution glyphs
+                //
+                //if we lookup glyph index from the unicode char
+                // (eg. building pre-built glyph texture)
+                //we may miss some glyph that is needed for substitution process.
+                //                
+                //so, we collect it here, based on current script lang.
+                foreach (LookupSubTable subTable in SubTables)
+                {
+                    subTable.CollectAssociatedSubtitutionGlyphs(outputAssocGlyphs);
+                }
             }
 #if DEBUG
             public override string ToString()
@@ -163,12 +190,22 @@ namespace Typography.OpenFont.Tables
 
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
                 {
-                    if (CoverageTable.FindPosition(glyphIndices[pos]) > -1)
+                    ushort glyphIndex = glyphIndices[pos];
+                    if (CoverageTable.FindPosition(glyphIndex) > -1)
                     {
-                        glyphIndices.Replace(pos, (ushort)(glyphIndices[pos] + DeltaGlyph));
+                        glyphIndices.Replace(pos, (ushort)(glyphIndex + DeltaGlyph));
                         return true;
                     }
                     return false;
+                }
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    //1. iterate glyphs from CoverageTable                    
+                    foreach (ushort glyphIndex in CoverageTable.GetExpandedValueIter())
+                    {
+                        //2. add substitution glyph
+                        outputAssocGlyphs.Add((ushort)(glyphIndex + DeltaGlyph));
+                    }
                 }
             }
             /// <summary>
@@ -196,6 +233,17 @@ namespace Typography.OpenFont.Tables
                     }
                     return false;
                 }
+
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    foreach (ushort glyphIndex in CoverageTable.GetExpandedValueIter())
+                    {
+                        //2. add substitution glyph
+                        int foundAt = CoverageTable.FindPosition(glyphIndex);
+                        outputAssocGlyphs.Add((ushort)(glyphIndex + SubstituteGlyphs[foundAt]));
+                    }
+                }
+
             }
 
 
@@ -289,11 +337,27 @@ namespace Typography.OpenFont.Tables
                     {
                         SequenceTable seqTable = SeqTables[foundPos];
                         //replace current glyph index with new seq
+#if DEBUG
                         int new_seqCount = seqTable.substituteGlyphs.Length;
+#endif
                         glyphIndices.Replace(pos, seqTable.substituteGlyphs);
                         return true;
                     }
                     return false;
+                }
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    foreach (ushort glyphIndex in CoverageTable.GetExpandedValueIter())
+                    {
+                        int pos = CoverageTable.FindPosition(glyphIndex);
+#if DEBUG
+                        if (pos >= SeqTables.Length)
+                        {
+
+                        }
+#endif
+                        outputAssocGlyphs.AddRange(SeqTables[pos].substituteGlyphs);
+                    }
                 }
             }
             struct SequenceTable
@@ -376,9 +440,12 @@ namespace Typography.OpenFont.Tables
                     //Coverage table containing the indices of glyphs with alternative forms(Coverage),
                     int iscovered = this.CoverageTable.FindPosition(glyphIndices[pos]);
                     //this.CoverageTable.FindPosition()
-                    // Console.WriteLine("lksubtable3 is not  implemented");
                     Utils.WarnUnimplemented("Lookup Subtable Type 3");
                     return false;
+                }
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    Utils.WarnUnimplementedCollectAssocGlyphs(this.ToString());
                 }
             }
             /// <summary>
@@ -504,6 +571,18 @@ namespace Typography.OpenFont.Tables
                         }
                     }
                     return false;
+                }
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    foreach (ushort glyphIndex in CoverageTable.GetExpandedValueIter())
+                    {
+                        int foundPos = CoverageTable.FindPosition(glyphIndex);
+                        LigatureSetTable ligTable = LigatureSetTables[foundPos];
+                        foreach (LigatureTable lig in ligTable.Ligatures)
+                        {
+                            outputAssocGlyphs.Add(lig.GlyphId);
+                        }
+                    }
                 }
             }
             class LigatureSetTable
@@ -887,6 +966,10 @@ namespace Typography.OpenFont.Tables
                     Utils.WarnUnimplemented("Lookup Subtable Type 6 Format 1");
                     return false;
                 }
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    Utils.WarnUnimplementedCollectAssocGlyphs(this.ToString());
+                }
             }
 
             class LkSubTableT6Fmt2 : LookupSubTable
@@ -900,6 +983,10 @@ namespace Typography.OpenFont.Tables
                 {
                     Utils.WarnUnimplemented("Lookup Subtable Type 6 Format 2");
                     return false;
+                }
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    Utils.WarnUnimplementedCollectAssocGlyphs(this.ToString());
                 }
             }
 
@@ -961,6 +1048,17 @@ namespace Typography.OpenFont.Tables
                     }
 
                     return hasChanged;
+                }
+                public override void CollectAssociatedSubtitutionGlyphs(List<ushort> outputAssocGlyphs)
+                {
+                    foreach (SubstLookupRecord lookupRecord in SubstLookupRecords)
+                    {
+                        ushort replaceAt = lookupRecord.sequenceIndex;
+                        ushort lookupIndex = lookupRecord.lookupListIndex;
+
+                        LookupTable anotherLookup = OwnerGSub.LookupList[lookupIndex];
+                        anotherLookup.CollectAssociatedSubstitutionGlyph(outputAssocGlyphs);
+                    }
                 }
             }
 
