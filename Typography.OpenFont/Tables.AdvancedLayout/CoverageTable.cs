@@ -148,7 +148,7 @@ namespace Typography.OpenFont.Tables
 
         public static CoverageTable[] CreateMultipleCoverageTables(long initPos, ushort[] offsets, BinaryReader reader)
         {
-            List<CoverageTable> results = new List<CoverageTable>();
+            List<CoverageTable> results = new List<CoverageTable>(offsets.Length);
             foreach (ushort offset in offsets)
             {
                 results.Add(CoverageTable.CreateFrom(reader, initPos + offset));
