@@ -425,6 +425,9 @@ namespace Typography.OpenFont
         static Dictionary<string, ScriptLang> s_registerScriptFromFullNames = new Dictionary<string, ScriptLang>();
         static SortedList<int, UnicodeRangeMapWithScriptLang> s_unicodeLangToScriptLang = new SortedList<int, UnicodeRangeMapWithScriptLang>();
 
+
+        static Dictionary<string, UnicodeLangBits[]> s_registeredScriptTagsToUnicodeLangBits = new Dictionary<string, UnicodeLangBits[]>();
+
         struct UnicodeRangeMapWithScriptLang
         {
             public readonly ScriptLang scLang;
@@ -675,11 +678,21 @@ namespace Typography.OpenFont
 
                     }
                 }
+
+
+                if (langBits.Length > 0)
+                {
+                    s_registeredScriptTagsToUnicodeLangBits.Add(shortname, langBits);
+                }
+
+
                 return scriptLang;
             }
-
         }
-
+        public static bool TryGenUnicodeLangBitsArray(string langShortName, out UnicodeLangBits[] unicodeLangBits)
+        {
+            return s_registeredScriptTagsToUnicodeLangBits.TryGetValue(langShortName, out unicodeLangBits);
+        }
         public static bool TryGetScriptLang(char c, out ScriptLang scLang)
         {
             foreach (var kp in s_unicodeLangToScriptLang)
@@ -702,9 +715,8 @@ namespace Typography.OpenFont
 
             scLang = null;
             return false;
-
-
         }
+        
         public static ScriptLang GetRegisteredScriptLang(string shortname)
         {
             ScriptLang found;

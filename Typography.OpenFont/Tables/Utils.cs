@@ -75,10 +75,16 @@ namespace Typography.OpenFont
         public static void WarnUnimplemented(string format, params object[] args)
         {
 #if DEBUG
-            Console.WriteLine("!STUB! " + format, args);
+            System.Diagnostics.Debug.WriteLine("!STUB! " + string.Format(format, args));
 #endif
         }
 
+        internal static void WarnUnimplementedCollectAssocGlyphs(string msg)
+        {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine("!STUB! UnimplementedCollectAssocGlyph :" + msg);
+#endif
+        }
 #if DEBUG
         public static bool dbugIsDiff(GlyphPointF[] set1, GlyphPointF[] set2)
         {

@@ -37,27 +37,5 @@ namespace Typography.OpenFont.Tables
         /// <param name="newGlyphIndices"></param>
         void Replace(int index, ushort[] newGlyphIndices);
     }
-
-    partial class GSUB
-    {
-        /// <summary>
-        /// base class of lookup sub table
-        /// </summary>
-        public abstract class LookupSubTable
-        {
-            public abstract bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len);
-            public GSUB OwnerGSub;
-        }
-
-        /// <summary>
-        /// Empty lookup sub table for unimplemented formats
-        /// </summary>
-        public class NullLookupSubTable : LookupSubTable
-        {
-            public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
-            {
-                return false;
-            }
-        }
-    }
+ 
 }

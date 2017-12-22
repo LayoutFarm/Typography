@@ -342,6 +342,7 @@ namespace Typography.OpenFont
                     throw new System.NotSupportedException();
                 }
             }
+
             public static bool RecommendToUseTypoMetricsForLineSpacing(this Typeface typeface)
             {
                 //https://www.microsoft.com/typography/otspec/os2.htm
@@ -387,6 +388,9 @@ namespace Typography.OpenFont
                 //sTypoAscender, sTypoDescender and sTypoLineGap specify the recommended line spacing for single-spaced horizontal text.
                 //The baseline-to-baseline value is expressed by:
                 //OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap
+ 
+       
+ 
 
                 //sTypoLineGap will usually be set by the font developer such that the value of the above expression is approximately 120% of the em.
                 //The application can use this value as the default horizontal line spacing. 

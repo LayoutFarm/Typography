@@ -572,7 +572,5 @@ namespace Typography.OpenFont.Tables
             this.usLowerOpticalPointSize = reader.ReadUInt16();
             this.usUpperOpticalPointSize = reader.ReadUInt16();
         }
-    }
-
-
+    } 
 }

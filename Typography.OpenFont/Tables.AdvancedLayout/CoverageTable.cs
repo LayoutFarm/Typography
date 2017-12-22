@@ -9,11 +9,11 @@ namespace Typography.OpenFont.Tables
     abstract class CoverageTable
     {
         public abstract int FindPosition(ushort glyphIndex);
+        public abstract IEnumerable<ushort> GetExpandedValueIter();
 
 #if DEBUG
-        public abstract IEnumerable<ushort> dbugGetExpandedGlyphs();
-#endif
 
+#endif
         public class CoverageFmt1 : CoverageTable
         {
             public static CoverageFmt1 CreateFrom(BinaryReader reader)
@@ -36,9 +36,9 @@ namespace Typography.OpenFont.Tables
                 int n = Array.BinarySearch(_orderedGlyphIdList, glyphIndex);
                 return n < 0 ? -1 : n;
             }
+            public override IEnumerable<ushort> GetExpandedValueIter() { return _orderedGlyphIdList; }
 
 #if DEBUG
-            public override IEnumerable<ushort> dbugGetExpandedGlyphs() { return _orderedGlyphIdList; }
 
             public override string ToString()
             {
@@ -71,6 +71,16 @@ namespace Typography.OpenFont.Tables
                 return _coverageIndices[n] + glyphIndex - _startIndices[n];
             }
 
+            public override IEnumerable<ushort> GetExpandedValueIter()
+            {
+                for (int i = 0; i < RangeCount; ++i)
+                {
+                    for (ushort n = _startIndices[i]; n <= _endIndices[i]; ++n)
+                    {
+                        yield return n;
+                    }
+                }
+            }
             public static CoverageFmt2 CreateFrom(BinaryReader reader)
             {
                 // CoverageFormat2 table: Range of glyphs
@@ -105,16 +115,6 @@ namespace Typography.OpenFont.Tables
             }
 
 #if DEBUG
-            public override IEnumerable<ushort> dbugGetExpandedGlyphs()
-            {
-                for (int i = 0; i < RangeCount; ++i)
-                {
-                    for (ushort n = _startIndices[i]; n <= _endIndices[i]; ++n)
-                    {
-                        yield return n;
-                    }
-                }
-            }
 
             public override string ToString()
             {
@@ -148,7 +148,7 @@ namespace Typography.OpenFont.Tables
 
         public static CoverageTable[] CreateMultipleCoverageTables(long initPos, ushort[] offsets, BinaryReader reader)
         {
-            List<CoverageTable> results = new List<CoverageTable>();
+            List<CoverageTable> results = new List<CoverageTable>(offsets.Length);
             foreach (ushort offset in offsets)
             {
                 results.Add(CoverageTable.CreateFrom(reader, initPos + offset));
