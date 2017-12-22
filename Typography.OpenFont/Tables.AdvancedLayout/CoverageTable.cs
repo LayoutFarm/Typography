@@ -9,10 +9,7 @@ namespace Typography.OpenFont.Tables
     abstract class CoverageTable
     {
         public abstract int FindPosition(ushort glyphIndex);
-
-#if DEBUG
-        public abstract IEnumerable<ushort> dbugGetExpandedGlyphs();
-#endif
+        public abstract IEnumerable<ushort> GetCoveredValueIter();
 
         public class CoverageFmt1 : CoverageTable
         {
@@ -36,9 +33,9 @@ namespace Typography.OpenFont.Tables
                 int n = Array.BinarySearch(_orderedGlyphIdList, glyphIndex);
                 return n < 0 ? -1 : n;
             }
-
+            public override IEnumerable<ushort> GetCoveredValueIter() { return _orderedGlyphIdList; }
 #if DEBUG
-            public override IEnumerable<ushort> dbugGetExpandedGlyphs() { return _orderedGlyphIdList; }
+
 
             public override string ToString()
             {
@@ -103,9 +100,7 @@ namespace Typography.OpenFont.Tables
                     _coverageIndices = coverageIndices
                 };
             }
-
-#if DEBUG
-            public override IEnumerable<ushort> dbugGetExpandedGlyphs()
+            public override IEnumerable<ushort> GetCoveredValueIter()
             {
                 for (int i = 0; i < RangeCount; ++i)
                 {
@@ -115,6 +110,8 @@ namespace Typography.OpenFont.Tables
                     }
                 }
             }
+#if DEBUG
+
 
             public override string ToString()
             {
