@@ -95,8 +95,8 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\GSUB.cs">
       <Link>Tables.AdvanceLayout\GSUB.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\GSUB.SubTables.cs">
-      <Link>Tables.AdvanceLayout\GSUB.SubTables.cs</Link>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\IGlyphIndexList.cs">
+      <Link>Tables.AdvanceLayout\IGlyphIndexList.cs</Link>
     </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.AdvancedLayout\JustificationTable.cs">
       <Link>Tables.AdvanceLayout\JustificationTable.cs</Link>
