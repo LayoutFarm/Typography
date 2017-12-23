@@ -159,10 +159,10 @@ namespace Typography.TextLayout
             }
             //-------------
             //add some glyphs that also need by substitution process 
-            List<ushort> assocSubtitutionGlyphs = new List<ushort>();
+           
             foreach (GSUB.LookupTable subLk in _lookupTables)
             {
-                subLk.CollectAssociatedSubstitutionGlyph(assocSubtitutionGlyphs);
+                subLk.CollectAssociatedSubstitutionGlyph(outputGlyphIndices);
             }
             //
             //WARN :not ensure glyph unique at this stage
