@@ -240,7 +240,7 @@ namespace Typography.OpenFont.Tables
                     {
                         //2. add substitution glyph
                         int foundAt = CoverageTable.FindPosition(glyphIndex);
-                        outputAssocGlyphs.Add((ushort)(glyphIndex + SubstituteGlyphs[foundAt]));
+                        outputAssocGlyphs.Add((ushort)(SubstituteGlyphs[foundAt]));
                     }
                 }
 
