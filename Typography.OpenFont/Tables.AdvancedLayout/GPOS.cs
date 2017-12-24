@@ -44,8 +44,18 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// Subtable for unhandled/unimplemented features
         /// </summary>
-        public class NullLookupSubTable : LookupSubTable
+        public class NotImplementLookupSubTable : LookupSubTable
         {
+            string _msg;
+            public NotImplementLookupSubTable(string message)
+            {
+                this._msg = message;
+                Utils.WarnUnimplemented(message);
+            }
+            public override string ToString()
+            {
+                return _msg;
+            }
             public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
             {
             }
@@ -99,8 +109,7 @@ namespace Typography.OpenFont.Tables
                     case 9: return ReadLookupType9(reader, subTableStartAt);
                 }
 
-                Utils.WarnUnimplemented("GPOS Lookup Type {0}", lookupType);
-                return new NullLookupSubTable();
+                return new NotImplementLookupSubTable(string.Format("GPOS Lookup Type {0}", lookupType));
             }
 
             class LkSubTableType1 : LookupSubTable
@@ -327,8 +336,7 @@ namespace Typography.OpenFont.Tables
                 switch (format)
                 {
                     default:
-                        Utils.WarnUnimplemented("GPOS Lookup Table Type 2 Format {0}", format);
-                        return new NullLookupSubTable();
+                        return new NotImplementLookupSubTable(string.Format("GPOS Lookup Table Type 2 Format {0}", format));
                     case 1:
                         {
                             ushort coverage = reader.ReadUInt16();
@@ -369,8 +377,8 @@ namespace Typography.OpenFont.Tables
                                 }
 
                             }
-                            Utils.WarnUnimplemented("GPOS Lookup Table Type 2 Format 2");
-                            return new NullLookupSubTable();
+
+                            return new NotImplementLookupSubTable("GPOS Lookup Table Type 2 Format 2");
                         }
                 }
             }
@@ -382,8 +390,8 @@ namespace Typography.OpenFont.Tables
             static LookupSubTable ReadLookupType3(BinaryReader reader, long subTableStartAt)
             {
                 // TODO: implement this
-                Utils.WarnUnimplemented("GPOS Lookup Table Type 3");
-                return new NullLookupSubTable();
+
+                return new NotImplementLookupSubTable("GPOS Lookup Table Type 3");
             }
 
             /// <summary>
@@ -517,8 +525,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 if (format != 1)
                 {
-                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 4 Format {0}", format);
-                    return new NullLookupSubTable();
+                    return new NotImplementLookupSubTable(string.Format("GPOS Lookup Sub Table Type 4 Format {0}", format));
                 }
                 ushort markCoverageOffset = reader.ReadUInt16(); //offset from
                 ushort baseCoverageOffset = reader.ReadUInt16();
@@ -568,8 +575,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 if (format != 1)
                 {
-                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 5 Format {0}", format);
-                    return new NullLookupSubTable();
+                    return new NotImplementLookupSubTable(string.Format("GPOS Lookup Sub Table Type 5 Format {0}", format));
                 }
                 ushort markCoverageOffset = reader.ReadUInt16(); //from beginning of MarkLigPos subtable
                 ushort ligatureCoverageOffset = reader.ReadUInt16();
@@ -685,8 +691,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 if (format != 1)
                 {
-                    Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 6 Format {0}", format);
-                    return new NullLookupSubTable();
+                    return new NotImplementLookupSubTable(string.Format("GPOS Lookup Sub Table Type 6 Format {0}", format));
                 }
                 ushort mark1CoverageOffset = reader.ReadUInt16();
                 ushort mark2CoverageOffset = reader.ReadUInt16();
@@ -715,8 +720,7 @@ namespace Typography.OpenFont.Tables
                 switch (format)
                 {
                     default:
-                        Utils.WarnUnimplemented("GPOS Lookup Sub Table Type 7 Format {0}", format);
-                        return new NullLookupSubTable();
+                        return new NotImplementLookupSubTable(string.Format("GPOS Lookup Sub Table Type 7 Format {0}", format));
                     case 1:
                         {
                             //Context Positioning Subtable: Format 1
@@ -883,8 +887,7 @@ namespace Typography.OpenFont.Tables
                 switch (format)
                 {
                     default:
-                        Utils.WarnUnimplemented("GPOS Lookup Table Type 8 Format {0}", format);
-                        return new NullLookupSubTable();
+                        return new NotImplementLookupSubTable(string.Format("GPOS Lookup Table Type 8 Format {0}", format));
                     case 1:
                         {
                             //Chaining Context Positioning  Format 1: Simple Chaining Context Glyph Positioning
