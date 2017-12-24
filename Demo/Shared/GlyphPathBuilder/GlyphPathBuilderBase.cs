@@ -3,7 +3,7 @@
 using Typography.OpenFont;
 
 
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     //-----------------------------------
     //sample GlyphPathBuilder :
@@ -68,7 +68,7 @@ namespace Typography.Rendering
             }
             else
             {
-                _recentPixelScale = Typeface.CalculateToPixelScale(RecentFontSizeInPixels);
+                _recentPixelScale = Typeface.CalculateScaleToPixel(RecentFontSizeInPixels);
             }
             //-------------------------------------
             FitCurrentGlyph(glyphIndex, glyph);

@@ -1,22 +1,27 @@
 ﻿//MIT, 2014-2017, WinterDev
-using System.Collections.Generic;
+
 
 namespace Typography.TextLayout
 {
     public class TextBuffer
     {
-        char[] buffer;
+        char[] _buffer;
         public TextBuffer(char[] buffer)
         {
-            this.buffer = buffer;
+            this._buffer = buffer;
+        }
+        public int Len { get { return _buffer.Length; } }
+        public static char[] UnsafeGetCharBuffer(TextBuffer textBuffer)
+        {
+            return textBuffer._buffer;
         }
         internal char[] UnsafeGetInternalBuffer()
         {
-            return buffer;
+            return _buffer;
         }
         public string CopyString(int start, int len)
         {
-            return new string(buffer, start, len);
+            return new string(_buffer, start, len);
         }
     }
 }

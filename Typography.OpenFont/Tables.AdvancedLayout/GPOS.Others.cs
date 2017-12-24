@@ -225,7 +225,7 @@ namespace Typography.OpenFont.Tables
                             //that specify the location of the anchor point. 
                             //This format has the benefits of small size and simplicity,
                             //but the anchor point cannot be hinted to adjust its position for different device resolutions.
-                            //Value 	Type 	Description
+                            //Value 	Type 	        Description
                             //uint16 	AnchorFormat 	Format identifier, = 1
                             //int16 	XCoordinate 	Horizontal value, in design units
                             //int16 	YCoordinate 	Vertical value, in design units
@@ -250,7 +250,7 @@ namespace Typography.OpenFont.Tables
 
 
                             //AnchorFormat2 table: Design units plus contour point
-                            //Value 	Type 	Description
+                            //Value 	Type 	        Description
                             //uint16 	AnchorFormat 	Format identifier, = 2
                             //int16 	XCoordinate 	Horizontal value, in design units
                             //int16 	YCoordinate 	Vertical value, in design units
@@ -291,7 +291,7 @@ namespace Typography.OpenFont.Tables
 
 
                             //AnchorFormat3 table: Design units plus Device or VariationIndex tables
-                            //Value 	Type 	Description
+                            //Value 	Type 	        Description
                             //uint16 	AnchorFormat 	Format identifier, = 3
                             //int16 	XCoordinate 	Horizontal value, in design units
                             //int16 	YCoordinate 	Vertical value, in design units
@@ -434,8 +434,8 @@ namespace Typography.OpenFont.Tables
         class Mark2ArrayTable
         {
             ///Mark2Array table
-            //Value 	Type 	Description
-            //uint16 	Mark2Count 	Number of Mark2 records
+            //Value 	Type 	        Description
+            //uint16 	Mark2Count 	    Number of Mark2 records
             //struct 	Mark2Record[Mark2Count] 	Array of Mark2 records-in Coverage order
 
             //Each Mark2Record contains an array of offsets to Anchor tables (Mark2Anchor).
@@ -449,7 +449,7 @@ namespace Typography.OpenFont.Tables
             //the Mark1 glyphs in a particular class to the Mark2 glyph.
 
             //Mark2Record
-            //Value 	Type 	Description
+            //Value 	Type 	                    Description
             //Offset16 	Mark2Anchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of Mark2Array table-zero-based array
 
             public static Mark2ArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
@@ -485,8 +485,8 @@ namespace Typography.OpenFont.Tables
         class BaseArrayTable
         {
             //BaseArray table
-            //Value 	Type 	Description
-            //uint16 	BaseCount 	Number of BaseRecords
+            //Value 	Type 	                Description
+            //uint16 	BaseCount 	            Number of BaseRecords
             //struct 	BaseRecord[BaseCount] 	Array of BaseRecords-in order of BaseCoverage Index
 
             //A BaseRecord declares one Anchor table for each mark class (including Class 0)
@@ -693,7 +693,7 @@ namespace Typography.OpenFont.Tables
         {
 
             //PosRuleSet table: All contexts beginning with the same glyph
-            // Value 	Type 	Description
+            // Value 	Type 	        Description
             //uint16 	PosRuleCount 	Number of PosRule tables
             //Offset16 	PosRule[PosRuleCount] 	Array of offsets to PosRule tables-from beginning of PosRuleSet-ordered by preference
             //
@@ -737,7 +737,7 @@ namespace Typography.OpenFont.Tables
         {
 
             //PosRule subtable
-            //Value 	Type 	Description
+            //Value 	Type 	    Description
             //uint16 	GlyphCount 	Number of glyphs in the Input glyph sequence
             //uint16 	PosCount 	Number of PosLookupRecords
             //uint16 	Input[GlyphCount - 1]  Array of input GlyphIDs-starting with the second glyph***
@@ -775,7 +775,7 @@ namespace Typography.OpenFont.Tables
             //----------------------
             //PosClassRule table: One class context definition
             //----------------------
-            //Value 	Type 	Description
+            //Value 	Type 	    Description
             //uint16 	GlyphCount 	Number of glyphs to be matched
             //uint16 	PosCount 	Number of PosLookupRecords
             //uint16 	Class[GlyphCount - 1] 	Array of classes-beginning with the second class-to be matched to the input glyph sequence
@@ -825,30 +825,6 @@ namespace Typography.OpenFont.Tables
                 posClassRule.posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                 return posClassRule;
             }
-        }
-
-
-    }
-
-
-    //struct GlyphPos
-    //{
-    //    IGlyphPositions glyphPositions;
-    //    int index;
-    //    public GlyphPos(IGlyphPositions glyphPositions, int index)
-    //    {
-    //        this.glyphPositions = glyphPositions;
-    //        this.index = index;
-    //    }
-    //}
-
-    //static class IGlyphPositionsExtensions
-    //{
-    //    public static GlyphPos GetGlyphPos(this IGlyphPositions glyphPositions, int index)
-    //    {
-    //        return new GlyphPos(glyphPositions, index);
-    //    }
-    //}
-
-
+        } 
+    } 
 }

@@ -17,7 +17,7 @@ namespace Typography.TextBreak
         List<BreakingEngine> otherEngines = new List<BreakingEngine>();
 
         WordVisitor visitor;
-        int textLength;
+        int _endAt;
 
         public CustomBreaker()
         {
@@ -52,20 +52,27 @@ namespace Typography.TextBreak
                 return engBreakingEngine;
             }
         }
-        public void BreakWords(char[] charBuff, int startAt)
+        public void BreakWords(char[] charBuff, int startAt, int len)
         {
             //conver to char buffer 
             int j = charBuff.Length;
-            textLength = j;
-            visitor.LoadText(charBuff, 0);
+            if (j < 1)
+            {
+                _endAt = 0;
+                return;
+            }
+            _endAt = startAt + len;
+            visitor.LoadText(charBuff, startAt);
             //---------------------------------------- 
             BreakingEngine currentEngine = breakingEngine = SelectEngine(charBuff[startAt]);
             //----------------------------------------
             //select breaking engine
-            for (;;)
+            int endAt = startAt + len;
+
+            for (; ; )
             {
                 //----------------------------------------
-                currentEngine.BreakWord(visitor, charBuff, startAt, charBuff.Length - startAt);
+                currentEngine.BreakWord(visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
                 switch (visitor.State)
                 {
                     default: throw new NotSupportedException();
@@ -95,7 +102,9 @@ namespace Typography.TextBreak
 
         public void BreakWords(string inputstr)
         {
-            BreakWords(inputstr.ToCharArray(), 0);
+            //TODO: review here
+            char[] buffer = inputstr.ToCharArray();
+            BreakWords(buffer, 0, inputstr.Length); //all
         }
         public void LoadBreakAtList(List<int> outputList)
         {
@@ -119,17 +128,17 @@ namespace Typography.TextBreak
             {
                 BreakSpan sp = new BreakSpan();
                 sp.startAt = c_index;
-                sp.len = breakAtList[i] - c_index;
+                sp.len = (ushort)(breakAtList[i] - c_index);
                 c_index += sp.len;
                 i++;
                 yield return sp;
             }
             //-------------------
-            if (c_index < textLength)
+            if (c_index < _endAt)
             {
                 BreakSpan sp = new BreakSpan();
                 sp.startAt = c_index;
-                sp.len = textLength - c_index;
+                sp.len = (ushort)(_endAt - c_index);
                 yield return sp;
             }
         }

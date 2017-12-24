@@ -6,7 +6,8 @@ using System.Windows.Forms;
 //
 using Typography.OpenFont;
 using Typography.TextLayout;
-using Typography.Rendering;
+using Typography.Contours;
+using Typography.TextServices;
 
 
 namespace SampleWinForms
@@ -53,7 +54,7 @@ namespace SampleWinForms
             //but you can create another text printer that specific to text textbox control
             _textBoxControllerForGdi.TextPrinter = _currentTextPrinter;
             _textBoxControllerForGdi.BindHostGraphics(this.sampleTextBox1.CreateGraphics());
-          
+
             this.sampleTextBox1.SetController(_textBoxControllerForGdi);
 
             //---------- 
@@ -278,9 +279,10 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-            List<GlyphPlan> userGlyphPlans = new List<GlyphPlan>();
+            GlyphPlanList userGlyphPlans = new GlyphPlanList();
 
-            _currentTextPrinter.GlyphLayoutMan.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
+
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
@@ -291,9 +293,8 @@ namespace SampleWinForms
                   y_pos
              );
             //Example 3: MeasureString        
-            float scale = _currentTextPrinter.Typeface.CalculateToPixelScaleFromPointSize(_currentTextPrinter.FontSizeInPoints);
-            MeasuredStringBox strBox;
-            _currentTextPrinter.GlyphLayoutMan.MeasureString(textBuffer, 0, textBuffer.Length, out strBox, scale);
+
+            MeasuredStringBox strBox = _currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
             //draw line mark
 
             float x_pos2 = x_pos + strBox.width + 10;

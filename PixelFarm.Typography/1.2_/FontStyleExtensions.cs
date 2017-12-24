@@ -1,6 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev 
 
- 
+using Typography.TextServices;
+
 namespace PixelFarm.Drawing.Fonts
 {
     public static class FontStyleExtensions

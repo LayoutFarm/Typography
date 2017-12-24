@@ -148,7 +148,7 @@ namespace DrawingGL
         }
         public float CalculateToPixelScaleFromPointSize(float sizeInPoint)
         {
-            return typeface.CalculateToPixelScaleFromPointSize(sizeInPoint);
+            return typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
         }
 
     }

@@ -88,7 +88,9 @@ namespace Typography.TextBreak
                         if (visitor.IsEnd)
                         {
                             //end  
-                             
+                            visitor.State = VisitorState.End;
+                            return;
+
                         }
                         WordGroup next = GetSubGroup(visitor, c_wordgroup);
                         //for debug

@@ -64,7 +64,7 @@
             // 
             // cmdManagedBreaker
             // 
-            this.cmdManagedBreaker.Location = new System.Drawing.Point(283, 44);
+            this.cmdManagedBreaker.Location = new System.Drawing.Point(13, 44);
             this.cmdManagedBreaker.Name = "cmdManagedBreaker";
             this.cmdManagedBreaker.Size = new System.Drawing.Size(130, 35);
             this.cmdManagedBreaker.TabIndex = 4;
@@ -74,7 +74,7 @@
             // 
             // cmdIcuTest
             // 
-            this.cmdIcuTest.Location = new System.Drawing.Point(12, 44);
+            this.cmdIcuTest.Location = new System.Drawing.Point(283, 399);
             this.cmdIcuTest.Name = "cmdIcuTest";
             this.cmdIcuTest.Size = new System.Drawing.Size(130, 35);
             this.cmdIcuTest.TabIndex = 5;

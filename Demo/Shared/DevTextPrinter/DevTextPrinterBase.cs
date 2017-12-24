@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
-using Typography.TextLayout;
+using Typography.TextLayout; 
 
-namespace Typography.Rendering
+namespace Typography.Contours
 {
     /// <summary>
     /// base TextPrinter class for developer only, 
@@ -18,6 +18,21 @@ namespace Typography.Rendering
 
         public abstract Typography.TextLayout.GlyphLayout GlyphLayoutMan { get; }
         public abstract Typography.OpenFont.Typeface Typeface { get; set; }
+        public virtual void GenerateGlyphPlan(
+                 char[] textBuffer,
+                 int startAt,
+                 int len,
+                 GlyphPlanList outputGlyphPlanList,
+                 List<UserCharToGlyphIndexMap> charToGlyphMapList)
+        {
+
+            this.GlyphLayoutMan.Layout(textBuffer, startAt, len);
+            GlyphLayoutExtensions.GenerateGlyphPlan(this.GlyphLayoutMan.ResultUnscaledGlyphPositions,
+                this.Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
+                false, outputGlyphPlanList);
+        }
+
+
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
         public float FontAscendingPx { get; set; }
@@ -67,7 +82,7 @@ namespace Typography.Rendering
         /// <param name="glyphPlanList"></param>
         /// <param name="xpos"></param>
         /// <param name="ypos"></param>
-        public abstract void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float xpos, float ypos);
+        public abstract void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, int startAt, int len, float xpos, float ypos);
 
         /// <summary>
         /// draw caret at xpos,ypos (sample only)
@@ -83,7 +98,7 @@ namespace Typography.Rendering
         {
             DrawString(textBuffer, 0, textBuffer.Length, xpos, ypos);
         }
-        public void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, float xpos, float ypos)
+        public void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, float xpos, float ypos)
         {
             DrawFromGlyphPlans(glyphPlanList, 0, glyphPlanList.Count, xpos, ypos);
         }

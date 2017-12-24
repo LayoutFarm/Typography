@@ -10,7 +10,7 @@ using Typography.OpenFont.Extensions;
 
 using Typography.Contours;
 using Typography.Rendering;
-
+using Typography.TextServices;
 
 
 namespace PixelFarm.Drawing.Fonts
@@ -48,7 +48,7 @@ namespace PixelFarm.Drawing.Fonts
         {
 
             //1. read font info
-            NOpenFontFace openFont = (NOpenFontFace)OpenFontLoader.LoadFont(typeface, creationParams.scriptLang, creationParams.writeDirection);
+            NOpenFontFace openFont = (NOpenFontFace)OpenFontLoader.LoadFont(typeface);
 
             //------------------------
             SimpleFontAtlasBuilder atlas1 = null;
@@ -175,7 +175,7 @@ namespace PixelFarm.Drawing.Fonts
                 //build glyph 
                 builder.BuildFromGlyphIndex(gindex, -1); //use original glyph size (assign -1)
                 var glyphToContour = new GlyphContourBuilder();
-                
+
 
                 //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                 builder.ReadShapes(glyphToContour);

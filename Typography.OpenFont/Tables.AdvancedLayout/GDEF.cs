@@ -76,32 +76,34 @@ namespace Typography.OpenFont.Tables
             tableStartAt = reader.BaseStream.Position;
             //-----------------------------------------
             //GDEF Header, Version 1.0
-            //Type 	    Name 	        Description
-            //uint16 	MajorVersion 	Major version of the GDEF table, = 1
-            //uint16 	MinorVersion 	Minor version of the GDEF table, = 0
-            //Offset16 	GlyphClassDef 	Offset to class definition table for glyph type, from beginning of GDEF header (may be NULL)
-            //Offset16 	AttachList  	Offset to list of glyphs with attachment points, from beginning of GDEF header (may be NULL)
-            //Offset16 	LigCaretList 	Offset to list of positioning points for ligature carets, from beginning of GDEF header (may be NULL)
+            //Type 	    Name 	            Description
+            //uint16 	MajorVersion 	    Major version of the GDEF table, = 1
+            //uint16 	MinorVersion 	    Minor version of the GDEF table, = 0
+            //Offset16 	GlyphClassDef 	    Offset to class definition table for glyph type, from beginning of GDEF header (may be NULL)
+            //Offset16 	AttachList  	    Offset to list of glyphs with attachment points, from beginning of GDEF header (may be NULL)
+            //Offset16 	LigCaretList 	    Offset to list of positioning points for ligature carets, from beginning of GDEF header (may be NULL)
             //Offset16 	MarkAttachClassDef 	Offset to class definition table for mark attachment type, from beginning of GDEF header (may be NULL)
+            //
             //GDEF Header, Version 1.2
             //Type 	Name 	Description
-            //uint16 	MajorVersion 	Major version of the GDEF table, = 1
-            //uint16 	MinorVersion 	Minor version of the GDEF table, = 2
-            //Offset16 	GlyphClassDef 	Offset to class definition table for glyph type, from beginning of GDEF header (may be NULL)
-            //Offset16 	AttachList 	Offset to list of glyphs with attachment points, from beginning of GDEF header (may be NULL)
-            //Offset16 	LigCaretList 	Offset to list of positioning points for ligature carets, from beginning of GDEF header (may be NULL)
+            //uint16 	MajorVersion 	    Major version of the GDEF table, = 1
+            //uint16 	MinorVersion 	    Minor version of the GDEF table, = 2
+            //Offset16 	GlyphClassDef 	    Offset to class definition table for glyph type, from beginning of GDEF header (may be NULL)
+            //Offset16 	AttachList 	        Offset to list of glyphs with attachment points, from beginning of GDEF header (may be NULL)
+            //Offset16 	LigCaretList 	    Offset to list of positioning points for ligature carets, from beginning of GDEF header (may be NULL)
             //Offset16 	MarkAttachClassDef 	Offset to class definition table for mark attachment type, from beginning of GDEF header (may be NULL)
             //Offset16 	MarkGlyphSetsDef 	Offset to the table of mark set definitions, from beginning of GDEF header (may be NULL)
+            //
             //GDEF Header, Version 1.3
             //Type 	Name 	Description
-            //uint16 	MajorVersion 	Major version of the GDEF table, = 1
-            //uint16 	MinorVersion 	Minor version of the GDEF table, = 3
-            //Offset16 	GlyphClassDef 	Offset to class definition table for glyph type, from beginning of GDEF header (may be NULL)
-            //Offset16 	AttachList 	Offset to list of glyphs with attachment points, from beginning of GDEF header (may be NULL)
-            //Offset16 	LigCaretList 	Offset to list of positioning points for ligature carets, from beginning of GDEF header (may be NULL)
+            //uint16 	MajorVersion 	    Major version of the GDEF table, = 1
+            //uint16 	MinorVersion 	    Minor version of the GDEF table, = 3
+            //Offset16 	GlyphClassDef 	    Offset to class definition table for glyph type, from beginning of GDEF header (may be NULL)
+            //Offset16 	AttachList  	    Offset to list of glyphs with attachment points, from beginning of GDEF header (may be NULL)
+            //Offset16 	LigCaretList 	    Offset to list of positioning points for ligature carets, from beginning of GDEF header (may be NULL)
             //Offset16 	MarkAttachClassDef 	Offset to class definition table for mark attachment type, from beginning of GDEF header (may be NULL)
             //Offset16 	MarkGlyphSetsDef 	Offset to the table of mark set definitions, from beginning of GDEF header (may be NULL)
-            //Offset32 	ItemVarStore 	Offset to the Item Variation Store table, from beginning of GDEF header (may be NULL)
+            //Offset32 	ItemVarStore 	    Offset to the Item Variation Store table, from beginning of GDEF header (may be NULL)
 
             //common to 1.0, 1.2, 1.3...
             this.MajorVersion = reader.ReadUInt16();

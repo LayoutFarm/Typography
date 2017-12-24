@@ -5,6 +5,9 @@ using System;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
+    /// <summary>
+    /// hhea
+    /// </summary>
     class HorizontalHeader : TableEntry
     {
         //-----

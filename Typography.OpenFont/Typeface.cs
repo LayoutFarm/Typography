@@ -75,6 +75,11 @@ namespace Typography.OpenFont
             get;
             set;
         }
+        internal HorizontalHeader HheaTable
+        {
+            get;
+            set;
+        }
         internal OS2Table OS2Table
         {
             get;
@@ -112,49 +117,29 @@ namespace Typography.OpenFont
         {
             get
             {
+                //The typographic line gap for this font.
+                //Remember that this is not the same as the LineGap value in the 'hhea' table, 
+                //which Apple defines in a far different manner.
+                //The suggested usage for sTypoLineGap is 
+                //that it be used in conjunction with unitsPerEm 
+                //to compute a typographically correct default line spacing.
+                //
+                //Typical values average 7 - 10 % of units per em.
+                //The goal is to free applications from Macintosh or Windows - specific metrics
+                //which are constrained by backward compatability requirements
+                //(see chapter, “Recommendations for OpenType Fonts”).
+                //These new metrics, when combined with the character design widths,
+                //will allow applications to lay out documents in a typographically correct and portable fashion. 
+                //These metrics will be exposed through Windows APIs.
+                //Macintosh applications will need to access the 'sfnt' resource and 
+                //parse it to extract this data from the “OS / 2” table
+                //(unless Apple exposes the 'OS/2' table through a new API)
+
+
                 return OS2Table.sTypoLineGap;
             }
         }
-        /// <summary>
-        /// overall calculated line spacing 
-        /// </summary>
-        public int LineSpacing
-        {
-            get
-            {
 
-                //from https://www.microsoft.com/typography/OTSpec/recom.htm#tad
-                //sTypoAscender, sTypoDescender and sTypoLineGap
-                //sTypoAscender is used to determine the optimum offset from the top of a text frame to the first baseline.
-                //sTypoDescender is used to determine the optimum offset from the last baseline to the bottom of the text frame. 
-                //The value of (sTypoAscender - sTypoDescender) is recommended to equal one em.
-                //
-                //While the OpenType specification allows for CJK (Chinese, Japanese, and Korean) fonts' sTypoDescender and sTypoAscender 
-                //fields to specify metrics different from the HorizAxis.ideo and HorizAxis.idtp baselines in the 'BASE' table,
-                //CJK font developers should be aware that existing applications may not read the 'BASE' table at all but simply use 
-                //the sTypoDescender and sTypoAscender fields to describe the bottom and top edges of the ideographic em-box. 
-                //If developers want their fonts to work correctly with such applications, 
-                //they should ensure that any ideographic em-box values in the 'BASE' table describe the same bottom and top edges as the sTypoDescender and
-                //sTypoAscender fields. 
-                //See the sections “OpenType CJK Font Guidelines“ and ”Ideographic Em-Box“ for more details.
-
-                //For Western fonts, the Ascender and Descender fields in Type 1 fonts' AFM files are a good source of sTypoAscender
-                //and sTypoDescender, respectively. 
-                //The Minion Pro font family (designed on a 1000-unit em), 
-                //for example, sets sTypoAscender = 727 and sTypoDescender = -273.
-
-                //sTypoAscender, sTypoDescender and sTypoLineGap specify the recommended line spacing for single-spaced horizontal text.
-                //The baseline-to-baseline value is expressed by:
-                //OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap
-
-                //sTypoLineGap will usually be set by the font developer such that the value of the above expression is approximately 120% of the em.
-                //The application can use this value as the default horizontal line spacing. 
-                //The Minion Pro font family (designed on a 1000-unit em), for example, sets sTypoLineGap = 200.
-
-
-                return Ascender - Descender + LineGap;
-            }
-        }
         public string Name
         {
             get { return _nameEntry.FontName; }
@@ -172,7 +157,7 @@ namespace Typography.OpenFont
         public Glyph Lookup(int codepoint)
         {
             return _glyphs[LookupIndex(codepoint)];
-        } 
+        }
         public Glyph GetGlyphByIndex(int glyphIndex)
         {
             return _glyphs[glyphIndex];
@@ -221,7 +206,7 @@ namespace Typography.OpenFont
         /// </summary>
         /// <param name="targetPixelSize">target font size in point unit</param>
         /// <returns></returns>
-        public float CalculateToPixelScale(float targetPixelSize)
+        public float CalculateScaleToPixel(float targetPixelSize)
         {
             //1. return targetPixelSize / UnitsPerEm
             return targetPixelSize / this.UnitsPerEm;
@@ -232,7 +217,7 @@ namespace Typography.OpenFont
         /// <param name="targetPointSize">target font size in point unit</param>
         /// <param name="resolution"></param>
         /// <returns></returns>
-        public float CalculateToPixelScaleFromPointSize(float targetPointSize, int resolution = 96)
+        public float CalculateScaleToPixelFromPointSize(float targetPointSize, int resolution = 96)
         {
             //1. var sizeInPixels = ConvPointsToPixels(sizeInPointUnit);
             //2. return  sizeInPixels / UnitsPerEm
@@ -317,6 +302,8 @@ namespace Typography.OpenFont
 
         public static class TypefaceExtensions
         {
+
+
             public static bool DoesSupportUnicode(
                 this Typeface typeface,
                 UnicodeLangBits unicodeLangBits)
@@ -355,8 +342,201 @@ namespace Typography.OpenFont
                     throw new System.NotSupportedException();
                 }
             }
-        }
-         
 
+            public static bool RecommendToUseTypoMetricsForLineSpacing(this Typeface typeface)
+            {
+                //https://www.microsoft.com/typography/otspec/os2.htm
+                //
+                //fsSelection ...
+                //
+                //bit     name                
+                //7       USE_TYPO_METRICS   
+                //  
+                //        Description
+                //        If set, it is strongly recommended to use
+                //        OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap 
+                //        as a value for default line spacing for this font.
+
+                return ((typeface.OS2Table.fsSelection >> 7) & 1) != 0;
+            }
+            /// <summary>
+            /// overall calculated line spacing 
+            /// </summary>
+            static int Calculate_TypoMetricLineSpacing(Typeface typeface)
+            {
+
+                //from https://www.microsoft.com/typography/OTSpec/recom.htm#tad
+                //sTypoAscender, sTypoDescender and sTypoLineGap
+                //sTypoAscender is used to determine the optimum offset from the top of a text frame to the first baseline.
+                //sTypoDescender is used to determine the optimum offset from the last baseline to the bottom of the text frame. 
+                //The value of (sTypoAscender - sTypoDescender) is recommended to equal one em.
+                //
+                //While the OpenType specification allows for CJK (Chinese, Japanese, and Korean) fonts' sTypoDescender and sTypoAscender 
+                //fields to specify metrics different from the HorizAxis.ideo and HorizAxis.idtp baselines in the 'BASE' table,
+                //CJK font developers should be aware that existing applications may not read the 'BASE' table at all but simply use 
+                //the sTypoDescender and sTypoAscender fields to describe the bottom and top edges of the ideographic em-box. 
+                //If developers want their fonts to work correctly with such applications, 
+                //they should ensure that any ideographic em-box values in the 'BASE' table describe the same bottom and top edges as the sTypoDescender and
+                //sTypoAscender fields. 
+                //See the sections “OpenType CJK Font Guidelines“ and ”Ideographic Em-Box“ for more details.
+
+                //For Western fonts, the Ascender and Descender fields in Type 1 fonts' AFM files are a good source of sTypoAscender
+                //and sTypoDescender, respectively. 
+                //The Minion Pro font family (designed on a 1000-unit em), 
+                //for example, sets sTypoAscender = 727 and sTypoDescender = -273.
+
+                //sTypoAscender, sTypoDescender and sTypoLineGap specify the recommended line spacing for single-spaced horizontal text.
+                //The baseline-to-baseline value is expressed by:
+                //OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap
+ 
+       
+ 
+
+                //sTypoLineGap will usually be set by the font developer such that the value of the above expression is approximately 120% of the em.
+                //The application can use this value as the default horizontal line spacing. 
+                //The Minion Pro font family (designed on a 1000-unit em), for example, sets sTypoLineGap = 200.
+
+
+                return typeface.Ascender - typeface.Descender + typeface.LineGap;
+
+            }
+
+            /// <summary>
+            /// calculate Baseline-to-Baseline Distance (BTBD) for Windows
+            /// </summary>
+            /// <param name="typeface"></param>
+            /// <returns>return 'unscaled-to-pixel' BTBD value</returns>
+            static int Calculate_BTBD_Windows(Typeface typeface)
+            {
+
+                //from https://www.microsoft.com/typography/otspec/recom.htm#tad
+
+                //Baseline to Baseline Distances
+                //The 'OS/2' table fields sTypoAscender, sTypoDescender, and sTypoLineGap 
+                //free applications from Macintosh-or Windows - specific metrics
+                //which are constrained by backward compatibility requirements.
+                //
+                //The following discussion only pertains to the platform-specific metrics.
+                //The suggested Baseline to Baseline Distance(BTBD) is computed differently for Windows and the Macintosh,
+                //and it is based on different OpenType metrics.
+                //However, if the recommendations below are followed, the BTBD will be the same for both Windows and the Mac.
+
+                //Windows Metric         OpenType Metric
+                //ascent                    usWinAscent
+                //descent                   usWinDescent
+                //internal leading          usWinAscent + usWinDescent - unitsPerEm
+                //external leading          MAX(0, LineGap - ((usWinAscent + usWinDescent) - (Ascender - Descender)))
+
+                //The suggested BTBD = ascent + descent + external leading
+
+                //It should be clear that the “external leading” can never be less than zero. 
+                //Pixels above the ascent or below the descent will be clipped from the character; 
+                //this is true for all output devices.
+
+                //The usWinAscent and usWinDescent are values 
+                //from the 'OS/2' table.
+                //The unitsPerEm value is from the 'head' table.
+                //The LineGap, Ascender and Descender values are from the 'hhea' table.
+
+                int usWinAscent = typeface.OS2Table.usWinAscent;
+                int usWinDescent = typeface.OS2Table.usWinDescent;
+                int internal_leading = usWinAscent + usWinDescent - typeface.UnitsPerEm;
+                HorizontalHeader hhea = typeface.HheaTable;
+                int external_leading = System.Math.Max(0, hhea.LineGap - ((usWinAscent + usWinDescent) - (hhea.Ascent - hhea.Descent)));
+                return usWinAscent + usWinDescent + external_leading;
+            }
+            /// <summary>
+            /// calculate Baseline-to-Baseline Distance (BTBD) for macOS
+            /// </summary>
+            /// <param name="typeface"></param>
+            /// <returns>return 'unscaled-to-pixel' BTBD value</returns>
+            static int CalculateBTBD_Mac(Typeface typeface)
+            {
+                //from https://www.microsoft.com/typography/otspec/recom.htm#tad
+
+                //Ascender and Descender are metrics defined by Apple 
+                //and are not to be confused with the Windows ascent or descent, 
+                //nor should they be confused with the true typographic ascender and descender that are found in AFM files.
+                //The Macintosh metrics below are returned by the Apple Advanced Typography(AAT) GetFontInfo() API.
+                //
+                //
+                //Macintosh Metric      OpenType Metric
+                //ascender                  Ascender
+                //descender                 Descender
+                //leading                   LineGap
+
+                //The suggested BTBD = ascent + descent + leading
+                //If pixels extend above the ascent or below the descent, 
+                //the character will be squashed in the vertical direction 
+                //so that all pixels fit within these limitations; this is true for screen display only.
+
+                //TODO: please test this
+                HorizontalHeader hhea = typeface.HheaTable;
+                return hhea.Ascent + hhea.Descent + hhea.LineGap;
+            }
+
+            public static int CalculateRecommendLineSpacing(this Typeface typeface, out LineSpacingChoice choice)
+            {
+                //check if we are on Windows env or macOS eve
+                if (RecommendToUseTypoMetricsForLineSpacing(typeface))
+                {
+                    choice = LineSpacingChoice.TypoMetric;
+                    return Calculate_TypoMetricLineSpacing(typeface);
+                }
+                else
+                {
+                    //check if we are on Windows or mac 
+                    if (CurrentEnv.CurrentOSName == CurrentOSName.Mac)
+                    {
+                        choice = LineSpacingChoice.Mac;
+                        return CalculateBTBD_Mac(typeface);
+                    }
+                    else
+                    {
+                        choice = LineSpacingChoice.Windows;
+                        return Calculate_BTBD_Windows(typeface);
+                    }
+                }
+            }
+            public static int CalculateRecommendLineSpacing(this Typeface typeface)
+            {
+                LineSpacingChoice selectedChoice;
+                return CalculateRecommendLineSpacing(typeface, out selectedChoice);
+            }
+
+
+            public static int CalculateLineSpacing(this Typeface typeface, LineSpacingChoice choice)
+            {
+                switch (choice)
+                {
+                    default:
+                    case LineSpacingChoice.Windows:
+                        return Calculate_BTBD_Windows(typeface);
+                    case LineSpacingChoice.Mac:
+                        return CalculateBTBD_Mac(typeface);
+                    case LineSpacingChoice.TypoMetric:
+                        return Calculate_TypoMetricLineSpacing(typeface);
+                }
+            }
+
+        }
+        public enum LineSpacingChoice
+        {
+            TypoMetric,
+            Windows,
+            Mac
+        }
+        public enum CurrentOSName
+        {
+            None,//not evaluate yet
+            Windows,
+            Mac,
+            Others
+        }
+
+        public static class CurrentEnv
+        {
+            public static CurrentOSName CurrentOSName;
+        }
     }
 }

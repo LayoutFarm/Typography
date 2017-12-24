@@ -98,6 +98,10 @@
       <Project>{8f69ab8d-174a-4912-9328-cae8eda5564b}</Project>
       <Name>Typography.MsdfGen</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{fe23e283-a667-4e68-b381-c7d8598d3688}</Project>
+      <Name>Typography.TextServices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>

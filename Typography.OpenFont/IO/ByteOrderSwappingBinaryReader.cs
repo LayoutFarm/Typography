@@ -13,37 +13,52 @@ namespace Typography.OpenFont.IO
             : base(input)
         {
         }
-
-        public override Stream BaseStream { get { return base.BaseStream; } }
-        //public override void Close() { base.Close(); }
-
-        public override int PeekChar() { throw new NotImplementedException(); }
-        public override int Read() { throw new NotImplementedException(); }
-        public override int Read(byte[] buffer, int index, int count) { throw new NotImplementedException(); }
-        public override int Read(char[] buffer, int index, int count) { throw new NotImplementedException(); }
-        public override bool ReadBoolean() { throw new NotImplementedException(); }
-        public override byte ReadByte() { return base.ReadByte(); }
-        public override byte[] ReadBytes(int count) { return base.ReadBytes(count); }
-        public override char ReadChar() { throw new NotImplementedException(); }
-        public override char[] ReadChars(int count) { throw new NotImplementedException(); }
-        //public override decimal ReadDecimal() { throw new NotImplementedException(); }
-        public override double ReadDouble() { throw new NotImplementedException(); }
-        public override short ReadInt16() { return BitConverter.ToInt16(ReadBytesAndReverse(2), 0); }
-        public override int ReadInt32() { throw new NotImplementedException(); }
-        public override long ReadInt64() { throw new NotImplementedException(); }
-        public override sbyte ReadSByte() { throw new NotImplementedException(); }
-        public override float ReadSingle() { throw new NotImplementedException(); }
-        public override string ReadString() { throw new NotImplementedException(); }
-        public override ushort ReadUInt16() { return BitConverter.ToUInt16(ReadBytesAndReverse(2), 0); }
-        public override uint ReadUInt32() { return BitConverter.ToUInt32(ReadBytesAndReverse(4), 0); }
-        public override ulong ReadUInt64() { return BitConverter.ToUInt64(ReadBytesAndReverse(8), 0); }
-
-        private byte[] ReadBytesAndReverse(int count) { var b = ReadBytes(count); Array.Reverse(b); return b; }
-
         protected override void Dispose(bool disposing)
         {
             GC.SuppressFinalize(this);
             base.Dispose(disposing);
         }
+        //
+        //as original
+        //
+        //public override byte ReadByte() { return base.ReadByte(); } 
+        // 
+        //we override the 4 methods here
+        //
+        public override short ReadInt16() { return BitConverter.ToInt16(RR(2), 8 - 2); }
+        public override ushort ReadUInt16() { return BitConverter.ToUInt16(RR(2), 8 - 2); }
+        public override uint ReadUInt32() { return BitConverter.ToUInt32(RR(4), 8 - 4); }
+        public override ulong ReadUInt64() { return BitConverter.ToUInt64(RR(8), 8 - 8); }
+        //
+        byte[] _reusable_buffer = new byte[8]; //fix buffer size to 8 bytes
+        /// <summary>
+        /// read and reverse 
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        private byte[] RR(int count)
+        {
+            base.Read(_reusable_buffer, 0, count);
+            Array.Reverse(_reusable_buffer);
+            return _reusable_buffer;
+        }
+
+        //we don't use these methods in our OpenFont, so => throw the exception
+        public override int PeekChar() { throw new NotImplementedException(); }
+        public override int Read() { throw new NotImplementedException(); }
+        public override int Read(byte[] buffer, int index, int count) { throw new NotImplementedException(); }
+        public override int Read(char[] buffer, int index, int count) { throw new NotImplementedException(); }
+        public override bool ReadBoolean() { throw new NotImplementedException(); }
+        public override char ReadChar() { throw new NotImplementedException(); }
+        public override char[] ReadChars(int count) { throw new NotImplementedException(); }
+        public override decimal ReadDecimal() { throw new NotImplementedException(); }
+        public override double ReadDouble() { throw new NotImplementedException(); }
+        public override int ReadInt32() { throw new NotImplementedException(); }
+        public override long ReadInt64() { throw new NotImplementedException(); }
+        public override sbyte ReadSByte() { throw new NotImplementedException(); }
+        public override float ReadSingle() { throw new NotImplementedException(); }
+        public override string ReadString() { throw new NotImplementedException(); }
+        //
+
     }
 }

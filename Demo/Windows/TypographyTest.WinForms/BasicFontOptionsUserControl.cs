@@ -3,7 +3,7 @@ using System;
 using System.Windows.Forms;
 
 using Typography.TextLayout;
-using PixelFarm.Drawing.Fonts;
+using Typography.TextServices;
 
 namespace TypographyTest.WinForms
 {

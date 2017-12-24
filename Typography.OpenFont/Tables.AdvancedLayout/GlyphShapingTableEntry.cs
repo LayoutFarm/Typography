@@ -8,19 +8,19 @@ namespace Typography.OpenFont.Tables
     //Data Types
 
     // The following data types are used in the OpenType font file.All OpenType fonts use Motorola-style byte ordering (Big Endian):
-    // Data     Type   Description
-    // uint8    8-bit unsigned integer.
-    // int8     8-bit signed integer.
-    // uint16   16-bit unsigned integer.
-    // int16    16-bit signed integer.
-    // uint24   24-bit unsigned integer.
-    // uint32   32-bit unsigned integer.
-    // int32    32-bit signed integer.
-    // Fixed    32-bit signed fixed-point number(16.16)
-    // FWORD    int16 that describes a quantity in font design units.
-    // UFWORD   uint16 that describes a quantity in font design units.
+    // Data     Type    Description
+    // uint8    8-bit   unsigned integer.
+    // int8     8-bit   signed integer.
+    // uint16   16-bit  unsigned integer.
+    // int16    16-bit  signed integer.
+    // uint24   24-bit  unsigned integer.
+    // uint32   32-bit  unsigned integer.
+    // int32    32-bit  signed integer.
+    // Fixed    32-bit  signed fixed-point number(16.16)
+    // FWORD    int16   that describes a quantity in font design units.
+    // UFWORD   uint16  that describes a quantity in font design units.
     // F2DOT14  16 - bit signed fixed number with the low 14 bits of fraction(2.14).
-    // LONGDATETIME   Date represented in number of seconds since 12:00 midnight, January 1, 1904.The value is represented as a signed 64 - bit integer.
+    // LONGDATETIME     Date represented in number of seconds since 12:00 midnight, January 1, 1904.The value is represented as a signed 64 - bit integer.
     // Tag Array of four uint8s(length = 32 bits) used to identify a script, language system, feature, or baseline
     // Offset16   Short offset to a table, same as uint16, NULL offset = 0x0000
     // Offset32   Long offset to a table, same as uint32, NULL offset = 0x00000000
@@ -49,12 +49,12 @@ namespace Typography.OpenFont.Tables
             // Example 1 at the end of this chapter shows a GPOS/GSUB Header table definition.
             //
             // GPOS/GSUB Header, Version 1.0
-            // Value     Type          Description
-            // uint16    MajorVersion  Major version of the GPOS/GSUB table, = 1
-            // uint16    MinorVersion  Minor version of the GPOS/GSUB table, = 0
-            // Offset16  ScriptList    Offset to ScriptList table, from beginning of GPOS/GSUB table
-            // Offset16  FeatureList   Offset to FeatureList table, from beginning of GPOS/GSUB table
-            // Offset16  LookupList    Offset to LookupList table, from beginning of GPOS/GSUB table
+            // Value     Type               Description
+            // uint16    MajorVersion       Major version of the GPOS/GSUB table, = 1
+            // uint16    MinorVersion       Minor version of the GPOS/GSUB table, = 0
+            // Offset16  ScriptList         Offset to ScriptList table, from beginning of GPOS/GSUB table
+            // Offset16  FeatureList        Offset to FeatureList table, from beginning of GPOS/GSUB table
+            // Offset16  LookupList         Offset to LookupList table, from beginning of GPOS/GSUB table
             //
             // GPOS/GSUB Header, Version 1.1
             // Value     Type               Description
@@ -133,7 +133,7 @@ namespace Typography.OpenFont.Tables
             //
             // Lookup table
             // --------------------------------
-            // Type      Name             Description
+            // Type      Name                     Description
             // unit16    LookupType               Different enumerations for GSUB and GPOS
             // unit16    LookupFlag               Lookup qualifiers
             // unit16    SubTableCount            Number of SubTables for this lookup

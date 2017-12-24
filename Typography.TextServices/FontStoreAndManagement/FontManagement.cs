@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 
-namespace PixelFarm.Drawing.Fonts
+
+namespace Typography.TextServices
 {
-
-
     public class InstalledFont
     {
         internal InstalledFont(string fontName,
@@ -423,7 +422,13 @@ namespace PixelFarm.Drawing.Fonts
         {
             try
             {
-                // 1. font dir
+                //font dir
+                if (!Directory.Exists(folder))
+                {
+                    //not found
+                    return;
+                }
+                
                 foreach (string file in Directory.GetFiles(folder))
                 {
                     //eg. this is our custom font folder
@@ -463,6 +468,26 @@ namespace PixelFarm.Drawing.Fonts
             // OS X system fonts (https://support.apple.com/en-us/HT201722)
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
             LoadFontsFromFolder(fontCollection, "/Library/Fonts");
+
+
+
+
+            //for Windows , how to find Windows' Font Directory from Windows Registry
+            //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
+            //        // get parent of System folder to have Windows folder
+            //        DirectoryInfo dirWindowsFolder = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System));
+            //        string strFontsFolder = Path.Combine(dirWindowsFolder.FullName, "Fonts");
+            //        RegistryKey regKey = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts");
+            //        //---------------------------------------- 
+            //        foreach (string winFontName in localMachineFonts)
+            //        {
+            //            string f = (string)regKey.GetValue(winFontName);
+            //            if (f.EndsWith(".ttf") || f.EndsWith(".otf"))
+            //            {
+            //                yield return Path.Combine(strFontsFolder, f);
+            //            }
+            //        }
+
         }
     }
 }

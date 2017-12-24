@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using Typography.TextLayout;
-using Typography.Rendering;
+using Typography.Contours;
 
 namespace SampleWinForms.UI
 {
@@ -37,20 +37,22 @@ namespace SampleWinForms.UI
         public void Draw()
         {
 
-            List<GlyphPlan> glyphPlans = _line._glyphPlans;
+            GlyphPlanList glyphPlans = _line._glyphPlans;
             List<UserCharToGlyphIndexMap> userCharToGlyphIndexMap = _line._userCharToGlyphMap;
             if (_line.ContentChanged)
             {
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
-                glyphPlans.Clear(); 
+                glyphPlans.Clear();
 
                 userCharToGlyphIndexMap.Clear();
 
                 //read glyph plan and userCharToGlyphIndexMap                 
-                _printer.GlyphLayoutMan.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, glyphPlans, userCharToGlyphIndexMap);
+                
+                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, glyphPlans, userCharToGlyphIndexMap);
 
-                toPxScale = _printer.Typeface.CalculateToPixelScaleFromPointSize(_printer.FontSizeInPoints);
+
+                toPxScale = _printer.Typeface.CalculateScaleToPixelFromPointSize(_printer.FontSizeInPoints);
                 _line.ContentChanged = false;
             }
 

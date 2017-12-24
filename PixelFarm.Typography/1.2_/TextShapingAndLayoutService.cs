@@ -1,14 +1,13 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
-using PixelFarm.Drawing.Fonts;
 using Typography.TextLayout;
-namespace PixelFarm.Drawing.Text
+namespace PixelFarm.Drawing.Fonts
 {
     public abstract class TextShapingService
     {
 
-        protected abstract void GetGlyphPosImpl(ActualFont actualFont, char[] buffer, int startAt, int len, List<GlyphPlan> properGlyphs);
-        public static void GetGlyphPos(ActualFont actualFont, char[] buffer, int startAt, int len, List<GlyphPlan> properGlyphs)
+        protected abstract void GetGlyphPosImpl(ActualFont actualFont, char[] buffer, int startAt, int len, GlyphPlanList properGlyphs);
+        public static void GetGlyphPos(ActualFont actualFont, char[] buffer, int startAt, int len, GlyphPlanList properGlyphs)
         {
             defaultSharpingService.GetGlyphPosImpl(actualFont, buffer, startAt, len, properGlyphs);
         }

@@ -6,31 +6,34 @@ namespace Typography.OpenFont.Tables
 
     //https://www.microsoft.com/typography/otspec/os2.htm
     /// <summary>
-    /// OS2 and Windows metrics
+    /// OS2 and Windows metrics, 
+    /// consists of a set of metrics and other data
+    /// that are REQUIRED in OpenType fonts.
     /// </summary>
     class OS2Table : TableEntry
     {
-        //USHORT 	version 	0x0005
-        //SHORT 	xAvgCharWidth 	 
-        //USHORT 	usWeightClass 	 
-        //USHORT 	usWidthClass 	 
-        //USHORT 	fsType 	 
-        public ushort version;
-        public short xAvgCharWidth;
-        public ushort usWeightClass;
-        public ushort usWidthClass;
-        public ushort fsType;
-        //SHORT 	ySubscriptXSize 	 
-        //SHORT 	ySubscriptYSize 	 
-        //SHORT 	ySubscriptXOffset 	 
-        //SHORT 	ySubscriptYOffset 	 
-        //SHORT 	ySuperscriptXSize 	 
-        //SHORT 	ySuperscriptYSize 	 
-        //SHORT 	ySuperscriptXOffset 	 
-        //SHORT 	ySuperscriptYOffset 	 
-        //SHORT 	yStrikeoutSize 	 
-        //SHORT 	yStrikeoutPosition 	 
-        //SHORT 	sFamilyClass 	 
+        // Type     Name of  Entry        Comments
+        //uint16 	version 	           0x0005
+        //int16 	xAvgCharWidth 	    
+        //uint16 	usWeightClass 	 
+        //uint16 	usWidthClass 	 
+        //uint16 	fsType 	 
+        public ushort version;          //0-5
+        public short xAvgCharWidth;     //just average, not recommend to use.
+        public ushort usWeightClass;    //visual weight (degree of blackness or thickness of strokes), 0-1000
+        public ushort usWidthClass;     //A relative change from the normal aspect ratio (width to height ratio)
+        public ushort fsType;           //Type flags., embedding licensing rights for the font
+        //int16 	ySubscriptXSize 	 
+        //int16 	ySubscriptYSize 	 
+        //int16 	ySubscriptXOffset 	 
+        //int16 	ySubscriptYOffset 	 
+        //int16 	ySuperscriptXSize 	 
+        //int16 	ySuperscriptYSize 	 
+        //int16 	ySuperscriptXOffset 	 
+        //int16 	ySuperscriptYOffset 	 
+        //int16 	yStrikeoutSize 	 
+        //int16 	yStrikeoutPosition 	 
+        //int16 	sFamilyClass 	
         public short ySubscriptXSize;
         public short ySubscriptYSize;
         public short ySubscriptXOffset;
@@ -41,50 +44,50 @@ namespace Typography.OpenFont.Tables
         public short ySuperscriptYOffset;
         public short yStrikeoutSize;
         public short yStrikeoutPosition;
-        public short sFamilyClass;
+        public short sFamilyClass;      //This parameter is a classification of font-family design. ,see https://www.microsoft.com/typography/otspec/ibmfc.htm
 
-        //BYTE 	panose[10] 	 
+        //uint8 	panose[10] 	        (array of bytes,len =10)
         public byte[] panose;
-        //ULONG 	ulUnicodeRange1 	Bits 0-31
-        //ULONG 	ulUnicodeRange2 	Bits 32-63
-        //ULONG 	ulUnicodeRange3 	Bits 64-95
-        //ULONG 	ulUnicodeRange4 	Bits 96-127
+        //uint32 	ulUnicodeRange1 	Bits 0-31
+        //uint32 	ulUnicodeRange2 	Bits 32-63
+        //uint32 	ulUnicodeRange3 	Bits 64-95
+        //uint32 	ulUnicodeRange4 	Bits 96-127
         public uint ulUnicodeRange1;
         public uint ulUnicodeRange2;
         public uint ulUnicodeRange3;
         public uint ulUnicodeRange4;
 
-        //CHAR 	achVendID[4] 	 
-        public uint achVendID;
-        //USHORT 	fsSelection 	 
-        //USHORT 	usFirstCharIndex 	 
-        //USHORT 	usLastCharIndex 
-        public ushort fsSelection;
+        //Tag 	    achVendID[4] 	    char 4 
+        public uint achVendID;          //see 'registered venders' at https://www.microsoft.com/typography/links/vendorlist.aspx
+        //uint16 	fsSelection 	 
+        //uint16 	usFirstCharIndex 	 
+        //uint16 	usLastCharIndex 
+        public ushort fsSelection;      //Contains information concerning the nature of the font patterns
         public ushort usFirstCharIndex;
         public ushort usLastCharIndex;
-        //SHORT 	sTypoAscender 	 
-        //SHORT 	sTypoDescender 	 
-        //SHORT 	sTypoLineGap 	 
+        //int16 	sTypoAscender 	 
+        //int16 	sTypoDescender 	 
+        //int16 	sTypoLineGap 	 
         public short sTypoAscender;
         public short sTypoDescender;
         public short sTypoLineGap;
-        //USHORT 	usWinAscent 	 
-        //USHORT 	usWinDescent 	 
-        //ULONG 	ulCodePageRange1 	Bits 0-31
-        //ULONG 	ulCodePageRange2 	Bits 32-63
+        //uint16 	usWinAscent 	 
+        //uint16 	usWinDescent 	 
+        //uint32 	ulCodePageRange1 	Bits 0-31
+        //uint32 	ulCodePageRange2 	Bits 32-63
         public ushort usWinAscent;
         public ushort usWinDescent;
         public uint ulCodePageRange1;
         public uint ulCodePageRange2;
-        //SHORT 	sxHeight 	 
-        //SHORT 	sCapHeight 	 
-        //USHORT 	usDefaultChar 	 
-        //USHORT 	usBreakChar 	 
-        //USHORT 	usMaxContext 	 
-        //USHORT 	usLowerOpticalPointSize 	 
-        //USHORT 	usUpperOpticalPointSize 	 
+        //int16 	sxHeight 	 
+        //int16 	sCapHeight 	  
         public short sxHeight;
         public short sCapHeight;
+        //uint16 	usDefaultChar 	 
+        //uint16 	usBreakChar 	 
+        //uint16 	usMaxContext 	 
+        //uint16 	usLowerOpticalPointSize 	 
+        //uint16 	usUpperOpticalPointSize
         public ushort usDefaultChar;
         public ushort usBreakChar;
         public ushort usMaxContext;
@@ -103,27 +106,26 @@ namespace Typography.OpenFont.Tables
 #endif
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            //USHORT 	version 	0x0005
-            //SHORT 	xAvgCharWidth 	 
-            //USHORT 	usWeightClass 	 
-            //USHORT 	usWidthClass 	 
-            //USHORT 	fsType 	  
+            //Six versions of the OS/2 table have been defined: versions 0 to 5
+            //Versions 0 to 4 were defined in earlier versions of the OpenType or
+            //TrueType specifications. 
+
             switch (this.version = reader.ReadUInt16())
             {
                 default: throw new System.NotSupportedException();
-                case 0:
+                case 0: //defined in TrueType revision 1.5
                     ReadVersion0(reader);
                     break;
-                case 1:
+                case 1: // defined in TrueType revision 1.66
                     ReadVersion1(reader);
                     break;
-                case 2:
+                case 2: //defined in OpenType version 1.2
                     ReadVersion2(reader);
                     break;
-                case 3:
+                case 3: //defined in OpenType version 1.4
                     ReadVersion3(reader);
                     break;
-                case 4:
+                case 4: //defined in OpenType version 1.6
                     ReadVersion4(reader);
                     break;
                 case 5:
@@ -570,6 +572,5 @@ namespace Typography.OpenFont.Tables
             this.usLowerOpticalPointSize = reader.ReadUInt16();
             this.usUpperOpticalPointSize = reader.ReadUInt16();
         }
-    }
-     
+    } 
 }

@@ -38,9 +38,9 @@ namespace TextBreakerTest
             //
             //lao
             icu_currentLocale = "lo-LA";
-            //string test1 = "ແປ້ນພິມລາວ";
+            //string test1 = "ສະບາຍດີແປ້ນພິມລາວ";
             //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
-            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
+            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่";
             //----------------
             this.textBox1.Text = test1;
 
@@ -84,7 +84,7 @@ namespace TextBreakerTest
             //we use dic data from icu-project
 
             //1. create dictionary based breaking engine 
-            CustomBreakerBuilder.DataDir = "../../../icu58/brkitr_src/dictionaries";
+            CustomBreakerBuilder.Setup("../../../icu58/brkitr_src/dictionaries");
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
 
 
@@ -92,7 +92,7 @@ namespace TextBreakerTest
             this.listBox1.Items.Clear();
 
 
-            breaker1.BreakWords(test, 0);
+            breaker1.BreakWords(test, 0, test.Length);
             foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             {
                 string s = new string(test, span.startAt, span.len);
@@ -129,13 +129,13 @@ namespace TextBreakerTest
         {
 
             //-------------------
-            CustomBreakerBuilder.DataDir = "../../../icu58/brkitr_src/dictionaries";
+            CustomBreakerBuilder.Setup("../../../icu58/brkitr_src/dictionaries");
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
             char[] test = this.textBox1.Text.ToCharArray();
             //-------------
             for (int i = ntimes - 1; i >= 0; --i)
             {
-                breaker1.BreakWords(test, 0);
+                breaker1.BreakWords(test, 0, test.Length);
                 foreach (var span in breaker1.GetBreakSpanIter())
                 {
 

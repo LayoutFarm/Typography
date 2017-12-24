@@ -1,5 +1,5 @@
 ﻿//MIT, 2014-2017, WinterDev    
-namespace PixelFarm.Drawing.Fonts
+namespace Typography.TextServices
 {
     public class OpenFontStore : IFontLoader
     {
@@ -40,6 +40,7 @@ namespace PixelFarm.Drawing.Fonts
         }
         public InstalledFont GetFont(string fontName, InstalledFontStyle style)
         {
+            //check if we have this font in the collection or not
             InstalledFont found = installFontCollection.GetFont(fontName, style);
             if (found == null)
             {
@@ -60,7 +61,5 @@ namespace PixelFarm.Drawing.Fonts
         {
             this.fontNotFoundHandler = fontNotFoundHandler;
         }
-
-
     }
 }

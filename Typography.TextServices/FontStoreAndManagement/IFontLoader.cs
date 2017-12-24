@@ -1,5 +1,5 @@
 ﻿//MIT, 2017, WinterDev
-namespace PixelFarm.Drawing.Fonts
+namespace Typography.TextServices
 {
     public interface IFontLoader
     {

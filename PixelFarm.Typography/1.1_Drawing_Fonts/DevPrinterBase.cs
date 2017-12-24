@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using Typography.TextLayout;
 
-namespace Typography.Rendering
+
+namespace Typography.Contours
 {
     /// <summary>
     /// base TextPrinter class for developer only, 
@@ -18,6 +19,21 @@ namespace Typography.Rendering
 
         public abstract Typography.TextLayout.GlyphLayout GlyphLayoutMan { get; }
         public abstract Typography.OpenFont.Typeface Typeface { get; set; }
+        public virtual void GenerateGlyphPlan(
+                 char[] textBuffer,
+                 int startAt,
+                 int len,
+                 GlyphPlanList outputGlyphPlanList,
+                 List<UserCharToGlyphIndexMap> charToGlyphMapList)
+        {
+
+            this.GlyphLayoutMan.Layout(textBuffer, startAt, len);
+            GlyphLayoutExtensions.GenerateGlyphPlan(this.GlyphLayoutMan.ResultUnscaledGlyphPositions,
+                this.Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
+                false, outputGlyphPlanList);
+        }
+
+
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
         public float FontAscendingPx { get; set; }
@@ -67,7 +83,7 @@ namespace Typography.Rendering
         /// <param name="glyphPlanList"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public abstract void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, int startAt, int len, float x, float y);
+        public abstract void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, int startAt, int len, float x, float y);
 
         /// <summary>
         /// draw caret at xpos,ypos (sample only)
@@ -83,7 +99,7 @@ namespace Typography.Rendering
         {
             DrawString(textBuffer, 0, textBuffer.Length, x, y);
         }
-        public void DrawFromGlyphPlans(List<GlyphPlan> glyphPlanList, float x, float y)
+        public void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, float x, float y)
         {
             DrawFromGlyphPlans(glyphPlanList, 0, glyphPlanList.Count, x, y);
         }

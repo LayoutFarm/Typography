@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
 using Typography.TextLayout;
+using Typography.TextServices;
 
-using PixelFarm.Drawing.Fonts;
 
 namespace TypographyTest
 {
@@ -28,11 +28,12 @@ namespace TypographyTest
         InstalledFontCollection _installedFontCollection;
         OpenFontStore _openFontStore;
         InstalledFont _installedFont;
+
         Typeface _selectedTypeface;
         bool _typefaceChanged = false;
         public BasicFontOptions()
         {
-            _openFontStore = new OpenFontStore();
+           
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
         }

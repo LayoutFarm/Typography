@@ -119,7 +119,7 @@ namespace SampleWinForms.UI
             RectD bounds = new RectD();
             BoundingRect.GetBoundingRect(new VertexStoreSnap(vxs), ref bounds);
             //----------------------------------------------------
-            float scale = _typeface.CalculateToPixelScaleFromPointSize(_sizeInPoint);
+            float scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoint);
             _pxscale = scale;
             this._infoView.PxScale = scale;
 
