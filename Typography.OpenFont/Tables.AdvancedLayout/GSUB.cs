@@ -83,10 +83,10 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// Empty lookup sub table for unimplemented formats
         /// </summary>
-        public class UnimplementedLookupSubTable : LookupSubTable
+        public class UnImplementedLookupSubTable : LookupSubTable
         {
             string _message;
-            public UnimplementedLookupSubTable(string msg)
+            public UnImplementedLookupSubTable(string msg)
             {
                 this._message = msg;
                 Utils.WarnUnimplemented(msg);
@@ -179,7 +179,7 @@ namespace Typography.OpenFont.Tables
                 }
 
 
-                return new UnimplementedLookupSubTable(string.Format("GSUB Lookup Type {0}", lookupType));
+                return new UnImplementedLookupSubTable(string.Format("GSUB Lookup Type {0}", lookupType));
             }
 
             /// <summary>
@@ -758,7 +758,7 @@ namespace Typography.OpenFont.Tables
             /// <param name="reader"></param>
             LookupSubTable ReadLookupType5(BinaryReader reader, long subTableStartAt)
             {
-                return new UnimplementedLookupSubTable("Lookup Subtable Type 5");
+                return new UnImplementedLookupSubTable("Lookup Subtable Type 5");
             }
 
             class ChainSubRuleSetTable
