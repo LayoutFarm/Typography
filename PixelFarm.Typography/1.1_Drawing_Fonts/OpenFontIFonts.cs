@@ -54,21 +54,17 @@ namespace LayoutFarm
             //}
 
         }
+
+
         public Size MeasureString(char[] str, int startAt, int len, RequestFont font)
         {
-            //resolve type face
-            Typeface typeface = typefaceStore.GetTypeface(font.Name, InstalledFontStyle.Normal);
-            glyphLayout.Typeface = typeface;
-            MeasuredStringBox result;
-            float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
-
-            //measure string at specific px scale
-            glyphLayout.MeasureString(str, startAt, len, out result, scale);
-
-            return new Size((int)result.width, (int)result.CalculateLineHeight());
+            int w, h;
+            MeasureString(str, startAt, len, out w, out h);
+            return new Size(w, h);
 
         }
-        public Size MeasureString(char[] str, int startAt, int len, RequestFont font, float maxWidth, out int charFit, out int charFitWidth)
+        public Size MeasureString(char[] str, int startAt, int len, RequestFont font,
+            float maxWidth, out int charFit, out int charFitWidth)
         {
             throw new NotImplementedException();
         }
@@ -77,5 +73,72 @@ namespace LayoutFarm
         {
             throw new NotImplementedException();
         }
+
+
+        GlyphPlanList _reusableGlyphPlanList = new GlyphPlanList();
+        List<MeasuredStringBox> _reusableMeasureBoxList = new List<MeasuredStringBox>();
+        public void MeasureString(char[] str, int startAt, int len, out int w, out int h)
+        {
+            throw new NotSupportedException();
+
+            ////measure string 
+            //if (str.Length < 1)
+            //{
+            //    w = h = 0;
+            //}
+            //_reusableMeasureBoxList.Clear(); //reset 
+
+            //float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts);
+            ////NOET:at this moment, simple operation
+            ////may not be simple...  
+            ////-------------------
+            ////input string may contain more than 1 script lang
+            ////user can parse it by other parser
+            ////but in this code, we use our Typography' parser
+            ////-------------------
+            ////user must setup the CustomBreakerBuilder before use         
+
+            //int cur_startAt = startAt;
+            //float accumW = 0;
+            //float accumH = 0;
+
+            //foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            //{
+
+
+            //    //measure string at specific px scale 
+            //    _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
+            //    //
+            //    _reusableGlyphPlanList.Clear();
+            //    GlyphLayoutExtensions.GenerateGlyphPlan(
+            //        _glyphLayout.ResultUnscaledGlyphPositions,
+            //        pxscale,
+            //        true,
+            //        _reusableGlyphPlanList);
+            //    //measure string size
+            //    var result = new MeasuredStringBox(
+            //        _reusableGlyphPlanList.AccumAdvanceX * pxscale,
+            //        _currentTypeface.Ascender * pxscale,
+            //        _currentTypeface.Descender * pxscale,
+            //        _currentTypeface.LineGap * pxscale,
+            //         Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_currentTypeface) * pxscale);
+            //    //
+            //    ConcatMeasureBox(ref accumW, ref accumH, ref result);
+
+            //}
+
+            //w = (int)System.Math.Round(accumW);
+            //h = (int)System.Math.Round(accumH);
+        }
+        static void ConcatMeasureBox(ref float accumW, ref float accumH, ref MeasuredStringBox measureBox)
+        {
+            accumW += measureBox.width;
+            float h = measureBox.CalculateLineHeight();
+            if (h > accumH)
+            {
+                accumH = h;
+            }
+        }
+
     }
 }

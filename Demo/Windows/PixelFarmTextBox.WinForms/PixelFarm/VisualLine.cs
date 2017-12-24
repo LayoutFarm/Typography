@@ -11,7 +11,7 @@ namespace SampleWinForms.UI
     {
 
         SmallLine _line;
-        DevTextPrinterBase _printer; 
+        DevTextPrinterBase _printer;
         public VisualLine()
         {
 
@@ -41,13 +41,12 @@ namespace SampleWinForms.UI
                 //TODO: or font face/font-size change 
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
+
+
                 glyphPlans.Clear();
                 userCharToGlyphIndexMap.Clear();
-                //read glyph plan and userCharToGlyphIndexMap                 
-                _printer.GlyphLayoutMan.FontSizeInPoints = _printer.FontSizeInPoints;
-                _printer.GlyphLayoutMan.GenerateGlyphPlans(textBuffer, 0, textBuffer.Length, glyphPlans, userCharToGlyphIndexMap);
-
- 
+                //read glyph plan and userCharToGlyphIndexMap                                  
+                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, glyphPlans, null);
                 _line.ContentChanged = false;
             }
 

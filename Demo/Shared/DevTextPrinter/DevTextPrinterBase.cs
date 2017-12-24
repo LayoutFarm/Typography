@@ -18,6 +18,21 @@ namespace Typography.Contours
 
         public abstract Typography.TextLayout.GlyphLayout GlyphLayoutMan { get; }
         public abstract Typography.OpenFont.Typeface Typeface { get; set; }
+        public virtual void GenerateGlyphPlan(
+                 char[] textBuffer,
+                 int startAt,
+                 int len,
+                 GlyphPlanList outputGlyphPlanList,
+                 List<UserCharToGlyphIndexMap> charToGlyphMapList)
+        {
+
+            this.GlyphLayoutMan.Layout(textBuffer, startAt, len);
+            GlyphLayoutExtensions.GenerateGlyphPlan(this.GlyphLayoutMan.ResultUnscaledGlyphPositions,
+                this.Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
+                false, outputGlyphPlanList);
+        }
+
+
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
         public float FontAscendingPx { get; set; }

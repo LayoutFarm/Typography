@@ -53,14 +53,26 @@ namespace DrawingGL.Text
             _tessTool = new TessTool();
         }
 
-        public void Measure(char[] textBuffer, int startAt, int len, out float width, out float height)
+        GlyphPlanList _reusableGlyphPlanList = new GlyphPlanList();
+        public MeasuredStringBox Measure(char[] textBuffer, int startAt, int len)
         {
             glyphLayout.Typeface = this.CurrentTypeFace;
-            var scale = CurrentTypeFace.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
-            MeasuredStringBox strBox;
-            glyphLayout.MeasureString(textBuffer, startAt, len, out strBox, scale);
-            width = strBox.width;
-            height = strBox.CalculateLineHeight();
+            float pxscale = CurrentTypeFace.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
+            glyphLayout.Layout(textBuffer, startAt, len);
+
+            _reusableGlyphPlanList.Clear();
+            IGlyphPositions glyphPositions = glyphLayout.ResultUnscaledGlyphPositions;
+            GlyphLayoutExtensions.GenerateGlyphPlan(glyphLayout.ResultUnscaledGlyphPositions,
+                pxscale,
+                false, _reusableGlyphPlanList);
+            return new MeasuredStringBox(
+                 _reusableGlyphPlanList.AccumAdvanceX * pxscale,
+                  CurrentTypeFace.Ascender * pxscale,
+                  CurrentTypeFace.Descender * pxscale,
+                  CurrentTypeFace.LineGap * pxscale,
+                  Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(CurrentTypeFace) * pxscale);
+
+
         }
 
         /// <summary>
@@ -139,9 +151,17 @@ namespace DrawingGL.Text
             //and then we scale it later, so I just specific font size=0 (you can use any value)
             _glyphMeshCollection.SetCacheInfo(this.CurrentTypeFace, 0, this.HintTechnique);
 
-            outputGlyphPlans.Clear();
+
             glyphLayout.Typeface = this.CurrentTypeFace;
-            glyphLayout.GenerateGlyphPlans(charBuffer, start, len, outputGlyphPlans, null);
+            glyphLayout.Layout(charBuffer, start, len);
+
+            float pxscale = this.CurrentTypeFace.CalculateScaleToPixelFromPointSize(sizeInPoints);
+
+            outputGlyphPlans.Clear();
+            GlyphLayoutExtensions.GenerateGlyphPlan(
+                glyphLayout.ResultUnscaledGlyphPositions,
+                pxscale, false, outputGlyphPlans);
+
             // render each glyph 
             int planCount = outputGlyphPlans.Count;
             for (var i = 0; i < planCount; ++i)

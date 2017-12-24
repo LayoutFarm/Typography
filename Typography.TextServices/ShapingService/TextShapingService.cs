@@ -15,6 +15,7 @@ namespace Typography.TextServices
         Dictionary<TextShapingContextKey, TextShapingContext> _registerShapingContexts = new Dictionary<TextShapingContextKey, TextShapingContext>();
         GlyphLayout _glyphLayout;
 
+        float _fontSizeInPts;
 
         internal TextShapingService(TextServiceHub hub)
         {
@@ -54,8 +55,7 @@ namespace Typography.TextServices
                 _registerShapingContexts.Add(key, shapingContext);
                 _currentShapingContext = shapingContext;
             }
-
-            _glyphLayout.FontSizeInPoints = fontSizeInPts;
+            _fontSizeInPts = fontSizeInPts;
         }
         public void SetCurrentScriptLang(ScriptLang scLang)
         {
@@ -109,6 +109,7 @@ namespace Typography.TextServices
     {
         //TODO: consider this value, make this a variable (static int)
         const int PREDEFINE_LEN = 10;
+
         /// <summary>
         /// common len 0-10?
         /// </summary>
@@ -118,14 +119,22 @@ namespace Typography.TextServices
         public GlyphPlanSeqSet()
         {
             _cacheSeqCollection1 = new GlyphPlanSeqCollection[PREDEFINE_LEN];
-            //TODO:
-            //what is the proper number of cache word ?
-            //init free dic
+
+            this.MaxCacheLen = 20;//stop caching, please managed this ...
+                                  //TODO:
+                                  //what is the proper number of cache word ?
+                                  //init free dic
             for (int i = PREDEFINE_LEN - 1; i >= 0; --i)
             {
                 _cacheSeqCollection1[i] = new GlyphPlanSeqCollection(i);
             }
         }
+        public int MaxCacheLen
+        {
+            get;
+            private set;
+        }
+
         public GlyphPlanSeqCollection GetSeqCollectionOrCreateIfNotExist(int len)
         {
             if (len < PREDEFINE_LEN)
@@ -149,6 +158,7 @@ namespace Typography.TextServices
             }
         }
     }
+
 
     class TextShapingContext
     {
@@ -176,7 +186,6 @@ namespace Typography.TextServices
                 startAt,
                 len);
 
-            glyphLayout.ReadOutput(planList);
 
             int post_count = planList.Count;
             return new GlyphPlanSequence(_glyphPlanBuffer, pre_count, post_count - pre_count);
@@ -194,25 +203,31 @@ namespace Typography.TextServices
             //and create glyph list 
             //check if we have the string cache in specific value 
             //---------
+            if (len > _glyphPlanSeqSet.MaxCacheLen)
+            {
+                //layout string is too long to be cache
+                //it need to split into small buffer 
+            }
+
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
+
             GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(len);
             int hashValue = CalculateHash(buffer, startAt, len);
             if (!seqCol.TryGetCacheGlyphPlanSeq(hashValue, out planSeq))
             {
-                //not found then create glyph plan seq
-                bool useOutputScale = glyphLayout.UsePxScaleOnReadOutput;//save 
+                ////not found then create glyph plan seq
+                //bool useOutputScale = glyphLayout.UsePxScaleOnReadOutput;
+
+                ////save 
                 //some font may have 'special' glyph x,y at some font size(eg. for subpixel-rendering position)
                 //but in general we store the new glyph plan seq with unscale glyph pos
-                glyphLayout.UsePxScaleOnReadOutput = false;
+                //glyphLayout.UsePxScaleOnReadOutput = false;
                 planSeq = CreateGlyphPlanSeq(glyphLayout, buffer, startAt, len);
-                glyphLayout.UsePxScaleOnReadOutput = useOutputScale;//restore
+                //glyphLayout.UsePxScaleOnReadOutput = useOutputScale;//restore
                 seqCol.Register(hashValue, planSeq);
             }
             //---
-            //on unscale font=> we scale it to final font size
-            
-
-
+            //on unscale font=> we use original  
             return planSeq;
         }
     }

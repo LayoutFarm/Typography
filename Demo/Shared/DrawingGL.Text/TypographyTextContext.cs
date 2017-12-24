@@ -80,7 +80,7 @@ namespace DrawingGL.Text
             get;
             set;
         }
- 
+
 
 
         public void Update()
@@ -97,17 +97,15 @@ namespace DrawingGL.Text
         public void GenerateGlyphRuns(TextRun textRun, char[] charBuffer, int startAt, int len)
         {
             _textPrinter.FontSizeInPoints = this.FontSize;
-            _textPrinter.GenerateGlyphRuns(textRun, charBuffer, startAt, len); 
+            _textPrinter.GenerateGlyphRuns(textRun, charBuffer, startAt, len);
             //System.Collections.Generic.List<GlyphRun> glyphs = textRun._glyphs; 
 
         }
         public Size Measure(char[] charBuffer, int startAt, int len)
         {
-            _textPrinter.FontSizeInPoints = this.FontSize;
-            float width;
-            float height;
-            _textPrinter.Measure(charBuffer, startAt, len, out width, out height);
-            return new Size(width, height);
+            _textPrinter.FontSizeInPoints = this.FontSize; 
+            Typography.TextLayout.MeasuredStringBox mesureStringBox = _textPrinter.Measure(charBuffer, startAt, len);
+            return new Size(mesureStringBox.width, mesureStringBox.btbd);
         }
 
         //TODO
