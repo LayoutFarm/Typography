@@ -178,7 +178,20 @@ _pic 4: Say with Emoji?_
 (see more sam's work at https://github.com/samhocevar/emoji.wpf)
 
 ---
+The HtmlRenderer example!
+---
 
+This is a snapshot of Html drawboard from (https://github.com/LayoutFarm/HtmlRenderer).
+The glyphs are generated/layouted with our _Typography_, and rendered with
+the PixelFarm (https://github.com/PaintLab/PixelFarm)
+
+![html_renderer_with_selection](https://user-images.githubusercontent.com/7447159/34452219-1a37545c-ed6d-11e7-969f-b0f5623e4802.png)
+_pic 1: HtmlRenderer on GLES2 surface, text are renderered with the Typography_
+
+
+also, please note the text selection on the Html Surface. 
+
+---
 
 License
 -----------
