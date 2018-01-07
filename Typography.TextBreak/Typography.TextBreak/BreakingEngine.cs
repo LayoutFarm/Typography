@@ -89,6 +89,19 @@ namespace Typography.TextBreak
                         {
                             //end  
                             visitor.State = VisitorState.End;
+                            //----------------------------------------
+                            WordGroup next1 = GetSubGroup(visitor, c_wordgroup);
+
+                            if (next1 != null)
+                            { 
+                                //accept 
+                                if (next1.PrefixIsWord)
+                                {
+                                    candidate.Push(candidateLen);
+                                }
+                            }
+
+
 
                             //----------------------------------------
                             i = endAt; //temp fix, TODO: review here
@@ -118,7 +131,7 @@ namespace Typography.TextBreak
                                     foundCandidate = true;
                                     break;
                                 }
-                            } 
+                            }
                             continueRead = false;
                             //----------------------------------------
                             return;
