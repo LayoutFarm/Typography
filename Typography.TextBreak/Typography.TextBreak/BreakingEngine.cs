@@ -93,44 +93,27 @@ namespace Typography.TextBreak
                             WordGroup next1 = GetSubGroup(visitor, c_wordgroup);
 
                             if (next1 != null)
-                            { 
+                            {
                                 //accept 
                                 if (next1.PrefixIsWord)
                                 {
                                     candidate.Push(candidateLen);
                                 }
                             }
-
-
-
                             //----------------------------------------
                             i = endAt; //temp fix, TODO: review here
-                            bool foundCandidate = false;
+
                             //choose best match 
-                            while (candidate.Count > 0)
+                            if (candidate.Count > 0)
                             {
 
                                 int candi1 = candidate.Pop();
                                 //try
                                 visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
-                                if (visitor.State != VisitorState.End)
-                                {
-                                    char next_char = visitor.Char;
-                                    if (CanBeStartChar(next_char))
-                                    {
-                                        //use this
-                                        //use this candidate if possible
-                                        visitor.AddWordBreakAt(visitor.CurrentIndex);
-                                        foundCandidate = true;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    visitor.AddWordBreakAt(visitor.CurrentIndex);
-                                    foundCandidate = true;
-                                    break;
-                                }
+                                //use this
+                                //use this candidate if possible
+                                visitor.AddWordBreakAt(visitor.CurrentIndex); 
+                                break;
                             }
                             continueRead = false;
                             //----------------------------------------
