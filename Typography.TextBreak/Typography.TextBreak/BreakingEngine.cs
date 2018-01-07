@@ -112,7 +112,7 @@ namespace Typography.TextBreak
                                 visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
                                 //use this
                                 //use this candidate if possible
-                                visitor.AddWordBreakAt(visitor.CurrentIndex); 
+                                visitor.AddWordBreakAt(visitor.CurrentIndex);
                                 break;
                             }
                             continueRead = false;
@@ -191,31 +191,67 @@ namespace Typography.TextBreak
                                     else
                                     {
                                         bool foundCandidate = false;
-                                        while (candidate.Count > 0)
+                                        int candi_count = candidate.Count;
+                                        if (candi_count == 0)
                                         {
-
-                                            int candi1 = candidate.Pop();
-                                            //try
-                                            visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
-                                            //check if we can use this candidate
-                                            if (visitor.State != VisitorState.End)
+                                            //no candidate 
+                                            //need to step back
+                                            int latestBreakAt = visitor.LatestBreakAt;
+                                            if (visitor.CurrentIndex - 1 > latestBreakAt)
                                             {
-                                                char next_char = visitor.Char;
-                                                if (CanBeStartChar(next_char))
+                                                //steop back
+
+                                                visitor.SetCurrentIndex(visitor.CurrentIndex - 1);
+                                                char current_char = visitor.Char;
+                                                if (CanBeStartChar(current_char))
                                                 {
-                                                    //use this
-                                                    //use this candidate if possible
-                                                    visitor.AddWordBreakAt(visitor.CurrentIndex);
-                                                    foundCandidate = true;
-                                                    break;
+                                                        
+                                                    if (visitor.CurrentIndex - 1 > latestBreakAt)
+                                                    {
+
+                                                    }
+                                                    else
+                                                    {
+
+                                                    }
                                                 }
+                                                else
+                                                {
+
+                                                }
+
                                             }
                                             else
                                             {
-                                                visitor.AddWordBreakAt(visitor.CurrentIndex);
-                                                foundCandidate = true;
+                                                throw new NotSupportedException("i-3311");
                                             }
-
+                                        }
+                                        else
+                                        {
+                                            while (candi_count > 0)
+                                            {
+                                                int candi1 = candidate.Pop();
+                                                //try
+                                                visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
+                                                //check if we can use this candidate
+                                                if (visitor.State != VisitorState.End)
+                                                {
+                                                    char next_char = visitor.Char;
+                                                    if (CanBeStartChar(next_char))
+                                                    {
+                                                        //use this
+                                                        //use this candidate if possible
+                                                        visitor.AddWordBreakAt(visitor.CurrentIndex);
+                                                        foundCandidate = true;
+                                                        break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    visitor.AddWordBreakAt(visitor.CurrentIndex);
+                                                    foundCandidate = true;
+                                                }
+                                            }
                                         }
                                         if (!foundCandidate)
                                         {
@@ -237,7 +273,6 @@ namespace Typography.TextBreak
                                                 visitor.AddWordBreakAt(visitor.CurrentIndex);
                                                 visitor.SetCurrentIndex(visitor.LatestBreakAt);
                                             }
-
                                         }
                                     }
                                 }
