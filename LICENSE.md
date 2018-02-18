@@ -1,9 +1,14 @@
----
-Font files in this lib are for testing only.
 
+ 
+The project is based on multiple open-sourced projects (listed below) all using permissive licenses.
+
+A license for a whole project is [**MIT**](https://opensource.org/licenses/MIT).
+
+but if you use some part of the code
+please check each source file's header for the licensing info.
+
+ 
 ---
-Source code from multiple projects,
-here... 
 
 **Geometry**
 
@@ -21,7 +26,7 @@ SGI, 2000, Eric Veach, Tesselate.
 
 **Font**
 
-Apache2, 2016-2017, WinterDev, from https://github.com/LayoutFarm/Typography
+MIT, 2016-2017, WinterDev, from https://github.com/LayoutFarm/Typography
 
 Apache2, 2014-2016, Samuel Carlsson, from https://github.com/vidstige/NRasterizer
 
