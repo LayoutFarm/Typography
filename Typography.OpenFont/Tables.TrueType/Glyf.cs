@@ -4,6 +4,91 @@ using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
+
+    class CFF : TableEntry
+    {
+
+        public override string Name
+        {
+            get { return "CFF "; } //4 char, left 1 blank whitespace
+        }
+
+        protected override void ReadContentFrom(BinaryReader reader)
+        {
+            uint tableOffset = this.Header.Offset;
+
+
+            Cff1Parser cffParser = new Cff1Parser();
+            cffParser.Parse(reader);
+        }
+
+    }
+
+
+
+
+    class Cff1Parser
+    {
+        //Table 1 CFF Data Layout
+        //Entry               Comments
+        //Header      		–
+        //Name INDEX  		–
+        //Top DICT INDEX 		–
+        //String INDEX		–
+        //Global Subr INDEX	– 	
+        //Encodings			–		
+        //Charsets			–
+        //FDSelect CIDFonts only
+        //CharStrings INDEX per-font
+        //Font DICT INDEX     per-font, CIDFonts only
+        //Private DICT        per-font
+        //Local Subr INDEX    per-font or per-Private DICT for CIDFonts
+        //Copyright and 		-
+        //Trademark Notices 
+        //-----------------
+        //Table 2 CFF Data Types
+        //Name       Range      Description
+        //Card8      0 – 255   	1-byte unsigned number
+        //Card16     0 – 65535 	2-byte unsigned number
+        //Offset     varies 	  	1, 2, 3, or 4 byte offset(specified by  OffSize field)
+        //OffSize	 1–4			1-byte unsigned number specifies the
+        //size of an Offset field or fields
+        //SID		0 – 64999   2-byte string identifier
+        //-----------------
+
+        //from Apache's PDF box/FontBox
+        //@author Villu Ruusmann
+        public void Parse(BinaryReader reader)
+        {
+
+            //Table 8 Header Format
+            //Type      Name    Description
+            //Card8     major   Format major version(starting at 1)
+            //Card8     minor   Format minor version(starting at 0)
+            //Card8     hdrSize Header size(bytes)
+            //OffSize   offSize Absolute offset(0) size
+            byte[] header = reader.ReadBytes(4);
+            byte major = header[0];
+            byte minor = header[1];
+            byte hdrSize = header[2];
+            byte offSize = header[3];
+            ////---------
+            //name index
+            ReadIndexData(reader);
+
+        }
+        void ReadIndexData(BinaryReader reader)
+        {
+            ushort count = reader.ReadUInt16();
+            byte offSize = reader.ReadByte();
+        }
+
+    }
+
+
+
+
+
     class Glyf : TableEntry
     {
         Glyph[] _glyphs;

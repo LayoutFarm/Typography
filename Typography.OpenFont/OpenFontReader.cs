@@ -88,6 +88,9 @@ namespace Typography.OpenFont
                 //--------------
                 Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
+
+                CFF ccf = ReadTableIfExists(tables, input, new CFF());
+
                 Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
@@ -124,7 +127,7 @@ namespace Typography.OpenFont
                 //----------------------------
                 typeface.CmapTable = cmaps;
                 typeface.KernTable = kern;
-                typeface.GaspTable = gaspTable;               
+                typeface.GaspTable = gaspTable;
                 typeface.MaxProfile = maximumProfile;
                 typeface.HheaTable = horizontalHeader;
                 //----------------------------
