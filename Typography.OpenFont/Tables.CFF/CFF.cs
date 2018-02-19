@@ -46,7 +46,6 @@ namespace Typography.OpenFont.CFF
     {
         internal List<string> fontNames;
         internal List<Cff1Font> _fonts = new List<Cff1Font>();
-
     }
     class Cff1Font
     {
@@ -90,6 +89,8 @@ namespace Typography.OpenFont.CFF
         BinaryReader _reader;
 
         Cff1FontSet _cff1FontSet;
+
+        List<CffDataDicEntry> _topDic;
         public void ParseAfterHader(BinaryReader reader)
         {
             _cff1FontSet = new Cff1FontSet();
@@ -101,6 +102,8 @@ namespace Typography.OpenFont.CFF
             ReadGlobalSubrIndex();
             ReadEncodings();
             ReadCharsets();
+            ReadFDSelect();
+            ReadCharStringsIndex();
             //...
         }
 
@@ -181,11 +184,18 @@ namespace Typography.OpenFont.CFF
             //simplicity.The keys from the FontInfo dict are indicated in the
             //Default, notes  column of Table 9)
             int count = offsets.Length;
+            if (count > 1)
+            {
+                //temp...
+                throw new NotSupportedException();
+            }
             for (int i = 0; i < count; ++i)
             {
                 //read DICT data
                 CffIndexOffset offset = offsets[i];
                 List<CffDataDicEntry> dicData = ReadDICTData(offset.len);
+
+                _topDic = dicData;
             }
         }
 
@@ -283,21 +293,222 @@ namespace Typography.OpenFont.CFF
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
             if (offsets == null) return;
 
-
-
-            //... TODO: ....
+            //TODO: review here
             throw new NotImplementedException();
-
         }
+
         void ReadEncodings()
         {
+            //Encoding data is located via the offset operand to the
+            //Encoding operator in the Top DICT.
 
+            //Only one Encoding operator can be
+            //specified per font except for CIDFonts which specify no
+            //encoding.A glyph’s encoding is specified by a 1 - byte code that
+            //permits values in the range 0 - 255.
+
+
+            //Each encoding is described by a format-type identifier byte
+            //followed by format-specific data.Two formats are currently
+            //defined as specified in Tables 11(Format 0) and 12(Format 1). 
+            byte format = _reader.ReadByte();
+            switch (format)
+            {
+                case 0:
+                    {
+                        ReadFormat0Encoding();
+                    }
+                    break;
+                case 1:
+                    {
+                        ReadFormat1Encoding();
+                    }
+                    break;
+            }
+
+
+
+            //TODO: ...
         }
         void ReadCharsets()
         {
+            //Charset data is located via the offset operand to the
+            //charset operator in the Top DICT.
+
+            //Each charset is described by a format-
+            //type identifier byte followed by format-specific data.
+            //Three formats are currently defined as shown in Tables
+            //17, 18, and 20.
+
+            //TODO: ...
+            byte format = _reader.ReadByte();
+            switch (format)
+            {
+                default:
+                    throw new NotSupportedException();
+                case 0:
+                    throw new NotSupportedException();
+                    break;
+                case 1:
+                    ReadCharsetsFormat1();
+                    break;
+                case 2:
+                    throw new NotSupportedException();
+                    break;
+            }
+        }
+        void ReadCharsetsFormat0()
+        {
 
         }
 
+        void ReadCharsetsFormat1()
+        {
+            //Table 19 Range1 Format (Charset)
+            //Type            Name          Description
+            //SID             first         First glyph in range
+            //Card8           nLeft         Glyphs left in range(excluding first)
+
+
+            //Each Range1 describes a group of sequential SIDs. The number
+            //of ranges is not explicitly specified in the font. Instead, software
+            //utilizing this data simply processes ranges until all glyphs in the
+            //font are covered. This format is particularly suited to charsets
+            //that are well ordered
+
+            int sid = _reader.ReadUInt16();//string iden (SID)
+            byte nleft = _reader.ReadByte();
+        }
+        void ReadCharsetsFormat2()
+        {
+
+        }
+        void ReadFDSelect()
+        {
+            //19. FDSelect
+
+            // The FDSelect associates an FD(Font DICT) with a glyph by
+            //specifying an FD index for that glyph. The FD index is used to
+            //access one of the Font DICTs stored in the Font DICT INDEX.
+
+            //FDSelect data is located via the offset operand to the
+            //FDSelect operator in the Top DICT.FDSelect data specifies a format - type
+            //identifier byte followed by format-specific data.Two formats
+            //are currently defined, as shown in Tables  27 and 28.
+
+
+            //TODO: ...
+
+
+        }
+        void ReadCharStringsIndex()
+        {
+            //14. CharStrings INDEX
+
+            //This contains the charstrings of all the glyphs in a font stored in 
+            //an INDEX structure.
+
+            //Charstring objects contained within this
+            //INDEX are accessed by GID.
+
+            //The first charstring(GID 0) must be
+            //the.notdef glyph. 
+
+            //The number of glyphs available in a font may
+            //be determined from the count field in the INDEX. 
+
+            //
+
+            //The format of the charstring data, and therefore the method of
+            //interpretation, is specified by the
+            //CharstringType  operator in the Top DICT.
+
+            //The CharstringType operator has a default value
+            //of 2 indicating the Type 2 charstring format which was designed
+            //in conjunction with CFF.
+
+            //Type 1 charstrings are documented in 
+            //the “Adobe Type 1 Font Format” published by Addison - Wesley.
+
+            //Type 2 charstrings are described in Adobe Technical Note #5177: 
+            //“Type 2 Charstring Format.” Other charstring types may also be
+            //supported by this method.
+
+
+
+            CffIndexOffset[] offsets = ReadIndexDataOffsets();
+
+
+
+            //TODO: ...
+
+
+
+        }
+        void ReadFormat0Encoding()
+        {
+
+            //Table 11: Format 0
+            //Type      Name            Description
+            //Card8     format          = 0
+            //Card8     nCodes          Number of encoded glyphs
+            //Card8     code[nCodes]    Code array
+            //-------
+            //Each element of the code array represents the encoding for the
+            //corresponding glyph.This format should be used when the
+            //codes are in a fairly random order
+
+            //we have read format field( 1st field) ..
+            //so start with 2nd field
+
+            int nCodes = _reader.ReadByte();
+            byte[] codes = _reader.ReadBytes(nCodes);
+
+        }
+        void ReadFormat1Encoding()
+        {
+            //Table 12 Format 1
+            //Type      Name              Description
+            //Card8     format             = 1
+            //Card8     nRanges           Number of code ranges
+            //struct    Range1[nRanges]   Range1 array(see Table  13)
+            //--------------
+            int nRanges = _reader.ReadByte();
+
+
+
+
+            //Table 13 Range1 Format(Encoding)
+            //Type        Name        Description
+            //Card8       first       First code in range
+            //Card8       nLeft       Codes left in range(excluding first)
+            //--------------
+            //Each Range1 describes a group of sequential codes. For 
+            //example, the codes 51 52 53 54 55 could be represented by the
+            //Range1: 51 4, and a perfectly ordered encoding of 256 codes can
+            //be described with the Range1: 0 255.
+
+            //This format is particularly suited to encodings that are well ordered.
+
+
+            //A few fonts have multiply - encoded glyphs which are not
+            //supported directly by any of the above formats. This situation is
+            //indicated by setting the high - order bit in the format byte and
+            //supplementing the encoding, regardless of format type, as
+            //shown in Table 14.
+
+
+            //Table 14 Supplemental Encoding Data            
+            //Type 	    Name	    		Description
+            //Card8	    nSups		    	Number of supplementary mappings
+            //struct    Supplement[nSups]   Supplementary encoding array(see Table  15 below)
+
+
+            //Table 15 Supplement Format
+            //Type      Name        Description
+            //Card8     code        Encoding
+            //SID       glyph       Name
+        }
 
         List<CffDataDicEntry> ReadDICTData(int len)
         {
