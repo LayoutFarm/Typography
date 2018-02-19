@@ -194,9 +194,9 @@ namespace SampleWinForms
                 case TypographyTest.RenderChoice.RenderWithSdfGen:
                     {
                         char testChar = this.txtInputChar.Text[0];
-                        Typeface typeFace = _basicOptions.Typeface;
+                        Typeface typeFace = _basicOptions.Typeface; 
                         RenderWithMsdfImg(typeFace, testChar, _basicOptions.FontSizeInPoints);
-
+                         
                     }
                     break;
                 case TypographyTest.RenderChoice.RenderWithMiniAgg_SingleGlyph:

@@ -89,7 +89,7 @@ namespace Typography.OpenFont
                 Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
 
-                CFF ccf = ReadTableIfExists(tables, input, new CFF());
+                CFFTable ccf = ReadTableIfExists(tables, input, new CFFTable());
 
                 Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
                 //--------------
@@ -117,13 +117,38 @@ namespace Typography.OpenFont
                 //about truetype instruction init 
 
                 //--------------------------------------------- 
-                var typeface = new Typeface(
-                    nameEntry,
-                    header.Bounds,
-                    header.UnitsPerEm,
-                    glyf.Glyphs,
-                    horizontalMetrics,
-                    os2Table);
+                Typeface typeface = null;
+                if (glyf == null)
+                {
+                    //check if this is cff table ?
+                    if (ccf == null)
+                    {
+                        //TODO: review here
+                        throw new NotSupportedException();
+                    }
+                    //... 
+
+                    
+
+                    typeface = new Typeface(
+                          nameEntry,
+                          header.Bounds,
+                          header.UnitsPerEm,
+                          null,
+                          horizontalMetrics,
+                          os2Table);
+                }
+                else
+                {
+                    typeface = new Typeface(
+                        nameEntry,
+                        header.Bounds,
+                        header.UnitsPerEm,
+                        glyf.Glyphs,
+                        horizontalMetrics,
+                        os2Table);
+                }
+
                 //----------------------------
                 typeface.CmapTable = cmaps;
                 typeface.KernTable = kern;
