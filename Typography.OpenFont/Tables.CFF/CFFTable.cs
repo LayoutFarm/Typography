@@ -43,11 +43,14 @@ namespace Typography.OpenFont.Tables
 
     class CFFTable : TableEntry
     {
+        Cff1FontSet _cff1FontSet;
 
         public override string Name
         {
             get { return "CFF "; } //4 char, left 1 blank whitespace
         }
+
+        internal Cff1FontSet Cff1FontSet { get { return _cff1FontSet; } }
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -66,7 +69,6 @@ namespace Typography.OpenFont.Tables
             //Card8     hdrSize Header size(bytes)
             //OffSize   offSize Absolute offset(0) size
             byte[] header = reader.ReadBytes(4);
-
             byte major = header[0];
             byte minor = header[1];
             byte hdrSize = header[2];
@@ -81,6 +83,7 @@ namespace Typography.OpenFont.Tables
                     {
                         Cff1Parser cff1 = new Cff1Parser();
                         cff1.ParseAfterHeader(tableOffset, reader);
+                        _cff1FontSet = cff1.ResultCff1FontSet;
                     }
                     break;
                 case 2:

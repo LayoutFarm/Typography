@@ -28,6 +28,8 @@ namespace Typography.OpenFont
         }
 
     }
+
+
     public class OpenFontReader
     {
         /// <summary>
@@ -91,13 +93,13 @@ namespace Typography.OpenFont
                 //--------------
                 Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
-                 
+
                 Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
                 VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
                 //--------------
-               
+
 
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 //--------------
@@ -128,15 +130,13 @@ namespace Typography.OpenFont
                         //TODO: review here
                         throw new NotSupportedException();
                     }
-                    //... 
-
-                    
-
+                    //...  
+                    //PostScript outline font
                     typeface = new Typeface(
                           nameEntry,
                           header.Bounds,
                           header.UnitsPerEm,
-                          null,
+                          ccf,
                           horizontalMetrics,
                           os2Table);
                 }
@@ -196,6 +196,7 @@ namespace Typography.OpenFont
         static T ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, T resultTable)
             where T : TableEntry
         {
+
             TableEntry found;
             if (tables.TryGetTable(resultTable.Name, out found))
             {
@@ -219,5 +220,7 @@ namespace Typography.OpenFont
             //not found
             return null;
         }
+
+
     }
 }
