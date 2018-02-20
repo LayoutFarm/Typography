@@ -53,6 +53,407 @@ namespace Typography.OpenFont.CFF
         internal List<string> fontNames;
         internal List<Cff1Font> _fonts = new List<Cff1Font>();
         internal string[] _uniqueStringTable;
+
+
+
+
+        //
+        internal const int nStdStrings = 390;
+        internal static readonly string[] _StdStrings = new string[] {
+            //Appendix A: Standard Strings
+            ".notdef",
+            "space",
+            "exclam",
+            "quotedbl",
+            "numbersign",
+            "dollar",
+            "percent",
+            "ampersand",
+            "quoteright",
+            "parenleft",
+            "parenright",
+            "asterisk",
+            "plus",
+            "comma",
+            "hyphen",
+            "period",
+            "slash",
+            "zero",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine",
+            "colon",
+            "semicolon",
+            "less",
+            "equal",
+            "greater",
+            "question",
+            "at",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+            "bracketleft",
+            "backslash",
+            "bracketright",
+            "asciicircum",
+            "underscore",
+            "quoteleft",
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "o",
+            "p",
+            "q",
+            "r",
+            "s",
+            "t",
+            "u",
+            "v",
+            "w",
+            "x",
+            "y",
+            "z",
+            "braceleft",
+            "bar",
+            "braceright",
+            "asciitilde",
+            "exclamdown",
+            "cent",
+            "sterling",
+            "fraction",
+            "yen",
+            "florin",
+            "section",
+            "currency",
+            "quotesingle",
+            "quotedblleft",
+            "guillemotleft",
+            "guilsinglleft",
+            "guilsinglright",
+            "fi",
+            "fl",
+            "endash",
+            "dagger",
+            "daggerdbl",
+            "periodcentered",
+            "paragraph",
+            "bullet",
+            "quotesinglbase",
+            "quotedblbase",
+            "quotedblright",
+            "guillemotright",
+            "ellipsis",
+            "perthousand",
+            "questiondown",
+            "grave",
+            "acute",
+            "circumflex",
+            "tilde",
+            "macron",
+            "breve",
+            "dotaccent",
+            "dieresis",
+            "ring",
+            "cedilla",
+            "hungarumlaut",
+            "ogonek",
+            "caron",
+            "emdash",
+            "AE",
+            "ordfeminine",
+            "Lslash",
+            "Oslash",
+            "OE",
+            "ordmasculine",
+            "ae",
+            "dotlessi",
+            "lslash",
+            "oslash",
+            "oe",
+            "germandbls",
+            "onesuperior",
+            "logicalnot",
+            "mu",
+            "trademark",
+            "Eth",
+            "onehalf",
+            "plusminus",
+            "Thorn",
+            "onequarter",
+            "divide",
+            "brokenbar",
+            "degree",
+            "thorn",
+            "threequarters",
+            "twosuperior",
+            "registered",
+            "minus",
+            "eth",
+            "multiply",
+            "threesuperior",
+            "copyright",
+            "Aacute",
+            "Acircumflex",
+            "Adieresis",
+            "Agrave",
+            "Aring",
+            "Atilde",
+            "Ccedilla",
+            "Eacute",
+            "Ecircumflex",
+            "Edieresis",
+            "Egrave",
+            "Iacute",
+            "Icircumflex",
+            "Idieresis",
+            "Igrave",
+            "Ntilde",
+            "Oacute",
+            "Ocircumflex",
+            "Odieresis",
+            "Ograve",
+            "Otilde",
+            "Scaron",
+            "Uacute",
+            "Ucircumflex",
+            "Udieresis",
+            "Ugrave",
+            "Yacute",
+            "Ydieresis",
+            "Zcaron",
+            "aacute",
+            "acircumflex",
+            "adieresis",
+            "agrave",
+            "aring",
+            "atilde",
+            "ccedilla",
+            "eacute",
+            "ecircumflex",
+            "edieresis",
+            "egrave",
+            "iacute",
+            "icircumflex",
+            "idieresis",
+            "igrave",
+            "ntilde",
+            "oacute",
+            "ocircumflex",
+            "odieresis",
+            "ograve",
+            "otilde",
+            "scaron",
+            "uacute",
+            "ucircumflex",
+            "udieresis",
+            "ugrave",
+            "yacute",
+            "ydieresis",
+            "zcaron",
+            "exclamsmall",
+            "Hungarumlautsmall",
+            "dollaroldstyle",
+            "dollarsuperior",
+            "ampersandsmall",
+            "Acutesmall",
+            "parenleftsuperior",
+            "parenrightsuperior",
+            "twodotenleader",
+            "onedotenleader",
+            "zerooldstyle",
+            "oneoldstyle",
+            "twooldstyle",
+            "threeoldstyle",
+            "fouroldstyle",
+            "fiveoldstyle",
+            "sixoldstyle",
+            "sevenoldstyle",
+            "eightoldstyle",
+            "nineoldstyle",
+            "commasuperior",
+            "threequartersemdash",
+            "periodsuperior",
+            "questionsmall",
+            "asuperior",
+            "bsuperior",
+            "centsuperior",
+            "dsuperior",
+            "esuperior",
+            "isuperior",
+            "lsuperior",
+            "msuperior",
+            "nsuperior",
+            "osuperior",
+            "rsuperior",
+            "ssuperior",
+            "tsuperior",
+            "ff",
+            "ffi",
+            "ffl",
+            "parenleftinferior",
+            "parenrightinferior",
+            "Circumflexsmall",
+            "hyphensuperior",
+            "Gravesmall",
+            "Asmall",
+            "Bsmall",
+            "Csmall",
+            "Dsmall",
+            "Esmall",
+            "Fsmall",
+            "Gsmall",
+            "Hsmall",
+            "Ismall",
+            "Jsmall",
+            "Ksmall",
+            "Lsmall",
+            "Msmall",
+            "Nsmall",
+            "Osmall",
+            "Psmall",
+            "Qsmall",
+            "Rsmall",
+            "Ssmall",
+            "Tsmall",
+            "Usmall",
+            "Vsmall",
+            "Wsmall",
+            "Xsmall",
+            "Ysmall",
+            "Zsmall",
+            "colonmonetary",
+            "onefitted",
+            "rupiah",
+            "Tildesmall",
+            "exclamdownsmall",
+            "centoldstyle",
+            "Lslashsmall",
+            "Scaronsmall",
+            "Zcaronsmall",
+            "Dieresissmall",
+            "Brevesmall",
+            "Caronsmall",
+            "Dotaccentsmall",
+            "Macronsmall",
+            "figuredash",
+            "hypheninferior",
+            "Ogoneksmall",
+            "Ringsmall",
+            "Cedillasmall",
+            "questiondownsmall",
+            "oneeighth",
+            "threeeighths",
+            "fiveeighths",
+            "seveneighths",
+            "onethird",
+            "twothirds",
+            "zerosuperior",
+            "foursuperior",
+            "fivesuperior",
+            "sixsuperior",
+            "sevensuperior",
+            "eightsuperior",
+            "ninesuperior",
+            "zeroinferior",
+            "oneinferior",
+            "twoinferior",
+            "threeinferior",
+            "fourinferior",
+            "fiveinferior",
+            "sixinferior",
+            "seveninferior",
+            "eightinferior",
+            "nineinferior",
+            "centinferior",
+            "dollarinferior",
+            "periodinferior",
+            "commainferior",
+            "Agravesmall",
+            "Aacutesmall",
+            "Acircumflexsmall",
+            "Atildesmall",
+            "Adieresissmall",
+            "Aringsmall",
+            "AEsmall",
+            "Ccedillasmall",
+            "Egravesmall",
+            "Eacutesmall",
+            "Ecircumflexsmall",
+            "Edieresissmall",
+            "Igravesmall",
+            "Iacutesmall",
+            "Icircumflexsmall",
+            "Idieresissmall",
+            "Ethsmall",
+            "Ntildesmall",
+            "Ogravesmall",
+            "Oacutesmall",
+            "Ocircumflexsmall",
+            "Otildesmall",
+            "Odieresissmall",
+            "OEsmall",
+            "Oslashsmall",
+            "Ugravesmall",
+            "Uacutesmall",
+            "Ucircumflexsmall",
+            "Udieresissmall",
+            "Yacutesmall",
+            "Thornsmall",
+            "Ydieresissmall",
+            "001.000",
+            "001.001",
+            "001.002",
+            "001.003",
+            "Black",
+            "Bold",
+            "Book",
+            "Light",
+            "Medium",
+            "Regular",
+            "Roman",
+            "Semibold"  };//390
+
+
     }
     class Cff1Font
     {
@@ -70,7 +471,19 @@ namespace Typography.OpenFont.CFF
         public byte[] RawGlyphInstructions { get; set; }
         public string Name { get; set; }
         public int GlyphIndex { get; set; }
-
+#if DEBUG
+        public override string ToString()
+        {
+            StringBuilder stbuilder = new StringBuilder();
+            stbuilder.Append(GlyphIndex);
+            if (Name != null)
+            {
+                stbuilder.Append(" ");
+                stbuilder.Append(Name);
+            }
+            return stbuilder.ToString();
+        }
+#endif
     }
     class Cff1Parser
     {
@@ -115,6 +528,10 @@ namespace Typography.OpenFont.CFF
         List<CffDataDicEntry> _topDic;
         uint _cffStartAt;
 
+        int _charStringsOffset;
+        int _charsetOffset;
+
+
         public void ParseAfterHeader(uint cffStartAt, BinaryReader reader)
         {
             _cffStartAt = cffStartAt;
@@ -126,11 +543,19 @@ namespace Typography.OpenFont.CFF
             ReadStringIndex();
             ReadGlobalSubrIndex();
 
-            ReadEncodings();
-            ReadCharsets();
-            ReadFDSelect();
+            //----------------------
             ReadCharStringsIndex();
+            ReadCharsets();
+            ReadEncodings();
+
+            ReadFDSelect();
+
             //...
+        }
+
+        public Cff1FontSet ResultCff1FontSet
+        {
+            get { return _cff1FontSet; }
         }
 
         void ReadNameIndex()
@@ -196,7 +621,7 @@ namespace Typography.OpenFont.CFF
             }
             _currentCff1Font = new Cff1Font();
             _currentCff1Font.FontName = fontNames[0];
-
+            _cff1FontSet._fonts.Add(_currentCff1Font);
         }
 
         void ReadTopDICTIndex()
@@ -234,12 +659,34 @@ namespace Typography.OpenFont.CFF
                 CffIndexOffset offset = offsets[i];
                 List<CffDataDicEntry> dicData = ReadDICTData(offset.len);
                 _topDic = dicData;
+            }
+
+
+            //translate top-dic
+            foreach (CffDataDicEntry entry in _topDic)
+            {
+                switch (entry._operator.Name)
+                {
+                    case "CharStrings":
+                        _charStringsOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "charset":
+                        _charsetOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "Encoding":
+                        break;
+                }
+
+
 
             }
 
+
         }
 
-        string[] uniqueStringTable;
+        string[] _uniqueStringTable;
+
+
 
         void ReadStringIndex()
         {
@@ -287,17 +734,17 @@ namespace Typography.OpenFont.CFF
             //
 
             int count = offsets.Length;
-            uniqueStringTable = new string[count];
+            _uniqueStringTable = new string[count];
             for (int i = 0; i < count; ++i)
             {
                 CffIndexOffset offset = offsets[i];
                 //TODO: review here again, 
                 //check if we need to set _reader.BaseStream.Position or not 
                 //TODO: Is Charsets.ISO_8859_1 Encoding supported in .netcore 
-                uniqueStringTable[i] = System.Text.Encoding.UTF8.GetString(_reader.ReadBytes(offset.len));
+                _uniqueStringTable[i] = System.Text.Encoding.UTF8.GetString(_reader.ReadBytes(offset.len));
             }
 
-            _cff1FontSet._uniqueStringTable = uniqueStringTable;
+            _cff1FontSet._uniqueStringTable = _uniqueStringTable;
         }
 
         void ReadGlobalSubrIndex()
@@ -368,9 +815,6 @@ namespace Typography.OpenFont.CFF
                     }
                     break;
             }
-
-
-
             //TODO: ...
         }
         void ReadCharsets()
@@ -383,6 +827,7 @@ namespace Typography.OpenFont.CFF
             //Three formats are currently defined as shown in Tables
             //17, 18, and 20.
 
+            _reader.BaseStream.Position = _cffStartAt + _charsetOffset;
             //TODO: ...
             byte format = _reader.ReadByte();
             switch (format)
@@ -390,21 +835,50 @@ namespace Typography.OpenFont.CFF
                 default:
                     throw new NotSupportedException();
                 case 0:
-                    throw new NotSupportedException();
+                    ReadCharsetsFormat0();
                     break;
                 case 1:
                     ReadCharsetsFormat1();
                     break;
                 case 2:
                     throw new NotSupportedException();
-                    break;
+
             }
         }
         void ReadCharsetsFormat0()
         {
+            //Table 17: Format 0
+            //Type	    Name		        Description
+            //Card8     format    		    =0
+            //SID       glyph[nGlyphs-1] 	Glyph name array
 
+            //Each element of the glyph array represents the name of the 
+            //corresponding glyph. This format should be used when the SIDs 
+            //are in a fairly random order. The number of glyphs (nGlyphs) is 
+            //the value of the count field in the 
+            //CharStrings INDEX. (There is 
+            //one less element in the glyph name array than nGlyphs because 
+            //the .notdef glyph name is omitted.)
+
+
+
+            Cff1Glyph[] cff1Glyphs = _currentCff1Font.glyphs;
+            int nGlyphs = cff1Glyphs.Length;
+            for (int i = 1; i < nGlyphs; ++i)
+            {
+                //fill font name?
+                ushort sid = _reader.ReadUInt16();
+                if (sid <= Cff1FontSet.nStdStrings)
+                {
+                    //use standard name
+                    cff1Glyphs[i].Name = Cff1FontSet._StdStrings[sid];
+                }
+                else
+                {
+                    cff1Glyphs[i].Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings];
+                }
+            }
         }
-
         void ReadCharsetsFormat1()
         {
             //Table 18 Format 1
@@ -424,9 +898,12 @@ namespace Typography.OpenFont.CFF
             //font are covered. This format is particularly suited to charsets
             //that are well ordered
 
+            throw new NotSupportedException();
 
             int sid = _reader.ReadUInt16();//string iden (SID)
             byte nleft = _reader.ReadByte();
+
+
         }
         void ReadCharsetsFormat2()
         {
@@ -479,7 +956,7 @@ namespace Typography.OpenFont.CFF
             //“Type 2 Charstring Format.” Other charstring types may also be
             //supported by this method. 
 
-            _reader.BaseStream.Position = _cffStartAt + charStringsOffsetStartAt;
+            _reader.BaseStream.Position = _cffStartAt + _charStringsOffset;
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
             int glyphCount = offsets.Length;
             //assume Type2
@@ -596,18 +1073,11 @@ namespace Typography.OpenFont.CFF
             {
                 CffDataDicEntry dicEntry = ReadEntry();
                 dicData.Add(dicEntry);
-
-
-                //temp fix
-                if (dicEntry._operator.Name == "CharStrings")
-                {
-                    charStringsOffsetStartAt = (int)dicEntry.operands[0]._realNumValue;
-                }
-
             }
             return dicData;
         }
-        int charStringsOffsetStartAt;
+
+
 
         CffDataDicEntry ReadEntry()
         {
@@ -692,8 +1162,10 @@ namespace Typography.OpenFont.CFF
                 nibbles[0] = b / 16;
                 nibbles[1] = b % 16;
 
-                foreach (int nibble in nibbles)
+                for (int i = 0; i < 2; ++i)
                 {
+                    int nibble = nibbles[i];
+
                     switch (nibble)
                     {
                         case 0x0:
