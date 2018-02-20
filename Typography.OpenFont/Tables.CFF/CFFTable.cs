@@ -1,4 +1,4 @@
-﻿//Apache2, 2018, Apache/PdfBox Authors ( https://github.com/apache/pdfbox) 
+﻿//Apache2, 2018, Apache/PDFBox Authors ( https://github.com/apache/pdfbox) 
 //
 //
 //Apache PDFBox

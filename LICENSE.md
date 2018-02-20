@@ -24,6 +24,8 @@ BSD, 2009-2010, Poly2Tri Contributors, from https://github.com/PaintLab/poly2tri
 
 SGI, 2000, Eric Veach, Tesselate.
 
+MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
+
 **Font**
 
 MIT, 2016-2017, WinterDev, from https://github.com/LayoutFarm/Typography
@@ -34,7 +36,7 @@ MIT, 2015, Michael Popoloski MIT, from https://github.com/MikePopoloski/SharpFon
 
 The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robert Wilhelm, and Werner Lemberg and others, from https://www.freetype.org/
 
-MIT, 2016, Viktor Chlumsky, from https://github.com/Chlumsky/msdfgen
+Apache2, 2018, Apache/PDFBox Authors ( https://github.com/apache/pdfbox) 
 
 **Platforms**
 
