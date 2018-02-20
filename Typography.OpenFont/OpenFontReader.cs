@@ -122,6 +122,7 @@ namespace Typography.OpenFont
 
                 //--------------------------------------------- 
                 Typeface typeface = null;
+                bool isPostScriptOutline = false;
                 if (glyf == null)
                 {
                     //check if this is cff table ?
@@ -131,7 +132,8 @@ namespace Typography.OpenFont
                         throw new NotSupportedException();
                     }
                     //...  
-                    //PostScript outline font
+                    //PostScript outline font 
+                    isPostScriptOutline = true;
                     typeface = new Typeface(
                           nameEntry,
                           header.Bounds,
@@ -164,21 +166,25 @@ namespace Typography.OpenFont
                 typeface.MaxProfile = maximumProfile;
                 typeface.HheaTable = horizontalHeader;
                 //----------------------------
-                FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
-                //control values table
-                CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
-                if (cvtTable != null)
+
+                if (!isPostScriptOutline)
                 {
-                    typeface.ControlValues = cvtTable.controlValues;
-                }
-                if (fpgmTable != null)
-                {
-                    typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
-                }
-                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
-                if (propProgramTable != null)
-                {
-                    typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                    FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
+                    //control values table
+                    CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
+                    if (cvtTable != null)
+                    {
+                        typeface.ControlValues = cvtTable.controlValues;
+                    }
+                    if (fpgmTable != null)
+                    {
+                        typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
+                    }
+                    PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
+                    if (propProgramTable != null)
+                    {
+                        typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                    }
                 }
                 //-------------------------
                 typeface.LoadOpenFontLayoutInfo(
