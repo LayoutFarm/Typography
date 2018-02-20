@@ -1,4 +1,4 @@
-﻿//Apapche, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
+﻿//Apache2, 2018, Apache/PdfBox Authors ( https://github.com/apache/pdfbox) 
 //
 //
 //Apache PDFBox
@@ -52,6 +52,11 @@ namespace Typography.OpenFont.Tables
         protected override void ReadContentFrom(BinaryReader reader)
         {
             uint tableOffset = this.Header.Offset;
+            if (reader.BaseStream.Position != tableOffset)
+            {
+
+            }
+
             //
             //
             //Table 8 Header Format
@@ -75,7 +80,7 @@ namespace Typography.OpenFont.Tables
                 case 1:
                     {
                         Cff1Parser cff1 = new Cff1Parser();
-                        cff1.ParseAfterHader(reader);
+                        cff1.ParseAfterHader(tableOffset, reader);
                     }
                     break;
                 case 2:

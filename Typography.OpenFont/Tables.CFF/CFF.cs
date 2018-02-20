@@ -27,6 +27,12 @@
 //Adobe's The Compact Font Format Specification
 //from http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf
 
+//Type1CharString Format spec:
+//https://www-cdf.fnal.gov/offline/PostScript/T1_SPEC.PDF
+
+//Type2CharString Format spec:
+//http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+
 //------------------------------------------------------------------
 //many areas are ported from Java code
 //Apache2, 2018, WinterDev
@@ -91,8 +97,11 @@ namespace Typography.OpenFont.CFF
         Cff1FontSet _cff1FontSet;
 
         List<CffDataDicEntry> _topDic;
-        public void ParseAfterHader(BinaryReader reader)
+        uint _cffStartAt;
+
+        public void ParseAfterHader(uint cffStartAt, BinaryReader reader)
         {
+            _cffStartAt = cffStartAt;
             _cff1FontSet = new Cff1FontSet();
             _reader = reader;
             //
@@ -100,6 +109,7 @@ namespace Typography.OpenFont.CFF
             ReadTopDICTIndex();
             ReadStringIndex();
             ReadGlobalSubrIndex();
+
             ReadEncodings();
             ReadCharsets();
             ReadFDSelect();
@@ -194,10 +204,15 @@ namespace Typography.OpenFont.CFF
                 //read DICT data
                 CffIndexOffset offset = offsets[i];
                 List<CffDataDicEntry> dicData = ReadDICTData(offset.len);
-
                 _topDic = dicData;
+
+
+
             }
+
         }
+
+        List<string> uniqueStringTable;
 
         void ReadStringIndex()
         {
@@ -245,7 +260,7 @@ namespace Typography.OpenFont.CFF
             //
 
             int count = offsets.Length;
-            List<string> uniqueStringTable = new List<string>();
+            uniqueStringTable = new List<string>();
             for (int i = 0; i < count; ++i)
             {
                 CffIndexOffset offset = offsets[i];
@@ -254,9 +269,6 @@ namespace Typography.OpenFont.CFF
                 //TODO: Is Charsets.ISO_8859_1 Encoding supported in .netcore 
                 uniqueStringTable.Add(System.Text.Encoding.UTF8.GetString(_reader.ReadBytes(offset.len)));
             }
-
-
-
         }
 
         void ReadGlobalSubrIndex()
@@ -364,10 +376,15 @@ namespace Typography.OpenFont.CFF
 
         void ReadCharsetsFormat1()
         {
+            //Table 18 Format 1
+            //Type		Name	            Description
+            //Card8		format		        =1
+            //struct	Range1[<varies>]	Range1 array (see Table  19)
+
             //Table 19 Range1 Format (Charset)
-            //Type            Name          Description
-            //SID             first         First glyph in range
-            //Card8           nLeft         Glyphs left in range(excluding first)
+            //Type      Name          Description
+            //SID       first         First glyph in range
+            //Card8     nLeft         Glyphs left in range(excluding first)
 
 
             //Each Range1 describes a group of sequential SIDs. The number
@@ -375,6 +392,7 @@ namespace Typography.OpenFont.CFF
             //utilizing this data simply processes ranges until all glyphs in the
             //font are covered. This format is particularly suited to charsets
             //that are well ordered
+
 
             int sid = _reader.ReadUInt16();//string iden (SID)
             byte nleft = _reader.ReadByte();
@@ -432,19 +450,27 @@ namespace Typography.OpenFont.CFF
 
             //Type 2 charstrings are described in Adobe Technical Note #5177: 
             //“Type 2 Charstring Format.” Other charstring types may also be
-            //supported by this method.
+            //supported by this method. 
 
-
-
+            _reader.BaseStream.Position = _cffStartAt + charStringsOffsetStartAt;
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
+            int glyphCount = offsets.Length;
+            //assume Type2
+            //TODO: review here 
 
+            Type2CharStringParser type2CharStringParser = new Type2CharStringParser();
 
-
+            for (int i = 0; i < glyphCount; ++i)
+            {
+                CffIndexOffset offset = offsets[i];
+                //_reader.BaseStream.Position = _cffStartAt + offset.startOffset;
+                byte[] buffer = _reader.ReadBytes(offset.len);
+                //parse here or later 
+                type2CharStringParser.ParseType2CharsString(buffer);
+            }
             //TODO: ...
-
-
-
         }
+
         void ReadFormat0Encoding()
         {
 
@@ -524,19 +550,26 @@ namespace Typography.OpenFont.CFF
 
             //-----------------------------
             //A DICT is simply a sequence of 
-            //operand(s)/operator bytes concatenated together. 
-
-
+            //operand(s)/operator bytes concatenated together.  
             int endBefore = (int)(_reader.BaseStream.Position + len);
-
             List<CffDataDicEntry> dicData = new List<CffDataDicEntry>();
             while (_reader.BaseStream.Position < endBefore)
             {
                 CffDataDicEntry dicEntry = ReadEntry();
                 dicData.Add(dicEntry);
+
+
+                //temp fix
+                if (dicEntry._operator.Name == "CharStrings")
+                {
+                    charStringsOffsetStartAt = (int)dicEntry.operands[0]._realNumValue;
+                }
+
             }
             return dicData;
         }
+        int charStringsOffsetStartAt;
+
         CffDataDicEntry ReadEntry()
         {
             //-----------------------------
@@ -561,7 +594,7 @@ namespace Typography.OpenFont.CFF
             {
                 byte b0 = _reader.ReadByte();
 
-                if (b0 >= 0 && b0 < 21)
+                if (b0 >= 0 && b0 <= 21)
                 {
                     //operators
                     dicEntry._operator = ReadOperator(b0);
@@ -709,8 +742,11 @@ namespace Typography.OpenFont.CFF
             {
                 throw new Exception();
             }
-
         }
+
+
+
+
         CffIndexOffset[] ReadIndexDataOffsets()
         {
 
@@ -931,7 +967,7 @@ namespace Typography.OpenFont.CFF
             Register(12, 3, "UnderlinePosition", OperatorOperandKind.Number);
             Register(12, 4, "UnderlineThickness", OperatorOperandKind.Number);
             Register(12, 5, "PaintType", OperatorOperandKind.Number);
-            Register(12, 6, "CharstringType", OperatorOperandKind.Number);
+            Register(12, 6, "CharstringType", OperatorOperandKind.Number); //default value 2
             Register(12, 7, "FontMatrix", OperatorOperandKind.Array);
             Register(13, "UniqueID", OperatorOperandKind.Number);
             Register(5, "FontBBox", OperatorOperandKind.Array);

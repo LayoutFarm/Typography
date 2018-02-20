@@ -85,18 +85,20 @@ namespace Typography.OpenFont
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
 
+                PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
+                CFFTable ccf = ReadTableIfExists(tables, input, new CFFTable());
+
                 //--------------
                 Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
-
-                CFFTable ccf = ReadTableIfExists(tables, input, new CFFTable());
-
+                 
                 Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
                 VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
                 //--------------
-                PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
+               
+
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 //--------------
                 //advanced typography

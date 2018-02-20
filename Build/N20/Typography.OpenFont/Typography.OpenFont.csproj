@@ -122,6 +122,9 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.CFF\CFFTable.cs">
       <Link>Tables.CFF\CFFTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.CFF\Type2CharStringParser.cs">
+      <Link>Tables.CFF\Type2CharStringParser.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.Others\EBLCTable.cs">
       <Link>Tables.Others\EBLCTable.cs</Link>
     </Compile>

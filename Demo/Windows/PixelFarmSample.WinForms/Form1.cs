@@ -57,7 +57,7 @@ namespace SampleWinForms
             _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
 
 
-            this.Load += new EventHandler(Form1_Load);
+            
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             button1.Click += (s, e) => UpdateRenderOutput();
 
@@ -99,11 +99,7 @@ namespace SampleWinForms
 
 
 
-
-        void Form1_Load(object sender, EventArgs e)
-        {
-            this.Text = "Render with PixelFarm";
-        }
+         
         bool _readyToRender;
         void UpdateRenderOutput()
         {
@@ -528,9 +524,9 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
-        private void Form1_Load_1(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
-
+            this.Text = "Render with PixelFarm";
         }
     }
 }

@@ -39,6 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\CFFTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\CFF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\Type2CharStringParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\EBLCTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\HorizontalDeviceMetrics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Kern.cs" />
