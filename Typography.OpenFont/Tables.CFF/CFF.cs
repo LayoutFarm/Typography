@@ -453,12 +453,32 @@ namespace Typography.OpenFont.CFF
             "Roman",
             "Semibold"  };//390
 
-
     }
     class Cff1Font
     {
         internal string FontName { get; set; }
         internal Cff1Glyph[] glyphs;
+
+
+        Dictionary<string, Cff1Glyph> _cachedGlyphDicByName;
+        public Cff1Glyph GetGlyphByName(string name)
+        {
+            if (_cachedGlyphDicByName == null)
+            {
+                //create a cache ... 
+                _cachedGlyphDicByName = new Dictionary<string, Cff1Glyph>();
+                int j = glyphs.Length;
+                for (int i = 1; i < j; ++i)
+                {
+                    Cff1Glyph cff1Glyph = glyphs[i];
+                    _cachedGlyphDicByName.Add(cff1Glyph.Name, cff1Glyph);
+                }
+            }
+            Cff1Glyph found;
+            _cachedGlyphDicByName.TryGetValue(name, out found);
+            return found;
+
+        }
 
     }
 

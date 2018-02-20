@@ -139,6 +139,12 @@ namespace Typography.OpenFont
                           ccf,
                           horizontalMetrics,
                           os2Table);
+
+#if DEBUG
+                    //test
+                    int found = typeface.GetGlyphIndexByName("Uacute");
+#endif
+
                 }
                 else
                 {

@@ -203,6 +203,23 @@ namespace Typography.OpenFont
             return _glyphs[glyphIndex];
         }
 
+        public int GetGlyphIndexByName(string glyphName)
+        {
+            if (_cffTable != null)
+            {
+                //early preview ...
+                CFF.Cff1Font cff1Font = _cffTable.Cff1FontSet._fonts[0];
+                return cff1Font.GetGlyphByName(glyphName).GlyphIndex;
+            }
+            else
+            {
+                //TODO: implement this ...
+                return 0;
+            }
+
+        }
+
+
         public ushort GetAdvanceWidth(int codepoint)
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
