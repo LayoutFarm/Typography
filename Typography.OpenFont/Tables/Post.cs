@@ -102,9 +102,25 @@ namespace Typography.OpenFont.Tables
 
                 ushort numOfGlyphs = reader.ReadUInt16();
                 ushort[] glyphNameIndice = Utils.ReadUInt16Array(reader, numOfGlyphs);
-                
-                 
+                int newGlyphCount = 0;
 
+                System.Collections.Generic.List<ushort> newGlyphs = new System.Collections.Generic.List<ushort>(numOfGlyphs - 258);
+                for (int i = 0; i < numOfGlyphs; ++i)
+                {
+                    ushort glyphNameIndex = glyphNameIndice[i];
+                    if (glyphNameIndex > 258)
+                    {
+                        newGlyphs.Add((ushort)(glyphNameIndex - 258));
+                        newGlyphCount++;
+                    }
+                    //TODO: get standard Macintosh set. 
+                }
+                //read 'new' glyph name
+                for (int i = 0; i < newGlyphCount; ++i)
+                {
+                    int len = reader.ReadByte();
+                    string glyphName = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len));
+                }
             }
             else
             {
