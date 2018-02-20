@@ -27,6 +27,7 @@ namespace Typography.OpenFont
             Bounds bounds,
             byte[] glyphInstructions)
         {
+            //create from TTF 
 
 #if DEBUG
             this.dbugId = s_debugTotalId++;
@@ -37,6 +38,18 @@ namespace Typography.OpenFont
             GlyphInstructions = glyphInstructions;
         }
 
+
+        internal CFF.Cff1GlyphData _cff1GlyphData; //temp
+        internal Glyph(CFF.Cff1GlyphData cff1Glyph)
+        {
+#if DEBUG
+            this.dbugId = s_debugTotalId++;
+#endif
+
+
+            //create from CFF 
+            this._cff1GlyphData = cff1Glyph;
+        }
 
         public Bounds Bounds { get { return _bounds; } }
         public ushort[] EndPoints { get { return _contourEndPoints; } }

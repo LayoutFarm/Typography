@@ -457,24 +457,24 @@ namespace Typography.OpenFont.CFF
     class Cff1Font
     {
         internal string FontName { get; set; }
-        internal Cff1Glyph[] glyphs;
+        internal Glyph[] glyphs;
 
 
-        Dictionary<string, Cff1Glyph> _cachedGlyphDicByName;
-        public Cff1Glyph GetGlyphByName(string name)
+        Dictionary<string, Glyph> _cachedGlyphDicByName;
+        public Glyph GetGlyphByName(string name)
         {
             if (_cachedGlyphDicByName == null)
             {
                 //create a cache ... 
-                _cachedGlyphDicByName = new Dictionary<string, Cff1Glyph>();
+                _cachedGlyphDicByName = new Dictionary<string, Glyph>();
                 int j = glyphs.Length;
                 for (int i = 1; i < j; ++i)
                 {
-                    Cff1Glyph cff1Glyph = glyphs[i];
-                    _cachedGlyphDicByName.Add(cff1Glyph.Name, cff1Glyph);
+                    Glyph cff1Glyph = glyphs[i];
+                    _cachedGlyphDicByName.Add(cff1Glyph._cff1GlyphData.Name, cff1Glyph);
                 }
             }
-            Cff1Glyph found;
+            Glyph found;
             _cachedGlyphDicByName.TryGetValue(name, out found);
             return found;
 
@@ -482,10 +482,10 @@ namespace Typography.OpenFont.CFF
 
     }
 
-    class Cff1Glyph
+    class Cff1GlyphData
     {
 
-        public Cff1Glyph()
+        public Cff1GlyphData()
         {
         }
         public byte[] RawGlyphInstructions { get; set; }
@@ -505,6 +505,7 @@ namespace Typography.OpenFont.CFF
         }
 #endif
     }
+
     class Cff1Parser
     {
 
@@ -880,9 +881,7 @@ namespace Typography.OpenFont.CFF
             //one less element in the glyph name array than nGlyphs because 
             //the .notdef glyph name is omitted.)
 
-
-
-            Cff1Glyph[] cff1Glyphs = _currentCff1Font.glyphs;
+            Glyph[] cff1Glyphs = _currentCff1Font.glyphs;
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs; ++i)
             {
@@ -891,11 +890,12 @@ namespace Typography.OpenFont.CFF
                 if (sid <= Cff1FontSet.nStdStrings)
                 {
                     //use standard name
-                    cff1Glyphs[i].Name = Cff1FontSet._StdStrings[sid];
+                    //TODO: review here
+                    cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet._StdStrings[sid];
                 }
                 else
                 {
-                    cff1Glyphs[i].Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings];
+                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings];
                 }
             }
         }
@@ -983,9 +983,9 @@ namespace Typography.OpenFont.CFF
             //TODO: review here 
 
             Type2CharStringParser type2CharStringParser = new Type2CharStringParser();
-            Cff1Glyph[] glyphs = new Cff1Glyph[glyphCount];
-            _currentCff1Font.glyphs = glyphs;
+            Glyph[] glyphs = new Glyph[glyphCount];
 
+            _currentCff1Font.glyphs = glyphs;
             for (int i = 0; i < glyphCount; ++i)
             {
                 CffIndexOffset offset = offsets[i];
@@ -999,9 +999,7 @@ namespace Typography.OpenFont.CFF
                 }
 #endif
 
-                glyphs[i] = new Cff1Glyph() { RawGlyphInstructions = buffer, GlyphIndex = i };
-
-
+                glyphs[i] = new Glyph(new Cff1GlyphData() { RawGlyphInstructions = buffer, GlyphIndex = i });
                 //parse here or later 
                 //type2CharStringParser.ParseType2CharsString(buffer);
             }
