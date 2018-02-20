@@ -79,12 +79,12 @@ namespace Typography.OpenFont
                 OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
                 NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
 
-
                 Head header = ReadTableIfExists(tables, input, new Head());
                 MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
 
+                //---
                 PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
                 CFFTable ccf = ReadTableIfExists(tables, input, new CFFTable());
 

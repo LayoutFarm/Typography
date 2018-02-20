@@ -52,10 +52,25 @@ namespace Typography.OpenFont.CFF
     {
         internal List<string> fontNames;
         internal List<Cff1Font> _fonts = new List<Cff1Font>();
+        internal string[] _uniqueStringTable;
     }
     class Cff1Font
     {
         internal string FontName { get; set; }
+        internal Cff1Glyph[] glyphs;
+
+    }
+
+    class Cff1Glyph
+    {
+
+        public Cff1Glyph()
+        {
+        }
+        public byte[] RawGlyphInstructions { get; set; }
+        public string Name { get; set; }
+        public int GlyphIndex { get; set; }
+
     }
     class Cff1Parser
     {
@@ -95,11 +110,12 @@ namespace Typography.OpenFont.CFF
         BinaryReader _reader;
 
         Cff1FontSet _cff1FontSet;
+        Cff1Font _currentCff1Font;
 
         List<CffDataDicEntry> _topDic;
         uint _cffStartAt;
 
-        public void ParseAfterHader(uint cffStartAt, BinaryReader reader)
+        public void ParseAfterHeader(uint cffStartAt, BinaryReader reader)
         {
             _cffStartAt = cffStartAt;
             _cff1FontSet = new Cff1FontSet();
@@ -171,6 +187,16 @@ namespace Typography.OpenFont.CFF
             _cff1FontSet.fontNames = fontNames;
 
 
+            //TODO: review here
+            //in this version 
+            //count ==1
+            if (count != 1)
+            {
+                throw new NotSupportedException();
+            }
+            _currentCff1Font = new Cff1Font();
+            _currentCff1Font.FontName = fontNames[0];
+
         }
 
         void ReadTopDICTIndex()
@@ -197,8 +223,11 @@ namespace Typography.OpenFont.CFF
             if (count > 1)
             {
                 //temp...
+                //TODO: review here again
                 throw new NotSupportedException();
             }
+
+            //
             for (int i = 0; i < count; ++i)
             {
                 //read DICT data
@@ -206,13 +235,11 @@ namespace Typography.OpenFont.CFF
                 List<CffDataDicEntry> dicData = ReadDICTData(offset.len);
                 _topDic = dicData;
 
-
-
             }
 
         }
 
-        List<string> uniqueStringTable;
+        string[] uniqueStringTable;
 
         void ReadStringIndex()
         {
@@ -260,15 +287,17 @@ namespace Typography.OpenFont.CFF
             //
 
             int count = offsets.Length;
-            uniqueStringTable = new List<string>();
+            uniqueStringTable = new string[count];
             for (int i = 0; i < count; ++i)
             {
                 CffIndexOffset offset = offsets[i];
                 //TODO: review here again, 
                 //check if we need to set _reader.BaseStream.Position or not 
                 //TODO: Is Charsets.ISO_8859_1 Encoding supported in .netcore 
-                uniqueStringTable.Add(System.Text.Encoding.UTF8.GetString(_reader.ReadBytes(offset.len)));
+                uniqueStringTable[i] = System.Text.Encoding.UTF8.GetString(_reader.ReadBytes(offset.len));
             }
+
+            _cff1FontSet._uniqueStringTable = uniqueStringTable;
         }
 
         void ReadGlobalSubrIndex()
@@ -316,7 +345,9 @@ namespace Typography.OpenFont.CFF
 
             //Only one Encoding operator can be
             //specified per font except for CIDFonts which specify no
-            //encoding.A glyph’s encoding is specified by a 1 - byte code that
+            //encoding.
+
+            //A glyph’s encoding is specified by a 1 - byte code that
             //permits values in the range 0 - 255.
 
 
@@ -412,12 +443,8 @@ namespace Typography.OpenFont.CFF
             //FDSelect data is located via the offset operand to the
             //FDSelect operator in the Top DICT.FDSelect data specifies a format - type
             //identifier byte followed by format-specific data.Two formats
-            //are currently defined, as shown in Tables  27 and 28.
-
-
-            //TODO: ...
-
-
+            //are currently defined, as shown in Tables  27 and 28. 
+            //TODO: ... 
         }
         void ReadCharStringsIndex()
         {
@@ -459,16 +486,28 @@ namespace Typography.OpenFont.CFF
             //TODO: review here 
 
             Type2CharStringParser type2CharStringParser = new Type2CharStringParser();
+            Cff1Glyph[] glyphs = new Cff1Glyph[glyphCount];
+            _currentCff1Font.glyphs = glyphs;
 
             for (int i = 0; i < glyphCount; ++i)
             {
                 CffIndexOffset offset = offsets[i];
-                //_reader.BaseStream.Position = _cffStartAt + offset.startOffset;
                 byte[] buffer = _reader.ReadBytes(offset.len);
+#if DEBUG
+                //check
+                if (buffer[offset.len - 1] != 14)
+                {
+                    //endchar
+                    throw new Exception("invalid end char?");
+                }
+#endif
+
+                glyphs[i] = new Cff1Glyph() { RawGlyphInstructions = buffer, GlyphIndex = i };
+
+
                 //parse here or later 
-                type2CharStringParser.ParseType2CharsString(buffer);
+                //type2CharStringParser.ParseType2CharsString(buffer);
             }
-            //TODO: ...
         }
 
         void ReadFormat0Encoding()
@@ -1037,7 +1076,7 @@ namespace Typography.OpenFont.CFF
         //Font DICT INDEX
         //Array of Font DICT  Included in Font DICT INDEX.
         //Private DICT    One per Font DICT.
-        public void ParseAfterHader(BinaryReader reader)
+        public void ParseAfterHeader(BinaryReader reader)
         {
 
         }
