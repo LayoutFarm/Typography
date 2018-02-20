@@ -80,13 +80,13 @@ namespace Typography.OpenFont.Tables
                 case 1:
                     {
                         Cff1Parser cff1 = new Cff1Parser();
-                        cff1.ParseAfterHader(tableOffset, reader);
+                        cff1.ParseAfterHeader(tableOffset, reader);
                     }
                     break;
                 case 2:
                     {
                         Cff2Parser cff2 = new Cff2Parser();
-                        cff2.ParseAfterHader(reader);
+                        cff2.ParseAfterHeader(reader);
                     }
                     break;
             }
