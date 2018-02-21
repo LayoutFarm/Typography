@@ -52,8 +52,13 @@ namespace Typography.OpenFont
         }
 
         public Bounds Bounds { get { return _bounds; } }
+
+        //ttf
         public ushort[] EndPoints { get { return _contourEndPoints; } }
         public GlyphPointF[] GlyphPoints { get { return glyphPoints; } }
+
+
+
         public ushort OriginalAdvanceWidth
         {
             get { return _orgAdvWidth; }
@@ -65,6 +70,8 @@ namespace Typography.OpenFont
         }
         public bool HasOriginalAdvancedWidth { get { return _hasOrgAdvWidth; } }
         //--------------
+
+
 
         internal static void OffsetXY(Glyph glyph, short dx, short dy)
         {
@@ -204,6 +211,17 @@ namespace Typography.OpenFont
         {
             get { return _bounds.YMax; }
         }
+
+
+
+        //--------------------
+        //cff
+        public byte[] GetCffBytes()
+        {
+            //temp 
+            return _cff1GlyphData.RawGlyphInstructions;
+        }
+
 
 #if DEBUG
         public override string ToString()

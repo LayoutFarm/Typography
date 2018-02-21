@@ -547,12 +547,15 @@ namespace Typography.OpenFont.CFF
         Cff1Font _currentCff1Font;
 
         List<CffDataDicEntry> _topDic;
+        List<CffDataDicEntry> _privateDict;
+
         uint _cffStartAt;
 
         int _charStringsOffset;
         int _charsetOffset;
-
-
+        int _encodingOffset;
+        int _privateDICTSize;
+        int _privateDICTOffset;
         public void ParseAfterHeader(uint cffStartAt, BinaryReader reader)
         {
             _cffStartAt = cffStartAt;
@@ -565,10 +568,11 @@ namespace Typography.OpenFont.CFF
             ReadGlobalSubrIndex();
 
             //----------------------
+
             ReadCharStringsIndex();
             ReadCharsets();
             ReadEncodings();
-
+            ReadPrivateDict();
             ReadFDSelect();
 
             //...
@@ -695,6 +699,12 @@ namespace Typography.OpenFont.CFF
                         _charsetOffset = (int)entry.operands[0]._realNumValue;
                         break;
                     case "Encoding":
+                        _encodingOffset = (int)entry.operands[0]._realNumValue;
+                        break;
+                    case "Private":
+                        //private DICT size and offset
+                        _privateDICTSize = (int)entry.operands[0]._realNumValue;
+                        _privateDICTOffset = (int)entry.operands[1]._realNumValue;
                         break;
                 }
 
@@ -925,6 +935,7 @@ namespace Typography.OpenFont.CFF
 
 
         }
+
         void ReadCharsetsFormat2()
         {
 
@@ -1068,6 +1079,13 @@ namespace Typography.OpenFont.CFF
             //Type      Name        Description
             //Card8     code        Encoding
             //SID       glyph       Name
+        }
+
+        void ReadPrivateDict()
+        {
+            //per-font 
+            _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset;
+            _privateDict = ReadDICTData(_privateDICTSize);
         }
 
         List<CffDataDicEntry> ReadDICTData(int len)
