@@ -124,11 +124,24 @@ namespace Typography.OpenFont.CFF
     class Type2EvaluationStack
     {
 
+        double _currentX;
+        double _currentY;
+
+
+
         double[] _argStack = new double[50];
         int _currentIndex = 0; //current stack index
 
+
+        IGlyphTranslator _glyphTranslator;
+
         public Type2EvaluationStack()
         {
+        }
+        public IGlyphTranslator GlyphTranslator
+        {
+            get { return _glyphTranslator; }
+            set { _glyphTranslator = value; }
         }
         public void Push(double value)
         {
@@ -147,7 +160,7 @@ namespace Typography.OpenFont.CFF
         //[NOTE4]:
         //The first stack - clearing operator, which must be one of...
 
-        //  hstem, hstemhm, vstem, vstemhm, cntrmask, 
+        //hstem, hstemhm, vstem, vstemhm, cntrmask, 
         //hintmask, hmoveto, vmoveto, rmoveto, or endchar,
 
         //...
@@ -168,7 +181,10 @@ namespace Typography.OpenFont.CFF
             //moves the current point to
             //a position at the relative coordinates(dx1, dy1) 
             //see [NOTE4]
+
+            _currentIndex = 0; //clear stack 
         }
+
         /// <summary>
         /// hmoveto
         /// </summary>
@@ -180,6 +196,12 @@ namespace Typography.OpenFont.CFF
             //dx1 units in the horizontal direction
             //see [NOTE4]
 
+            int rd_index = 0; //start at bottom
+            double w = _argStack[rd_index];
+            _currentX += _argStack[rd_index + 1];
+
+            _glyphTranslator.MoveTo((int)_currentX, (int)_currentY);
+
             _currentIndex = 0; //clear stack 
         }
         public void V_MoveTo()
@@ -188,6 +210,15 @@ namespace Typography.OpenFont.CFF
             //moves the current point 
             //dy1 units in the vertical direction.
             //see [NOTE4]
+
+
+            int rd_index = 0; //start at bottom
+            double w = _argStack[rd_index];
+            _currentY += _argStack[rd_index + 1];
+
+            _glyphTranslator.MoveTo((int)_currentX, (int)_currentY);
+
+            _currentIndex = 0; //clear stack 
         }
         public void R_LineTo()
         {
@@ -206,7 +237,28 @@ namespace Typography.OpenFont.CFF
         }
         public void H_LineTo()
         {
+
+            //|- dx1 {dya dxb}*  hlineto (6) |-
+            //|- {dxa dyb}+  hlineto (6) |-
+
+            //appends a horizontal line of length 
+            //dx1 to the current point. 
+
+            //With an odd number of arguments, subsequent argument pairs 
+            //are interpreted as alternating values of 
+            //dy and dx, for which additional lineto
+            //operators draw alternating vertical and 
+            //horizontal lines.
+
+            //With an even number of arguments, the 
+            //arguments are interpreted as alternating horizontal and 
+            //vertical lines. The number of lines is determined from the 
+            //number of arguments on the stack.
+
+
+
             _currentIndex = 0; //clear stack 
+
         }
         public void V_LineTo()
         {
@@ -225,6 +277,20 @@ namespace Typography.OpenFont.CFF
             //arguments are interpreted as alternating vertical and 
             //horizontal lines. The number of lines is determined from the 
             //number of arguments on the stack.
+
+            int nElem = _currentIndex;
+            if ((nElem % 2) == 0)
+            {
+                //even number
+
+            }
+            else
+            {
+                //odd number
+
+            }
+
+
 
             _currentIndex = 0; //clear stack 
         }
@@ -333,6 +399,8 @@ namespace Typography.OpenFont.CFF
             //If the argument count is a multiple of four, the curve starts and ends vertical. 
             //If the argument count is odd, the first curve does not begin with a vertical tangent.
 
+
+            _currentIndex = 0; //clear stack
         }
         public void Flex()
         {
@@ -341,6 +409,9 @@ namespace Typography.OpenFont.CFF
             //shown in Figure 2 below), to be rendered as a straight line when
             //the flex depth is less than fd / 100 device pixels, and as curved lines
             // when the flex depth is greater than or equal to fd/ 100 device pixels
+
+
+            _currentIndex = 0; //clear stack 
         }
         public void H_Flex()
         {
@@ -356,6 +427,8 @@ namespace Typography.OpenFont.CFF
             //b) the joining point and the neighbor control points have
             //the same y value.
             //c) the flex depth is 50.
+
+            _currentIndex = 0; //clear stack
         }
         public void H_Flex1()
         {
@@ -373,6 +446,7 @@ namespace Typography.OpenFont.CFF
             //b) the joining point and the neighbor control points have 
             //the same y value.
             //c) the flex depth is 50.
+            _currentIndex = 0; //clear stack
         }
         public void Flex1()
         {
@@ -391,6 +465,9 @@ namespace Typography.OpenFont.CFF
             //abs(dx) > abs(dy), then the last point’s x-value is given by d6, and
             //its y - value is equal to y.
             //  Otherwise, the last point’s x-value is equal to x and its y-value is given by d6.
+
+
+            _currentIndex = 0; //clear stack
         }
 
 
@@ -398,11 +475,15 @@ namespace Typography.OpenFont.CFF
         //4.3 Hint Operators
         public void H_Stem()
         {
+            //|- y dy {dya dyb}*  hstem (1) |-
 
+            _currentIndex = 0; //clear stack
         }
         public void V_Stem()
         {
+            //|- x dx {dxa dxb}*  vstem (3) |-
 
+            _currentIndex = 0; //clear stack
         }
         public void H_StemHM()
         {
@@ -413,11 +494,12 @@ namespace Typography.OpenFont.CFF
             //except that it must be used 
             //in place of hstem  if the charstring contains one or more 
             //hintmask operators.
-            _currentIndex = 0; //clear stack?
+            _currentIndex = 0; //clear stack
         }
         public void HintMask()
         {
-
+            //|- hintmask (19 + mask) |-
+            _currentIndex = 0; //clear stack
         }
         public void CounterSpaceMask()
         {
@@ -483,8 +565,12 @@ namespace Typography.OpenFont.CFF
         //array do not persist beyond the scope of rendering an individual 
         //character. 
 
-        public void Put() { }
-        public void Get() { }
+        public void Put()
+        {
+        }
+        public void Get()
+        {
+        }
 
         //-------------------------
         //4.6: Conditional 
@@ -508,6 +594,12 @@ namespace Typography.OpenFont.CFF
 
         }
 
+#if DEBUG
+        public void dbugClearEvalStack()
+        {
+            _currentIndex = 0;
+        }
+#endif
     }
 
     class Type2CharStringParser : IDisposable
@@ -522,6 +614,10 @@ namespace Typography.OpenFont.CFF
         {
             _msBuffer = new MemoryStream();
             _reader = new BinaryReader(_msBuffer);
+        }
+        public void SetGlyphTranslator(IGlyphTranslator glyphTranslator)
+        {
+            this._evalStack.GlyphTranslator = glyphTranslator;
         }
         public void ParseType2CharsString(byte[] buffer)
         {
@@ -538,15 +634,16 @@ namespace Typography.OpenFont.CFF
                 //read first byte 
                 //translate *** 
                 byte b0 = _reader.ReadByte();
-
-
                 switch (b0)
                 {
                     default: //else 32 -255
                         {
 
 #if DEBUG
-                            if (b0 < 32) throw new Exception();
+                            if (b0 < 32)
+                            {
+                                throw new Exception();
+                            }
 #endif
 
                             int num = ReadIntegerNumber(b0);
@@ -605,6 +702,7 @@ namespace Typography.OpenFont.CFF
                             }
                         }
                         break;
+                    case (byte)Type2Operator1.hmoveto: _evalStack.H_MoveTo(); break;
                     case (byte)Type2Operator1.vmoveto: _evalStack.V_MoveTo(); break;
                     case (byte)Type2Operator1.rlineto: _evalStack.R_LineTo(); break;
                     case (byte)Type2Operator1.hlineto: _evalStack.H_LineTo(); break;
@@ -628,7 +726,6 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.callsubr: _evalStack.CallSubr(); break;
                     case (byte)Type2Operator1.callgsubr: _evalStack.CallGSubr(); break;
                     case (byte)Type2Operator1._return:
-
                         break;
                 }
             }

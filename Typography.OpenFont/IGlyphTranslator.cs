@@ -377,6 +377,7 @@ namespace Typography.OpenFont
         public static void Read(this IGlyphTranslator tx, byte[] cff1RawGlyphBuffer, float scale = 1)
         {
             CFF.Type2CharStringParser type2Parser = new CFF.Type2CharStringParser();
+            type2Parser.SetGlyphTranslator(tx);
             type2Parser.ParseType2CharsString(cff1RawGlyphBuffer);
 
         }
