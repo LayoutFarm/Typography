@@ -402,12 +402,7 @@ namespace Typography.OpenFont.CFF
         public void CallGSubr()
         {
 
-        }
-        //---------------------
-
-        //4.6
-
-
+        } 
 
     }
 
@@ -415,7 +410,8 @@ namespace Typography.OpenFont.CFF
     {
         MemoryStream _msBuffer;
         BinaryReader _reader;
-        Type2EvaluationStack _type2EvalStack = new Type2EvaluationStack();
+
+        Type2EvaluationStack _evalStack = new Type2EvaluationStack();
 
 
         public Type2CharStringParser()
@@ -432,8 +428,7 @@ namespace Typography.OpenFont.CFF
             _msBuffer.Write(buffer, 0, buffer.Length);
             _msBuffer.Position = 0;
             int len = buffer.Length;
-            List<Type2Command> cmds = new List<Type2Command>();
-
+            List<Type2Command> cmds = new List<Type2Command>(); 
             while (_reader.BaseStream.Position < len)
             {
                 //read first byte 
@@ -451,7 +446,7 @@ namespace Typography.OpenFont.CFF
 #endif
 
                             int num = ReadIntegerNumber(b0);
-                            _type2EvalStack.Push(num);
+                            _evalStack.Push(num);
                         }
                         break;
                     case 0:
@@ -461,7 +456,7 @@ namespace Typography.OpenFont.CFF
 
                         //shortint
                         //First byte of a 3-byte sequence specifying a number.
-                        _type2EvalStack.Push(_reader.ReadUInt16());
+                        _evalStack.Push(_reader.ReadUInt16());
 
                         break;
                     case (byte)Type2Operator1.escape: //12
@@ -472,62 +467,62 @@ namespace Typography.OpenFont.CFF
                                 default: throw new NotSupportedException();
                                 //-------------------------
                                 //4.1: Path Construction Operators
-                                case Type2Operator2.flex: _type2EvalStack.Flex(); break;
-                                case Type2Operator2.hflex: _type2EvalStack.H_Flex(); break;
-                                case Type2Operator2.hflex1: _type2EvalStack.H_Flex1(); break;
-                                case Type2Operator2.flex1: _type2EvalStack.Flex1(); break;
+                                case Type2Operator2.flex: _evalStack.Flex(); break;
+                                case Type2Operator2.hflex: _evalStack.H_Flex(); break;
+                                case Type2Operator2.hflex1: _evalStack.H_Flex1(); break;
+                                case Type2Operator2.flex1: _evalStack.Flex1(); break;
                                 //-------------------------
                                 //4.4: Arithmetic Operators
-                                case Type2Operator2.abs: _type2EvalStack.Op_Abs(); break;
-                                case Type2Operator2.add: _type2EvalStack.Op_Add(); break;
-                                case Type2Operator2.sub: _type2EvalStack.Op_Sub(); break;
-                                case Type2Operator2.div: _type2EvalStack.Op_Div(); break;
-                                case Type2Operator2.neg: _type2EvalStack.Op_Neg(); break;
-                                case Type2Operator2.random: _type2EvalStack.Op_Random(); break;
-                                case Type2Operator2.mul: _type2EvalStack.Op_Mul(); break;
-                                case Type2Operator2.sqrt: _type2EvalStack.Op_Sqrt(); break;
-                                case Type2Operator2.drop: _type2EvalStack.Op_Drop(); break;
-                                case Type2Operator2.exch: _type2EvalStack.Op_Exch(); break;
-                                case Type2Operator2.index: _type2EvalStack.Op_Index(); break;
-                                case Type2Operator2.roll: _type2EvalStack.Op_Roll(); break;
-                                case Type2Operator2.dup: _type2EvalStack.Op_Dup(); break;
+                                case Type2Operator2.abs: _evalStack.Op_Abs(); break;
+                                case Type2Operator2.add: _evalStack.Op_Add(); break;
+                                case Type2Operator2.sub: _evalStack.Op_Sub(); break;
+                                case Type2Operator2.div: _evalStack.Op_Div(); break;
+                                case Type2Operator2.neg: _evalStack.Op_Neg(); break;
+                                case Type2Operator2.random: _evalStack.Op_Random(); break;
+                                case Type2Operator2.mul: _evalStack.Op_Mul(); break;
+                                case Type2Operator2.sqrt: _evalStack.Op_Sqrt(); break;
+                                case Type2Operator2.drop: _evalStack.Op_Drop(); break;
+                                case Type2Operator2.exch: _evalStack.Op_Exch(); break;
+                                case Type2Operator2.index: _evalStack.Op_Index(); break;
+                                case Type2Operator2.roll: _evalStack.Op_Roll(); break;
+                                case Type2Operator2.dup: _evalStack.Op_Dup(); break;
 
                                 //-------------------------
                                 //4.5: Storage Operators 
-                                case Type2Operator2.put: _type2EvalStack.Put(); break;
-                                case Type2Operator2.get: _type2EvalStack.Get(); break;
+                                case Type2Operator2.put: _evalStack.Put(); break;
+                                case Type2Operator2.get: _evalStack.Get(); break;
                                 //-------------------------
                                 //4.6: Conditional
-                                case Type2Operator2.and: _type2EvalStack.Op_And(); break;
-                                case Type2Operator2.or: _type2EvalStack.Op_Or(); break;
-                                case Type2Operator2.not: _type2EvalStack.Op_Not(); break;
-                                case Type2Operator2.eq: _type2EvalStack.Op_Eq(); break;
-                                case Type2Operator2.ifelse: _type2EvalStack.Op_IfElse(); break;
+                                case Type2Operator2.and: _evalStack.Op_And(); break;
+                                case Type2Operator2.or: _evalStack.Op_Or(); break;
+                                case Type2Operator2.not: _evalStack.Op_Not(); break;
+                                case Type2Operator2.eq: _evalStack.Op_Eq(); break;
+                                case Type2Operator2.ifelse: _evalStack.Op_IfElse(); break;
                             }
                         }
                         break;
-                    case (byte)Type2Operator1.vmoveto: _type2EvalStack.V_MoveTo(); break;
-                    case (byte)Type2Operator1.rlineto: _type2EvalStack.R_LineTo(); break;
-                    case (byte)Type2Operator1.hlineto: _type2EvalStack.H_LineTo(); break;
-                    case (byte)Type2Operator1.vlineto: _type2EvalStack.V_LineTo(); break;
-                    case (byte)Type2Operator1.rrcurveto: _type2EvalStack.RR_CurveTo(); break;
-                    case (byte)Type2Operator1.hhcurveto: _type2EvalStack.HH_CurveTo(); break;
-                    case (byte)Type2Operator1.hvcurveto: _type2EvalStack.HV_CurveTo(); break;
-                    case (byte)Type2Operator1.rcurveline: _type2EvalStack.R_CurveLine(); break;
-                    case (byte)Type2Operator1.rlinecurve: _type2EvalStack.R_LineCurve(); break;
-                    case (byte)Type2Operator1.vhcurveto: _type2EvalStack.VH_CurveTo(); break;
-                    case (byte)Type2Operator1.vvcurveto: _type2EvalStack.VV_CurveTo(); break;
+                    case (byte)Type2Operator1.vmoveto: _evalStack.V_MoveTo(); break;
+                    case (byte)Type2Operator1.rlineto: _evalStack.R_LineTo(); break;
+                    case (byte)Type2Operator1.hlineto: _evalStack.H_LineTo(); break;
+                    case (byte)Type2Operator1.vlineto: _evalStack.V_LineTo(); break;
+                    case (byte)Type2Operator1.rrcurveto: _evalStack.RR_CurveTo(); break;
+                    case (byte)Type2Operator1.hhcurveto: _evalStack.HH_CurveTo(); break;
+                    case (byte)Type2Operator1.hvcurveto: _evalStack.HV_CurveTo(); break;
+                    case (byte)Type2Operator1.rcurveline: _evalStack.R_CurveLine(); break;
+                    case (byte)Type2Operator1.rlinecurve: _evalStack.R_LineCurve(); break;
+                    case (byte)Type2Operator1.vhcurveto: _evalStack.VH_CurveTo(); break;
+                    case (byte)Type2Operator1.vvcurveto: _evalStack.VV_CurveTo(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case (byte)Type2Operator1.hstem: _type2EvalStack.H_Stem(); break;
-                    case (byte)Type2Operator1.vstem: _type2EvalStack.V_Stem(); break;
-                    case (byte)Type2Operator1.hstemhm: _type2EvalStack.H_StemHM(); break;
-                    case (byte)Type2Operator1.hintmask: _type2EvalStack.HintMask(); break;
-                    case (byte)Type2Operator1.cntrmask: _type2EvalStack.CounterSpaceMask(); break;
+                    case (byte)Type2Operator1.hstem: _evalStack.H_Stem(); break;
+                    case (byte)Type2Operator1.vstem: _evalStack.V_Stem(); break;
+                    case (byte)Type2Operator1.hstemhm: _evalStack.H_StemHM(); break;
+                    case (byte)Type2Operator1.hintmask: _evalStack.HintMask(); break;
+                    case (byte)Type2Operator1.cntrmask: _evalStack.CounterSpaceMask(); break;
                     //-------------------------
                     //4.7: Subroutine Operators
-                    case (byte)Type2Operator1.callsubr: _type2EvalStack.CallSubr(); break;
-                    case (byte)Type2Operator1.callgsubr: _type2EvalStack.CallGSubr(); break;
+                    case (byte)Type2Operator1.callsubr: _evalStack.CallSubr(); break;
+                    case (byte)Type2Operator1.callgsubr: _evalStack.CallGSubr(); break;
                     case (byte)Type2Operator1._return:
 
                         break;
