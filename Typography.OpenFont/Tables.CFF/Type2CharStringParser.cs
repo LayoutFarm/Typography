@@ -248,45 +248,149 @@ namespace Typography.OpenFont.CFF
         }
         public void HH_CurveTo()
         {
+            //|- dy1? {dxa dxb dyb dxc}+ hhcurveto (27) |-
+
+            //appends one or more Bézier curves, as described by the 
+            //dxa...dxc set of arguments, to the current point. 
+            //For each curve, if there are 4 arguments, 
+            //the curve starts and ends horizontal. 
+
+            //The first curve need not start horizontal (the odd argument 
+            //case). Note the argument order for the odd argument case
+
+
             _currentIndex = 0; //clear stack 
         }
         public void HV_CurveTo()
         {
+            //|- dx1 dx2 dy2 dy3 {dya dxb dyb dxc dxd dxe dye dyf}* dxf? hvcurveto (31) |-
+
+            //|- {dxa dxb dyb dyc dyd dxe dye dxf}+ dyf? hvcurveto (31) |-
+
+            //appends one or more Bézier curves to the current point.
+
+            //The tangent for the first Bézier must be horizontal, and the second 
+            //must be vertical (except as noted below).
+
+            //If there is a multiple of four arguments, the curve starts 
+            //horizontal and ends vertical. 
+
+            //Note that the curves alternate between 
+            //start horizontal, end vertical, and start vertical, and end horizontal. 
+
+            //The last curve (the odd argument case) need not 
+            //end horizontal/vertical.
             _currentIndex = 0; //clear stack 
         }
         public void R_CurveLine()
         {
+
+            //|- { dxa dya dxb dyb dxc dyc} +dxd dyd rcurveline(24) |-
+
+
+            //is equivalent to one rrcurveto for each set of six arguments
+            //dxa...dyc, followed by exactly one rlineto using
+            //the dxd, dyd arguments.
+
+            //The number of curves is determined from the count
+            //on the argument stack.
+
             _currentIndex = 0; //clear stack 
         }
         public void R_LineCurve()
         {
+
+            //|- { dxa dya} +dxb dyb dxc dyc dxd dyd rlinecurve(25) |-
+
+            //is equivalent to one rlineto for each pair of arguments beyond
+            //the six arguments dxb...dyd needed for the one
+            //rrcurveto command.The number of lines is determined from the count of
+            //items on the argument stack.
+
             _currentIndex = 0; //clear stack 
         }
         public void VH_CurveTo()
         {
+            //|- dy1 dx2 dy2 dx3 {dxa dxb dyb dyc dyd dxe dye dxf}* dyf? vhcurveto (30) |-
 
+
+            //|- {dya dxb dyb dxc dxd dxe dye dyf}+ dxf? vhcurveto (30) |- 
+
+            //appends one or more Bézier curves to the current point, where 
+            //the first tangent is vertical and the second tangent is horizontal.
+
+            //This command is the complement of 
+            //hvcurveto; 
+
+            //see the description of hvcurveto for more information.
+
+            _currentIndex = 0; //clear stack 
         }
         public void VV_CurveTo()
         {
+            // |- dx1? {dya dxb dyb dyc}+  vvcurveto (26) |-
+            //appends one or more curves to the current point. 
+            //If the argument count is a multiple of four, the curve starts and ends vertical. 
+            //If the argument count is odd, the first curve does not begin with a vertical tangent.
 
         }
-
-
         public void Flex()
         {
-
+            //|- dx1 dy1 dx2 dy2 dx3 dy3 dx4 dy4 dx5 dy5 dx6 dy6 fd flex (12 35) |-
+            //causes two Bézier curves, as described by the arguments(as
+            //shown in Figure 2 below), to be rendered as a straight line when
+            //the flex depth is less than fd / 100 device pixels, and as curved lines
+            // when the flex depth is greater than or equal to fd/ 100 device pixels
         }
         public void H_Flex()
         {
+            //|- dx1 dx2 dy2 dx3 dx4 dx5 dx6 hflex (12 34) |- 
+            //causes the two curves described by the arguments
+            //dx1...dx6  to be rendered as a straight line when
+            //the flex depth is less than 0.5(that is, fd is 50) device pixels,
+            //and as curved lines when the flex depth is greater than or equal to 0.5 device pixels. 
 
+            //hflex is used when the following are all true:
+            //a) the starting and ending points, first and last control points
+            //have the same y value.
+            //b) the joining point and the neighbor control points have
+            //the same y value.
+            //c) the flex depth is 50.
         }
         public void H_Flex1()
         {
+            //|- dx1 dy1 dx2 dy2 dx3 dx4 dx5 dy5 dx6 hflex1 (12 36) |-
 
+            //causes the two curves described by the arguments to be 
+            //rendered as a straight line when the flex depth is less than 0.5 
+            //device pixels, and as curved lines when the flex depth is greater 
+            //than or equal to 0.5 device pixels.
+
+            //hflex1 is used if the conditions for hflex
+            //are not met but all of the following are true:
+
+            //a) the starting and ending points have the same y value,
+            //b) the joining point and the neighbor control points have 
+            //the same y value.
+            //c) the flex depth is 50.
         }
         public void Flex1()
         {
+            //|- dx1 dy1 dx2 dy2 dx3 dy3 dx4 dy4 dx5 dy5 d6 flex1 (12 37) |
 
+            //causes the two curves described by the arguments to be
+            //rendered as a straight line when the flex depth is less than 0.5
+            //device pixels, and as curved lines when the flex depth is greater
+            //than or equal to 0.5 device pixels.
+
+            //The d6 argument will be either a dx or dy value, depending on
+            //the curve(see Figure 3). To determine the correct value, 
+            //compute the distance from the starting point(x, y), the first
+            //point of the first curve, to the last flex control point(dx5, dy5)
+            //by summing all the arguments except d6; call this(dx, dy).If
+            //abs(dx) > abs(dy), then the last point’s x-value is given by d6, and
+            //its y - value is equal to y.
+            //  Otherwise, the last point’s x-value is equal to x and its y-value is given by d6.
         }
 
 
@@ -402,7 +506,7 @@ namespace Typography.OpenFont.CFF
         public void CallGSubr()
         {
 
-        } 
+        }
 
     }
 
@@ -428,7 +532,7 @@ namespace Typography.OpenFont.CFF
             _msBuffer.Write(buffer, 0, buffer.Length);
             _msBuffer.Position = 0;
             int len = buffer.Length;
-            List<Type2Command> cmds = new List<Type2Command>(); 
+            List<Type2Command> cmds = new List<Type2Command>();
             while (_reader.BaseStream.Position < len)
             {
                 //read first byte 
