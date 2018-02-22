@@ -145,7 +145,7 @@ namespace Typography.OpenFont.CFF
             //indicated by the stack bottom symbol ‘| -’ in the result position
             //of the operator definition
 
-            //NOTE4:
+            //[NOTE4]:
             //The first stack - clearing operator, which must be one of...
 
             //  hstem, hstemhm, vstem, vstemhm, cntrmask, 
@@ -163,34 +163,38 @@ namespace Typography.OpenFont.CFF
                         _currentIndex = 0; //clear stack 
                     }
                     break;
+                //-------------------------
+                //4.1: Path Construction Operators
                 case Type2Operator1.rmoveto:
                     {
 
                         //|- dx1 dy1 rmoveto(21) |-
 
                         //moves the current point to
-                        //a position at the relative coordinates(dx1, dy1)
+                        //a position at the relative coordinates(dx1, dy1) 
+                        //see [NOTE4]
+                    }
+                    break;
+                case Type2Operator1.hmoveto:
+                    {
 
+                        //|- dx1 hmoveto(22) |-
+
+                        //moves the current point 
+                        //dx1 units in the horizontal direction
+                        //see [NOTE4]
+
+                        _currentIndex = 0; //clear stack 
 
                     }
                     break;
-                case Type2Operator1.rrcurveto:
+                case Type2Operator1.vmoveto:
                     {
-                         
+                        //|- dy1 vmoveto (4) |-
+                        //moves the current point 
+                        //dy1 units in the vertical direction.
+                        //see [NOTE4]
 
-                        //|- {dxa dya dxb dyb dxc dyc}+  rrcurveto (8) |-
-
-                        //appends a Bézier curve, defined by  dy1 to the current point. 
-                        //With dxa...dyc, to the current point.
-
-                        //For each subsequent set of six arguments, an additional 
-                        //curve is appended to the current point. 
-
-                        //The number of curve segments is determined from 
-                        //the number of arguments on the number stack and 
-                        //is limited only by the size of the number stack
-
-                        _currentIndex = 0; //clear stack 
                     }
                     break;
                 case Type2Operator1.rlineto:
@@ -209,9 +213,13 @@ namespace Typography.OpenFont.CFF
                         _currentIndex = 0; //clear stack 
                     }
                     break;
+                case Type2Operator1.hlineto:
+                    {
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
                 case Type2Operator1.vlineto:
                     {
-
                         //|- dy1 {dxa dyb}*  vlineto (7) |-
                         //|- {dya dxb}+  vlineto (7) |-
 
@@ -231,41 +239,70 @@ namespace Typography.OpenFont.CFF
                         _currentIndex = 0; //clear stack 
                     }
                     break;
-                case Type2Operator1.hmoveto:
+                case Type2Operator1.rrcurveto:
                     {
-                        
-                        //|- dx1 hmoveto(22) |-
 
+
+                        //|- {dxa dya dxb dyb dxc dyc}+  rrcurveto (8) |-
+
+                        //appends a Bézier curve, defined by  dy1 to the current point. 
+                        //With dxa...dyc, to the current point.
+
+                        //For each subsequent set of six arguments, an additional 
+                        //curve is appended to the current point. 
+
+                        //The number of curve segments is determined from 
+                        //the number of arguments on the number stack and 
+                        //is limited only by the size of the number stack
 
                         _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.hhcurveto:
+                    {
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.hvcurveto:
+                    {
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.rcurveline:
+                    {
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.rlinecurve:
+                    {
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.vhcurveto:
+                    {
 
                     }
                     break;
-                case Type2Operator1.cntrmask:
+                case Type2Operator1.vvcurveto:
                     {
-                        _currentIndex = 0;
 
+                    }
+                    break;
+                //-------------------------------------------------------------------
+                //4.3 Hint Operators
+                case Type2Operator1.hstem:
+                    {
 
-                        
-                        //|- cntrmask(20 + mask) |-
-
-                        //specifies the counter spaces to be controlled, and their relative
-                        //priority.The mask bits in the bytes, following the operator, 
-                        //reference the stem hint declarations; the most significant bit of
-                        //the first byte refers to the first stem hint declared, through to
-                        //the last hint declaration.The counters to be controlled are
-                        //those that are delimited by the referenced stem hints.Bits set to
-                        //1 in the first cntrmask command have top priority; subsequent
-                        //cntrmask commands specify lower priority counters(see Figure
-                        //1 and the accompanying example).
-
-
+                    }
+                    break;
+                case Type2Operator1.vstem:
+                    {
 
                     }
                     break;
                 case Type2Operator1.hstemhm:
                     {
-                         
+
                         //|- y dy {dya dyb}*  hstemhm (18) |-
 
                         //has the same meaning as 
@@ -277,12 +314,115 @@ namespace Typography.OpenFont.CFF
 
                     }
                     break;
+                case Type2Operator1.hintmask:
+                    {
 
+
+                    }
+                    break;
+                case Type2Operator1.cntrmask:
+                    {
+                        _currentIndex = 0;
+                        //|- cntrmask(20 + mask) |-
+
+                        //specifies the counter spaces to be controlled, and their relative
+                        //priority.The mask bits in the bytes, following the operator, 
+                        //reference the stem hint declarations; the most significant bit of
+                        //the first byte refers to the first stem hint declared, through to
+                        //the last hint declaration.The counters to be controlled are
+                        //those that are delimited by the referenced stem hints.Bits set to
+                        //1 in the first cntrmask command have top priority; subsequent
+                        //cntrmask commands specify lower priority counters(see Figure
+                        //1 and the accompanying example). 
+                    }
+                    break;
+
+                //-------------------------
+                //4.7: Subroutine Operators
+                case Type2Operator1.callsubr:
+                case Type2Operator1.callgsubr:
+                case Type2Operator1._return:
+                    break;
             }
+
+            //TEMP, NOT CORRECT
+            _currentIndex = 0; //current stack index
         }
         public void Eval(Type2Operator2 op)
         {
+            switch (op)
+            {
+                default: throw new NotSupportedException();
+                //-------------------------
+                //4.1: Path Construction Operators
+                case Type2Operator2.flex:
+                    {
 
+                    }
+                    break;
+                case Type2Operator2.hflex:
+                    {
+
+                    }
+                    break;
+                case Type2Operator2.hflex1:
+                    {
+
+                    }
+                    break;
+                case Type2Operator2.flex1:
+                    {
+
+                    }
+                    break;//
+
+                //-------------------------
+                //4.4: Arithmetic Operators
+                case Type2Operator2.abs:
+                case Type2Operator2.add:
+                case Type2Operator2.sub:
+                case Type2Operator2.div:
+                case Type2Operator2.neg:
+                case Type2Operator2.random:
+                case Type2Operator2.mul:
+                case Type2Operator2.sqrt:
+                case Type2Operator2.drop:
+                case Type2Operator2.exch:
+                case Type2Operator2.index:
+                case Type2Operator2.roll:
+                case Type2Operator2.dup:
+                    break;
+
+                //-------------------------
+                //4.5: Storage Operators
+                //The storage operators utilize a transient array and provide 
+                //facilities for storing and retrieving transient array data. 
+
+                //The transient array provides non-persistent storage for 
+                //intermediate values. 
+                //There is no provision to initialize this array, 
+                //except explicitly using the put operator, 
+                //and values stored in the 
+                //array do not persist beyond the scope of rendering an individual 
+                //character. 
+                case Type2Operator2.put:
+                case Type2Operator2.get:
+                    break;
+
+                //-------------------------
+                //4.6:
+                case Type2Operator2.and:
+                case Type2Operator2.or:
+                case Type2Operator2.not:
+                case Type2Operator2.eq:
+                case Type2Operator2.ifelse:
+                    break;
+
+
+            }
+
+            //TEMP, NOT CORRECT
+            _currentIndex = 0; //current stack index, 
         }
 
 
