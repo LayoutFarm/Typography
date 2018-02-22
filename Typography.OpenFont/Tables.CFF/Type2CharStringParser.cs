@@ -1,6 +1,8 @@
 ﻿//Apache2, 2018, Villu Ruusmann , Apache/PdfBox Authors ( https://github.com/apache/pdfbox)  
 //Apache2, 2018, WinterDev 
 
+//ref http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,12 +11,21 @@ using System.Text;
 namespace Typography.OpenFont.CFF
 {
 
+
+    //The Type 2 Charstring Format
+    //...
+    //must be used in a CFF (Compact Font Format) or OpenType font 
+    //file to create a complete font program
+
+
+
+
     struct Type2Command
     {
         //operands
         //operator 
         internal bool is2BytesOperator;
-        internal Type2Operator1 _operator; 
+        internal Type2Operator1 _operator;
     }
 
     enum Type2Operator1 : byte
@@ -109,10 +120,180 @@ namespace Typography.OpenFont.CFF
 
     }
 
+
+    class Type2EvaluationStack
+    {
+
+        double[] _argStack = new double[50];
+        int _currentIndex = 0; //current stack index
+
+        public Type2EvaluationStack()
+        {
+        }
+        public void Push(double value)
+        {
+            _argStack[_currentIndex] = value;
+            _currentIndex++;
+        }
+        public void Eval(Type2Operator1 op)
+        {
+
+            //Many operators take their arguments from the bottom-most
+            //entries in the Type 2 argument stack; this behavior is indicated
+            //by the stack bottom symbol ‘| -’ appearing to the left of the first
+            //argument.Operators that clear the argument stack are
+            //indicated by the stack bottom symbol ‘| -’ in the result position
+            //of the operator definition
+
+            //NOTE4:
+            //The first stack - clearing operator, which must be one of...
+
+            //  hstem, hstemhm, vstem, vstemhm, cntrmask, 
+            //hintmask, hmoveto, vmoveto, rmoveto, or endchar,
+
+            //...
+            //takes an additional argument — the width(as
+            //described earlier), which may be expressed as zero or one numeric
+            //argument
+
+            switch (op)
+            {
+                default:
+                    {
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.rmoveto:
+                    {
+
+                        //|- dx1 dy1 rmoveto(21) |-
+
+                        //moves the current point to
+                        //a position at the relative coordinates(dx1, dy1)
+
+
+                    }
+                    break;
+                case Type2Operator1.rrcurveto:
+                    {
+                         
+
+                        //|- {dxa dya dxb dyb dxc dyc}+  rrcurveto (8) |-
+
+                        //appends a Bézier curve, defined by  dy1 to the current point. 
+                        //With dxa...dyc, to the current point.
+
+                        //For each subsequent set of six arguments, an additional 
+                        //curve is appended to the current point. 
+
+                        //The number of curve segments is determined from 
+                        //the number of arguments on the number stack and 
+                        //is limited only by the size of the number stack
+
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.rlineto:
+                    {
+                        //|- {dxa dya}+  rlineto (5) |-
+
+                        //appends a line from the current point to 
+                        //a position at the relative coordinates dxa, dya. 
+
+                        //Additional rlineto operations are 
+                        //performed for all subsequent argument pairs. 
+
+                        //The number of 
+                        //lines is determined from the number of arguments on the stack
+
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.vlineto:
+                    {
+
+                        //|- dy1 {dxa dyb}*  vlineto (7) |-
+                        //|- {dya dxb}+  vlineto (7) |-
+
+                        //appends a vertical line of length 
+                        //dy1 to the current point. 
+
+                        //With an odd number of arguments, subsequent argument pairs are 
+                        //interpreted as alternating values of dx and dy, for which additional 
+                        //lineto operators draw alternating horizontal and 
+                        //vertical lines.
+
+                        //With an even number of arguments, the 
+                        //arguments are interpreted as alternating vertical and 
+                        //horizontal lines. The number of lines is determined from the 
+                        //number of arguments on the stack.
+
+                        _currentIndex = 0; //clear stack 
+                    }
+                    break;
+                case Type2Operator1.hmoveto:
+                    {
+                        
+                        //|- dx1 hmoveto(22) |-
+
+
+                        _currentIndex = 0; //clear stack 
+
+                    }
+                    break;
+                case Type2Operator1.cntrmask:
+                    {
+                        _currentIndex = 0;
+
+
+                        
+                        //|- cntrmask(20 + mask) |-
+
+                        //specifies the counter spaces to be controlled, and their relative
+                        //priority.The mask bits in the bytes, following the operator, 
+                        //reference the stem hint declarations; the most significant bit of
+                        //the first byte refers to the first stem hint declared, through to
+                        //the last hint declaration.The counters to be controlled are
+                        //those that are delimited by the referenced stem hints.Bits set to
+                        //1 in the first cntrmask command have top priority; subsequent
+                        //cntrmask commands specify lower priority counters(see Figure
+                        //1 and the accompanying example).
+
+
+
+                    }
+                    break;
+                case Type2Operator1.hstemhm:
+                    {
+                         
+                        //|- y dy {dya dyb}*  hstemhm (18) |-
+
+                        //has the same meaning as 
+                        //hstem (1),
+                        //except that it must be used 
+                        //in place of hstem  if the charstring contains one or more 
+                        //hintmask operators.
+                        _currentIndex = 0; //clear stack?
+
+                    }
+                    break;
+
+            }
+        }
+        public void Eval(Type2Operator2 op)
+        {
+
+        }
+
+
+    }
+
     class Type2CharStringParser : IDisposable
     {
         MemoryStream _msBuffer;
         BinaryReader _reader;
+        Type2EvaluationStack _type2EvalStack = new Type2EvaluationStack();
+
 
         public Type2CharStringParser()
         {
@@ -123,12 +304,12 @@ namespace Typography.OpenFont.CFF
         {
             //TODO: implement this
             //reset
-            _msBuffer.SetLength(9);
+            _msBuffer.SetLength(0);
             _msBuffer.Position = 0;
             _msBuffer.Write(buffer, 0, buffer.Length);
-            _msBuffer.Position = 0; 
-            int len = buffer.Length; 
-            List<Type2Command> cmds = new List<Type2Command>(); 
+            _msBuffer.Position = 0;
+            int len = buffer.Length;
+            List<Type2Command> cmds = new List<Type2Command>();
 
             while (_reader.BaseStream.Position < len)
             {
@@ -136,39 +317,34 @@ namespace Typography.OpenFont.CFF
                 //translate *** 
                 byte b0 = _reader.ReadByte();
 
-                if (b0 == 0)
+                if (b0 >= 32 && b0 <= 255)
+                {
+                    int num = ReadIntegerNumber(b0);
+                    _type2EvalStack.Push(num);
+                }
+                else if (b0 == 0)
                 {
                     //reserve
                 }
                 else if (b0 == 12)
                 {
-                    // First byte of a 2-byte operator
-                    _reader.ReadByte(); //temp fix , not correct
+                    // First byte of a 2-byte operator 
+                    _type2EvalStack.Eval((Type2Operator2)_reader.ReadByte());
                 }
                 else if (b0 < 28)
                 {
-
+                    _type2EvalStack.Eval((Type2Operator1)b0);
                 }
                 else if (b0 == 28)
                 {
                     //shortint
                     //First byte of a 3-byte sequence specifying a number.
-                    _reader.ReadUInt16(); //temp fix , not correct
+                    _type2EvalStack.Push(_reader.ReadUInt16());
                 }
                 else if (b0 >= 29 && b0 < 32)
                 {
                     //29,30,31
-                }
-                else if (b0 >= 32 && b0 < 255)
-                {
-                    int num = ReadIntegerNumber(b0);
-                    //operands.Add(new CffOperand(num, OperandKind.IntNumber));
-                }
-                else if (b0 == 255)
-                {
-                    //int
-                    //First byte of a 5-byte sequence specifying a number.
-                    _reader.ReadInt32();
+                    _type2EvalStack.Eval((Type2Operator1)b0);
                 }
                 else
                 {
@@ -193,9 +369,14 @@ namespace Typography.OpenFont.CFF
                 int b1 = _reader.ReadByte();
                 return -(b0 - 251) * 256 - b1 - 108;
             }
+            else if (b0 == 255)
+            {
+                //First byte of a 5-byte sequence specifying a number.
+                return _reader.ReadInt32();
+            }
             else
             {
-                throw new Exception();
+                throw new NotSupportedException();
             }
         }
 

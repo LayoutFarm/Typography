@@ -17,12 +17,15 @@ namespace Typography.Contours
         TrueTypeInterpreter _trueTypeInterpreter;
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
+
+        protected byte[] _cff1GlyphBuffer;
+
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
         bool _useInterpreter;
-        
+
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
@@ -62,6 +65,9 @@ namespace Typography.Contours
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
 
+            //temp fix
+            this._cff1GlyphBuffer = glyph.GetCffGlyphBuffer();
+
             if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)
             {
                 //convert to pixel size
@@ -97,7 +103,16 @@ namespace Typography.Contours
         public virtual void ReadShapes(IGlyphTranslator tx)
         {
             //read output from glyph points
-            tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
+
+            if (this._cff1GlyphBuffer != null)
+            {
+                tx.Read(this._cff1GlyphBuffer);
+            }
+            else
+            {
+                tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
+            }
+
         }
 
 

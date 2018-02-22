@@ -216,7 +216,7 @@ namespace Typography.OpenFont
 
         //--------------------
         //cff
-        public byte[] GetCffBytes()
+        public byte[] GetCffGlyphBuffer()
         {
             //temp 
             return _cff1GlyphData.RawGlyphInstructions;

@@ -78,7 +78,7 @@ namespace Typography.OpenFont
 
     public static class IGlyphReaderExtensions
     {
-
+        //for TrueType Font
         public static void Read(this IGlyphTranslator tx, GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float scale = 1)
         {
 
@@ -369,6 +369,16 @@ namespace Typography.OpenFont
             return new Vector2(
                 ((v0.X + x1) / 2f),
                 ((v0.Y + y1) / 2f));
+        }
+
+
+        //-----------
+        //for CFF1
+        public static void Read(this IGlyphTranslator tx, byte[] cff1RawGlyphBuffer, float scale = 1)
+        {
+            CFF.Type2CharStringParser type2Parser = new CFF.Type2CharStringParser();
+            type2Parser.ParseType2CharsString(cff1RawGlyphBuffer);
+
         }
     }
 
