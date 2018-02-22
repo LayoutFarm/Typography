@@ -135,295 +135,278 @@ namespace Typography.OpenFont.CFF
             _argStack[_currentIndex] = value;
             _currentIndex++;
         }
-        public void Eval(Type2Operator1 op)
+
+
+        //Many operators take their arguments from the bottom-most
+        //entries in the Type 2 argument stack; this behavior is indicated
+        //by the stack bottom symbol ‘| -’ appearing to the left of the first
+        //argument.Operators that clear the argument stack are
+        //indicated by the stack bottom symbol ‘| -’ in the result position
+        //of the operator definition
+
+        //[NOTE4]:
+        //The first stack - clearing operator, which must be one of...
+
+        //  hstem, hstemhm, vstem, vstemhm, cntrmask, 
+        //hintmask, hmoveto, vmoveto, rmoveto, or endchar,
+
+        //...
+        //takes an additional argument — the width(as
+        //described earlier), which may be expressed as zero or one numeric
+        //argument
+
+        //-------------------------
+        //4.1: Path Construction Operators
+
+        /// <summary>
+        /// rmoveto
+        /// </summary>
+        public void R_MoveTo()
+        {
+            //|- dx1 dy1 rmoveto(21) |-
+
+            //moves the current point to
+            //a position at the relative coordinates(dx1, dy1) 
+            //see [NOTE4]
+        }
+        /// <summary>
+        /// hmoveto
+        /// </summary>
+        public void H_MoveTo()
+        {
+            //|- dx1 hmoveto(22) |-
+
+            //moves the current point 
+            //dx1 units in the horizontal direction
+            //see [NOTE4]
+
+            _currentIndex = 0; //clear stack 
+        }
+        public void V_MoveTo()
+        {
+            //|- dy1 vmoveto (4) |-
+            //moves the current point 
+            //dy1 units in the vertical direction.
+            //see [NOTE4]
+        }
+        public void R_LineTo()
+        {
+            //|- {dxa dya}+  rlineto (5) |-
+
+            //appends a line from the current point to 
+            //a position at the relative coordinates dxa, dya. 
+
+            //Additional rlineto operations are 
+            //performed for all subsequent argument pairs. 
+
+            //The number of 
+            //lines is determined from the number of arguments on the stack
+
+            _currentIndex = 0; //clear stack 
+        }
+        public void H_LineTo()
+        {
+            _currentIndex = 0; //clear stack 
+        }
+        public void V_LineTo()
+        {
+            //|- dy1 {dxa dyb}*  vlineto (7) |-
+            //|- {dya dxb}+  vlineto (7) |-
+
+            //appends a vertical line of length 
+            //dy1 to the current point. 
+
+            //With an odd number of arguments, subsequent argument pairs are 
+            //interpreted as alternating values of dx and dy, for which additional 
+            //lineto operators draw alternating horizontal and 
+            //vertical lines.
+
+            //With an even number of arguments, the 
+            //arguments are interpreted as alternating vertical and 
+            //horizontal lines. The number of lines is determined from the 
+            //number of arguments on the stack.
+
+            _currentIndex = 0; //clear stack 
+        }
+
+        public void RR_CurveTo()
         {
 
-            //Many operators take their arguments from the bottom-most
-            //entries in the Type 2 argument stack; this behavior is indicated
-            //by the stack bottom symbol ‘| -’ appearing to the left of the first
-            //argument.Operators that clear the argument stack are
-            //indicated by the stack bottom symbol ‘| -’ in the result position
-            //of the operator definition
+            //|- {dxa dya dxb dyb dxc dyc}+  rrcurveto (8) |-
 
-            //[NOTE4]:
-            //The first stack - clearing operator, which must be one of...
+            //appends a Bézier curve, defined by  dy1 to the current point. 
+            //With dxa...dyc, to the current point.
 
-            //  hstem, hstemhm, vstem, vstemhm, cntrmask, 
-            //hintmask, hmoveto, vmoveto, rmoveto, or endchar,
+            //For each subsequent set of six arguments, an additional 
+            //curve is appended to the current point. 
 
-            //...
-            //takes an additional argument — the width(as
-            //described earlier), which may be expressed as zero or one numeric
-            //argument
+            //The number of curve segments is determined from 
+            //the number of arguments on the number stack and 
+            //is limited only by the size of the number stack
 
-            switch (op)
-            {
-                default:
-                    {
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                //-------------------------
-                //4.1: Path Construction Operators
-                case Type2Operator1.rmoveto:
-                    {
-
-                        //|- dx1 dy1 rmoveto(21) |-
-
-                        //moves the current point to
-                        //a position at the relative coordinates(dx1, dy1) 
-                        //see [NOTE4]
-                    }
-                    break;
-                case Type2Operator1.hmoveto:
-                    {
-
-                        //|- dx1 hmoveto(22) |-
-
-                        //moves the current point 
-                        //dx1 units in the horizontal direction
-                        //see [NOTE4]
-
-                        _currentIndex = 0; //clear stack 
-
-                    }
-                    break;
-                case Type2Operator1.vmoveto:
-                    {
-                        //|- dy1 vmoveto (4) |-
-                        //moves the current point 
-                        //dy1 units in the vertical direction.
-                        //see [NOTE4]
-
-                    }
-                    break;
-                case Type2Operator1.rlineto:
-                    {
-                        //|- {dxa dya}+  rlineto (5) |-
-
-                        //appends a line from the current point to 
-                        //a position at the relative coordinates dxa, dya. 
-
-                        //Additional rlineto operations are 
-                        //performed for all subsequent argument pairs. 
-
-                        //The number of 
-                        //lines is determined from the number of arguments on the stack
-
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.hlineto:
-                    {
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.vlineto:
-                    {
-                        //|- dy1 {dxa dyb}*  vlineto (7) |-
-                        //|- {dya dxb}+  vlineto (7) |-
-
-                        //appends a vertical line of length 
-                        //dy1 to the current point. 
-
-                        //With an odd number of arguments, subsequent argument pairs are 
-                        //interpreted as alternating values of dx and dy, for which additional 
-                        //lineto operators draw alternating horizontal and 
-                        //vertical lines.
-
-                        //With an even number of arguments, the 
-                        //arguments are interpreted as alternating vertical and 
-                        //horizontal lines. The number of lines is determined from the 
-                        //number of arguments on the stack.
-
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.rrcurveto:
-                    {
-
-
-                        //|- {dxa dya dxb dyb dxc dyc}+  rrcurveto (8) |-
-
-                        //appends a Bézier curve, defined by  dy1 to the current point. 
-                        //With dxa...dyc, to the current point.
-
-                        //For each subsequent set of six arguments, an additional 
-                        //curve is appended to the current point. 
-
-                        //The number of curve segments is determined from 
-                        //the number of arguments on the number stack and 
-                        //is limited only by the size of the number stack
-
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.hhcurveto:
-                    {
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.hvcurveto:
-                    {
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.rcurveline:
-                    {
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.rlinecurve:
-                    {
-                        _currentIndex = 0; //clear stack 
-                    }
-                    break;
-                case Type2Operator1.vhcurveto:
-                    {
-
-                    }
-                    break;
-                case Type2Operator1.vvcurveto:
-                    {
-
-                    }
-                    break;
-                //-------------------------------------------------------------------
-                //4.3 Hint Operators
-                case Type2Operator1.hstem:
-                    {
-
-                    }
-                    break;
-                case Type2Operator1.vstem:
-                    {
-
-                    }
-                    break;
-                case Type2Operator1.hstemhm:
-                    {
-
-                        //|- y dy {dya dyb}*  hstemhm (18) |-
-
-                        //has the same meaning as 
-                        //hstem (1),
-                        //except that it must be used 
-                        //in place of hstem  if the charstring contains one or more 
-                        //hintmask operators.
-                        _currentIndex = 0; //clear stack?
-
-                    }
-                    break;
-                case Type2Operator1.hintmask:
-                    {
-
-
-                    }
-                    break;
-                case Type2Operator1.cntrmask:
-                    {
-                        _currentIndex = 0;
-                        //|- cntrmask(20 + mask) |-
-
-                        //specifies the counter spaces to be controlled, and their relative
-                        //priority.The mask bits in the bytes, following the operator, 
-                        //reference the stem hint declarations; the most significant bit of
-                        //the first byte refers to the first stem hint declared, through to
-                        //the last hint declaration.The counters to be controlled are
-                        //those that are delimited by the referenced stem hints.Bits set to
-                        //1 in the first cntrmask command have top priority; subsequent
-                        //cntrmask commands specify lower priority counters(see Figure
-                        //1 and the accompanying example). 
-                    }
-                    break;
-
-                //-------------------------
-                //4.7: Subroutine Operators
-                case Type2Operator1.callsubr:
-                case Type2Operator1.callgsubr:
-                case Type2Operator1._return:
-                    break;
-            }
-
-            //TEMP, NOT CORRECT
-            _currentIndex = 0; //current stack index
+            _currentIndex = 0; //clear stack 
         }
-        public void Eval(Type2Operator2 op)
+        public void HH_CurveTo()
         {
-            switch (op)
-            {
-                default: throw new NotSupportedException();
-                //-------------------------
-                //4.1: Path Construction Operators
-                case Type2Operator2.flex:
-                    {
-
-                    }
-                    break;
-                case Type2Operator2.hflex:
-                    {
-
-                    }
-                    break;
-                case Type2Operator2.hflex1:
-                    {
-
-                    }
-                    break;
-                case Type2Operator2.flex1:
-                    {
-
-                    }
-                    break;//
-
-                //-------------------------
-                //4.4: Arithmetic Operators
-                case Type2Operator2.abs:
-                case Type2Operator2.add:
-                case Type2Operator2.sub:
-                case Type2Operator2.div:
-                case Type2Operator2.neg:
-                case Type2Operator2.random:
-                case Type2Operator2.mul:
-                case Type2Operator2.sqrt:
-                case Type2Operator2.drop:
-                case Type2Operator2.exch:
-                case Type2Operator2.index:
-                case Type2Operator2.roll:
-                case Type2Operator2.dup:
-                    break;
-
-                //-------------------------
-                //4.5: Storage Operators
-                //The storage operators utilize a transient array and provide 
-                //facilities for storing and retrieving transient array data. 
-
-                //The transient array provides non-persistent storage for 
-                //intermediate values. 
-                //There is no provision to initialize this array, 
-                //except explicitly using the put operator, 
-                //and values stored in the 
-                //array do not persist beyond the scope of rendering an individual 
-                //character. 
-                case Type2Operator2.put:
-                case Type2Operator2.get:
-                    break;
-
-                //-------------------------
-                //4.6:
-                case Type2Operator2.and:
-                case Type2Operator2.or:
-                case Type2Operator2.not:
-                case Type2Operator2.eq:
-                case Type2Operator2.ifelse:
-                    break;
-
-
-            }
-
-            //TEMP, NOT CORRECT
-            _currentIndex = 0; //current stack index, 
+            _currentIndex = 0; //clear stack 
         }
+        public void HV_CurveTo()
+        {
+            _currentIndex = 0; //clear stack 
+        }
+        public void R_CurveLine()
+        {
+            _currentIndex = 0; //clear stack 
+        }
+        public void R_LineCurve()
+        {
+            _currentIndex = 0; //clear stack 
+        }
+        public void VH_CurveTo()
+        {
+
+        }
+        public void VV_CurveTo()
+        {
+
+        }
+
+
+        public void Flex()
+        {
+
+        }
+        public void H_Flex()
+        {
+
+        }
+        public void H_Flex1()
+        {
+
+        }
+        public void Flex1()
+        {
+
+        }
+
+
+        //-------------------------------------------------------------------
+        //4.3 Hint Operators
+        public void H_Stem()
+        {
+
+        }
+        public void V_Stem()
+        {
+
+        }
+        public void H_StemHM()
+        {
+            //|- y dy {dya dyb}*  hstemhm (18) |-
+
+            //has the same meaning as 
+            //hstem (1),
+            //except that it must be used 
+            //in place of hstem  if the charstring contains one or more 
+            //hintmask operators.
+            _currentIndex = 0; //clear stack?
+        }
+        public void HintMask()
+        {
+
+        }
+        public void CounterSpaceMask()
+        {
+            _currentIndex = 0;
+            //|- cntrmask(20 + mask) |-
+
+            //specifies the counter spaces to be controlled, and their relative
+            //priority.The mask bits in the bytes, following the operator, 
+            //reference the stem hint declarations; the most significant bit of
+            //the first byte refers to the first stem hint declared, through to
+            //the last hint declaration.The counters to be controlled are
+            //those that are delimited by the referenced stem hints.Bits set to
+            //1 in the first cntrmask command have top priority; subsequent
+            //cntrmask commands specify lower priority counters(see Figure
+            //1 and the accompanying example). 
+        }
+
+        //4.4: Arithmetic Operators
+
+        //case Type2Operator2.abs:
+        //                case Type2Operator2.add:
+        //                case Type2Operator2.sub:
+        //                case Type2Operator2.div:
+        //                case Type2Operator2.neg:
+        //                case Type2Operator2.random:
+        //                case Type2Operator2.mul:
+        //                case Type2Operator2.sqrt:
+        //                case Type2Operator2.drop:
+        //                case Type2Operator2.exch:
+        //                case Type2Operator2.index:
+        //                case Type2Operator2.roll:
+        //                case Type2Operator2.dup:
+
+        public void Op_Abs() { }
+        public void Op_Add()
+        {
+
+        }
+        public void Op_Sub() { }
+        public void Op_Div() { }
+        public void Op_Neg() { }
+        public void Op_Random() { }
+        public void Op_Mul() { }
+        public void Op_Sqrt() { }
+        public void Op_Drop() { }
+        public void Op_Exch() { }
+        public void Op_Index() { }
+        public void Op_Roll() { }
+        public void Op_Dup() { }
+
+
+        //-------------------------
+        //4.5: Storage Operators
+
+        //The storage operators utilize a transient array and provide 
+        //facilities for storing and retrieving transient array data. 
+
+        //The transient array provides non-persistent storage for 
+        //intermediate values. 
+        //There is no provision to initialize this array, 
+        //except explicitly using the put operator, 
+        //and values stored in the 
+        //array do not persist beyond the scope of rendering an individual 
+        //character. 
+
+        public void Put() { }
+        public void Get() { }
+
+        //-------------------------
+        //4.6: Conditional 
+
+
+        public void Op_And() { }
+        public void Op_Or() { }
+        public void Op_Not() { }
+        public void Op_Eq() { }
+        public void Op_IfElse() { }
+
+
+        //-------------------------
+        //4.7: Subroutine Operators
+        public void CallSubr()
+        {
+
+        }
+        public void CallGSubr()
+        {
+
+        }
+        //---------------------
+
+        //4.6
+
 
 
     }
@@ -457,38 +440,97 @@ namespace Typography.OpenFont.CFF
                 //translate *** 
                 byte b0 = _reader.ReadByte();
 
-                if (b0 >= 32 && b0 <= 255)
+
+                switch (b0)
                 {
-                    int num = ReadIntegerNumber(b0);
-                    _type2EvalStack.Push(num);
-                }
-                else if (b0 == 0)
-                {
-                    //reserve
-                }
-                else if (b0 == 12)
-                {
-                    // First byte of a 2-byte operator 
-                    _type2EvalStack.Eval((Type2Operator2)_reader.ReadByte());
-                }
-                else if (b0 < 28)
-                {
-                    _type2EvalStack.Eval((Type2Operator1)b0);
-                }
-                else if (b0 == 28)
-                {
-                    //shortint
-                    //First byte of a 3-byte sequence specifying a number.
-                    _type2EvalStack.Push(_reader.ReadUInt16());
-                }
-                else if (b0 >= 29 && b0 < 32)
-                {
-                    //29,30,31
-                    _type2EvalStack.Eval((Type2Operator1)b0);
-                }
-                else
-                {
-                    throw new NotSupportedException();
+                    default: //else 32 -255
+                        {
+
+#if DEBUG
+                            if (b0 < 32) throw new Exception();
+#endif
+
+                            int num = ReadIntegerNumber(b0);
+                            _type2EvalStack.Push(num);
+                        }
+                        break;
+                    case 0:
+                        //reserve, do nothing
+                        break;
+                    case (byte)Type2Operator1.shortint: // 28
+
+                        //shortint
+                        //First byte of a 3-byte sequence specifying a number.
+                        _type2EvalStack.Push(_reader.ReadUInt16());
+
+                        break;
+                    case (byte)Type2Operator1.escape: //12
+                        {
+                            b0 = _reader.ReadByte();
+                            switch ((Type2Operator2)b0)
+                            {
+                                default: throw new NotSupportedException();
+                                //-------------------------
+                                //4.1: Path Construction Operators
+                                case Type2Operator2.flex: _type2EvalStack.Flex(); break;
+                                case Type2Operator2.hflex: _type2EvalStack.H_Flex(); break;
+                                case Type2Operator2.hflex1: _type2EvalStack.H_Flex1(); break;
+                                case Type2Operator2.flex1: _type2EvalStack.Flex1(); break;
+                                //-------------------------
+                                //4.4: Arithmetic Operators
+                                case Type2Operator2.abs: _type2EvalStack.Op_Abs(); break;
+                                case Type2Operator2.add: _type2EvalStack.Op_Add(); break;
+                                case Type2Operator2.sub: _type2EvalStack.Op_Sub(); break;
+                                case Type2Operator2.div: _type2EvalStack.Op_Div(); break;
+                                case Type2Operator2.neg: _type2EvalStack.Op_Neg(); break;
+                                case Type2Operator2.random: _type2EvalStack.Op_Random(); break;
+                                case Type2Operator2.mul: _type2EvalStack.Op_Mul(); break;
+                                case Type2Operator2.sqrt: _type2EvalStack.Op_Sqrt(); break;
+                                case Type2Operator2.drop: _type2EvalStack.Op_Drop(); break;
+                                case Type2Operator2.exch: _type2EvalStack.Op_Exch(); break;
+                                case Type2Operator2.index: _type2EvalStack.Op_Index(); break;
+                                case Type2Operator2.roll: _type2EvalStack.Op_Roll(); break;
+                                case Type2Operator2.dup: _type2EvalStack.Op_Dup(); break;
+
+                                //-------------------------
+                                //4.5: Storage Operators 
+                                case Type2Operator2.put: _type2EvalStack.Put(); break;
+                                case Type2Operator2.get: _type2EvalStack.Get(); break;
+                                //-------------------------
+                                //4.6: Conditional
+                                case Type2Operator2.and: _type2EvalStack.Op_And(); break;
+                                case Type2Operator2.or: _type2EvalStack.Op_Or(); break;
+                                case Type2Operator2.not: _type2EvalStack.Op_Not(); break;
+                                case Type2Operator2.eq: _type2EvalStack.Op_Eq(); break;
+                                case Type2Operator2.ifelse: _type2EvalStack.Op_IfElse(); break;
+                            }
+                        }
+                        break;
+                    case (byte)Type2Operator1.vmoveto: _type2EvalStack.V_MoveTo(); break;
+                    case (byte)Type2Operator1.rlineto: _type2EvalStack.R_LineTo(); break;
+                    case (byte)Type2Operator1.hlineto: _type2EvalStack.H_LineTo(); break;
+                    case (byte)Type2Operator1.vlineto: _type2EvalStack.V_LineTo(); break;
+                    case (byte)Type2Operator1.rrcurveto: _type2EvalStack.RR_CurveTo(); break;
+                    case (byte)Type2Operator1.hhcurveto: _type2EvalStack.HH_CurveTo(); break;
+                    case (byte)Type2Operator1.hvcurveto: _type2EvalStack.HV_CurveTo(); break;
+                    case (byte)Type2Operator1.rcurveline: _type2EvalStack.R_CurveLine(); break;
+                    case (byte)Type2Operator1.rlinecurve: _type2EvalStack.R_LineCurve(); break;
+                    case (byte)Type2Operator1.vhcurveto: _type2EvalStack.VH_CurveTo(); break;
+                    case (byte)Type2Operator1.vvcurveto: _type2EvalStack.VV_CurveTo(); break;
+                    //-------------------------------------------------------------------
+                    //4.3 Hint Operators
+                    case (byte)Type2Operator1.hstem: _type2EvalStack.H_Stem(); break;
+                    case (byte)Type2Operator1.vstem: _type2EvalStack.V_Stem(); break;
+                    case (byte)Type2Operator1.hstemhm: _type2EvalStack.H_StemHM(); break;
+                    case (byte)Type2Operator1.hintmask: _type2EvalStack.HintMask(); break;
+                    case (byte)Type2Operator1.cntrmask: _type2EvalStack.CounterSpaceMask(); break;
+                    //-------------------------
+                    //4.7: Subroutine Operators
+                    case (byte)Type2Operator1.callsubr: _type2EvalStack.CallSubr(); break;
+                    case (byte)Type2Operator1.callgsubr: _type2EvalStack.CallGSubr(); break;
+                    case (byte)Type2Operator1._return:
+
+                        break;
                 }
             }
         }
@@ -519,6 +561,7 @@ namespace Typography.OpenFont.CFF
                 throw new NotSupportedException();
             }
         }
+
 
         public void Dispose()
         {
