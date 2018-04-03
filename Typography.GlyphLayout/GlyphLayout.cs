@@ -224,7 +224,7 @@ namespace Typography.TextLayout
             {
                 char ch = str[startAt + i];
                 int codepoint = ch;
-                if (Char.IsSurrogate(ch) && i + 1 < len)
+                if (Char.IsHighSurrogate(ch) && i + 1 < len)
                 {
                     char nextCh = str[startAt + i + 1];
                     if (Char.IsLowSurrogate(nextCh))
