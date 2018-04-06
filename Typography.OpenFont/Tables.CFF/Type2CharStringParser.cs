@@ -216,7 +216,7 @@ namespace Typography.OpenFont.CFF
             double w = _argStack[rd_index];
             _currentY += _argStack[rd_index + 1];
 
-            _glyphTranslator.MoveTo((int)_currentX, (int)_currentY);
+            _glyphTranslator.MoveTo((float)_currentX, (float)_currentY);
 
             _currentIndex = 0; //clear stack 
         }
@@ -233,6 +233,12 @@ namespace Typography.OpenFont.CFF
             //The number of 
             //lines is determined from the number of arguments on the stack
 
+            for (int i = 0; i < _currentIndex;)
+            {
+                _glyphTranslator.MoveTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
+
+                i += 2;
+            }
             _currentIndex = 0; //clear stack 
         }
         public void H_LineTo()
@@ -255,7 +261,35 @@ namespace Typography.OpenFont.CFF
             //vertical lines. The number of lines is determined from the 
             //number of arguments on the stack.
 
+            if ((_currentIndex % 2) == 0)
+            {
+                //even number
+                for (int i = 0; i < _currentIndex;)
+                {
+                    //line to                     
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
+                    //
+                    i += 2;
+                }
+            }
+            else
+            {
+                //odd number
 
+                //first elem
+                int i = 0;
+                _currentX += _argStack[i];
+                i++;
+                //
+                _glyphTranslator.LineTo((float)_currentX, (float)_currentY);
+                for (; i < _currentIndex;)
+                {
+                    //line to
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
+                    //
+                    i += 2;
+                }
+            }
 
             _currentIndex = 0; //clear stack 
 
@@ -278,19 +312,36 @@ namespace Typography.OpenFont.CFF
             //horizontal lines. The number of lines is determined from the 
             //number of arguments on the stack.
 
-            int nElem = _currentIndex;
-            if ((nElem % 2) == 0)
+
+            if ((_currentIndex % 2) == 0)
             {
                 //even number
-
+                for (int i = 0; i < _currentIndex;)
+                {
+                    //line to                     
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
+                    //
+                    i += 2;
+                }
             }
             else
             {
                 //odd number
 
+                //first elem
+                int i = 0;
+                _currentY += _argStack[i];
+                i++;
+                //
+                _glyphTranslator.LineTo((float)_currentX, (float)_currentY);
+                for (; i < _currentIndex;)
+                {
+                    //line to
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
+                    //
+                    i += 2;
+                }
             }
-
-
 
             _currentIndex = 0; //clear stack 
         }
@@ -309,6 +360,33 @@ namespace Typography.OpenFont.CFF
             //The number of curve segments is determined from 
             //the number of arguments on the number stack and 
             //is limited only by the size of the number stack
+
+
+            //All Bézier curve path segments are drawn using six arguments,
+            //dxa, dya, dxb, dyb, dxc, dyc; where dxa and dya are relative to
+            //the current point, and all subsequent arguments are relative to
+            //the previous point.A number of the curve operators take
+            //advantage of the situation where some tangent points are
+            //horizontal or vertical(and hence the value is zero), thus
+            //reducing the number of arguments needed.
+
+            for (int i = 0; i < _currentIndex;)
+            {
+
+                double curX = _currentX;
+                double curY = _currentY;
+
+                _glyphTranslator.Curve4(
+                    (float)(curX += _argStack[i + 0]), (float)(curY += _argStack[i + 1]), //dxa,dya
+                    (float)(curX += _argStack[i + 2]), (float)(curY += _argStack[i + 3]), //dxb,dyb
+                    (float)(curX += _argStack[i + 4]), (float)(curY += _argStack[i + 5])  //dxc,dyc
+                    );
+
+                _currentX = curX;
+                _currentY = curY;
+                //
+                i += 6;
+            }
 
             _currentIndex = 0; //clear stack 
         }
