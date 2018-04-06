@@ -375,7 +375,32 @@ namespace Typography.OpenFont.CFF
             //The first curve need not start horizontal (the odd argument 
             //case). Note the argument order for the odd argument case
 
-           
+            int i = 0;
+            if ((_currentIndex % 2) != 0)
+            {
+                //odd number                
+                _glyphTranslator.LineTo((float)_currentX, (float)(_currentY += _argStack[i]));
+                i++;
+            }
+
+            for (; i < _currentIndex;)
+            {
+
+                double curX = _currentX;
+                double curY = _currentY;
+
+                _glyphTranslator.Curve4(
+                    (float)(curX += _argStack[i + 0]), (float)(curY), //dxa,+0
+                    (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
+                    (float)(curX += _argStack[i + 3]), (float)(curY)  //dxc,+0
+                    );
+
+                _currentX = curX;
+                _currentY = curY;
+
+                //
+                i += 4;
+            }
             _currentIndex = 0; //clear stack  
         }
         public void HV_CurveTo()
@@ -397,6 +422,100 @@ namespace Typography.OpenFont.CFF
 
             //The last curve (the odd argument case) need not 
             //end horizontal/vertical.
+            int i = 0;
+            int remaining = 0;
+
+            switch (remaining = (_currentIndex % 8))
+            {
+                default: throw new NotSupportedException();
+                case 0:
+                case 1:
+                    {
+                        //|- {dxa dxb dyb dyc dyd dxe dye dxf}+ dyf? hvcurveto (31) |-
+
+                        double curX = _currentX;
+                        double curY = _currentY;
+
+                        int endBefore = _currentIndex - remaining;
+                        for (; i < endBefore;)
+                        {
+                            //line to 
+
+                            _glyphTranslator.Curve4(
+                                (float)(curX += _argStack[i + 0]), (float)(curY), //+dxa,0
+                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
+                                (float)(curX), (float)(curY += _argStack[i + 3])  //+0,dyc
+                                );
+
+                            _glyphTranslator.Curve4(
+                              (float)(curX), (float)(curY += _argStack[i + 4]), //+0,dyd
+                              (float)(curX += _argStack[i + 5]), (float)(curY += _argStack[i + 6]), //dxe,dye
+                              (float)(curX += _argStack[i + 7]), (float)(curY)  //dxf,+0
+                              );
+                            //
+                            i += 8;
+                        }
+                        _currentX = curX;
+                        _currentY = curY;
+
+                        if (remaining == 1)
+                        {
+                            //dyf?
+                            _glyphTranslator.LineTo((float)(_currentX), (float)(_currentY += _argStack[i]));
+                        }
+                    }
+                    break;
+
+                case 4:
+                case 5:
+                    {
+
+                        //|- dx1 dx2 dy2 dy3 {dya dxb dyb dxc dxd dxe dye dyf}* dxf? hvcurveto (31) |-
+
+                        double curX = _currentX;
+                        double curY = _currentY;
+
+                        _glyphTranslator.Curve4(
+                                (float)(curX += _argStack[i + 0]), (float)(curY), //dx1,0
+                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dx2,dy2
+                                (float)(curX), (float)(curY += _argStack[i + 3])  //+0,dy3
+                                );
+                        i += 4;
+
+                        int endBefore = _currentIndex - remaining;
+                        for (; i < endBefore;)
+                        {
+
+
+                            _glyphTranslator.Curve4(
+                                (float)(curX), (float)(curY += _argStack[i + 0]), //0,dya
+                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
+                                (float)(curX += _argStack[i + 3]), (float)(curY)  //dxc, +0
+                                );
+
+                            _glyphTranslator.Curve4(
+                              (float)(curX += _argStack[i + 4]), (float)(curY), //dxd,0
+                              (float)(curX += _argStack[i + 5]), (float)(curY += _argStack[i + 6]), //dxe,dye
+                              (float)(curX), (float)(curY += _argStack[i + 7])  //0,dyf
+                              );
+                            //
+                            i += 8;
+                        }
+
+                        _currentX = curX;
+                        _currentY = curY;
+
+                        if (remaining == 5)
+                        {
+                            //dxf?
+                            _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY));
+                        }
+
+                    }
+                    break;
+            }
+
+
             _currentIndex = 0; //clear stack 
         }
         public void R_CurveLine()
@@ -440,8 +559,100 @@ namespace Typography.OpenFont.CFF
             //hvcurveto; 
 
             //see the description of hvcurveto for more information.
+            int i = 0;
+            int remaining = 0;
+
+            switch (remaining = (_currentIndex % 8))
+            {
+                default: throw new NotSupportedException();
+                case 0:
+                case 1:
+                    {
+                        //|- {dya dxb dyb dxc dxd dxe dye dyf}+ dxf? vhcurveto (30) |- 
+
+
+                        double curX = _currentX;
+                        double curY = _currentY;
+
+                        int endBefore = _currentIndex - remaining;
+                        for (; i < endBefore;)
+                        {
+                            _glyphTranslator.Curve4(
+                                (float)(curX), (float)(curY += _argStack[i + 0]), //+0,dya
+                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
+                                (float)(curX += _argStack[i + 3]), (float)(curY)  //dxc,+0
+                                );
+
+                            _glyphTranslator.Curve4(
+                              (float)(curX += _argStack[i + 4]), (float)(curY), //dxd,+0
+                              (float)(curX += _argStack[i + 5]), (float)(curY += _argStack[i + 6]), //dxe,dye
+                              (float)(curX), (float)(curY += _argStack[i + 7])  //+0,dyf
+                              );
+                            //
+                            i += 8;
+                        }
+                        _currentX = curX;
+                        _currentY = curY;
+
+                        if (remaining == 1)
+                        {
+                            //dxf?
+                            _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)_currentY);
+                        }
+                    }
+                    break;
+
+                case 4:
+                case 5:
+                    {
+
+                        //|- dy1 dx2 dy2 dx3 {dxa dxb dyb dyc dyd dxe dye dxf}* dyf? vhcurveto (30) |-
+                        double curX = _currentX;
+                        double curY = _currentY;
+
+                        _glyphTranslator.Curve4(
+                                (float)(curX), (float)(curY += _argStack[i + 0]), //+0,dy1
+                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dx2,dy2
+                                (float)(curX += _argStack[i + 3]), (float)(curY)  //dx3,+0
+                                );
+                        i += 4;
+
+                        int endBefore = _currentIndex - remaining;
+                        for (; i < endBefore;)
+                        {
+                            //line to
+
+                            _glyphTranslator.Curve4(
+                                (float)(curX += _argStack[i + 0]), (float)(curY), //dxa,
+                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
+                                (float)(curX), (float)(curY += _argStack[i + 3])  //+0, dyc
+                                );
+
+                            _glyphTranslator.Curve4(
+                              (float)(curX += _argStack[i + 4]), (float)(curY), //+0,dyd
+                              (float)(curX += _argStack[i + 5]), (float)(curY += _argStack[i + 6]), //dxe,dye
+                              (float)(curX += _argStack[i + 7]), (float)(curY)  //dxf,0
+                              );
+                            //
+                            i += 8;
+                        }
+
+                        _currentX = curX;
+                        _currentY = curY;
+
+                        if (remaining == 5)
+                        {
+                            // dyf?
+                            _glyphTranslator.LineTo((float)(_currentX), (float)(_currentY += _argStack[i]));
+                        }
+
+                    }
+                    break;
+            }
 
             _currentIndex = 0; //clear stack 
+
+
         }
         public void VV_CurveTo()
         {
@@ -450,6 +661,32 @@ namespace Typography.OpenFont.CFF
             //If the argument count is a multiple of four, the curve starts and ends vertical. 
             //If the argument count is odd, the first curve does not begin with a vertical tangent.
 
+            int i = 0;
+            if ((_currentIndex % 2) != 0)
+            {
+                //odd number                
+                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY));
+                i++;
+            }
+
+            for (; i < _currentIndex;)
+            {
+                //line to
+                double curX = _currentX;
+                double curY = _currentY;
+
+                _glyphTranslator.Curve4(
+                    (float)(curX), (float)(curY += _argStack[i + 0]), //+0,dya
+                    (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
+                    (float)(curX), (float)(curY += _argStack[i + 3])  //+0,dyc
+                    );
+
+                _currentX = curX;
+                _currentY = curY;
+
+                //
+                i += 4;
+            }
 
             _currentIndex = 0; //clear stack
         }
@@ -704,13 +941,15 @@ namespace Typography.OpenFont.CFF
                     case 0:
                         //reserve, do nothing
                         break;
+                    case (byte)Type2Operator1.endchar:
+
+                        break;                     
                     case (byte)Type2Operator1.shortint: // 28
 
                         //shortint
                         //First byte of a 3-byte sequence specifying a number.
                         _evalStack.Push(_reader.ReadUInt16());
-
-                        break;
+                        break; 
                     case (byte)Type2Operator1.escape: //12
                         {
                             b0 = _reader.ReadByte();
