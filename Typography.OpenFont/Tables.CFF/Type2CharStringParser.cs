@@ -261,34 +261,21 @@ namespace Typography.OpenFont.CFF
             //vertical lines. The number of lines is determined from the 
             //number of arguments on the stack.
 
-            if ((_currentIndex % 2) == 0)
+            //first elem
+            int i = 0;
+            if ((_currentIndex % 2) != 0)
             {
-                //even number
-                for (int i = 0; i < _currentIndex;)
-                {
-                    //line to                     
-                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
-                    //
-                    i += 2;
-                }
-            }
-            else
-            {
-                //odd number
-
-                //first elem
-                int i = 0;
-                _currentX += _argStack[i];
+                //odd number                
+                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY));
                 i++;
+            }
+
+            for (; i < _currentIndex;)
+            {
+                //line to
+                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
                 //
-                _glyphTranslator.LineTo((float)_currentX, (float)_currentY);
-                for (; i < _currentIndex;)
-                {
-                    //line to
-                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
-                    //
-                    i += 2;
-                }
+                i += 2;
             }
 
             _currentIndex = 0; //clear stack 
@@ -310,39 +297,23 @@ namespace Typography.OpenFont.CFF
             //With an even number of arguments, the 
             //arguments are interpreted as alternating vertical and 
             //horizontal lines. The number of lines is determined from the 
-            //number of arguments on the stack.
-
-
-            if ((_currentIndex % 2) == 0)
+            //number of arguments on the stack. 
+            //first elem
+            int i = 0;
+            if ((_currentIndex % 2) != 0)
             {
-                //even number
-                for (int i = 0; i < _currentIndex;)
-                {
-                    //line to                     
-                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
-                    //
-                    i += 2;
-                }
-            }
-            else
-            {
-                //odd number
-
-                //first elem
-                int i = 0;
-                _currentY += _argStack[i];
+                //odd number                
+                _glyphTranslator.LineTo((float)_currentX, (float)(_currentY += _argStack[i]));
                 i++;
-                //
-                _glyphTranslator.LineTo((float)_currentX, (float)_currentY);
-                for (; i < _currentIndex;)
-                {
-                    //line to
-                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
-                    //
-                    i += 2;
-                }
             }
 
+            for (; i < _currentIndex;)
+            {
+                //line to
+                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
+                //
+                i += 2;
+            }
             _currentIndex = 0; //clear stack 
         }
 
@@ -392,6 +363,7 @@ namespace Typography.OpenFont.CFF
         }
         public void HH_CurveTo()
         {
+
             //|- dy1? {dxa dxb dyb dxc}+ hhcurveto (27) |-
 
             //appends one or more Bézier curves, as described by the 
@@ -399,11 +371,12 @@ namespace Typography.OpenFont.CFF
             //For each curve, if there are 4 arguments, 
             //the curve starts and ends horizontal. 
 
+
             //The first curve need not start horizontal (the odd argument 
             //case). Note the argument order for the odd argument case
 
-
-            _currentIndex = 0; //clear stack 
+           
+            _currentIndex = 0; //clear stack  
         }
         public void HV_CurveTo()
         {
