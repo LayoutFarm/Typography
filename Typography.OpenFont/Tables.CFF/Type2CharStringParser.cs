@@ -182,6 +182,22 @@ namespace Typography.OpenFont.CFF
             //a position at the relative coordinates(dx1, dy1) 
             //see [NOTE4]
 
+
+#if DEBUG
+            if ((_currentIndex % 2) != 0)
+            {
+
+            }
+#endif
+            for (int i = 0; i < _currentIndex;)
+            {
+                _currentX += _argStack[i];
+                _currentY += _argStack[i + 1];
+                i += 2;
+            }
+
+            _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
+
             _currentIndex = 0; //clear stack 
         }
 
@@ -196,11 +212,12 @@ namespace Typography.OpenFont.CFF
             //dx1 units in the horizontal direction
             //see [NOTE4]
 
-            int rd_index = 0; //start at bottom
-            double w = _argStack[rd_index];
-            _currentX += _argStack[rd_index + 1];
+            int i = 0; //start at bottom
+            double w = _argStack[i];
+            _currentX += _argStack[i + 1];
 
-            _glyphTranslator.MoveTo((int)_currentX, (int)_currentY);
+
+            _glyphTranslator.MoveTo((float)(_currentX), (float)_currentY);
 
             _currentIndex = 0; //clear stack 
         }
@@ -236,7 +253,6 @@ namespace Typography.OpenFont.CFF
             for (int i = 0; i < _currentIndex;)
             {
                 _glyphTranslator.MoveTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
-
                 i += 2;
             }
             _currentIndex = 0; //clear stack 
@@ -690,6 +706,10 @@ namespace Typography.OpenFont.CFF
 
             _currentIndex = 0; //clear stack
         }
+        public void EndChar()
+        {
+            _currentIndex = 0;
+        }
         public void Flex()
         {
             //|- dx1 dy1 dx2 dy2 dx3 dy3 dx4 dy4 dx5 dy5 dx6 dy6 fd flex (12 35) |-
@@ -821,22 +841,58 @@ namespace Typography.OpenFont.CFF
         //                case Type2Operator2.roll:
         //                case Type2Operator2.dup:
 
-        public void Op_Abs() { }
+        public void Op_Abs()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Abs));
+        }
         public void Op_Add()
         {
-
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Add));
         }
-        public void Op_Sub() { }
-        public void Op_Div() { }
-        public void Op_Neg() { }
-        public void Op_Random() { }
-        public void Op_Mul() { }
-        public void Op_Sqrt() { }
-        public void Op_Drop() { }
-        public void Op_Exch() { }
-        public void Op_Index() { }
-        public void Op_Roll() { }
-        public void Op_Dup() { }
+        public void Op_Sub()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Sub));
+        }
+        public void Op_Div()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Div));
+        }
+        public void Op_Neg()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Neg));
+        }
+        public void Op_Random()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Random));
+        }
+        public void Op_Mul()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Mul));
+        }
+        public void Op_Sqrt()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Sqrt));
+        }
+        public void Op_Drop()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Drop));
+        }
+        public void Op_Exch()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Exch));
+        }
+        public void Op_Index()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Index));
+        }
+        public void Op_Roll()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Roll));
+        }
+        public void Op_Dup()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Dup));
+        }
 
 
         //-------------------------
@@ -855,31 +911,49 @@ namespace Typography.OpenFont.CFF
 
         public void Put()
         {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Put));
         }
         public void Get()
         {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Get));
         }
 
         //-------------------------
         //4.6: Conditional 
 
 
-        public void Op_And() { }
-        public void Op_Or() { }
-        public void Op_Not() { }
-        public void Op_Eq() { }
-        public void Op_IfElse() { }
+        public void Op_And()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_And));
+        }
+        public void Op_Or()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Or));
+        }
+        public void Op_Not()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Not));
+        }
+        public void Op_Eq()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Eq));
+        }
+        public void Op_IfElse()
+        {
+            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_IfElse));
+        }
 
 
         //-------------------------
         //4.7: Subroutine Operators
         public void CallSubr()
         {
-
+            _currentIndex = 0;
         }
         public void CallGSubr()
         {
 
+            _currentIndex = 0;
         }
 
 #if DEBUG
@@ -907,6 +981,10 @@ namespace Typography.OpenFont.CFF
         {
             this._evalStack.GlyphTranslator = glyphTranslator;
         }
+#if DEBUG
+
+        int _dbugCount = 0;
+#endif
         public void ParseType2CharsString(byte[] buffer)
         {
             //TODO: implement this
@@ -919,6 +997,14 @@ namespace Typography.OpenFont.CFF
             List<Type2Command> cmds = new List<Type2Command>();
             while (_reader.BaseStream.Position < len)
             {
+
+#if DEBUG
+                _dbugCount++;
+                if (_dbugCount == 15)
+                {
+
+                }
+#endif
                 //read first byte 
                 //translate *** 
                 byte b0 = _reader.ReadByte();
@@ -942,14 +1028,14 @@ namespace Typography.OpenFont.CFF
                         //reserve, do nothing
                         break;
                     case (byte)Type2Operator1.endchar:
-
-                        break;                     
+                        _evalStack.EndChar();
+                        break;
                     case (byte)Type2Operator1.shortint: // 28
 
                         //shortint
                         //First byte of a 3-byte sequence specifying a number.
                         _evalStack.Push(_reader.ReadUInt16());
-                        break; 
+                        break;
                     case (byte)Type2Operator1.escape: //12
                         {
                             b0 = _reader.ReadByte();
@@ -992,6 +1078,7 @@ namespace Typography.OpenFont.CFF
                             }
                         }
                         break;
+                    case (byte)Type2Operator1.rmoveto: _evalStack.R_MoveTo(); break;
                     case (byte)Type2Operator1.hmoveto: _evalStack.H_MoveTo(); break;
                     case (byte)Type2Operator1.vmoveto: _evalStack.V_MoveTo(); break;
                     case (byte)Type2Operator1.rlineto: _evalStack.R_LineTo(); break;

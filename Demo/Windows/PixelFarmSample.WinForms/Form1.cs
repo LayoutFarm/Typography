@@ -57,7 +57,7 @@ namespace SampleWinForms
             _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
 
 
-            
+
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             button1.Click += (s, e) => UpdateRenderOutput();
 
@@ -77,12 +77,12 @@ namespace SampleWinForms
             //string inputstr = "k";
             //string inputstr = "8";
             //string inputstr = "#";
-            //string inputstr = "a";
+            string inputstr = "a";
             //string inputstr = "e";
             //string inputstr = "l";
             //string inputstr = "t";
             //string inputstr = "i";
-            string inputstr = "ma";
+            //string inputstr = "ma"; 
             //string inputstr = "po";
             //string inputstr = "Å";
             //string inputstr = "fi";
@@ -99,7 +99,7 @@ namespace SampleWinForms
 
 
 
-         
+
         bool _readyToRender;
         void UpdateRenderOutput()
         {
@@ -190,9 +190,9 @@ namespace SampleWinForms
                 case TypographyTest.RenderChoice.RenderWithSdfGen:
                     {
                         char testChar = this.txtInputChar.Text[0];
-                        Typeface typeFace = _basicOptions.Typeface; 
+                        Typeface typeFace = _basicOptions.Typeface;
                         RenderWithMsdfImg(typeFace, testChar, _basicOptions.FontSizeInPoints);
-                         
+
                     }
                     break;
                 case TypographyTest.RenderChoice.RenderWithMiniAgg_SingleGlyph:
@@ -451,7 +451,7 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
-         
+
         static void CreateSampleMsdfImg(GlyphContourBuilder tx, string outputFile)
         {
             //sample
