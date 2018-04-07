@@ -200,9 +200,13 @@ also, please note the text selection on the Html Surface.
 
 License
 -----------
-Source code from multiple projects.
-I select ONLY PERMISSIVE license.
-Here... 
+
+The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**.
+
+A license for a whole project is [**MIT**](https://opensource.org/licenses/MIT).
+
+but if you use some part of the code
+please check each source file's header for the licensing info.
 
  
 **Font** 
