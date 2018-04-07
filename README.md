@@ -30,6 +30,11 @@ Concept
  * .Net >=2.0 
  
 
+What are each project used for?
+-----------
+see => https://github.com/LayoutFarm/Typography/issues/99
+
+
 Screenshots
 -----------
 Some screenshots of the current master.
