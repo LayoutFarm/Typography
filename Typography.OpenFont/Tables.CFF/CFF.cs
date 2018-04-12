@@ -468,11 +468,13 @@ namespace Typography.OpenFont.CFF
             "Semibold"  };//390
 
     }
-    class Cff1Font
+    public class Cff1Font
     {
         internal string FontName { get; set; }
         internal Glyph[] glyphs;
 
+        internal List<CffDataDicEntry> _privateDict;
+        internal List<Type2GlyphInstructionList> _localSubrs;
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
         public Glyph GetGlyphByName(string name)
@@ -505,6 +507,7 @@ namespace Typography.OpenFont.CFF
         public byte[] RawGlyphInstructions { get; set; }
         public string Name { get; set; }
         public int GlyphIndex { get; set; }
+
 #if DEBUG
         public override string ToString()
         {
@@ -561,7 +564,6 @@ namespace Typography.OpenFont.CFF
         Cff1Font _currentCff1Font;
 
         List<CffDataDicEntry> _topDic;
-        List<CffDataDicEntry> _privateDict;
 
         uint _cffStartAt;
 
@@ -1025,7 +1027,7 @@ namespace Typography.OpenFont.CFF
                 }
 #endif
 
-                glyphs[i] = new Glyph(new Cff1GlyphData() { RawGlyphInstructions = buffer, GlyphIndex = i });
+                glyphs[i] = new Glyph(_currentCff1Font, new Cff1GlyphData() { RawGlyphInstructions = buffer, GlyphIndex = i });
 
             }
         }
@@ -1098,18 +1100,20 @@ namespace Typography.OpenFont.CFF
         {
             //per-font 
             _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset;
-            _privateDict = ReadDICTData(_privateDICTSize);
+            _currentCff1Font._privateDict = ReadDICTData(_privateDICTSize);
+
         }
 
 
-        List<Type2CharStringSubroutine> localSubrs;
+
 
         void ReadLocalSubrs()
         {
             //read local subr
             bool found = false;
             int localSubrsOffset = 0;
-            foreach (CffDataDicEntry dicEntry in _privateDict)
+
+            foreach (CffDataDicEntry dicEntry in _currentCff1Font._privateDict)
             {
                 if (dicEntry._operator.Name == "Subrs")
                 {
@@ -1134,28 +1138,25 @@ namespace Typography.OpenFont.CFF
 
             _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset + localSubrsOffset;
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
-            //then read each local subrountine
-
-
+            //then read each local subrountine 
 
             //temp 
             Type2CharStringParser type2Parser = new Type2CharStringParser();
-            EmptyGlyphTranslator emptyTx = new EmptyGlyphTranslator();
-            type2Parser.SetGlyphTranslator(emptyTx);
-
             int j = offsets.Length;
-            localSubrs = new List<Type2CharStringSubroutine>(j);
+
+            List<Type2GlyphInstructionList> localSubrs = new List<Type2GlyphInstructionList>(j);
+            _currentCff1Font._localSubrs = localSubrs;
 
             for (int i = 0; i < j; ++i)
             {
                 CffIndexOffset offset = offsets[i];
                 byte[] charStringBuffer = _reader.ReadBytes(offset.len);
-
-                localSubrs.Add(new Type2CharStringSubroutine(charStringBuffer));
-                type2Parser.ParseType2CharString(charStringBuffer);
-                //TODO: implement instruction sets for CFF
+                Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(charStringBuffer);
+                instList.Kind = Type2GlyphInstructionListKind.LocalSubroutine;
+                localSubrs.Add(instList);
             }
         }
+
 
 
         List<CffDataDicEntry> ReadDICTData(int len)
@@ -1640,9 +1641,6 @@ namespace Typography.OpenFont.CFF
     }
 
 
-
-
-
     class Cff2Parser
     {
 
@@ -1662,6 +1660,4 @@ namespace Typography.OpenFont.CFF
 
         }
     }
-
-
 }

@@ -119,6 +119,9 @@
     <Compile Include="..\..\..\Typography.OpenFont\Tables.CFF\CFF.cs">
       <Link>Tables.CFF\CFF.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\Tables.CFF\CffEvaluationEngine.cs">
+      <Link>Tables.CFF\CffEvaluationEngine.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Tables.CFF\CFFTable.cs">
       <Link>Tables.CFF\CFFTable.cs</Link>
     </Compile>

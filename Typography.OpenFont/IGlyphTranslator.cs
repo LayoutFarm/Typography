@@ -370,16 +370,17 @@ namespace Typography.OpenFont
                 ((v0.X + x1) / 2f),
                 ((v0.Y + y1) / 2f));
         }
-
-
         //-----------
         //for CFF1
-        public static void Read(this IGlyphTranslator tx, byte[] cff1RawGlyphBuffer, float scale = 1)
+        public static void Read(this IGlyphTranslator tx, CFF.Cff1Font cff1Font, byte[] cff1RawGlyphBuffer, float scale = 1)
         {
             CFF.Type2CharStringParser type2Parser = new CFF.Type2CharStringParser();
-            type2Parser.SetGlyphTranslator(tx);
-            type2Parser.ParseType2CharString(cff1RawGlyphBuffer);
-
+            CFF.Type2GlyphInstructionList charStrSubRoutine = type2Parser.ParseType2CharString(cff1RawGlyphBuffer);
+            charStrSubRoutine.Kind = CFF.Type2GlyphInstructionListKind.GlyphDescription;
+            //
+            //temp ....
+            CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
+            evalEngine.Run(tx, cff1Font, charStrSubRoutine);
         }
     }
 

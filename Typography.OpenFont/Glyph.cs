@@ -38,15 +38,15 @@ namespace Typography.OpenFont
             GlyphInstructions = glyphInstructions;
         }
 
-
+        internal CFF.Cff1Font _ownerCffFont;
         internal CFF.Cff1GlyphData _cff1GlyphData; //temp
-        internal Glyph(CFF.Cff1GlyphData cff1Glyph)
+        internal Glyph(CFF.Cff1Font owner, CFF.Cff1GlyphData cff1Glyph)
         {
 #if DEBUG
             this.dbugId = s_debugTotalId++;
 #endif
 
-
+            this._ownerCffFont = owner;
             //create from CFF 
             this._cff1GlyphData = cff1Glyph;
         }
@@ -212,8 +212,7 @@ namespace Typography.OpenFont
             get { return _bounds.YMax; }
         }
 
-
-
+         
         //--------------------
         //cff
         public byte[] GetCffGlyphBuffer()
@@ -221,7 +220,11 @@ namespace Typography.OpenFont
             //temp 
             return _cff1GlyphData.RawGlyphInstructions;
         }
-
+        public CFF.Cff1Font GetCffOwner()
+        {
+            //temp 
+            return _ownerCffFont;
+        }
 
 #if DEBUG
         public override string ToString()

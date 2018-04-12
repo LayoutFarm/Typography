@@ -19,7 +19,7 @@ namespace Typography.Contours
         protected ushort[] _outputContours;
 
         protected byte[] _cff1GlyphBuffer;
-
+        protected OpenFont.CFF.Cff1Font _ownerCff;
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
@@ -67,6 +67,7 @@ namespace Typography.Contours
 
             //temp fix
             this._cff1GlyphBuffer = glyph.GetCffGlyphBuffer();
+            this._ownerCff = glyph.GetCffOwner();
 
             if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)
             {
@@ -106,7 +107,8 @@ namespace Typography.Contours
 
             if (this._cff1GlyphBuffer != null)
             {
-                tx.Read(this._cff1GlyphBuffer);
+
+                tx.Read(this._ownerCff, this._cff1GlyphBuffer);
             }
             else
             {
