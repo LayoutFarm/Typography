@@ -212,18 +212,25 @@ namespace Typography.OpenFont
             get { return _bounds.YMax; }
         }
 
-         
+
         //--------------------
         //cff
-        public byte[] GetCffGlyphBuffer()
+        
+        public bool IsCffGlyph
         {
-            //temp 
-            return _cff1GlyphData.RawGlyphInstructions;
+            get
+            {
+                return _ownerCffFont != null;
+            }
         }
-        public CFF.Cff1Font GetCffOwner()
+        public CFF.Cff1Font GetOwnerCff()
         {
             //temp 
             return _ownerCffFont;
+        }
+        public CFF.Cff1GlyphData GetCff1GlyphData()
+        {
+            return _cff1GlyphData;
         }
 
 #if DEBUG

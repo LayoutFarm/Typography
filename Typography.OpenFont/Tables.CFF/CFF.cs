@@ -497,16 +497,16 @@ namespace Typography.OpenFont.CFF
         }
 
     }
-
-    class Cff1GlyphData
+    public class Cff1GlyphData
     {
 
         public Cff1GlyphData()
         {
         }
-        public byte[] RawGlyphInstructions { get; set; }
+
         public string Name { get; set; }
         public int GlyphIndex { get; set; }
+        internal Type2GlyphInstructionList GlyphInstructions { get; set; }
 
 #if DEBUG
         public override string ToString()
@@ -1014,6 +1014,9 @@ namespace Typography.OpenFont.CFF
             Glyph[] glyphs = new Glyph[glyphCount];
 
             _currentCff1Font.glyphs = glyphs;
+
+            Type2CharStringParser charStrParser = new Type2CharStringParser();
+
             for (int i = 0; i < glyphCount; ++i)
             {
                 CffIndexOffset offset = offsets[i];
@@ -1026,8 +1029,13 @@ namespace Typography.OpenFont.CFF
                     throw new Exception("invalid end char?");
                 }
 #endif
+                //now we can parse the raw glyph instructions
 
-                glyphs[i] = new Glyph(_currentCff1Font, new Cff1GlyphData() { RawGlyphInstructions = buffer, GlyphIndex = i });
+
+                Type2CharStringParser type2Parser = new Type2CharStringParser();
+                Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
+                instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
+                glyphs[i] = new Glyph(_currentCff1Font, new Cff1GlyphData() { GlyphInstructions = instList, GlyphIndex = i });
 
             }
         }

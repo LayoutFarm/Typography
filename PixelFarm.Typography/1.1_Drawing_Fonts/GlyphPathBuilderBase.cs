@@ -18,8 +18,11 @@ namespace Typography.Contours
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
 
-        protected byte[] _cff1GlyphBuffer;
+
+
         protected OpenFont.CFF.Cff1Font _ownerCff;
+        protected OpenFont.CFF.Cff1GlyphData _cffGlyphData;
+
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
@@ -62,12 +65,22 @@ namespace Typography.Contours
             Glyph glyph = _typeface.GetGlyphByIndex(glyphIndex);
 
 
+            //for true type font
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
 
-            //temp fix
-            this._cff1GlyphBuffer = glyph.GetCffGlyphBuffer();
-            this._ownerCff = glyph.GetCffOwner();
+
+            //------------
+            //temp fix for Cff Font
+            if (glyph.IsCffGlyph)
+            {
+                this._cffGlyphData = glyph.GetCff1GlyphData();
+                this._ownerCff = glyph.GetOwnerCff();
+            }
+
+            //---------------
+
+
 
             if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)
             {
@@ -105,10 +118,9 @@ namespace Typography.Contours
         {
             //read output from glyph points
 
-            if (this._cff1GlyphBuffer != null)
-            {
-
-                tx.Read(this._ownerCff, this._cff1GlyphBuffer);
+            if (this._cffGlyphData != null)
+            {   
+                tx.Read(this._ownerCff, this._cffGlyphData);
             }
             else
             {
