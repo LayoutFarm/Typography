@@ -82,6 +82,7 @@ namespace Typography.OpenFont.CFF
                     //4.3 Hint Operators
                     case OperatorName.hstem: _evalStack.H_Stem(); break;
                     case OperatorName.vstem: _evalStack.V_Stem(); break;
+                    case OperatorName.vstemhm: _evalStack.V_StemHM(); break;
                     case OperatorName.hstemhm: _evalStack.H_StemHM(); break;
                     case OperatorName.hintmask: _evalStack.HintMask(); break;
                     case OperatorName.cntrmask: _evalStack.CounterSpaceMask(); break;
@@ -789,6 +790,13 @@ namespace Typography.OpenFont.CFF
         public void V_Stem()
         {
             //|- x dx {dxa dxb}*  vstem (3) |-
+
+            _currentIndex = 0; //clear stack
+        }
+        public void V_StemHM()
+        {
+
+            //| -x dx { dxa dxb} *vstemhm(23) |
 
             _currentIndex = 0; //clear stack
         }

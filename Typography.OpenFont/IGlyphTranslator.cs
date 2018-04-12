@@ -372,15 +372,11 @@ namespace Typography.OpenFont
         }
         //-----------
         //for CFF1
-        public static void Read(this IGlyphTranslator tx, CFF.Cff1Font cff1Font, byte[] cff1RawGlyphBuffer, float scale = 1)
+        public static void Read(this IGlyphTranslator tx, CFF.Cff1Font cff1Font, CFF.Cff1GlyphData glyphData, float scale = 1)
         {
-            CFF.Type2CharStringParser type2Parser = new CFF.Type2CharStringParser();
-            CFF.Type2GlyphInstructionList charStrSubRoutine = type2Parser.ParseType2CharString(cff1RawGlyphBuffer);
-            charStrSubRoutine.Kind = CFF.Type2GlyphInstructionListKind.GlyphDescription;
-            //
-            //temp ....
+         
             CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
-            evalEngine.Run(tx, cff1Font, charStrSubRoutine);
+            evalEngine.Run(tx, cff1Font, glyphData.GlyphInstructions);
         }
     }
 

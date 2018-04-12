@@ -49,7 +49,7 @@ namespace Typography.OpenFont.CFF
             }
             else
             {
-                return Op.ToString() +" "+ Value.ToString();
+                return Op.ToString() + " " + Value.ToString();
             }
 
         }
@@ -218,8 +218,8 @@ namespace Typography.OpenFont.CFF
     }
 
 
-   
-    
+
+
     enum Type2GlyphInstructionListKind
     {
         GlyphDescription,
@@ -290,10 +290,10 @@ namespace Typography.OpenFont.CFF
 
 #if DEBUG
                 _dbugCount++;
-                //if (_dbugCount >= 20)
-                //{
+                if (_dbugCount > 13610)
+                {
 
-                //}
+                }
 #endif
                 //read first byte 
                 //translate *** 
@@ -306,14 +306,21 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
                             if (b0 < 32)
                             {
-                                throw new Exception();
+                                Console.WriteLine("err!:" + b0);
+                                return null;
                             }
 #endif                      
                             insts.Add(new Type2Instruction(OperatorName.LoadInt, ReadIntegerNumber(b0)));
                         }
                         break;
-                    case 0:
-                        //reserve, do nothing
+                    case (byte)Type2Operator1._Reserved0_://???
+                    case (byte)Type2Operator1._Reserved2_://???
+                    case (byte)Type2Operator1._Reserved9_://???
+                    case (byte)Type2Operator1._Reserved13_://???
+                    case (byte)Type2Operator1._Reserved15_://???
+                    case (byte)Type2Operator1._Reserved16_: //???
+                    case (byte)Type2Operator1._Reserved17_: //???
+                        //reserved, do nothing ?
                         break;
                     case (byte)Type2Operator1.endchar:
                         insts.Add(new Type2Instruction(OperatorName.endchar));
@@ -329,7 +336,13 @@ namespace Typography.OpenFont.CFF
                             b0 = _reader.ReadByte();
                             switch ((Type2Operator2)b0)
                             {
-                                default: throw new NotSupportedException();
+                                default:
+                                    if (b0 < 32)
+                                    {
+                                        Console.WriteLine("err!:" + b0);
+                                        return null;
+                                    }
+                                    break;
                                 //-------------------------
                                 //4.1: Path Construction Operators
                                 case Type2Operator2.flex: insts.Add(new Type2Instruction(OperatorName.flex)); break;
@@ -383,6 +396,7 @@ namespace Typography.OpenFont.CFF
                     //4.3 Hint Operators
                     case (byte)Type2Operator1.hstem: insts.Add(new Type2Instruction(OperatorName.hstem)); break;
                     case (byte)Type2Operator1.vstem: insts.Add(new Type2Instruction(OperatorName.vstem)); break;
+                    case (byte)Type2Operator1.vstemhm: insts.Add(new Type2Instruction(OperatorName.vstemhm)); break;
                     case (byte)Type2Operator1.hstemhm: insts.Add(new Type2Instruction(OperatorName.hstemhm)); break;
                     case (byte)Type2Operator1.hintmask: insts.Add(new Type2Instruction(OperatorName.hintmask)); break;
                     case (byte)Type2Operator1.cntrmask: insts.Add(new Type2Instruction(OperatorName.cntrmask)); break;
@@ -435,6 +449,6 @@ namespace Typography.OpenFont.CFF
             }
         }
     }
-     
+
 
 }
