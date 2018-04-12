@@ -250,9 +250,14 @@ namespace Typography.OpenFont.CFF
             //The number of 
             //lines is determined from the number of arguments on the stack
 
+            if ((_currentIndex % 2) != 0)
+            {
+                throw new NotSupportedException();
+            }
+
             for (int i = 0; i < _currentIndex;)
             {
-                _glyphTranslator.MoveTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
+                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
                 i += 2;
             }
             _currentIndex = 0; //clear stack 
@@ -281,18 +286,31 @@ namespace Typography.OpenFont.CFF
             int i = 0;
             if ((_currentIndex % 2) != 0)
             {
+                //|- dx1 {dya dxb}*  hlineto (6) |-
                 //odd number                
-                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY));
+                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)_currentY);
                 i++;
+                for (; i < _currentIndex;)
+                {
+                    _glyphTranslator.LineTo((float)(_currentX), (float)(_currentY += _argStack[i]));
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i + 1]), (float)(_currentY));
+                    i += 2;
+                }
+            }
+            else
+            {
+                //even number
+                //|- {dxa dyb}+  hlineto (6) |-
+                for (; i < _currentIndex;)
+                {
+                    //line to
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY));
+                    _glyphTranslator.LineTo((float)(_currentX), (float)(_currentY += _argStack[i + 1]));
+                    //
+                    i += 2;
+                }
             }
 
-            for (; i < _currentIndex;)
-            {
-                //line to
-                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
-                //
-                i += 2;
-            }
 
             _currentIndex = 0; //clear stack 
 
@@ -318,17 +336,32 @@ namespace Typography.OpenFont.CFF
             int i = 0;
             if ((_currentIndex % 2) != 0)
             {
+                //|- dy1 {dxa dyb}*  vlineto (7) |-
                 //odd number                
                 _glyphTranslator.LineTo((float)_currentX, (float)(_currentY += _argStack[i]));
                 i++;
-            }
 
-            for (; i < _currentIndex;)
+                for (; i < _currentIndex;)
+                {
+                    //line to
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY));
+                    _glyphTranslator.LineTo((float)(_currentX), (float)(_currentY += _argStack[i + 1]));
+                    //
+                    i += 2;
+                }
+            }
+            else
             {
-                //line to
-                _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
-                //
-                i += 2;
+                //even number
+                //|- {dya dxb}+  vlineto (7) |-
+                for (; i < _currentIndex;)
+                {
+                    //line to
+                    _glyphTranslator.LineTo((float)(_currentX), (float)(_currentY += _argStack[i]));
+                    _glyphTranslator.LineTo((float)(_currentX += _argStack[i + 1]), (float)(_currentY));
+                    //
+                    i += 2;
+                }
             }
             _currentIndex = 0; //clear stack 
         }

@@ -77,7 +77,8 @@ namespace SampleWinForms
             //string inputstr = "k";
             //string inputstr = "8";
             //string inputstr = "#";
-            string inputstr = "a";
+            //string inputstr = "a";
+            string inputstr = "0";
             //string inputstr = "e";
             //string inputstr = "l";
             //string inputstr = "t";

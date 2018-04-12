@@ -52,7 +52,7 @@
             this.txtInputChar.Name = "txtInputChar";
             this.txtInputChar.Size = new System.Drawing.Size(168, 21);
             this.txtInputChar.TabIndex = 1;
-            this.txtInputChar.Text = "I";
+            this.txtInputChar.Text = "a";
             // 
             // cmdBuildMsdfTexture
             // 
