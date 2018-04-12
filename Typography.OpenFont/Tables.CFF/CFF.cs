@@ -1035,11 +1035,12 @@ namespace Typography.OpenFont.CFF
                 glyphData.GlyphIndex = i;
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
                 //
+                
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
                     instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
-                    glyphData.GlyphInstructions = instList;                     
+                    glyphData.GlyphInstructions = instList;
                 }
 
 
