@@ -49,7 +49,7 @@ namespace Typography.OpenFont.CFF
             }
             else
             {
-                return Op.ToString() +" "+ Value.ToString();
+                return Op.ToString() + " " + Value.ToString();
             }
 
         }
@@ -218,8 +218,8 @@ namespace Typography.OpenFont.CFF
     }
 
 
-   
-    
+
+
     enum Type2GlyphInstructionListKind
     {
         GlyphDescription,
@@ -306,7 +306,8 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
                             if (b0 < 32)
                             {
-                                throw new Exception();
+                                Console.WriteLine("err!:" + b0);
+                                return null;
                             }
 #endif                      
                             insts.Add(new Type2Instruction(OperatorName.LoadInt, ReadIntegerNumber(b0)));
@@ -329,7 +330,12 @@ namespace Typography.OpenFont.CFF
                             b0 = _reader.ReadByte();
                             switch ((Type2Operator2)b0)
                             {
-                                default: throw new NotSupportedException();
+                                default:
+                                    if (b0 < 32)
+                                    {
+                                        Console.WriteLine("err!:" + b0);
+                                        return null;
+                                    }break;
                                 //-------------------------
                                 //4.1: Path Construction Operators
                                 case Type2Operator2.flex: insts.Add(new Type2Instruction(OperatorName.flex)); break;
@@ -435,6 +441,6 @@ namespace Typography.OpenFont.CFF
             }
         }
     }
-     
+
 
 }

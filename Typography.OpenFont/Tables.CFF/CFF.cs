@@ -1015,7 +1015,7 @@ namespace Typography.OpenFont.CFF
 
             _currentCff1Font.glyphs = glyphs;
 
-            Type2CharStringParser charStrParser = new Type2CharStringParser();
+            Type2CharStringParser type2Parser = new Type2CharStringParser();
 
             for (int i = 0; i < glyphCount; ++i)
             {
@@ -1029,13 +1029,19 @@ namespace Typography.OpenFont.CFF
                     throw new Exception("invalid end char?");
                 }
 #endif
-                //now we can parse the raw glyph instructions
+                //now we can parse the raw glyph instructions 
 
-
-                Type2CharStringParser type2Parser = new Type2CharStringParser();
+                Cff1GlyphData glyphData = new Cff1GlyphData();
+                glyphData.GlyphIndex = i;
+                glyphs[i] = new Glyph(_currentCff1Font, glyphData);
+                //
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
-                instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
-                glyphs[i] = new Glyph(_currentCff1Font, new Cff1GlyphData() { GlyphInstructions = instList, GlyphIndex = i });
+                if (instList != null)
+                {
+                    instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
+                    glyphData.GlyphInstructions = instList;                     
+                }
+
 
             }
         }
@@ -1159,9 +1165,17 @@ namespace Typography.OpenFont.CFF
             {
                 CffIndexOffset offset = offsets[i];
                 byte[] charStringBuffer = _reader.ReadBytes(offset.len);
+
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(charStringBuffer);
-                instList.Kind = Type2GlyphInstructionListKind.LocalSubroutine;
-                localSubrs.Add(instList);
+                if (instList != null)
+                {
+                    instList.Kind = Type2GlyphInstructionListKind.LocalSubroutine;
+                    localSubrs.Add(instList);
+                }
+                else
+                {
+                    localSubrs.Add(null);
+                }
             }
         }
 
