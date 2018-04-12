@@ -167,7 +167,7 @@ namespace SampleWinForms
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
-                        float x_pos = 0, y_pos = 200;
+                        float x_pos = 0, y_pos = 50;
                         float lineSpacingPx = selectedTextPrinter.FontLineSpacingPx;
                         for (int i = 0; i < 1; ++i)
                         {
