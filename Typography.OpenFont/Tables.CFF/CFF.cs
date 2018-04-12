@@ -46,6 +46,20 @@ using System.Text;
 
 namespace Typography.OpenFont.CFF
 {
+    //from: The Compact Font Format Specification (https://www-cdf.fnal.gov/offline/PostScript/5176.CFF.pdf)
+    //....CFF
+    //allows multiple fonts to be stored together in a unit called a FontSet.
+
+    //Principal space  savings are  a result  of  using  a
+    //compact binary  representation  for  most of  the informa-
+    //tion,   sharing of   common data   between fonts, and
+    //defaulting frequently occurring data.
+
+    //The CFF format is designed to be used in conjunction with
+    //Type 2 charstrings for the character description procedures
+    //(see Adobe Technical Note #5177: “The Type 2 Charstring
+    //Format”).
+
 
 
     class Cff1FontSet
@@ -573,6 +587,7 @@ namespace Typography.OpenFont.CFF
             ReadCharsets();
             ReadEncodings();
             ReadPrivateDict();
+            ReadLocalSubrs();
             ReadFDSelect();
 
             //...
@@ -993,7 +1008,7 @@ namespace Typography.OpenFont.CFF
             //assume Type2
             //TODO: review here 
 
-            Type2CharStringParser type2CharStringParser = new Type2CharStringParser();
+
             Glyph[] glyphs = new Glyph[glyphCount];
 
             _currentCff1Font.glyphs = glyphs;
@@ -1011,8 +1026,7 @@ namespace Typography.OpenFont.CFF
 #endif
 
                 glyphs[i] = new Glyph(new Cff1GlyphData() { RawGlyphInstructions = buffer, GlyphIndex = i });
-                //parse here or later 
-                //type2CharStringParser.ParseType2CharsString(buffer);
+
             }
         }
 
@@ -1080,13 +1094,58 @@ namespace Typography.OpenFont.CFF
             //Card8     code        Encoding
             //SID       glyph       Name
         }
-
         void ReadPrivateDict()
         {
             //per-font 
             _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset;
             _privateDict = ReadDICTData(_privateDICTSize);
         }
+        void ReadLocalSubrs()
+        {
+            //read local subr
+            bool found = false;
+            int localSubrsOffset = 0;
+            foreach (CffDataDicEntry dicEntry in _privateDict)
+            {
+                if (dicEntry._operator.Name == "Subrs")
+                {
+                    //from: https://www-cdf.fnal.gov/offline/PostScript/5176.CFF.pdf
+                    //The local subrs offset is relative to the beginning of the Private DICT data. 
+                    localSubrsOffset = (int)dicEntry.operands[0]._realNumValue;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) return;
+            //
+
+
+            //
+            //Local subrs  are stored  in  an INDEX  structure which  is
+            //located via the offset operand of the
+            //Subrs operator in the
+            //Private DICT.A font without local subrs has no
+            //Subrs operator in the Private DICT 
+
+            _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset + localSubrsOffset;
+            CffIndexOffset[] offsets = ReadIndexDataOffsets();
+            //then read each local subrountine
+
+            Type2CharStringParser type2Parser = new Type2CharStringParser();
+            EmptyGlyphTranslator emptyTx = new EmptyGlyphTranslator();
+            type2Parser.SetGlyphTranslator(emptyTx);
+            int j = offsets.Length;
+            for (int i = 0; i < j; ++i)
+            {
+                CffIndexOffset offset = offsets[i];
+                byte[] charStringBuffer = _reader.ReadBytes(offset.len);
+                type2Parser.ParseType2CharsString(charStringBuffer);
+                //TODO: implement instruction sets for CFF
+                
+            }
+        }
+
 
         List<CffDataDicEntry> ReadDICTData(int len)
         {

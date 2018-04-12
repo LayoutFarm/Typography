@@ -948,6 +948,8 @@ namespace Typography.OpenFont.CFF
         //4.7: Subroutine Operators
         public void CallSubr()
         {
+            var subrIndex = _argStack[_currentIndex - 1];
+
             _currentIndex = 0;
         }
         public void CallGSubr()
@@ -964,11 +966,47 @@ namespace Typography.OpenFont.CFF
 #endif
     }
 
+    class EmptyGlyphTranslator : IGlyphTranslator
+    {
+        public void BeginRead(int contourCount)
+        {
+
+        }
+
+        public void CloseContour()
+        {
+
+        }
+
+        public void Curve3(float x1, float y1, float x2, float y2)
+        {
+
+        }
+
+        public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
+        {
+
+        }
+
+        public void EndRead()
+        {
+
+        }
+
+        public void LineTo(float x1, float y1)
+        {
+
+        }
+
+        public void MoveTo(float x0, float y0)
+        {
+
+        }
+    }
     class Type2CharStringParser : IDisposable
     {
         MemoryStream _msBuffer;
         BinaryReader _reader;
-
         Type2EvaluationStack _evalStack = new Type2EvaluationStack();
 
 
@@ -985,6 +1023,8 @@ namespace Typography.OpenFont.CFF
 
         int _dbugCount = 0;
 #endif
+
+
         public void ParseType2CharsString(byte[] buffer)
         {
             //TODO: implement this
@@ -1000,10 +1040,10 @@ namespace Typography.OpenFont.CFF
 
 #if DEBUG
                 _dbugCount++;
-                if (_dbugCount == 15)
-                {
+                //if (_dbugCount >= 20)
+                //{
 
-                }
+                //}
 #endif
                 //read first byte 
                 //translate *** 
