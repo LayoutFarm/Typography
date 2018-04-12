@@ -378,7 +378,7 @@ namespace Typography.OpenFont
         {
             CFF.Type2CharStringParser type2Parser = new CFF.Type2CharStringParser();
             type2Parser.SetGlyphTranslator(tx);
-            type2Parser.ParseType2CharsString(cff1RawGlyphBuffer);
+            type2Parser.ParseType2CharString(cff1RawGlyphBuffer);
 
         }
     }

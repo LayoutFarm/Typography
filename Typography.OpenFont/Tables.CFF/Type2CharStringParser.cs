@@ -1003,6 +1003,20 @@ namespace Typography.OpenFont.CFF
 
         }
     }
+
+
+
+    class Type2CharStringSubroutine
+    {
+
+        byte[] _rawCharStringBuffer;
+        public Type2CharStringSubroutine(byte[] rawCharStingBuffer)
+        {
+            this._rawCharStringBuffer = rawCharStingBuffer;
+        }
+
+    }
+
     class Type2CharStringParser : IDisposable
     {
         MemoryStream _msBuffer;
@@ -1025,7 +1039,7 @@ namespace Typography.OpenFont.CFF
 #endif
 
 
-        public void ParseType2CharsString(byte[] buffer)
+        public void ParseType2CharString(byte[] buffer)
         {
             //TODO: implement this
             //reset
