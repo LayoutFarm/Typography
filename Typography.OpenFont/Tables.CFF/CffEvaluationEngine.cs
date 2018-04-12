@@ -212,12 +212,11 @@ namespace Typography.OpenFont.CFF
             //dx1 units in the horizontal direction
             //see [NOTE4]
 
-            int i = 0; //start at bottom
-            double w = _argStack[i];
-            _currentX += _argStack[i + 1];
-
-
-            _glyphTranslator.MoveTo((float)(_currentX), (float)_currentY);
+            if (_currentIndex != 1)
+            {
+                throw new NotSupportedException();
+            }
+            _glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)_currentY);
 
             _currentIndex = 0; //clear stack 
         }

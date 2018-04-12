@@ -44,6 +44,7 @@
             this.button1.TabIndex = 0;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
+           
             // 
             // txtInputChar
             // 

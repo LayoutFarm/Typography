@@ -529,5 +529,7 @@ namespace SampleWinForms
         {
             this.Text = "Render with PixelFarm";
         }
+
+         
     }
 }
