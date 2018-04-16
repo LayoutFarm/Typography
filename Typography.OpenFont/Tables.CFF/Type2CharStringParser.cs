@@ -334,7 +334,7 @@ namespace Typography.OpenFont.CFF
                         //most significant byte follows the(28)
                         byte s_b0 = _reader.ReadByte();
                         byte s_b1 = _reader.ReadByte();
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt, (s_b0 << 16 | s_b1)));
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt, (s_b0 << 8 | s_b1)));
                         break;
                     case (byte)Type2Operator1.escape: //12
                         {
