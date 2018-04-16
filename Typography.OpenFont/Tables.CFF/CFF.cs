@@ -475,6 +475,12 @@ namespace Typography.OpenFont.CFF
 
         internal List<CffDataDicEntry> _privateDict;
         internal List<Type2GlyphInstructionList> _localSubrs;
+        internal int defaultWidthX;
+        internal int nominalWidthX;
+
+
+
+
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
         public Glyph GetGlyphByName(string name)
@@ -589,7 +595,7 @@ namespace Typography.OpenFont.CFF
             ReadCharsets();
             ReadEncodings();
             ReadPrivateDict();
-            ReadLocalSubrs();
+
             ReadFDSelect();
 
             //...
@@ -1035,7 +1041,7 @@ namespace Typography.OpenFont.CFF
                 glyphData.GlyphIndex = i;
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
                 //
-                
+
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
@@ -1117,41 +1123,40 @@ namespace Typography.OpenFont.CFF
             _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset;
             _currentCff1Font._privateDict = ReadDICTData(_privateDICTSize);
 
+            //interpret the values of private dict
+            //
+
+            foreach (CffDataDicEntry dicEntry in _currentCff1Font._privateDict)
+            {
+                switch (dicEntry._operator.Name)
+                {
+                    case "Subrs":
+                        {
+                            int localSubrsOffset = (int)dicEntry.operands[0]._realNumValue;
+                            _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset + localSubrsOffset;
+                            ReadLocalSubrs();
+                        }
+                        break;
+                    case "defaultWidthX":
+                        _currentCff1Font.defaultWidthX = (int)dicEntry.operands[0]._realNumValue;
+                        break;
+                    case "nominalWidthX":
+                        _currentCff1Font.nominalWidthX = (int)dicEntry.operands[0]._realNumValue;
+                        break;
+                    default:
+                        {
+
+                        }
+                        break;
+                }
+            }
+
         }
-
-
 
 
         void ReadLocalSubrs()
         {
-            //read local subr
-            bool found = false;
-            int localSubrsOffset = 0;
 
-            foreach (CffDataDicEntry dicEntry in _currentCff1Font._privateDict)
-            {
-                if (dicEntry._operator.Name == "Subrs")
-                {
-                    //from: https://www-cdf.fnal.gov/offline/PostScript/5176.CFF.pdf
-                    //The local subrs offset is relative to the beginning of the Private DICT data. 
-                    localSubrsOffset = (int)dicEntry.operands[0]._realNumValue;
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) return;
-            //
-
-
-            //
-            //Local subrs  are stored  in  an INDEX  structure which  is
-            //located via the offset operand of the
-            //Subrs operator in the
-            //Private DICT.A font without local subrs has no
-            //Subrs operator in the Private DICT 
-
-            _reader.BaseStream.Position = _cffStartAt + _privateDICTOffset + localSubrsOffset;
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
             //then read each local subrountine 
 
@@ -1460,6 +1465,12 @@ namespace Typography.OpenFont.CFF
                 this.startOffset = startOffset;
                 this.len = len;
             }
+#if DEBUG
+            public override string ToString()
+            {
+                return "offset:" + startOffset + ",len:" + len;
+            }
+#endif
         }
 
     }

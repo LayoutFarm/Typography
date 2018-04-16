@@ -230,17 +230,9 @@ namespace Typography.OpenFont.CFF
     class Type2GlyphInstructionList
     {
 
-
-        byte[] _rawCharStringBuffer;
         List<Type2Instruction> insts;
-        public Type2GlyphInstructionList(byte[] rawCharStingBuffer)
-        {
-
-            this._rawCharStringBuffer = rawCharStingBuffer;
-        }
         public Type2GlyphInstructionList(List<Type2Instruction> insts)
         {
-
             this.insts = insts;
         }
         public List<Type2Instruction> Insts
@@ -253,7 +245,9 @@ namespace Typography.OpenFont.CFF
             set;
         }
 
-
+#if DEBUG
+        public int dbugMark;
+#endif
     }
 
 
@@ -269,9 +263,9 @@ namespace Typography.OpenFont.CFF
             _reader = new BinaryReader(_msBuffer);
         }
 
-#if DEBUG
-
+#if DEBUG 
         int _dbugCount = 0;
+        int _dbugInstructionListMark = 0;
 #endif
 
         public Type2GlyphInstructionList ParseType2CharString(byte[] buffer)
@@ -283,22 +277,24 @@ namespace Typography.OpenFont.CFF
             _msBuffer.Write(buffer, 0, buffer.Length);
             _msBuffer.Position = 0;
             int len = buffer.Length;
-
             var insts = new List<Type2Instruction>();
+#if DEBUG
+            _dbugInstructionListMark++;
+            if (_dbugInstructionListMark == 20)
+            {
+
+            }
+#endif
+
+            byte b0 = 0;
             while (_reader.BaseStream.Position < len)
             {
 
 #if DEBUG
                 _dbugCount++;
-                if (_dbugCount > 13610)
-                {
-
-                }
 #endif
-                //read first byte 
-                //translate *** 
-                byte b0 = _reader.ReadByte();
-                switch (b0)
+
+                switch (b0 = _reader.ReadByte())
                 {
                     default: //else 32 -255
                         {
@@ -326,18 +322,33 @@ namespace Typography.OpenFont.CFF
                         insts.Add(new Type2Instruction(OperatorName.endchar));
                         break;
                     case (byte)Type2Operator1.shortint: // 28
+                        if (_dbugInstructionListMark == 20)
+                        {
+
+                        }
 
                         //shortint
                         //First byte of a 3-byte sequence specifying a number.
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt, _reader.ReadUInt16()));
+                        //a ShortInt value is specified by using the operator (28) followed by two bytes
+                        //which represent numbers between –32768 and + 32767.The
+                        //most significant byte follows the(28)
+                        byte s_b0 = _reader.ReadByte();
+                        byte s_b1 = _reader.ReadByte();
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt, (s_b0 << 16 | s_b1)));
                         break;
                     case (byte)Type2Operator1.escape: //12
                         {
+
+                            if (_dbugInstructionListMark == 20)
+                            {
+
+                            }
+
                             b0 = _reader.ReadByte();
                             switch ((Type2Operator2)b0)
                             {
                                 default:
-                                    if (b0 < 32)
+                                    if (b0 <= 38)
                                     {
                                         Console.WriteLine("err!:" + b0);
                                         return null;
@@ -408,7 +419,17 @@ namespace Typography.OpenFont.CFF
                 }
             }
 
+#if DEBUG
+            if (_dbugInstructionListMark == 20)
+            {
+
+            }
+
+            return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark };
+#else
             return new Type2GlyphInstructionList(insts);
+#endif
+
         }
         int ReadIntegerNumber(byte b0)
         {

@@ -1,4 +1,5 @@
-﻿//MIT, 2018, WinterDev  
+﻿//Apapche, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
+//MIT, 2018, WinterDev  
 
 using System;
 using System.Collections.Generic;
@@ -20,9 +21,15 @@ namespace Typography.OpenFont.CFF
             List<Type2Instruction> insts = instructionList.Insts;
             _evalStack.GlyphTranslator = tx;
             int j = insts.Count;
+
             for (int i = 0; i < j; ++i)
             {
                 Type2Instruction inst = insts[i];
+
+                if (inst.Op != OperatorName.LoadInt)
+                {
+
+                }
                 switch (inst.Op)
                 {
                     default: throw new NotSupportedException();
@@ -64,10 +71,7 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.not: _evalStack.Op_Not(); break;
                     case OperatorName.eq: _evalStack.Op_Eq(); break;
                     case OperatorName.ifelse: _evalStack.Op_IfElse(); break;
-                    //
-                    case OperatorName.rmoveto: _evalStack.R_MoveTo(); break;
-                    case OperatorName.hmoveto: _evalStack.H_MoveTo(); break;
-                    case OperatorName.vmoveto: _evalStack.V_MoveTo(); break;
+                    // 
                     case OperatorName.rlineto: _evalStack.R_LineTo(); break;
                     case OperatorName.hlineto: _evalStack.H_LineTo(); break;
                     case OperatorName.vlineto: _evalStack.V_LineTo(); break;
@@ -78,14 +82,42 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.rlinecurve: _evalStack.R_LineCurve(); break;
                     case OperatorName.vhcurveto: _evalStack.VH_CurveTo(); break;
                     case OperatorName.vvcurveto: _evalStack.VV_CurveTo(); break;
+                    //-------------------------------------------------------------------                     
+                    case OperatorName.rmoveto: _evalStack.R_MoveTo(); break;
+                    case OperatorName.hmoveto: _evalStack.H_MoveTo(); break;
+                    case OperatorName.vmoveto: _evalStack.V_MoveTo(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case OperatorName.hstem: _evalStack.H_Stem(); break;
-                    case OperatorName.vstem: _evalStack.V_Stem(); break;
-                    case OperatorName.vstemhm: _evalStack.V_StemHM(); break;
-                    case OperatorName.hstemhm: _evalStack.H_StemHM(); break;
-                    case OperatorName.hintmask: _evalStack.HintMask(); break;
-                    case OperatorName.cntrmask: _evalStack.CounterSpaceMask(); break;
+                    case OperatorName.hstem:
+                        {
+                            _evalStack.H_Stem();
+                        }
+                        break;
+                    case OperatorName.vstem:
+                        {
+                            _evalStack.V_Stem();
+                        }
+                        break;
+                    case OperatorName.vstemhm:
+                        {
+                            _evalStack.V_StemHM();
+                        }
+                        break;
+                    case OperatorName.hstemhm:
+                        {
+                            _evalStack.H_StemHM();
+                        }
+                        break;
+                    case OperatorName.hintmask:
+                        {
+                            _evalStack.HintMask();
+                        }
+                        break;
+                    case OperatorName.cntrmask:
+                        {
+                            _evalStack.CounterSpaceMask();
+                        }
+                        break;
                     //-------------------------
                     //4.7: Subroutine Operators
                     case OperatorName._return: _evalStack.Ret(); break;
@@ -186,9 +218,22 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+                if (_currentIndex == 3)
+                {
+                    //? 
+                    _currentX += _argStack[0];
+                    _currentY += _argStack[1];
 
+                    _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
+                    _currentIndex = 0; //clear stack 
+                    return;
+                }
             }
 #endif
+            if (_currentIndex > 2)
+            {
+
+            }
             for (int i = 0; i < _currentIndex;)
             {
                 _currentX += _argStack[i];
@@ -389,7 +434,15 @@ namespace Typography.OpenFont.CFF
             //horizontal or vertical(and hence the value is zero), thus
             //reducing the number of arguments needed.
 
-            for (int i = 0; i < _currentIndex;)
+            int i = 0;
+#if DEBUG
+            if ((_currentIndex % 6) != 0)
+            {
+                // i++;
+            }
+#endif
+
+            for (; i < _currentIndex;)
             {
 
                 double curX = _currentX;
@@ -460,16 +513,8 @@ namespace Typography.OpenFont.CFF
             //appends one or more Bézier curves to the current point.
 
             //The tangent for the first Bézier must be horizontal, and the second 
-            //must be vertical (except as noted below).
+            //must be vertical (except as noted below). 
 
-            //If there is a multiple of four arguments, the curve starts 
-            //horizontal and ends vertical. 
-
-            //Note that the curves alternate between 
-            //start horizontal, end vertical, and start vertical, and end horizontal. 
-
-            //The last curve (the odd argument case) need not 
-            //end horizontal/vertical.
             int i = 0;
             int remaining = 0;
 
@@ -520,14 +565,20 @@ namespace Typography.OpenFont.CFF
 
                         //|- dx1 dx2 dy2 dy3 {dya dxb dyb dxc dxd dxe dye dyf}* dxf? hvcurveto (31) |-
 
+                        //If there is a multiple of four arguments, the curve starts
+                        //horizontal and ends vertical.
+                        //Note that the curves alternate between start horizontal, end vertical, and start vertical, and
+                        //end horizontal.The last curve(the odd argument case) need not
+                        //end horizontal/ vertical.
+
                         double curX = _currentX;
                         double curY = _currentY;
 
-                        _glyphTranslator.Curve4(
-                                (float)(curX += _argStack[i + 0]), (float)(curY), //dx1,0
-                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dx2,dy2
-                                (float)(curX), (float)(curY += _argStack[i + 3])  //+0,dy3
-                                );
+
+                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 0]), (float)(curY));
+                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]));
+                        _glyphTranslator.LineTo((float)(curX), (float)(curY += _argStack[i + 3]));
+
                         i += 4;
 
                         int endBefore = _currentIndex - remaining;
@@ -658,11 +709,11 @@ namespace Typography.OpenFont.CFF
                         double curX = _currentX;
                         double curY = _currentY;
 
-                        _glyphTranslator.Curve4(
-                                (float)(curX), (float)(curY += _argStack[i + 0]), //+0,dy1
-                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dx2,dy2
-                                (float)(curX += _argStack[i + 3]), (float)(curY)  //dx3,+0
-                                );
+
+                        _glyphTranslator.LineTo((float)(curX), (float)(curY += _argStack[i + 0]));
+                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]));
+                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 3]), (float)(curY));
+
                         i += 4;
 
                         int endBefore = _currentIndex - remaining;
@@ -677,7 +728,7 @@ namespace Typography.OpenFont.CFF
                                 );
 
                             _glyphTranslator.Curve4(
-                              (float)(curX += _argStack[i + 4]), (float)(curY), //+0,dyd
+                              (float)(curX), (float)(curY += _argStack[i + 4]), //+0,dyd
                               (float)(curX += _argStack[i + 5]), (float)(curY += _argStack[i + 6]), //dxe,dye
                               (float)(curX += _argStack[i + 7]), (float)(curY)  //dxf,0
                               );
@@ -817,25 +868,35 @@ namespace Typography.OpenFont.CFF
         {
             //|- y dy {dya dyb}*  hstem (1) |-
 
+            if ((_currentIndex % 2) != 0)
+            {
+            }
+
             _currentIndex = 0; //clear stack
         }
         public void V_Stem()
         {
             //|- x dx {dxa dxb}*  vstem (3) |-
-
+            if ((_currentIndex % 2) != 0)
+            {
+            }
             _currentIndex = 0; //clear stack
         }
         public void V_StemHM()
         {
 
             //| -x dx { dxa dxb} *vstemhm(23) |
-
+            if ((_currentIndex % 2) != 0)
+            {
+            }
             _currentIndex = 0; //clear stack
         }
         public void H_StemHM()
         {
             //|- y dy {dya dyb}*  hstemhm (18) |-
-
+            if ((_currentIndex % 2) != 0)
+            {
+            }
             //has the same meaning as 
             //hstem (1),
             //except that it must be used 
@@ -845,11 +906,19 @@ namespace Typography.OpenFont.CFF
         }
         public void HintMask()
         {
+            if (_currentIndex != 1)
+            {
+
+            }
             //|- hintmask (19 + mask) |-
             _currentIndex = 0; //clear stack
         }
         public void CounterSpaceMask()
         {
+            if (_currentIndex != 1)
+            {
+
+            }
             _currentIndex = 0;
             //|- cntrmask(20 + mask) |-
 
