@@ -942,8 +942,17 @@ namespace Typography.OpenFont.CFF
         {
             _currentIndex = 0; //clear stack
         }
-        public void HintMaskBits(int hintMaskValue)
+        public void HintMaskBits(int bitCount)
         {
+
+            //calculate bytes need by 
+            //bytes need = (bitCount+7)/8 
+#if DEBUG
+            if (_currentIndex != (bitCount + 7) / 8)
+            {
+
+            }
+#endif
             _currentIndex = 0; //clear stack
         }
         //----------------------------------------
@@ -974,8 +983,17 @@ namespace Typography.OpenFont.CFF
         {
             _currentIndex = 0;//clear stack
         }
-        public void CounterSpaceMaskBits(int cntMaskValue)
+        public void CounterSpaceMaskBits(int bitCount)
         {
+            //calculate bytes need by 
+            //bytes need = (bitCount+7)/8 
+#if DEBUG
+            if (_currentIndex != (bitCount + 7) / 8)
+            {
+
+            }
+#endif
+
             _currentIndex = 0;//clear stack
         }
         //----------------------------------------
