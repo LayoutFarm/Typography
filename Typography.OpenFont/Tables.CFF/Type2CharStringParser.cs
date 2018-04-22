@@ -275,7 +275,20 @@ namespace Typography.OpenFont.CFF
         }
 
 #if DEBUG
-        public int dbugMark;
+        int _dbugMark;
+        public int dbugMark
+        {
+            get { return _dbugMark; }
+            set
+            {
+                _dbugMark = value;
+                //if (value == 7)
+                //{
+                //    Type2CharStringParser.dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
+
+                //}
+            }
+        }
 #endif
     }
 
@@ -465,10 +478,6 @@ namespace Typography.OpenFont.CFF
             }
 
 #if DEBUG
-            //if (_dbugInstructionListMark == 3520)
-            //{
-            //    dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
-            //}
 
             return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark - 1 };
 #else
@@ -477,7 +486,7 @@ namespace Typography.OpenFont.CFF
 
         }
 #if DEBUG
-        void dbugDumpInstructionListToFile(List<Type2Instruction> insts, string filename)
+        internal static void dbugDumpInstructionListToFile(List<Type2Instruction> insts, string filename)
         {
             using (FileStream fs = new FileStream(filename, FileMode.Create))
             using (StreamWriter w = new StreamWriter(fs))
