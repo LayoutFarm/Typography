@@ -25,11 +25,9 @@ namespace Typography.OpenFont.CFF
             for (int i = 0; i < j; ++i)
             {
                 Type2Instruction inst = insts[i];
-
-                if (inst.Op != OperatorName.LoadInt)
-                {
-
-                }
+                //if (inst.Op != OperatorName.LoadInt)
+                //{ 
+                //}
                 switch (inst.Op)
                 {
                     default: throw new NotSupportedException();
@@ -94,27 +92,17 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.vstem: _evalStack.V_Stem(); break;
                     case OperatorName.vstemhm: _evalStack.V_StemHM(); break;
                     case OperatorName.hstemhm: _evalStack.H_StemHM(); break;
-                    case OperatorName.hintmask:
-                        {
-                            //hintmask | -hintmask(19 + mask) | -
-                            //The mask data bytes are defined as follows:
-                            //• The number of data bytes is exactly the number needed, one
-                            //bit per hint, to reference the number of stem hints declared
-                            //at the beginning of the charstring program.
-                            //• Each bit of the mask, starting with the most-significant bit of
-                            //the first byte, represents the corresponding hint zone in the
-                            //order in which the hints were declared at the beginning of
-                            //the charstring.
-                            //• For each bit in the mask, a value of ‘1’ specifies that the
-                            //corresponding hint shall be active. A bit value of ‘0’ specifies
-                            //that the hint shall be inactive.
-                            //• Unused bits in the mask, if any, must be zero.
-
-                            //hintCount += _evalStack.StackCount/2; 
-                            _evalStack.HintMask();
-                        }
-                        break;
+                    //--------------------------
+                    case OperatorName.hintmask1: _evalStack.HintMask1(inst.Value); break;
+                    case OperatorName.hintmask2: _evalStack.HintMask2(inst.Value); break;
+                    case OperatorName.hintmask3: _evalStack.HintMask3(inst.Value); break;
+                    case OperatorName.hintmask4: _evalStack.HintMask4(inst.Value); break;
+                    case OperatorName.hintmask4_andMore: _evalStack.HintMask4AndMore(inst.Value); break;
+                    //------------------------------
                     case OperatorName.cntrmask: _evalStack.CounterSpaceMask(); break;
+
+
+
                     //-------------------------
                     //4.7: Subroutine Operators
                     case OperatorName._return: _evalStack.Ret(); break;
@@ -901,7 +889,22 @@ namespace Typography.OpenFont.CFF
             _currentIndex = 0; //clear stack
         }
 
-        public void HintMask()
+        //----------------------------------------
+        //hintmask | -hintmask(19 + mask) | -
+        //The mask data bytes are defined as follows:
+        //• The number of data bytes is exactly the number needed, one
+        //bit per hint, to reference the number of stem hints declared
+        //at the beginning of the charstring program.
+        //• Each bit of the mask, starting with the most-significant bit of
+        //the first byte, represents the corresponding hint zone in the
+        //order in which the hints were declared at the beginning of
+        //the charstring.
+        //• For each bit in the mask, a value of ‘1’ specifies that the
+        //corresponding hint shall be active. A bit value of ‘0’ specifies
+        //that the hint shall be inactive.
+        //• Unused bits in the mask, if any, must be zero.
+
+        public void HintMask1(int hintMaskValue)
         {
             //specifies which hints are active and which are not active. If any
             //hints overlap, hintmask must be used to establish a nonoverlapping
@@ -913,12 +916,30 @@ namespace Typography.OpenFont.CFF
             //managed by use of the hintmask operator, the results are
             //undefined. 
 
-            //|- hintmask (19 + mask) |-
+            //|- hintmask (19 + mask) |- 
             _currentIndex = 0; //clear stack
         }
+        public void HintMask2(int hintMaskValue)
+        {
+            _currentIndex = 0; //clear stack
+        }
+        public void HintMask3(int hintMaskValue)
+        {
+            _currentIndex = 0; //clear stack
+        }
+        public void HintMask4(int hintMaskValue)
+        {
+            _currentIndex = 0; //clear stack
+        }
+        public void HintMask4AndMore(int hintMaskValue)
+        {
+            _currentIndex = 0; //clear stack
+        }
+        //----------------------------------------
+
         public void CounterSpaceMask()
         {
-            
+
             _currentIndex = 0;
             //|- cntrmask(20 + mask) |-
 
@@ -1047,7 +1068,7 @@ namespace Typography.OpenFont.CFF
         public void Op_IfElse()
         {
             Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_IfElse));
-        } 
+        }
         public int Pop()
         {
             return (int)_argStack[--_currentIndex];//*** use prefix 

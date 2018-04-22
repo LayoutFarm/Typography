@@ -49,7 +49,18 @@ namespace Typography.OpenFont.CFF
             }
             else
             {
-                return Op.ToString() + " " + Value.ToString();
+                switch (Op)
+                {
+                    case OperatorName.hintmask1:
+                    case OperatorName.hintmask2:
+                    case OperatorName.hintmask3:
+                    case OperatorName.hintmask4:
+                    case OperatorName.hintmask4_andMore:
+                        return Op.ToString() + " " + Convert.ToString(Value, 2); 
+                    default:
+                        return Op.ToString() + " " + Value.ToString();
+                }
+
             }
 
         }
@@ -173,11 +184,20 @@ namespace Typography.OpenFont.CFF
         [OriginalType2Operator(Type2Operator1.callsubr)] callsubr,
         //---------------------
         [OriginalType2Operator(Type2Operator1._return)] _return,
-        //[OriginalType2Operator(Type2Operator1.escape)] escape,
+        //[OriginalType2Operator(Type2Operator1.escape)] escape, //not used!
         [OriginalType2Operator(Type2Operator1.endchar)] endchar,
         [OriginalType2Operator(Type2Operator1.hstemhm)] hstemhm,
-        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask,
-        [OriginalType2Operator(Type2Operator1.cntrmask)] cntrmask,
+
+        //---------
+        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask1, //my hint-mask extension, contains 1 byte hint
+        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask2, //my hint-mask extension, contains 2 bytes hint
+        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask3, //my hint-mask extension, contains 3 bytes hint
+        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask4, //my hint-mask extension, contains 4 bytes hint 
+        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask4_andMore,//my hint-mask extension, contains 4 bytes hint and need the follower
+        //---------
+        
+        [OriginalType2Operator(Type2Operator1.cntrmask)] cntrmask, //my counter-mask extension
+
         //---------------------
         [OriginalType2Operator(Type2Operator1.rmoveto)] rmoveto,
         [OriginalType2Operator(Type2Operator1.hmoveto)] hmoveto,
@@ -284,11 +304,11 @@ namespace Typography.OpenFont.CFF
             int len = buffer.Length;
             var insts = new List<Type2Instruction>();
 #if DEBUG
-            //if (_dbugInstructionListMark == 1860)
+            //if (_dbugInstructionListMark == 20)
             //{
 
             //}
-            //_dbugInstructionListMark++; 
+            _dbugInstructionListMark++;
 #endif
 
             byte b0 = 0;
@@ -431,21 +451,72 @@ namespace Typography.OpenFont.CFF
 
                     case (byte)Type2Operator1.hintmask:
                         {
-                            //temp fix
-                            int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
-                            if (_reader.BaseStream.Position + properNumberOfMaskBytes < len)
+                            if (hintStemCount == 0)
                             {
-                                _reader.ReadBytes(properNumberOfMaskBytes);
+                                if (!foundSomeStem)
+                                {
+                                    hintStemCount = current_stem_Count;
+                                    foundSomeStem = true;//?
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
                             }
-                            else
+                            ////----------------------
+
+                            //this is my hintmask extension, => to fit with our Evaluation stack
+                            int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
+                            if (_reader.BaseStream.Position + properNumberOfMaskBytes >= len)
                             {
                                 throw new NotSupportedException();
                             }
-                            insts.Add(new Type2Instruction(OperatorName.hintmask, 0));
+                            int hh = properNumberOfMaskBytes;
+                            for (; hh > 4;)
+                            {
+                                insts.Add(new Type2Instruction(OperatorName.hintmask4_andMore,
+                                   (_reader.ReadByte() << 24) |
+                                   (_reader.ReadByte() << 16) |
+                                   (_reader.ReadByte() << 8) |
+                                   (_reader.ReadByte())
+                                   ));
+                                hh -= 4; //***
+                            }
+                            //last remaining <4 bytes 
+                            switch (hh)
+                            {
+                                case 0:
+                                default: throw new NotSupportedException();//should not occur !
+                                case 1:
+                                    insts.Add(new Type2Instruction(OperatorName.hintmask1, (_reader.ReadByte() << 24)));
+                                    break;
+                                case 2:
+                                    insts.Add(new Type2Instruction(OperatorName.hintmask2,
+                                        (_reader.ReadByte() << 24) |
+                                        (_reader.ReadByte() << 16)
+                                        ));
+                                    break;
+                                case 3:
+                                    insts.Add(new Type2Instruction(OperatorName.hintmask3,
+                                        (_reader.ReadByte() << 24) |
+                                        (_reader.ReadByte() << 16) |
+                                        (_reader.ReadByte() << 8)
+                                        ));
+                                    break;
+                                case 4:
+                                    insts.Add(new Type2Instruction(OperatorName.hintmask4,
+                                        (_reader.ReadByte() << 24) |
+                                        (_reader.ReadByte() << 16) |
+                                        (_reader.ReadByte() << 8) |
+                                        (_reader.ReadByte())
+                                        ));
+                                    break;
+                            }
                         }
                         break;
                     case (byte)Type2Operator1.cntrmask:
                         {
+                            //TODO: review here again
                             int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
                             if (_reader.BaseStream.Position + properNumberOfMaskBytes < len)
                             {
@@ -467,10 +538,10 @@ namespace Typography.OpenFont.CFF
             }
 
 #if DEBUG
-            if (_dbugInstructionListMark == 3520)
-            {
-                dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
-            }
+            //if (_dbugInstructionListMark == 3520)
+            //{
+            //    dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
+            //}
 
             return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark };
 #else
