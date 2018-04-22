@@ -12,10 +12,33 @@ namespace Typography.OpenFont.CFF
     {
 
         CFF.Cff1Font cff1Font;
+        int _cffBias;
 
         public void Run(IGlyphTranslator tx, CFF.Cff1Font cff1Font, Type2GlyphInstructionList instructionList)
         {
             this.cff1Font = cff1Font;
+
+            //-------------
+            //from Technical Note #5176 (CFF spec)
+            //resolve with bias
+            //Card16 bias;
+            //Card16 nSubrs = subrINDEX.count;
+            //if (CharstringType == 1)
+            //    bias = 0;
+            //else if (nSubrs < 1240)
+            //    bias = 107;
+            //else if (nSubrs < 33900)
+            //    bias = 1131;
+            //else
+            //    bias = 32768;
+
+            //find local subroutine
+
+            int nsubrs = cff1Font._localSubrs.Count;
+            _cffBias = (nsubrs < 1240) ? 107 :
+                            (nsubrs < 33900) ? 1131 : 32769;
+
+            //-------------
             double currentX = 0, currentY = 0;
             Run(tx, instructionList, ref currentX, ref currentY);
         }
@@ -23,15 +46,12 @@ namespace Typography.OpenFont.CFF
         {
 
             Type2EvaluationStack _evalStack = new Type2EvaluationStack();
-
             _evalStack._currentX = currentX;
-            _evalStack._currentY = currentY;
-
+            _evalStack._currentY = currentY; 
 
             List<Type2Instruction> insts = instructionList.Insts;
             _evalStack.GlyphTranslator = tx;
-            int j = insts.Count;
-
+            int j = insts.Count; 
 
             for (int i = 0; i < j; ++i)
             {
@@ -120,41 +140,20 @@ namespace Typography.OpenFont.CFF
                     //4.7: Subroutine Operators
                     case OperatorName._return:
                         {
-
+                            //***
+                            //don't forget to return _evalStack's currentX, currentY to prev evl context
                             currentX = _evalStack._currentX;
-                            currentY = _evalStack._currentY;
-
+                            currentY = _evalStack._currentY; 
                             _evalStack.Ret();
                         }
                         break;
                     case OperatorName.callsubr:
                         {
                             //resolve local subrountine
-                            int rawSubRoutineNum = (int)_evalStack.Pop();
-
-                            //from Technical Note #5176 (CFF spec)
-                            //resolve with bias
-                            //Card16 bias;
-                            //Card16 nSubrs = subrINDEX.count;
-                            //if (CharstringType == 1)
-                            //    bias = 0;
-                            //else if (nSubrs < 1240)
-                            //    bias = 107;
-                            //else if (nSubrs < 33900)
-                            //    bias = 1131;
-                            //else
-                            //    bias = 32768;
-
-                            int nsubrs = cff1Font._localSubrs.Count;
-                            int bias = (nsubrs < 1240) ? 107 :
-                                            (nsubrs < 33900) ? 1131 : 32769;
-
-
-                            //find local subroutine
-                            Type2GlyphInstructionList resolvedSubroutine = cff1Font._localSubrs[rawSubRoutineNum + bias];
+                            int rawSubRoutineNum = (int)_evalStack.Pop(); 
+                            Type2GlyphInstructionList resolvedSubroutine = cff1Font._localSubrs[rawSubRoutineNum + _cffBias];
                             //then we move to another context
-                            Run(tx, resolvedSubroutine, ref _evalStack._currentX, ref _evalStack._currentY);
-
+                            Run(tx, resolvedSubroutine, ref _evalStack._currentX, ref _evalStack._currentY); 
                         }
                         break;
                     case OperatorName.callgsubr: throw new NotSupportedException();
