@@ -1040,16 +1040,17 @@ namespace Typography.OpenFont.CFF
                 Cff1GlyphData glyphData = new Cff1GlyphData();
                 glyphData.GlyphIndex = i;
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
-                //
+                ////
+                //if (i == 5)
+                //{
 
+                //}
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
                     instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
                     glyphData.GlyphInstructions = instList;
-                }
-
-
+                } 
             }
         }
 
