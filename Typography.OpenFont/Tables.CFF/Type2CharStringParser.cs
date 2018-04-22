@@ -260,20 +260,41 @@ namespace Typography.OpenFont.CFF
     {
 
         List<Type2Instruction> insts;
-        public Type2GlyphInstructionList(List<Type2Instruction> insts)
+        public Type2GlyphInstructionList()
         {
-            this.insts = insts;
+            this.insts = new List<Type2Instruction>();
         }
         public List<Type2Instruction> Insts
         {
             get { return insts; }
         }
+
         public Type2GlyphInstructionListKind Kind
         {
             get;
             set;
         }
 
+        public void AddInt(int intValue)
+        {
+            insts.Add(new Type2Instruction(OperatorName.LoadInt, intValue));
+        }
+        public void AddOp(OperatorName opName)
+        {
+            insts.Add(new Type2Instruction(opName));
+        }
+        public void AddOp(OperatorName opName, int value)
+        {
+            insts.Add(new Type2Instruction(opName, value));
+        }
+        internal void ChangeFirstInstToGlyphWidthValue()
+        {
+            //check the first element must be loadint
+            Type2Instruction firstInst = insts[0];
+            if (firstInst.Op != OperatorName.LoadInt) { throw new NotSupportedException(); }
+            //the replace
+            insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
+        }
 #if DEBUG
         int _dbugMark;
         public int dbugMark
@@ -289,7 +310,35 @@ namespace Typography.OpenFont.CFF
                 //}
             }
         }
+
+        internal void dbugDumpInstructionListToFile(string filename)
+        {
+            using (FileStream fs = new FileStream(filename, FileMode.Create))
+            using (StreamWriter w = new StreamWriter(fs))
+            {
+
+                int j = insts.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    Type2Instruction inst = insts[i];
+
+                    w.Write("[" + i + "] ");
+                    if (inst.Op == OperatorName.LoadInt)
+                    {
+                        w.Write(inst.Value.ToString());
+                        w.Write(' ');
+                    }
+                    else
+                    {
+                        w.Write(inst.ToString());
+                        w.WriteLine();
+                    }
+
+                }
+            }
+        }
 #endif
+
     }
 
 
@@ -321,9 +370,11 @@ namespace Typography.OpenFont.CFF
             _msBuffer.Write(buffer, 0, buffer.Length);
             _msBuffer.Position = 0;
             int len = buffer.Length;
-            var insts = new List<Type2Instruction>();
+            var insts = new Type2GlyphInstructionList();
+
 #if DEBUG
-            if (_dbugInstructionListMark == 12)
+            insts.dbugMark = _dbugInstructionListMark;
+            if (_dbugInstructionListMark == 20)
             {
 
             }
@@ -356,7 +407,8 @@ namespace Typography.OpenFont.CFF
                             }
                             try
                             {
-                                insts.Add(new Type2Instruction(OperatorName.LoadInt, ReadIntegerNumber(b0)));
+
+                                insts.AddInt(ReadIntegerNumber(b0));
                                 current_stem_Count++;
                             }
                             catch
@@ -380,7 +432,7 @@ namespace Typography.OpenFont.CFF
                         //most significant byte follows the(28)
                         byte s_b0 = _reader.ReadByte();
                         byte s_b1 = _reader.ReadByte();
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt, (s_b0 << 8 | s_b1)));
+                        insts.AddInt((s_b0 << 8) | (s_b1));
                         current_stem_Count++;
                         break;
                     //---------------------------------------------------
@@ -394,7 +446,7 @@ namespace Typography.OpenFont.CFF
                         //reserved, do nothing ?
                         break;
                     case (byte)Type2Operator1.endchar:
-                        insts.Add(new Type2Instruction(OperatorName.endchar));
+                        insts.AddOp(OperatorName.endchar);
                         cont = false;
                         //when we found end char
                         //stop reading this...
@@ -414,53 +466,53 @@ namespace Typography.OpenFont.CFF
                                     break;
                                 //-------------------------
                                 //4.1: Path Construction Operators
-                                case Type2Operator2.flex: insts.Add(new Type2Instruction(OperatorName.flex)); break;
-                                case Type2Operator2.hflex: insts.Add(new Type2Instruction(OperatorName.hflex)); break;
-                                case Type2Operator2.hflex1: insts.Add(new Type2Instruction(OperatorName.hflex1)); break;
-                                case Type2Operator2.flex1: insts.Add(new Type2Instruction(OperatorName.flex1)); ; break;
+                                case Type2Operator2.flex: insts.AddOp(OperatorName.flex); break;
+                                case Type2Operator2.hflex: insts.AddOp(OperatorName.hflex); break;
+                                case Type2Operator2.hflex1: insts.AddOp(OperatorName.hflex1); break;
+                                case Type2Operator2.flex1: insts.AddOp(OperatorName.flex1); ; break;
                                 //-------------------------
                                 //4.4: Arithmetic Operators
-                                case Type2Operator2.abs: insts.Add(new Type2Instruction(OperatorName.abs)); break;
-                                case Type2Operator2.add: insts.Add(new Type2Instruction(OperatorName.add)); break;
-                                case Type2Operator2.sub: insts.Add(new Type2Instruction(OperatorName.sub)); break;
-                                case Type2Operator2.div: insts.Add(new Type2Instruction(OperatorName.div)); break;
-                                case Type2Operator2.neg: insts.Add(new Type2Instruction(OperatorName.neg)); break;
-                                case Type2Operator2.random: insts.Add(new Type2Instruction(OperatorName.random)); break;
-                                case Type2Operator2.mul: insts.Add(new Type2Instruction(OperatorName.mul)); break;
-                                case Type2Operator2.sqrt: insts.Add(new Type2Instruction(OperatorName.sqrt)); break;
-                                case Type2Operator2.drop: insts.Add(new Type2Instruction(OperatorName.drop)); break;
-                                case Type2Operator2.exch: insts.Add(new Type2Instruction(OperatorName.exch)); break;
-                                case Type2Operator2.index: insts.Add(new Type2Instruction(OperatorName.index)); break;
-                                case Type2Operator2.roll: insts.Add(new Type2Instruction(OperatorName.roll)); break;
-                                case Type2Operator2.dup: insts.Add(new Type2Instruction(OperatorName.dup)); break;
+                                case Type2Operator2.abs: insts.AddOp(OperatorName.abs); break;
+                                case Type2Operator2.add: insts.AddOp(OperatorName.add); break;
+                                case Type2Operator2.sub: insts.AddOp(OperatorName.sub); break;
+                                case Type2Operator2.div: insts.AddOp(OperatorName.div); break;
+                                case Type2Operator2.neg: insts.AddOp(OperatorName.neg); break;
+                                case Type2Operator2.random: insts.AddOp(OperatorName.random); break;
+                                case Type2Operator2.mul: insts.AddOp(OperatorName.mul); break;
+                                case Type2Operator2.sqrt: insts.AddOp(OperatorName.sqrt); break;
+                                case Type2Operator2.drop: insts.AddOp(OperatorName.drop); break;
+                                case Type2Operator2.exch: insts.AddOp(OperatorName.exch); break;
+                                case Type2Operator2.index: insts.AddOp(OperatorName.index); break;
+                                case Type2Operator2.roll: insts.AddOp(OperatorName.roll); break;
+                                case Type2Operator2.dup: insts.AddOp(OperatorName.dup); break;
 
                                 //-------------------------
                                 //4.5: Storage Operators 
-                                case Type2Operator2.put: insts.Add(new Type2Instruction(OperatorName.put)); break;
-                                case Type2Operator2.get: insts.Add(new Type2Instruction(OperatorName.get)); break;
+                                case Type2Operator2.put: insts.AddOp(OperatorName.put); break;
+                                case Type2Operator2.get: insts.AddOp(OperatorName.get); break;
                                 //-------------------------
                                 //4.6: Conditional
-                                case Type2Operator2.and: insts.Add(new Type2Instruction(OperatorName.and)); break;
-                                case Type2Operator2.or: insts.Add(new Type2Instruction(OperatorName.or)); break;
-                                case Type2Operator2.not: insts.Add(new Type2Instruction(OperatorName.not)); break;
-                                case Type2Operator2.eq: insts.Add(new Type2Instruction(OperatorName.eq)); break;
-                                case Type2Operator2.ifelse: insts.Add(new Type2Instruction(OperatorName.ifelse)); break;
+                                case Type2Operator2.and: insts.AddOp(OperatorName.and); break;
+                                case Type2Operator2.or: insts.AddOp(OperatorName.or); break;
+                                case Type2Operator2.not: insts.AddOp(OperatorName.not); break;
+                                case Type2Operator2.eq: insts.AddOp(OperatorName.eq); break;
+                                case Type2Operator2.ifelse: insts.AddOp(OperatorName.ifelse); break;
                             }
                         }
                         break;
-                    case (byte)Type2Operator1.rmoveto: insts.Add(new Type2Instruction(OperatorName.rmoveto)); break;
-                    case (byte)Type2Operator1.hmoveto: insts.Add(new Type2Instruction(OperatorName.hmoveto)); break;
-                    case (byte)Type2Operator1.vmoveto: insts.Add(new Type2Instruction(OperatorName.vmoveto)); break;
-                    case (byte)Type2Operator1.rlineto: insts.Add(new Type2Instruction(OperatorName.rlineto)); break;
-                    case (byte)Type2Operator1.hlineto: insts.Add(new Type2Instruction(OperatorName.hlineto)); break;
-                    case (byte)Type2Operator1.vlineto: insts.Add(new Type2Instruction(OperatorName.vlineto)); break;
-                    case (byte)Type2Operator1.rrcurveto: insts.Add(new Type2Instruction(OperatorName.rrcurveto)); break;
-                    case (byte)Type2Operator1.hhcurveto: insts.Add(new Type2Instruction(OperatorName.hhcurveto)); break;
-                    case (byte)Type2Operator1.hvcurveto: insts.Add(new Type2Instruction(OperatorName.hvcurveto)); break;
-                    case (byte)Type2Operator1.rcurveline: insts.Add(new Type2Instruction(OperatorName.rcurveline)); break;
-                    case (byte)Type2Operator1.rlinecurve: insts.Add(new Type2Instruction(OperatorName.rlinecurve)); break;
-                    case (byte)Type2Operator1.vhcurveto: insts.Add(new Type2Instruction(OperatorName.vhcurveto)); break;
-                    case (byte)Type2Operator1.vvcurveto: insts.Add(new Type2Instruction(OperatorName.vvcurveto)); break;
+                    case (byte)Type2Operator1.rmoveto: insts.AddOp(OperatorName.rmoveto); break;
+                    case (byte)Type2Operator1.hmoveto: insts.AddOp(OperatorName.hmoveto); break;
+                    case (byte)Type2Operator1.vmoveto: insts.AddOp(OperatorName.vmoveto); break;
+                    case (byte)Type2Operator1.rlineto: insts.AddOp(OperatorName.rlineto); break;
+                    case (byte)Type2Operator1.hlineto: insts.AddOp(OperatorName.hlineto); break;
+                    case (byte)Type2Operator1.vlineto: insts.AddOp(OperatorName.vlineto); break;
+                    case (byte)Type2Operator1.rrcurveto: insts.AddOp(OperatorName.rrcurveto); break;
+                    case (byte)Type2Operator1.hhcurveto: insts.AddOp(OperatorName.hhcurveto); break;
+                    case (byte)Type2Operator1.hvcurveto: insts.AddOp(OperatorName.hvcurveto); break;
+                    case (byte)Type2Operator1.rcurveline: insts.AddOp(OperatorName.rcurveline); break;
+                    case (byte)Type2Operator1.rlinecurve: insts.AddOp(OperatorName.rlinecurve); break;
+                    case (byte)Type2Operator1.vhcurveto: insts.AddOp(OperatorName.vhcurveto); break;
+                    case (byte)Type2Operator1.vvcurveto: insts.AddOp(OperatorName.vvcurveto); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
                     case (byte)Type2Operator1.hstem: AddStemToList(insts, OperatorName.hstem, ref hintStemCount, ref current_stem_Count); break;
@@ -471,52 +523,17 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(insts, _reader, ref hintStemCount, ref current_stem_Count); break;
                     //-------------------------
                     //4.7: Subroutine Operators
-                    case (byte)Type2Operator1.callsubr: insts.Add(new Type2Instruction(OperatorName.callsubr)); break;
-                    case (byte)Type2Operator1.callgsubr: insts.Add(new Type2Instruction(OperatorName.callgsubr)); break;
-                    case (byte)Type2Operator1._return: insts.Add(new Type2Instruction(OperatorName._return)); break;
+                    case (byte)Type2Operator1.callsubr: insts.AddOp(OperatorName.callsubr); break;
+                    case (byte)Type2Operator1.callgsubr: insts.AddOp(OperatorName.callgsubr); break;
+                    case (byte)Type2Operator1._return: insts.AddOp(OperatorName._return); break;
                 }
             }
-
-#if DEBUG
-
-            return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark - 1 };
-#else
-            return new Type2GlyphInstructionList(insts);
-#endif
-
+            return insts;
         }
-#if DEBUG
-        internal static void dbugDumpInstructionListToFile(List<Type2Instruction> insts, string filename)
-        {
-            using (FileStream fs = new FileStream(filename, FileMode.Create))
-            using (StreamWriter w = new StreamWriter(fs))
-            {
 
 
-                int j = insts.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    Type2Instruction inst = insts[i];
 
-                    w.Write("[" + i + "] ");
-                    if (inst.Op == OperatorName.LoadInt)
-                    {
-                        w.Write(inst.Value.ToString());
-                        w.Write(' ');
-                    }
-                    else
-                    {
-                        w.Write(inst.ToString());
-                        w.WriteLine();
-                    }
-
-                }
-            }
-        }
-#endif
-
-
-        void AddStemToList(List<Type2Instruction> insts, OperatorName stemName, ref int hintStemCount, ref int current_stem_Count)
+        void AddStemToList(Type2GlyphInstructionList insts, OperatorName stemName, ref int hintStemCount, ref int current_stem_Count)
         {
             //support 4 kinds 
 
@@ -533,8 +550,7 @@ namespace Typography.OpenFont.CFF
             //notes
             //The sequence and form of a Type 2 charstring program may be
             //represented as:
-            //w? { hs* vs*cm * hm * mt subpath}? { mt subpath} *endchar
-
+            //w? { hs* vs*cm * hm * mt subpath}? { mt subpath} *endchar 
 
             if ((current_stem_Count % 2) != 0)
             {
@@ -542,23 +558,34 @@ namespace Typography.OpenFont.CFF
 
                 if (foundSomeStem)
                 {
-                    dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
+#if DEBUG
+                    insts.dbugDumpInstructionListToFile("d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
+#endif
                     throw new NotSupportedException();
                 }
                 else
                 {
                     //the first one is 'width'
-                    ChangeFirstInstToGlyphWidthValue(insts);
+                    insts.ChangeFirstInstToGlyphWidthValue();
                     current_stem_Count--;
                 }
             }
             hintStemCount += current_stem_Count; //save a snapshot of stem count
-            insts.Add(new Type2Instruction(stemName));
+            insts.AddOp(stemName);
             current_stem_Count = 0;//clear
             foundSomeStem = true;
         }
-        void AddHintMaskToList(List<Type2Instruction> insts, BinaryReader reader, ref int hintStemCount, ref int current_stem_Count)
+        void AddHintMaskToList(Type2GlyphInstructionList insts, BinaryReader reader, ref int hintStemCount, ref int current_stem_Count)
         {
+            if (current_stem_Count > 0)
+            {
+
+            }
+            else
+            {
+
+            }
+
             if (hintStemCount == 0)
             {
                 if (!foundSomeStem)
@@ -584,7 +611,7 @@ namespace Typography.OpenFont.CFF
 
                 for (; remaining > 3;)
                 {
-                    insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                    insts.AddInt((
                        (_reader.ReadByte() << 24) |
                        (_reader.ReadByte() << 16) |
                        (_reader.ReadByte() << 8) |
@@ -598,26 +625,24 @@ namespace Typography.OpenFont.CFF
                         //do nothing
                         break;
                     case 1:
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
-                            (_reader.ReadByte() << 24)));
-
+                        insts.AddInt(_reader.ReadByte() << 24);
                         break;
                     case 2:
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                        insts.AddInt(
                             (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16)));
+                            (_reader.ReadByte() << 16));
 
                         break;
                     case 3:
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                        insts.AddInt(
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8)));
+                            (_reader.ReadByte() << 8));
                         break;
                     default: throw new NotSupportedException();//should not occur !
                 }
 
-                insts.Add(new Type2Instruction(OperatorName.hintmask_bits, properNumberOfMaskBytes));
+                insts.AddOp(OperatorName.hintmask_bits, properNumberOfMaskBytes);
             }
             else
             {
@@ -627,33 +652,33 @@ namespace Typography.OpenFont.CFF
                     case 0:
                     default: throw new NotSupportedException();//should not occur !
                     case 1:
-                        insts.Add(new Type2Instruction(OperatorName.hintmask1, (_reader.ReadByte() << 24)));
+                        insts.AddOp(OperatorName.hintmask1, (_reader.ReadByte() << 24));
                         break;
                     case 2:
-                        insts.Add(new Type2Instruction(OperatorName.hintmask2,
+                        insts.AddOp(OperatorName.hintmask2,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16)
-                            ));
+                            );
                         break;
                     case 3:
-                        insts.Add(new Type2Instruction(OperatorName.hintmask3,
+                        insts.AddOp(OperatorName.hintmask3,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8)
-                            ));
+                            );
                         break;
                     case 4:
-                        insts.Add(new Type2Instruction(OperatorName.hintmask4,
+                        insts.AddOp(OperatorName.hintmask4,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8) |
                             (_reader.ReadByte())
-                            ));
+                            );
                         break;
                 }
             }
         }
-        void AddCounterMaskToList(List<Type2Instruction> insts, BinaryReader reader, ref int hintStemCount, ref int current_stem_Count)
+        void AddCounterMaskToList(Type2GlyphInstructionList insts, BinaryReader reader, ref int hintStemCount, ref int current_stem_Count)
         {
 
 
@@ -683,7 +708,7 @@ namespace Typography.OpenFont.CFF
 
                 for (; remaining > 3;)
                 {
-                    insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                    insts.AddInt((
                        (_reader.ReadByte() << 24) |
                        (_reader.ReadByte() << 16) |
                        (_reader.ReadByte() << 8) |
@@ -697,26 +722,24 @@ namespace Typography.OpenFont.CFF
                         //do nothing
                         break;
                     case 1:
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
-                            (_reader.ReadByte() << 24)));
-
+                        insts.AddInt(_reader.ReadByte() << 24);
                         break;
                     case 2:
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                        insts.AddInt(
                             (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16)));
+                            (_reader.ReadByte() << 16));
 
                         break;
                     case 3:
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                        insts.AddInt(
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8)));
+                            (_reader.ReadByte() << 8));
                         break;
                     default: throw new NotSupportedException();//should not occur !
                 }
 
-                insts.Add(new Type2Instruction(OperatorName.cntrmask_bits, properNumberOfMaskBytes));
+                insts.AddOp(OperatorName.cntrmask_bits, properNumberOfMaskBytes);
             }
             else
             {
@@ -726,41 +749,34 @@ namespace Typography.OpenFont.CFF
                     case 0:
                     default: throw new NotSupportedException();//should not occur !
                     case 1:
-                        insts.Add(new Type2Instruction(OperatorName.cntrmask1, (_reader.ReadByte() << 24)));
+                        insts.AddOp(OperatorName.cntrmask1, (_reader.ReadByte() << 24));
                         break;
                     case 2:
-                        insts.Add(new Type2Instruction(OperatorName.cntrmask2,
+                        insts.AddOp(OperatorName.cntrmask2,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16)
-                            ));
+                            );
                         break;
                     case 3:
-                        insts.Add(new Type2Instruction(OperatorName.cntrmask3,
+                        insts.AddOp(OperatorName.cntrmask3,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8)
-                            ));
+                            );
                         break;
                     case 4:
-                        insts.Add(new Type2Instruction(OperatorName.cntrmask4,
+                        insts.AddOp(OperatorName.cntrmask4,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8) |
                             (_reader.ReadByte())
-                            ));
+                            );
                         break;
                 }
             }
         }
 
-        static void ChangeFirstInstToGlyphWidthValue(List<Type2Instruction> insts)
-        {
-            //check the first element must be loadint
-            Type2Instruction firstInst = insts[0];
-            if (firstInst.Op != OperatorName.LoadInt) { throw new NotSupportedException(); }
-            //the replace
-            insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
-        }
+
         int ReadIntegerNumber(byte b0)
         {
 
