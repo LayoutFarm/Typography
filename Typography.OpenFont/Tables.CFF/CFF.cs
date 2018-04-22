@@ -1040,16 +1040,17 @@ namespace Typography.OpenFont.CFF
                 Cff1GlyphData glyphData = new Cff1GlyphData();
                 glyphData.GlyphIndex = i;
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
-                //
+                ////
+                //if (i == 5)
+                //{
 
+                //}
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
                     instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
                     glyphData.GlyphInstructions = instList;
-                }
-
-
+                } 
             }
         }
 
@@ -1164,7 +1165,7 @@ namespace Typography.OpenFont.CFF
             Type2CharStringParser type2Parser = new Type2CharStringParser();
             int j = offsets.Length;
 
-            List<Type2GlyphInstructionList> localSubrs = new List<Type2GlyphInstructionList>(j); 
+            List<Type2GlyphInstructionList> localSubrs = new List<Type2GlyphInstructionList>(j);
             _currentCff1Font._localSubrs = localSubrs;
 
             for (int i = 0; i < j; ++i)

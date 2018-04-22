@@ -1099,15 +1099,23 @@ namespace Typography.OpenFont.CFF
         }
         public double Pop()
         {
+#if DEBUG
+            if (_currentIndex < 1)
+            {
+
+            }
+#endif
             return (double)_argStack[--_currentIndex];//*** use prefix 
         }
 
         public void Ret()
         {
+#if DEBUG
             if (_currentIndex > 0)
             {
 
             }
+#endif
             _currentIndex = 0;
         }
 #if DEBUG

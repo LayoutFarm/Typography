@@ -169,6 +169,8 @@ namespace Typography.OpenFont.CFF
     /// </summary>
     enum OperatorName : byte
     {
+        Unknown,
+        //
         LoadInt,
         GlyphWidth,
         //---------------------
@@ -277,14 +279,23 @@ namespace Typography.OpenFont.CFF
 
         public void AddInt(int intValue)
         {
+#if DEBUG
+            debugCheck();
+#endif
             insts.Add(new Type2Instruction(OperatorName.LoadInt, intValue));
         }
         public void AddOp(OperatorName opName)
         {
+#if DEBUG
+            debugCheck();
+#endif
             insts.Add(new Type2Instruction(opName));
         }
         public void AddOp(OperatorName opName, int value)
         {
+#if DEBUG
+            debugCheck();
+#endif
             insts.Add(new Type2Instruction(opName, value));
         }
         internal void ChangeFirstInstToGlyphWidthValue()
@@ -296,6 +307,14 @@ namespace Typography.OpenFont.CFF
             insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
         }
 #if DEBUG
+        void debugCheck()
+        {
+            if (this._dbugMark == 5 && insts.Count > 50)
+            {
+
+            }
+        }
+        public int dbugInstCount { get { return insts.Count; } }
         int _dbugMark;
         public int dbugMark
         {
@@ -360,67 +379,62 @@ namespace Typography.OpenFont.CFF
 #endif
 
         bool foundSomeStem = false;
+        Type2GlyphInstructionList insts;
+        int current_int_count = 0;
+        bool doStemCount = true;
 
         public Type2GlyphInstructionList ParseType2CharString(byte[] buffer)
         {
-            //TODO: implement this
+            //reset
+            current_int_count = 0;
             foundSomeStem = false;
+            doStemCount = true;
             _msBuffer.SetLength(0);
             _msBuffer.Position = 0;
             _msBuffer.Write(buffer, 0, buffer.Length);
             _msBuffer.Position = 0;
             int len = buffer.Length;
-            var insts = new Type2GlyphInstructionList();
-
+            //
+            insts = new Type2GlyphInstructionList();
 #if DEBUG
             insts.dbugMark = _dbugInstructionListMark;
-            if (_dbugInstructionListMark == 20)
-            {
+            //if (_dbugInstructionListMark == 5)
+            //{
 
-            }
+            //}
             _dbugInstructionListMark++;
 #endif
 
             byte b0 = 0;
             int hintStemCount = 0;
-            int current_stem_Count = 0;
 
             bool cont = true;
 
             while (cont && _reader.BaseStream.Position < len)
             {
-
+                b0 = _reader.ReadByte();
 #if DEBUG
+                //easy for debugging here
                 _dbugCount++;
-#endif
+                if (b0 < 32)
+                {
 
-                switch (b0 = _reader.ReadByte())
+                }
+#endif
+                switch (b0)
                 {
                     default: //else 32 -255
                         {
-
-#if DEBUG
                             if (b0 < 32)
                             {
                                 Console.WriteLine("err!:" + b0);
                                 return null;
                             }
-                            try
+                            insts.AddInt(ReadIntegerNumber(b0));
+                            if (doStemCount)
                             {
-
-                                insts.AddInt(ReadIntegerNumber(b0));
-                                current_stem_Count++;
+                                current_int_count++;
                             }
-                            catch
-                            {
-                                //dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
-                            }
-#else
-                            insts.Add(new Type2Instruction(OperatorName.LoadInt, ReadIntegerNumber(b0)));
-                            load_intCount++;
-                            current_stem_Count++;
-#endif
-
                         }
                         break;
                     case (byte)Type2Operator1.shortint: // 28
@@ -433,7 +447,11 @@ namespace Typography.OpenFont.CFF
                         byte s_b0 = _reader.ReadByte();
                         byte s_b1 = _reader.ReadByte();
                         insts.AddInt((s_b0 << 8) | (s_b1));
-                        current_stem_Count++;
+                        //
+                        if (doStemCount)
+                        {
+                            current_int_count++;
+                        }
                         break;
                     //---------------------------------------------------
                     case (byte)Type2Operator1._Reserved0_://???
@@ -498,42 +516,50 @@ namespace Typography.OpenFont.CFF
                                 case Type2Operator2.eq: insts.AddOp(OperatorName.eq); break;
                                 case Type2Operator2.ifelse: insts.AddOp(OperatorName.ifelse); break;
                             }
+
+                            StopStemCount();
                         }
                         break;
-                    case (byte)Type2Operator1.rmoveto: insts.AddOp(OperatorName.rmoveto); break;
-                    case (byte)Type2Operator1.hmoveto: insts.AddOp(OperatorName.hmoveto); break;
-                    case (byte)Type2Operator1.vmoveto: insts.AddOp(OperatorName.vmoveto); break;
-                    case (byte)Type2Operator1.rlineto: insts.AddOp(OperatorName.rlineto); break;
-                    case (byte)Type2Operator1.hlineto: insts.AddOp(OperatorName.hlineto); break;
-                    case (byte)Type2Operator1.vlineto: insts.AddOp(OperatorName.vlineto); break;
-                    case (byte)Type2Operator1.rrcurveto: insts.AddOp(OperatorName.rrcurveto); break;
-                    case (byte)Type2Operator1.hhcurveto: insts.AddOp(OperatorName.hhcurveto); break;
-                    case (byte)Type2Operator1.hvcurveto: insts.AddOp(OperatorName.hvcurveto); break;
-                    case (byte)Type2Operator1.rcurveline: insts.AddOp(OperatorName.rcurveline); break;
-                    case (byte)Type2Operator1.rlinecurve: insts.AddOp(OperatorName.rlinecurve); break;
-                    case (byte)Type2Operator1.vhcurveto: insts.AddOp(OperatorName.vhcurveto); break;
-                    case (byte)Type2Operator1.vvcurveto: insts.AddOp(OperatorName.vvcurveto); break;
+                    case (byte)Type2Operator1.rmoveto: insts.AddOp(OperatorName.rmoveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hmoveto: insts.AddOp(OperatorName.hmoveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.vmoveto: insts.AddOp(OperatorName.vmoveto); StopStemCount(); break;
+                    //---------------------------------------------------------------------------
+                    case (byte)Type2Operator1.rlineto: insts.AddOp(OperatorName.rlineto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hlineto: insts.AddOp(OperatorName.hlineto); StopStemCount(); break;
+                    case (byte)Type2Operator1.vlineto: insts.AddOp(OperatorName.vlineto); StopStemCount(); break;
+                    case (byte)Type2Operator1.rrcurveto: insts.AddOp(OperatorName.rrcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hhcurveto: insts.AddOp(OperatorName.hhcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hvcurveto: insts.AddOp(OperatorName.hvcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.rcurveline: insts.AddOp(OperatorName.rcurveline); StopStemCount(); break;
+                    case (byte)Type2Operator1.rlinecurve: insts.AddOp(OperatorName.rlinecurve); StopStemCount(); break;
+                    case (byte)Type2Operator1.vhcurveto: insts.AddOp(OperatorName.vhcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.vvcurveto: insts.AddOp(OperatorName.vvcurveto); StopStemCount(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case (byte)Type2Operator1.hstem: AddStemToList(insts, OperatorName.hstem, ref hintStemCount, ref current_stem_Count); break;
-                    case (byte)Type2Operator1.vstem: AddStemToList(insts, OperatorName.vstem, ref hintStemCount, ref current_stem_Count); break;
-                    case (byte)Type2Operator1.vstemhm: AddStemToList(insts, OperatorName.vstemhm, ref hintStemCount, ref current_stem_Count); break;
-                    case (byte)Type2Operator1.hstemhm: AddStemToList(insts, OperatorName.hstemhm, ref hintStemCount, ref current_stem_Count); break;
-                    case (byte)Type2Operator1.hintmask: AddHintMaskToList(insts, _reader, ref hintStemCount, ref current_stem_Count); break;
-                    case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(insts, _reader, ref hintStemCount, ref current_stem_Count); break;
-                    //-------------------------
+                    case (byte)Type2Operator1.hstem: AddStemToList(OperatorName.hstem, ref hintStemCount); break;
+                    case (byte)Type2Operator1.vstem: AddStemToList(OperatorName.vstem, ref hintStemCount); break;
+                    case (byte)Type2Operator1.vstemhm: AddStemToList(OperatorName.vstemhm, ref hintStemCount); break;
+                    case (byte)Type2Operator1.hstemhm: AddStemToList(OperatorName.hstemhm, ref hintStemCount); break;
+                    //-------------------------------------------------------------------
+                    case (byte)Type2Operator1.hintmask: AddHintMaskToList(_reader, ref hintStemCount); StopStemCount(); break;
+                    case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(_reader, ref hintStemCount); StopStemCount(); break;
+                    //-------------------------------------------------------------------
                     //4.7: Subroutine Operators
-                    case (byte)Type2Operator1.callsubr: insts.AddOp(OperatorName.callsubr); break;
-                    case (byte)Type2Operator1.callgsubr: insts.AddOp(OperatorName.callgsubr); break;
-                    case (byte)Type2Operator1._return: insts.AddOp(OperatorName._return); break;
+                    case (byte)Type2Operator1.callsubr: insts.AddOp(OperatorName.callsubr); StopStemCount(); break;
+                    case (byte)Type2Operator1.callgsubr: insts.AddOp(OperatorName.callgsubr); StopStemCount(); break;
+                    case (byte)Type2Operator1._return: insts.AddOp(OperatorName._return); StopStemCount(); break;
                 }
             }
             return insts;
         }
 
-
-
-        void AddStemToList(Type2GlyphInstructionList insts, OperatorName stemName, ref int hintStemCount, ref int current_stem_Count)
+        void StopStemCount()
+        {
+            current_int_count = 0;
+            doStemCount = false;
+        }
+        OperatorName _latestOpName = OperatorName.Unknown;
+        void AddStemToList(OperatorName stemName, ref int hintStemCount)
         {
             //support 4 kinds 
 
@@ -552,7 +578,7 @@ namespace Typography.OpenFont.CFF
             //represented as:
             //w? { hs* vs*cm * hm * mt subpath}? { mt subpath} *endchar 
 
-            if ((current_stem_Count % 2) != 0)
+            if ((current_int_count % 2) != 0)
             {
                 //all kind has even number of stem               
 
@@ -567,30 +593,66 @@ namespace Typography.OpenFont.CFF
                 {
                     //the first one is 'width'
                     insts.ChangeFirstInstToGlyphWidthValue();
-                    current_stem_Count--;
+                    current_int_count--;
                 }
             }
-            hintStemCount += current_stem_Count; //save a snapshot of stem count
+            hintStemCount += (current_int_count / 2); //save a snapshot of stem count
             insts.AddOp(stemName);
-            current_stem_Count = 0;//clear
+            current_int_count = 0;//clear
             foundSomeStem = true;
+            _latestOpName = stemName;
         }
-        void AddHintMaskToList(Type2GlyphInstructionList insts, BinaryReader reader, ref int hintStemCount, ref int current_stem_Count)
+        void AddHintMaskToList(BinaryReader reader, ref int hintStemCount)
         {
-            if (current_stem_Count > 0)
-            {
+            
 
-            }
-            else
+            if (foundSomeStem && current_int_count > 0)
             {
+                //type2 5177.pdf
+                //...
+                //If hstem and vstem hints are both declared at the beginning of
+                //a charstring, and this sequence is followed directly by the
+                //hintmask or cntrmask operators, the vstem hint operator need
+                //not be included 
 
+#if DEBUG
+                if ((current_int_count % 2) != 0)
+                {
+                    throw new NotSupportedException();
+                }
+                else
+                {
+
+                }
+#endif
+
+                switch (_latestOpName)
+                {
+                    case OperatorName.hstem:
+                        //add vstem 
+                        hintStemCount += (current_int_count / 2); //save a snapshot of stem count
+                        insts.AddOp(OperatorName.vstem);
+
+                        _latestOpName = OperatorName.vstem;
+                        current_int_count = 0; //clear
+                        break;
+                    case OperatorName.hstemhm:
+                        //add vstem 
+                        hintStemCount += (current_int_count / 2); //save a snapshot of stem count
+                        insts.AddOp(OperatorName.vstem);
+                        _latestOpName = OperatorName.vstem;
+                        current_int_count = 0;//clear
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
             }
 
             if (hintStemCount == 0)
             {
                 if (!foundSomeStem)
                 {
-                    hintStemCount = current_stem_Count;
+                    hintStemCount = (current_int_count / 2);
                     foundSomeStem = true;//?
                 }
                 else
@@ -598,6 +660,7 @@ namespace Typography.OpenFont.CFF
                     throw new NotSupportedException();
                 }
             }
+
             //---------------------- 
             //this is my hintmask extension, => to fit with our Evaluation stack
             int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
@@ -677,16 +740,16 @@ namespace Typography.OpenFont.CFF
                         break;
                 }
             }
+
         }
-        void AddCounterMaskToList(Type2GlyphInstructionList insts, BinaryReader reader, ref int hintStemCount, ref int current_stem_Count)
+        void AddCounterMaskToList(BinaryReader reader, ref int hintStemCount)
         {
-
-
             if (hintStemCount == 0)
             {
                 if (!foundSomeStem)
                 {
-                    hintStemCount = current_stem_Count;
+                    //????
+                    hintStemCount = (current_int_count / 2);
                     foundSomeStem = true;//?
                 }
                 else
