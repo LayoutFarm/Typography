@@ -210,6 +210,7 @@ The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robe
 
 MIT, 2016, Viktor Chlumsky, https://github.com/Chlumsky/msdfgen
 
+Apache2, 2018, Apache/PDFBox Authors,  https://github.com/apache/pdfbox
 
 **Geometry**
 

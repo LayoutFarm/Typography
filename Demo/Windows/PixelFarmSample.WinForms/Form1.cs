@@ -57,7 +57,7 @@ namespace SampleWinForms
             _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
 
 
-            
+
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             button1.Click += (s, e) => UpdateRenderOutput();
 
@@ -78,11 +78,12 @@ namespace SampleWinForms
             //string inputstr = "8";
             //string inputstr = "#";
             //string inputstr = "a";
+            string inputstr = "0";
             //string inputstr = "e";
             //string inputstr = "l";
             //string inputstr = "t";
             //string inputstr = "i";
-            string inputstr = "ma";
+            //string inputstr = "ma"; 
             //string inputstr = "po";
             //string inputstr = "Å";
             //string inputstr = "fi";
@@ -99,7 +100,7 @@ namespace SampleWinForms
 
 
 
-         
+
         bool _readyToRender;
         void UpdateRenderOutput()
         {
@@ -167,7 +168,7 @@ namespace SampleWinForms
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
-                        float x_pos = 0, y_pos = 200;
+                        float x_pos = 0, y_pos = 50;
                         float lineSpacingPx = selectedTextPrinter.FontLineSpacingPx;
                         for (int i = 0; i < 1; ++i)
                         {
@@ -190,9 +191,9 @@ namespace SampleWinForms
                 case TypographyTest.RenderChoice.RenderWithSdfGen:
                     {
                         char testChar = this.txtInputChar.Text[0];
-                        Typeface typeFace = _basicOptions.Typeface; 
+                        Typeface typeFace = _basicOptions.Typeface;
                         RenderWithMsdfImg(typeFace, testChar, _basicOptions.FontSizeInPoints);
-                         
+
                     }
                     break;
                 case TypographyTest.RenderChoice.RenderWithMiniAgg_SingleGlyph:
@@ -451,7 +452,7 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
-         
+
         static void CreateSampleMsdfImg(GlyphContourBuilder tx, string outputFile)
         {
             //sample
@@ -528,5 +529,7 @@ namespace SampleWinForms
         {
             this.Text = "Render with PixelFarm";
         }
+
+         
     }
 }

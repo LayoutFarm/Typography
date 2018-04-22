@@ -41,10 +41,20 @@ using Typography.OpenFont.CFF;
 namespace Typography.OpenFont.Tables
 {
 
+    //from https://docs.microsoft.com/en-us/typography/opentype/spec/cff
+    //This table contains a Compact Font Format font representation (also known as a PostScript Type 1, or CIDFont)
+    //...
+    // ... glyph data is accessed through the CharStrings INDEX of the CFF table.
+
+    //...
+    //The CFF Top DICT must specify a CharstringType value of 2. 
+    //The numGlyphs field in the 'maxp' table must be the same as the number of entries in the CFF's CharStrings INDEX. 
+    //The OpenType font glyph index is the same as the CFF glyph index for all glyphs in the font.
+
+
     class CFFTable : TableEntry
     {
         Cff1FontSet _cff1FontSet;
-
         public override string Name
         {
             get { return "CFF "; } //4 char, left 1 blank whitespace
