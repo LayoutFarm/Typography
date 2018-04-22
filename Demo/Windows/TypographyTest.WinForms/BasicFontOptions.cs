@@ -22,7 +22,7 @@ namespace TypographyTest
     public class BasicFontOptions
     {
         public event EventHandler UpdateRenderOutput;
-        public event EventHandler<TypefaceChangedEventArgs> TypefaceChanged; 
+        public event EventHandler<TypefaceChangedEventArgs> TypefaceChanged;
 
         TypefaceStore _typefaceStore;
         InstalledFontCollection _installedFontCollection;
@@ -33,7 +33,7 @@ namespace TypographyTest
         bool _typefaceChanged = false;
         public BasicFontOptions()
         {
-           
+
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
         }
@@ -55,10 +55,19 @@ namespace TypographyTest
             //1. create font collection        
             //2. set some essential handler
             _installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-            foreach (string file in Directory.GetFiles("../../../TestFonts", "*.ttf"))
+            foreach (string file in Directory.GetFiles("../../../TestFonts", "*.*"))
             {
                 //eg. this is our custom font folder  
-                _installedFontCollection.AddFont(new FontFileStreamProvider(file));
+                string ext = Path.GetExtension(file).ToLower();
+
+                switch (ext)
+                {
+                    case ".ttf":
+                    case ".otf":
+                        _installedFontCollection.AddFont(new FontFileStreamProvider(file));
+                        break;
+                }
+
             }
             PositionTech = PositionTechnique.OpenFont;
         }

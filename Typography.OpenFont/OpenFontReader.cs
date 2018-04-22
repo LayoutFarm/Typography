@@ -28,6 +28,8 @@ namespace Typography.OpenFont
         }
 
     }
+
+
     public class OpenFontReader
     {
         /// <summary>
@@ -79,21 +81,26 @@ namespace Typography.OpenFont
                 OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
                 NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
 
-
                 Head header = ReadTableIfExists(tables, input, new Head());
                 MaxProfile maximumProfile = ReadTableIfExists(tables, input, new MaxProfile());
                 HorizontalHeader horizontalHeader = ReadTableIfExists(tables, input, new HorizontalHeader());
                 HorizontalMetrics horizontalMetrics = ReadTableIfExists(tables, input, new HorizontalMetrics(horizontalHeader.HorizontalMetricsCount, maximumProfile.GlyphCount));
 
+                //---
+                PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
+                CFFTable ccf = ReadTableIfExists(tables, input, new CFFTable());
+
                 //--------------
                 Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
                 GlyphLocations glyphLocations = ReadTableIfExists(tables, input, new GlyphLocations(maximumProfile.GlyphCount, header.WideGlyphLocations));
+
                 Glyf glyf = ReadTableIfExists(tables, input, new Glyf(glyphLocations));
                 //--------------
                 Gasp gaspTable = ReadTableIfExists(tables, input, new Gasp());
                 VerticalDeviceMetrics vdmx = ReadTableIfExists(tables, input, new VerticalDeviceMetrics());
                 //--------------
-                PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
+
+
                 Kern kern = ReadTableIfExists(tables, input, new Kern());
                 //--------------
                 //advanced typography
@@ -114,35 +121,70 @@ namespace Typography.OpenFont
                 //about truetype instruction init 
 
                 //--------------------------------------------- 
-                var typeface = new Typeface(
-                    nameEntry,
-                    header.Bounds,
-                    header.UnitsPerEm,
-                    glyf.Glyphs,
-                    horizontalMetrics,
-                    os2Table);
+                Typeface typeface = null;
+                bool isPostScriptOutline = false;
+                if (glyf == null)
+                {
+                    //check if this is cff table ?
+                    if (ccf == null)
+                    {
+                        //TODO: review here
+                        throw new NotSupportedException();
+                    }
+                    //...  
+                    //PostScript outline font 
+                    isPostScriptOutline = true;
+                    typeface = new Typeface(
+                          nameEntry,
+                          header.Bounds,
+                          header.UnitsPerEm,
+                          ccf,
+                          horizontalMetrics,
+                          os2Table);
+
+#if DEBUG
+                    //test
+                    int found = typeface.GetGlyphIndexByName("Uacute");
+#endif
+
+                }
+                else
+                {
+                    typeface = new Typeface(
+                        nameEntry,
+                        header.Bounds,
+                        header.UnitsPerEm,
+                        glyf.Glyphs,
+                        horizontalMetrics,
+                        os2Table);
+                }
+
                 //----------------------------
                 typeface.CmapTable = cmaps;
                 typeface.KernTable = kern;
-                typeface.GaspTable = gaspTable;               
+                typeface.GaspTable = gaspTable;
                 typeface.MaxProfile = maximumProfile;
                 typeface.HheaTable = horizontalHeader;
                 //----------------------------
-                FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
-                //control values table
-                CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
-                if (cvtTable != null)
+
+                if (!isPostScriptOutline)
                 {
-                    typeface.ControlValues = cvtTable.controlValues;
-                }
-                if (fpgmTable != null)
-                {
-                    typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
-                }
-                PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
-                if (propProgramTable != null)
-                {
-                    typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                    FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
+                    //control values table
+                    CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
+                    if (cvtTable != null)
+                    {
+                        typeface.ControlValues = cvtTable.controlValues;
+                    }
+                    if (fpgmTable != null)
+                    {
+                        typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
+                    }
+                    PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
+                    if (propProgramTable != null)
+                    {
+                        typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                    }
                 }
                 //-------------------------
                 typeface.LoadOpenFontLayoutInfo(
@@ -166,6 +208,7 @@ namespace Typography.OpenFont
         static T ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, T resultTable)
             where T : TableEntry
         {
+
             TableEntry found;
             if (tables.TryGetTable(resultTable.Name, out found))
             {
@@ -189,5 +232,7 @@ namespace Typography.OpenFont
             //not found
             return null;
         }
+
+
     }
 }

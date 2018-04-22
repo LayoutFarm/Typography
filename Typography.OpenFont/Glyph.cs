@@ -27,6 +27,7 @@ namespace Typography.OpenFont
             Bounds bounds,
             byte[] glyphInstructions)
         {
+            //create from TTF 
 
 #if DEBUG
             this.dbugId = s_debugTotalId++;
@@ -37,10 +38,27 @@ namespace Typography.OpenFont
             GlyphInstructions = glyphInstructions;
         }
 
+        internal CFF.Cff1Font _ownerCffFont;
+        internal CFF.Cff1GlyphData _cff1GlyphData; //temp
+        internal Glyph(CFF.Cff1Font owner, CFF.Cff1GlyphData cff1Glyph)
+        {
+#if DEBUG
+            this.dbugId = s_debugTotalId++;
+#endif
+
+            this._ownerCffFont = owner;
+            //create from CFF 
+            this._cff1GlyphData = cff1Glyph;
+        }
 
         public Bounds Bounds { get { return _bounds; } }
+
+        //ttf
         public ushort[] EndPoints { get { return _contourEndPoints; } }
         public GlyphPointF[] GlyphPoints { get { return glyphPoints; } }
+
+
+
         public ushort OriginalAdvanceWidth
         {
             get { return _orgAdvWidth; }
@@ -52,6 +70,8 @@ namespace Typography.OpenFont
         }
         public bool HasOriginalAdvancedWidth { get { return _hasOrgAdvWidth; } }
         //--------------
+
+
 
         internal static void OffsetXY(Glyph glyph, short dx, short dy)
         {
@@ -190,6 +210,27 @@ namespace Typography.OpenFont
         public short MaxY
         {
             get { return _bounds.YMax; }
+        }
+
+
+        //--------------------
+        //cff
+        
+        public bool IsCffGlyph
+        {
+            get
+            {
+                return _ownerCffFont != null;
+            }
+        }
+        public CFF.Cff1Font GetOwnerCff()
+        {
+            //temp 
+            return _ownerCffFont;
+        }
+        public CFF.Cff1GlyphData GetCff1GlyphData()
+        {
+            return _cff1GlyphData;
         }
 
 #if DEBUG
