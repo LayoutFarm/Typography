@@ -99,9 +99,11 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.hintmask4: _evalStack.HintMask4(inst.Value); break;
                     case OperatorName.hintmask4_andMore: _evalStack.HintMask4AndMore(inst.Value); break;
                     //------------------------------
-                    case OperatorName.cntrmask: _evalStack.CounterSpaceMask(); break;
-
-
+                    case OperatorName.cntrmask1: _evalStack.CounterSpaceMask1(inst.Value); break;
+                    case OperatorName.cntrmask2: _evalStack.CounterSpaceMask2(inst.Value); break;
+                    case OperatorName.cntrmask3: _evalStack.CounterSpaceMask3(inst.Value); break;
+                    case OperatorName.cntrmask4: _evalStack.CounterSpaceMask4(inst.Value); break;
+                    case OperatorName.cntrmask4_andMore: _evalStack.CounterSpaceMask4AndMore(inst.Value); break; 
 
                     //-------------------------
                     //4.7: Subroutine Operators
@@ -936,23 +938,40 @@ namespace Typography.OpenFont.CFF
             _currentIndex = 0; //clear stack
         }
         //----------------------------------------
+        //|- cntrmask(20 + mask) |-
 
-        public void CounterSpaceMask()
+        //specifies the counter spaces to be controlled, and their relative
+        //priority.The mask bits in the bytes, following the operator, 
+        //reference the stem hint declarations; the most significant bit of
+        //the first byte refers to the first stem hint declared, through to
+        //the last hint declaration.The counters to be controlled are
+        //those that are delimited by the referenced stem hints.Bits set to
+        //1 in the first cntrmask command have top priority; subsequent
+        //cntrmask commands specify lower priority counters(see Figure
+        //1 and the accompanying example). 
+        public void CounterSpaceMask1(int cntMaskValue)
         {
-
             _currentIndex = 0;
-            //|- cntrmask(20 + mask) |-
-
-            //specifies the counter spaces to be controlled, and their relative
-            //priority.The mask bits in the bytes, following the operator, 
-            //reference the stem hint declarations; the most significant bit of
-            //the first byte refers to the first stem hint declared, through to
-            //the last hint declaration.The counters to be controlled are
-            //those that are delimited by the referenced stem hints.Bits set to
-            //1 in the first cntrmask command have top priority; subsequent
-            //cntrmask commands specify lower priority counters(see Figure
-            //1 and the accompanying example). 
         }
+        public void CounterSpaceMask2(int cntMaskValue)
+        {
+            _currentIndex = 0;
+        }
+        public void CounterSpaceMask3(int cntMaskValue)
+        {
+            _currentIndex = 0;
+        }
+        public void CounterSpaceMask4(int cntMaskValue)
+        {
+            _currentIndex = 0;
+        }
+        public void CounterSpaceMask4AndMore(int cntMaskValue)
+        {
+            _currentIndex = 0;
+        }
+        //----------------------------------------
+
+
 
         //4.4: Arithmetic Operators
 
