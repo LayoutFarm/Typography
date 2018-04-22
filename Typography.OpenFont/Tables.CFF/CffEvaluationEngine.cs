@@ -1,9 +1,8 @@
-﻿//Apapche, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
+﻿//Apapche2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
 //MIT, 2018, WinterDev  
 
 using System;
 using System.Collections.Generic;
-
 
 
 namespace Typography.OpenFont.CFF
@@ -22,6 +21,7 @@ namespace Typography.OpenFont.CFF
             _evalStack.GlyphTranslator = tx;
             int j = insts.Count;
 
+            int hintCount = 0;
             for (int i = 0; i < j; ++i)
             {
                 Type2Instruction inst = insts[i];
@@ -88,36 +88,31 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.vmoveto: _evalStack.V_MoveTo(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case OperatorName.hstem:
-                        {
-                            _evalStack.H_Stem();
-                        }
-                        break;
-                    case OperatorName.vstem:
-                        {
-                            _evalStack.V_Stem();
-                        }
-                        break;
-                    case OperatorName.vstemhm:
-                        {
-                            _evalStack.V_StemHM();
-                        }
-                        break;
-                    case OperatorName.hstemhm:
-                        {
-                            _evalStack.H_StemHM();
-                        }
-                        break;
+                    case OperatorName.hstem: _evalStack.H_Stem(); break;
+                    case OperatorName.vstem: _evalStack.V_Stem(); break;
+                    case OperatorName.vstemhm: _evalStack.V_StemHM(); break;
+                    case OperatorName.hstemhm: _evalStack.H_StemHM(); break;
                     case OperatorName.hintmask:
                         {
+                            //hintmask | -hintmask(19 + mask) | -
+                            //The mask data bytes are defined as follows:
+                            //• The number of data bytes is exactly the number needed, one
+                            //bit per hint, to reference the number of stem hints declared
+                            //at the beginning of the charstring program.
+                            //• Each bit of the mask, starting with the most-significant bit of
+                            //the first byte, represents the corresponding hint zone in the
+                            //order in which the hints were declared at the beginning of
+                            //the charstring.
+                            //• For each bit in the mask, a value of ‘1’ specifies that the
+                            //corresponding hint shall be active. A bit value of ‘0’ specifies
+                            //that the hint shall be inactive.
+                            //• Unused bits in the mask, if any, must be zero.
+
+                            //hintCount += _evalStack.StackCount/2; 
                             _evalStack.HintMask();
                         }
                         break;
-                    case OperatorName.cntrmask:
-                        {
-                            _evalStack.CounterSpaceMask();
-                        }
-                        break;
+                    case OperatorName.cntrmask: _evalStack.CounterSpaceMask(); break;
                     //-------------------------
                     //4.7: Subroutine Operators
                     case OperatorName._return: _evalStack.Ret(); break;
@@ -156,6 +151,7 @@ namespace Typography.OpenFont.CFF
             }
         }
     }
+
     class Type2EvaluationStack
     {
 
@@ -867,11 +863,11 @@ namespace Typography.OpenFont.CFF
         public void H_Stem()
         {
             //|- y dy {dya dyb}*  hstem (1) |-
-
             if ((_currentIndex % 2) != 0)
             {
             }
 
+            //hintCount += _currentIndex / 2;
             _currentIndex = 0; //clear stack
         }
         public void V_Stem()
@@ -880,6 +876,7 @@ namespace Typography.OpenFont.CFF
             if ((_currentIndex % 2) != 0)
             {
             }
+            //hintCount += _currentIndex / 2;
             _currentIndex = 0; //clear stack
         }
         public void V_StemHM()
@@ -889,6 +886,7 @@ namespace Typography.OpenFont.CFF
             if ((_currentIndex % 2) != 0)
             {
             }
+            //hintCount += _currentIndex / 2;
             _currentIndex = 0; //clear stack
         }
         public void H_StemHM()
@@ -897,6 +895,7 @@ namespace Typography.OpenFont.CFF
             if ((_currentIndex % 2) != 0)
             {
             }
+            //hintCount += _currentIndex / 2;
             //has the same meaning as 
             //hstem (1),
             //except that it must be used 
@@ -904,8 +903,19 @@ namespace Typography.OpenFont.CFF
             //hintmask operators.
             _currentIndex = 0; //clear stack
         }
+ 
         public void HintMask()
         {
+            //specifies which hints are active and which are not active. If any
+            //hints overlap, hintmask must be used to establish a nonoverlapping
+            //subset of hints.
+            //hintmask may occur any number of
+            //times in a charstring. Path operators occurring after a hintmask
+            //are influenced by the new hint set, but the current point is not
+            //moved. If stem hint zones overlap and are not properly
+            //managed by use of the hintmask operator, the results are
+            //undefined.
+
             if (_currentIndex != 1)
             {
 

@@ -152,6 +152,10 @@ namespace Typography.OpenFont.CFF
         hflex1,//36
         flex1//37
     }
+
+    /// <summary>
+    /// merged ccf operators,(op1 and op2, note on attribute of each field)
+    /// </summary>
     enum OperatorName : byte
     {
         LoadInt,
@@ -292,6 +296,10 @@ namespace Typography.OpenFont.CFF
 
 #if DEBUG
                 _dbugCount++;
+                //if (insts.Count > 37)
+                //{
+
+                //}
 #endif
 
                 switch (b0 = _reader.ReadByte())
@@ -409,7 +417,21 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.vstem: insts.Add(new Type2Instruction(OperatorName.vstem)); break;
                     case (byte)Type2Operator1.vstemhm: insts.Add(new Type2Instruction(OperatorName.vstemhm)); break;
                     case (byte)Type2Operator1.hstemhm: insts.Add(new Type2Instruction(OperatorName.hstemhm)); break;
-                    case (byte)Type2Operator1.hintmask: insts.Add(new Type2Instruction(OperatorName.hintmask)); break;
+                    case (byte)Type2Operator1.hintmask:
+                        {
+                            //temp fix
+                            //read 1 byte after hint mask
+                            if (_reader.BaseStream.Position < len)
+                            {
+                                b0 = _reader.ReadByte();
+                            }
+                            else
+                            {
+                                throw new NotSupportedException();
+                            }
+                            insts.Add(new Type2Instruction(OperatorName.hintmask, b0));
+                        }
+                        break;
                     case (byte)Type2Operator1.cntrmask: insts.Add(new Type2Instruction(OperatorName.cntrmask)); break;
                     //-------------------------
                     //4.7: Subroutine Operators
@@ -420,10 +442,10 @@ namespace Typography.OpenFont.CFF
             }
 
 #if DEBUG
-            if (_dbugInstructionListMark == 20)
-            {
-
-            }
+            //if (_dbugInstructionListMark == 20)
+            //{
+            //    dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
+            //}
 
             return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark };
 #else
@@ -431,6 +453,36 @@ namespace Typography.OpenFont.CFF
 #endif
 
         }
+#if DEBUG
+        void dbugDumpInstructionListToFile(List<Type2Instruction> insts, string filename)
+        {
+            using (FileStream fs = new FileStream(filename, FileMode.Create))
+            using (StreamWriter w = new StreamWriter(fs))
+            {
+
+
+                int j = insts.Count;
+                for (int i = 0; i < j; ++i)
+                {
+                    Type2Instruction inst = insts[i];
+
+                    w.Write("[" + i + "] ");
+                    if (inst.Op == OperatorName.LoadInt)
+                    {
+                        w.Write(inst.Value.ToString());
+                        w.Write(' ');
+                    }
+                    else
+                    {
+                        w.Write(inst.ToString());
+                        w.WriteLine();
+                    }
+
+                }
+            }
+        }
+#endif
+
         int ReadIntegerNumber(byte b0)
         {
 
