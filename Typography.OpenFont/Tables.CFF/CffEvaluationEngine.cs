@@ -111,7 +111,7 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.callsubr:
                         {
                             //resolve local subrountine
-                            int rawSubRoutineNum = _evalStack.Pop();
+                            int rawSubRoutineNum = (int)_evalStack.Pop();
 
                             //from Technical Note #5176 (CFF spec)
                             //resolve with bias
@@ -252,13 +252,14 @@ namespace Typography.OpenFont.CFF
             //moves the current point 
             //dy1 units in the vertical direction.
             //see [NOTE4]
+#if DEBUG
+            if (_currentIndex != 1)
+            {
+                throw new NotSupportedException();
+            }
+#endif
 
-
-            int rd_index = 0; //start at bottom
-            double w = _argStack[rd_index];
-            _currentY += _argStack[rd_index + 1];
-
-            _glyphTranslator.MoveTo((float)_currentX, (float)_currentY);
+            _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += _argStack[0]));
 
             _currentIndex = 0; //clear stack 
         }
@@ -422,25 +423,20 @@ namespace Typography.OpenFont.CFF
                 // i++;
             }
 #endif
-
+            double curX = _currentX;
+            double curY = _currentY;
             for (; i < _currentIndex;)
             {
-
-                double curX = _currentX;
-                double curY = _currentY;
-
                 _glyphTranslator.Curve4(
                     (float)(curX += _argStack[i + 0]), (float)(curY += _argStack[i + 1]), //dxa,dya
                     (float)(curX += _argStack[i + 2]), (float)(curY += _argStack[i + 3]), //dxb,dyb
                     (float)(curX += _argStack[i + 4]), (float)(curY += _argStack[i + 5])  //dxc,dyc
                     );
-
-                _currentX = curX;
-                _currentY = curY;
                 //
                 i += 6;
             }
-
+            _currentX = curX;
+            _currentY = curY;
             _currentIndex = 0; //clear stack 
         }
         public void HH_CurveTo()
@@ -464,25 +460,20 @@ namespace Typography.OpenFont.CFF
                 _glyphTranslator.LineTo((float)_currentX, (float)(_currentY += _argStack[i]));
                 i++;
             }
-
+            double curX = _currentX;
+            double curY = _currentY;
             for (; i < _currentIndex;)
             {
-
-                double curX = _currentX;
-                double curY = _currentY;
-
                 _glyphTranslator.Curve4(
                     (float)(curX += _argStack[i + 0]), (float)(curY), //dxa,+0
                     (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
                     (float)(curX += _argStack[i + 3]), (float)(curY)  //dxc,+0
                     );
-
-                _currentX = curX;
-                _currentY = curY;
-
                 //
                 i += 4;
             }
+            _currentX = curX;
+            _currentY = curY;
             _currentIndex = 0; //clear stack  
         }
         public void HV_CurveTo()
@@ -744,26 +735,21 @@ namespace Typography.OpenFont.CFF
                 _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY));
                 i++;
             }
-
+            double curX = _currentX;
+            double curY = _currentY;
             for (; i < _currentIndex;)
             {
-                //line to
-                double curX = _currentX;
-                double curY = _currentY;
-
+                //line to 
                 _glyphTranslator.Curve4(
                     (float)(curX), (float)(curY += _argStack[i + 0]), //+0,dya
                     (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
                     (float)(curX), (float)(curY += _argStack[i + 3])  //+0,dyc
                     );
-
-                _currentX = curX;
-                _currentY = curY;
-
                 //
                 i += 4;
             }
-
+            _currentX = curX;
+            _currentY = curY;
             _currentIndex = 0; //clear stack
         }
         public void EndChar()
@@ -955,23 +941,23 @@ namespace Typography.OpenFont.CFF
         //1 and the accompanying example). 
         public void CounterSpaceMask1(int cntMaskValue)
         {
-            _currentIndex = 0;
+            _currentIndex = 0;//clear stack
         }
         public void CounterSpaceMask2(int cntMaskValue)
         {
-            _currentIndex = 0;
+            _currentIndex = 0;//clear stack
         }
         public void CounterSpaceMask3(int cntMaskValue)
         {
-            _currentIndex = 0;
+            _currentIndex = 0;//clear stack
         }
         public void CounterSpaceMask4(int cntMaskValue)
         {
-            _currentIndex = 0;
+            _currentIndex = 0;//clear stack
         }
         public void CounterSpaceMaskBits(int cntMaskValue)
         {
-            _currentIndex = 0;
+            _currentIndex = 0;//clear stack
         }
         //----------------------------------------
 
@@ -1092,9 +1078,9 @@ namespace Typography.OpenFont.CFF
         {
             Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_IfElse));
         }
-        public int Pop()
+        public double Pop()
         {
-            return (int)_argStack[--_currentIndex];//*** use prefix 
+            return (double)_argStack[--_currentIndex];//*** use prefix 
         }
 
         public void Ret()
