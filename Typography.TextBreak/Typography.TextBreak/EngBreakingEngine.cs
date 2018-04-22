@@ -192,7 +192,9 @@ namespace Typography.TextBreak
                 }
 
             }
-            if (breakBounds.startIndex < start + len)
+
+            if (lexState != LexState.Init && 
+                breakBounds.startIndex < start + len)
             {
                 //some remaining data
                 breakBounds.length = (start + len) - breakBounds.startIndex;

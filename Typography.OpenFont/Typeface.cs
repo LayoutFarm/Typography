@@ -55,6 +55,29 @@ namespace Typography.OpenFont
             //---------------------------------------------------
         }
 
+
+        CFFTable _cffTable;
+        internal Typeface(
+           NameEntry nameEntry,
+           Bounds bounds,
+           ushort unitsPerEm,
+           CFFTable cffTable,
+           HorizontalMetrics horizontalMetrics,
+           OS2Table os2Table)
+        {
+
+            _nameEntry = nameEntry;
+            _bounds = bounds;
+            _unitsPerEm = unitsPerEm;
+            _cffTable = cffTable;
+            _horizontalMetrics = horizontalMetrics;
+            OS2Table = os2Table;
+
+
+            //------
+            this._glyphs = _cffTable.Cff1FontSet._fonts[0].glyphs;
+
+        }
         /// <summary>
         /// control values in Font unit
         /// </summary>
@@ -162,6 +185,23 @@ namespace Typography.OpenFont
         {
             return _glyphs[glyphIndex];
         }
+
+        public int GetGlyphIndexByName(string glyphName)
+        {
+            if (_cffTable != null)
+            {
+                //early preview ...
+                CFF.Cff1Font cff1Font = _cffTable.Cff1FontSet._fonts[0];
+                return cff1Font.GetGlyphByName(glyphName)._cff1GlyphData.GlyphIndex;
+            }
+            else
+            {
+                //TODO: implement this ...
+                return 0;
+            }
+
+        }
+
 
         public ushort GetAdvanceWidth(int codepoint)
         {
@@ -275,6 +315,17 @@ namespace Typography.OpenFont
             if (gdefTable != null)
             {
                 gdefTable.FillGlyphData(this.Glyphs);
+                //if (this.Glyphs != null)
+                //{
+                   
+                //}
+                //else if (this._cffTable != null)
+                //{
+                //    //post script outline
+                //    //TODO: fill gdef for cff font
+
+                //}
+
             }
         }
     }
@@ -388,9 +439,9 @@ namespace Typography.OpenFont
                 //sTypoAscender, sTypoDescender and sTypoLineGap specify the recommended line spacing for single-spaced horizontal text.
                 //The baseline-to-baseline value is expressed by:
                 //OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap
- 
-       
- 
+
+
+
 
                 //sTypoLineGap will usually be set by the font developer such that the value of the above expression is approximately 120% of the em.
                 //The application can use this value as the default horizontal line spacing. 

@@ -44,6 +44,7 @@
             this.button1.TabIndex = 0;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
+           
             // 
             // txtInputChar
             // 
@@ -52,7 +53,7 @@
             this.txtInputChar.Name = "txtInputChar";
             this.txtInputChar.Size = new System.Drawing.Size(168, 21);
             this.txtInputChar.TabIndex = 1;
-            this.txtInputChar.Text = "I";
+            this.txtInputChar.Text = "a";
             // 
             // cmdBuildMsdfTexture
             // 
@@ -101,7 +102,7 @@
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load_1);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

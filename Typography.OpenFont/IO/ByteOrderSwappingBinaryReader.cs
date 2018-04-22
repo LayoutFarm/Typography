@@ -29,6 +29,13 @@ namespace Typography.OpenFont.IO
         public override ushort ReadUInt16() { return BitConverter.ToUInt16(RR(2), 8 - 2); }
         public override uint ReadUInt32() { return BitConverter.ToUInt32(RR(4), 8 - 4); }
         public override ulong ReadUInt64() { return BitConverter.ToUInt64(RR(8), 8 - 8); }
+
+
+        //used in CFF font
+        public override double ReadDouble() { return BitConverter.ToDouble(RR(8), 8 - 8); }
+        //used in CFF font
+        public override int ReadInt32() { return BitConverter.ToInt32(RR(4), 8 - 4); }
+
         //
         byte[] _reusable_buffer = new byte[8]; //fix buffer size to 8 bytes
         /// <summary>
@@ -52,8 +59,7 @@ namespace Typography.OpenFont.IO
         public override char ReadChar() { throw new NotImplementedException(); }
         public override char[] ReadChars(int count) { throw new NotImplementedException(); }
         public override decimal ReadDecimal() { throw new NotImplementedException(); }
-        public override double ReadDouble() { throw new NotImplementedException(); }
-        public override int ReadInt32() { throw new NotImplementedException(); }
+
         public override long ReadInt64() { throw new NotImplementedException(); }
         public override sbyte ReadSByte() { throw new NotImplementedException(); }
         public override float ReadSingle() { throw new NotImplementedException(); }
