@@ -310,10 +310,10 @@ namespace Typography.OpenFont.CFF
             int len = buffer.Length;
             var insts = new List<Type2Instruction>();
 #if DEBUG
-            //if (_dbugInstructionListMark == 20)
-            //{
+            if (_dbugInstructionListMark == 12)
+            {
 
-            //}
+            }
             _dbugInstructionListMark++;
 #endif
 
@@ -473,7 +473,7 @@ namespace Typography.OpenFont.CFF
             //    dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
             //}
 
-            return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark };
+            return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark - 1 };
 #else
             return new Type2GlyphInstructionList(insts);
 #endif
@@ -547,7 +547,7 @@ namespace Typography.OpenFont.CFF
                 }
             }
             hintStemCount += current_stem_Count; //save a snapshot of stem count
-            insts.Add(new Type2Instruction(OperatorName.hstemhm));
+            insts.Add(new Type2Instruction(stemName));
             current_stem_Count = 0;//clear
             foundSomeStem = true;
         }
