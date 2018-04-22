@@ -21,7 +21,7 @@ namespace Typography.OpenFont.CFF
             _evalStack.GlyphTranslator = tx;
             int j = insts.Count;
 
-            int hintCount = 0;
+
             for (int i = 0; i < j; ++i)
             {
                 Type2Instruction inst = insts[i];
@@ -33,10 +33,12 @@ namespace Typography.OpenFont.CFF
                 switch (inst.Op)
                 {
                     default: throw new NotSupportedException();
+                    case OperatorName.GlyphWidth:
+                        //TODO: 
+                        break;
                     case OperatorName.LoadInt:
                         _evalStack.Push(inst.Value);
-                        break;
-                    //
+                        break;                    //
                     case OperatorName.endchar:
                         _evalStack.EndChar();
                         break;
@@ -214,22 +216,10 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-                if (_currentIndex == 3)
-                {
-                    //? 
-                    _currentX += _argStack[0];
-                    _currentY += _argStack[1];
 
-                    _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
-                    _currentIndex = 0; //clear stack 
-                    return;
-                }
             }
 #endif
-            if (_currentIndex > 2)
-            {
 
-            }
             for (int i = 0; i < _currentIndex;)
             {
                 _currentX += _argStack[i];
@@ -252,11 +242,12 @@ namespace Typography.OpenFont.CFF
             //moves the current point 
             //dx1 units in the horizontal direction
             //see [NOTE4]
-
+#if DEBUG
             if (_currentIndex != 1)
             {
                 throw new NotSupportedException();
             }
+#endif
             _glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)_currentY);
 
             _currentIndex = 0; //clear stack 
@@ -289,12 +280,12 @@ namespace Typography.OpenFont.CFF
 
             //The number of 
             //lines is determined from the number of arguments on the stack
-
+#if DEBUG
             if ((_currentIndex % 2) != 0)
             {
                 throw new NotSupportedException();
             }
-
+#endif
             for (int i = 0; i < _currentIndex;)
             {
                 _glyphTranslator.LineTo((float)(_currentX += _argStack[i]), (float)(_currentY += _argStack[i + 1]));
@@ -570,18 +561,16 @@ namespace Typography.OpenFont.CFF
                         double curX = _currentX;
                         double curY = _currentY;
 
-
-                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 0]), (float)(curY));
-                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]));
-                        _glyphTranslator.LineTo((float)(curX), (float)(curY += _argStack[i + 3]));
-
+                        _glyphTranslator.Curve4(
+                                (float)(curX += _argStack[i + 0]), (float)(curY), //dx1
+                                (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dx2,dy2
+                                (float)(curX), (float)(curY += _argStack[i + 3])  //dy3
+                                );
                         i += 4;
 
                         int endBefore = _currentIndex - remaining;
                         for (; i < endBefore;)
                         {
-
-
                             _glyphTranslator.Curve4(
                                 (float)(curX), (float)(curY += _argStack[i + 0]), //0,dya
                                 (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dxb,dyb
@@ -663,12 +652,9 @@ namespace Typography.OpenFont.CFF
                 case 0:
                 case 1:
                     {
-                        //|- {dya dxb dyb dxc dxd dxe dye dyf}+ dxf? vhcurveto (30) |- 
-
-
+                        //|- {dya dxb dyb dxc dxd dxe dye dyf}+ dxf? vhcurveto (30) |-  
                         double curX = _currentX;
                         double curY = _currentY;
-
                         int endBefore = _currentIndex - remaining;
                         for (; i < endBefore;)
                         {
@@ -705,10 +691,11 @@ namespace Typography.OpenFont.CFF
                         double curX = _currentX;
                         double curY = _currentY;
 
-
-                        _glyphTranslator.LineTo((float)(curX), (float)(curY += _argStack[i + 0]));
-                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]));
-                        _glyphTranslator.LineTo((float)(curX += _argStack[i + 3]), (float)(curY));
+                        _glyphTranslator.Curve4(
+                               (float)(curX), (float)(curY += _argStack[i + 0]), //dy1
+                               (float)(curX += _argStack[i + 1]), (float)(curY += _argStack[i + 2]), //dx2,dy2
+                               (float)(curX += _argStack[i + 3]), (float)(curY) //dx3
+                               );
 
                         i += 4;
 
@@ -863,38 +850,48 @@ namespace Typography.OpenFont.CFF
         public void H_Stem()
         {
             //|- y dy {dya dyb}*  hstem (1) |-
+
+
+#if DEBUG
             if ((_currentIndex % 2) != 0)
             {
             }
-
+#endif
             //hintCount += _currentIndex / 2;
             _currentIndex = 0; //clear stack
         }
         public void V_Stem()
         {
             //|- x dx {dxa dxb}*  vstem (3) |-
+#if DEBUG
             if ((_currentIndex % 2) != 0)
             {
             }
+#endif
             //hintCount += _currentIndex / 2;
             _currentIndex = 0; //clear stack
         }
         public void V_StemHM()
         {
 
-            //| -x dx { dxa dxb} *vstemhm(23) |
+            //|- x dx {dxa dxb}* vstemhm (23) |-
+#if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+
             }
+#endif
             //hintCount += _currentIndex / 2;
             _currentIndex = 0; //clear stack
         }
         public void H_StemHM()
         {
             //|- y dy {dya dyb}*  hstemhm (18) |-
+#if DEBUG
             if ((_currentIndex % 2) != 0)
             {
             }
+#endif
             //hintCount += _currentIndex / 2;
             //has the same meaning as 
             //hstem (1),
@@ -903,7 +900,7 @@ namespace Typography.OpenFont.CFF
             //hintmask operators.
             _currentIndex = 0; //clear stack
         }
- 
+
         public void HintMask()
         {
             //specifies which hints are active and which are not active. If any
@@ -914,21 +911,14 @@ namespace Typography.OpenFont.CFF
             //are influenced by the new hint set, but the current point is not
             //moved. If stem hint zones overlap and are not properly
             //managed by use of the hintmask operator, the results are
-            //undefined.
+            //undefined. 
 
-            if (_currentIndex != 1)
-            {
-
-            }
             //|- hintmask (19 + mask) |-
             _currentIndex = 0; //clear stack
         }
         public void CounterSpaceMask()
         {
-            if (_currentIndex != 1)
-            {
-
-            }
+            
             _currentIndex = 0;
             //|- cntrmask(20 + mask) |-
 
@@ -1057,12 +1047,10 @@ namespace Typography.OpenFont.CFF
         public void Op_IfElse()
         {
             Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_IfElse));
-        }
-
+        } 
         public int Pop()
         {
-            return (int)_argStack[--_currentIndex];//*** use prefix
-
+            return (int)_argStack[--_currentIndex];//*** use prefix 
         }
 
         public void Ret()

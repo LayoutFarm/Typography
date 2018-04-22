@@ -154,12 +154,12 @@ namespace Typography.OpenFont.CFF
     }
 
     /// <summary>
-    /// merged ccf operators,(op1 and op2, note on attribute of each field)
+    /// Merged ccf operators,(op1 and op2, note on attribute of each field)
     /// </summary>
     enum OperatorName : byte
     {
         LoadInt,
-
+        GlyphWidth,
         //---------------------
         //type2Operator1
         //---------------------
@@ -271,11 +271,12 @@ namespace Typography.OpenFont.CFF
         int _dbugCount = 0;
         int _dbugInstructionListMark = 0;
 #endif
+        bool foundSomeStem = false;
 
         public Type2GlyphInstructionList ParseType2CharString(byte[] buffer)
         {
             //TODO: implement this
-            //reset
+            foundSomeStem = false;
             _msBuffer.SetLength(0);
             _msBuffer.Position = 0;
             _msBuffer.Write(buffer, 0, buffer.Length);
@@ -283,23 +284,24 @@ namespace Typography.OpenFont.CFF
             int len = buffer.Length;
             var insts = new List<Type2Instruction>();
 #if DEBUG
-            _dbugInstructionListMark++;
-            if (_dbugInstructionListMark == 20)
-            {
+            //if (_dbugInstructionListMark == 1860)
+            //{
 
-            }
+            //}
+            //_dbugInstructionListMark++; 
 #endif
 
             byte b0 = 0;
-            while (_reader.BaseStream.Position < len)
+            int hintStemCount = 0;
+            int current_stem_Count = 0;
+
+            bool cont = true;
+
+            while (cont && _reader.BaseStream.Position < len)
             {
 
 #if DEBUG
                 _dbugCount++;
-                //if (insts.Count > 37)
-                //{
-
-                //}
 #endif
 
                 switch (b0 = _reader.ReadByte())
@@ -313,10 +315,36 @@ namespace Typography.OpenFont.CFF
                                 Console.WriteLine("err!:" + b0);
                                 return null;
                             }
-#endif                      
+                            try
+                            {
+                                insts.Add(new Type2Instruction(OperatorName.LoadInt, ReadIntegerNumber(b0)));
+                                current_stem_Count++;
+                            }
+                            catch
+                            {
+                                //dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
+                            }
+#else
                             insts.Add(new Type2Instruction(OperatorName.LoadInt, ReadIntegerNumber(b0)));
+                            load_intCount++;
+                            current_stem_Count++;
+#endif
+
                         }
                         break;
+                    case (byte)Type2Operator1.shortint: // 28
+
+                        //shortint
+                        //First byte of a 3-byte sequence specifying a number.
+                        //a ShortInt value is specified by using the operator (28) followed by two bytes
+                        //which represent numbers between –32768 and + 32767.The
+                        //most significant byte follows the(28)
+                        byte s_b0 = _reader.ReadByte();
+                        byte s_b1 = _reader.ReadByte();
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt, (s_b0 << 8 | s_b1)));
+                        current_stem_Count++;
+                        break;
+                    //---------------------------------------------------
                     case (byte)Type2Operator1._Reserved0_://???
                     case (byte)Type2Operator1._Reserved2_://???
                     case (byte)Type2Operator1._Reserved9_://???
@@ -328,29 +356,12 @@ namespace Typography.OpenFont.CFF
                         break;
                     case (byte)Type2Operator1.endchar:
                         insts.Add(new Type2Instruction(OperatorName.endchar));
-                        break;
-                    case (byte)Type2Operator1.shortint: // 28
-                        if (_dbugInstructionListMark == 20)
-                        {
-
-                        }
-
-                        //shortint
-                        //First byte of a 3-byte sequence specifying a number.
-                        //a ShortInt value is specified by using the operator (28) followed by two bytes
-                        //which represent numbers between –32768 and + 32767.The
-                        //most significant byte follows the(28)
-                        byte s_b0 = _reader.ReadByte();
-                        byte s_b1 = _reader.ReadByte();
-                        insts.Add(new Type2Instruction(OperatorName.LoadInt, (s_b0 << 8 | s_b1)));
+                        cont = false;
+                        //when we found end char
+                        //stop reading this...
                         break;
                     case (byte)Type2Operator1.escape: //12
                         {
-
-                            if (_dbugInstructionListMark == 20)
-                            {
-
-                            }
 
                             b0 = _reader.ReadByte();
                             switch ((Type2Operator2)b0)
@@ -413,26 +424,40 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.vvcurveto: insts.Add(new Type2Instruction(OperatorName.vvcurveto)); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case (byte)Type2Operator1.hstem: insts.Add(new Type2Instruction(OperatorName.hstem)); break;
-                    case (byte)Type2Operator1.vstem: insts.Add(new Type2Instruction(OperatorName.vstem)); break;
-                    case (byte)Type2Operator1.vstemhm: insts.Add(new Type2Instruction(OperatorName.vstemhm)); break;
-                    case (byte)Type2Operator1.hstemhm: insts.Add(new Type2Instruction(OperatorName.hstemhm)); break;
+                    case (byte)Type2Operator1.hstem: AddStemToList(insts, OperatorName.hstem, ref hintStemCount, ref current_stem_Count); break;
+                    case (byte)Type2Operator1.vstem: AddStemToList(insts, OperatorName.vstem, ref hintStemCount, ref current_stem_Count); break;
+                    case (byte)Type2Operator1.vstemhm: AddStemToList(insts, OperatorName.vstemhm, ref hintStemCount, ref current_stem_Count); break;
+                    case (byte)Type2Operator1.hstemhm: AddStemToList(insts, OperatorName.hstemhm, ref hintStemCount, ref current_stem_Count); break;
+
                     case (byte)Type2Operator1.hintmask:
                         {
                             //temp fix
-                            //read 1 byte after hint mask
-                            if (_reader.BaseStream.Position < len)
+                            int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
+                            if (_reader.BaseStream.Position + properNumberOfMaskBytes < len)
                             {
-                                b0 = _reader.ReadByte();
+                                _reader.ReadBytes(properNumberOfMaskBytes);
                             }
                             else
                             {
                                 throw new NotSupportedException();
                             }
-                            insts.Add(new Type2Instruction(OperatorName.hintmask, b0));
+                            insts.Add(new Type2Instruction(OperatorName.hintmask, 0));
                         }
                         break;
-                    case (byte)Type2Operator1.cntrmask: insts.Add(new Type2Instruction(OperatorName.cntrmask)); break;
+                    case (byte)Type2Operator1.cntrmask:
+                        {
+                            int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
+                            if (_reader.BaseStream.Position + properNumberOfMaskBytes < len)
+                            {
+                                _reader.ReadBytes(properNumberOfMaskBytes);
+                            }
+                            else
+                            {
+                                throw new NotSupportedException();
+                            }
+                            insts.Add(new Type2Instruction(OperatorName.cntrmask, 0));
+                        }
+                        break;
                     //-------------------------
                     //4.7: Subroutine Operators
                     case (byte)Type2Operator1.callsubr: insts.Add(new Type2Instruction(OperatorName.callsubr)); break;
@@ -442,10 +467,10 @@ namespace Typography.OpenFont.CFF
             }
 
 #if DEBUG
-            //if (_dbugInstructionListMark == 20)
-            //{
-            //    dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
-            //}
+            if (_dbugInstructionListMark == 3520)
+            {
+                dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
+            }
 
             return new Type2GlyphInstructionList(insts) { dbugMark = _dbugInstructionListMark };
 #else
@@ -483,6 +508,57 @@ namespace Typography.OpenFont.CFF
         }
 #endif
 
+
+        void AddStemToList(List<Type2Instruction> insts, OperatorName stemName, ref int hintStemCount, ref int current_stem_Count)
+        {
+            //support 4 kinds 
+
+            //1. 
+            //|- y dy {dya dyb}*  hstemhm (18) |-
+            //2.
+            //|- x dx {dxa dxb}* vstemhm (23) |-
+            //3.
+            //|- y dy {dya dyb}*  hstem (1) |-
+            //4. 
+            //|- x dx {dxa dxb}*  vstem (3) |- 
+            //-----------------------
+
+            //notes
+            //The sequence and form of a Type 2 charstring program may be
+            //represented as:
+            //w? { hs* vs*cm * hm * mt subpath}? { mt subpath} *endchar
+
+
+            if ((current_stem_Count % 2) != 0)
+            {
+                //all kind has even number of stem               
+
+                if (foundSomeStem)
+                {
+                    dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
+                    throw new NotSupportedException();
+                }
+                else
+                {
+                    //the first one is 'width'
+                    ChangeFirstInstToGlyphWidthValue(insts);
+                    current_stem_Count--;
+                }
+            }
+            hintStemCount += current_stem_Count; //save a snapshot of stem count
+            insts.Add(new Type2Instruction(OperatorName.hstemhm));
+            current_stem_Count = 0;//clear
+            foundSomeStem = true;
+        }
+
+        static void ChangeFirstInstToGlyphWidthValue(List<Type2Instruction> insts)
+        {
+            //check the first element must be loadint
+            Type2Instruction firstInst = insts[0];
+            if (firstInst.Op != OperatorName.LoadInt) { throw new NotSupportedException(); }
+            //the replace
+            insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
+        }
         int ReadIntegerNumber(byte b0)
         {
 
