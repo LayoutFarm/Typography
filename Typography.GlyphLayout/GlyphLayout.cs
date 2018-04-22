@@ -224,10 +224,10 @@ namespace Typography.TextLayout
             {
                 char ch = str[startAt + i];
                 int codepoint = ch;
-                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)
+                if (Char.IsHighSurrogate(ch) && i + 1 < len)
                 {
                     char nextCh = str[startAt + i + 1];
-                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
+                    if (Char.IsLowSurrogate(nextCh))
                     {
                         ++i;
                         codepoint = char.ConvertToUtf32(ch, nextCh);
@@ -380,7 +380,7 @@ namespace Typography.TextLayout
                     //if you want to snap each glyph to grid (1px or 0.5px) by ROUNDING
                     //we can do it here,this produces a predictable caret position result
                     //
-                    s_advW += (int)Math.Round(s_advW);
+                    s_advW = (int)Math.Round(s_advW);
                 }
                 float exact_x = (float)(cx + offsetX * pxscale);
                 float exact_y = (float)(cy + offsetY * pxscale);
@@ -389,7 +389,7 @@ namespace Typography.TextLayout
                    glyphIndex,
                     exact_x,
                     exact_y,
-                    advW));
+                    advW * pxscale));
                 cx += s_advW;
 
             }
