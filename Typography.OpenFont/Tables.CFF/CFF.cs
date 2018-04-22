@@ -1164,7 +1164,7 @@ namespace Typography.OpenFont.CFF
             Type2CharStringParser type2Parser = new Type2CharStringParser();
             int j = offsets.Length;
 
-            List<Type2GlyphInstructionList> localSubrs = new List<Type2GlyphInstructionList>(j);
+            List<Type2GlyphInstructionList> localSubrs = new List<Type2GlyphInstructionList>(j); 
             _currentCff1Font._localSubrs = localSubrs;
 
             for (int i = 0; i < j; ++i)

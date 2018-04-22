@@ -455,10 +455,7 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.vstemhm: AddStemToList(insts, OperatorName.vstemhm, ref hintStemCount, ref current_stem_Count); break;
                     case (byte)Type2Operator1.hstemhm: AddStemToList(insts, OperatorName.hstemhm, ref hintStemCount, ref current_stem_Count); break;
                     case (byte)Type2Operator1.hintmask: AddHintMaskToList(insts, _reader, ref hintStemCount, ref current_stem_Count); break;
-                    case (byte)Type2Operator1.cntrmask:
-
-
-                        break;
+                    case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(insts, _reader, ref hintStemCount, ref current_stem_Count); break;
                     //-------------------------
                     //4.7: Subroutine Operators
                     case (byte)Type2Operator1.callsubr: insts.Add(new Type2Instruction(OperatorName.callsubr)); break;
