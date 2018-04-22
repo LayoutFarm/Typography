@@ -97,13 +97,13 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.hintmask2: _evalStack.HintMask2(inst.Value); break;
                     case OperatorName.hintmask3: _evalStack.HintMask3(inst.Value); break;
                     case OperatorName.hintmask4: _evalStack.HintMask4(inst.Value); break;
-                    case OperatorName.hintmask4_andMore: _evalStack.HintMask4AndMore(inst.Value); break;
+                    case OperatorName.hintmask_bits: _evalStack.HintMaskBits(inst.Value); break;
                     //------------------------------
                     case OperatorName.cntrmask1: _evalStack.CounterSpaceMask1(inst.Value); break;
                     case OperatorName.cntrmask2: _evalStack.CounterSpaceMask2(inst.Value); break;
                     case OperatorName.cntrmask3: _evalStack.CounterSpaceMask3(inst.Value); break;
                     case OperatorName.cntrmask4: _evalStack.CounterSpaceMask4(inst.Value); break;
-                    case OperatorName.cntrmask4_andMore: _evalStack.CounterSpaceMask4AndMore(inst.Value); break; 
+                    case OperatorName.cntrmask_bits: _evalStack.CounterSpaceMaskBits(inst.Value); break; 
 
                     //-------------------------
                     //4.7: Subroutine Operators
@@ -933,7 +933,7 @@ namespace Typography.OpenFont.CFF
         {
             _currentIndex = 0; //clear stack
         }
-        public void HintMask4AndMore(int hintMaskValue)
+        public void HintMaskBits(int hintMaskValue)
         {
             _currentIndex = 0; //clear stack
         }
@@ -965,7 +965,7 @@ namespace Typography.OpenFont.CFF
         {
             _currentIndex = 0;
         }
-        public void CounterSpaceMask4AndMore(int cntMaskValue)
+        public void CounterSpaceMaskBits(int cntMaskValue)
         {
             _currentIndex = 0;
         }

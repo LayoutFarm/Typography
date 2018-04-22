@@ -55,7 +55,7 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.hintmask2:
                     case OperatorName.hintmask3:
                     case OperatorName.hintmask4:
-                    case OperatorName.hintmask4_andMore:
+                    case OperatorName.hintmask_bits:
                         return Op.ToString() + " " + Convert.ToString(Value, 2);
                     default:
                         return Op.ToString() + " " + Value.ToString();
@@ -193,7 +193,7 @@ namespace Typography.OpenFont.CFF
         [OriginalType2Operator(Type2Operator1.hintmask)] hintmask2, //my hint-mask extension, contains 2 bytes hint
         [OriginalType2Operator(Type2Operator1.hintmask)] hintmask3, //my hint-mask extension, contains 3 bytes hint
         [OriginalType2Operator(Type2Operator1.hintmask)] hintmask4, //my hint-mask extension, contains 4 bytes hint 
-        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask4_andMore,//my hint-mask extension, contains 4 bytes hint and need the follower
+        [OriginalType2Operator(Type2Operator1.hintmask)] hintmask_bits,//my hint-mask extension, contains n bits of hint
 
         //---------
 
@@ -201,7 +201,7 @@ namespace Typography.OpenFont.CFF
         [OriginalType2Operator(Type2Operator1.cntrmask)] cntrmask2, //my counter-mask extension, contains 2 bytes hint
         [OriginalType2Operator(Type2Operator1.cntrmask)] cntrmask3, //my counter-mask extension, contains 3 bytes hint
         [OriginalType2Operator(Type2Operator1.cntrmask)] cntrmask4, //my counter-mask extension, contains 4 bytes hint
-        [OriginalType2Operator(Type2Operator1.cntrmask)] cntrmask4_andMore, //my counter-mask extension, contains 4 bytes hint and need the follower
+        [OriginalType2Operator(Type2Operator1.cntrmask)] cntrmask_bits, //my counter-mask extension, contains n bits of hint
 
         //---------------------
         [OriginalType2Operator(Type2Operator1.rmoveto)] rmoveto,
@@ -456,8 +456,8 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.hstemhm: AddStemToList(insts, OperatorName.hstemhm, ref hintStemCount, ref current_stem_Count); break;
                     case (byte)Type2Operator1.hintmask: AddHintMaskToList(insts, _reader, ref hintStemCount, ref current_stem_Count); break;
                     case (byte)Type2Operator1.cntrmask:
-                      
-                            
+
+
                         break;
                     //-------------------------
                     //4.7: Subroutine Operators
@@ -572,50 +572,85 @@ namespace Typography.OpenFont.CFF
             {
                 throw new NotSupportedException();
             }
-            int hh = properNumberOfMaskBytes;
-            for (; hh > 4;)
+            if (properNumberOfMaskBytes > 4)
             {
-                insts.Add(new Type2Instruction(OperatorName.hintmask4_andMore,
-                   (_reader.ReadByte() << 24) |
-                   (_reader.ReadByte() << 16) |
-                   (_reader.ReadByte() << 8) |
-                   (_reader.ReadByte())
-                   ));
-                hh -= 4; //***
+                int remaining = properNumberOfMaskBytes;
+
+                for (; remaining > 3;)
+                {
+                    insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                       (_reader.ReadByte() << 24) |
+                       (_reader.ReadByte() << 16) |
+                       (_reader.ReadByte() << 8) |
+                       (_reader.ReadByte())
+                       ));
+                    remaining -= 4; //*** 
+                }
+                switch (remaining)
+                {
+                    case 0:
+                        //do nothing
+                        break;
+                    case 1:
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                            (_reader.ReadByte() << 24)));
+
+                        break;
+                    case 2:
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16)));
+
+                        break;
+                    case 3:
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16) |
+                            (_reader.ReadByte() << 8)));
+                        break;
+                    default: throw new NotSupportedException();//should not occur !
+                }
+
+                insts.Add(new Type2Instruction(OperatorName.hintmask_bits, properNumberOfMaskBytes));
             }
-            //last remaining <4 bytes 
-            switch (hh)
+            else
             {
-                case 0:
-                default: throw new NotSupportedException();//should not occur !
-                case 1:
-                    insts.Add(new Type2Instruction(OperatorName.hintmask1, (_reader.ReadByte() << 24)));
-                    break;
-                case 2:
-                    insts.Add(new Type2Instruction(OperatorName.hintmask2,
-                        (_reader.ReadByte() << 24) |
-                        (_reader.ReadByte() << 16)
-                        ));
-                    break;
-                case 3:
-                    insts.Add(new Type2Instruction(OperatorName.hintmask3,
-                        (_reader.ReadByte() << 24) |
-                        (_reader.ReadByte() << 16) |
-                        (_reader.ReadByte() << 8)
-                        ));
-                    break;
-                case 4:
-                    insts.Add(new Type2Instruction(OperatorName.hintmask4,
-                        (_reader.ReadByte() << 24) |
-                        (_reader.ReadByte() << 16) |
-                        (_reader.ReadByte() << 8) |
-                        (_reader.ReadByte())
-                        ));
-                    break;
+                //last remaining <4 bytes 
+                switch (properNumberOfMaskBytes)
+                {
+                    case 0:
+                    default: throw new NotSupportedException();//should not occur !
+                    case 1:
+                        insts.Add(new Type2Instruction(OperatorName.hintmask1, (_reader.ReadByte() << 24)));
+                        break;
+                    case 2:
+                        insts.Add(new Type2Instruction(OperatorName.hintmask2,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16)
+                            ));
+                        break;
+                    case 3:
+                        insts.Add(new Type2Instruction(OperatorName.hintmask3,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16) |
+                            (_reader.ReadByte() << 8)
+                            ));
+                        break;
+                    case 4:
+                        insts.Add(new Type2Instruction(OperatorName.hintmask4,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16) |
+                            (_reader.ReadByte() << 8) |
+                            (_reader.ReadByte())
+                            ));
+                        break;
+                }
             }
         }
         void AddCounterMaskToList(List<Type2Instruction> insts, BinaryReader reader, ref int hintStemCount, ref int current_stem_Count)
         {
+
+
             if (hintStemCount == 0)
             {
                 if (!foundSomeStem)
@@ -635,46 +670,80 @@ namespace Typography.OpenFont.CFF
             {
                 throw new NotSupportedException();
             }
-            int hh = properNumberOfMaskBytes;
-            for (; hh > 4;)
+
+            if (properNumberOfMaskBytes > 4)
             {
-                insts.Add(new Type2Instruction(OperatorName.cntrmask4_andMore,
-                   (_reader.ReadByte() << 24) |
-                   (_reader.ReadByte() << 16) |
-                   (_reader.ReadByte() << 8) |
-                   (_reader.ReadByte())
-                   ));
-                hh -= 4; //***
+                int remaining = properNumberOfMaskBytes;
+
+                for (; remaining > 3;)
+                {
+                    insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                       (_reader.ReadByte() << 24) |
+                       (_reader.ReadByte() << 16) |
+                       (_reader.ReadByte() << 8) |
+                       (_reader.ReadByte())
+                       ));
+                    remaining -= 4; //*** 
+                }
+                switch (remaining)
+                {
+                    case 0:
+                        //do nothing
+                        break;
+                    case 1:
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                            (_reader.ReadByte() << 24)));
+
+                        break;
+                    case 2:
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16)));
+
+                        break;
+                    case 3:
+                        insts.Add(new Type2Instruction(OperatorName.LoadInt,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16) |
+                            (_reader.ReadByte() << 8)));
+                        break;
+                    default: throw new NotSupportedException();//should not occur !
+                }
+
+                insts.Add(new Type2Instruction(OperatorName.cntrmask_bits, properNumberOfMaskBytes));
             }
-            //last remaining <4 bytes 
-            switch (hh)
+            else
             {
-                case 0:
-                default: throw new NotSupportedException();//should not occur !
-                case 1:
-                    insts.Add(new Type2Instruction(OperatorName.cntrmask1, (_reader.ReadByte() << 24)));
-                    break;
-                case 2:
-                    insts.Add(new Type2Instruction(OperatorName.cntrmask2,
-                        (_reader.ReadByte() << 24) |
-                        (_reader.ReadByte() << 16)
-                        ));
-                    break;
-                case 3:
-                    insts.Add(new Type2Instruction(OperatorName.cntrmask3,
-                        (_reader.ReadByte() << 24) |
-                        (_reader.ReadByte() << 16) |
-                        (_reader.ReadByte() << 8)
-                        ));
-                    break;
-                case 4:
-                    insts.Add(new Type2Instruction(OperatorName.cntrmask4,
-                        (_reader.ReadByte() << 24) |
-                        (_reader.ReadByte() << 16) |
-                        (_reader.ReadByte() << 8) |
-                        (_reader.ReadByte())
-                        ));
-                    break;
+                //last remaining <4 bytes 
+                switch (properNumberOfMaskBytes)
+                {
+                    case 0:
+                    default: throw new NotSupportedException();//should not occur !
+                    case 1:
+                        insts.Add(new Type2Instruction(OperatorName.cntrmask1, (_reader.ReadByte() << 24)));
+                        break;
+                    case 2:
+                        insts.Add(new Type2Instruction(OperatorName.cntrmask2,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16)
+                            ));
+                        break;
+                    case 3:
+                        insts.Add(new Type2Instruction(OperatorName.cntrmask3,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16) |
+                            (_reader.ReadByte() << 8)
+                            ));
+                        break;
+                    case 4:
+                        insts.Add(new Type2Instruction(OperatorName.cntrmask4,
+                            (_reader.ReadByte() << 24) |
+                            (_reader.ReadByte() << 16) |
+                            (_reader.ReadByte() << 8) |
+                            (_reader.ReadByte())
+                            ));
+                        break;
+                }
             }
         }
 
