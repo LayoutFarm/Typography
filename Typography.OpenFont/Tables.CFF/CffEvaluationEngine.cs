@@ -11,12 +11,23 @@ namespace Typography.OpenFont.CFF
     class CffEvaluationEngine
     {
 
-        CFF.Cff1Font _cff1Font;
+        CFF.Cff1Font cff1Font;
+
         public void Run(IGlyphTranslator tx, CFF.Cff1Font cff1Font, Type2GlyphInstructionList instructionList)
         {
+            this.cff1Font = cff1Font;
+            double currentX = 0, currentY = 0;
+            Run(tx, instructionList, ref currentX, ref currentY);
+        }
+        void Run(IGlyphTranslator tx, Type2GlyphInstructionList instructionList, ref double currentX, ref double currentY)
+        {
 
-            this._cff1Font = cff1Font;
             Type2EvaluationStack _evalStack = new Type2EvaluationStack();
+
+            _evalStack._currentX = currentX;
+            _evalStack._currentY = currentY;
+
+
             List<Type2Instruction> insts = instructionList.Insts;
             _evalStack.GlyphTranslator = tx;
             int j = insts.Count;
@@ -107,7 +118,15 @@ namespace Typography.OpenFont.CFF
 
                     //-------------------------
                     //4.7: Subroutine Operators
-                    case OperatorName._return: _evalStack.Ret(); break;
+                    case OperatorName._return:
+                        {
+
+                            currentX = _evalStack._currentX;
+                            currentY = _evalStack._currentY;
+
+                            _evalStack.Ret();
+                        }
+                        break;
                     case OperatorName.callsubr:
                         {
                             //resolve local subrountine
@@ -132,9 +151,9 @@ namespace Typography.OpenFont.CFF
 
 
                             //find local subroutine
-                            Type2GlyphInstructionList resolvedSubroutine = _cff1Font._localSubrs[rawSubRoutineNum + bias];
+                            Type2GlyphInstructionList resolvedSubroutine = cff1Font._localSubrs[rawSubRoutineNum + bias];
                             //then we move to another context
-                            Run(tx, cff1Font, resolvedSubroutine);
+                            Run(tx, resolvedSubroutine, ref _evalStack._currentX, ref _evalStack._currentY);
 
                         }
                         break;
@@ -148,8 +167,8 @@ namespace Typography.OpenFont.CFF
     class Type2EvaluationStack
     {
 
-        double _currentX;
-        double _currentY;
+        internal double _currentX;
+        internal double _currentY;
 
         double[] _argStack = new double[50];
         int _currentIndex = 0; //current stack index
@@ -1080,12 +1099,23 @@ namespace Typography.OpenFont.CFF
         }
         public double Pop()
         {
+#if DEBUG
+            if (_currentIndex < 1)
+            {
+
+            }
+#endif
             return (double)_argStack[--_currentIndex];//*** use prefix 
         }
 
         public void Ret()
         {
+#if DEBUG
+            if (_currentIndex > 0)
+            {
 
+            }
+#endif
             _currentIndex = 0;
         }
 #if DEBUG
