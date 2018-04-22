@@ -103,7 +103,7 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.cntrmask2: _evalStack.CounterSpaceMask2(inst.Value); break;
                     case OperatorName.cntrmask3: _evalStack.CounterSpaceMask3(inst.Value); break;
                     case OperatorName.cntrmask4: _evalStack.CounterSpaceMask4(inst.Value); break;
-                    case OperatorName.cntrmask_bits: _evalStack.CounterSpaceMaskBits(inst.Value); break; 
+                    case OperatorName.cntrmask_bits: _evalStack.CounterSpaceMaskBits(inst.Value); break;
 
                     //-------------------------
                     //4.7: Subroutine Operators
@@ -129,6 +129,7 @@ namespace Typography.OpenFont.CFF
                             int nsubrs = cff1Font._localSubrs.Count;
                             int bias = (nsubrs < 1240) ? 107 :
                                             (nsubrs < 33900) ? 1131 : 32769;
+
 
                             //find local subroutine
                             Type2GlyphInstructionList resolvedSubroutine = _cff1Font._localSubrs[rawSubRoutineNum + bias];
@@ -168,8 +169,11 @@ namespace Typography.OpenFont.CFF
             _argStack[_currentIndex] = value;
             _currentIndex++;
         }
-
-
+        public void Push(int value)
+        {
+            _argStack[_currentIndex] = value;
+            _currentIndex++;
+        }
         //Many operators take their arguments from the bottom-most
         //entries in the Type 2 argument stack; this behavior is indicated
         //by the stack bottom symbol ‘| -’ appearing to the left of the first
