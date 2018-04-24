@@ -294,6 +294,8 @@ namespace Typography.OpenFont
 
                 output.Add(LookupIndex(codepoint));
             }
+
+            //TODO: review here again
             //tmp disable here
             //check for glyph substitution
             //this.GSUBTable.CheckSubstitution(output[1]);
@@ -317,7 +319,7 @@ namespace Typography.OpenFont
                 gdefTable.FillGlyphData(this.Glyphs);
                 //if (this.Glyphs != null)
                 //{
-                   
+
                 //}
                 //else if (this._cffTable != null)
                 //{

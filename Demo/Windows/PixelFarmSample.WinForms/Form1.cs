@@ -46,6 +46,8 @@ namespace SampleWinForms
                 {
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
                 }
+
+                this.glyphNameListUserControl1.Typeface = e.SelectedTypeface;
             };
 
             _basicOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
@@ -530,6 +532,6 @@ namespace SampleWinForms
             this.Text = "Render with PixelFarm";
         }
 
-         
+
     }
 }

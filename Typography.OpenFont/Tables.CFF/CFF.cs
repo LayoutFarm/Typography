@@ -476,11 +476,7 @@ namespace Typography.OpenFont.CFF
         internal List<CffDataDicEntry> _privateDict;
         internal List<Type2GlyphInstructionList> _localSubrs;
         internal int defaultWidthX;
-        internal int nominalWidthX;
-
-
-
-
+        internal int nominalWidthX; 
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
         public Glyph GetGlyphByName(string name)
@@ -498,8 +494,7 @@ namespace Typography.OpenFont.CFF
             }
             Glyph found;
             _cachedGlyphDicByName.TryGetValue(name, out found);
-            return found;
-
+            return found; 
         }
 
     }
