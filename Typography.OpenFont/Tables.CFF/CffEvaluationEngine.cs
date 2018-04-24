@@ -12,26 +12,106 @@ namespace Typography.OpenFont.CFF
     {
 
         CFF.Cff1Font cff1Font;
+        int _cffBias;
+        float _scale = 1;//default
 
-        public void Run(IGlyphTranslator tx, CFF.Cff1Font cff1Font, Type2GlyphInstructionList instructionList)
+
+
+        class PxScaleGlyphTx : IGlyphTranslator
+        {
+            float scale;
+            IGlyphTranslator tx;
+            public PxScaleGlyphTx(float scale, IGlyphTranslator tx)
+            {
+                this.scale = scale;
+                this.tx = tx;
+            }
+
+            public void BeginRead(int contourCount)
+            {
+                tx.BeginRead(contourCount);
+            }
+
+            public void CloseContour()
+            {
+                tx.CloseContour();
+            }
+
+            public void Curve3(float x1, float y1, float x2, float y2)
+            {
+                tx.Curve3(x1 * scale, y1 * scale, x2 * scale, y2 * scale);
+            }
+
+            public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
+            {
+                tx.Curve4(x1 * scale, y1 * scale, x2 * scale, y2 * scale, x3 * scale, y3 * scale);
+            }
+
+            public void EndRead()
+            {
+                tx.EndRead();
+            }
+
+            public void LineTo(float x1, float y1)
+            {
+                tx.LineTo(x1 * scale, y1 * scale);
+            }
+
+            public void MoveTo(float x0, float y0)
+            {
+                tx.MoveTo(x0 * scale, y0 * scale);
+            }
+        }
+
+        public void Run(IGlyphTranslator tx, CFF.Cff1Font cff1Font, Type2GlyphInstructionList instructionList, float scale = 1)
         {
             this.cff1Font = cff1Font;
+            this._scale = scale;
+            //-------------
+            //from Technical Note #5176 (CFF spec)
+            //resolve with bias
+            //Card16 bias;
+            //Card16 nSubrs = subrINDEX.count;
+            //if (CharstringType == 1)
+            //    bias = 0;
+            //else if (nSubrs < 1240)
+            //    bias = 107;
+            //else if (nSubrs < 33900)
+            //    bias = 1131;
+            //else
+            //    bias = 32768;
+
+            //find local subroutine
+
+            int nsubrs = cff1Font._localSubrs.Count;
+            _cffBias = (nsubrs < 1240) ? 107 :
+                            (nsubrs < 33900) ? 1131 : 32769;
+            
+            
+            //-------------
             double currentX = 0, currentY = 0;
-            Run(tx, instructionList, ref currentX, ref currentY);
+            if (scale != 1)
+            {
+                //create a scale wrapper 
+                Run(new PxScaleGlyphTx(scale, tx), instructionList, ref currentX, ref currentY);
+            }
+            else
+            {
+                Run(tx, instructionList, ref currentX, ref currentY);
+            }
+
+
         }
         void Run(IGlyphTranslator tx, Type2GlyphInstructionList instructionList, ref double currentX, ref double currentY)
         {
 
             Type2EvaluationStack _evalStack = new Type2EvaluationStack();
-
             _evalStack._currentX = currentX;
             _evalStack._currentY = currentY;
-
 
             List<Type2Instruction> insts = instructionList.Insts;
             _evalStack.GlyphTranslator = tx;
             int j = insts.Count;
-
 
             for (int i = 0; i < j; ++i)
             {
@@ -120,10 +200,10 @@ namespace Typography.OpenFont.CFF
                     //4.7: Subroutine Operators
                     case OperatorName._return:
                         {
-
+                            //***
+                            //don't forget to return _evalStack's currentX, currentY to prev evl context
                             currentX = _evalStack._currentX;
                             currentY = _evalStack._currentY;
-
                             _evalStack.Ret();
                         }
                         break;
@@ -131,30 +211,9 @@ namespace Typography.OpenFont.CFF
                         {
                             //resolve local subrountine
                             int rawSubRoutineNum = (int)_evalStack.Pop();
-
-                            //from Technical Note #5176 (CFF spec)
-                            //resolve with bias
-                            //Card16 bias;
-                            //Card16 nSubrs = subrINDEX.count;
-                            //if (CharstringType == 1)
-                            //    bias = 0;
-                            //else if (nSubrs < 1240)
-                            //    bias = 107;
-                            //else if (nSubrs < 33900)
-                            //    bias = 1131;
-                            //else
-                            //    bias = 32768;
-
-                            int nsubrs = cff1Font._localSubrs.Count;
-                            int bias = (nsubrs < 1240) ? 107 :
-                                            (nsubrs < 33900) ? 1131 : 32769;
-
-
-                            //find local subroutine
-                            Type2GlyphInstructionList resolvedSubroutine = cff1Font._localSubrs[rawSubRoutineNum + bias];
+                            Type2GlyphInstructionList resolvedSubroutine = cff1Font._localSubrs[rawSubRoutineNum + _cffBias];
                             //then we move to another context
                             Run(tx, resolvedSubroutine, ref _evalStack._currentX, ref _evalStack._currentY);
-
                         }
                         break;
                     case OperatorName.callgsubr: throw new NotSupportedException();
@@ -169,6 +228,7 @@ namespace Typography.OpenFont.CFF
 
         internal double _currentX;
         internal double _currentY;
+
 
         double[] _argStack = new double[50];
         int _currentIndex = 0; //current stack index
@@ -942,8 +1002,17 @@ namespace Typography.OpenFont.CFF
         {
             _currentIndex = 0; //clear stack
         }
-        public void HintMaskBits(int hintMaskValue)
+        public void HintMaskBits(int bitCount)
         {
+
+            //calculate bytes need by 
+            //bytes need = (bitCount+7)/8 
+#if DEBUG
+            if (_currentIndex != (bitCount + 7) / 8)
+            {
+
+            }
+#endif
             _currentIndex = 0; //clear stack
         }
         //----------------------------------------
@@ -974,8 +1043,17 @@ namespace Typography.OpenFont.CFF
         {
             _currentIndex = 0;//clear stack
         }
-        public void CounterSpaceMaskBits(int cntMaskValue)
+        public void CounterSpaceMaskBits(int bitCount)
         {
+            //calculate bytes need by 
+            //bytes need = (bitCount+7)/8 
+#if DEBUG
+            if (_currentIndex != (bitCount + 7) / 8)
+            {
+
+            }
+#endif
+
             _currentIndex = 0;//clear stack
         }
         //----------------------------------------
