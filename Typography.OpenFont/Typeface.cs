@@ -194,12 +194,11 @@ namespace Typography.OpenFont
                 CFF.Cff1Font cff1Font = _cffTable.Cff1FontSet._fonts[0];
                 return cff1Font.GetGlyphByName(glyphName)._cff1GlyphData.GlyphIndex;
             }
-            else
+            else if (PostTable != null)
             {
-                //TODO: implement this ...
-                return 0;
+                return PostTable.GetGlyphIndex(glyphName);
             }
-
+            return 0; 
         }
 
 
@@ -330,6 +329,11 @@ namespace Typography.OpenFont
 
             }
         }
+
+
+        //---------
+        internal PostTable PostTable { get; set; }
+
     }
 
 

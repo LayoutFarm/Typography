@@ -35,6 +35,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Typography.OpenFont\AdditionalInfo\MacPostFormat1.cs">
+      <Link>AdditionalInfo\MacPostFormat1.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\AdditionalInfo\OS2_IBMFontClassParameters.cs">
+      <Link>AdditionalInfo\OS2_IBMFontClassParameters.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\Bounds.cs">
       <Link>Bounds.cs</Link>
     </Compile>
