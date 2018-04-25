@@ -116,6 +116,16 @@ namespace Typography.OpenFont
                     VerticalMatric vmtx = ReadTableIfExists(tables, input, new VerticalMatric(vhea.NumOfLongVerMetrics));
                 }
 
+
+
+                //test math table
+                MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
+                if (mathtable != null)
+                {
+
+                }
+
+
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
                 //---------------------------------------------
                 //about truetype instruction init 
@@ -140,7 +150,7 @@ namespace Typography.OpenFont
                           header.UnitsPerEm,
                           ccf,
                           horizontalMetrics,
-                          os2Table); 
+                          os2Table);
                 }
                 else
                 {
@@ -150,7 +160,7 @@ namespace Typography.OpenFont
                         header.UnitsPerEm,
                         glyf.Glyphs,
                         horizontalMetrics,
-                        os2Table); 
+                        os2Table);
                 }
 
                 //----------------------------
@@ -158,7 +168,7 @@ namespace Typography.OpenFont
                 typeface.KernTable = kern;
                 typeface.GaspTable = gaspTable;
                 typeface.MaxProfile = maximumProfile;
-                typeface.HheaTable = horizontalHeader; 
+                typeface.HheaTable = horizontalHeader;
                 //----------------------------
 
                 if (!isPostScriptOutline)
@@ -190,7 +200,7 @@ namespace Typography.OpenFont
                     cpal);
 
                 //------------
-                
+
                 typeface.PostTable = postTable;
 
 #if DEBUG
