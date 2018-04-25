@@ -46,6 +46,8 @@ namespace SampleWinForms
                 {
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
                 }
+
+                this.glyphNameListUserControl1.Typeface = e.SelectedTypeface;
             };
 
             _basicOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
@@ -61,6 +63,13 @@ namespace SampleWinForms
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             button1.Click += (s, e) => UpdateRenderOutput();
 
+            //
+            this.glyphNameListUserControl1.GlyphNameChanged += (s, e) =>
+            {
+                //test render 
+                //just our convention by add & and ;
+                RenderByGlyphName(glyphNameListUserControl1.SelectedGlyphName);
+            };
             //----------------
             //string inputstr = "ก้า";
             //string inputstr = "น้ำน้ำ";
@@ -97,9 +106,61 @@ namespace SampleWinForms
             this.txtInputChar.Text = inputstr;
             _readyToRender = true;
         }
+        void RenderByGlyphName(string selectedGlyphName)
+        {
+            //---------------------------------------------
+            //this version only render with MiniAgg**
+            //---------------------------------------------
+
+            painter.Clear(PixelFarm.Drawing.Color.White);
+            painter.UseSubPixelRendering = _contourAnalysisOpts.LcdTechnique;
+            painter.FillColor = PixelFarm.Drawing.Color.Black;
+
+            selectedTextPrinter = _devVxsTextPrinter;
+            selectedTextPrinter.Typeface = _basicOptions.Typeface;
+            selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
+            selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+            selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+
+            selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+            selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
+
+            //test print 3 lines
+#if DEBUG
+            GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+            GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+            GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+#endif
+
+            
+            float x_pos = 0, y_pos = 50;
+            var glyphPlanList = new Typography.TextLayout.GlyphPlanList();
+
+            //in this version
+            //create a glyph-plan manully
+            ushort selectedGlyphIndex =
+                glyphNameListUserControl1.Typeface.GetGlyphIndexByName(selectedGlyphName);
+
+            glyphPlanList.Append(new Typography.TextLayout.GlyphPlan(selectedGlyphIndex, 0, 0, 0));
+
+            selectedTextPrinter.DrawFromGlyphPlans(glyphPlanList, x_pos, y_pos);
 
 
+            char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
 
+            float lineSpacingPx = selectedTextPrinter.FontLineSpacingPx;
+            for (int i = 0; i < 1; ++i)
+            {
+                selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
+                y_pos -= lineSpacingPx;
+            }
+
+
+            //copy from Agg's memory buffer to gdi 
+            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            g.Clear(Color.White);
+            g.DrawImage(winBmp, new Point(10, 0));
+        }
 
         bool _readyToRender;
         void UpdateRenderOutput()
@@ -530,6 +591,6 @@ namespace SampleWinForms
             this.Text = "Render with PixelFarm";
         }
 
-         
+
     }
 }

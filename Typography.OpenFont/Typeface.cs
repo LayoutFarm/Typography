@@ -108,6 +108,7 @@ namespace Typography.OpenFont
             get;
             set;
         }
+        internal CFFTable CffTable { get { return _cffTable; } }
         /// <summary>
         /// actual font filename
         /// </summary>
@@ -186,7 +187,7 @@ namespace Typography.OpenFont
             return _glyphs[glyphIndex];
         }
 
-        public int GetGlyphIndexByName(string glyphName)
+        public ushort GetGlyphIndexByName(string glyphName)
         {
             if (_cffTable != null)
             {
@@ -194,12 +195,11 @@ namespace Typography.OpenFont
                 CFF.Cff1Font cff1Font = _cffTable.Cff1FontSet._fonts[0];
                 return cff1Font.GetGlyphByName(glyphName)._cff1GlyphData.GlyphIndex;
             }
-            else
+            else if (PostTable != null)
             {
-                //TODO: implement this ...
-                return 0;
+                return PostTable.GetGlyphIndex(glyphName);
             }
-
+            return 0;
         }
 
 
@@ -294,6 +294,8 @@ namespace Typography.OpenFont
 
                 output.Add(LookupIndex(codepoint));
             }
+
+            //TODO: review here again
             //tmp disable here
             //check for glyph substitution
             //this.GSUBTable.CheckSubstitution(output[1]);
@@ -317,7 +319,7 @@ namespace Typography.OpenFont
                 gdefTable.FillGlyphData(this.Glyphs);
                 //if (this.Glyphs != null)
                 //{
-                   
+
                 //}
                 //else if (this._cffTable != null)
                 //{
@@ -326,6 +328,17 @@ namespace Typography.OpenFont
 
                 //}
 
+            }
+        }
+
+
+        //---------
+        internal PostTable PostTable { get; set; }
+        internal bool IsCffFont
+        {
+            get
+            {
+                return _cffTable != null;
             }
         }
     }
@@ -589,5 +602,42 @@ namespace Typography.OpenFont
         {
             public static CurrentOSName CurrentOSName;
         }
+    }
+
+
+    public struct GlyphNameMap
+    {
+        public readonly ushort glyphIndex;
+        public readonly string glyphName;
+        public GlyphNameMap(ushort glyphIndex, string glyphName)
+        {
+            this.glyphIndex = glyphIndex;
+            this.glyphName = glyphName;
+        }
+    }
+
+    public static class TypefaceExtension2
+    {
+
+
+        public static IEnumerable<GlyphNameMap> GetGlyphNameIter(this Typeface typeface)
+        {
+            if (typeface.IsCffFont)
+            {
+                CFF.Cff1Font cff1Font = typeface.CffTable.Cff1FontSet._fonts[0];
+                foreach (var kp in cff1Font.GetGlyphNameIter())
+                {
+                    yield return kp;
+                }
+            }
+            else
+            {
+                foreach (var kp in typeface.PostTable.GlyphNames)
+                {
+                    yield return new GlyphNameMap(kp.Key, kp.Value);
+                }
+            }
+        }
+
     }
 }

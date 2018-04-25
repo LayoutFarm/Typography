@@ -140,13 +140,7 @@ namespace Typography.OpenFont
                           header.UnitsPerEm,
                           ccf,
                           horizontalMetrics,
-                          os2Table);
-
-#if DEBUG
-                    //test
-                    int found = typeface.GetGlyphIndexByName("Uacute");
-#endif
-
+                          os2Table); 
                 }
                 else
                 {
@@ -156,7 +150,7 @@ namespace Typography.OpenFont
                         header.UnitsPerEm,
                         glyf.Glyphs,
                         horizontalMetrics,
-                        os2Table);
+                        os2Table); 
                 }
 
                 //----------------------------
@@ -164,7 +158,7 @@ namespace Typography.OpenFont
                 typeface.KernTable = kern;
                 typeface.GaspTable = gaspTable;
                 typeface.MaxProfile = maximumProfile;
-                typeface.HheaTable = horizontalHeader;
+                typeface.HheaTable = horizontalHeader; 
                 //----------------------------
 
                 if (!isPostScriptOutline)
@@ -194,6 +188,16 @@ namespace Typography.OpenFont
                     baseTable,
                     colr,
                     cpal);
+
+                //------------
+                
+                typeface.PostTable = postTable;
+
+#if DEBUG
+                //test
+                int found = typeface.GetGlyphIndexByName("Uacute");
+#endif
+
                 return typeface;
             }
         }
@@ -219,7 +223,7 @@ namespace Typography.OpenFont
                     //set header before actal read
                     resultTable.Header = found.Header;
                     resultTable.LoadDataFrom(reader);
-                    //then reaplce
+                    //then replace
                     tables.ReplaceTable(resultTable);
                     return resultTable;
                 }
