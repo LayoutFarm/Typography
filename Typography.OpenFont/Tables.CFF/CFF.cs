@@ -67,10 +67,6 @@ namespace Typography.OpenFont.CFF
         internal List<string> fontNames;
         internal List<Cff1Font> _fonts = new List<Cff1Font>();
         internal string[] _uniqueStringTable;
-
-
-
-
         //
         internal const int nStdStrings = 390;
         internal static readonly string[] _StdStrings = new string[] {
@@ -476,14 +472,13 @@ namespace Typography.OpenFont.CFF
         internal List<CffDataDicEntry> _privateDict;
         internal List<Type2GlyphInstructionList> _localSubrs;
         internal int defaultWidthX;
-        internal int nominalWidthX; 
+        internal int nominalWidthX;
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
         public Glyph GetGlyphByName(string name)
         {
             if (_cachedGlyphDicByName == null)
             {
-                //create a cache ... 
                 _cachedGlyphDicByName = new Dictionary<string, Glyph>();
                 int j = glyphs.Length;
                 for (int i = 1; i < j; ++i)
@@ -494,9 +489,22 @@ namespace Typography.OpenFont.CFF
             }
             Glyph found;
             _cachedGlyphDicByName.TryGetValue(name, out found);
-            return found; 
+            return found;
         }
 
+        internal IEnumerable<GlyphNameMap> GetGlyphNameIter()
+        {
+            int j = glyphs.Length;
+#if DEBUG
+            if (j > ushort.MaxValue) { throw new NotSupportedException(); }
+#endif
+            for (int i = 1; i < j; ++i)
+            {
+                Glyph cff1Glyph = glyphs[i];
+                yield return new GlyphNameMap((ushort)i, cff1Glyph._cff1GlyphData.Name);
+            }
+
+        }
     }
     public class Cff1GlyphData
     {
@@ -506,7 +514,7 @@ namespace Typography.OpenFont.CFF
         }
 
         public string Name { get; set; }
-        public int GlyphIndex { get; set; }
+        public ushort GlyphIndex { get; set; }
         internal Type2GlyphInstructionList GlyphInstructions { get; set; }
 
 #if DEBUG
@@ -1033,7 +1041,7 @@ namespace Typography.OpenFont.CFF
                 //now we can parse the raw glyph instructions 
 
                 Cff1GlyphData glyphData = new Cff1GlyphData();
-                glyphData.GlyphIndex = i;
+                glyphData.GlyphIndex = (ushort)i;
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
                 ////
                 //if (i == 5)
@@ -1045,7 +1053,7 @@ namespace Typography.OpenFont.CFF
                 {
                     instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
                     glyphData.GlyphInstructions = instList;
-                } 
+                }
             }
         }
 

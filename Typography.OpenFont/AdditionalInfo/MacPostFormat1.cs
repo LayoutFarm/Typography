@@ -21,7 +21,7 @@ namespace Typography.OpenFont
                 {
                     string[] seps = new string[] { " " };
 
-                    string line = strReader.ReadLine();                   
+                    string line = strReader.ReadLine();
 
                     while (line != null)
                     {
@@ -56,6 +56,7 @@ namespace Typography.OpenFont
             }
             return stdMacGlyphNames;
         }
+
 
         //'post' Format 1
         //The order in which glyphs are placed in a font is at the convenience of the font developer To use format 1,

@@ -108,6 +108,7 @@ namespace Typography.OpenFont
             get;
             set;
         }
+        internal CFFTable CffTable { get { return _cffTable; } }
         /// <summary>
         /// actual font filename
         /// </summary>
@@ -186,7 +187,7 @@ namespace Typography.OpenFont
             return _glyphs[glyphIndex];
         }
 
-        public int GetGlyphIndexByName(string glyphName)
+        public ushort GetGlyphIndexByName(string glyphName)
         {
             if (_cffTable != null)
             {
@@ -198,7 +199,7 @@ namespace Typography.OpenFont
             {
                 return PostTable.GetGlyphIndex(glyphName);
             }
-            return 0; 
+            return 0;
         }
 
 
@@ -333,7 +334,13 @@ namespace Typography.OpenFont
 
         //---------
         internal PostTable PostTable { get; set; }
-
+        internal bool IsCffFont
+        {
+            get
+            {
+                return _cffTable != null;
+            }
+        }
     }
 
 
@@ -595,5 +602,42 @@ namespace Typography.OpenFont
         {
             public static CurrentOSName CurrentOSName;
         }
+    }
+
+
+    public struct GlyphNameMap
+    {
+        public readonly ushort glyphIndex;
+        public readonly string glyphName;
+        public GlyphNameMap(ushort glyphIndex, string glyphName)
+        {
+            this.glyphIndex = glyphIndex;
+            this.glyphName = glyphName;
+        }
+    }
+
+    public static class TypefaceExtension2
+    {
+
+
+        public static IEnumerable<GlyphNameMap> GetGlyphNameIter(this Typeface typeface)
+        {
+            if (typeface.IsCffFont)
+            {
+                CFF.Cff1Font cff1Font = typeface.CffTable.Cff1FontSet._fonts[0];
+                foreach (var kp in cff1Font.GetGlyphNameIter())
+                {
+                    yield return kp;
+                }
+            }
+            else
+            {
+                foreach (var kp in typeface.PostTable.GlyphNames)
+                {
+                    yield return new GlyphNameMap(kp.Key, kp.Value);
+                }
+            }
+        }
+
     }
 }
