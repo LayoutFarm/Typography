@@ -1,6 +1,8 @@
 ﻿//Apache2, 2016-2017, WinterDev
 
 using System.IO;
+using System.Collections.Generic;
+
 namespace Typography.OpenFont.Tables
 {
     //https://www.microsoft.com/typography/otspec/post.htm
@@ -49,6 +51,12 @@ namespace Typography.OpenFont.Tables
         uint italicAngle;
         short underlinePosition;
         short underlineThickness;
+
+        //---------------
+
+        Dictionary<ushort, string> _glyphNames;
+        Dictionary<string, ushort> _glyphIndiceByName;
+
         public override string Name
         {
             get { return "post"; }
@@ -100,34 +108,71 @@ namespace Typography.OpenFont.Tables
 
                 //If you do not want to associate a PostScript name with a particular glyph, use index number 0 which points to the name .notdef.
 
-                ushort numOfGlyphs = reader.ReadUInt16();
-                ushort[] glyphNameIndice = Utils.ReadUInt16Array(reader, numOfGlyphs);
-                int newGlyphCount = 0;
+                _glyphNames = new Dictionary<ushort, string>();
 
-                System.Collections.Generic.List<ushort> newGlyphs = new System.Collections.Generic.List<ushort>(numOfGlyphs - 258);
+                ushort numOfGlyphs = reader.ReadUInt16();
+                ushort[] glyphNameIndice = Utils.ReadUInt16Array(reader, numOfGlyphs);//***  
+                string[] stdMacGlyphNames = MacPostFormat1.GetStdMacGlyphNames();
                 for (int i = 0; i < numOfGlyphs; ++i)
                 {
                     ushort glyphNameIndex = glyphNameIndice[i];
-                    if (glyphNameIndex > 258)
+
+                    if (glyphNameIndex > 257)
                     {
-                        newGlyphs.Add((ushort)(glyphNameIndex - 258));
-                        newGlyphCount++;
+                        int len = reader.ReadByte();
+                        //                        string name = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len));
+                        //#if DEBUG
+                        //                        if (name == null)
+                        //                        { 
+                        //                        }
+                        //#endif
+
+                        _glyphNames.Add(glyphNameIndex, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len)));
                     }
-                    //TODO: get standard Macintosh set. 
-                }
-                //read 'new' glyph name
-                for (int i = 0; i < newGlyphCount; ++i)
-                {
-                    int len = reader.ReadByte();
-                    string glyphName = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len));
+                    else
+                    {
+                        //258 and 65535, 
+
+                        //TODO: get standard Macintosh set. 
+                        //                        string name = stdMacGlyphNames[glyphNameIndex];
+                        //#if DEBUG
+                        //                        if (name == null)
+                        //                        {
+
+                        //                        }
+                        //#endif
+                        _glyphNames.Add(glyphNameIndex, stdMacGlyphNames[glyphNameIndex]);
+                    }
                 }
             }
             else
             {
                 throw new System.NotSupportedException();
             }
-
         }
+
+
+        internal Dictionary<ushort, string> GlyphNames
+        {
+            get { return _glyphNames; }
+        }
+        internal ushort GetGlyphIndex(string glyphName)
+        {
+            if (_glyphIndiceByName == null)
+            {
+                //------
+                //create a cache
+                _glyphIndiceByName = new Dictionary<string, ushort>();
+                foreach (var kp in _glyphNames)
+                {
+                    _glyphIndiceByName.Add(kp.Value, kp.Key);
+                }
+            }
+
+            _glyphIndiceByName.TryGetValue(glyphName, out ushort found);
+            return found;
+        }
+
     }
 
 
@@ -160,5 +205,8 @@ namespace Typography.OpenFont.Tables
     //    Note: The italicAngle value is not adjusted by variation data since this corresponds to the 'slnt' variation axis that can be used to define a font’s variation space. Appropriate post.italicAngle values for a variation instance can be derived from the 'slnt' user coordinates that are used to select a particular variation instance. See the discussion of the 'slnt' axis in the Variation Axis Tags section of the 'fvar' table chapter for details on the relationship between italicAngle and the 'slnt' axis.
 
     //For general information on OpenType Font Variations, see the chapter, OpenType Font Variations Overview.
+
+
+
 
 }

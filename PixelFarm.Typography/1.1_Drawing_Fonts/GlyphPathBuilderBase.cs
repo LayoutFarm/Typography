@@ -120,7 +120,7 @@ namespace Typography.Contours
 
             if (this._cffGlyphData != null)
             {   
-                tx.Read(this._ownerCff, this._cffGlyphData);
+                tx.Read(this._ownerCff, this._cffGlyphData, _recentPixelScale);
             }
             else
             {

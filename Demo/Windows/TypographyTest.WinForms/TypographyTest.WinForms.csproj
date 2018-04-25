@@ -58,6 +58,12 @@
     <Compile Include="GlyphLayoutOptionsUserControl.Designer.cs">
       <DependentUpon>GlyphLayoutOptionsUserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlyphNameListUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GlyphNameListUserControl.Designer.cs">
+      <DependentUpon>GlyphNameListUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="GlyphRenderOptions.cs" />
     <Compile Include="GlyphRenderOptionsUserControl.cs">
       <SubType>UserControl</SubType>
@@ -96,6 +102,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GlyphLayoutOptionsUserControl.resx">
       <DependentUpon>GlyphLayoutOptionsUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GlyphNameListUserControl.resx">
+      <DependentUpon>GlyphNameListUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GlyphRenderOptionsUserControl.resx">
       <DependentUpon>GlyphRenderOptionsUserControl.cs</DependentUpon>
