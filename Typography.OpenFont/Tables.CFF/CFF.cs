@@ -1673,9 +1673,14 @@ namespace Typography.OpenFont.CFF
             Register(12, 12, "StemSnapH", OperatorOperandKind.Delta);
             Register(12, 13, "StemSnapV", OperatorOperandKind.Delta);
             Register(12, 14, "ForceBold", OperatorOperandKind.Boolean);
-            Register(12, 15, "LanguageGroup", OperatorOperandKind.Number);
-            Register(12, 16, "ExpansionFactor", OperatorOperandKind.Number);
-            Register(12, 17, "initialRandomSeed", OperatorOperandKind.Number);
+
+            //reserved 12 15//https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
+            //reserved 12 16//https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
+            
+            Register(12, 17, "LanguageGroup", OperatorOperandKind.Number); //https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
+            Register(12, 18, "ExpansionFactor", OperatorOperandKind.Number); //https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
+            Register(12, 19, "initialRandomSeed", OperatorOperandKind.Number); //https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
+
             Register(19, "Subrs", OperatorOperandKind.Number);
             Register(20, "defaultWidthX", OperatorOperandKind.Number);
             Register(21, "nominalWidthX", OperatorOperandKind.Number);
