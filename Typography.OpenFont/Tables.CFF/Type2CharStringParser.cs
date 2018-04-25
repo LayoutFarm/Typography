@@ -604,16 +604,17 @@ namespace Typography.OpenFont.CFF
         }
         void AddHintMaskToList(BinaryReader reader, ref int hintStemCount)
         {
-            
+
 
             if (foundSomeStem && current_int_count > 0)
             {
+
                 //type2 5177.pdf
                 //...
                 //If hstem and vstem hints are both declared at the beginning of
                 //a charstring, and this sequence is followed directly by the
-                //hintmask or cntrmask operators, the vstem hint operator need
-                //not be included 
+                //hintmask or cntrmask operators, ...
+                //the vstem hint operator need not be included ***
 
 #if DEBUG
                 if ((current_int_count % 2) != 0)
@@ -629,7 +630,8 @@ namespace Typography.OpenFont.CFF
                 switch (_latestOpName)
                 {
                     case OperatorName.hstem:
-                        //add vstem 
+                        //add vstem  ***( from reason above)
+
                         hintStemCount += (current_int_count / 2); //save a snapshot of stem count
                         insts.AddOp(OperatorName.vstem);
 
@@ -637,7 +639,16 @@ namespace Typography.OpenFont.CFF
                         current_int_count = 0; //clear
                         break;
                     case OperatorName.hstemhm:
-                        //add vstem 
+                        //add vstem  ***( from reason above) ??
+                        hintStemCount += (current_int_count / 2); //save a snapshot of stem count
+                        insts.AddOp(OperatorName.vstem);
+                        _latestOpName = OperatorName.vstem;
+                        current_int_count = 0;//clear
+                        break;
+                    case OperatorName.vstemhm:
+                        //-------
+                        //TODO: review here? 
+                        //found this in xits.otf
                         hintStemCount += (current_int_count / 2); //save a snapshot of stem count
                         insts.AddOp(OperatorName.vstem);
                         _latestOpName = OperatorName.vstem;
