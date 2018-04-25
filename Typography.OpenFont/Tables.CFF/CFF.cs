@@ -1285,25 +1285,36 @@ namespace Typography.OpenFont.CFF
             //get registered operator by its key
             return CFFOperator.GetOperatorByKey(b0, b1);
         }
+
+
+
         double ReadRealNumber()
         {
+            //from https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
+            // A real number operand is provided in addition to integer
+            //operands.This operand begins with a byte value of 30 followed
+            //by a variable-length sequence of bytes.Each byte is composed
+            //of two 4 - bit nibbles asdefined in Table 5.
+
+            //The first nibble of a
+            //pair is stored in the most significant 4 bits of a byte and the
+            //second nibble of a pair is stored in the least significant 4 bits of a byte
+
+
 
             StringBuilder sb = new StringBuilder();
             bool done = false;
             bool exponentMissing = false;
-
-            int[] nibbles = { 0, 0 };
-
             while (!done)
             {
                 int b = _reader.ReadByte();
-                //TODO: review here
-                nibbles[0] = b / 16;
-                nibbles[1] = b % 16;
 
-                for (int i = 0; i < 2; ++i)
+                int nb_0 = (b >> 4) & 0xf;
+                int nb_1 = (b) & 0xf;
+
+                for (int i = 0; !done && i < 2; ++i)
                 {
-                    int nibble = nibbles[i];
+                    int nibble = (i == 0) ? nb_0 : nb_1;
 
                     switch (nibble)
                     {
