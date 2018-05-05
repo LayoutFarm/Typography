@@ -186,14 +186,25 @@ namespace Typography.OpenFont
         {
             return _glyphs[glyphIndex];
         }
-
-        public ushort GetGlyphIndexByName(string glyphName)
+        public Glyph GetGlyphByName(string glyphName)
         {
             if (_cffTable != null)
             {
                 //early preview ...
                 CFF.Cff1Font cff1Font = _cffTable.Cff1FontSet._fonts[0];
-                return cff1Font.GetGlyphByName(glyphName)._cff1GlyphData.GlyphIndex;
+                return cff1Font.GetGlyphByName(glyphName);
+            }
+            else if (PostTable != null)
+            {
+                return GetGlyphByIndex(GetGlyphIndexByName(glyphName));
+            }
+            return null;
+        }
+        public ushort GetGlyphIndexByName(string glyphName)
+        {
+            if (_cffTable != null)
+            {
+                return GetGlyphByName(glyphName)._cff1GlyphData.GlyphIndex;
             }
             else if (PostTable != null)
             {
