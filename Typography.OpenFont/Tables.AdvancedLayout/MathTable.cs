@@ -1,8 +1,8 @@
-﻿
-//MIT, 2018, WinterDev
+﻿//MIT, 2018, WinterDev
+//https://www.microsoft.com/typography/otspec/math.htm
+
 using System.Collections.Generic;
 using System.IO;
-
 
 namespace Typography.OpenFont.Tables
 {
@@ -16,25 +16,24 @@ namespace Typography.OpenFont.Tables
                 return new MathValueRecord(reader.ReadInt16(), reader.ReadUInt16());
             }
 
-            public static void ReadMathValueRecords(this BinaryReader reader,
-                out MathValueRecord v0,
-                out MathValueRecord v1,
-                out MathValueRecord v2,
-                out MathValueRecord v3)
+            public static MathValueRecord[] ReadMathValueRecords(this BinaryReader reader, int count)
             {
-                v0 = ReadMathValueRecord(reader);
-                v1 = ReadMathValueRecord(reader);
-                v2 = ReadMathValueRecord(reader);
-                v3 = ReadMathValueRecord(reader);
+                MathValueRecord[] records = new MathValueRecord[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    records[i] = reader.ReadMathValueRecord();
+                }
+                return records;
             }
         }
     }
 
 
-    //https://www.microsoft.com/typography/otspec/math.htm
+
     class MathTable : TableEntry
     {
         MathConstantsTable _mathConstTable;
+
         public override string Name
         {
             get { return "MATH"; }
@@ -84,74 +83,74 @@ namespace Typography.OpenFont.Tables
             mc.DelimitedSubFormulaMinHeight = reader.ReadUInt16();
             mc.DisplayOperatorMinHeight = reader.ReadUInt16();
             //
+            //            
+
+            mc.MathLeading = reader.ReadMathValueRecord();
+            mc.AxisHeight = reader.ReadMathValueRecord();
+            mc.AccentBaseHeight = reader.ReadMathValueRecord();
+            mc.FlattenedAccentBaseHeight = reader.ReadMathValueRecord();
+
+            // 
+            mc.SubscriptShiftDown = reader.ReadMathValueRecord();
+            mc.SubscriptTopMax = reader.ReadMathValueRecord();
+            mc.SubscriptBaselineDropMin = reader.ReadMathValueRecord();
+            mc.SuperscriptShiftUp = reader.ReadMathValueRecord();
             //
-            reader.ReadMathValueRecords(
-                out mc.MathLeading,
-                out mc.AxisHeight,
-                out mc.AccentBaseHeight,
-                out mc.FlattenedAccentBaseHeight);
-            //
-            reader.ReadMathValueRecords(
-                out mc.SubscriptShiftDown,
-                out mc.SubscriptTopMax,
-                out mc.SubscriptBaselineDropMin,
-                out mc.SuperscriptShiftUp);
-            //
-            reader.ReadMathValueRecords(
-                out mc.SuperscriptShiftUpCramped,
-                out mc.SuperscriptBottomMin,
-                out mc.SuperscriptBaselineDropMax,
-                out mc.SubSuperscriptGapMin);
-            //
-            reader.ReadMathValueRecords(
-               out mc.SuperscriptBottomMaxWithSubscript,
-               out mc.SpaceAfterScript,
-               out mc.UpperLimitGapMin,
-               out mc.UpperLimitBaselineRiseMin);
+
+            mc.SuperscriptShiftUpCramped = reader.ReadMathValueRecord();
+            mc.SuperscriptBottomMin = reader.ReadMathValueRecord();
+            mc.SuperscriptBaselineDropMax = reader.ReadMathValueRecord();
+            mc.SubSuperscriptGapMin = reader.ReadMathValueRecord();
+
+            mc.SuperscriptBottomMaxWithSubscript = reader.ReadMathValueRecord();
+            mc.SpaceAfterScript = reader.ReadMathValueRecord();
+            mc.UpperLimitGapMin = reader.ReadMathValueRecord();
+            mc.UpperLimitBaselineRiseMin = reader.ReadMathValueRecord();
+
             mc.LowerLimitGapMin = reader.ReadMathValueRecord();
             mc.LowerLimitBaselineDropMin = reader.ReadMathValueRecord();
-            //
-            reader.ReadMathValueRecords(
-               out mc.StackTopShiftUp,
-               out mc.StackTopDisplayStyleShiftUp,
-               out mc.StackBottomShiftDown,
-               out mc.StackBottomDisplayStyleShiftDown);
-            reader.ReadMathValueRecords(
-               out mc.StackGapMin,
-               out mc.StackDisplayStyleGapMin,
-               out mc.StretchStackTopShiftUp,
-               out mc.StretchStackBottomShiftDown);
+            // 
+            mc.StackTopShiftUp = reader.ReadMathValueRecord();
+            mc.StackTopDisplayStyleShiftUp = reader.ReadMathValueRecord();
+            mc.StackBottomShiftDown = reader.ReadMathValueRecord();
+            mc.StackBottomDisplayStyleShiftDown = reader.ReadMathValueRecord();
+
+            mc.StackGapMin = reader.ReadMathValueRecord();
+            mc.StackDisplayStyleGapMin = reader.ReadMathValueRecord();
+            mc.StretchStackTopShiftUp = reader.ReadMathValueRecord();
+            mc.StretchStackBottomShiftDown = reader.ReadMathValueRecord();
+
             mc.StretchStackGapAboveMin = reader.ReadMathValueRecord();
             mc.StretchStackGapBelowMin = reader.ReadMathValueRecord();
             // 
-            reader.ReadMathValueRecords(
-               out mc.FractionNumeratorShiftUp,
-               out mc.FractionNumeratorDisplayStyleShiftUp,
-               out mc.FractionDenominatorShiftDown,
-               out mc.FractionDenominatorDisplayStyleShiftDown);
-            reader.ReadMathValueRecords(
-               out mc.FractionNumeratorGapMin,
-               out mc.FractionNumDisplayStyleGapMin,
-               out mc.FractionRuleThickness,
-               out mc.FractionDenominatorGapMin);
+
+            mc.FractionNumeratorShiftUp = reader.ReadMathValueRecord();
+            mc.FractionNumeratorDisplayStyleShiftUp = reader.ReadMathValueRecord();
+            mc.FractionDenominatorShiftDown = reader.ReadMathValueRecord();
+            mc.FractionDenominatorDisplayStyleShiftDown = reader.ReadMathValueRecord();
+
+            mc.FractionNumeratorGapMin = reader.ReadMathValueRecord();
+            mc.FractionNumDisplayStyleGapMin = reader.ReadMathValueRecord();
+            mc.FractionRuleThickness = reader.ReadMathValueRecord();
+            mc.FractionDenominatorGapMin = reader.ReadMathValueRecord();
+
             mc.FractionDenomDisplayStyleGapMin = reader.ReadMathValueRecord();
+            // 
+            mc.SkewedFractionHorizontalGap = reader.ReadMathValueRecord();
+            mc.SkewedFractionVerticalGap = reader.ReadMathValueRecord();
+            mc.OverbarVerticalGap = reader.ReadMathValueRecord();
+            mc.OverbarRuleThickness = reader.ReadMathValueRecord();
             //
-            reader.ReadMathValueRecords(
-               out mc.SkewedFractionHorizontalGap,
-               out mc.SkewedFractionVerticalGap,
-               out mc.OverbarVerticalGap,
-               out mc.OverbarRuleThickness);
-            reader.ReadMathValueRecords(
-               out mc.OverbarExtraAscender,
-               out mc.UnderbarVerticalGap,
-               out mc.UnderbarRuleThickness,
-               out mc.UnderbarExtraDescender);
-            //
-            reader.ReadMathValueRecords(
-               out mc.RadicalVerticalGap,
-               out mc.RadicalDisplayStyleVerticalGap,
-               out mc.RadicalRuleThickness,
-               out mc.RadicalExtraAscender);
+            mc.OverbarExtraAscender = reader.ReadMathValueRecord();
+            mc.UnderbarVerticalGap = reader.ReadMathValueRecord();
+            mc.UnderbarRuleThickness = reader.ReadMathValueRecord();
+            mc.UnderbarExtraDescender = reader.ReadMathValueRecord();
+
+            mc.RadicalVerticalGap = reader.ReadMathValueRecord();
+            mc.RadicalDisplayStyleVerticalGap = reader.ReadMathValueRecord();
+            mc.RadicalRuleThickness = reader.ReadMathValueRecord();
+            mc.RadicalExtraAscender = reader.ReadMathValueRecord();
+
             mc.RadicalKernBeforeDegree = reader.ReadMathValueRecord();
             mc.RadicalKernAfterDegree = reader.ReadMathValueRecord();
             mc.RadicalDegreeBottomRaisePercent = reader.ReadInt16();
@@ -161,13 +160,130 @@ namespace Typography.OpenFont.Tables
         }
         void ReadMathMathGlyphInfoTable(BinaryReader reader)
         {
-           
+
+            //MathGlyphInfo Table
+            //  The MathGlyphInfo table contains positioning information that is defined on per - glyph basis.The table consists of the following parts:
+            //    Offset to MathItalicsCorrectionInfo table that contains information on italics correction values.
+            //    Offset to MathTopAccentAttachment table that contains horizontal positions for attaching mathematical accents.
+            //    Offset to Extended Shape coverage table.The glyphs covered by this table are to be considered extended shapes.
+            //    Offset to MathKernInfo table that provides per - glyph information for mathematical kerning.
 
 
+            //  NOTE: Here, and elsewhere in the subclause – please refer to subclause 6.2.4 "Features and Lookups" for description of the coverage table formats.
+
+            long startAt = reader.BaseStream.Position;
+            ushort offsetTo_MathItalicsCorrectionInfo_Table = reader.ReadUInt16();
+            ushort offsetTo_MathTopAccentAttachment_Table = reader.ReadUInt16();
+            ushort offsetTo_Extended_Shape_coverage_Table = reader.ReadUInt16();
+            ushort offsetTo_MathKernInfo_Table = reader.ReadUInt16();
+            //-----------------------
+
+            reader.BaseStream.Position = startAt + offsetTo_MathItalicsCorrectionInfo_Table;
+            ReadMathItalicCorrectionInfoTable(reader);
+            //
+            reader.BaseStream.Position = startAt + offsetTo_MathTopAccentAttachment_Table;
+            ReadMathTopAccentAttachment(reader);
+            //
+            reader.BaseStream.Position = startAt + offsetTo_Extended_Shape_coverage_Table;
+            ReadExtendedShapeCoverageTable(reader);
+            //
+            reader.BaseStream.Position = startAt + offsetTo_MathKernInfo_Table;
+            ReadMathKernInfoTable(reader);
         }
+
+
         void ReadMathMathVariantsTable(BinaryReader reader)
         {
+            _mathVariantsTable = new MathVariantsTable();
+            _mathVariantsTable.ReadContentFrom(reader);
+        }
 
+        MathVariantsTable _mathVariantsTable;
+        MathItalicsCorrectonInfoTable _mathItalicCorrectionInfo;
+        void ReadMathItalicCorrectionInfoTable(BinaryReader reader)
+        {
+            long startAt = reader.BaseStream.Position;
+            _mathItalicCorrectionInfo = new MathItalicsCorrectonInfoTable();
+
+
+            //MathItalicsCorrectionInfo Table
+            //Type           Name                           Description
+            //Offset16       Coverage                       Offset to Coverage table - from the beginning of MathItalicsCorrectionInfo table.
+            //uint16         ItalicsCorrectionCount         Number of italics correction values.Should coincide with the number of covered glyphs.
+            //MathValueRecord ItalicsCorrection[ItalicsCorrectionCount]  Array of MathValueRecords defining italics correction values for each covered glyph.
+
+
+            ushort coverageOffset = reader.ReadUInt16();
+            ushort italicCorrectionCount = reader.ReadUInt16();
+            MathValueRecord[] italicCorrections = reader.ReadMathValueRecords(italicCorrectionCount);
+            //read coverage ...
+
+        }
+        void ReadMathTopAccentAttachment(BinaryReader reader)
+        {
+            //MathTopAccentAttachment Table
+
+            //The MathTopAccentAttachment table contains information on horizontal positioning of top math accents. The table consists of the following parts:
+
+            //Coverage of glyphs for which information on horizontal positioning of math accents is provided.To position accents over any other glyph, its geometrical center(with respect to advance width) can be used.
+
+            //Count of covered glyphs.
+
+            //Array of top accent attachment points for each covered glyph, in order of coverage.These attachment points are to be used for finding horizontal positions of accents over characters.It is done by aligning the attachment point of the base glyph with the attachment point of the accent.Note that this is very similar to mark - to - base attachment, but here alignment only happens in the horizontal direction, and the vertical positions of accents are determined by different means.
+            //MathTopAccentAttachment Table
+            //Type          Name                        Description
+            //Offset16      TopAccentCoverage           Offset to Coverage table - from the beginning of MathTopAccentAttachment table.
+            //uint16        TopAccentAttachmentCount    Number of top accent attachment point values.Should coincide with the number of covered glyphs.
+            //MathValueRecord TopAccentAttachment[TopAccentAttachmentCount]  Array of MathValueRecords defining top accent attachment points for each covered glyph.
+            ushort topAccentCoverage = reader.ReadUInt16();
+            ushort topAccentAttachmentCount = reader.ReadUInt16();
+            MathValueRecord[] topAccentAttachMents = reader.ReadMathValueRecords(topAccentAttachmentCount);
+        }
+        void ReadExtendedShapeCoverageTable(BinaryReader reader)
+        {
+            //TODO:...
+            //The glyphs covered by this table are to be considered extended shapes.
+            //These glyphs are variants extended in the vertical direction, e.g.,
+            //to match height of another part of the formula.
+            //Because their dimensions may be very large in comparison with normal glyphs in the glyph set,
+            //the standard positioning algorithms will not produce the best results when applied to them.
+            //In the vertical direction, other formula elements will be positioned not relative to those glyphs,
+            //but instead to the ink box of the subexpression containing them
+
+            //....
+
+        }
+        void ReadMathKernInfoTable(BinaryReader reader)
+        {
+            // MathKernInfo Table
+
+            //The MathKernInfo table provides information on glyphs for which mathematical (height - dependent) kerning values are defined.It consists of the following fields:
+
+            //    Coverage of glyphs for which mathematical kerning information is provided.
+            //    Count of MathKernInfoRecords.Should coincide with the number of glyphs in Coverage table.
+            //    Array of MathKernInfoRecords for each covered glyph, in order of coverage.
+
+            //MathKernInfo Table
+            //Type          Name                Description
+            //Offset16      MathKernCoverage    Offset to Coverage table - from the beginning of the MathKernInfo table.
+            //uint16        MathKernCount       Number of MathKernInfoRecords.
+            //MathKernInfoRecord MathKernInfoRecords[MathKernCount]     Array of MathKernInfoRecords, per - glyph information for mathematical positioning of subscripts and superscripts.
+
+            //...
+            //Each MathKernInfoRecord points to up to four kern tables for each of the corners around the glyph.
+
+            ushort mathKernCoverage = reader.ReadUInt16();
+            ushort mathKernCount = reader.ReadUInt16();
+            MathKernInfoRecord[] mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
+            for (int i = 0; i < mathKernCount; ++i)
+            {
+                mathKernInfoRecords[i] = new MathKernInfoRecord(
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16()
+                    );
+            }
 
         }
     }
@@ -188,6 +304,48 @@ namespace Typography.OpenFont.Tables
         }
     }
 
+    struct MathKernInfoRecord
+    {
+        public readonly ushort TopRightMathKern;
+        public readonly ushort TopLeftMathKern;
+        public readonly ushort BottomRightMathKern;
+        public readonly ushort BottomLeftMathKern;
+        public MathKernInfoRecord(ushort topRight, ushort topLeft, ushort bottomRight, ushort bottomLeft)
+        {
+            this.TopRightMathKern = topRight;
+            this.TopLeftMathKern = topLeft;
+            this.BottomRightMathKern = bottomRight;
+            this.BottomLeftMathKern = bottomLeft;
+        }
+    }
+
+    class MathKernTable
+    {
+        //The MathKern table contains adjustments to horizontal positions of subscripts and superscripts
+        //The kerning algorithm consists of the following steps:
+
+        //1. Calculate vertical positions of subscripts and superscripts.
+        //2. Set the default horizontal position for the subscript immediately after the base glyph.
+        //3. Set the default horizontal position for the superscript as shifted relative to the position of the subscript by the italics correction of the base glyph.
+        //4. Based on the vertical positions, calculate the height of the top/ bottom for the bounding boxes of sub/superscript relative to the base glyph, and the height of the top/ bottom of the base relative to the super/ subscript.These will be the correction heights.
+        //5. Get the kern values corresponding to these correction heights for the appropriate corner of the base glyph and sub/superscript glyph from the appropriate MathKern tables.Kern the default horizontal positions by the minimum of sums of those values at the correction heights for the base and for the sub/superscript.
+        //6. If either one of the base or superscript expression has to be treated as a box not providing glyph
+        //MathKern Table
+        //Type              Name                                Description
+        //uint16            HeightCount                         Number of heights on which the kern value changes.
+        //MathValueRecord   CorrectionHeight[HeightCount]       Array of correction heights at which the kern value changes.Sorted by the height value in design units.
+        //MathValueRecord   KernValue[HeightCount+1]            Array of kern values corresponding to heights.
+
+        //First value is the kern value for all heights less or equal than the first height in this table.
+        //Last value is the value to be applied for all heights greater than the last height in this table.
+        //Negative values are interpreted as "move glyphs closer to each other".
+
+        public ushort HeightCount;
+        public MathValueRecord[] CorrectionHeights;
+        public MathValueRecord[] KernValues;
+
+    }
+
     class MathConstantsTable
     {
 
@@ -199,8 +357,6 @@ namespace Typography.OpenFont.Tables
         //Drop and Rise – Specifies the relationship between measurements of two elements to be positioned relative to each other(but not necessarily in a stack - like manner) that must meet certain criteria.For a Drop, one of the positioned elements has to be moved down to satisfy those criteria; for a Rise, the movement is upwards.
         //Shift – Defines a vertical shift applied to an element sitting on a baseline.
         //Dist – Defines a distance between baselines of two elements.
-
-
 
         /// <summary>
         /// Percentage of scaling down for script level 1. 
@@ -507,6 +663,21 @@ namespace Typography.OpenFont.Tables
     }
     class MathItalicsCorrectonInfoTable
     {
+        //MathItalicsCorrectonInfo Table 
+        //The MathItalicsCorrectionInfo table contains italics correction values for slanted glyphs used in math typesetting.The table consists of the following parts:
+
+        //    Coverage of glyphs for which the italics correction values are provided.It is assumed to be zero for all other glyphs.
+        //    Count of covered glyphs.
+        //    Array of italic correction values for each covered glyph, in order of coverage.The italics correction is the measurement of how slanted the glyph is, and how much its top part protrudes to the right. For example, taller letters tend to have larger italics correction, and a V will probably have larger italics correction than an L.
+
+        //Italics correction can be used in the following situations:
+
+        //    When a run of slanted characters is followed by a straight character (such as an operator or a delimiter), the italics correction of the last glyph is added to its advance width.
+        //    When positioning limits on an N-ary operator (e.g., integral sign), the horizontal position of the upper limit is moved to the right by ½ of the italics correction, while the position of the lower limit is moved to the left by the same distance.
+        //    When positioning superscripts and subscripts, their default horizontal positions are also different by the amount of the italics correction of the preceding glyph.
+
+
+
 
     }
     class MathTopAccentAttachmentTable
@@ -523,10 +694,68 @@ namespace Typography.OpenFont.Tables
     }
     class MathKernInfoRecordTable { }
 
-    class MathKernTable { }
 
-    class MathVariantsTable { }
 
-    class MathGlyphConstructionTable { }
+    class MathVariantsTable
+    {
+        //MathVariants Table
+
+        //The MathVariants table solves the following problem: given a particular default glyph shape and a certain width or height, find a variant shape glyph(or construct created by putting several glyph together) that has the required measurement.This functionality is needed for growing the parentheses to match the height of the expression within, growing the radical sign to match the height of the expression under the radical, stretching accents like tilde when they are put over several characters, for stretching arrows, horizontal curly braces, and so forth.
+
+        //The MathVariants table consists of the following fields:
+
+
+        //  Count and coverage of glyph that can grow in the vertical direction.
+        //  Count and coverage of glyphs that can grow in the horizontal direction.
+        //  MinConnectorOverlap defines by how much two glyphs need to overlap with each other when used to construct a larger shape. Each glyph to be used as a building block in constructing extended shapes will have a straight part at either or both ends.This connector part is used to connect that glyph to other glyphs in the assembly. These connectors need to overlap to compensate for rounding errors and hinting corrections at a lower resolution.The MinConnectorOverlap value tells how much overlap is necessary for this particular font.
+
+        //  Two arrays of offsets to MathGlyphConstruction tables: one array for glyphs that grow in the vertical direction, and the other array for glyphs that grow in the horizontal direction.The arrays must be arranged in coverage order and have specified sizes.
+
+
+        //MathVariants Table
+        //Type          Name                    Description
+        //uint16        MinConnectorOverlap     Minimum overlap of connecting glyphs during glyph construction, in design units.
+        //Offset16      VertGlyphCoverage       Offset to Coverage table - from the beginning of MathVariants table.
+        //Offset16      HorizGlyphCoverage      Offset to Coverage table - from the beginning of MathVariants table.
+        //uint16        VertGlyphCount          Number of glyphs for which information is provided for vertically growing variants.
+        //uint16        HorizGlyphCount         Number of glyphs for which information is provided for horizontally growing variants.
+        //Offset16      VertGlyphConstruction[VertGlyphCount]  Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in vertical direction.
+        //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
+
+        public ushort MinConnectorOverlap;
+        public void ReadContentFrom(BinaryReader reader)
+        {
+            long startAt = reader.BaseStream.Position;
+            //
+            MinConnectorOverlap = reader.ReadUInt16();
+            ushort vertGlyphCoverage = reader.ReadUInt16();
+            ushort horizGlyphCoverage = reader.ReadUInt16();
+            ushort vertGlyphCount = reader.ReadUInt16();
+            ushort horizGlyphCount = reader.ReadUInt16();
+            ushort[] vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
+            ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
+            //
+        }
+    }
+
+    class MathGlyphConstructionTable
+    {
+        //MathGlyphConstruction Table  
+        //The MathGlyphConstruction table provides information on finding or assembling extended variants for one particular glyph.It can be used for shapes that grow in both horizontal and vertical directions.
+
+        //The first entry is the offset to the GlyphAssembly table that specifies how the shape for this glyph can be assembled from parts found in the glyph set of the font.If no such assembly exists, this offset will be set to NULL.
+
+        //The MathGlyphConstruction table also contains the count and array of ready-made glyph variants for the specified glyph.Each variant consists of the glyph index and this glyph’s measurement in the direction of extension (vertical or horizontal).
+
+        //Note that it is quite possible that both the GlyphAssembly table and some variants are defined for a particular glyph.For example, the font may specify several variants for curly braces of different sizes, and a general mechanism of how larger versions of curly braces can be constructed by stacking parts found in the glyph set.First attempt is made to find glyph among provided variants.However, if the required size is bigger than all glyph variants provided, the general mechanism can be employed to typeset the curly braces as a glyph assembly.
+
+        //MathGlyphConstruction Table
+        //Type          Name            Description
+        //Offset16      GlyphAssembly   Offset to GlyphAssembly table for this shape - from the beginning of MathGlyphConstruction table.May be NULL.
+        //uint16        VariantCount    Count of glyph growing variants for this glyph.
+        //MathGlyphVariantRecord MathGlyphVariantRecord [VariantCount]   MathGlyphVariantRecords for alternative variants of the glyphs.
+
+
+    }
     class GlyphAssemblyTable { }
 }
