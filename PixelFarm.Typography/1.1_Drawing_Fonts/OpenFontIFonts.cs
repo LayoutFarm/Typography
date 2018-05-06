@@ -81,6 +81,8 @@ namespace LayoutFarm
         {
             throw new NotSupportedException();
 
+            //NOTE: Maybe replace following with Typography.TextLayout.GlyphLayout.LayoutAndMeasureString
+
             ////measure string 
             //if (str.Length < 1)
             //{
