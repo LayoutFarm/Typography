@@ -157,9 +157,12 @@ namespace Typography.OpenFont.Tables
             mc.RadicalDegreeBottomRaisePercent = reader.ReadInt16();
 
 
+            this._mathConstTable = mc;
         }
         void ReadMathMathGlyphInfoTable(BinaryReader reader)
         {
+           
+
 
         }
         void ReadMathMathVariantsTable(BinaryReader reader)
@@ -188,7 +191,7 @@ namespace Typography.OpenFont.Tables
     class MathConstantsTable
     {
 
-        //    When selecting names for values in the MathConstants table, the following naming convention should be used:
+        //When selecting names for values in the MathConstants table, the following naming convention should be used:
 
         //Height – Specifies a distance from the main baseline.
         //Kern – Represents a fixed amount of empty space to be introduced.
@@ -504,6 +507,7 @@ namespace Typography.OpenFont.Tables
     }
     class MathItalicsCorrectonInfoTable
     {
+
     }
     class MathTopAccentAttachmentTable
     {
