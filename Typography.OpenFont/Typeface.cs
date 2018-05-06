@@ -217,8 +217,14 @@ namespace Typography.OpenFont
                     //check data from adobe glyph list 
                     //from the unicode value
                     //select glyph index   
+
+                    //we use AdobeGlyphList
+                    //from https://github.com/adobe-type-tools/agl-aglfn/blob/master/glyphlist.txt
+
+                    //but user can provide their own map here...
+
                     return LookupIndex(AdobeGlyphList.GetUnicodeValueByGlyphName(glyphName));
-                } 
+                }
             }
             return 0;
         }
