@@ -123,25 +123,7 @@ namespace SampleWinForms
             UpdateGlyphLayoutSettings();
 
             //2. unscale layout, in design unit
-            this._glyphLayout.Layout(textBuffer, startAt, len);
-
-            //3. scale  to specific font size
-            _outputGlyphPlans.Clear();
-
-            GlyphLayoutExtensions.GenerateGlyphPlan(
-                _glyphLayout.ResultUnscaledGlyphPositions,
-                _currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
-                false,
-                _outputGlyphPlans);
-            //
-            float pxscale = this.Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
-            return new MeasuredStringBox(
-                  _outputGlyphPlans.AccumAdvanceX * pxscale,
-                  _currentTypeface.Ascender * pxscale,
-                  _currentTypeface.Descender * pxscale,
-                  _currentTypeface.LineGap * pxscale,
-                   Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_currentTypeface) * pxscale);
-
+            return this._glyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints, out _outputGlyphPlans);
         }
         public void UpdateGlyphLayoutSettings()
         {

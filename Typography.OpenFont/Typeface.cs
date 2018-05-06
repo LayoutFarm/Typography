@@ -285,26 +285,40 @@ namespace Typography.OpenFont
 
         //-------------------------------------------------------
 
-        public void Lookup(char[] buffer, List<int> output)
+        public IEnumerable<int> GetCodepoints(char[] str, int startAt = 0, int len = -1)
         {
-            //do shaping here?
-            //1. do look up and substitution 
-            for (int i = 0; i < buffer.Length; ++i)
+            if (len == -1) len = str.Length;
+            // this is important!
+            // -----------------------
+            //  from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // In many places, "char" is not a valid type to handle characters, because it
+            // only supports 16 bits.In order to handle the full range of Unicode characters,
+            // we need to use "int".
+            // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
+            // though they are encoded as two "char"s in a C# string.
+            for (int i = 0; i < len; ++i)
             {
-                char ch = buffer[i];
+                char ch = str[startAt + i];
                 int codepoint = ch;
-                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < buffer.Length)
+                if (char.IsHighSurrogate(ch) && i + 1 < len)
                 {
-                    char nextCh = buffer[i + 1];
-                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
+                    char nextCh = str[startAt + i + 1];
+                    if (char.IsLowSurrogate(nextCh))
                     {
                         ++i;
                         codepoint = char.ConvertToUtf32(ch, nextCh);
                     }
                 }
-
-                output.Add(LookupIndex(codepoint));
+                yield return codepoint;
             }
+        }
+
+        public void LookupIndices(char[] buffer, List<int> output)
+        {
+            //do shaping here?
+            //1. do look up and substitution 
+            foreach(var codepoint in GetCodepoints(buffer))
+                output.Add(LookupIndex(codepoint));
 
             //TODO: review here again
             //tmp disable here
