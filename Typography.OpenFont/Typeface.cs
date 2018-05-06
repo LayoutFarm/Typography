@@ -208,7 +208,17 @@ namespace Typography.OpenFont
             }
             else if (PostTable != null)
             {
-                return PostTable.GetGlyphIndex(glyphName);
+                if (PostTable.Version == 2)
+                {
+                    return PostTable.GetGlyphIndex(glyphName);
+                }
+                else
+                {
+                    //check data from adobe glyph list 
+                    //from the unicode value
+                    //select glyph index   
+                    return LookupIndex(AdobeGlyphList.GetUnicodeValueByGlyphName(glyphName));
+                } 
             }
             return 0;
         }
@@ -317,7 +327,7 @@ namespace Typography.OpenFont
         {
             //do shaping here?
             //1. do look up and substitution 
-            foreach(var codepoint in GetCodepoints(buffer))
+            foreach (var codepoint in GetCodepoints(buffer))
                 output.Add(LookupIndex(codepoint));
 
             //TODO: review here again

@@ -35,6 +35,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Typography.OpenFont\AdditionalInfo\AdobeGlyphList.cs">
+      <Link>AdditionalInfo\AdobeGlyphList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.OpenFont\AdditionalInfo\AdobeGlyphListForNewFont.cs">
+      <Link>AdditionalInfo\AdobeGlyphListForNewFont.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.OpenFont\AdditionalInfo\MacPostFormat1.cs">
       <Link>AdditionalInfo\MacPostFormat1.cs</Link>
     </Compile>
