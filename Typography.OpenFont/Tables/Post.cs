@@ -85,6 +85,7 @@ namespace Typography.OpenFont.Tables
                 version_f == 3)
             {
                 //end here
+                //so _glyphNames=> null!
             }
             else if (version_f == 2)
             {
@@ -158,6 +159,11 @@ namespace Typography.OpenFont.Tables
         }
         internal ushort GetGlyphIndex(string glyphName)
         {
+            if (_glyphNames == null)
+            {
+                return 0; //not found!
+            }
+            //
             if (_glyphIndiceByName == null)
             {
                 //------
