@@ -212,7 +212,8 @@ namespace Typography.TextLayout
             }
 
             _codepoints.Clear();
-            _codepoints.AddRange(_typeface.GetCodepoints(str, startAt, len));
+            StringUtils.FillWithCodepoints(_codepoints, str, startAt, len);
+
 
             // clear before use
             _inputGlyphs.Clear();
@@ -395,7 +396,7 @@ namespace Typography.TextLayout
 
             }
         }
-       
+
     }
 
     /// <summary>
