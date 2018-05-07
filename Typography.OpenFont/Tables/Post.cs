@@ -57,6 +57,7 @@ namespace Typography.OpenFont.Tables
         Dictionary<ushort, string> _glyphNames;
         Dictionary<string, ushort> _glyphIndiceByName;
 
+        public int Version { get; set; }
         public override string Name
         {
             get { return "post"; }
@@ -85,9 +86,12 @@ namespace Typography.OpenFont.Tables
                 version_f == 3)
             {
                 //end here
+                //so _glyphNames=> null!
+                Version = (int)version_f;
             }
             else if (version_f == 2)
             {
+                Version = 2;
 
                 //Version 2.0
 
@@ -158,6 +162,11 @@ namespace Typography.OpenFont.Tables
         }
         internal ushort GetGlyphIndex(string glyphName)
         {
+            if (_glyphNames == null)
+            {
+                return 0; //not found!
+            }
+            //
             if (_glyphIndiceByName == null)
             {
                 //------
@@ -168,7 +177,6 @@ namespace Typography.OpenFont.Tables
                     _glyphIndiceByName.Add(kp.Value, kp.Key);
                 }
             }
-
             _glyphIndiceByName.TryGetValue(glyphName, out ushort found);
             return found;
         }

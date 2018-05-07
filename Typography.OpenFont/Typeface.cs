@@ -208,7 +208,23 @@ namespace Typography.OpenFont
             }
             else if (PostTable != null)
             {
-                return PostTable.GetGlyphIndex(glyphName);
+                if (PostTable.Version == 2)
+                {
+                    return PostTable.GetGlyphIndex(glyphName);
+                }
+                else
+                {
+                    //check data from adobe glyph list 
+                    //from the unicode value
+                    //select glyph index   
+
+                    //we use AdobeGlyphList
+                    //from https://github.com/adobe-type-tools/agl-aglfn/blob/master/glyphlist.txt
+
+                    //but user can provide their own map here...
+
+                    return LookupIndex(AdobeGlyphList.GetUnicodeValueByGlyphName(glyphName));
+                }
             }
             return 0;
         }
@@ -285,33 +301,8 @@ namespace Typography.OpenFont
 
         //-------------------------------------------------------
 
-        public void Lookup(char[] buffer, List<int> output)
-        {
-            //do shaping here?
-            //1. do look up and substitution 
-            for (int i = 0; i < buffer.Length; ++i)
-            {
-                char ch = buffer[i];
-                int codepoint = ch;
-                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < buffer.Length)
-                {
-                    char nextCh = buffer[i + 1];
-                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
-                    {
-                        ++i;
-                        codepoint = char.ConvertToUtf32(ch, nextCh);
-                    }
-                }
-
-                output.Add(LookupIndex(codepoint));
-            }
-
-            //TODO: review here again
-            //tmp disable here
-            //check for glyph substitution
-            //this.GSUBTable.CheckSubstitution(output[1]);
-        }
-        //-------------------------------------------------------
+        
+         
         //experiment
         internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
         {
@@ -370,7 +361,64 @@ namespace Typography.OpenFont
     }
 
 
+    public static class StringUtils
+    {
+        public static void FillWithCodepoints(List<int> codepoints, char[] str, int startAt = 0, int len = -1)
+        {
 
+            if (len == -1) len = str.Length;
+            // this is important!
+            // -----------------------
+            //  from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // In many places, "char" is not a valid type to handle characters, because it
+            // only supports 16 bits.In order to handle the full range of Unicode characters,
+            // we need to use "int".
+            // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
+            // though they are encoded as two "char"s in a C# string.
+            for (int i = 0; i < len; ++i)
+            {
+                char ch = str[startAt + i];
+                int codepoint = ch;
+                if (char.IsHighSurrogate(ch) && i + 1 < len)
+                {
+                    char nextCh = str[startAt + i + 1];
+                    if (char.IsLowSurrogate(nextCh))
+                    {
+                        ++i;
+                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                    }
+                }
+                codepoints.Add(codepoint);
+            }
+        }
+        public static IEnumerable<int> GetCodepoints(char[] str, int startAt = 0, int len = -1)
+        {
+            if (len == -1) len = str.Length;
+            // this is important!
+            // -----------------------
+            //  from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // In many places, "char" is not a valid type to handle characters, because it
+            // only supports 16 bits.In order to handle the full range of Unicode characters,
+            // we need to use "int".
+            // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
+            // though they are encoded as two "char"s in a C# string.
+            for (int i = 0; i < len; ++i)
+            {
+                char ch = str[startAt + i];
+                int codepoint = ch;
+                if (char.IsHighSurrogate(ch) && i + 1 < len)
+                {
+                    char nextCh = str[startAt + i + 1];
+                    if (char.IsLowSurrogate(nextCh))
+                    {
+                        ++i;
+                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                    }
+                }
+                yield return codepoint;
+            }
+        }
+    }
 
     namespace Extensions
     {
