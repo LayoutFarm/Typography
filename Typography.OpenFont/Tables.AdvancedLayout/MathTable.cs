@@ -158,6 +158,8 @@ namespace Typography.OpenFont.Tables
 
             this._mathConstTable = mc;
         }
+
+        CoverageTable _extendedShapeCoverageTable;
         void ReadMathMathGlyphInfoTable(BinaryReader reader)
         {
 
@@ -184,8 +186,19 @@ namespace Typography.OpenFont.Tables
             reader.BaseStream.Position = startAt + offsetTo_MathTopAccentAttachment_Table;
             ReadMathTopAccentAttachment(reader);
             //
-            reader.BaseStream.Position = startAt + offsetTo_Extended_Shape_coverage_Table;
-            ReadExtendedShapeCoverageTable(reader);
+
+
+            //TODO:...
+            //The glyphs covered by this table are to be considered extended shapes.
+            //These glyphs are variants extended in the vertical direction, e.g.,
+            //to match height of another part of the formula.
+            //Because their dimensions may be very large in comparison with normal glyphs in the glyph set,
+            //the standard positioning algorithms will not produce the best results when applied to them.
+            //In the vertical direction, other formula elements will be positioned not relative to those glyphs,
+            //but instead to the ink box of the subexpression containing them
+
+            //.... 
+            _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
             //
             reader.BaseStream.Position = startAt + offsetTo_MathKernInfo_Table;
             ReadMathKernInfoTable(reader);
@@ -199,26 +212,26 @@ namespace Typography.OpenFont.Tables
         }
 
         MathVariantsTable _mathVariantsTable;
+
         MathItalicsCorrectonInfoTable _mathItalicCorrectionInfo;
         void ReadMathItalicCorrectionInfoTable(BinaryReader reader)
         {
-            long startAt = reader.BaseStream.Position;
+            long beginAt = reader.BaseStream.Position;
             _mathItalicCorrectionInfo = new MathItalicsCorrectonInfoTable();
-
-
             //MathItalicsCorrectionInfo Table
             //Type           Name                           Description
             //Offset16       Coverage                       Offset to Coverage table - from the beginning of MathItalicsCorrectionInfo table.
             //uint16         ItalicsCorrectionCount         Number of italics correction values.Should coincide with the number of covered glyphs.
-            //MathValueRecord ItalicsCorrection[ItalicsCorrectionCount]  Array of MathValueRecords defining italics correction values for each covered glyph.
-
-
+            //MathValueRecord ItalicsCorrection[ItalicsCorrectionCount]  Array of MathValueRecords defining italics correction values for each covered glyph. 
             ushort coverageOffset = reader.ReadUInt16();
             ushort italicCorrectionCount = reader.ReadUInt16();
-            MathValueRecord[] italicCorrections = reader.ReadMathValueRecords(italicCorrectionCount);
+            _mathItalicCorrectionInfo.ItalicCorrections = reader.ReadMathValueRecords(italicCorrectionCount);
             //read coverage ...
+            _mathItalicCorrectionInfo.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
 
         }
+
+        MathTopAccentAttachmentTable _mathTopAccentAttachmentTable;
         void ReadMathTopAccentAttachment(BinaryReader reader)
         {
             //MathTopAccentAttachment Table
@@ -235,24 +248,17 @@ namespace Typography.OpenFont.Tables
             //Offset16      TopAccentCoverage           Offset to Coverage table - from the beginning of MathTopAccentAttachment table.
             //uint16        TopAccentAttachmentCount    Number of top accent attachment point values.Should coincide with the number of covered glyphs.
             //MathValueRecord TopAccentAttachment[TopAccentAttachmentCount]  Array of MathValueRecords defining top accent attachment points for each covered glyph.
-            ushort topAccentCoverage = reader.ReadUInt16();
+
+
+            long beginAt = reader.BaseStream.Position;
+            _mathTopAccentAttachmentTable = new MathTopAccentAttachmentTable();
+
+            ushort coverageOffset = reader.ReadUInt16();
             ushort topAccentAttachmentCount = reader.ReadUInt16();
-            MathValueRecord[] topAccentAttachMents = reader.ReadMathValueRecords(topAccentAttachmentCount);
+            _mathTopAccentAttachmentTable.TopAccentAttachment = reader.ReadMathValueRecords(topAccentAttachmentCount);
+            _mathTopAccentAttachmentTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
         }
-        void ReadExtendedShapeCoverageTable(BinaryReader reader)
-        {
-            //TODO:...
-            //The glyphs covered by this table are to be considered extended shapes.
-            //These glyphs are variants extended in the vertical direction, e.g.,
-            //to match height of another part of the formula.
-            //Because their dimensions may be very large in comparison with normal glyphs in the glyph set,
-            //the standard positioning algorithms will not produce the best results when applied to them.
-            //In the vertical direction, other formula elements will be positioned not relative to those glyphs,
-            //but instead to the ink box of the subexpression containing them
 
-            //....
-
-        }
         void ReadMathKernInfoTable(BinaryReader reader)
         {
             // MathKernInfo Table
@@ -302,6 +308,20 @@ namespace Typography.OpenFont.Tables
             this.Value = value;
             this.DeviceTable = deviceTable;
         }
+#if DEBUG
+        public override string ToString()
+        {
+            if (DeviceTable == 0)
+            {
+                return Value.ToString();
+            }
+            else
+            {
+                return Value + "," + DeviceTable;
+            }
+
+        }
+#endif
     }
 
     struct MathKernInfoRecord
@@ -676,13 +696,15 @@ namespace Typography.OpenFont.Tables
         //    When positioning limits on an N-ary operator (e.g., integral sign), the horizontal position of the upper limit is moved to the right by ½ of the italics correction, while the position of the lower limit is moved to the left by the same distance.
         //    When positioning superscripts and subscripts, their default horizontal positions are also different by the amount of the italics correction of the preceding glyph.
 
-
+        public MathValueRecord[] ItalicCorrections;
+        public CoverageTable CoverageTable;
 
 
     }
     class MathTopAccentAttachmentTable
     {
-
+        public MathValueRecord[] TopAccentAttachment;
+        public CoverageTable CoverageTable;
     }
     class ExtendedShapeCoverageTable
     {
@@ -723,18 +745,26 @@ namespace Typography.OpenFont.Tables
         //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
 
         public ushort MinConnectorOverlap;
+        ushort[] vertGlyphConstructions;
+        ushort[] horizonGlyphConstructions;
+        CoverageTable vertCoverage;
+        CoverageTable horizCoverage;
         public void ReadContentFrom(BinaryReader reader)
         {
             long startAt = reader.BaseStream.Position;
             //
             MinConnectorOverlap = reader.ReadUInt16();
-            ushort vertGlyphCoverage = reader.ReadUInt16();
-            ushort horizGlyphCoverage = reader.ReadUInt16();
+            //
+            ushort vertGlyphCoverageOffset = reader.ReadUInt16();
+            ushort horizGlyphCoverageOffset = reader.ReadUInt16();
             ushort vertGlyphCount = reader.ReadUInt16();
             ushort horizGlyphCount = reader.ReadUInt16();
-            ushort[] vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
-            ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
+            vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
+            horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
             //
+
+            vertCoverage = CoverageTable.CreateFrom(reader, startAt + vertGlyphCoverageOffset);
+            horizCoverage = CoverageTable.CreateFrom(reader, startAt + horizGlyphCoverageOffset);
         }
     }
 
