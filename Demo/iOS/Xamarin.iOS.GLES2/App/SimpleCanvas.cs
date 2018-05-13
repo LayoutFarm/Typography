@@ -112,8 +112,8 @@ namespace DrawingGL
                 GlyphRun run = glyphs[i];
                 //
                 fillShader.SetOffset(
-                   x + run.OffsetX * scale,
-                   y + run.OffsetY * scale);
+                   x + run.OffsetX,
+                   y + run.OffsetY);
                 //
                 fillShader.FillTriangles(
                     run.tessData,
