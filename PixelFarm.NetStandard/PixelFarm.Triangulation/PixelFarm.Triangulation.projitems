@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>d487dfd2-3da4-4a72-93ed-6048ea8029db</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PixelFarm.Triangulation</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)P2T.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Polygon\Polygon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\DelaunayTriangle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\Sweep\AdvancingFront.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\Sweep\DTSweep.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\Sweep\DTSweepConstraint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\Sweep\DTSweepContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Delaunay\Sweep\PointOnEdgeException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\ITriangulatable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Orientation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Sets\ConstrainedPointSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Sets\PointSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\TriangulationAlgorithm.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\TriangulationContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\TriangulationDebugContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\TriangulationMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\TriangulationPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\TriangulationUtil.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Util\PointGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Triangulation\Util\PolygonGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)x_notused\DTSweepBasin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)x_notused\DTSweepEdgeEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)x_notused\DTSweepPointComparator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)x_notused\FixedArray3.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)x_notused\FixedBitArray3.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)x_notused\PolygonSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)x_notused\TriangulationConstraint.cs" />
+  </ItemGroup>
+</Project>

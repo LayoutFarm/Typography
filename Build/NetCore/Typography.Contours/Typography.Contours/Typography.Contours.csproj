@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
+
+  <Import Project="..\..\..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Typography.OpenFont\Typography.OpenFont\Typography.OpenFont.csproj" />
+  </ItemGroup>
+
+   
+</Project>
