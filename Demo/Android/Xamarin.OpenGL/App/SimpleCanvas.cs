@@ -102,9 +102,9 @@ namespace DrawingGL
             //fill text run at spefic pos
 
             List<GlyphRun> glyphs = textRun._glyphs;
-            int j = glyphs.Count;
-
-            float scale = textRun.CalculateToPixelScaleFromPointSize(textRun.sizeInPoints);
+            int j = glyphs.Count; 
+            float x_pos = x;
+            float y_pos = y;
 
             for (int i = 0; i < j; ++i)
             {
@@ -112,9 +112,10 @@ namespace DrawingGL
                 GlyphRun run = glyphs[i];
                 //
                 fillShader.SetOffset(
-                   x + run.OffsetX * scale,
-                   y + run.OffsetY * scale);
+                   x_pos + run.OffsetX ,
+                   y_pos + run.OffsetY);
                 //
+                
                 fillShader.FillTriangles(
                     run.tessData,
                     run.nTessElements,

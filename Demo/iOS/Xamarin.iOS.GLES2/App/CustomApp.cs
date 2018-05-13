@@ -22,12 +22,26 @@ namespace Xamarin.iOS.GLES2
             DrawingGL.Text.Utility.SetLoadFontDel(
             fontfile =>
                  {
+
+                     if (File.Exists("DroidSans.ttf"))
+                     {
+                         using (Stream s = new FileStream("DroidSans.ttf", FileMode.Open))
+                         using (var ms = new MemoryStream())// This is a simple hack because on Xamarin.Android, a `Stream` created by `AssetManager.Open` is not seekable.
+                         {
+                             s.CopyTo(ms);
+                             return new MemoryStream(ms.ToArray());
+                         }
+                     }
+
+
                      return null;
                  });
 
             //--------------------------------------
             simpleCanvas = new SimpleCanvas(canvasW, canvasH);
             var text = "Typography";
+
+
             //optional ....
             //var directory = AndroidOS.Environment.ExternalStorageDirectory;
             //var fullFileName = Path.Combine(directory.ToString(), "TypographyTest.txt");

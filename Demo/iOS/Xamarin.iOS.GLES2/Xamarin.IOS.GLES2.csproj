@@ -22,6 +22,7 @@
     <MtouchArch>x86_64</MtouchArch>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>true</MtouchDebug>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -91,6 +92,9 @@
     <Compile Include="App\SimpleCanvas.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <BundleResource Include="DroidSans.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </BundleResource>
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <InterfaceDefinition Include="Main.storyboard" />
@@ -111,17 +115,13 @@
     <Content Include="Entitlements.plist" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\IOS\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{7b742f80-62ce-401b-96c6-cfcc30002f19}</Project>
+    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
       <Name>Typography.GlyphLayout</Name>
-      <IsAppExtension>false</IsAppExtension>
-      <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\IOS\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{a96adb72-b7fd-4f8f-acf0-df1274ddda6b}</Project>
+    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{280d17d5-4435-4ead-839a-33c5a8990e7e}</Project>
       <Name>Typography.OpenFont</Name>
-      <IsAppExtension>false</IsAppExtension>
-      <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\Shared\DrawingGL.Common.projitems" Label="Shared" />

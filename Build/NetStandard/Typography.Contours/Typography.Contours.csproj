@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
+
+  <Import Project="..\..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
+  </ItemGroup>
+
+</Project>
