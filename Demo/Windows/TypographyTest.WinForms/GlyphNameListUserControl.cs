@@ -38,7 +38,23 @@ namespace TypographyTest.WinForms
                     }
                 }
             };
+
+            this.textBox1.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    //find user name first
+                    string userSupplyGlyphName = this.textBox1.Text;
+                    Glyph found = _selectedTypeface.GetGlyphByName(userSupplyGlyphName);
+                    if (found != null)
+                    {
+                        int sel_index = listBox1.FindString(userSupplyGlyphName);
+                        listBox1.SelectedIndex = sel_index;
+                    }
+                }
+            };
         }
+
         private void GlyphNameListUserControl_Load(object sender, EventArgs e)
         {
 

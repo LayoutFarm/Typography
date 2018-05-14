@@ -105,39 +105,19 @@ namespace Typography.OpenFont.Tables
                 //This font file contains glyphs not in the standard Macintosh set,
                 //or the ordering of the glyphs in the font file differs from the standard Macintosh set. 
                 //The glyph name array maps the glyphs in this font to name index.
-                //If the name index is between 0 and 257, treat the name index as a glyph index in the Macintosh standard order. 
-                //If the name index is between 258 and 65535, 
-                //then subtract 258 and use that to index into the list of Pascal strings at the end of the table. 
-                //Thus a given font may map some of its glyphs to the standard glyph names, and some to its own names.
-
+                //....
                 //If you do not want to associate a PostScript name with a particular glyph, use index number 0 which points to the name .notdef.
 
                 _glyphNames = new Dictionary<ushort, string>();
-
                 ushort numOfGlyphs = reader.ReadUInt16();
                 ushort[] glyphNameIndice = Utils.ReadUInt16Array(reader, numOfGlyphs);//***  
                 string[] stdMacGlyphNames = MacPostFormat1.GetStdMacGlyphNames();
                 for (int i = 0; i < numOfGlyphs; ++i)
                 {
                     ushort glyphNameIndex = glyphNameIndice[i];
-
-                    if (glyphNameIndex > 257)
+                    if (glyphNameIndex < 258)
                     {
-                        int len = reader.ReadByte();
-                        //                        string name = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len));
-                        //#if DEBUG
-                        //                        if (name == null)
-                        //                        { 
-                        //                        }
-                        //#endif
-
-                        _glyphNames.Add(glyphNameIndex, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len)));
-                    }
-                    else
-                    {
-                        //258 and 65535, 
-
-                        //TODO: get standard Macintosh set. 
+                        //If the name index is between 0 and 257, treat the name index as a glyph index in the Macintosh standard order.  
                         //                        string name = stdMacGlyphNames[glyphNameIndex];
                         //#if DEBUG
                         //                        if (name == null)
@@ -147,6 +127,24 @@ namespace Typography.OpenFont.Tables
                         //#endif
                         _glyphNames.Add(glyphNameIndex, stdMacGlyphNames[glyphNameIndex]);
                     }
+                    else
+                    {
+                        //If the name index is between 258 and 65535, 
+                        //then subtract 258 and use that to index into the list of Pascal strings at the end of the table. 
+                        //Thus a given font may map some of its glyphs to the standard glyph names, and some to its own names.
+
+                        //258 and 65535, 
+                        int len = reader.ReadByte();
+
+                        //                        string name = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len));
+                        //#if DEBUG
+                        //                        if (name == null)
+                        //                        { 
+                        //                        }
+                        //#endif
+
+                        _glyphNames.Add(glyphNameIndex, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len)));
+                    } 
                 }
             }
             else
