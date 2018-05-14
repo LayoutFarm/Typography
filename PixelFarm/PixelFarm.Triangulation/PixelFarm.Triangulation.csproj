@@ -52,36 +52,73 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="P2T.cs" />
-    <Compile Include="Polygon\Polygon.cs" />
-    <Compile Include="x_notused\PolygonSet.cs" />
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\P2T.cs">
+      <Link>P2T.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Polygon\Polygon.cs">
+      <Link>Polygon\Polygon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\DelaunayTriangle.cs">
+      <Link>Triangulation\Delaunay\DelaunayTriangle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\AdvancingFront.cs">
+      <Link>Triangulation\Delaunay\Sweep\AdvancingFront.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs">
+      <Link>Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweep.cs">
+      <Link>Triangulation\Delaunay\Sweep\DTSweep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepConstraint.cs">
+      <Link>Triangulation\Delaunay\Sweep\DTSweepConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepContext.cs">
+      <Link>Triangulation\Delaunay\Sweep\DTSweepContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs">
+      <Link>Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\PointOnEdgeException.cs">
+      <Link>Triangulation\Delaunay\Sweep\PointOnEdgeException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\ITriangulatable.cs">
+      <Link>Triangulation\ITriangulatable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Orientation.cs">
+      <Link>Triangulation\Orientation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Sets\ConstrainedPointSet.cs">
+      <Link>Triangulation\Sets\ConstrainedPointSet.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Sets\PointSet.cs">
+      <Link>Triangulation\Sets\PointSet.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationAlgorithm.cs">
+      <Link>Triangulation\TriangulationAlgorithm.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationContext.cs">
+      <Link>Triangulation\TriangulationContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationDebugContext.cs">
+      <Link>Triangulation\TriangulationDebugContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationMode.cs">
+      <Link>Triangulation\TriangulationMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationPoint.cs">
+      <Link>Triangulation\TriangulationPoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationUtil.cs">
+      <Link>Triangulation\TriangulationUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Util\PointGenerator.cs">
+      <Link>Triangulation\Utils\PointGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Util\PolygonGenerator.cs">
+      <Link>Triangulation\Utils\PolygonGenerator.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Triangulation\Delaunay\DelaunayTriangle.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\AdvancingFront.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweep.cs" />
-    <Compile Include="x_notused\DTSweepBasin.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepConstraint.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepContext.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs" />
-    <Compile Include="x_notused\DTSweepEdgeEvent.cs" />
-    <Compile Include="x_notused\DTSweepPointComparator.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\PointOnEdgeException.cs" />
-    <Compile Include="Triangulation\Orientation.cs" />
-    <Compile Include="Triangulation\Sets\ConstrainedPointSet.cs" />
-    <Compile Include="Triangulation\Sets\PointSet.cs" />
-    <Compile Include="Triangulation\ITriangulatable.cs" />
-    <Compile Include="Triangulation\TriangulationAlgorithm.cs" />
-    <Compile Include="x_notused\TriangulationConstraint.cs" />
-    <Compile Include="Triangulation\TriangulationContext.cs" />
-    <Compile Include="Triangulation\TriangulationDebugContext.cs" />
-    <Compile Include="Triangulation\TriangulationMode.cs" />
-    <Compile Include="Triangulation\TriangulationPoint.cs" />
-    <Compile Include="Triangulation\TriangulationUtil.cs" />
-    <Compile Include="Triangulation\Util\PointGenerator.cs" />
-    <Compile Include="Triangulation\Util\PolygonGenerator.cs" />
-    <Compile Include="x_notused\FixedArray3.cs" />
-    <Compile Include="x_notused\FixedBitArray3.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
