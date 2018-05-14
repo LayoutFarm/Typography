@@ -81,6 +81,10 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.Contours\Typography.Contours.csproj">
+      <Project>{4c8f33a9-059c-4102-8135-ac34ec7d6828}</Project>
+      <Name>Typography.Contours</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
       <Name>Typography.GlyphLayout</Name>

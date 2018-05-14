@@ -27,5 +27,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\MyMath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\Rect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphDynamicOutline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilderBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\HintTechnique.cs" />
   </ItemGroup>
 </Project>
