@@ -921,7 +921,7 @@ namespace Typography.OpenFont.CFF
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs; ++i)
             {
-                //fill font name?
+                
                 ushort sid = _reader.ReadUInt16();
                 if (sid <= Cff1FontSet.nStdStrings)
                 {
@@ -931,7 +931,7 @@ namespace Typography.OpenFont.CFF
                 }
                 else
                 {
-                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings];
+                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings-1];
                 }
             }
         }
