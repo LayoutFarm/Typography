@@ -88,14 +88,8 @@
     <Compile Include="..\..\..\Typography.Contours\GlyphDynamicOutline.cs">
       <Link>GlyphDynamicOutline.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilder\GlyphPathBuilder.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilder\GlyphPathBuilderBase.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilder\HintTechnique.cs">
-      <Link>GlyphPathBuilder\HintTechnique.cs</Link>
+    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilderBase.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

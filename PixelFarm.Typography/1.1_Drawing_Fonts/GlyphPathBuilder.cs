@@ -25,7 +25,7 @@ namespace Typography.Contours
         public bool dbugAlwaysDoCurveAnalysis;
 #endif
 
-        public bool TemporaryDisableCustomFit { get; set; }
+        internal bool TemporaryDisableCustomFit { get; set; }
         /// <summary>
         /// glyph dynamic edge offset
         /// </summary>

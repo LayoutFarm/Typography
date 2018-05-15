@@ -36,6 +36,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="..\..\Shared\DevTextPrinter\DevTextPrinterBase.cs">
       <Link>DevTextPrinter\DevTextPrinterBase.cs</Link>
     </Compile>
@@ -44,6 +47,9 @@
     </Compile>
     <Compile Include="..\..\Shared\DevTextPrinter\GlyphMeshCollection.cs">
       <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\DevGdiTextPrinter.cs">
       <Link>GdiPlus\DevGdiTextPrinter.cs</Link>
@@ -94,10 +100,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.Contours\Typography.Contours.csproj">
-      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
-      <Name>Typography.Contours</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>
       <Name>Typography.GlyphLayout</Name>
