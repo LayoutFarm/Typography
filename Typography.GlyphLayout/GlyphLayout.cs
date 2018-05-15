@@ -304,7 +304,7 @@ namespace Typography.TextLayout
             //
             float pxscale = _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
             return new MeasuredStringBox(
-                  _outputGlyphPlans.AccumAdvanceX * pxscale,
+                  _outputGlyphPlans.AccumAdvanceX,
                   _typeface.Ascender * pxscale,
                   _typeface.Descender * pxscale,
                   _typeface.LineGap * pxscale,
