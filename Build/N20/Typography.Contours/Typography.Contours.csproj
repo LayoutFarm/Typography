@@ -88,6 +88,9 @@
     <Compile Include="..\..\..\Typography.Contours\GlyphDynamicOutline.cs">
       <Link>GlyphDynamicOutline.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

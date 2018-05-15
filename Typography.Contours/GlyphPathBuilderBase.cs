@@ -134,11 +134,11 @@ namespace Typography.Contours
 
     public static class GlyphPathBuilderExtensions
     {
-        public static void Build(this GlyphPathBuilder builder, char c, float sizeInPoints)
+        public static void Build(this GlyphPathBuilderBase builder, char c, float sizeInPoints)
         {
             builder.BuildFromGlyphIndex((ushort)builder.Typeface.LookupIndex(c), sizeInPoints);
         }
-        public static void SetHintTechnique(this GlyphPathBuilder builder, HintTechnique hintTech)
+        public static void SetHintTechnique(this GlyphPathBuilderBase builder, HintTechnique hintTech)
         {
 
             builder.UseTrueTypeInstructions = false;//reset
