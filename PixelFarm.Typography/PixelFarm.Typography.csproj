@@ -101,7 +101,6 @@
     <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilder.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphMeshCollection.cs" />
-    <Compile Include="1.1_Drawing_Fonts\HintTechnique.cs" />
     <Compile Include="1.1_Drawing_Fonts\OpenFontIFonts.cs" />
     <Compile Include="1.1_Drawing_Fonts\PixelScaleLayoutEngine.cs" />
     <Compile Include="1.2_\TextShapingAndLayoutService.cs" />
@@ -111,7 +110,6 @@
     <Compile Include="3_FontFaceImpl\ScriptLangConv.cs" />
     <Compile Include="3_FontFaceImpl\TextureFontLoader.cs" />
     <Compile Include="6_AggTexture\AggGlyphTextureGen.cs" />
-    <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilderBase.cs" />
     <Compile Include="1.2_\FontStyleExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

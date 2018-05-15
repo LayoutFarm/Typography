@@ -1,7 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev
 
-using Typography.OpenFont;
-using Typography.Rendering;
+using Typography.OpenFont; 
 
 namespace Typography.Contours
 {
@@ -135,11 +134,11 @@ namespace Typography.Contours
 
     public static class GlyphPathBuilderExtensions
     {
-        public static void Build(this GlyphPathBuilder builder, char c, float sizeInPoints)
+        public static void Build(this GlyphPathBuilderBase builder, char c, float sizeInPoints)
         {
             builder.BuildFromGlyphIndex((ushort)builder.Typeface.LookupIndex(c), sizeInPoints);
         }
-        public static void SetHintTechnique(this GlyphPathBuilder builder, HintTechnique hintTech)
+        public static void SetHintTechnique(this GlyphPathBuilderBase builder, HintTechnique hintTech)
         {
 
             builder.UseTrueTypeInstructions = false;//reset
@@ -159,5 +158,24 @@ namespace Typography.Contours
                     break;
             }
         }
+    }
+    public enum HintTechnique : byte
+    {
+        /// <summary>
+        /// no hinting
+        /// </summary>
+        None,
+        /// <summary>
+        /// truetype instruction
+        /// </summary>
+        TrueTypeInstruction,
+        /// <summary>
+        /// truetype instruction vertical only
+        /// </summary>
+        TrueTypeInstruction_VerticalOnly,
+        /// <summary>
+        /// custom hint
+        /// </summary>
+        CustomAutoFit
     }
 }
