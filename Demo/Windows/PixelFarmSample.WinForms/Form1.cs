@@ -132,7 +132,7 @@ namespace SampleWinForms
             GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
-            
+
             float x_pos = 0, y_pos = 50;
             var glyphPlanList = new Typography.TextLayout.GlyphPlanList();
 
@@ -181,7 +181,7 @@ namespace SampleWinForms
                 _devVxsTextPrinter.TargetCanvasPainter = painter;
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
-                //_devGdiTextPrinter.TargetGraphics = g;
+
             }
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -591,6 +591,28 @@ namespace SampleWinForms
             this.Text = "Render with PixelFarm";
         }
 
+        private void cmdMeasureString_Click(object sender, EventArgs e)
+        {
 
+            //How to measure user's string...
+            //this demostrate step-by-step
+
+            //similar to ...  selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos); 
+            string str = txtInputChar.Text;
+            //
+            Typeface typeface = _basicOptions.Typeface;
+            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
+
+            var layout = new Typography.TextLayout.GlyphLayout();
+            layout.Typeface = typeface;
+            layout.ScriptLang = _basicOptions.ScriptLang;
+            layout.PositionTechnique = _basicOptions.PositionTech;
+            layout.EnableLigature = false;// true
+            layout.EnableComposition = true;
+
+            //3.
+            Typography.TextLayout.MeasuredStringBox box = layout.LayoutAndMeasureString(str.ToCharArray(), 0, str.Length, _basicOptions.FontSizeInPoints, out var resultGlyphPlanList);
+            this.lblStringSize.Text = "measure width=" + box.width.ToString() + "px";
+        }
     }
 }
