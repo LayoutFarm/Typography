@@ -1,31 +1,34 @@
 ﻿//MIT, 2016-2017, WinterDev
 
 using Typography.OpenFont;
-
-
+ 
 namespace Typography.Contours
 {
     //-----------------------------------
     //sample GlyphPathBuilder :
     //for your flexiblity of glyph path builder.
-    //-----------------------------------
-
+    //----------------------------------- 
 
     public abstract class GlyphPathBuilderBase
     {
         readonly Typeface _typeface;
         TrueTypeInterpreter _trueTypeInterpreter;
         protected GlyphPointF[] _outputGlyphPoints;
-        protected ushort[] _outputContours;
+        protected ushort[] _outputContours; 
+
+        protected OpenFont.CFF.Cff1Font _ownerCff;
+        protected OpenFont.CFF.Cff1GlyphData _cffGlyphData;
+
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
         bool _useInterpreter;
+
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
-            this.UseTrueTypeInstructions = false;//default?
+            this.UseTrueTypeInstructions = true;//default?
             _trueTypeInterpreter = new TrueTypeInterpreter();
             _trueTypeInterpreter.SetTypeFace(typeface);
             _recentPixelScale = 1;
@@ -56,8 +59,24 @@ namespace Typography.Contours
         {
             //
             Glyph glyph = _typeface.GetGlyphByIndex(glyphIndex);
+
+
+            //for true type font
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
+
+
+            //------------
+            //temp fix for Cff Font
+            if (glyph.IsCffGlyph)
+            {
+                this._cffGlyphData = glyph.GetCff1GlyphData();
+                this._ownerCff = glyph.GetOwnerCff();
+            }
+
+            //---------------
+
+
 
             if ((RecentFontSizeInPixels = Typeface.ConvPointsToPixels(sizeInPoints)) < 0)
             {
@@ -69,10 +88,12 @@ namespace Typography.Contours
             else
             {
                 _recentPixelScale = Typeface.CalculateScaleToPixel(RecentFontSizeInPixels);
+                IsSizeChanged = true;
             }
             //-------------------------------------
             FitCurrentGlyph(glyphIndex, glyph);
         }
+        protected bool IsSizeChanged { get; set; }
         protected float RecentFontSizeInPixels { get; private set; }
         protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph)
         {
@@ -87,13 +108,25 @@ namespace Typography.Contours
                 //all points are scaled from _trueTypeInterpreter, 
                 //so not need further scale.=> set _recentPixelScale=1
                 _recentPixelScale = 1;
-            } 
+            }
         }
         public virtual void ReadShapes(IGlyphTranslator tx)
         {
             //read output from glyph points
-            tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
+
+            if (this._cffGlyphData != null)
+            {
+                tx.Read(this._ownerCff, this._cffGlyphData, _recentPixelScale);
+            }
+            else
+            {
+                tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
+            }
+
         }
+
+
+
     }
 
     public static class GlyphPathBuilderExtensions
