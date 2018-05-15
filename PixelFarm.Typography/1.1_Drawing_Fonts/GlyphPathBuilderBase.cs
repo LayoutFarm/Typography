@@ -1,7 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev
 
-using Typography.OpenFont;
-using Typography.Rendering;
+using Typography.OpenFont; 
 
 namespace Typography.Contours
 {

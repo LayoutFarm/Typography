@@ -36,6 +36,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\PixelFarm.Typography\1.1_Drawing_Fonts\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="..\..\Shared\DrawingGL.Text\GlyphTranslatorToPath.cs">
       <Link>DrawingGL.Text\GlyphTranslatorToPath.cs</Link>
     </Compile>
@@ -53,9 +56,6 @@
     </Compile>
     <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilderBase.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\Tesselate\ActiveRegion.cs">
       <Link>Tess\ActiveRegion.cs</Link>
