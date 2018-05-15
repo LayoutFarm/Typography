@@ -27,14 +27,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\GeometryUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\MiniShaderProgram.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilderBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\HintTechnique.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Dictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Face.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\HalfEdge.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\MaxFirstList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\mesh.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Tesselator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Tesselator.cs" /> 
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Tesselate\" />

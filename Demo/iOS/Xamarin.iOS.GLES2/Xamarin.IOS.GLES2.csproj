@@ -86,6 +86,9 @@
     <CodesignKey>iPhone Distribution</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
+      <Link>App\GlyphPathBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="App\Color.cs" />
     <Compile Include="App\CustomApp.cs" />
     <Compile Include="App\Shaders.cs" />
