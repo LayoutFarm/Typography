@@ -57,9 +57,6 @@
     <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilderBase.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
     </Compile>
-    <Compile Include="..\..\Shared\GlyphPathBuilder\HintTechnique.cs">
-      <Link>GlyphPathBuilder\HintTechnique.cs</Link>
-    </Compile>
     <Compile Include="..\..\Shared\Tesselate\ActiveRegion.cs">
       <Link>Tess\ActiveRegion.cs</Link>
     </Compile>

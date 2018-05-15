@@ -101,7 +101,6 @@
     <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilder.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphMeshCollection.cs" />
-    <Compile Include="1.1_Drawing_Fonts\HintTechnique.cs" />
     <Compile Include="1.1_Drawing_Fonts\OpenFontIFonts.cs" />
     <Compile Include="1.1_Drawing_Fonts\PixelScaleLayoutEngine.cs" />
     <Compile Include="1.2_\TextShapingAndLayoutService.cs" />
