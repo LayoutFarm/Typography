@@ -103,10 +103,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.Contours\Typography.Contours.csproj">
-      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
-      <Name>Typography.Contours</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>
       <Name>Typography.GlyphLayout</Name>
