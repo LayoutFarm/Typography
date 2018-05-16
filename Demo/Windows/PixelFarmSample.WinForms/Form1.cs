@@ -26,7 +26,7 @@ namespace SampleWinForms
 
 
 
-        DevTextPrinterBase selectedTextPrinter = null;
+        TextPrinterBase selectedTextPrinter = null;
         VxsTextPrinter _devVxsTextPrinter = null;
 
         UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
@@ -611,7 +611,13 @@ namespace SampleWinForms
             layout.EnableComposition = true;
 
             //3.
-            Typography.TextLayout.MeasuredStringBox box = layout.LayoutAndMeasureString(str.ToCharArray(), 0, str.Length, _basicOptions.FontSizeInPoints, out var resultGlyphPlanList);
+            //3.1 : if you want GlyphPlanList too.
+            //var resultGlyphPlanList = new Typography.TextLayout.GlyphPlanList();
+            //Typography.TextLayout.MeasuredStringBox box = layout.LayoutAndMeasureString(str.ToCharArray(), 0, str.Length, _basicOptions.FontSizeInPoints, resultGlyphPlanList);
+
+            //or
+            //3.2 : only MeasuredStringBox
+            Typography.TextLayout.MeasuredStringBox box = layout.LayoutAndMeasureString(str.ToCharArray(), 0, str.Length, _basicOptions.FontSizeInPoints);
             this.lblStringSize.Text = "measure width=" + box.width.ToString() + "px";
         }
     }

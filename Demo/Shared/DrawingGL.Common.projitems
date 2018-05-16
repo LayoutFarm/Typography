@@ -10,10 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\FontManagement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\GlyphMeshCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ActiveRegion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ContourVertex.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\DevTextPrinterBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\CurveFlattener.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Path.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Primitives.cs" />
@@ -32,7 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\HalfEdge.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\MaxFirstList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\mesh.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Tesselator.cs" /> 
+    <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Tesselator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Tesselate\" />

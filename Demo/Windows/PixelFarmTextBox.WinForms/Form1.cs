@@ -26,7 +26,7 @@ namespace PixelFarmTextBox.WinForms
         ActualImage destImg;
         Bitmap winBmp;
 
-        DevTextPrinterBase selectedTextPrinter = null;
+        TextPrinterBase selectedTextPrinter = null;
         VxsTextPrinter _devVxsTextPrinter = null;
         SampleWinForms.UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new SampleWinForms.UI.SampleTextBoxControllerForPixelFarm();
 

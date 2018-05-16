@@ -14,7 +14,7 @@ using Typography.TextServices;
 namespace PixelFarm.Drawing.Fonts
 {
 
-    public class VxsTextPrinter : DevTextPrinterBase, ITextPrinter
+    public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
         /// <summary>
         /// target canvas
@@ -113,7 +113,7 @@ namespace PixelFarm.Drawing.Fonts
             }
 
         }
-        public override GlyphLayout GlyphLayoutMan
+        public override GlyphLayout GlyphLayout
         {
             get
             {

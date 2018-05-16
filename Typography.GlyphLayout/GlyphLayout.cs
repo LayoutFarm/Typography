@@ -288,23 +288,27 @@ namespace Typography.TextLayout
             _needPlanUpdate = false;
         }
 
-        public MeasuredStringBox LayoutAndMeasureString(char[] textBuffer, int startAt, int len, float fontSizeInPoints, out GlyphPlanList _outputGlyphPlans)
+        GlyphPlanList _reusableGlyphPlanList = new GlyphPlanList();
+        public MeasuredStringBox LayoutAndMeasureString(char[] textBuffer, int startAt, int len, float fontSizeInPoints)
+        {
+            _reusableGlyphPlanList.Clear();
+            return LayoutAndMeasureString(textBuffer, startAt, len, fontSizeInPoints, _reusableGlyphPlanList);
+        }
+        public MeasuredStringBox LayoutAndMeasureString(char[] textBuffer, int startAt, int len, float fontSizeInPoints, GlyphPlanList outputGlyphPlans)
         {
             //1. unscale layout, in design unit
             this.Layout(textBuffer, startAt, len);
 
-            //2. scale  to specific font size
-            _outputGlyphPlans = new GlyphPlanList();
-
+            //2. scale  to specific font size 
+            float pxscale = _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
             GlyphLayoutExtensions.GenerateGlyphPlan(
                 this.ResultUnscaledGlyphPositions,
-                _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints),
+                pxscale,
                 false,
-                _outputGlyphPlans);
+                outputGlyphPlans);
             //
-            float pxscale = _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
             return new MeasuredStringBox(
-                  _outputGlyphPlans.AccumAdvanceX,
+                  outputGlyphPlans.AccumAdvanceX,
                   _typeface.Ascender * pxscale,
                   _typeface.Descender * pxscale,
                   _typeface.LineGap * pxscale,

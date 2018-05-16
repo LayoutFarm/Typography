@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Typography.OpenFont\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
   </ItemGroup>
 
    

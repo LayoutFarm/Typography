@@ -39,14 +39,14 @@
     <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
     </Compile>
-    <Compile Include="..\..\Shared\DevTextPrinter\DevTextPrinterBase.cs">
+    <Compile Include="..\..\..\Typography.Contours\TextPrinterBase.cs">
       <Link>DevTextPrinter\DevTextPrinterBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
+      <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
       <Link>DevTextPrinter\FontManagement.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Shared\DevTextPrinter\GlyphMeshCollection.cs">
-      <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>

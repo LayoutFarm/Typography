@@ -88,8 +88,14 @@
     <Compile Include="..\..\..\Typography.Contours\GlyphDynamicOutline.cs">
       <Link>GlyphDynamicOutline.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
+      <Link>GlyphMeshCollection.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
       <Link>GlyphPathBuilderBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.Contours\TextPrinterBase.cs">
+      <Link>TextPrinterBase.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -97,6 +103,10 @@
     <ProjectReference Include="..\..\..\PixelFarm\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
       <Name>PixelFarm.Triangulation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
