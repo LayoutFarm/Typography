@@ -56,7 +56,7 @@ namespace DrawingGL.Text
         public MeasuredStringBox Measure(char[] textBuffer, int startAt, int len)
         {
             GlyphLayout.Typeface = this.Typeface;
-            return GlyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints, out var _);
+            return GlyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints);
         }
 
         /// <summary>

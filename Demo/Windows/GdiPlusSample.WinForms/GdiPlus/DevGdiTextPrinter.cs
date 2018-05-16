@@ -116,7 +116,7 @@ namespace SampleWinForms
         public MeasuredStringBox MeasureString(char[] textBuffer, int startAt, int len)
         {
             //unscale layout, in design unit
-            return this._glyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints, out _outputGlyphPlans);
+            return this._glyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints);
         }
         void UpdateVisualOutputSettings()
         {
