@@ -89,6 +89,12 @@
     <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
       <Link>App\GlyphPathBuilderBase.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Typography.Contours\TextPrinterBase.cs">
+      <Link>App\DevTextPrinterBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
+      <Link>App\GlyphMeshCollection.cs</Link>
+    </Compile>
     <Compile Include="App\Color.cs" />
     <Compile Include="App\CustomApp.cs" />
     <Compile Include="App\Shaders.cs" />

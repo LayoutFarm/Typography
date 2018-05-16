@@ -38,7 +38,7 @@ namespace DrawingGL.Text
         }
         public Typography.OpenFont.Typeface Typeface
         {
-            get { return _textPrinter.CurrentTypeFace; }
+            get { return _textPrinter.Typeface; }
         }
 
 

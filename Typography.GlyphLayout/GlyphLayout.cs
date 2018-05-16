@@ -296,13 +296,13 @@ namespace Typography.TextLayout
             //2. scale  to specific font size
             _outputGlyphPlans = new GlyphPlanList();
 
+            float pxscale = _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
             GlyphLayoutExtensions.GenerateGlyphPlan(
                 this.ResultUnscaledGlyphPositions,
-                _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints),
+                pxscale,
                 false,
                 _outputGlyphPlans);
             //
-            float pxscale = _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
             return new MeasuredStringBox(
                   _outputGlyphPlans.AccumAdvanceX,
                   _typeface.Ascender * pxscale,

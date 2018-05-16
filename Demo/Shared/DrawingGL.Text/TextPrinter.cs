@@ -9,7 +9,7 @@ namespace DrawingGL.Text
     /// <summary>
     /// text printer
     /// </summary>
-    class TextPrinter
+    class TextPrinter : TextPrinterBase
     {
         //funcs:
         //1. layout glyph
@@ -17,7 +17,7 @@ namespace DrawingGL.Text
         //3. generate glyph runs into textrun
 
 
-        readonly GlyphLayout glyphLayout = new GlyphLayout();
+        public override GlyphLayout GlyphLayout { get; } = new GlyphLayout();
         readonly GlyphPlanList outputGlyphPlans = new GlyphPlanList();
         GlyphTranslatorToPath pathTranslator;
         string currentFontFile;
@@ -52,27 +52,11 @@ namespace DrawingGL.Text
 
             _tessTool = new TessTool();
         }
-
-        GlyphPlanList _reusableGlyphPlanList = new GlyphPlanList();
+        
         public MeasuredStringBox Measure(char[] textBuffer, int startAt, int len)
         {
-            glyphLayout.Typeface = this.CurrentTypeFace;
-            float pxscale = CurrentTypeFace.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
-            glyphLayout.Layout(textBuffer, startAt, len);
-
-            _reusableGlyphPlanList.Clear();
-            IGlyphPositions glyphPositions = glyphLayout.ResultUnscaledGlyphPositions;
-            GlyphLayoutExtensions.GenerateGlyphPlan(glyphLayout.ResultUnscaledGlyphPositions,
-                pxscale,
-                false, _reusableGlyphPlanList);
-            return new MeasuredStringBox(
-                 _reusableGlyphPlanList.AccumAdvanceX * pxscale,
-                  CurrentTypeFace.Ascender * pxscale,
-                  CurrentTypeFace.Descender * pxscale,
-                  CurrentTypeFace.LineGap * pxscale,
-                  Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(CurrentTypeFace) * pxscale);
-
-
+            GlyphLayout.Typeface = this.Typeface;
+            return GlyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints, out var _);
         }
 
         /// <summary>
@@ -91,11 +75,11 @@ namespace DrawingGL.Text
                     using (var stream = Utility.ReadFile(value))
                     {
                         var reader = new OpenFontReader();
-                        CurrentTypeFace = reader.Read(stream);
+                        Typeface = reader.Read(stream);
                     }
 
                     //2. glyph builder
-                    currentGlyphPathBuilder = new GlyphPathBuilder(CurrentTypeFace);
+                    currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
                     currentGlyphPathBuilder.UseTrueTypeInstructions = false; //reset
                     currentGlyphPathBuilder.UseVerticalHinting = false; //reset
                     switch (this.HintTechnique)
@@ -116,22 +100,12 @@ namespace DrawingGL.Text
                     pathTranslator = new GlyphTranslatorToPath();
 
                     //4. Update GlyphLayout
-                    glyphLayout.ScriptLang = this.ScriptLang;
-                    glyphLayout.PositionTechnique = this.PositionTechnique;
-                    glyphLayout.EnableLigature = this.EnableLigature;
+                    GlyphLayout.ScriptLang = this.ScriptLang;
+                    GlyphLayout.PositionTechnique = this.PositionTechnique;
+                    GlyphLayout.EnableLigature = this.EnableLigature;
                 }
             }
         }
-
-        public HintTechnique HintTechnique { get; set; }
-        public float FontSizeInPoints { get; set; }
-        public ScriptLang ScriptLang { get; set; }
-        public PositionTechnique PositionTechnique { get; set; }
-        public bool EnableLigature { get; set; }
-        public Typeface CurrentTypeFace { get; private set; }
-
-
-
 
         /// <summary>
         /// generate glyph run into a given textRun
@@ -144,22 +118,22 @@ namespace DrawingGL.Text
         {
             // layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
-            outputTextRun.typeface = this.CurrentTypeFace;
+            outputTextRun.typeface = this.Typeface;
             outputTextRun.sizeInPoints = sizeInPoints;
 
             //in this version we store original glyph into the mesh collection
             //and then we scale it later, so I just specific font size=0 (you can use any value)
-            _glyphMeshCollection.SetCacheInfo(this.CurrentTypeFace, 0, this.HintTechnique);
+            _glyphMeshCollection.SetCacheInfo(this.Typeface, 0, this.HintTechnique);
 
 
-            glyphLayout.Typeface = this.CurrentTypeFace;
-            glyphLayout.Layout(charBuffer, start, len);
+            GlyphLayout.Typeface = this.Typeface;
+            GlyphLayout.Layout(charBuffer, start, len);
 
-            float pxscale = this.CurrentTypeFace.CalculateScaleToPixelFromPointSize(sizeInPoints);
+            float pxscale = this.Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
 
             outputGlyphPlans.Clear();
             GlyphLayoutExtensions.GenerateGlyphPlan(
-                glyphLayout.ResultUnscaledGlyphPositions,
+                GlyphLayout.ResultUnscaledGlyphPositions,
                 pxscale, false, outputGlyphPlans);
 
             // render each glyph 
@@ -202,6 +176,21 @@ namespace DrawingGL.Text
                         processGlyph.tessData,
                         processGlyph.tessNElements));
             }
+        }
+
+        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void DrawCaret(float x, float y)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

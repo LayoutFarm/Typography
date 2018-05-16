@@ -26,7 +26,7 @@ namespace SampleWinForms
 
 
 
-        DevTextPrinterBase selectedTextPrinter = null;
+        TextPrinterBase selectedTextPrinter = null;
         VxsTextPrinter _devVxsTextPrinter = null;
 
         UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
