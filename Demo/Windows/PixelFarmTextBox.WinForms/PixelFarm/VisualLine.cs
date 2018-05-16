@@ -11,7 +11,7 @@ namespace SampleWinForms.UI
     {
 
         SmallLine _line;
-        DevTextPrinterBase _printer;
+        TextPrinterBase _printer;
         public VisualLine()
         {
 
@@ -20,7 +20,7 @@ namespace SampleWinForms.UI
         {
             this._line = line;
         }
-        public void BindPrinter(DevTextPrinterBase printer)
+        public void BindPrinter(TextPrinterBase printer)
         {
             _printer = printer;
         }

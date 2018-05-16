@@ -1,24 +1,27 @@
 ﻿//MIT, 2016-2017, WinterDev
 using System.Collections.Generic;
+using Typography.OpenFont;
 using Typography.TextLayout;
 
 
 namespace Typography.Contours
 {
     /// <summary>
-    /// base TextPrinter class for developer only, 
+    /// base TextPrinter class
     /// </summary>
-    public abstract class DevTextPrinterBase
+    public abstract class TextPrinterBase
     {
-        Typography.Contours.HintTechnique _hintTech;
-        public DevTextPrinterBase()
+        public TextPrinterBase()
         {
             FontSizeInPoints = 14;//
-            ScriptLang = Typography.OpenFont.ScriptLangs.Latin;//default?
+            ScriptLang = ScriptLangs.Latin;//default?
         }
 
-        public abstract Typography.TextLayout.GlyphLayout GlyphLayoutMan { get; }
-        public abstract Typography.OpenFont.Typeface Typeface { get; set; }
+        public abstract GlyphLayout GlyphLayout { get; }
+        public virtual Typeface Typeface { get { return GlyphLayout.Typeface; } set { GlyphLayout.Typeface = value; } }
+        public ScriptLang ScriptLang { get { return GlyphLayout.ScriptLang; } set { GlyphLayout.ScriptLang = value; } }
+        public PositionTechnique PositionTechnique { get { return GlyphLayout.PositionTechnique; } set { GlyphLayout.PositionTechnique = value; } }
+        public bool EnableLigature { get { return GlyphLayout.EnableLigature; } set { GlyphLayout.EnableLigature = value; } }
         public virtual void GenerateGlyphPlan(
                  char[] textBuffer,
                  int startAt,
@@ -27,8 +30,8 @@ namespace Typography.Contours
                  List<UserCharToGlyphIndexMap> charToGlyphMapList)
         {
 
-            this.GlyphLayoutMan.Layout(textBuffer, startAt, len);
-            GlyphLayoutExtensions.GenerateGlyphPlan(this.GlyphLayoutMan.ResultUnscaledGlyphPositions,
+            this.GlyphLayout.Layout(textBuffer, startAt, len);
+            GlyphLayoutExtensions.GenerateGlyphPlan(this.GlyphLayout.ResultUnscaledGlyphPositions,
                 this.Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
                 false, outputGlyphPlanList);
         }
@@ -41,14 +44,7 @@ namespace Typography.Contours
         public float FontLineGapPx { get; set; }
         public float FontLineSpacingPx { get; set; }
 
-        public Typography.Contours.HintTechnique HintTechnique
-        {
-            get { return _hintTech; }
-            set
-            {
-                this._hintTech = value;
-            }
-        }
+        public HintTechnique HintTechnique { get; set; }
 
         float _fontSizeInPoints;
         public float FontSizeInPoints
@@ -65,9 +61,7 @@ namespace Typography.Contours
         }
 
         protected virtual void OnFontSizeChanged() { }
-        public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
-        public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
-        public bool EnableLigature { get; set; }
+
         /// <summary>
         /// draw string at (xpos,ypos) of baseline 
         /// </summary>

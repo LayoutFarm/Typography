@@ -16,9 +16,8 @@ namespace SampleWinForms
     /// <summary>
     /// developer's version, Gdi+ text printer
     /// </summary>
-    class DevGdiTextPrinter : DevTextPrinterBase
+    class DevGdiTextPrinter : TextPrinterBase
     {
-        Typeface _currentTypeface;
         GlyphPathBuilder _currentGlyphPathBuilder;
         GlyphTranslatorToGdiPath _txToGdiPath;
         GlyphLayout _glyphLayout = new GlyphLayout();
@@ -36,7 +35,7 @@ namespace SampleWinForms
             OutlineColor = Color.Green;
         }
 
-        public override GlyphLayout GlyphLayoutMan
+        public override GlyphLayout GlyphLayout
         {
             get
             {
@@ -47,25 +46,25 @@ namespace SampleWinForms
         {
             get
             {
-                return _currentTypeface;
+                return base.Typeface;
             }
             set
             {
                 //check if we change it or not
-                if (value == _currentTypeface) return;
+                if (value == base.Typeface) return;
                 //change ...
                 //check if we have used this typeface before?
                 //if not, create a proper glyph builder for it
                 //--------------------------------
                 //reset 
-                _currentTypeface = value;
+                base.Typeface = value;
                 _currentGlyphPathBuilder = null;
                 //--------------------------------
                 if (value == null) return;
                 //--------------------------------
 
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
+                _currentGlyphPathBuilder = new GlyphPathBuilder(base.Typeface);
                 //for gdi path***
                 //3. glyph reader,output as Gdi+ GraphicsPath
                 _txToGdiPath = new GlyphTranslatorToGdiPath();
@@ -77,12 +76,12 @@ namespace SampleWinForms
         protected override void OnFontSizeChanged()
         {
             //update some font matrix property  
-            if (_currentTypeface != null)
+            if (Typeface != null)
             {
-                float pointToPixelScale = _currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
-                this.FontAscendingPx = _currentTypeface.Ascender * pointToPixelScale;
-                this.FontDescedingPx = _currentTypeface.Descender * pointToPixelScale;
-                this.FontLineGapPx = _currentTypeface.LineGap * pointToPixelScale;
+                float pointToPixelScale = Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints);
+                this.FontAscendingPx = Typeface.Ascender * pointToPixelScale;
+                this.FontDescedingPx = Typeface.Descender * pointToPixelScale;
+                this.FontLineGapPx = Typeface.LineGap * pointToPixelScale;
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
             }
         }
@@ -99,18 +98,15 @@ namespace SampleWinForms
         GlyphPlanList _outputGlyphPlans = new GlyphPlanList();//for internal use
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
-            //1. update
-            UpdateGlyphLayoutSettings();
-
-            //2. unscale layout, in design unit
+            //1. unscale layout, in design unit
             this._glyphLayout.Layout(textBuffer, startAt, len);
 
-            //3. scale  to specific font size
+            //2. scale  to specific font size
             _outputGlyphPlans.Clear();
 
             GlyphLayoutExtensions.GenerateGlyphPlan(
                 _glyphLayout.ResultUnscaledGlyphPositions,
-                _currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
+                Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
                 false,
                 _outputGlyphPlans);
 
@@ -119,19 +115,8 @@ namespace SampleWinForms
 
         public MeasuredStringBox MeasureString(char[] textBuffer, int startAt, int len)
         {
-            //1. update
-            UpdateGlyphLayoutSettings();
-
-            //2. unscale layout, in design unit
-            return this._glyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints, out _outputGlyphPlans);
-        }
-        public void UpdateGlyphLayoutSettings()
-        {
-            _glyphLayout.Typeface = this.Typeface;
-            _glyphLayout.ScriptLang = this.ScriptLang;
-            _glyphLayout.PositionTechnique = this.PositionTechnique;
-            _glyphLayout.EnableLigature = this.EnableLigature;
-
+            //unscale layout, in design unit
+            return this._glyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints);
         }
         void UpdateVisualOutputSettings()
         {
@@ -147,7 +132,7 @@ namespace SampleWinForms
             //3. render each glyph 
 
             float sizeInPoints = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
+            float scale = Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
             //
             _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.HintTechnique);
 
