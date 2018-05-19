@@ -858,12 +858,12 @@ namespace Typography.OpenFont.CFF
             {
                 return b0 - 139;
             }
-            else if (b0 >= 247 && b0 <= 250)
+            else if (b0 <= 250)  // && b0 >= 247 , *** if-else sequence is important! ***
             {
                 int b1 = _reader.ReadByte();
                 return (b0 - 247) * 256 + b1 + 108;
             }
-            else if (b0 >= 251 && b0 <= 254)
+            else if (b0 <= 254)  //&&  b0 >= 251 ,*** if-else sequence is important! ***
             {
                 int b1 = _reader.ReadByte();
                 return -(b0 - 251) * 256 - b1 - 108;
