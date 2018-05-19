@@ -141,12 +141,12 @@ namespace SampleWinForms
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             _currentTextPrinter.TargetGraphics = g;
             //render at specific pos
-            float x_pos = 0, y_pos = 100;
+            float x_pos = 0, y_pos = -300;
             char[] textBuffer = txtInputChar.Text.ToCharArray();
 
             //test draw multiple lines
             float lineSpacingPx = _currentTextPrinter.FontLineSpacingPx;
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 1; ++i)
             {
                 _currentTextPrinter.DrawString(
                  textBuffer,
