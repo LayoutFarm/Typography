@@ -446,7 +446,7 @@ namespace Typography.OpenFont.CFF
                         //most significant byte follows the(28)
                         byte s_b0 = _reader.ReadByte();
                         byte s_b1 = _reader.ReadByte();
-                        insts.AddInt((s_b0 << 8) | (s_b1));
+                        insts.AddInt((short)((s_b0 << 8) | (s_b1)));
                         //
                         if (doStemCount)
                         {
