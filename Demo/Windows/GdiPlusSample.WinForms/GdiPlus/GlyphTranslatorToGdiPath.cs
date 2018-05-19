@@ -50,6 +50,7 @@ namespace SampleWinForms
         }
         public void CloseContour()
         {
+            contour_is_closed = true;
             ps.CloseFigure();
         }
         public void Curve3(float x1, float y1, float x2, float y2)
