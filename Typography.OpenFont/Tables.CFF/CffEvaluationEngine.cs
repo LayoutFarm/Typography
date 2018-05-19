@@ -86,8 +86,8 @@ namespace Typography.OpenFont.CFF
             int nsubrs = cff1Font._localSubrs.Count;
             _cffBias = (nsubrs < 1240) ? 107 :
                             (nsubrs < 33900) ? 1131 : 32769;
-            
-            
+
+            tx.BeginRead(0);//unknown contour count
             //-------------
             double currentX = 0, currentY = 0;
             if (scale != 1)
@@ -99,7 +99,7 @@ namespace Typography.OpenFont.CFF
             {
                 Run(tx, instructionList, ref currentX, ref currentY);
             }
-
+            tx.EndRead();
 
         }
         void Run(IGlyphTranslator tx, Type2GlyphInstructionList instructionList, ref double currentX, ref double currentY)
