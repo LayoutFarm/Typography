@@ -37,7 +37,7 @@ namespace Typography.OpenFont.MathGlyphs
 #endif
     }
 
-    public class MathConstantsTable
+    public class MathConstants
     {
         //MathConstantsTable
         //When selecting names for values in the MathConstants table, the following naming convention should be used:
@@ -376,7 +376,7 @@ namespace Typography.OpenFont.Tables
 
     class MathTable : TableEntry
     {
-        MathConstantsTable _mathConstTable;
+        MathConstants _mathConstTable;
 
         public override string Name
         {
@@ -422,7 +422,7 @@ namespace Typography.OpenFont.Tables
             //The table also contains general use constants that may affect all parts of the formula,
             //such as axis height and math leading.Note that most of the constants deal with the vertical positioning.
 
-            MathConstantsTable mc = new MathConstantsTable();
+            MathConstants mc = new MathConstants();
             mc.ScriptPercentScaleDown = reader.ReadInt16();
             mc.ScriptScriptPercentScaleDown = reader.ReadInt16();
             mc.DelimitedSubFormulaMinHeight = reader.ReadUInt16();
