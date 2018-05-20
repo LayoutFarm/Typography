@@ -207,8 +207,69 @@ namespace Typography.OpenFont.Tables
 
         void ReadMathMathVariantsTable(BinaryReader reader)
         {
+            //MathVariants Table
+
+            //The MathVariants table solves the following problem:
+            //given a particular default glyph shape and a certain width or height, 
+            //find a variant shape glyph(or construct created by putting several glyph together) 
+            //that has the required measurement.
+            //This functionality is needed for growing the parentheses to match the height of the expression within,
+            //growing the radical sign to match the height of the expression under the radical, 
+            //stretching accents like tilde when they are put over several characters, 
+            //for stretching arrows, horizontal curly braces, and so forth.
+
+            //The MathVariants table consists of the following fields:
+
+
+            //  Count and coverage of glyph that can grow in the vertical direction.
+            //  Count and coverage of glyphs that can grow in the horizontal direction.
+            //  MinConnectorOverlap defines by how much two glyphs need to overlap with each other when used to construct a larger shape. 
+            //  Each glyph to be used as a building block in constructing extended shapes will have a straight part at either or both ends.
+            //  This connector part is used to connect that glyph to other glyphs in the assembly. 
+            //  These connectors need to overlap to compensate for rounding errors and hinting corrections at a lower resolution.
+            //  The MinConnectorOverlap value tells how much overlap is necessary for this particular font.
+
+            //  Two arrays of offsets to MathGlyphConstruction tables: 
+            //  one array for glyphs that grow in the vertical direction, 
+            //  and the other array for glyphs that grow in the horizontal direction.
+            //  The arrays must be arranged in coverage order and have specified sizes.
+
+
+            //MathVariants Table
+            //Type          Name                    Description
+            //uint16        MinConnectorOverlap     Minimum overlap of connecting glyphs during glyph construction, in design units.
+            //Offset16      VertGlyphCoverage       Offset to Coverage table - from the beginning of MathVariants table.
+            //Offset16      HorizGlyphCoverage      Offset to Coverage table - from the beginning of MathVariants table.
+            //uint16        VertGlyphCount          Number of glyphs for which information is provided for vertically growing variants.
+            //uint16        HorizGlyphCount         Number of glyphs for which information is provided for horizontally growing variants.
+            //Offset16      VertGlyphConstruction[VertGlyphCount]  Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in vertical direction.
+            //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
+
+            //public ushort MinConnectorOverlap;
+            //ushort[] vertGlyphConstructions;
+            //ushort[] horizonGlyphConstructions;
+            //CoverageTable vertCoverage;
+            //CoverageTable horizCoverage;
+            //_mathVariantsTable = new MathVariantsTable();
+            //_mathVariantsTable.ReadContentFrom(reader);
+
+
             _mathVariantsTable = new MathVariantsTable();
-            _mathVariantsTable.ReadContentFrom(reader);
+
+            long startAt = reader.BaseStream.Position;
+            //
+            ushort MinConnectorOverlap = reader.ReadUInt16();
+            //
+            ushort vertGlyphCoverageOffset = reader.ReadUInt16();
+            ushort horizGlyphCoverageOffset = reader.ReadUInt16();
+            ushort vertGlyphCount = reader.ReadUInt16();
+            ushort horizGlyphCount = reader.ReadUInt16();
+            ushort[] vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
+            ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
+            //
+
+            CoverageTable vertCoverage = CoverageTable.CreateFrom(reader, startAt + vertGlyphCoverageOffset);
+            CoverageTable horizCoverage = CoverageTable.CreateFrom(reader, startAt + horizGlyphCoverageOffset);
         }
 
         MathVariantsTable _mathVariantsTable;
@@ -720,52 +781,7 @@ namespace Typography.OpenFont.Tables
 
     class MathVariantsTable
     {
-        //MathVariants Table
 
-        //The MathVariants table solves the following problem: given a particular default glyph shape and a certain width or height, find a variant shape glyph(or construct created by putting several glyph together) that has the required measurement.This functionality is needed for growing the parentheses to match the height of the expression within, growing the radical sign to match the height of the expression under the radical, stretching accents like tilde when they are put over several characters, for stretching arrows, horizontal curly braces, and so forth.
-
-        //The MathVariants table consists of the following fields:
-
-
-        //  Count and coverage of glyph that can grow in the vertical direction.
-        //  Count and coverage of glyphs that can grow in the horizontal direction.
-        //  MinConnectorOverlap defines by how much two glyphs need to overlap with each other when used to construct a larger shape. Each glyph to be used as a building block in constructing extended shapes will have a straight part at either or both ends.This connector part is used to connect that glyph to other glyphs in the assembly. These connectors need to overlap to compensate for rounding errors and hinting corrections at a lower resolution.The MinConnectorOverlap value tells how much overlap is necessary for this particular font.
-
-        //  Two arrays of offsets to MathGlyphConstruction tables: one array for glyphs that grow in the vertical direction, and the other array for glyphs that grow in the horizontal direction.The arrays must be arranged in coverage order and have specified sizes.
-
-
-        //MathVariants Table
-        //Type          Name                    Description
-        //uint16        MinConnectorOverlap     Minimum overlap of connecting glyphs during glyph construction, in design units.
-        //Offset16      VertGlyphCoverage       Offset to Coverage table - from the beginning of MathVariants table.
-        //Offset16      HorizGlyphCoverage      Offset to Coverage table - from the beginning of MathVariants table.
-        //uint16        VertGlyphCount          Number of glyphs for which information is provided for vertically growing variants.
-        //uint16        HorizGlyphCount         Number of glyphs for which information is provided for horizontally growing variants.
-        //Offset16      VertGlyphConstruction[VertGlyphCount]  Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in vertical direction.
-        //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
-
-        public ushort MinConnectorOverlap;
-        ushort[] vertGlyphConstructions;
-        ushort[] horizonGlyphConstructions;
-        CoverageTable vertCoverage;
-        CoverageTable horizCoverage;
-        public void ReadContentFrom(BinaryReader reader)
-        {
-            long startAt = reader.BaseStream.Position;
-            //
-            MinConnectorOverlap = reader.ReadUInt16();
-            //
-            ushort vertGlyphCoverageOffset = reader.ReadUInt16();
-            ushort horizGlyphCoverageOffset = reader.ReadUInt16();
-            ushort vertGlyphCount = reader.ReadUInt16();
-            ushort horizGlyphCount = reader.ReadUInt16();
-            vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
-            horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
-            //
-
-            vertCoverage = CoverageTable.CreateFrom(reader, startAt + vertGlyphCoverageOffset);
-            horizCoverage = CoverageTable.CreateFrom(reader, startAt + horizGlyphCoverageOffset);
-        }
     }
 
     class MathGlyphConstructionTable
