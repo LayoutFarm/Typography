@@ -608,7 +608,7 @@ namespace Typography.OpenFont.Tables
 
             _mathVariantsTable = new MathVariantsTable();
 
-            long startAt = reader.BaseStream.Position;
+            long beginAt = reader.BaseStream.Position;
             //
             ushort MinConnectorOverlap = reader.ReadUInt16();
             //
@@ -620,8 +620,8 @@ namespace Typography.OpenFont.Tables
             ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
             //
 
-            CoverageTable vertCoverage = CoverageTable.CreateFrom(reader, startAt + vertGlyphCoverageOffset);
-            CoverageTable horizCoverage = CoverageTable.CreateFrom(reader, startAt + horizGlyphCoverageOffset);
+            CoverageTable vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
+            CoverageTable horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
         }
 
         MathVariantsTable _mathVariantsTable;
@@ -870,16 +870,6 @@ namespace Typography.OpenFont.Tables
         public MathValueRecord[] TopAccentAttachment;
         public CoverageTable CoverageTable;
     }
-    class ExtendedShapeCoverageTable
-    {
-
-    }
-    class MathKernInfoTable
-    {
-
-    }
-    class MathKernInfoRecordTable { }
-
 
 
     class MathVariantsTable
@@ -906,5 +896,8 @@ namespace Typography.OpenFont.Tables
 
 
     }
-    class GlyphAssemblyTable { }
+    class GlyphAssemblyTable
+    {
+
+    }
 }
