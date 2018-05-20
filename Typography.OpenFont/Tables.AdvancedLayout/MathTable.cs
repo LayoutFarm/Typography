@@ -199,10 +199,17 @@ namespace Typography.OpenFont.Tables
             //but instead to the ink box of the subexpression containing them
 
             //.... 
+
             _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
+
             //
-            reader.BaseStream.Position = startAt + offsetTo_MathKernInfo_Table;
-            ReadMathKernInfoTable(reader);
+            if (offsetTo_MathKernInfo_Table > 0)
+            {
+                //may be null? eg. latin-modern-math.otf => not found
+                //we found this in Asana-math-regular
+                reader.BaseStream.Position = startAt + offsetTo_MathKernInfo_Table;
+                ReadMathKernInfoTable(reader);
+            }
         }
 
 
@@ -320,11 +327,14 @@ namespace Typography.OpenFont.Tables
             _mathTopAccentAttachmentTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
         }
 
+
+        CoverageTable _mathKernInfoCoverage;
         void ReadMathKernInfoTable(BinaryReader reader)
         {
             // MathKernInfo Table
 
-            //The MathKernInfo table provides information on glyphs for which mathematical (height - dependent) kerning values are defined.It consists of the following fields:
+            //The MathKernInfo table provides information on glyphs for which mathematical (height - dependent) kerning values are defined.
+            //It consists of the following fields:
 
             //    Coverage of glyphs for which mathematical kerning information is provided.
             //    Count of MathKernInfoRecords.Should coincide with the number of glyphs in Coverage table.
@@ -339,9 +349,11 @@ namespace Typography.OpenFont.Tables
             //...
             //Each MathKernInfoRecord points to up to four kern tables for each of the corners around the glyph.
 
-            ushort mathKernCoverage = reader.ReadUInt16();
+            long beginAt = reader.BaseStream.Position;
+
+            ushort mathKernCoverage_offset = reader.ReadUInt16();
             ushort mathKernCount = reader.ReadUInt16();
-            MathKernInfoRecord[] mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
+            var mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
             for (int i = 0; i < mathKernCount; ++i)
             {
                 mathKernInfoRecords[i] = new MathKernInfoRecord(
@@ -352,7 +364,115 @@ namespace Typography.OpenFont.Tables
                     );
             }
 
+            _mathKernInfoCoverage = CoverageTable.CreateFrom(reader, beginAt + mathKernCoverage_offset);
+            //-------
+            //read each kern table  
+            foreach (MathKernInfoRecord mathKernRec in mathKernInfoRecords)
+            {
+                //top-right
+                if (mathKernRec.TopRight_MathKern > 0)
+                {
+                    reader.BaseStream.Position = beginAt + mathKernRec.TopRight_MathKern;
+                    mathKernRec.TopRight = ReadMathKernTable(reader);
+                }
+
+                //top-left
+                if (mathKernRec.TopLeft_MathKern > 0)
+                {
+                    reader.BaseStream.Position = beginAt + mathKernRec.TopLeft_MathKern;
+                    mathKernRec.TopLeft = ReadMathKernTable(reader);
+                }
+
+                //bottom-right
+                if (mathKernRec.BottomRight_MathKern > 0)
+                {
+                    reader.BaseStream.Position = beginAt + mathKernRec.BottomRight_MathKern;
+                    mathKernRec.BottomRight = ReadMathKernTable(reader);
+                }
+
+                //bottom-left
+                if (mathKernRec.BottomLeft_MathKern > 0)
+                {
+                    reader.BaseStream.Position = beginAt + mathKernRec.BottomLeft_MathKern;
+                    mathKernRec.BottomLeft = ReadMathKernTable(reader);
+                }
+            }
         }
+
+        static MathKernTable ReadMathKernTable(BinaryReader reader)
+        {
+
+            //The MathKern table contains adjustments to horizontal positions of subscripts and superscripts
+            //The kerning algorithm consists of the following steps:
+
+            //1. Calculate vertical positions of subscripts and superscripts.
+            //2. Set the default horizontal position for the subscript immediately after the base glyph.
+            //3. Set the default horizontal position for the superscript as shifted relative to the position of the subscript by the italics correction of the base glyph.
+            //4. Based on the vertical positions, calculate the height of the top/ bottom for the bounding boxes of sub/superscript relative to the base glyph, and the height of the top/ bottom of the base relative to the super/ subscript.These will be the correction heights.
+            //5. Get the kern values corresponding to these correction heights for the appropriate corner of the base glyph and sub/superscript glyph from the appropriate MathKern tables.Kern the default horizontal positions by the minimum of sums of those values at the correction heights for the base and for the sub/superscript.
+            //6. If either one of the base or superscript expression has to be treated as a box not providing glyph
+            //MathKern Table
+            //Type              Name                                Description
+            //uint16            HeightCount                         Number of heights on which the kern value changes.
+            //MathValueRecord   CorrectionHeight[HeightCount]       Array of correction heights at which the kern value changes.Sorted by the height value in design units.
+            //MathValueRecord   KernValue[HeightCount+1]            Array of kern values corresponding to heights.
+
+            //First value is the kern value for all heights less or equal than the first height in this table.
+            //Last value is the value to be applied for all heights greater than the last height in this table.
+            //Negative values are interpreted as "move glyphs closer to each other".
+
+            ushort heightCount = reader.ReadUInt16();
+            return new MathKernTable(heightCount,
+                reader.ReadMathValueRecords(heightCount),
+                reader.ReadMathValueRecords(heightCount + 1)
+                );
+        }
+    }
+
+    class MathKernInfoRecord
+    {
+
+
+        //MathKernInfoRecord Table
+
+        //Each MathKernInfoRecord points to up to four kern tables for each of the corners around the glyph.
+
+        //MathKernInfoRecord Table
+        //Type      Name                Description
+        //Offset16  TopRightMathKern    Offset to MathKern table for top right corner - from the beginning of MathKernInfo table.May be NULL.
+        //Offset16  TopLeftMathKern     Offset to MathKern table for the top left corner - from the beginning of MathKernInfo table. May be NULL.
+        //Offset16  BottomRightMathKern Offset to MathKern table for bottom right corner - from the beginning of MathKernInfo table. May be NULL.
+        //Offset16  BottomLeftMathKern  Offset to MathKern table for bottom left corner - from the beginning of MathKernInfo table. May be NULL.
+
+        public readonly ushort TopRight_MathKern;
+        public readonly ushort TopLeft_MathKern;
+        public readonly ushort BottomRight_MathKern;
+        public readonly ushort BottomLeft_MathKern;
+
+
+
+        //resolved value
+        public MathKernTable TopRight;
+        public MathKernTable TopLeft;
+        public MathKernTable BottomRight;
+        public MathKernTable BottomLeft;
+
+
+
+        public MathKernInfoRecord(ushort topRight, ushort topLeft, ushort bottomRight, ushort bottomLeft)
+        {
+            this.TopRight_MathKern = topRight;
+            this.TopLeft_MathKern = topLeft;
+            this.BottomRight_MathKern = bottomRight;
+            this.BottomLeft_MathKern = bottomLeft;
+        }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return TopRight_MathKern + "," + TopLeft_MathKern + "," + BottomRight_MathKern + "," + BottomLeft_MathKern;
+        }
+#endif
     }
 
 
@@ -385,46 +505,29 @@ namespace Typography.OpenFont.Tables
 #endif
     }
 
-    struct MathKernInfoRecord
-    {
-        public readonly ushort TopRightMathKern;
-        public readonly ushort TopLeftMathKern;
-        public readonly ushort BottomRightMathKern;
-        public readonly ushort BottomLeftMathKern;
-        public MathKernInfoRecord(ushort topRight, ushort topLeft, ushort bottomRight, ushort bottomLeft)
-        {
-            this.TopRightMathKern = topRight;
-            this.TopLeftMathKern = topLeft;
-            this.BottomRightMathKern = bottomRight;
-            this.BottomLeftMathKern = bottomLeft;
-        }
-    }
+
 
     class MathKernTable
     {
-        //The MathKern table contains adjustments to horizontal positions of subscripts and superscripts
-        //The kerning algorithm consists of the following steps:
-
-        //1. Calculate vertical positions of subscripts and superscripts.
-        //2. Set the default horizontal position for the subscript immediately after the base glyph.
-        //3. Set the default horizontal position for the superscript as shifted relative to the position of the subscript by the italics correction of the base glyph.
-        //4. Based on the vertical positions, calculate the height of the top/ bottom for the bounding boxes of sub/superscript relative to the base glyph, and the height of the top/ bottom of the base relative to the super/ subscript.These will be the correction heights.
-        //5. Get the kern values corresponding to these correction heights for the appropriate corner of the base glyph and sub/superscript glyph from the appropriate MathKern tables.Kern the default horizontal positions by the minimum of sums of those values at the correction heights for the base and for the sub/superscript.
-        //6. If either one of the base or superscript expression has to be treated as a box not providing glyph
-        //MathKern Table
-        //Type              Name                                Description
-        //uint16            HeightCount                         Number of heights on which the kern value changes.
-        //MathValueRecord   CorrectionHeight[HeightCount]       Array of correction heights at which the kern value changes.Sorted by the height value in design units.
-        //MathValueRecord   KernValue[HeightCount+1]            Array of kern values corresponding to heights.
-
-        //First value is the kern value for all heights less or equal than the first height in this table.
-        //Last value is the value to be applied for all heights greater than the last height in this table.
-        //Negative values are interpreted as "move glyphs closer to each other".
 
         public ushort HeightCount;
         public MathValueRecord[] CorrectionHeights;
         public MathValueRecord[] KernValues;
 
+
+        public MathKernTable(ushort heightCount, MathValueRecord[] correctionHeights, MathValueRecord[] kernValues)
+        {
+            HeightCount = heightCount;
+            CorrectionHeights = correctionHeights;
+            KernValues = kernValues;
+        }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return HeightCount.ToString();
+        }
+#endif
     }
 
     class MathConstantsTable
