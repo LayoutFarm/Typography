@@ -62,10 +62,11 @@ namespace Typography.OpenFont.Tables
             ReadMathConstantsTable(reader);
             //
             reader.BaseStream.Position = beginAt + mathGlyphInfo_offset;
-            ReadMathMathGlyphInfoTable(reader);
+            ReadMathGlyphInfoTable(reader);
             //
             reader.BaseStream.Position = beginAt + mathVariants_offset;
-            ReadMathMathVariantsTable(reader);
+            ReadMathVariantsTable(reader);
+
         }
         void ReadMathConstantsTable(BinaryReader reader)
         {
@@ -160,7 +161,7 @@ namespace Typography.OpenFont.Tables
         }
 
         CoverageTable _extendedShapeCoverageTable;
-        void ReadMathMathGlyphInfoTable(BinaryReader reader)
+        void ReadMathGlyphInfoTable(BinaryReader reader)
         {
 
             //MathGlyphInfo Table
@@ -205,7 +206,7 @@ namespace Typography.OpenFont.Tables
         }
 
 
-        void ReadMathMathVariantsTable(BinaryReader reader)
+        void ReadMathVariantsTable(BinaryReader reader)
         {
             //MathVariants Table
 
@@ -273,7 +274,6 @@ namespace Typography.OpenFont.Tables
         }
 
         MathVariantsTable _mathVariantsTable;
-
         MathItalicsCorrectonInfoTable _mathItalicCorrectionInfo;
         void ReadMathItalicCorrectionInfoTable(BinaryReader reader)
         {
@@ -429,7 +429,7 @@ namespace Typography.OpenFont.Tables
 
     class MathConstantsTable
     {
-
+        //MathConstantsTable
         //When selecting names for values in the MathConstants table, the following naming convention should be used:
 
         //Height – Specifies a distance from the main baseline.
