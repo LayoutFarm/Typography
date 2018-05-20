@@ -1,7 +1,7 @@
 ﻿//MIT, 2018, WinterDev
 //https://www.microsoft.com/typography/otspec/math.htm
 
-using System.Collections.Generic;
+
 using System.IO;
 
 
@@ -557,6 +557,10 @@ namespace Typography.OpenFont.Tables
         }
 
 
+
+
+
+        MathVariantsTable _mathVariantsTable;
         void ReadMathVariantsTable(BinaryReader reader)
         {
             //MathVariants Table
@@ -597,15 +601,6 @@ namespace Typography.OpenFont.Tables
             //Offset16      VertGlyphConstruction[VertGlyphCount]  Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in vertical direction.
             //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
 
-            //public ushort MinConnectorOverlap;
-            //ushort[] vertGlyphConstructions;
-            //ushort[] horizonGlyphConstructions;
-            //CoverageTable vertCoverage;
-            //CoverageTable horizCoverage;
-            //_mathVariantsTable = new MathVariantsTable();
-            //_mathVariantsTable.ReadContentFrom(reader);
-
-
             _mathVariantsTable = new MathVariantsTable();
 
             long beginAt = reader.BaseStream.Position;
@@ -622,9 +617,127 @@ namespace Typography.OpenFont.Tables
 
             CoverageTable vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
             CoverageTable horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
+
+            //read math construction table
+
+            //vertical
+            var vertGlyphConstructionTables = new MathGlyphConstructionTable[vertGlyphCount];
+            for (int i = 0; i < vertGlyphCount; ++i)
+            {
+                reader.BaseStream.Position = beginAt + vertGlyphConstructions[i];
+                vertGlyphConstructionTables[i] = ReadMathGlyphConstructionTable(reader);
+            }
+
+            //
+            //horizon
+            var horizGlyphConstructionTables = new MathGlyphConstructionTable[horizGlyphCount];
+            for (int i = 0; i < horizGlyphCount; ++i)
+            {
+                reader.BaseStream.Position = beginAt + horizonGlyphConstructions[i];
+                horizGlyphConstructionTables[i] = ReadMathGlyphConstructionTable(reader);
+            }
         }
 
-        MathVariantsTable _mathVariantsTable;
+        MathGlyphConstructionTable ReadMathGlyphConstructionTable(BinaryReader reader)
+        {
+
+            //MathGlyphConstruction Table  
+            //The MathGlyphConstruction table provides information on finding or assembling extended variants for one particular glyph.
+            //It can be used for shapes that grow in both horizontal and vertical directions.
+
+            //The first entry is the offset to the GlyphAssembly table that specifies how the shape for this glyph can be assembled 
+            //from parts found in the glyph set of the font.
+            //If no such assembly exists, this offset will be set to NULL.
+
+            //The MathGlyphConstruction table also contains the count and array of ready-made glyph variants for the specified glyph.
+            //Each variant consists of the glyph index and this glyph’s measurement in the direction of extension(vertical or horizontal).
+
+            //Note that it is quite possible that both the GlyphAssembly table and some variants are defined for a particular glyph.
+            //For example, the font may specify several variants for curly braces of different sizes,
+            //and a general mechanism of how larger versions of curly braces can be constructed by stacking parts found in the glyph set.
+            //First attempt is made to find glyph among provided variants.
+            //
+            //However, if the required size is bigger than all glyph variants provided, 
+            //the general mechanism can be employed to typeset the curly braces as a glyph assembly.
+
+
+            //MathGlyphConstruction Table
+            //Type          Name            Description
+            //Offset16      GlyphAssembly   Offset to GlyphAssembly table for this shape - from the beginning of MathGlyphConstruction table.May be NULL.
+            //uint16        VariantCount    Count of glyph growing variants for this glyph.
+            //MathGlyphVariantRecord MathGlyphVariantRecord [VariantCount]   MathGlyphVariantRecords for alternative variants of the glyphs.
+
+            long beginAt = reader.BaseStream.Position;
+
+            var glyphConstructionTable = new MathGlyphConstructionTable();
+
+            ushort glyphAsmOffset = reader.ReadUInt16();
+            ushort variantCount = reader.ReadUInt16();
+
+            var variantRecords = glyphConstructionTable.glyphVariantRecords = new MathGlyphVariantRecord[variantCount];
+
+            for (int i = 0; i < variantCount; ++i)
+            {
+                variantRecords[i] = new MathGlyphVariantRecord(
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16()
+                    );
+            }
+
+
+            //read glyph asm table
+            if (glyphAsmOffset > 0)//may be NULL
+            {
+                reader.BaseStream.Position = beginAt + glyphAsmOffset;
+                FillGlyphAssemblyInfo(reader, glyphConstructionTable);
+            }
+            return glyphConstructionTable;
+        }
+
+        static void FillGlyphAssemblyInfo(BinaryReader reader, MathGlyphConstructionTable glyphConstruction)
+        {
+            //since MathGlyphConstructionTable: GlyphAssembly is 1:1
+
+            //---------
+            //GlyphAssembly Table 
+            //The GlyphAssembly table specifies how the shape for a particular glyph can be constructed from parts found in the glyph set.
+            //The table defines the italics correction of the resulting assembly, and a number of parts that have to be put together to form the required shape.
+
+            //GlyphAssembly
+            //Type              Name                    Description
+            //MathValueRecord   ItalicsCorrection       Italics correction of this GlyphAssembly.Should not depend on the assembly size.
+            //uint16            PartCount               Number of parts in this assembly.
+            //GlyphPartRecord   PartRecords[PartCount]  Array of part records, from left to right and bottom to top. 
+
+            //The result of the assembly process is an array of glyphs with an offset specified for each of those glyphs.
+            //When drawn consecutively at those offsets, the glyphs should combine correctly and produce the required shape.
+
+            //The offsets in the direction of growth (advance offsets), as well as the number of parts labeled as extenders, 
+            //are determined based on the size requirement for the resulting assembly.
+
+            //Note that the glyphs comprising the assembly should be designed so that they align properly in the direction that is orthogonal to the direction of growth.
+
+
+            glyphConstruction.GlyphAsm_ItalicCorrection = reader.ReadMathValueRecord();
+
+            ushort partCount = reader.ReadUInt16();
+
+            var partRecords = glyphConstruction.GlyphAsm_GlyphPartRecords = new GlyphPartRecord[partCount];
+
+            for (int i = 0; i < partCount; ++i)
+            {
+                partRecords[i] = new GlyphPartRecord(
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16()
+                    );
+            }
+        }
+
+
+
         MathItalicsCorrectonInfoTable _mathItalicCorrectionInfo;
         void ReadMathItalicCorrectionInfoTable(BinaryReader reader)
         {
@@ -879,25 +992,86 @@ namespace Typography.OpenFont.Tables
 
     class MathGlyphConstructionTable
     {
-        //MathGlyphConstruction Table  
-        //The MathGlyphConstruction table provides information on finding or assembling extended variants for one particular glyph.It can be used for shapes that grow in both horizontal and vertical directions.
 
-        //The first entry is the offset to the GlyphAssembly table that specifies how the shape for this glyph can be assembled from parts found in the glyph set of the font.If no such assembly exists, this offset will be set to NULL.
+        public MathValueRecord GlyphAsm_ItalicCorrection;
+        public GlyphPartRecord[] GlyphAsm_GlyphPartRecords;
 
-        //The MathGlyphConstruction table also contains the count and array of ready-made glyph variants for the specified glyph.Each variant consists of the glyph index and this glyph’s measurement in the direction of extension (vertical or horizontal).
-
-        //Note that it is quite possible that both the GlyphAssembly table and some variants are defined for a particular glyph.For example, the font may specify several variants for curly braces of different sizes, and a general mechanism of how larger versions of curly braces can be constructed by stacking parts found in the glyph set.First attempt is made to find glyph among provided variants.However, if the required size is bigger than all glyph variants provided, the general mechanism can be employed to typeset the curly braces as a glyph assembly.
-
-        //MathGlyphConstruction Table
-        //Type          Name            Description
-        //Offset16      GlyphAssembly   Offset to GlyphAssembly table for this shape - from the beginning of MathGlyphConstruction table.May be NULL.
-        //uint16        VariantCount    Count of glyph growing variants for this glyph.
-        //MathGlyphVariantRecord MathGlyphVariantRecord [VariantCount]   MathGlyphVariantRecords for alternative variants of the glyphs.
-
+        public MathGlyphVariantRecord[] glyphVariantRecords;
 
     }
-    class GlyphAssemblyTable
+
+    struct GlyphPartRecord
     {
+        //Thus, a GlyphPartRecord consists of the following fields: 
+        //1) Glyph ID for the part.
+        //2) Lengths of the connectors on each end of the glyph. 
+        //      The connectors are straight parts of the glyph that can be used to link it with the next or previous part.
+        //      The connectors of neighboring parts can overlap, which provides flexibility of how these glyphs can be put together.However, the overlap should not be less than the value of MinConnectorOverlap defined in the MathVariants tables, and it should not exceed the length of either of two overlapping connectors.If the part does not have a connector on one of its sides, the corresponding length should be set to zero.
 
+        //3) The full advance of the part. 
+        //      It is also used to determine the measurement of the result by using the following formula:
+
+        //  *** Size of Assembly = Offset of the Last Part + Full Advance of the Last Part ***
+
+        //4) PartFlags is the last field.
+        //      It identifies a number of parts as extenders – those parts that can be repeated(that is, multiple instances of them can be used in place of one) or skipped altogether.Usually the extenders are vertical or horizontal bars of the appropriate thickness, aligned with the rest of the assembly.
+
+        //To ensure that the width/height is distributed equally and the symmetry of the shape is preserved,
+        //following steps can be used by math handling client.
+
+        // Assemble all parts by overlapping connectors by maximum amount, and removing all extenders.
+        //This gives the smallest possible result.
+
+        // Determine how much extra width/height can be distributed into all connections between neighboring parts.
+        // If that is enough to achieve the size goal, extend each connection equally by changing overlaps of connectors to finish the job.
+        // If all connections have been extended to minimum overlap and further growth is needed, add one of each extender, 
+        //and repeat the process from the first step.
+
+        //Note that for assemblies growing in vertical direction,
+        //the distribution of height or the result between ascent and descent is not defined.
+        //The math handling client is responsible for positioning the resulting assembly relative to the baseline.
+
+
+        //GlyphPartRecord Table
+        //Type      Name                    Description
+        //uint16    Glyph                   Glyph ID for the part.
+        //uint16    StartConnectorLength    Advance width/ height of the straight bar connector material, in design units, is at the beginning of the glyph, in the direction of the extension.
+        //uint16    EndConnectorLength      Advance width/ height of the straight bar connector material, in design units, is at the end of the glyph, in the direction of the extension.
+        //uint16    FullAdvance             Full advance width/height for this part, in the direction of the extension.In design units.
+        //uint16    PartFlags               Part qualifiers. PartFlags enumeration currently uses only one bit:
+        //                                       0x0001 fExtender If set, the part can be skipped or repeated.
+        //                                        0xFFFE Reserved.
+
+        public readonly ushort GlyphId;
+        public readonly ushort StartConnectorLength;
+        public readonly ushort EndConnectorLength;
+        public readonly ushort FullAdvance;
+        public readonly ushort PartFlags;
+
+        public GlyphPartRecord(ushort glyphId, ushort startConnectorLength, ushort endConnectorLength, ushort fullAdvance, ushort partFlags)
+        {
+            GlyphId = glyphId;
+            StartConnectorLength = startConnectorLength;
+            EndConnectorLength = endConnectorLength;
+            FullAdvance = fullAdvance;
+            PartFlags = partFlags;
+        }
     }
+
+
+    struct MathGlyphVariantRecord
+    {
+        //    MathGlyphVariantRecord Table
+        //Type      Name                Description
+        //uint16    VariantGlyph        Glyph ID for the variant.
+        //uint16    AdvanceMeasurement  Advance width/height, in design units, of the variant, in the direction of requested glyph extension.
+        public ushort VariantGlyph;
+        public ushort AdvanceMeasurement;
+        public MathGlyphVariantRecord(ushort variantGlyph, ushort advanceMeasurement)
+        {
+            this.VariantGlyph = variantGlyph;
+            this.AdvanceMeasurement = advanceMeasurement;
+        }
+    }
+
 }
