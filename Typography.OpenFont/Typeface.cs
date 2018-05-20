@@ -301,8 +301,8 @@ namespace Typography.OpenFont
 
         //-------------------------------------------------------
 
-        
-         
+
+
         //experiment
         internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
         {
@@ -341,6 +341,18 @@ namespace Typography.OpenFont
             get
             {
                 return _cffTable != null;
+            }
+        }
+
+        MathTable _mathTable;
+        internal void LoadMathTable(MathTable mathTable)
+        {
+            _mathTable = mathTable;
+            //fill math glyph info to associated math glyph
+            int j = _glyphs.Length;
+            for (int i = 0; i < j; ++i)
+            {
+
             }
         }
     }

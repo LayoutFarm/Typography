@@ -120,12 +120,6 @@ namespace Typography.OpenFont
 
                 //test math table
                 MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
-                if (mathtable != null)
-                {
-
-                }
-
-
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
                 //---------------------------------------------
                 //about truetype instruction init 
@@ -202,7 +196,10 @@ namespace Typography.OpenFont
                 //------------
 
                 typeface.PostTable = postTable;
-
+                if (mathtable != null)
+                {
+                    typeface.LoadMathTable(mathtable);
+                }
 #if DEBUG
                 //test
                 int found = typeface.GetGlyphIndexByName("Uacute");
