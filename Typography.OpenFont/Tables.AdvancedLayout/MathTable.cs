@@ -810,50 +810,62 @@ namespace Typography.OpenFont.Tables
 
             ushort mathKernCoverage_offset = reader.ReadUInt16();
             ushort mathKernCount = reader.ReadUInt16();
+
+
+            //MathKernInfoRecord Table 
+            //Each MathKernInfoRecord points to up to four kern tables for each of the corners around the glyph.
+
+            //    //MathKernInfoRecord Table
+            //    //Type      Name                Description
+            //    //Offset16  TopRightMathKern    Offset to MathKern table for top right corner - from the beginning of MathKernInfo table.May be NULL.
+            //    //Offset16  TopLeftMathKern     Offset to MathKern table for the top left corner - from the beginning of MathKernInfo table. May be NULL.
+            //    //Offset16  BottomRightMathKern Offset to MathKern table for bottom right corner - from the beginning of MathKernInfo table. May be NULL.
+            //    //Offset16  BottomLeftMathKern  Offset to MathKern table for bottom left corner - from the beginning of MathKernInfo table. May be NULL.
+
+            ushort[] allKernRecOffset = Utils.ReadUInt16Array(reader, 4 * mathKernCount);//*** 
+
+            //read each kern table  
             var mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
+            int index = 0;
+            ushort m_kern_offset = 0;
             for (int i = 0; i < mathKernCount; ++i)
             {
-                mathKernInfoRecords[i] = new MathKernInfoRecord(
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16()
-                    );
-            }
-
-            _mathKernInfoCoverage = CoverageTable.CreateFrom(reader, beginAt + mathKernCoverage_offset);
-            //-------
-            //read each kern table  
-            foreach (MathKernInfoRecord mathKernRec in mathKernInfoRecords)
-            {
+                var mathKernRec = mathKernInfoRecords[i] = new MathKernInfoRecord();
                 //top-right
-                if (mathKernRec.TopRight_MathKern > 0)
+                m_kern_offset = allKernRecOffset[index];
+                if (m_kern_offset > 0)
                 {
-                    reader.BaseStream.Position = beginAt + mathKernRec.TopRight_MathKern;
+                    reader.BaseStream.Position = beginAt + m_kern_offset;
                     mathKernRec.TopRight = ReadMathKernTable(reader);
                 }
-
                 //top-left
-                if (mathKernRec.TopLeft_MathKern > 0)
+                m_kern_offset = allKernRecOffset[index + 1];
+                if (m_kern_offset > 0)
                 {
-                    reader.BaseStream.Position = beginAt + mathKernRec.TopLeft_MathKern;
+                    reader.BaseStream.Position = beginAt + m_kern_offset;
                     mathKernRec.TopLeft = ReadMathKernTable(reader);
                 }
-
                 //bottom-right
-                if (mathKernRec.BottomRight_MathKern > 0)
+                m_kern_offset = allKernRecOffset[index + 2];
+                if (m_kern_offset > 0)
                 {
-                    reader.BaseStream.Position = beginAt + mathKernRec.BottomRight_MathKern;
+                    reader.BaseStream.Position = beginAt + m_kern_offset;
                     mathKernRec.BottomRight = ReadMathKernTable(reader);
                 }
-
                 //bottom-left
-                if (mathKernRec.BottomLeft_MathKern > 0)
+                m_kern_offset = allKernRecOffset[index + 3];
+                if (m_kern_offset > 0)
                 {
-                    reader.BaseStream.Position = beginAt + mathKernRec.BottomLeft_MathKern;
+                    reader.BaseStream.Position = beginAt + m_kern_offset;
                     mathKernRec.BottomLeft = ReadMathKernTable(reader);
                 }
+
+                index += 4;//***
             }
+
+            //-----
+            _mathKernInfoCoverage = CoverageTable.CreateFrom(reader, beginAt + mathKernCoverage_offset);
+
         }
 
         static MathKernTable ReadMathKernTable(BinaryReader reader)
@@ -888,45 +900,15 @@ namespace Typography.OpenFont.Tables
 
     class MathKernInfoRecord
     {
-        //MathKernInfoRecord Table 
-        //Each MathKernInfoRecord points to up to four kern tables for each of the corners around the glyph.
-
-        //MathKernInfoRecord Table
-        //Type      Name                Description
-        //Offset16  TopRightMathKern    Offset to MathKern table for top right corner - from the beginning of MathKernInfo table.May be NULL.
-        //Offset16  TopLeftMathKern     Offset to MathKern table for the top left corner - from the beginning of MathKernInfo table. May be NULL.
-        //Offset16  BottomRightMathKern Offset to MathKern table for bottom right corner - from the beginning of MathKernInfo table. May be NULL.
-        //Offset16  BottomLeftMathKern  Offset to MathKern table for bottom left corner - from the beginning of MathKernInfo table. May be NULL.
-
-        public readonly ushort TopRight_MathKern;
-        public readonly ushort TopLeft_MathKern;
-        public readonly ushort BottomRight_MathKern;
-        public readonly ushort BottomLeft_MathKern;
-
-
-
         //resolved value
         public MathKernTable TopRight;
         public MathKernTable TopLeft;
         public MathKernTable BottomRight;
         public MathKernTable BottomLeft;
-
-
-
-        public MathKernInfoRecord(ushort topRight, ushort topLeft, ushort bottomRight, ushort bottomLeft)
+        public MathKernInfoRecord()
         {
-            this.TopRight_MathKern = topRight;
-            this.TopLeft_MathKern = topLeft;
-            this.BottomRight_MathKern = bottomRight;
-            this.BottomLeft_MathKern = bottomLeft;
         }
 
-#if DEBUG
-        public override string ToString()
-        {
-            return TopRight_MathKern + "," + TopLeft_MathKern + "," + BottomRight_MathKern + "," + BottomLeft_MathKern;
-        }
-#endif
     }
 
 
