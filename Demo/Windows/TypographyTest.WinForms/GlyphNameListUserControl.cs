@@ -1,13 +1,7 @@
 ﻿//MIT, 2017, WinterDev
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
-
-
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 
@@ -17,6 +11,8 @@ namespace TypographyTest.WinForms
     {
         Typeface _selectedTypeface;
         public event EventHandler GlyphNameChanged;
+        List<GlyphNameMapInfo> _allGlyphNameMapList = new List<GlyphNameMapInfo>();
+
 
         public GlyphNameListUserControl()
         {
@@ -26,7 +22,7 @@ namespace TypographyTest.WinForms
                 if (listBox1.SelectedItem != null)
                 {
                     this.textBox1.Text =
-                       SelectedGlyphName = (string)listBox1.SelectedItem;
+                       SelectedGlyphName = ((GlyphNameMapInfo)listBox1.SelectedItem)._glyphNameMap.glyphName;
                 }
 
                 if (chkRenderGlyph.Checked)
@@ -45,11 +41,54 @@ namespace TypographyTest.WinForms
                 {
                     //find user name first
                     string userSupplyGlyphName = this.textBox1.Text;
-                    Glyph found = _selectedTypeface.GetGlyphByName(userSupplyGlyphName);
-                    if (found != null)
+                    if (userSupplyGlyphName == "")
                     {
-                        int sel_index = listBox1.FindString(userSupplyGlyphName);
-                        listBox1.SelectedIndex = sel_index;
+                        //show all
+                        ShowGlyphNameList(_allGlyphNameMapList);
+                    }
+                    else
+                    {
+                        //show 
+                        Glyph found = _selectedTypeface.GetGlyphByName(userSupplyGlyphName);
+                        if (found != null)
+                        {
+                            int index = 0;
+                            bool found1 = false;
+                            foreach (GlyphNameMapInfo mapInfo in _allGlyphNameMapList)
+                            {
+                                if (mapInfo._glyphNameMap.glyphName == userSupplyGlyphName)
+                                {
+                                    found1 = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    index++;
+                                }
+                            }
+
+                            if (found1)
+                            {
+                                listBox1.SelectedIndex = index;
+                            }
+                        }
+                        else
+                        {
+                            //not found => find glyph that contains the 'name'
+                            int index = 0;
+                            string user_upperCase = userSupplyGlyphName.ToUpper();
+
+                            List<GlyphNameMapInfo> similarList = new List<GlyphNameMapInfo>();
+                            foreach (GlyphNameMapInfo mapInfo in _allGlyphNameMapList)
+                            {
+                                if (mapInfo._glyphNameMap.glyphName.ToUpper().Contains(user_upperCase))
+                                {
+                                    similarList.Add(mapInfo);
+                                }
+                                index++;
+                            }
+                            ShowGlyphNameList(similarList);
+                        }
                     }
                 }
             };
@@ -80,13 +119,42 @@ namespace TypographyTest.WinForms
                 }
             }
         }
+
+        class GlyphNameMapInfo
+        {
+            //this is a helper class
+            public readonly GlyphNameMap _glyphNameMap;
+            public GlyphNameMapInfo(GlyphNameMap glyphNameMap)
+            {
+                _glyphNameMap = glyphNameMap;
+            }
+            public override string ToString()
+            {
+                return _glyphNameMap.glyphIndex + ": " + _glyphNameMap.glyphName;
+            }
+        }
+
+
         void ListAllGlyphNames(Typeface typeface)
         {
-            this.listBox1.Items.Clear();
+            _allGlyphNameMapList.Clear();
+
             foreach (GlyphNameMap glyphNameMap in typeface.GetGlyphNameIter())
             {
-                listBox1.Items.Add(glyphNameMap.glyphName);
+                var mapInfo = new GlyphNameMapInfo(glyphNameMap);
+                _allGlyphNameMapList.Add(mapInfo);
             }
+
+            ShowGlyphNameList(_allGlyphNameMapList);
+        }
+        void ShowGlyphNameList(List<GlyphNameMapInfo> srcList)
+        {
+            this.listBox1.Items.Clear();
+            foreach (GlyphNameMapInfo mapInfo in srcList)
+            {
+                listBox1.Items.Add(mapInfo);
+            }
+
         }
     }
 }
