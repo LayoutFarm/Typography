@@ -405,12 +405,15 @@ namespace Typography.OpenFont.Tables
             ushort mathVariants_offset = reader.ReadUInt16();
             //---------------------------------
 
+            //(1)
             reader.BaseStream.Position = beginAt + mathConstants_offset;
             ReadMathConstantsTable(reader);
             //
+            //(2)
             reader.BaseStream.Position = beginAt + mathGlyphInfo_offset;
             ReadMathGlyphInfoTable(reader);
             //
+            //(3)
             reader.BaseStream.Position = beginAt + mathVariants_offset;
             ReadMathVariantsTable(reader);
 
@@ -528,9 +531,11 @@ namespace Typography.OpenFont.Tables
             ushort offsetTo_MathKernInfo_Table = reader.ReadUInt16();
             //-----------------------
 
+            //(1)
             reader.BaseStream.Position = startAt + offsetTo_MathItalicsCorrectionInfo_Table;
             ReadMathItalicCorrectionInfoTable(reader);
-            //
+
+            //(2)
             reader.BaseStream.Position = startAt + offsetTo_MathTopAccentAttachment_Table;
             ReadMathTopAccentAttachment(reader);
             //
@@ -547,9 +552,10 @@ namespace Typography.OpenFont.Tables
 
             //.... 
 
+            //(3)
             _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
 
-            //
+            //(4)
             if (offsetTo_MathKernInfo_Table > 0)
             {
                 //may be null? eg. latin-modern-math.otf => not found
@@ -558,10 +564,6 @@ namespace Typography.OpenFont.Tables
                 ReadMathKernInfoTable(reader);
             }
         }
-
-
-
-
 
         MathVariantsTable _mathVariantsTable;
         void ReadMathVariantsTable(BinaryReader reader)
@@ -972,6 +974,7 @@ namespace Typography.OpenFont.Tables
 
     class MathVariantsTable
     {
+        public ushort MinConnectorOverlap;
         public CoverageTable vertCoverage;
         public CoverageTable horizCoverage;
         public MathGlyphConstructionTable[] vertConstructionTables;
