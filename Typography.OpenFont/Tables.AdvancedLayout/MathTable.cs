@@ -348,6 +348,9 @@ namespace Typography.OpenFont.MathGlyphs
         /// </summary>
         public short RadicalDegreeBottomRaisePercent;
     }
+
+
+
 }
 
 namespace Typography.OpenFont.Tables
@@ -615,13 +618,13 @@ namespace Typography.OpenFont.Tables
             ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
             //
 
-            CoverageTable vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
-            CoverageTable horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
+            _mathVariantsTable.vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
+            _mathVariantsTable.horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
 
             //read math construction table
 
             //vertical
-            var vertGlyphConstructionTables = new MathGlyphConstructionTable[vertGlyphCount];
+            var vertGlyphConstructionTables = _mathVariantsTable.vertConstructionTables = new MathGlyphConstructionTable[vertGlyphCount];
             for (int i = 0; i < vertGlyphCount; ++i)
             {
                 reader.BaseStream.Position = beginAt + vertGlyphConstructions[i];
@@ -630,7 +633,7 @@ namespace Typography.OpenFont.Tables
 
             //
             //horizon
-            var horizGlyphConstructionTables = new MathGlyphConstructionTable[horizGlyphCount];
+            var horizGlyphConstructionTables = _mathVariantsTable.horizConstructionTables = new MathGlyphConstructionTable[horizGlyphCount];
             for (int i = 0; i < horizGlyphCount; ++i)
             {
                 reader.BaseStream.Position = beginAt + horizonGlyphConstructions[i];
@@ -969,7 +972,10 @@ namespace Typography.OpenFont.Tables
 
     class MathVariantsTable
     {
-
+        public CoverageTable vertCoverage;
+        public CoverageTable horizCoverage;
+        public MathGlyphConstructionTable[] vertConstructionTables;
+        public MathGlyphConstructionTable[] horizConstructionTables;
     }
 
     class MathGlyphConstructionTable
@@ -1022,7 +1028,7 @@ namespace Typography.OpenFont.Tables
         //uint16    FullAdvance             Full advance width/height for this part, in the direction of the extension.In design units.
         //uint16    PartFlags               Part qualifiers. PartFlags enumeration currently uses only one bit:
         //                                       0x0001 fExtender If set, the part can be skipped or repeated.
-        //                                        0xFFFE Reserved.
+        //                                       0xFFFE Reserved.
 
         public readonly ushort GlyphId;
         public readonly ushort StartConnectorLength;
@@ -1038,6 +1044,12 @@ namespace Typography.OpenFont.Tables
             FullAdvance = fullAdvance;
             PartFlags = partFlags;
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return "glyph_id:" + GlyphId;
+        }
+#endif
     }
 
 
