@@ -610,7 +610,7 @@ namespace Typography.OpenFont.Tables
 
             long beginAt = reader.BaseStream.Position;
             //
-            ushort MinConnectorOverlap = reader.ReadUInt16();
+            _mathVariantsTable.MinConnectorOverlap = reader.ReadUInt16();
             //
             ushort vertGlyphCoverageOffset = reader.ReadUInt16();
             ushort horizGlyphCoverageOffset = reader.ReadUInt16();
