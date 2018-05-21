@@ -791,6 +791,7 @@ namespace Typography.OpenFont.Tables
 
 
         CoverageTable _mathKernInfoCoverage;
+        MathKernInfoRecord[] _mathKernInfoRecords;
         void ReadMathKernInfoTable(BinaryReader reader)
         {
             // MathKernInfo Table
@@ -830,12 +831,12 @@ namespace Typography.OpenFont.Tables
             ushort[] allKernRecOffset = Utils.ReadUInt16Array(reader, 4 * mathKernCount);//*** 
 
             //read each kern table  
-            var mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
+            _mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
             int index = 0;
             ushort m_kern_offset = 0;
             for (int i = 0; i < mathKernCount; ++i)
             {
-                var mathKernRec = mathKernInfoRecords[i] = new MathKernInfoRecord();
+                var mathKernRec = _mathKernInfoRecords[i] = new MathKernInfoRecord();
                 //top-right
                 m_kern_offset = allKernRecOffset[index];
                 if (m_kern_offset > 0)
