@@ -464,9 +464,12 @@ namespace Typography.OpenFont.Tables
 
 
 
+
+
+
     class MathTable : TableEntry
     {
-        MathConstants _mathConstTable;
+        internal MathConstants _mathConstTable;
 
         public override string Name
         {
@@ -505,6 +508,10 @@ namespace Typography.OpenFont.Tables
             ReadMathVariantsTable(reader);
 
         }
+        /// <summary>
+        /// (1) MathConstants
+        /// </summary>
+        /// <param name="reader"></param>
         void ReadMathConstantsTable(BinaryReader reader)
         {
             //MathConstants Table
@@ -597,7 +604,13 @@ namespace Typography.OpenFont.Tables
             this._mathConstTable = mc;
         }
 
-        CoverageTable _extendedShapeCoverageTable;
+
+        //--------------------------------------------------------------------------
+
+        /// <summary>
+        /// (2) MathGlyphInfo
+        /// </summary>
+        /// <param name="reader"></param>
         void ReadMathGlyphInfoTable(BinaryReader reader)
         {
 
@@ -618,11 +631,11 @@ namespace Typography.OpenFont.Tables
             ushort offsetTo_MathKernInfo_Table = reader.ReadUInt16();
             //-----------------------
 
-            //(1)
+            //(2.1)
             reader.BaseStream.Position = startAt + offsetTo_MathItalicsCorrectionInfo_Table;
             ReadMathItalicCorrectionInfoTable(reader);
 
-            //(2)
+            //(2.2)
             reader.BaseStream.Position = startAt + offsetTo_MathTopAccentAttachment_Table;
             ReadMathTopAccentAttachment(reader);
             //
@@ -639,10 +652,10 @@ namespace Typography.OpenFont.Tables
 
             //.... 
 
-            //(3)
+            //(2.3)
             _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
 
-            //(4)
+            //(2.4)
             if (offsetTo_MathKernInfo_Table > 0)
             {
                 //may be null? eg. latin-modern-math.otf => not found
@@ -652,185 +665,15 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        MathVariantsTable _mathVariantsTable;
-        void ReadMathVariantsTable(BinaryReader reader)
-        {
-            //MathVariants Table
 
-            //The MathVariants table solves the following problem:
-            //given a particular default glyph shape and a certain width or height, 
-            //find a variant shape glyph(or construct created by putting several glyph together) 
-            //that has the required measurement.
-            //This functionality is needed for growing the parentheses to match the height of the expression within,
-            //growing the radical sign to match the height of the expression under the radical, 
-            //stretching accents like tilde when they are put over several characters, 
-            //for stretching arrows, horizontal curly braces, and so forth.
-
-            //The MathVariants table consists of the following fields:
-
-
-            //  Count and coverage of glyph that can grow in the vertical direction.
-            //  Count and coverage of glyphs that can grow in the horizontal direction.
-            //  MinConnectorOverlap defines by how much two glyphs need to overlap with each other when used to construct a larger shape. 
-            //  Each glyph to be used as a building block in constructing extended shapes will have a straight part at either or both ends.
-            //  This connector part is used to connect that glyph to other glyphs in the assembly. 
-            //  These connectors need to overlap to compensate for rounding errors and hinting corrections at a lower resolution.
-            //  The MinConnectorOverlap value tells how much overlap is necessary for this particular font.
-
-            //  Two arrays of offsets to MathGlyphConstruction tables: 
-            //  one array for glyphs that grow in the vertical direction, 
-            //  and the other array for glyphs that grow in the horizontal direction.
-            //  The arrays must be arranged in coverage order and have specified sizes.
-
-
-            //MathVariants Table
-            //Type          Name                    Description
-            //uint16        MinConnectorOverlap     Minimum overlap of connecting glyphs during glyph construction, in design units.
-            //Offset16      VertGlyphCoverage       Offset to Coverage table - from the beginning of MathVariants table.
-            //Offset16      HorizGlyphCoverage      Offset to Coverage table - from the beginning of MathVariants table.
-            //uint16        VertGlyphCount          Number of glyphs for which information is provided for vertically growing variants.
-            //uint16        HorizGlyphCount         Number of glyphs for which information is provided for horizontally growing variants.
-            //Offset16      VertGlyphConstruction[VertGlyphCount]  Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in vertical direction.
-            //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
-
-            _mathVariantsTable = new MathVariantsTable();
-
-            long beginAt = reader.BaseStream.Position;
-            //
-            _mathVariantsTable.MinConnectorOverlap = reader.ReadUInt16();
-            //
-            ushort vertGlyphCoverageOffset = reader.ReadUInt16();
-            ushort horizGlyphCoverageOffset = reader.ReadUInt16();
-            ushort vertGlyphCount = reader.ReadUInt16();
-            ushort horizGlyphCount = reader.ReadUInt16();
-            ushort[] vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
-            ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
-            //
-
-            _mathVariantsTable.vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
-            _mathVariantsTable.horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
-
-            //read math construction table
-
-            //vertical
-            var vertGlyphConstructionTables = _mathVariantsTable.vertConstructionTables = new MathGlyphConstructionTable[vertGlyphCount];
-            for (int i = 0; i < vertGlyphCount; ++i)
-            {
-                reader.BaseStream.Position = beginAt + vertGlyphConstructions[i];
-                vertGlyphConstructionTables[i] = ReadMathGlyphConstructionTable(reader);
-            }
-
-            //
-            //horizon
-            var horizGlyphConstructionTables = _mathVariantsTable.horizConstructionTables = new MathGlyphConstructionTable[horizGlyphCount];
-            for (int i = 0; i < horizGlyphCount; ++i)
-            {
-                reader.BaseStream.Position = beginAt + horizonGlyphConstructions[i];
-                horizGlyphConstructionTables[i] = ReadMathGlyphConstructionTable(reader);
-            }
-        }
-
-        MathGlyphConstructionTable ReadMathGlyphConstructionTable(BinaryReader reader)
-        {
-
-            //MathGlyphConstruction Table  
-            //The MathGlyphConstruction table provides information on finding or assembling extended variants for one particular glyph.
-            //It can be used for shapes that grow in both horizontal and vertical directions.
-
-            //The first entry is the offset to the GlyphAssembly table that specifies how the shape for this glyph can be assembled 
-            //from parts found in the glyph set of the font.
-            //If no such assembly exists, this offset will be set to NULL.
-
-            //The MathGlyphConstruction table also contains the count and array of ready-made glyph variants for the specified glyph.
-            //Each variant consists of the glyph index and this glyph’s measurement in the direction of extension(vertical or horizontal).
-
-            //Note that it is quite possible that both the GlyphAssembly table and some variants are defined for a particular glyph.
-            //For example, the font may specify several variants for curly braces of different sizes,
-            //and a general mechanism of how larger versions of curly braces can be constructed by stacking parts found in the glyph set.
-            //First attempt is made to find glyph among provided variants.
-            //
-            //However, if the required size is bigger than all glyph variants provided, 
-            //the general mechanism can be employed to typeset the curly braces as a glyph assembly.
-
-
-            //MathGlyphConstruction Table
-            //Type          Name            Description
-            //Offset16      GlyphAssembly   Offset to GlyphAssembly table for this shape - from the beginning of MathGlyphConstruction table.May be NULL.
-            //uint16        VariantCount    Count of glyph growing variants for this glyph.
-            //MathGlyphVariantRecord MathGlyphVariantRecord [VariantCount]   MathGlyphVariantRecords for alternative variants of the glyphs.
-
-            long beginAt = reader.BaseStream.Position;
-
-            var glyphConstructionTable = new MathGlyphConstructionTable();
-
-            ushort glyphAsmOffset = reader.ReadUInt16();
-            ushort variantCount = reader.ReadUInt16();
-
-            var variantRecords = glyphConstructionTable.glyphVariantRecords = new MathGlyphVariantRecord[variantCount];
-
-            for (int i = 0; i < variantCount; ++i)
-            {
-                variantRecords[i] = new MathGlyphVariantRecord(
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16()
-                    );
-            }
-
-
-            //read glyph asm table
-            if (glyphAsmOffset > 0)//may be NULL
-            {
-                reader.BaseStream.Position = beginAt + glyphAsmOffset;
-                FillGlyphAssemblyInfo(reader, glyphConstructionTable);
-            }
-            return glyphConstructionTable;
-        }
-
-        static void FillGlyphAssemblyInfo(BinaryReader reader, MathGlyphConstructionTable glyphConstruction)
-        {
-            //since MathGlyphConstructionTable: GlyphAssembly is 1:1
-
-            //---------
-            //GlyphAssembly Table 
-            //The GlyphAssembly table specifies how the shape for a particular glyph can be constructed from parts found in the glyph set.
-            //The table defines the italics correction of the resulting assembly, and a number of parts that have to be put together to form the required shape.
-
-            //GlyphAssembly
-            //Type              Name                    Description
-            //MathValueRecord   ItalicsCorrection       Italics correction of this GlyphAssembly.Should not depend on the assembly size.
-            //uint16            PartCount               Number of parts in this assembly.
-            //GlyphPartRecord   PartRecords[PartCount]  Array of part records, from left to right and bottom to top. 
-
-            //The result of the assembly process is an array of glyphs with an offset specified for each of those glyphs.
-            //When drawn consecutively at those offsets, the glyphs should combine correctly and produce the required shape.
-
-            //The offsets in the direction of growth (advance offsets), as well as the number of parts labeled as extenders, 
-            //are determined based on the size requirement for the resulting assembly.
-
-            //Note that the glyphs comprising the assembly should be designed so that they align properly in the direction that is orthogonal to the direction of growth.
-
-
-            glyphConstruction.GlyphAsm_ItalicCorrection = reader.ReadMathValueRecord();
-
-            ushort partCount = reader.ReadUInt16();
-
-            var partRecords = glyphConstruction.GlyphAsm_GlyphPartRecords = new GlyphPartRecord[partCount];
-
-            for (int i = 0; i < partCount; ++i)
-            {
-                partRecords[i] = new GlyphPartRecord(
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16(),
-                    reader.ReadUInt16()
-                    );
-            }
-        }
-
-
-
-        MathItalicsCorrectonInfoTable _mathItalicCorrectionInfo;
+        /// <summary>
+        /// (2.1)
+        /// </summary>
+        internal MathItalicsCorrectonInfoTable _mathItalicCorrectionInfo;
+        /// <summary>
+        /// (2.1)
+        /// </summary>
+        /// <param name="reader"></param>
         void ReadMathItalicCorrectionInfoTable(BinaryReader reader)
         {
             long beginAt = reader.BaseStream.Position;
@@ -848,7 +691,15 @@ namespace Typography.OpenFont.Tables
 
         }
 
-        MathTopAccentAttachmentTable _mathTopAccentAttachmentTable;
+
+        /// <summary>
+        /// (2.2)
+        /// </summary>
+        internal MathTopAccentAttachmentTable _mathTopAccentAttachmentTable;
+        /// <summary>
+        /// (2.2)
+        /// </summary>
+        /// <param name="reader"></param>
         void ReadMathTopAccentAttachment(BinaryReader reader)
         {
             //MathTopAccentAttachment Table
@@ -876,9 +727,24 @@ namespace Typography.OpenFont.Tables
             _mathTopAccentAttachmentTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
         }
 
+        /// <summary>
+        /// (2.3)
+        /// </summary>
+        internal CoverageTable _extendedShapeCoverageTable;
 
-        CoverageTable _mathKernInfoCoverage;
-        MathKernInfoRecord[] _mathKernInfoRecords;
+
+        /// <summary>
+        /// (2.4)
+        /// </summary>
+        internal CoverageTable _mathKernInfoCoverage;
+        /// <summary>
+        /// (2.4)
+        /// </summary>
+        internal MathKernInfoRecord[] _mathKernInfoRecords;
+        /// <summary>
+        /// (2.4)
+        /// </summary>
+        /// <param name="reader"></param>
         void ReadMathKernInfoTable(BinaryReader reader)
         {
             // MathKernInfo Table
@@ -960,7 +826,11 @@ namespace Typography.OpenFont.Tables
             _mathKernInfoCoverage = CoverageTable.CreateFrom(reader, beginAt + mathKernCoverage_offset);
 
         }
-
+        /// <summary>
+        /// (2.4)
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         static MathKernTable ReadMathKernTable(BinaryReader reader)
         {
 
@@ -989,6 +859,201 @@ namespace Typography.OpenFont.Tables
                 reader.ReadMathValueRecords(heightCount + 1)
                 );
         }
+
+
+        //--------------------------------------------------------------------------
+
+        /// <summary>
+        /// (3)
+        /// </summary>
+        internal MathVariantsTable _mathVariantsTable;
+        /// <summary>
+        /// (3) MathVariants
+        /// </summary>
+        /// <param name="reader"></param>
+        void ReadMathVariantsTable(BinaryReader reader)
+        {
+            //MathVariants Table
+
+            //The MathVariants table solves the following problem:
+            //given a particular default glyph shape and a certain width or height, 
+            //find a variant shape glyph(or construct created by putting several glyph together) 
+            //that has the required measurement.
+            //This functionality is needed for growing the parentheses to match the height of the expression within,
+            //growing the radical sign to match the height of the expression under the radical, 
+            //stretching accents like tilde when they are put over several characters, 
+            //for stretching arrows, horizontal curly braces, and so forth.
+
+            //The MathVariants table consists of the following fields:
+
+
+            //  Count and coverage of glyph that can grow in the vertical direction.
+            //  Count and coverage of glyphs that can grow in the horizontal direction.
+            //  MinConnectorOverlap defines by how much two glyphs need to overlap with each other when used to construct a larger shape. 
+            //  Each glyph to be used as a building block in constructing extended shapes will have a straight part at either or both ends.
+            //  This connector part is used to connect that glyph to other glyphs in the assembly. 
+            //  These connectors need to overlap to compensate for rounding errors and hinting corrections at a lower resolution.
+            //  The MinConnectorOverlap value tells how much overlap is necessary for this particular font.
+
+            //  Two arrays of offsets to MathGlyphConstruction tables: 
+            //  one array for glyphs that grow in the vertical direction, 
+            //  and the other array for glyphs that grow in the horizontal direction.
+            //  The arrays must be arranged in coverage order and have specified sizes.
+
+
+            //MathVariants Table
+            //Type          Name                    Description
+            //uint16        MinConnectorOverlap     Minimum overlap of connecting glyphs during glyph construction, in design units.
+            //Offset16      VertGlyphCoverage       Offset to Coverage table - from the beginning of MathVariants table.
+            //Offset16      HorizGlyphCoverage      Offset to Coverage table - from the beginning of MathVariants table.
+            //uint16        VertGlyphCount          Number of glyphs for which information is provided for vertically growing variants.
+            //uint16        HorizGlyphCount         Number of glyphs for which information is provided for horizontally growing variants.
+            //Offset16      VertGlyphConstruction[VertGlyphCount]  Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in vertical direction.
+            //Offset16      HorizGlyphConstruction[HorizGlyphCount]    Array of offsets to MathGlyphConstruction tables - from the beginning of the MathVariants table, for shapes growing in horizontal direction.
+
+            _mathVariantsTable = new MathVariantsTable();
+
+            long beginAt = reader.BaseStream.Position;
+            //
+            _mathVariantsTable.MinConnectorOverlap = reader.ReadUInt16();
+            //
+            ushort vertGlyphCoverageOffset = reader.ReadUInt16();
+            ushort horizGlyphCoverageOffset = reader.ReadUInt16();
+            ushort vertGlyphCount = reader.ReadUInt16();
+            ushort horizGlyphCount = reader.ReadUInt16();
+            ushort[] vertGlyphConstructions = Utils.ReadUInt16Array(reader, vertGlyphCount);
+            ushort[] horizonGlyphConstructions = Utils.ReadUInt16Array(reader, horizGlyphCount);
+            //
+
+            _mathVariantsTable.vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
+            _mathVariantsTable.horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
+
+            //read math construction table
+
+            //(3.1)
+            //vertical
+            var vertGlyphConstructionTables = _mathVariantsTable.vertConstructionTables = new MathGlyphConstructionTable[vertGlyphCount];
+            for (int i = 0; i < vertGlyphCount; ++i)
+            {
+                reader.BaseStream.Position = beginAt + vertGlyphConstructions[i];
+                vertGlyphConstructionTables[i] = ReadMathGlyphConstructionTable(reader);
+            }
+
+            //(3.2)
+            //horizon
+            var horizGlyphConstructionTables = _mathVariantsTable.horizConstructionTables = new MathGlyphConstructionTable[horizGlyphCount];
+            for (int i = 0; i < horizGlyphCount; ++i)
+            {
+                reader.BaseStream.Position = beginAt + horizonGlyphConstructions[i];
+                horizGlyphConstructionTables[i] = ReadMathGlyphConstructionTable(reader);
+            }
+        }
+
+
+        /// <summary>
+        /// (3.1, 3.2)
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        MathGlyphConstructionTable ReadMathGlyphConstructionTable(BinaryReader reader)
+        {
+
+            //MathGlyphConstruction Table  
+            //The MathGlyphConstruction table provides information on finding or assembling extended variants for one particular glyph.
+            //It can be used for shapes that grow in both horizontal and vertical directions.
+
+            //The first entry is the offset to the GlyphAssembly table that specifies how the shape for this glyph can be assembled 
+            //from parts found in the glyph set of the font.
+            //If no such assembly exists, this offset will be set to NULL.
+
+            //The MathGlyphConstruction table also contains the count and array of ready-made glyph variants for the specified glyph.
+            //Each variant consists of the glyph index and this glyph’s measurement in the direction of extension(vertical or horizontal).
+
+            //Note that it is quite possible that both the GlyphAssembly table and some variants are defined for a particular glyph.
+            //For example, the font may specify several variants for curly braces of different sizes,
+            //and a general mechanism of how larger versions of curly braces can be constructed by stacking parts found in the glyph set.
+            //First attempt is made to find glyph among provided variants.
+            //
+            //However, if the required size is bigger than all glyph variants provided, 
+            //the general mechanism can be employed to typeset the curly braces as a glyph assembly.
+
+
+            //MathGlyphConstruction Table
+            //Type          Name            Description
+            //Offset16      GlyphAssembly   Offset to GlyphAssembly table for this shape - from the beginning of MathGlyphConstruction table.May be NULL.
+            //uint16        VariantCount    Count of glyph growing variants for this glyph.
+            //MathGlyphVariantRecord MathGlyphVariantRecord [VariantCount]   MathGlyphVariantRecords for alternative variants of the glyphs.
+
+            long beginAt = reader.BaseStream.Position;
+
+            var glyphConstructionTable = new MathGlyphConstructionTable();
+
+            ushort glyphAsmOffset = reader.ReadUInt16();
+            ushort variantCount = reader.ReadUInt16();
+
+            var variantRecords = glyphConstructionTable.glyphVariantRecords = new MathGlyphVariantRecord[variantCount];
+
+            for (int i = 0; i < variantCount; ++i)
+            {
+                variantRecords[i] = new MathGlyphVariantRecord(
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16()
+                    );
+            }
+
+
+            //read glyph asm table
+            if (glyphAsmOffset > 0)//may be NULL
+            {
+                reader.BaseStream.Position = beginAt + glyphAsmOffset;
+                FillGlyphAssemblyInfo(reader, glyphConstructionTable);
+            }
+            return glyphConstructionTable;
+        }
+        /// <summary>
+        /// (3.1, 3.2,)
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="glyphConstruction"></param>
+        static void FillGlyphAssemblyInfo(BinaryReader reader, MathGlyphConstructionTable glyphConstruction)
+        {
+            //since MathGlyphConstructionTable: GlyphAssembly is 1:1 
+            //---------
+            //GlyphAssembly Table 
+            //The GlyphAssembly table specifies how the shape for a particular glyph can be constructed from parts found in the glyph set.
+            //The table defines the italics correction of the resulting assembly, and a number of parts that have to be put together to form the required shape.
+
+            //GlyphAssembly
+            //Type              Name                    Description
+            //MathValueRecord   ItalicsCorrection       Italics correction of this GlyphAssembly.Should not depend on the assembly size.
+            //uint16            PartCount               Number of parts in this assembly.
+            //GlyphPartRecord   PartRecords[PartCount]  Array of part records, from left to right and bottom to top. 
+
+            //The result of the assembly process is an array of glyphs with an offset specified for each of those glyphs.
+            //When drawn consecutively at those offsets, the glyphs should combine correctly and produce the required shape.
+
+            //The offsets in the direction of growth (advance offsets), as well as the number of parts labeled as extenders, 
+            //are determined based on the size requirement for the resulting assembly.
+
+            //Note that the glyphs comprising the assembly should be designed so that they align properly in the direction that is orthogonal to the direction of growth.
+
+
+            glyphConstruction.GlyphAsm_ItalicCorrection = reader.ReadMathValueRecord();
+            ushort partCount = reader.ReadUInt16();
+            var partRecords = glyphConstruction.GlyphAsm_GlyphPartRecords = new GlyphPartRecord[partCount];
+            for (int i = 0; i < partCount; ++i)
+            {
+                partRecords[i] = new GlyphPartRecord(
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16(),
+                    reader.ReadUInt16()
+                    );
+            }
+        }
+
+
     }
 
     class MathKernInfoRecord
@@ -1004,7 +1069,7 @@ namespace Typography.OpenFont.Tables
 
     }
 
-     
+
 
     class MathKernTable
     {
@@ -1072,7 +1137,6 @@ namespace Typography.OpenFont.Tables
 
         public MathValueRecord GlyphAsm_ItalicCorrection;
         public GlyphPartRecord[] GlyphAsm_GlyphPartRecords;
-
         public MathGlyphVariantRecord[] glyphVariantRecords;
 
     }
