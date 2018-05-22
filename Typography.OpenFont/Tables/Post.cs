@@ -125,6 +125,14 @@ namespace Typography.OpenFont.Tables
 
                         //                        }
                         //#endif
+
+                        //?
+                        if (i > 0 && glyphNameIndex == 0)
+                        {
+                            //found in "TestFonts\\segoescb.ttf"
+                            continue; //? 
+                        }
+
                         _glyphNames.Add(glyphNameIndex, stdMacGlyphNames[glyphNameIndex]);
                     }
                     else
@@ -144,7 +152,7 @@ namespace Typography.OpenFont.Tables
                         //#endif
 
                         _glyphNames.Add(glyphNameIndex, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len)));
-                    } 
+                    }
                 }
             }
             else
@@ -172,7 +180,12 @@ namespace Typography.OpenFont.Tables
                 _glyphIndiceByName = new Dictionary<string, ushort>();
                 foreach (var kp in _glyphNames)
                 {
-                    _glyphIndiceByName.Add(kp.Value, kp.Key);
+                    //TODO: review how to handle duplicated glyph name
+                    //1. report the error
+                    //2. handle ...
+
+                    _glyphIndiceByName[kp.Value] = kp.Key;
+                    //_glyphIndiceByName.Add(kp.Value, kp.Key);
                 }
             }
             _glyphIndiceByName.TryGetValue(glyphName, out ushort found);
