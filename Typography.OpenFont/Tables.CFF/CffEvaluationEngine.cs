@@ -14,6 +14,8 @@ namespace Typography.OpenFont.CFF
         CFF.Cff1Font cff1Font;
         int _cffBias;
         float _scale = 1;//default 
+        Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
+
         class PxScaleGlyphTx : IGlyphTranslator
         {
             float scale;
@@ -60,14 +62,22 @@ namespace Typography.OpenFont.CFF
             }
         }
 
+        public CffEvaluationEngine()
+        {
+
+        }
         public void Run(IGlyphTranslator tx, Cff1Font cff1Font, Cff1GlyphData glyphData, float scale = 1)
         {
             Run(tx, cff1Font, glyphData.GlyphInstructions, scale);
         }
         internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2GlyphInstructionList instructionList, float scale = 1)
         {
+
+            //all fields are set to new values***
+
             this.cff1Font = cff1Font;
             this._scale = scale;
+
             //-------------
             //from Technical Note #5176 (CFF spec)
             //resolve with bias
@@ -105,13 +115,15 @@ namespace Typography.OpenFont.CFF
         }
         void Run(IGlyphTranslator tx, Type2GlyphInstructionList instructionList, ref double currentX, ref double currentY)
         {
+            //recursive ***
 
-            Type2EvaluationStack _evalStack = new Type2EvaluationStack();
-            _evalStack._currentX = currentX;
-            _evalStack._currentY = currentY;
+            Type2EvaluationStack evalStack = GetFreeEvalStack(); //**
+
+            evalStack._currentX = currentX;
+            evalStack._currentY = currentY;
 
             List<Type2Instruction> insts = instructionList.Insts;
-            _evalStack.GlyphTranslator = tx;
+            evalStack.GlyphTranslator = tx;
             int j = insts.Count;
 
             for (int i = 0; i < j; ++i)
@@ -127,75 +139,75 @@ namespace Typography.OpenFont.CFF
                         //TODO: 
                         break;
                     case OperatorName.LoadInt:
-                        _evalStack.Push(inst.Value);
+                        evalStack.Push(inst.Value);
                         break;                    //
                     case OperatorName.endchar:
-                        _evalStack.EndChar();
+                        evalStack.EndChar();
                         break;
-                    case OperatorName.flex: _evalStack.Flex(); break;
-                    case OperatorName.hflex: _evalStack.H_Flex(); break;
-                    case OperatorName.hflex1: _evalStack.H_Flex1(); break;
-                    case OperatorName.flex1: _evalStack.Flex1(); break;
+                    case OperatorName.flex: evalStack.Flex(); break;
+                    case OperatorName.hflex: evalStack.H_Flex(); break;
+                    case OperatorName.hflex1: evalStack.H_Flex1(); break;
+                    case OperatorName.flex1: evalStack.Flex1(); break;
                     //-------------------------
                     //4.4: Arithmetic Operators
-                    case OperatorName.abs: _evalStack.Op_Abs(); break;
-                    case OperatorName.add: _evalStack.Op_Add(); break;
-                    case OperatorName.sub: _evalStack.Op_Sub(); break;
-                    case OperatorName.div: _evalStack.Op_Div(); break;
-                    case OperatorName.neg: _evalStack.Op_Neg(); break;
-                    case OperatorName.random: _evalStack.Op_Random(); break;
-                    case OperatorName.mul: _evalStack.Op_Mul(); break;
-                    case OperatorName.sqrt: _evalStack.Op_Sqrt(); break;
-                    case OperatorName.drop: _evalStack.Op_Drop(); break;
-                    case OperatorName.exch: _evalStack.Op_Exch(); break;
-                    case OperatorName.index: _evalStack.Op_Index(); break;
-                    case OperatorName.roll: _evalStack.Op_Roll(); break;
-                    case OperatorName.dup: _evalStack.Op_Dup(); break;
+                    case OperatorName.abs: evalStack.Op_Abs(); break;
+                    case OperatorName.add: evalStack.Op_Add(); break;
+                    case OperatorName.sub: evalStack.Op_Sub(); break;
+                    case OperatorName.div: evalStack.Op_Div(); break;
+                    case OperatorName.neg: evalStack.Op_Neg(); break;
+                    case OperatorName.random: evalStack.Op_Random(); break;
+                    case OperatorName.mul: evalStack.Op_Mul(); break;
+                    case OperatorName.sqrt: evalStack.Op_Sqrt(); break;
+                    case OperatorName.drop: evalStack.Op_Drop(); break;
+                    case OperatorName.exch: evalStack.Op_Exch(); break;
+                    case OperatorName.index: evalStack.Op_Index(); break;
+                    case OperatorName.roll: evalStack.Op_Roll(); break;
+                    case OperatorName.dup: evalStack.Op_Dup(); break;
 
                     //-------------------------
                     //4.5: Storage Operators 
-                    case OperatorName.put: _evalStack.Put(); break;
-                    case OperatorName.get: _evalStack.Get(); break;
+                    case OperatorName.put: evalStack.Put(); break;
+                    case OperatorName.get: evalStack.Get(); break;
                     //-------------------------
                     //4.6: Conditional
-                    case OperatorName.and: _evalStack.Op_And(); break;
-                    case OperatorName.or: _evalStack.Op_Or(); break;
-                    case OperatorName.not: _evalStack.Op_Not(); break;
-                    case OperatorName.eq: _evalStack.Op_Eq(); break;
-                    case OperatorName.ifelse: _evalStack.Op_IfElse(); break;
+                    case OperatorName.and: evalStack.Op_And(); break;
+                    case OperatorName.or: evalStack.Op_Or(); break;
+                    case OperatorName.not: evalStack.Op_Not(); break;
+                    case OperatorName.eq: evalStack.Op_Eq(); break;
+                    case OperatorName.ifelse: evalStack.Op_IfElse(); break;
                     // 
-                    case OperatorName.rlineto: _evalStack.R_LineTo(); break;
-                    case OperatorName.hlineto: _evalStack.H_LineTo(); break;
-                    case OperatorName.vlineto: _evalStack.V_LineTo(); break;
-                    case OperatorName.rrcurveto: _evalStack.RR_CurveTo(); break;
-                    case OperatorName.hhcurveto: _evalStack.HH_CurveTo(); break;
-                    case OperatorName.hvcurveto: _evalStack.HV_CurveTo(); break;
-                    case OperatorName.rcurveline: _evalStack.R_CurveLine(); break;
-                    case OperatorName.rlinecurve: _evalStack.R_LineCurve(); break;
-                    case OperatorName.vhcurveto: _evalStack.VH_CurveTo(); break;
-                    case OperatorName.vvcurveto: _evalStack.VV_CurveTo(); break;
+                    case OperatorName.rlineto: evalStack.R_LineTo(); break;
+                    case OperatorName.hlineto: evalStack.H_LineTo(); break;
+                    case OperatorName.vlineto: evalStack.V_LineTo(); break;
+                    case OperatorName.rrcurveto: evalStack.RR_CurveTo(); break;
+                    case OperatorName.hhcurveto: evalStack.HH_CurveTo(); break;
+                    case OperatorName.hvcurveto: evalStack.HV_CurveTo(); break;
+                    case OperatorName.rcurveline: evalStack.R_CurveLine(); break;
+                    case OperatorName.rlinecurve: evalStack.R_LineCurve(); break;
+                    case OperatorName.vhcurveto: evalStack.VH_CurveTo(); break;
+                    case OperatorName.vvcurveto: evalStack.VV_CurveTo(); break;
                     //-------------------------------------------------------------------                     
-                    case OperatorName.rmoveto: _evalStack.R_MoveTo(); break;
-                    case OperatorName.hmoveto: _evalStack.H_MoveTo(); break;
-                    case OperatorName.vmoveto: _evalStack.V_MoveTo(); break;
+                    case OperatorName.rmoveto: evalStack.R_MoveTo(); break;
+                    case OperatorName.hmoveto: evalStack.H_MoveTo(); break;
+                    case OperatorName.vmoveto: evalStack.V_MoveTo(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case OperatorName.hstem: _evalStack.H_Stem(); break;
-                    case OperatorName.vstem: _evalStack.V_Stem(); break;
-                    case OperatorName.vstemhm: _evalStack.V_StemHM(); break;
-                    case OperatorName.hstemhm: _evalStack.H_StemHM(); break;
+                    case OperatorName.hstem: evalStack.H_Stem(); break;
+                    case OperatorName.vstem: evalStack.V_Stem(); break;
+                    case OperatorName.vstemhm: evalStack.V_StemHM(); break;
+                    case OperatorName.hstemhm: evalStack.H_StemHM(); break;
                     //--------------------------
-                    case OperatorName.hintmask1: _evalStack.HintMask1(inst.Value); break;
-                    case OperatorName.hintmask2: _evalStack.HintMask2(inst.Value); break;
-                    case OperatorName.hintmask3: _evalStack.HintMask3(inst.Value); break;
-                    case OperatorName.hintmask4: _evalStack.HintMask4(inst.Value); break;
-                    case OperatorName.hintmask_bits: _evalStack.HintMaskBits(inst.Value); break;
+                    case OperatorName.hintmask1: evalStack.HintMask1(inst.Value); break;
+                    case OperatorName.hintmask2: evalStack.HintMask2(inst.Value); break;
+                    case OperatorName.hintmask3: evalStack.HintMask3(inst.Value); break;
+                    case OperatorName.hintmask4: evalStack.HintMask4(inst.Value); break;
+                    case OperatorName.hintmask_bits: evalStack.HintMaskBits(inst.Value); break;
                     //------------------------------
-                    case OperatorName.cntrmask1: _evalStack.CounterSpaceMask1(inst.Value); break;
-                    case OperatorName.cntrmask2: _evalStack.CounterSpaceMask2(inst.Value); break;
-                    case OperatorName.cntrmask3: _evalStack.CounterSpaceMask3(inst.Value); break;
-                    case OperatorName.cntrmask4: _evalStack.CounterSpaceMask4(inst.Value); break;
-                    case OperatorName.cntrmask_bits: _evalStack.CounterSpaceMaskBits(inst.Value); break;
+                    case OperatorName.cntrmask1: evalStack.CounterSpaceMask1(inst.Value); break;
+                    case OperatorName.cntrmask2: evalStack.CounterSpaceMask2(inst.Value); break;
+                    case OperatorName.cntrmask3: evalStack.CounterSpaceMask3(inst.Value); break;
+                    case OperatorName.cntrmask4: evalStack.CounterSpaceMask4(inst.Value); break;
+                    case OperatorName.cntrmask_bits: evalStack.CounterSpaceMaskBits(inst.Value); break;
 
                     //-------------------------
                     //4.7: Subroutine Operators
@@ -203,27 +215,46 @@ namespace Typography.OpenFont.CFF
                         {
                             //***
                             //don't forget to return _evalStack's currentX, currentY to prev evl context
-                            currentX = _evalStack._currentX;
-                            currentY = _evalStack._currentY;
-                            _evalStack.Ret();
+                            currentX = evalStack._currentX;
+                            currentY = evalStack._currentY;
+                            evalStack.Ret();
                         }
                         break;
                     case OperatorName.callsubr:
                         {
                             //resolve local subrountine
-                            int rawSubRoutineNum = (int)_evalStack.Pop();
+                            int rawSubRoutineNum = (int)evalStack.Pop();
                             Type2GlyphInstructionList resolvedSubroutine = cff1Font._localSubrs[rawSubRoutineNum + _cffBias];
                             //then we move to another context
-                            Run(tx, resolvedSubroutine, ref _evalStack._currentX, ref _evalStack._currentY);
+                            //recursive ***
+                            Run(tx, resolvedSubroutine, ref evalStack._currentX, ref evalStack._currentY);
                         }
                         break;
                     case OperatorName.callgsubr: throw new NotSupportedException();
 
                 }
             }
+
+
+            ReleaseEvalStack(evalStack);//****
         }
 
-
+        Type2EvaluationStack GetFreeEvalStack()
+        {
+            if (_evalStackPool.Count > 0)
+            {
+                return _evalStackPool.Pop();
+            }
+            else
+            {
+                return new Type2EvaluationStack();
+            }
+        }
+        void ReleaseEvalStack(Type2EvaluationStack evalStack)
+        {
+            evalStack.Reset();
+            _evalStackPool.Push(evalStack);
+        }
     }
 
     class Type2EvaluationStack
@@ -240,6 +271,13 @@ namespace Typography.OpenFont.CFF
 
         public Type2EvaluationStack()
         {
+        }
+
+        public void Reset()
+        {
+            _currentIndex = 0;
+            _currentX = _currentY = 0;
+            _glyphTranslator = null;
         }
         public IGlyphTranslator GlyphTranslator
         {
