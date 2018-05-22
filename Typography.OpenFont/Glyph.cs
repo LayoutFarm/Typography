@@ -39,7 +39,7 @@ namespace Typography.OpenFont
         }
 
         internal CFF.Cff1Font _ownerCffFont;
-        internal CFF.Cff1GlyphData _cff1GlyphData; //temp
+        internal CFF.Cff1GlyphData _cff1GlyphData; //temp , TODO: review here again
         internal Glyph(CFF.Cff1Font owner, CFF.Cff1GlyphData cff1Glyph)
         {
 #if DEBUG
@@ -215,7 +215,7 @@ namespace Typography.OpenFont
 
         //--------------------
         //cff
-        
+
         public bool IsCffGlyph
         {
             get
@@ -232,6 +232,12 @@ namespace Typography.OpenFont
         {
             return _cff1GlyphData;
         }
+
+
+        //--------------------
+        //math glyph info, temp , TODO: review here again
+        public MathGlyphs.MathGlyphInfo MathGlyphInfo { get; internal set; }
+        public bool HasMathGlyphInfo { get; internal set; }
 
 #if DEBUG
         public override string ToString()

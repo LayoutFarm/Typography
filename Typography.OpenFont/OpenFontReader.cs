@@ -198,7 +198,9 @@ namespace Typography.OpenFont
                 typeface.PostTable = postTable;
                 if (mathtable != null)
                 {
-                    typeface.LoadMathTable(mathtable);
+                    var mathGlyphLoader = new MathGlyphLoader();
+                    mathGlyphLoader.LoadMathGlyph(typeface, mathtable);
+
                 }
 #if DEBUG
                 //test

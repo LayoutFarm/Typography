@@ -356,7 +356,43 @@ namespace Typography.OpenFont.MathGlyphs
         {
             this.GlyphIndex = glyphIndex;
         }
+
+        public MathValueRecord? ItalicCorrection { get; internal set; }
+        public MathValueRecord? TopAccentAttachment { get; internal set; }
+        public bool IsShapeExtensible { get; internal set; }
+
+        //optional 
+        public MathKern TopLeftMathKern { get { return _mathKernRec.TopLeft; } }
+        public MathKern TopRightMathKern { get { return _mathKernRec.TopRight; } }
+        public MathKern BottomLeftMathKern { get { return _mathKernRec.BottomLeft; } }
+        public MathKern BottomRightMathKern { get { return _mathKernRec.BottomRight; } }
+        public bool HasSomeMathKern { get; private set; }
+
+        //
+        MathKernInfoRecord _mathKernRec;
+        internal void SetMathKerns(MathKernInfoRecord mathKernRec)
+        {
+            _mathKernRec = mathKernRec;
+            HasSomeMathKern = true;
+        }
+
+        /// <summary>
+        /// vertical glyph construction
+        /// </summary>
+        public MathGlyphConstruction VertGlyphConstruction;
+        /// <summary>
+        /// horizontal glyph construction
+        /// </summary>
+        public MathGlyphConstruction HoriGlyphConstruction;
+
     }
+    public class MathGlyphConstruction
+    {
+        public MathValueRecord GlyphAsm_ItalicCorrection;
+        public GlyphPartRecord[] GlyphAsm_GlyphPartRecords;
+        public MathGlyphVariantRecord[] glyphVariantRecords;
+    }
+
 
     public struct GlyphPartRecord
     {
@@ -436,7 +472,56 @@ namespace Typography.OpenFont.MathGlyphs
             this.VariantGlyph = variantGlyph;
             this.AdvanceMeasurement = advanceMeasurement;
         }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return "variant_glyph_id:" + VariantGlyph + ", adv:" + AdvanceMeasurement;
+        }
+#endif
     }
+
+    public class MathKern
+    {
+        //reference =>see  MathKernTable
+        public ushort HeightCount;
+        public MathValueRecord[] CorrectionHeights;
+        public MathValueRecord[] KernValues;
+
+        public MathKern(ushort heightCount, MathValueRecord[] correctionHeights, MathValueRecord[] kernValues)
+        {
+            HeightCount = heightCount;
+            CorrectionHeights = correctionHeights;
+            KernValues = kernValues;
+        }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return HeightCount.ToString();
+        }
+#endif
+    }
+    struct MathKernInfoRecord
+    {
+        //resolved value
+        public readonly MathKern TopRight;
+        public readonly MathKern TopLeft;
+        public readonly MathKern BottomRight;
+        public readonly MathKern BottomLeft;
+        public MathKernInfoRecord(MathKern topRight,
+             MathKern topLeft,
+             MathKern bottomRight,
+             MathKern bottomLeft)
+        {
+            TopRight = topLeft;
+            TopLeft = topLeft;
+            BottomRight = bottomRight;
+            BottomLeft = bottomLeft;
+        }
+
+    }
+
 
 }
 
@@ -462,28 +547,103 @@ namespace Typography.OpenFont.Tables
         }
     }
 
-
-
-
     struct MathGlyphLoader
     {
 
+        static MathGlyphInfo GetMathGlyphOrCreateNew(MathGlyphInfo[] mathGlyphInfos, ushort glyphIndex)
+        {
+            return mathGlyphInfos[glyphIndex] ?? (mathGlyphInfos[glyphIndex] = new MathGlyphInfo(glyphIndex));
+        }
         public void LoadMathGlyph(Typeface typeface, MathTable mathTable)
         {
             //expand math info to each glyph in typeface
 
             typeface._mathTable = mathTable;
-
             Glyph[] allGlyphs = typeface.GetRawGlyphList();
-            //expand all information to the glyph
 
+            //expand all information to the glyph 
+            int glyphCount = allGlyphs.Length;
+            MathGlyphInfo[] mathGlyphInfos = new MathGlyphInfo[glyphCount];
+            typeface._mathGlyphInfos = mathGlyphInfos;
 
-            int j = allGlyphs.Length;
-            for (int i = 0; i < j; ++i)
-            {
-                Glyph glyph = allGlyphs[i]; 
-
+            int index = 0;
+            //-----------------
+            //2. MathGlyphInfo
+            //-----------------
+            {    //2.1 expand italic correction
+                MathItalicsCorrectonInfoTable italicCorrection = mathTable._mathItalicCorrectionInfo;
+                index = 0; //reset
+                foreach (ushort glyphIndex in italicCorrection.CoverageTable.GetExpandedValueIter())
+                {
+                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).ItalicCorrection = italicCorrection.ItalicCorrections[index];
+                    index++;
+                }
             }
+            //--------
+            {
+                //2.2 expand top accent
+                MathTopAccentAttachmentTable topAccentAttachment = mathTable._mathTopAccentAttachmentTable;
+                index = 0; //reset
+                foreach (ushort glyphIndex in topAccentAttachment.CoverageTable.GetExpandedValueIter())
+                {
+                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).TopAccentAttachment = topAccentAttachment.TopAccentAttachment[index];
+                    index++;
+                }
+            }
+            //--------
+            {
+                //2.3 expand , expand shape
+                index = 0; //reset
+                foreach (ushort glyphIndex in mathTable._extendedShapeCoverageTable.GetExpandedValueIter())
+                {
+                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).IsShapeExtensible = true;
+                    index++;
+                }
+            }
+            //--------
+            {
+                //2.4 math kern
+                index = 0; //reset
+                if (mathTable._mathKernInfoCoverage != null)
+                {
+                    MathKernInfoRecord[] kernRecs = mathTable._mathKernInfoRecords;
+                    foreach (ushort glyphIndex in mathTable._mathKernInfoCoverage.GetExpandedValueIter())
+                    {
+                        GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).SetMathKerns(kernRecs[index]);
+                        index++;
+                    }
+                }
+            }
+            //-----------------
+            //3. MathVariants
+            //-----------------
+            {
+
+                MathVariantsTable mathVariants = mathTable._mathVariantsTable;
+                //3.1  vertical
+                index = 0; //reset
+                foreach (ushort glyphIndex in mathVariants.vertCoverage.GetExpandedValueIter())
+                {
+                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).VertGlyphConstruction = mathVariants.vertConstructionTables[index];
+                    index++;
+                }
+                //
+                //3.2 horizontal
+                index = 0;//reset
+                foreach (ushort glyphIndex in mathVariants.horizCoverage.GetExpandedValueIter())
+                {
+                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).HoriGlyphConstruction = mathVariants.horizConstructionTables[index];
+                    index++;
+                }
+            }
+
+            //-------
+            //fill to original glyph?
+            for (int n = allGlyphs.Length - 1; n >= 0; --n)
+            {
+                allGlyphs[n].MathGlyphInfo = mathGlyphInfos[n];
+            }
+
         }
 
     }
@@ -810,37 +970,43 @@ namespace Typography.OpenFont.Tables
             _mathKernInfoRecords = new MathKernInfoRecord[mathKernCount];
             int index = 0;
             ushort m_kern_offset = 0;
+
             for (int i = 0; i < mathKernCount; ++i)
             {
-                var mathKernRec = _mathKernInfoRecords[i] = new MathKernInfoRecord();
+
                 //top-right
                 m_kern_offset = allKernRecOffset[index];
+
+                MathKern topRight = null, topLeft = null, bottomRight = null, bottomLeft = null;
+
                 if (m_kern_offset > 0)
                 {
                     reader.BaseStream.Position = beginAt + m_kern_offset;
-                    mathKernRec.TopRight = ReadMathKernTable(reader);
+                    topRight = ReadMathKernTable(reader);
                 }
                 //top-left
                 m_kern_offset = allKernRecOffset[index + 1];
                 if (m_kern_offset > 0)
                 {
                     reader.BaseStream.Position = beginAt + m_kern_offset;
-                    mathKernRec.TopLeft = ReadMathKernTable(reader);
+                    topLeft = ReadMathKernTable(reader);
                 }
                 //bottom-right
                 m_kern_offset = allKernRecOffset[index + 2];
                 if (m_kern_offset > 0)
                 {
                     reader.BaseStream.Position = beginAt + m_kern_offset;
-                    mathKernRec.BottomRight = ReadMathKernTable(reader);
+                    bottomRight = ReadMathKernTable(reader);
                 }
                 //bottom-left
                 m_kern_offset = allKernRecOffset[index + 3];
                 if (m_kern_offset > 0)
                 {
                     reader.BaseStream.Position = beginAt + m_kern_offset;
-                    mathKernRec.BottomLeft = ReadMathKernTable(reader);
+                    bottomLeft = ReadMathKernTable(reader);
                 }
+
+                _mathKernInfoRecords[i] = new MathKernInfoRecord(topRight, topLeft, bottomRight, bottomLeft);
 
                 index += 4;//***
             }
@@ -854,7 +1020,7 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        static MathKernTable ReadMathKernTable(BinaryReader reader)
+        static MathKern ReadMathKernTable(BinaryReader reader)
         {
 
             //The MathKern table contains adjustments to horizontal positions of subscripts and superscripts
@@ -877,7 +1043,7 @@ namespace Typography.OpenFont.Tables
             //Negative values are interpreted as "move glyphs closer to each other".
 
             ushort heightCount = reader.ReadUInt16();
-            return new MathKernTable(heightCount,
+            return new MathKern(heightCount,
                 reader.ReadMathValueRecords(heightCount),
                 reader.ReadMathValueRecords(heightCount + 1)
                 );
@@ -955,7 +1121,7 @@ namespace Typography.OpenFont.Tables
 
             //(3.1)
             //vertical
-            var vertGlyphConstructionTables = _mathVariantsTable.vertConstructionTables = new MathGlyphConstructionTable[vertGlyphCount];
+            var vertGlyphConstructionTables = _mathVariantsTable.vertConstructionTables = new MathGlyphConstruction[vertGlyphCount];
             for (int i = 0; i < vertGlyphCount; ++i)
             {
                 reader.BaseStream.Position = beginAt + vertGlyphConstructions[i];
@@ -964,7 +1130,7 @@ namespace Typography.OpenFont.Tables
 
             //(3.2)
             //horizon
-            var horizGlyphConstructionTables = _mathVariantsTable.horizConstructionTables = new MathGlyphConstructionTable[horizGlyphCount];
+            var horizGlyphConstructionTables = _mathVariantsTable.horizConstructionTables = new MathGlyphConstruction[horizGlyphCount];
             for (int i = 0; i < horizGlyphCount; ++i)
             {
                 reader.BaseStream.Position = beginAt + horizonGlyphConstructions[i];
@@ -978,7 +1144,7 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        MathGlyphConstructionTable ReadMathGlyphConstructionTable(BinaryReader reader)
+        MathGlyphConstruction ReadMathGlyphConstructionTable(BinaryReader reader)
         {
 
             //MathGlyphConstruction Table  
@@ -1009,7 +1175,7 @@ namespace Typography.OpenFont.Tables
 
             long beginAt = reader.BaseStream.Position;
 
-            var glyphConstructionTable = new MathGlyphConstructionTable();
+            var glyphConstructionTable = new MathGlyphConstruction();
 
             ushort glyphAsmOffset = reader.ReadUInt16();
             ushort variantCount = reader.ReadUInt16();
@@ -1038,7 +1204,7 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="glyphConstruction"></param>
-        static void FillGlyphAssemblyInfo(BinaryReader reader, MathGlyphConstructionTable glyphConstruction)
+        static void FillGlyphAssemblyInfo(BinaryReader reader, MathGlyphConstruction glyphConstruction)
         {
             //since MathGlyphConstructionTable: GlyphAssembly is 1:1 
             //---------
@@ -1079,43 +1245,9 @@ namespace Typography.OpenFont.Tables
 
     }
 
-    class MathKernInfoRecord
-    {
-        //resolved value
-        public MathKernTable TopRight;
-        public MathKernTable TopLeft;
-        public MathKernTable BottomRight;
-        public MathKernTable BottomLeft;
-        public MathKernInfoRecord()
-        {
-        }
-
-    }
 
 
 
-    class MathKernTable
-    {
-
-        public ushort HeightCount;
-        public MathValueRecord[] CorrectionHeights;
-        public MathValueRecord[] KernValues;
-
-
-        public MathKernTable(ushort heightCount, MathValueRecord[] correctionHeights, MathValueRecord[] kernValues)
-        {
-            HeightCount = heightCount;
-            CorrectionHeights = correctionHeights;
-            KernValues = kernValues;
-        }
-
-#if DEBUG
-        public override string ToString()
-        {
-            return HeightCount.ToString();
-        }
-#endif
-    }
 
 
 
@@ -1151,18 +1283,10 @@ namespace Typography.OpenFont.Tables
         public ushort MinConnectorOverlap;
         public CoverageTable vertCoverage;
         public CoverageTable horizCoverage;
-        public MathGlyphConstructionTable[] vertConstructionTables;
-        public MathGlyphConstructionTable[] horizConstructionTables;
+        public MathGlyphConstruction[] vertConstructionTables;
+        public MathGlyphConstruction[] horizConstructionTables;
     }
 
-    class MathGlyphConstructionTable
-    {
-
-        public MathValueRecord GlyphAsm_ItalicCorrection;
-        public GlyphPartRecord[] GlyphAsm_GlyphPartRecords;
-        public MathGlyphVariantRecord[] glyphVariantRecords;
-
-    }
 
 
 

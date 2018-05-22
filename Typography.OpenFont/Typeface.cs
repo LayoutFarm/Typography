@@ -344,16 +344,15 @@ namespace Typography.OpenFont
             }
         }
 
-        MathTable _mathTable;
-        internal void LoadMathTable(MathTable mathTable)
+        internal MathTable _mathTable;
+        internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
+        internal Glyph[] GetRawGlyphList()
         {
-            _mathTable = mathTable;
-            //fill math glyph info to associated math glyph
-            int j = _glyphs.Length;
-            for (int i = 0; i < j; ++i)
-            {
-
-            }
+            return _glyphs;
+        }
+        public MathGlyphs.MathConstants MathConsts
+        {
+            get { return _mathTable._mathConstTable; }
         }
     }
 
