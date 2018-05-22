@@ -1,6 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev
 
-using Typography.OpenFont; 
+using Typography.OpenFont;
 
 namespace Typography.Contours
 {
@@ -121,13 +121,15 @@ namespace Typography.Contours
                 _recentPixelScale = 1;
             }
         }
+
+        Typography.OpenFont.CFF.CffEvaluationEngine cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();
         public virtual void ReadShapes(IGlyphTranslator tx)
         {
             //read output from glyph points
 
             if (this._cffGlyphData != null)
-            {   
-                tx.Read(this._ownerCff, this._cffGlyphData, _recentPixelScale);
+            {
+                cffEvalEngine.Run(tx, this._ownerCff, this._cffGlyphData, _recentPixelScale);
             }
             else
             {
