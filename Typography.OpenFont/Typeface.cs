@@ -705,8 +705,10 @@ namespace Typography.OpenFont
                     yield return kp;
                 }
             }
-            else
-            {
+            else if (typeface.PostTable.Version == 2)
+            {   
+                //version 1 and 3 => no glyph names
+
                 foreach (var kp in typeface.PostTable.GlyphNames)
                 {
                     yield return new GlyphNameMap(kp.Key, kp.Value);
