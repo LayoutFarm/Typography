@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace Typography.OpenFont.CFF
 {
 
-    class CffEvaluationEngine
+    public class CffEvaluationEngine
     {
 
         CFF.Cff1Font cff1Font;
@@ -60,7 +60,11 @@ namespace Typography.OpenFont.CFF
             }
         }
 
-        public void Run(IGlyphTranslator tx, CFF.Cff1Font cff1Font, Type2GlyphInstructionList instructionList, float scale = 1)
+        public void Run(IGlyphTranslator tx, Cff1Font cff1Font, Cff1GlyphData glyphData, float scale = 1)
+        {
+            Run(tx, cff1Font, glyphData.GlyphInstructions, scale);
+        }
+        internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2GlyphInstructionList instructionList, float scale = 1)
         {
             this.cff1Font = cff1Font;
             this._scale = scale;
