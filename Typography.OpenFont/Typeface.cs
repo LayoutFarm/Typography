@@ -191,8 +191,13 @@ namespace Typography.OpenFont
             if (_cffTable != null)
             {
                 //early preview ...
-                CFF.Cff1Font cff1Font = _cffTable.Cff1FontSet._fonts[0];
-                return cff1Font.GetGlyphByName(glyphName);
+                List<CFF.Cff1Font> cff1Fonts = _cffTable.Cff1FontSet._fonts;
+                for (int i = 0; i < cff1Fonts.Count; i++)
+                {
+                    Glyph glyph = cff1Fonts[i].GetGlyphByName(glyphName);
+                    if (glyph != null) return glyph;
+                }
+                return null;
             }
             else if (PostTable != null)
             {
