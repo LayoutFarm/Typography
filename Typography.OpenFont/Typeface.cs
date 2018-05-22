@@ -732,8 +732,12 @@ namespace Typography.OpenFont
 
             float _minX, _maxX, _minY, _maxY;
             float _curX, _curY;
-
+            float _latestMove_X, _latestMove_Y;
+            /// <summary>
+            /// curve flatten steps  => this a copy from Typography.Contours's GlyphPartFlattener
+            /// </summary>
             int nsteps = 3;
+            bool _contourOpen = false;
 
             public CffBoundFinder()
             {
@@ -741,9 +745,10 @@ namespace Typography.OpenFont
             }
             public void Reset()
             {
-                _curX = _curY = _minX = _maxX = _minY = _maxY = 0;
+                _latestMove_X = _latestMove_Y =
+                    _curX = _curY =
+                        _minX = _maxX = _minY = _maxY = 0;
             }
-
             public void BeginRead(int contourCount)
             {
 
@@ -754,7 +759,9 @@ namespace Typography.OpenFont
             }
             public void CloseContour()
             {
-
+                _contourOpen = false;
+                _curX = _latestMove_X;
+                _curY = _latestMove_Y;
             }
             public void Curve3(float x1, float y1, float x2, float y2)
             {
@@ -767,16 +774,20 @@ namespace Typography.OpenFont
                 for (int t = 1; t < nsteps; ++t)
                 {
                     float c = 1.0f - t;
-                    float x = (c * c * _curX) + (2 * t * c * x1) + (t * t * x2);
-                    float y = (c * c * _curY) + (2 * t * c * y1) + (t * t * y2);
 
-                    UpdateMinMax(x, y);
+                    UpdateMinMax(
+                         (c * c * _curX) + (2 * t * c * x1) + (t * t * x2),  //x
+                         (c * c * _curY) + (2 * t * c * y1) + (t * t * y2)); //y
 
                     stepSum += eachstep;
                 }
 
-                _curX = x2;
-                _curY = y2;
+                //
+                UpdateMinMax(
+                    _curX = x2,
+                    _curY = y2);
+
+                _contourOpen = true;
             }
 
             public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
@@ -790,26 +801,39 @@ namespace Typography.OpenFont
                 for (int t = 1; t < nsteps; ++t)
                 {
                     float c = 1.0f - t;
-                    float x = (_curX * c * c * c) + (x1 * 3 * t * c * c) + (x2 * 3 * t * t * c) + x3 * t * t * t;
-                    float y = (_curY * c * c * c) + (y1 * 3 * t * c * c) + (y2 * 3 * t * t * c) + y3 * t * t * t;
 
-                    UpdateMinMax(x, y);
+                    UpdateMinMax(
+                        (_curX * c * c * c) + (x1 * 3 * t * c * c) + (x2 * 3 * t * t * c) + x3 * t * t * t,  //x
+                        (_curY * c * c * c) + (y1 * 3 * t * c * c) + (y2 * 3 * t * t * c) + y3 * t * t * t); //y
 
                     stepSum += eachstep;
                 }
+                //
+                UpdateMinMax(
+                    _curX = x3,
+                    _curY = y3);
 
-                _curX = x3;
-                _curY = y3;
+                _contourOpen = true;
             }
             public void LineTo(float x1, float y1)
             {
-                UpdateMinMax(_curX = x1, _curY = y1);
+                UpdateMinMax(
+                    _curX = x1,
+                    _curY = y1);
+
+                _contourOpen = true;
             }
             public void MoveTo(float x0, float y0)
             {
-                _curX = x0;
-                _curY = y0;
-                UpdateMinMax(_curX, _curY);
+
+                if (_contourOpen)
+                {
+                    CloseContour();
+                }
+
+                UpdateMinMax(
+                    _curX = x0,
+                    _curY = y0);
             }
             void UpdateMinMax(float x0, float y0)
             {
