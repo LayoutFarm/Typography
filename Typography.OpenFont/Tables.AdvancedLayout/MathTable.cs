@@ -347,6 +347,13 @@ namespace Typography.OpenFont.MathGlyphs
         ///  Suggested: 60%.
         /// </summary>
         public short RadicalDegreeBottomRaisePercent { get; internal set; }
+
+
+        //---------------------------------------------------------
+        //ONLY this value come from  "MathVariants" *** 
+        //I expose that value on this class
+        public ushort MinConnectorOverlap { get; internal set; }
+        //---------------------------------------------------------
     }
 
     public class MathGlyphInfo
@@ -620,6 +627,7 @@ namespace Typography.OpenFont.Tables
             {
 
                 MathVariantsTable mathVariants = mathTable._mathVariantsTable;
+
                 //3.1  vertical
                 index = 0; //reset
                 foreach (ushort glyphIndex in mathVariants.vertCoverage.GetExpandedValueIter())
@@ -690,6 +698,8 @@ namespace Typography.OpenFont.Tables
             reader.BaseStream.Position = beginAt + mathVariants_offset;
             ReadMathVariantsTable(reader);
 
+            //NOTE: expose  MinConnectorOverlap via _mathConstTable
+            _mathConstTable.MinConnectorOverlap = _mathVariantsTable.MinConnectorOverlap;
         }
         /// <summary>
         /// (1) MathConstants
