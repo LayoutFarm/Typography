@@ -52,7 +52,7 @@ namespace Typography.OpenFont.Tables
                     if (contoursCount >= 0)
                     {
                         Bounds bounds = Utils.ReadBounds(reader);
-                        _glyphs[i] = ReadSimpleGlyph(reader, contoursCount, bounds);
+                        _glyphs[i] = ReadSimpleGlyph(reader, contoursCount, bounds, (ushort)i);
                     }
                     else
                     {
@@ -180,7 +180,7 @@ namespace Typography.OpenFont.Tables
             YSignOrSame = 1 << 5
         }
 
-        static Glyph ReadSimpleGlyph(BinaryReader reader, int contourCount, Bounds bounds)
+        static Glyph ReadSimpleGlyph(BinaryReader reader, int contourCount, Bounds bounds, ushort index)
         {
             //https://www.microsoft.com/typography/OTSPEC/glyf.htm
             //Simple Glyph Description
@@ -214,7 +214,7 @@ namespace Typography.OpenFont.Tables
             //-----------
             //lets build GlyphPoint set
             //-----------
-            return new Glyph(glyphPoints, endPoints, bounds, instructions);
+            return new Glyph(glyphPoints, endPoints, bounds, instructions, index);
         }
 
 
