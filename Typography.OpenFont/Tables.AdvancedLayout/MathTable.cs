@@ -722,63 +722,67 @@ namespace Typography.OpenFont.Tables
             mc.SubscriptShiftDown = reader.ReadMathValueRecord();
             mc.SubscriptTopMax = reader.ReadMathValueRecord();
             mc.SubscriptBaselineDropMin = reader.ReadMathValueRecord();
-            mc.SuperscriptShiftUp = reader.ReadMathValueRecord();
-            //
 
+            //
+            mc.SuperscriptShiftUp = reader.ReadMathValueRecord();
             mc.SuperscriptShiftUpCramped = reader.ReadMathValueRecord();
             mc.SuperscriptBottomMin = reader.ReadMathValueRecord();
             mc.SuperscriptBaselineDropMax = reader.ReadMathValueRecord();
+            //
             mc.SubSuperscriptGapMin = reader.ReadMathValueRecord();
-
             mc.SuperscriptBottomMaxWithSubscript = reader.ReadMathValueRecord();
             mc.SpaceAfterScript = reader.ReadMathValueRecord();
+
+            //
             mc.UpperLimitGapMin = reader.ReadMathValueRecord();
             mc.UpperLimitBaselineRiseMin = reader.ReadMathValueRecord();
-
             mc.LowerLimitGapMin = reader.ReadMathValueRecord();
             mc.LowerLimitBaselineDropMin = reader.ReadMathValueRecord();
+
             // 
             mc.StackTopShiftUp = reader.ReadMathValueRecord();
             mc.StackTopDisplayStyleShiftUp = reader.ReadMathValueRecord();
             mc.StackBottomShiftDown = reader.ReadMathValueRecord();
             mc.StackBottomDisplayStyleShiftDown = reader.ReadMathValueRecord();
-
             mc.StackGapMin = reader.ReadMathValueRecord();
             mc.StackDisplayStyleGapMin = reader.ReadMathValueRecord();
+
+            //
             mc.StretchStackTopShiftUp = reader.ReadMathValueRecord();
             mc.StretchStackBottomShiftDown = reader.ReadMathValueRecord();
-
             mc.StretchStackGapAboveMin = reader.ReadMathValueRecord();
             mc.StretchStackGapBelowMin = reader.ReadMathValueRecord();
-            // 
 
+            // 
             mc.FractionNumeratorShiftUp = reader.ReadMathValueRecord();
             mc.FractionNumeratorDisplayStyleShiftUp = reader.ReadMathValueRecord();
             mc.FractionDenominatorShiftDown = reader.ReadMathValueRecord();
             mc.FractionDenominatorDisplayStyleShiftDown = reader.ReadMathValueRecord();
-
             mc.FractionNumeratorGapMin = reader.ReadMathValueRecord();
             mc.FractionNumDisplayStyleGapMin = reader.ReadMathValueRecord();
             mc.FractionRuleThickness = reader.ReadMathValueRecord();
             mc.FractionDenominatorGapMin = reader.ReadMathValueRecord();
-
             mc.FractionDenomDisplayStyleGapMin = reader.ReadMathValueRecord();
+
             // 
             mc.SkewedFractionHorizontalGap = reader.ReadMathValueRecord();
             mc.SkewedFractionVerticalGap = reader.ReadMathValueRecord();
+
+            //
             mc.OverbarVerticalGap = reader.ReadMathValueRecord();
             mc.OverbarRuleThickness = reader.ReadMathValueRecord();
-            //
             mc.OverbarExtraAscender = reader.ReadMathValueRecord();
+
+            //
             mc.UnderbarVerticalGap = reader.ReadMathValueRecord();
             mc.UnderbarRuleThickness = reader.ReadMathValueRecord();
             mc.UnderbarExtraDescender = reader.ReadMathValueRecord();
 
+            //
             mc.RadicalVerticalGap = reader.ReadMathValueRecord();
             mc.RadicalDisplayStyleVerticalGap = reader.ReadMathValueRecord();
             mc.RadicalRuleThickness = reader.ReadMathValueRecord();
             mc.RadicalExtraAscender = reader.ReadMathValueRecord();
-
             mc.RadicalKernBeforeDegree = reader.ReadMathValueRecord();
             mc.RadicalKernAfterDegree = reader.ReadMathValueRecord();
             mc.RadicalDegreeBottomRaisePercent = reader.ReadInt16();
