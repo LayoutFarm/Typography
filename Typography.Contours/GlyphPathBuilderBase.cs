@@ -32,8 +32,6 @@ namespace Typography.Contours
         {
             _typeface = typeface;
             this.UseTrueTypeInstructions = true;//default?
-            _trueTypeInterpreter = new TrueTypeInterpreter();
-            _trueTypeInterpreter.SetTypeFace(typeface);
             _recentPixelScale = 1;
         }
         public Typeface Typeface { get { return _typeface; } }
@@ -104,6 +102,11 @@ namespace Typography.Contours
                   this._typeface.HasPrepProgramBuffer &&
                   glyph.HasGlyphInstructions)
             {
+                if (_trueTypeInterpreter == null)
+                {
+                    _trueTypeInterpreter = new TrueTypeInterpreter();
+                    _trueTypeInterpreter.SetTypeFace(_typeface);
+                }
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                 //output as points,
                 this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, RecentFontSizeInPixels);
