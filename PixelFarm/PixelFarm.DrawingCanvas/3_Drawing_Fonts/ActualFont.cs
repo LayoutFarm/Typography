@@ -26,7 +26,7 @@ namespace PixelFarm.Drawing.Fonts
 #endif
         protected abstract void OnDispose();
         //---------------------
-        public abstract FontGlyph GetGlyphByIndex(uint glyphIndex);
+        public abstract FontGlyph GetGlyphByIndex(ushort glyphIndex);
         public abstract FontGlyph GetGlyph(char c);
         public abstract FontFace FontFace { get; }
         public abstract FontStyle FontStyle { get; }

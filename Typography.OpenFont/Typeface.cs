@@ -182,7 +182,7 @@ namespace Typography.OpenFont
         {
             return _glyphs[LookupIndex(codepoint)];
         }
-        public Glyph GetGlyphByIndex(int glyphIndex)
+        public Glyph GetGlyphByIndex(ushort glyphIndex)
         {
             return _glyphs[glyphIndex];
         }
@@ -244,12 +244,12 @@ namespace Typography.OpenFont
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
         }
-        public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
+        public ushort GetHAdvanceWidthFromGlyphIndex(ushort glyphIndex)
         {
 
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
-        public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
+        public short GetHFrontSideBearingFromGlyphIndex(ushort glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
@@ -851,7 +851,7 @@ namespace Typography.OpenFont
                 int j = typeface.GlyphCount;
                 CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
                 CffBoundFinder boundFinder = new CffBoundFinder();
-                for (int i = 0; i < j; ++i)
+                for (ushort i = 0; i < j; ++i)
                 {
                     Glyph g = typeface.GetGlyphByIndex(i);
                     boundFinder.Reset();
