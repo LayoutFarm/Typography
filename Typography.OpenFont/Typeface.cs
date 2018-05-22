@@ -851,7 +851,7 @@ namespace Typography.OpenFont
                 int j = typeface.GlyphCount;
                 CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
                 CffBoundFinder boundFinder = new CffBoundFinder();
-                for (int i = 0; i < j; ++i)
+                for (ushort i = 0; i < j; ++i)
                 {
                     Glyph g = typeface.GetGlyphByIndex(i);
                     boundFinder.Reset();
