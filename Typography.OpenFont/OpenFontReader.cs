@@ -116,6 +116,10 @@ namespace Typography.OpenFont
                     VerticalMetrics vmtx = ReadTableIfExists(tables, input, new VerticalMetrics(vhea.NumOfLongVerMetrics));
                 }
 
+
+
+                //test math table
+                MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
                 EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
                 //---------------------------------------------
                 //about truetype instruction init 
@@ -140,7 +144,9 @@ namespace Typography.OpenFont
                           header.UnitsPerEm,
                           ccf,
                           horizontalMetrics,
-                          os2Table); 
+                          os2Table);
+
+
                 }
                 else
                 {
@@ -150,7 +156,7 @@ namespace Typography.OpenFont
                         header.UnitsPerEm,
                         glyf.Glyphs,
                         horizontalMetrics,
-                        os2Table); 
+                        os2Table);
                 }
 
                 //----------------------------
@@ -158,7 +164,7 @@ namespace Typography.OpenFont
                 typeface.KernTable = kern;
                 typeface.GaspTable = gaspTable;
                 typeface.MaxProfile = maximumProfile;
-                typeface.HheaTable = horizontalHeader; 
+                typeface.HheaTable = horizontalHeader;
                 //----------------------------
 
                 if (!isPostScriptOutline)
@@ -190,17 +196,30 @@ namespace Typography.OpenFont
                     cpal);
 
                 //------------
-                
-                typeface.PostTable = postTable;
 
+                typeface.PostTable = postTable;
+                if (mathtable != null)
+                {
+                    var mathGlyphLoader = new MathGlyphLoader();
+                    mathGlyphLoader.LoadMathGlyph(typeface, mathtable);
+
+                }
 #if DEBUG
                 //test
-                int found = typeface.GetGlyphIndexByName("Uacute");
+                int found = typeface.GetGlyphIndexByName("Uacute"); 
+                if (typeface.IsCffFont)
+                {
+                    //optional
+                    typeface.UpdateAllCffGlyphBounds();
+                }
 #endif
-
                 return typeface;
             }
         }
+
+
+
+
         static TableHeader ReadTableHeader(BinaryReader input)
         {
             return new TableHeader(
@@ -239,4 +258,5 @@ namespace Typography.OpenFont
 
 
     }
+
 }

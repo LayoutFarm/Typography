@@ -13,10 +13,7 @@ namespace Typography.OpenFont.CFF
 
         CFF.Cff1Font cff1Font;
         int _cffBias;
-        float _scale = 1;//default
-
-
-
+        float _scale = 1;//default 
         class PxScaleGlyphTx : IGlyphTranslator
         {
             float scale;
@@ -221,6 +218,8 @@ namespace Typography.OpenFont.CFF
                 }
             }
         }
+
+
     }
 
     class Type2EvaluationStack

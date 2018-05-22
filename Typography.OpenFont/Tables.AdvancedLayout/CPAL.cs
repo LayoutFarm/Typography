@@ -34,7 +34,7 @@ namespace Typography.OpenFont.Tables
         public void GetColor(int colorIndex, out byte r, out byte g, out byte b, out byte a)
         {
             //Each color record has BGRA values. The color space for these values is sRGB.
-            //Type Name    Description
+            //Type    Name    Description
             //uint8   blue    Blue value(B0).
             //uint8   green   Green value(B1).
             //uint8   red     Red value(B2).
