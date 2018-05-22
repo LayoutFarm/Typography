@@ -31,7 +31,7 @@ namespace Typography.Contours
         /// </summary>
         public float GlyphDynamicEdgeOffset { get; set; }
 
-        protected override void FitCurrentGlyph(ushort glyphIndex, Glyph glyph)
+        protected override void FitCurrentGlyph(Glyph glyph)
         {
             //not use interperter so we need to scale it with our mechanism
             //this demonstrate our auto hint engine ***
@@ -39,7 +39,7 @@ namespace Typography.Contours
             _latestDynamicOutline = null;//reset
             if (this.UseTrueTypeInstructions)
             {
-                base.FitCurrentGlyph(glyphIndex, glyph);
+                base.FitCurrentGlyph(glyph);
             }
             else
             {
@@ -51,7 +51,7 @@ namespace Typography.Contours
                 //
                 if (this.UseVerticalHinting)
                 {
-                    if (!_fitoutlineCollection.TryGetValue(glyphIndex, out _latestDynamicOutline))
+                    if (!_fitoutlineCollection.TryGetValue(glyph.GlyphIndex, out _latestDynamicOutline))
                     {
 
                         //---------------------------------------------
@@ -73,7 +73,7 @@ namespace Typography.Contours
                         _latestDynamicOutline.OriginalGlyphControlBounds = glyph.Bounds;
                         //store to our dynamic outline collection
                         //so we can reuse it
-                        _fitoutlineCollection.Add(glyphIndex, _latestDynamicOutline);
+                        _fitoutlineCollection.Add(glyph.GlyphIndex, _latestDynamicOutline);
                         //-------------------
                         //
                         _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateScaleToPixel(RecentFontSizeInPixels));
@@ -91,6 +91,7 @@ namespace Typography.Contours
                 }
             }
         }
+
         public override void ReadShapes(IGlyphTranslator tx)
         {
             //read output shape from dynamic outline

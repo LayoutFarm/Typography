@@ -32,8 +32,6 @@ namespace Typography.Contours
         {
             _typeface = typeface;
             this.UseTrueTypeInstructions = true;//default?
-            _trueTypeInterpreter = new TrueTypeInterpreter();
-            _trueTypeInterpreter.SetTypeFace(typeface);
             _recentPixelScale = 1;
         }
         public Typeface Typeface { get { return _typeface; } }
@@ -54,16 +52,21 @@ namespace Typography.Contours
         }
 
         /// <summary>
-        /// build glyph shape from glyphIndex and 
+        /// build glyph shape from glyphIndex to be read
         /// </summary>
         /// <param name="glyphIndex"></param>
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-            //
-            Glyph glyph = _typeface.GetGlyphByIndex(glyphIndex);
-
-
+            BuildFromGlyph(_typeface.GetGlyphByIndex(glyphIndex), sizeInPoints);
+        }
+        /// <summary>
+        /// build glyph shape from glyph to be read
+        /// </summary>
+        /// <param name="glyphIndex"></param>
+        /// <param name="sizeInPoints"></param>
+        public void BuildFromGlyph(Glyph glyph, float sizeInPoints)
+        {
             //for true type font
             this._outputGlyphPoints = glyph.GlyphPoints;
             this._outputContours = glyph.EndPoints;
@@ -94,19 +97,24 @@ namespace Typography.Contours
                 IsSizeChanged = true;
             }
             //-------------------------------------
-            FitCurrentGlyph(glyphIndex, glyph);
+            FitCurrentGlyph(glyph);
         }
         protected bool IsSizeChanged { get; set; }
         protected float RecentFontSizeInPixels { get; private set; }
-        protected virtual void FitCurrentGlyph(ushort glyphIndex, Glyph glyph)
+        protected virtual void FitCurrentGlyph(Glyph glyph)
         {
             if (RecentFontSizeInPixels > 0 && UseTrueTypeInstructions &&
                   this._typeface.HasPrepProgramBuffer &&
                   glyph.HasGlyphInstructions)
             {
+                if (_trueTypeInterpreter == null)
+                {
+                    _trueTypeInterpreter = new TrueTypeInterpreter();
+                    _trueTypeInterpreter.SetTypeFace(_typeface);
+                }
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                 //output as points,
-                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyphIndex, RecentFontSizeInPixels);
+                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyph.GlyphIndex, RecentFontSizeInPixels);
                 //***
                 //all points are scaled from _trueTypeInterpreter, 
                 //so not need further scale.=> set _recentPixelScale=1
