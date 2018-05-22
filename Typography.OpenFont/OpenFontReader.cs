@@ -145,6 +145,8 @@ namespace Typography.OpenFont
                           ccf,
                           horizontalMetrics,
                           os2Table);
+
+
                 }
                 else
                 {
@@ -204,12 +206,20 @@ namespace Typography.OpenFont
                 }
 #if DEBUG
                 //test
-                int found = typeface.GetGlyphIndexByName("Uacute");
+                int found = typeface.GetGlyphIndexByName("Uacute"); 
+                if (typeface.IsCffFont)
+                {
+                    //optional
+                    typeface.UpdateAllCffGlyphBounds();
+                }
 #endif
-
                 return typeface;
             }
         }
+
+
+
+
         static TableHeader ReadTableHeader(BinaryReader input)
         {
             return new TableHeader(
@@ -248,4 +258,5 @@ namespace Typography.OpenFont
 
 
     }
+
 }

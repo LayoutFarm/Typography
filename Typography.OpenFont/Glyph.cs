@@ -32,13 +32,15 @@ namespace Typography.OpenFont
 #endif
             this.glyphPoints = glyphPoints;
             _contourEndPoints = contourEndPoints;
-            _bounds = bounds;
+            Bounds = bounds;
             GlyphInstructions = glyphInstructions;
             GlyphIndex = index;
         }
-
-
-        public Bounds Bounds { get { return _bounds; } }
+        public Bounds Bounds
+        {
+            get { return _bounds; }
+            internal set { _bounds = value; }
+        }
 
         public ushort[] EndPoints { get { return _contourEndPoints; } }
         public GlyphPointF[] GlyphPoints { get { return glyphPoints; } }
@@ -138,8 +140,6 @@ namespace Typography.OpenFont
 
         internal static Glyph Clone(Glyph original)
         {
-            //---------------------- 
-
             return new Glyph(
                 Utils.CloneArray(original.glyphPoints),
                 Utils.CloneArray(original._contourEndPoints),
@@ -249,8 +249,8 @@ namespace Typography.OpenFont
             //create from CFF 
             this._cff1GlyphData = cff1Glyph;
             this.GlyphIndex = cff1Glyph.GlyphIndex;
-        }
 
+        }
         public bool IsCffGlyph
         {
             get

@@ -76,8 +76,8 @@ namespace Typography.OpenFont
 
             //------
             this._glyphs = _cffTable.Cff1FontSet._fonts[0].glyphs;
-
         }
+
         /// <summary>
         /// control values in Font unit
         /// </summary>
@@ -186,8 +186,13 @@ namespace Typography.OpenFont
         {
             return _glyphs[glyphIndex];
         }
+        public int GlyphCount
+        {
+            get { return _glyphs.Length; }
+        }
         public Glyph GetGlyphByName(string glyphName)
         {
+
             if (_cffTable != null)
             {
                 //early preview ...
@@ -341,6 +346,7 @@ namespace Typography.OpenFont
 
         //---------
         internal PostTable PostTable { get; set; }
+        internal bool _evalCffGlyphBounds;
         internal bool IsCffFont
         {
             get
@@ -348,7 +354,7 @@ namespace Typography.OpenFont
                 return _cffTable != null;
             }
         }
-
+        //---------
         internal MathTable _mathTable;
         internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
         internal Glyph[] GetRawGlyphList()
@@ -706,7 +712,7 @@ namespace Typography.OpenFont
                 }
             }
             else if (typeface.PostTable.Version == 2)
-            {   
+            {
                 //version 1 and 3 => no glyph names
 
                 foreach (var kp in typeface.PostTable.GlyphNames)
@@ -715,6 +721,154 @@ namespace Typography.OpenFont
                 }
             }
         }
+
+
+
+
+
+
+        class CffBoundFinder : IGlyphTranslator
+        {
+
+            float _minX, _maxX, _minY, _maxY;
+            float _curX, _curY;
+
+            int nsteps = 3;
+
+            public CffBoundFinder()
+            {
+
+            }
+            public void Reset()
+            {
+                _curX = _curY = _minX = _maxX = _minY = _maxY = 0;
+            }
+
+            public void BeginRead(int contourCount)
+            {
+
+            }
+            public void EndRead()
+            {
+
+            }
+            public void CloseContour()
+            {
+
+            }
+            public void Curve3(float x1, float y1, float x2, float y2)
+            {
+
+                //this a copy from Typography.Contours -> GlyphPartFlattener
+
+                float eachstep = (float)1 / nsteps;
+                float stepSum = eachstep;//start
+
+                for (int t = 1; t < nsteps; ++t)
+                {
+                    float c = 1.0f - t;
+                    float x = (c * c * _curX) + (2 * t * c * x1) + (t * t * x2);
+                    float y = (c * c * _curY) + (2 * t * c * y1) + (t * t * y2);
+
+                    UpdateMinMax(x, y);
+
+                    stepSum += eachstep;
+                }
+
+                _curX = x2;
+                _curY = y2;
+            }
+
+            public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
+            {
+
+                //this a copy from Typography.Contours -> GlyphPartFlattener
+
+                float eachstep = (float)1 / nsteps;
+                float stepSum = eachstep;//start
+
+                for (int t = 1; t < nsteps; ++t)
+                {
+                    float c = 1.0f - t;
+                    float x = (_curX * c * c * c) + (x1 * 3 * t * c * c) + (x2 * 3 * t * t * c) + x3 * t * t * t;
+                    float y = (_curY * c * c * c) + (y1 * 3 * t * c * c) + (y2 * 3 * t * t * c) + y3 * t * t * t;
+
+                    UpdateMinMax(x, y);
+
+                    stepSum += eachstep;
+                }
+
+                _curX = x3;
+                _curY = y3;
+            }
+            public void LineTo(float x1, float y1)
+            {
+                UpdateMinMax(_curX = x1, _curY = y1);
+            }
+            public void MoveTo(float x0, float y0)
+            {
+                _curX = x0;
+                _curY = y0;
+                UpdateMinMax(_curX, _curY);
+            }
+            void UpdateMinMax(float x0, float y0)
+            {
+                if (x0 < _minX)
+                {
+                    _minX = x0;
+                }
+                else if (x0 > _maxX)
+                {
+                    _maxX = x0;
+                }
+
+                if (y0 < _minY)
+                {
+                    _minY = y0;
+                }
+                else if (y0 > _maxY)
+                {
+                    _maxY = y0;
+                }
+            }
+
+            public Bounds GetResultBounds()
+            {
+                return new Bounds(
+                    (short)System.Math.Floor(_minX),
+                    (short)System.Math.Floor(_minY),
+                    (short)System.Math.Ceiling(_maxX),
+                    (short)System.Math.Ceiling(_maxY));
+            }
+
+
+        }
+        public static void UpdateAllCffGlyphBounds(this Typeface typeface)
+        {
+
+            if (typeface.IsCffFont && !typeface._evalCffGlyphBounds)
+            {
+                int j = typeface.GlyphCount;
+                CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
+                CffBoundFinder boundFinder = new CffBoundFinder();
+                for (int i = 0; i < j; ++i)
+                {
+                    Glyph g = typeface.GetGlyphByIndex(i);
+                    boundFinder.Reset();
+
+                    evalEngine.Run(boundFinder,
+                        g._ownerCffFont,
+                        g._cff1GlyphData.GlyphInstructions);
+
+                    g.Bounds = boundFinder.GetResultBounds();
+                }
+                typeface._evalCffGlyphBounds = true;
+            }
+        }
+
+
+
+
 
     }
 }
