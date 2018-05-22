@@ -32,7 +32,7 @@ namespace Typography.OpenFont.Tables
             int glyphCount = locations.GlyphCount;
             _glyphs = new Glyph[glyphCount];
 
-            List<int> compositeGlyphs = new List<int>();
+            List<ushort> compositeGlyphs = new List<ushort>();
 
             for (int i = 0; i < glyphCount; i++)
             {
@@ -58,7 +58,7 @@ namespace Typography.OpenFont.Tables
                     {
                         //skip composite glyph,
                         //resolve later
-                        compositeGlyphs.Add(i);
+                        compositeGlyphs.Add((ushort)i);
                     }
                 }
                 else
@@ -70,7 +70,7 @@ namespace Typography.OpenFont.Tables
             //--------------------------------
             //resolve composte glyphs 
             //--------------------------------
-            foreach (int glyphIndex in compositeGlyphs)
+            foreach (ushort glyphIndex in compositeGlyphs)
             {
 #if DEBUG
                 if (glyphIndex == 7)
@@ -252,7 +252,7 @@ namespace Typography.OpenFont.Tables
             UNSCALED_COMPONENT_OFFSET = 1 << 12
         }
 
-        Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, uint tableOffset, int compositeGlyphIndex)
+        Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, uint tableOffset, ushort compositeGlyphIndex)
         {
             //------------------------------------------------------ 
             //https://www.microsoft.com/typography/OTSPEC/glyf.htm
@@ -382,7 +382,7 @@ namespace Typography.OpenFont.Tables
                     {
                         //use this matrix  
                         Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
-                        Glyph.OffsetXY(newGlyph, (short)(arg1), arg2);
+                        Glyph.OffsetXY(newGlyph, arg1, arg2);
                     }
                     else
                     {
