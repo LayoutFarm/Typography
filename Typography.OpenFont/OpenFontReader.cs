@@ -113,7 +113,7 @@ namespace Typography.OpenFont
                 VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
                 if (vhea != null)
                 {
-                    VerticalMatric vmtx = ReadTableIfExists(tables, input, new VerticalMatric(vhea.NumOfLongVerMetrics));
+                    VerticalMetrics vmtx = ReadTableIfExists(tables, input, new VerticalMetrics(vhea.NumOfLongVerMetrics));
                 }
 
 
@@ -145,6 +145,8 @@ namespace Typography.OpenFont
                           ccf,
                           horizontalMetrics,
                           os2Table);
+
+
                 }
                 else
                 {
@@ -204,12 +206,20 @@ namespace Typography.OpenFont
                 }
 #if DEBUG
                 //test
-                int found = typeface.GetGlyphIndexByName("Uacute");
+                int found = typeface.GetGlyphIndexByName("Uacute"); 
+                if (typeface.IsCffFont)
+                {
+                    //optional
+                    typeface.UpdateAllCffGlyphBounds();
+                }
 #endif
-
                 return typeface;
             }
         }
+
+
+
+
         static TableHeader ReadTableHeader(BinaryReader input)
         {
             return new TableHeader(
@@ -248,4 +258,5 @@ namespace Typography.OpenFont
 
 
     }
+
 }

@@ -65,10 +65,7 @@ namespace Typography.OpenFont.Tables
         protected override void ReadContentFrom(BinaryReader reader)
         {
             uint tableOffset = this.Header.Offset;
-            if (reader.BaseStream.Position != tableOffset)
-            {
 
-            }
 
             //
             //

@@ -921,7 +921,7 @@ namespace Typography.OpenFont.CFF
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs; ++i)
             {
-                
+
                 ushort sid = _reader.ReadUInt16();
                 if (sid <= Cff1FontSet.nStdStrings)
                 {
@@ -931,7 +931,7 @@ namespace Typography.OpenFont.CFF
                 }
                 else
                 {
-                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings-1];
+                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings - 1];
                 }
             }
         }
@@ -1023,8 +1023,8 @@ namespace Typography.OpenFont.CFF
             Glyph[] glyphs = new Glyph[glyphCount];
 
             _currentCff1Font.glyphs = glyphs;
-
             Type2CharStringParser type2Parser = new Type2CharStringParser();
+ 
 
             for (int i = 0; i < glyphCount; ++i)
             {
@@ -1042,20 +1042,17 @@ namespace Typography.OpenFont.CFF
 
                 Cff1GlyphData glyphData = new Cff1GlyphData();
                 glyphData.GlyphIndex = (ushort)i;
-                glyphs[i] = new Glyph(_currentCff1Font, glyphData);
-                ////
-                //if (i == 5)
-                //{
 
-                //}
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
                     instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
                     glyphData.GlyphInstructions = instList;
-                }
+                } 
+                glyphs[i] = new Glyph(_currentCff1Font, glyphData); 
             }
         }
+
 
         void ReadFormat0Encoding()
         {
@@ -1490,7 +1487,7 @@ namespace Typography.OpenFont.CFF
 
     }
 
-
+  
     static class CFFBinaryReaderExtension
     {
 
@@ -1676,7 +1673,7 @@ namespace Typography.OpenFont.CFF
 
             //reserved 12 15//https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
             //reserved 12 16//https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
-            
+
             Register(12, 17, "LanguageGroup", OperatorOperandKind.Number); //https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
             Register(12, 18, "ExpansionFactor", OperatorOperandKind.Number); //https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
             Register(12, 19, "initialRandomSeed", OperatorOperandKind.Number); //https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
