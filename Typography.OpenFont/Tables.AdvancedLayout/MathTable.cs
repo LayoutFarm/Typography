@@ -448,6 +448,7 @@ namespace Typography.OpenFont.MathGlyphs
         public readonly ushort EndConnectorLength;
         public readonly ushort FullAdvance;
         public readonly ushort PartFlags;
+        public bool IsExtender { get { return PartFlags == 0x0001; } }
 
         public GlyphPartRecord(ushort glyphId, ushort startConnectorLength, ushort endConnectorLength, ushort fullAdvance, ushort partFlags)
         {
