@@ -50,8 +50,10 @@ namespace TypographyTest.WinForms
                     {
                         //show 
                         Glyph found = _selectedTypeface.GetGlyphByName(userSupplyGlyphName);
-                        if (found != null)
+                        if (found != null && found.GlyphIndex != 0)
                         {
+                            ShowGlyphNameList(_allGlyphNameMapList);
+
                             int index = 0;
                             bool found1 = false;
                             foreach (GlyphNameMapInfo mapInfo in _allGlyphNameMapList)

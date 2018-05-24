@@ -133,7 +133,7 @@ namespace SampleWinForms
 #endif
 
 
-            float x_pos = 0, y_pos = 50;
+            float x_pos = 0, y_pos = 100;
             var glyphPlanList = new Typography.TextLayout.GlyphPlanList();
 
             //in this version
