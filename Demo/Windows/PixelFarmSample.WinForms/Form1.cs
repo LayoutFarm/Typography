@@ -133,7 +133,7 @@ namespace SampleWinForms
 #endif
 
 
-            float x_pos = 0, y_pos = 50;
+            float x_pos = 0, y_pos = 100;
             var glyphPlanList = new Typography.TextLayout.GlyphPlanList();
 
             //in this version
@@ -618,7 +618,7 @@ namespace SampleWinForms
             //or
             //3.2 : only MeasuredStringBox
             Typography.TextLayout.MeasuredStringBox box = layout.LayoutAndMeasureString(str.ToCharArray(), 0, str.Length, _basicOptions.FontSizeInPoints);
-            this.lblStringSize.Text = "measure width=" + box.width.ToString() + "px";
+            this.lblStringSize.Text = "measure (W,H)= (" + box.width.ToString() + "," + (box.ascending - box.descending) + ") px";
         }
     }
 }

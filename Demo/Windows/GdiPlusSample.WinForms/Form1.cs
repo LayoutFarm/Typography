@@ -283,7 +283,7 @@ namespace SampleWinForms
             //draw line mark
 
             float x_pos2 = x_pos + strBox.width + 10;
-            g.DrawRectangle(Pens.Red, x_pos, y_pos, strBox.width, strBox.CalculateLineHeight());
+            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.descending, strBox.width, strBox.CalculateLineHeight());
             g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
             g.DrawLine(Pens.Green, x_pos, y_pos + strBox.descending, x_pos2, y_pos + strBox.descending);//descending
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending
