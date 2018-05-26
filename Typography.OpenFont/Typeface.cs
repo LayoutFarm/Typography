@@ -745,9 +745,10 @@ namespace Typography.OpenFont
             }
             public void Reset()
             {
-                _latestMove_X = _latestMove_Y =
-                    _curX = _curY =
-                        _minX = _maxX = _minY = _maxY = 0;
+                _curX = _curY = _latestMove_X = _latestMove_Y = 0;
+                _minX = _minY = float.MaxValue;//**
+                _maxX = _maxY = float.MinValue;//**
+
             }
             public void BeginRead(int contourCount)
             {
@@ -794,7 +795,7 @@ namespace Typography.OpenFont
             {
 
                 //this a copy from Typography.Contours -> GlyphPartFlattener
-                 
+
 
                 float eachstep = (float)1 / nsteps;
                 float t = eachstep;//start
