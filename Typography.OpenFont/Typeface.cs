@@ -769,9 +769,9 @@ namespace Typography.OpenFont
                 //this a copy from Typography.Contours -> GlyphPartFlattener
 
                 float eachstep = (float)1 / nsteps;
-                float stepSum = eachstep;//start
+                float t = eachstep;//start
 
-                for (int t = 1; t < nsteps; ++t)
+                for (int n = 1; n < nsteps; ++n)
                 {
                     float c = 1.0f - t;
 
@@ -779,7 +779,7 @@ namespace Typography.OpenFont
                          (c * c * _curX) + (2 * t * c * x1) + (t * t * x2),  //x
                          (c * c * _curY) + (2 * t * c * y1) + (t * t * y2)); //y
 
-                    stepSum += eachstep;
+                    t += eachstep;
                 }
 
                 //
@@ -794,11 +794,12 @@ namespace Typography.OpenFont
             {
 
                 //this a copy from Typography.Contours -> GlyphPartFlattener
+                 
 
                 float eachstep = (float)1 / nsteps;
-                float stepSum = eachstep;//start
+                float t = eachstep;//start
 
-                for (int t = 1; t < nsteps; ++t)
+                for (int n = 1; n < nsteps; ++n)
                 {
                     float c = 1.0f - t;
 
@@ -806,7 +807,7 @@ namespace Typography.OpenFont
                         (_curX * c * c * c) + (x1 * 3 * t * c * c) + (x2 * 3 * t * t * c) + x3 * t * t * t,  //x
                         (_curY * c * c * c) + (y1 * 3 * t * c * c) + (y2 * 3 * t * t * c) + y3 * t * t * t); //y
 
-                    stepSum += eachstep;
+                    t += eachstep;
                 }
                 //
                 UpdateMinMax(
