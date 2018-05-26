@@ -309,7 +309,7 @@ namespace SampleWinForms
                 float xmax = b.XMax * pxscale;
                 float ymax = b.YMax * pxscale;
                 //
-                float glyph_x = glyphPlan.ExactX;
+                float glyph_x = x_pos + glyphPlan.ExactX;
                 g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
 
             }
