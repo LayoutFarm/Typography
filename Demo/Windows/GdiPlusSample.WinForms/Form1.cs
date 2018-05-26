@@ -290,6 +290,32 @@ namespace SampleWinForms
 
 
 
+            //------------
+            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
+            Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
+            float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
+
+            int j = userGlyphPlans.Count;
+            for (int i = 0; i < j; ++i)
+            {
+                GlyphPlan glyphPlan = userGlyphPlans[i];
+                Typography.OpenFont.Glyph glyph = typeface.GetGlyphByIndex(glyphPlan.glyphIndex);
+                //
+                Typography.OpenFont.Bounds b = glyph.Bounds;
+                //
+                float xmin = b.XMin * pxscale;
+                float ymin = b.YMin * pxscale;
+                //
+                float xmax = b.XMax * pxscale;
+                float ymax = b.YMax * pxscale;
+                //
+                float glyph_x = glyphPlan.ExactX;
+                g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
+
+            }
+
+
+            //------------
             _currentTextPrinter.FillColor = Color.Black;
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
