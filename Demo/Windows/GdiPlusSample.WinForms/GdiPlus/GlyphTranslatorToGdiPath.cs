@@ -44,7 +44,7 @@ namespace SampleWinForms
             {
                 CloseContour();
             }
-             
+
             lastX = lastMoveX = (float)x0;
             lastY = lastMoveY = (float)y0;
         }
@@ -52,6 +52,9 @@ namespace SampleWinForms
         {
             contour_is_closed = true;
             ps.CloseFigure();
+
+            lastX = lastMoveX;
+            lastY = lastMoveY;
         }
         public void Curve3(float x1, float y1, float x2, float y2)
         {
@@ -93,7 +96,8 @@ namespace SampleWinForms
         public void Reset()
         {
             ps = null;
-            lastMoveX = lastMoveY = lastX = lastY;
+            lastMoveX = lastMoveY = lastX = lastY = 0;
+            contour_is_closed = true;
         }
         public GraphicsPath ResultGraphicsPath { get { return this.ps; } }
 
