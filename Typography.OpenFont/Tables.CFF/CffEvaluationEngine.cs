@@ -356,13 +356,23 @@ namespace Typography.OpenFont.CFF
             //moves the current point 
             //dx1 units in the horizontal direction
             //see [NOTE4]
+
+            double hSum = 0;
+            int m = 0;
+            for (int n = _currentIndex; n >= 1; --n)
+            {
+                hSum += _argStack[m];
+                m++;
+            }
 #if DEBUG
             if (_currentIndex != 1)
             {
-                throw new NotSupportedException();
+
+                // throw new NotSupportedException();
             }
 #endif
-            _glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)_currentY);
+            //_glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)_currentY);
+            _glyphTranslator.MoveTo((float)(_currentX += hSum), (float)_currentY);
 
             _currentIndex = 0; //clear stack 
         }
@@ -372,14 +382,24 @@ namespace Typography.OpenFont.CFF
             //moves the current point 
             //dy1 units in the vertical direction.
             //see [NOTE4]
+
+            double vSum = 0;
+            int m = 0;
+            for (int n = _currentIndex; n >= 1; --n)
+            {
+                vSum += _argStack[m];
+                m++;
+            }
+
 #if DEBUG
             if (_currentIndex != 1)
             {
-                throw new NotSupportedException();
+
+                //throw new NotSupportedException();
             }
 #endif
 
-            _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += _argStack[0]));
+            _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += vSum));
 
             _currentIndex = 0; //clear stack 
         }
