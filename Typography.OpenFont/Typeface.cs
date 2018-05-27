@@ -738,7 +738,7 @@ namespace Typography.OpenFont
             /// </summary>
             int nsteps = 3;
             bool _contourOpen = false;
-
+            bool _first_eval = true;
             public CffBoundFinder()
             {
 
@@ -748,7 +748,8 @@ namespace Typography.OpenFont
                 _curX = _curY = _latestMove_X = _latestMove_Y = 0;
                 _minX = _minY = float.MaxValue;//**
                 _maxX = _maxY = float.MinValue;//**
-
+                _first_eval = true;
+                _contourOpen = false;
             }
             public void BeginRead(int contourCount)
             {
@@ -839,23 +840,56 @@ namespace Typography.OpenFont
             }
             void UpdateMinMax(float x0, float y0)
             {
-                if (x0 < _minX)
+
+                if (_first_eval)
                 {
-                    _minX = x0;
+                    //4 times
+
+                    if (x0 < _minX)
+                    {
+                        _minX = x0;
+                    }
+                    //
+                    if (x0 > _maxX)
+                    {
+                        _maxX = x0;
+                    }
+                    //
+                    if (y0 < _minY)
+                    {
+                        _minY = y0;
+                    }
+                    //
+                    if (y0 > _maxY)
+                    {
+                        _maxY = y0;
+                    }
+
+                    _first_eval = false;
                 }
-                else if (x0 > _maxX)
-                {
-                    _maxX = x0;
+                else
+                {   
+                    //2 times
+
+                    if (x0 < _minX)
+                    {
+                        _minX = x0;
+                    }
+                    else if (x0 > _maxX)
+                    {
+                        _maxX = x0;
+                    }
+
+                    if (y0 < _minY)
+                    {
+                        _minY = y0;
+                    }
+                    else if (y0 > _maxY)
+                    {
+                        _maxY = y0;
+                    } 
                 }
 
-                if (y0 < _minY)
-                {
-                    _minY = y0;
-                }
-                else if (y0 > _maxY)
-                {
-                    _maxY = y0;
-                }
             }
 
             public Bounds GetResultBounds()
@@ -879,6 +913,13 @@ namespace Typography.OpenFont
                 CffBoundFinder boundFinder = new CffBoundFinder();
                 for (ushort i = 0; i < j; ++i)
                 {
+#if DEBUG
+
+                    //if (i == 3084)
+                    //{
+
+                    //}
+#endif
                     Glyph g = typeface.GetGlyphByIndex(i);
                     boundFinder.Reset();
 
