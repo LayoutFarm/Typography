@@ -20,6 +20,9 @@ namespace Typography.OpenFont.CFF
         {
             float scale;
             IGlyphTranslator tx;
+
+            bool _is_contour_opened;
+
             public PxScaleGlyphTx(float scale, IGlyphTranslator tx)
             {
                 this.scale = scale;
@@ -33,16 +36,19 @@ namespace Typography.OpenFont.CFF
 
             public void CloseContour()
             {
+                _is_contour_opened = false;
                 tx.CloseContour();
             }
 
             public void Curve3(float x1, float y1, float x2, float y2)
             {
+                _is_contour_opened = true;
                 tx.Curve3(x1 * scale, y1 * scale, x2 * scale, y2 * scale);
             }
 
             public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
             {
+                _is_contour_opened = true;
                 tx.Curve4(x1 * scale, y1 * scale, x2 * scale, y2 * scale, x3 * scale, y3 * scale);
             }
 
@@ -53,6 +59,7 @@ namespace Typography.OpenFont.CFF
 
             public void LineTo(float x1, float y1)
             {
+                _is_contour_opened = true;
                 tx.LineTo(x1 * scale, y1 * scale);
             }
 
@@ -60,6 +67,9 @@ namespace Typography.OpenFont.CFF
             {
                 tx.MoveTo(x0 * scale, y0 * scale);
             }
+            //
+
+            public bool IsContourOpened { get { return _is_contour_opened; } }
         }
 
         public CffEvaluationEngine()
@@ -96,21 +106,28 @@ namespace Typography.OpenFont.CFF
 
             int nsubrs = cff1Font._localSubrs.Count;
             _cffBias = (nsubrs < 1240) ? 107 :
-                            (nsubrs < 33900) ? 1131 : 32769;
+                            (nsubrs < 33900) ? 1131 : 32769; //TODO: review 32769 or 32768
 
-            tx.BeginRead(0);//unknown contour count
-            //-------------
+            //
             double currentX = 0, currentY = 0;
-            if (scale != 1)
+
+
+            var scaleTx = new PxScaleGlyphTx(scale, tx);
+            //
+            scaleTx.BeginRead(0);//unknown contour count  
+            //
+            Run(scaleTx, instructionList, ref currentX, ref currentY);
+            //
+
+            //
+            //some cff end without closing the latest contour?
+
+            if (scaleTx.IsContourOpened)
             {
-                //create a scale wrapper 
-                Run(new PxScaleGlyphTx(scale, tx), instructionList, ref currentX, ref currentY);
+                scaleTx.CloseContour();
             }
-            else
-            {
-                Run(tx, instructionList, ref currentX, ref currentY);
-            }
-            tx.EndRead();
+
+            scaleTx.EndRead();
 
         }
         void Run(IGlyphTranslator tx, Type2GlyphInstructionList instructionList, ref double currentX, ref double currentY)
