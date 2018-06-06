@@ -136,6 +136,10 @@ namespace SampleWinForms
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
 
+
+            _currentTextPrinter.FillBackground = this.chkFillBackground.Checked;
+            _currentTextPrinter.DrawOutline = this.chkBorder.Checked;
+
             //-----------------------  
             _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
