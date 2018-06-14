@@ -365,6 +365,13 @@ namespace Typography.OpenFont
         {
             get { return _mathTable._mathConstTable; }
         }
+        public bool HasMathTable
+        {
+            get
+            {
+                return _mathTable != null;
+            }
+        }
     }
 
 
