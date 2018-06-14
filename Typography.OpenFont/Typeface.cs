@@ -363,7 +363,10 @@ namespace Typography.OpenFont
         }
         public MathGlyphs.MathConstants MathConsts
         {
-            get { return _mathTable._mathConstTable; }
+            get
+            {
+                return (_mathTable != null) ? _mathTable._mathConstTable : null;
+            }
         }
     }
 
@@ -722,9 +725,10 @@ namespace Typography.OpenFont
             }
         }
 
-
-
-
+        public static bool HasMathTable(this Typeface typeface)
+        {
+            return typeface.MathConsts != null;
+        }
 
 
         class CffBoundFinder : IGlyphTranslator
@@ -868,7 +872,7 @@ namespace Typography.OpenFont
                     _first_eval = false;
                 }
                 else
-                {   
+                {
                     //2 times
 
                     if (x0 < _minX)
@@ -887,7 +891,7 @@ namespace Typography.OpenFont
                     else if (y0 > _maxY)
                     {
                         _maxY = y0;
-                    } 
+                    }
                 }
 
             }
