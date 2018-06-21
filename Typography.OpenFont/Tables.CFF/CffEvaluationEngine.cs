@@ -354,14 +354,7 @@ namespace Typography.OpenFont.CFF
                 _currentX += _argStack[i];
                 _currentY += _argStack[i + 1];
                 i += 2;
-            }
-
-            for (int i = 0; i < _currentIndex;)
-            {
-                _currentX += _argStack[i];
-                _currentY += _argStack[i + 1];
-                i += 2;
-            }
+            } 
 
             _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
 
