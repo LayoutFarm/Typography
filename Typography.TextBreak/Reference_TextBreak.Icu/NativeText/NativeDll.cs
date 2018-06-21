@@ -4,7 +4,7 @@ namespace Typography.TextBreak.ICU
 {
     static class NativeDLL
     {
-        public const string MyFtLibName = "myft.dll";
+        public const string MyFtLibName = "../../myft.dll";
     }
 
 }
