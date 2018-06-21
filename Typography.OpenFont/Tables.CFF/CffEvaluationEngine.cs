@@ -344,19 +344,17 @@ namespace Typography.OpenFont.CFF
             //see [NOTE4]
 
 
-#if DEBUG
+            int i = 0;
             if ((_currentIndex % 2) != 0)
             {
-
+                i = 1;
             }
-#endif
-
-            for (int i = 0; i < _currentIndex;)
+            for (; i < _currentIndex;)
             {
                 _currentX += _argStack[i];
                 _currentY += _argStack[i + 1];
                 i += 2;
-            }
+            } 
 
             _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
 
