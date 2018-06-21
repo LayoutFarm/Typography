@@ -17,8 +17,9 @@ namespace TextBreakerTest
 
         private void cmdReadDict_Click(object sender, EventArgs e)
         {
-
-            // LayoutFarm.TextBreaker.ICU.DictionaryData.LoadData("../../../icu58/brkitr/thaidict.dict");
+#if TEST_ICU
+            LayoutFarm.TextBreaker.ICU.DictionaryData.LoadData("../../../icu58/brkitr/thaidict.dict");
+#endif
         }
 
 
@@ -122,8 +123,7 @@ namespace TextBreakerTest
             stopWatch.Stop();
             long ms2 = stopWatch.ElapsedMilliseconds;
             //----------------------------
-            Console.WriteLine(ms1.ToString());
-            Console.WriteLine(ms2.ToString());
+            MessageBox.Show("Managed: " + ms1.ToString() + "ms, Native Icu: " + ms2.ToString() + "ms");
         }
         void ParseWithManaged(int ntimes)
         {
