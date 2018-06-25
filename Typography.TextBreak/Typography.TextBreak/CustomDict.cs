@@ -81,8 +81,8 @@ namespace Typography.TextBreak
                     line = reader.ReadLine();
                 }
 
-                reader.Close();
-                fs.Close();
+                //reader.Close();
+                //fs.Close();
             }
             //------------------------------------------------------------------
             textBuffer.Freeze();

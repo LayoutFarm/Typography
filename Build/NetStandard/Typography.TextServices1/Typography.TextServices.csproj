@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\Build\NetStandard\Typography.MsdfGen1\Typography.MsdfGen.csproj" />
+    <ProjectReference Include="..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\Build\NetStandard\Typography.TextFlow1\Typography.TextFlow.csproj" />
+    <ProjectReference Include="..\Typography.TextBreak1\Typography.TextBreak.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
+
+</Project>
