@@ -33,10 +33,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinPacker.cs" />
+    <Compile Include="FontAtlasFile.cs" />
     <Compile Include="GlyphImages.cs" />
     <Compile Include="MsdfGlyphGen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
