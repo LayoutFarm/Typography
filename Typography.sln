@@ -99,7 +99,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FontAtlas", "FontAtlas\Font
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontAtlas", "Build\N20\FontAtlas\FontAtlas.csproj", "{B2667A10-2969-493F-8E7B-23F21CBFB886}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FontAtlas1", "Build\NetStandard\FontAtlas1\FontAtlas1.csproj", "{5A412825-5A25-4707-9353-9FD20A8799FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FontAtlas", "Build\NetStandard\FontAtlas\FontAtlas.csproj", "{5A412825-5A25-4707-9353-9FD20A8799FF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextBreak", "Build\N20\Typography.TextBreak\Typography.TextBreak.csproj", "{BC10CC51-A795-40D0-96F0-F87585D59D02}"
 EndProject
