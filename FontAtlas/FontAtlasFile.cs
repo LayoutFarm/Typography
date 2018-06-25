@@ -7,6 +7,7 @@ using Typography.Rendering;
 namespace PixelFarm.Drawing.Fonts
 {
 
+
     public class FontAtlasFile
     {
         //Typography's custom font atlas file        
@@ -16,8 +17,7 @@ namespace PixelFarm.Drawing.Fonts
             End,
             TotalImageInfo,
             GlyphList,
-            FontInfo,
-
+            OverviewFontInfo,
         }
         public SimpleFontAtlas Result
         {
@@ -40,6 +40,9 @@ namespace PixelFarm.Drawing.Fonts
                     switch (objKind)
                     {
                         default: throw new NotSupportedException();
+                        case FontTextureObjectKind.OverviewFontInfo:
+                            ReadOverviewFontInfo(reader);
+                            break;
                         case FontTextureObjectKind.End:
                             stop = true;
                             break;
@@ -47,7 +50,7 @@ namespace PixelFarm.Drawing.Fonts
                             ReadGlyphList(reader);
                             break;
                         case FontTextureObjectKind.TotalImageInfo:
-                            ReadTotalImage(reader);
+                            ReadTotalImageInfo(reader);
                             break;
                     }
                 }
@@ -55,19 +58,14 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
-        void ReadTotalImage(BinaryReader reader)
+        void ReadTotalImageInfo(BinaryReader reader)
         {
             //read total
             //this version compose of width and height
-            ushort width = reader.ReadUInt16();
-            ushort height = reader.ReadUInt16();
+            _atlas.Width = reader.ReadUInt16();
+            _atlas.Height = reader.ReadUInt16();
             byte colorComponent = reader.ReadByte(); //1 or 4
-
-            _atlas.Width = width;
-            _atlas.Height = height;
-            //...
-
-
+            _atlas.TextureKind = (TextureKind)reader.ReadByte();
         }
         void ReadGlyphList(BinaryReader reader)
         {
@@ -98,7 +96,11 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
-
+        void ReadOverviewFontInfo(BinaryReader reader)
+        {
+            _atlas.FontFilename = reader.ReadString();
+            _atlas.OriginalFontSizePts = reader.ReadSingle();
+        }
 
         //------------------------------------------------------------
         BinaryWriter _writer;
@@ -117,12 +119,24 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Close();
             _writer = null;
         }
-        public void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent)
+
+        public void WriteOverviewFontInfo(string fontFileName, float sizeInPt)
+        {
+            _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
+            if (fontFileName == null)
+            {
+                fontFileName = "";
+            }
+            _writer.Write(fontFileName);
+            _writer.Write(sizeInPt);
+        }
+        public void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
         {
             _writer.Write((ushort)FontTextureObjectKind.TotalImageInfo);
             _writer.Write(width);
             _writer.Write(height);
             _writer.Write(colorComponent);
+            _writer.Write((byte)textureKind);
         }
         public void WriteGlyphList(Dictionary<ushort, CacheGlyph> glyphs)
         {

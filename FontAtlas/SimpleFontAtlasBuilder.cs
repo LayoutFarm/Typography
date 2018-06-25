@@ -8,7 +8,7 @@ using Typography.Contours;
 
 namespace Typography.Rendering
 {
-    public enum TextureKind
+    public enum TextureKind : byte
     {
         AggGrayScale,
         AggSubPixel,
@@ -20,6 +20,8 @@ namespace Typography.Rendering
         Dictionary<ushort, CacheGlyph> glyphs = new Dictionary<ushort, CacheGlyph>();
         public TextureKind TextureKind { get; private set; }
         public float FontSizeInPoints { get; private set; }
+        public string FontFilename { get; set; }
+
         public void AddGlyph(ushort glyphIndex, GlyphImage img)
         {
             var glyphCache = new CacheGlyph();
@@ -120,10 +122,15 @@ namespace Typography.Rendering
             using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Create))
             {
                 fontAtlasFile.StartWrite(fs);
-                fontAtlasFile.WriteTotalImageInfo((ushort)latestGenGlyphImage.Width, (ushort)latestGenGlyphImage.Height, 4);
+                fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontSizeInPoints);
+
+                fontAtlasFile.WriteTotalImageInfo(
+                    (ushort)latestGenGlyphImage.Width,
+                    (ushort)latestGenGlyphImage.Height, 4,
+                    this.TextureKind);
                 //
                 //
-                fontAtlasFile.WriteGlyphList(glyphs); 
+                fontAtlasFile.WriteGlyphList(glyphs);
                 fontAtlasFile.EndWrite();
             }
 
