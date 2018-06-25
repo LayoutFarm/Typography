@@ -41,6 +41,7 @@ namespace PixelFarm.Drawing.Fonts
             return true;
         }
 
+        public string FontFilename { get; set; }
 
     }
 
