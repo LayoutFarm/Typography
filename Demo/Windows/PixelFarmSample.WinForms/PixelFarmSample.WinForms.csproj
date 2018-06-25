@@ -78,6 +78,10 @@
       <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
       <Name>Typography.Contours</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+      <Name>Typography.TextServices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
       <Name>PixelFarm.Triangulation</Name>
@@ -93,14 +97,6 @@
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Typography.MsdfGen\Typography.MsdfGen.csproj">
-      <Project>{8f69ab8d-174a-4912-9328-cae8eda5564b}</Project>
-      <Name>Typography.MsdfGen</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{fe23e283-a667-4e68-b381-c7d8598d3688}</Project>
-      <Name>Typography.TextServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>

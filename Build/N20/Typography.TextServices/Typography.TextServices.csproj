@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B999F927-08C5-4328-B07E-69ACC1392DA4}</ProjectGuid>
+    <ProjectGuid>{6B0E034B-0EBD-4907-AD7F-437DE66D78D4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Typography.Contours</RootNamespace>
-    <AssemblyName>Typography.Contours</AssemblyName>
+    <RootNamespace>Typography.TextServices</RootNamespace>
+    <AssemblyName>Typography.TextServices</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,19 +36,27 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PixelFarm\PixelFarm.Triangulation\PixelFarm.Triangulation.csproj">
-      <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
-      <Name>PixelFarm.Triangulation</Name>
+    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj">
+      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
+      <Name>Typography.Contours</Name>
     </ProjectReference>
     <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj">
+      <Project>{9a3b8b84-56be-4aa1-8d90-1b3b3fef1f71}</Project>
+      <Name>Typography.MsdfGen</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Typography.TextFlow\Typography.TextFlow.csproj">
+      <Project>{333f3209-8da9-4d33-a560-299ed4c6dfa5}</Project>
+      <Name>Typography.TextFlow</Name>
+    </ProjectReference>
   </ItemGroup>
-  <Import Project="..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
+  <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
