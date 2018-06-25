@@ -48,8 +48,8 @@
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{fe23e283-a667-4e68-b381-c7d8598d3688}</Project>
+    <ProjectReference Include="..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
       <Name>Typography.TextServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">

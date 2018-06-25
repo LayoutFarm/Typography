@@ -29,10 +29,6 @@ namespace Typography.OpenFont
 
 #if DEBUG
             this.dbugId = s_debugTotalId++;
-            //if (this.dbugId == 11820)
-            //{
-
-            //}
 #endif
             this.glyphPoints = glyphPoints;
             _contourEndPoints = contourEndPoints;
@@ -142,14 +138,14 @@ namespace Typography.OpenFont
 
         }
 
-        internal static Glyph Clone(Glyph original, ushort newGlyphIndex)
+        internal static Glyph Clone(Glyph original)
         {
             return new Glyph(
                 Utils.CloneArray(original.glyphPoints),
                 Utils.CloneArray(original._contourEndPoints),
                 original.Bounds,
                 original.GlyphInstructions != null ? Utils.CloneArray(original.GlyphInstructions) : null,
-                newGlyphIndex);
+                original.GlyphIndex);
         }
 
         /// <summary>

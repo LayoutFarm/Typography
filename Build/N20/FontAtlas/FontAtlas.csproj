@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{64C28AAB-E2EF-45C1-A674-5660D462882F}</ProjectGuid>
+    <ProjectGuid>{B2667A10-2969-493F-8E7B-23F21CBFB886}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FontAtlas</RootNamespace>
@@ -29,40 +29,31 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinPacker.cs" />
-    <Compile Include="GlyphImages.cs" />
-    <Compile Include="MsdfGlyphGen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleFontAtlas.cs" />
-    <Compile Include="SimpleFontAtlasBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Build\N20\Typography.Contours\Typography.Contours.csproj">
+    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj">
       <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
       <Name>Typography.Contours</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
+    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Name>Typography.GlyphLayout</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj">
+      <Project>{9a3b8b84-56be-4aa1-8d90-1b3b3fef1f71}</Project>
+      <Name>Typography.MsdfGen</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj">
-      <Project>{8f69ab8d-174a-4912-9328-cae8eda5564b}</Project>
-      <Name>Typography.MsdfGen</Name>
-    </ProjectReference>
   </ItemGroup>
+  <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -116,7 +116,6 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Write((ushort)FontTextureObjectKind.End);
             //
             _writer.Flush();
-            _writer.Close();
             _writer = null;
         }
 

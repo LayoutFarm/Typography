@@ -423,12 +423,11 @@ namespace SampleWinForms
             //samples...
             //1. create texture from specific glyph index range
             string sampleFontFile = "../../../TestFonts/tahoma.ttf";
-            //string sampleFontFile = "c:\\Windows\\Fonts\\tahoma.ttf";
             CreateSampleMsdfTextureFont(
                 sampleFontFile,
                 18,
                 0,
-                100,
+                255,
                 "d:\\WImageTest\\sample_msdf.png");
             //---------------------------------------------------------
             //2. for debug, create from some unicode chars
@@ -553,24 +552,23 @@ namespace SampleWinForms
 
                 for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
                 {
-
                     //build glyph
                     builder.BuildFromGlyphIndex(gindex, sizeInPoint);
+
                     var glyphToContour = new GlyphContourBuilder();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     var genParams = new MsdfGenParams();
                     builder.ReadShapes(glyphToContour);
-                    //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
+                    genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
                     GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
                     atlasBuilder.AddGlyph(gindex, glyphImg);
 
-                    //using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                    //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     //{
-                    //    int[] buffer = glyphImg.GetImageBuffer();
-                    //    var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+                    //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
                     //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
                     //    bmp.UnlockBits(bmpdata);
-                    //    bmp.Save("d:\\WImageTest\\a001_xn2_" + gindex + ".png");
+                    //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
                     //}
                 }
 
@@ -585,14 +583,7 @@ namespace SampleWinForms
                     bmp.UnlockBits(bmpdata);
                     bmp.Save("d:\\WImageTest\\a_total.png");
                 }
-
-                atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.bin");
-                //-----------
-                //test read texture info back
-                var atlasBuilder2 = new SimpleFontAtlasBuilder();
-                var readbackFontAtlas = atlasBuilder2.LoadFontInfo("d:\\WImageTest\\a_info.bin");
-
-
+                atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
         private void Form1_Load(object sender, EventArgs e)
