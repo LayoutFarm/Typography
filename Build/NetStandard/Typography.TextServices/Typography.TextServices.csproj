@@ -4,14 +4,15 @@
     <TargetFramework>netstandard1.6</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
-    <ProjectReference Include="..\Build\NetStandard\Typography.MsdfGen1\Typography.MsdfGen.csproj" />
-    <ProjectReference Include="..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj" />
-    <ProjectReference Include="..\Build\NetStandard\Typography.TextFlow1\Typography.TextFlow.csproj" />
-    <ProjectReference Include="..\Typography.TextBreak1\Typography.TextBreak.csproj" />
-  </ItemGroup>
+  <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
 
-  <Import Project="..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj" />
+    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj" />
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
+    <ProjectReference Include="..\Typography.TextBreak\Typography.TextBreak.csproj" />
+    <ProjectReference Include="..\Typography.TextFlow\Typography.TextFlow.csproj" />
+  </ItemGroup>
 
 </Project>
