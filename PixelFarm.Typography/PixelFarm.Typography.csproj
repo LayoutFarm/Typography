@@ -64,6 +64,9 @@
     <Compile Include="..\FontAtlas\BinPacker.cs">
       <Link>4_FontAtlas\BinPacker.cs</Link>
     </Compile>
+    <Compile Include="..\FontAtlas\FontAtlasFile.cs">
+      <Link>4_FontAtlas\FontAtlasFile.cs</Link>
+    </Compile>
     <Compile Include="..\FontAtlas\GlyphImages.cs">
       <Link>4_FontAtlas\GlyphImages.cs</Link>
     </Compile>
