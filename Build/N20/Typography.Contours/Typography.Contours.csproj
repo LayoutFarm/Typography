@@ -34,69 +34,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\0_GlyphTriangle.cs">
-      <Link>GlyphAnalysis\0_GlyphTriangle.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\1_EdgeLine.cs">
-      <Link>GlyphAnalysis\1_EdgeLine.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\2_GlyphCentroidPair.cs">
-      <Link>GlyphAnalysis\2_GlyphCentroidPair.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\3_GlyphBoneJoint.cs">
-      <Link>GlyphAnalysis\3_GlyphBoneJoint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\4_GlyphBone.cs">
-      <Link>GlyphAnalysis\4_GlyphBone.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\5_CentroidLineAndHub.cs">
-      <Link>GlyphAnalysis\5_CentroidLineAndHub.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\CurveGen.cs">
-      <Link>GlyphAnalysis\CurveGen.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphContour.cs">
-      <Link>GlyphAnalysis\GlyphContour.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphContourBuilder.cs">
-      <Link>GlyphAnalysis\GlyphContourBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphIntermediateOutline.cs">
-      <Link>GlyphAnalysis\GlyphIntermediateOutline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphOutlineAnalyzer.cs">
-      <Link>GlyphAnalysis\GlyphOutlineAnalyzer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphOutlineWalker.cs">
-      <Link>GlyphAnalysis\GlyphOutlineWalker.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphPartFlattener.cs">
-      <Link>GlyphAnalysis\GlyphPartFlattener.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphParts.cs">
-      <Link>GlyphAnalysis\GlyphParts.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\GlyphPoint.cs">
-      <Link>GlyphAnalysis\GlyphPoint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\MyMath.cs">
-      <Link>GlyphAnalysis\MyMath.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphAnalysis\Rect.cs">
-      <Link>GlyphAnalysis\Rect.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphDynamicOutline.cs">
-      <Link>GlyphDynamicOutline.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
-      <Link>GlyphMeshCollection.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
-      <Link>GlyphPathBuilderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\TextPrinterBase.cs">
-      <Link>TextPrinterBase.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -113,5 +50,6 @@
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
