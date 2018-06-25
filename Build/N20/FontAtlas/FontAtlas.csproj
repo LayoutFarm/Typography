@@ -53,6 +53,10 @@
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Typography.TextBreak\Typography.TextBreak.csproj">
+      <Project>{bc10cc51-a795-40d0-96f0-f87585d59d02}</Project>
+      <Name>Typography.TextBreak</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
