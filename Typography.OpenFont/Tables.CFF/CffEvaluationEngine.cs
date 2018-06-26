@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 
 namespace Typography.OpenFont.CFF
@@ -1154,55 +1155,55 @@ namespace Typography.OpenFont.CFF
 
         public void Op_Abs()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Abs));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Abs));
         }
         public void Op_Add()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Add));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Add));
         }
         public void Op_Sub()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Sub));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Sub));
         }
         public void Op_Div()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Div));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Div));
         }
         public void Op_Neg()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Neg));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Neg));
         }
         public void Op_Random()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Random));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Random));
         }
         public void Op_Mul()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Mul));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Mul));
         }
         public void Op_Sqrt()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Sqrt));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Sqrt));
         }
         public void Op_Drop()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Drop));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Drop));
         }
         public void Op_Exch()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Exch));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Exch));
         }
         public void Op_Index()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Index));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Index));
         }
         public void Op_Roll()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Roll));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Roll));
         }
         public void Op_Dup()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Dup));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Dup));
         }
 
 
@@ -1222,34 +1223,34 @@ namespace Typography.OpenFont.CFF
 
         public void Put()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Put));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Put));
         }
         public void Get()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Get));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Get));
         }
 
         //-------------------------
         //4.6: Conditional  
         public void Op_And()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_And));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_And));
         }
         public void Op_Or()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Or));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Or));
         }
         public void Op_Not()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Not));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Not));
         }
         public void Op_Eq()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Eq));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_Eq));
         }
         public void Op_IfElse()
         {
-            Console.WriteLine("NOT_IMPLEMENT:" + nameof(Op_IfElse));
+            Debug.WriteLine("NOT_IMPLEMENT:" + nameof(Op_IfElse));
         }
         public double Pop()
         {

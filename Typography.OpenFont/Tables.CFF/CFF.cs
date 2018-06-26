@@ -656,7 +656,7 @@ namespace Typography.OpenFont.CFF
                 CffIndexOffset indexElem = nameIndexElems[i];
                 //TODO: review here again, 
                 //check if we need to set _reader.BaseStream.Position or not
-                fontNames.Add(System.Text.Encoding.UTF8.GetString(_reader.ReadBytes(indexElem.len)));
+                fontNames.Add(Encoding.UTF8.GetString(_reader.ReadBytes(indexElem.len), 0, indexElem.len));
             }
 
             //
@@ -798,7 +798,7 @@ namespace Typography.OpenFont.CFF
                 //TODO: review here again, 
                 //check if we need to set _reader.BaseStream.Position or not 
                 //TODO: Is Charsets.ISO_8859_1 Encoding supported in .netcore 
-                _uniqueStringTable[i] = System.Text.Encoding.UTF8.GetString(_reader.ReadBytes(offset.len));
+                _uniqueStringTable[i] = Encoding.UTF8.GetString(_reader.ReadBytes(offset.len), 0, offset.len);
             }
 
             _cff1FontSet._uniqueStringTable = _uniqueStringTable;

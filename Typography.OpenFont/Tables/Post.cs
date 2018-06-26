@@ -151,7 +151,7 @@ namespace Typography.OpenFont.Tables
                         //                        }
                         //#endif
 
-                        _glyphNames.Add(glyphNameIndex, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len)));
+                        _glyphNames.Add(glyphNameIndex, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len), 0, len));
                     }
                 }
             }
