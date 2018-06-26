@@ -5,8 +5,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 namespace Typography.OpenFont.CFF
 {
@@ -427,7 +427,7 @@ namespace Typography.OpenFont.CFF
                         {
                             if (b0 < 32)
                             {
-                                Console.WriteLine("err!:" + b0);
+                                Debug.WriteLine("err!:" + b0);
                                 return null;
                             }
                             insts.AddInt(ReadIntegerNumber(b0));
@@ -478,7 +478,7 @@ namespace Typography.OpenFont.CFF
                                 default:
                                     if (b0 <= 38)
                                     {
-                                        Console.WriteLine("err!:" + b0);
+                                        Debug.WriteLine("err!:" + b0);
                                         return null;
                                     }
                                     break;
