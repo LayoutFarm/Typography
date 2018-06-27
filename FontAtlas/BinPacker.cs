@@ -176,7 +176,7 @@ namespace Typography.Rendering
                 // new node at the left side of the used node
                 if (usedNode.X > freeNode.X && usedNode.X < freeNode.Right)
                 {
-                    var newNode = freeNode;
+                    BinPackRect newNode = freeNode;
                     newNode.Width = usedNode.X - newNode.X;
                     freeList.Add(newNode);
                 }
@@ -184,7 +184,7 @@ namespace Typography.Rendering
                 // new node at the right side of the used node
                 if (usedNode.Right < freeNode.Right)
                 {
-                    var newNode = freeNode;
+                    BinPackRect newNode = freeNode;
                     newNode.X = usedNode.Right;
                     newNode.Width = freeNode.Right - usedNode.Right;
                     freeList.Add(newNode);
