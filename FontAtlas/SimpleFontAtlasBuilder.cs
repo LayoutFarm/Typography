@@ -224,7 +224,7 @@ namespace Typography.Rendering
                 BuildSingleImage();
             }
 
-            FontAtlasFile fontAtlasFile = new FontAtlasFile(); 
+            FontAtlasFile fontAtlasFile = new FontAtlasFile();
             fontAtlasFile.StartWrite(outputStream);
             fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontSizeInPoints);
 
@@ -282,7 +282,7 @@ namespace Typography.Rendering
 
             return simpleFontAtlas;
         }
-        //read font info from xml document
+        
         public SimpleFontAtlas LoadFontInfo(string filename)
         {
 
@@ -290,9 +290,15 @@ namespace Typography.Rendering
             using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Open))
             {
                 //read font atlas from stream data
-                atlasFile.Read(fs);
-                return atlasFile.Result;
+                return LoadFontInfo(fs);
             }
+        }
+        public SimpleFontAtlas LoadFontInfo(System.IO.Stream dataStream)
+        {
+            FontAtlasFile atlasFile = new FontAtlasFile();
+            //read font atlas from stream data
+            atlasFile.Read(dataStream);
+            return atlasFile.Result;
         }
 
         static void CopyToDest(int[] srcPixels, int srcW, int srcH, int[] targetPixels, int targetX, int targetY, int totalTargetWidth)
