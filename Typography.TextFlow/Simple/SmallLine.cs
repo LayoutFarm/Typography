@@ -11,7 +11,7 @@ namespace Typography.TextLayout
         //TODO: temp public, review accessibility here again
         public List<char> _charBuffer = new List<char>();
         public GlyphPlanList _glyphPlans = new GlyphPlanList();
-        public List<UserCharToGlyphIndexMap> _userCharToGlyphMap = new List<UserCharToGlyphIndexMap>();
+        public List<UserCodePointToGlyphIndex> _userCharToGlyphMap = new List<UserCodePointToGlyphIndex>();
 
         bool _contentChanged = true;
 
@@ -91,7 +91,7 @@ namespace Typography.TextLayout
                 if (_caretCharIndex > 0)
                 {
                     //find its mapping to glyph index
-                    UserCharToGlyphIndexMap userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
+                    UserCodePointToGlyphIndex userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
                     int mapToGlyphIndex = userCharToGlyphMap.glyphIndexListOffset_plus1;
                     //
                     if (mapToGlyphIndex == 0)
@@ -137,7 +137,7 @@ namespace Typography.TextLayout
                 {
 
                     //find its mapping to glyph index
-                    UserCharToGlyphIndexMap userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
+                    UserCodePointToGlyphIndex userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
                     int mapToGlyphIndex = userCharToGlyphMap.glyphIndexListOffset_plus1;
                     //
                     if (mapToGlyphIndex == 0)
@@ -217,7 +217,7 @@ namespace Typography.TextLayout
                 _caretCharIndex = sel_index + 1;
                 //check if the caret can rest on this pos or not
 
-                UserCharToGlyphIndexMap map = _userCharToGlyphMap[_caretCharIndex];
+                UserCodePointToGlyphIndex map = _userCharToGlyphMap[_caretCharIndex];
                 if (map.glyphIndexListOffset_plus1 == 0)
                 {
                     //no map
@@ -241,7 +241,7 @@ namespace Typography.TextLayout
             {
                 _caretCharIndex = sel_index;
                 //check if the caret can rest on this pos or not
-                UserCharToGlyphIndexMap map = _userCharToGlyphMap[_caretCharIndex];
+                UserCodePointToGlyphIndex map = _userCharToGlyphMap[_caretCharIndex];
                 if (map.glyphIndexListOffset_plus1 == 0)
                 {
                     //no map
