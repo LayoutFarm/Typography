@@ -8,27 +8,29 @@ using Typography.Contours;
 
 namespace Typography.Rendering
 {
-    public enum TextureKind : byte
-    {
-        StencilLcdEffect, //default
-        StencilGreyScale,        
-        Msdf,
-        Bitmap
-    }
+  
     public class SimpleFontAtlasBuilder
     {
-        GlyphImage latestGenGlyphImage;
-        Dictionary<ushort, CacheGlyph> glyphs = new Dictionary<ushort, CacheGlyph>();
+        GlyphImage _latestGenGlyphImage;
+        Dictionary<ushort, CacheGlyph> _glyphs = new Dictionary<ushort, CacheGlyph>();
         public TextureKind TextureKind { get; private set; }
         public float FontSizeInPoints { get; private set; }
         public string FontFilename { get; set; }
+
+        public enum CompactOption
+        {
+            None,
+            BinPack,
+            ArrangeByHeight
+        }
+
 
         public void AddGlyph(ushort glyphIndex, GlyphImage img)
         {
             var glyphCache = new CacheGlyph();
             glyphCache.glyphIndex = glyphIndex;
             glyphCache.img = img;
-            glyphs[glyphIndex] = glyphCache;
+            _glyphs[glyphIndex] = glyphCache;
         }
 
         public void SetAtlasInfo(TextureKind textureKind, float fontSizeInPts)
@@ -39,8 +41,8 @@ namespace Typography.Rendering
         public GlyphImage BuildSingleImage()
         {
             //1. add to list 
-            var glyphList = new List<CacheGlyph>(glyphs.Count);
-            foreach (CacheGlyph glyphImg in glyphs.Values)
+            var glyphList = new List<CacheGlyph>(_glyphs.Count);
+            foreach (CacheGlyph glyphImg in _glyphs.Values)
             {
                 //sort data
                 glyphList.Add(glyphImg);
@@ -102,7 +104,7 @@ namespace Typography.Rendering
 
             GlyphImage glyphImage = new GlyphImage(totalMaxLim, imgH);
             glyphImage.SetImageBuffer(totalBuffer, true);
-            latestGenGlyphImage = glyphImage;
+            _latestGenGlyphImage = glyphImage;
             return glyphImage;
 
         }
@@ -114,7 +116,7 @@ namespace Typography.Rendering
         public void SaveFontInfo(string filename)
         {
 
-            if (latestGenGlyphImage == null)
+            if (_latestGenGlyphImage == null)
             {
                 BuildSingleImage();
             }
@@ -126,12 +128,12 @@ namespace Typography.Rendering
                 fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontSizeInPoints);
 
                 fontAtlasFile.WriteTotalImageInfo(
-                    (ushort)latestGenGlyphImage.Width,
-                    (ushort)latestGenGlyphImage.Height, 4,
+                    (ushort)_latestGenGlyphImage.Width,
+                    (ushort)_latestGenGlyphImage.Height, 4,
                     this.TextureKind);
                 //
                 //
-                fontAtlasFile.WriteGlyphList(glyphs);
+                fontAtlasFile.WriteGlyphList(_glyphs);
                 fontAtlasFile.EndWrite();
             }
 
@@ -189,7 +191,7 @@ namespace Typography.Rendering
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
             simpleFontAtlas.TextureKind = this.TextureKind;
             simpleFontAtlas.OriginalFontSizePts = this.FontSizeInPoints;
-            foreach (CacheGlyph cacheGlyph in glyphs.Values)
+            foreach (CacheGlyph cacheGlyph in _glyphs.Values)
             {
                 //convert char to hex
                 string unicode = ("0x" + ((int)cacheGlyph.character).ToString("X"));//code point
