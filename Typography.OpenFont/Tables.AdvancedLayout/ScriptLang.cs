@@ -716,7 +716,7 @@ namespace Typography.OpenFont
             scLang = null;
             return false;
         }
-        
+
         public static ScriptLang GetRegisteredScriptLang(string shortname)
         {
             ScriptLang found;
