@@ -1,4 +1,4 @@
-﻿//MIT, 2018-present, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System;
 using Typography.Contours;
 namespace Typography.Rendering
