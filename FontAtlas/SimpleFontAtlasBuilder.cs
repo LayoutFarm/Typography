@@ -216,11 +216,7 @@ namespace Typography.Rendering
 
         }
 
-        /// <summary>
-        /// save font info into xml document
-        /// </summary>
-        /// <param name="filename"></param>
-        public void SaveFontInfo(string filename)
+        public void SaveFontInfo(System.IO.Stream outputStream)
         {
 
             if (_latestGenGlyphImage == null)
@@ -228,23 +224,31 @@ namespace Typography.Rendering
                 BuildSingleImage();
             }
 
-            FontAtlasFile fontAtlasFile = new FontAtlasFile();
+            FontAtlasFile fontAtlasFile = new FontAtlasFile(); 
+            fontAtlasFile.StartWrite(outputStream);
+            fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontSizeInPoints);
+
+            fontAtlasFile.WriteTotalImageInfo(
+                (ushort)_latestGenGlyphImage.Width,
+                (ushort)_latestGenGlyphImage.Height, 4,
+                this.TextureKind);
+            //
+            //
+            fontAtlasFile.WriteGlyphList(_glyphs);
+            fontAtlasFile.EndWrite();
+
+        }
+        /// <summary>
+        /// save font info into xml document
+        /// </summary>
+        /// <param name="filename"></param>
+        public void SaveFontInfo(string filename)
+        {
             using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Create))
             {
-                fontAtlasFile.StartWrite(fs);
-                fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontSizeInPoints);
-
-                fontAtlasFile.WriteTotalImageInfo(
-                    (ushort)_latestGenGlyphImage.Width,
-                    (ushort)_latestGenGlyphImage.Height, 4,
-                    this.TextureKind);
-                //
-                //
-                fontAtlasFile.WriteGlyphList(_glyphs);
-                fontAtlasFile.EndWrite();
-            } 
+                SaveFontInfo(fs);
+            }
         }
-
         public SimpleFontAtlas CreateSimpleFontAtlas()
         {
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
@@ -290,7 +294,7 @@ namespace Typography.Rendering
                 return atlasFile.Result;
             }
         }
-        
+
         static void CopyToDest(int[] srcPixels, int srcW, int srcH, int[] targetPixels, int targetX, int targetY, int totalTargetWidth)
         {
             int srcIndex = 0;
