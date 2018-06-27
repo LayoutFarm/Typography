@@ -45,7 +45,7 @@ namespace Typography.OpenFont.Tables
             b = colorBGRABuffer[startAt];
             g = colorBGRABuffer[startAt + 1];
             r = colorBGRABuffer[startAt + 2];
-            a = colorBGRABuffer[startAt + 3]; 
+            a = colorBGRABuffer[startAt + 3];
         }
     }
 }
