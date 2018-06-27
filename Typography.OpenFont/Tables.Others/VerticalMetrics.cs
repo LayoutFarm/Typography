@@ -1,7 +1,6 @@
 ﻿//Apache2, 2017-present, WinterDev
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {

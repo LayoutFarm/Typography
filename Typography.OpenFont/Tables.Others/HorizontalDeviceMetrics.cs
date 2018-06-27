@@ -27,7 +27,7 @@ namespace Typography.OpenFont.Tables
         //Please see the chapter “Recommendations for OpenType Fonts” for more detail.
 
         //The table begins as follows:
-        //hdmx Header 
+        //hdmx  Header 
         //Type 	    Name 	            Description
         //USHORT    version 	        Table version number (0)
         //SHORT     numRecords 	        Number of device records.
