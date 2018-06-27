@@ -825,6 +825,6 @@ namespace Typography.OpenFont.Tables
                 posClassRule.posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                 return posClassRule;
             }
-        } 
-    } 
+        }
+    }
 }
