@@ -10,9 +10,10 @@ namespace Typography.Rendering
 {
     public enum TextureKind : byte
     {
-        AggGrayScale,
-        AggSubPixel,
-        Msdf
+        StencilLcdEffect, //default
+        StencilGreyScale,        
+        Msdf,
+        Bitmap
     }
     public class SimpleFontAtlasBuilder
     {
