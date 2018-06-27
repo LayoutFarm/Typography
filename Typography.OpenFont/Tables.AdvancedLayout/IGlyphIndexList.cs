@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017,  WinterDev
+﻿//Apache2, 2016-present, WinterDev
 
 
 namespace Typography.OpenFont.Tables

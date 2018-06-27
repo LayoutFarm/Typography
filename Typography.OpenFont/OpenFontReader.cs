@@ -1,4 +1,4 @@
-﻿//Apache2, 2017, WinterDev
+﻿//Apache2, 2017-present, WinterDev
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;
@@ -206,7 +206,7 @@ namespace Typography.OpenFont
                 }
 #if DEBUG
                 //test
-                int found = typeface.GetGlyphIndexByName("Uacute"); 
+                int found = typeface.GetGlyphIndexByName("Uacute");
                 if (typeface.IsCffFont)
                 {
                     //optional

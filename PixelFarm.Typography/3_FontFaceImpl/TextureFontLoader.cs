@@ -55,7 +55,7 @@ namespace PixelFarm.Drawing.Fonts
             switch (creationParams.textureKind)
             {
                 default: throw new System.NotSupportedException();
-                case TextureKind.AggSubPixel:
+                case TextureKind.StencilLcdEffect:
                     atlas1 = CreateAggSubPixelRenderingTextureFont(
                            typeface,
                            creationParams.originalFontSizeInPoint,
@@ -63,7 +63,7 @@ namespace PixelFarm.Drawing.Fonts
                            GetGlyphIndexIter(typeface, creationParams.langBits)
                            );
                     break;
-                case TextureKind.AggGrayScale:
+                case TextureKind.StencilGreyScale:
                     atlas1 = CreateAggTextureFont(
                            typeface,
                            creationParams.originalFontSizeInPoint,
@@ -236,7 +236,7 @@ namespace PixelFarm.Drawing.Fonts
             builder.SetHintTechnique(hintTech);
             //-------------------------------------------------------------
             var atlasBuilder = new SimpleFontAtlasBuilder();
-            atlasBuilder.SetAtlasInfo(TextureKind.AggGrayScale, sizeInPoint);
+            atlasBuilder.SetAtlasInfo(TextureKind.StencilGreyScale, sizeInPoint);
             VertexStorePool vxsPool = new VertexStorePool();
             //create agg cavnas
 
@@ -345,7 +345,7 @@ namespace PixelFarm.Drawing.Fonts
             builder.SetHintTechnique(hintTech);
             //-------------------------------------------------------------
             var atlasBuilder = new SimpleFontAtlasBuilder();
-            atlasBuilder.SetAtlasInfo(TextureKind.AggSubPixel, sizeInPoint);
+            atlasBuilder.SetAtlasInfo(TextureKind.StencilLcdEffect, sizeInPoint);
             VertexStorePool vxsPool = new VertexStorePool();
             //create agg cavnas
 

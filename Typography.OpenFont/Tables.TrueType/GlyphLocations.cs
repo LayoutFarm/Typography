@@ -1,4 +1,5 @@
-﻿//Apache2, 2014-2016, Samuel Carlsson, WinterDev
+﻿//MIT, 2018-present, WinterDev
+//Apache2, 2014-2016, Samuel Carlsson, WinterDev
 //https://www.microsoft.com/typography/otspec/loca.htm
 
 using System.IO;

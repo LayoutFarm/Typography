@@ -1,4 +1,4 @@
-﻿//MIT, 2018-present, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System;
 using Typography.Contours;
 namespace Typography.Rendering
@@ -59,11 +59,11 @@ namespace Typography.Rendering
     {
         public int borderX;
         public int borderY;
-        public GlyphImage img;
+        internal GlyphImage img;
         public Rectangle area;
-        public char character;
+        public char character;//TODO: this should be code point(int32)
         public ushort glyphIndex;
-        public GlyphMatrix2 glyphMatrix;
+
     }
     public class TextureGlyphMapData
     {
@@ -77,31 +77,14 @@ namespace Typography.Rendering
 
         public float TextureXOffset { get; set; }
         public float TextureYOffset { get; set; }
+
+        public void GetRect(out int x, out int y, out int w, out int h)
+        {
+            x = Left;
+            y = Top;
+            w = Width;
+            h = Height;
+        }
     }
 
-    public struct GlyphMatrix2
-    {
-        public short unit_per_em;
-        public short ascender;
-        public short descender;
-        public short height;
-        public int advanceX;
-        public int advanceY;
-        public int bboxXmin;
-        public int bboxXmax;
-        public int bboxYmin;
-        public int bboxYmax;
-        public int img_width;
-        public int img_height;
-        public int img_horiBearingX;
-        public int img_horiBearingY;
-        public int img_horiAdvance;
-        public int img_vertBearingX;
-        public int img_vertBearingY;
-        public int img_vertAdvance;
-        public int bitmap_left;
-        public int bitmap_top;
-        //public IntPtr bitmap;
-        //public IntPtr outline;
-    }
 }

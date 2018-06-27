@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev 
+﻿//MIT, 2016-present, WinterDev 
 namespace Typography.TextLayout
 {
     public struct MeasuredStringBox
