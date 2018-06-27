@@ -242,55 +242,7 @@ namespace Typography.Rendering
                 //
                 fontAtlasFile.WriteGlyphList(_glyphs);
                 fontAtlasFile.EndWrite();
-            }
-
-            //foreach (CacheGlyph g in glyphs.Values)
-            //{
-            //    XmlElement gElem = xmldoc.CreateElement("glyph");
-            //    //convert char to hex
-            //    string unicode = ("0x" + ((int)g.character).ToString("X"));//code point
-            //    Rectangle area = g.area;
-            //    gElem.SetAttribute("c", g.codePoint.ToString());
-            //    gElem.SetAttribute("uc", unicode);//unicode char
-            //    gElem.SetAttribute("ltwh",
-            //        area.Left + " " + area.Top + " " + area.Width + " " + area.Height
-            //        );
-            //    gElem.SetAttribute("borderXY",
-            //        g.borderX + " " + g.borderY
-            //        );
-            //    var mat = g.glyphMatrix;
-            //    gElem.SetAttribute("mat",
-            //        mat.advanceX + " " + mat.advanceY + " " +
-            //        mat.bboxXmin + " " + mat.bboxXmax + " " +
-            //        mat.bboxYmin + " " + mat.bboxYmax + " " +
-            //        mat.img_width + " " + mat.img_height + " " +
-            //        mat.img_horiAdvance + " " + mat.img_horiBearingX + " " +
-            //        mat.img_horiBearingY + " " +
-            //        //-----------------------------
-            //        mat.img_vertAdvance + " " +
-            //        mat.img_vertBearingX + " " + mat.img_vertBearingY);
-
-            //    if (g.character > 50)
-            //    {
-            //        gElem.SetAttribute("example", g.character.ToString());
-            //    }
-            //    root.AppendChild(gElem);
-            //}
-            ////if (embededGlyphsImage)
-            ////{
-            ////    XmlElement glyphImgElem = xmldoc.CreateElement("msdf_img");
-            ////    glyphImgElem.SetAttribute("w", latestGenGlyphImage.Width.ToString());
-            ////    glyphImgElem.SetAttribute("h", latestGenGlyphImage.Height.ToString());
-            ////    int[] imgBuffer = latestGenGlyphImage.GetImageBuffer();
-            ////    glyphImgElem.SetAttribute("buff_len", (imgBuffer.Length * 4).ToString());
-            ////    //----------------------------------------------------------------------
-            ////    glyphImgElem.AppendChild(
-            ////        xmldoc.CreateTextNode(ConvertToBase64(imgBuffer)));
-            ////    //----------------------------------------------------------------------
-            ////    root.AppendChild(glyphImgElem);
-            ////    latestGenGlyphImage.GetImageBuffer();
-            ////}
-            //xmldoc.Save(filename);
+            } 
         }
 
         public SimpleFontAtlas CreateSimpleFontAtlas()
@@ -338,29 +290,7 @@ namespace Typography.Rendering
                 return atlasFile.Result;
             }
         }
-
-        static float[] ParseFloatArray(string str)
-        {
-            string[] str_values = str.Split(' ');
-            int j = str_values.Length;
-            float[] f_values = new float[j];
-            for (int i = 0; i < j; ++i)
-            {
-                f_values[i] = float.Parse(str_values[i]);
-            }
-            return f_values;
-        }
-        static Rectangle ParseRect(string str)
-        {
-            string[] ltwh = str.Split(' ');
-            return new Rectangle(
-                int.Parse(ltwh[0]),
-                int.Parse(ltwh[1]),
-                int.Parse(ltwh[2]),
-                int.Parse(ltwh[3]));
-        }
-
-
+        
         static void CopyToDest(int[] srcPixels, int srcW, int srcH, int[] targetPixels, int targetX, int targetY, int totalTargetWidth)
         {
             int srcIndex = 0;
