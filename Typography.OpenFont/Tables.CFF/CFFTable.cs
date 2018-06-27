@@ -28,7 +28,7 @@
 //ccf1 spec from http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5176.CFF.pdf
 
 //------------------------------------------------------------------
-//Apache2, 2018, WinterDev
+//Apache2, 2018-present, WinterDev
 
 
 using System;

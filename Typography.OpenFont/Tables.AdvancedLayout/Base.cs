@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev
+﻿//Apache2, 2016-present, WinterDev
 //https://www.microsoft.com/typography/otspec/base.htm
 //BASE - Baseline Table
 //The Baseline table (BASE) provides information used to align glyphs of different scripts and sizes in a line of text, 

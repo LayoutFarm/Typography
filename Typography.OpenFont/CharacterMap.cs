@@ -1,4 +1,4 @@
-﻿//Apache2, 2017, WinterDev, Sam Hocevar
+﻿//Apache2, 2017-present, WinterDev, Sam Hocevar
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 
 using System;

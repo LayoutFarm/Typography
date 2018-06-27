@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Sam Hocevar <sam@hocevar.net>
+﻿// Copyright © 2017-present Sam Hocevar <sam@hocevar.net>
 // Apache2
 
 using System;
