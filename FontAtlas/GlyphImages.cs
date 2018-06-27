@@ -77,6 +77,14 @@ namespace Typography.Rendering
 
         public float TextureXOffset { get; set; }
         public float TextureYOffset { get; set; }
+
+        public void GetGlyphRect(out int x, out int y, out int w, out int h)
+        {
+            x = Left;
+            y = Top;
+            w = Width;
+            h = Height;
+        }
     }
 
 }
