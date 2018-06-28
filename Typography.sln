@@ -130,6 +130,7 @@ Global
 		Typography.GlyphLayout\Typography.GlyphLayout.projitems*{d8861cf8-c506-472b-8a57-632bd6ca6496}*SharedItemsImports = 13
 		FontAtlas\FontAtlas.projitems*{f6602808-f1d5-4e3b-bb8c-b9ca4ae77437}*SharedItemsImports = 13
 		Typography.OpenFont\Typography.OpenFont.projitems*{f7d71e61-9342-4dd7-9afd-69045f2ec98b}*SharedItemsImports = 4
+		PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems*{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU

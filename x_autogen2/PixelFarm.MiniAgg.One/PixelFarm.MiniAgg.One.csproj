@@ -8,6 +8,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AssemblyName>PixelFarm.MiniAgg.One</AssemblyName>
+    <ProjectGuid>{FB5F78F5-C921-405D-8F21-42F7C15C2AD9}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -575,72 +576,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.PrimitiveGeo\RectInt.cs">
       <Link>PixelFarm\PixelFarm.PrimitiveGeo\RectInt.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\AdvancingFront.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\AdvancingFront.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\AdvancingFrontNode.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\AdvancingFrontNode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\DelaunayTriangle.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\DelaunayTriangle.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\DTSweep.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\DTSweep.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\DTSweepConstraint.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\DTSweepConstraint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\DTSweepContext.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\DTSweepContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\DTSweepDebugContext.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\DTSweepDebugContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\delaunay\PointOnEdgeException.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\delaunay\PointOnEdgeException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\P2T.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\P2T.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\polygon\Polygon.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\polygon\Polygon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\sets\ConstrainedPointSet.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\sets\ConstrainedPointSet.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\sets\PointSet.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\sets\PointSet.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\ITriangulatable.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\ITriangulatable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\Orientation.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\Orientation.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationAlgorithm.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationAlgorithm.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationContext.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationDebugContext.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationDebugContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationMode.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationMode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationPoint.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationPoint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationUtil.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\triangulation\TriangulationUtil.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\util\PointGenerator.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\util\PointGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm\PixelFarm.Triangulation\util\PolygonGenerator.cs">
-      <Link>PixelFarm\PixelFarm.Triangulation\util\PolygonGenerator.cs</Link>
-    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\1_vectormaths\AggMath.cs">
       <Link>PixelFarm\PixelFarm.Vectors\1_vectormaths\AggMath.cs</Link>
     </Compile>
@@ -804,5 +739,6 @@
       <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface\SvgRenderVx.cs</Link>
     </Compile>
   </ItemGroup>
+  <Import Project="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

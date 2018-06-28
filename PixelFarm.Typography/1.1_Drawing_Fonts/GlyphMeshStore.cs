@@ -1,14 +1,12 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 
 using System;
 using System.Collections.Generic;
-using PixelFarm.Agg;
 
+using PixelFarm.Drawing;
 using PixelFarm.Drawing.Fonts;
 
 using Typography.OpenFont;
-using Typography.TextLayout;
-
 
 namespace Typography.Contours
 {
@@ -56,7 +54,7 @@ namespace Typography.Contours
         float _currentFontSizeInPoints;
         HintTechnique _currentHintTech;
 
-        VertexStorePool _vxsPool = new VertexStorePool(); //TODO: review pool again
+
         GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
 
         public GlyphMeshStore()
@@ -105,6 +103,13 @@ namespace Typography.Contours
             //------------------------------------------ 
             _hintGlyphCollection.SetCacheInfo(typeface, this._currentFontSizeInPoints, _currentHintTech);
         }
+
+        bool _flipGlyphUpward;
+        public bool FlipGlyphUpward
+        {
+            get { return _flipGlyphUpward; }
+            set { _flipGlyphUpward = value; }
+        }
         /// <summary>
         /// get existing or create new one from current font setting
         /// </summary>
@@ -144,6 +149,9 @@ namespace Typography.Contours
             return InternalGetGlyphMesh(glyphIndex).GetControlPars();
         }
 
+        PixelFarm.CpuBlit.VertexProcessing.Affine _invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
+        VertexStore _vxs1 = new VertexStore();
+
         /// <summary>
         /// get glyph mesh from current font setting
         /// </summary>
@@ -161,19 +169,51 @@ namespace Typography.Contours
                 if (dynamicOutline != null)
                 {
                     dynamicOutline.GenerateOutput(_tovxs, pxscale);
-                    glyphMeshData.vxsStore = new VertexStore();
-                    _tovxs.WriteOutput(glyphMeshData.vxsStore, _vxsPool);
+
+                    //version 3 
+                    if (_flipGlyphUpward)
+                    {
+                        _vxs1.Clear(); //write to temp buffer first
+                        _tovxs.WriteOutput(_vxs1);
+
+                        VertexStore vxs = new VertexStore();
+                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _vxs1, vxs);
+                        //then
+                        glyphMeshData.vxsStore = vxs;
+                    }
+                    else
+                    {
+                        glyphMeshData.vxsStore = new VertexStore();
+                        _tovxs.WriteOutput(glyphMeshData.vxsStore);
+                    }
                 }
                 else
                 {
-                    //no dynamic outline
-                    glyphMeshData.vxsStore = new VertexStore();
-                    _currentGlyphBuilder.ReadShapes(_tovxs);
-                    //TODO: review here,
-                    //float pxScale = _glyphPathBuilder.GetPixelScale(); 
-                    _tovxs.WriteOutput(glyphMeshData.vxsStore, _vxsPool);
-                }
 
+                    if (_flipGlyphUpward)
+                    {
+                        _vxs1.Clear(); //write to temp buffer first
+
+                        _currentGlyphBuilder.ReadShapes(_tovxs);
+                        _tovxs.WriteOutput(_vxs1);
+
+                        VertexStore vxs = new VertexStore();
+                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _vxs1, vxs);
+                        //then
+                        glyphMeshData.vxsStore = vxs;
+                    }
+                    else
+                    {
+                        //no dynamic outline
+
+                        _currentGlyphBuilder.ReadShapes(_tovxs);
+                        //TODO: review here,
+                        //float pxScale = _glyphPathBuilder.GetPixelScale(); 
+
+                        glyphMeshData.vxsStore = new VertexStore();
+                        _tovxs.WriteOutput(glyphMeshData.vxsStore);
+                    }
+                }
 
             }
             return glyphMeshData.vxsStore;
@@ -181,5 +221,5 @@ namespace Typography.Contours
         }
     }
 
- 
+
 }
