@@ -52,78 +52,13 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\P2T.cs">
-      <Link>P2T.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Polygon\Polygon.cs">
-      <Link>Polygon\Polygon.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\DelaunayTriangle.cs">
-      <Link>Triangulation\Delaunay\DelaunayTriangle.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\AdvancingFront.cs">
-      <Link>Triangulation\Delaunay\Sweep\AdvancingFront.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs">
-      <Link>Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweep.cs">
-      <Link>Triangulation\Delaunay\Sweep\DTSweep.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepConstraint.cs">
-      <Link>Triangulation\Delaunay\Sweep\DTSweepConstraint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepContext.cs">
-      <Link>Triangulation\Delaunay\Sweep\DTSweepContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs">
-      <Link>Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Delaunay\Sweep\PointOnEdgeException.cs">
-      <Link>Triangulation\Delaunay\Sweep\PointOnEdgeException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\ITriangulatable.cs">
-      <Link>Triangulation\ITriangulatable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Orientation.cs">
-      <Link>Triangulation\Orientation.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Sets\ConstrainedPointSet.cs">
-      <Link>Triangulation\Sets\ConstrainedPointSet.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Sets\PointSet.cs">
-      <Link>Triangulation\Sets\PointSet.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationAlgorithm.cs">
-      <Link>Triangulation\TriangulationAlgorithm.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationContext.cs">
-      <Link>Triangulation\TriangulationContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationDebugContext.cs">
-      <Link>Triangulation\TriangulationDebugContext.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationMode.cs">
-      <Link>Triangulation\TriangulationMode.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationPoint.cs">
-      <Link>Triangulation\TriangulationPoint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\TriangulationUtil.cs">
-      <Link>Triangulation\TriangulationUtil.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Util\PointGenerator.cs">
-      <Link>Triangulation\Utils\PointGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\Triangulation\Util\PolygonGenerator.cs">
-      <Link>Triangulation\Utils\PolygonGenerator.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

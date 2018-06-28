@@ -123,6 +123,7 @@ Global
 		Demo\Shared\DrawingGL.Common.projitems*{b824ffb2-d057-490a-8967-892c0e20c0b6}*SharedItemsImports = 4
 		Typography.Contours\Typography.Contours.projitems*{b999f927-08c5-4328-b07e-69acc1392da4}*SharedItemsImports = 4
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{bc10cc51-a795-40d0-96f0-f87585d59d02}*SharedItemsImports = 4
+		PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems*{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}*SharedItemsImports = 4
 		Typography.GlyphLayout\Typography.GlyphLayout.projitems*{c6807d05-09be-4313-9f8b-bd2d51c55819}*SharedItemsImports = 4
 		Typography.TextServices\Typography.TextServices.projitems*{d07686ee-2618-4c20-8eb5-32ad4c4d3810}*SharedItemsImports = 13
 		PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems*{d487dfd2-3da4-4a72-93ed-6048ea8029db}*SharedItemsImports = 13
