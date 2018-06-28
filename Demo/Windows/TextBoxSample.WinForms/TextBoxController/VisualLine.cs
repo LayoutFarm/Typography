@@ -38,7 +38,7 @@ namespace SampleWinForms.UI
         {
 
             GlyphPlanList glyphPlans = _line._glyphPlans;
-            List<UserCharToGlyphIndexMap> userCharToGlyphIndexMap = _line._userCharToGlyphMap;
+            List<UserCodePointToGlyphIndex> userCharToGlyphIndexMap = _line._userCharToGlyphMap;
             if (_line.ContentChanged)
             {
                 //re-calculate 
@@ -72,7 +72,7 @@ namespace SampleWinForms.UI
                 }
                 else
                 {
-                    UserCharToGlyphIndexMap map = userCharToGlyphIndexMap[caret_index - 1];
+                    UserCodePointToGlyphIndex map = userCharToGlyphIndexMap[caret_index - 1];
                     GlyphPlan p = glyphPlans[map.glyphIndexListOffset_plus1 + map.len - 2];
                     _printer.DrawCaret(X + p.ExactRight, this.Y);
                 }

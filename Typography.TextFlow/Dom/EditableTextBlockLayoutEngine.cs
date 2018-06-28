@@ -1,11 +1,36 @@
-﻿//MIT, 2014-2017, WinterDev
+﻿//MIT, 2014-present, WinterDev
 using System.Collections.Generic;
-using System.IO;
+
 
 using Typography.OpenFont;
 using Typography.WordBreaks;
 namespace Typography.TextLayout
-{   
+{
+
+    public class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
+    {
+        List<UnscaledGlyphPlan> list = new List<UnscaledGlyphPlan>();
+        public int Count
+        {
+            get { return list.Count; }
+        }
+        public UnscaledGlyphPlan this[int index]
+        {
+            get
+            {
+                return list[index];
+            }
+        }
+        public void Append(UnscaledGlyphPlan unscaledGlyphPlan)
+        {
+            list.Add(unscaledGlyphPlan);
+        }
+        public void Clear()
+        {
+            list.Clear();
+        }
+    }
+
     /// <summary>
     /// collect and managed editable text line
     /// </summary>
@@ -14,8 +39,10 @@ namespace Typography.TextLayout
 
         TextBlockLexer _textBlockLexer;
         List<EditableTextLine> _lines = new List<EditableTextLine>();
-
         GlyphLayout _glyphLayout;
+
+
+
         public EditableTextBlockLayoutEngine()
         {
             _textBlockLexer = new TextBlockLexer();
@@ -94,8 +121,18 @@ namespace Typography.TextLayout
             //we can calculate the text run size when
             //we known more about font of each style 
         }
+
+
+        UnscaledGlyphPlanList _outputGlyphPlan = new UnscaledGlyphPlanList();
+
         public void DoLayout()
         {
+
+            //----------------
+            //TODO: use typography text service
+            //it should be faster since it has glyph-plan cache
+            //----------------
+
             //user can use other native methods 
             //to do the layout ***
 
@@ -105,23 +142,14 @@ namespace Typography.TextLayout
 
             //then at this step 
             //we calculate span size 
-            //resolve each font style 
-
-
+            //resolve each font style  
             _glyphLayout.EnableComposition = true;
             _glyphLayout.EnableLigature = true;
-
             int lineCount = _lines.Count;
 
-            GlyphPlanList outputGlyphPlan = new GlyphPlanList();
-            GlyphPlanBuffer glyphPlanBuffer = new GlyphPlanBuffer(outputGlyphPlan);
+
             Typeface selectedTypeface = this.DefaultTypeface;
-
-
-            //
             float pxscale = selectedTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPts);
-
-
             for (int i = 0; i < lineCount; ++i)
             {
                 EditableTextLine line = _lines[i];
@@ -141,18 +169,23 @@ namespace Typography.TextLayout
                     TextBuffer buffer = tt.TextBuffer;
                     char[] rawBuffer = buffer.UnsafeGetInternalBuffer();
 
-                    int preCount = outputGlyphPlan.Count;
+
+                    //TODO: review here again
+
+                    int preCount = _outputGlyphPlan.Count;
+
                     _glyphLayout.Typeface = selectedTypeface;
                     _glyphLayout.Layout(rawBuffer, tt.StartAt, tt.Len);
 
+                    GlyphPlanSequence.GenerateUnscaledGlyphPlans(
+                        _glyphLayout.ResultUnscaledGlyphPositions,
+                        _outputGlyphPlan);
+
                     //use pixel-scale-layout-engine to scale to specific font size
-                    //or scale it manually
-
-                    int postCount = outputGlyphPlan.Count;
-
-
+                    //or scale it manually 
+                    int postCount = _outputGlyphPlan.Count;
                     //
-                    tt.SetGlyphPlanSeq(new GlyphPlanSequence(glyphPlanBuffer, preCount, postCount - preCount));
+                    tt.SetGlyphPlanSeq(new GlyphPlanSequence(_outputGlyphPlan, preCount, postCount - preCount));
                     tt.IsMeasured = true;
                     //
                 }

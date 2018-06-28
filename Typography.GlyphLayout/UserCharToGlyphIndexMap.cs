@@ -2,16 +2,17 @@
 namespace Typography.TextLayout
 {
 
-    public struct UserCharToGlyphIndexMap
+    public struct UserCodePointToGlyphIndex
     {
-        //from user char index to offset in _glyphIndics     
+        //from user codepoint index to offset in _glyphIndics     
         //this index is 1-based ***
         //if glyphIndexListOffset_1==0 then no map data in  _glyphIndices*** 
         public ushort glyphIndexListOffset_plus1;
         public ushort len;
+
+        internal int userCodePointIndex;
 #if DEBUG
-        public ushort dbug_userCharIndex;
-        public int dbug_userChar;
+
         public override string ToString()
         {
             return glyphIndexListOffset_plus1 + ":" + len;
