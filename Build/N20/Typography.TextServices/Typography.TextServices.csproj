@@ -44,10 +44,6 @@
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj">
-      <Project>{9a3b8b84-56be-4aa1-8d90-1b3b3fef1f71}</Project>
-      <Name>Typography.MsdfGen</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj">
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
