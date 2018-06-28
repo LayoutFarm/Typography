@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackEnd.FilterFx", "PdnPixelEffectPixelFarm\BackEnd.FilterFx.csproj", "{9A7DB6EA-7F85-4420-9E42-F0F277524FB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPdnEffect", "TestPdnEffect\TestPdnEffect.csproj", "{1A8E11C5-07CE-4B98-A0BA-76F199525D7F}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PdnSharedProject", "PdnSharedProject\PdnSharedProject.shproj", "{536B9B08-98D7-4261-A78D-3B1CCD11D5EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdnCore", "PdnCore\PdnCore.csproj", "{02D8652B-88AC-4615-AD26-90B47438A454}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestPdnCore", "TestPdnCore\TestPdnCore.csproj", "{F31E59A0-7886-419F-AE35-D2CBAC023846}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackEnd.DrawingBuffer", "..\BackEnd.DrawingBuffer\BackEnd.DrawingBuffer\BackEnd.DrawingBuffer.csproj", "{5EB9544F-51E1-42CC-ABFD-B9AFBA6A2A0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormGdiPlus", "..\BackEnd.DrawingBuffer\Test_WinFormGdiPlus\WinFormGdiPlus.csproj", "{9422AB9D-341B-4B72-8611-86418707B2E8}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		PdnSharedProject\PdnSharedProject.projitems*{536b9b08-98d7-4261-a78d-3b1ccd11d5ef}*SharedItemsImports = 13
+		PdnSharedProject\PdnSharedProject.projitems*{9a7db6ea-7f85-4420-9e42-f0f277524fb7}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A7DB6EA-7F85-4420-9E42-F0F277524FB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A7DB6EA-7F85-4420-9E42-F0F277524FB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A7DB6EA-7F85-4420-9E42-F0F277524FB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A7DB6EA-7F85-4420-9E42-F0F277524FB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A8E11C5-07CE-4B98-A0BA-76F199525D7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A8E11C5-07CE-4B98-A0BA-76F199525D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A8E11C5-07CE-4B98-A0BA-76F199525D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A8E11C5-07CE-4B98-A0BA-76F199525D7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02D8652B-88AC-4615-AD26-90B47438A454}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D8652B-88AC-4615-AD26-90B47438A454}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D8652B-88AC-4615-AD26-90B47438A454}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D8652B-88AC-4615-AD26-90B47438A454}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F31E59A0-7886-419F-AE35-D2CBAC023846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F31E59A0-7886-419F-AE35-D2CBAC023846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F31E59A0-7886-419F-AE35-D2CBAC023846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F31E59A0-7886-419F-AE35-D2CBAC023846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EB9544F-51E1-42CC-ABFD-B9AFBA6A2A0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EB9544F-51E1-42CC-ABFD-B9AFBA6A2A0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EB9544F-51E1-42CC-ABFD-B9AFBA6A2A0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EB9544F-51E1-42CC-ABFD-B9AFBA6A2A0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9422AB9D-341B-4B72-8611-86418707B2E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9422AB9D-341B-4B72-8611-86418707B2E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9422AB9D-341B-4B72-8611-86418707B2E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9422AB9D-341B-4B72-8611-86418707B2E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7035047F-9E7E-4E7A-B22D-4D3FB50AC99E}
+	EndGlobalSection
+EndGlobal

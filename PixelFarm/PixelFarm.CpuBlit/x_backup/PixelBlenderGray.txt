@@ -1,0 +1,685 @@
+////BSD, 2014-present, WinterDev
+////----------------------------------------------------------------------------
+//// Anti-Grain Geometry - Version 2.4
+//// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
+////
+//// C# Port port by: Lars Brubaker
+////                  larsbrubaker@gmail.com
+//// Copyright (C) 2007
+////
+//// Permission to copy, use, modify, sell and distribute this software 
+//// is granted provided this copyright notice appears in all copies. 
+//// This software is provided "as is" without express or implied
+//// warranty, and with no claim as to its suitability for any purpose.
+////
+////----------------------------------------------------------------------------
+//// Contact: mcseem@antigrain.com
+////          mcseemagg@yahoo.com
+////          http://www.antigrain.com
+////----------------------------------------------------------------------------
+////
+//// Adaptation for high precision colors has been sponsored by 
+//// Liberty Technology Systems, Inc., visit http://lib-sys.com
+////
+//// Liberty Technology Systems, Inc. is the provider of
+//// PostScript and PDF technology for software developers.
+//// 
+////----------------------------------------------------------------------------
+
+//using System;
+//using PixelFarm.Drawing;
+//namespace PixelFarm.Agg.Imaging
+//{
+
+//    public class PixelBlenderGray : PixelBlenderBGRABase, IPixelBlender
+//    {
+//        internal override void BlendPixel32(int[] buffer, int arrayOffset, Color sourceColor)
+//        {
+//            unsafe
+//            {
+//                fixed (int* head = &buffer[arrayOffset])
+//                {
+//                    Blend32PixelInternal(head, sourceColor);
+//                }
+//            }
+//        }
+
+//        internal override unsafe void BlendPixel32(int* ptr, Color sc)
+//        {
+//            Blend32PixelInternal(ptr, sc);
+//        }
+
+//        internal override void BlendPixels(int[] destBuffer, int arrayElemOffset, Color[] sourceColors, int sourceColorsOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+//        {
+//            if (firstCoverForAll)
+//            {
+//                int cover = covers[coversIndex];
+//                if (cover == 255)
+//                {
+
+//                    unsafe
+//                    {
+//                        fixed (int* dstHead = &destBuffer[arrayElemOffset])
+//                        {
+//                            int* dstBuffer = dstHead;
+
+//                            if (count % 2 != 0)
+//                            {
+//                                //odd
+//                                //
+//                                Blend32PixelInternal(dstBuffer, sourceColors[sourceColorsOffset++]);
+//                                dstBuffer++;//move next
+//                                count--;
+//                            }
+
+//                            //now count is even number
+//                            while (count > 0)
+//                            {
+//                                //now count is even number
+//                                //---------
+//                                //1
+//                                Blend32PixelInternal(dstBuffer, sourceColors[sourceColorsOffset++]);
+//                                dstBuffer++;//move next
+//                                count--;
+//                                //---------
+//                                //2
+//                                Blend32PixelInternal(dstBuffer, sourceColors[sourceColorsOffset++]);
+//                                dstBuffer++;//move next
+//                                count--;
+//                            }
+
+//                        }
+//                    }
+//                }
+//                else
+//                {
+
+//                    unsafe
+//                    {
+//                        fixed (int* head = &destBuffer[arrayElemOffset])
+//                        {
+//                            int* header2 = (int*)(IntPtr)head;
+
+//                            if (count % 2 != 0)
+//                            {
+//                                //odd
+//                                //
+//                                Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++], cover);
+//                                header2++;//move next
+//                                count--;
+//                            }
+//                            while (count > 0)
+//                            {
+//                                //Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++].NewFromChangeCoverage(cover));
+//                                //1.
+//                                Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++], cover);
+//                                header2++;//move next
+//                                count--;
+//                                //2.
+//                                Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++], cover);
+//                                header2++;//move next
+//                                count--;
+//                            }
+
+//                        }
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                do
+//                {
+//                    //cover may diff in each loop
+//                    int cover = covers[coversIndex++];
+//                    if (cover == 255)
+//                    {
+//                        BlendPixel32(destBuffer, arrayElemOffset, sourceColors[sourceColorsOffset]);
+//                    }
+//                    else
+//                    {
+//                        BlendPixel32(destBuffer, arrayElemOffset, sourceColors[sourceColorsOffset].NewFromChangeCoverage(cover));
+//                    }
+//                    arrayElemOffset++;
+//                    ++sourceColorsOffset;
+//                }
+//                while (--count != 0);
+//            }
+//        }
+
+
+//        internal override void CopyPixel(int[] buffer, int arrayOffset, Color sourceColor)
+//        {
+//            unsafe
+//            {
+//                unchecked
+//                {
+//                    fixed (int* ptr = &buffer[arrayOffset])
+//                    {
+//                        //TODO: consider use memcpy() impl***  
+
+//                        //
+//                        int dest = *ptr;
+//                        //
+//                        byte a = (byte)((dest >> 24) & 0xff);
+//                        byte r = (byte)((dest >> 16) & 0xff);
+//                        byte g = (byte)((dest >> 8) & 0xff);
+//                        byte b = (byte)((dest) & 0xff);
+//                        int src_a = sourceColor.A;
+//                        //int value = ((byte)(255) << 24) |
+//                        //             ((byte)(((sourceColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
+//                        //             (g << 8) |
+//                        //              b;
+//                        src_a = 255;
+//                        int value = ((byte)(255) << 24) |
+//                                    ((byte)((((0 - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) & 0xff) << 16) |
+//                                   (g << 8) |
+//                                   b;
+
+
+//                        *ptr = value;
+//                    }
+//                }
+//            }
+//        }
+
+//        internal override void CopyPixels(int[] buffer, int arrayOffset, Color sourceColor, int count)
+//        {
+//            unsafe
+//            {
+//                unchecked
+//                {
+//                    fixed (int* ptr_byte = &buffer[arrayOffset])
+//                    {
+//                        //TODO: consider use memcpy() impl***
+//                        int* ptr = ptr_byte;
+
+//                        //
+//                        int dest = *ptr;
+
+//                        //
+//                        byte a = (byte)((dest >> 24) & 0xff);
+//                        byte r = (byte)((dest >> 16) & 0xff);
+//                        byte g = (byte)((dest >> 8) & 0xff);
+//                        byte b = (byte)((dest) & 0xff);
+
+//                        int src_a = sourceColor.A;
+//                        src_a = 255;
+
+//                        int value = ((byte)(255) << 24) |
+//                                  ((byte)((((0 - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) & 0xff) << 16) |
+//                                   (g << 8) |
+//                                    b;
+//                        if (((value) & 0xffffff) == 0)
+//                        {
+
+//                        }
+//                        //---------
+//                        if ((count % 2) != 0)
+//                        {
+//                            *ptr = value;
+//                            ptr++; //move next
+//                            count--;
+//                        }
+
+//                        while (count > 0)
+//                        {
+//                            //-----------
+//                            //1.
+//                            *ptr = value;
+//                            ptr++; //move next
+//                            count--;
+//                            //-----------
+//                            //2
+//                            *ptr = value;
+//                            ptr++; //move next
+//                            count--;
+//                        }
+
+//                    }
+//                }
+//            }
+//        }
+
+//        static unsafe void Blend32PixelInternal(int* ptr, Color sc, int coverageValue)
+//        {
+//            //calculate new alpha
+//            int src_a = (byte)((sc.alpha * coverageValue + 255) >> 8);
+//            //after apply the alpha
+//            unchecked
+//            {
+//                if (src_a == 255)
+//                {
+//                    int dest = *ptr;
+//                    byte a = (byte)((dest >> 24) & 0xff);
+//                    byte r = (byte)((dest >> 16) & 0xff);
+//                    byte g = (byte)((dest >> 8) & 0xff);
+//                    byte b = (byte)((dest) & 0xff);
+
+//                    int value = ((byte)(255) << 24) |
+//                                ((byte)((((0 - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) & 0xff) << 16) |
+//                                (g << 8) |
+//                                b;
+
+//                    *ptr = value;
+//                    //*ptr = sc.ToARGB(); //just copy
+//                }
+//                else
+//                {
+//                    int dest = *ptr;
+//                    if (((dest) & 0xffffff) == 0)
+//                    {
+//                    }
+//                    //separate each component
+//                    byte a = (byte)((dest >> 24) & 0xff);
+//                    byte r = (byte)((dest >> 16) & 0xff);
+//                    byte g = (byte)((dest >> 8) & 0xff);
+//                    byte b = (byte)((dest) & 0xff);
+
+//                    src_a = 255;
+//                    int value =
+//                     ((byte)(255) << 24) |
+//                    ((byte)((((0 - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) & 0xff) << 16) |
+//                     (g << 8) |
+//                      b;
+
+//                    *ptr = value;
+//                }
+//            }
+
+//        }
+//        static unsafe void Blend32PixelInternal(int* ptr, Color sc)
+//        {
+//            unchecked
+//            {
+//                if (sc.alpha == 255)
+//                {
+//                    int src_a = 255;
+//                    int dest = *ptr;
+
+//                    byte a = (byte)((dest >> 24) & 0xff);
+//                    byte r = (byte)((dest >> 16) & 0xff);
+//                    byte g = (byte)((dest >> 8) & 0xff);
+//                    byte b = (byte)((dest) & 0xff);
+
+//                    int value = ((byte)(255) << 24) |
+//                                ((byte)((((0 - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) & 0xff) << 16) |
+//                                 (g << 8) |
+//                                  b;
+
+//                    *ptr = value;
+//                }
+//                else
+//                {
+//                    int dest = *ptr;
+
+//                    //separate each component
+//                    byte a = (byte)((dest >> 24) & 0xff);
+//                    byte r = (byte)((dest >> 16) & 0xff);
+//                    byte g = (byte)((dest >> 8) & 0xff);
+//                    byte b = (byte)((dest) & 0xff);
+
+//                    byte src_a = sc.alpha;
+//                    src_a = 255;
+//                    int value =
+//                     ((byte)(255) << 24) |
+//                    ((byte)((((0 - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) & 0xff) << 16) |
+//                     (g << 8) |
+//                     b;
+
+
+//                    *ptr = value;
+//                }
+//            }
+//        }
+
+//    }
+
+
+//    //public class PixelBlenderGray : IPixelBlender
+//    //{
+//    //    public int NumPixelBits { get { return 8; } }
+
+//    //    const byte BASE_MASK = 255;
+//    //    const int BASE_SHIFT = 8;
+//    //    int bytesBetweenPixelsInclusive;
+//    //    public PixelBlenderGray(int bytesBetweenPixelsInclusive)
+//    //    {
+//    //        this.bytesBetweenPixelsInclusive = bytesBetweenPixelsInclusive;
+//    //    }
+
+//    //    public Color PixelToColorRGBA(byte[] buffer, int bufferOffset)
+//    //    {
+//    //        byte value = buffer[bufferOffset];
+//    //        return new Color(value, value, value);
+//    //    }
+
+//    //    public void CopyPixels(byte[] pDestBuffer, int bufferOffset, Color sourceColor, int count)
+//    //    {
+//    //        //convert rgb to gray scale color with weight value
+//    //        //TODO: we can set other weight ?
+
+//    //        int y = (sourceColor.red * 77) + (sourceColor.green * 151) + (sourceColor.blue * 28);
+//    //        int gray = (y >> 8);
+//    //        do
+//    //        {
+//    //            pDestBuffer[bufferOffset] = (byte)gray;
+//    //            bufferOffset += bytesBetweenPixelsInclusive;
+//    //        }
+//    //        while (--count != 0);
+//    //    }
+//    //    public void CopyPixel(byte[] pDestBuffer, int bufferOffset, Color sourceColor)
+//    //    {
+//    //        int y = (sourceColor.red * 77) + (sourceColor.green * 151) + (sourceColor.blue * 28);
+//    //        int gray = (y >> 8);
+//    //        pDestBuffer[bufferOffset] = (byte)gray;
+//    //    }
+//    //    public void BlendPixel(byte[] pDestBuffer, int bufferOffset, Color sourceColor)
+//    //    {
+//    //        int OneOverAlpha = BASE_MASK - sourceColor.alpha;
+//    //        unchecked
+//    //        {
+//    //            int y = (sourceColor.red * 77) + (sourceColor.green * 151) + (sourceColor.blue * 28);
+//    //            int gray = (y >> 8);
+//    //            gray = (byte)((((gray - (int)(pDestBuffer[bufferOffset])) * sourceColor.alpha) + ((int)(pDestBuffer[bufferOffset]) << BASE_SHIFT)) >> BASE_SHIFT);
+//    //            pDestBuffer[bufferOffset] = (byte)gray;
+//    //        }
+//    //    }
+
+//    //    public void BlendPixels(byte[] destBuffer, int bufferOffset,
+//    //        Color[] sourceColors, int sourceColorsOffset,
+//    //        byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+//    //    {
+//    //        if (firstCoverForAll)
+//    //        {
+//    //            int cover = covers[coversIndex];
+//    //            if (cover == 255)
+//    //            {
+//    //                do
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset++]);
+//    //                    bufferOffset += bytesBetweenPixelsInclusive;
+//    //                }
+//    //                while (--count != 0);
+//    //            }
+//    //            else
+//    //            {
+//    //                do
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset].NewFromChangeCoverage(cover));
+//    //                    bufferOffset += bytesBetweenPixelsInclusive;
+//    //                    ++sourceColorsOffset;
+//    //                }
+//    //                while (--count != 0);
+//    //            }
+//    //        }
+//    //        else
+//    //        {
+//    //            do
+//    //            {
+//    //                int cover = covers[coversIndex++];
+//    //                if (cover == 255)
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset]);
+//    //                }
+//    //                else
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset].NewFromChangeCoverage(cover));
+//    //                }
+//    //                bufferOffset += bytesBetweenPixelsInclusive;
+//    //                ++sourceColorsOffset;
+//    //            }
+//    //            while (--count != 0);
+//    //        }
+//    //    }
+//    //}
+
+//    //public class BlenderGrayFromRed : IPixelBlender
+//    //{
+//    //    const byte BASE_MASK = 255;
+//    //    const int BASE_SHIFT = 8;
+
+//    //    int bytesBetweenPixelsInclusive;
+//    //    public BlenderGrayFromRed(int bytesBetweenPixelsInclusive)
+//    //    {
+//    //        this.bytesBetweenPixelsInclusive = bytesBetweenPixelsInclusive;
+
+//    //    }
+//    //    public int NumPixelBits { get { return 8; } }
+//    //    public Color PixelToColorRGBA(byte[] buffer, int bufferOffset)
+//    //    {
+//    //        byte value = buffer[bufferOffset];
+//    //        return new Color(value, value, value);
+//    //    }
+
+//    //    public void CopyPixels(byte[] pDestBuffer, int bufferOffset, Color sourceColor, int count)
+//    //    {
+//    //        do
+//    //        {
+//    //            pDestBuffer[bufferOffset] = sourceColor.red;
+//    //            bufferOffset += bytesBetweenPixelsInclusive;
+//    //        }
+//    //        while (--count != 0);
+//    //    }
+//    //    public void CopyPixel(byte[] pDestBuffer, int bufferOffset, Color sourceColor)
+//    //    {
+//    //        pDestBuffer[bufferOffset] = sourceColor.red;
+//    //        bufferOffset += bytesBetweenPixelsInclusive;
+//    //    }
+//    //    public void BlendPixel(byte[] pDestBuffer, int bufferOffset, Color sourceColor)
+//    //    {
+//    //        int OneOverAlpha = BASE_MASK - sourceColor.alpha;
+//    //        unchecked
+//    //        {
+//    //            byte gray = (byte)((((sourceColor.red - (int)(pDestBuffer[bufferOffset])) * sourceColor.alpha) + ((int)(pDestBuffer[bufferOffset]) << BASE_SHIFT)) >> BASE_SHIFT);
+//    //            pDestBuffer[bufferOffset] = (byte)gray;
+//    //        }
+//    //    }
+
+//    //    public void BlendPixels(byte[] destBuffer, int bufferOffset,
+//    //        Color[] sourceColors, int sourceColorsOffset,
+//    //        byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+//    //    {
+//    //        if (firstCoverForAll)
+//    //        {
+//    //            int cover = covers[coversIndex];
+//    //            if (cover == 255)
+//    //            {
+//    //                do
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset++]);
+//    //                    bufferOffset += bytesBetweenPixelsInclusive;
+//    //                }
+//    //                while (--count != 0);
+//    //            }
+//    //            else
+//    //            {
+//    //                do
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset].NewFromChangeCoverage(cover));
+//    //                    bufferOffset += bytesBetweenPixelsInclusive;
+//    //                    ++sourceColorsOffset;
+//    //                }
+//    //                while (--count != 0);
+//    //            }
+//    //        }
+//    //        else
+//    //        {
+//    //            do
+//    //            {
+//    //                int cover = covers[coversIndex++];
+//    //                if (cover == 255)
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset]);
+//    //                }
+//    //                else
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset].NewFromChangeCoverage(cover));
+//    //                }
+//    //                bufferOffset += bytesBetweenPixelsInclusive;
+//    //                ++sourceColorsOffset;
+//    //            }
+//    //            while (--count != 0);
+//    //        }
+//    //    }
+//    //}
+
+//    //public class BlenderGrayClampedMax : IPixelBlender
+//    //{
+//    //    const byte BASE_MASK = 255;
+//    //    const int BASE_SHIFT = 8;
+
+//    //    int bytesBetweenPixelsInclusive;
+//    //    public BlenderGrayClampedMax(int bytesBetweenPixelsInclusive)
+//    //    {
+//    //        this.bytesBetweenPixelsInclusive = bytesBetweenPixelsInclusive;
+
+//    //    }
+//    //    public int NumPixelBits { get { return 8; } }
+//    //    public Color PixelToColorRGBA(byte[] buffer, int bufferOffset)
+//    //    {
+//    //        byte value = buffer[bufferOffset];
+//    //        return new Color(value, value, value);
+//    //    }
+
+//    //    public void CopyPixels(byte[] pDestBuffer, int bufferOffset, Color sourceColor, int count)
+//    //    {
+//    //        byte clampedMax = Math.Min(Math.Max(sourceColor.red, Math.Max(sourceColor.green, sourceColor.blue)), (byte)255);
+//    //        do
+//    //        {
+//    //            pDestBuffer[bufferOffset] = clampedMax;
+//    //            bufferOffset += bytesBetweenPixelsInclusive;
+//    //        }
+//    //        while (--count != 0);
+//    //    }
+//    //    public void CopyPixel(byte[] pDestBuffer, int bufferOffset, Color sourceColor)
+//    //    {
+//    //        byte clampedMax = Math.Min(Math.Max(sourceColor.red, Math.Max(sourceColor.green, sourceColor.blue)), (byte)255);
+//    //        pDestBuffer[bufferOffset] = clampedMax;
+//    //    }
+//    //    public void BlendPixel(byte[] pDestBuffer, int bufferOffset, Color sourceColor)
+//    //    {
+//    //        int OneOverAlpha = BASE_MASK - sourceColor.alpha;
+//    //        unchecked
+//    //        {
+//    //            byte clampedMax = Math.Min(Math.Max(sourceColor.red, Math.Max(sourceColor.green, sourceColor.blue)), (byte)255);
+//    //            byte gray = (byte)((((clampedMax - (int)(pDestBuffer[bufferOffset])) * sourceColor.alpha) + ((int)(pDestBuffer[bufferOffset]) << BASE_SHIFT)) >> BASE_SHIFT);
+//    //            pDestBuffer[bufferOffset] = (byte)gray;
+//    //        }
+//    //    }
+
+//    //    public void BlendPixels(byte[] destBuffer, int bufferOffset,
+//    //        Color[] sourceColors, int sourceColorsOffset,
+//    //        byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+//    //    {
+//    //        if (firstCoverForAll)
+//    //        {
+//    //            int cover = covers[coversIndex];
+//    //            if (cover == 255)
+//    //            {
+//    //                do
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset++]);
+//    //                    bufferOffset += bytesBetweenPixelsInclusive;
+//    //                }
+//    //                while (--count != 0);
+//    //            }
+//    //            else
+//    //            {
+//    //                do
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset].NewFromChangeCoverage(cover));
+//    //                    bufferOffset += bytesBetweenPixelsInclusive;
+//    //                    ++sourceColorsOffset;
+//    //                }
+//    //                while (--count != 0);
+//    //            }
+//    //        }
+//    //        else
+//    //        {
+//    //            do
+//    //            {
+//    //                int cover = covers[coversIndex++];
+//    //                if (cover == 255)
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset]);
+//    //                }
+//    //                else
+//    //                {
+//    //                    BlendPixel(destBuffer, bufferOffset, sourceColors[sourceColorsOffset].NewFromChangeCoverage(cover));
+//    //                }
+//    //                bufferOffset += bytesBetweenPixelsInclusive;
+//    //                ++sourceColorsOffset;
+//    //            }
+//    //            while (--count != 0);
+//    //        }
+//    //    }
+//    //}
+
+//    /*
+
+//    //======================================================blender_gray_pre
+//    //template<class ColorT> 
+//    struct blender_gray_pre
+//    {
+//        typedef ColorT color_type;
+//        typedef typename color_type::value_type value_type;
+//        typedef typename color_type::calc_type calc_type;
+//        enum base_scale_e { base_shift = color_type::base_shift };
+
+//        static void blend_pix(value_type* p, int cv,
+//                                         int alpha, int cover)
+//        {
+//            alpha = color_type::base_mask - alpha;
+//            cover = (cover + 1) << (base_shift - 8);
+//            *p = (value_type)((*p * alpha + cv * cover) >> base_shift);
+//        }
+
+//        static void blend_pix(value_type* p, int cv,
+//                                         int alpha)
+//        {
+//            *p = (value_type)(((*p * (color_type::base_mask - alpha)) >> base_shift) + cv);
+//        }
+//    };
+    
+
+
+//    //=====================================================apply_gamma_dir_gray
+//    //template<class ColorT, class GammaLut> 
+//    class apply_gamma_dir_gray
+//    {
+//    public:
+//        typedef typename ColorT::value_type value_type;
+
+//        apply_gamma_dir_gray(GammaLut& gamma) : m_gamma(gamma) {}
+
+//        void operator () (byte* p)
+//        {
+//            *p = m_gamma.dir(*p);
+//        }
+
+//    private:
+//        GammaLut& m_gamma;
+//    };
+
+
+
+//    //=====================================================apply_gamma_inv_gray
+//    //template<class ColorT, class GammaLut> 
+//    class apply_gamma_inv_gray
+//    {
+//    public:
+//        typedef typename ColorT::value_type value_type;
+
+//        apply_gamma_inv_gray(GammaLut& gamma) : m_gamma(gamma) {}
+
+//        void operator () (byte* p)
+//        {
+//            *p = m_gamma.inv(*p);
+//        }
+
+//    private:
+//        GammaLut& m_gamma;
+//    };
+
+//     */
+//}
