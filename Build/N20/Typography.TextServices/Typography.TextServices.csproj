@@ -52,11 +52,9 @@
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.TextFlow\Typography.TextFlow.csproj">
-      <Project>{333f3209-8da9-4d33-a560-299ed4c6dfa5}</Project>
-      <Name>Typography.TextFlow</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
+  <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
+  <Import Project="..\..\..\Typography.TextFlow\Typography.TextFlow.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

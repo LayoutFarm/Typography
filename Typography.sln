@@ -101,7 +101,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.TextFlow", "Buil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.MsdfGen", "Build\NetStandard\Typography.MsdfGen\Typography.MsdfGen.csproj", "{39D43296-9CFD-4213-8F6D-E5ABF3EF3695}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.TextServices", "Build\NetStandard\Typography.TextServices\Typography.TextServices.csproj", "{E0D31F8B-6D44-49E8-9025-592C09322E4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Typography.TextServices", "Build\NetStandard\Typography.TextServices\Typography.TextServices.csproj", "{E0D31F8B-6D44-49E8-9025-592C09322E4E}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -109,6 +109,8 @@ Global
 		Typography.OpenFont\Typography.OpenFont.projitems*{235a071b-8d06-40ae-a5c5-b1ce59715ee9}*SharedItemsImports = 13
 		Demo\Shared\DrawingGL.Common.projitems*{2e1e828f-6d2c-4b0e-a2e2-ddf24798cacf}*SharedItemsImports = 13
 		Typography.TextFlow\Typography.TextFlow.projitems*{333f3209-8da9-4d33-a560-299ed4c6dfa5}*SharedItemsImports = 4
+		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
+		Typography.TextFlow\Typography.TextFlow.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
 		Typography.TextServices\Typography.TextServices.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
 		Typography.TextFlow\Typography.TextFlow.projitems*{7a8a63d2-2cb5-41f5-8e83-6f6e54398cf4}*SharedItemsImports = 13
 		Typography.MsdfGen\Typography.MsdfGen.projitems*{86a03bfa-0879-4449-8d6c-b1f9fb062e7e}*SharedItemsImports = 13
