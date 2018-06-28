@@ -8,8 +8,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;NET20;NETSTANDARD1_6;NETSTANDARD1_6</DefineConstants>
   </PropertyGroup>
-
-  <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+  
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+  </ItemGroup>
   
   <Import Project="..\..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" />
 
