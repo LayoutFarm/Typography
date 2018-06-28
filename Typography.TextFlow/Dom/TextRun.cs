@@ -81,55 +81,6 @@ namespace Typography.TextLayout
 
     }
 
-    public class GlyphPlanBuffer
-    {
-        GlyphPlanList _glyphPlans;
-        public GlyphPlanBuffer(GlyphPlanList glyphPlans)
-        {
-            this._glyphPlans = glyphPlans;
-        }
-        public int GlyphPlanCount { get { return _glyphPlans.Count; } }
-
-        public static GlyphPlanList UnsafeGetGlyphPlanList(GlyphPlanBuffer buffer)
-        {
-            return buffer._glyphPlans;
-        }
-    }
-
-    public struct GlyphPlanSequence
-    {
-        //
-        public static GlyphPlanSequence Empty = new GlyphPlanSequence();
-        //
-        readonly GlyphPlanBuffer glyphBuffer;
-        public readonly int startAt;
-        public readonly ushort len;
-
-        public GlyphPlanSequence(GlyphPlanBuffer glyphBuffer, int startAt, int len)
-        {
-            this.glyphBuffer = glyphBuffer;
-            this.startAt = startAt;
-            this.len = (ushort)len;
-        }
-        public float CalculateWidth()
-        {
-            GlyphPlanList plans = UnsafeGetInteralGlyphPlanList(this);
-            int end = startAt + len;
-            float width = 0;
-            for (int i = startAt; i < end; ++i)
-            {
-                width += plans[i].AdvanceX;
-            }
-            return width;
-        }
-        public bool IsEmpty()
-        {
-            return glyphBuffer == null;
-        }
-        public static GlyphPlanList UnsafeGetInteralGlyphPlanList(GlyphPlanSequence planSeq)
-        {
-            return GlyphPlanBuffer.UnsafeGetGlyphPlanList(planSeq.glyphBuffer);
-        }
-    }
+   
 
 }
