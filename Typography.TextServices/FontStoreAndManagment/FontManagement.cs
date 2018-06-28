@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev 
+﻿//MIT, 2016-present, WinterDev 
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,12 +22,12 @@ namespace Typography.TextServices
         public string FontSubFamily { get; internal set; }
         public string FontPath { get; internal set; }
 
-#if DEBUG
+
         public override string ToString()
         {
             return FontName + " " + FontSubFamily;
         }
-#endif
+
     }
 
 
@@ -63,7 +63,7 @@ namespace Typography.TextServices
         Italic = 1 << 3,
     }
 
-    public delegate void FirstInitFontCollection(InstalledFontCollection fontCollection);
+    public delegate void FirstInitFontCollectionDelegate(InstalledFontCollection fontCollection);
 
     public delegate InstalledFont FontNotFoundHandler(InstalledFontCollection fontCollection, string fontName, string fontSubFam, InstalledFontStyle wellknownStyle);
     public delegate FontNameDuplicatedDecision FontNameDuplicatedHandler(InstalledFont existing, InstalledFont newAddedFont);
@@ -147,6 +147,7 @@ namespace Typography.TextServices
                 {
                     var reader = new OpenFontReader();
                     typeface = reader.Read(fs);
+                    typeface.Filename = installedFont.FontPath;
                 }
                 return _loadedTypefaces[installedFont] = typeface;
             }
@@ -203,7 +204,7 @@ namespace Typography.TextServices
 
 
         static InstalledFontCollection s_sharedFontCollection;
-        public static InstalledFontCollection GetSharedFontCollection(FirstInitFontCollection initdel)
+        public static InstalledFontCollection GetSharedFontCollection(FirstInitFontCollectionDelegate initdel)
         {
             if (s_sharedFontCollection == null)
             {
@@ -338,7 +339,41 @@ namespace Typography.TextServices
                 case InstalledFontStyle.Italic: selectedFontGroup = _italic; break;
                 case (InstalledFontStyle.Bold | InstalledFontStyle.Italic): selectedFontGroup = _bold_italic; break;
             }
-            selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found);
+            if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
+            {
+                return _found;
+            }
+            //-------------------------------------------
+
+            //retry ....
+            if (wellknownSubFam == InstalledFontStyle.Bold)
+            {
+                //try get from Gras?
+                //eg. tahoma
+                if (_subFamToFontGroup.TryGetValue("GRAS", out selectedFontGroup))
+                {
+
+                    if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
+                    {
+                        return _found;
+                    }
+
+                }
+            }
+            else if (wellknownSubFam == InstalledFontStyle.Italic)
+            {
+                //TODO: simulate oblique (italic) font???
+                selectedFontGroup = _normal;
+
+                if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
+                {
+                    return _found;
+                }
+
+            }
+
+
+
             return _found;
         }
         //public FindResult GetFont(string fontName, InstalledFontStyle style, out InstalledFont found)
@@ -422,13 +457,7 @@ namespace Typography.TextServices
         {
             try
             {
-                //font dir
-                if (!Directory.Exists(folder))
-                {
-                    //not found
-                    return;
-                }
-                
+                // 1. font dir
                 foreach (string file in Directory.GetFiles(folder))
                 {
                     //eg. this is our custom font folder
@@ -468,26 +497,24 @@ namespace Typography.TextServices
             // OS X system fonts (https://support.apple.com/en-us/HT201722)
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
             LoadFontsFromFolder(fontCollection, "/Library/Fonts");
-
-
-
-
-            //for Windows , how to find Windows' Font Directory from Windows Registry
-            //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
-            //        // get parent of System folder to have Windows folder
-            //        DirectoryInfo dirWindowsFolder = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System));
-            //        string strFontsFolder = Path.Combine(dirWindowsFolder.FullName, "Fonts");
-            //        RegistryKey regKey = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts");
-            //        //---------------------------------------- 
-            //        foreach (string winFontName in localMachineFonts)
-            //        {
-            //            string f = (string)regKey.GetValue(winFontName);
-            //            if (f.EndsWith(".ttf") || f.EndsWith(".otf"))
-            //            {
-            //                yield return Path.Combine(strFontsFolder, f);
-            //            }
-            //        }
-
         }
+
+
+        //for Windows , how to find Windows' Font Directory from Windows Registry
+        //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
+        //        // get parent of System folder to have Windows folder
+        //        DirectoryInfo dirWindowsFolder = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System));
+        //        string strFontsFolder = Path.Combine(dirWindowsFolder.FullName, "Fonts");
+        //        RegistryKey regKey = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts");
+        //        //---------------------------------------- 
+        //        foreach (string winFontName in localMachineFonts)
+        //        {
+        //            string f = (string)regKey.GetValue(winFontName);
+        //            if (f.EndsWith(".ttf") || f.EndsWith(".otf"))
+        //            {
+        //                yield return Path.Combine(strFontsFolder, f);
+        //            }
+        //        }
+
     }
 }

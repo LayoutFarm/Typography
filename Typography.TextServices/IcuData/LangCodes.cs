@@ -1,4 +1,4 @@
-﻿//2017, MIT, WinterDev
+﻿//MIT, 2017-present, WinterDev
 //and ICU data is modified from ICU project (http://site.icu-project.org/)
 
 //----------------------------
@@ -34,11 +34,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-
 namespace Typography.TextServices
 {
-    public static class IcuData
+
+    static class IcuData
     {
         //this data is a modified version from 
         //icu/icu4c-60_1-data/data/lang/en.txt
@@ -665,9 +664,9 @@ namespace Typography.TextServices
 
         static Dictionary<string, string> s_shortNameToFullNames = new Dictionary<string, string>();
 
-        static IcuData()
+        static bool _init_data;
+        static void InitData()
         {
-
             //simple icu data
             //parse
             using (StringReader reader = new StringReader(LangsCode))
@@ -679,30 +678,53 @@ namespace Typography.TextServices
                     //parse each line
                     line = line.Trim();
                     int firstBrace = line.IndexOf('{');
-                    if (firstBrace < -1)
+                    if (firstBrace > -1)
                     {
-                        //err?,skip this? 
-                        continue;
-                    }
-                    //
-                    int lastBrace = line.IndexOf('}', firstBrace);
-                    if (lastBrace < -1)
-                    {
-                        //err?,skip this? 
-                        continue;
-                    }
-                    string langCode = line.Substring(0, firstBrace);
-                    string fullLangName = line.Substring(firstBrace, lastBrace - firstBrace);
+                        int lastBrace = line.IndexOf('}', firstBrace);
+                        if (lastBrace > -1)
+                        {
+                            string langCode = line.Substring(0, firstBrace);
+                            string fullLangName = line.Substring(firstBrace + 1, lastBrace - firstBrace - 1);
+                            if (!s_shortNameToFullNames.ContainsKey(langCode))
+                            {
+                                s_shortNameToFullNames.Add(langCode, fullLangName);
+                            }
+                            else
+                            {
 
-                    //
-                    reader.ReadLine();
+                                //this should not occur?
+                            }
+                        }
+
+                    }
+                    //read next line
+                    line = reader.ReadLine();
                 }
             }
         }
-
-        public static bool TryGetFullLanguageNameFromLangCode(string langCode, out string fullLangName)
+        public static bool TryGetFullLanguageNameFromLangCode(string langCode1, string langCode2, out string fullLangName)
         {
-            return s_shortNameToFullNames.TryGetValue(langCode, out fullLangName);
+            if (!_init_data) InitData();
+            //
+            _init_data = true;
+            if (langCode1 != null)
+            {
+                if (s_shortNameToFullNames.TryGetValue(langCode1, out fullLangName))
+                {   //found
+                    return true;
+                }
+            }
+            //another chance
+            if (langCode2 != null)
+            {
+                if (s_shortNameToFullNames.TryGetValue(langCode2, out fullLangName))
+                {   //found
+                    return true;
+                }
+            }
+            //not found
+            fullLangName = null;
+            return false;
         }
     }
 

@@ -1,4 +1,4 @@
-﻿//MIT, 2014-2017, WinterDev    
+﻿//MIT, 2014-present, WinterDev    
 namespace Typography.TextServices
 {
     public class OpenFontStore : IFontLoader
@@ -16,26 +16,26 @@ namespace Typography.TextServices
 
 
             _defaultFontNotFoundHandler = (fontCollection, fontName, subfamName, style) =>
-             {
-                 //TODO: implement font not found mapping here
-                 //_fontsMapping["monospace"] = "Courier New";
-                 //_fontsMapping["Helvetica"] = "Arial";
-                 fontName = fontName.ToUpper();
-                 switch (fontName)
-                 {
-                     case "MONOSPACE":
-                         return fontCollection.GetFont("Courier New", style);
-                     case "HELVETICA":
-                         return fontCollection.GetFont("Arial", style);
-                     case "TAHOMA":
-                         //default font must found
-                         //if not throw err 
-                         //this prevent infinit loop
-                         throw new System.NotSupportedException();
-                     default:
-                         return fontCollection.GetFont("tahoma", style);
-                 }
-             };
+            {
+                //TODO: implement font not found mapping here
+                //_fontsMapping["monospace"] = "Courier New";
+                //_fontsMapping["Helvetica"] = "Arial";
+                fontName = fontName.ToUpper();
+                switch (fontName)
+                {
+                    case "MONOSPACE":
+                        return fontCollection.GetFont("Courier New", style);
+                    case "HELVETICA":
+                        return fontCollection.GetFont("Arial", style);
+                    case "TAHOMA":
+                        //default font must found
+                        //if not throw err 
+                        //this prevent infinit loop
+                        throw new System.NotSupportedException();
+                    default:
+                        return fontCollection.GetFont("tahoma", style);
+                }
+            };
 
         }
         public InstalledFont GetFont(string fontName, InstalledFontStyle style)

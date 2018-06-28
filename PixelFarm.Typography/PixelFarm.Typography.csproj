@@ -33,7 +33,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Build\N20\Typography.Contours\Typography.Contours.csproj">
@@ -61,58 +60,24 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\FontAtlas\BinPacker.cs">
-      <Link>4_FontAtlas\BinPacker.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\FontAtlasFile.cs">
-      <Link>4_FontAtlas\FontAtlasFile.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\GlyphImages.cs">
-      <Link>4_FontAtlas\GlyphImages.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\MsdfGlyphGen.cs">
-      <Link>4_FontAtlas\MsdfGlyphGen.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\SimpleFontAtlas.cs">
-      <Link>4_FontAtlas\SimpleFontAtlas.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\SimpleFontAtlasBuilder.cs">
-      <Link>4_FontAtlas\SimpleFontAtlasBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeColor.cs">
-      <Link>5_Msdf\EdgeColor.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeColoring.cs">
-      <Link>5_Msdf\EdgeColoring.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeHolder.cs">
-      <Link>5_Msdf\EdgeHolder.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeSegment.cs">
-      <Link>5_Msdf\EdgeSegment.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EquationSolver.cs">
-      <Link>5_Msdf\EquationSolver.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\MsdfGen.cs">
-      <Link>5_Msdf\MsdfGen.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\SignedDistance.cs">
-      <Link>5_Msdf\SignedDistance.cs</Link>
-    </Compile>
+    <Compile Include="1.1_Drawing_Fonts\FontAtlasTextPrinter.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilder.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.1_Drawing_Fonts\OpenFontIFonts.cs" />
-    <Compile Include="1.1_Drawing_Fonts\PixelScaleLayoutEngine.cs" />
-    <Compile Include="1.2_\TextShapingAndLayoutService.cs" />
+    <Compile Include="1.1_Drawing_Fonts\GlyphMeshStore.cs" />
+    <Compile Include="1.3_DrawingFonts\TextShapingAndLayoutService.cs" />
+    <Compile Include="3_FontFaceImpl\BitmapFontMx.cs" />
+    <Compile Include="3_FontFaceImpl\GlyphTextureBitmapGenerator.cs" />
     <Compile Include="3_FontFaceImpl\NOpenFontFace.cs" />
     <Compile Include="3_FontFaceImpl\OpenFontLoader.cs" />
     <Compile Include="1.1_Drawing_Fonts\VxsTextPrinter.cs" />
     <Compile Include="3_FontFaceImpl\ScriptLangConv.cs" />
     <Compile Include="3_FontFaceImpl\TextureFontLoader.cs" />
-    <Compile Include="6_AggTexture\AggGlyphTextureGen.cs" />
-    <Compile Include="1.2_\FontStyleExtensions.cs" />
+    <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
+    <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
   </ItemGroup>
+  <Import Project="..\Typography.MsdfGen\Typography.MsdfGen.projitems" Label="Shared" />
+  <Import Project="..\FontAtlas\FontAtlas.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
