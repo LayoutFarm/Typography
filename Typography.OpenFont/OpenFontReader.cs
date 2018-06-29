@@ -203,7 +203,7 @@ namespace Typography.OpenFont
                     SvgTable svgTable = ReadTableIfExists(tables, input, new SvgTable());
                     if (svgTable != null)
                     {
-
+                        typeface._svgTable = svgTable;
                     }
                 }
 

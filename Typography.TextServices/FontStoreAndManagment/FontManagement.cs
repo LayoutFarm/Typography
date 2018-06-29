@@ -333,10 +333,10 @@ namespace Typography.TextServices
                     //err!
                     return false;
                 }
-                if (previewFont.fontName.StartsWith("Bungee"))
-                {
+                //if (previewFont.fontName.StartsWith("Bungee"))
+                //{
 
-                }
+                //}
 
                 return RegisterFont(new InstalledFont(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
             }

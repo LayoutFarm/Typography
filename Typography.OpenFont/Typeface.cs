@@ -344,7 +344,7 @@ namespace Typography.OpenFont
         }
 
 
-        //---------
+        //---------        
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
         internal bool IsCffFont
@@ -368,6 +368,9 @@ namespace Typography.OpenFont
                 return (_mathTable != null) ? _mathTable._mathConstTable : null;
             }
         }
+        //---------
+        internal SvgTable _svgTable;
+
     }
     
     public interface IGlyphPositions
