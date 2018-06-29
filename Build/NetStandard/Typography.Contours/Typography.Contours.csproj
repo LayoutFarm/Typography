@@ -2,14 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <Import Project="..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
-
   <Import Project="..\..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems" Label="Shared" />
 
   <ItemGroup>
