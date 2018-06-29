@@ -197,6 +197,16 @@ namespace Typography.OpenFont
 
                 //------------
 
+
+                //test
+                {
+                    SvgTable svgTable = ReadTableIfExists(tables, input, new SvgTable());
+                    if (svgTable != null)
+                    {
+
+                    }
+                }
+
                 typeface.PostTable = postTable;
                 if (mathtable != null)
                 {
