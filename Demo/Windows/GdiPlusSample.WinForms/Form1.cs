@@ -167,8 +167,7 @@ namespace SampleWinForms
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
-                                                    //-----------------------  
-
+                                                    //-----------------------   
 
         }
 

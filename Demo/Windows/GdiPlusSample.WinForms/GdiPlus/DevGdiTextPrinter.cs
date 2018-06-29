@@ -12,7 +12,7 @@ using Typography.Contours;
 namespace SampleWinForms
 {
 
-    
+
     /// <summary>
     /// developer's version, Gdi+ text printer
     /// </summary>
@@ -98,17 +98,18 @@ namespace SampleWinForms
             this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
         }
 
-        UnscaledGlyphPlanList _resuableGlyphPlanList = new UnscaledGlyphPlanList();
+
         PxScaledGlyphPlanList _reusablePxScaleGlyphPlanList = new PxScaledGlyphPlanList();
 
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
+
             //1. unscale layout, in design unit
             this._glyphLayout.Layout(textBuffer, startAt, len);
 
-            //2. scale  to specific font size
-            _resuableGlyphPlanList.Clear();
+            //2. scale  to specific font size  
 
+            _reusablePxScaleGlyphPlanList.Clear();
 
             GlyphLayoutExtensions.GenerateGlyphPlans(
                 _glyphLayout.ResultUnscaledGlyphPositions,
@@ -180,13 +181,13 @@ namespace SampleWinForms
                 //------
                 //then move pen point to the position we want to draw a glyph
 
-                float ngx = acc_x + (float)Math.Round(glyphPlan.OffsetX * scale);
-                float ngy = acc_y + (float)Math.Round(glyphPlan.OffsetY * scale);
+                float ngx = acc_x + (float)Math.Round(glyphPlan.OffsetX);
+                float ngy = acc_y + (float)Math.Round(glyphPlan.OffsetY);
 
                 g_x = (x + (ngx));
                 g_y = (y + (ngy));
 
-                acc_x += (float)Math.Round(glyphPlan.AdvanceX * scale);
+                acc_x += (float)Math.Round(glyphPlan.AdvanceX);
 
                 //g_x = (float)Math.Round(g_x);
                 g_y = (float)Math.Floor(g_y);
