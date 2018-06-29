@@ -1,10 +1,5 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
 using System.Windows.Forms;
 
 namespace TypographyTest.WinForms
@@ -65,7 +60,7 @@ namespace TypographyTest.WinForms
             chkShowTess.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkXGridFitting.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkYGridFitting.CheckedChanged += (s, e) => UpdateRenderOutput();
-            
+
             chkLcdTechnique.CheckedChanged += (s, e) => UpdateRenderOutput();
 
             //----------           
@@ -77,7 +72,7 @@ namespace TypographyTest.WinForms
             chkSetPrinterLayoutForLcdSubPix.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkDrawTriangles.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkDrawRegenerateOutline.CheckedChanged += (s, e) => UpdateRenderOutput();
-           
+
             chkDrawLineHubConn.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkDrawPerpendicularLine.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkDrawGlyphPoint.CheckedChanged += (s, e) => UpdateRenderOutput();
@@ -101,7 +96,7 @@ namespace TypographyTest.WinForms
         }
         void UpdateRenderOutput()
         {
-          
+
             _options.ShowGrid = chkShowGrid.Checked;
             _options.ShowTess = chkShowTess.Checked;
 
