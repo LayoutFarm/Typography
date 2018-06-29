@@ -1,7 +1,7 @@
-﻿//MIT, 2014-2017, WinterDev
+﻿//MIT, 2014-present, WinterDev
 
 using System.Drawing;
-using PixelFarm.Agg;
+using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
 namespace SampleWinForms.UI
 {
@@ -10,12 +10,12 @@ namespace SampleWinForms.UI
     {
         Graphics g;
         VxsTextPrinter _printer;
-        ActualImage destImg;
-        ImageGraphics2D imgGfx2d;
-        AggCanvasPainter p;
+        ActualBitmap destImg;
+
+        AggPainter p;
         Bitmap winBmp;
         VisualLine _visualLine;
-         
+
         public SampleTextBoxControllerForPixelFarm()
         {
         }
@@ -24,12 +24,11 @@ namespace SampleWinForms.UI
         {
             g = hostControlGraphics;
             //
-            destImg = new ActualImage(400, 300, PixelFormat.ARGB32);
-            imgGfx2d = new ImageGraphics2D(destImg); //no platform
-            p = new AggCanvasPainter(imgGfx2d);
+            destImg = new ActualBitmap(400, 300);
+            p = AggPainter.Create(destImg);
             winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            _printer = new VxsTextPrinter(p, null);
+            _printer = new VxsTextPrinter(p);
             _visualLine = new VisualLine();
             _visualLine.BindLine(_line);
             _visualLine.Y = 100;
@@ -55,7 +54,7 @@ namespace SampleWinForms.UI
             p.FillColor = PixelFarm.Drawing.Color.Black;
             p.Clear(PixelFarm.Drawing.Color.White);
 
-            _printer.TargetCanvasPainter = p;
+            // _printer.TargetCanvasPainter = p;
             _visualLine.Draw();
 
 
@@ -66,7 +65,7 @@ namespace SampleWinForms.UI
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
 
-            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(p.Graphics.DestActualImage, winBmp);
+            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(p.RenderSurface.DestActualImage, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
+
 namespace Typography.TextLayout
 {
 
@@ -123,13 +124,35 @@ namespace Typography.TextLayout
     }
 
 
-
-
     public interface IUnscaledGlyphPlanList
     {
         void Append(UnscaledGlyphPlan glyphPlan);
         int Count { get; }
         UnscaledGlyphPlan this[int index] { get; }
+    }
+
+    public class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
+    {
+        List<UnscaledGlyphPlan> list = new List<UnscaledGlyphPlan>();
+        public int Count
+        {
+            get { return list.Count; }
+        }
+        public UnscaledGlyphPlan this[int index]
+        {
+            get
+            {
+                return list[index];
+            }
+        }
+        public void Append(UnscaledGlyphPlan unscaledGlyphPlan)
+        {
+            list.Add(unscaledGlyphPlan);
+        }
+        public void Clear()
+        {
+            list.Clear();
+        }
     }
     public struct GlyphPlanSequence
     {

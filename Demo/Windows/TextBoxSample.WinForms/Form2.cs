@@ -279,9 +279,9 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-            GlyphPlanList userGlyphPlans = new GlyphPlanList();
 
 
+            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
             _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
             //2.2
             //and we can print the formatted glyph plan later.
@@ -294,7 +294,12 @@ namespace SampleWinForms
              );
             //Example 3: MeasureString        
 
-            MeasuredStringBox strBox = _currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
+            //TODO: review here again
+            MeasuredStringBox strBox = SampleMeasureStringUtil.MeasureString(
+                _currentTextPrinter.GlyphLayoutMan,
+                _currentTextPrinter.FontSizeInPoints,
+                textBuffer, 0,
+                textBuffer.Length, out int w, out int h);
             //draw line mark
 
             float x_pos2 = x_pos + strBox.width + 10;

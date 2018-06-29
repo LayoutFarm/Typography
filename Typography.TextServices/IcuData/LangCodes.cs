@@ -37,7 +37,7 @@ using System.IO;
 namespace Typography.TextServices
 {
 
-    static class IcuData
+    public static class IcuData
     {
         //this data is a modified version from 
         //icu/icu4c-60_1-data/data/lang/en.txt

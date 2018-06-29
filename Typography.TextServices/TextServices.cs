@@ -41,27 +41,10 @@ namespace Typography.TextServices
             typefaceStore = new TypefaceStore();
             typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(null);
             _glyphLayout = new GlyphLayout();
-        }
-        public bool TrySettingScriptLangFromCurrentThreadCultureInfo()
-        {
-            ////accessory...
-            //var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            //Typography.OpenFont.ScriptLang scLang = null;
-            //string langFullName;
-            //if (IcuData.TryGetFullLanguageNameFromLangCode(
-            //     currentCulture.TwoLetterISOLanguageName,
-            //     currentCulture.ThreeLetterISOLanguageName,
-            //     out langFullName))
-            //{
-            //    scLang = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
-            //    SetDefaultScriptLang(scLang);
-            //    CurrentScriptLang = scLang;
-            //    return true;
-            //}
 
-            throw new System.NotSupportedException();
-            return false;
+          
         }
+      
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
             this.scLang = _defaultScriptLang = scLang;

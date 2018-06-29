@@ -57,6 +57,9 @@
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
+    <Compile Include="..\TypographyTest.WinForms\SampleMeasureStringUtils.cs">
+      <Link>DevTextPrinter\SampleMeasureStringUtils.cs</Link>
+    </Compile>
     <Compile Include="Form2.cs">
       <SubType>Form</SubType>
     </Compile>

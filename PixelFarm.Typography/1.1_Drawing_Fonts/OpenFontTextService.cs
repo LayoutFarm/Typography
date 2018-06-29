@@ -39,12 +39,34 @@ namespace LayoutFarm
             //user can set this to other choices...
             //eg. directly specific the script lang  
 
-            _typographyTxtServices.TrySettingScriptLangFromCurrentThreadCultureInfo();
+            if (!TrySettingScriptLangFromCurrentThreadCultureInfo(_typographyTxtServices))
+            {
+                //TODO:
+            }
             // ... or specific the scriptlang manully, eg. ...
             //_shapingServices.SetDefaultScriptLang(scLang);
             //_shapingServices.SetCurrentScriptLang(scLang);
             //--------------- 
         }
+        static bool TrySettingScriptLangFromCurrentThreadCultureInfo(TextServices textservice)
+        {
+            //accessory...
+            var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            Typography.OpenFont.ScriptLang scLang = null;
+            string langFullName;
+            if (Typography.TextServices.IcuData.TryGetFullLanguageNameFromLangCode(
+                 currentCulture.TwoLetterISOLanguageName,
+                 currentCulture.ThreeLetterISOLanguageName,
+                 out langFullName))
+            {
+                scLang = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
+                textservice.SetDefaultScriptLang(scLang);
+                textservice.CurrentScriptLang = scLang;
+                return true;
+            }
+            return false;
+        }
+
         public ScriptLang CurrentScriptLang
         {
             get { return _typographyTxtServices.CurrentScriptLang; }

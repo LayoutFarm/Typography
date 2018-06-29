@@ -53,6 +53,9 @@
     <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\TypographyTest.WinForms\SampleMeasureStringUtils.cs">
+      <Link>DevTextPrinter\SampleMeasureStringUtils.cs</Link>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

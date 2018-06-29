@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
@@ -110,24 +110,16 @@ namespace DrawingGL
     {
         //glyph run contains...
         //1.
-        Typography.TextLayout.GlyphPlan glyphPlan; //10 bytes        
+        Typography.TextLayout.UnscaledGlyphPlan glyphPlan; //10 bytes        
         public float[] tessData; //4
         public ushort nTessElements;//2
-        internal GlyphRun(Typography.TextLayout.GlyphPlan glyphPlan, float[] tessData, ushort nTessElements)
+        internal GlyphRun(Typography.TextLayout.UnscaledGlyphPlan glyphPlan, float[] tessData, ushort nTessElements)
         {
             this.glyphPlan = glyphPlan;
             this.tessData = tessData;
             this.nTessElements = nTessElements;
+        }
 
-        }
-        public float OffsetX
-        {
-            get { return glyphPlan.ExactX; }
-        }
-        public float OffsetY
-        {
-            get { return glyphPlan.ExactY; }
-        }
 
     }
     public class TextRun
