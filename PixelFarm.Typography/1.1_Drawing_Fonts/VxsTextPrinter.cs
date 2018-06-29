@@ -377,8 +377,19 @@ namespace PixelFarm.Drawing.Fonts
             float gx = 0;
             float gy = 0;
             float baseY = (int)y;
+
+#if DEBUG
+            if (_currentTypeface.HasSvgTable())
+            {
+
+            }
+#endif
+
+
             if (!hasColorGlyphs)
             {
+
+
 
                 bool savedUseLcdMode = _painter.UseSubPixelLcdEffect; //save,restore later
                 RenderQualtity savedRederQuality = _painter.RenderQuality;

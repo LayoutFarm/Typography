@@ -731,7 +731,10 @@ namespace Typography.OpenFont
         {
             return typeface.MathConsts != null;
         }
-
+        public static bool HasSvgTable(this Typeface typeface)
+        {
+            return typeface._svgTable != null;
+        }
 
         class CffBoundFinder : IGlyphTranslator
         {
