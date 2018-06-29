@@ -19,7 +19,7 @@ namespace LayoutFarm
         /// <summary>
         /// instance of Typography lib's text service
         /// </summary>
-        TextServices _typographyTxtServices;
+        TextServices _txtServices;
         Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>();
         readonly int _system_id;
         public OpenFontTextService()
@@ -28,7 +28,9 @@ namespace LayoutFarm
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
-            _typographyTxtServices = new TextServices();
+            _txtServices = new TextServices();
+
+
             //create typography service
             //you can implement this service on your own
             //just see the code inside the service 
@@ -39,7 +41,7 @@ namespace LayoutFarm
             //user can set this to other choices...
             //eg. directly specific the script lang  
 
-            if (!TrySettingScriptLangFromCurrentThreadCultureInfo(_typographyTxtServices))
+            if (!TrySettingScriptLangFromCurrentThreadCultureInfo(_txtServices))
             {
                 //TODO:
             }
@@ -69,7 +71,7 @@ namespace LayoutFarm
 
         public ScriptLang CurrentScriptLang
         {
-            get { return _typographyTxtServices.CurrentScriptLang; }
+            get { return _txtServices.CurrentScriptLang; }
         }
 
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, int[] outputGlyphAdvances, out int outputTotalW, out int outputLineHeight)
@@ -89,7 +91,7 @@ namespace LayoutFarm
             //resolve for typeface
             //  
             Typeface typeface = ResolveTypeface(font);
-            _typographyTxtServices.SetCurrentFont(typeface, font.SizeInPoints);
+            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
 
 
             MyLineSegmentList mylineSegs = (MyLineSegmentList)lineSegs;
@@ -108,13 +110,13 @@ namespace LayoutFarm
                 //get each segment
                 MyLineSegment lineSeg = mylineSegs.GetSegment(i);
                 //each line seg may has different script lang
-                _typographyTxtServices.CurrentScriptLang = lineSeg.scriptLang;
+                _txtServices.CurrentScriptLang = lineSeg.scriptLang;
                 //
                 //CACHING ...., reduce number of GSUB/GPOS
                 //
                 //we cache used line segment for a while
                 //we ask for caching context for a specific typeface and font size   
-                GlyphPlanSequence seq = _typographyTxtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer,
+                GlyphPlanSequence seq = _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer,
                      lineSeg.StartAt,
                      lineSeg.Length);
 
@@ -245,7 +247,7 @@ namespace LayoutFarm
             {
                 //not found ask the typeface store to load that font
                 //....
-                typeface = _typographyTxtServices.GetTypeface(font.Name, font.Style.ConvToInstalledFontStyle());
+                typeface = _txtServices.GetTypeface(font.Name, font.Style.ConvToInstalledFontStyle());
                 if (typeface == null)
                     throw new NotSupportedException();
                 //
@@ -282,29 +284,29 @@ namespace LayoutFarm
         {
 
             Typeface typeface = ResolveTypeface(font);
-            _typographyTxtServices.SetCurrentFont(typeface, font.SizeInPoints);
+            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
 
             _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
 
-            return _typographyTxtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
+            return _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer, textBufferSpan.start, textBufferSpan.len);
         }
         public Size MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font)
         {
             Typeface typeface = ResolveTypeface(font);
-            _typographyTxtServices.SetCurrentFont(typeface, font.SizeInPoints);
+            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
             int w, h;
 
             //
-            _typographyTxtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out w, out h);
+            _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out w, out h);
             return new Size(w, h);
         }
         public void MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
         {
             Typeface typeface = ResolveTypeface(font);
-            _typographyTxtServices.SetCurrentFont(typeface, font.SizeInPoints);
+            _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
 
             charFit = 0;
-            _typographyTxtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, limitWidth, out charFit, out charFitWidth);
+            _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, limitWidth, out charFit, out charFitWidth);
 
         }
         float ITextService.MeasureBlankLineHeight(RequestFont font)
@@ -391,7 +393,7 @@ namespace LayoutFarm
 
             MyLineSegmentList lineSegs = new MyLineSegmentList(textBufferSpan.start, textBufferSpan.len);
             int cur_startAt = textBufferSpan.start;
-            foreach (Typography.TextServices.BreakSpan breakSpan in _typographyTxtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
+            foreach (Typography.TextServices.BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
                 MyLineSegment lineSeg = new MyLineSegment(lineSegs, breakSpan.startAt, breakSpan.len);
                 lineSeg.scriptLang = breakSpan.scLang;

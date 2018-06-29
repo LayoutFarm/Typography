@@ -10,10 +10,15 @@ namespace Typography.OpenFont.Tables
         //OpenType fonts with either TrueType or CFF outlines may also contain an optional 'SVG ' table, 
         //which allows some or all glyphs in the font to be defined with color, gradients, or animation.
 
+
+
+        SvgDocumentEntry[] _entries; //TODO: review again
         public override string Name
         {
-            get { return "SVG "; } //with 1 whitespace
+            get { return "SVG "; } //with 1 whitespace ***
         }
+
+
         protected override void ReadContentFrom(BinaryReader reader)
         {
             long svgTableStartAt = reader.BaseStream.Position;
@@ -56,10 +61,10 @@ namespace Typography.OpenFont.Tables
             //The encoding of the (uncompressed) SVG document must be UTF-8. 
             //In both cases, svgDocLength encodes the length of the encoded data, not the decoded document.
 
-            SvgDocumentEntry[] entries = new SvgDocumentEntry[numEntries];
+            _entries = new SvgDocumentEntry[numEntries];
             for (int i = 0; i < numEntries; ++i)
             {
-                entries[i] = new SvgDocumentEntry()
+                _entries[i] = new SvgDocumentEntry()
                 {
                     startGlyphID = reader.ReadUInt16(),
                     endGlyphID = reader.ReadUInt16(),
@@ -67,26 +72,40 @@ namespace Typography.OpenFont.Tables
                     svgDocLength = reader.ReadUInt32()
                 };
             }
+
+            //TODO: review lazy load
             for (int i = 0; i < numEntries; ++i)
             {
                 //read data
-                SvgDocumentEntry entry = entries[i];
-                reader.BaseStream.Seek(svgDocIndexStartAt + entry.svgDocOffset, SeekOrigin.Begin);
-                byte[] svgData = reader.ReadBytes((int)entry.svgDocLength);
+                SvgDocumentEntry entry = _entries[i];
 
+                if (entry.endGlyphID - entry.startGlyphID > 0)
+                {
+                    throw new System.NotSupportedException();
+                }
+
+                reader.BaseStream.Seek(svgDocIndexStartAt + entry.svgDocOffset, SeekOrigin.Begin);
+
+
+                if (entry.svgDocLength == 0)
+                {
+                    throw new System.NotSupportedException();
+                }
+                //
+                byte[] svgData = reader.ReadBytes((int)entry.svgDocLength);
+                _entries[i].svgBuffer = svgData;
                 if (svgData[0] == (byte)'<')
                 {
                     //should be plain-text
-                    string svgDataString = System.Text.Encoding.UTF8.GetString(svgData);
-
 #if DEBUG
-                    dbugSaveAsHtml("svg" + i + ".html", svgDataString);
+                    //string svgDataString = System.Text.Encoding.UTF8.GetString(svgData);
+                    //dbugSaveAsHtml("svg" + i + ".html", svgDataString);
 #endif
                 }
                 else
                 {
                     //TODO: gzip-encoded
-
+                    _entries[i].compressed = true;
                 }
             }
         }
@@ -116,6 +135,9 @@ namespace Typography.OpenFont.Tables
             public ushort endGlyphID;
             public uint svgDocOffset;
             public uint svgDocLength;
+
+            public byte[] svgBuffer;
+            public bool compressed;
 
 #if DEBUG
             public override string ToString()

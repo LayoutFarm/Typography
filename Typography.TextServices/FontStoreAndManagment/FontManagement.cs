@@ -80,15 +80,49 @@ namespace Typography.TextServices
     }
 
 
-    public class TypefaceStore
+    public class TypefaceStore : IFontLoader
     {
 
+        FontNotFoundHandler _defaultFontNotFoundHandler;
         FontNotFoundHandler _fontNotFoundHandler;
         Dictionary<InstalledFont, Typeface> _loadedTypefaces = new Dictionary<InstalledFont, Typeface>();
         public TypefaceStore()
         {
-
+            _defaultFontNotFoundHandler = (fontCollection, fontName, subfamName, style) =>
+            {
+                //TODO: implement font not found mapping here
+                //_fontsMapping["monospace"] = "Courier New";
+                //_fontsMapping["Helvetica"] = "Arial";
+                fontName = fontName.ToUpper();
+                switch (fontName)
+                {
+                    case "MONOSPACE":
+                        return fontCollection.GetFont("Courier New", style);
+                    case "HELVETICA":
+                        return fontCollection.GetFont("Arial", style);
+                    case "TAHOMA":
+                        //use can change this ...
+                        //default font must found
+                        //if not throw err 
+                        //this prevent infinit loop
+                        throw new System.NotSupportedException();
+                    default:
+                        return fontCollection.GetFont("tahoma", style);
+                }
+            };
         }
+
+        static TypefaceStore s_typefaceStore;
+        public static TypefaceStore GetTypefaceStoreOrCreateNewIfNotExist()
+        {
+            if (s_typefaceStore == null)
+            {
+                s_typefaceStore = new TypefaceStore();
+            }
+            return s_typefaceStore;
+        }
+
+
         /// <summary>
         /// font collection of the store
         /// </summary>
@@ -116,6 +150,9 @@ namespace Typography.TextServices
             }
             return GetTypefaceOrCreateNew(installedFont);
         }
+
+
+
         /// <summary>
         /// get typeface from wellknown style
         /// </summary>
@@ -129,6 +166,12 @@ namespace Typography.TextServices
             {
                 installedFont = _fontNotFoundHandler(this.FontCollection, fontname, null, style);
             }
+
+            if (installedFont == null && style == InstalledFontStyle.Normal)
+            {
+                FontCollection.GetFont(fontname, "Regular");
+            }
+
             if (installedFont == null)
             {
                 return null;
@@ -153,6 +196,29 @@ namespace Typography.TextServices
             }
             return typeface;
         }
+
+
+        //----------------------------------------------------------------
+        public InstalledFont GetFont(string fontName, InstalledFontStyle style)
+        {
+            //check if we have this font in the collection or not
+            InstalledFont found = FontCollection.GetFont(fontName, style);
+            if (found == null)
+            {
+                //not found
+                if (_fontNotFoundHandler != null)
+                {
+                    return _fontNotFoundHandler(FontCollection, fontName, null, style);
+                }
+                else
+                {
+                    return _defaultFontNotFoundHandler(FontCollection, fontName, null, style);
+                }
+
+            }
+            return found;
+        }
+
     }
 
     public class InstalledFontCollection
@@ -267,6 +333,11 @@ namespace Typography.TextServices
                     //err!
                     return false;
                 }
+                if (previewFont.fontName.StartsWith("Bungee"))
+                {
+
+                }
+
                 return RegisterFont(new InstalledFont(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
             }
         }
@@ -314,6 +385,7 @@ namespace Typography.TextServices
         {
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
+
 
             //find font group
             FontGroup foundFontGroup;
