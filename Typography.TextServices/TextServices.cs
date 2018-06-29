@@ -14,8 +14,9 @@ namespace Typography.TextServices
         public ushort len;
         public short flags;
         public ScriptLang scLang;
-
     }
+
+
 
     public class TextServices
     {
@@ -38,16 +39,26 @@ namespace Typography.TextServices
         public TextServices()
         {
 
-            typefaceStore = new TypefaceStore();
-            typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(null);
-            _glyphLayout = new GlyphLayout();
+            typefaceStore = TypefaceStore.GetTypefaceStoreOrCreateNewIfNotExist();
 
-          
+            typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(fontCollection =>
+            {
+                fontCollection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
+                //fontCollection.LoadSystemFonts();
+            });
+
+            _glyphLayout = new GlyphLayout();
         }
-      
+
+
+
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
             this.scLang = _defaultScriptLang = scLang;
+        }
+        public InstalledFontCollection InstalledFontCollection
+        {
+            get { return typefaceStore.FontCollection; }
         }
 
         public ScriptLang CurrentScriptLang
@@ -371,7 +382,7 @@ namespace Typography.TextServices
         }
 
 
-      
+
     }
 
 
