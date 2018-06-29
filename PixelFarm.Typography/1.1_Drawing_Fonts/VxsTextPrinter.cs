@@ -87,6 +87,8 @@ namespace PixelFarm.Drawing.Fonts
                 this.FontDescedingPx = currentTypeface.Descender * pointToPixelScale;
                 this.FontLineGapPx = currentTypeface.LineGap * pointToPixelScale;
                 this.FontLineSpacingPx = FontAscendingPx - FontDescedingPx + FontLineGapPx;
+
+
             }
 
         }
@@ -108,7 +110,7 @@ namespace PixelFarm.Drawing.Fonts
             {
 
                 if (_currentTypeface == value) return;
-                //
+                // 
                 _currentTypeface = value;
                 OnFontSizeChanged();
             }
@@ -368,7 +370,7 @@ namespace PixelFarm.Drawing.Fonts
             bool hasColorGlyphs = (colrTable != null) && (cpalTable != null);
 
             //--------------------------------------------------- 
-            _glyphMeshStore.SetHintTechnique(HintTechnique.TrueTypeInstruction_VerticalOnly);
+            _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
             //---------------------------------------------------
 

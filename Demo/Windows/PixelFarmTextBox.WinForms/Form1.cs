@@ -73,8 +73,8 @@ namespace PixelFarmTextBox.WinForms
 
             painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
+            //....
             _devVxsTextPrinter = new VxsTextPrinter(painter);
-
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
             _devVxsTextPrinter.FontSizeInPoints = 10;
@@ -85,6 +85,7 @@ namespace PixelFarmTextBox.WinForms
             this.sampleTextBox1.SetController(_controllerForPixelFarm);
             _readyToRender = true;
             _basicOptions.UpdateRenderOutput += (s, e2) => UpdateRenderOutput();
+            //....
             //----------
             //txtInputChar.TextChanged += (s, e2) => UpdateRenderOutput();
             //----------

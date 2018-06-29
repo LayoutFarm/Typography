@@ -42,7 +42,11 @@ namespace SampleWinForms
                 if (_devVxsTextPrinter != null)
                 {
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
+                    var reqFont = new PixelFarm.Drawing.RequestFont(e.SelectedTypeface.Name, _basicOptions.FontSizeInPoints);
+                    _devVxsTextPrinter.ChangeFont(reqFont);
+                    painter.CurrentFont = reqFont;
                 }
+
 
                 this.glyphNameListUserControl1.Typeface = e.SelectedTypeface;
             };
@@ -108,7 +112,7 @@ namespace SampleWinForms
             //---------------------------------------------
             //this version only render with MiniAgg**
             //---------------------------------------------
-            
+
             painter.Clear(PixelFarm.Drawing.Color.White);
             painter.UseSubPixelLcdEffect = _contourAnalysisOpts.LcdTechnique;
             painter.FillColor = PixelFarm.Drawing.Color.Black;
@@ -198,7 +202,7 @@ namespace SampleWinForms
             {
                 //TODO: set lcd or not here
 
-            } 
+            }
 
             //1. read typeface from font file 
             TypographyTest.RenderChoice renderChoice = _basicOptions.RenderChoice;
