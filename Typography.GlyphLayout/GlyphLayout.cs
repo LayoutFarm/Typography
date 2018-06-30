@@ -517,34 +517,6 @@ namespace Typography.TextLayout
             _needPlanUpdate = false;
         }
 
-
-        PxScaledGlyphPlanList _reusablePxScaleGlyphPlanList = new PxScaledGlyphPlanList();
-        public MeasuredStringBox LayoutAndMeasureString(char[] textBuffer, int startAt, int len, float fontSizeInPoints, PxScaledGlyphPlanList outputGlyphPlans = null)
-        {
-            //1. unscale layout, in design unit
-            this.Layout(textBuffer, startAt, len);
-
-            if (outputGlyphPlans == null)
-            {
-                //clear before use
-                _reusablePxScaleGlyphPlanList.Clear();
-                outputGlyphPlans = _reusablePxScaleGlyphPlanList;
-            }
-            //2. scale  to specific font size           
-
-            float pxscale = _typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
-            this.GenerateScaledGlyphPlans(
-                pxscale,
-                false, outputGlyphPlans);
-
-            return new MeasuredStringBox(
-                  outputGlyphPlans.AccumAdvanceX * pxscale,
-                  _typeface.Ascender * pxscale,
-                  _typeface.Descender * pxscale,
-                  _typeface.LineGap * pxscale,
-                   Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_typeface) * pxscale);
-        }
-
         /// <summary>
         /// fetch layout result,
         /// </summary>
@@ -574,6 +546,8 @@ namespace Typography.TextLayout
                     ));
             }
         }
+
+
 
 
     }
@@ -720,7 +694,46 @@ namespace Typography.TextLayout
         }
 
 
+        //string measurement result depends on multiple variables eg. font-size, snap-to-grid.
+        //
 
+        static PxScaledGlyphPlanList _reusablePxScaleGlyphPlanList = new PxScaledGlyphPlanList();
+
+        public static MeasuredStringBox LayoutAndMeasureString(
+            this GlyphLayout glyphLayout,
+            char[] textBuffer,
+            int startAt,
+            int len,
+            float fontSizeInPoints,
+            PxScaledGlyphPlanList outputGlyphPlans = null)
+        {
+            //1. unscale layout, in design unit
+            glyphLayout.Layout(textBuffer, startAt, len);
+
+            if (outputGlyphPlans == null)
+            {
+                //clear before use
+                _reusablePxScaleGlyphPlanList.Clear();
+                outputGlyphPlans = _reusablePxScaleGlyphPlanList;
+            }
+            //2. scale  to specific font size           
+
+            Typeface typeface = glyphLayout.Typeface;
+            float pxscale = typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
+
+            //....
+            GenerateScaledGlyphPlans(
+                glyphLayout,
+                pxscale,
+                false, outputGlyphPlans);
+
+            return new MeasuredStringBox(
+                  outputGlyphPlans.AccumAdvanceX * pxscale,
+                  typeface.Ascender * pxscale,
+                  typeface.Descender * pxscale,
+                  typeface.LineGap * pxscale,
+                   Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface) * pxscale);
+        }
     }
 
     /// <summary>

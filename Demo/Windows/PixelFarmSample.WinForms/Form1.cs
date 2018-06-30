@@ -10,8 +10,10 @@ using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
 
 using Typography.OpenFont;
+using Typography.TextLayout;
 using Typography.Rendering;
 using Typography.Contours;
+
 
 
 namespace SampleWinForms
