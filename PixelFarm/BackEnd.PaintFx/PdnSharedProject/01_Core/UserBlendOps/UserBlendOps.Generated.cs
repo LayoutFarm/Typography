@@ -13,7 +13,7 @@
 
 
 using System;
-using PixelFarm.PaintFx;
+using PaintFx;
 // The generalized alpha compositing formula, "B OVER A" is:
 // C(A,a,B,b) = bB + aA - baA
 // where:
@@ -302,7 +302,7 @@ using PixelFarm.PaintFx;
 
 
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     partial class UserBlendOps
     {

@@ -10,7 +10,7 @@
 using System;
 using PixelFarm.Drawing;
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     public unsafe abstract class PixelOp
         : IPixelOp

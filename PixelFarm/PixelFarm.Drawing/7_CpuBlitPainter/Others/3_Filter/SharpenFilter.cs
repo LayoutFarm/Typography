@@ -10,8 +10,8 @@
 //Apache2, 2017-present, WinterDev
 
 using System;
-using PixelFarm.PaintFx.Effects;
-using PixelFarm.PaintFx;
+using PaintFx;
+using PaintFx.Effects;
 namespace PixelFarm.CpuBlit.Imaging
 {
     /// <summary>

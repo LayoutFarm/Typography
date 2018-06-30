@@ -18,7 +18,7 @@
 
 
 
-namespace PixelFarm.BitmapBufferEx
+namespace BitmapBufferEx
 {
     /// <summary>
     /// Collection of blit (copy) extension methods for the WriteableBitmap class.

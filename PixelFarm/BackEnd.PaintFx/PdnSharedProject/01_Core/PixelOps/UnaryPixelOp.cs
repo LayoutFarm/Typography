@@ -10,7 +10,7 @@
 using System;
 using PixelFarm.Drawing;
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// Defines a way to operate on a pixel, or a region of pixels, in a unary fashion.

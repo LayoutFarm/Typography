@@ -4,7 +4,7 @@
 using System;
 using PixelFarm.CpuBlit.VertexProcessing;
 
-namespace PixelFarm.BitmapBufferEx
+namespace BitmapBufferEx
 {
     public abstract class GeneralTransform
     {

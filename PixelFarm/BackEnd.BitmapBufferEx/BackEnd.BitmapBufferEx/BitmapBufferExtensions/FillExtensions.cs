@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PixelFarm.BitmapBufferEx
+namespace BitmapBufferEx
 {
     /// <summary>
     /// Collection of extension methods for the WriteableBitmap class.

@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// This class contains all the render ops that can be used by the user

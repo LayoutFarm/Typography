@@ -16,7 +16,7 @@
 //
 
 using System;
-namespace PixelFarm.BitmapBufferEx
+namespace BitmapBufferEx
 {
     /// <summary>
     /// Collection of filter / convolution extension methods for the WriteableBitmap class.

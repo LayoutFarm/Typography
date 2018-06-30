@@ -11,7 +11,7 @@
 using System;
 using PixelFarm.Drawing;
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// Provides a set of standard UnaryPixelOps.

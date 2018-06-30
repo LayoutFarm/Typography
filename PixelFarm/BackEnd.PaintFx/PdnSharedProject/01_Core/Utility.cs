@@ -16,7 +16,7 @@ using System.IO;
 using System.Text;
 using PixelFarm.Drawing;
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// Defines miscellaneous constants and static functions.

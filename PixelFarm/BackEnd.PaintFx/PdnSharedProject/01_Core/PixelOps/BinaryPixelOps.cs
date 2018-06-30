@@ -10,7 +10,7 @@
 //Apache2, 2017-present, WinterDev
 using System;
 using PixelFarm.Drawing;
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// Provides a set of standard BinaryPixelOps.

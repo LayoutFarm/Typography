@@ -33,7 +33,7 @@
 //Apache2, 2017-present, WinterDev
 
 using PixelFarm.Drawing;
-namespace PixelFarm.PaintFx.Effects
+namespace PaintFx.Effects
 {
     public abstract class WrapBasedRenderer : EffectRendererBase
     {

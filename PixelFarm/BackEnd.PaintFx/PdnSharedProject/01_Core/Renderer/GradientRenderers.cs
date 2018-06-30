@@ -9,7 +9,7 @@
 //Apache2, 2017-present, WinterDev
 using System;
 using PixelFarm.Drawing;
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     public static class GradientRenderers
     {

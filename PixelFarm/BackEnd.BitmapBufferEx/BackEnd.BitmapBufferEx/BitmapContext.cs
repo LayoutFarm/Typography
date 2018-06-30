@@ -16,7 +16,7 @@
 // 
 
 using System;
-namespace PixelFarm.BitmapBufferEx
+namespace BitmapBufferEx
 {
     /// <summary>
     /// Read Write Mode for the BitmapContext.

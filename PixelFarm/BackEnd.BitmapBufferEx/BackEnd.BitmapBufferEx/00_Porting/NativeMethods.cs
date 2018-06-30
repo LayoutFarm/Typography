@@ -4,7 +4,7 @@ using System;
 using System.Runtime;
 using System.Runtime.InteropServices;
 
-namespace PixelFarm.BitmapBufferEx
+namespace BitmapBufferEx
 {
     internal static class NativeMethods
     {

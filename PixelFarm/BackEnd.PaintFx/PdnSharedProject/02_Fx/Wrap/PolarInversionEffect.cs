@@ -9,7 +9,7 @@
 //Apache2, 2017-present, WinterDev
 
 using PixelFarm.Drawing;
-namespace PixelFarm.PaintFx.Effects
+namespace PaintFx.Effects
 {
 
     public class PolarInversionEffRenderer : WrapBasedRenderer

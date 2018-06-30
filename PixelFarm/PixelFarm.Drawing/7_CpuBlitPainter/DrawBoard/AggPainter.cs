@@ -4,11 +4,12 @@ using System;
 using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
-using PixelFarm.BitmapBufferEx;
 using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.CpuBlit.Rasterization;
 using PixelFarm.CpuBlit.FragmentProcessing;
 using PixelFarm.CpuBlit.PixelProcessing;
+
+using BitmapBufferEx;
 namespace PixelFarm.CpuBlit
 {
 
@@ -926,8 +927,8 @@ namespace PixelFarm.CpuBlit
                 BitmapBuffer srcBmp = new BitmapBuffer(actualBmp.Width, actualBmp.Height, ActualBitmap.GetBuffer(actualBmp));
                 try
                 {
-                    var src = new PixelFarm.BitmapBufferEx.RectD(srcX, srcY, srcW, srcH);
-                    var dest = new PixelFarm.BitmapBufferEx.RectD(left, top, srcW, srcH);
+                    var src = new BitmapBufferEx.RectD(srcX, srcY, srcW, srcH);
+                    var dest = new BitmapBufferEx.RectD(left, top, srcW, srcH);
                     BitmapBuffer bmpBuffer = new BitmapBuffer(actualBmp.Width, actualBmp.Height, ActualBitmap.GetBuffer(actualBmp));
                     this._bxt.CopyBlit(dest, bmpBuffer, src);
                 }
@@ -1002,7 +1003,7 @@ namespace PixelFarm.CpuBlit
                 BitmapBuffer srcBmp = new BitmapBuffer(img.Width, img.Height, ActualBitmap.GetBuffer(actualImg));
                 if (affinePlans != null)
                 {
-                    this._bxt.BlitRender(srcBmp, false, 1, new PixelFarm.BitmapBufferEx.MatrixTransform(affinePlans));
+                    this._bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
                 }
                 else
                 {

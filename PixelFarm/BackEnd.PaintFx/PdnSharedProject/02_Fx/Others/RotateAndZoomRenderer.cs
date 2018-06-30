@@ -10,7 +10,7 @@
 using System;
 using PixelFarm.Drawing;
 
-namespace PixelFarm.PaintFx.Effects
+namespace PaintFx.Effects
 {
     public class RotateAndZoomRenderer
     {
@@ -190,7 +190,7 @@ namespace PixelFarm.PaintFx.Effects
                                     }
                                     else
                                     {
-                                        *dstPtr = PixelFarm.PaintFx.UserBlendOps.NormalBlendOp.ApplyStatic(*srcPtr, c);
+                                        *dstPtr = PaintFx.UserBlendOps.NormalBlendOp.ApplyStatic(*srcPtr, c);
                                     }
                                 }
                             }

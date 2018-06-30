@@ -9,7 +9,7 @@
 
 //Apache2, 2017-present, WinterDev
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// Abstract base class that all "user" blend ops derive from.

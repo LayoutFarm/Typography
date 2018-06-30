@@ -38,7 +38,7 @@ using System;
 
 using PixelFarm.Drawing;
 
-namespace PixelFarm.PaintFx.Effects
+namespace PaintFx.Effects
 {
     internal static class PerlinNoise2D
     {

@@ -9,7 +9,7 @@
 
 //Apache2, 2017-present, WinterDev
 using PixelFarm.Drawing;
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// Provides an interface for the methods that UnaryPixelOp and BinaryPixelOp share.

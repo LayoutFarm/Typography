@@ -11,7 +11,7 @@
 using System;
 using PixelFarm.Drawing;
 
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
 
     class MemHolder

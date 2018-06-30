@@ -11,7 +11,7 @@
 using System;
 using System.Runtime.InteropServices;
 using PixelFarm.Drawing;
-namespace PixelFarm.PaintFx
+namespace PaintFx
 {
     /// <summary>
     /// This is our pixel format that we will work with. It is always 32-bits / 4-bytes and is
