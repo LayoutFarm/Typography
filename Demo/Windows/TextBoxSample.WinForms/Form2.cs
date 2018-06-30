@@ -282,7 +282,7 @@ namespace SampleWinForms
 
 
             PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
@@ -295,11 +295,11 @@ namespace SampleWinForms
             //Example 3: MeasureString        
 
             //TODO: review here again
-            MeasuredStringBox strBox = SampleMeasureStringUtil.MeasureString(
-                _currentTextPrinter.GlyphLayoutMan,
-                _currentTextPrinter.FontSizeInPoints,
+            MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
                 textBuffer, 0,
-                textBuffer.Length, out int w, out int h);
+                textBuffer.Length,
+                _currentTextPrinter.FontSizeInPoints);
+
             //draw line mark
 
             float x_pos2 = x_pos + strBox.width + 10;

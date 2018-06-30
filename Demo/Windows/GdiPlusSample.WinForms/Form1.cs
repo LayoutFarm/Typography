@@ -271,7 +271,7 @@ namespace SampleWinForms
             //2.1
 
             PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
@@ -285,13 +285,12 @@ namespace SampleWinForms
             //Example 3: MeasureString   
 
             Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
+
             MeasuredStringBox strBox =
-                Typography.TextServices.SampleMeasureStringUtil.MeasureString(
-                _currentTextPrinter.GlyphLayoutMan,
-                _currentTextPrinter.FontSizeInPoints,
+               _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
                  textBuffer, 0, textBuffer.Length,
-                 out int spanW,
-                 out int spanH);
+                 _currentTextPrinter.FontSizeInPoints);
+
             float x_pos2 = x_pos + strBox.width + 10;
             g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.descending, strBox.width, strBox.CalculateLineHeight());
             g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline

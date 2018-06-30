@@ -34,17 +34,17 @@ namespace SampleWinForms.UI
         {
 
             PxScaledGlyphPlanList glyphPlans = _line._glyphPlans;
-            List<UserCodePointToGlyphIndex> userCharToGlyphIndexMap = _line._userCodePointToGlyphIndexMap;
+            //List<UserCodePointToGlyphIndex> userCharToGlyphIndexMap = _line._userCodePointToGlyphIndexMap;
             if (_line.ContentChanged)
             {
                 //TODO: or font face/font-size change 
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
                 glyphPlans.Clear();
-                userCharToGlyphIndexMap.Clear();
+                //userCharToGlyphIndexMap.Clear();
                 //read glyph plan and userCharToGlyphIndexMap                
 
-                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, glyphPlans, userCharToGlyphIndexMap);
+                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, glyphPlans);
 
 
                 _line.ContentChanged = false;

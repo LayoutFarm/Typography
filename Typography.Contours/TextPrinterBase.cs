@@ -25,7 +25,7 @@ namespace Typography.Contours
                   int startAt,
                   int len,
                   PxScaledGlyphPlanList outputGlyphPlanList,
-                  List<UserCodePointToGlyphIndex> charToGlyphMapList)
+                  List<UserCodePointToGlyphIndex> charToGlyphMapList = null)
         {
 
             GlyphLayout glyphLayout = this.GlyphLayoutMan;

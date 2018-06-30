@@ -623,13 +623,10 @@ namespace SampleWinForms
             //or
             //3.2 : only MeasuredStringBox
             Typography.TextLayout.MeasuredStringBox box =
-            Typography.TextServices.SampleMeasureStringUtil.MeasureString(
-                layout,
-                fontSizeInPoints,
-                str.ToCharArray(), 0,
-                str.Length,
-                out int width,
-                out int height);
+                layout.LayoutAndMeasureString(
+                    str.ToCharArray(), 0,
+                    str.Length,
+                    fontSizeInPoints);
 
             this.lblStringSize.Text = "measure (W,H)= (" + box.width.ToString() + "," + (box.ascending - box.descending) + ") px";
         }
