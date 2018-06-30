@@ -1,18 +1,9 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
-using System.Collections.Generic;
-using System.IO;
-
-using PixelFarm.CpuBlit;
-
 using Typography.Contours;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-
-using Typography.Rendering;
 using Typography.TextLayout;
-using Typography.TextServices;
-
 namespace PixelFarm.Drawing.Fonts
 {
 

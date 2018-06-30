@@ -15,10 +15,4 @@
     <Compile Include="$(MSBuildThisFileDirectory)TextServices.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\CRC32.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Typography.TextBreak\DictionaryBasedBreakingEngine\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Typography.TextFlow\Dom\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Typography.TextFlow\Simple\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Typography.TextFlow\TextLexer\" />
-  </ItemGroup>
 </Project>
