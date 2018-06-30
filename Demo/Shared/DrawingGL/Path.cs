@@ -110,14 +110,18 @@ namespace DrawingGL
     {
         //glyph run contains...
         //1.
-        Typography.TextLayout.UnscaledGlyphPlan glyphPlan; //10 bytes        
+        Typography.TextLayout.PxScaledGlyphPlan glyphPlan; //10 bytes        
         public float[] tessData; //4
         public ushort nTessElements;//2
-        internal GlyphRun(Typography.TextLayout.UnscaledGlyphPlan glyphPlan, float[] tessData, ushort nTessElements)
+        internal GlyphRun(Typography.TextLayout.PxScaledGlyphPlan glyphPlan, float[] tessData, ushort nTessElements)
         {
             this.glyphPlan = glyphPlan;
             this.tessData = tessData;
             this.nTessElements = nTessElements;
+        }
+        public Typography.TextLayout.PxScaledGlyphPlan GlyphPlan
+        {
+            get { return glyphPlan; }
         }
 
 

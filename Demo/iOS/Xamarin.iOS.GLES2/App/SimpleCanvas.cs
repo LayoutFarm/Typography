@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using OpenTK.Graphics.ES20;
 
+using Typography.OpenFont;
+using Typography.TextLayout;
 //
 using DrawingGL.Text;
 
@@ -106,22 +108,113 @@ namespace DrawingGL
 
             float scale = textRun.CalculateToPixelScaleFromPointSize(textRun.sizeInPoints);
 
+            float accX = 0;
+            float accY = 0;
+            float nx = x;
+            float ny = y;
+
             for (int i = 0; i < j; ++i)
             {
                 //render each glyph
                 GlyphRun run = glyphs[i];
-                //
-                fillShader.SetOffset(
-                   x + run.OffsetX,
-                   y + run.OffsetY);
-                //
+                Typography.TextLayout.PxScaledGlyphPlan plan = run.GlyphPlan;
+
+                nx = x + accX + plan.OffsetX;
+                ny = y + accY + plan.OffsetY;
+
+                fillShader.SetOffset(nx, ny);
+                accX += plan.AdvanceX;
+
                 fillShader.FillTriangles(
                     run.tessData,
                     run.nTessElements,
                     this.FillColor
                     );
             }
+
+            //for (int i = 0; i < j; ++i)
+            //{
+            //    //render each glyph
+            //    GlyphRun run = glyphs[i];
+            //    //
+
+            //    fillShader.SetOffset(
+            //       x + run.OffsetX,
+            //       y + run.OffsetY);
+            //    //
+            //    fillShader.FillTriangles(
+            //        run.tessData,
+            //        run.nTessElements,
+            //        this.FillColor
+            //        );
+            //}
             fillShader.SetOffset(0, 0);
         }
     }
+    public static class SampleMeasureStringUtil
+    {
+        //-----------------
+        //measure string utils
+
+        static PxScaledGlyphPlanList _reusableScaledGlyphPlanList = new PxScaledGlyphPlanList();
+        static List<MeasuredStringBox> _reusableMeasureBoxList = new List<MeasuredStringBox>();
+
+        static UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
+
+        public static MeasuredStringBox MeasureString(
+             Typography.TextLayout.GlyphLayout glyphLayout,
+             float fontSizeInPts,
+             char[] str, int startAt, int len, out int w, out int h)
+        {
+            //measure string 
+            //check if we use cache feature or not
+
+            Typography.OpenFont.Typeface typeface = glyphLayout.Typeface;
+
+            if (str.Length < 1)
+            {
+                w = h = 0;
+            }
+            _reusableMeasureBoxList.Clear(); //reset 
+
+            float pxscale = typeface.CalculateScaleToPixelFromPointSize(fontSizeInPts);
+            //NOET:at this moment, simple operation
+            //may not be simple...  
+            //-------------------
+            //input string may contain more than 1 script lang
+            //user can parse it by other parser
+            //but in this code, we use our Typography' parser
+            //-------------------
+            //user must setup the CustomBreakerBuilder before use         
+
+            int cur_startAt = startAt;
+            float accumW = 0;
+            float accumH = 0;
+
+
+
+            glyphLayout.Layout(str, 0, str.Length);
+            //
+            _reusableGlyphPlanList.Clear();
+            GlyphLayoutExtensions.GenerateGlyphPlans(
+                glyphLayout.ResultUnscaledGlyphPositions,
+                pxscale,
+                true,
+                _reusableScaledGlyphPlanList);
+            //measure string size
+            var result = new MeasuredStringBox(
+                _reusableGlyphPlanList.AccumAdvanceX,
+                typeface.Ascender * pxscale,
+                typeface.Descender * pxscale,
+                typeface.LineGap * pxscale,
+                 Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface) * pxscale);
+
+
+            w = (int)System.Math.Round(accumW);
+            h = (int)System.Math.Round(accumH);
+
+            return result;
+        }
+    }
+
 }

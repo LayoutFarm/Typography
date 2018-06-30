@@ -144,15 +144,21 @@ namespace Typography.TextLayout
             {
                 return list[index];
             }
-        }
-        public void Append(UnscaledGlyphPlan unscaledGlyphPlan)
-        {
-            list.Add(unscaledGlyphPlan);
-        }
+        } 
+        float _accumAdvanceX;
+
         public void Clear()
         {
             list.Clear();
+            _accumAdvanceX = 0;
         }
+        public void Append(UnscaledGlyphPlan glyphPlan)
+        {
+            list.Add(glyphPlan);
+            _accumAdvanceX += glyphPlan.AdvanceX;
+        }
+        public float AccumAdvanceX { get { return _accumAdvanceX; } }
+
     }
     public struct GlyphPlanSequence
     {

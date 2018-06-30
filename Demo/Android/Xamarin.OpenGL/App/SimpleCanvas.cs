@@ -102,20 +102,25 @@ namespace DrawingGL
             //fill text run at spefic pos
 
             List<GlyphRun> glyphs = textRun._glyphs;
-            int j = glyphs.Count; 
-            float x_pos = x;
-            float y_pos = y;
+            int j = glyphs.Count;
+            float accX = 0;
+            float accY = 0;
+            float nx = x;
+            float ny = y;
 
             for (int i = 0; i < j; ++i)
             {
                 //render each glyph
                 GlyphRun run = glyphs[i];
-                //
-                fillShader.SetOffset(
-                   x_pos + run.OffsetX ,
-                   y_pos + run.OffsetY);
-                //
-                
+                Typography.TextLayout.PxScaledGlyphPlan plan = run.GlyphPlan;
+
+                nx = x + accX + plan.OffsetX;
+                ny = y + accY + plan.OffsetY;
+
+                fillShader.SetOffset(nx, ny);
+                accX += plan.AdvanceX;
+
+
                 fillShader.FillTriangles(
                     run.tessData,
                     run.nTessElements,
@@ -125,4 +130,6 @@ namespace DrawingGL
             fillShader.SetOffset(0, 0);
         }
     }
+
+
 }
