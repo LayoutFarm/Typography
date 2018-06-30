@@ -47,14 +47,11 @@ namespace Typography.TextLayout
     /// </summary>
     public class PxScaledGlyphPlanList : IPixelScaledGlyphPlanList
     {
-        List<PxScaledGlyphPlan> _glyphPlans = new List<PxScaledGlyphPlan>();
-        float _accumAdvanceX;
+        List<PxScaledGlyphPlan> _glyphPlans = new List<PxScaledGlyphPlan>(); 
         public void Append(PxScaledGlyphPlan glyphPlan)
         {
-            _glyphPlans.Add(glyphPlan);
-            _accumAdvanceX += glyphPlan.AdvanceX;
-        }
-
+            _glyphPlans.Add(glyphPlan); 
+        } 
         public PxScaledGlyphPlan this[int index]
         {
             get
@@ -69,12 +66,10 @@ namespace Typography.TextLayout
                 return _glyphPlans.Count;
             }
         }
-        internal float AccumAdvanceX { get { return _accumAdvanceX; } }
-
+        
         public void Clear()
         {
-            _glyphPlans.Clear();
-            _accumAdvanceX = 0;
+            _glyphPlans.Clear(); 
         }
 #if DEBUG
         public PxScaledGlyphPlanList()

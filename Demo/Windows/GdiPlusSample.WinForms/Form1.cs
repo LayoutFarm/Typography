@@ -235,6 +235,8 @@ namespace SampleWinForms
         //        atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
         //    }
         //}
+
+
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -270,7 +272,7 @@ namespace SampleWinForms
             //you can create you own class to hold userGlyphPlans.***
             //2.1
 
-            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
+            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList(); 
             _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans);
             //2.2
             //and we can print the formatted glyph plan later.
