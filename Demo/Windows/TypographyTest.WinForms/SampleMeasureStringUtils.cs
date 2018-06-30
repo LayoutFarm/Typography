@@ -98,7 +98,7 @@ namespace Typography.TextServices
             glyphLayout.Layout(str, 0, str.Length);
             //
             _reusableGlyphPlanList.Clear();
-            GlyphLayoutExtensions.GenerateGlyphPlans(
+            GlyphLayoutExtensions.GenerateScaledGlyphPlans(
                 glyphLayout.ResultUnscaledGlyphPositions,
                 pxscale,
                 true,

@@ -111,7 +111,7 @@ namespace SampleWinForms
 
             _reusablePxScaleGlyphPlanList.Clear();
 
-            GlyphLayoutExtensions.GenerateGlyphPlans(
+            GlyphLayoutExtensions.GenerateScaledGlyphPlans(
                 _glyphLayout.ResultUnscaledGlyphPositions,
                 _currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
                 false,
