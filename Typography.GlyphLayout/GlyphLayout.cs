@@ -13,9 +13,9 @@ namespace Typography.TextLayout
     /// </summary>
     public struct PxScaledGlyphPlan
     {
-        public readonly short input_cp_offset;
+        public readonly ushort input_cp_offset;
         public readonly ushort glyphIndex;
-        public PxScaledGlyphPlan(short input_cp_offset, ushort glyphIndex, float advanceW, float offsetX, float offsetY)
+        public PxScaledGlyphPlan(ushort input_cp_offset, ushort glyphIndex, float advanceW, float offsetX, float offsetY)
         {
             this.input_cp_offset = input_cp_offset;
             this.glyphIndex = glyphIndex;
@@ -93,9 +93,9 @@ namespace Typography.TextLayout
     /// </summary>
     public struct UnscaledGlyphPlan
     {
-        public readonly short input_cp_offset;
+        public readonly ushort input_cp_offset;
         public readonly ushort glyphIndex;
-        public UnscaledGlyphPlan(short input_cp_offset, ushort glyphIndex, short advanceW, short offsetX, short offsetY)
+        public UnscaledGlyphPlan(ushort input_cp_offset, ushort glyphIndex, short advanceW, short offsetX, short offsetY)
         {
             this.input_cp_offset = input_cp_offset;
             this.glyphIndex = glyphIndex;
@@ -234,8 +234,12 @@ namespace Typography.TextLayout
             int finalGlyphCount = glyphPositions.Count;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
-                short input_offset, offsetX, offsetY, advW; //all from pen-pos
-                ushort glyphIndex = glyphPositions.GetGlyph(i, out input_offset, out offsetX, out offsetY, out advW);
+                short offsetX, offsetY, advW; //all from pen-pos
+                ushort glyphIndex = glyphPositions.GetGlyph(i,
+                    out ushort input_offset,
+                    out offsetX,
+                    out offsetY,
+                    out advW);
 
                 outputGlyphPlanList.Append(new UnscaledGlyphPlan(
                     input_offset,
@@ -497,7 +501,7 @@ namespace Typography.TextLayout
                 //
                 Glyph orgGlyph = _typeface.GetGlyphByIndex(glyIndex);
                 //this is original value WITHOUT fit-to-grid adjust
-                _glyphPositions.AddGlyph((short)input_codepointOffset, glyIndex, orgGlyph);
+                _glyphPositions.AddGlyph(input_codepointOffset, glyIndex, orgGlyph);
             }
 
             PositionTechnique posTech = this.PositionTechnique;
@@ -586,8 +590,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short input_offset, offsetX, offsetY, advW; //all from pen-pos
-                    ushort glyphIndex = glyphPositions.GetGlyph(i, out input_offset, out offsetX, out offsetY, out advW);
+                    short offsetX, offsetY, advW; //all from pen-pos
+                    ushort glyphIndex = glyphPositions.GetGlyph(i,
+                        out ushort input_offset,
+                        out offsetX,
+                        out offsetY,
+                        out advW);
 
                     outputGlyphPlanList.Append(new PxScaledGlyphPlan(
                         input_offset,
@@ -605,8 +613,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short input_offset, offsetX, offsetY, advW; //all from pen-pos
-                    ushort glyphIndex = glyphPositions.GetGlyph(i, out input_offset, out offsetX, out offsetY, out advW);
+                    short offsetX, offsetY, advW; //all from pen-pos
+                    ushort glyphIndex = glyphPositions.GetGlyph(i,
+                        out ushort input_offset,
+                        out offsetX,
+                        out offsetY,
+                        out advW);
 
                     outputGlyphPlanList.Append(new PxScaledGlyphPlan(
                         input_offset,
@@ -649,7 +661,7 @@ namespace Typography.TextLayout
             get { return this._typeface; }
             set { this._typeface = value; }
         }
-        public void AddGlyph(short o_offset, ushort glyphIndex, Glyph glyph)
+        public void AddGlyph(ushort o_offset, ushort glyphIndex, Glyph glyph)
         {
             if (!glyph.HasOriginalAdvancedWidth)
             {
@@ -682,7 +694,7 @@ namespace Typography.TextLayout
             advW = (ushort)pos.advanceW;
             return pos.glyphIndex;
         }
-        public ushort GetGlyph(int index, out short inputOffset, out short offsetX, out short offsetY, out short advW)
+        public ushort GetGlyph(int index, out ushort inputOffset, out short offsetX, out short offsetY, out short advW)
         {
             GlyphPos pos = _glyphPosList[index];
             offsetX = pos.xoffset;
@@ -709,14 +721,14 @@ namespace Typography.TextLayout
 
     struct GlyphPos
     {
-        public readonly short o_offset; //original user offset
+        public readonly ushort o_offset; //original user offset
         public readonly ushort glyphIndex;
         public short xoffset;
         public short yoffset;
         public short advanceW; // actually this value is ushort, TODO: review here
         public readonly GlyphClassKind glyphClass;
 
-        public GlyphPos(short o_offset,
+        public GlyphPos(ushort o_offset,
             ushort glyphIndex,
             GlyphClassKind glyphClass,
             ushort orgAdvanced

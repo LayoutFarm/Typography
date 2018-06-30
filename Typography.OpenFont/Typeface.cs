@@ -379,6 +379,7 @@ namespace Typography.OpenFont
 
     }
 
+
     public interface IGlyphPositions
     {
         int Count { get; }
@@ -388,7 +389,7 @@ namespace Typography.OpenFont
         void AppendGlyphAdvance(int index, short appendAdvX, short appendAdvY);
 
         ushort GetGlyph(int index, out ushort advW);
-        ushort GetGlyph(int index, out short inputOffset, out short offsetX, out short offsetY, out short advW);
+        ushort GetGlyph(int index, out ushort inputOffset, out short offsetX, out short offsetY, out short advW);
         //
         void GetOffset(int index, out short offsetX, out short offsetY);
     }
