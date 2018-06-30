@@ -544,6 +544,9 @@ namespace Typography.TextLayout
                   _typeface.LineGap * pxscale,
                    Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_typeface) * pxscale);
         }
+
+
+
     }
 
     public static class GlyphLayoutExtensions
@@ -567,10 +570,13 @@ namespace Typography.TextLayout
             int floor_value = (int)value;
             return floor_value + 1;
         }
-
 #endif
+
+
+
+
         /// <summary>
-        /// generate scaled from unscale glyph size to specific scale
+        /// fetch layout result,
         /// </summary>
         /// <param name="glyphPositions"></param>
         /// <param name="pxscale"></param>
@@ -601,7 +607,7 @@ namespace Typography.TextLayout
         }
 
         /// <summary>
-        /// generate scaled from unscale glyph size to specific scale
+        /// fetch layout result, generate specific scaled version from unscaled glyph plan
         /// </summary>
         /// <param name="glyphPositions"></param>
         /// <param name="pxscale"></param>
@@ -661,7 +667,7 @@ namespace Typography.TextLayout
         }
 
         /// <summary>
-        /// generated scaled glyph-plan-list from unscaled version
+        /// fetch layout result, generate specific scaled version from unscaled glyph plan
         /// </summary>
         /// <param name="unscaledGlyphPlanList"></param>
         /// <param name="startAt"></param>
@@ -752,17 +758,14 @@ namespace Typography.TextLayout
         {
             if (!glyph.HasOriginalAdvancedWidth)
             {
+                //TODO: review here, 
+                //WHY? some glyph dose not have original advanced width
                 glyph.OriginalAdvanceWidth = _typeface.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
             }
+
             _glyphPosList.Add(new GlyphPos(o_offset, glyphIndex, glyph.GlyphClass, glyph.OriginalAdvanceWidth));
         }
-        public void AppendGlyphOffset(int index, short appendOffsetX, short appendOffsetY)
-        {
-            GlyphPos existing = _glyphPosList[index];
-            existing.xoffset += appendOffsetX;
-            existing.yoffset += appendOffsetY;
-            _glyphPosList[index] = existing;
-        }
+        
         public GlyphPos this[int index]
         {
 
@@ -775,12 +778,27 @@ namespace Typography.TextLayout
         {
             return _glyphPosList[index].classKind;
         }
+        /// <summary>
+        /// get glyph-index (+ other info) at specific indexed-position, 
+        /// </summary>
+        /// <param name="index">glyph index</param>
+        /// <param name="advW">advanced width</param>
+        /// <returns></returns>
         public ushort GetGlyph(int index, out ushort advW)
         {
             GlyphPos pos = _glyphPosList[index];
             advW = (ushort)pos.advanceW;
             return pos.glyphIndex;
         }
+        /// <summary>
+        /// get glyph-index (+ other info) at specific indexed-position, 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="inputOffset"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        /// <param name="advW"></param>
+        /// <returns></returns>
         public ushort GetGlyph(int index, out ushort inputOffset, out short offsetX, out short offsetY, out short advW)
         {
             GlyphPos pos = _glyphPosList[index];
@@ -790,19 +808,33 @@ namespace Typography.TextLayout
             inputOffset = pos.o_offset;
             return pos.glyphIndex;
         }
+        /// <summary>
+        /// get glyph offset at specific indexed-position, 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
         public void GetOffset(int index, out short offsetX, out short offsetY)
         {
             GlyphPos pos = _glyphPosList[index];
             offsetX = pos.xoffset;
             offsetY = pos.yoffset;
         }
-
+        //
+        public void AppendGlyphOffset(int index, short appendOffsetX, short appendOffsetY)
+        {
+            GlyphPos existing = _glyphPosList[index];
+            existing.xoffset += appendOffsetX;
+            existing.yoffset += appendOffsetY;
+            _glyphPosList[index] = existing;
+        }
         public void AppendGlyphAdvance(int index, short appendAdvX, short appendAdvY)
         {
             GlyphPos pos = _glyphPosList[index];
             pos.advanceW += appendAdvX;//TODO: review for appendY
             _glyphPosList[index] = pos;
         }
+
 
     }
 
