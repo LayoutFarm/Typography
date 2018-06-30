@@ -26,4 +26,3 @@ namespace Typography.TextBreak
 
     }
 }
-a
