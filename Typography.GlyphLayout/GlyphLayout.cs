@@ -5,89 +5,8 @@ using Typography.OpenFont;
 
 namespace Typography.TextLayout
 {
-
-
-    /// <summary>
-    /// scaled glyph plan to specfic font size.
-    /// offsetX,offsetY,advanceX are adjusted to fit with specific font size    
-    /// </summary>
-    public struct PxScaledGlyphPlan
-    {
-        public readonly ushort input_cp_offset;
-        public readonly ushort glyphIndex;
-        public PxScaledGlyphPlan(ushort input_cp_offset, ushort glyphIndex, float advanceW, float offsetX, float offsetY)
-        {
-            this.input_cp_offset = input_cp_offset;
-            this.glyphIndex = glyphIndex;
-            this.OffsetX = offsetX;
-            this.OffsetY = offsetY;
-            this.AdvanceX = advanceW;
-        }
-        public float AdvanceX { get; private set; }
-        /// <summary>
-        /// x offset from current position
-        /// </summary>
-        public float OffsetX { get; private set; }
-        /// <summary>
-        /// y offset from current position
-        /// </summary>
-        public float OffsetY { get; private set; }
-
-        public bool AdvanceMoveForward { get { return this.AdvanceX > 0; } }
-
-#if DEBUG
-        public override string ToString()
-        {
-            return " adv:" + AdvanceX;
-        }
-#endif
-    }
-
-
-    /// <summary>
-    /// expandable list of glyph plan
-    /// </summary>
-    public class PxScaledGlyphPlanList
-    {
-        List<PxScaledGlyphPlan> _glyphPlans = new List<PxScaledGlyphPlan>();
-        float _accumAdvanceX;
-
-        public void Clear()
-        {
-            _glyphPlans.Clear();
-            _accumAdvanceX = 0;
-        }
-        public void Append(PxScaledGlyphPlan glyphPlan)
-        {
-            _glyphPlans.Add(glyphPlan);
-            _accumAdvanceX += glyphPlan.AdvanceX;
-        }
-        public float AccumAdvanceX { get { return _accumAdvanceX; } }
-
-        public PxScaledGlyphPlan this[int index]
-        {
-            get
-            {
-                return _glyphPlans[index];
-            }
-        }
-        public int Count
-        {
-            get
-            {
-                return _glyphPlans.Count;
-            }
-        }
-
-#if DEBUG
-        public PxScaledGlyphPlanList()
-        {
-
-        }
-#endif
-    }
-
-
+     
+   
     /// <summary>
     /// unscaled glyph-plan
     /// </summary>
@@ -158,8 +77,11 @@ namespace Typography.TextLayout
             _accumAdvanceX += glyphPlan.AdvanceX;
         }
         public float AccumAdvanceX { get { return _accumAdvanceX; } }
-
     }
+
+    /// <summary>
+    /// unscaled glyph-plan sequence
+    /// </summary>
     public struct GlyphPlanSequence
     {
         //
@@ -518,7 +440,7 @@ namespace Typography.TextLayout
         }
 
         /// <summary>
-        /// fetch layout result,
+        /// fetch layout result, unscaled version, put to IUnscaledGlyphPlanList
         /// </summary>
         /// <param name="glyphPositions"></param>
         /// <param name="pxscale"></param>
@@ -546,195 +468,32 @@ namespace Typography.TextLayout
                     ));
             }
         }
+        public IEnumerable<UnscaledGlyphPlan> GetUnscaledGlyphPlanIter()
+        {
+            //this for iterator version
+            IGlyphPositions glyphPositions = _glyphPositions;
+            int finalGlyphCount = glyphPositions.Count;
+            for (int i = 0; i < finalGlyphCount; ++i)
+            {
+                short offsetX, offsetY, advW;
+                ushort glyphIndex = glyphPositions.GetGlyph(i,
+                    out ushort input_offset,
+                    out offsetX,
+                    out offsetY,
+                    out advW);
 
-
-
-
+                yield return new UnscaledGlyphPlan(
+                    input_offset,
+                    glyphIndex,
+                    advW,
+                    offsetX,
+                    offsetY
+                    );
+            } 
+        } 
     }
 
-    public static class GlyphLayoutExtensions
-    {
 
-#if DEBUG
-        public static float dbugSnapToFitInteger(float value)
-        {
-            int floor_value = (int)value;
-            return (value - floor_value >= (1f / 2f)) ? floor_value + 1 : floor_value;
-        }
-        public static float dbugSnapHalf(float value)
-        {
-            int floor_value = (int)value;
-            //round to int 0, 0.5,1.0
-            return (value - floor_value >= (2f / 3f)) ? floor_value + 1 : //else->
-                   (value - floor_value >= (1f / 3f)) ? floor_value + 0.5f : floor_value;
-        }
-        static int dbugSnapUpper(float value)
-        {
-            int floor_value = (int)value;
-            return floor_value + 1;
-        }
-#endif
-
-
-        /// <summary>
-        /// fetch layout result, generate specific scaled version from unscaled glyph plan
-        /// </summary>
-        /// <param name="glyphPositions"></param>
-        /// <param name="pxscale"></param>
-        /// <param name="outputGlyphPlanList"></param>
-        public static void GenerateScaledGlyphPlans(this GlyphLayout glyphLayout,
-            float pxscale,
-            bool snapToGrid,
-            PxScaledGlyphPlanList outputGlyphPlanList)
-        {
-            //user can implement this with some 'PixelScaleEngine' 
-            IGlyphPositions glyphPositions = glyphLayout.ResultUnscaledGlyphPositions;
-            if (snapToGrid)
-            {
-
-                int finalGlyphCount = glyphPositions.Count;
-                for (int i = 0; i < finalGlyphCount; ++i)
-                {
-                    short offsetX, offsetY, advW; //all from pen-pos
-                    ushort glyphIndex = glyphPositions.GetGlyph(i,
-                        out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
-
-                    outputGlyphPlanList.Append(new PxScaledGlyphPlan(
-                        input_offset,
-                        glyphIndex,
-                        (short)Math.Round(advW * pxscale),
-                        (short)Math.Round(offsetX * pxscale),
-                        (short)Math.Round(offsetY * pxscale)
-                        ));
-                }
-            }
-            else
-            {
-                //not snap to grid
-                //scaled but not snap to grid
-                int finalGlyphCount = glyphPositions.Count;
-                for (int i = 0; i < finalGlyphCount; ++i)
-                {
-                    short offsetX, offsetY, advW; //all from pen-pos
-                    ushort glyphIndex = glyphPositions.GetGlyph(i,
-                        out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
-
-                    outputGlyphPlanList.Append(new PxScaledGlyphPlan(
-                        input_offset,
-                        glyphIndex,
-                        advW * pxscale,
-                        offsetX * pxscale,
-                        offsetY * pxscale
-                        ));
-                }
-            }
-        }
-
-        /// <summary>
-        /// fetch layout result, generate specific scaled version from unscaled glyph plan
-        /// </summary>
-        /// <param name="unscaledGlyphPlanList"></param>
-        /// <param name="startAt"></param>
-        /// <param name="len"></param>
-        /// <param name="pxscale"></param>
-        /// <param name="snapToGrid"></param>
-        /// <param name="outputGlyphPlanList"></param>
-        public static void GenerateScaledGlyphPlans(
-            this IUnscaledGlyphPlanList unscaledGlyphPlanList,
-            int startAt,
-            int len,
-            float pxscale,
-            bool snapToGrid,
-
-            PxScaledGlyphPlanList outputGlyphPlanList)
-        {
-            //user can implement this with some 'PixelScaleEngine'  
-
-            int end = startAt + len;
-            if (snapToGrid)
-            {
-
-                for (int i = startAt; i < end; ++i)
-                {
-                    UnscaledGlyphPlan gp = unscaledGlyphPlanList[i];
-                    outputGlyphPlanList.Append(new PxScaledGlyphPlan(
-                        gp.input_cp_offset,
-                        gp.glyphIndex,
-                        (short)Math.Round(gp.AdvanceX * pxscale),
-                        (short)Math.Round(gp.OffsetX * pxscale),
-                        (short)Math.Round(gp.OffsetY * pxscale)
-                        ));
-                }
-            }
-            else
-            {
-                //not snap to grid
-                //scaled but not snap to grid
-
-                for (int i = startAt; i < end; ++i)
-                {
-
-                    UnscaledGlyphPlan gp = unscaledGlyphPlanList[i];
-
-                    outputGlyphPlanList.Append(new PxScaledGlyphPlan(
-                        gp.input_cp_offset,
-                        gp.glyphIndex,
-                        gp.AdvanceX * pxscale,
-                        gp.OffsetX * pxscale,
-                        gp.OffsetY * pxscale
-                        ));
-                }
-            }
-        }
-
-
-        //string measurement result depends on multiple variables eg. font-size, snap-to-grid.
-        //
-
-        static PxScaledGlyphPlanList _reusablePxScaleGlyphPlanList = new PxScaledGlyphPlanList();
-
-        public static MeasuredStringBox LayoutAndMeasureString(
-            this GlyphLayout glyphLayout,
-            char[] textBuffer,
-            int startAt,
-            int len,
-            float fontSizeInPoints,
-            PxScaledGlyphPlanList outputGlyphPlans = null)
-        {
-            //1. unscale layout, in design unit
-            glyphLayout.Layout(textBuffer, startAt, len);
-
-            if (outputGlyphPlans == null)
-            {
-                //clear before use
-                _reusablePxScaleGlyphPlanList.Clear();
-                outputGlyphPlans = _reusablePxScaleGlyphPlanList;
-            }
-            //2. scale  to specific font size           
-
-            Typeface typeface = glyphLayout.Typeface;
-            float pxscale = typeface.CalculateScaleToPixelFromPointSize(fontSizeInPoints);
-
-            //....
-            GenerateScaledGlyphPlans(
-                glyphLayout,
-                pxscale,
-                false, outputGlyphPlans);
-
-            return new MeasuredStringBox(
-                  outputGlyphPlans.AccumAdvanceX * pxscale,
-                  typeface.Ascender * pxscale,
-                  typeface.Descender * pxscale,
-                  typeface.LineGap * pxscale,
-                   Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface) * pxscale);
-        }
-    }
 
     /// <summary>
     /// glyph position stream

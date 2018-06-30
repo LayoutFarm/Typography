@@ -157,13 +157,9 @@ namespace Typography.TextServices
                 breakspan.len = sp.len;
                 breakspan.scLang = selectedScriptLang;
                 yield return breakspan;
-            }
-
+            } 
         }
-
-
-
-
+         
         /// <summary>
         /// expandable list of glyph plan
         /// </summary>
@@ -244,6 +240,7 @@ namespace Typography.TextServices
                 _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
                 //
                 _reusableGlyphPlanList.Clear();
+
                 _glyphLayout.GenerateScaledGlyphPlans(
                     pxscale,
                     true,
