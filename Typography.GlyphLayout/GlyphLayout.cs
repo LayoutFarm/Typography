@@ -545,6 +545,35 @@ namespace Typography.TextLayout
                    Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_typeface) * pxscale);
         }
 
+        /// <summary>
+        /// fetch layout result,
+        /// </summary>
+        /// <param name="glyphPositions"></param>
+        /// <param name="pxscale"></param>
+        /// <param name="outputGlyphPlanList"></param>
+        public void GenerateUnscaledGlyphPlans(IUnscaledGlyphPlanList outputGlyphPlanList)
+        {
+
+            IGlyphPositions glyphPositions = _glyphPositions;
+            int finalGlyphCount = glyphPositions.Count;
+            for (int i = 0; i < finalGlyphCount; ++i)
+            {
+                short offsetX, offsetY, advW;
+                ushort glyphIndex = glyphPositions.GetGlyph(i,
+                    out ushort input_offset,
+                    out offsetX,
+                    out offsetY,
+                    out advW);
+                //
+                outputGlyphPlanList.Append(new UnscaledGlyphPlan(
+                    input_offset,
+                    glyphIndex,
+                    advW,
+                    offsetX,
+                    offsetY
+                    ));
+            }
+        }
 
 
     }
@@ -572,39 +601,6 @@ namespace Typography.TextLayout
         }
 #endif
 
-
-
-
-        /// <summary>
-        /// fetch layout result,
-        /// </summary>
-        /// <param name="glyphPositions"></param>
-        /// <param name="pxscale"></param>
-        /// <param name="outputGlyphPlanList"></param>
-        public static void GenerateUnscaledGlyphPlans(this GlyphLayout glyphLayout,
-            IUnscaledGlyphPlanList outputGlyphPlanList)
-        {
-            //user can implement this with some 'PixelScaleEngine'
-            IGlyphPositions glyphPositions = glyphLayout.ResultUnscaledGlyphPositions;
-            int finalGlyphCount = glyphPositions.Count;
-            for (int i = 0; i < finalGlyphCount; ++i)
-            {
-                short offsetX, offsetY, advW;
-                ushort glyphIndex = glyphPositions.GetGlyph(i,
-                    out ushort input_offset,
-                    out offsetX,
-                    out offsetY,
-                    out advW);
-                //
-                outputGlyphPlanList.Append(new UnscaledGlyphPlan(
-                    input_offset,
-                    glyphIndex,
-                    advW,
-                    offsetX,
-                    offsetY
-                    ));
-            }
-        }
 
         /// <summary>
         /// fetch layout result, generate specific scaled version from unscaled glyph plan
@@ -765,7 +761,7 @@ namespace Typography.TextLayout
 
             _glyphPosList.Add(new GlyphPos(o_offset, glyphIndex, glyph.GlyphClass, glyph.OriginalAdvanceWidth));
         }
-        
+
         public GlyphPos this[int index]
         {
 
