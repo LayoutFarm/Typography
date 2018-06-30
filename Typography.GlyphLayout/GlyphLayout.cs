@@ -144,7 +144,7 @@ namespace Typography.TextLayout
             {
                 return list[index];
             }
-        } 
+        }
         float _accumAdvanceX;
 
         public void Clear()
@@ -305,11 +305,15 @@ namespace Typography.TextLayout
         }
     }
 
-
-
     struct CodePointFromUserChar
     {
+        /// <summary>
+        /// input codepoint
+        /// </summary>
         public readonly int codePoint;
+        /// <summary>
+        /// offset from the start of input codepoint buffer
+        /// </summary>
         public readonly ushort user_char_offset;
         public CodePointFromUserChar(ushort user_char_offset, int codePoint)
         {
@@ -402,9 +406,10 @@ namespace Typography.TextLayout
 
 
             //[A]
+            //convert from char[] to codepoint-list
             // this is important!
             // -----------------------
-            //  from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
             // In many places, "char" is not a valid type to handle characters, because it
             // only supports 16 bits.In order to handle the full range of Unicode characters,
             // we need to use "int".
@@ -438,6 +443,7 @@ namespace Typography.TextLayout
             for (int i = 0; i < codePointCount; ++i)
             {
                 CodePointFromUserChar cp = _reusableCodePointFromUserCharList[i];
+                //find glyph index by specific codepoint
                 ushort glyphIndex = _typeface.LookupIndex(cp.codePoint);
 
                 if (i + 1 < codePointCount)
