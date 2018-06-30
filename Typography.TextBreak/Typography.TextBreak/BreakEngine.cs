@@ -8,24 +8,8 @@ namespace Typography.TextBreak
         Word,
         Sentence,
     }
-
-    public delegate void OnBreak(BreakBounds breakBounds);
-
-    public class BreakBounds
-    {
-        public int startIndex;
-        public int length;
-        public bool stopNext;
-        public WorkKind kind;
-    }
-    public enum WorkKind
-    {
-        Whitespace,
-        NewLine,
-        Text,
-        Number,
-        Punc
-    }
+     
+   
     public abstract class TextBreaker
     {
         public abstract void DoBreak(char[] input, int start, int len, OnBreak onbreak);
