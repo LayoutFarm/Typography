@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.OpenFont;
-using Typography.TextLayout; 
+using Typography.TextLayout;
 
 
 namespace Typography.TextServices
@@ -98,8 +98,7 @@ namespace Typography.TextServices
             glyphLayout.Layout(str, 0, str.Length);
             //
             _reusableGlyphPlanList.Clear();
-            GlyphLayoutExtensions.GenerateScaledGlyphPlans(
-                glyphLayout.ResultUnscaledGlyphPositions,
+            glyphLayout.GenerateScaledGlyphPlans(
                 pxscale,
                 true,
                 _reusableScaledGlyphPlanList);

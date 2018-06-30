@@ -31,8 +31,7 @@ namespace Typography.Contours
             GlyphLayout glyphLayout = this.GlyphLayoutMan;
             glyphLayout.Layout(textBuffer, startAt, len);
 
-            GlyphLayoutExtensions.GenerateScaledGlyphPlans(
-                glyphLayout.ResultUnscaledGlyphPositions,
+            glyphLayout.GenerateScaledGlyphPlans(
                 this.Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
                 false,
                 outputGlyphPlanList);

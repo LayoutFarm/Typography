@@ -155,7 +155,7 @@ namespace Typography.TextLayout
                     _glyphLayout.Typeface = selectedTypeface;
                     _glyphLayout.Layout(rawBuffer, tt.StartAt, tt.Len);
 
-                    _glyphLayout.ResultUnscaledGlyphPositions.GenerateUnscaledGlyphPlans(_outputGlyphPlan);
+                    _glyphLayout.GenerateUnscaledGlyphPlans(_outputGlyphPlan);
 
 
                     //use pixel-scale-layout-engine to scale to specific font size

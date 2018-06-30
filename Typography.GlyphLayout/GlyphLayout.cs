@@ -324,10 +324,14 @@ namespace Typography.TextLayout
             EnableComposition = true;
             ScriptLang = ScriptLangs.Latin;
         }
-        public IGlyphPositions ResultUnscaledGlyphPositions
+
+
+        internal IGlyphPositions ResultUnscaledGlyphPositions
         {
+            //unscaled version
             get { return _glyphPositions; }
         }
+
         public PositionTechnique PositionTechnique { get; set; }
         public ScriptLang ScriptLang
         {
@@ -341,7 +345,6 @@ namespace Typography.TextLayout
                 _scriptLang = value;
             }
         }
-
 
         public bool EnableLigature { get; set; }
         public bool EnableComposition { get; set; }
@@ -549,12 +552,13 @@ namespace Typography.TextLayout
         /// <param name="glyphPositions"></param>
         /// <param name="pxscale"></param>
         /// <param name="outputGlyphPlanList"></param>
-        public static void GenerateScaledGlyphPlans(this IGlyphPositions glyphPositions,
+        public static void GenerateScaledGlyphPlans(this GlyphLayout glyphLayout,
             float pxscale,
             bool snapToGrid,
             PxScaledGlyphPlanList outputGlyphPlanList)
         {
             //user can implement this with some 'PixelScaleEngine' 
+            IGlyphPositions glyphPositions = glyphLayout.ResultUnscaledGlyphPositions;
             if (snapToGrid)
             {
 
@@ -610,10 +614,11 @@ namespace Typography.TextLayout
         /// <param name="glyphPositions"></param>
         /// <param name="pxscale"></param>
         /// <param name="outputGlyphPlanList"></param>
-        public static void GenerateUnscaledGlyphPlans(this IGlyphPositions glyphPositions, IUnscaledGlyphPlanList outputGlyphPlanList)
+        public static void GenerateUnscaledGlyphPlans(this GlyphLayout glyphLayout,
+            IUnscaledGlyphPlanList outputGlyphPlanList)
         {
             //user can implement this with some 'PixelScaleEngine'
-
+            IGlyphPositions glyphPositions = glyphLayout.ResultUnscaledGlyphPositions;
             int finalGlyphCount = glyphPositions.Count;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
@@ -633,10 +638,6 @@ namespace Typography.TextLayout
                     ));
             }
         }
-
-
-
-
     }
 
     /// <summary>
