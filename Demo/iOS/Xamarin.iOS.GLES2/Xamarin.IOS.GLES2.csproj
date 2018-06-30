@@ -95,10 +95,7 @@
     <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
       <Link>App\GlyphMeshCollection.cs</Link>
     </Compile>
-    <Compile Include="App\Color.cs" />
     <Compile Include="App\CustomApp.cs" />
-    <Compile Include="App\Shaders.cs" />
-    <Compile Include="App\SimpleCanvas.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <BundleResource Include="DroidSans.ttf">
