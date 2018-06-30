@@ -1,11 +1,10 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 // some code from icu-project
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
 namespace Typography.TextBreak
@@ -27,9 +26,11 @@ namespace Typography.TextBreak
         }
         public char FirstChar { get { return firstChar; } }
         public char LastChar { get { return lastChar; } }
-        public void LoadFromTextfile(string filename)
+
+
+        public void LoadSortedUniqueWordList(IEnumerable<string> sortedWordList)
         {
-            //once only            
+            // load unique and sorted word list
             if (textBuffer != null)
             {
                 return;
@@ -41,48 +42,36 @@ namespace Typography.TextBreak
 
             //---------------
             Dictionary<char, DevelopingWordGroup> wordGroups = new Dictionary<char, DevelopingWordGroup>();
-            using (FileStream fs = new FileStream(filename, FileMode.Open))
-            using (StreamReader reader = new StreamReader(fs))
+            textBuffer = new TextBuffer(1024);
+            foreach (string line in sortedWordList)
             {
-                //init with filesize
-                textBuffer = new TextBuffer((int)fs.Length);
-                string line = reader.ReadLine();
-                while (line != null)
+                char[] lineBuffer = line.Trim().ToCharArray();
+                int lineLen = lineBuffer.Length;
+                char c0;
+                if (lineLen > 0 && (c0 = lineBuffer[0]) != '#')
                 {
-                    line = line.Trim();
-                    char[] lineBuffer = line.ToCharArray();
-                    int lineLen = lineBuffer.Length;
-                    char c0;
-                    if (lineLen > 0 && (c0 = lineBuffer[0]) != '#')
-                    {
-                        int startAt = textBuffer.CurrentPosition;
-                        textBuffer.AddWord(lineBuffer);
+                    int startAt = textBuffer.CurrentPosition;
+                    textBuffer.AddWord(lineBuffer);
 
 #if DEBUG
-                        if (lineLen > byte.MaxValue)
-                        {
-                            throw new NotSupportedException();
-                        }
+                    if (lineLen > byte.MaxValue)
+                    {
+                        throw new NotSupportedException();
+                    }
 #endif
 
-                        WordSpan wordspan = new WordSpan(startAt, (byte)lineLen);
-                        //each wordgroup contains text span
+                    WordSpan wordspan = new WordSpan(startAt, (byte)lineLen);
+                    //each wordgroup contains text span
 
-                        DevelopingWordGroup found;
-                        if (!wordGroups.TryGetValue(c0, out found))
-                        {
-                            found = new DevelopingWordGroup(new WordSpan(startAt, 1));
-                            wordGroups.Add(c0, found);
-                        }
-                        found.AddWordSpan(wordspan);
-
+                    DevelopingWordGroup found;
+                    if (!wordGroups.TryGetValue(c0, out found))
+                    {
+                        found = new DevelopingWordGroup(new WordSpan(startAt, 1));
+                        wordGroups.Add(c0, found);
                     }
-                    //- next line
-                    line = reader.ReadLine();
+                    found.AddWordSpan(wordspan);
                 }
-
-                //reader.Close();
-                //fs.Close();
+                //- next line
             }
             //------------------------------------------------------------------
             textBuffer.Freeze();
@@ -94,6 +83,7 @@ namespace Typography.TextBreak
             wordGroups.Clear();
 
         }
+
         int TransformCharToIndex(char c)
         {
             return c - this.firstChar;
@@ -170,7 +160,6 @@ namespace Typography.TextBreak
                 return true;
             }
             return false;
-            //return this.startAt == another.startAt && this.len == another.len;
         }
     }
 
@@ -208,12 +197,13 @@ namespace Typography.TextBreak
             return new string(this.charBuffer, index, len);
         }
     }
+
     public struct BreakSpan
     {
         public int startAt;
         public ushort len;
+        public WordKind wordKind;
     }
-
 
     class DevelopingWordGroup
     {
