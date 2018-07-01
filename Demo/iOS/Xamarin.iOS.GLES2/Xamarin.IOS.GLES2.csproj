@@ -95,10 +95,7 @@
     <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
       <Link>App\GlyphMeshCollection.cs</Link>
     </Compile>
-    <Compile Include="App\Color.cs" />
     <Compile Include="App\CustomApp.cs" />
-    <Compile Include="App\Shaders.cs" />
-    <Compile Include="App\SimpleCanvas.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <BundleResource Include="DroidSans.ttf">
@@ -126,11 +123,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
+      <Project>{c161ddea-0711-4d59-887c-c6a2fda2d74c}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{280d17d5-4435-4ead-839a-33c5a8990e7e}</Project>
+      <Project>{82d701b5-d844-4d5c-8643-26945adc2c5a}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
   </ItemGroup>

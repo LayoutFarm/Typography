@@ -167,8 +167,7 @@ namespace SampleWinForms
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
-                                                    //-----------------------  
-
+                                                    //-----------------------   
 
         }
 
@@ -236,6 +235,10 @@ namespace SampleWinForms
         //        atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
         //    }
         //}
+
+
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
+
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -270,21 +273,36 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-            GlyphPlanList userGlyphPlans = new GlyphPlanList();
 
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
+            _reusableUnscaledGlyphPlanList.Clear();
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
             _currentTextPrinter.FillColor = Color.Red;
+
             _currentTextPrinter.DrawFromGlyphPlans(
-                  userGlyphPlans,
+                  new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
                   x_pos,
                   y_pos
              );
-            //Example 3: MeasureString        
-            MeasuredStringBox strBox = _currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
-            //draw line mark
+
+            //Example 3: MeasureString   
+
+            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
+
+            UnscaledGlyphPlanList userGlyphPlans = new UnscaledGlyphPlanList();
+
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(userGlyphPlans);
+
+            MeasuredStringBox strBox = new MeasuredStringBox();
+            throw new System.NotSupportedException();
+
+            //_currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
+            //  textBuffer, 0, textBuffer.Length,
+            //  _currentTextPrinter.FontSizeInPoints,
+            //  true,
+            //  userGlyphPlans);
 
             float x_pos2 = x_pos + strBox.width + 10;
             g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.descending, strBox.width, strBox.CalculateLineHeight());
@@ -293,16 +311,13 @@ namespace SampleWinForms
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending
 
 
-
-            //------------
-            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
             Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
 
             int j = userGlyphPlans.Count;
             for (int i = 0; i < j; ++i)
             {
-                GlyphPlan glyphPlan = userGlyphPlans[i];
+                UnscaledGlyphPlan glyphPlan = userGlyphPlans[i];
                 Typography.OpenFont.Glyph glyph = typeface.GetGlyphByIndex(glyphPlan.glyphIndex);
                 //
                 Typography.OpenFont.Bounds b = glyph.Bounds;
@@ -313,7 +328,7 @@ namespace SampleWinForms
                 float xmax = b.XMax * pxscale;
                 float ymax = b.YMax * pxscale;
                 //
-                float glyph_x = x_pos + glyphPlan.ExactX;
+                float glyph_x = x_pos + glyphPlan.OffsetX;
                 g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
 
             }
@@ -325,6 +340,8 @@ namespace SampleWinForms
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
         }
+
+
 
     }
 }

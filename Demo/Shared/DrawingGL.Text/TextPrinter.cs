@@ -14,11 +14,7 @@ namespace DrawingGL.Text
         //funcs:
         //1. layout glyph
         //2. measure glyph
-        //3. generate glyph runs into textrun
-
-
-        public override GlyphLayout GlyphLayout { get; } = new GlyphLayout();
-        readonly GlyphPlanList outputGlyphPlans = new GlyphPlanList();
+        //3. generate glyph runs into textrun 
         GlyphTranslatorToPath pathTranslator;
         string currentFontFile;
         GlyphPathBuilder currentGlyphPathBuilder;
@@ -28,6 +24,8 @@ namespace DrawingGL.Text
         // 
         SimpleCurveFlattener _curveFlattener;
         TessTool _tessTool;
+
+        Typeface _currentTypeface;
 
         //-------------
         struct ProcessedGlyph
@@ -52,11 +50,29 @@ namespace DrawingGL.Text
 
             _tessTool = new TessTool();
         }
-        
+
+
+        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
+        {
+            throw new System.NotImplementedException();
+        }
+        public override GlyphLayout GlyphLayoutMan { get; } = new GlyphLayout();
+
+        public override Typeface Typeface
+        {
+            get { return _currentTypeface; }
+            set
+            {
+                _currentTypeface = value;
+                GlyphLayoutMan.Typeface = value;
+            }
+        }
         public MeasuredStringBox Measure(char[] textBuffer, int startAt, int len)
         {
-            GlyphLayout.Typeface = this.Typeface;
-            return GlyphLayout.LayoutAndMeasureString(textBuffer, startAt, len, this.FontSizeInPoints);
+            return GlyphLayoutMan.LayoutAndMeasureString(
+                textBuffer, startAt, len,
+                this.FontSizeInPoints
+                );
         }
 
         /// <summary>
@@ -100,12 +116,15 @@ namespace DrawingGL.Text
                     pathTranslator = new GlyphTranslatorToPath();
 
                     //4. Update GlyphLayout
-                    GlyphLayout.ScriptLang = this.ScriptLang;
-                    GlyphLayout.PositionTechnique = this.PositionTechnique;
-                    GlyphLayout.EnableLigature = this.EnableLigature;
+                    GlyphLayoutMan.ScriptLang = this.ScriptLang;
+                    GlyphLayoutMan.PositionTechnique = this.PositionTechnique;
+                    GlyphLayoutMan.EnableLigature = this.EnableLigature;
                 }
             }
         }
+
+
+        UnscaledGlyphPlanList _resuableGlyphPlanList = new UnscaledGlyphPlanList();
 
         /// <summary>
         /// generate glyph run into a given textRun
@@ -126,18 +145,16 @@ namespace DrawingGL.Text
             _glyphMeshCollection.SetCacheInfo(this.Typeface, 0, this.HintTechnique);
 
 
-            GlyphLayout.Typeface = this.Typeface;
-            GlyphLayout.Layout(charBuffer, start, len);
+            GlyphLayoutMan.Typeface = this.Typeface;
+            GlyphLayoutMan.Layout(charBuffer, start, len);
 
             float pxscale = this.Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
 
-            outputGlyphPlans.Clear();
-            GlyphLayoutExtensions.GenerateGlyphPlan(
-                GlyphLayout.ResultUnscaledGlyphPositions,
-                pxscale, false, outputGlyphPlans);
+            _resuableGlyphPlanList.Clear();
+            GenerateGlyphPlan(charBuffer, 0, charBuffer.Length, _resuableGlyphPlanList);
 
             // render each glyph 
-            int planCount = outputGlyphPlans.Count;
+            int planCount = _resuableGlyphPlanList.Count;
             for (var i = 0; i < planCount; ++i)
             {
 
@@ -145,7 +162,7 @@ namespace DrawingGL.Text
                 //----
                 //glyph path 
                 //---- 
-                GlyphPlan glyphPlan = outputGlyphPlans[i];
+                UnscaledGlyphPlan glyphPlan = _resuableGlyphPlanList[i];
                 //
                 //1. check if we have this glyph in cache?
                 //if yes, not need to build it again 
@@ -177,20 +194,15 @@ namespace DrawingGL.Text
                         processGlyph.tessNElements));
             }
         }
-
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
-            throw new System.NotImplementedException();
-        }
 
-        public override void DrawFromGlyphPlans(GlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
-        {
-            throw new System.NotImplementedException();
         }
-
         public override void DrawCaret(float x, float y)
         {
-            throw new System.NotImplementedException();
+
         }
     }
+
+
 }
