@@ -17,7 +17,7 @@ namespace PixelFarm.Drawing.Fonts
         GreyscaleStencil,
         None,
     }
-    public class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter
+    public sealed class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter
     {
         PixelBlenderWithMask maskPixelBlender = new PixelBlenderWithMask();
         PixelBlenderPerColorComponentWithMask maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
@@ -196,31 +196,9 @@ namespace PixelFarm.Drawing.Fonts
         {
             //TODO...
         }
-         
-        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
-        {
-            //TODO...
 
-        }
-        public void DrawString(char[] text, int startAt, int len, double x, double y)
+        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float x, float y)
         {
-            InternalDrawString(text, startAt, len, (float)x, (float)y);
-        }
-        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
-        {
-            InternalDrawString(textBuffer, startAt, len, x, y);
-        }
-
-        void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
-        {
-
-
-            int j = buffer.Length;
-            //create temp buffer span that describe the part of a whole char buffer
-            TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
-            //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
-            //with specific request font
-            GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font);
 
             float scale = 1;// _fontAtlas.TargetTextureScale;
             int recommendLineSpacing = (int)_font.LineSpacingInPx;
@@ -254,9 +232,10 @@ namespace PixelFarm.Drawing.Fonts
                 //test...
                 //fill glyph-by-glyh
 
-                var aaTech = this.AntialiasTech;
+                var aaTech = this.AntialiasTech; 
+                int seqLen = glyphPlanSeq.Count; 
 
-                int seqLen = glyphPlanSeq.Count;
+                
                 for (int i = 0; i < seqLen; ++i)
                 {
                     UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
@@ -403,6 +382,24 @@ namespace PixelFarm.Drawing.Fonts
 
             //
             _painter.DestBitmapBlender.OutputPixelBlender = prevPxBlender;//restore back
+        }
+        public void DrawString(char[] text, int startAt, int len, double x, double y)
+        {
+            InternalDrawString(text, startAt, len, (float)x, (float)y);
+        }
+        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
+        {
+            InternalDrawString(textBuffer, startAt, len, x, y);
+        }
+
+        void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
+        {
+ 
+            //create temp buffer span that describe the part of a whole char buffer
+            TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
+            //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
+            //with specific request font      
+            DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font), startAt, len, x, y);
         }
     }
 }

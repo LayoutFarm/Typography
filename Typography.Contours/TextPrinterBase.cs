@@ -101,12 +101,7 @@ namespace Typography.Contours
         {
             DrawFromGlyphPlans(glyphPlanSeq, 0, glyphPlanSeq.Count, x, y);
         }
-        //public void DrawFromGlyphPlans(IPixelScaledGlyphPlanList glyphPlanList, float x, float y)
-        //{
-
-        //    DrawFromGlyphPlans(glyphPlanList, 0, glyphPlanList.Count, x, y);
-        //}
-
+        
 
     }
 

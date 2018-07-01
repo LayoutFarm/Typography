@@ -35,23 +35,22 @@ namespace SampleWinForms.UI
         public void Draw()
         {
 
-            PxScaledGlyphPlanList glyphPlans = _line._glyphPlans;
+     
             //List<UserCodePointToGlyphIndex> userCharToGlyphIndexMap = _line._userCodePointToGlyphIndexMap;
             if (_line.ContentChanged)
             {
                 //TODO: or font face/font-size change 
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
-                glyphPlans.Clear();
+          
                 //userCharToGlyphIndexMap.Clear();
-                //read glyph plan and userCharToGlyphIndexMap                
-
+                //read glyph plan and userCharToGlyphIndexMap      
                 _reusableUnscaledGlyphPlanList.Clear();
                 _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
                 _line.ContentChanged = false;
             }
 
-            if (glyphPlans.Count > 0)
+            if (_reusableUnscaledGlyphPlanList.Count > 0)
             {
 
                 _printer.DrawFromGlyphPlans(

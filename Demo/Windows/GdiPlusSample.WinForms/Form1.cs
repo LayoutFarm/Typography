@@ -291,14 +291,18 @@ namespace SampleWinForms
 
             Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
 
-            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
+            UnscaledGlyphPlanList userGlyphPlans = new UnscaledGlyphPlanList();
 
-            MeasuredStringBox strBox =
-               _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
-                 textBuffer, 0, textBuffer.Length,
-                 _currentTextPrinter.FontSizeInPoints,
-                 true,
-                 userGlyphPlans);
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(userGlyphPlans);
+
+            MeasuredStringBox strBox = new MeasuredStringBox();
+            throw new System.NotSupportedException();
+
+            //_currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
+            //  textBuffer, 0, textBuffer.Length,
+            //  _currentTextPrinter.FontSizeInPoints,
+            //  true,
+            //  userGlyphPlans);
 
             float x_pos2 = x_pos + strBox.width + 10;
             g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.descending, strBox.width, strBox.CalculateLineHeight());
@@ -313,7 +317,7 @@ namespace SampleWinForms
             int j = userGlyphPlans.Count;
             for (int i = 0; i < j; ++i)
             {
-                PxScaledGlyphPlan glyphPlan = userGlyphPlans[i];
+                UnscaledGlyphPlan glyphPlan = userGlyphPlans[i];
                 Typography.OpenFont.Glyph glyph = typeface.GetGlyphByIndex(glyphPlan.glyphIndex);
                 //
                 Typography.OpenFont.Bounds b = glyph.Bounds;
