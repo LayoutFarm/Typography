@@ -97,6 +97,13 @@ namespace DrawingGL
         {
             fillShader.DrawLine(x0, y0, x1, y1, this.StrokeColor);
         }
+        internal TextPrinter TextPrinter
+        {
+            get
+            {
+                return _textPrinter;
+            }
+        }
         public void FillTextRun(TextRun textRun, float x, float y)
         {
             //fill text run at spefic pos
@@ -108,17 +115,21 @@ namespace DrawingGL
             float nx = x;
             float ny = y;
 
+            float pxscale = _textPrinter.Typeface.CalculateScaleToPixelFromPointSize(_textPrinter.FontSizeInPoints);
+
+
             for (int i = 0; i < j; ++i)
             {
                 //render each glyph
                 GlyphRun run = glyphs[i];
-                Typography.TextLayout.PxScaledGlyphPlan plan = run.GlyphPlan;
 
-                nx = x + accX + plan.OffsetX;
-                ny = y + accY + plan.OffsetY;
+                Typography.TextLayout.UnscaledGlyphPlan plan = run.GlyphPlan;
+
+                nx = x + accX + plan.OffsetX * pxscale;
+                ny = y + accY + plan.OffsetY * pxscale;
 
                 fillShader.SetOffset(nx, ny);
-                accX += plan.AdvanceX;
+                accX += (plan.AdvanceX * pxscale);
 
 
                 fillShader.FillTriangles(

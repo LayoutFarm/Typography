@@ -245,6 +245,8 @@ namespace SampleWinForms
         //        atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
         //    }
         //}
+
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlan = new UnscaledGlyphPlanList();
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -281,14 +283,14 @@ namespace SampleWinForms
             //2.1
 
 
-            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans);
+            _reusableUnscaledGlyphPlan.Clear();
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlan);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
             _currentTextPrinter.FillColor = Color.Red;
             _currentTextPrinter.DrawFromGlyphPlans(
-                  userGlyphPlans,
+                  new GlyphPlanSequence(_reusableUnscaledGlyphPlan),
                   x_pos,
                   y_pos
              );

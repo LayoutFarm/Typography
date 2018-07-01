@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
-{   
+{
     class Glyf : TableEntry
     {
         Glyph[] _glyphs;
@@ -292,7 +292,7 @@ namespace Typography.OpenFont.Tables
                     reader.BaseStream.Position = storedOffset;
                 }
 
-                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex]);
+                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
                 short arg1 = 0;
                 short arg2 = 0;

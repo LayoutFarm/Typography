@@ -30,30 +30,32 @@ namespace SampleWinForms.UI
             _line.SetCharIndexFromPos(x, y);
         }
 
+
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public void Draw()
         {
 
-            PxScaledGlyphPlanList glyphPlans = _line._glyphPlans;
+     
             //List<UserCodePointToGlyphIndex> userCharToGlyphIndexMap = _line._userCodePointToGlyphIndexMap;
             if (_line.ContentChanged)
             {
                 //TODO: or font face/font-size change 
                 //re-calculate 
                 char[] textBuffer = _line._charBuffer.ToArray();
-                glyphPlans.Clear();
+          
                 //userCharToGlyphIndexMap.Clear();
-                //read glyph plan and userCharToGlyphIndexMap                
-
-                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, glyphPlans);
-
-
+                //read glyph plan and userCharToGlyphIndexMap      
+                _reusableUnscaledGlyphPlanList.Clear();
+                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
                 _line.ContentChanged = false;
             }
 
-            if (glyphPlans.Count > 0)
+            if (_reusableUnscaledGlyphPlanList.Count > 0)
             {
 
-                _printer.DrawFromGlyphPlans(glyphPlans, X, Y);
+                _printer.DrawFromGlyphPlans(
+                    new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
+                    X, Y);
                 //draw caret 
                 //not blink in this version
                 int caret_index = _line.CaretCharIndex;

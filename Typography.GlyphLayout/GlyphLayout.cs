@@ -5,8 +5,8 @@ using Typography.OpenFont;
 
 namespace Typography.TextLayout
 {
-     
-   
+
+
     /// <summary>
     /// unscaled glyph-plan
     /// </summary>
@@ -90,6 +90,12 @@ namespace Typography.TextLayout
         readonly IUnscaledGlyphPlanList glyphBuffer;
         internal readonly int startAt;
         internal readonly ushort len;
+        public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer)
+        {
+            this.glyphBuffer = glyphBuffer;
+            this.startAt = 0;
+            this.len = (ushort)glyphBuffer.Count;
+        }
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer, int startAt, int len)
         {
             this.glyphBuffer = glyphBuffer;
@@ -489,8 +495,8 @@ namespace Typography.TextLayout
                     offsetX,
                     offsetY
                     );
-            } 
-        } 
+            }
+        }
     }
 
 

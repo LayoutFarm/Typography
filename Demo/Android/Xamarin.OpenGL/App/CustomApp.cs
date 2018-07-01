@@ -42,22 +42,24 @@ namespace Test_Android_Glyph
             //}
             //-------------------------------------------------------------------------- 
             //we want to create a prepared visual object ***
-            textContext = new TypographyTextContext()
-            {
-                FontFamily = "DroidSans.ttf", //corresponding to font file Assets/DroidSans.ttf
-                FontSize = 64,//size in Points
-                FontStretch = FontStretch.Normal,
-                FontStyle = FontStyle.Normal,
-                FontWeight = FontWeight.Normal,
-                Alignment = DrawingGL.Text.TextAlignment.Leading
-            };
+            //textContext = new TypographyTextContext()
+            //{
+            //    FontFamily = "DroidSans.ttf", //corresponding to font file Assets/DroidSans.ttf
+            //    FontSize = 64,//size in Points
+            //    FontStretch = FontStretch.Normal,
+            //    FontStyle = FontStyle.Normal,
+            //    FontWeight = FontWeight.Normal,
+            //    Alignment = DrawingGL.Text.TextAlignment.Leading
+            //};
             //-------------------------------------------------------------------------- 
             //create blank text run 
             textRun = new TextRun();
-            //generate glyph run inside text text run
-            textContext.GenerateGlyphRuns(textRun, text);
-            //-------------------------------------------------------------------------- 
-
+            TextPrinter textPrinter = simpleCanvas.TextPrinter;
+            textPrinter.FontFilename = "DroidSans.ttf"; //corresponding to font file Assets/DroidSans.ttf
+            textPrinter.FontSizeInPoints = 64;
+            //
+            simpleCanvas.TextPrinter.GenerateGlyphRuns(textRun, text.ToCharArray(), 0, text.Length);
+            //--------------------------------------------------------------------------  
         }
 
         public void RenderFrame()

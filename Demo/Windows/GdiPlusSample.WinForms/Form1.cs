@@ -237,6 +237,8 @@ namespace SampleWinForms
         //}
 
 
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
+
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -272,14 +274,15 @@ namespace SampleWinForms
             //you can create you own class to hold userGlyphPlans.***
             //2.1
 
-            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList(); 
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans);
+            _reusableUnscaledGlyphPlanList.Clear();
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
             _currentTextPrinter.FillColor = Color.Red;
+
             _currentTextPrinter.DrawFromGlyphPlans(
-                  userGlyphPlans,
+                  new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
                   x_pos,
                   y_pos
              );
@@ -288,10 +291,18 @@ namespace SampleWinForms
 
             Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
 
-            MeasuredStringBox strBox =
-               _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
-                 textBuffer, 0, textBuffer.Length,
-                 _currentTextPrinter.FontSizeInPoints);
+            UnscaledGlyphPlanList userGlyphPlans = new UnscaledGlyphPlanList();
+
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(userGlyphPlans);
+
+            MeasuredStringBox strBox = new MeasuredStringBox();
+            throw new System.NotSupportedException();
+
+            //_currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
+            //  textBuffer, 0, textBuffer.Length,
+            //  _currentTextPrinter.FontSizeInPoints,
+            //  true,
+            //  userGlyphPlans);
 
             float x_pos2 = x_pos + strBox.width + 10;
             g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.descending, strBox.width, strBox.CalculateLineHeight());
@@ -300,14 +311,13 @@ namespace SampleWinForms
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.ascending, x_pos2, y_pos + strBox.ascending);//ascending
 
 
-
             Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
 
             int j = userGlyphPlans.Count;
             for (int i = 0; i < j; ++i)
             {
-                PxScaledGlyphPlan glyphPlan = userGlyphPlans[i];
+                UnscaledGlyphPlan glyphPlan = userGlyphPlans[i];
                 Typography.OpenFont.Glyph glyph = typeface.GetGlyphByIndex(glyphPlan.glyphIndex);
                 //
                 Typography.OpenFont.Bounds b = glyph.Bounds;

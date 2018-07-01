@@ -10,8 +10,7 @@ namespace Typography.TextLayout
         int _caretCharIndex = 0;//default  
         //TODO: temp public, review accessibility here again
         public List<char> _charBuffer = new List<char>();
-        public PxScaledGlyphPlanList _glyphPlans = new PxScaledGlyphPlanList();
-
+        public PxScaledGlyphPlan[] _glyphPlans;
         public List<UserCodePointToGlyphIndex> _userCodePointToGlyphIndexMap = new List<UserCodePointToGlyphIndex>();
 
         bool _contentChanged = true;
@@ -189,7 +188,7 @@ namespace Typography.TextLayout
         public void SetCharIndexFromPos(float x, float y)
         {
 
-            int count = _glyphPlans.Count;
+            int count = _glyphPlans.Length;
             float accum_x = 0;
 
 
