@@ -56,20 +56,20 @@
     <Compile Include="Polygon\Polygon.cs" />
     <Compile Include="x_notused\PolygonSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Triangulation\Delaunay\DelaunayTriangle.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\AdvancingFront.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweep.cs" />
+    <Compile Include="Delaunay\DelaunayTriangle.cs" />
+    <Compile Include="Delaunay\AdvancingFront.cs" />
+    <Compile Include="Delaunay\AdvancingFrontNode.cs" />
+    <Compile Include="Delaunay\DTSweep.cs" />
     <Compile Include="x_notused\DTSweepBasin.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepConstraint.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepContext.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs" />
+    <Compile Include="Delaunay\DTSweepConstraint.cs" />
+    <Compile Include="Delaunay\DTSweepContext.cs" />
+    <Compile Include="Delaunay\DTSweepDebugContext.cs" />
     <Compile Include="x_notused\DTSweepEdgeEvent.cs" />
     <Compile Include="x_notused\DTSweepPointComparator.cs" />
-    <Compile Include="Triangulation\Delaunay\Sweep\PointOnEdgeException.cs" />
+    <Compile Include="Delaunay\PointOnEdgeException.cs" />
     <Compile Include="Triangulation\Orientation.cs" />
-    <Compile Include="Triangulation\Sets\ConstrainedPointSet.cs" />
-    <Compile Include="Triangulation\Sets\PointSet.cs" />
+    <Compile Include="Sets\ConstrainedPointSet.cs" />
+    <Compile Include="Sets\PointSet.cs" />
     <Compile Include="Triangulation\ITriangulatable.cs" />
     <Compile Include="Triangulation\TriangulationAlgorithm.cs" />
     <Compile Include="x_notused\TriangulationConstraint.cs" />
@@ -78,15 +78,14 @@
     <Compile Include="Triangulation\TriangulationMode.cs" />
     <Compile Include="Triangulation\TriangulationPoint.cs" />
     <Compile Include="Triangulation\TriangulationUtil.cs" />
-    <Compile Include="Triangulation\Util\PointGenerator.cs" />
-    <Compile Include="Triangulation\Util\PolygonGenerator.cs" />
+    <Compile Include="Util\PointGenerator.cs" />
+    <Compile Include="Util\PolygonGenerator.cs" />
     <Compile Include="x_notused\FixedArray3.cs" />
     <Compile Include="x_notused\FixedBitArray3.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

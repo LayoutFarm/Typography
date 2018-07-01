@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System.Collections.Generic;
 using Typography.OpenFont.Tables;
 namespace Typography.TextLayout
@@ -10,28 +10,27 @@ namespace Typography.TextLayout
     class GlyphIndexList : IGlyphIndexList
     {
         List<ushort> _glyphIndices = new List<ushort>();
-        List<int> _originalChars = new List<int>();
-        ushort _originalOffset = 0;
-        List<GlyphIndexToUserChar> _mapGlyphIndexToUserChar = new List<GlyphIndexToUserChar>();
-        internal List<UserCharToGlyphIndexMap> _mapUserCharToGlyphIndices = new List<UserCharToGlyphIndexMap>();
+        List<int> _inputCodePointIndexList = new List<int>();
+        ushort _originalCodePointOffset = 0;
+        List<GlyphIndexToUserCodePoint> _mapGlyphIndexToUserCodePoint = new List<GlyphIndexToUserCodePoint>();
 
         /// <summary>
         /// map from glyph index to original user char
         /// </summary>
-        struct GlyphIndexToUserChar
+        struct GlyphIndexToUserCodePoint
         {
             /// <summary>
             /// offset from start layout char
             /// </summary>
-            public readonly ushort o_user_charOffset;
+            public readonly ushort o_codepoint_charOffset;
             public readonly ushort len;
 #if DEBUG
             public ushort dbug_glyphIndex;
 #endif
-            public GlyphIndexToUserChar(ushort o_user_charOffset, ushort len)
+            public GlyphIndexToUserCodePoint(ushort o_user_charOffset, ushort len)
             {
                 this.len = len;
-                this.o_user_charOffset = o_user_charOffset;
+                this.o_codepoint_charOffset = o_user_charOffset;
 #if DEBUG
                 this.dbug_glyphIndex = 0;
 #endif
@@ -39,7 +38,7 @@ namespace Typography.TextLayout
 #if DEBUG
             public override string ToString()
             {
-                return "char_offset: " + o_user_charOffset + " : len" + len;
+                return "codepoint_offset: " + o_codepoint_charOffset + " : len" + len;
             }
 #endif
         }
@@ -47,28 +46,30 @@ namespace Typography.TextLayout
         public void Clear()
         {
             _glyphIndices.Clear();
-            _originalOffset = 0;
-            _originalChars.Clear();
+            _originalCodePointOffset = 0;
+            _inputCodePointIndexList.Clear();
 
-            _mapGlyphIndexToUserChar.Clear();
-            _mapUserCharToGlyphIndices.Clear();
+            _mapGlyphIndexToUserCodePoint.Clear();
+
         }
         /// <summary>
-        /// add original char and its glyph index
+        ///  add codepoint index and its glyph index
         /// </summary>
-        /// <param name="glyphIndex"></param>
-        public void AddGlyph(int originalChar, ushort glyphIndex)
+        /// <param name="codePointIndex">index to codepoint element in code point array</param>
+        /// <param name="glyphIndex">map to glyphindex</param>
+        public void AddGlyph(int codePointIndex, ushort glyphIndex)
         {
-            _glyphIndices.Add(glyphIndex);
             //so we can monitor what substituion process
-            _originalChars.Add(originalChar);
 
-            var glyphIndexToCharMap = new GlyphIndexToUserChar(_originalOffset, 1);
+            _inputCodePointIndexList.Add(codePointIndex);
+            _glyphIndices.Add(glyphIndex);
+
+            var glyphIndexToCharMap = new GlyphIndexToUserCodePoint(_originalCodePointOffset, 1);
 #if DEBUG
             glyphIndexToCharMap.dbug_glyphIndex = glyphIndex;
 #endif
-            _mapGlyphIndexToUserChar.Add(glyphIndexToCharMap);
-            _originalOffset++;
+            _mapGlyphIndexToUserCodePoint.Add(glyphIndexToCharMap);
+            _originalCodePointOffset++;
         }
 
         /// <summary>
@@ -82,6 +83,13 @@ namespace Typography.TextLayout
                 return _glyphIndices[index];
             }
         }
+        public void GetGlyphIndexAndMap(int index, out ushort glyphIndex, out ushort input_codepointOffset, out ushort input_mapLen)
+        {
+            glyphIndex = _glyphIndices[index];
+            GlyphIndexToUserCodePoint glyphIndexToUserCodePoint = _mapGlyphIndexToUserCodePoint[index];
+            input_codepointOffset = glyphIndexToUserCodePoint.o_codepoint_charOffset;
+            input_mapLen = glyphIndexToUserCodePoint.len;
+        }
 
         /// <summary>
         /// remove:add_new 1:1
@@ -94,7 +102,7 @@ namespace Typography.TextLayout
         }
 
 #if DEBUG
-        List<GlyphIndexToUserChar> _tmpGlypIndexBackup = new List<GlyphIndexToUserChar>();
+        List<GlyphIndexToUserCodePoint> _tmpGlypIndexBackup = new List<GlyphIndexToUserCodePoint>();
 #endif
         /// <summary>
         /// remove:add_new >=1:1
@@ -110,27 +118,27 @@ namespace Typography.TextLayout
             _glyphIndices.RemoveRange(index, removeLen);
             _glyphIndices.Insert(index, newGlyphIndex);
             //------------------------------------------------  
-             
-            GlyphIndexToUserChar firstRemove = _mapGlyphIndexToUserChar[index];
+
+            GlyphIndexToUserCodePoint firstRemove = _mapGlyphIndexToUserCodePoint[index];
 
 #if DEBUG
             _tmpGlypIndexBackup.Clear();
             int endAt = index + removeLen;
             for (int i = index; i < endAt; ++i)
             {
-                _tmpGlypIndexBackup.Add(_mapGlyphIndexToUserChar[i]);
+                _tmpGlypIndexBackup.Add(_mapGlyphIndexToUserCodePoint[i]);
             }
             _tmpGlypIndexBackup.Clear();
 #endif
             //TODO: check if removeLen > ushort.Max
-            GlyphIndexToUserChar newMap = new GlyphIndexToUserChar(firstRemove.o_user_charOffset, (ushort)removeLen);
+            GlyphIndexToUserCodePoint newMap = new GlyphIndexToUserCodePoint(firstRemove.o_codepoint_charOffset, (ushort)removeLen);
 #if DEBUG
             newMap.dbug_glyphIndex = newGlyphIndex;
 #endif
 
             //------------------------------------------------ 
-            _mapGlyphIndexToUserChar.RemoveRange(index, removeLen);
-            _mapGlyphIndexToUserChar.Insert(index, newMap);
+            _mapGlyphIndexToUserCodePoint.RemoveRange(index, removeLen);
+            _mapGlyphIndexToUserCodePoint.Insert(index, newMap);
 
         }
         /// <summary>
@@ -142,52 +150,49 @@ namespace Typography.TextLayout
         {
             _glyphIndices.RemoveAt(index);
             _glyphIndices.InsertRange(index, newGlyphIndices);
-            GlyphIndexToUserChar cur = _mapGlyphIndexToUserChar[index];
-            _mapGlyphIndexToUserChar.RemoveAt(index);
+            GlyphIndexToUserCodePoint cur = _mapGlyphIndexToUserCodePoint[index];
+            _mapGlyphIndexToUserCodePoint.RemoveAt(index);
             //insert 
             int j = newGlyphIndices.Length;
             for (int i = 0; i < j; ++i)
             {
-                var newglyph = new GlyphIndexToUserChar(cur.o_user_charOffset, 1);
+                var newglyph = new GlyphIndexToUserCodePoint(cur.o_codepoint_charOffset, 1);
 #if DEBUG
                 newglyph.dbug_glyphIndex = newGlyphIndices[i];
 #endif
-                //can point to the same user char                 
-                _mapGlyphIndexToUserChar.Insert(index, newglyph);
+                //may point to the same user char                 
+                _mapGlyphIndexToUserCodePoint.Insert(index, newglyph);
             }
         }
 
 
-        public void CreateMapFromUserCharToGlyphIndices()
+        public void CreateMapFromUserCodePointToGlyphIndices(List<UserCodePointToGlyphIndex> mapUserCodePointToGlyphIndex)
         {
             //(optional)
-            //this method should be called after we finish the substitution process
-            _mapUserCharToGlyphIndices.Clear();
+            //this method should be called after we finish the substitution process 
             //--------------------------------------
-            int userCharCount = _originalChars.Count;
-
-            for (int i = 0; i < userCharCount; ++i)
+            int codePointCount = _inputCodePointIndexList.Count;
+            for (int i = 0; i < codePointCount; ++i)
             {
-                var charToGlyphMap = new UserCharToGlyphIndexMap();
-#if DEBUG
-                charToGlyphMap.dbug_userCharIndex = (ushort)i;
-                charToGlyphMap.dbug_userChar = _originalChars[i];
-#endif
-                _mapUserCharToGlyphIndices.Add(charToGlyphMap);
+                //
+                var codePointToGlyphIndexMap = new UserCodePointToGlyphIndex();
+                //set index that point to original codePointIndex
+                codePointToGlyphIndexMap.userCodePointIndex = _inputCodePointIndexList[i];
+                //
+                mapUserCodePointToGlyphIndex.Add(codePointToGlyphIndexMap);
             }
             //--------------------------------------
-            //then fill with glyphindex to user char information 
+            //then fill the user-codepoint with glyph information information 
 
             int glyphIndexCount = _glyphIndices.Count;
             for (int i = 0; i < glyphIndexCount; ++i)
             {
-                GlyphIndexToUserChar glyphIndexToUserChar = _mapGlyphIndexToUserChar[i];
+                GlyphIndexToUserCodePoint glyphIndexToUserCodePoint = _mapGlyphIndexToUserCodePoint[i];
                 //
-                UserCharToGlyphIndexMap charToGlyphIndexMap = _mapUserCharToGlyphIndices[glyphIndexToUserChar.o_user_charOffset];
-                charToGlyphIndexMap.AppendData((ushort)(i + 1), (glyphIndexToUserChar.len));
+                UserCodePointToGlyphIndex charToGlyphIndexMap = mapUserCodePointToGlyphIndex[glyphIndexToUserCodePoint.o_codepoint_charOffset];
+                charToGlyphIndexMap.AppendData((ushort)(i + 1), (glyphIndexToUserCodePoint.len));
                 //replace with the changed value
-                _mapUserCharToGlyphIndices[glyphIndexToUserChar.o_user_charOffset] = charToGlyphIndexMap;
-
+                mapUserCodePointToGlyphIndex[glyphIndexToUserCodePoint.o_codepoint_charOffset] = charToGlyphIndexMap;
             }
 
         }

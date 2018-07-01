@@ -1,4 +1,4 @@
-﻿//MIT, 2017, WinterDev
+﻿//MIT, 2017-present, WinterDev
 using System.Numerics;
 namespace Typography.Contours
 {

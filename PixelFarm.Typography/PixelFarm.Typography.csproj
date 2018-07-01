@@ -33,9 +33,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Build\N20\Typography.Contours\Typography.Contours.csproj">
+      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
+      <Name>Typography.Contours</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>
       <Name>Typography.GlyphLayout</Name>
@@ -44,12 +47,8 @@
       <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj">
-      <Project>{e4a1c3c3-1c1c-4e11-a2e6-a1fafd6652c7}</Project>
-      <Name>Typography.Contours</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{fe23e283-a667-4e68-b381-c7d8598d3688}</Project>
+    <ProjectReference Include="..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
       <Name>Typography.TextServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
@@ -61,59 +60,28 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\FontAtlas\BinPacker.cs">
-      <Link>4_FontAtlas\BinPacker.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\GlyphImages.cs">
-      <Link>4_FontAtlas\GlyphImages.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\MsdfGlyphGen.cs">
-      <Link>4_FontAtlas\MsdfGlyphGen.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\SimpleFontAtlas.cs">
-      <Link>4_FontAtlas\SimpleFontAtlas.cs</Link>
-    </Compile>
-    <Compile Include="..\FontAtlas\SimpleFontAtlasBuilder.cs">
-      <Link>4_FontAtlas\SimpleFontAtlasBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeColor.cs">
-      <Link>5_Msdf\EdgeColor.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeColoring.cs">
-      <Link>5_Msdf\EdgeColoring.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeHolder.cs">
-      <Link>5_Msdf\EdgeHolder.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EdgeSegment.cs">
-      <Link>5_Msdf\EdgeSegment.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\EquationSolver.cs">
-      <Link>5_Msdf\EquationSolver.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\MsdfGen.cs">
-      <Link>5_Msdf\MsdfGen.cs</Link>
-    </Compile>
-    <Compile Include="..\Typography.MsdfGen\SignedDistance.cs">
-      <Link>5_Msdf\SignedDistance.cs</Link>
-    </Compile>
-    <Compile Include="1.1_Drawing_Fonts\DevPrinterBase.cs" />
+    <Compile Include="1.1_Drawing_Fonts\FontAtlasTextPrinter.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilder.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
-    <Compile Include="1.1_Drawing_Fonts\GlyphMeshCollection.cs" />
-    <Compile Include="1.1_Drawing_Fonts\HintTechnique.cs" />
-    <Compile Include="1.1_Drawing_Fonts\OpenFontIFonts.cs" />
-    <Compile Include="1.1_Drawing_Fonts\PixelScaleLayoutEngine.cs" />
-    <Compile Include="1.2_\TextShapingAndLayoutService.cs" />
+    <Compile Include="1.1_Drawing_Fonts\GlyphMeshStore.cs" />
+    <Compile Include="1.1_Drawing_Fonts\OpenFontTextService.cs" />
+    <Compile Include="1.3_DrawingFonts\ManagedShapingService.cs" />
+    <Compile Include="1.3_DrawingFonts\TextShapingAndLayoutService.cs" />
+    <Compile Include="2_Drawing_Text\ActualFont.cs" />
+    <Compile Include="2_Drawing_Text\FontFace.cs" />
+    <Compile Include="2_Drawing_Text\FontGlyph.cs" />
+    <Compile Include="3_FontFaceImpl\BitmapFontMx.cs" />
+    <Compile Include="3_FontFaceImpl\GlyphTextureBitmapGenerator.cs" />
     <Compile Include="3_FontFaceImpl\NOpenFontFace.cs" />
     <Compile Include="3_FontFaceImpl\OpenFontLoader.cs" />
     <Compile Include="1.1_Drawing_Fonts\VxsTextPrinter.cs" />
     <Compile Include="3_FontFaceImpl\ScriptLangConv.cs" />
     <Compile Include="3_FontFaceImpl\TextureFontLoader.cs" />
-    <Compile Include="6_AggTexture\AggGlyphTextureGen.cs" />
-    <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilderBase.cs" />
-    <Compile Include="1.2_\FontStyleExtensions.cs" />
+    <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
+    <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
   </ItemGroup>
+  <Import Project="..\Typography.MsdfGen\Typography.MsdfGen.projitems" Label="Shared" />
+  <Import Project="..\FontAtlas\FontAtlas.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

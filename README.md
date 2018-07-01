@@ -22,7 +22,7 @@ and the example(2) the uses Typography with 'mini' snapshot of PixelFarm Renderi
 Concept
 ---
 
- * 1.Loads .ttf files, with OpenFontReader.
+ * 1.Loads .ttf, .otf files, with OpenFontReader.
  
  * 2.Rasterizes char to bitmap with pure software renderer + Agg(anti grain geometry) Quality! with 
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
@@ -219,6 +219,7 @@ The FreeType Project LICENSE (3-clauses BSD style),2003-2016, David Turner, Robe
 
 MIT, 2016, Viktor Chlumsky, https://github.com/Chlumsky/msdfgen
 
+Apache2, 2018, Apache/PDFBox Authors,  https://github.com/apache/pdfbox
 
 **Geometry**
 

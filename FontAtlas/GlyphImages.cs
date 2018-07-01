@@ -1,4 +1,5 @@
-﻿using System;
+﻿//MIT, 2016-present, WinterDev
+using System;
 using Typography.Contours;
 namespace Typography.Rendering
 {
@@ -58,69 +59,32 @@ namespace Typography.Rendering
     {
         public int borderX;
         public int borderY;
-        public GlyphImage img;
+        internal GlyphImage img;
         public Rectangle area;
-        public char character;
-        public int codePoint;
-        public GlyphMatrix2 glyphMatrix;
-    
-    }
+        public char character;//TODO: this should be code point(int32)
+        public ushort glyphIndex;
 
-    public class TextureFontGlyphData
+    }
+    public class TextureGlyphMapData
     {
+
+        public int Left { get; set; }
+        public int Top { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         public float BorderX { get; set; }
         public float BorderY { get; set; }
-        public float AdvanceX { get; set; }
-        public float AdvanceY { get; set; }
-        public float BBoxXMin { get; set; }
-        public float BBoxXMax { get; set; }
-        public float BBoxYMin { get; set; }
-        public float BBoxYMax { get; set; }
-        public float ImgWidth { get; set; }
-        public float ImgHeight { get; set; }
-        //-----
-        public float HAdvance { get; set; }
-        public float HBearingX { get; set; }
-        public float HBearingY { get; set; }
-        //-----
-        public float VAdvance { get; set; }
-        public float VBearingX { get; set; }
-        public float VBearingY { get; set; }
-        //---
-        public double TextureXOffset { get; set; }
-        public double TextureYOffset { get; set; }
 
-        public Rectangle Rect
+        public float TextureXOffset { get; set; }
+        public float TextureYOffset { get; set; }
+
+        public void GetRect(out int x, out int y, out int w, out int h)
         {
-            get;
-            set;
+            x = Left;
+            y = Top;
+            w = Width;
+            h = Height;
         }
-
     }
 
-    public struct GlyphMatrix2
-    {
-        public short unit_per_em;
-        public short ascender;
-        public short descender;
-        public short height;
-        public int advanceX;
-        public int advanceY;
-        public int bboxXmin;
-        public int bboxXmax;
-        public int bboxYmin;
-        public int bboxYmax;
-        public int img_width;
-        public int img_height;
-        public int img_horiBearingX;
-        public int img_horiBearingY;
-        public int img_horiAdvance;
-        public int img_vertBearingX;
-        public int img_vertBearingY;
-        public int img_vertAdvance;
-        public int bitmap_left;
-        public int bitmap_top;
-        //public IntPtr bitmap;
-        //public IntPtr outline;
-    }
 }

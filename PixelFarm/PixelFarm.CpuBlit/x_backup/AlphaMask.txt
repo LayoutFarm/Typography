@@ -1,0 +1,495 @@
+////BSD, 2014-present, WinterDev
+////----------------------------------------------------------------------------
+//// Anti-Grain Geometry - Version 2.4
+//// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
+////
+//// C# Port port by: Lars Brubaker
+////                  larsbrubaker@gmail.com
+//// Copyright (C) 2007
+////
+//// Permission to copy, use, modify, sell and distribute this software 
+//// is granted provided this copyright notice appears in all copies. 
+//// This software is provided "as is" without express or implied
+//// warranty, and with no claim as to its suitability for any purpose.
+////
+////----------------------------------------------------------------------------
+//// Contact: mcseem@antigrain.com
+////          mcseemagg@yahoo.com
+////          http://www.antigrain.com
+////----------------------------------------------------------------------------
+////
+//// scanline_u8 class
+////
+////----------------------------------------------------------------------------
+
+//using System;
+//namespace PixelFarm.Agg
+//{
+//    public interface IAlphaMask
+//    {
+//        byte pixel(int x, int y);
+//        // byte combine_pixel(int x, int y, byte val);
+//        void fill_hspan(int x, int y, byte[] dst, int dstIndex, int num_pix);
+//        void fill_vspan(int x, int y, byte[] dst, int dstIndex, int num_pix);
+//        void combine_hspanFullCover(int x, int y, byte[] dst, int dstIndex, int num_pix);
+//        void combine_hspan(int x, int y, byte[] dst, int dstIndex, int num_pix);
+//        void combine_vspan(int x, int y, byte[] dst, int dstIndex, int num_pix);
+//    }
+
+//    public sealed class AlphaMaskByteUnclipped : IAlphaMask
+//    {
+//        IBitmapBlender m_rbuf;
+//        uint m_Step;
+//        uint m_Offset;
+//        //public static readonly int cover_shift = 8;
+//        //public static readonly int cover_none = 0;
+//        //public static readonly int cover_full = 255;
+
+//        public AlphaMaskByteUnclipped(IBitmapBlender rbuf, uint Step, uint Offset)
+//        {
+//            m_Step = Step;
+//            m_Offset = Offset;
+//            m_rbuf = rbuf;
+//        }
+
+//        public void attach(IBitmapBlender rbuf) { m_rbuf = rbuf; }
+
+//        //--------------------------------------------------------------------
+//        public byte pixel(int x, int y)
+//        {
+
+//            unsafe
+//            {
+//                int bufferIndex = m_rbuf.GetByteBufferOffsetXY(x, y);
+//                TempMemPtr tmpMem = m_rbuf.GetBufferPtr();
+//                byte value = *((byte*)tmpMem.Ptr + bufferIndex);
+//                tmpMem.Release();
+//                return value;
+//            }
+//        }
+
+//        //--------------------------------------------------------------------
+//        //public byte combine_pixel(int x, int y, byte val)
+//        //{
+//        //    unchecked
+//        //    {
+//        //        int bufferIndex = m_rbuf.GetBufferOffsetXY(x, y);
+//        //        byte[] buffer = m_rbuf.GetBuffer();
+//        //        return (byte)((255 + val * buffer[bufferIndex]) >> 8);
+//        //    }
+//        //}
+
+//        public void fill_hspan(int x, int y, byte[] dst, int dstIndex, int num_pix)
+//        {
+//            throw new NotImplementedException();
+//#if false
+//            byte[] mask = m_rbuf.GetPixelPointerY(y) + x * m_Step + m_Offset;
+//            do
+//            {
+//                *dst++ = *mask;
+//                mask += m_Step;
+//            }
+//            while (--num_pix != 0);
+//#endif
+//        }
+
+//        public void combine_hspanFullCover(int x, int y, byte[] covers, int coversIndex, int count)
+//        {
+//            int maskIndex = m_rbuf.GetByteBufferOffsetXY(x, y);
+//            unsafe
+//            {
+//                TempMemPtr memPtr = m_rbuf.GetBufferPtr();
+//                byte* m = ((byte*)memPtr.Ptr + maskIndex);
+//                do
+//                {
+//                    covers[coversIndex++] = *m;//[maskIndex++];
+//                    m++; //move to next
+//                }
+//                while (--count != 0);
+//                memPtr.Release();
+//            }
+//            //byte[] mask = m_rbuf.GetBuffer();
+//            //do
+//            //{
+//            //    covers[coversIndex++] = mask[maskIndex++];
+//            //}
+//            //while (--count != 0);
+//        }
+
+//        public void combine_hspan(int x, int y, byte[] covers, int coversIndex, int count)
+//        {
+//            unsafe
+//            {
+//                int maskIndex = m_rbuf.GetByteBufferOffsetXY(x, y);
+//                TempMemPtr maskPtr = m_rbuf.GetBufferPtr();
+
+//                byte* mask = (byte*)maskPtr.Ptr;
+//                do
+//                {
+//                    covers[coversIndex] = (byte)((255 + (covers[coversIndex]) * mask[maskIndex]) >> 8);
+//                    coversIndex++;
+//                    maskIndex++;
+//                }
+//                while (--count != 0);
+//                maskPtr.Release();
+//            }
+
+//        }
+
+//        public void fill_vspan(int x, int y, byte[] buffer, int bufferIndex, int num_pix)
+//        {
+//            throw new NotImplementedException();
+//#if false
+//            byte[] mask = m_rbuf.GetPixelPointerY(y) + x * m_Step + m_Offset;
+//            do
+//            {
+//                *dst++ = *mask;
+//                mask += m_rbuf.StrideInBytes();
+//            }
+//            while (--num_pix != 0);
+//#endif
+//        }
+
+//        public void combine_vspan(int x, int y, byte[] dst, int dstIndex, int num_pix)
+//        {
+//            throw new NotImplementedException();
+//#if false
+//            byte[] mask = m_rbuf.GetPixelPointerY(y) + x * m_Step + m_Offset;
+//            do
+//            {
+//                *dst = (byte)((cover_full + (*dst) * (*mask)) >> cover_shift);
+//                ++dst;
+//                mask += m_rbuf.StrideInBytes();
+//            }
+//            while (--num_pix != 0);
+//#endif
+//        }
+//    }
+//    public sealed class AlphaMaskByteClipped : IAlphaMask
+//    {
+//        IBitmapBlender m_rbuf;
+//        uint m_Step;
+//        uint m_Offset;
+//        //public static readonly int cover_shift = 8;
+//        //public static readonly int cover_none = 0;
+//        //public static readonly int cover_full = 255;
+
+//        public AlphaMaskByteClipped(IBitmapBlender rbuf, uint step, uint offset)
+//        {
+//            m_Step = step;
+//            m_Offset = offset;
+//            m_rbuf = rbuf;
+//        }
+
+//        public void attach(IBitmapBlender rbuf) { m_rbuf = rbuf; }
+
+
+//        //--------------------------------------------------------------------
+//        public byte pixel(int x, int y)
+//        {
+//            unchecked
+//            {
+//                if ((uint)x < (uint)m_rbuf.Width
+//                    && (uint)y < (uint)m_rbuf.Height)
+//                {
+
+//                    unsafe
+//                    {
+//                        int bufferIndex = m_rbuf.GetByteBufferOffsetXY(x, y);
+//                        TempMemPtr tmpMem = m_rbuf.GetBufferPtr();
+//                        byte value = *((byte*)tmpMem.Ptr + bufferIndex);
+//                        tmpMem.Release();
+//                        return value;
+//                    }
+
+//                    //int bufferIndex = m_rbuf.GetByteBufferOffsetXY(x, y);
+//                    //byte[] buffer = m_rbuf.GetBuffer();
+//                    //return buffer[bufferIndex];
+//                }
+//            }
+
+//            return 0;
+//        }
+
+//        //public byte combine_pixel(int x, int y, byte val)
+//        //{
+//        //    unchecked
+//        //    {
+//        //        if ((uint)x < (uint)m_rbuf.Width
+//        //            && (uint)y < (uint)m_rbuf.Height)
+//        //        {
+//        //            int bufferIndex = m_rbuf.GetBufferOffsetXY(x, y);
+//        //            byte[] buffer = m_rbuf.GetBuffer();
+//        //            return (byte)((val * buffer[bufferIndex] + 255) >> 8);
+//        //        }
+//        //    }
+//        //    return 0;
+//        //}
+
+//        public void fill_hspan(int x, int y, byte[] dst, int dstIndex, int num_pix)
+//        {
+//            throw new NotImplementedException();
+//#if false
+//            int xmax = (int)m_rbuf.Width() - 1;
+//            int ymax = (int)m_rbuf.Height() - 1;
+
+//            int count = num_pix;
+//            byte[] covers = dst;
+
+//            if (y < 0 || y > ymax)
+//            {
+//                agg_basics.MemClear(dst, num_pix);
+//                return;
+//            }
+
+//            if (x < 0)
+//            {
+//                count += x;
+//                if (count <= 0)
+//                {
+//                    agg_basics.MemClear(dst, num_pix);
+//                    return;
+//                }
+//                agg_basics.MemClear(covers, -x);
+//                covers -= x;
+//                x = 0;
+//            }
+
+//            if (x + count > xmax)
+//            {
+//                int rest = x + count - xmax - 1;
+//                count -= rest;
+//                if (count <= 0)
+//                {
+//                    agg_basics.MemClear(dst, num_pix);
+//                    return;
+//                }
+//                agg_basics.MemClear(covers + count, rest);
+//            }
+
+//            byte[] mask = m_rbuf.GetPixelPointerY(y) + x * m_Step + m_Offset;
+//            do
+//            {
+//                *covers++ = *(mask);
+//                mask += m_Step;
+//            }
+//            while (--count != 0);
+//#endif
+//        }
+
+//        public void combine_hspanFullCover(int x, int y, byte[] covers, int coversIndex, int num_pix)
+//        {
+//            int xmax = (int)m_rbuf.Width - 1;
+//            int ymax = (int)m_rbuf.Height - 1;
+//            int count = num_pix;
+//            if (y < 0 || y > ymax)
+//            {
+//                AggMemMx.MemClear(covers, coversIndex, num_pix);
+//                return;
+//            }
+
+//            if (x < 0)
+//            {
+//                count += x;
+//                if (count <= 0)
+//                {
+//                    AggMemMx.MemClear(covers, coversIndex, num_pix);
+//                    return;
+//                }
+//                AggMemMx.MemClear(covers, coversIndex, -x);
+//                coversIndex -= x;
+//                x = 0;
+//            }
+
+//            if (x + count > xmax)
+//            {
+//                int rest = x + count - xmax - 1;
+//                count -= rest;
+//                if (count <= 0)
+//                {
+//                    AggMemMx.MemClear(covers, coversIndex, num_pix);
+//                    return;
+//                }
+//                AggMemMx.MemClear(covers, coversIndex + count, rest);
+//            }
+
+//            int maskIndex = m_rbuf.GetByteBufferOffsetXY(x, y);
+//            unsafe
+//            {
+//                TempMemPtr maskPtr = m_rbuf.GetBufferPtr();
+//                byte* mask = (byte*)maskPtr.Ptr;
+//                do
+//                {
+//                    covers[coversIndex++] = mask[maskIndex++];
+//                }
+//                while (--count != 0);
+
+//                maskPtr.Release();
+//            }
+
+//        }
+
+//        public void combine_hspan(int x, int y, byte[] buffer, int bufferIndex, int num_pix)
+//        {
+//            int xmax = (int)m_rbuf.Width - 1;
+//            int ymax = (int)m_rbuf.Height - 1;
+//            int count = num_pix;
+//            byte[] covers = buffer;
+//            int coversIndex = bufferIndex;
+//            if (y < 0 || y > ymax)
+//            {
+//                AggMemMx.MemClear(buffer, bufferIndex, num_pix);
+//                return;
+//            }
+
+//            if (x < 0)
+//            {
+//                count += x;
+//                if (count <= 0)
+//                {
+//                    AggMemMx.MemClear(buffer, bufferIndex, num_pix);
+//                    return;
+//                }
+//                AggMemMx.MemClear(covers, coversIndex, -x);
+//                coversIndex -= x;
+//                x = 0;
+//            }
+
+//            if (x + count > xmax)
+//            {
+//                int rest = x + count - xmax - 1;
+//                count -= rest;
+//                if (count <= 0)
+//                {
+//                    AggMemMx.MemClear(buffer, bufferIndex, num_pix);
+//                    return;
+//                }
+//                AggMemMx.MemClear(covers, coversIndex + count, rest);
+//            }
+
+//            int maskIndex = m_rbuf.GetByteBufferOffsetXY(x, y);
+
+//            unsafe
+//            {
+//                TempMemPtr maskPtr = m_rbuf.GetBufferPtr();
+//                byte* maskHead = (byte*)maskPtr.Ptr;
+//                fixed (byte* coverHead = &covers[coversIndex])
+//                {
+//                    byte* c_mask_index = maskHead;
+//                    byte* c_cover_index = coverHead;
+//                    do
+//                    {
+//                        *c_cover_index = (byte)((*c_cover_index * (*c_mask_index) + 255) >> 8);
+//                        c_cover_index++;
+//                        c_mask_index++;
+//                    }
+//                    while (--count != 0);
+//                }
+//                maskPtr.Release();
+//            }
+//        }
+
+//        public void fill_vspan(int x, int y, byte[] buffer, int bufferIndex, int num_pix)
+//        {
+//            throw new NotImplementedException();
+//#if false
+//            int xmax = (int)m_rbuf.Width() - 1;
+//            int ymax = (int)m_rbuf.Height() - 1;
+
+//            int count = num_pix;
+//            byte[] covers = dst;
+
+//            if (x < 0 || x > xmax)
+//            {
+//                agg_basics.MemClear(dst, num_pix);
+//                return;
+//            }
+
+//            if (y < 0)
+//            {
+//                count += y;
+//                if (count <= 0)
+//                {
+//                    agg_basics.MemClear(dst, num_pix);
+//                    return;
+//                }
+//                agg_basics.MemClear(covers, -y);
+//                covers -= y;
+//                y = 0;
+//            }
+
+//            if (y + count > ymax)
+//            {
+//                int rest = y + count - ymax - 1;
+//                count -= rest;
+//                if (count <= 0)
+//                {
+//                    agg_basics.MemClear(dst, num_pix);
+//                    return;
+//                }
+//                agg_basics.MemClear(covers + count, rest);
+//            }
+
+//            byte[] mask = m_rbuf.GetPixelPointerY(y) + x * m_Step + m_Offset;
+//            do
+//            {
+//                *covers++ = *mask;
+//                mask += m_rbuf.StrideInBytes();
+//            }
+//            while (--count != 0);
+//#endif
+//        }
+
+//        public void combine_vspan(int x, int y, byte[] buffer, int bufferIndex, int num_pix)
+//        {
+//            throw new NotImplementedException();
+//#if false
+//            int xmax = (int)m_rbuf.Width() - 1;
+//            int ymax = (int)m_rbuf.Height() - 1;
+
+//            int count = num_pix;
+//            byte[] covers = dst;
+
+//            if (x < 0 || x > xmax)
+//            {
+//                agg_basics.MemClear(dst, num_pix);
+//                return;
+//            }
+
+//            if (y < 0)
+//            {
+//                count += y;
+//                if (count <= 0)
+//                {
+//                    agg_basics.MemClear(dst, num_pix);
+//                    return;
+//                }
+//                agg_basics.MemClear(covers, -y);
+//                covers -= y;
+//                y = 0;
+//            }
+
+//            if (y + count > ymax)
+//            {
+//                int rest = y + count - ymax - 1;
+//                count -= rest;
+//                if (count <= 0)
+//                {
+//                    agg_basics.MemClear(dst, num_pix);
+//                    return;
+//                }
+//                agg_basics.MemClear(covers + count, rest);
+//            }
+
+//            byte[] mask = m_rbuf.GetPixelPointerY(y) + x * m_Step + m_Offset;
+//            do
+//            {
+//                *covers = (byte)((cover_full + (*covers) * (*mask)) >> cover_shift);
+//                ++covers;
+//                mask += m_rbuf.StrideInBytes();
+//            }
+//            while (--count != 0);
+//#endif
+//        }
+//    };
+//}

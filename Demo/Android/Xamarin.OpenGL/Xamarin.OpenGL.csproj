@@ -52,14 +52,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
+      <Link>App\GlyphPathBuilderBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.Contours\TextPrinterBase.cs">
+      <Link>App\TextPrinterBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
+      <Link>App\GlyphMeshCollection.cs</Link>
+    </Compile>
     <Compile Include="App\CustomApp.cs" />
-    <Compile Include="App\Color.cs" />
-    <Compile Include="App\Shaders.cs" />
     <Compile Include="GLView1.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="App\SimpleCanvas.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\DroidSans.ttf" />
@@ -81,12 +87,12 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\Android\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{6abd1c6e-866d-42a8-99d0-7780b4ad08d3}</Project>
+    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
       <Name>Typography.GlyphLayout</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\Android\Typography.OpenFont\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{9e204a4b-f9b8-4f7f-a792-184260b3494d}</Project>
+    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{280d17d5-4435-4ead-839a-33c5a8990e7e}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">

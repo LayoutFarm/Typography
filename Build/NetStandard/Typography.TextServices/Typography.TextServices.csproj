@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />
+
+  <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
+
+  <Import Project="..\..\..\Typography.TextFlow\Typography.TextFlow.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj" />
+    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj" />
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
+  </ItemGroup>
+
+</Project>

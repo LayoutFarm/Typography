@@ -1,4 +1,4 @@
-﻿//BSD, 2014-2017, WinterDev
+﻿//BSD, 2014-present, WinterDev
 
 /* Poly2Tri
  * Copyright (c) 2009-2010, Poly2Tri Contributors

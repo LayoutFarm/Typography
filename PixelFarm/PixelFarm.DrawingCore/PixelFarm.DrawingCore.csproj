@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FDE310C7-9C58-47F9-A6AF-3F518613BC4B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PixelFarm.DrawingCore</RootNamespace>
+    <AssemblyName>PixelFarm.DrawingCore</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PIXEL_FARM, PIXEL_FARM_NET20</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\PixelFarm.PrimitiveGeo\AffinePlan.cs">
+      <Link>1_PrimitiveGeo\AffinePlan.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveGeo\BasicGeometries.cs">
+      <Link>1_PrimitiveGeo\BasicGeometries.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveGeo\Rectangle.cs">
+      <Link>1_PrimitiveGeo\Rectangle.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveGeo\RectangleF.cs">
+      <Link>1_PrimitiveGeo\RectangleF.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.PrimitiveGeo\RectInt.cs">
+      <Link>1_PrimitiveGeo\RectInt.cs</Link>
+    </Compile>
+    <Compile Include="2_Abstract_DrawingElements\Brushes_Pens.cs" />
+    <Compile Include="2_Abstract_DrawingElements\Color.cs" />
+    <Compile Include="2_Abstract_DrawingElements\CombineMode.cs" />
+    <Compile Include="2_Abstract_DrawingElements\DashStyle.cs" />
+    <Compile Include="2_Abstract_DrawingElements\GraphicsPath.cs" />
+    <Compile Include="2_Abstract_DrawingElements\Image.cs" />
+    <Compile Include="2_Abstract_DrawingElements\Region.cs" />
+    <Compile Include="3_DrawBoard\0_VertexCommandAndOrientation.cs" />
+    <Compile Include="3_DrawBoard\1_VertexStore.cs" />
+    <Compile Include="3_DrawBoard\2_VertexStoreSnap.cs" />
+    <Compile Include="3_DrawBoard\DrawBoard.cs" />
+    <Compile Include="3_DrawBoard\Painter.cs" />
+    <Compile Include="3_DrawBoard\RenderVx.cs" />
+    <Compile Include="3_DrawBoard\RequestFont.cs" />
+    <Compile Include="ExtensionAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

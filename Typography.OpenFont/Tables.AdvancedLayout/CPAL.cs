@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 Sam Hocevar <sam@hocevar.net>, WinterDev
+﻿// Copyright © 2017-present Sam Hocevar <sam@hocevar.net>, WinterDev
 // Apache2
 
 
@@ -34,7 +34,7 @@ namespace Typography.OpenFont.Tables
         public void GetColor(int colorIndex, out byte r, out byte g, out byte b, out byte a)
         {
             //Each color record has BGRA values. The color space for these values is sRGB.
-            //Type Name    Description
+            //Type    Name    Description
             //uint8   blue    Blue value(B0).
             //uint8   green   Green value(B1).
             //uint8   red     Red value(B2).
@@ -45,7 +45,7 @@ namespace Typography.OpenFont.Tables
             b = colorBGRABuffer[startAt];
             g = colorBGRABuffer[startAt + 1];
             r = colorBGRABuffer[startAt + 2];
-            a = colorBGRABuffer[startAt + 3]; 
+            a = colorBGRABuffer[startAt + 3];
         }
     }
 }

@@ -32,10 +32,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicFontOptionsUserControl.cs">
@@ -58,6 +56,12 @@
     <Compile Include="GlyphLayoutOptionsUserControl.Designer.cs">
       <DependentUpon>GlyphLayoutOptionsUserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlyphNameListUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GlyphNameListUserControl.Designer.cs">
+      <DependentUpon>GlyphNameListUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="GlyphRenderOptions.cs" />
     <Compile Include="GlyphRenderOptionsUserControl.cs">
       <SubType>UserControl</SubType>
@@ -67,9 +71,14 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BasicFontOptions.cs" />
+    <Compile Include="SampleMeasureStringUtils.cs" />
     <Compile Include="TypefaceChangedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.Contours\Typography.Contours.csproj">
+      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
+      <Name>Typography.Contours</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>
@@ -78,13 +87,17 @@
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
+      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
+      <Name>Typography.TextServices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\PixelFarm.Typography\PixelFarm.Typography.csproj">
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{fe23e283-a667-4e68-b381-c7d8598d3688}</Project>
-      <Name>Typography.TextServices</Name>
+    <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
+      <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
+      <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +109,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GlyphLayoutOptionsUserControl.resx">
       <DependentUpon>GlyphLayoutOptionsUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GlyphNameListUserControl.resx">
+      <DependentUpon>GlyphNameListUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GlyphRenderOptionsUserControl.resx">
       <DependentUpon>GlyphRenderOptionsUserControl.cs</DependentUpon>

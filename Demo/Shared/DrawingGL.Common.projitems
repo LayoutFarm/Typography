@@ -10,10 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\FontManagement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\GlyphMeshCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Color.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Shaders.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\SimpleCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ActiveRegion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\ContourVertex.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\DevTextPrinterBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\CurveFlattener.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Path.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Primitives.cs" />
@@ -27,8 +28,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\GeometryUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\MiniShaderProgram.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilderBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\HintTechnique.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Dictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Face.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\HalfEdge.cs" />

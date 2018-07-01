@@ -1,4 +1,4 @@
-﻿//Apache2, 2017, WinterDev
+﻿//Apache2, 2017-present, WinterDev
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 using System.Collections.Generic;
 using Typography.OpenFont.Tables;
@@ -55,6 +55,29 @@ namespace Typography.OpenFont
             //---------------------------------------------------
         }
 
+
+        CFFTable _cffTable;
+        internal Typeface(
+           NameEntry nameEntry,
+           Bounds bounds,
+           ushort unitsPerEm,
+           CFFTable cffTable,
+           HorizontalMetrics horizontalMetrics,
+           OS2Table os2Table)
+        {
+
+            _nameEntry = nameEntry;
+            _bounds = bounds;
+            _unitsPerEm = unitsPerEm;
+            _cffTable = cffTable;
+            _horizontalMetrics = horizontalMetrics;
+            OS2Table = os2Table;
+
+
+            //------
+            this._glyphs = _cffTable.Cff1FontSet._fonts[0].glyphs;
+        }
+
         /// <summary>
         /// control values in Font unit
         /// </summary>
@@ -85,6 +108,7 @@ namespace Typography.OpenFont
             get;
             set;
         }
+        internal CFFTable CffTable { get { return _cffTable; } }
         /// <summary>
         /// actual font filename
         /// </summary>
@@ -149,6 +173,12 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
+        /// <summary>
+        /// find glyph index by codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="nextCodepoint"></param>
+        /// <returns></returns>
         public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
             return CmapTable.LookupIndex(codepoint, nextCodepoint);
@@ -158,21 +188,74 @@ namespace Typography.OpenFont
         {
             return _glyphs[LookupIndex(codepoint)];
         }
-        public Glyph GetGlyphByIndex(int glyphIndex)
+        public Glyph GetGlyphByIndex(ushort glyphIndex)
         {
             return _glyphs[glyphIndex];
         }
+        public int GlyphCount
+        {
+            get { return _glyphs.Length; }
+        }
+        public Glyph GetGlyphByName(string glyphName)
+        {
+
+            if (_cffTable != null)
+            {
+                //early preview ...
+                List<CFF.Cff1Font> cff1Fonts = _cffTable.Cff1FontSet._fonts;
+                for (int i = 0; i < cff1Fonts.Count; i++)
+                {
+                    Glyph glyph = cff1Fonts[i].GetGlyphByName(glyphName);
+                    if (glyph != null) return glyph;
+                }
+                return null;
+            }
+            else if (PostTable != null)
+            {
+                return GetGlyphByIndex(GetGlyphIndexByName(glyphName));
+            }
+            return null;
+        }
+        public ushort GetGlyphIndexByName(string glyphName)
+        {
+            if (_cffTable != null)
+            {
+                return GetGlyphByName(glyphName)._cff1GlyphData.GlyphIndex;
+            }
+            else if (PostTable != null)
+            {
+                if (PostTable.Version == 2)
+                {
+                    return PostTable.GetGlyphIndex(glyphName);
+                }
+                else
+                {
+                    //check data from adobe glyph list 
+                    //from the unicode value
+                    //select glyph index   
+
+                    //we use AdobeGlyphList
+                    //from https://github.com/adobe-type-tools/agl-aglfn/blob/master/glyphlist.txt
+
+                    //but user can provide their own map here...
+
+                    return LookupIndex(AdobeGlyphList.GetUnicodeValueByGlyphName(glyphName));
+                }
+            }
+            return 0;
+        }
+
 
         public ushort GetAdvanceWidth(int codepoint)
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
         }
-        public ushort GetHAdvanceWidthFromGlyphIndex(int glyphIndex)
+        public ushort GetHAdvanceWidthFromGlyphIndex(ushort glyphIndex)
         {
 
             return _horizontalMetrics.GetAdvanceWidth(glyphIndex);
         }
-        public short GetHFrontSideBearingFromGlyphIndex(int glyphIndex)
+        public short GetHFrontSideBearingFromGlyphIndex(ushort glyphIndex)
         {
             return _horizontalMetrics.GetLeftSideBearing(glyphIndex);
         }
@@ -234,31 +317,8 @@ namespace Typography.OpenFont
 
         //-------------------------------------------------------
 
-        public void Lookup(char[] buffer, List<int> output)
-        {
-            //do shaping here?
-            //1. do look up and substitution 
-            for (int i = 0; i < buffer.Length; ++i)
-            {
-                char ch = buffer[i];
-                int codepoint = ch;
-                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < buffer.Length)
-                {
-                    char nextCh = buffer[i + 1];
-                    if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
-                    {
-                        ++i;
-                        codepoint = char.ConvertToUtf32(ch, nextCh);
-                    }
-                }
 
-                output.Add(LookupIndex(codepoint));
-            }
-            //tmp disable here
-            //check for glyph substitution
-            //this.GSUBTable.CheckSubstitution(output[1]);
-        }
-        //-------------------------------------------------------
+
         //experiment
         internal void LoadOpenFontLayoutInfo(GDEF gdefTable, GSUB gsubTable, GPOS gposTable, BASE baseTable, COLR colrTable, CPAL cpalTable)
         {
@@ -275,8 +335,48 @@ namespace Typography.OpenFont
             if (gdefTable != null)
             {
                 gdefTable.FillGlyphData(this.Glyphs);
+                //if (this.Glyphs != null)
+                //{
+
+                //}
+                //else if (this._cffTable != null)
+                //{
+                //    //post script outline
+                //    //TODO: fill gdef for cff font
+
+                //}
+
             }
         }
+
+
+        //---------        
+        internal PostTable PostTable { get; set; }
+        internal bool _evalCffGlyphBounds;
+        internal bool IsCffFont
+        {
+            get
+            {
+                return _cffTable != null;
+            }
+        }
+        //---------
+        internal MathTable _mathTable;
+        internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
+        internal Glyph[] GetRawGlyphList()
+        {
+            return _glyphs;
+        }
+        public MathGlyphs.MathConstants MathConsts
+        {
+            get
+            {
+                return (_mathTable != null) ? _mathTable._mathConstTable : null;
+            }
+        }
+        //---------
+        internal SvgTable _svgTable;
+
     }
 
 
@@ -289,13 +389,70 @@ namespace Typography.OpenFont
         void AppendGlyphAdvance(int index, short appendAdvX, short appendAdvY);
 
         ushort GetGlyph(int index, out ushort advW);
-        ushort GetGlyph(int index, out short offsetX, out short offsetY, out short advW);
+        ushort GetGlyph(int index, out ushort inputOffset, out short offsetX, out short offsetY, out short advW);
         //
         void GetOffset(int index, out short offsetX, out short offsetY);
     }
 
 
+    public static class StringUtils
+    {
+        public static void FillWithCodepoints(List<int> codepoints, char[] str, int startAt = 0, int len = -1)
+        {
 
+            if (len == -1) len = str.Length;
+            // this is important!
+            // -----------------------
+            //  from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // In many places, "char" is not a valid type to handle characters, because it
+            // only supports 16 bits.In order to handle the full range of Unicode characters,
+            // we need to use "int".
+            // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
+            // though they are encoded as two "char"s in a C# string.
+            for (int i = 0; i < len; ++i)
+            {
+                char ch = str[startAt + i];
+                int codepoint = ch;
+                if (char.IsHighSurrogate(ch) && i + 1 < len)
+                {
+                    char nextCh = str[startAt + i + 1];
+                    if (char.IsLowSurrogate(nextCh))
+                    {
+                        ++i;
+                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                    }
+                }
+                codepoints.Add(codepoint);
+            }
+        }
+        public static IEnumerable<int> GetCodepoints(char[] str, int startAt = 0, int len = -1)
+        {
+            if (len == -1) len = str.Length;
+            // this is important!
+            // -----------------------
+            //  from @samhocevar's PR: (https://github.com/LayoutFarm/Typography/pull/56/commits/b71c7cf863531ebf5caa478354d3249bde40b96e)
+            // In many places, "char" is not a valid type to handle characters, because it
+            // only supports 16 bits.In order to handle the full range of Unicode characters,
+            // we need to use "int".
+            // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
+            // though they are encoded as two "char"s in a C# string.
+            for (int i = 0; i < len; ++i)
+            {
+                char ch = str[startAt + i];
+                int codepoint = ch;
+                if (char.IsHighSurrogate(ch) && i + 1 < len)
+                {
+                    char nextCh = str[startAt + i + 1];
+                    if (char.IsLowSurrogate(nextCh))
+                    {
+                        ++i;
+                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                    }
+                }
+                yield return codepoint;
+            }
+        }
+    }
 
     namespace Extensions
     {
@@ -388,9 +545,9 @@ namespace Typography.OpenFont
                 //sTypoAscender, sTypoDescender and sTypoLineGap specify the recommended line spacing for single-spaced horizontal text.
                 //The baseline-to-baseline value is expressed by:
                 //OS/2.sTypoAscender - OS/2.sTypoDescender + OS/2.sTypoLineGap
- 
-       
- 
+
+
+
 
                 //sTypoLineGap will usually be set by the font developer such that the value of the above expression is approximately 120% of the em.
                 //The application can use this value as the default horizontal line spacing. 
@@ -538,5 +695,263 @@ namespace Typography.OpenFont
         {
             public static CurrentOSName CurrentOSName;
         }
+    }
+
+
+    public struct GlyphNameMap
+    {
+        public readonly ushort glyphIndex;
+        public readonly string glyphName;
+        public GlyphNameMap(ushort glyphIndex, string glyphName)
+        {
+            this.glyphIndex = glyphIndex;
+            this.glyphName = glyphName;
+        }
+    }
+
+    public static class TypefaceExtension2
+    {
+
+
+        public static IEnumerable<GlyphNameMap> GetGlyphNameIter(this Typeface typeface)
+        {
+            if (typeface.IsCffFont)
+            {
+                CFF.Cff1Font cff1Font = typeface.CffTable.Cff1FontSet._fonts[0];
+                foreach (var kp in cff1Font.GetGlyphNameIter())
+                {
+                    yield return kp;
+                }
+            }
+            else if (typeface.PostTable.Version == 2)
+            {
+                //version 1 and 3 => no glyph names
+
+                foreach (var kp in typeface.PostTable.GlyphNames)
+                {
+                    yield return new GlyphNameMap(kp.Key, kp.Value);
+                }
+            }
+        }
+
+        public static bool HasMathTable(this Typeface typeface)
+        {
+            return typeface.MathConsts != null;
+        }
+        public static bool HasSvgTable(this Typeface typeface)
+        {
+            return typeface._svgTable != null;
+        }
+
+        class CffBoundFinder : IGlyphTranslator
+        {
+
+            float _minX, _maxX, _minY, _maxY;
+            float _curX, _curY;
+            float _latestMove_X, _latestMove_Y;
+            /// <summary>
+            /// curve flatten steps  => this a copy from Typography.Contours's GlyphPartFlattener
+            /// </summary>
+            int nsteps = 3;
+            bool _contourOpen = false;
+            bool _first_eval = true;
+            public CffBoundFinder()
+            {
+
+            }
+            public void Reset()
+            {
+                _curX = _curY = _latestMove_X = _latestMove_Y = 0;
+                _minX = _minY = float.MaxValue;//**
+                _maxX = _maxY = float.MinValue;//**
+                _first_eval = true;
+                _contourOpen = false;
+            }
+            public void BeginRead(int contourCount)
+            {
+
+            }
+            public void EndRead()
+            {
+
+            }
+            public void CloseContour()
+            {
+                _contourOpen = false;
+                _curX = _latestMove_X;
+                _curY = _latestMove_Y;
+            }
+            public void Curve3(float x1, float y1, float x2, float y2)
+            {
+
+                //this a copy from Typography.Contours -> GlyphPartFlattener
+
+                float eachstep = (float)1 / nsteps;
+                float t = eachstep;//start
+
+                for (int n = 1; n < nsteps; ++n)
+                {
+                    float c = 1.0f - t;
+
+                    UpdateMinMax(
+                         (c * c * _curX) + (2 * t * c * x1) + (t * t * x2),  //x
+                         (c * c * _curY) + (2 * t * c * y1) + (t * t * y2)); //y
+
+                    t += eachstep;
+                }
+
+                //
+                UpdateMinMax(
+                    _curX = x2,
+                    _curY = y2);
+
+                _contourOpen = true;
+            }
+
+            public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
+            {
+
+                //this a copy from Typography.Contours -> GlyphPartFlattener
+
+
+                float eachstep = (float)1 / nsteps;
+                float t = eachstep;//start
+
+                for (int n = 1; n < nsteps; ++n)
+                {
+                    float c = 1.0f - t;
+
+                    UpdateMinMax(
+                        (_curX * c * c * c) + (x1 * 3 * t * c * c) + (x2 * 3 * t * t * c) + x3 * t * t * t,  //x
+                        (_curY * c * c * c) + (y1 * 3 * t * c * c) + (y2 * 3 * t * t * c) + y3 * t * t * t); //y
+
+                    t += eachstep;
+                }
+                //
+                UpdateMinMax(
+                    _curX = x3,
+                    _curY = y3);
+
+                _contourOpen = true;
+            }
+            public void LineTo(float x1, float y1)
+            {
+                UpdateMinMax(
+                    _curX = x1,
+                    _curY = y1);
+
+                _contourOpen = true;
+            }
+            public void MoveTo(float x0, float y0)
+            {
+
+                if (_contourOpen)
+                {
+                    CloseContour();
+                }
+
+                UpdateMinMax(
+                    _curX = x0,
+                    _curY = y0);
+            }
+            void UpdateMinMax(float x0, float y0)
+            {
+
+                if (_first_eval)
+                {
+                    //4 times
+
+                    if (x0 < _minX)
+                    {
+                        _minX = x0;
+                    }
+                    //
+                    if (x0 > _maxX)
+                    {
+                        _maxX = x0;
+                    }
+                    //
+                    if (y0 < _minY)
+                    {
+                        _minY = y0;
+                    }
+                    //
+                    if (y0 > _maxY)
+                    {
+                        _maxY = y0;
+                    }
+
+                    _first_eval = false;
+                }
+                else
+                {
+                    //2 times
+
+                    if (x0 < _minX)
+                    {
+                        _minX = x0;
+                    }
+                    else if (x0 > _maxX)
+                    {
+                        _maxX = x0;
+                    }
+
+                    if (y0 < _minY)
+                    {
+                        _minY = y0;
+                    }
+                    else if (y0 > _maxY)
+                    {
+                        _maxY = y0;
+                    }
+                }
+
+            }
+
+            public Bounds GetResultBounds()
+            {
+                return new Bounds(
+                    (short)System.Math.Floor(_minX),
+                    (short)System.Math.Floor(_minY),
+                    (short)System.Math.Ceiling(_maxX),
+                    (short)System.Math.Ceiling(_maxY));
+            }
+
+
+        }
+        public static void UpdateAllCffGlyphBounds(this Typeface typeface)
+        {
+
+            if (typeface.IsCffFont && !typeface._evalCffGlyphBounds)
+            {
+                int j = typeface.GlyphCount;
+                CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
+                CffBoundFinder boundFinder = new CffBoundFinder();
+                for (ushort i = 0; i < j; ++i)
+                {
+#if DEBUG
+
+                    //if (i == 3084)
+                    //{
+
+                    //}
+#endif
+                    Glyph g = typeface.GetGlyphByIndex(i);
+                    boundFinder.Reset();
+
+                    evalEngine.Run(boundFinder,
+                        g._ownerCffFont,
+                        g._cff1GlyphData.GlyphInstructions);
+
+                    g.Bounds = boundFinder.GetResultBounds();
+                }
+                typeface._evalCffGlyphBounds = true;
+            }
+        }
+
+
+
+
+
     }
 }

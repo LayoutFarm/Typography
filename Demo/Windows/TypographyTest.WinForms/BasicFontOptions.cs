@@ -1,4 +1,4 @@
-﻿//MIT, 2017, WinterDev
+﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,20 +22,21 @@ namespace TypographyTest
     public class BasicFontOptions
     {
         public event EventHandler UpdateRenderOutput;
-        public event EventHandler<TypefaceChangedEventArgs> TypefaceChanged; 
+        public event EventHandler<TypefaceChangedEventArgs> TypefaceChanged;
 
-        TypefaceStore _typefaceStore;
-        InstalledFontCollection _installedFontCollection;
-        OpenFontStore _openFontStore;
         InstalledFont _installedFont;
 
         Typeface _selectedTypeface;
         bool _typefaceChanged = false;
+
+        Typography.TextServices.TextServices _textServices;
         public BasicFontOptions()
         {
-           
+
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
+            _textServices = new TextServices();
+
         }
         public RenderChoice RenderChoice
         {
@@ -44,30 +45,32 @@ namespace TypographyTest
         }
         public void LoadFontList()
         {
-
-            _openFontStore = new OpenFontStore();
-            _typefaceStore = new TypefaceStore();
-            //
-            _installedFontCollection = new InstalledFontCollection();
-            _typefaceStore.FontCollection = _installedFontCollection;
-
-            //---------- 
-            //1. create font collection        
-            //2. set some essential handler
-            _installedFontCollection.SetFontNameDuplicatedHandler((f1, f2) => FontNameDuplicatedDecision.Skip);
-            foreach (string file in Directory.GetFiles("../../../TestFonts", "*.ttf"))
+            PositionTech = PositionTechnique.OpenFont;
+            ////---------- 
+            ////1. create font collection        
+            ////2. set some essential handler
+            foreach (string file in Directory.GetFiles("../../../TestFonts", "*.*"))
             {
                 //eg. this is our custom font folder  
-                _installedFontCollection.AddFont(new FontFileStreamProvider(file));
+                string ext = Path.GetExtension(file).ToLower();
+
+                switch (ext)
+                {
+                    case ".ttf":
+                    case ".otf":
+                        _textServices.InstalledFontCollection.AddFont(new FontFileStreamProvider(file));
+                        break;
+                }
+
             }
-            PositionTech = PositionTechnique.OpenFont;
+
         }
         public PositionTechnique PositionTech { get; set; }
-        public OpenFontStore OpenFontStore
-        {
-            get { return _openFontStore; }
-            set { _openFontStore = value; }
-        }
+        //public OpenFontStore OpenFontStore
+        //{
+        //    get { return _openFontStore; }
+        //    set { _openFontStore = value; }
+        //}
         public Typeface Typeface
         {
             get
@@ -89,7 +92,9 @@ namespace TypographyTest
                 _typefaceChanged = false;
                 //
                 if (value == null) return;
-                var selected_typeface = _typefaceStore.GetTypeface(value);
+
+                //TODO: review here again
+                Typeface selected_typeface = _textServices.GetTypeface(value.FontName, InstalledFontStyle.Normal);
                 if (selected_typeface != this._selectedTypeface)
                 {
                     _typefaceChanged = true;
@@ -99,7 +104,7 @@ namespace TypographyTest
         }
         public IEnumerable<InstalledFont> GetInstalledFontIter()
         {
-            foreach (InstalledFont ff in _installedFontCollection.GetInstalledFontIter())
+            foreach (InstalledFont ff in _textServices.InstalledFontCollection.GetInstalledFontIter())
             {
                 yield return ff;
             }

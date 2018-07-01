@@ -1,4 +1,4 @@
-﻿//Apache2, 2017, WinterDev
+﻿//Apache2, 2017-present, WinterDev
 //https://www.microsoft.com/typography/otspec/vhea.htm
 
 using System;

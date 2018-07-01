@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>16af3672-531e-4e0d-8f23-65285fe56298</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Typography.Contours</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)TextPrinterBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\0_GlyphTriangle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\1_EdgeLine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\2_GlyphCentroidPair.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\3_GlyphBoneJoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\4_GlyphBone.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\5_CentroidLineAndHub.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\CurveGen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphContour.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphContourBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphIntermediateOutline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphOutlineAnalyzer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphOutlineWalker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphPartFlattener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphParts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\MyMath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\Rect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphDynamicOutline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphMeshCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilderBase.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0CC424D5-20AC-4849-993D-3A720DBAE94F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PixelFarm.Painter</RootNamespace>
+    <AssemblyName>PixelFarm.Painter</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CubicBezier.cs">
+      <Link>1_Vectors\4_BurningMineCurves\CubicBezier.cs</Link>
+    </Compile>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveBuilder.cs">
+      <Link>1_Vectors\4_BurningMineCurves\CurveBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveFit.cs">
+      <Link>1_Vectors\4_BurningMineCurves\CurveFit.cs</Link>
+    </Compile>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveFitBase.cs">
+      <Link>1_Vectors\4_BurningMineCurves\CurveFitBase.cs</Link>
+    </Compile>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurvePreprocess.cs">
+      <Link>1_Vectors\4_BurningMineCurves\CurvePreprocess.cs</Link>
+    </Compile>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\Spline.cs">
+      <Link>1_Vectors\4_BurningMineCurves\Spline.cs</Link>
+    </Compile>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\SplineBuilder.cs">
+      <Link>1_Vectors\4_BurningMineCurves\SplineBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\BackEnd.BurningMineCurve\curveutils\VectorHelper.cs">
+      <Link>1_Vectors\4_BurningMineCurves\VectorHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\AggMath.cs">
+      <Link>1_Vectors\1_VectorMaths\AggMath.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\AxisAlignedBoundingBox.cs">
+      <Link>1_Vectors\1_VectorMaths\AxisAlignedBoundingBox.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\BezierCurve.cs">
+      <Link>1_Vectors\1_VectorMaths\BezierCurve.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\BezierCurveCubic.cs">
+      <Link>1_Vectors\1_VectorMaths\BezierCurveCubic.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\BezierCurveQuadric.cs">
+      <Link>1_Vectors\1_VectorMaths\BezierCurveQuadric.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\MathHelper.cs">
+      <Link>1_Vectors\1_VectorMaths\MathHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\Matrix4x4.cs">
+      <Link>1_Vectors\1_VectorMaths\Matrix4x4.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\MyVector2.cs">
+      <Link>1_Vectors\1_VectorMaths\MyVector2.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\Quaternion.cs">
+      <Link>1_Vectors\1_VectorMaths\Quaternion.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\Ray.cs">
+      <Link>1_Vectors\1_VectorMaths\Ray.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\Vector2.cs">
+      <Link>1_Vectors\1_VectorMaths\Vector2.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\Vector3.cs">
+      <Link>1_Vectors\1_VectorMaths\Vector3.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\Vector3Float.cs">
+      <Link>1_Vectors\1_VectorMaths\Vector3Float.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\1_vectormaths\Vector4.cs">
+      <Link>1_Vectors\1_VectorMaths\Vector4.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\2_geometry\Arc.cs">
+      <Link>1_Vectors\2_Geometry\Arc.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\2_geometry\BezireCurve.cs">
+      <Link>1_Vectors\2_Geometry\BezireCurve.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\2_geometry\BSpline.cs">
+      <Link>1_Vectors\2_Geometry\BSpline.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\2_geometry\Collections.cs">
+      <Link>1_Vectors\2_Geometry\Collections.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\2_geometry\Curves.cs">
+      <Link>1_Vectors\2_Geometry\Curves.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\2_geometry\Ellipse.cs">
+      <Link>1_Vectors\2_Geometry\Ellipse.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\2_geometry\RectD.cs">
+      <Link>1_Vectors\2_Geometry\RectD.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\3_Transform\1_Affine.cs">
+      <Link>1_Vectors\3_Transform\1_Affine.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\3_transform\2_Bilinear.cs">
+      <Link>1_Vectors\3_Transform\2_Bilinear.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\3_transform\3_Perspective.cs">
+      <Link>1_Vectors\3_Transform\3_Perspective.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\3_transform\4_SimulEqGeneral.cs">
+      <Link>1_Vectors\3_Transform\4_SimulEqGeneral.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\3_Transform\ICoordTransformer.cs">
+      <Link>1_Vectors\3_Transform\ICoordTransformer.cs</Link>
+    </Compile>
+    <Compile Include="..\pixelfarm.vectors\3_transform\Viewport.cs">
+      <Link>1_Vectors\3_Transform\Viewport.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\5_Clipper\cliper.cs">
+      <Link>1_Vectors\5_Clipper\cliper.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\5_Clipper\ClipLiangBarsky.cs">
+      <Link>1_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
+    </Compile>
+    <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="3_Cpu_Blit\ColorRGBAf.cs" />
+    <Compile Include="3_Cpu_Blit\PainterExtensions.cs" />
+    <Compile Include="2_Canvas\ColorEx.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\BoundingRect.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\CurveFlattener.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\LineCapAndJoin.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\LineWalker.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\PathWriter.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\RoundedRect.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\SimpleRect.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\Stroke.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\StrokeGenerator.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\StrokeGen_Old.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\StrokeMath.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\VectorToolBox.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\VertexData.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs" />
+    <Compile Include="2_Canvas\ITextPrinter.cs" />
+    <Compile Include="3_Cpu_Blit\ActualBitmap.cs" />
+    <Compile Include="3_Cpu_Blit\MemMx.cs" />
+    <Compile Include="3_Cpu_Blit\NativeMemMx.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\VertexHitTester.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\VxsClipping.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PixelFarm.DrawingCore\PixelFarm.DrawingCore.csproj">
+      <Project>{fde310c7-9c58-47f9-a6af-3f518613bc4b}</Project>
+      <Name>PixelFarm.DrawingCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
