@@ -1,10 +1,10 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 // some code from icu-project
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
- 
-namespace Typography.TextBreak 
+
+namespace Typography.TextBreak
 {
 
 
@@ -42,14 +42,14 @@ namespace Typography.TextBreak
         const char s_lastChar = (char)0x0EFF;
         static LaoDictionaryBreakingEngine()
         {
-            char[] laoCantStartWithChars = new char[] { 
+            char[] laoCantStartWithChars = new char[] {
                 (char)0x0EB0, //
                 (char)0x0EB1, //
                 (char)0x0EB2,
                 (char)0x0EB3,
-                (char)0x0EB4, 
-                (char)0x0EB5, 
-                (char)0x0EB6, 
+                (char)0x0EB4,
+                (char)0x0EB5,
+                (char)0x0EB6,
                 (char)0x0EB7,
                 (char)0x0EB8,
                 (char)0x0EB9,
@@ -75,9 +75,9 @@ namespace Typography.TextBreak
             {
                 int shiftedIndex = laoCantStartWithChars[i] - s_firstChar;
                 //some char can't be start char
-                canbeStartChars[shiftedIndex] = false; 
+                canbeStartChars[shiftedIndex] = false;
             }
-            
+
         }
     }
 

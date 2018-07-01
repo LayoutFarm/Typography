@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>9a99f103-b119-4a4d-8093-6a03baa6d36b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Typography.TextBreak</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BreakBounds.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BreakEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BreakingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomBreaker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomBreakerBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomDict.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\CJBreakingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\BurneseBreakingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\KhmerDictionaryBreakingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EngBreakingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\LaoDictionaryBreakingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\ThaiDictionaryBreakingEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WordVisitor.cs" />
+  </ItemGroup>
+</Project>

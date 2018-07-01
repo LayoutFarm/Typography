@@ -98,8 +98,37 @@ namespace TextBreakerTest
             {
                 string s = new string(test, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
+            } 
+        }
+        static bool StringStartsWithChars(string srcString, string value)
+        {
+            int findingLen = value.Length;
+            if (findingLen > srcString.Length)
+            {
+                return false;
             }
-
+            //
+            unsafe
+            {
+                fixed (char* srcStringBuff = srcString)
+                fixed (char* findingChar = value)
+                {
+                    char* srcBuff1 = srcStringBuff;
+                    char* findChar1 = findingChar;
+                    for (int i = 0; i < findingLen; ++i)
+                    {
+                        //compare by values
+                        if (*srcBuff1 != *findChar1)
+                        {
+                            return false;
+                        }
+                        srcBuff1++;
+                        findChar1++;
+                    }
+                    //MATCH all
+                    return true;
+                }
+            } 
         }
         private void cmdPerformace1_Click(object sender, EventArgs e)
         {
