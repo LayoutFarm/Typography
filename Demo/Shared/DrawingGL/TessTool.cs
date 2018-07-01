@@ -1,4 +1,4 @@
-﻿//MIT, 2014-2017, WinterDev  
+﻿//MIT, 2014-present, WinterDev  
 
 using System.Collections.Generic;
 using Tesselate;
@@ -204,6 +204,6 @@ namespace DrawingGL
         }
     }
 
-    
+
 
 }

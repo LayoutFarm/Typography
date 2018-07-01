@@ -1,5 +1,5 @@
 ﻿//Apapche2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
-//MIT, 2018, WinterDev  
+//MIT, 2018-present, WinterDev  
 
 using System;
 using System.Collections.Generic;

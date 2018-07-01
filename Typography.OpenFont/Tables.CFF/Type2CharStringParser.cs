@@ -1,5 +1,5 @@
 ﻿//Apache2, 2018, Villu Ruusmann , Apache/PdfBox Authors ( https://github.com/apache/pdfbox)  
-//Apache2, 2018, WinterDev 
+//Apache2, 2018-present, WinterDev 
 
 //ref http://wwwimages.adobe.com/www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
 

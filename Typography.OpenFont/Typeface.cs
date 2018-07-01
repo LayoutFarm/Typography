@@ -1,4 +1,4 @@
-﻿//Apache2, 2017, WinterDev
+﻿//Apache2, 2017-present, WinterDev
 //Apache2, 2014-2016, Samuel Carlsson, WinterDev
 using System.Collections.Generic;
 using Typography.OpenFont.Tables;
@@ -173,6 +173,12 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
+        /// <summary>
+        /// find glyph index by codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="nextCodepoint"></param>
+        /// <returns></returns>
         public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
             return CmapTable.LookupIndex(codepoint, nextCodepoint);
@@ -344,7 +350,7 @@ namespace Typography.OpenFont
         }
 
 
-        //---------
+        //---------        
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
         internal bool IsCffFont
@@ -368,6 +374,9 @@ namespace Typography.OpenFont
                 return (_mathTable != null) ? _mathTable._mathConstTable : null;
             }
         }
+        //---------
+        internal SvgTable _svgTable;
+
     }
 
 
@@ -380,7 +389,7 @@ namespace Typography.OpenFont
         void AppendGlyphAdvance(int index, short appendAdvX, short appendAdvY);
 
         ushort GetGlyph(int index, out ushort advW);
-        ushort GetGlyph(int index, out short offsetX, out short offsetY, out short advW);
+        ushort GetGlyph(int index, out ushort inputOffset, out short offsetX, out short offsetY, out short advW);
         //
         void GetOffset(int index, out short offsetX, out short offsetY);
     }
@@ -729,7 +738,10 @@ namespace Typography.OpenFont
         {
             return typeface.MathConsts != null;
         }
-
+        public static bool HasSvgTable(this Typeface typeface)
+        {
+            return typeface._svgTable != null;
+        }
 
         class CffBoundFinder : IGlyphTranslator
         {

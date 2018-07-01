@@ -1,35 +1,164 @@
-﻿//MIT, 2014-2016, WinterDev
+﻿//MIT, 2014-present, WinterDev
 
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-namespace PixelFarm.Agg.Imaging
+using PixelFarm.CpuBlit.Rasterization;
+
+namespace PixelFarm.CpuBlit.Imaging
 {
-    static class BitmapHelper
+    public static class BitmapHelper
     {
-
-
         /// <summary>
         /// copy from actual image direct to hBmpScan0
         /// </summary>
         /// <param name="actualImage"></param>
         /// <param name="hBmpScan0"></param>
         public static void CopyToWindowsBitmapSameSize(
-           ActualImage actualImage,
+           ActualBitmap actualImage,
            IntPtr hBmpScan0)
         {
             //1st, fast
-            byte[] rawBuffer = ActualImage.GetBuffer(actualImage);
-            System.Runtime.InteropServices.Marshal.Copy(rawBuffer, 0,
-               hBmpScan0, rawBuffer.Length);
+            //byte[] rawBuffer = ActualImage.GetBuffer(actualImage);
+
+            TempMemPtr memPtr = ActualBitmap.GetBufferPtr(actualImage);
+            unsafe
+            {
+                MemMx.memcpy((byte*)hBmpScan0, (byte*)memPtr.Ptr, actualImage.Stride * actualImage.Height);
+            }
+            //System.Runtime.InteropServices.Marshal.Copy(rawBuffer, 0,
+            //   hBmpScan0, rawBuffer.Length);
+
+            memPtr.Release();
         }
 
 
 
         /////////////////////////////////////////////////////////////////////////////////////
+        public static void CopyToGdiPlusBitmapSameSizeNotFlip(
+          ActualBitmap actualImage,
+          Bitmap bitmap)
+        {
+            //agg store image buffer head-down
+            //when copy to window bmp we here to flip 
+            //style1: copy row by row *** (fastest)***
+            {
+                //System.GC.Collect();
+                //System.Diagnostics.Stopwatch sss = new System.Diagnostics.Stopwatch();
+                //sss.Start();
+                //for (int i = 0; i < 1000; ++i)
+                //{
+                int h = bitmap.Height;
+                int w = bitmap.Width;
+                BitmapData bitmapData1 = bitmap.LockBits(
+                          new Rectangle(0, 0,
+                              w,
+                              h),
+                              System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                              bitmap.PixelFormat);
+                IntPtr scan0 = bitmapData1.Scan0;
+                int stride = bitmapData1.Stride;
+                //byte[] srcBuffer = ActualImage.GetBuffer(actualImage);
+                TempMemPtr srcBufferPtr = ActualBitmap.GetBufferPtr(actualImage);
+                unsafe
+                {
+                    //fixed (byte* bufferH = &srcBuffer[0])
+                    byte* srcBufferH = (byte*)srcBufferPtr.Ptr;
+                    {
+                        byte* target = (byte*)scan0;
+                        int startRowAt = 0;
+                        for (int y = 0; y < h; ++y)
+                        {
+                            //byte* src = bufferH + ((y - 1) * stride);
+                            byte* src = srcBufferH + startRowAt;
+                            //System.Runtime.InteropServices.Marshal.Copy(
+                            //   srcBuffer,//src
+                            //   startRowAt,
+                            //   (IntPtr)target,
+                            //   stride);
+                            MemMx.memcpy(target, src, stride);
 
+                            startRowAt += stride;
+                            target += stride;
+                        }
+                    }
+                }
+                srcBufferPtr.Release();
+                bitmap.UnlockBits(bitmapData1);
+                //}
+                //sss.Stop();
+                //long ms = sss.ElapsedMilliseconds;
+            }
+            //-----------------------------------
+            //style2: copy all, then flip again
+            //{
+            //    System.GC.Collect();
+            //    System.Diagnostics.Stopwatch sss = new System.Diagnostics.Stopwatch();
+            //    sss.Start();
+            //    for (int i = 0; i < 1000; ++i)
+            //    {
+            //        byte[] rawBuffer = ActualImage.GetBuffer(actualImage);
+            //        var bmpdata = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+            //          System.Drawing.Imaging.ImageLockMode.ReadOnly,
+            //         bitmap.PixelFormat);
+
+
+            //        System.Runtime.InteropServices.Marshal.Copy(rawBuffer, 0,
+            //            bmpdata.Scan0, rawBuffer.Length);
+
+            //        bitmap.UnlockBits(bmpdata);
+            //        bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            //    }
+
+            //    sss.Stop();
+            //    long ms = sss.ElapsedMilliseconds; 
+            //}
+            //-----------------------------------
+
+            //-----------------------------------
+            //style3: copy row by row + 
+            //{
+            //    System.GC.Collect();
+            //    System.Diagnostics.Stopwatch sss = new System.Diagnostics.Stopwatch();
+            //    sss.Start();
+            //    for (int i = 0; i < 1000; ++i)
+            //    {
+            //        int h = bitmap.Height;
+            //        int w = bitmap.Width;
+            //        BitmapData bitmapData1 = bitmap.LockBits(
+            //                  new Rectangle(0, 0,
+            //                      w,
+            //                      h),
+            //                      System.Drawing.Imaging.ImageLockMode.ReadWrite,
+            //                      bitmap.PixelFormat);
+            //        IntPtr scan0 = bitmapData1.Scan0;
+            //        int stride = bitmapData1.Stride;
+            //        byte[] buffer = ActualImage.GetBuffer(actualImage);
+            //        unsafe
+            //        {
+            //            fixed (byte* bufferH = &buffer[0])
+            //            {
+            //                byte* target = (byte*)scan0;
+            //                for (int y = h; y > 0; --y)
+            //                {
+            //                    byte* src = bufferH + ((y - 1) * stride);
+            //                    for (int n = stride - 1; n >= 0; --n)
+            //                    {
+            //                        *target = *src;
+            //                        target++;
+            //                        src++;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //        bitmap.UnlockBits(bitmapData1);
+            //    }
+            //    sss.Stop();
+            //    long ms = sss.ElapsedMilliseconds;
+            //} 
+        }
         public static void CopyToGdiPlusBitmapSameSize(
-            ActualImage actualImage,
+            ActualBitmap actualImage,
             Bitmap bitmap)
         {
             //agg store image buffer head-down
@@ -51,25 +180,143 @@ namespace PixelFarm.Agg.Imaging
                               bitmap.PixelFormat);
                 IntPtr scan0 = bitmapData1.Scan0;
                 int stride = bitmapData1.Stride;
-                byte[] srcBuffer = ActualImage.GetBuffer(actualImage);
+                //byte[] srcBuffer = ActualImage.GetBuffer(actualImage);
+                TempMemPtr srcBufferPtr = ActualBitmap.GetBufferPtr(actualImage);
                 unsafe
                 {
-                    fixed (byte* bufferH = &srcBuffer[0])
+                    //fixed (byte* bufferH = &srcBuffer[0])
+                    byte* srcBufferH = (byte*)srcBufferPtr.Ptr;
                     {
                         byte* target = (byte*)scan0;
                         int startRowAt = ((h - 1) * stride);
                         for (int y = h; y > 0; --y)
                         {
                             //byte* src = bufferH + ((y - 1) * stride);
-                            System.Runtime.InteropServices.Marshal.Copy(
-                               srcBuffer,//src
-                               startRowAt,
-                               (IntPtr)target,
-                               stride);
+                            byte* src = srcBufferH + startRowAt;
+                            //System.Runtime.InteropServices.Marshal.Copy(
+                            //   srcBuffer,//src
+                            //   startRowAt,
+                            //   (IntPtr)target,
+                            //   stride);
+                            MemMx.memcpy(target, src, stride);
+
                             startRowAt -= stride;
                             target += stride;
                         }
                     }
+                }
+                srcBufferPtr.Release();
+                bitmap.UnlockBits(bitmapData1);
+                //}
+                //sss.Stop();
+                //long ms = sss.ElapsedMilliseconds;
+            }
+            //-----------------------------------
+            //style2: copy all, then flip again
+            //{
+            //    System.GC.Collect();
+            //    System.Diagnostics.Stopwatch sss = new System.Diagnostics.Stopwatch();
+            //    sss.Start();
+            //    for (int i = 0; i < 1000; ++i)
+            //    {
+            //        byte[] rawBuffer = ActualImage.GetBuffer(actualImage);
+            //        var bmpdata = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+            //          System.Drawing.Imaging.ImageLockMode.ReadOnly,
+            //         bitmap.PixelFormat);
+
+
+            //        System.Runtime.InteropServices.Marshal.Copy(rawBuffer, 0,
+            //            bmpdata.Scan0, rawBuffer.Length);
+
+            //        bitmap.UnlockBits(bmpdata);
+            //        bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            //    }
+
+            //    sss.Stop();
+            //    long ms = sss.ElapsedMilliseconds; 
+            //}
+            //-----------------------------------
+
+            //-----------------------------------
+            //style3: copy row by row + 
+            //{
+            //    System.GC.Collect();
+            //    System.Diagnostics.Stopwatch sss = new System.Diagnostics.Stopwatch();
+            //    sss.Start();
+            //    for (int i = 0; i < 1000; ++i)
+            //    {
+            //        int h = bitmap.Height;
+            //        int w = bitmap.Width;
+            //        BitmapData bitmapData1 = bitmap.LockBits(
+            //                  new Rectangle(0, 0,
+            //                      w,
+            //                      h),
+            //                      System.Drawing.Imaging.ImageLockMode.ReadWrite,
+            //                      bitmap.PixelFormat);
+            //        IntPtr scan0 = bitmapData1.Scan0;
+            //        int stride = bitmapData1.Stride;
+            //        byte[] buffer = ActualImage.GetBuffer(actualImage);
+            //        unsafe
+            //        {
+            //            fixed (byte* bufferH = &buffer[0])
+            //            {
+            //                byte* target = (byte*)scan0;
+            //                for (int y = h; y > 0; --y)
+            //                {
+            //                    byte* src = bufferH + ((y - 1) * stride);
+            //                    for (int n = stride - 1; n >= 0; --n)
+            //                    {
+            //                        *target = *src;
+            //                        target++;
+            //                        src++;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //        bitmap.UnlockBits(bitmapData1);
+            //    }
+            //    sss.Stop();
+            //    long ms = sss.ElapsedMilliseconds;
+            //} 
+        }
+        public static void CopyToGdiPlusBitmapSameSize(
+           IntPtr srcBuffer,
+           Bitmap bitmap)
+        {
+            //agg store image buffer head-down
+            //when copy to window bmp we here to flip 
+            //style1: copy row by row *** (fastest)***
+            {
+                //System.GC.Collect();
+                //System.Diagnostics.Stopwatch sss = new System.Diagnostics.Stopwatch();
+                //sss.Start();
+                //for (int i = 0; i < 1000; ++i)
+                //{
+                int h = bitmap.Height;
+                int w = bitmap.Width;
+                BitmapData bitmapData1 = bitmap.LockBits(
+                          new Rectangle(0, 0,
+                              w,
+                              h),
+                              System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                              bitmap.PixelFormat);
+                IntPtr scan0 = bitmapData1.Scan0;
+                int stride = bitmapData1.Stride;
+
+                unsafe
+                {
+                    byte* bufferH = (byte*)srcBuffer;
+                    byte* target = (byte*)scan0;
+                    int startRowAt = ((h - 1) * stride);
+
+                    for (int y = h; y > 0; --y)
+                    {
+                        byte* src = bufferH + ((y - 1) * stride);
+                        MemMx.memcpy(target, src, stride);
+                        startRowAt -= stride;
+                        target += stride;
+                    }
+
                 }
                 bitmap.UnlockBits(bitmapData1);
                 //}
@@ -144,38 +391,43 @@ namespace PixelFarm.Agg.Imaging
             //    long ms = sss.ElapsedMilliseconds;
             //} 
         }
-
-        public static void CopyFromGdiPlusBitmapSameSize(
+        public static void CopyFromGdiPlusBitmapSameSizeTo32BitsBuffer(
            Bitmap windowsBitmap,
-           ActualImage actualImage)
+           ActualBitmap actualImage)
         {
+
             int h = windowsBitmap.Height;
             int w = windowsBitmap.Width;
-            byte[] targetBuffer = ActualImage.GetBuffer(actualImage);
+            //byte[] targetBuffer = ActualImage.GetBuffer(actualImage);
+            TempMemPtr targetBufferPtr = ActualBitmap.GetBufferPtr(actualImage);
             BitmapData bitmapData1 = windowsBitmap.LockBits(
                       new Rectangle(0, 0,
                           w,
                           h),
-                          System.Drawing.Imaging.ImageLockMode.ReadWrite,
-                          windowsBitmap.PixelFormat);
+                          System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                          System.Drawing.Imaging.PixelFormat.Format32bppArgb); //read as 32 bits
             IntPtr scan0 = bitmapData1.Scan0;
             int stride = bitmapData1.Stride;
 
-            //TODO: review here 
-            //use buffer copy
+            //test
+            //in this version we decided that
+            //Agg's image should use Big-endian bytes.
+
+            //so we convert the byte order for 
 
             unsafe
             {
-                //target 
+
+                byte* targetH = (byte*)targetBufferPtr.Ptr;
                 int startRowAt = ((h - 1) * stride);
                 byte* src = (byte*)scan0;
                 for (int y = h; y > 0; --y)
                 {
-                    // byte* target = targetH + ((y - 1) * stride);
 
-                    System.Runtime.InteropServices.Marshal.Copy(
-                          (IntPtr)src,//src
-                          targetBuffer, startRowAt, stride);
+                    //System.Runtime.InteropServices.Marshal.Copy(
+                    //      (IntPtr)src,//src
+                    //      targetBuffer, startRowAt, stride);
+                    MemMx.memcpy(targetH + startRowAt, src, stride);
                     startRowAt -= stride;
                     src += stride;
                 }
@@ -186,16 +438,69 @@ namespace PixelFarm.Agg.Imaging
                 //    byte* src = (byte*)scan0;
                 //    for (int y = h; y > 0; --y)
                 //    {
-                //        byte* target = targetH + ((y - 1) * stride);
-                //        for (int n = stride - 1; n >= 0; --n)
+                //        byte* target = targetH + ((y - 1) * stride); //start at first column of the current row
+
+                //        for (int n = stride - 1; n >= 0;) //n steps
                 //        {
-                //            *target = *src;
-                //            target++;
-                //            src++;
+                //            //*target = *src;
+                //            //target++;
+                //            //src++;
+
+                //            //the win gdi+ is 
+                //            *(target + 2) = *src; //R, 0->2
+                //            *(target + 1) = *(src + 1); //G 1->1
+                //            *(target + 0) = *(src + 2); //B 2->0
+                //            *(target + 3) = *(src + 3); //A 3->3
+
+                //            //#if !RGBA
+                //            //       //eg OpenGL, 
+                //            //       /// <summary>
+                //            //        /// order b
+                //            //        /// </summary>
+                //            //        public const int B = 0;
+                //            //        /// <summary>
+                //            //        /// order g
+                //            //        /// </summary>
+                //            //        public const int G = 1;
+                //            //        /// <summary>
+                //            //        /// order b
+                //            //        /// </summary>
+                //            //        public const int R = 2;
+                //            //        /// <summary>
+                //            //        /// order a
+                //            //        /// </summary>
+                //            //        public const int A = 3;
+                //            //#else
+                //            //        //RGBA (Windows GDI+)
+
+                //            //        /// <summary>
+                //            //        /// order b
+                //            //        /// </summary>
+                //            //        public const int B = 2;
+                //            //        /// <summary>
+                //            //        /// order g
+                //            //        /// </summary>
+                //            //        public const int G = 1;
+                //            //        /// <summary>
+                //            //        /// order b
+                //            //        /// </summary>
+                //            //        public const int R = 0;
+                //            //        /// <summary>
+                //            //        /// order a
+                //            //        /// </summary>
+                //            //        public const int A = 3;
+                //            //#endif
+
+                //            target += 4;
+                //            src += 4;
+                //            //target++;
+                //            //src++;
+                //            n -= 4;
                 //        }
                 //    }
                 //}
             }
+            targetBufferPtr.Release();
             windowsBitmap.UnlockBits(bitmapData1);
         }
 

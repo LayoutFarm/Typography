@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev 
+﻿//Apache2, 2016-present, WinterDev 
 using System.Collections.Generic;
 namespace Typography.OpenFont
 {
@@ -716,7 +716,7 @@ namespace Typography.OpenFont
             scLang = null;
             return false;
         }
-        
+
         public static ScriptLang GetRegisteredScriptLang(string shortname)
         {
             ScriptLang found;

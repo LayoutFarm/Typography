@@ -104,10 +104,6 @@
       <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
       <Name>Typography.OpenFont</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.TextFlow\Typography.TextFlow.csproj">
-      <Project>{333f3209-8da9-4d33-a560-299ed4c6dfa5}</Project>
-      <Name>Typography.TextFlow</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
       <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
       <Name>Typography.TextServices</Name>

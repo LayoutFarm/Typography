@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 
 using System.Collections.Generic;
 
@@ -10,7 +10,6 @@ namespace DrawingGL
     //[Serializable]
     struct BezierCurveCubic
     {
-        #region Fields
 
         /// <summary>
         /// Start anchor point.
@@ -29,9 +28,7 @@ namespace DrawingGL
         /// </summary>
         public Vector2 SecondControlPoint;
 
-        #endregion
 
-        #region Constructors
 
         /// <summary>
         /// Constructs a new <see cref="BezierCurveCubic"/>.
@@ -49,9 +46,7 @@ namespace DrawingGL
 
         }
 
-        #endregion
 
-        #region Functions
 
         /// <summary>
         /// Calculates the point with the specified t.
@@ -70,7 +65,6 @@ namespace DrawingGL
         }
 
 
-        #endregion
     }
 
     class SimpleCurveFlattener

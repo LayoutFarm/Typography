@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 // some code from icu-project
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
@@ -14,14 +14,15 @@ namespace Typography.TextBreak
         Parsing,
         OutOfRangeChar,
         End,
-
     }
-    public class WordVisitor
+
+
+
+    class WordVisitor
     {
         CustomBreaker ownerBreak;
         //
-        List<int> breakAtList = new List<int>();
-        List<ushort> _breakerEngineCode = new List<ushort>();
+        List<BreakAtInfo> breakAtList = new List<BreakAtInfo>();
 
         //
         char[] buffer;
@@ -66,10 +67,10 @@ namespace Typography.TextBreak
         public bool IsEnd
         {
             get { return currentIndex >= bufferLen - 1; }
-        } 
-        public void AddWordBreakAt(int index)
+        }
+        public void AddWordBreakAt(int index, WordKind wordKind)
         {
-            
+
 #if DEBUG
             if (index == latestBreakAt)
             {
@@ -77,8 +78,14 @@ namespace Typography.TextBreak
             }
 #endif
             this.latestBreakAt = index;
-            breakAtList.Add(index);
+
+            breakAtList.Add(new BreakAtInfo(index, wordKind));
         }
+        public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
+        {
+            AddWordBreakAt(this.CurrentIndex, wordKind);
+        }
+
         public int LatestBreakAt
         {
             get { return this.latestBreakAt; }
@@ -98,7 +105,7 @@ namespace Typography.TextBreak
             }
         }
 
-        public List<int> GetBreakList()
+        public List<BreakAtInfo> GetBreakList()
         {
             return breakAtList;
         }

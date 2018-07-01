@@ -62,13 +62,10 @@
       <Link>App\GlyphMeshCollection.cs</Link>
     </Compile>
     <Compile Include="App\CustomApp.cs" />
-    <Compile Include="App\Color.cs" />
-    <Compile Include="App\Shaders.cs" />
     <Compile Include="GLView1.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="App\SimpleCanvas.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\DroidSans.ttf" />
