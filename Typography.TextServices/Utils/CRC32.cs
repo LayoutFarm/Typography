@@ -43,9 +43,7 @@ namespace Typography.TextServices
 
 
 
-
-
-    static class CRC32
+    public static class CRC32
     {
 
         /// <summary>
@@ -230,10 +228,10 @@ namespace Typography.TextServices
                     i++;
                 } while (i != 0);
             }
-        } 
+        }
 
         const uint RESET_REGISTER = 0xFFFFFFFFU;
-       
+
     }
 
 

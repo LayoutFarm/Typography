@@ -9,12 +9,10 @@
     <Import_RootNamespace>Typography.TextServices</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagement\FontManagement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagement\IFontLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagement\OpenFontStore.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IcuData\IcuLangCodes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShapingService\CRC32.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShapingService\TextShapingService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TextServiceHub.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\FontManagement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\IFontLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IcuData\LangCodes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextServices.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\CRC32.cs" />
   </ItemGroup>
 </Project>
