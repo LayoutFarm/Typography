@@ -42,7 +42,7 @@ namespace Test_Android_Glyph
             //}
             //-------------------------------------------------------------------------- 
             //we want to create a prepared visual object ***
-            textContext = new TypographyTextContext()
+            textContext = new TypographyTextContext(simpleCanvas.TextPrinter)
             {
                 FontFamily = "DroidSans.ttf", //corresponding to font file Assets/DroidSans.ttf
                 FontSize = 64,//size in Points

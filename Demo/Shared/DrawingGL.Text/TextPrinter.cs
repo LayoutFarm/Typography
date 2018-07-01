@@ -52,10 +52,6 @@ namespace DrawingGL.Text
         }
 
 
-        public override void DrawFromGlyphPlans(PxScaledGlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
-        {
-            throw new System.NotImplementedException();
-        }
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
         {
             throw new System.NotImplementedException();
@@ -128,6 +124,7 @@ namespace DrawingGL.Text
         }
 
 
+        UnscaledGlyphPlanList _resuableGlyphPlanList = new UnscaledGlyphPlanList();
 
         /// <summary>
         /// generate glyph run into a given textRun
@@ -153,11 +150,11 @@ namespace DrawingGL.Text
 
             float pxscale = this.Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
 
-            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
-            GenerateGlyphPlan(charBuffer, 0, charBuffer.Length, userGlyphPlans, null);
+            _resuableGlyphPlanList.Clear();
+            GenerateGlyphPlan(charBuffer, 0, charBuffer.Length, _resuableGlyphPlanList);
 
             // render each glyph 
-            int planCount = userGlyphPlans.Count;
+            int planCount = _resuableGlyphPlanList.Count;
             for (var i = 0; i < planCount; ++i)
             {
 
@@ -165,7 +162,7 @@ namespace DrawingGL.Text
                 //----
                 //glyph path 
                 //---- 
-                PxScaledGlyphPlan glyphPlan = userGlyphPlans[i];
+                UnscaledGlyphPlan glyphPlan = _resuableGlyphPlanList[i];
                 //
                 //1. check if we have this glyph in cache?
                 //if yes, not need to build it again 

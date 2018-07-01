@@ -39,6 +39,7 @@ namespace Xamarin.iOS.GLES2
 
             //--------------------------------------
             simpleCanvas = new SimpleCanvas(canvasW, canvasH);
+
             var text = "Typography";
 
 
@@ -51,7 +52,7 @@ namespace Xamarin.iOS.GLES2
             //}
             //-------------------------------------------------------------------------- 
             //we want to create a prepared visual object ***
-            textContext = new TypographyTextContext()
+            textContext = new TypographyTextContext(simpleCanvas.TextPrinter)
             {
                 FontFamily = "DroidSans.ttf", //corresponding to font file Assets/DroidSans.ttf
                 FontSize = 64,//size in Points

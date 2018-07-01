@@ -8,7 +8,7 @@ namespace DrawingGL.Text
     /// </summary>
     class TypographyTextContext
     {
-        TextPrinter _textPrinter = new TextPrinter();
+        TextPrinter _textPrinter;
         string _fontFam;
         internal TypographyTextContext(TextPrinter textPrinter)
         {
@@ -97,6 +97,7 @@ namespace DrawingGL.Text
         public void GenerateGlyphRuns(TextRun textRun, char[] charBuffer, int startAt, int len)
         {
             _textPrinter.FontSizeInPoints = this.FontSize;
+
             _textPrinter.GenerateGlyphRuns(textRun, charBuffer, startAt, len);
             //System.Collections.Generic.List<GlyphRun> glyphs = textRun._glyphs; 
 
@@ -108,17 +109,17 @@ namespace DrawingGL.Text
             return new Size(mesureStringBox.width, mesureStringBox.btbd);
         }
 
-        //TODO
-        public uint XyToIndex(float pointX, float pointY, out bool isInside)
-        {
-            throw new NotImplementedException();
-        }
+        ////TODO
+        //public uint XyToIndex(float pointX, float pointY, out bool isInside)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        //TODO
-        public void IndexToXY(uint textPosition, bool isTrailingHit, out float pointX, out float pointY, out float height)
-        {
-            throw new NotImplementedException();
-        }
+        ////TODO
+        //public void IndexToXY(uint textPosition, bool isTrailingHit, out float pointX, out float pointY, out float height)
+        //{
+        //    throw new NotImplementedException();
+        //}
         public void Dispose()
         {
             // No native resource is used.
