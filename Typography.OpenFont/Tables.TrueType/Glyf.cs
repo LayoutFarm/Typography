@@ -32,7 +32,7 @@ namespace Typography.OpenFont.Tables
             int glyphCount = locations.GlyphCount;
             _glyphs = new Glyph[glyphCount];
 
-            List<int> compositeGlyphs = new List<int>();
+            List<ushort> compositeGlyphs = new List<ushort>();
 
             for (int i = 0; i < glyphCount; i++)
             {
@@ -52,13 +52,13 @@ namespace Typography.OpenFont.Tables
                     if (contoursCount >= 0)
                     {
                         Bounds bounds = Utils.ReadBounds(reader);
-                        _glyphs[i] = ReadSimpleGlyph(reader, contoursCount, bounds);
+                        _glyphs[i] = ReadSimpleGlyph(reader, contoursCount, bounds, (ushort)i);
                     }
                     else
                     {
                         //skip composite glyph,
                         //resolve later
-                        compositeGlyphs.Add(i);
+                        compositeGlyphs.Add((ushort)i);
                     }
                 }
                 else
@@ -70,7 +70,7 @@ namespace Typography.OpenFont.Tables
             //--------------------------------
             //resolve composte glyphs 
             //--------------------------------
-            foreach (int glyphIndex in compositeGlyphs)
+            foreach (ushort glyphIndex in compositeGlyphs)
             {
 #if DEBUG
                 if (glyphIndex == 7)
@@ -180,7 +180,7 @@ namespace Typography.OpenFont.Tables
             YSignOrSame = 1 << 5
         }
 
-        static Glyph ReadSimpleGlyph(BinaryReader reader, int contourCount, Bounds bounds)
+        static Glyph ReadSimpleGlyph(BinaryReader reader, int contourCount, Bounds bounds, ushort index)
         {
             //https://www.microsoft.com/typography/OTSPEC/glyf.htm
             //Simple Glyph Description
@@ -214,7 +214,7 @@ namespace Typography.OpenFont.Tables
             //-----------
             //lets build GlyphPoint set
             //-----------
-            return new Glyph(glyphPoints, endPoints, bounds, instructions);
+            return new Glyph(glyphPoints, endPoints, bounds, instructions, index);
         }
 
 
@@ -252,7 +252,7 @@ namespace Typography.OpenFont.Tables
             UNSCALED_COMPONENT_OFFSET = 1 << 12
         }
 
-        Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, uint tableOffset, int compositeGlyphIndex)
+        Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, uint tableOffset, ushort compositeGlyphIndex)
         {
             //------------------------------------------------------ 
             //https://www.microsoft.com/typography/OTSPEC/glyf.htm
@@ -292,7 +292,7 @@ namespace Typography.OpenFont.Tables
                     reader.BaseStream.Position = storedOffset;
                 }
 
-                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex]);
+                Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
                 short arg1 = 0;
                 short arg2 = 0;
@@ -382,7 +382,7 @@ namespace Typography.OpenFont.Tables
                     {
                         //use this matrix  
                         Glyph.TransformNormalWith2x2Matrix(newGlyph, xscale, scale01, scale10, yscale);
-                        Glyph.OffsetXY(newGlyph, (short)(arg1), arg2);
+                        Glyph.OffsetXY(newGlyph, arg1, arg2);
                     }
                     else
                     {

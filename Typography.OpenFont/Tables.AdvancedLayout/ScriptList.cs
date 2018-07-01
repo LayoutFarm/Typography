@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev
+﻿//Apache2, 2016-present, WinterDev
 
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +12,7 @@ namespace Typography.OpenFont.Tables
         // each of which is represented by a Script table that contains script and language-system data.
         // Language system tables reference features, which are defined in the FeatureList.
         // Each feature table references the lookup data defined in the LookupList that describes how, when, and where to implement the feature.
-
+        private ScriptList() { }
         public new ScriptTable this[string tagName]
         {
             get { return TryGetValue(tagName, out ScriptTable ret) ? ret : null; }

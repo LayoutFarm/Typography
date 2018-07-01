@@ -1,14 +1,13 @@
-﻿//Apache2, 2017, WinterDev
+﻿//Apache2, 2017-present, WinterDev
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
     /// <summary>
-    /// vertical matric table
+    /// vertical metrics table
     /// </summary>
-    class VerticalMatric : TableEntry
+    class VerticalMetrics : TableEntry
     {
         // https://www.microsoft.com/typography/otspec/vmtx.htm
         // vmtx - Vertical Metrics Table
@@ -58,7 +57,7 @@ namespace Typography.OpenFont.Tables
 
         ushort _numOfLongVerMetrics;
         AdvanceHeightAndTopSideBearing[] _advHeightAndTopSideBearings;
-        public VerticalMatric(ushort numOfLongVerMetrics)
+        public VerticalMetrics(ushort numOfLongVerMetrics)
         {
             this._numOfLongVerMetrics = numOfLongVerMetrics;
         }

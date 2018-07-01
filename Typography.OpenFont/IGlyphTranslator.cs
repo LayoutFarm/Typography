@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 //MIT, 2015, Michael Popoloski 
 //FTL, 3-clauses BSD, FreeType project
 //-----------------------------------------------------
@@ -78,7 +78,7 @@ namespace Typography.OpenFont
 
     public static class IGlyphReaderExtensions
     {
-
+        //for TrueType Font
         public static void Read(this IGlyphTranslator tx, GlyphPointF[] glyphPoints, ushort[] contourEndPoints, float scale = 1)
         {
 
@@ -369,6 +369,13 @@ namespace Typography.OpenFont
             return new Vector2(
                 ((v0.X + x1) / 2f),
                 ((v0.Y + y1) / 2f));
+        }
+        //-----------
+        //for CFF1
+        public static void Read(this IGlyphTranslator tx, CFF.Cff1Font cff1Font, CFF.Cff1GlyphData glyphData, float scale = 1)
+        {
+            CFF.CffEvaluationEngine evalEngine = new CFF.CffEvaluationEngine();
+            evalEngine.Run(tx, cff1Font, glyphData.GlyphInstructions, scale);
         }
     }
 

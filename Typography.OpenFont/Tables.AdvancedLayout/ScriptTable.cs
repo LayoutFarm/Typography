@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev
+﻿//Apache2, 2016-present, WinterDev
 //https://www.microsoft.com/typography/otspec/chapter2.htm
 //https://www.microsoft.com/typography/OTSpec/delta180to181/chapter2.htm
 

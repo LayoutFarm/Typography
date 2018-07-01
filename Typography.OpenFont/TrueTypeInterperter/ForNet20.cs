@@ -27,8 +27,32 @@ SOFTWARE.
 
 namespace System.Numerics
 {
-    //FOR NET20
 
+
+    public static class Vector2Ext
+    {
+        public static Vector2 Rotate(this Vector2 v, int degree)
+        {
+            double radian = degree * Math.PI / 180.0;
+            double sin = Math.Sin(radian);
+            double cos = Math.Cos(radian);
+            double nx = v.X * cos - v.Y * sin;
+            double ny = v.X * sin + v.Y * cos;
+
+            return new Vector2((float)nx, (float)ny);
+        }
+        public static Vector2 NewLength(this Vector2 v, double newLength)
+        {
+            //radian
+            double atan = Math.Atan2(v.Y, v.X);
+            return new Vector2(
+                      (float)(Math.Cos(atan) * newLength),
+                      (float)(Math.Sin(atan) * newLength));
+        }
+    }
+
+    //FOR NET20
+#if NET20
     public struct Vector2
     {
         static Vector2 zeroVector = new Vector2(0f, 0f);
@@ -151,25 +175,6 @@ namespace System.Numerics
 #endif
 
 
-        public Vector2 Rotate(int degree)
-        {
-            double radian = degree * Math.PI / 180.0;
-            double sin = Math.Sin(radian);
-            double cos = Math.Cos(radian);
-            double nx = X * cos - Y * sin;
-            double ny = X * sin + Y * cos;
-
-            return new Vector2((float)nx, (float)ny);
-        }
-        public Vector2 NewLength(double newLength)
-        {
-            //radian
-            double atan = Math.Atan2(Y, X);
-            return new Vector2(
-                      (float)(Math.Cos(atan) * newLength),
-                      (float)(Math.Sin(atan) * newLength));
-        }
-
     }
 
     public struct Matrix3x2
@@ -236,4 +241,7 @@ namespace System.Numerics
             this.M31 = M31; this.M32 = M32;
         }
     }
+#endif
 }
+
+

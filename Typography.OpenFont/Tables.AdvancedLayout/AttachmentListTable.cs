@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev
+﻿//Apache2, 2016-present, WinterDev
 
 using System.IO;
 
@@ -13,9 +13,9 @@ namespace Typography.OpenFont.Tables
     //a count of the glyphs with attachment points (GlyphCount), and an array of offsets to AttachPoint tables (AttachPoint). 
     //The array lists the AttachPoint tables, one for each glyph in the Coverage table, in the same order as the Coverage Index.
     //AttachList table
-    //Type 	Name 	Description
-    //Offset16 	Coverage 	Offset to Coverage table - from beginning of AttachList table
-    //unint16 	GlyphCount 	Number of glyphs with attachment points
+    //Type 	    Name 	        Description
+    //Offset16 	Coverage 	    Offset to Coverage table - from beginning of AttachList table
+    //unint16 	GlyphCount 	    Number of glyphs with attachment points
     //Offset16 	AttachPoint[GlyphCount] 	Array of offsets to AttachPoint tables-from beginning of AttachList table-in Coverage Index order
 
     //An AttachPoint table consists of a count of the attachment points on a single glyph (PointCount) and 
@@ -23,7 +23,7 @@ namespace Typography.OpenFont.Tables
 
     //Example 3 at the end of the chapter demonstrates an AttachList table that defines attachment points for two glyphs.
     //AttachPoint table
-    //Type 	Name 	Description
+    //Type 	    Name 	    Description
     //uint16 	PointCount 	Number of attachment points on this glyph
     //uint16 	PointIndex[PointCount] 	Array of contour point indices -in increasing numerical order
 

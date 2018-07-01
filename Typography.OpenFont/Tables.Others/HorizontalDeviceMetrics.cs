@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev 
+﻿//Apache2, 2016-present, WinterDev 
 
 using System.IO;
 
@@ -27,17 +27,19 @@ namespace Typography.OpenFont.Tables
         //Please see the chapter “Recommendations for OpenType Fonts” for more detail.
 
         //The table begins as follows:
-        //hdmx Header Type 	Name 	Description
-        //USHORT 	version 	Table version number (0)
-        //SHORT 	numRecords 	Number of device records.
-        //LONG 	sizeDeviceRecord 	Size of a device record, long aligned.
+        //hdmx  Header 
+        //Type 	    Name 	            Description
+        //USHORT    version 	        Table version number (0)
+        //SHORT     numRecords 	        Number of device records.
+        //LONG 	    sizeDeviceRecord 	Size of a device record, long aligned.
         //DeviceRecord 	records[numRecords] 	Array of device records.
 
         //Each DeviceRecord for format 0 looks like this.
-        //Device Record Type 	Name 	Description
-        //BYTE 	pixelSize 	Pixel size for following widths (as ppem).
-        //BYTE 	maxWidth 	Maximum width.
-        //BYTE 	widths[numGlyphs] 	Array of widths (numGlyphs is from the 'maxp' table).
+        //Device Record
+        //Type 	    Name 	            Description
+        //BYTE 	    pixelSize 	        Pixel size for following widths (as ppem).
+        //BYTE 	    maxWidth 	        Maximum width.
+        //BYTE 	    widths[numGlyphs] 	Array of widths (numGlyphs is from the 'maxp' table).
 
         //Each DeviceRecord is padded with 0's to make it long word aligned.
 
