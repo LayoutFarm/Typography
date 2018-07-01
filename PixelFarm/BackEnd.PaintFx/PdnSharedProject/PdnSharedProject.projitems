@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>536b9b08-98d7-4261-a78d-3b1ccd11d5ef</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PdnSharedProject</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Color\ColorBgra.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Color\HsvColor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Color\RgbColor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\PdnResources.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\PixelOps\BinaryPixelOp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\PixelOps\BinaryPixelOps.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\PixelOps\IPixelOp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\PixelOps\PixelOp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\PixelOps\UnaryPixelOp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\PixelOps\UnaryPixelOps.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\RenderArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Renderer\GradientRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Renderer\GradientRenderers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Renderer\Histogram.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Renderer\HistogramLuminosity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Renderer\HistogramRGB.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\ResamplingAlgorithm.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Scanline.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Surface.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\UserBlendOps\UserBlendOp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\UserBlendOps\UserBlendOps.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\UserBlendOps\UserBlendOps.Generated.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)01_Core\Utility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Blur\BrightnessAndContrastRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Blur\MotionBlurRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Blur\ZoomBlurEffRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Convolution\ColorDiffEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Convolution\ConvolutionRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Convolution\EdgeDetectRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Convolution\EmbossRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Convolution\GaussainBlurRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Convolution\ReliefEffectRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EffectRendererBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Histogram\HistogramRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Histogram\MedianRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Histogram\OutlineRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Histogram\ReduceNoiseRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Histogram\SharpenRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Histogram\UnfocusRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Levels\AutoLevelRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Levels\SepiaRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Material\BlugeEffectRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Material\CloudEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Material\GlowRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Material\OilPaintRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Material\PencilSketchRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Material\TileRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Material\TwistRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Others\InkSketchRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Others\JulianFractalRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Others\PerlinNoise2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Others\RotateAndZoomRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\PixelOps\HueAndSatRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\PixelOps\InvertColorRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\PixelOps\PosterizeRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformMemory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\TransformEffect\RotateZoomEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\TransformEffect\RotateZoomEffectConfigToken.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Wrap\PolarInversionEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Wrap\WarpEdgeBehavior.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)02_Fx\Wrap\WrapBasedEffRenderer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)01_Core\UserBlendOps\UserBlendOps.Generated.H.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)02_Fx\" />
+  </ItemGroup>
+</Project>
