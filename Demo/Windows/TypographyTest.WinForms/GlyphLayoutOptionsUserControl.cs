@@ -1,9 +1,8 @@
-﻿//MIT, 2017, WinterDev
+﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Text;
 using System.Windows.Forms;
 

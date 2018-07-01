@@ -1,17 +1,19 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System;
 using System.Collections.Generic;
-
 using System.Drawing;
+
 using System.IO;
 using System.Windows.Forms;
 
-using PixelFarm.Agg;
+using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
 
 using Typography.OpenFont;
+using Typography.TextLayout;
 using Typography.Rendering;
 using Typography.Contours;
+
 
 
 namespace SampleWinForms
@@ -19,14 +21,11 @@ namespace SampleWinForms
     public partial class Form1 : Form
     {
         Graphics g;
-        AggCanvasPainter painter;
-        ImageGraphics2D imgGfx2d;
-        ActualImage destImg;
+        AggPainter painter;
+        ActualBitmap destImg;
         Bitmap winBmp;
 
-
-
-        DevTextPrinterBase selectedTextPrinter = null;
+        TextPrinterBase selectedTextPrinter = null;
         VxsTextPrinter _devVxsTextPrinter = null;
 
         UI.DebugGlyphVisualizer debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
@@ -45,7 +44,13 @@ namespace SampleWinForms
                 if (_devVxsTextPrinter != null)
                 {
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
+                    var reqFont = new PixelFarm.Drawing.RequestFont(e.SelectedTypeface.Name, _basicOptions.FontSizeInPoints);
+                    _devVxsTextPrinter.ChangeFont(reqFont);
+                    painter.CurrentFont = reqFont;
                 }
+
+
+                this.glyphNameListUserControl1.Typeface = e.SelectedTypeface;
             };
 
             _basicOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
@@ -57,10 +62,17 @@ namespace SampleWinForms
             _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
 
 
-            this.Load += new EventHandler(Form1_Load);
+
             txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
             button1.Click += (s, e) => UpdateRenderOutput();
 
+            //
+            this.glyphNameListUserControl1.GlyphNameChanged += (s, e) =>
+            {
+                //test render 
+                //just our convention by add & and ;
+                RenderByGlyphName(glyphNameListUserControl1.SelectedGlyphName);
+            };
             //----------------
             //string inputstr = "ก้า";
             //string inputstr = "น้ำน้ำ";
@@ -78,11 +90,12 @@ namespace SampleWinForms
             //string inputstr = "8";
             //string inputstr = "#";
             //string inputstr = "a";
+            string inputstr = "0";
             //string inputstr = "e";
             //string inputstr = "l";
             //string inputstr = "t";
             //string inputstr = "i";
-            string inputstr = "ma";
+            //string inputstr = "ma"; 
             //string inputstr = "po";
             //string inputstr = "Å";
             //string inputstr = "fi";
@@ -96,14 +109,65 @@ namespace SampleWinForms
             this.txtInputChar.Text = inputstr;
             _readyToRender = true;
         }
-
-
-
-
-        void Form1_Load(object sender, EventArgs e)
+        void RenderByGlyphName(string selectedGlyphName)
         {
-            this.Text = "Render with PixelFarm";
+            //---------------------------------------------
+            //this version only render with MiniAgg**
+            //---------------------------------------------
+
+            painter.Clear(PixelFarm.Drawing.Color.White);
+            painter.UseSubPixelLcdEffect = _contourAnalysisOpts.LcdTechnique;
+            painter.FillColor = PixelFarm.Drawing.Color.Black;
+
+            selectedTextPrinter = _devVxsTextPrinter;
+            selectedTextPrinter.Typeface = _basicOptions.Typeface;
+            selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
+            selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
+            selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
+
+            selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+            selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
+
+            //test print 3 lines
+#if DEBUG
+            GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+            GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+            GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+#endif
+
+
+            float x_pos = 0, y_pos = 100;
+            var glyphPlanList = new Typography.TextLayout.UnscaledGlyphPlanList();
+
+
+            //in this version
+            //create a glyph-plan manully
+            ushort selectedGlyphIndex =
+                glyphNameListUserControl1.Typeface.GetGlyphIndexByName(selectedGlyphName);
+
+            glyphPlanList.Append(
+                new Typography.TextLayout.UnscaledGlyphPlan(0, selectedGlyphIndex, 0, 0, 0));
+
+            var seq = new Typography.TextLayout.GlyphPlanSequence(
+                glyphPlanList,
+                0, 1);
+            selectedTextPrinter.DrawFromGlyphPlans(seq, x_pos, y_pos);
+
+            char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
+            float lineSpacingPx = selectedTextPrinter.FontLineSpacingPx;
+            for (int i = 0; i < 1; ++i)
+            {
+                selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
+                y_pos -= lineSpacingPx;
+            }
+
+
+            //copy from Agg's memory buffer to gdi 
+            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            g.Clear(System.Drawing.Color.White);
+            g.DrawImage(winBmp, new System.Drawing.Point(10, 0));
         }
+
         bool _readyToRender;
         void UpdateRenderOutput()
         {
@@ -111,19 +175,17 @@ namespace SampleWinForms
             //
             if (g == null)
             {
-                destImg = new ActualImage(800, 600, PixelFormat.ARGB32);
-                imgGfx2d = new ImageGraphics2D(destImg); //no platform
-                painter = new AggCanvasPainter(imgGfx2d);
+                destImg = new ActualBitmap(800, 600);
+                painter = AggPainter.Create(destImg);
                 winBmp = new Bitmap(destImg.Width, destImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 g = this.CreateGraphics();
 
                 painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
-                _devVxsTextPrinter = new VxsTextPrinter(painter, _basicOptions.OpenFontStore);
-                _devVxsTextPrinter.TargetCanvasPainter = painter;
+                _devVxsTextPrinter = new VxsTextPrinter(painter);
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
-                //_devGdiTextPrinter.TargetGraphics = g;
+
             }
 
             if (string.IsNullOrEmpty(this.txtInputChar.Text))
@@ -133,10 +195,16 @@ namespace SampleWinForms
 
             //test option use be used with lcd subpixel rendering.
             //this demonstrate how we shift a pixel for subpixel rendering tech
-            _devVxsTextPrinter.UseWithLcdSubPixelRenderingTechnique = _contourAnalysisOpts.SetupPrinterLayoutForLcdSubPix;
 
+            if (_contourAnalysisOpts.SetupPrinterLayoutForLcdSubPix)
+            {
+                //TODO: set lcd or not here
+            }
+            else
+            {
+                //TODO: set lcd or not here
 
-
+            }
 
             //1. read typeface from font file 
             TypographyTest.RenderChoice renderChoice = _basicOptions.RenderChoice;
@@ -151,7 +219,7 @@ namespace SampleWinForms
                     {
                         //clear previous draw
                         painter.Clear(PixelFarm.Drawing.Color.White);
-                        painter.UseSubPixelRendering = _contourAnalysisOpts.LcdTechnique;
+                        painter.UseSubPixelLcdEffect = _contourAnalysisOpts.LcdTechnique;
                         painter.FillColor = PixelFarm.Drawing.Color.Black;
 
                         selectedTextPrinter = _devVxsTextPrinter;
@@ -171,7 +239,7 @@ namespace SampleWinForms
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
-                        float x_pos = 0, y_pos = 200;
+                        float x_pos = 0, y_pos = 50;
                         float lineSpacingPx = selectedTextPrinter.FontLineSpacingPx;
                         for (int i = 0; i < 1; ++i)
                         {
@@ -181,7 +249,7 @@ namespace SampleWinForms
 
 
                         //copy from Agg's memory buffer to gdi 
-                        PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+                        PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
                         g.Clear(Color.White);
                         g.DrawImage(winBmp, new Point(10, 0));
 
@@ -229,7 +297,7 @@ namespace SampleWinForms
                 {
                     painter.SetOrigin(0, 0);
                     //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-                    PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+                    PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
                     //--------------- 
                     //7. just render our bitmap
                     g.Clear(Color.White);
@@ -280,7 +348,7 @@ namespace SampleWinForms
             }
             painter.SetOrigin(0, 0);
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
@@ -308,7 +376,7 @@ namespace SampleWinForms
             MsdfGenParams genParams = new MsdfGenParams();
             GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
 
-            var actualImg = ActualImage.CreateFromBuffer(glyphImg.Width, glyphImg.Height, PixelFormat.ARGB32, glyphImg.GetImageBuffer());
+            ActualBitmap actualImg = ActualBitmap.CreateFromBuffer(glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer());
             painter.DrawImage(actualImg, 0, 0);
 
             //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -326,14 +394,14 @@ namespace SampleWinForms
             }
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            PixelFarm.Agg.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
+            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(destImg, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
             g.DrawImage(winBmp, new Point(30, 20));
         }
 
-        void RenderGrids(int width, int height, int sqSize, CanvasPainter p)
+        void RenderGrids(int width, int height, int sqSize, AggPainter p)
         {
             //render grid 
             p.FillColor = PixelFarm.Drawing.Color.Gray;
@@ -344,7 +412,7 @@ namespace SampleWinForms
             {
                 for (int x = 0; x < width;)
                 {
-                    p.FillRectLBWH(x, y, pointW, pointW);
+                    p.FillRect(x, y, pointW, pointW);
                     x += sqSize;
                 }
                 y += sqSize;
@@ -354,9 +422,6 @@ namespace SampleWinForms
 
 
 
-
-
-        VertexStorePool _vxsPool2 = new VertexStorePool();
         int _gridSize = 5;//default 
 
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
@@ -369,7 +434,7 @@ namespace SampleWinForms
                 sampleFontFile,
                 18,
                 0,
-                255,
+                100,
                 "d:\\WImageTest\\sample_msdf.png");
             //---------------------------------------------------------
             //2. for debug, create from some unicode chars
@@ -455,7 +520,7 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
             }
         }
-         
+
         static void CreateSampleMsdfImg(GlyphContourBuilder tx, string outputFile)
         {
             //sample
@@ -501,17 +566,19 @@ namespace SampleWinForms
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     var genParams = new MsdfGenParams();
                     builder.ReadShapes(glyphToContour);
-                    genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
+                    //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
                     GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
                     atlasBuilder.AddGlyph(gindex, glyphImg);
 
-                    //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                    //{
-                    //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                    //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
-                    //    bmp.UnlockBits(bmpdata);
-                    //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
-                    //}
+                    using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                    {
+                        int[] buffer = glyphImg.GetImageBuffer();
+                         
+                        var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+                        System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length); 
+                        bmp.UnlockBits(bmpdata); 
+                        bmp.Save("d:\\WImageTest\\a001_xn2_" + gindex + ".png");
+                    }
                 }
 
                 var glyphImg2 = atlasBuilder.BuildSingleImage();
@@ -525,12 +592,52 @@ namespace SampleWinForms
                     bmp.UnlockBits(bmpdata);
                     bmp.Save("d:\\WImageTest\\a_total.png");
                 }
-                atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
+                atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.bin");
+                //
+                //-----------
+                //test read texture info back
+                var atlasBuilder2 = new SimpleFontAtlasBuilder();
+                var readbackFontAtlas = atlasBuilder2.LoadFontInfo("d:\\WImageTest\\a_info.bin");
             }
         }
-        private void Form1_Load_1(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            this.Text = "Render with PixelFarm";
+        }
+
+        private void cmdMeasureString_Click(object sender, EventArgs e)
         {
 
+            //How to measure user's string...
+            //this demostrate step-by-step
+
+            //similar to ...  selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos); 
+            string str = txtInputChar.Text;
+            //
+            Typeface typeface = _basicOptions.Typeface;
+            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
+
+            var layout = new Typography.TextLayout.GlyphLayout();
+            layout.Typeface = typeface;
+            layout.ScriptLang = _basicOptions.ScriptLang;
+            layout.PositionTechnique = _basicOptions.PositionTech;
+            layout.EnableLigature = false;// true
+            layout.EnableComposition = true;
+
+            //3.
+            //3.1 : if you want GlyphPlanList too.
+            //var resultGlyphPlanList = new Typography.TextLayout.GlyphPlanList();
+            //Typography.TextLayout.MeasuredStringBox box = layout.LayoutAndMeasureString(str.ToCharArray(), 0, str.Length, _basicOptions.FontSizeInPoints, resultGlyphPlanList);
+
+            //or
+            //3.2 : only MeasuredStringBox
+            Typography.TextLayout.MeasuredStringBox box =
+                layout.LayoutAndMeasureString(
+                    str.ToCharArray(), 0,
+                    str.Length,
+                    fontSizeInPoints);
+
+            this.lblStringSize.Text = "measure (W,H)= (" + box.width.ToString() + "," + (box.ascending - box.descending) + ") px";
         }
     }
 }

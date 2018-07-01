@@ -5,12 +5,10 @@ using System.IO;
 using Typography.OpenFont;
 using Typography.TextLayout;
 
-using PixelFarm.Drawing.Fonts;
 
-namespace TypographyTest
+namespace Typography.TextServices
 {
-    public class GlyphLayoutOptions
-    {
+  
 
-    }
+
 }

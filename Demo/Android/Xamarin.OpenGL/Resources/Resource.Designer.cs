@@ -26,10 +26,6 @@ namespace Xamarin_OpenGL
 		
 		public static void UpdateIdValues()
 		{
-			global::ClassLibrary1.Resource.String.ApplicationName = global::Xamarin_OpenGL.Resource.String.ApplicationName;
-			global::ClassLibrary1.Resource.String.Hello = global::Xamarin_OpenGL.Resource.String.Hello;
-			global::Typography.GlyphLayout.Resource.String.ApplicationName = global::Xamarin_OpenGL.Resource.String.ApplicationName;
-			global::Typography.GlyphLayout.Resource.String.Hello = global::Xamarin_OpenGL.Resource.String.Hello;
 		}
 		
 		public partial class Attribute

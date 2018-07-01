@@ -22,12 +22,27 @@ namespace Xamarin.iOS.GLES2
             DrawingGL.Text.Utility.SetLoadFontDel(
             fontfile =>
                  {
+
+                     if (File.Exists("DroidSans.ttf"))
+                     {
+                         using (Stream s = new FileStream("DroidSans.ttf", FileMode.Open))
+                         using (var ms = new MemoryStream())// This is a simple hack because on Xamarin.Android, a `Stream` created by `AssetManager.Open` is not seekable.
+                         {
+                             s.CopyTo(ms);
+                             return new MemoryStream(ms.ToArray());
+                         }
+                     }
+
+
                      return null;
                  });
 
             //--------------------------------------
             simpleCanvas = new SimpleCanvas(canvasW, canvasH);
+
             var text = "Typography";
+
+
             //optional ....
             //var directory = AndroidOS.Environment.ExternalStorageDirectory;
             //var fullFileName = Path.Combine(directory.ToString(), "TypographyTest.txt");
@@ -37,20 +52,25 @@ namespace Xamarin.iOS.GLES2
             //}
             //-------------------------------------------------------------------------- 
             //we want to create a prepared visual object ***
-            textContext = new TypographyTextContext()
-            {
-                FontFamily = "DroidSans.ttf", //corresponding to font file Assets/DroidSans.ttf
-                FontSize = 64,//size in Points
-                FontStretch = FontStretch.Normal,
-                FontStyle = FontStyle.Normal,
-                FontWeight = FontWeight.Normal,
-                Alignment = DrawingGL.Text.TextAlignment.Leading
-            };
+            //textContext = new TypographyTextContext()
+            //{
+            //    FontFamily = "DroidSans.ttf", //corresponding to font file Assets/DroidSans.ttf
+            //    FontSize = 64,//size in Points
+            //    FontStretch = FontStretch.Normal,
+            //    FontStyle = FontStyle.Normal,
+            //    FontWeight = FontWeight.Normal,
+            //    Alignment = DrawingGL.Text.TextAlignment.Leading
+            //};
             //-------------------------------------------------------------------------- 
             //create blank text run 
             textRun = new TextRun();
             //generate glyph run inside text text run
-            textContext.GenerateGlyphRuns(textRun, text);
+
+            TextPrinter textPrinter = simpleCanvas.TextPrinter;
+            textPrinter.FontFilename = "DroidSans.ttf"; //corresponding to font file Assets/DroidSans.ttf
+            textPrinter.FontSizeInPoints = 64; 
+            //
+            simpleCanvas.TextPrinter.GenerateGlyphRuns(textRun, text.ToCharArray(), 0, text.Length);
             //-------------------------------------------------------------------------- 
 
         }

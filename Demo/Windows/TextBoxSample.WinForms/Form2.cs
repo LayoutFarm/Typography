@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
@@ -245,6 +245,8 @@ namespace SampleWinForms
         //        atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
         //    }
         //}
+
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlan = new UnscaledGlyphPlanList();
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -279,22 +281,27 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-            GlyphPlanList userGlyphPlans = new GlyphPlanList();
 
 
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
+            _reusableUnscaledGlyphPlan.Clear();
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlan);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
             _currentTextPrinter.FillColor = Color.Red;
             _currentTextPrinter.DrawFromGlyphPlans(
-                  userGlyphPlans,
+                  new GlyphPlanSequence(_reusableUnscaledGlyphPlan),
                   x_pos,
                   y_pos
              );
             //Example 3: MeasureString        
 
-            MeasuredStringBox strBox = _currentTextPrinter.MeasureString(textBuffer, 0, textBuffer.Length);
+            //TODO: review here again
+            MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
+                textBuffer, 0,
+                textBuffer.Length,
+                _currentTextPrinter.FontSizeInPoints);
+
             //draw line mark
 
             float x_pos2 = x_pos + strBox.width + 10;
