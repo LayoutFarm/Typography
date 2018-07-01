@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 
 using System.Collections.Generic;
 using Typography.OpenFont;
@@ -159,7 +159,7 @@ namespace Typography.TextLayout
             }
             //-------------
             //add some glyphs that also need by substitution process 
-           
+
             foreach (GSUB.LookupTable subLk in _lookupTables)
             {
                 subLk.CollectAssociatedSubstitutionGlyph(outputGlyphIndices);
@@ -221,8 +221,11 @@ namespace Typography.TextLayout
             }
 
             //-----------
-            var gsub = new GlyphSubstitution(typeface, scLang.shortname);
-            gsub.CollectAdditionalSubstitutionGlyphIndices(outputGlyphIndexList);
+            if (typeface.GSUBTable != null)
+            {
+                var gsub = new GlyphSubstitution(typeface, scLang.shortname);
+                gsub.CollectAdditionalSubstitutionGlyphIndices(outputGlyphIndexList);
+            }
         }
 
     }
