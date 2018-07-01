@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev, Sam Hocevar <sam@hocevar.net>
+﻿//Apache2, 2016-present, WinterDev, Sam Hocevar <sam@hocevar.net>
 
 using System.IO;
 

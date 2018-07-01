@@ -35,7 +35,7 @@
 
 //------------------------------------------------------------------
 //many areas are ported from Java code
-//Apache2, 2018, WinterDev
+//Apache2, 2018-present, WinterDev
 
 
 using System;

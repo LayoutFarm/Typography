@@ -1,4 +1,4 @@
-﻿//Apache2, 2016-2017, WinterDev
+﻿//Apache2, 2016-present, WinterDev
 using System;
 using System.IO;
 using System.Text;
@@ -825,6 +825,6 @@ namespace Typography.OpenFont.Tables
                 posClassRule.posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                 return posClassRule;
             }
-        } 
-    } 
+        }
+    }
 }

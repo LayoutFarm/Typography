@@ -174,7 +174,7 @@ namespace System.Numerics
         }
 #endif
 
-     
+
     }
 
     public struct Matrix3x2
