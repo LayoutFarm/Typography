@@ -30,6 +30,8 @@ namespace SampleWinForms.UI
             _line.SetCharIndexFromPos(x, y);
         }
 
+
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public void Draw()
         {
 
@@ -44,16 +46,17 @@ namespace SampleWinForms.UI
                 //userCharToGlyphIndexMap.Clear();
                 //read glyph plan and userCharToGlyphIndexMap                
 
-                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, glyphPlans);
-
-
+                _reusableUnscaledGlyphPlanList.Clear();
+                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
                 _line.ContentChanged = false;
             }
 
             if (glyphPlans.Count > 0)
             {
 
-                _printer.DrawFromGlyphPlans(glyphPlans, X, Y);
+                _printer.DrawFromGlyphPlans(
+                    new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
+                    X, Y);
                 //draw caret 
                 //not blink in this version
                 int caret_index = _line.CaretCharIndex;

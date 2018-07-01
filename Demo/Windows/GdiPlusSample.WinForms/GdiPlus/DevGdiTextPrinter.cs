@@ -99,24 +99,23 @@ namespace SampleWinForms
         }
 
 
-        PxScaledGlyphPlanList _reusablePxScaleGlyphPlanList = new PxScaledGlyphPlanList();
 
+
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
 
+            _reusableUnscaledGlyphPlanList.Clear();
             //1. unscale layout, in design unit
             this._glyphLayout.Layout(textBuffer, startAt, len);
+            _glyphLayout.GenerateUnscaledGlyphPlans(_reusableUnscaledGlyphPlanList);
 
-            //2. scale  to specific font size  
+            //draw from the glyph plan seq
 
-            _reusablePxScaleGlyphPlanList.Clear();
+            DrawFromGlyphPlans(
+                new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
+                x, y);
 
-            _glyphLayout.GenerateScaledGlyphPlans(
-                _currentTypeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
-                false,
-                _reusablePxScaleGlyphPlanList);
-
-            DrawFromGlyphPlans(_reusablePxScaleGlyphPlanList, x, y);
         }
 
 
@@ -134,76 +133,76 @@ namespace SampleWinForms
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
         }
-        public override void DrawFromGlyphPlans(PxScaledGlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
-        {
-            UpdateVisualOutputSettings();
+        //public override void DrawFromGlyphPlans(IPixelScaledGlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
+        //{
+        //    UpdateVisualOutputSettings();
 
-            //draw data in glyph plan 
-            //3. render each glyph 
+        //    //draw data in glyph plan 
+        //    //3. render each glyph 
 
-            float sizeInPoints = this.FontSizeInPoints;
-            float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
-            //
-            _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.HintTechnique);
+        //    float sizeInPoints = this.FontSizeInPoints;
+        //    float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
+        //    //
+        //    _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.HintTechnique);
 
 
-            //this draw a single line text span***
-            int endBefore = startAt + len;
+        //    //this draw a single line text span***
+        //    int endBefore = startAt + len;
 
-            Graphics g = this.TargetGraphics;
+        //    Graphics g = this.TargetGraphics;
 
-            float acc_x = 0;
-            float acc_y = 0;
+        //    float acc_x = 0;
+        //    float acc_y = 0;
 
-            float g_x = 0;
-            float g_y = 0;
+        //    float g_x = 0;
+        //    float g_y = 0;
 
-            for (int i = startAt; i < endBefore; ++i)
-            {
-                PxScaledGlyphPlan glyphPlan = glyphPlanList[i];
+        //    for (int i = startAt; i < endBefore; ++i)
+        //    {
+        //        PxScaledGlyphPlan glyphPlan = glyphPlanList[i];
 
-                //check if we have a cache of this glyph
-                //if not -> create it
+        //        //check if we have a cache of this glyph
+        //        //if not -> create it
 
-                GraphicsPath foundPath;
-                if (!_glyphMeshCollections.TryGetCacheGlyph(glyphPlan.glyphIndex, out foundPath))
-                {
-                    //if not found then create a new one
-                    _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
-                    _txToGdiPath.Reset();
-                    _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
-                    foundPath = _txToGdiPath.ResultGraphicsPath;
+        //        GraphicsPath foundPath;
+        //        if (!_glyphMeshCollections.TryGetCacheGlyph(glyphPlan.glyphIndex, out foundPath))
+        //        {
+        //            //if not found then create a new one
+        //            _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
+        //            _txToGdiPath.Reset();
+        //            _currentGlyphPathBuilder.ReadShapes(_txToGdiPath);
+        //            foundPath = _txToGdiPath.ResultGraphicsPath;
 
-                    //register
-                    _glyphMeshCollections.RegisterCachedGlyph(glyphPlan.glyphIndex, foundPath);
-                }
-                //------
-                //then move pen point to the position we want to draw a glyph
+        //            //register
+        //            _glyphMeshCollections.RegisterCachedGlyph(glyphPlan.glyphIndex, foundPath);
+        //        }
+        //        //------
+        //        //then move pen point to the position we want to draw a glyph
 
-                float ngx = acc_x + (float)Math.Round(glyphPlan.OffsetX);
-                float ngy = acc_y + (float)Math.Round(glyphPlan.OffsetY);
+        //        float ngx = acc_x + (float)Math.Round(glyphPlan.OffsetX);
+        //        float ngy = acc_y + (float)Math.Round(glyphPlan.OffsetY);
 
-                g_x = (x + (ngx));
-                g_y = (y + (ngy));
+        //        g_x = (x + (ngx));
+        //        g_y = (y + (ngy));
 
-                acc_x += (float)Math.Round(glyphPlan.AdvanceX);
+        //        acc_x += (float)Math.Round(glyphPlan.AdvanceX);
 
-                //g_x = (float)Math.Round(g_x);
-                g_y = (float)Math.Floor(g_y);
-                g.TranslateTransform(g_x, g_y);
+        //        //g_x = (float)Math.Round(g_x);
+        //        g_y = (float)Math.Floor(g_y);
+        //        g.TranslateTransform(g_x, g_y);
 
-                if (FillBackground)
-                {
-                    g.FillPath(_fillBrush, foundPath);
-                }
-                if (DrawOutline)
-                {
-                    g.DrawPath(_outlinePen, foundPath);
-                }
-                //and then we reset back ***
-                g.TranslateTransform(-g_x, -g_y);
-            }
-        }
+        //        if (FillBackground)
+        //        {
+        //            g.FillPath(_fillBrush, foundPath);
+        //        }
+        //        if (DrawOutline)
+        //        {
+        //            g.DrawPath(_outlinePen, foundPath);
+        //        }
+        //        //and then we reset back ***
+        //        g.TranslateTransform(-g_x, -g_y);
+        //    }
+        //}
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
         {
             UpdateVisualOutputSettings();

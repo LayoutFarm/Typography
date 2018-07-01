@@ -196,10 +196,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             //TODO...
         }
-        public override void DrawFromGlyphPlans(PxScaledGlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
-        {
-            //TODO...
-        }
+         
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
         {
             //TODO...
