@@ -1,4 +1,4 @@
-﻿//MIT, 2014-2017, WinterDev
+﻿//MIT, 2014-present, WinterDev
 using System.Collections.Generic;
 
 namespace Typography.TextLayout
@@ -10,8 +10,8 @@ namespace Typography.TextLayout
         int _caretCharIndex = 0;//default  
         //TODO: temp public, review accessibility here again
         public List<char> _charBuffer = new List<char>();
-        public GlyphPlanList _glyphPlans = new GlyphPlanList();
-        public List<UserCharToGlyphIndexMap> _userCharToGlyphMap = new List<UserCharToGlyphIndexMap>();
+        public PxScaledGlyphPlan[] _glyphPlans;
+        public List<UserCodePointToGlyphIndex> _userCodePointToGlyphIndexMap = new List<UserCodePointToGlyphIndex>();
 
         bool _contentChanged = true;
 
@@ -91,8 +91,8 @@ namespace Typography.TextLayout
                 if (_caretCharIndex > 0)
                 {
                     //find its mapping to glyph index
-                    UserCharToGlyphIndexMap userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
-                    int mapToGlyphIndex = userCharToGlyphMap.glyphIndexListOffset_plus1;
+                    UserCodePointToGlyphIndex userCodePointToGlyphIndex = _userCodePointToGlyphIndexMap[_caretCharIndex];
+                    int mapToGlyphIndex = userCodePointToGlyphIndex.glyphIndexListOffset_plus1;
                     //
                     if (mapToGlyphIndex == 0)
                     {
@@ -102,7 +102,7 @@ namespace Typography.TextLayout
                     }
                     //-------------------------
                     //we -1 ***
-                    GlyphPlan glyphPlan = _glyphPlans[userCharToGlyphMap.glyphIndexListOffset_plus1 - 1];
+                    PxScaledGlyphPlan glyphPlan = _glyphPlans[userCodePointToGlyphIndex.glyphIndexListOffset_plus1 - 1];
                     if (!glyphPlan.AdvanceMoveForward)
                     {
                         //caret can't rest here
@@ -137,8 +137,8 @@ namespace Typography.TextLayout
                 {
 
                     //find its mapping to glyph index
-                    UserCharToGlyphIndexMap userCharToGlyphMap = _userCharToGlyphMap[_caretCharIndex];
-                    int mapToGlyphIndex = userCharToGlyphMap.glyphIndexListOffset_plus1;
+                    UserCodePointToGlyphIndex userCodePointToGlyphIndex = _userCodePointToGlyphIndexMap[_caretCharIndex];
+                    int mapToGlyphIndex = userCodePointToGlyphIndex.glyphIndexListOffset_plus1;
                     //
                     if (mapToGlyphIndex == 0)
                     {
@@ -148,7 +148,7 @@ namespace Typography.TextLayout
                     }
                     //-------------------------
                     //we -1 ***
-                    GlyphPlan glyphPlan = _glyphPlans[userCharToGlyphMap.glyphIndexListOffset_plus1 - 1];
+                    PxScaledGlyphPlan glyphPlan = _glyphPlans[userCodePointToGlyphIndex.glyphIndexListOffset_plus1 - 1];
                     if (!glyphPlan.AdvanceMoveForward)
                     {
                         //caret can't rest here
@@ -171,7 +171,10 @@ namespace Typography.TextLayout
         {
             _caretCharIndex = _charBuffer.Count;
         }
-
+        public int CharCount
+        {
+            get { return 0; }
+        }
         public bool ContentChanged { get { return _contentChanged; } set { _contentChanged = value; } }
         public int CaretCharIndex { get { return _caretCharIndex; } }
         public void SetCaretCharIndex(int newindex)
@@ -185,101 +188,84 @@ namespace Typography.TextLayout
         public void SetCharIndexFromPos(float x, float y)
         {
 
-            int count = _glyphPlans.Count;
+            int count = _glyphPlans.Length;
             float accum_x = 0;
 
-            int sel_index = -1;
-            float thisGlyphW = 0;
+
+
             for (int i = 0; i < count; ++i)
             {
-                sel_index = i;
-                thisGlyphW = _glyphPlans[i].AdvanceX;
+                float thisGlyphW = _glyphPlans[i].AdvanceX;
                 accum_x += thisGlyphW;
                 if (accum_x > x)
-                {   //TODO: review here 
+                {
+                    //TODO: review here 
                     //for some glyph that has been substituted 
                     //glyph may not match with actual user char in the _line    
+
+                    float xoffset_on_glyph = (x - (accum_x - thisGlyphW));
+                    if (xoffset_on_glyph >= (thisGlyphW / 2))
+                    {
+                        if (i + 1 >= _userCodePointToGlyphIndexMap.Count)
+                        {
+                            //break here
+                            _caretCharIndex = i + 1;
+                            return;
+                        }
+
+                        _caretCharIndex = i + 1;
+                        //check if the caret can rest on this pos or not
+
+                        UserCodePointToGlyphIndex map = _userCodePointToGlyphIndexMap[_caretCharIndex];
+                        if (map.glyphIndexListOffset_plus1 == 0)
+                        {
+                            //no map
+                            //cant rest here
+                            if (_caretCharIndex < count)
+                            {
+                                DoRight();
+                            }
+                        }
+                        else
+                        {
+                            //has map
+                            if (_caretCharIndex < count && !_glyphPlans[map.glyphIndexListOffset_plus1 - 1].AdvanceMoveForward)
+                            {
+                                //recursive ***
+                                DoRight(); //
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _caretCharIndex = i;
+                        //check if the caret can rest on this pos or not
+                        UserCodePointToGlyphIndex map = _userCodePointToGlyphIndexMap[_caretCharIndex];
+                        if (map.glyphIndexListOffset_plus1 == 0)
+                        {
+                            //no map
+                            //cant rest here
+                            if (_caretCharIndex > 0)
+                            {
+                                //recursive ***
+                                DoLeft();
+                            }
+                        }
+                        else
+                        {
+                            //has map
+                            if (_caretCharIndex < count && !_glyphPlans[map.glyphIndexListOffset_plus1 - 1].AdvanceMoveForward)
+                            {
+                                //recursive ***
+                                DoLeft();
+                            }
+                        }
+
+                    }
+                    //stop
                     break;
                 }
             }
-            //-----------------------------------------
-
-            float xoffset_on_glyph = (x - (accum_x - thisGlyphW));
-            if (xoffset_on_glyph >= (thisGlyphW / 2))
-            {
-                if (sel_index + 1 >= _userCharToGlyphMap.Count)
-                {
-                    //break here
-                    _caretCharIndex = sel_index + 1;
-                    return;
-                }
-
-                _caretCharIndex = sel_index + 1;
-                //check if the caret can rest on this pos or not
-
-                UserCharToGlyphIndexMap map = _userCharToGlyphMap[_caretCharIndex];
-                if (map.glyphIndexListOffset_plus1 == 0)
-                {
-                    //no map
-                    //cant rest here
-                    if (_caretCharIndex < count)
-                    {
-                        DoRight();
-                    }
-                }
-                else
-                {
-                    //has map
-                    if (_caretCharIndex < count && !_glyphPlans[map.glyphIndexListOffset_plus1 - 1].AdvanceMoveForward)
-                    {
-                        //recursive ***
-                        DoRight(); //
-                    }
-                }
-            }
-            else
-            {
-                _caretCharIndex = sel_index;
-                //check if the caret can rest on this pos or not
-                UserCharToGlyphIndexMap map = _userCharToGlyphMap[_caretCharIndex];
-                if (map.glyphIndexListOffset_plus1 == 0)
-                {
-                    //no map
-                    //cant rest here
-                    if (_caretCharIndex > 0)
-                    {
-                        //recursive ***
-                        DoLeft();
-                    }
-                }
-                else
-                {
-                    //has map
-                    if (_caretCharIndex < count && !_glyphPlans[map.glyphIndexListOffset_plus1 - 1].AdvanceMoveForward)
-                    {
-                        //recursive ***
-                        DoLeft();
-                    }
-                }
-
-            }
-
-
-            //for (int i = 0; i < count; ++i)
-            //{
-            //    float thisGlyphW = _glyphPlans[i].AdvanceX;
-            //    accum_x += thisGlyphW;
-            //    if (accum_x > x)
-            //    {
-            //        //TODO: review here 
-            //        //for some glyph that has been substituted 
-            //        //glyph may not match with actual user char in the _line    
-
-
-            //        //stop
-            //        break;
-            //    }
-            //}
         }
     }
 
