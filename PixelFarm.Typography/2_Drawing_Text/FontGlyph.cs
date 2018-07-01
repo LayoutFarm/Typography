@@ -2,8 +2,7 @@
 //----------------------------------- 
 
 using System;
-using System.Runtime.InteropServices;
-using PixelFarm.CpuBlit;
+using System.Runtime.InteropServices; 
 namespace PixelFarm.Drawing.Fonts
 {
 

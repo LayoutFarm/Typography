@@ -7,7 +7,7 @@ using Typography.WordBreaks;
 namespace Typography.TextLayout
 {
 
-    
+
 
     /// <summary>
     /// collect and managed editable text line
@@ -155,9 +155,8 @@ namespace Typography.TextLayout
                     _glyphLayout.Typeface = selectedTypeface;
                     _glyphLayout.Layout(rawBuffer, tt.StartAt, tt.Len);
 
-                    GlyphPlanSequence.GenerateUnscaledGlyphPlans(
-                        _glyphLayout.ResultUnscaledGlyphPositions,
-                        _outputGlyphPlan);
+                    _glyphLayout.GenerateUnscaledGlyphPlans(_outputGlyphPlan);
+
 
                     //use pixel-scale-layout-engine to scale to specific font size
                     //or scale it manually 

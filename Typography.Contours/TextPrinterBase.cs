@@ -24,19 +24,13 @@ namespace Typography.Contours
                   char[] textBuffer,
                   int startAt,
                   int len,
-                  PxScaledGlyphPlanList outputGlyphPlanList,
-                  List<UserCodePointToGlyphIndex> charToGlyphMapList)
+                  IUnscaledGlyphPlanList unscaledGlyphPlan)
         {
-
             GlyphLayout glyphLayout = this.GlyphLayoutMan;
             glyphLayout.Layout(textBuffer, startAt, len);
-
-            GlyphLayoutExtensions.GenerateGlyphPlans(
-                glyphLayout.ResultUnscaledGlyphPositions,
-                this.Typeface.CalculateScaleToPixelFromPointSize(this.FontSizeInPoints),
-                false,
-                outputGlyphPlanList);
+            glyphLayout.GenerateUnscaledGlyphPlans(unscaledGlyphPlan); 
         }
+        
 
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
@@ -88,7 +82,7 @@ namespace Typography.Contours
         /// <param name="x"></param>
         /// <param name="y"></param>
         public abstract void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y);
-        public abstract void DrawFromGlyphPlans(PxScaledGlyphPlanList glyphPlanList, int startAt, int len, float x, float y);
+       
         /// <summary>
         /// draw caret at xpos,ypos (sample only)
         /// </summary>
@@ -105,15 +99,9 @@ namespace Typography.Contours
         }
         public void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, float x, float y)
         {
-
             DrawFromGlyphPlans(glyphPlanSeq, 0, glyphPlanSeq.Count, x, y);
         }
-        public void DrawFromGlyphPlans(PxScaledGlyphPlanList glyphPlanList, float x, float y)
-        {
-
-            DrawFromGlyphPlans(glyphPlanList, 0, glyphPlanList.Count, x, y);
-        }
-
+        
 
     }
 

@@ -173,6 +173,12 @@ namespace Typography.OpenFont
             get { return _nameEntry.FontSubFamily; }
         }
 
+        /// <summary>
+        /// find glyph index by codepoint
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="nextCodepoint"></param>
+        /// <returns></returns>
         public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
             return CmapTable.LookupIndex(codepoint, nextCodepoint);
@@ -372,7 +378,8 @@ namespace Typography.OpenFont
         internal SvgTable _svgTable;
 
     }
-    
+
+
     public interface IGlyphPositions
     {
         int Count { get; }
@@ -382,7 +389,7 @@ namespace Typography.OpenFont
         void AppendGlyphAdvance(int index, short appendAdvX, short appendAdvY);
 
         ushort GetGlyph(int index, out ushort advW);
-        ushort GetGlyph(int index, out short inputOffset, out short offsetX, out short offsetY, out short advW);
+        ushort GetGlyph(int index, out ushort inputOffset, out short offsetX, out short offsetY, out short advW);
         //
         void GetOffset(int index, out short offsetX, out short offsetY);
     }

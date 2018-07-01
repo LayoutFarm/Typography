@@ -134,18 +134,17 @@ namespace Typography.OpenFont
             //TODO: review here
             glyph._bounds = new Bounds(
                (short)new_xmin, (short)new_ymin,
-               (short)new_xmax, (short)new_ymax);
-
+               (short)new_xmax, (short)new_ymax); 
         }
 
-        internal static Glyph Clone(Glyph original)
+        internal static Glyph Clone(Glyph original, ushort newGlyphIndex)
         {
             return new Glyph(
                 Utils.CloneArray(original.glyphPoints),
                 Utils.CloneArray(original._contourEndPoints),
                 original.Bounds,
                 original.GlyphInstructions != null ? Utils.CloneArray(original.GlyphInstructions) : null,
-                original.GlyphIndex);
+                newGlyphIndex);
         }
 
         /// <summary>

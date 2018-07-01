@@ -245,6 +245,8 @@ namespace SampleWinForms
         //        atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
         //    }
         //}
+
+        UnscaledGlyphPlanList _reusableUnscaledGlyphPlan = new UnscaledGlyphPlanList();
         private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
         {
             //set some Gdi+ props... 
@@ -281,25 +283,25 @@ namespace SampleWinForms
             //2.1
 
 
-            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, userGlyphPlans, null);
+            _reusableUnscaledGlyphPlan.Clear();
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlan);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;
             _currentTextPrinter.FillColor = Color.Red;
             _currentTextPrinter.DrawFromGlyphPlans(
-                  userGlyphPlans,
+                  new GlyphPlanSequence(_reusableUnscaledGlyphPlan),
                   x_pos,
                   y_pos
              );
             //Example 3: MeasureString        
 
             //TODO: review here again
-            MeasuredStringBox strBox = SampleMeasureStringUtil.MeasureString(
-                _currentTextPrinter.GlyphLayoutMan,
-                _currentTextPrinter.FontSizeInPoints,
+            MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
                 textBuffer, 0,
-                textBuffer.Length, out int w, out int h);
+                textBuffer.Length,
+                _currentTextPrinter.FontSizeInPoints);
+
             //draw line mark
 
             float x_pos2 = x_pos + strBox.width + 10;

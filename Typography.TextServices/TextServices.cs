@@ -44,7 +44,7 @@ namespace Typography.TextServices
             typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(fontCollection =>
             {
                 fontCollection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-                //fontCollection.LoadSystemFonts();
+                fontCollection.LoadSystemFonts();
             });
 
             _glyphLayout = new GlyphLayout();
@@ -158,11 +158,7 @@ namespace Typography.TextServices
                 breakspan.scLang = selectedScriptLang;
                 yield return breakspan;
             }
-
         }
-
-
-
 
         /// <summary>
         /// expandable list of glyph plan
@@ -170,19 +166,19 @@ namespace Typography.TextServices
         class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
         {
             List<UnscaledGlyphPlan> _glyphPlans = new List<UnscaledGlyphPlan>();
-            float _accumAdvanceX;
+
 
             public void Clear()
             {
                 _glyphPlans.Clear();
-                _accumAdvanceX = 0;
+
             }
             public void Append(UnscaledGlyphPlan glyphPlan)
             {
                 _glyphPlans.Add(glyphPlan);
-                _accumAdvanceX += glyphPlan.AdvanceX;
+
             }
-            public float AccumAdvanceX { get { return _accumAdvanceX; } }
+
 
             public UnscaledGlyphPlan this[int index]
             {
@@ -208,7 +204,7 @@ namespace Typography.TextServices
         }
 
 
-        PxScaledGlyphPlanList _reusableScaledGlyphPlanList = new PxScaledGlyphPlanList();
+
         List<MeasuredStringBox> _reusableMeasureBoxList = new List<MeasuredStringBox>();
 
         UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
@@ -238,26 +234,27 @@ namespace Typography.TextServices
             float accumW = 0;
             float accumH = 0;
 
+
             foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
             {
 
                 _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
                 //
-                _reusableGlyphPlanList.Clear();
-                GlyphLayoutExtensions.GenerateGlyphPlans(
-                    _glyphLayout.ResultUnscaledGlyphPositions,
-                    pxscale,
-                    true,
-                    _reusableScaledGlyphPlanList);
-                //measure string size
-                var result = new MeasuredStringBox(
-                    _reusableGlyphPlanList.AccumAdvanceX,
-                    _currentTypeface.Ascender * pxscale,
-                    _currentTypeface.Descender * pxscale,
-                    _currentTypeface.LineGap * pxscale,
-                     Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_currentTypeface) * pxscale);
+                _reusableGlyphPlanList.Clear(); 
+                _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList); 
+                //create pixelscale...
+                
+
+
+                ////measure string size
+                //var result = new MeasuredStringBox(
+                //    _reusableGlyphPlanList.AccumAdvanceX,
+                //    _currentTypeface.Ascender * pxscale,
+                //    _currentTypeface.Descender * pxscale,
+                //    _currentTypeface.LineGap * pxscale,
+                //     Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_currentTypeface) * pxscale);
                 //
-                ConcatMeasureBox(ref accumW, ref accumH, ref result);
+               // ConcatMeasureBox(ref accumW, ref accumH, ref result);
 
             }
 
@@ -295,12 +292,11 @@ namespace Typography.TextServices
                 _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
                 //
 
-                _reusableScaledGlyphPlanList.Clear();
-                GlyphLayoutExtensions.GenerateGlyphPlans(
-                    _glyphLayout.ResultUnscaledGlyphPositions,
-                    pxscale,
-                    true,
-                    _reusableScaledGlyphPlanList);
+                _reusableGlyphPlanList.Clear();
+                _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
+                //measure ...
+
+
                 //measure each glyph
                 //limit at specific width
                 int glyphCount = _reusableGlyphPlanList.Count;
@@ -500,9 +496,9 @@ namespace Typography.TextServices
 
                 int pre_count = _reusableGlyphPlanList.Count;
                 //create glyph-plan ( UnScaled version) and add it to planList                
-                GlyphPlanSequence.GenerateUnscaledGlyphPlans(
-                    glyphLayout.ResultUnscaledGlyphPositions,
-                    _reusableGlyphPlanList);
+
+                glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
+
                 int post_count = _reusableGlyphPlanList.Count;
                 planSeq = new GlyphPlanSequence(_reusableGlyphPlanList, pre_count, post_count - pre_count);
                 //

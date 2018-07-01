@@ -17,7 +17,7 @@ namespace PixelFarm.Drawing.Fonts
         GreyscaleStencil,
         None,
     }
-    public class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter
+    public sealed class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter
     {
         PixelBlenderWithMask maskPixelBlender = new PixelBlenderWithMask();
         PixelBlenderPerColorComponentWithMask maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
@@ -196,36 +196,13 @@ namespace PixelFarm.Drawing.Fonts
         {
             //TODO...
         }
-        public override void DrawFromGlyphPlans(PxScaledGlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
-        {
-            //TODO...
-        }
-        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
-        {
-            //TODO...
 
-        }
-        public void DrawString(char[] text, int startAt, int len, double x, double y)
-        {
-            InternalDrawString(text, startAt, len, (float)x, (float)y);
-        }
-        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
-        {
-            InternalDrawString(textBuffer, startAt, len, x, y);
-        }
-
-        void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
+        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float x, float y)
         {
 
+            Typeface typeface = _textServices.ResolveTypeface(_font);
 
-            int j = buffer.Length;
-            //create temp buffer span that describe the part of a whole char buffer
-            TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
-            //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
-            //with specific request font
-            GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font);
-
-            float scale = 1;// _fontAtlas.TargetTextureScale;
+            float scale = typeface.CalculateScaleToPixelFromPointSize(_font.SizeInPoints);
             int recommendLineSpacing = (int)_font.LineSpacingInPx;
             //--------------------------
             //TODO:
@@ -234,7 +211,7 @@ namespace PixelFarm.Drawing.Fonts
             y -= ((_font.LineSpacingInPx) * scale);
 
             // 
-            float scaleFromTexture = _finalTextureScale;
+
             TextureKind textureKind = _fontAtlas.TextureKind;
 
             float gx = 0;
@@ -258,8 +235,9 @@ namespace PixelFarm.Drawing.Fonts
                 //fill glyph-by-glyh
 
                 var aaTech = this.AntialiasTech;
-
                 int seqLen = glyphPlanSeq.Count;
+
+
                 for (int i = 0; i < seqLen; ++i)
                 {
                     UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
@@ -286,18 +264,18 @@ namespace PixelFarm.Drawing.Fonts
                     //{
                     //}
 
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset) * scaleFromTexture); //ideal x
-                    gy = (float)(y + (ngy + glyphData.TextureYOffset - srcH + lineHeight) * scaleFromTexture);
+                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(y + (ngy + glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
-                    gy = (float)Math.Floor(gy) + lineHeight;
+                    gy = (float)Math.Floor(gy);// + lineHeight;
 
                     //clear with solid black color 
                     //_maskBufferPainter.Clear(Color.Black);
                     //clear mask buffer at specific pos
                     _maskBufferPainter.FillRect(gx - 1, gy - 1, srcW + 2, srcH + 2, Color.Black);
                     //draw 'stencil' glyph on mask-buffer                
-                    _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY), srcW, srcH);
+                    _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY + srcH), srcW, srcH);
 
                     switch (aaTech)
                     {
@@ -363,8 +341,8 @@ namespace PixelFarm.Drawing.Fonts
                     // -glyphData.TextureXOffset => restore to original pos
                     // -glyphData.TextureYOffset => restore to original pos 
                     //--------------------------
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset) * scaleFromTexture); //ideal x
-                    gy = (float)(y + (ngy - glyphData.TextureYOffset - srcH + lineHeight) * scaleFromTexture);
+                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(y + (ngy - glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(glyph.AdvanceX * scale);
                     gy = (float)Math.Floor(gy) + lineHeight;
@@ -406,6 +384,24 @@ namespace PixelFarm.Drawing.Fonts
 
             //
             _painter.DestBitmapBlender.OutputPixelBlender = prevPxBlender;//restore back
+        }
+        public void DrawString(char[] text, int startAt, int len, double x, double y)
+        {
+            InternalDrawString(text, startAt, len, (float)x, (float)y);
+        }
+        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
+        {
+            InternalDrawString(textBuffer, startAt, len, x, y);
+        }
+
+        void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
+        {
+
+            //create temp buffer span that describe the part of a whole char buffer
+            TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
+            //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
+            //with specific request font      
+            DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font), startAt, len, x, y);
         }
     }
 }

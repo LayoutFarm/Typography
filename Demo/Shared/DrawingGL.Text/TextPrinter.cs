@@ -52,10 +52,6 @@ namespace DrawingGL.Text
         }
 
 
-        public override void DrawFromGlyphPlans(PxScaledGlyphPlanList glyphPlanList, int startAt, int len, float x, float y)
-        {
-            throw new System.NotImplementedException();
-        }
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
         {
             throw new System.NotImplementedException();
@@ -73,13 +69,10 @@ namespace DrawingGL.Text
         }
         public MeasuredStringBox Measure(char[] textBuffer, int startAt, int len)
         {
-
-            return SampleMeasureStringUtil.MeasureString(
-                this.GlyphLayoutMan,
-                this.FontSizeInPoints,
+            return GlyphLayoutMan.LayoutAndMeasureString(
                 textBuffer, startAt, len,
-                out int w,
-                out int h);
+                this.FontSizeInPoints
+                );
         }
 
         /// <summary>
@@ -131,6 +124,7 @@ namespace DrawingGL.Text
         }
 
 
+        UnscaledGlyphPlanList _resuableGlyphPlanList = new UnscaledGlyphPlanList();
 
         /// <summary>
         /// generate glyph run into a given textRun
@@ -156,11 +150,11 @@ namespace DrawingGL.Text
 
             float pxscale = this.Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
 
-            PxScaledGlyphPlanList userGlyphPlans = new PxScaledGlyphPlanList();
-            GenerateGlyphPlan(charBuffer, 0, charBuffer.Length, userGlyphPlans, null);
+            _resuableGlyphPlanList.Clear();
+            GenerateGlyphPlan(charBuffer, 0, charBuffer.Length, _resuableGlyphPlanList);
 
             // render each glyph 
-            int planCount = userGlyphPlans.Count;
+            int planCount = _resuableGlyphPlanList.Count;
             for (var i = 0; i < planCount; ++i)
             {
 
@@ -168,7 +162,7 @@ namespace DrawingGL.Text
                 //----
                 //glyph path 
                 //---- 
-                PxScaledGlyphPlan glyphPlan = userGlyphPlans[i];
+                UnscaledGlyphPlan glyphPlan = _resuableGlyphPlanList[i];
                 //
                 //1. check if we have this glyph in cache?
                 //if yes, not need to build it again 
@@ -210,69 +204,5 @@ namespace DrawingGL.Text
         }
     }
 
-    public static class SampleMeasureStringUtil
-    {
-        //-----------------
-        //measure string utils
 
-        static PxScaledGlyphPlanList _reusableScaledGlyphPlanList = new PxScaledGlyphPlanList();
-        static List<MeasuredStringBox> _reusableMeasureBoxList = new List<MeasuredStringBox>();
-
-        static UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
-
-        public static MeasuredStringBox MeasureString(
-             Typography.TextLayout.GlyphLayout glyphLayout,
-             float fontSizeInPts,
-             char[] str, int startAt, int len, out int w, out int h)
-        {
-            //measure string 
-            //check if we use cache feature or not
-
-            Typography.OpenFont.Typeface typeface = glyphLayout.Typeface;
-
-            if (str.Length < 1)
-            {
-                w = h = 0;
-            }
-            _reusableMeasureBoxList.Clear(); //reset 
-
-            float pxscale = typeface.CalculateScaleToPixelFromPointSize(fontSizeInPts);
-            //NOET:at this moment, simple operation
-            //may not be simple...  
-            //-------------------
-            //input string may contain more than 1 script lang
-            //user can parse it by other parser
-            //but in this code, we use our Typography' parser
-            //-------------------
-            //user must setup the CustomBreakerBuilder before use         
-
-            int cur_startAt = startAt;
-            float accumW = 0;
-            float accumH = 0;
-
-
-
-            glyphLayout.Layout(str, 0, str.Length);
-            //
-            _reusableGlyphPlanList.Clear();
-            GlyphLayoutExtensions.GenerateGlyphPlans(
-                glyphLayout.ResultUnscaledGlyphPositions,
-                pxscale,
-                true,
-                _reusableScaledGlyphPlanList);
-            //measure string size
-            var result = new MeasuredStringBox(
-                _reusableGlyphPlanList.AccumAdvanceX,
-                typeface.Ascender * pxscale,
-                typeface.Descender * pxscale,
-                typeface.LineGap * pxscale,
-                 Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface) * pxscale);
-
-
-            w = (int)System.Math.Round(accumW);
-            h = (int)System.Math.Round(accumH);
-
-            return result;
-        }
-    }
 }

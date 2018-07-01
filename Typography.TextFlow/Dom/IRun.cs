@@ -1,5 +1,5 @@
 ﻿//MIT, 2014-present, WinterDev
-using System.Collections.Generic;
+
 
 namespace Typography.TextLayout
 {
