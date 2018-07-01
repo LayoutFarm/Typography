@@ -227,7 +227,6 @@ namespace Typography.TextLayout
 
             if (snapToGrid)
             {
-
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {

@@ -200,7 +200,9 @@ namespace PixelFarm.Drawing.Fonts
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float x, float y)
         {
 
-            float scale = 1;// _fontAtlas.TargetTextureScale;
+            Typeface typeface = _textServices.ResolveTypeface(_font);
+
+            float scale = typeface.CalculateScaleToPixelFromPointSize(_font.SizeInPoints);
             int recommendLineSpacing = (int)_font.LineSpacingInPx;
             //--------------------------
             //TODO:
@@ -209,7 +211,7 @@ namespace PixelFarm.Drawing.Fonts
             y -= ((_font.LineSpacingInPx) * scale);
 
             // 
-            float scaleFromTexture = _finalTextureScale;
+
             TextureKind textureKind = _fontAtlas.TextureKind;
 
             float gx = 0;
@@ -232,10 +234,10 @@ namespace PixelFarm.Drawing.Fonts
                 //test...
                 //fill glyph-by-glyh
 
-                var aaTech = this.AntialiasTech; 
-                int seqLen = glyphPlanSeq.Count; 
+                var aaTech = this.AntialiasTech;
+                int seqLen = glyphPlanSeq.Count;
 
-                
+
                 for (int i = 0; i < seqLen; ++i)
                 {
                     UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
@@ -262,18 +264,18 @@ namespace PixelFarm.Drawing.Fonts
                     //{
                     //}
 
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset) * scaleFromTexture); //ideal x
-                    gy = (float)(y + (ngy + glyphData.TextureYOffset - srcH + lineHeight) * scaleFromTexture);
+                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(y + (ngy + glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
-                    gy = (float)Math.Floor(gy) + lineHeight;
+                    gy = (float)Math.Floor(gy);// + lineHeight;
 
                     //clear with solid black color 
                     //_maskBufferPainter.Clear(Color.Black);
                     //clear mask buffer at specific pos
                     _maskBufferPainter.FillRect(gx - 1, gy - 1, srcW + 2, srcH + 2, Color.Black);
                     //draw 'stencil' glyph on mask-buffer                
-                    _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY), srcW, srcH);
+                    _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY + srcH), srcW, srcH);
 
                     switch (aaTech)
                     {
@@ -339,8 +341,8 @@ namespace PixelFarm.Drawing.Fonts
                     // -glyphData.TextureXOffset => restore to original pos
                     // -glyphData.TextureYOffset => restore to original pos 
                     //--------------------------
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset) * scaleFromTexture); //ideal x
-                    gy = (float)(y + (ngy - glyphData.TextureYOffset - srcH + lineHeight) * scaleFromTexture);
+                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(y + (ngy - glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(glyph.AdvanceX * scale);
                     gy = (float)Math.Floor(gy) + lineHeight;
@@ -394,7 +396,7 @@ namespace PixelFarm.Drawing.Fonts
 
         void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
         {
- 
+
             //create temp buffer span that describe the part of a whole char buffer
             TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
