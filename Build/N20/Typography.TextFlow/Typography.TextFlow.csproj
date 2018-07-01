@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F7D71E61-9342-4DD7-9AFD-69045F2EC98B}</ProjectGuid>
+    <ProjectGuid>{333F3209-8DA9-4D33-A560-299ED4C6DFA5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Typography.OpenFont</RootNamespace>
-    <AssemblyName>Typography.OpenFont</AssemblyName>
+    <RootNamespace>Typography.TextFlow</RootNamespace>
+    <AssemblyName>Typography.TextFlow</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,6 @@
     <DefineConstants>TRACE;DEBUG;NET20</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,15 +28,23 @@
     <DefineConstants>TRACE;NET20</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="..\..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
+      <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
+      <Name>Typography.GlyphLayout</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj">
+      <Project>{f7d71e61-9342-4dd7-9afd-69045f2ec98b}</Project>
+      <Name>Typography.OpenFont</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\..\..\Typography.TextFlow\Typography.TextFlow.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

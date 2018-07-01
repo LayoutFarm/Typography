@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD1_6;NETSTANDARD1_3</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj" />
+    <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
+    <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj" />
+    <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
+
+</Project>
