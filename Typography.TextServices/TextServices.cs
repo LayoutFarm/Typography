@@ -33,16 +33,18 @@ namespace Typography.TextServices
         Typeface _currentTypeface;
         float _fontSizeInPts;
         ScriptLang _defaultScriptLang;
-        TypefaceStore typefaceStore;
+        ActiveTypefaceCache typefaceStore;
+        InstalledTypefaceCollection _installedTypefaceCollection;
         ScriptLang scLang;
 
 
         public TextServices()
         {
 
-            typefaceStore = TypefaceStore.GetTypefaceStoreOrCreateNewIfNotExist();
+            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
 
-            typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(fontCollection =>
+            //default, user can set this later
+            _installedTypefaceCollection = InstalledTypefaceCollection.GetSharedFontCollection(fontCollection =>
             {
                 fontCollection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
                 fontCollection.LoadSystemFonts();
@@ -50,16 +52,20 @@ namespace Typography.TextServices
 
             _glyphLayout = new GlyphLayout();
         }
-
-
-
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
             this.scLang = _defaultScriptLang = scLang;
         }
-        public InstalledFontCollection InstalledFontCollection
+        public InstalledTypefaceCollection InstalledFontCollection
         {
-            get { return typefaceStore.FontCollection; }
+            get
+            {
+                return _installedTypefaceCollection;
+            }
+            set
+            {
+                _installedTypefaceCollection = value;
+            }
         }
 
         public ScriptLang CurrentScriptLang
@@ -89,8 +95,15 @@ namespace Typography.TextServices
         }
         public Typeface GetTypeface(string name, TypefaceStyle installedFontStyle)
         {
-            return typefaceStore.GetTypeface(name, installedFontStyle);
+            InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
+            if (inst != null)
+            {
+                return typefaceStore.GetTypeface(inst);
+            }
+            return null;
+
         }
+
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(TextBuffer buffer, int start, int len)
         {
             //under current typeface + scriptlang setting 
