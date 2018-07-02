@@ -252,7 +252,7 @@ namespace Typography.FontManagement
         Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
 
         InstalledTypefaceGroup _normal, _bold, _italic, _bold_italic;
-        List<InstalledTypefaceGroup> _allFontGroups = new List<InstalledTypefaceGroup>();
+        List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
         FontNameDuplicatedHandler fontNameDuplicatedHandler;
 
 
@@ -311,7 +311,7 @@ namespace Typography.FontManagement
                 //should not duplicate 
                 _subFamToFontGroup.Add(upperCaseName, fontGroup);
             }
-            _allFontGroups.Add(fontGroup);
+            _allGroups.Add(fontGroup);
             return fontGroup;
         }
 
@@ -319,7 +319,7 @@ namespace Typography.FontManagement
         {
             fontNameDuplicatedHandler = handler;
         }
-        public bool AddTypefaceSource(FontStreamSource src)
+        public bool AddFontStreamSource(FontStreamSource src)
         {
             //preview data of font
             using (Stream stream = src.ReadFontStream())
@@ -350,7 +350,7 @@ namespace Typography.FontManagement
                 //so we add to 'other group' list
                 selectedFontGroup = new InstalledTypefaceGroup();
                 _subFamToFontGroup.Add(fontsubFamUpperCaseName, selectedFontGroup);
-                _allFontGroups.Add(selectedFontGroup);
+                _allGroups.Add(selectedFontGroup);
             }
             //
             string fontNameUpper = newfont.FontName.ToUpper();
@@ -449,7 +449,7 @@ namespace Typography.FontManagement
 
         public IEnumerable<InstalledTypeface> GetInstalledFontIter()
         {
-            foreach (InstalledTypefaceGroup fontgroup in _allFontGroups)
+            foreach (InstalledTypefaceGroup fontgroup in _allGroups)
             {
                 foreach (InstalledTypeface f in fontgroup._members.Values)
                 {
@@ -476,7 +476,7 @@ namespace Typography.FontManagement
                         default: break;
                         case ".ttf":
                         case ".otf":
-                            fontCollection.AddTypefaceSource(new FontFileStreamProvider(file));
+                            fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
                             break;
                     }
                 }
