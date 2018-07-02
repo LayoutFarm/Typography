@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 using Typography.TextLayout;
 using Typography.TextServices;
-
+using Typography.FontManagement;
 namespace TypographyTest.WinForms
 {
 

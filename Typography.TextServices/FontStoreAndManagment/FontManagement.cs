@@ -5,7 +5,7 @@ using System.IO;
 using Typography.OpenFont;
 
 
-namespace Typography.TextServices
+namespace Typography.FontManagement
 {
     public class InstalledFont
     {
@@ -27,9 +27,15 @@ namespace Typography.TextServices
         {
             return FontName + " " + FontSubFamily;
         }
-
     }
-
+    [Flags]
+    public enum InstalledFontStyle
+    {
+        Others = 0,
+        Normal = 1,
+        Bold = 1 << 2,
+        Italic = 1 << 3,
+    }
 
     public interface FontStreamSource
     {
@@ -50,17 +56,6 @@ namespace Typography.TextServices
             return new FileStream(this.PathName, FileMode.Open, FileAccess.Read);
 
         }
-    }
-
-
-
-    [Flags]
-    public enum InstalledFontStyle
-    {
-        Others = 0,
-        Normal = 1,
-        Bold = 1 << 2,
-        Italic = 1 << 3,
     }
 
     public delegate void FirstInitFontCollectionDelegate(InstalledFontCollection fontCollection);

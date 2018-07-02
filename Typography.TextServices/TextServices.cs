@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
+using Typography.FontManagement;
 
-
-namespace Typography.TextServices
+namespace Typography.TextLayout
 {
-
     public struct BreakSpan
     {
         public int startAt;
@@ -15,8 +14,10 @@ namespace Typography.TextServices
         public short flags;
         public ScriptLang scLang;
     }
+}
 
-
+namespace Typography.TextServices
+{
 
     public class TextServices
     {
@@ -240,10 +241,10 @@ namespace Typography.TextServices
 
                 _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
                 //
-                _reusableGlyphPlanList.Clear(); 
-                _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList); 
+                _reusableGlyphPlanList.Clear();
+                _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
                 //create pixelscale...
-                
+
 
 
                 ////measure string size
@@ -254,7 +255,7 @@ namespace Typography.TextServices
                 //    _currentTypeface.LineGap * pxscale,
                 //     Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_currentTypeface) * pxscale);
                 //
-               // ConcatMeasureBox(ref accumW, ref accumH, ref result);
+                // ConcatMeasureBox(ref accumW, ref accumH, ref result);
 
             }
 

@@ -393,7 +393,7 @@ namespace LayoutFarm
 
             MyLineSegmentList lineSegs = new MyLineSegmentList(textBufferSpan.start, textBufferSpan.len);
             int cur_startAt = textBufferSpan.start;
-            foreach (Typography.TextServices.BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
+            foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
                 MyLineSegment lineSeg = new MyLineSegment(lineSegs, breakSpan.startAt, breakSpan.len);
                 lineSeg.scriptLang = breakSpan.scLang;

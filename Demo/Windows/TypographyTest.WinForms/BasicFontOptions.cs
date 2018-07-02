@@ -5,7 +5,7 @@ using System.IO;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.TextServices;
-
+using Typography.FontManagement;    
 
 namespace TypographyTest
 {
@@ -58,7 +58,7 @@ namespace TypographyTest
                 {
                     case ".ttf":
                     case ".otf":
-                        _textServices.InstalledFontCollection.AddFont(new FontFileStreamProvider(file));
+                        _textServices.InstalledFontCollection.AddFont(new Typography.FontManagement.FontFileStreamProvider(file));
                         break;
                 }
 
