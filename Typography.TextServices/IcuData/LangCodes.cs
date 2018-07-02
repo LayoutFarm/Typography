@@ -34,7 +34,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-namespace Typography.TextServices
+namespace Typography.TextBreak
 {
 
     public static class IcuData

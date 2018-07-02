@@ -1,6 +1,6 @@
 ﻿//MIT, 2016-2017, WinterDev 
 
-using Typography.TextServices;
+
 using Typography.FontManagement;
 namespace PixelFarm.Drawing.Fonts
 {

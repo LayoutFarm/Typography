@@ -56,7 +56,7 @@ namespace LayoutFarm
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
             Typography.OpenFont.ScriptLang scLang = null;
             string langFullName;
-            if (Typography.TextServices.IcuData.TryGetFullLanguageNameFromLangCode(
+            if (Typography.TextBreak.IcuData.TryGetFullLanguageNameFromLangCode(
                  currentCulture.TwoLetterISOLanguageName,
                  currentCulture.ThreeLetterISOLanguageName,
                  out langFullName))
