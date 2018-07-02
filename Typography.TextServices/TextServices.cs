@@ -87,7 +87,7 @@ namespace Typography.TextServices
 
             //_glyphLayout.FontSizeInPoints = _fontSizeInPts = fontSizeInPts;
         }
-        public Typeface GetTypeface(string name, InstalledFontStyle installedFontStyle)
+        public Typeface GetTypeface(string name, TypefaceStyle installedFontStyle)
         {
             return typefaceStore.GetTypeface(name, installedFontStyle);
         }

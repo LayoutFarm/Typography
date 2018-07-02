@@ -10,7 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\FontManagement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FontStoreAndManagment\IFontLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IcuData\LangCodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextServices.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\CRC32.cs" />

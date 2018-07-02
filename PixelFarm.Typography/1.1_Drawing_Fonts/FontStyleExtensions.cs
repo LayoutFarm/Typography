@@ -1,25 +1,24 @@
-﻿//MIT, 2016-2017, WinterDev 
+﻿//MIT, 2016-present, WinterDev 
 
 
-using Typography.FontManagement;
 namespace PixelFarm.Drawing.Fonts
 {
     public static class FontStyleExtensions
     {
-        public static InstalledFontStyle ConvToInstalledFontStyle(this FontStyle style)
+        public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this FontStyle style)
         {
-            InstalledFontStyle installedStyle = InstalledFontStyle.Normal;//regular
+            Typography.FontManagement.TypefaceStyle installedStyle = Typography.FontManagement.TypefaceStyle.Normal;//regular
             switch (style)
             {
                 default: break;
                 case FontStyle.Bold:
-                    installedStyle = InstalledFontStyle.Bold;
+                    installedStyle = Typography.FontManagement.TypefaceStyle.Bold;
                     break;
                 case FontStyle.Italic:
-                    installedStyle = InstalledFontStyle.Italic;
+                    installedStyle = Typography.FontManagement.TypefaceStyle.Italic;
                     break;
                 case FontStyle.Bold | FontStyle.Italic:
-                    installedStyle = InstalledFontStyle.Italic;
+                    installedStyle = Typography.FontManagement.TypefaceStyle.Italic;
                     break;
             }
             return installedStyle;

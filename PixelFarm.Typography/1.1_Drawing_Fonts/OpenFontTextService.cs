@@ -374,12 +374,8 @@ namespace LayoutFarm
             public MyLineSegment GetSegment(int index)
             {
                 return _segments[index];
-            }
-
-            public int GetHashKey(char[] orgString, int segmentOffset, int len)
-            {
-                return Typography.TextServices.CRC32.CalculateCRC32(orgString, _startAt + segmentOffset, len);
-            }
+            } 
+         
         }
         List<MyLineSegment> _resuableLineSegments = new List<MyLineSegment>();
 
