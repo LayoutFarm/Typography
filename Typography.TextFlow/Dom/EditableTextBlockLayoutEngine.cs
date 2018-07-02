@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 
 using Typography.OpenFont;
-using Typography.WordBreaks;
+using Typography.TextBreak;
+
 namespace Typography.TextLayout
 {
-
-
 
     /// <summary>
     /// collect and managed editable text line
@@ -17,9 +16,7 @@ namespace Typography.TextLayout
 
         TextBlockLexer _textBlockLexer;
         List<EditableTextLine> _lines = new List<EditableTextLine>();
-        GlyphLayout _glyphLayout;
-
-
+        GlyphLayout _glyphLayout; 
 
         public EditableTextBlockLayoutEngine()
         {
