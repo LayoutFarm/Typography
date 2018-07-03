@@ -82,48 +82,6 @@ namespace Typography.FontManagement
     }
 
 
-    class ActiveTypefaceCache
-    {
-
-        Dictionary<InstalledTypeface, Typeface> _loadedTypefaces = new Dictionary<InstalledTypeface, Typeface>();
-        public ActiveTypefaceCache()
-        {
-
-        }
-        static ActiveTypefaceCache s_typefaceStore;
-        public static ActiveTypefaceCache GetTypefaceStoreOrCreateNewIfNotExist()
-        {
-            if (s_typefaceStore == null)
-            {
-                s_typefaceStore = new ActiveTypefaceCache();
-            }
-            return s_typefaceStore;
-        }
-        public Typeface GetTypeface(InstalledTypeface installedFont)
-        {
-            return GetTypefaceOrCreateNew(installedFont);
-        }
-        Typeface GetTypefaceOrCreateNew(InstalledTypeface installedFont)
-        {
-            //load 
-            //check if we have create this typeface or not 
-            Typeface typeface;
-            if (!_loadedTypefaces.TryGetValue(installedFont, out typeface))
-            {
-                //TODO: review how to load font here
-                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
-                {
-                    var reader = new OpenFontReader();
-                    typeface = reader.Read(fs);
-                    typeface.Filename = installedFont.FontPath;
-                }
-                return _loadedTypefaces[installedFont] = typeface;
-            }
-            return typeface;
-        }
-
-    }
-
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
         //_defaultFontNotFoundHandler = (fontCollection, fontName, subfamName, style) =>

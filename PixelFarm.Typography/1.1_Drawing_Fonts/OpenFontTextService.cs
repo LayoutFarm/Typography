@@ -9,6 +9,7 @@ using Typography.OpenFont.Extensions;
 
 using Typography.TextLayout;
 using Typography.TextServices;
+using Typography.FontManagement;
 
 namespace LayoutFarm
 {
@@ -29,7 +30,13 @@ namespace LayoutFarm
 
             //set up typography text service
             _txtServices = new TextServices();
+            //default, user can set this later
 
+            _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedFontCollection(collection =>
+            {
+                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
+                collection.LoadSystemFonts();
+            });
 
             //create typography service
             //you can implement this service on your own
@@ -374,8 +381,8 @@ namespace LayoutFarm
             public MyLineSegment GetSegment(int index)
             {
                 return _segments[index];
-            } 
-         
+            }
+
         }
         List<MyLineSegment> _resuableLineSegments = new List<MyLineSegment>();
 
