@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using Typography.TextLayout;
-namespace Typography.WordBreaks
+namespace Typography.TextBreak
 {
     public class TextBlockLexer
     {

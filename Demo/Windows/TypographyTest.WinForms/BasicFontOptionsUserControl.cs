@@ -3,8 +3,7 @@ using System;
 using System.Windows.Forms;
 
 using Typography.TextLayout;
-using Typography.TextServices;
-
+using Typography.FontManagement;
 namespace TypographyTest.WinForms
 {
 
@@ -36,18 +35,17 @@ namespace TypographyTest.WinForms
             SetupRenderOptions();
             //
             this.lstFontSizes.SelectedIndex = 0;// lstFontSizes.Items.Count - 3;
-            var installedFont = lstFontList.SelectedItem as InstalledFont;
-            if (installedFont != null)
+            var instTypeface = lstFontList.SelectedItem as InstalledTypeface;
+            if (instTypeface != null)
             {
-                _options.InstalledFont = installedFont;
+                _options.InstalledTypeface = instTypeface;
             }
             SetupPositionTechniqueList();
         }
         void SetupFontList()
         {
 
-
-            InstalledFont selectedFF = null;
+            InstalledTypeface selectedInstalledTypeface = null;
             int selected_index = 0;
             int ffcount = 0;
             bool found = false;
@@ -55,16 +53,16 @@ namespace TypographyTest.WinForms
             string defaultFont = "Tahoma";
             //string defaultFont = "Alef"; //test hebrew
             //string defaultFont = "Century";
-            foreach (InstalledFont ff in _options.GetInstalledFontIter())
+            foreach (InstalledTypeface installedTypeface in _options.GetInstalledTypefaceIter())
             {
-                if (!found && ff.FontName == defaultFont)
+                if (!found && installedTypeface.FontName == defaultFont)
                 {
-                    selectedFF = ff;
+                    selectedInstalledTypeface = installedTypeface;
                     selected_index = ffcount;
-                    _options.InstalledFont = ff;
+                    _options.InstalledTypeface = installedTypeface;
                     found = true;
                 }
-                lstFontList.Items.Add(ff);
+                lstFontList.Items.Add(installedTypeface);
                 ffcount++;
             }
             //set default font for current text printer
@@ -75,10 +73,10 @@ namespace TypographyTest.WinForms
             lstFontList.SelectedIndex = selected_index;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
-                InstalledFont ff = lstFontList.SelectedItem as InstalledFont;
+                InstalledTypeface ff = lstFontList.SelectedItem as InstalledTypeface;
                 if (ff != null)
                 {
-                    _options.InstalledFont = ff;
+                    _options.InstalledTypeface = ff;
                     _options.InvokeAttachEvents();
                 }
             };

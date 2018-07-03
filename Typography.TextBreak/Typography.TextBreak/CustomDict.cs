@@ -14,11 +14,11 @@ namespace Typography.TextBreak
     /// </summary>
     public class CustomDic
     {
-        TextBuffer textBuffer;
+        CustomDicTextBuffer textBuffer;
         WordGroup[] wordGroups;
         char firstChar, lastChar;
 
-        internal TextBuffer TextBuffer { get { return textBuffer; } }
+        internal CustomDicTextBuffer TextBuffer { get { return textBuffer; } }
         public void SetCharRange(char firstChar, char lastChar)
         {
             this.firstChar = firstChar;
@@ -42,7 +42,7 @@ namespace Typography.TextBreak
 
             //---------------
             Dictionary<char, DevelopingWordGroup> wordGroups = new Dictionary<char, DevelopingWordGroup>();
-            textBuffer = new TextBuffer(1024);
+            textBuffer = new CustomDicTextBuffer(1024);
             foreach (string line in sortedWordList)
             {
                 char[] lineBuffer = line.Trim().ToCharArray();
@@ -138,15 +138,15 @@ namespace Typography.TextBreak
             this.startAt = startAt;
             this.len = len;
         }
-        public char GetChar(int index, TextBuffer textBuffer)
+        public char GetChar(int index, CustomDicTextBuffer textBuffer)
         {
             return textBuffer.GetChar(startAt + index);
         }
-        public string GetString(TextBuffer textBuffer)
+        public string GetString(CustomDicTextBuffer textBuffer)
         {
             return textBuffer.GetString(startAt, len);
         }
-        public bool SameTextContent(WordSpan another, TextBuffer textBuffer)
+        public bool SameTextContent(WordSpan another, CustomDicTextBuffer textBuffer)
         {
             if (another.len == this.len)
             {
@@ -163,40 +163,7 @@ namespace Typography.TextBreak
         }
     }
 
-    class TextBuffer
-    {
-        List<char> _tmpCharList;
-        int position;
-        char[] charBuffer;
-        public TextBuffer(int initCapacity)
-        {
-            _tmpCharList = new List<char>(initCapacity);
-        }
-        public void AddWord(char[] wordBuffer)
-        {
-            _tmpCharList.AddRange(wordBuffer);
-            //append with  ' ' 
-            _tmpCharList.Add(' ');
-            position += wordBuffer.Length + 1;
-        }
-        public void Freeze()
-        {
-            charBuffer = _tmpCharList.ToArray();
-            _tmpCharList = null;
-        }
-        public int CurrentPosition
-        {
-            get { return position; }
-        }
-        public char GetChar(int index)
-        {
-            return charBuffer[index];
-        }
-        public string GetString(int index, int len)
-        {
-            return new string(this.charBuffer, index, len);
-        }
-    }
+
 
     public struct BreakSpan
     {
@@ -230,7 +197,7 @@ namespace Typography.TextBreak
         debugDataState dbugDataState;
 #endif
 
-        internal string GetPrefix(TextBuffer buffer)
+        internal string GetPrefix(CustomDicTextBuffer buffer)
         {
             return prefixSpan.GetString(buffer);
         }
@@ -239,7 +206,7 @@ namespace Typography.TextBreak
             get;
             private set;
         }
-        internal void CollectAllWords(TextBuffer textBuffer, List<string> output)
+        internal void CollectAllWords(CustomDicTextBuffer textBuffer, List<string> output)
         {
             if (this.PrefixIsWord)
             {
@@ -282,7 +249,7 @@ namespace Typography.TextBreak
             }
         }
         WordGroup _resultWordGroup;//after call DoIndex()
-        internal void DoIndex(TextBuffer textBuffer, CustomDic owner)
+        internal void DoIndex(CustomDicTextBuffer textBuffer, CustomDic owner)
         {
 
             //recursive
@@ -412,7 +379,7 @@ namespace Typography.TextBreak
             }
         }
 
-        void DoIndexOfSmallAmount(TextBuffer textBuffer)
+        void DoIndexOfSmallAmount(CustomDicTextBuffer textBuffer)
         {
 
             //convention...
@@ -459,6 +426,41 @@ namespace Typography.TextBreak
     }
 
 
+    class CustomDicTextBuffer
+    {
+        List<char> _tmpCharList;
+        int position;
+        char[] charBuffer;
+        public CustomDicTextBuffer(int initCapacity)
+        {
+            _tmpCharList = new List<char>(initCapacity);
+        }
+        public void AddWord(char[] wordBuffer)
+        {
+            _tmpCharList.AddRange(wordBuffer);
+            //append with  ' ' 
+            _tmpCharList.Add(' ');
+            position += wordBuffer.Length + 1;
+        }
+        public void Freeze()
+        {
+            charBuffer = _tmpCharList.ToArray();
+            _tmpCharList = null;
+        }
+        public int CurrentPosition
+        {
+            get { return position; }
+        }
+        public char GetChar(int index)
+        {
+            return charBuffer[index];
+        }
+        public string GetString(int index, int len)
+        {
+            return new string(this.charBuffer, index, len);
+        }
+    }
+
     public class WordGroup
     {
         readonly WordGroup[] subGroups;
@@ -473,7 +475,7 @@ namespace Typography.TextBreak
             this.prefixIsWord = isPrefixIsWord;
         }
 
-        internal string GetPrefix(TextBuffer buffer)
+        internal string GetPrefix(CustomDicTextBuffer buffer)
         {
             return prefixSpan.GetString(buffer);
         }
@@ -481,7 +483,7 @@ namespace Typography.TextBreak
         {
             get { return this.prefixIsWord; }
         }
-        internal void CollectAllWords(TextBuffer textBuffer, List<string> output)
+        internal void CollectAllWords(CustomDicTextBuffer textBuffer, List<string> output)
         {
             if (this.PrefixIsWord)
             {

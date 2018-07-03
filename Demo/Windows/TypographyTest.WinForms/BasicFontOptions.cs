@@ -5,7 +5,7 @@ using System.IO;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.TextServices;
-
+using Typography.FontManagement;
 
 namespace TypographyTest
 {
@@ -24,7 +24,7 @@ namespace TypographyTest
         public event EventHandler UpdateRenderOutput;
         public event EventHandler<TypefaceChangedEventArgs> TypefaceChanged;
 
-        InstalledFont _installedFont;
+        InstalledTypeface _instTypeface;
 
         Typeface _selectedTypeface;
         bool _typefaceChanged = false;
@@ -58,7 +58,7 @@ namespace TypographyTest
                 {
                     case ".ttf":
                     case ".otf":
-                        _textServices.InstalledFontCollection.AddFont(new FontFileStreamProvider(file));
+                        _textServices.InstalledFontCollection.AddFontStreamSource(new Typography.FontManagement.FontFileStreamProvider(file));
                         break;
                 }
 
@@ -80,21 +80,21 @@ namespace TypographyTest
         }
         public float FontSizeInPoints { get; set; }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
-        public InstalledFont InstalledFont
+        public InstalledTypeface InstalledTypeface
         {
             get
             {
-                return _installedFont;
+                return _instTypeface;
             }
             set
             {
-                _installedFont = value;
+                _instTypeface = value;
                 _typefaceChanged = false;
                 //
                 if (value == null) return;
 
                 //TODO: review here again
-                Typeface selected_typeface = _textServices.GetTypeface(value.FontName, InstalledFontStyle.Normal);
+                Typeface selected_typeface = _textServices.GetTypeface(value.FontName, TypefaceStyle.Normal);
                 if (selected_typeface != this._selectedTypeface)
                 {
                     _typefaceChanged = true;
@@ -102,9 +102,9 @@ namespace TypographyTest
                 _selectedTypeface = selected_typeface;
             }
         }
-        public IEnumerable<InstalledFont> GetInstalledFontIter()
+        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter()
         {
-            foreach (InstalledFont ff in _textServices.InstalledFontCollection.GetInstalledFontIter())
+            foreach (InstalledTypeface ff in _textServices.InstalledFontCollection.GetInstalledFontIter())
             {
                 yield return ff;
             }
