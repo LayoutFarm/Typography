@@ -9,6 +9,7 @@ using Typography.OpenFont.Extensions;
 
 using Typography.TextLayout;
 using Typography.TextServices;
+using Typography.FontManagement;
 
 namespace LayoutFarm
 {
@@ -29,7 +30,13 @@ namespace LayoutFarm
 
             //set up typography text service
             _txtServices = new TextServices();
+            //default, user can set this later
 
+            _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedFontCollection(collection =>
+            {
+                collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
+                collection.LoadSystemFonts();
+            });
 
             //create typography service
             //you can implement this service on your own
@@ -56,7 +63,7 @@ namespace LayoutFarm
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
             Typography.OpenFont.ScriptLang scLang = null;
             string langFullName;
-            if (Typography.TextServices.IcuData.TryGetFullLanguageNameFromLangCode(
+            if (Typography.TextBreak.IcuData.TryGetFullLanguageNameFromLangCode(
                  currentCulture.TwoLetterISOLanguageName,
                  currentCulture.ThreeLetterISOLanguageName,
                  out langFullName))
@@ -376,10 +383,6 @@ namespace LayoutFarm
                 return _segments[index];
             }
 
-            public int GetHashKey(char[] orgString, int segmentOffset, int len)
-            {
-                return Typography.TextServices.CRC32.CalculateCRC32(orgString, _startAt + segmentOffset, len);
-            }
         }
         List<MyLineSegment> _resuableLineSegments = new List<MyLineSegment>();
 
@@ -393,7 +396,7 @@ namespace LayoutFarm
 
             MyLineSegmentList lineSegs = new MyLineSegmentList(textBufferSpan.start, textBufferSpan.len);
             int cur_startAt = textBufferSpan.start;
-            foreach (Typography.TextServices.BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
+            foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
                 MyLineSegment lineSeg = new MyLineSegment(lineSegs, breakSpan.startAt, breakSpan.len);
                 lineSeg.scriptLang = breakSpan.scLang;

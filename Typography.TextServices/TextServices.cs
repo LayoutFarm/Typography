@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
+using Typography.FontManagement;
+using System.IO;
 
-
-namespace Typography.TextServices
+namespace Typography.TextLayout
 {
-
     public struct BreakSpan
     {
         public int startAt;
@@ -15,8 +15,10 @@ namespace Typography.TextServices
         public short flags;
         public ScriptLang scLang;
     }
+}
 
-
+namespace Typography.TextServices
+{
 
     public class TextServices
     {
@@ -32,33 +34,31 @@ namespace Typography.TextServices
         Typeface _currentTypeface;
         float _fontSizeInPts;
         ScriptLang _defaultScriptLang;
-        TypefaceStore typefaceStore;
+        ActiveTypefaceCache typefaceStore;
+        InstalledTypefaceCollection _installedTypefaceCollection;
         ScriptLang scLang;
 
 
         public TextServices()
         {
 
-            typefaceStore = TypefaceStore.GetTypefaceStoreOrCreateNewIfNotExist();
-
-            typefaceStore.FontCollection = InstalledFontCollection.GetSharedFontCollection(fontCollection =>
-            {
-                fontCollection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-                fontCollection.LoadSystemFonts();
-            });
-
+            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist(); 
             _glyphLayout = new GlyphLayout();
         }
-
-
-
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
             this.scLang = _defaultScriptLang = scLang;
         }
-        public InstalledFontCollection InstalledFontCollection
+        public InstalledTypefaceCollection InstalledFontCollection
         {
-            get { return typefaceStore.FontCollection; }
+            get
+            {
+                return _installedTypefaceCollection;
+            }
+            set
+            {
+                _installedTypefaceCollection = value;
+            }
         }
 
         public ScriptLang CurrentScriptLang
@@ -86,10 +86,17 @@ namespace Typography.TextServices
 
             //_glyphLayout.FontSizeInPoints = _fontSizeInPts = fontSizeInPts;
         }
-        public Typeface GetTypeface(string name, InstalledFontStyle installedFontStyle)
+        public Typeface GetTypeface(string name, TypefaceStyle installedFontStyle)
         {
-            return typefaceStore.GetTypeface(name, installedFontStyle);
+            InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
+            if (inst != null)
+            {
+                return typefaceStore.GetTypeface(inst);
+            }
+            return null;
+
         }
+
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(TextBuffer buffer, int start, int len)
         {
             //under current typeface + scriptlang setting 
@@ -240,10 +247,10 @@ namespace Typography.TextServices
 
                 _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
                 //
-                _reusableGlyphPlanList.Clear(); 
-                _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList); 
+                _reusableGlyphPlanList.Clear();
+                _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
                 //create pixelscale...
-                
+
 
 
                 ////measure string size
@@ -254,7 +261,7 @@ namespace Typography.TextServices
                 //    _currentTypeface.LineGap * pxscale,
                 //     Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_currentTypeface) * pxscale);
                 //
-               // ConcatMeasureBox(ref accumW, ref accumH, ref result);
+                // ConcatMeasureBox(ref accumW, ref accumH, ref result);
 
             }
 
@@ -535,4 +542,48 @@ namespace Typography.TextServices
             return _knownSeqs.TryGetValue(hashValue, out seq);
         }
     }
+
+
+    class ActiveTypefaceCache
+    {
+
+        Dictionary<InstalledTypeface, Typeface> _loadedTypefaces = new Dictionary<InstalledTypeface, Typeface>();
+        public ActiveTypefaceCache()
+        {
+
+        }
+        static ActiveTypefaceCache s_typefaceStore;
+        public static ActiveTypefaceCache GetTypefaceStoreOrCreateNewIfNotExist()
+        {
+            if (s_typefaceStore == null)
+            {
+                s_typefaceStore = new ActiveTypefaceCache();
+            }
+            return s_typefaceStore;
+        }
+        public Typeface GetTypeface(InstalledTypeface installedFont)
+        {
+            return GetTypefaceOrCreateNew(installedFont);
+        }
+        Typeface GetTypefaceOrCreateNew(InstalledTypeface installedFont)
+        {
+            //load 
+            //check if we have create this typeface or not 
+            Typeface typeface;
+            if (!_loadedTypefaces.TryGetValue(installedFont, out typeface))
+            {
+                //TODO: review how to load font here
+                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
+                {
+                    var reader = new OpenFontReader();
+                    typeface = reader.Read(fs);
+                    typeface.Filename = installedFont.FontPath;
+                }
+                return _loadedTypefaces[installedFont] = typeface;
+            }
+            return typeface;
+        }
+
+    }
+
 }

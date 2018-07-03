@@ -426,7 +426,7 @@ namespace Typography.TextBreak
             int nwords = wordSpans.Length;
             //only 1 that match 
 
-            TextBuffer currentTextBuffer = CurrentCustomDic.TextBuffer;
+            CustomDicTextBuffer currentTextBuffer = CurrentCustomDic.TextBuffer;
 
             //we sort unindex string ***
             //so we find from longest one( last) to begin 

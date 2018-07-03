@@ -5,11 +5,12 @@ using System.IO;
 using Typography.OpenFont;
 
 
-namespace Typography.TextServices
+namespace Typography.FontManagement
 {
-    public class InstalledFont
+
+    public class InstalledTypeface
     {
-        internal InstalledFont(string fontName,
+        internal InstalledTypeface(string fontName,
             string fontSubFamily,
             string fontPath)
         {
@@ -27,9 +28,15 @@ namespace Typography.TextServices
         {
             return FontName + " " + FontSubFamily;
         }
-
     }
-
+    [Flags]
+    public enum TypefaceStyle
+    {
+        Others = 0,
+        Normal = 1,
+        Bold = 1 << 2,
+        Italic = 1 << 3,
+    }
 
     public interface FontStreamSource
     {
@@ -52,21 +59,10 @@ namespace Typography.TextServices
         }
     }
 
+    public delegate void FirstInitFontCollectionDelegate(InstalledTypefaceCollection fontCollection);
 
-
-    [Flags]
-    public enum InstalledFontStyle
-    {
-        Others = 0,
-        Normal = 1,
-        Bold = 1 << 2,
-        Italic = 1 << 3,
-    }
-
-    public delegate void FirstInitFontCollectionDelegate(InstalledFontCollection fontCollection);
-
-    public delegate InstalledFont FontNotFoundHandler(InstalledFontCollection fontCollection, string fontName, string fontSubFam, InstalledFontStyle wellknownStyle);
-    public delegate FontNameDuplicatedDecision FontNameDuplicatedHandler(InstalledFont existing, InstalledFont newAddedFont);
+    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection fontCollection, string fontName, string fontSubFam);
+    public delegate FontNameDuplicatedDecision FontNameDuplicatedHandler(InstalledTypeface existing, InstalledTypeface newAddedFont);
     public enum FontNameDuplicatedDecision
     {
         /// <summary>
@@ -80,165 +76,50 @@ namespace Typography.TextServices
     }
 
 
-    public class TypefaceStore : IFontLoader
+    public interface IInstalledTypefaceProvider
     {
-
-        FontNotFoundHandler _defaultFontNotFoundHandler;
-        FontNotFoundHandler _fontNotFoundHandler;
-        Dictionary<InstalledFont, Typeface> _loadedTypefaces = new Dictionary<InstalledFont, Typeface>();
-        public TypefaceStore()
-        {
-            _defaultFontNotFoundHandler = (fontCollection, fontName, subfamName, style) =>
-            {
-                //TODO: implement font not found mapping here
-                //_fontsMapping["monospace"] = "Courier New";
-                //_fontsMapping["Helvetica"] = "Arial";
-                fontName = fontName.ToUpper();
-                switch (fontName)
-                {
-                    case "MONOSPACE":
-                        return fontCollection.GetFont("Courier New", style);
-                    case "HELVETICA":
-                        return fontCollection.GetFont("Arial", style);
-                    case "TAHOMA":
-                        //use can change this ...
-                        //default font must found
-                        //if not throw err 
-                        //this prevent infinit loop
-                        throw new System.NotSupportedException();
-                    default:
-                        return fontCollection.GetFont("tahoma", style);
-                }
-            };
-        }
-
-        static TypefaceStore s_typefaceStore;
-        public static TypefaceStore GetTypefaceStoreOrCreateNewIfNotExist()
-        {
-            if (s_typefaceStore == null)
-            {
-                s_typefaceStore = new TypefaceStore();
-            }
-            return s_typefaceStore;
-        }
-
-
-        /// <summary>
-        /// font collection of the store
-        /// </summary>
-        public InstalledFontCollection FontCollection { get; set; }
-        public void SetFontNotFoundHandler(FontNotFoundHandler fontNotFoundHandler)
-        {
-            _fontNotFoundHandler = fontNotFoundHandler;
-        }
-        public Typeface GetTypeface(InstalledFont installedFont)
-        {
-            return GetTypefaceOrCreateNew(installedFont);
-        }
-        public Typeface GetTypeface(string fontname, string fontSubFam)
-        {
-
-            InstalledFont installedFont = FontCollection.GetFont(fontname, fontSubFam);
-            //convert from   
-            if (installedFont == null && _fontNotFoundHandler != null)
-            {
-                installedFont = _fontNotFoundHandler(this.FontCollection, fontname, fontSubFam, FontCollection.GetWellknownFontStyle(fontSubFam));
-            }
-            if (installedFont == null)
-            {
-                return null;
-            }
-            return GetTypefaceOrCreateNew(installedFont);
-        }
-
-
-
-        /// <summary>
-        /// get typeface from wellknown style
-        /// </summary>
-        /// <param name="fontname"></param>
-        /// <param name="style"></param>
-        /// <returns></returns>
-        public Typeface GetTypeface(string fontname, InstalledFontStyle style)
-        {
-            InstalledFont installedFont = FontCollection.GetFont(fontname, style);
-            if (installedFont == null && _fontNotFoundHandler != null)
-            {
-                installedFont = _fontNotFoundHandler(this.FontCollection, fontname, null, style);
-            }
-
-            if (installedFont == null && style == InstalledFontStyle.Normal)
-            {
-                FontCollection.GetFont(fontname, "Regular");
-            }
-
-            if (installedFont == null)
-            {
-                return null;
-            }
-            return GetTypefaceOrCreateNew(installedFont);
-        }
-        Typeface GetTypefaceOrCreateNew(InstalledFont installedFont)
-        {
-            //load 
-            //check if we have create this typeface or not 
-            Typeface typeface;
-            if (!_loadedTypefaces.TryGetValue(installedFont, out typeface))
-            {
-                //TODO: review how to load font here
-                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
-                {
-                    var reader = new OpenFontReader();
-                    typeface = reader.Read(fs);
-                    typeface.Filename = installedFont.FontPath;
-                }
-                return _loadedTypefaces[installedFont] = typeface;
-            }
-            return typeface;
-        }
-
-
-        //----------------------------------------------------------------
-        public InstalledFont GetFont(string fontName, InstalledFontStyle style)
-        {
-            //check if we have this font in the collection or not
-            InstalledFont found = FontCollection.GetFont(fontName, style);
-            if (found == null)
-            {
-                //not found
-                if (_fontNotFoundHandler != null)
-                {
-                    return _fontNotFoundHandler(FontCollection, fontName, null, style);
-                }
-                else
-                {
-                    return _defaultFontNotFoundHandler(FontCollection, fontName, null, style);
-                }
-
-            }
-            return found;
-        }
-
+        InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style);
     }
 
-    public class InstalledFontCollection
+
+    public class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
+        //_defaultFontNotFoundHandler = (fontCollection, fontName, subfamName, style) =>
+        //{
+        //    //TODO: implement font not found mapping here 
+        //    fontName = fontName.ToUpper();
+        //    switch (fontName)
+        //    {
+        //        case "MONOSPACE":
+        //            return fontCollection.GetInstalledTypeface("Courier New", style);
+        //        case "HELVETICA":
+        //            return fontCollection.GetInstalledTypeface("Arial", style);
+        //        case "TAHOMA":
+        //            //use can change this ...
+        //            //default font must found
+        //            //if not throw err 
+        //            //this prevent infinit loop
+        //            throw new System.NotSupportedException();
+        //        default:
+        //            return fontCollection.GetInstalledTypeface("tahoma", style);
+        //    }
+        //};
 
 
-        class FontGroup
+        class InstalledTypefaceGroup
         {
 
-            internal Dictionary<string, InstalledFont> _members = new Dictionary<string, InstalledFont>();
-            public void AddFont(InstalledFont installedFont)
+            internal Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
+            public void AddFont(InstalledTypeface installedFont)
             {
 
                 _members.Add(installedFont.FontName.ToUpper(), installedFont);
             }
-            public bool TryGetValue(string fontName, out InstalledFont found)
+            public bool TryGetValue(string fontName, out InstalledTypeface found)
             {
                 return _members.TryGetValue(fontName, out found);
             }
-            public void Replace(InstalledFont newone)
+            public void Replace(InstalledTypeface newone)
             {
                 _members[newone.FontName.ToUpper()] = newone;
             }
@@ -247,64 +128,48 @@ namespace Typography.TextServices
         /// <summary>
         /// map from font subfam to internal group name
         /// </summary>
-        Dictionary<string, FontGroup> _subFamToFontGroup = new Dictionary<string, FontGroup>();
+        Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
 
-        FontGroup _normal, _bold, _italic, _bold_italic;
-        List<FontGroup> _allFontGroups = new List<FontGroup>();
-        FontNameDuplicatedHandler fontNameDuplicatedHandler;
+        InstalledTypefaceGroup _normal, _bold, _italic, _bold_italic;
+        List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
+        FontNameDuplicatedHandler _fontNameDuplicatedHandler;
+        FontNotFoundHandler _fontNotFoundHandler;
 
-
-        public InstalledFontCollection()
+        public InstalledTypefaceCollection()
         {
 
             //-----------------------------------------------------
             //init wellknown subfam 
-            _normal = CreateNewFontGroup(InstalledFontStyle.Normal, "regular", "normal");
-            _italic = CreateNewFontGroup(InstalledFontStyle.Italic, "Italic", "italique");
+            _normal = CreateCreateNewGroup(TypefaceStyle.Normal, "regular", "normal");
+            _italic = CreateCreateNewGroup(TypefaceStyle.Italic, "Italic", "italique");
             //
-            _bold = CreateNewFontGroup(InstalledFontStyle.Bold, "bold");
+            _bold = CreateCreateNewGroup(TypefaceStyle.Bold, "bold");
             //
-            _bold_italic = CreateNewFontGroup(InstalledFontStyle.Bold | InstalledFontStyle.Italic, "bold italic");
+            _bold_italic = CreateCreateNewGroup(TypefaceStyle.Bold | TypefaceStyle.Italic, "bold italic");
             //
         }
 
-
-        static InstalledFontCollection s_sharedFontCollection;
-        public static InstalledFontCollection GetSharedFontCollection(FirstInitFontCollectionDelegate initdel)
+        public void SetFontNotFoundHandler(FontNotFoundHandler fontNotFoundHandler)
         {
-            if (s_sharedFontCollection == null)
+            _fontNotFoundHandler = fontNotFoundHandler;
+        }
+
+        static InstalledTypefaceCollection s_intalledTypefaces;
+        public static InstalledTypefaceCollection GetSharedFontCollection(FirstInitFontCollectionDelegate initdel)
+        {
+            if (s_intalledTypefaces == null)
             {
                 //first time
-                s_sharedFontCollection = new InstalledFontCollection();
-                initdel(s_sharedFontCollection);
+                s_intalledTypefaces = new InstalledTypefaceCollection();
+                initdel(s_intalledTypefaces);
             }
-            return s_sharedFontCollection;
+            return s_intalledTypefaces;
         }
 
-
-
-
-        public InstalledFontStyle GetWellknownFontStyle(string subFamName)
-        {
-            switch (subFamName.ToUpper())
-            {
-                default: return InstalledFontStyle.Others;
-                case "NORMAL":
-                case "REGULAR":
-                    return InstalledFontStyle.Normal;
-                case "BOLD":
-                    return InstalledFontStyle.Bold;
-                case "ITALIC":
-                case "ITALIQUE":
-                    return InstalledFontStyle.Italic;
-                case "BOLD ITALIC":
-                    return (InstalledFontStyle.Bold | InstalledFontStyle.Italic);
-            }
-        }
-        FontGroup CreateNewFontGroup(InstalledFontStyle installedFontStyle, params string[] names)
+        InstalledTypefaceGroup CreateCreateNewGroup(TypefaceStyle installedFontStyle, params string[] names)
         {
             //create font group
-            var fontGroup = new FontGroup();
+            var fontGroup = new InstalledTypefaceGroup();
             //single dic may be called by many names            
             foreach (string name in names)
             {
@@ -313,15 +178,15 @@ namespace Typography.TextServices
                 //should not duplicate 
                 _subFamToFontGroup.Add(upperCaseName, fontGroup);
             }
-            _allFontGroups.Add(fontGroup);
+            _allGroups.Add(fontGroup);
             return fontGroup;
         }
 
         public void SetFontNameDuplicatedHandler(FontNameDuplicatedHandler handler)
         {
-            fontNameDuplicatedHandler = handler;
+            _fontNameDuplicatedHandler = handler;
         }
-        public bool AddFont(FontStreamSource src)
+        public bool AddFontStreamSource(FontStreamSource src)
         {
             //preview data of font
             using (Stream stream = src.ReadFontStream())
@@ -338,33 +203,33 @@ namespace Typography.TextServices
 
                 //}
 
-                return RegisterFont(new InstalledFont(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
+                return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
             }
         }
-        bool RegisterFont(InstalledFont newfont)
+        bool Register(InstalledTypeface newfont)
         {
-            FontGroup selectedFontGroup;
+            InstalledTypefaceGroup selectedFontGroup;
             string fontsubFamUpperCaseName = newfont.FontSubFamily.ToUpper();
 
             if (!_subFamToFontGroup.TryGetValue(fontsubFamUpperCaseName, out selectedFontGroup))
             {
                 //create new group, we don't known this font group before 
                 //so we add to 'other group' list
-                selectedFontGroup = new FontGroup();
+                selectedFontGroup = new InstalledTypefaceGroup();
                 _subFamToFontGroup.Add(fontsubFamUpperCaseName, selectedFontGroup);
-                _allFontGroups.Add(selectedFontGroup);
+                _allGroups.Add(selectedFontGroup);
             }
             //
             string fontNameUpper = newfont.FontName.ToUpper();
 
-            InstalledFont found;
+            InstalledTypeface found;
             if (selectedFontGroup.TryGetValue(fontNameUpper, out found))
             {
                 //TODO:
                 //we already have this font name
                 //(but may be different file
                 //we let user to handle it        
-                switch (fontNameDuplicatedHandler(found, newfont))
+                switch (_fontNameDuplicatedHandler(found, newfont))
                 {
                     default: throw new NotSupportedException();
                     case FontNameDuplicatedDecision.Skip:
@@ -381,140 +246,117 @@ namespace Typography.TextServices
             }
         }
 
-        public InstalledFont GetFont(string fontName, string subFamName)
+        public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName)
         {
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
 
 
             //find font group
-            FontGroup foundFontGroup;
+            InstalledTypefaceGroup foundFontGroup;
             if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out foundFontGroup))
             {
-                InstalledFont foundInstalledFont;
+                InstalledTypeface foundInstalledFont;
                 foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont);
                 return foundInstalledFont;
             }
+
+            if (_fontNotFoundHandler != null)
+            {
+                return _fontNotFoundHandler(this, fontName, subFamName);
+            }
+
             return null; //not found
         }
 
-        public InstalledFont GetFont(string fontName, InstalledFontStyle wellknownSubFam)
+        public InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle wellknownSubFam)
         {
             //not auto resolve
-            FontGroup selectedFontGroup;
-            InstalledFont _found;
+            InstalledTypefaceGroup selectedFontGroup;
+            InstalledTypeface _found;
             switch (wellknownSubFam)
             {
                 default: return null;
-                case InstalledFontStyle.Normal: selectedFontGroup = _normal; break;
-                case InstalledFontStyle.Bold: selectedFontGroup = _bold; break;
-                case InstalledFontStyle.Italic: selectedFontGroup = _italic; break;
-                case (InstalledFontStyle.Bold | InstalledFontStyle.Italic): selectedFontGroup = _bold_italic; break;
+                case TypefaceStyle.Normal: selectedFontGroup = _normal; break;
+                case TypefaceStyle.Bold: selectedFontGroup = _bold; break;
+                case TypefaceStyle.Italic: selectedFontGroup = _italic; break;
+                case (TypefaceStyle.Bold | TypefaceStyle.Italic): selectedFontGroup = _bold_italic; break;
             }
             if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
             {
                 return _found;
             }
-            //-------------------------------------------
+            //------------------------------------------- 
+            //not found then ...
+
 
             //retry ....
-            if (wellknownSubFam == InstalledFontStyle.Bold)
+            //if (wellknownSubFam == TypefaceStyle.Bold)
+            //{
+            //    //try get from Gras?
+            //    //eg. tahoma
+            //    if (_subFamToFontGroup.TryGetValue("GRAS", out selectedFontGroup))
+            //    {
+
+            //        if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
+            //        {
+            //            return _found;
+            //        }
+
+            //    }
+            //}
+            //else if (wellknownSubFam == TypefaceStyle.Italic)
+            //{
+            //    //TODO: simulate oblique (italic) font???
+            //    selectedFontGroup = _normal;
+
+            //    if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
+            //    {
+            //        return _found;
+            //    }
+            //}
+
+            if (_found == null && _fontNotFoundHandler != null)
             {
-                //try get from Gras?
-                //eg. tahoma
-                if (_subFamToFontGroup.TryGetValue("GRAS", out selectedFontGroup))
-                {
-
-                    if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
-                    {
-                        return _found;
-                    }
-
-                }
+                return _fontNotFoundHandler(this, fontName, GetSubFam(wellknownSubFam));
             }
-            else if (wellknownSubFam == InstalledFontStyle.Italic)
-            {
-                //TODO: simulate oblique (italic) font???
-                selectedFontGroup = _normal;
-
-                if (selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found))
-                {
-                    return _found;
-                }
-
-            }
-
-
-
             return _found;
         }
-        //public FindResult GetFont(string fontName, InstalledFontStyle style, out InstalledFont found)
-        //{
-        //    //request font from installed font
-        //    string upperCaseFontName = fontName.ToUpper();
-        //    FindResult result = FindResult.Matched;
-        //    switch (style)
-        //    {
-        //        case (InstalledFontStyle.Bold | InstalledFontStyle.Italic):
-        //            {
-        //                //check if we have bold & italic 
-        //                //version of this font ?  
-        //                if (!_bold_italic.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    //if not found then goto italic 
-        //                    result = FindResult.Nearest;
-        //                    goto case InstalledFontStyle.Italic;
-        //                }
-        //                return result;
-        //            }
-        //        case InstalledFontStyle.Bold:
-        //            {
 
-        //                if (!_bold.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    //goto regular
-        //                    result = FindResult.Nearest;
-        //                    goto default;
-        //                }
-        //                return result;
-        //            }
-        //        case InstalledFontStyle.Italic:
-        //            {
-        //                //if not found then choose regular
-        //                if (!_italic.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    result = FindResult.Nearest;
-        //                    goto default;
-        //                }
-        //                return result;
-        //            }
-        //        default:
-        //            {
-        //                //we skip gras style ?
-        //                if (!_normal.TryGetValue(upperCaseFontName, out found))
-        //                {
-        //                    if (fontNotFoundHandler != null)
-        //                    {
-        //                        result = FindResult.Nearest;
-        //                        found = fontNotFoundHandler(
-        //                            this,
-        //                            fontName,
-        //                            style);
-        //                        return (found == null) ? FindResult.NotFound : FindResult.Nearest;
-        //                    }
-        //                    return FindResult.NotFound;
-        //                }
-        //                return result;
-        //            }
-        //    }
-        //}
-
-
-        public IEnumerable<InstalledFont> GetInstalledFontIter()
+        internal static string GetSubFam(TypefaceStyle typefaceStyle)
         {
-            foreach (FontGroup fontgroup in _allFontGroups)
+            switch (typefaceStyle)
             {
-                foreach (InstalledFont f in fontgroup._members.Values)
+                case TypefaceStyle.Bold: return "BOLD";
+                case TypefaceStyle.Italic: return "ITALIC";
+                case TypefaceStyle.Normal: return "NORMAL";
+                case TypefaceStyle.Bold | TypefaceStyle.Italic: return "BOLD ITALIC";
+            }
+            return "";
+        }
+        internal static TypefaceStyle GetWellknownFontStyle(string subFamName)
+        {
+            switch (subFamName.ToUpper())
+            {
+                default: return TypefaceStyle.Others;
+                case "NORMAL":
+                case "REGULAR":
+                    return TypefaceStyle.Normal;
+                case "BOLD":
+                    return TypefaceStyle.Bold;
+                case "ITALIC":
+                case "ITALIQUE":
+                    return TypefaceStyle.Italic;
+                case "BOLD ITALIC":
+                    return (TypefaceStyle.Bold | TypefaceStyle.Italic);
+            }
+        }
+
+        public IEnumerable<InstalledTypeface> GetInstalledFontIter()
+        {
+            foreach (InstalledTypefaceGroup fontgroup in _allGroups)
+            {
+                foreach (InstalledTypeface f in fontgroup._members.Values)
                 {
                     yield return f;
                 }
@@ -523,9 +365,9 @@ namespace Typography.TextServices
     }
 
 
-    public static class InstalledFontCollectionExtension
+    public static class InstalledTypefaceCollectionExtensions
     {
-        public static void LoadFontsFromFolder(this InstalledFontCollection fontCollection, string folder)
+        public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder)
         {
             try
             {
@@ -539,7 +381,7 @@ namespace Typography.TextServices
                         default: break;
                         case ".ttf":
                         case ".otf":
-                            fontCollection.AddFont(new FontFileStreamProvider(file));
+                            fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
                             break;
                     }
                 }
@@ -555,7 +397,7 @@ namespace Typography.TextServices
                 return;
             }
         }
-        public static void LoadSystemFonts(this InstalledFontCollection fontCollection)
+        public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection)
         {
             // Windows system fonts
             LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
