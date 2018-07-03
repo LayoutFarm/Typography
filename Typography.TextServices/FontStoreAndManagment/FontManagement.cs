@@ -154,16 +154,16 @@ namespace Typography.FontManagement
             _fontNotFoundHandler = fontNotFoundHandler;
         }
 
-        static InstalledTypefaceCollection s_sharedFontCollection;
+        static InstalledTypefaceCollection s_intalledTypefaces;
         public static InstalledTypefaceCollection GetSharedFontCollection(FirstInitFontCollectionDelegate initdel)
         {
-            if (s_sharedFontCollection == null)
+            if (s_intalledTypefaces == null)
             {
                 //first time
-                s_sharedFontCollection = new InstalledTypefaceCollection();
-                initdel(s_sharedFontCollection);
+                s_intalledTypefaces = new InstalledTypefaceCollection();
+                initdel(s_intalledTypefaces);
             }
-            return s_sharedFontCollection;
+            return s_intalledTypefaces;
         }
 
         InstalledTypefaceGroup CreateCreateNewGroup(TypefaceStyle installedFontStyle, params string[] names)
@@ -365,7 +365,7 @@ namespace Typography.FontManagement
     }
 
 
-    public static class InstalledFontCollectionExtension
+    public static class InstalledTypefaceCollectionExtensions
     {
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder)
         {
