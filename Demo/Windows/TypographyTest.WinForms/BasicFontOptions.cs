@@ -36,7 +36,7 @@ namespace TypographyTest
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
             _textServices = new TextServices();
-
+            _textServices.InstalledFontCollection = new InstalledTypefaceCollection();
         }
         public RenderChoice RenderChoice
         {

@@ -189,22 +189,31 @@ namespace Typography.FontManagement
         public bool AddFontStreamSource(FontStreamSource src)
         {
             //preview data of font
-            using (Stream stream = src.ReadFontStream())
+            try
             {
-                var reader = new OpenFontReader();
-                PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                if (string.IsNullOrEmpty(previewFont.fontName))
+                using (Stream stream = src.ReadFontStream())
                 {
-                    //err!
-                    return false;
+                    var reader = new OpenFontReader();
+                    PreviewFontInfo previewFont = reader.ReadPreview(stream);
+                    if (string.IsNullOrEmpty(previewFont.fontName))
+                    {
+                        //err!
+                        return false;
+                    }
+                    //if (previewFont.fontName.StartsWith("Bungee"))
+                    //{
+
+                    //}
+
+                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
                 }
-                //if (previewFont.fontName.StartsWith("Bungee"))
-                //{
-
-                //}
-
-                return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
             }
+            catch(Exception ex)
+            {
+                return false;
+            }
+
+           
         }
         bool Register(InstalledTypeface newfont)
         {
