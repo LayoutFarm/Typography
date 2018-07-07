@@ -187,7 +187,7 @@ _pic 4: Say with Emoji?_
 **CFF Font and MathTable**
 --- 
 
-Typography can read CFF font(.otf)
+Typography can read [CFF](https://docs.microsoft.com/en-us/typography/opentype/spec/cff) font(.otf) 
 
 In this version, the results are not hinted by CFF instructions, so they are not pixel-perfect.
 
@@ -195,9 +195,9 @@ In this version, the results are not hinted by CFF instructions, so they are not
 
 _pic 1: compare with Win7's NotePad, latin-modern-math-regular.otf, 18 pts_
 
-further more=> Typography can read all advanced **MathTable** info.
+further more=> Typography can read all advanced [**MathTable**](https://docs.microsoft.com/en-us/typography/opentype/spec/math). 
 
-see Its action here [CSharpMath](https://github.com/verybadcat/CSharpMath/issues/1#issuecomment-393211266)
+see Its action here => [CSharpMath](https://github.com/verybadcat/CSharpMath/issues/1#issuecomment-393211266)
 
 
 ---
