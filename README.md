@@ -183,7 +183,9 @@ _pic 4: Say with Emoji?_
 (see more sam's work at https://github.com/samhocevar/emoji.wpf)
 
 ---
-**CFF Font**
+
+**CFF Font and MathTable**
+--- 
 
 Typography can read CFF font(.otf)
 
