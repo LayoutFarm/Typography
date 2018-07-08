@@ -183,6 +183,24 @@ _pic 4: Say with Emoji?_
 (see more sam's work at https://github.com/samhocevar/emoji.wpf)
 
 ---
+
+**CFF Font and MathTable**
+--- 
+
+Typography can read [CFF](https://docs.microsoft.com/en-us/typography/opentype/spec/cff) font(.otf) 
+
+In this version, the results are not hinted by CFF instructions, so they are not pixel-perfect.
+
+![latin_long_compare](https://user-images.githubusercontent.com/7447159/39213045-b3b020b4-483a-11e8-9174-9e2a1abda2cf.png)
+
+_pic 1: compare with Win7's NotePad, latin-modern-math-regular.otf, 18 pts_
+
+further more=> Typography can read all advanced [**MathTable**](https://docs.microsoft.com/en-us/typography/opentype/spec/math). 
+
+see Its action here => [CSharpMath](https://github.com/verybadcat/CSharpMath/issues/1#issuecomment-393211266)
+
+
+---
 The HtmlRenderer example!
 ---
 
