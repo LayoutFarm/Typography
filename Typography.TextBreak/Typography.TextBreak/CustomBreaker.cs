@@ -13,7 +13,7 @@ namespace Typography.TextBreak
         //default for latin breaking engine
         EngBreakingEngine engBreakingEngine = new EngBreakingEngine();
         //current lang breaking engine
-        BreakingEngine breakingEngine = engBreakingEngine;
+        BreakingEngine breakingEngine;
         List<BreakingEngine> otherEngines = new List<BreakingEngine>();
 
         WordVisitor visitor;
@@ -22,6 +22,7 @@ namespace Typography.TextBreak
         public CustomBreaker()
         {
             visitor = new WordVisitor(this);
+            breakingEngine = engBreakingEngine;
         }
         public void AddBreakingEngine(BreakingEngine engine)
         {
