@@ -22,6 +22,7 @@ namespace Typography.TextBreak
         public CustomBreaker()
         {
             visitor = new WordVisitor(this);
+            breakingEngine = engBreakingEngine;
         }
         public void AddBreakingEngine(BreakingEngine engine)
         {
