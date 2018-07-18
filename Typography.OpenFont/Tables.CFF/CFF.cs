@@ -1024,7 +1024,7 @@ namespace Typography.OpenFont.CFF
 
             _currentCff1Font.glyphs = glyphs;
             Type2CharStringParser type2Parser = new Type2CharStringParser();
- 
+
 
             for (int i = 0; i < glyphCount; ++i)
             {
@@ -1048,8 +1048,8 @@ namespace Typography.OpenFont.CFF
                 {
                     instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
                     glyphData.GlyphInstructions = instList;
-                } 
-                glyphs[i] = new Glyph(_currentCff1Font, glyphData); 
+                }
+                glyphs[i] = new Glyph(_currentCff1Font, glyphData);
             }
         }
 
@@ -1285,6 +1285,7 @@ namespace Typography.OpenFont.CFF
 
 
 
+        StringBuilder _sbForReadRealNumber = new StringBuilder(); 
         double ReadRealNumber()
         {
             //from https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
@@ -1297,9 +1298,9 @@ namespace Typography.OpenFont.CFF
             //pair is stored in the most significant 4 bits of a byte and the
             //second nibble of a pair is stored in the least significant 4 bits of a byte
 
+            StringBuilder sb = _sbForReadRealNumber;
+            sb.Length = 0;//reset
 
-
-            StringBuilder sb = new StringBuilder();
             bool done = false;
             bool exponentMissing = false;
             while (!done)
@@ -1364,9 +1365,12 @@ namespace Typography.OpenFont.CFF
                 return 0d;
             }
 
+
             //TODO: use TryParse
             double value;
-            if (!double.TryParse(sb.ToString(), out value))
+            if (!double.TryParse(sb.ToString(),
+                System.Globalization.NumberStyles.Number | System.Globalization.NumberStyles.AllowExponent,
+                System.Globalization.CultureInfo.InvariantCulture, out value))
             {
                 throw new NotSupportedException();
             }
@@ -1487,7 +1491,7 @@ namespace Typography.OpenFont.CFF
 
     }
 
-  
+
     static class CFFBinaryReaderExtension
     {
 
