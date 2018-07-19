@@ -108,25 +108,25 @@ namespace Typography.OpenFont
                             default: throw new System.Exception("??");
                             case 1:
                                 unicodeValue =
-                                    int.Parse(unicodeParts[0].Trim(), System.Globalization.NumberStyles.HexNumber);
+                                    int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case 2:
                                 unicodeValue =
-                                    int.Parse(unicodeParts[0].Trim(), System.Globalization.NumberStyles.HexNumber) << 8 |
-                                    int.Parse(unicodeParts[1].Trim(), System.Globalization.NumberStyles.HexNumber);
+                                    int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
+                                    int.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case 3:
                                 unicodeValue =
-                                  int.Parse(unicodeParts[0].Trim(), System.Globalization.NumberStyles.HexNumber) << 16 |
-                                  int.Parse(unicodeParts[1].Trim(), System.Globalization.NumberStyles.HexNumber) << 8 |
-                                  int.Parse(unicodeParts[2].Trim(), System.Globalization.NumberStyles.HexNumber);
+                                  int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 16 |
+                                  int.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
+                                  int.Parse(unicodeParts[2], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case 4:
                                 unicodeValue =
-                                  int.Parse(unicodeParts[0].Trim(), System.Globalization.NumberStyles.HexNumber) << 24 |
-                                  int.Parse(unicodeParts[1].Trim(), System.Globalization.NumberStyles.HexNumber) << 16 |
-                                  int.Parse(unicodeParts[2].Trim(), System.Globalization.NumberStyles.HexNumber) << 8 |
-                                  int.Parse(unicodeParts[3].Trim(), System.Globalization.NumberStyles.HexNumber);
+                                  int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 24 |
+                                  int.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 16 |
+                                  int.Parse(unicodeParts[2], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
+                                  int.Parse(unicodeParts[3], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                         }
                          
