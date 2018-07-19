@@ -34,7 +34,7 @@ namespace Typography.OpenFont
                             {
                                 throw new System.NotSupportedException();
                             }
-                            if (int.TryParse(key_value[0], out int index))
+                            if (int.TryParse(key_value[0], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int index))
                             {
 #if DEBUG
                                 if (index < 0 || index > 258)
