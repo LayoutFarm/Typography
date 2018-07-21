@@ -92,7 +92,7 @@ namespace Poly2Tri
             if (P1 == p) return 1;
             if (P2 == p) return 2;
             throw new Exception("Calling index with a point that doesn't exist in triangle");
-            return -1;
+            //return -1;
             //return -1;
             //int i = Points.IndexOf(p);
             //if (i == -1) throw new Exception("Calling index with a point that doesn't exist in triangle");
