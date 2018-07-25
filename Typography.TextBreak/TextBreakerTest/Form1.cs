@@ -85,7 +85,9 @@ namespace TextBreakerTest
             //we use dic data from icu-project
 
             //1. create dictionary based breaking engine 
-            CustomBreakerBuilder.Setup("../../../icu58/brkitr_src/dictionaries");
+            //TODO: dic should be read once
+            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src/dictionaries" };
+            CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
 
 
@@ -98,7 +100,7 @@ namespace TextBreakerTest
             {
                 string s = new string(test, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
-            } 
+            }
         }
         static bool StringStartsWithChars(string srcString, string value)
         {
@@ -128,7 +130,7 @@ namespace TextBreakerTest
                     //MATCH all
                     return true;
                 }
-            } 
+            }
         }
         private void cmdPerformace1_Click(object sender, EventArgs e)
         {
@@ -158,7 +160,8 @@ namespace TextBreakerTest
         {
 
             //-------------------
-            CustomBreakerBuilder.Setup("../../../icu58/brkitr_src/dictionaries");
+            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src/dictionaries" };
+            CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
             char[] test = this.textBox1.Text.ToCharArray();
             //-------------
