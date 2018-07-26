@@ -52,7 +52,7 @@ namespace System.Numerics
     }
 
     //FOR NET20
-#if NET20 ||COSMOS
+#if NET20 || COSMOS || DEFINE_VECTOR2
     public struct Vector2
     {
         static Vector2 zeroVector = new Vector2(0f, 0f);
