@@ -54,7 +54,7 @@ namespace Typography.TextBreak
                 return engBreakingEngine;
             }
         }
-        public void BreakWords(char[] charBuff, int startAt, int len)
+        public void BreakWords(char[] charBuff, int startAt, int len, bool throwIfCharOutOfRange = true)
         {
             //conver to char buffer 
             int j = charBuff.Length;
@@ -89,7 +89,10 @@ namespace Typography.TextBreak
                             BreakingEngine anotherEngine = SelectEngine(visitor.Char);
                             if (anotherEngine == currentEngine)
                             {
-                                throw new NotSupportedException();
+                                if(throwIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.Char}' was not found.");
+                                startAt = visitor.CurrentIndex + 1;
+                                visitor.SetCurrentIndex(startAt);
+                                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
                             }
                             else
                             {
@@ -102,11 +105,11 @@ namespace Typography.TextBreak
             }
         }
 
-        public void BreakWords(string inputstr)
+        public void BreakWords(string inputstr, bool throwIfCharOutOfRange = true)
         {
             //TODO: review here
             char[] buffer = inputstr.ToCharArray();
-            BreakWords(buffer, 0, inputstr.Length); //all
+            BreakWords(buffer, 0, inputstr.Length, throwIfCharOutOfRange); //all
         }
         public void LoadBreakAtList(List<BreakAtInfo> outputList)
         {
