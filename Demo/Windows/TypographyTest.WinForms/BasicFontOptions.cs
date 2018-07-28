@@ -37,6 +37,10 @@ namespace TypographyTest
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
             _textServices = new TextServices();
             _textServices.InstalledFontCollection = new InstalledTypefaceCollection();
+
+            _textServices.InstalledFontCollection.SetFontNameDuplicatedHandler(
+                (f0, f1) => FontNameDuplicatedDecision.Skip);
+
         }
         public RenderChoice RenderChoice
         {
@@ -49,28 +53,43 @@ namespace TypographyTest
             ////---------- 
             ////1. create font collection        
             ////2. set some essential handler
+
+            int index = 0;
+
             foreach (string file in Directory.GetFiles("../../../TestFonts", "*.*"))
             {
                 //eg. this is our custom font folder  
-                string ext = Path.GetExtension(file).ToLower();
 
-                switch (ext)
+#if DEBUG
+                //if (index == 16)
+                //{
+
+                //}
+#endif
+
+                string ext = Path.GetExtension(file).ToLower();
+                try
                 {
-                    case ".ttf":
-                    case ".otf":
-                        _textServices.InstalledFontCollection.AddFontStreamSource(new Typography.FontManagement.FontFileStreamProvider(file));
-                        break;
+                    switch (ext)
+                    {
+                        case ".ttf":
+                        case ".otf":
+                            _textServices.InstalledFontCollection.AddFontStreamSource(new Typography.FontManagement.FontFileStreamProvider(file));
+                            break;
+                    }
+
                 }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(index + " " + file + " , err=>" + ex.Message);
+                }
+                index++;
 
             }
 
         }
         public PositionTechnique PositionTech { get; set; }
-        //public OpenFontStore OpenFontStore
-        //{
-        //    get { return _openFontStore; }
-        //    set { _openFontStore = value; }
-        //}
+        
         public Typeface Typeface
         {
             get

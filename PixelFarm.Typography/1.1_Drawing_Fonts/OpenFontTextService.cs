@@ -35,7 +35,7 @@ namespace LayoutFarm
             _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedFontCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-                collection.LoadSystemFonts();
+                collection.LoadSystemFonts(); //load system fonts
             });
 
             //create typography service
@@ -56,6 +56,10 @@ namespace LayoutFarm
             //_shapingServices.SetDefaultScriptLang(scLang);
             //_shapingServices.SetCurrentScriptLang(scLang);
             //--------------- 
+        }
+        public void LoadFontsFromFolder(string folder)
+        {
+            _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
         }
         static bool TrySettingScriptLangFromCurrentThreadCultureInfo(TextServices textservice)
         {
@@ -256,7 +260,9 @@ namespace LayoutFarm
                 //....
                 typeface = _txtServices.GetTypeface(font.Name, font.Style.ConvToInstalledFontStyle());
                 if (typeface == null)
+                {
                     throw new NotSupportedException();
+                }
                 //
                 //cache here (level-1)
                 _resolvedTypefaceCache.Add(font.FontKey, typeface);
