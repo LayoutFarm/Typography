@@ -47,6 +47,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="ICUNativeTextBreaker\DictionaryData.cs" />
+    <Compile Include="IcuSimpleTextFileDictionaryProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

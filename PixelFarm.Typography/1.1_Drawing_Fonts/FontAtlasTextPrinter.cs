@@ -25,7 +25,7 @@ namespace PixelFarm.Drawing.Fonts
         AggPainter _maskBufferPainter;
         ActualBitmap _fontBmp;
         ActualBitmap _alphaBmp;
-        float _finalTextureScale = 1;
+       
 
         /// <summary>
         /// target canvas

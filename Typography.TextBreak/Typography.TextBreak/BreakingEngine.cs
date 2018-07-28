@@ -187,8 +187,12 @@ namespace Typography.TextBreak
 
                             if (visitor.IsEnd)
                             {
+
                                 i = endAt; //temp fix, TODO: review here
-                                bool foundCandidate = false;
+
+#if DEBUG
+                                bool dbugFoundCandidate = false;
+#endif
                                 //choose best match 
                                 while (candidateBreakList.Count > 0)
                                 {
@@ -204,14 +208,18 @@ namespace Typography.TextBreak
                                             //use this
                                             //use this candidate if possible
                                             visitor.AddWordBreakAtCurrentIndex();
-                                            foundCandidate = true;
+#if DEBUG
+                                            dbugFoundCandidate = true;
+#endif
                                             break;
                                         }
                                     }
                                     else
                                     {
                                         visitor.AddWordBreakAtCurrentIndex();
-                                        foundCandidate = true;
+#if DEBUG
+                                        dbugFoundCandidate = true;
+#endif
                                         break;
                                     }
                                 }

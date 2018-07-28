@@ -487,8 +487,8 @@ namespace Typography.OpenFont.CFF
                     _cachedGlyphDicByName.Add(cff1Glyph._cff1GlyphData.Name, cff1Glyph);
                 }
             }
-            Glyph found;
-            _cachedGlyphDicByName.TryGetValue(name, out found);
+
+            _cachedGlyphDicByName.TryGetValue(name, out Glyph found);
             return found;
         }
 
@@ -956,8 +956,8 @@ namespace Typography.OpenFont.CFF
 
             throw new NotSupportedException();
 
-            int sid = _reader.ReadUInt16();//string iden (SID)
-            byte nleft = _reader.ReadByte();
+            //int sid = _reader.ReadUInt16();//string iden (SID)
+            //byte nleft = _reader.ReadByte();
 
 
         }
@@ -1282,10 +1282,8 @@ namespace Typography.OpenFont.CFF
             //get registered operator by its key
             return CFFOperator.GetOperatorByKey(b0, b1);
         }
-
-
-
-        StringBuilder _sbForReadRealNumber = new StringBuilder(); 
+         
+        readonly StringBuilder _sbForReadRealNumber = new StringBuilder();
         double ReadRealNumber()
         {
             //from https://typekit.files.wordpress.com/2013/05/5176.cff.pdf
@@ -1366,11 +1364,11 @@ namespace Typography.OpenFont.CFF
             }
 
 
-            //TODO: use TryParse
-            double value;
+            //TODO: use TryParse 
+
             if (!double.TryParse(sb.ToString(),
                 System.Globalization.NumberStyles.Number | System.Globalization.NumberStyles.AllowExponent,
-                System.Globalization.CultureInfo.InvariantCulture, out value))
+                System.Globalization.CultureInfo.InvariantCulture, out double value))
             {
                 throw new NotSupportedException();
             }
@@ -1589,9 +1587,9 @@ namespace Typography.OpenFont.CFF
     class CFFOperator
     {
 
-        byte b0;
-        byte b1;
-        OperatorOperandKind _operatorOperandKind;
+        readonly byte b0;
+        readonly byte b1;
+        readonly OperatorOperandKind _operatorOperandKind;
 
         //b0 the first byte of a two byte value
         //b1 the second byte of a two byte value
@@ -1606,8 +1604,7 @@ namespace Typography.OpenFont.CFF
 
         public static CFFOperator GetOperatorByKey(byte b0, byte b1)
         {
-            CFFOperator found;
-            s_registered_Operators.TryGetValue((b1 << 8) | b0, out found);
+            s_registered_Operators.TryGetValue((b1 << 8) | b0, out CFFOperator found);
             return found;
         }
 
