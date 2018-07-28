@@ -63,7 +63,7 @@ namespace Typography.OpenFont
 
         public Typeface Read(Stream stream, ReadFlags readFlags = ReadFlags.Full)
         {
-            var little = BitConverter.IsLittleEndian;
+            bool little = BitConverter.IsLittleEndian;
             using (var input = new ByteOrderSwappingBinaryReader(stream))
             {
                 ushort majorVersion = input.ReadUInt16();
