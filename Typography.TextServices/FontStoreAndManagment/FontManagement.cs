@@ -84,26 +84,7 @@ namespace Typography.FontManagement
 
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
-        //_defaultFontNotFoundHandler = (fontCollection, fontName, subfamName, style) =>
-        //{
-        //    //TODO: implement font not found mapping here 
-        //    fontName = fontName.ToUpper();
-        //    switch (fontName)
-        //    {
-        //        case "MONOSPACE":
-        //            return fontCollection.GetInstalledTypeface("Courier New", style);
-        //        case "HELVETICA":
-        //            return fontCollection.GetInstalledTypeface("Arial", style);
-        //        case "TAHOMA":
-        //            //use can change this ...
-        //            //default font must found
-        //            //if not throw err 
-        //            //this prevent infinit loop
-        //            throw new System.NotSupportedException();
-        //        default:
-        //            return fontCollection.GetInstalledTypeface("tahoma", style);
-        //    }
-        //};
+      
 
 
         class InstalledTypefaceGroup
@@ -300,7 +281,7 @@ namespace Typography.FontManagement
             }
             //------------------------------------------- 
             //not found then ...
-
+            
 
             //retry ....
             //if (wellknownSubFam == TypefaceStyle.Bold)
