@@ -41,6 +41,8 @@ namespace SampleWinForms
             _basicOptions = openFontOptions1.Options;
             _basicOptions.TypefaceChanged += (s, e) =>
             {
+                if (e.SelectedTypeface == null) return;
+                //
                 if (_devVxsTextPrinter != null)
                 {
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
@@ -169,6 +171,8 @@ namespace SampleWinForms
         }
 
         bool _readyToRender;
+
+        LayoutFarm.OpenFontTextService _textService;
         void UpdateRenderOutput()
         {
             if (!_readyToRender) return;
@@ -182,7 +186,11 @@ namespace SampleWinForms
 
                 painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
-                _devVxsTextPrinter = new VxsTextPrinter(painter);
+
+                _textService = new LayoutFarm.OpenFontTextService();
+                _textService.LoadFontsFromFolder("../../../TestFonts");
+
+                _devVxsTextPrinter = new VxsTextPrinter(painter, _textService);
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
@@ -573,10 +581,10 @@ namespace SampleWinForms
                     using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                     {
                         int[] buffer = glyphImg.GetImageBuffer();
-                         
+
                         var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                        System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length); 
-                        bmp.UnlockBits(bmpdata); 
+                        System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
+                        bmp.UnlockBits(bmpdata);
                         bmp.Save("d:\\WImageTest\\a001_xn2_" + gindex + ".png");
                     }
                 }

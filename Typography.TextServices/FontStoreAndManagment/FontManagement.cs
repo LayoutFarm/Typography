@@ -241,7 +241,9 @@ namespace Typography.FontManagement
                 //we let user to handle it        
                 switch (_fontNameDuplicatedHandler(found, newfont))
                 {
-                    default: throw new NotSupportedException();
+                    default:
+                        throw new NotSupportedException();
+
                     case FontNameDuplicatedDecision.Skip:
                         return false;
                     case FontNameDuplicatedDecision.Replace:
@@ -379,33 +381,30 @@ namespace Typography.FontManagement
     {
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder)
         {
-            try
-            {
-                // 1. font dir
-                foreach (string file in Directory.GetFiles(folder))
-                {
-                    //eg. this is our custom font folder
-                    string ext = Path.GetExtension(file).ToLower();
-                    switch (ext)
-                    {
-                        default: break;
-                        case ".ttf":
-                        case ".otf":
-                            fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
-                            break;
-                    }
-                }
+            if (!Directory.Exists(folder)) return;
+            //-------------------------------------
 
-                //2. browse recursively; on Linux, fonts are organised in subdirectories
-                foreach (string subfolder in Directory.GetDirectories(folder))
+            // 1. font dir
+            foreach (string file in Directory.GetFiles(folder))
+            {
+                //eg. this is our custom font folder
+                string ext = Path.GetExtension(file).ToLower();
+                switch (ext)
                 {
-                    LoadFontsFromFolder(fontCollection, subfolder);
+                    default: break;
+                    case ".ttf":
+                    case ".otf":
+                        fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
+                        break;
                 }
             }
-            catch (DirectoryNotFoundException)
+
+            //2. browse recursively; on Linux, fonts are organised in subdirectories
+            foreach (string subfolder in Directory.GetDirectories(folder))
             {
-                return;
+                LoadFontsFromFolder(fontCollection, subfolder);
             }
+
         }
         public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection)
         {
@@ -439,6 +438,7 @@ namespace Typography.FontManagement
         //                yield return Path.Combine(strFontsFolder, f);
         //            }
         //        }
+
 
     }
 }

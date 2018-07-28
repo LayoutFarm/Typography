@@ -26,7 +26,7 @@ namespace PixelFarm.Drawing.Fonts
 
         float _currentFontSizePxScale;
 
-        public VxsTextPrinter(Painter painter)
+        public VxsTextPrinter(Painter painter, LayoutFarm.OpenFontTextService textService)
         {
             StartDrawOnLeftTop = true;
             //
@@ -35,7 +35,7 @@ namespace PixelFarm.Drawing.Fonts
             _glyphMeshStore.FlipGlyphUpward = true;
             this.PositionTechnique = PositionTechnique.OpenFont;
             //
-            _textServices = new LayoutFarm.OpenFontTextService();
+            _textServices = textService;
             ChangeFont(new RequestFont("tahoma", 10));
         }
         /// <summary>
@@ -118,12 +118,15 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void UpdateGlyphLayoutSettings()
         {
+            
+
             if (this._reqFont == null)
             {
                 //this.ScriptLang = canvasPainter.CurrentFont.GetOpenFontScriptLang();
                 ChangeFont(_painter.CurrentFont);
             }
             //2.1              
+            if (Typeface == null) return;
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
@@ -267,7 +270,7 @@ namespace PixelFarm.Drawing.Fonts
                 {
                     len = seqLen;
                 }
-                
+
                 var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
                 while (snapToPx.Read())
                 {

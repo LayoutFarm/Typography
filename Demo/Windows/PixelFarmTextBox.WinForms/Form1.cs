@@ -33,6 +33,8 @@ namespace PixelFarmTextBox.WinForms
         TypographyTest.BasicFontOptions _basicOptions;
         TypographyTest.GlyphRenderOptions _renderOptions;
 
+        LayoutFarm.OpenFontTextService _openFontTextService;
+
         public Form1()
         {
             InitializeComponent();
@@ -73,8 +75,9 @@ namespace PixelFarmTextBox.WinForms
 
             painter.CurrentFont = new PixelFarm.Drawing.RequestFont("tahoma", 14);
 
+            _openFontTextService = new LayoutFarm.OpenFontTextService();
             //....
-            _devVxsTextPrinter = new VxsTextPrinter(painter);
+            _devVxsTextPrinter = new VxsTextPrinter(painter, _openFontTextService);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
             _devVxsTextPrinter.FontSizeInPoints = 10;
