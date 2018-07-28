@@ -38,13 +38,13 @@ namespace Typography.FontManagement
         Italic = 1 << 3,
     }
 
-    public interface FontStreamSource
+    public interface IFontStreamSource
     {
         Stream ReadFontStream();
         string PathName { get; }
     }
 
-    public class FontFileStreamProvider : FontStreamSource
+    public class FontFileStreamProvider : IFontStreamSource
     {
         public FontFileStreamProvider(string filename)
         {
@@ -186,7 +186,7 @@ namespace Typography.FontManagement
         {
             _fontNameDuplicatedHandler = handler;
         }
-        public bool AddFontStreamSource(FontStreamSource src)
+        public bool AddFontStreamSource(IFontStreamSource src)
         {
             //preview data of font
             try
@@ -208,12 +208,13 @@ namespace Typography.FontManagement
                     return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
                 }
             }
-            catch(Exception ex)
+            catch (IOException)
             {
+                //TODO review here agina
                 return false;
             }
 
-           
+
         }
         bool Register(InstalledTypeface newfont)
         {
@@ -261,9 +262,9 @@ namespace Typography.FontManagement
             string upperCaseSubFamName = subFamName.ToUpper();
 
 
-            //find font group
-            InstalledTypefaceGroup foundFontGroup;
-            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out foundFontGroup))
+            //find font group 
+
+            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup))
             {
                 InstalledTypeface foundInstalledFont;
                 foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont);
@@ -401,7 +402,7 @@ namespace Typography.FontManagement
                     LoadFontsFromFolder(fontCollection, subfolder);
                 }
             }
-            catch (DirectoryNotFoundException e)
+            catch (DirectoryNotFoundException)
             {
                 return;
             }

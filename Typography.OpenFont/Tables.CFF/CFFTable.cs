@@ -102,8 +102,6 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-
-        internal List<string> fontNames;
     }
 
 

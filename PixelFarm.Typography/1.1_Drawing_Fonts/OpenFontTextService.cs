@@ -335,8 +335,8 @@ namespace LayoutFarm
         class MyLineSegment : ILineSegment
         {
             MyLineSegmentList owner;
-            int startAt;
-            int len;
+            readonly int startAt;
+            readonly int len;
             internal ScriptLang scriptLang;
 
             public MyLineSegment(MyLineSegmentList owner, int startAt, int len)
