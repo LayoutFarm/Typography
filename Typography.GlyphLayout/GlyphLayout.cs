@@ -305,11 +305,6 @@ namespace Typography.TextLayout
             int startAt,
             int len)
         {
-            if (_needPlanUpdate)
-            {
-                UpdateLayoutPlan();
-            }
-
 
             //[A]
             //convert from char[] to codepoint-list
@@ -371,23 +366,33 @@ namespace Typography.TextLayout
                 }
                 _inputGlyphs.AddGlyph(i, glyphIndex);
             }
+            //continue below...
+            Layout(_inputGlyphs);
+        }
+
+        public void Layout(GlyphIndexList glyphs)
+        {
+            if (_needPlanUpdate)
+            {
+                UpdateLayoutPlan();
+            }
 
             //[C]
             //----------------------------------------------  
             //glyph substitution            
-            if (_gsub != null & len > 0)
+            if (_gsub != null && glyphs.Count > 0)
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
                 _gsub.EnableComposition = this.EnableComposition;
-                _gsub.DoSubstitution(_inputGlyphs);
+                _gsub.DoSubstitution(glyphs);
             }
 
             //----------------------------------------------  
             //after glyph substitution,
             //number of input glyph MAY changed (increase or decrease).***
             //so count again.
-            int finalGlyphCount = _inputGlyphs.Count;
+            int finalGlyphCount = glyphs.Count;
             //----------------------------------------------  
 
             //[D]
@@ -399,7 +404,7 @@ namespace Typography.TextLayout
                 //at this stage _inputGlyphs and _glyphPositions 
                 //has member 1:1
                 ushort glyIndex, input_codepointOffset, input_mapLen;
-                _inputGlyphs.GetGlyphIndexAndMap(i, out glyIndex, out input_codepointOffset, out input_mapLen);
+                glyphs.GetGlyphIndexAndMap(i, out glyIndex, out input_codepointOffset, out input_mapLen);
                 //
                 Glyph orgGlyph = _typeface.GetGlyphByIndex(glyIndex);
                 //this is original value WITHOUT fit-to-grid adjust
@@ -407,7 +412,7 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (_gpos != null && len > 1 && posTech == PositionTechnique.OpenFont)
+            if (_gpos != null && glyphs.Count > 1 && posTech == PositionTechnique.OpenFont)
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
