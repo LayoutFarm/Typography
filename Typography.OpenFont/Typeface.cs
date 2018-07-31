@@ -179,12 +179,12 @@ namespace Typography.OpenFont
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns></returns>
-        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
+        public ushort LookupIndex(uint codepoint, uint nextCodepoint = 0)
         {
             return CmapTable.LookupIndex(codepoint, nextCodepoint);
         }
 
-        public Glyph Lookup(int codepoint)
+        public Glyph Lookup(uint codepoint)
         {
             return _glyphs[LookupIndex(codepoint)];
         }
@@ -246,7 +246,7 @@ namespace Typography.OpenFont
         }
 
 
-        public ushort GetAdvanceWidth(int codepoint)
+        public ushort GetAdvanceWidth(uint codepoint)
         {
             return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
         }
@@ -397,7 +397,7 @@ namespace Typography.OpenFont
 
     public static class StringUtils
     {
-        public static void FillWithCodepoints(List<int> codepoints, char[] str, int startAt = 0, int len = -1)
+        public static void FillWithCodepoints(List<uint> codepoints, char[] str, int startAt = 0, int len = -1)
         {
 
             if (len == -1) len = str.Length;
@@ -412,20 +412,20 @@ namespace Typography.OpenFont
             for (int i = 0; i < len; ++i)
             {
                 char ch = str[startAt + i];
-                int codepoint = ch;
+                uint codepoint = ch;
                 if (char.IsHighSurrogate(ch) && i + 1 < len)
                 {
                     char nextCh = str[startAt + i + 1];
                     if (char.IsLowSurrogate(nextCh))
                     {
                         ++i;
-                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                        codepoint = (uint)char.ConvertToUtf32(ch, nextCh);
                     }
                 }
                 codepoints.Add(codepoint);
             }
         }
-        public static IEnumerable<int> GetCodepoints(char[] str, int startAt = 0, int len = -1)
+        public static IEnumerable<uint> GetCodepoints(char[] str, int startAt = 0, int len = -1)
         {
             if (len == -1) len = str.Length;
             // this is important!
@@ -439,14 +439,14 @@ namespace Typography.OpenFont
             for (int i = 0; i < len; ++i)
             {
                 char ch = str[startAt + i];
-                int codepoint = ch;
+                uint codepoint = ch;
                 if (char.IsHighSurrogate(ch) && i + 1 < len)
                 {
                     char nextCh = str[startAt + i + 1];
                     if (char.IsLowSurrogate(nextCh))
                     {
                         ++i;
-                        codepoint = char.ConvertToUtf32(ch, nextCh);
+                        codepoint = (uint)char.ConvertToUtf32(ch, nextCh);
                     }
                 }
                 yield return codepoint;

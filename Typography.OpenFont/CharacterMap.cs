@@ -25,7 +25,7 @@ namespace Typography.OpenFont
             _glyphIdArray = glyphIdArray;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        protected override ushort RawCharacterToGlyphIndex(uint codepoint)
         {
             // This lookup table only supports 16-bit codepoints
             if (codepoint > ushort.MaxValue)
@@ -90,12 +90,12 @@ namespace Typography.OpenFont
             this.startGlyphIds = startGlyphIds;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        protected override ushort RawCharacterToGlyphIndex(uint codepoint)
         {
             // https://www.microsoft.com/typography/otspec/cmap.htm#format12
             // "Groups must be sorted by increasing startCharCode."
             // -> binary search is valid here
-            int i = Array.BinarySearch(startCharCodes, (uint)codepoint);
+            int i = Array.BinarySearch(startCharCodes, codepoint);
             i = i < 0 ? ~i - 1 : i;
 
             if (i >= 0 && codepoint <= endCharCodes[i])
@@ -116,14 +116,14 @@ namespace Typography.OpenFont
             _startCode = startCode;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        protected override ushort RawCharacterToGlyphIndex(uint codepoint)
         {
             // The firstCode and entryCount values specify a subrange (beginning at firstCode,
             // length = entryCount) within the range of possible character codes.
             // Codes outside of this subrange are mapped to glyph index 0.
             // The offset of the code (from the first code) within this subrange is used as
             // index to the glyphIdArray, which provides the glyph index value.
-            int i = codepoint - _startCode;
+            uint i = codepoint - _startCode;
             return i >= 0 && i < _glyphIdArray.Length ? _glyphIdArray[i] : (ushort)0;
         }
 
@@ -146,9 +146,9 @@ namespace Typography.OpenFont
     class CharMapFormat14 : CharacterMap
     {
         public override ushort Format { get { return 14; } }
-        protected override ushort RawCharacterToGlyphIndex(int character) { return 0; }
+        protected override ushort RawCharacterToGlyphIndex(uint character) { return 0; }
 
-        public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
+        public ushort CharacterPairToGlyphIndex(uint codepoint, ushort defaultGlyphIndex, uint nextCodepoint)
         {
             // Only check codepoint if nextCodepoint is a variation selector
             VariationSelector sel;
@@ -216,8 +216,8 @@ namespace Typography.OpenFont
             uint length = reader.ReadUInt32(); // Byte length of this subtable (including the header)
             uint numVarSelectorRecords = reader.ReadUInt32();
 
-            var variationSelectors = new Dictionary<int, VariationSelector>();
-            int[] varSelectors = new int[numVarSelectorRecords];
+            var variationSelectors = new Dictionary<uint, VariationSelector>();
+            uint[] varSelectors = new uint[numVarSelectorRecords];
             uint[] defaultUVSOffsets = new uint[numVarSelectorRecords];
             uint[] nonDefaultUVSOffsets = new uint[numVarSelectorRecords];
             for (int i = 0; i < numVarSelectorRecords; ++i)
@@ -302,7 +302,7 @@ namespace Typography.OpenFont
                     uint numUVSMappings = reader.ReadUInt32();
                     for (int n = 0; n < numUVSMappings; ++n)
                     {
-                        int unicodeValue = (int)Utils.ReadUInt24(reader);
+                        uint unicodeValue = Utils.ReadUInt24(reader);
                         ushort glyphID = reader.ReadUInt16();
                         sel.UVSMappings.Add(unicodeValue, glyphID);
                     }
@@ -318,10 +318,10 @@ namespace Typography.OpenFont
         {
             public List<int> DefaultStartCodes = new List<int>();
             public List<int> DefaultEndCodes = new List<int>();
-            public Dictionary<int, ushort> UVSMappings = new Dictionary<int, ushort>();
+            public Dictionary<uint, ushort> UVSMappings = new Dictionary<uint, ushort>();
         }
 
-        private Dictionary<int, VariationSelector> _variationSelectors;
+        private Dictionary<uint, VariationSelector> _variationSelectors;
     }
 
     /// <summary>
@@ -331,7 +331,7 @@ namespace Typography.OpenFont
     {
         public override ushort Format { get { return 0; } }
 
-        protected override ushort RawCharacterToGlyphIndex(int character) { return 0; }
+        protected override ushort RawCharacterToGlyphIndex(uint character) { return 0; }
     }
 
     abstract class CharacterMap
@@ -341,12 +341,12 @@ namespace Typography.OpenFont
         public abstract ushort Format { get; }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
-        public ushort CharacterToGlyphIndex(int codepoint)
+        public ushort CharacterToGlyphIndex(uint codepoint)
         {
             return RawCharacterToGlyphIndex(codepoint);
         }
 
-        protected abstract ushort RawCharacterToGlyphIndex(int codepoint);
+        protected abstract ushort RawCharacterToGlyphIndex(uint codepoint);
 
         //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
         //{

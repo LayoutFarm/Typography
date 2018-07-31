@@ -31,7 +31,7 @@ namespace Typography.OpenFont.Tables
     {
         public override string Name { get { return "cmap"; } }
 
-        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
+        public ushort LookupIndex(uint codepoint, uint nextCodepoint = 0)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
             // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
@@ -79,7 +79,7 @@ namespace Typography.OpenFont.Tables
         }
 
         private List<CharacterMap> _charMaps = new List<CharacterMap>();
-        private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
+        private Dictionary<uint, ushort> _codepointToGlyphs = new Dictionary<uint, ushort>();
 
         protected override void ReadContentFrom(BinaryReader input)
         {

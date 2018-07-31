@@ -207,8 +207,8 @@ namespace Typography.TextLayout
                 foreach (UnicodeLangBits unicodeLangBits in unicodeLangBitsRanges)
                 {
                     UnicodeRangeInfo rngInfo = unicodeLangBits.ToUnicodeRangeInfo();
-                    int endAt = rngInfo.EndAt;
-                    for (int codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
+                    uint endAt = rngInfo.EndAt;
+                    for (uint codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
                     {
                         ushort glyghIndex = typeface.LookupIndex(codePoint);
                         if (glyghIndex > 0)
