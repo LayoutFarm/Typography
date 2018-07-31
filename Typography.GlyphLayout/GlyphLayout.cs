@@ -364,11 +364,11 @@ namespace Typography.TextLayout
             // clear before use
             _inputGlyphs.Clear();
             int end = startAt + len;
-            for (int i = 0; startAt < end; ++i)
+            for (int i = 0; i < end; ++i)
             {
                 //find glyph index by specific codepoint 
                 ushort glyphIndex = _typeface.LookupIndex(inputCodePoints[i]);
-                if (i + 1 < startAt)
+                if (i + 1 < end)
                 {
                     // Maybe this is a UVS sequence; in that case,
                     //***SKIP*** the second codepoint 
