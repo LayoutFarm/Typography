@@ -208,7 +208,8 @@ namespace Typography.TextLayout
         }
     }
 
-    struct CodePointFromUserChar
+#if DEBUG
+    struct dbugCodePointFromUserChar
     {
         /// <summary>
         /// input codepoint
@@ -217,14 +218,15 @@ namespace Typography.TextLayout
         /// <summary>
         /// offset from the start of input codepoint buffer
         /// </summary>
-        public readonly ushort user_char_offset;
-        public CodePointFromUserChar(ushort user_char_offset, int codePoint)
+        public ushort user_char_offset;
+        public dbugCodePointFromUserChar(ushort user_char_offset, int codePoint)
         {
             this.user_char_offset = user_char_offset;
             this.codePoint = codePoint;
         }
     }
 
+#endif
 
     //TODO: rename this to ShapingEngine ?
 
@@ -292,7 +294,11 @@ namespace Typography.TextLayout
 
         //not thread-safe*** 
 
-        List<CodePointFromUserChar> _reusableCodePointFromUserCharList = new List<CodePointFromUserChar>();
+        List<int> _reusableUserCodePoints = new List<int>();
+#if DEBUG
+        List<dbugCodePointFromUserChar> _dbugReusableCodePointFromUserCharList = new List<dbugCodePointFromUserChar>();
+#endif
+
 
         /// <summary>
         /// do glyph shaping and glyph out, output is unscaled glyph-plan
@@ -305,11 +311,6 @@ namespace Typography.TextLayout
             int startAt,
             int len)
         {
-            if (_needPlanUpdate)
-            {
-                UpdateLayoutPlan();
-            }
-
 
             //[A]
             //convert from char[] to codepoint-list
@@ -321,7 +322,11 @@ namespace Typography.TextLayout
             // we need to use "int".
             // This allows characters such as 🙌 or 𐐷 or to be treated as single codepoints even
             // though they are encoded as two "char"s in a C# string.
-            _reusableCodePointFromUserCharList.Clear();
+
+            _reusableUserCodePoints.Clear();
+#if DEBUG
+            _dbugReusableCodePointFromUserCharList.Clear();
+#endif
             for (int i = 0; i < len; ++i)
             {
                 char ch = str[startAt + i];
@@ -337,27 +342,37 @@ namespace Typography.TextLayout
                         codepoint = char.ConvertToUtf32(ch, nextCh);
                     }
                 }
-                _reusableCodePointFromUserCharList.Add(new CodePointFromUserChar((ushort)i, codepoint));
+                _reusableUserCodePoints.Add(codepoint);
+#if DEBUG
+                _dbugReusableCodePointFromUserCharList.Add(new dbugCodePointFromUserChar((ushort)i, codepoint));
+#endif
             }
+
+            Layout(_reusableUserCodePoints);
+        }
+
+        public void Layout(IList<int> inputCodePoints)
+        {
+            Layout(inputCodePoints, 0, inputCodePoints.Count);
+        }
+        public void Layout(IList<int> inputCodePoints, int startAt, int len)
+        {
 
             //
             //[B]
             // convert codepoint-list to input glyph-list 
             // clear before use
             _inputGlyphs.Clear();
-            int codePointCount = _reusableCodePointFromUserCharList.Count;
-            for (int i = 0; i < codePointCount; ++i)
+            int end = startAt + len;
+            for (int i = 0; i < end; ++i)
             {
-                CodePointFromUserChar cp = _reusableCodePointFromUserCharList[i];
-                //find glyph index by specific codepoint
-                ushort glyphIndex = _typeface.LookupIndex(cp.codePoint);
-
-                if (i + 1 < codePointCount)
+                //find glyph index by specific codepoint 
+                ushort glyphIndex = _typeface.LookupIndex(inputCodePoints[i]);
+                if (i + 1 < end)
                 {
                     // Maybe this is a UVS sequence; in that case,
-                    //***SKIP*** the second codepoint
-                    CodePointFromUserChar nextCp = _reusableCodePointFromUserCharList[i + 1];
-                    ushort variationGlyphIndex = _typeface.LookupIndex(cp.codePoint, nextCp.codePoint);
+                    //***SKIP*** the second codepoint 
+                    ushort variationGlyphIndex = _typeface.LookupIndex(inputCodePoints[i], inputCodePoints[i + 1]);
                     if (variationGlyphIndex > 0)
                     {
                         //user glyph index from next codepoint
@@ -371,23 +386,32 @@ namespace Typography.TextLayout
                 }
                 _inputGlyphs.AddGlyph(i, glyphIndex);
             }
+            //continue below...
+            Layout(_inputGlyphs);
+        }
+        void Layout(GlyphIndexList glyphs)
+        {
+            if (_needPlanUpdate)
+            {
+                UpdateLayoutPlan();
+            }
 
             //[C]
             //----------------------------------------------  
             //glyph substitution            
-            if (_gsub != null & len > 0)
+            if (_gsub != null && glyphs.Count > 0)
             {
                 //TODO: review perf here
                 _gsub.EnableLigation = this.EnableLigature;
                 _gsub.EnableComposition = this.EnableComposition;
-                _gsub.DoSubstitution(_inputGlyphs);
+                _gsub.DoSubstitution(glyphs);
             }
 
             //----------------------------------------------  
             //after glyph substitution,
             //number of input glyph MAY changed (increase or decrease).***
             //so count again.
-            int finalGlyphCount = _inputGlyphs.Count;
+            int finalGlyphCount = glyphs.Count;
             //----------------------------------------------  
 
             //[D]
@@ -399,7 +423,7 @@ namespace Typography.TextLayout
                 //at this stage _inputGlyphs and _glyphPositions 
                 //has member 1:1
                 ushort glyIndex, input_codepointOffset, input_mapLen;
-                _inputGlyphs.GetGlyphIndexAndMap(i, out glyIndex, out input_codepointOffset, out input_mapLen);
+                glyphs.GetGlyphIndexAndMap(i, out glyIndex, out input_codepointOffset, out input_mapLen);
                 //
                 Glyph orgGlyph = _typeface.GetGlyphByIndex(glyIndex);
                 //this is original value WITHOUT fit-to-grid adjust
@@ -407,7 +431,7 @@ namespace Typography.TextLayout
             }
 
             PositionTechnique posTech = this.PositionTechnique;
-            if (_gpos != null && len > 1 && posTech == PositionTechnique.OpenFont)
+            if (_gpos != null && glyphs.Count > 1 && posTech == PositionTechnique.OpenFont)
             {
                 _gpos.DoGlyphPosition(_glyphPositions);
             }
