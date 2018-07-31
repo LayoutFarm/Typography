@@ -54,10 +54,10 @@ namespace Typography.OpenFont
     static class AdobeGlyphList
     {
 
-        static Dictionary<string, int> s_glyphNameToUnicodeScalarValueDic = new Dictionary<string, int>();
-        static Dictionary<int, string> s_unicodeScalarValueToGlyphNameDic = new Dictionary<int, string>();
+        static Dictionary<string, uint> s_glyphNameToUnicodeScalarValueDic = new Dictionary<string, uint>();
+        static Dictionary<uint, string> s_unicodeScalarValueToGlyphNameDic = new Dictionary<uint, string>();
         static bool s_init = false;
-        public static string GetGlyphNameByUnicodeValue(int unicodeValue)
+        public static string GetGlyphNameByUnicodeValue(uint unicodeValue)
         {
             if (!s_init)
             {
@@ -67,14 +67,14 @@ namespace Typography.OpenFont
             s_unicodeScalarValueToGlyphNameDic.TryGetValue(unicodeValue, out string glyphName);
             return glyphName;
         }
-        public static int GetUnicodeValueByGlyphName(string glyphName)
+        public static uint GetUnicodeValueByGlyphName(string glyphName)
         {
             if (!s_init)
             {
                 InitData();
             }
             //
-            s_glyphNameToUnicodeScalarValueDic.TryGetValue(glyphName, out int unicodeValue);
+            s_glyphNameToUnicodeScalarValueDic.TryGetValue(glyphName, out uint unicodeValue);
             return unicodeValue;
         }
         static void InitData()
@@ -101,32 +101,32 @@ namespace Typography.OpenFont
                         string glyphName = kp[0].Trim();
                         string[] unicodeParts = kp[1].Trim().Split(' ');
                         int partCount = unicodeParts.Length;
-                        int unicodeValue = 0;
+                        uint unicodeValue = 0;
                         switch (partCount)
                         {
                             case 0:
                             default: throw new System.Exception("??");
                             case 1:
                                 unicodeValue =
-                                    int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
+                                    uint.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case 2:
                                 unicodeValue =
-                                    int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
-                                    int.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
+                                    uint.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
+                                    uint.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case 3:
                                 unicodeValue =
-                                  int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 16 |
-                                  int.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
-                                  int.Parse(unicodeParts[2], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
+                                  uint.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 16 |
+                                  uint.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
+                                  uint.Parse(unicodeParts[2], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                             case 4:
                                 unicodeValue =
-                                  int.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 24 |
-                                  int.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 16 |
-                                  int.Parse(unicodeParts[2], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
-                                  int.Parse(unicodeParts[3], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
+                                  uint.Parse(unicodeParts[0], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 24 |
+                                  uint.Parse(unicodeParts[1], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 16 |
+                                  uint.Parse(unicodeParts[2], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture) << 8 |
+                                  uint.Parse(unicodeParts[3], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
                                 break;
                         }
                          

@@ -23,21 +23,21 @@ namespace Typography.OpenFont
         public static UnicodeRangeInfo ToUnicodeRangeInfo(this UnicodeLangBits unicodeLangBits)
         {
             long bits = (long)unicodeLangBits;
-            int bitpos = (int)(bits >> 32);
+            uint bitpos = (uint)(bits >> 32);
             uint lower32 = (uint)(bits & 0xFFFFFFFF);
             return new UnicodeRangeInfo(bitpos,
-                (int)(lower32 >> 16),
-                 (int)(lower32 & 0xFFFF));
+                 lower32 >> 16,
+                 lower32 & 0xFFFF);
         }
     }
 
     //unicode range 
     public struct UnicodeRangeInfo
     {
-        public readonly int BitNo;
-        public readonly int StartAt;
-        public readonly int EndAt;
-        public UnicodeRangeInfo(int bitNo, int startAt, int endAt)
+        public readonly uint BitNo;
+        public readonly uint StartAt;
+        public readonly uint EndAt;
+        public UnicodeRangeInfo(uint bitNo, uint startAt, uint endAt)
         {
             BitNo = bitNo;
             StartAt = startAt;
@@ -423,7 +423,7 @@ namespace Typography.OpenFont
         static Dictionary<string, int> s_registerNames = new Dictionary<string, int>();
         static Dictionary<string, ScriptLang> s_registeredScriptTags = new Dictionary<string, ScriptLang>();
         static Dictionary<string, ScriptLang> s_registerScriptFromFullNames = new Dictionary<string, ScriptLang>();
-        static SortedList<int, UnicodeRangeMapWithScriptLang> s_unicodeLangToScriptLang = new SortedList<int, UnicodeRangeMapWithScriptLang>();
+        static SortedList<uint, UnicodeRangeMapWithScriptLang> s_unicodeLangToScriptLang = new SortedList<uint, UnicodeRangeMapWithScriptLang>();
 
 
         static Dictionary<string, UnicodeLangBits[]> s_registeredScriptTagsToUnicodeLangBits = new Dictionary<string, UnicodeLangBits[]>();
