@@ -7,7 +7,7 @@ namespace Typography.TextLayout
     /// <summary>
     /// impl replaceable glyph index list
     /// </summary>
-    public class GlyphIndexList : IGlyphIndexList
+    class GlyphIndexList : IGlyphIndexList
     {
         List<ushort> _glyphIndices = new List<ushort>();
         List<int> _inputCodePointIndexList = new List<int>();
