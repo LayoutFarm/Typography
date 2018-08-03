@@ -327,7 +327,7 @@ namespace Typography.FontManagement
             {
                 case TypefaceStyle.Bold: return "BOLD";
                 case TypefaceStyle.Italic: return "ITALIC";
-                case TypefaceStyle.Regular: return "NORMAL";
+                case TypefaceStyle.Regular: return "REGULAR";
                 case TypefaceStyle.Bold | TypefaceStyle.Italic: return "BOLD ITALIC";
             }
             return "";
@@ -337,7 +337,7 @@ namespace Typography.FontManagement
             switch (subFamName.ToUpper())
             {
                 default: return TypefaceStyle.Others;
-                case "NORMAL":
+                case "NORMAL": //normal weight?
                 case "REGULAR":
                     return TypefaceStyle.Regular;
                 case "BOLD":
