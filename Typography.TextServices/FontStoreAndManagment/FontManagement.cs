@@ -138,7 +138,7 @@ namespace Typography.FontManagement
         }
 
         static InstalledTypefaceCollection s_intalledTypefaces;
-        public static InstalledTypefaceCollection GetSharedFontCollection(FirstInitFontCollectionDelegate initdel)
+        public static InstalledTypefaceCollection GetSharedTypefaceCollection(FirstInitFontCollectionDelegate initdel)
         {
             if (s_intalledTypefaces == null)
             {
@@ -148,7 +148,10 @@ namespace Typography.FontManagement
             }
             return s_intalledTypefaces;
         }
-
+        public static void SetAsSharedTypefaceCollection(InstalledTypefaceCollection installedTypefaceCollection)
+        {
+            s_intalledTypefaces = installedTypefaceCollection;
+        }
         InstalledTypefaceGroup CreateCreateNewGroup(TypefaceStyle installedFontStyle, params string[] names)
         {
             //create font group
@@ -212,7 +215,7 @@ namespace Typography.FontManagement
             {
                 //TODO review here again
                 return false;
-            } 
+            }
         }
         bool Register(InstalledTypeface newfont)
         {
