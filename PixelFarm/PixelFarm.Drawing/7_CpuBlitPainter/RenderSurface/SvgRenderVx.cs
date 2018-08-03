@@ -86,7 +86,7 @@ namespace PixelFarm.CpuBlit
 
                     RectD rectTotal = new RectD();
                     VertexStore innerVxs = vx.GetVxs();
-                    BoundingRect.GetBoundingRect(new VertexStoreSnap(innerVxs), ref rectTotal);
+                    BoundingRect.GetBoundingRect(new VertexStoreSnap(innerVxs), true, ref rectTotal);
 
                     _boundRect.ExpandToInclude(rectTotal);
                 }
