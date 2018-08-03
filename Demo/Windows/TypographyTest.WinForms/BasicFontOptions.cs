@@ -113,7 +113,7 @@ namespace TypographyTest
                 if (value == null) return;
 
                 //TODO: review here again
-                Typeface selected_typeface = _textServices.GetTypeface(value.FontName, TypefaceStyle.Normal);
+                Typeface selected_typeface = _textServices.GetTypeface(value.FontName, TypefaceStyle.Regular);
                 if (selected_typeface != this._selectedTypeface)
                 {
                     _typefaceChanged = true;

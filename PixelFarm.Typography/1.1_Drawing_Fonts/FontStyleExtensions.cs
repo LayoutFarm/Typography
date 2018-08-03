@@ -7,7 +7,7 @@ namespace PixelFarm.Drawing.Fonts
     {
         public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this FontStyle style)
         {
-            Typography.FontManagement.TypefaceStyle installedStyle = Typography.FontManagement.TypefaceStyle.Normal;//regular
+            Typography.FontManagement.TypefaceStyle installedStyle = Typography.FontManagement.TypefaceStyle.Regular;//regular
             switch (style)
             {
                 default: break;
