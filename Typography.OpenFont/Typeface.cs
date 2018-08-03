@@ -31,7 +31,7 @@ namespace Typography.OpenFont
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
 
-   
+
         }
 
 
@@ -495,6 +495,56 @@ namespace Typography.OpenFont
 
                 return ((typeface.OS2Table.fsSelection >> 7) & 1) != 0;
             }
+            public static TranslatedOS2FontStyle TranslatedOS2FontStyle(this Typeface typeface)
+            {
+                return TranslatedOS2FontStyle(typeface.OS2Table);
+            }
+
+            internal static TranslatedOS2FontStyle TranslatedOS2FontStyle(OS2Table os2Table)
+            {
+                //@prepare's note, please note:=> this is not real value, this is 'translated' value from OS2.fsSelection 
+
+
+                //https://www.microsoft.com/typography/otspec/os2.htm
+                //Bit # 	macStyle bit 	C definition 	Description
+                //0         bit 1           ITALIC          Font contains italic or oblique characters, otherwise they are upright.
+                //1                         UNDERSCORE      Characters are underscored.
+                //2                         NEGATIVE        Characters have their foreground and background reversed.
+                //3                         OUTLINED        Outline(hollow) characters, otherwise they are solid.
+                //4                         STRIKEOUT       Characters are overstruck.
+                //5         bit 0           BOLD            Characters are emboldened.
+                //6                         REGULAR Characters are in the standard weight / style for the font.
+                //7                         USE_TYPO_METRICS    If set, it is strongly recommended to use OS / 2.sTypoAscender - OS / 2.sTypoDescender + OS / 2.sTypoLineGap as a value for default line spacing for this font.
+                //8                         WWS     The font has ‘name’ table strings consistent with a weight / width / slope family without requiring use of ‘name’ IDs 21 and 22. (Please see more detailed description below.)
+                //9                         OBLIQUE     Font contains oblique characters.
+                //10–15 < reserved > Reserved; set to 0.
+                ushort fsSelection = os2Table.fsSelection;
+                TranslatedOS2FontStyle result = Extensions.TranslatedOS2FontStyle.UNSET;
+
+                if ((fsSelection & 0x1) != 0)
+                {
+
+                    result |= Extensions.TranslatedOS2FontStyle.ITALIC;
+                }
+
+                if (((fsSelection >> 5) & 0x1) != 0)
+                {
+                    result |= Extensions.TranslatedOS2FontStyle.BOLD;
+                }
+
+                if (((fsSelection >> 6) & 0x1) != 0)
+                {
+                    result |= Extensions.TranslatedOS2FontStyle.REGULAR;
+                }
+                if (((fsSelection >> 9) & 0x1) != 0)
+                {
+                    result |= Extensions.TranslatedOS2FontStyle.OBLIQUE;
+                }
+
+                return result;
+            }
+
+
             /// <summary>
             /// overall calculated line spacing 
             /// </summary>
@@ -668,6 +718,21 @@ namespace Typography.OpenFont
             Windows,
             Mac,
             Others
+        }
+
+
+        [System.Flags]
+        public enum TranslatedOS2FontStyle : ushort
+        {
+
+            //@prepare's note, please note:=> this is not real value, this is 'translated' value from OS2.fsSelection 
+
+            UNSET = 0,
+
+            ITALIC = 1,
+            BOLD = 1 << 1,
+            REGULAR = 1 << 2,
+            OBLIQUE = 1 << 3,
         }
 
         public static class CurrentEnv
