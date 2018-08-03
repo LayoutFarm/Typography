@@ -56,7 +56,9 @@ namespace Typography.OpenFont.Tables
                     default:
                         //skip
                         break;
-
+                    case NameIdKind.VersionString:
+                        VersionString = strRet;
+                        break;
                     case NameIdKind.FontFamilyName:
                         FontName = strRet;
                         break;
@@ -69,20 +71,21 @@ namespace Typography.OpenFont.Tables
                     case NameIdKind.FullFontName:
                         FullFontName = strRet;
                         break;
+                    //
                     case NameIdKind.PostScriptName:
                         PostScriptName = strRet;
                         break;
+                    case NameIdKind.PostScriptCID_FindfontName:
+                        PostScriptCID_FindfontName = strRet;
+                        break;
+                    //
                     case NameIdKind.TypographicFamilyName:
                         TypographicFamilyName = strRet;
                         break;
                     case NameIdKind.TypographyicSubfamilyName:
                         TypographyicSubfamilyName = strRet;
                         break;
-                    case NameIdKind.PostScriptCID_FindfontName:
-                        PostScriptCID_FindfontName = strRet;
-                        break;
-                    case NameIdKind.VersionString:
-                        break;
+
                 }
                 //move to saved pos
                 reader.BaseStream.Seek(nPos, SeekOrigin.Begin);
