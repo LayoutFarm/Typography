@@ -29,10 +29,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     public static class BoundingRect
     {
 
-        public static bool GetBoundingRect(VertexStoreSnap vs, ref RectD rect)
+        public static bool GetBoundingRect(VertexStoreSnap vs, bool first, ref RectD rect)
         {
             double x1, y1, x2, y2;
-            bool rValue = GetBoundingRectSingle(vs, out x1, out y1, out x2, out y2);
+            bool rValue = GetBoundingRectSingle(vs, first, out x1, out y1, out x2, out y2);
             rect.Left = x1;
             rect.Bottom = y1;
             rect.Right = x2;
@@ -92,16 +92,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return x1 <= x2 && y1 <= y2;
         }
 
+
         //-----------------------------------------------------bounding_rect_single
         //template<class VertexSource, class CoordT> 
         static bool GetBoundingRectSingle(
           VertexStoreSnap vs,
+          bool first,
           out double x1, out double y1,
           out double x2, out double y2)
         {
             double x = 0;
             double y = 0;
-            bool first = true;
+
             x1 = 1;
             y1 = 1;
             x2 = 0;

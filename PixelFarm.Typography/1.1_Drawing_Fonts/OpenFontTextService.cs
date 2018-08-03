@@ -32,11 +32,12 @@ namespace LayoutFarm
             _txtServices = new TextServices();
             //default, user can set this later
 
-            _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedFontCollection(collection =>
+            _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
                 collection.LoadSystemFonts(); //load system fonts
             });
+            
 
             //create typography service
             //you can implement this service on your own
@@ -57,6 +58,8 @@ namespace LayoutFarm
             //_shapingServices.SetCurrentScriptLang(scLang);
             //--------------- 
         }
+
+
         public void LoadFontsFromFolder(string folder)
         {
             _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);

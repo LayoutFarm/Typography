@@ -40,7 +40,7 @@ namespace Typography.Contours
             //-------------------------------------------- 
             //GlyphImage glyphImg = new GlyphImage()
             RectD bounds = new RectD();
-            PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(new VertexStoreSnap(glyphVxs), ref bounds);
+            PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(new VertexStoreSnap(glyphVxs), true, ref bounds);
 
             ////-------------------------------------------- 
             int w = (int)System.Math.Ceiling(bounds.Width);
