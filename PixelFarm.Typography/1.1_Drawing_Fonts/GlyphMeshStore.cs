@@ -18,6 +18,8 @@ namespace Typography.Contours
         public short maxX;
         public short maxY;
     }
+
+
     class GlyphMeshStore
     {
 
@@ -27,7 +29,6 @@ namespace Typography.Contours
             public VertexStore vxsStore;
             public float avgXOffsetToFit;
             public Bounds orgBounds;
-
             public GlyphControlParameters GetControlPars()
             {
                 var pars = new GlyphControlParameters();
@@ -38,6 +39,9 @@ namespace Typography.Contours
                 pars.avgXOffsetToFit = avgXOffsetToFit;
                 return pars;
             }
+
+
+            internal GlyphMeshData _synthOblique;
 
         }
         /// <summary>
@@ -68,15 +72,21 @@ namespace Typography.Contours
         }
 
         /// <summary>
+        /// simulate italic glyph
+        /// </summary>
+        public bool SimulateOblique { get; set; }
+
+        public bool FlipGlyphUpward { get; set; }
+
+
+        /// <summary>
         /// set current font
         /// </summary>
         /// <param name="typeface"></param>
         /// <param name="fontSizeInPoints"></param>
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
-            //temp fix,            
-
-
+            //temp fix,        
             if (_currentGlyphBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(typeface))
             {
                 //store current typeface to cache
@@ -104,12 +114,6 @@ namespace Typography.Contours
             _hintGlyphCollection.SetCacheInfo(typeface, this._currentFontSizeInPoints, _currentHintTech);
         }
 
-        bool _flipGlyphUpward;
-        public bool FlipGlyphUpward
-        {
-            get { return _flipGlyphUpward; }
-            set { _flipGlyphUpward = value; }
-        }
         /// <summary>
         /// get existing or create new one from current font setting
         /// </summary>
@@ -149,8 +153,15 @@ namespace Typography.Contours
             return InternalGetGlyphMesh(glyphIndex).GetControlPars();
         }
 
-        PixelFarm.CpuBlit.VertexProcessing.Affine _invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
-        VertexStore _vxs1 = new VertexStore();
+
+        static readonly PixelFarm.CpuBlit.VertexProcessing.Affine _invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
+
+        //shearing horizontal axis to right side, 20 degree, TODO: user can configure this value
+        static PixelFarm.CpuBlit.VertexProcessing.Affine _slantHorizontal = PixelFarm.CpuBlit.VertexProcessing.Affine.NewSkewing(PixelFarm.CpuBlit.AggMath.deg2rad(-15), 0);
+
+
+        VertexStore _temp1 = new VertexStore();
+        VertexStore _temp2 = new VertexStore();
 
         /// <summary>
         /// get glyph mesh from current font setting
@@ -171,52 +182,79 @@ namespace Typography.Contours
                     dynamicOutline.GenerateOutput(_tovxs, pxscale);
 
                     //version 3 
-                    if (_flipGlyphUpward)
+                    if (FlipGlyphUpward)
                     {
-                        _vxs1.Clear(); //write to temp buffer first
-                        _tovxs.WriteOutput(_vxs1);
 
-                        VertexStore vxs = new VertexStore();
-                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _vxs1, vxs);
+                        _temp1.Clear();
+                        _temp2.Clear();
+                        _tovxs.WriteOutput(_temp1);//write to temp buffer first
+
+                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _temp1, _temp2);
                         //then
-                        glyphMeshData.vxsStore = vxs;
+                        glyphMeshData.vxsStore = _temp2.CreateTrim();
+
+
                     }
                     else
                     {
-                        glyphMeshData.vxsStore = new VertexStore();
-                        _tovxs.WriteOutput(glyphMeshData.vxsStore);
+                        _temp1.Clear();
+                        _tovxs.WriteOutput(_temp1);
+                        glyphMeshData.vxsStore = _temp1.CreateTrim();
                     }
                 }
                 else
                 {
 
-                    if (_flipGlyphUpward)
+                    if (FlipGlyphUpward)
                     {
-                        _vxs1.Clear(); //write to temp buffer first
-
+                        _temp1.Clear();
+                        _temp2.Clear();
                         _currentGlyphBuilder.ReadShapes(_tovxs);
-                        _tovxs.WriteOutput(_vxs1);
-
-                        VertexStore vxs = new VertexStore();
-                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _vxs1, vxs);
+                        _tovxs.WriteOutput(_temp1); //write to temp buffer first 
+                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _temp1, _temp2);
                         //then
-                        glyphMeshData.vxsStore = vxs;
+                        glyphMeshData.vxsStore = _temp2.CreateTrim();
                     }
                     else
                     {
                         //no dynamic outline
-
+                        _temp1.Clear();
                         _currentGlyphBuilder.ReadShapes(_tovxs);
                         //TODO: review here,
                         //float pxScale = _glyphPathBuilder.GetPixelScale(); 
 
-                        glyphMeshData.vxsStore = new VertexStore();
-                        _tovxs.WriteOutput(glyphMeshData.vxsStore);
+                        _tovxs.WriteOutput(_temp1);
+                        glyphMeshData.vxsStore = _temp1.CreateTrim();
+
                     }
                 }
-
             }
-            return glyphMeshData.vxsStore;
+
+
+            if (SimulateOblique)
+            {
+                if (glyphMeshData._synthOblique == null)
+                {
+                    //create italic version
+                    SimulateQbliqueGlyph(glyphMeshData);
+                }
+                return glyphMeshData._synthOblique.vxsStore;
+            }
+            else
+            {
+                return glyphMeshData.vxsStore;
+            }
+        }
+        void SimulateQbliqueGlyph(GlyphMeshData orgGlyphMashData)
+        {
+            _temp1.Clear();
+            PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_slantHorizontal, orgGlyphMashData.vxsStore, _temp1);
+            //italic mesh data
+
+            GlyphMeshData obliqueVersion = new GlyphMeshData();
+            obliqueVersion.vxsStore = _temp1.CreateTrim();
+
+            orgGlyphMashData._synthOblique = obliqueVersion;
 
         }
     }

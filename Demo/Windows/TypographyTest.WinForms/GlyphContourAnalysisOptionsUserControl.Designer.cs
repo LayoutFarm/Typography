@@ -49,6 +49,7 @@
             this.chkShowControlPoints = new System.Windows.Forms.CheckBox();
             this.lstEdgeOffset = new System.Windows.Forms.ListBox();
             this.treeView1 = new System.Windows.Forms.TreeView();
+            this.chkSimulateSlant = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // chkSetPrinterLayoutForLcdSubPix
@@ -274,10 +275,21 @@
             this.treeView1.Size = new System.Drawing.Size(302, 349);
             this.treeView1.TabIndex = 87;
             // 
+            // chkSimulateSlant
+            // 
+            this.chkSimulateSlant.AutoSize = true;
+            this.chkSimulateSlant.Location = new System.Drawing.Point(13, 159);
+            this.chkSimulateSlant.Name = "chkSimulateSlant";
+            this.chkSimulateSlant.Size = new System.Drawing.Size(93, 17);
+            this.chkSimulateSlant.TabIndex = 89;
+            this.chkSimulateSlant.Text = "Simulate Slant";
+            this.chkSimulateSlant.UseVisualStyleBackColor = true;
+            // 
             // GlyphContourAnalysisOptionsUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkSimulateSlant);
             this.Controls.Add(this.lstEdgeOffset);
             this.Controls.Add(this.treeView1);
             this.Controls.Add(this.chkSetPrinterLayoutForLcdSubPix);
@@ -330,5 +342,6 @@
         private System.Windows.Forms.CheckBox chkShowControlPoints;
         private System.Windows.Forms.ListBox lstEdgeOffset;
         private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.CheckBox chkSimulateSlant;
     }
 }

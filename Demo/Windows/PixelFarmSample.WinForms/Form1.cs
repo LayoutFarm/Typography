@@ -238,6 +238,7 @@ namespace SampleWinForms
 
                         selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
                         selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
+                        selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
 
                         //test print 3 lines
 #if DEBUG

@@ -38,6 +38,7 @@ namespace Typography.Contours
         public float FontDescedingPx { get; set; }
         public float FontLineGapPx { get; set; }
         public float FontLineSpacingPx { get; set; }
+        public bool SimulateSlant { get; set; }
 
         public Typography.Contours.HintTechnique HintTechnique
         {
