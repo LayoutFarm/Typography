@@ -18,6 +18,8 @@ namespace Typography.Contours
         public short maxX;
         public short maxY;
     }
+
+
     class GlyphMeshStore
     {
 
@@ -67,6 +69,10 @@ namespace Typography.Contours
 
         }
 
+       
+        public bool FlipGlyphUpward { get; set; }
+
+
         /// <summary>
         /// set current font
         /// </summary>
@@ -74,9 +80,7 @@ namespace Typography.Contours
         /// <param name="fontSizeInPoints"></param>
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
-            //temp fix,            
-
-
+            //temp fix,        
             if (_currentGlyphBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(typeface))
             {
                 //store current typeface to cache
@@ -102,14 +106,8 @@ namespace Typography.Contours
             _currentGlyphBuilder.TemporaryDisableCustomFit = (typeface.COLRTable != null) && (typeface.CPALTable != null);
             //------------------------------------------ 
             _hintGlyphCollection.SetCacheInfo(typeface, this._currentFontSizeInPoints, _currentHintTech);
-        }
+        } 
 
-        bool _flipGlyphUpward;
-        public bool FlipGlyphUpward
-        {
-            get { return _flipGlyphUpward; }
-            set { _flipGlyphUpward = value; }
-        }
         /// <summary>
         /// get existing or create new one from current font setting
         /// </summary>
@@ -150,6 +148,7 @@ namespace Typography.Contours
         }
 
         PixelFarm.CpuBlit.VertexProcessing.Affine _invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
+
         VertexStore _temp1 = new VertexStore();
         VertexStore _temp2 = new VertexStore();
 
@@ -172,7 +171,7 @@ namespace Typography.Contours
                     dynamicOutline.GenerateOutput(_tovxs, pxscale);
 
                     //version 3 
-                    if (_flipGlyphUpward)
+                    if (FlipGlyphUpward)
                     {
 
                         _temp1.Clear();
@@ -214,7 +213,7 @@ namespace Typography.Contours
                         _currentGlyphBuilder.ReadShapes(_tovxs);
                         //TODO: review here,
                         //float pxScale = _glyphPathBuilder.GetPixelScale(); 
-                       
+
                         _tovxs.WriteOutput(_temp1);
                         glyphMeshData.vxsStore = _temp1.CreateTrim();
 
