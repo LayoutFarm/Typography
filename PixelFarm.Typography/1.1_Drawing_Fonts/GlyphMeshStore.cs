@@ -150,7 +150,8 @@ namespace Typography.Contours
         }
 
         PixelFarm.CpuBlit.VertexProcessing.Affine _invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
-        VertexStore _vxs1 = new VertexStore();
+        VertexStore _temp1 = new VertexStore();
+        VertexStore _temp2 = new VertexStore();
 
         /// <summary>
         /// get glyph mesh from current font setting
@@ -173,18 +174,22 @@ namespace Typography.Contours
                     //version 3 
                     if (_flipGlyphUpward)
                     {
-                        _vxs1.Clear(); //write to temp buffer first
-                        _tovxs.WriteOutput(_vxs1);
 
-                        VertexStore vxs = new VertexStore();
-                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _vxs1, vxs);
+                        _temp1.Clear();
+                        _temp2.Clear();
+                        _tovxs.WriteOutput(_temp1);//write to temp buffer first
+
+                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _temp1, _temp2);
                         //then
-                        glyphMeshData.vxsStore = vxs;
+                        glyphMeshData.vxsStore = _temp2.CreateTrim();
+
+
                     }
                     else
                     {
-                        glyphMeshData.vxsStore = new VertexStore();
-                        _tovxs.WriteOutput(glyphMeshData.vxsStore);
+                        _temp1.Clear();
+                        _tovxs.WriteOutput(_temp1);
+                        glyphMeshData.vxsStore = _temp1.CreateTrim();
                     }
                 }
                 else
@@ -192,26 +197,27 @@ namespace Typography.Contours
 
                     if (_flipGlyphUpward)
                     {
-                        _vxs1.Clear(); //write to temp buffer first
-
+                        _temp1.Clear();
+                        _temp2.Clear();
                         _currentGlyphBuilder.ReadShapes(_tovxs);
-                        _tovxs.WriteOutput(_vxs1);
+                        _tovxs.WriteOutput(_temp1); //write to temp buffer first
 
-                        VertexStore vxs = new VertexStore();
-                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _vxs1, vxs);
+
+                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _temp1, _temp2);
                         //then
-                        glyphMeshData.vxsStore = vxs;
+                        glyphMeshData.vxsStore = _temp2.CreateTrim();
                     }
                     else
                     {
                         //no dynamic outline
-
+                        _temp1.Clear();
                         _currentGlyphBuilder.ReadShapes(_tovxs);
                         //TODO: review here,
                         //float pxScale = _glyphPathBuilder.GetPixelScale(); 
+                       
+                        _tovxs.WriteOutput(_temp1);
+                        glyphMeshData.vxsStore = _temp1.CreateTrim();
 
-                        glyphMeshData.vxsStore = new VertexStore();
-                        _tovxs.WriteOutput(glyphMeshData.vxsStore);
                     }
                 }
 
