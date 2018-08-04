@@ -21,12 +21,22 @@ namespace Typography.OpenFont
     {
         public readonly string fontName;
         public readonly string fontSubFamily;
-        public PreviewFontInfo(string fontName, string fontSubFam)
+        public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
+
+
+        public PreviewFontInfo(string fontName, string fontSubFam,
+            Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
         {
             this.fontName = fontName;
             this.fontSubFamily = fontSubFam;
+            OS2TranslatedStyle = os2TranslatedStyle;
         }
-
+#if DEBUG
+        public override string ToString()
+        {
+            return fontName + ", " + fontSubFamily + ", " + OS2TranslatedStyle;
+        }
+#endif
     }
 
 
@@ -54,9 +64,15 @@ namespace Typography.OpenFont
                     tables.AddEntry(new UnreadTableEntry(ReadTableHeader(input)));
                 }
 
-                //translate...
+
                 NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
-                return new PreviewFontInfo(nameEntry.FontName, nameEntry.FontSubFamily);
+                OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
+
+                return new PreviewFontInfo(
+                    nameEntry.FontName,
+                    nameEntry.FontSubFamily,
+                    Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
+                    );
             }
         }
 

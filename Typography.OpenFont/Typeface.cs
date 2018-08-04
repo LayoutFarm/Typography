@@ -31,28 +31,7 @@ namespace Typography.OpenFont
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
 
-            //---------------------------------------------------
-            //cmap - Character To Glyph Index Mapping Table
-            //---------------------------------------------------
-            //This table defines the mapping of character codes to the glyph index values used in the font. It may contain more than one subtable, in order to support more than one character encoding scheme.Character codes that do not correspond to any glyph in the font should be mapped to glyph index 0.The glyph at this location must be a special glyph representing a missing character, commonly known as .notdef.
-            //The table header indicates the character encodings for which subtables are present.Each subtable is in one of seven possible formats and begins with a format code indicating the format used.
-            //The platform ID and platform - specific encoding ID in the header entry(and, in the case of the Macintosh platform, the language field in the subtable itself) are used to specify a particular 'cmap' encoding.The header entries must be sorted first by platform ID, then by platform - specific encoding ID, and then by the language field in the corresponding subtable.Each platform ID, platform - specific encoding ID, and subtable language combination may appear only once in the 'cmap' table.
-            //When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1.When building a symbol font for Windows, the platform ID should be 3 and the encoding ID should be 0.When building a font that will be used on the Macintosh, the platform ID should be 1 and the encoding ID should be 0.
-            //All Microsoft Unicode BMP encodings(Platform ID = 3, Encoding ID = 1) must provide at least a Format 4 'cmap' subtable.If the font is meant to support supplementary(non - BMP) Unicode characters, it will additionally need a Format 12 subtable with a platform encoding ID 10.The contents of the Format 12 subtable need to be a superset of the contents of the Format 4 subtable.Microsoft strongly recommends using a BMP Unicode 'cmap' for all fonts. However, some other encodings that appear in current fonts follow:
-            //Windows Encodings
-            //Platform ID Encoding ID Description
-            //3   0   Symbol
-            //3   1   Unicode BMP(UCS - 2)
-            //3   2   ShiftJIS
-            //3   3   PRC
-            //3   4   Big5
-            //3   5   Wansung
-            //3   6   Johab
-            //3   7   Reserved
-            //3   8   Reserved
-            //3   9   Reserved
-            //3   10  Unicode UCS - 4
-            //---------------------------------------------------
+
         }
 
 
@@ -516,6 +495,56 @@ namespace Typography.OpenFont
 
                 return ((typeface.OS2Table.fsSelection >> 7) & 1) != 0;
             }
+            public static TranslatedOS2FontStyle TranslatedOS2FontStyle(this Typeface typeface)
+            {
+                return TranslatedOS2FontStyle(typeface.OS2Table);
+            }
+
+            internal static TranslatedOS2FontStyle TranslatedOS2FontStyle(OS2Table os2Table)
+            {
+                //@prepare's note, please note:=> this is not real value, this is 'translated' value from OS2.fsSelection 
+
+
+                //https://www.microsoft.com/typography/otspec/os2.htm
+                //Bit # 	macStyle bit 	C definition 	Description
+                //0         bit 1           ITALIC          Font contains italic or oblique characters, otherwise they are upright.
+                //1                         UNDERSCORE      Characters are underscored.
+                //2                         NEGATIVE        Characters have their foreground and background reversed.
+                //3                         OUTLINED        Outline(hollow) characters, otherwise they are solid.
+                //4                         STRIKEOUT       Characters are overstruck.
+                //5         bit 0           BOLD            Characters are emboldened.
+                //6                         REGULAR Characters are in the standard weight / style for the font.
+                //7                         USE_TYPO_METRICS    If set, it is strongly recommended to use OS / 2.sTypoAscender - OS / 2.sTypoDescender + OS / 2.sTypoLineGap as a value for default line spacing for this font.
+                //8                         WWS     The font has ‘name’ table strings consistent with a weight / width / slope family without requiring use of ‘name’ IDs 21 and 22. (Please see more detailed description below.)
+                //9                         OBLIQUE     Font contains oblique characters.
+                //10–15 < reserved > Reserved; set to 0.
+                ushort fsSelection = os2Table.fsSelection;
+                TranslatedOS2FontStyle result = Extensions.TranslatedOS2FontStyle.UNSET;
+
+                if ((fsSelection & 0x1) != 0)
+                {
+
+                    result |= Extensions.TranslatedOS2FontStyle.ITALIC;
+                }
+
+                if (((fsSelection >> 5) & 0x1) != 0)
+                {
+                    result |= Extensions.TranslatedOS2FontStyle.BOLD;
+                }
+
+                if (((fsSelection >> 6) & 0x1) != 0)
+                {
+                    result |= Extensions.TranslatedOS2FontStyle.REGULAR;
+                }
+                if (((fsSelection >> 9) & 0x1) != 0)
+                {
+                    result |= Extensions.TranslatedOS2FontStyle.OBLIQUE;
+                }
+
+                return result;
+            }
+
+
             /// <summary>
             /// overall calculated line spacing 
             /// </summary>
@@ -689,6 +718,21 @@ namespace Typography.OpenFont
             Windows,
             Mac,
             Others
+        }
+
+
+        [System.Flags]
+        public enum TranslatedOS2FontStyle : ushort
+        {
+
+            //@prepare's note, please note:=> this is not real value, this is 'translated' value from OS2.fsSelection 
+
+            UNSET = 0,
+
+            ITALIC = 1,
+            BOLD = 1 << 1,
+            REGULAR = 1 << 2,
+            OBLIQUE = 1 << 3,
         }
 
         public static class CurrentEnv

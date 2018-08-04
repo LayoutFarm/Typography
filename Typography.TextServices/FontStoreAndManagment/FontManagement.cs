@@ -12,17 +12,19 @@ namespace Typography.FontManagement
     {
         internal InstalledTypeface(string fontName,
             string fontSubFamily,
-            string fontPath)
+            string fontPath,
+            TypefaceStyle typefaceStyle)
         {
             FontName = fontName;
             FontSubFamily = fontSubFamily;
             FontPath = fontPath;
+            TypefaceStyle = typefaceStyle;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
         public string FontPath { get; internal set; }
-
+        public TypefaceStyle TypefaceStyle { get; internal set; }
 
         public override string ToString()
         {
@@ -33,7 +35,7 @@ namespace Typography.FontManagement
     public enum TypefaceStyle
     {
         Others = 0,
-        Normal = 1,
+        Regular = 1,
         Bold = 1 << 2,
         Italic = 1 << 3,
     }
@@ -84,7 +86,7 @@ namespace Typography.FontManagement
 
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
-      
+
 
 
         class InstalledTypefaceGroup
@@ -93,7 +95,6 @@ namespace Typography.FontManagement
             internal Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
             public void AddFont(InstalledTypeface installedFont)
             {
-
                 _members.Add(installedFont.FontName.ToUpper(), installedFont);
             }
             public bool TryGetValue(string fontName, out InstalledTypeface found)
@@ -111,7 +112,8 @@ namespace Typography.FontManagement
         /// </summary>
         Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
 
-        InstalledTypefaceGroup _normal, _bold, _italic, _bold_italic;
+
+        InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
         List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
         FontNameDuplicatedHandler _fontNameDuplicatedHandler;
         FontNotFoundHandler _fontNotFoundHandler;
@@ -121,7 +123,7 @@ namespace Typography.FontManagement
 
             //-----------------------------------------------------
             //init wellknown subfam 
-            _normal = CreateCreateNewGroup(TypefaceStyle.Normal, "regular", "normal");
+            _regular = CreateCreateNewGroup(TypefaceStyle.Regular, "regular", "normal");
             _italic = CreateCreateNewGroup(TypefaceStyle.Italic, "Italic", "italique");
             //
             _bold = CreateCreateNewGroup(TypefaceStyle.Bold, "bold");
@@ -136,7 +138,7 @@ namespace Typography.FontManagement
         }
 
         static InstalledTypefaceCollection s_intalledTypefaces;
-        public static InstalledTypefaceCollection GetSharedFontCollection(FirstInitFontCollectionDelegate initdel)
+        public static InstalledTypefaceCollection GetSharedTypefaceCollection(FirstInitFontCollectionDelegate initdel)
         {
             if (s_intalledTypefaces == null)
             {
@@ -146,7 +148,10 @@ namespace Typography.FontManagement
             }
             return s_intalledTypefaces;
         }
-
+        public static void SetAsSharedTypefaceCollection(InstalledTypefaceCollection installedTypefaceCollection)
+        {
+            s_intalledTypefaces = installedTypefaceCollection;
+        }
         InstalledTypefaceGroup CreateCreateNewGroup(TypefaceStyle installedFontStyle, params string[] names)
         {
             //create font group
@@ -185,31 +190,66 @@ namespace Typography.FontManagement
                     //{
 
                     //}
+                    TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
+                    switch (previewFont.OS2TranslatedStyle)
+                    {
+                        case OpenFont.Extensions.TranslatedOS2FontStyle.BOLD:
+                            typefaceStyle = TypefaceStyle.Bold;
+                            break;
+                        case OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC:
+                        case OpenFont.Extensions.TranslatedOS2FontStyle.OBLIQUE:
+                            typefaceStyle = TypefaceStyle.Italic;
+                            break;
+                        case OpenFont.Extensions.TranslatedOS2FontStyle.REGULAR:
+                            typefaceStyle = TypefaceStyle.Regular;
+                            break;
+                        case (OpenFont.Extensions.TranslatedOS2FontStyle.BOLD | OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC):
+                            typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
+                            break;
+                    }
 
-                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
+                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName, typefaceStyle));
                 }
             }
             catch (IOException)
             {
-                //TODO review here agina
+                //TODO review here again
                 return false;
             }
-
-
         }
         bool Register(InstalledTypeface newfont)
         {
-            InstalledTypefaceGroup selectedFontGroup;
-            string fontsubFamUpperCaseName = newfont.FontSubFamily.ToUpper();
+            InstalledTypefaceGroup selectedFontGroup = null;
 
-            if (!_subFamToFontGroup.TryGetValue(fontsubFamUpperCaseName, out selectedFontGroup))
+            switch (newfont.TypefaceStyle)
             {
-                //create new group, we don't known this font group before 
-                //so we add to 'other group' list
-                selectedFontGroup = new InstalledTypefaceGroup();
-                _subFamToFontGroup.Add(fontsubFamUpperCaseName, selectedFontGroup);
-                _allGroups.Add(selectedFontGroup);
+                default:
+                    {
+                        string fontSubFamUpperCaseName = newfont.FontSubFamily.ToUpper();
+                        if (!_subFamToFontGroup.TryGetValue(fontSubFamUpperCaseName, out selectedFontGroup))
+                        {
+                            //create new group, we don't known this font group before 
+                            //so we add to 'other group' list
+                            selectedFontGroup = new InstalledTypefaceGroup();
+                            _subFamToFontGroup.Add(fontSubFamUpperCaseName, selectedFontGroup);
+                            _allGroups.Add(selectedFontGroup);
+                        }
+                    }
+                    break;
+                case TypefaceStyle.Bold:
+                    selectedFontGroup = _bold;
+                    break;
+                case TypefaceStyle.Italic:
+                    selectedFontGroup = _italic;
+                    break;
+                case TypefaceStyle.Regular:
+                    selectedFontGroup = _regular;
+                    break;
+                case (TypefaceStyle.Bold | TypefaceStyle.Italic):
+                    selectedFontGroup = _bold_italic;
+                    break;
             }
+
             //
             string fontNameUpper = newfont.FontName.ToUpper();
 
@@ -250,10 +290,13 @@ namespace Typography.FontManagement
             if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup))
             {
                 InstalledTypeface foundInstalledFont;
-                foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont);
-                return foundInstalledFont;
+                if (foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
+                {
+                    return foundInstalledFont;
+                }
             }
 
+            //not found
             if (_fontNotFoundHandler != null)
             {
                 return _fontNotFoundHandler(this, fontName, subFamName);
@@ -270,7 +313,7 @@ namespace Typography.FontManagement
             switch (wellknownSubFam)
             {
                 default: return null;
-                case TypefaceStyle.Normal: selectedFontGroup = _normal; break;
+                case TypefaceStyle.Regular: selectedFontGroup = _regular; break;
                 case TypefaceStyle.Bold: selectedFontGroup = _bold; break;
                 case TypefaceStyle.Italic: selectedFontGroup = _italic; break;
                 case (TypefaceStyle.Bold | TypefaceStyle.Italic): selectedFontGroup = _bold_italic; break;
@@ -281,7 +324,7 @@ namespace Typography.FontManagement
             }
             //------------------------------------------- 
             //not found then ...
-            
+
 
             //retry ....
             //if (wellknownSubFam == TypefaceStyle.Bold)
@@ -322,7 +365,7 @@ namespace Typography.FontManagement
             {
                 case TypefaceStyle.Bold: return "BOLD";
                 case TypefaceStyle.Italic: return "ITALIC";
-                case TypefaceStyle.Normal: return "NORMAL";
+                case TypefaceStyle.Regular: return "REGULAR";
                 case TypefaceStyle.Bold | TypefaceStyle.Italic: return "BOLD ITALIC";
             }
             return "";
@@ -332,9 +375,9 @@ namespace Typography.FontManagement
             switch (subFamName.ToUpper())
             {
                 default: return TypefaceStyle.Others;
-                case "NORMAL":
+                case "NORMAL": //normal weight?
                 case "REGULAR":
-                    return TypefaceStyle.Normal;
+                    return TypefaceStyle.Regular;
                 case "BOLD":
                     return TypefaceStyle.Bold;
                 case "ITALIC":

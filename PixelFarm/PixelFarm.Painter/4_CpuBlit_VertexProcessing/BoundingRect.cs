@@ -33,10 +33,24 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             double x1, y1, x2, y2;
             bool rValue = GetBoundingRectSingle(vs, out x1, out y1, out x2, out y2);
-            rect.Left = x1;
-            rect.Bottom = y1;
-            rect.Right = x2;
-            rect.Top = y2;
+            if (x1 < rect.Left)
+            {
+                rect.Left = x1;
+            }
+            if (y1 < rect.Bottom)
+            {
+                rect.Bottom = y1;
+            }
+            if (x2 > rect.Right)
+            {
+                rect.Right = x2;
+            }
+
+            if (y2 > rect.Top)
+            {
+                rect.Top = y2;
+            }
+
             return rValue;
         }
 
@@ -52,10 +66,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double x = 0;
             double y = 0;
             bool first = true;
-            x1 = 1;
-            y1 = 1;
-            x2 = 0;
-            y2 = 0;
+            x1 = double.MaxValue;
+            y1 = double.MaxValue;
+            x2 = double.MinValue;
+            y2 = double.MinValue;
+
             for (i = 0; i < num; i++)
             {
                 VertexCmd flags;
@@ -101,32 +116,22 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             double x = 0;
             double y = 0;
-            bool first = true;
-            x1 = 1;
-            y1 = 1;
-            x2 = 0;
-            y2 = 0;
+
+            x1 = double.MaxValue;
+            y1 = double.MaxValue;
+            x2 = double.MinValue;
+            y2 = double.MinValue;
+
             var vsnapIter = vs.GetVertexSnapIter();
             VertexCmd PathAndFlags;
             while (!VertexHelper.IsEmpty(PathAndFlags = vsnapIter.GetNextVertex(out x, out y)))
             {
                 if (VertexHelper.IsVertextCommand(PathAndFlags))
                 {
-                    if (first)
-                    {
-                        x1 = x;
-                        y1 = y;
-                        x2 = x;
-                        y2 = y;
-                        first = false;
-                    }
-                    else
-                    {
-                        if (x < x1) x1 = x;
-                        if (y < y1) y1 = y;
-                        if (x > x2) x2 = x;
-                        if (y > y2) y2 = y;
-                    }
+                    if (x < x1) x1 = x;
+                    if (y < y1) y1 = y;
+                    if (x > x2) x2 = x;
+                    if (y > y2) y2 = y;
                 }
             }
             return x1 <= x2 && y1 <= y2;
@@ -207,5 +212,3 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
     }
 }
-
-//#endif

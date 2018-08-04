@@ -79,6 +79,7 @@ namespace TypographyTest.WinForms
             chkTestGridFit.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkUseHorizontalFitAlign.CheckedChanged += (s, e) => UpdateRenderOutput();
             chkWriteFitOutputToConsole.CheckedChanged += (s, e) => UpdateRenderOutput();
+            chkSimulateSlant.CheckedChanged += (s, e) => UpdateRenderOutput();
 
 
             //edge offset
@@ -122,6 +123,7 @@ namespace TypographyTest.WinForms
             _options.EdgeOffset = (float)lstEdgeOffset.SelectedItem;
 
 
+            _options.SimulateSlant = chkSimulateSlant.Checked;
             //
             _options.InvokeAttachEvents();
 

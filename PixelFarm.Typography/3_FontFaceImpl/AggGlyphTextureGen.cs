@@ -39,7 +39,7 @@ namespace Typography.Contours
             //find bound
             //-------------------------------------------- 
             //GlyphImage glyphImg = new GlyphImage()
-            RectD bounds = new RectD();
+            RectD bounds = RectD.ZeroIntersection;
             PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(new VertexStoreSnap(glyphVxs), ref bounds);
 
             ////-------------------------------------------- 
