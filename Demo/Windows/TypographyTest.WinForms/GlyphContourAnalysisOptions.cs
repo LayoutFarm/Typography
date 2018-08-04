@@ -43,5 +43,6 @@ namespace TypographyTest
 
         //
         public float EdgeOffset { get; set; }
+        public bool SimulateSlant { get; set; }
     }
 }

@@ -118,7 +118,7 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void UpdateGlyphLayoutSettings()
         {
-            
+
 
             if (this._reqFont == null)
             {
@@ -157,6 +157,8 @@ namespace PixelFarm.Drawing.Fonts
             //2. update current type face
             UpdateGlyphLayoutSettings();
             _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
+            _glyphMeshStore.SimulateOblique = this.SimulateSlant;
+
             //3. layout glyphs with selected layout technique
             //TODO: review this again, we should use pixel? 
             float fontSizePoint = this.FontSizeInPoints;
@@ -217,6 +219,7 @@ namespace PixelFarm.Drawing.Fonts
             //--------------------------------------------------- 
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
+            _glyphMeshStore.SimulateOblique = this.SimulateSlant;
             //---------------------------------------------------
 
 
