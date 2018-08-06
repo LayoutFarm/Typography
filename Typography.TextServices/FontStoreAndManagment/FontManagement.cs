@@ -131,7 +131,10 @@ namespace Typography.FontManagement
             _bold_italic = CreateCreateNewGroup(TypefaceStyle.Bold | TypefaceStyle.Italic, "bold italic");
             //
         }
-
+        public void SetFontNameDuplicatedHandler(FontNameDuplicatedHandler handler)
+        {
+            _fontNameDuplicatedHandler = handler;
+        }
         public void SetFontNotFoundHandler(FontNotFoundHandler fontNotFoundHandler)
         {
             _fontNotFoundHandler = fontNotFoundHandler;
@@ -168,10 +171,7 @@ namespace Typography.FontManagement
             return fontGroup;
         }
 
-        public void SetFontNameDuplicatedHandler(FontNameDuplicatedHandler handler)
-        {
-            _fontNameDuplicatedHandler = handler;
-        }
+
         public bool AddFontStreamSource(IFontStreamSource src)
         {
             //preview data of font
@@ -187,9 +187,10 @@ namespace Typography.FontManagement
                         return false;
                     }
                     //if (previewFont.fontName.StartsWith("Bungee"))
-                    //{
-
+                    //{ 
                     //}
+
+
                     TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
                     switch (previewFont.OS2TranslatedStyle)
                     {
@@ -208,6 +209,34 @@ namespace Typography.FontManagement
                             break;
                     }
 
+
+                    //---------------
+                    //some font subfam="Bold Italic" but OS2TranslatedStyle is only Italic
+                    //so we should check the subfam name too!
+                    string[] fontSubFamUpperCaseName_split = previewFont.fontSubFamily.ToUpper().Split(' ');
+                    if (fontSubFamUpperCaseName_split.Length > 1)
+                    {
+                        if (typefaceStyle != (TypefaceStyle.Bold | TypefaceStyle.Italic))
+                        {
+                            //translate more
+                            if ((fontSubFamUpperCaseName_split[0] == "BOLD" && fontSubFamUpperCaseName_split[1] == "ITALIC") ||
+                                (fontSubFamUpperCaseName_split[0] == "ITALIC" && fontSubFamUpperCaseName_split[1] == "BOLD"))
+                            {
+                                typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        //=1
+                        switch (fontSubFamUpperCaseName_split[0])
+                        {
+                            case "BOLD": typefaceStyle = TypefaceStyle.Bold; break;
+                            case "ITALIC": typefaceStyle = TypefaceStyle.Italic; break;
+                        }
+                    }
+
                     return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName, typefaceStyle));
                 }
             }
@@ -217,15 +246,16 @@ namespace Typography.FontManagement
                 return false;
             }
         }
-        bool Register(InstalledTypeface newfont)
-        {
-            InstalledTypefaceGroup selectedFontGroup = null;
 
-            switch (newfont.TypefaceStyle)
+        bool Register(InstalledTypeface newTypeface)
+        {
+
+            InstalledTypefaceGroup selectedFontGroup = null;
+            switch (newTypeface.TypefaceStyle)
             {
                 default:
                     {
-                        string fontSubFamUpperCaseName = newfont.FontSubFamily.ToUpper();
+                        string fontSubFamUpperCaseName = newTypeface.FontSubFamily.ToUpper();
                         if (!_subFamToFontGroup.TryGetValue(fontSubFamUpperCaseName, out selectedFontGroup))
                         {
                             //create new group, we don't known this font group before 
@@ -251,7 +281,7 @@ namespace Typography.FontManagement
             }
 
             //
-            string fontNameUpper = newfont.FontName.ToUpper();
+            string fontNameUpper = newTypeface.FontName.ToUpper();
 
             InstalledTypeface found;
             if (selectedFontGroup.TryGetValue(fontNameUpper, out found))
@@ -260,21 +290,28 @@ namespace Typography.FontManagement
                 //we already have this font name
                 //(but may be different file
                 //we let user to handle it        
-                switch (_fontNameDuplicatedHandler(found, newfont))
+                if (_fontNameDuplicatedHandler != null)
                 {
-                    default:
-                        throw new NotSupportedException();
+                    switch (_fontNameDuplicatedHandler(found, newTypeface))
+                    {
+                        default:
+                            throw new NotSupportedException();
 
-                    case FontNameDuplicatedDecision.Skip:
-                        return false;
-                    case FontNameDuplicatedDecision.Replace:
-                        selectedFontGroup.Replace(newfont);
-                        return true;
+                        case FontNameDuplicatedDecision.Skip:
+                            return false;
+                        case FontNameDuplicatedDecision.Replace:
+                            selectedFontGroup.Replace(newTypeface);
+                            return true;
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
             else
             {
-                selectedFontGroup.AddFont(newfont);
+                selectedFontGroup.AddFont(newTypeface);
                 return true;
             }
         }
@@ -432,6 +469,7 @@ namespace Typography.FontManagement
         }
         public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection)
         {
+
             // Windows system fonts
             LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
 

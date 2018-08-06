@@ -289,7 +289,7 @@ namespace Typography.TextBreak
                                         }
                                         else
                                         {
-                                            while (candi_count > 0)
+                                            while (candidateBreakList.Count > 0)
                                             {
                                                 int candi1 = candidateBreakList.Pop();
                                                 //try
