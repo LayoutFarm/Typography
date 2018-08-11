@@ -155,6 +155,10 @@ namespace Typography.FontManagement
         {
             s_intalledTypefaces = installedTypefaceCollection;
         }
+        public static InstalledTypefaceCollection GetSharedTypefaceCollection()
+        {
+            return s_intalledTypefaces;
+        }
         InstalledTypefaceGroup CreateCreateNewGroup(TypefaceStyle installedFontStyle, params string[] names)
         {
             //create font group
