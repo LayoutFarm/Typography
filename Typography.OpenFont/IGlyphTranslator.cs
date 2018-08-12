@@ -108,7 +108,7 @@ namespace Typography.OpenFont
                 Vector2 c1 = new Vector2(); //control point of quadratic curve
                 //-------------------------------------------------------------------
                 bool offCurveMode = false;
-                bool isFirstOnCurvePoint = true; //first point of this contour
+                bool foundFirstOnCurvePoint = false;
 
                 //-------------------------------------------------------------------
                 //[A]
@@ -207,10 +207,10 @@ namespace Typography.OpenFont
                             // p is ON CURVE, but now we are in OFF-CURVE mode.
                             //
                             //as describe above [B.2] ,... 
-                            if (isFirstOnCurvePoint)
+                            if (!foundFirstOnCurvePoint)
                             {
                                 //special treament for first point
-                                isFirstOnCurvePoint = false;
+                                foundFirstOnCurvePoint = true;
                                 switch (curveControlPointCount)
                                 {
                                     case 0:
@@ -255,7 +255,7 @@ namespace Typography.OpenFont
 
                             case 0:
                                 c1 = new Vector2(p_x, p_y);
-                                if (!isFirstOnCurvePoint)
+                                if (foundFirstOnCurvePoint)
                                 {
                                     //this point is curve control point***
                                     //so set curve mode = true 
@@ -269,6 +269,16 @@ namespace Typography.OpenFont
                                 break;
                             case 1:
                                 {
+                                    if (!foundFirstOnCurvePoint)
+                                    {
+                                        c_begin = c1;
+                                        has_c_begin = true;
+                                        tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
+                                        curveControlPointCount--;
+                                        foundFirstOnCurvePoint = true;
+                                        continue;
+                                    }
+
                                     //we already have previous 1st control point (c1)
                                     //------------------------------------- 
                                     //please note that TrueType font
