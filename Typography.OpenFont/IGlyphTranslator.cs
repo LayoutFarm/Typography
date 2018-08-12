@@ -269,6 +269,16 @@ namespace Typography.OpenFont
                                 break;
                             case 1:
                                 {
+                                    if (isFirstOnCurvePoint)
+                                    {
+                                        c_begin = c1;
+                                        has_c_begin = true;
+                                        tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
+                                        curveControlPointCount--;
+                                        isFirstOnCurvePoint = false;
+                                        continue;
+                                    }
+
                                     //we already have previous 1st control point (c1)
                                     //------------------------------------- 
                                     //please note that TrueType font
