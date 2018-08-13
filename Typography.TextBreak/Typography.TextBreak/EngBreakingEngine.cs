@@ -54,7 +54,7 @@ namespace Typography.TextBreak
                 if (c < first || c > last)
                 {
                     //clear accum state
-                    if (i > start)
+                    if (i > breakBounds.startIndex)
                     {
                         //some remaining data
                         breakBounds.length = i - breakBounds.startIndex;
@@ -71,36 +71,22 @@ namespace Typography.TextBreak
                     case LexState.Init:
                         {
                             //check char
-                            if (c == '\r')
+                            if (c == '\r' && i < endBefore - 1 && input[i + 1] == '\n')
                             {
-                                //check next if '\n'
-                                if (i < endBefore - 1)
-                                {
-                                    if (input[i + 1] == '\n')
-                                    {
-                                        //this is '\r\n' linebreak
-                                        breakBounds.startIndex = i;
-                                        breakBounds.length = 2;
-                                        breakBounds.kind = WordKind.NewLine;
-                                        //
-                                        onBreak(breakBounds);
-                                        //
-                                        breakBounds.length = 0;
-                                        lexState = LexState.Init;
+                                //this is '\r\n' linebreak
+                                breakBounds.startIndex = i;
+                                breakBounds.length = 2;
+                                breakBounds.kind = WordKind.NewLine;
+                                //
+                                onBreak(breakBounds);
+                                //
+                                breakBounds.length = 0;
+                                lexState = LexState.Init;
 
-                                        i++;
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
-                                    //sinple \r?
-                                    //to whitespace?
-                                    lexState = LexState.Whitespace;
-                                    breakBounds.startIndex = i;
-                                }
+                                i++;
+                                continue;
                             }
-                            else if (c == '\n')
+                            else if (c == '\r' || c == '\n')
                             {
                                 breakBounds.startIndex = i;
                                 breakBounds.length = 1;
