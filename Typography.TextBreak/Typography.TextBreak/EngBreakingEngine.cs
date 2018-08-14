@@ -44,6 +44,7 @@ namespace Typography.TextBreak
             LexState lexState = LexState.Init;
             int endBefore = start + len;
 
+            breakBounds.startIndex = start;
 
             char first = (char)1;
             char last = (char)255;
