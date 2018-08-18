@@ -46,7 +46,7 @@ namespace Typography.TextBreak
 
             breakBounds.startIndex = start;
 
-            char first = (char)1;
+            char first = (char)0;
             char last = (char)255;
 
             for (int i = start; i < endBefore; ++i)
