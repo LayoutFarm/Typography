@@ -46,7 +46,7 @@ namespace Typography.TextBreak
 
             breakBounds.startIndex = start;
 
-            char first = (char)1;
+            char first = (char)0;
             char last = (char)255;
 
             for (int i = start; i < endBefore; ++i)
@@ -87,7 +87,7 @@ namespace Typography.TextBreak
                                 i++;
                                 continue;
                             }
-                            else if (c == '\r' || c == '\n')
+                            else if (c == '\r' || c == '\n' || c == 0x85) //U+0085 NEXT LINE
                             {
                                 breakBounds.startIndex = i;
                                 breakBounds.length = 1;
@@ -149,9 +149,21 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 continue;
                             }
+                            else if (char.IsControl(c))
+                            {
+                                breakBounds.startIndex = i;
+                                breakBounds.length = 1;
+                                breakBounds.kind = WordKind.Control;
+                                //
+                                onBreak(breakBounds);
+                                //
+                                breakBounds.length = 0;
+                                lexState = LexState.Init;
+                                continue;
+                            }
                             else
                             {
-                                throw new System.NotSupportedException();
+                                throw new System.NotSupportedException($"The character {c} (U+{((ushort)c).ToString("X4")}) was unhandled.");
                             }
                         }
                         break;
