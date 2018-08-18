@@ -25,6 +25,7 @@ namespace Typography.TextBreak
         //
         Text,
         TextIncomplete,
+        Control
     }
     public struct BreakAtInfo
     {
