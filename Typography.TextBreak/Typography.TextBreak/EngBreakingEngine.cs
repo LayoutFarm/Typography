@@ -44,8 +44,16 @@ namespace Typography.TextBreak
             //simple break word/ num/ punc / space
             //similar to lexer function            
             //----------------------------------------
-            LexState lexState = LexState.Init;
             int endBefore = start + len;
+            if (endBefore > input.Length)
+                throw new System.ArgumentOutOfRangeException(nameof(len), len, "The range provided was partially out of bounds.");
+            else if (start < 0)
+                throw new System.ArgumentOutOfRangeException(nameof(start), start, "The starting index was negative.");
+            //throw instead of skipping the entire for loop
+            else if (len < 0)
+                throw new System.ArgumentOutOfRangeException(nameof(len), len, "The length provided was negative.");
+
+            LexState lexState = LexState.Init;
 
             breakBounds.startIndex = start;
 
@@ -58,9 +66,10 @@ namespace Typography.TextBreak
                 if (c < first || c > last)
                 {
                     //------------------------------
-                    if (char.IsHighSurrogate(c) && i < (endBefore + 1))
+                    if (char.IsHighSurrogate(c))
                     {
-                        if (char.IsLowSurrogate(input[i + 1]))
+                        if (i < endBefore - 1 && //not the last one
+                            char.IsLowSurrogate(input[i + 1]))
                         {
                             //surrogate pair
 
@@ -88,7 +97,7 @@ namespace Typography.TextBreak
                         else
                         {
                             //error
-                            throw new System.Exception("IsHighSurrogate??");
+                            throw new System.FormatException($"A high surrogate (U+{((ushort)c).ToString("X4")}) was not followed by a low surrogate.");
                         }
                     }
                     //------------------------------
