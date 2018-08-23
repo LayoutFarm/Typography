@@ -46,13 +46,13 @@ namespace Typography.TextBreak
             //----------------------------------------
             int endBefore = start + len;
             if (endBefore > input.Length)
-                throw new ArgumentOutOfRangeException(nameof(len), len, "The range provided was partially out of bounds.");
+                throw new System.ArgumentOutOfRangeException(nameof(len), len, "The range provided was partially out of bounds.");
             else if (start < 0)
-                throw new ArgumentOutOfRangeException(nameof(start), start, "The starting index was negative.");
+                throw new System.ArgumentOutOfRangeException(nameof(start), start, "The starting index was negative.");
             //throw instead of skipping the entire for loop
             else if (len < 0)
-                throw new ArgumentOutOfRangeException(nameof(len), len, "The length provided was negative.");
-                
+                throw new System.ArgumentOutOfRangeException(nameof(len), len, "The length provided was negative.");
+
             LexState lexState = LexState.Init;
 
             breakBounds.startIndex = start;
@@ -68,7 +68,8 @@ namespace Typography.TextBreak
                     //------------------------------
                     if (char.IsHighSurrogate(c))
                     {
-                        if (i <= endBefore && endBefore < input.Length && char.IsLowSurrogate(input[i + 1]))
+                        if (i < endBefore - 1 && //not the last one
+                            char.IsLowSurrogate(input[i + 1]))
                         {
                             //surrogate pair
 
