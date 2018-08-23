@@ -56,7 +56,7 @@
             // 
             this.cmdReadDict.Location = new System.Drawing.Point(283, 456);
             this.cmdReadDict.Name = "cmdReadDict";
-            this.cmdReadDict.Size = new System.Drawing.Size(130, 35);
+            this.cmdReadDict.Size = new System.Drawing.Size(143, 35);
             this.cmdReadDict.TabIndex = 3;
             this.cmdReadDict.Text = "ReadDict not complete!";
             this.cmdReadDict.UseVisualStyleBackColor = true;
@@ -76,7 +76,7 @@
             // 
             this.cmdIcuTest.Location = new System.Drawing.Point(283, 399);
             this.cmdIcuTest.Name = "cmdIcuTest";
-            this.cmdIcuTest.Size = new System.Drawing.Size(130, 35);
+            this.cmdIcuTest.Size = new System.Drawing.Size(143, 35);
             this.cmdIcuTest.TabIndex = 5;
             this.cmdIcuTest.Text = "Icu";
             this.cmdIcuTest.UseVisualStyleBackColor = true;
