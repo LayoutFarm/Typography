@@ -31,8 +31,11 @@ namespace Typography.TextBreak
         {
             //this is basic eng + surrogate-pair( eg. emoji)
             return (c <= 255) ||
-                   char.IsHighSurrogate(c);
-
+                   char.IsHighSurrogate(c) ||
+                   char.IsPunctuation(c) ||
+                   char.IsWhiteSpace(c) ||
+                   char.IsControl(c) ||
+                   char.IsSymbol(c); 
         }
         public override bool CanBeStartChar(char c)
         {
@@ -52,9 +55,9 @@ namespace Typography.TextBreak
             //throw instead of skipping the entire for loop
             else if (len < 0)
                 throw new System.ArgumentOutOfRangeException(nameof(len), len, "The length provided was negative.");
+            //----------------------------------------
 
             LexState lexState = LexState.Init;
-
             breakBounds.startIndex = start;
 
             char first = (char)0;
@@ -63,62 +66,6 @@ namespace Typography.TextBreak
             for (int i = start; i < endBefore; ++i)
             {
                 char c = input[i];
-                if (c < first || c > last)
-                {
-                    //------------------------------
-                    if (char.IsHighSurrogate(c))
-                    {
-                        if (i < endBefore - 1 && //not the last one
-                            char.IsLowSurrogate(input[i + 1]))
-                        {
-                            //surrogate pair
-
-                            //clear accum state
-                            if (i > breakBounds.startIndex)
-                            {
-                                //some remaining data
-                                breakBounds.length = i - breakBounds.startIndex;
-                                //
-                                onBreak(breakBounds);
-                            }
-                            //-------------------------------
-                            //surrogate pair
-                            breakBounds.startIndex = i;
-                            breakBounds.length = 2;
-                            onBreak(breakBounds);
-                            //-------------------------------
-
-                            i++;//consume next***
-
-                            breakBounds.startIndex = i + 1;//reset
-                            breakBounds.length = 0; //reset
-                            continue; //***
-                        }
-                        else
-                        {
-                            //error
-                            throw new System.FormatException($"A high surrogate (U+{((ushort)c).ToString("X4")}) was not followed by a low surrogate.");
-                        }
-                    }
-                    //------------------------------
-
-
-                    //clear accum state
-                    if (i > breakBounds.startIndex)
-                    {
-                        //some remaining data
-                        breakBounds.length = i - breakBounds.startIndex;
-                        //
-                        onBreak(breakBounds);
-                        //
-                    }
-                    visitor.State = VisitorState.OutOfRangeChar;
-                    return;
-                }
-
-
-
-
                 switch (lexState)
                 {
                     case LexState.Init:
@@ -153,6 +100,22 @@ namespace Typography.TextBreak
                             }
                             else if (char.IsLetter(c))
                             {
+                                if (c < first || c > last)
+                                {
+                                    //letter is out-of-range or not 
+                                    //clear accum state
+                                    if (i > breakBounds.startIndex)
+                                    {
+                                        //some remaining data
+                                        breakBounds.length = i - breakBounds.startIndex;
+                                        //
+                                        onBreak(breakBounds);
+                                        //
+                                    }
+                                    visitor.State = VisitorState.OutOfRangeChar;
+                                    return;
+                                }
+                                //------------------
                                 //just collect
                                 breakBounds.startIndex = i;
                                 breakBounds.kind = WordKind.Text;
@@ -213,6 +176,55 @@ namespace Typography.TextBreak
                                 lexState = LexState.Init;
                                 continue;
                             }
+                            else if (char.IsHighSurrogate(c))
+                            {
+                                if (i < endBefore - 1 && //not the last one
+                                   char.IsLowSurrogate(input[i + 1]))
+                                {
+                                    //surrogate pair 
+                                    //clear accum state
+                                    if (i > breakBounds.startIndex)
+                                    {
+                                        //some remaining data
+                                        breakBounds.length = i - breakBounds.startIndex;
+                                        //
+                                        onBreak(breakBounds);
+                                    }
+                                    //-------------------------------
+                                    //surrogate pair
+                                    breakBounds.startIndex = i;
+                                    breakBounds.length = 2;
+                                    onBreak(breakBounds);
+                                    //-------------------------------
+
+                                    i++;//consume next***
+
+                                    breakBounds.startIndex = i + 1;//reset
+                                    breakBounds.length = 0; //reset
+                                    lexState = LexState.Init;
+                                    continue; //***
+                                }
+                                else
+                                {
+                                    //error
+                                    throw new System.FormatException($"A high surrogate (U+{((ushort)c).ToString("X4")}) was not followed by a low surrogate.");
+                                }
+                            }
+                            else if (c < first || c > last)
+                            {
+                                //letter is out-of-range or not 
+                                //clear accum state
+                                if (i > breakBounds.startIndex)
+                                {
+                                    //some remaining data
+                                    breakBounds.length = i - breakBounds.startIndex;
+                                    //
+                                    onBreak(breakBounds);
+                                    //
+                                }
+                                visitor.State = VisitorState.OutOfRangeChar;
+                                return;
+                            }
                             else
                             {
                                 throw new System.NotSupportedException($"The character {c} (U+{((ushort)c).ToString("X4")}) was unhandled.");
@@ -234,6 +246,7 @@ namespace Typography.TextBreak
                                 onBreak(breakBounds);
                                 //
                                 breakBounds.length = 0;
+                                breakBounds.startIndex = i;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
@@ -243,15 +256,36 @@ namespace Typography.TextBreak
                         {
                             if (!char.IsLetter(c) && !char.IsNumber(c))
                             {
-                                //flush
+                                //flush existing text 
                                 breakBounds.length = i - breakBounds.startIndex;
                                 breakBounds.kind = WordKind.Text;
                                 //
                                 onBreak(breakBounds);
                                 //
                                 breakBounds.length = 0;
+                                breakBounds.startIndex = i;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
+                            }
+                            else
+                            {
+                                //c may be out-of-range letter
+                                //letter is out-of-range or not 
+                                //clear accum state
+                                if (c < first || c > last)
+                                {
+                                    if (i > breakBounds.startIndex)
+                                    {
+                                        //flush
+                                        breakBounds.length = i - breakBounds.startIndex;
+                                        breakBounds.kind = WordKind.Text;
+                                        //
+                                        onBreak(breakBounds);
+                                        //
+                                    }
+                                    visitor.State = VisitorState.OutOfRangeChar;
+                                    return;
+                                }
                             }
                         }
                         break;
@@ -265,6 +299,7 @@ namespace Typography.TextBreak
                                 onBreak(breakBounds);
                                 //
                                 breakBounds.length = 0;
+                                breakBounds.startIndex = i;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }

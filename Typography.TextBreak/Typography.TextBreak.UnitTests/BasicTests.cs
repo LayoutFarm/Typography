@@ -45,6 +45,9 @@ public class BasicTests
     [DataRow("\u0100", 0, new[] { "\u0100" })]
     [DataRow("\u3DB4", 0, new[] { "\u3DB4" })]
     [DataRow("\uFFFF", 0, new[] { "\uFFFF" })]
+    [DataRow("\r\n‸", 0, new[] { "\r\n", "‸" })]
+    [DataRow("\r\n‸\r\n", 0, new[] { "\r\n", "‸", "\r\n" })]
+    [DataRow("\r\n‸12a\r\n", 0, new[] { "\r\n", "‸", "12", "a", "\r\n" })]
     public void OutOfRange(string input, int _, string[] output) => BasicTest(input, output);
 
     [DataTestMethod]
