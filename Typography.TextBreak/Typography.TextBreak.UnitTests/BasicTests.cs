@@ -48,7 +48,10 @@ public class BasicTests
     public void OutOfRange(string input, int _, string[] output) => BasicTest(input, output);
 
     [DataTestMethod]
-    [DataRow("😀", 0, "\U0001F600")]
-    [DataRow("😂", 0, "\U0001F602")]
+    [DataRow("😀", 0, new[] { "😀" })]
+    [DataRow("😂", 0, new[] { "😂" })]
+    [DataRow("😂😂", 0, new[] { "😂", "😂" })]
+    [DataRow("😂A😂", 0, new[] { "😂", "A", "😂" })]
+    [DataRow("😂A123😂", 0, new[] { "😂", "A123", "😂" })]
     public void Surrogates(string input, int _, string[] output) => BasicTest(input, output);
 }

@@ -29,7 +29,10 @@ namespace Typography.TextBreak
         }
         public override bool CanHandle(char c)
         {
-            return c <= 255;
+            //this is basic eng + surrogate-pair( eg. emoji)
+            return (c <= 255) ||
+                   char.IsHighSurrogate(c);
+
         }
         public override bool CanBeStartChar(char c)
         {
@@ -54,6 +57,43 @@ namespace Typography.TextBreak
                 char c = input[i];
                 if (c < first || c > last)
                 {
+                    //------------------------------
+                    if (char.IsHighSurrogate(c) && i < (endBefore + 1))
+                    {
+                        if (char.IsLowSurrogate(input[i + 1]))
+                        {
+                            //surrogate pair
+
+                            //clear accum state
+                            if (i > breakBounds.startIndex)
+                            {
+                                //some remaining data
+                                breakBounds.length = i - breakBounds.startIndex;
+                                //
+                                onBreak(breakBounds);
+                            }
+                            //-------------------------------
+                            //surrogate pair
+                            breakBounds.startIndex = i;
+                            breakBounds.length = 2;
+                            onBreak(breakBounds);
+                            //-------------------------------
+
+                            i++;//consume next***
+
+                            breakBounds.startIndex = i + 1;//reset
+                            breakBounds.length = 0; //reset
+                            continue; //***
+                        }
+                        else
+                        {
+                            //error
+                            throw new System.Exception("IsHighSurrogate??");
+                        }
+                    }
+                    //------------------------------
+
+
                     //clear accum state
                     if (i > breakBounds.startIndex)
                     {
@@ -63,10 +103,13 @@ namespace Typography.TextBreak
                         onBreak(breakBounds);
                         //
                     }
-
                     visitor.State = VisitorState.OutOfRangeChar;
                     return;
                 }
+
+
+
+
                 switch (lexState)
                 {
                     case LexState.Init:
