@@ -51,6 +51,14 @@ namespace Typography.TextBreak
                     }
                 }
 
+                //default 
+#if DEBUG
+                if (!engBreakingEngine.CanHandle(c))
+                {
+                    //even default can't handle the char
+
+                }
+#endif
                 return engBreakingEngine;
             }
         }
@@ -89,7 +97,7 @@ namespace Typography.TextBreak
                             BreakingEngine anotherEngine = SelectEngine(visitor.Char);
                             if (anotherEngine == currentEngine)
                             {
-                                if(throwIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.Char}' was not found.");
+                                if (throwIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.Char}' was not found.");
                                 startAt = visitor.CurrentIndex + 1;
                                 visitor.SetCurrentIndex(startAt);
                                 visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
