@@ -97,6 +97,9 @@ namespace Typography.OpenFont
 
             while (todoContourCount > 0)
             {
+                //reset              
+                curveControlPointCount = 0;
+
                 //foreach contour...
                 //next contour will begin at...
                 int nextCntBeginAtIndex = contourEndPoints[startContour] + 1;
@@ -109,7 +112,8 @@ namespace Typography.OpenFont
                 //-------------------------------------------------------------------
                 bool offCurveMode = false;
                 bool foundFirstOnCurvePoint = false;
-
+                bool startWithOffCurve = false;
+                int cnt_point_count = 0;
                 //-------------------------------------------------------------------
                 //[A]
                 //first point may start with 'ON CURVE" or 'OFF-CURVE'
@@ -124,12 +128,9 @@ namespace Typography.OpenFont
 
 #if DEBUG
                 int dbug_cmdcount = 0;
-#endif
-
-
+#endif 
                 for (; cpoint_index < nextCntBeginAtIndex; ++cpoint_index)
                 {
-
 
 #if DEBUG
                     dbug_cmdcount++;
@@ -149,6 +150,8 @@ namespace Typography.OpenFont
                     //      else then p is end point of a line.
 
                     GlyphPointF p = glyphPoints[cpoint_index];
+                    cnt_point_count++;
+
                     float p_x = p.X * scale;
                     float p_y = p.Y * scale;
 
@@ -248,8 +251,15 @@ namespace Typography.OpenFont
                     }
                     else
                     {
+
+
                         //p is OFF-CURVE point (this is curve control point)
                         //
+                        if (cnt_point_count == 1)
+                        {
+                            //1st point
+                            startWithOffCurve = true;
+                        }
                         switch (curveControlPointCount)
                         {
 
@@ -271,12 +281,19 @@ namespace Typography.OpenFont
                                 {
                                     if (!foundFirstOnCurvePoint)
                                     {
+                                        Vector2 mid2 = GetMidPoint(c1, p_x, p_y);
+                                        //----------
+                                        //2. generate curve3 *** 
                                         c_begin = c1;
                                         has_c_begin = true;
-                                        tx.MoveTo(latest_moveto_x = p_x, latest_moveto_y = p_y);
-                                        curveControlPointCount--;
+
+
+                                        tx.MoveTo(latest_moveto_x = mid2.X, latest_moveto_y = mid2.Y);
+                                        // curveControlPointCount--;
                                         foundFirstOnCurvePoint = true;
+                                        c1 = new Vector2(p_x, p_y);
                                         continue;
+
                                     }
 
                                     //we already have previous 1st control point (c1)
@@ -319,6 +336,7 @@ namespace Typography.OpenFont
                 //--------
                 //when finish,                 
                 //ensure that the contour is closed.
+
                 if (offCurveMode)
                 {
                     switch (curveControlPointCount)
@@ -357,9 +375,19 @@ namespace Typography.OpenFont
                             throw new NotSupportedException();
 
                     }
-                    //reset
-                    offCurveMode = false;
-                    curveControlPointCount = 0;
+                }
+                else
+                {
+                    //end with touch curve
+                    //but if this start with off curve 
+                    //then we must close it properly
+                    if (startWithOffCurve)
+                    {
+                        //start with off-curve and end with touch curve                         
+                        tx.Curve3(
+                           c_begin.X, c_begin.Y,
+                           latest_moveto_x, latest_moveto_y);
+                    }
                 }
 
                 //--------      
