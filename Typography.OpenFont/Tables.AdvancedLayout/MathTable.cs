@@ -581,10 +581,13 @@ namespace Typography.OpenFont.Tables
             {    //2.1 expand italic correction
                 MathItalicsCorrectonInfoTable italicCorrection = mathTable._mathItalicCorrectionInfo;
                 index = 0; //reset
-                foreach (ushort glyphIndex in italicCorrection.CoverageTable.GetExpandedValueIter())
+                if (italicCorrection.CoverageTable != null)
                 {
-                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).ItalicCorrection = italicCorrection.ItalicCorrections[index];
-                    index++;
+                    foreach (ushort glyphIndex in italicCorrection.CoverageTable.GetExpandedValueIter())
+                    {
+                        GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).ItalicCorrection = italicCorrection.ItalicCorrections[index];
+                        index++;
+                    }
                 }
             }
             //--------
@@ -592,20 +595,26 @@ namespace Typography.OpenFont.Tables
                 //2.2 expand top accent
                 MathTopAccentAttachmentTable topAccentAttachment = mathTable._mathTopAccentAttachmentTable;
                 index = 0; //reset
-                foreach (ushort glyphIndex in topAccentAttachment.CoverageTable.GetExpandedValueIter())
+                if (topAccentAttachment.CoverageTable != null)
                 {
-                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).TopAccentAttachment = topAccentAttachment.TopAccentAttachment[index];
-                    index++;
+                    foreach (ushort glyphIndex in topAccentAttachment.CoverageTable.GetExpandedValueIter())
+                    {
+                        GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).TopAccentAttachment = topAccentAttachment.TopAccentAttachment[index];
+                        index++;
+                    }
                 }
             }
             //--------
             {
                 //2.3 expand , expand shape
                 index = 0; //reset
-                foreach (ushort glyphIndex in mathTable._extendedShapeCoverageTable.GetExpandedValueIter())
+                if (mathTable._extendedShapeCoverageTable != null)
                 {
-                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).IsShapeExtensible = true;
-                    index++;
+                    foreach (ushort glyphIndex in mathTable._extendedShapeCoverageTable.GetExpandedValueIter())
+                    {
+                        GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).IsShapeExtensible = true;
+                        index++;
+                    }
                 }
             }
             //--------
@@ -639,10 +648,13 @@ namespace Typography.OpenFont.Tables
                 //
                 //3.2 horizontal
                 index = 0;//reset
-                foreach (ushort glyphIndex in mathVariants.horizCoverage.GetExpandedValueIter())
+                if (mathVariants.horizCoverage != null)
                 {
-                    GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).HoriGlyphConstruction = mathVariants.horizConstructionTables[index];
-                    index++;
+                    foreach (ushort glyphIndex in mathVariants.horizCoverage.GetExpandedValueIter())
+                    {
+                        GetMathGlyphOrCreateNew(mathGlyphInfos, glyphIndex).HoriGlyphConstruction = mathVariants.horizConstructionTables[index];
+                        index++;
+                    }
                 }
             }
 
@@ -851,7 +863,11 @@ namespace Typography.OpenFont.Tables
             //.... 
 
             //(2.3)
-            _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
+            if (offsetTo_Extended_Shape_coverage_Table > 0)
+            {
+                //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
+                _extendedShapeCoverageTable = CoverageTable.CreateFrom(reader, startAt + offsetTo_Extended_Shape_coverage_Table);
+            }
 
             //(2.4)
             if (offsetTo_MathKernInfo_Table > 0)
@@ -885,8 +901,11 @@ namespace Typography.OpenFont.Tables
             ushort italicCorrectionCount = reader.ReadUInt16();
             _mathItalicCorrectionInfo.ItalicCorrections = reader.ReadMathValueRecords(italicCorrectionCount);
             //read coverage ...
-            _mathItalicCorrectionInfo.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
-
+            if (coverageOffset > 0)
+            {
+                //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
+                _mathItalicCorrectionInfo.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
+            }
         }
 
 
@@ -922,7 +941,12 @@ namespace Typography.OpenFont.Tables
             ushort coverageOffset = reader.ReadUInt16();
             ushort topAccentAttachmentCount = reader.ReadUInt16();
             _mathTopAccentAttachmentTable.TopAccentAttachment = reader.ReadMathValueRecords(topAccentAttachmentCount);
-            _mathTopAccentAttachmentTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
+            if (coverageOffset > 0)
+            {
+                //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
+                _mathTopAccentAttachmentTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
+            }
+
         }
 
         /// <summary>
@@ -1130,7 +1154,11 @@ namespace Typography.OpenFont.Tables
             //
 
             _mathVariantsTable.vertCoverage = CoverageTable.CreateFrom(reader, beginAt + vertGlyphCoverageOffset);
-            _mathVariantsTable.horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
+            if (horizGlyphCoverageOffset > 0)
+            {
+                //may be null?, eg. found in font Linux Libertine Regular (https://sourceforge.net/projects/linuxlibertine/)
+                _mathVariantsTable.horizCoverage = CoverageTable.CreateFrom(reader, beginAt + horizGlyphCoverageOffset);
+            }
 
             //read math construction table
 
