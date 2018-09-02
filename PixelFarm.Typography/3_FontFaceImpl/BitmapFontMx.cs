@@ -248,7 +248,13 @@ namespace Typography.Rendering
         {
             PixelFarm.CpuBlit.ActualBitmap bmp = StorageService.Provider.ReadPngBitmap(filename);
             GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
-            img.SetImageBuffer(PixelFarm.CpuBlit.ActualBitmap.GetBuffer(bmp), true);
+            int[] buffer = new int[bmp.Width * bmp.Height];
+            unsafe
+            {
+                PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.ActualBitmap.GetBufferPtr(bmp);
+                System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
+                img.SetImageBuffer(buffer, true);
+            }
             return img;
 
         }
