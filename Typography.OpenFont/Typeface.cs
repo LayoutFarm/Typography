@@ -199,7 +199,7 @@ namespace Typography.OpenFont
         {
             if (_cffTable != null)
             {
-                return GetGlyphByName(glyphName)._cff1GlyphData.GlyphIndex;
+                return GetGlyphByName(glyphName)?.GlyphIndex ?? 0;
             }
             else if (PostTable != null)
             {
