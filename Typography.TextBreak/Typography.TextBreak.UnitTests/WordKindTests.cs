@@ -50,6 +50,9 @@ public class WordKindTests
                  ("\r\n", NewLine), ("4", Number), ("th", Text), (" ", Whitespace),
                  ("line", Text), ("\u0085", NewLine),
                 ("5", Number), ("th", Text), (" ", Whitespace), ("line", Text) })
-        }) WordKindTest(testCase.Item1, testCase.Item2);
+        })
+        {
+            WordKindTest(testCase.Item1, testCase.Item2);
+        }
     }
 }

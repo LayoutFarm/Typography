@@ -89,6 +89,7 @@ namespace TextBreakerTest
             var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src/dictionaries" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
+            breaker1.BreakNumberAfterText = true;
 
 
             char[] test = this.textBox1.Text.ToCharArray();

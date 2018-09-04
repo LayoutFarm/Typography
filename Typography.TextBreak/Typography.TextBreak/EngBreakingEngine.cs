@@ -16,6 +16,8 @@ namespace Typography.TextBreak
             Text,
             Number,
         }
+        public bool BreakNumberAfterText { get; set; }
+
         BreakBounds breakBounds = new BreakBounds();
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
@@ -264,7 +266,8 @@ namespace Typography.TextBreak
                         break;
                     case LexState.Text:
                         {
-                            if (!char.IsLetter(c) && !char.IsNumber(c))
+                            bool is_number = false;
+                            if (!char.IsLetter(c) && !(is_number = char.IsNumber(c)))
                             {
                                 //flush existing text 
                                 breakBounds.length = i - breakBounds.startIndex;
@@ -298,6 +301,20 @@ namespace Typography.TextBreak
                                     visitor.State = VisitorState.OutOfRangeChar;
                                     return;
                                 }
+
+                                if (is_number && BreakNumberAfterText)
+                                {
+                                    //flush 
+                                    breakBounds.length = i - breakBounds.startIndex;
+                                    breakBounds.kind = WordKind.Text;
+                                    //
+                                    onBreak(breakBounds);
+                                    //
+                                    breakBounds.length = 1;
+                                    breakBounds.startIndex = i;
+                                    lexState = LexState.Number;
+                                }
+
                             }
                         }
                         break;
