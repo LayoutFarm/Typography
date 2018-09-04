@@ -8,7 +8,7 @@ public class BasicTests
     public void BasicTest(string input, string[] output)
     {
         var customBreaker = new CustomBreaker();
-        customBreaker.BreakWords(input, false);
+        customBreaker.BreakWords(input);
         var outputList = new List<int> { 0 };
         customBreaker.LoadBreakAtList(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
