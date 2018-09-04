@@ -41,7 +41,8 @@ namespace TextBreakerTest
             icu_currentLocale = "lo-LA";
             //string test1 = "ສະບາຍດີແປ້ນພິມລາວ";
             //string test1 = "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ";
-            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่";
+            string test1 = "ABCD1234567890ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ ผู้ใหญ่หาผ้าใหม่ให้สะใภ้ใช้คล้องคอ" +
+            "ใฝ่ใจเอาใส่ห่อมิหลงใหลใครขอดูจะใคร่่ลงเรือใบดูน้ำใสและปลาปูสิ่งใดอยู่ในตู้มิใช่อยู่ใต้ตั่งเตียงบ้าใบถือใยบัวหูตามัวมาใกล้เคียงเล่าท่องอย่าละเลี่ยงยี่สิบม้วนจำจงดี";
             //----------------
             this.textBox1.Text = test1;
 
@@ -86,7 +87,7 @@ namespace TextBreakerTest
 
             //1. create dictionary based breaking engine 
             //TODO: dic should be read once
-            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src/dictionaries" };
+            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu62/brkitr/dictionaries" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
             breaker1.BreakNumberAfterText = true;
