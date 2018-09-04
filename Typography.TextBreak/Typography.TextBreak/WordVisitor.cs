@@ -68,15 +68,27 @@ namespace Typography.TextBreak
         {
             get { return currentIndex >= bufferLen - 1; }
         }
+
+
+#if DEBUG
+        //int dbugAddSteps;
+#endif
         public void AddWordBreakAt(int index, WordKind wordKind)
         {
 
 #if DEBUG
+            //dbugAddSteps++;
+            //if (dbugAddSteps >= 57)
+            //{
+
+            //}
             if (index == latestBreakAt)
             {
                 throw new NotSupportedException();
             }
 #endif
+
+
             this.latestBreakAt = index;
 
             breakAtList.Add(new BreakAtInfo(index, wordKind));
