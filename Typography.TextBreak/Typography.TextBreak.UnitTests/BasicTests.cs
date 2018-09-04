@@ -5,10 +5,14 @@ using Typography.TextBreak;
 [TestClass]
 public class BasicTests
 {
-    public void BasicTest(string input, string[] output)
+
+    public void BasicTest(string input, string[] output, bool breakNumberAfterText = false)
     {
         var customBreaker = new CustomBreaker();
-        customBreaker.BreakWords(input, false);
+        customBreaker.BreakNumberAfterText = breakNumberAfterText;
+        //
+        customBreaker.BreakWords(input);        
+        //
         var outputList = new List<int> { 0 };
         customBreaker.LoadBreakAtList(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
@@ -57,4 +61,13 @@ public class BasicTests
     [DataRow("😂A😂", 0, new[] { "😂", "A", "😂" })]
     [DataRow("😂A123😂", 0, new[] { "😂", "A123", "😂" })]
     public void Surrogates(string input, int _, string[] output) => BasicTest(input, output);
+
+
+    [DataTestMethod]
+    [DataRow("A123", 0, new[] { "A", "123" })]
+    public void BreakNumAfterText(string input, int _, string[] output)
+    {
+        BasicTest(input, output, true);
+    }
+
 }

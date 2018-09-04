@@ -10,7 +10,7 @@ public class WordKindTests
     public void WordKindTest(string input, (string section, WordKind wordKind)[] output)
     {
         var customBreaker = new CustomBreaker();
-        customBreaker.BreakWords(input, false);
+        customBreaker.BreakWords(input);
         var outputList = new List<BreakAtInfo> { new BreakAtInfo(0, Unknown) };
         customBreaker.LoadBreakAtList(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
@@ -50,6 +50,9 @@ public class WordKindTests
                  ("\r\n", NewLine), ("4", Number), ("th", Text), (" ", Whitespace),
                  ("line", Text), ("\u0085", NewLine),
                 ("5", Number), ("th", Text), (" ", Whitespace), ("line", Text) })
-        }) WordKindTest(testCase.Item1, testCase.Item2);
+        })
+        {
+            WordKindTest(testCase.Item1, testCase.Item2);
+        }
     }
 }
