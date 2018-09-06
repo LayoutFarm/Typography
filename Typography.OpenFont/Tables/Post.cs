@@ -112,28 +112,15 @@ namespace Typography.OpenFont.Tables
                 ushort numOfGlyphs = reader.ReadUInt16();
                 ushort[] glyphNameIndice = Utils.ReadUInt16Array(reader, numOfGlyphs);//***  
                 string[] stdMacGlyphNames = MacPostFormat1.GetStdMacGlyphNames();
-                for (int i = 0; i < numOfGlyphs; ++i)
+
+                for (ushort i = 0; i < numOfGlyphs; ++i)
                 {
                     ushort glyphNameIndex = glyphNameIndice[i];
                     if (glyphNameIndex < 258)
                     {
                         //If the name index is between 0 and 257, treat the name index as a glyph index in the Macintosh standard order.  
-                        //                        string name = stdMacGlyphNames[glyphNameIndex];
-                        //#if DEBUG
-                        //                        if (name == null)
-                        //                        {
-
-                        //                        }
-                        //#endif
-
-                        //?
-                        if (i > 0 && glyphNameIndex == 0)
-                        {
-                            //found in "TestFonts\\segoescb.ttf"
-                            continue; //? 
-                        }
-
-                        _glyphNames.Add(glyphNameIndex, stdMacGlyphNames[glyphNameIndex]);
+                        //replace? 
+                        _glyphNames[i] = stdMacGlyphNames[glyphNameIndex];
                     }
                     else
                     {
@@ -142,16 +129,8 @@ namespace Typography.OpenFont.Tables
                         //Thus a given font may map some of its glyphs to the standard glyph names, and some to its own names.
 
                         //258 and 65535, 
-                        int len = reader.ReadByte();
-
-                        //                        string name = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len));
-                        //#if DEBUG
-                        //                        if (name == null)
-                        //                        { 
-                        //                        }
-                        //#endif
-
-                        _glyphNames.Add(glyphNameIndex, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len), 0, len));
+                        int len = reader.ReadByte(); //name len 
+                        _glyphNames.Add(i, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len), 0, len));
                     }
                 }
             }
