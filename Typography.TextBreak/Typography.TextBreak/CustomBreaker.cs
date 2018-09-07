@@ -18,12 +18,25 @@ namespace Typography.TextBreak
 
         WordVisitor visitor;
         int _endAt;
-
+        bool _breakNumberAfterText;
         public CustomBreaker()
         {
             visitor = new WordVisitor(this);
             breakingEngine = engBreakingEngine;
+            ThrowIfCharOutOfRange = false;
         }
+        public bool BreakNumberAfterText
+        {
+            get { return _breakNumberAfterText; }
+            set
+            {
+                _breakNumberAfterText = value;
+                engBreakingEngine.BreakNumberAfterText = value;
+                //TODO: apply to other engine
+            }
+        }
+        public bool ThrowIfCharOutOfRange { get; set; }
+
         public void AddBreakingEngine(BreakingEngine engine)
         {
             //TODO: make this accept more than 1 engine
@@ -62,7 +75,8 @@ namespace Typography.TextBreak
                 return engBreakingEngine;
             }
         }
-        public void BreakWords(char[] charBuff, int startAt, int len, bool throwIfCharOutOfRange = true)
+
+        public void BreakWords(char[] charBuff, int startAt, int len)
         {
             //conver to char buffer 
             int j = charBuff.Length;
@@ -97,7 +111,7 @@ namespace Typography.TextBreak
                             BreakingEngine anotherEngine = SelectEngine(visitor.Char);
                             if (anotherEngine == currentEngine)
                             {
-                                if (throwIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.Char}' was not found.");
+                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.Char}' was not found.");
                                 startAt = visitor.CurrentIndex + 1;
                                 visitor.SetCurrentIndex(startAt);
                                 visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
@@ -113,11 +127,11 @@ namespace Typography.TextBreak
             }
         }
 
-        public void BreakWords(string inputstr, bool throwIfCharOutOfRange = true)
+        public void BreakWords(string inputstr)
         {
             //TODO: review here
             char[] buffer = inputstr.ToCharArray();
-            BreakWords(buffer, 0, inputstr.Length, throwIfCharOutOfRange); //all
+            BreakWords(buffer, 0, inputstr.Length); //all
         }
         public void LoadBreakAtList(List<BreakAtInfo> outputList)
         {

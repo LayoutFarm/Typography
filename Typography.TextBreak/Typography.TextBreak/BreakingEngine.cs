@@ -260,9 +260,12 @@ namespace Typography.TextBreak
                                             int latestBreakAt = visitor.LatestBreakAt;
                                             if (visitor.CurrentIndex - 1 > latestBreakAt)
                                             {
-                                                //steop back
+                                                //step back
 
                                                 visitor.SetCurrentIndex(visitor.CurrentIndex - 1);
+                                         
+                                                //TODO: review here again
+#if DEBUG
                                                 char current_char = visitor.Char;
                                                 if (CanBeStartChar(current_char))
                                                 {
@@ -280,7 +283,7 @@ namespace Typography.TextBreak
                                                 {
 
                                                 }
-
+#endif
                                             }
                                             else
                                             {
