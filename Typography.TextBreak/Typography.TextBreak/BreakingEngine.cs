@@ -246,8 +246,25 @@ namespace Typography.TextBreak
                                     //on the same pos
                                     if (visitor.State == VisitorState.OutOfRangeChar)
                                     {
-                                        visitor.AddWordBreakAtCurrentIndex();
-                                        return;
+                                        //***
+                                        if (this.DontMergeLastIncompleteWord)
+                                        {
+                                            //choose best match 
+                                            if (candidateBreakList.Count > 0)
+                                            {
+                                                int candi1 = candidateBreakList.Pop();
+                                                visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
+                                                visitor.AddWordBreakAtCurrentIndex();
+                                            }
+                                            visitor.SetCurrentIndex(p1);
+                                            visitor.AddWordBreakAtCurrentIndex();
+                                            return; 
+                                        }
+                                        else
+                                        {
+                                            visitor.AddWordBreakAtCurrentIndex();
+                                            return;
+                                        }
                                     }
                                     else
                                     {
@@ -263,7 +280,7 @@ namespace Typography.TextBreak
                                                 //step back
 
                                                 visitor.SetCurrentIndex(visitor.CurrentIndex - 1);
-                                         
+
                                                 //TODO: review here again
 #if DEBUG
                                                 char current_char = visitor.Char;
