@@ -38,10 +38,6 @@ namespace Typography.TextBreak
         }
 
 
-        //public static void Setup(string dataDir)
-        //{
-        //    Setup(new IcuSimpleTextFileDictionaryProvider() { DataDir = dataDir });
-        //}
         public static void Setup(DictionaryProvider dicProvider)
         {
             if (isInit) return;
@@ -77,5 +73,5 @@ namespace Typography.TextBreak
 
 
 
-   
+
 }
