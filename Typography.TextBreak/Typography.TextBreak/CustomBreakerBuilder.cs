@@ -10,46 +10,56 @@ namespace Typography.TextBreak
 {
     public static class CustomBreakerBuilder
     {
-        static ThaiDictionaryBreakingEngine _thaiDicBreakingEngine;
-        static LaoDictionaryBreakingEngine _laoDicBreakingEngine;
+        //---------------------------------------------------------
+        //user can build their owner custom breaker builder 
+        //---------------------------------------------------------
 
-        static bool s_isInit;
+        //custom dic may be shared among breaking engine
+
+        [System.ThreadStatic]
+        static CustomDic s_thaiDic;
+        [System.ThreadStatic]
+        static CustomDic s_laoDic;
+
+
+        [System.ThreadStatic]
         static DictionaryProvider s_dicProvider;
 
         static void InitAllDics()
         {
-            if (_thaiDicBreakingEngine == null)
-            {
-                var customDic = new CustomDic();
-                _thaiDicBreakingEngine = new ThaiDictionaryBreakingEngine();
-                _thaiDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
-                customDic.SetCharRange(_thaiDicBreakingEngine.FirstUnicodeChar, _thaiDicBreakingEngine.LastUnicodeChar);
-                customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("thai"));
-            }
 
-            if (_laoDicBreakingEngine == null)
+            if (s_thaiDic == null)
             {
                 var customDic = new CustomDic();
-                _laoDicBreakingEngine = new LaoDictionaryBreakingEngine();
-                _laoDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
-                customDic.SetCharRange(_laoDicBreakingEngine.FirstUnicodeChar, _laoDicBreakingEngine.LastUnicodeChar);
-                customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("lao"));
+                customDic.SetCharRange(ThaiDictionaryBreakingEngine.FirstChar, ThaiDictionaryBreakingEngine.LastChar);
+                customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("thai"));
+                s_thaiDic = customDic;
             }
+            if (s_laoDic == null)
+            {
+                var customDic = new CustomDic();
+                customDic.SetCharRange(LaoDictionaryBreakingEngine.FirstChar, LaoDictionaryBreakingEngine.LastChar);
+                customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("lao"));
+                s_laoDic = customDic;
+            }
+             
         }
 
 
         public static void Setup(DictionaryProvider dicProvider)
         {
-            if (s_isInit) return;
-
+            if (s_dicProvider != null)
+            {
+                return;
+            }
+            //
             s_dicProvider = dicProvider;
             InitAllDics();
-            s_isInit = true;
         }
 
         public static CustomBreaker NewCustomBreaker()
         {
-            if (!s_isInit)
+            if (s_thaiDic == null)
             {
                 if (s_dicProvider == null)
                 {
@@ -57,11 +67,17 @@ namespace Typography.TextBreak
                     return null;
                 }
                 InitAllDics();
-                s_isInit = true;
             }
             var breaker = new CustomBreaker();
-            breaker.AddBreakingEngine(_thaiDicBreakingEngine);
-            breaker.AddBreakingEngine(_laoDicBreakingEngine);
+            //
+            var thBreaker = new ThaiDictionaryBreakingEngine();
+            thBreaker.DontMergeLastIncompleteWord = true;
+            thBreaker.SetDictionaryData(s_thaiDic);
+            breaker.AddBreakingEngine(thBreaker);
+            //
+            var laoBreak = new LaoDictionaryBreakingEngine();
+            laoBreak.SetDictionaryData(s_laoDic);
+            breaker.AddBreakingEngine(laoBreak);
             return breaker;
         }
     }
