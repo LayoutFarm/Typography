@@ -3,36 +3,36 @@
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
-using System.IO;
+
 using System.Collections.Generic;
 
 namespace Typography.TextBreak
 {
     public static class CustomBreakerBuilder
     {
-        static ThaiDictionaryBreakingEngine thaiDicBreakingEngine;
-        static LaoDictionaryBreakingEngine laoDicBreakingEngine;
+        static ThaiDictionaryBreakingEngine _thaiDicBreakingEngine;
+        static LaoDictionaryBreakingEngine _laoDicBreakingEngine;
 
-        static bool isInit;
+        static bool s_isInit;
         static DictionaryProvider s_dicProvider;
 
         static void InitAllDics()
         {
-            if (thaiDicBreakingEngine == null)
+            if (_thaiDicBreakingEngine == null)
             {
                 var customDic = new CustomDic();
-                thaiDicBreakingEngine = new ThaiDictionaryBreakingEngine();
-                thaiDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
-                customDic.SetCharRange(thaiDicBreakingEngine.FirstUnicodeChar, thaiDicBreakingEngine.LastUnicodeChar);
+                _thaiDicBreakingEngine = new ThaiDictionaryBreakingEngine();
+                _thaiDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
+                customDic.SetCharRange(_thaiDicBreakingEngine.FirstUnicodeChar, _thaiDicBreakingEngine.LastUnicodeChar);
                 customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("thai"));
             }
 
-            if (laoDicBreakingEngine == null)
+            if (_laoDicBreakingEngine == null)
             {
                 var customDic = new CustomDic();
-                laoDicBreakingEngine = new LaoDictionaryBreakingEngine();
-                laoDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
-                customDic.SetCharRange(laoDicBreakingEngine.FirstUnicodeChar, laoDicBreakingEngine.LastUnicodeChar);
+                _laoDicBreakingEngine = new LaoDictionaryBreakingEngine();
+                _laoDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
+                customDic.SetCharRange(_laoDicBreakingEngine.FirstUnicodeChar, _laoDicBreakingEngine.LastUnicodeChar);
                 customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("lao"));
             }
         }
@@ -40,16 +40,16 @@ namespace Typography.TextBreak
 
         public static void Setup(DictionaryProvider dicProvider)
         {
-            if (isInit) return;
+            if (s_isInit) return;
 
             s_dicProvider = dicProvider;
             InitAllDics();
-            isInit = true;
+            s_isInit = true;
         }
 
         public static CustomBreaker NewCustomBreaker()
         {
-            if (!isInit)
+            if (!s_isInit)
             {
                 if (s_dicProvider == null)
                 {
@@ -57,11 +57,11 @@ namespace Typography.TextBreak
                     return null;
                 }
                 InitAllDics();
-                isInit = true;
+                s_isInit = true;
             }
             var breaker = new CustomBreaker();
-            breaker.AddBreakingEngine(thaiDicBreakingEngine);
-            breaker.AddBreakingEngine(laoDicBreakingEngine);
+            breaker.AddBreakingEngine(_thaiDicBreakingEngine);
+            breaker.AddBreakingEngine(_laoDicBreakingEngine);
             return breaker;
         }
     }
