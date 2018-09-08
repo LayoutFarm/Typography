@@ -250,15 +250,21 @@ namespace Typography.TextBreak
                                         if (this.DontMergeLastIncompleteWord)
                                         {
                                             //choose best match 
+                                            int p3 = visitor.CurrentIndex;
+                                            int p4 = p3;
                                             if (candidateBreakList.Count > 0)
                                             {
                                                 int candi1 = candidateBreakList.Pop();
-                                                visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
+                                                visitor.SetCurrentIndex(p4 = (visitor.LatestBreakAt + candi1));
                                                 visitor.AddWordBreakAtCurrentIndex();
                                             }
-                                            visitor.SetCurrentIndex(p1);
-                                            visitor.AddWordBreakAtCurrentIndex();
-                                            return; 
+                                            //
+                                            if (p4 < p3)
+                                            {
+                                                visitor.SetCurrentIndex(p1);
+                                                visitor.AddWordBreakAtCurrentIndex();
+                                            }
+                                            return;
                                         }
                                         else
                                         {
