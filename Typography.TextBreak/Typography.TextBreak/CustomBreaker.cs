@@ -185,6 +185,10 @@ namespace Typography.TextBreak
         }
 
 
+        public BreakingEngine GetBreakingEngineFor(char c)
+        {
+            return SelectEngine(c);
+        }
         //
     }
 

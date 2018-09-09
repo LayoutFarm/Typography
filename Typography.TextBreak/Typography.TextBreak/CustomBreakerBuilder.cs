@@ -71,7 +71,7 @@ namespace Typography.TextBreak
             var breaker = new CustomBreaker();
             //
             var thBreaker = new ThaiDictionaryBreakingEngine();
-            thBreaker.DontMergeLastIncompleteWord = true;
+            //thBreaker.DontMergeLastIncompleteWord = true;
             thBreaker.SetDictionaryData(s_thaiDic);
             breaker.AddBreakingEngine(thBreaker);
             //
