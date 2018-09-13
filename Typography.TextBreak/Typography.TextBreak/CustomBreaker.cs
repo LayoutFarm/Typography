@@ -158,12 +158,9 @@ namespace Typography.TextBreak
                 outputList.Add(brk.breakAt);
             }
         }
-        public bool CanBeStartChar(char c)
-        {
-            return _breakingEngine.CanBeStartChar(c);
-        }
 
-        public int BreakAtCount
+
+        public int BreakItemCount
         {
             get { return _visitor.GetBreakList().Count; }
         }
