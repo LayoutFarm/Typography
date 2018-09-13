@@ -48,6 +48,7 @@ namespace Typography.TextBreak
             this._startIndex = _currentIndex = index;
             this._currentChar = buffer[_currentIndex];
             _breakAtList.Clear();
+            _tempCandidateBreaks.Clear();
             _latestBreakAt = 0;
         }
         public VisitorState State
