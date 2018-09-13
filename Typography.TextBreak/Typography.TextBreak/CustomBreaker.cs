@@ -21,7 +21,7 @@ namespace Typography.TextBreak
         bool _breakNumberAfterText;
         public CustomBreaker()
         {
-            _visitor = new WordVisitor(this);
+            _visitor = new WordVisitor();
             _breakingEngine = _engBreakingEngine;
             ThrowIfCharOutOfRange = false;
         }
@@ -87,7 +87,7 @@ namespace Typography.TextBreak
                 return;
             }
             _endAt = startAt + len;
-            _visitor.LoadText(charBuff, startAt);
+            _visitor.LoadText(charBuff, startAt, len);
             //---------------------------------------- 
             BreakingEngine currentEngine = _breakingEngine = SelectEngine(charBuff[startAt]);
             //----------------------------------------

@@ -20,37 +20,42 @@ namespace Typography.TextBreak
 
     class WordVisitor
     {
-        CustomBreaker _ownerBreak;
-        //
         List<BreakAtInfo> _breakAtList = new List<BreakAtInfo>();
-
-        //
         char[] _buffer;
-        int _bufferLen;
+
         int _startIndex;
+        int _endIndex;
+
         int _currentIndex;
         char _currentChar;
         int _latestBreakAt;
 
+
         Stack<int> _tempCandidateBreaks = new Stack<int>();
-
-
-        public WordVisitor(CustomBreaker ownerBreak)
+        public WordVisitor()
         {
-            this._ownerBreak = ownerBreak;
         }
+
         public void LoadText(char[] buffer, int index)
+        {
+            LoadText(buffer, index, buffer.Length);
+        }
+        public void LoadText(char[] buffer, int index, int len)
         {
             //check index < buffer
 
+            //reset all
             this._buffer = buffer;
-            this._bufferLen = buffer.Length;
+            this._endIndex = index + len;
+
             this._startIndex = _currentIndex = index;
             this._currentChar = buffer[_currentIndex];
             _breakAtList.Clear();
             _tempCandidateBreaks.Clear();
             _latestBreakAt = 0;
         }
+
+
         public VisitorState State
         {
             get;
@@ -64,12 +69,9 @@ namespace Typography.TextBreak
         {
             get { return _currentChar; }
         }
-
-
-
         public bool IsEnd
         {
-            get { return _currentIndex >= _bufferLen - 1; }
+            get { return _currentIndex >= _endIndex; }
         }
 
 
@@ -100,7 +102,6 @@ namespace Typography.TextBreak
         {
             AddWordBreakAt(this.CurrentIndex, wordKind);
         }
-
         public int LatestBreakAt
         {
             get { return this._latestBreakAt; }
@@ -119,12 +120,10 @@ namespace Typography.TextBreak
                 this.State = VisitorState.End;
             }
         }
-
         public List<BreakAtInfo> GetBreakList()
         {
             return _breakAtList;
         }
-
         internal Stack<int> GetTempCandidateBreaks()
         {
             return this._tempCandidateBreaks;
