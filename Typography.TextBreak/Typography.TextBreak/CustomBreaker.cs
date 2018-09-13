@@ -11,27 +11,37 @@ namespace Typography.TextBreak
     public class CustomBreaker
     {
         //default for latin breaking engine
-        EngBreakingEngine engBreakingEngine = new EngBreakingEngine();
+        EngBreakingEngine _engBreakingEngine = new EngBreakingEngine();
         //current lang breaking engine
-        BreakingEngine breakingEngine;
-        List<BreakingEngine> otherEngines = new List<BreakingEngine>();
+        BreakingEngine _breakingEngine;
+        List<BreakingEngine> _otherEngines = new List<BreakingEngine>();
 
-        WordVisitor visitor;
+        WordVisitor _visitor;
         int _endAt;
         bool _breakNumberAfterText;
+
+
         public CustomBreaker()
         {
-            visitor = new WordVisitor(this);
-            breakingEngine = engBreakingEngine;
             ThrowIfCharOutOfRange = false;
+            //
+            _visitor = new WordVisitor();
+            _breakingEngine = _engBreakingEngine; //default eng-breaking engine
         }
+
+        public EngBreakingEngine EngBreakingEngine
+        {
+            get { return _engBreakingEngine; }
+        }
+
+
         public bool BreakNumberAfterText
         {
             get { return _breakNumberAfterText; }
             set
             {
                 _breakNumberAfterText = value;
-                engBreakingEngine.BreakNumberAfterText = value;
+                _engBreakingEngine.BreakNumberAfterText = value;
                 //TODO: apply to other engine
             }
         }
@@ -40,25 +50,25 @@ namespace Typography.TextBreak
         public void AddBreakingEngine(BreakingEngine engine)
         {
             //TODO: make this accept more than 1 engine
-            otherEngines.Add(engine);
-            breakingEngine = engine;
+            _otherEngines.Add(engine);
+            _breakingEngine = engine;
         }
 
         protected BreakingEngine SelectEngine(char c)
         {
-            if (breakingEngine.CanHandle(c))
+            if (_breakingEngine.CanHandle(c))
             {
-                return breakingEngine;
+                return _breakingEngine;
             }
             else
             {
                 //find other engine
-                for (int i = otherEngines.Count - 1; i >= 0; --i)
+                for (int i = _otherEngines.Count - 1; i >= 0; --i)
                 {
                     //not the current engine 
                     //and can handle the character
-                    BreakingEngine engine = otherEngines[i];
-                    if (engine != breakingEngine && engine.CanHandle(c))
+                    BreakingEngine engine = _otherEngines[i];
+                    if (engine != _breakingEngine && engine.CanHandle(c))
                     {
                         return engine;
                     }
@@ -66,15 +76,16 @@ namespace Typography.TextBreak
 
                 //default 
 #if DEBUG
-                if (!engBreakingEngine.CanHandle(c))
+                if (!_engBreakingEngine.CanHandle(c))
                 {
                     //even default can't handle the char
 
                 }
 #endif
-                return engBreakingEngine;
+                return _engBreakingEngine;
             }
         }
+
 
         public void BreakWords(char[] charBuff, int startAt, int len)
         {
@@ -86,9 +97,9 @@ namespace Typography.TextBreak
                 return;
             }
             _endAt = startAt + len;
-            visitor.LoadText(charBuff, startAt);
+            _visitor.LoadText(charBuff, startAt, len);
             //---------------------------------------- 
-            BreakingEngine currentEngine = breakingEngine = SelectEngine(charBuff[startAt]);
+            BreakingEngine currentEngine = _breakingEngine = SelectEngine(charBuff[startAt]);
             //----------------------------------------
             //select breaking engine
             int endAt = startAt + len;
@@ -96,8 +107,8 @@ namespace Typography.TextBreak
             for (; ; )
             {
                 //----------------------------------------
-                currentEngine.BreakWord(visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
-                switch (visitor.State)
+                currentEngine.BreakWord(_visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
+                switch (_visitor.State)
                 {
                     default: throw new NotSupportedException();
 
@@ -108,18 +119,18 @@ namespace Typography.TextBreak
                         {
                             //find proper breaking engine for current char
 
-                            BreakingEngine anotherEngine = SelectEngine(visitor.Char);
+                            BreakingEngine anotherEngine = SelectEngine(_visitor.Char);
                             if (anotherEngine == currentEngine)
                             {
-                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.Char}' was not found.");
-                                startAt = visitor.CurrentIndex + 1;
-                                visitor.SetCurrentIndex(startAt);
-                                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
+                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
+                                startAt = _visitor.CurrentIndex + 1;
+                                _visitor.SetCurrentIndex(startAt);
+                                _visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
                             }
                             else
                             {
                                 currentEngine = anotherEngine;
-                                startAt = visitor.CurrentIndex;
+                                startAt = _visitor.CurrentIndex;
                             }
                         }
                         break;
@@ -133,13 +144,23 @@ namespace Typography.TextBreak
             char[] buffer = inputstr.ToCharArray();
             BreakWords(buffer, 0, inputstr.Length); //all
         }
-        public void LoadBreakAtList(List<BreakAtInfo> outputList)
+
+        /// <summary>
+        /// copy break-at result to outputList
+        /// </summary>
+        /// <param name="outputList"></param>
+        public void CopyBreakResults(List<BreakAtInfo> outputList)
         {
-            outputList.AddRange(visitor.GetBreakList());
+            outputList.AddRange(_visitor.GetBreakList());
         }
-        public void LoadBreakAtList(List<int> outputList)
+
+        /// <summary>
+        /// copy break-at result (only break pos) to outputList
+        /// </summary>
+        /// <param name="outputList"></param>
+        public void CopyBreakResults(List<int> outputList)
         {
-            List<BreakAtInfo> breakAtList = visitor.GetBreakList();
+            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
             int j = breakAtList.Count;
             for (int i = 0; i < j; ++i)
             {
@@ -147,18 +168,15 @@ namespace Typography.TextBreak
                 outputList.Add(brk.breakAt);
             }
         }
-        public bool CanBeStartChar(char c)
-        {
-            return breakingEngine.CanBeStartChar(c);
-        }
 
-        public int BreakAtCount
+
+        public int BreakItemCount
         {
-            get { return visitor.GetBreakList().Count; }
+            get { return _visitor.GetBreakList().Count; }
         }
         public IEnumerable<BreakSpan> GetBreakSpanIter()
         {
-            List<BreakAtInfo> breakAtList = visitor.GetBreakList();
+            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
             int c_index = 0;
             int count = breakAtList.Count;
             for (int i = 0; i < count; ++i)
@@ -185,6 +203,10 @@ namespace Typography.TextBreak
         }
 
 
+        public BreakingEngine GetBreakingEngineFor(char c)
+        {
+            return SelectEngine(c);
+        }
         //
     }
 

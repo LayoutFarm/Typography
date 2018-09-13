@@ -25,8 +25,7 @@ namespace Typography.TextBreak
         }
         protected abstract CustomDic CurrentCustomDic { get; }
         protected abstract WordGroup GetWordGroupForFirstChar(char c);
-
-
+        public bool BreakPeroidInTextSpan { get; set; }
 
         int _startAt;
         int _len;
@@ -45,21 +44,47 @@ namespace Typography.TextBreak
             int endAt = startAt + len;
 
             Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
+            bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
             for (int i = startAt; i < endAt;)
             {
+                ENTER_LOOP:
+
                 //find proper start words;
                 char c = charBuff[i];
                 //----------------------
                 //check if c is in our responsiblity
-                if (c < c_first || c > c_last)
+
+                if ((c < c_first || c > c_last))
                 {
-                    //out of our range
-                    //should return ?
-                    visitor.State = VisitorState.OutOfRangeChar;
-                    return;
+                    if (c == '.')
+                    {
+                        if (breakPeroidInTextSpan)
+                        {
+                            //out of our range
+                            //should return ?      
+                            visitor.State = VisitorState.OutOfRangeChar;
+                            return;
+                        }
+                        else
+                        {
+                            //****
+                            //concat eg. A.B.C
+                            //***
+                            ++i;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        //out of our range
+                        //should return ?      
+                        visitor.State = VisitorState.OutOfRangeChar;
+                        return;
+                    }
                 }
                 //----------------------
+
                 WordGroup wordgroup = GetWordGroupForFirstChar(c);
                 if (wordgroup == null)
                 {
@@ -172,6 +197,16 @@ namespace Typography.TextBreak
                             //----------------------------------------
                             return;
                         }
+                        //----------------------------------------
+
+
+                        if (!breakPeroidInTextSpan && visitor.Char == '.')
+                        {
+                            //treat abbrev
+                            ++i;
+                            goto ENTER_LOOP;
+                        }
+                        //----------------------------------------
                         WordGroup next = GetSubGroup(visitor, c_wordgroup);
                         //for debug
                         //string prefix = (next == null) ? "" : next.GetPrefix(CurrentCustomDic.TextBuffer);  
@@ -246,8 +281,31 @@ namespace Typography.TextBreak
                                     //on the same pos
                                     if (visitor.State == VisitorState.OutOfRangeChar)
                                     {
-                                        visitor.AddWordBreakAtCurrentIndex();
-                                        return;
+                                        //***
+                                        if (this.DontMergeLastIncompleteWord)
+                                        {
+                                            //choose best match 
+                                            int p3 = visitor.CurrentIndex;
+                                            int p4 = p3;
+                                            if (candidateBreakList.Count > 0)
+                                            {
+                                                int candi1 = candidateBreakList.Pop();
+                                                visitor.SetCurrentIndex(p4 = (visitor.LatestBreakAt + candi1));
+                                                visitor.AddWordBreakAtCurrentIndex();
+                                            }
+                                            //
+                                            if (p4 < p3)
+                                            {
+                                                visitor.SetCurrentIndex(p1);
+                                                visitor.AddWordBreakAtCurrentIndex();
+                                            }
+                                            return;
+                                        }
+                                        else
+                                        {
+                                            visitor.AddWordBreakAtCurrentIndex();
+                                            return;
+                                        }
                                     }
                                     else
                                     {
@@ -263,7 +321,7 @@ namespace Typography.TextBreak
                                                 //step back
 
                                                 visitor.SetCurrentIndex(visitor.CurrentIndex - 1);
-                                         
+
                                                 //TODO: review here again
 #if DEBUG
                                                 char current_char = visitor.Char;

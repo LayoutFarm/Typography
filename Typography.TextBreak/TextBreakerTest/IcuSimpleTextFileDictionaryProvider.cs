@@ -26,12 +26,44 @@ namespace Typography.TextBreak
             {
                 default:
                     return null;
+                case "abbrv-en":
+                    return GetAbbrvDicFromTextFile(DataDir + "/en.txt");
                 case "thai":
-                    return GetTextListIterFromTextFile(DataDir + "/thaidict.txt");
+                    return GetTextListIterFromTextFile(DataDir + "/dictionaries/thaidict.txt");
                 case "lao":
-                    return GetTextListIterFromTextFile(DataDir + "/laodict.txt");
+                    return GetTextListIterFromTextFile(DataDir + "/dictionaries/laodict.txt");
             }
+        }
+        static IEnumerable<string> GetAbbrvDicFromTextFile(string filename)
+        {
 
+            //read from original ICU's rule file
+            //..
+            //
+            List<string> allAbbrvs = new List<string>();
+            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            using (StreamReader reader = new StreamReader(fs))
+            {
+                string line = reader.ReadLine();
+                while (line != null)
+                {
+                    line = line.Trim();
+                    //---------------------
+                    //CAUTION:!!!, Very file-specific
+                    //not a full parse, this is for extract content  only
+                    //---------------------
+                    if (line.Length > 0 && (line[0] == '"')) //not a comment
+                    {
+                        int endpos = line.IndexOf('"', 1);
+                        string word = line.Substring(1, endpos - 1);
+                        allAbbrvs.Add(word);
+                    }
+                    //
+                    line = reader.ReadLine();//next line
+                }
+            }
+            allAbbrvs.Sort();
+            return allAbbrvs;
         }
         static IEnumerable<string> GetTextListIterFromTextFile(string filename)
         {

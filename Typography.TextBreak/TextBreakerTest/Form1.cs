@@ -87,16 +87,12 @@ namespace TextBreakerTest
 
             //1. create dictionary based breaking engine 
             //TODO: dic should be read once
-            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu62/brkitr/dictionaries" };
+            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu62/brkitr" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
-            breaker1.BreakNumberAfterText = true;
-
-
+            breaker1.BreakNumberAfterText = true; 
             char[] test = this.textBox1.Text.ToCharArray();
-            this.listBox1.Items.Clear();
-
-
+            this.listBox1.Items.Clear(); 
             breaker1.BreakWords(test, 0, test.Length);
             foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             {
@@ -162,7 +158,7 @@ namespace TextBreakerTest
         {
 
             //-------------------
-            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src/dictionaries" };
+            var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
             char[] test = this.textBox1.Text.ToCharArray();

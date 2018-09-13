@@ -12,7 +12,7 @@ public class WordKindTests
         var customBreaker = new CustomBreaker();
         customBreaker.BreakWords(input);
         var outputList = new List<BreakAtInfo> { new BreakAtInfo(0, Unknown) };
-        customBreaker.LoadBreakAtList(outputList);
+        customBreaker.CopyBreakResults(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
             Assert.AreEqual
