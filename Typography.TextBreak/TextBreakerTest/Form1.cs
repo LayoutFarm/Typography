@@ -90,13 +90,9 @@ namespace TextBreakerTest
             var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu62/brkitr/dictionaries" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
-            breaker1.BreakNumberAfterText = true;
-
-
+            breaker1.BreakNumberAfterText = true; 
             char[] test = this.textBox1.Text.ToCharArray();
-            this.listBox1.Items.Clear();
-
-
+            this.listBox1.Items.Clear(); 
             breaker1.BreakWords(test, 0, test.Length);
             foreach (BreakSpan span in breaker1.GetBreakSpanIter())
             {

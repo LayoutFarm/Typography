@@ -14,7 +14,7 @@ public class BasicTests
         customBreaker.BreakWords(input);        
         //
         var outputList = new List<int> { 0 };
-        customBreaker.LoadBreakAtList(outputList);
+        customBreaker.CopyBreakResults(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
             Assert.AreEqual

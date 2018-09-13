@@ -76,6 +76,7 @@ namespace Typography.TextBreak
             }
         }
 
+
         public void BreakWords(char[] charBuff, int startAt, int len)
         {
             //conver to char buffer 
@@ -133,11 +134,21 @@ namespace Typography.TextBreak
             char[] buffer = inputstr.ToCharArray();
             BreakWords(buffer, 0, inputstr.Length); //all
         }
-        public void LoadBreakAtList(List<BreakAtInfo> outputList)
+
+        /// <summary>
+        /// copy break-at result to outputList
+        /// </summary>
+        /// <param name="outputList"></param>
+        public void CopyBreakResults(List<BreakAtInfo> outputList)
         {
             outputList.AddRange(visitor.GetBreakList());
         }
-        public void LoadBreakAtList(List<int> outputList)
+
+        /// <summary>
+        /// copy break-at result (only break pos) to outputList
+        /// </summary>
+        /// <param name="outputList"></param>
+        public void CopyBreakResults(List<int> outputList)
         {
             List<BreakAtInfo> breakAtList = visitor.GetBreakList();
             int j = breakAtList.Count;
