@@ -128,6 +128,9 @@ namespace Typography.TextBreak
     }
 
 
+
+
+
     struct WordSpan
     {
         public readonly int startAt;
@@ -539,5 +542,38 @@ namespace Typography.TextBreak
 
     }
 
+
+    //----------------
+    /// <summary>
+    /// Abbreviation dic, special treatment for dot (.) in word parsing
+    /// </summary>
+    public class CustomAbbrvDic
+    {
+        /// <summary>
+        /// load wellknown Abbreviation
+        /// </summary>
+        /// <param name="sortedWordList"></param>
+        public void LoadSortedUniqueWordList(IEnumerable<string> sortedWordList)
+        {
+            if (sortedWordList == null)
+            {
+                return;
+            }
+            //---------------------
+            //build a dic
+            //each word contains one or more .
+
+            //TODO: implement this...
+            ////
+            ////If we use this feature:
+            ////when the central engine for . it consult the custom abbrv
+            //foreach (string str in sortedWordList)
+            //{
+            //    string[] subparts = str.Split('.');
+
+
+            //}
+        }
+    }
 
 }
