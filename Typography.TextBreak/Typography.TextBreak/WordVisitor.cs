@@ -41,6 +41,8 @@ namespace Typography.TextBreak
         }
         public void LoadText(char[] buffer, int index)
         {
+            //check index < buffer
+
             this.buffer = buffer;
             this.bufferLen = buffer.Length;
             this.startIndex = currentIndex = index;
