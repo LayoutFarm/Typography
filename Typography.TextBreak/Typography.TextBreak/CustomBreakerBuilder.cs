@@ -27,6 +27,7 @@ namespace Typography.TextBreak
 
         static void InitAllDics()
         {
+            //
 
             if (s_thaiDic == null)
             {

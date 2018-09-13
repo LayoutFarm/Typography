@@ -27,9 +27,9 @@ namespace Typography.TextBreak
                 default:
                     return null;
                 case "thai":
-                    return GetTextListIterFromTextFile(DataDir + "/thaidict.txt");
+                    return GetTextListIterFromTextFile(DataDir + "/dictionaries/thaidict.txt");
                 case "lao":
-                    return GetTextListIterFromTextFile(DataDir + "/laodict.txt");
+                    return GetTextListIterFromTextFile(DataDir + "/dictionaries/laodict.txt");
             }
 
         }
