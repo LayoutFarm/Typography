@@ -21,12 +21,16 @@ namespace Typography.TextBreak
         [System.ThreadStatic]
         static CustomDic s_laoDic;
 
+        [System.ThreadStatic]
+        static CustomAbbrvDic s_enAbbrvDic;
+
 
         [System.ThreadStatic]
         static DictionaryProvider s_dicProvider;
 
         static void InitAllDics()
         {
+            //
 
             if (s_thaiDic == null)
             {
@@ -42,7 +46,14 @@ namespace Typography.TextBreak
                 customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("lao"));
                 s_laoDic = customDic;
             }
-             
+
+
+            if (s_enAbbrvDic == null)
+            {
+                s_enAbbrvDic = new CustomAbbrvDic();
+                s_enAbbrvDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("abbrv-en"));
+
+            }
         }
 
 
@@ -69,6 +80,12 @@ namespace Typography.TextBreak
                 InitAllDics();
             }
             var breaker = new CustomBreaker();
+
+            breaker.EngBreakingEngine.EngCustomAbbrvDic = s_enAbbrvDic;//optional 
+            breaker.EngBreakingEngine.EnableCustomAbbrv = true;//optional 
+            //
+
+
             //
             var thBreaker = new ThaiDictionaryBreakingEngine();
             //thBreaker.DontMergeLastIncompleteWord = true;

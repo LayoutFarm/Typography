@@ -19,12 +19,22 @@ namespace Typography.TextBreak
         WordVisitor _visitor;
         int _endAt;
         bool _breakNumberAfterText;
+
+
         public CustomBreaker()
         {
-            _visitor = new WordVisitor();
-            _breakingEngine = _engBreakingEngine;
             ThrowIfCharOutOfRange = false;
+            //
+            _visitor = new WordVisitor();
+            _breakingEngine = _engBreakingEngine; //default eng-breaking engine
         }
+
+        public EngBreakingEngine EngBreakingEngine
+        {
+            get { return _engBreakingEngine; }
+        }
+
+
         public bool BreakNumberAfterText
         {
             get { return _breakNumberAfterText; }
