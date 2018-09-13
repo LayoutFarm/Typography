@@ -109,7 +109,7 @@ namespace Typography.TextBreak
         public void SetCurrentIndex(int index)
         {
             this._currentIndex = index;
-            if (index < _buffer.Length)
+            if (index < _endIndex)
             {
                 _currentChar = _buffer[index];
             }
