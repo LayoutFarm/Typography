@@ -40,6 +40,11 @@ namespace Typography.TextBreak
         static bool[] canbeStartChars;
         const char s_firstChar = (char)0x0E80;
         const char s_lastChar = (char)0x0EFF;
+        public static char FirstChar { get { return s_firstChar; } }
+        public static char LastChar { get { return s_lastChar; } }
+
+
+
         static LaoDictionaryBreakingEngine()
         {
             char[] laoCantStartWithChars = new char[] {

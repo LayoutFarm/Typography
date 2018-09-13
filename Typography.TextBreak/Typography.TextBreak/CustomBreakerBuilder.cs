@@ -3,57 +3,74 @@
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
-using System.IO;
+
 using System.Collections.Generic;
 
 namespace Typography.TextBreak
 {
     public static class CustomBreakerBuilder
     {
-        static ThaiDictionaryBreakingEngine thaiDicBreakingEngine;
-        static LaoDictionaryBreakingEngine laoDicBreakingEngine;
+        //---------------------------------------------------------
+        //user can build their owner custom breaker builder 
+        //---------------------------------------------------------
 
-        static bool isInit;
+        //custom dic may be shared among breaking engine
+
+        [System.ThreadStatic]
+        static CustomDic s_thaiDic;
+        [System.ThreadStatic]
+        static CustomDic s_laoDic;
+
+        [System.ThreadStatic]
+        static CustomAbbrvDic s_enAbbrvDic;
+
+
+        [System.ThreadStatic]
         static DictionaryProvider s_dicProvider;
 
         static void InitAllDics()
         {
-            if (thaiDicBreakingEngine == null)
+            //
+
+            if (s_thaiDic == null)
             {
                 var customDic = new CustomDic();
-                thaiDicBreakingEngine = new ThaiDictionaryBreakingEngine();
-                thaiDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
-                customDic.SetCharRange(thaiDicBreakingEngine.FirstUnicodeChar, thaiDicBreakingEngine.LastUnicodeChar);
+                customDic.SetCharRange(ThaiDictionaryBreakingEngine.FirstChar, ThaiDictionaryBreakingEngine.LastChar);
                 customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("thai"));
+                s_thaiDic = customDic;
+            }
+            if (s_laoDic == null)
+            {
+                var customDic = new CustomDic();
+                customDic.SetCharRange(LaoDictionaryBreakingEngine.FirstChar, LaoDictionaryBreakingEngine.LastChar);
+                customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("lao"));
+                s_laoDic = customDic;
             }
 
-            if (laoDicBreakingEngine == null)
+
+            if (s_enAbbrvDic == null)
             {
-                var customDic = new CustomDic();
-                laoDicBreakingEngine = new LaoDictionaryBreakingEngine();
-                laoDicBreakingEngine.SetDictionaryData(customDic);//add customdic to the breaker
-                customDic.SetCharRange(laoDicBreakingEngine.FirstUnicodeChar, laoDicBreakingEngine.LastUnicodeChar);
-                customDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("lao"));
+                s_enAbbrvDic = new CustomAbbrvDic();
+                s_enAbbrvDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("abbrv-en"));
+
             }
         }
 
 
-        //public static void Setup(string dataDir)
-        //{
-        //    Setup(new IcuSimpleTextFileDictionaryProvider() { DataDir = dataDir });
-        //}
         public static void Setup(DictionaryProvider dicProvider)
         {
-            if (isInit) return;
-
+            if (s_dicProvider != null)
+            {
+                return;
+            }
+            //
             s_dicProvider = dicProvider;
             InitAllDics();
-            isInit = true;
         }
 
         public static CustomBreaker NewCustomBreaker()
         {
-            if (!isInit)
+            if (s_thaiDic == null)
             {
                 if (s_dicProvider == null)
                 {
@@ -61,11 +78,23 @@ namespace Typography.TextBreak
                     return null;
                 }
                 InitAllDics();
-                isInit = true;
             }
             var breaker = new CustomBreaker();
-            breaker.AddBreakingEngine(thaiDicBreakingEngine);
-            breaker.AddBreakingEngine(laoDicBreakingEngine);
+
+            breaker.EngBreakingEngine.EngCustomAbbrvDic = s_enAbbrvDic;//optional 
+            breaker.EngBreakingEngine.EnableCustomAbbrv = true;//optional 
+            //
+
+
+            //
+            var thBreaker = new ThaiDictionaryBreakingEngine();
+            //thBreaker.DontMergeLastIncompleteWord = true;
+            thBreaker.SetDictionaryData(s_thaiDic);
+            breaker.AddBreakingEngine(thBreaker);
+            //
+            var laoBreak = new LaoDictionaryBreakingEngine();
+            laoBreak.SetDictionaryData(s_laoDic);
+            breaker.AddBreakingEngine(laoBreak);
             return breaker;
         }
     }
@@ -77,5 +106,5 @@ namespace Typography.TextBreak
 
 
 
-   
+
 }
