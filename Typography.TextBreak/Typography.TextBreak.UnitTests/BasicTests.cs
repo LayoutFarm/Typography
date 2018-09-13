@@ -11,7 +11,7 @@ public class BasicTests
         var customBreaker = new CustomBreaker();
         customBreaker.BreakNumberAfterText = breakNumberAfterText;
         //
-        customBreaker.BreakWords(input);        
+        customBreaker.BreakWords(input);
         //
         var outputList = new List<int> { 0 };
         customBreaker.CopyBreakResults(outputList);
@@ -70,4 +70,13 @@ public class BasicTests
         BasicTest(input, output, true);
     }
 
+    [DataTestMethod]
+    [DataRow("a.m", 0, new[] { "a.m" })]
+    [DataRow("a.m.", 0, new[] { "a.m." })]
+    [DataRow("a.m", 0, new[] { "a.m" })]
+    [DataRow("9 a.m.", 0, new[] { "9", " ","a.m." })]
+    public void DontBreakPerioidInTextSpan(string input, int _, string[] output)
+    {
+        BasicTest(input, output, true);
+    }
 }
