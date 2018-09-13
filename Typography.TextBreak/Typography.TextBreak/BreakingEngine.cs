@@ -25,8 +25,7 @@ namespace Typography.TextBreak
         }
         protected abstract CustomDic CurrentCustomDic { get; }
         protected abstract WordGroup GetWordGroupForFirstChar(char c);
-
-
+        public bool BreakPeroidInTextSpan { get; set; }
 
         int _startAt;
         int _len;
@@ -45,21 +44,47 @@ namespace Typography.TextBreak
             int endAt = startAt + len;
 
             Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
+            bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
             for (int i = startAt; i < endAt;)
             {
+                ENTER_LOOP:
+
                 //find proper start words;
                 char c = charBuff[i];
                 //----------------------
                 //check if c is in our responsiblity
-                if (c < c_first || c > c_last)
+
+                if ((c < c_first || c > c_last))
                 {
-                    //out of our range
-                    //should return ?
-                    visitor.State = VisitorState.OutOfRangeChar;
-                    return;
+                    if (c == '.')
+                    {
+                        if (breakPeroidInTextSpan)
+                        {
+                            //out of our range
+                            //should return ?      
+                            visitor.State = VisitorState.OutOfRangeChar;
+                            return;
+                        }
+                        else
+                        {
+                            //****
+                            //concat eg. A.B.C
+                            //***
+                            ++i;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        //out of our range
+                        //should return ?      
+                        visitor.State = VisitorState.OutOfRangeChar;
+                        return;
+                    }
                 }
                 //----------------------
+
                 WordGroup wordgroup = GetWordGroupForFirstChar(c);
                 if (wordgroup == null)
                 {
@@ -172,6 +197,16 @@ namespace Typography.TextBreak
                             //----------------------------------------
                             return;
                         }
+                        //----------------------------------------
+
+
+                        if (!breakPeroidInTextSpan && visitor.Char == '.')
+                        {
+                            //treat abbrev
+                            ++i;
+                            goto ENTER_LOOP;
+                        }
+                        //----------------------------------------
                         WordGroup next = GetSubGroup(visitor, c_wordgroup);
                         //for debug
                         //string prefix = (next == null) ? "" : next.GetPrefix(CurrentCustomDic.TextBuffer);  
