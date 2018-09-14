@@ -118,7 +118,7 @@ namespace Typography.TextBreak
                     {
                         //not end
                         //then move next
-                        candidateLen++;
+                       
                         visitor.SetCurrentIndex(i + 1);
                         if (visitor.IsEnd)
                         {
@@ -198,7 +198,7 @@ namespace Typography.TextBreak
                             return;
                         }
                         //----------------------------------------
-
+                        candidateLen++;
 
                         if (!breakPeroidInTextSpan && visitor.Char == '.')
                         {
