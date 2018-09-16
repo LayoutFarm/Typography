@@ -15,8 +15,6 @@ namespace Typography.TextBreak
         //current lang breaking engine
         BreakingEngine _breakingEngine;
         List<BreakingEngine> _otherEngines = new List<BreakingEngine>();
-
-        WordVisitor _visitor;
         int _endAt;
         bool _breakNumberAfterText;
 
@@ -24,8 +22,6 @@ namespace Typography.TextBreak
         public CustomBreaker()
         {
             ThrowIfCharOutOfRange = false;
-            //
-            _visitor = new WordVisitor();
             _breakingEngine = _engBreakingEngine; //default eng-breaking engine
         }
 
@@ -87,19 +83,14 @@ namespace Typography.TextBreak
         }
 
 
-        public void BreakWords(char[] charBuff, int startAt, int len)
+        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakAtInfo> outputBreakAtList)
         {
             //conver to char buffer 
-            int j = charBuff.Length;
-            if (j < 1)
-            {
-                _endAt = 0;
-                return;
-            }
-            _endAt = startAt + len;
-            _visitor.LoadText(charBuff, startAt, len);
+            if (charBuff.IsEmpty) return;
+            var visitor = new WordVisitor(charBuff, outputBreakAtList, new Stack<int>());
+            visitor.LoadText(charBuff);
             //---------------------------------------- 
-            BreakingEngine currentEngine = _breakingEngine = SelectEngine(charBuff[startAt]);
+            BreakingEngine currentEngine = _breakingEngine = SelectEngine(charBuff[charBuff.]);
             //----------------------------------------
             //select breaking engine
             int endAt = startAt + len;
@@ -123,7 +114,7 @@ namespace Typography.TextBreak
                             if (anotherEngine == currentEngine)
                             {
                                 if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
-                                startAt = _visitor.CurrentIndex + 1;
+                                visitor. startAt = _visitor.CurrentIndex + 1;
                                 _visitor.SetCurrentIndex(startAt);
                                 _visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
                             }
@@ -138,66 +129,9 @@ namespace Typography.TextBreak
             }
         }
 
-        public void BreakWords(string inputstr)
+        public void BreakWords(string inputstr, ICollection<BreakAtInfo> outputBreakAtList)
         {
-            BreakWords(MemoryExtensions. buffer, 0, inputstr.Length); //all
-        }
-
-        /// <summary>
-        /// copy break-at result to outputList
-        /// </summary>
-        /// <param name="outputList"></param>
-        public void CopyBreakResults(List<BreakAtInfo> outputList)
-        {
-            outputList.AddRange(_visitor.GetBreakList());
-        }
-
-        /// <summary>
-        /// copy break-at result (only break pos) to outputList
-        /// </summary>
-        /// <param name="outputList"></param>
-        public void CopyBreakResults(List<int> outputList)
-        {
-            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
-            int j = breakAtList.Count;
-            for (int i = 0; i < j; ++i)
-            {
-                BreakAtInfo brk = breakAtList[i];
-                outputList.Add(brk.breakAt);
-            }
-        }
-
-
-        public int BreakItemCount
-        {
-            get { return _visitor.GetBreakList().Count; }
-        }
-        public IEnumerable<BreakSpan> GetBreakSpanIter()
-        {
-            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
-            int c_index = 0;
-            int count = breakAtList.Count;
-            for (int i = 0; i < count; ++i)
-            {
-
-                BreakAtInfo brkInfo = breakAtList[i];
-                BreakSpan sp = new BreakSpan();
-                sp.startAt = c_index;
-                sp.len = (ushort)(brkInfo.breakAt - c_index);
-                sp.wordKind = brkInfo.wordKind;
-
-                c_index += sp.len;
-
-                yield return sp;
-            }
-            //-------------------
-            if (c_index < _endAt)
-            {
-                BreakSpan sp = new BreakSpan();
-                sp.startAt = c_index;
-                sp.len = (ushort)(_endAt - c_index);
-                yield return sp;
-            }
+            BreakWords(inputstr.AsSpan(), outputSpans);
         }
 
 

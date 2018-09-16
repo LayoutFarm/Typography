@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <Import Project="..\..\..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" />

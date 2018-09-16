@@ -18,43 +18,27 @@ namespace Typography.TextBreak
 
 
 
-    class WordVisitor
+    ref struct WordVisitor
     {
-        List<BreakAtInfo> _breakAtList = new List<BreakAtInfo>();
-        char[] _buffer;
-
-        int _startIndex;
-        int _endIndex;
+        ICollection<BreakAtInfo> _breakAtList;
+        ReadOnlySpan<char> _buffer;
 
         int _currentIndex;
         char _currentChar;
         int _latestBreakAt;
 
 
-        Stack<int> _tempCandidateBreaks = new Stack<int>();
-        public WordVisitor()
+        Stack<int> _tempCandidateBreaks;
+        public WordVisitor(ReadOnlySpan<char> buffer, ICollection<BreakAtInfo> breakAtList, Stack<int> tempCandidateBreaks)
         {
-        }
-
-        public void LoadText(char[] buffer, int index)
-        {
-            LoadText(buffer, index, buffer.Length);
-        }
-        public void LoadText(char[] buffer, int index, int len)
-        {
-            //check index < buffer
-
-            //reset all
-            this._buffer = buffer;
-            this._endIndex = index + len;
-
-            this._startIndex = _currentIndex = index;
-            this._currentChar = buffer[_currentIndex];
-            _breakAtList.Clear();
-            _tempCandidateBreaks.Clear();
+            _buffer = buffer;
+            _breakAtList = breakAtList;
+            _tempCandidateBreaks = tempCandidateBreaks;
+            _currentIndex = 0;
+            _currentChar = buffer[0];
+            State = VisitorState.Init;
             _latestBreakAt = 0;
         }
-
 
         public VisitorState State
         {
@@ -71,7 +55,7 @@ namespace Typography.TextBreak
         }
         public bool IsEnd
         {
-            get { return _currentIndex >= _endIndex; }
+            get { return _currentIndex >= _buffer.Length; }
         }
 
 
@@ -109,7 +93,7 @@ namespace Typography.TextBreak
         public void SetCurrentIndex(int index)
         {
             this._currentIndex = index;
-            if (index < _endIndex)
+            if (index < _buffer.Length)
             {
                 _currentChar = _buffer[index];
             }
@@ -120,7 +104,7 @@ namespace Typography.TextBreak
                 this.State = VisitorState.End;
             }
         }
-        public List<BreakAtInfo> GetBreakList()
+        public ICollection<BreakAtInfo> GetBreakList()
         {
             return _breakAtList;
         }

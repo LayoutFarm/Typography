@@ -10,7 +10,7 @@ namespace Typography.TextBreak
 {
     public abstract class BreakingEngine
     {
-        internal abstract void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len);
+        internal abstract void BreakWord(WordVisitor visitor, ReadOnlySpan<char> charBuff);
         public abstract bool CanBeStartChar(char c);
         public abstract bool CanHandle(char c);
     }
