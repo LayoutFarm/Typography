@@ -50,10 +50,16 @@ namespace TypographyTest.WinForms
             int ffcount = 0;
             bool found = false;
 
+
+            var tempList = new System.Collections.Generic.List<InstalledTypeface>();
+            tempList.AddRange(_options.GetInstalledTypefaceIter());
+            tempList.Sort((f1, f2) => f1.ToString().CompareTo(f2.ToString()));
+
+            //add to list and find default font
             string defaultFont = "Tahoma";
             //string defaultFont = "Alef"; //test hebrew
             //string defaultFont = "Century";
-            foreach (InstalledTypeface installedTypeface in _options.GetInstalledTypefaceIter())
+            foreach (InstalledTypeface installedTypeface in tempList)
             {
                 if (!found && installedTypeface.FontName == defaultFont)
                 {
@@ -70,6 +76,9 @@ namespace TypographyTest.WinForms
 
 
             if (selected_index < 0) { selected_index = 0; }
+
+
+
             lstFontList.SelectedIndex = selected_index;
             lstFontList.SelectedIndexChanged += (s, e) =>
             {
