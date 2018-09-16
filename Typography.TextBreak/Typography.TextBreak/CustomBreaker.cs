@@ -140,9 +140,7 @@ namespace Typography.TextBreak
 
         public void BreakWords(string inputstr)
         {
-            //TODO: review here
-            char[] buffer = inputstr.ToCharArray();
-            BreakWords(buffer, 0, inputstr.Length); //all
+            BreakWords(MemoryExtensions. buffer, 0, inputstr.Length); //all
         }
 
         /// <summary>

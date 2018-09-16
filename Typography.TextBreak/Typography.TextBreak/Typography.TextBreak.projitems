@@ -23,4 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\ThaiDictionaryBreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WordVisitor.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)NET20\" />
+  </ItemGroup>
 </Project>
