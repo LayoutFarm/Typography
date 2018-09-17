@@ -1,72 +1,70 @@
-![Typography, this img was rendered with this lib, in subpixel rendering mode](https://user-images.githubusercontent.com/7447159/31848163-cc9e00fe-b655-11e7-8a40-69258e440c7a.png)
+![Typography, this image was rendered with this library, in subpixel rendering mode](https://user-images.githubusercontent.com/7447159/31848163-cc9e00fe-b655-11e7-8a40-69258e440c7a.png)
 ===========
 
 Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.
 ---
 
-During developing the [PixelFarm](https://github.com/PaintLab/PixelFarm),
-I think _'How-to-render-a-font-glyph'_ may be useful for other libs.
+During developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
+I think _'How-to-render-a-font-glyph'_ may be useful for other libraries.
 
-So, I spin off  _'How-to-render-a-font-glyph'_ part to here,the **Typography**.
+So, I spinned off the _'How-to-render-a-font-glyph'_ part to here, the **Typography** library.
 
-The Typography lib dose NOT NEED PixelFarm Rendering lib.
+The Typography lib does NOT need the PixelFarm Rendering library.
 
 ![gdiplus_sample1](https://cloud.githubusercontent.com/assets/7447159/24084514/1969489e-0d1e-11e7-8748-965e9e84693b.png)
 
-_pic 1:  Typography project's Solution Explorer View_
+_Typography project's Solution Explorer View_
 
-see pic1, I provide the example(1) that uses Typography with WinGdiPlus,
+As shown in the above screenshot, an example (marked with `(1)`) that uses Typography with WinGdiPlus is provided,
 
-and the example(2) the uses Typography with 'mini' snapshot of PixelFarm Rendering Lib(3). 
+and an example (marked with `(2)`) the uses Typography with a 'mini' snapshot of PixelFarm Rendering library (marked with `(3)`). 
 
 Concept
 ---
 
- * 1.Loads .ttf, .otf files, with OpenFontReader.
+ * 1.Load .ttf, .otf files, with OpenFontReader.
  
- * 2.Rasterizes char to bitmap with pure software renderer + Agg(anti grain geometry) Quality! with 
+ * 2.Rasterize a character to a bitmap with a pure software renderer which has Agg(anti grain geometry) Quality! with 
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
 	  
- * .Net >=2.0 
+ * Supported platforms: .Net Framework >= 2.0 or .Net Standard >= 1.3
  
 
 What are each project used for?
 -----------
-see => https://github.com/LayoutFarm/Typography/issues/99
+See => https://github.com/LayoutFarm/Typography/issues/99
 
 
 Screenshots
 -----------
 Some screenshots of the current master.
 
- 
-
-Enable TrueType Hinting, Tahoma , 8 pts
+Enable TrueType Hinting, Tahoma, 8 pts
 
 ![enable_truetype_hinting](https://cloud.githubusercontent.com/assets/7447159/21425153/03d4f3c2-c87a-11e6-863e-eb2ba9bc0d61.png)
 
 ---
-Tahoma, 72 pts (disable TrueType Hinting)
+Tahoma, 72 pts (TrueType Hinting: disabled)
 
 ![compare1_tahoma_72pts](https://cloud.githubusercontent.com/assets/7447159/19414301/597e7b82-9372-11e6-81b8-5c8374a7400d.png)
 
 ---
-Tahoma, 8 pts, (disable TrueType Hinting)
+Tahoma, 8 pts, (TrueType Hinting: disabled)
 
 ![compare2_tahoma_8pts](https://cloud.githubusercontent.com/assets/7447159/19414345/de616836-9373-11e6-87ac-64076a8d9f1c.png)
 
 ---
-Tahoma, 11 pts (disable TrueType Hinting)
+Tahoma, 11 pts (TrueType Hinting: disabled)
 
 ![compare3_tahoma_11pts](https://cloud.githubusercontent.com/assets/7447159/19414753/bec50254-9381-11e6-8ebb-07b23d84eb90.png)
 
 ---
-Enable Kerning
+Kerning: Enabled
 
 ![enable_kerning1](https://cloud.githubusercontent.com/assets/7447159/23192688/605f9a9c-f8d7-11e6-9850-92b19fd098bf.png)
 
 ---
-SubPixel Rendering
+Subpixel Rendering
  
 ![lcd_09](https://cloud.githubusercontent.com/assets/7447159/22780526/a0e65712-eef1-11e6-948a-eca8e8158aaa.png)
 
@@ -74,23 +72,23 @@ SubPixel Rendering
 
 
 ---
-Multi-channel signed distance field (Msdf) Texture (https://github.com/Chlumsky/msdfgen) 
+A Multi-channel signed distance field (Msdf) Texture (https://github.com/Chlumsky/msdfgen) 
 
 ![msdfgen](https://cloud.githubusercontent.com/assets/7447159/22966208/c0c2407c-f393-11e6-8575-250a6939214b.png)
 
 ---
-Msdf Texture
+Another Msdf Texture
 
 ![msdfgen2](https://cloud.githubusercontent.com/assets/7447159/25565003/7cdde83a-2de9-11e7-9ff8-3740cd37c40a.png)
 
 ---
-Msdf Texture Sample
+A Msdf Texture Sample
 ![msdf_test_03](https://cloud.githubusercontent.com/assets/7447159/25564423/3686e0dc-2ddd-11e7-97f5-c34ba2d21762.png)
  
 
 ---
 
-Android GLES2-based
+An Android GLES2-based demo
 
 ![gles_android_emu](https://cloud.githubusercontent.com/assets/7447159/24420575/8725debe-141d-11e7-8ff2-0170334fa1f7.png)
 
@@ -99,18 +97,18 @@ _pic 1: GLES2-based android demo, DroidSans.ttf. Each glyph is tesselated to Gly
 
 ![gles_android_emu](https://cloud.githubusercontent.com/assets/7447159/24421237/bbd1df9e-141f-11e7-82d7-b22f2e5d9fe0.png)
 
-_pic 2: same technique as pic1, msjh.ttf_, '啊rAbc' , 
+_pic 2: The same technique as pic1, msjh.ttf_, '啊rAbc' , 
 
-please note that baseline of 啊 is not correct
+Please note that baseline of 啊 is not correct
 
 ---
-**Advance OpenFont Text Shaping**
+**Advanced OpenFont Text Shaping**
 
-**1. GSUB :  ligature feature** 
+**1. GSUB :  Ligature features** 
  
 ![ligature](https://cloud.githubusercontent.com/assets/7447159/23093970/f7f879a8-f622-11e6-8539-8cdbcf1026d7.png)
 
-_pic 1: show GSUB's  glyph ligature, see f-i_
+_pic 1: Showing GSUB's glyph ligature, see f-i_
 
 (see more : https://github.com/LayoutFarm/Typography/issues/80#issuecomment-344943446)
 
@@ -121,53 +119,49 @@ _pic 1: show GSUB's  glyph ligature, see f-i_
  
 ![gpos](https://cloud.githubusercontent.com/assets/7447159/23071092/d53c89c2-f55f-11e6-8b6d-a9353345f77c.png)
 
-_pic 2: test with Thai (complex script) glyph that require gpos table_
+_pic 2: Testing with Thai (complex script) glyph that require gpos table_
  
 ---
-**3. GSUB** : ccmp
- 
 
+**3. GSUB** : ccmp
 
 ![gsub](https://cloud.githubusercontent.com/assets/7447159/23079342/1efa46c0-f57f-11e6-869e-fc9700037feb.png)
 
-_pic 3: test with Thai glyph (complex script) , shows glyph substitution_
+_pic 3: Testing with Thai glyphs (complex script), showing glyph substitution_
 
 --- 
 
-**4. GSUB -  GPOS** 
+**4. GSUB and GPOS** 
 
 ![th_glyph](https://cloud.githubusercontent.com/assets/7447159/23125153/f96d8608-f7a2-11e6-921d-d9bb132c179c.png)
  
- ![th_glyph2](https://cloud.githubusercontent.com/assets/7447159/23194740/7b778fd2-f8e2-11e6-9aa1-1d62ad93de06.png)
+![th_glyph2](https://cloud.githubusercontent.com/assets/7447159/23194740/7b778fd2-f8e2-11e6-9aa1-1d62ad93de06.png)
 
-_pic 4: test with Thai glyph (complex script)_
+_pic 4: testing with Thai glyph (complex script)_
 
 (see more: https://github.com/LayoutFarm/Typography/issues/82#issue-274483803)
 
 ---
 
-**Fun with Emoji !**
+**Fun with Emojis!**
 --- 
 
-The Emoji and related features are contributed by [@samhocevar](https://github.com/samhocevar)
+Emojis and related features were contributed by [@samhocevar](https://github.com/samhocevar).
 
 ![typo_symbol](https://user-images.githubusercontent.com/7447159/31386243-515fdace-adf0-11e7-8644-f7c4632d9856.png)
 
-_pic 1: Segoe UI Symbol Normal, on Win7_
- 
- 
+_pic 1: Segoe UI Symbol Normal, on Windows 7_
  
 ![typo_symbol2](https://user-images.githubusercontent.com/7447159/31386781-3a8b85f8-adf2-11e7-8791-c19abe1fee8f.png)
 
 _pic 2: FireFoxEmoji.ttf from https://github.com/mozilla/fxemoji_
 
-
 ![typo_symbol3](https://user-images.githubusercontent.com/245089/31382300-77f4a52c-adb7-11e7-9510-1e07a76f41ab.png)
 
-_pic 3: Segoe UI Emoji Normal, Win 10_
+_pic 3: Segoe UI Emoji Normal, on Windows 10_
 
 
-**Advanced Emoji Ligature**
+**Advanced Emoji Ligatures**
 
 >This is 👩🏾‍👨🏾‍👧🏾‍👶🏾  “Family - Woman: Medium-Dark Skin Tone, Man: Medium-Dark Skin Tone, Girl: Medium-Dark Skin Tone, Baby: Medium-Dark Skin Tone” without `ccmp` ligatures:
 
@@ -198,9 +192,9 @@ In this version, the results are not hinted by CFF instructions, so they are not
 
 _pic 1: compare with Win7's NotePad, latin-modern-math-regular.otf, 18 pts_
 
-further more=> Typography can read all advanced [**MathTable**](https://docs.microsoft.com/en-us/typography/opentype/spec/math). 
+Further more=> Typography can read all advanced [**MathTable**](https://docs.microsoft.com/en-us/typography/opentype/spec/math). 
 
-see Its action here => [CSharpMath](https://github.com/verybadcat/CSharpMath/issues/1#issuecomment-393211266)
+See its action here => [CSharpMath](https://github.com/verybadcat/CSharpMath/issues/1#issuecomment-393211266)
 
 
 ---
@@ -208,26 +202,25 @@ The HtmlRenderer example!
 ---
 
 This is a snapshot of Html drawboard from (https://github.com/LayoutFarm/HtmlRenderer).
-The glyphs are generated/layouted with our _Typography_, and rendered with
-the PixelFarm (https://github.com/PaintLab/PixelFarm)
+The glyphs are generated/layouted with _Typography_, and rendered with PixelFarm (https://github.com/PaintLab/PixelFarm).
 
 ![html_renderer_with_selection2](https://user-images.githubusercontent.com/7447159/34453250-b149ecce-ed81-11e7-885b-e4b02460fcf7.png)
 _pic 1: HtmlRenderer on GLES2 surface, text are renderered with the Typography_
 
 
-also, please note the text selection on the Html Surface. 
+Also, please note the text selection on the Html Surface. 
 
 ---
 
 License
 -----------
 
-The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**.
+The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**. No GPL madness!
 
 A license for a whole project is [**MIT**](https://opensource.org/licenses/MIT).
 
-but if you use some part of the code
-please check each source file's header for the licensing info.
+But if you use some part of the codebase,
+please check each source file's header for the licensing info if available.
 
  
 **Font** 
@@ -262,7 +255,7 @@ MIT, 2006-2009,  Stefanos Apostolopoulos and other Open Tool Kit Contributors, h
 
 MIT, 2013, Antonie Blom, https://github.com/andykorth/Pencil.Gaming
 
-MIT, 2004,2007, Novell Inc., for System.Drawing 
+MIT, 2004, 2007, Novell Inc., for System.Drawing 
 
 **Demo**
 
