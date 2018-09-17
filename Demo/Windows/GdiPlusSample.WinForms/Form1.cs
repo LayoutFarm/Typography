@@ -146,7 +146,7 @@ namespace SampleWinForms
             _currentTextPrinter.TargetGraphics = g;
             //render at specific pos
             float x_pos = 0, y_pos = 100;
-            char[] textBuffer = txtInputChar.Text.ToCharArray();
+            var textBuffer = System.MemoryExtensions.AsSpan(txtInputChar.Text);
 
             //test draw multiple lines
             float lineSpacingPx = _currentTextPrinter.FontLineSpacingPx;
@@ -154,8 +154,6 @@ namespace SampleWinForms
             {
                 _currentTextPrinter.DrawString(
                  textBuffer,
-                 0,
-                 textBuffer.Length,
                  x_pos,
                  y_pos
                 );
@@ -256,15 +254,13 @@ namespace SampleWinForms
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 100;
-            char[] textBuffer = txtInputChar.Text.ToCharArray();
+            var textBuffer = System.MemoryExtensions.AsSpan(txtInputChar.Text);
 
             //Example 1: this is a basic draw sample
             _currentTextPrinter.FillColor = Color.Black;
             _currentTextPrinter.TargetGraphics = g;
             _currentTextPrinter.DrawString(
                 textBuffer,
-                 0,
-                 textBuffer.Length,
                  x_pos,
                  y_pos
                 );
@@ -275,7 +271,7 @@ namespace SampleWinForms
             //2.1
 
             _reusableUnscaledGlyphPlanList.Clear();
-            _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
+            _currentTextPrinter.GenerateGlyphPlan(textBuffer, _reusableUnscaledGlyphPlanList);
             //2.2
             //and we can print the formatted glyph plan later.
             y_pos -= _currentTextPrinter.FontLineSpacingPx;

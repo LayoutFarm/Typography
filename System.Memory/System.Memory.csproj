@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3F501B34-9E57-4610-8087-208F3A53CFB7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>System.Memory</RootNamespace>
+    <AssemblyName>System.Memory</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath Condition="'$(Configuration)' == 'Debug'">..\System.Runtime.CompilerServices.Unsafe\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'Release'">..\System.Runtime.CompilerServices.Unsafe\bin\Release\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ExtensionAttribute.cs" />
+    <Compile Include="IntPtrExtensions.cs" />
+    <Compile Include="Memory\IMemoryOwner.cs" />
+    <Compile Include="Memory\IPinnable.cs" />
+    <Compile Include="Memory\MemoryDebugView.cs" />
+    <Compile Include="Memory\MemoryExtensions.cs" />
+    <Compile Include="Memory\MemoryExtensions.Portable.cs" />
+    <Compile Include="Memory\Memory.cs" />
+    <Compile Include="Memory\MemoryHandle.cs" />
+    <Compile Include="Memory\MemoryManager.cs" />
+    <Compile Include="Memory\MemoryMarshal.cs" />
+    <Compile Include="Memory\MemoryMarshal.Portable.cs" />
+    <Compile Include="Memory\ReadOnlyMemory.cs" />
+    <Compile Include="Memory\NUint.cs" />
+    <Compile Include="MethodImplOptions.cs" />
+    <Compile Include="Pinnable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReadOnlySpan.cs" />
+    <Compile Include="ReadOnlySpan.Portable.cs" />
+    <Compile Include="Span.cs" />
+    <Compile Include="Span.Portable.cs" />
+    <Compile Include="SpanHelpers.BinarySearch.cs" />
+    <Compile Include="SpanHelpers.Byte.cs" />
+    <Compile Include="SpanHelpers.Char.cs" />
+    <Compile Include="SpanHelpers.cs" />
+    <Compile Include="SpanHelpers.T.cs" />
+    <Compile Include="SR.cs" />
+    <Compile Include="ThrowHelper.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

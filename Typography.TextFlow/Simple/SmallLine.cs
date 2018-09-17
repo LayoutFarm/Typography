@@ -6,14 +6,48 @@ namespace Typography.TextLayout
 
     public class SmallLine
     {
+        //Adapted from System.Collections.Generic.List<T>'s implementation
+        void GrowBufferIfNecessesary()
+        {
+            if (_charBuffer == null || _count == _charBuffer.Length)
+            {
+                int newLength = _charBuffer == null ? 16 : _charBuffer.Length * 2;
+                var newBuffer = new char[newLength];
+                System.Array.Copy(_charBuffer, 0, newBuffer, 0, _count);
+                _charBuffer = newBuffer;
+            }
+        }
+        void Add(char c)
+        {
+            GrowBufferIfNecessesary();
+            _charBuffer[_count++] = c;
+        }
+        void Insert(int index, char c)
+        {
+            GrowBufferIfNecessesary();
+            if (index < _count)
+                System.Array.Copy(_charBuffer, index, _charBuffer, index + 1, _count - index);
+            _charBuffer[index] = c;
+            _count++;
+        }
+        void RemoveAt(int index)
+        {
+            if (index < --_count)
+                System.Array.Copy(_charBuffer, index + 1, _charBuffer, index, _count - index);
+            _charBuffer[_count] = '\0'; //default char
+        }
+
 
         int _caretCharIndex = 0;//default  
         //TODO: temp public, review accessibility here again
-        public List<char> _charBuffer = new List<char>();
-        public PxScaledGlyphPlan[] _glyphPlans;
-        public List<UserCodePointToGlyphIndex> _userCodePointToGlyphIndexMap = new List<UserCodePointToGlyphIndex>();
+        int _count = 0;
+        char[] _charBuffer = null;
+        PxScaledGlyphPlan[] _glyphPlans;
+        List<UserCodePointToGlyphIndex> _userCodePointToGlyphIndexMap = new List<UserCodePointToGlyphIndex>();
 
         bool _contentChanged = true;
+
+        public System.ReadOnlySpan<char> Characters => new System.ReadOnlySpan<char>(_charBuffer, 0, _count);
 
         /// <summary>
         /// add char at current pos
@@ -22,17 +56,16 @@ namespace Typography.TextLayout
         public void AddChar(char c)
         {
             //add char at cursor index
-            int count = _charBuffer.Count;
 
-            if (_caretCharIndex == count)
+            if (_caretCharIndex == _count)
             {
                 //at the end                
-                _charBuffer.Add(c);
+                Add(c);
                 _caretCharIndex++;
             }
-            else if (_caretCharIndex < count)
+            else if (_caretCharIndex < _count)
             {
-                _charBuffer.Insert(_caretCharIndex, c);
+                Insert(_caretCharIndex, c);
                 _caretCharIndex++;
             }
             else
@@ -48,8 +81,7 @@ namespace Typography.TextLayout
                 return;
             }
             //
-            int count = _charBuffer.Count;
-            if (count == 0)
+            if (_count == 0)
             {
                 _caretCharIndex = 0;
                 return;
@@ -57,15 +89,14 @@ namespace Typography.TextLayout
 
             //end
             _caretCharIndex--;
-            _charBuffer.RemoveAt(_caretCharIndex);
+            RemoveAt(_caretCharIndex);
 
             _contentChanged = true;
         }
         public void DoDelete()
         {
             //simulate by do right + backspace
-            int count = _charBuffer.Count;
-            if (_caretCharIndex == count)
+            if (_caretCharIndex == _count)
             {
                 //caret is on the end
                 //just return
@@ -76,8 +107,7 @@ namespace Typography.TextLayout
         }
         public void DoLeft()
         {
-            int count = _charBuffer.Count;
-            if (count == 0)
+            if (_count == 0)
             {
                 _caretCharIndex = 0;
                 return;
@@ -122,18 +152,17 @@ namespace Typography.TextLayout
         }
         public void DoRight()
         {
-            int count = _charBuffer.Count;
-            if (count == 0)
+            if (_count == 0)
             {
                 return;
             }
-            else if (_caretCharIndex < count)
+            else if (_caretCharIndex < _count)
             {
                 //this is on the end
                 _caretCharIndex++;
 
                 //check if the caret can rest on this glyph?
-                if (_caretCharIndex < count)
+                if (_caretCharIndex < _count)
                 {
 
                     //find its mapping to glyph index
@@ -169,17 +198,14 @@ namespace Typography.TextLayout
         }
         public void DoEnd()
         {
-            _caretCharIndex = _charBuffer.Count;
+            _caretCharIndex = _count;
         }
-        public int CharCount
-        {
-            get { return 0; }
-        }
+        public int CharCount => _count;
         public bool ContentChanged { get { return _contentChanged; } set { _contentChanged = value; } }
         public int CaretCharIndex { get { return _caretCharIndex; } }
         public void SetCaretCharIndex(int newindex)
         {
-            if (newindex >= 0 && newindex <= _charBuffer.Count)
+            if (newindex >= 0 && newindex <= _count)
             {
                 _caretCharIndex = newindex;
             }

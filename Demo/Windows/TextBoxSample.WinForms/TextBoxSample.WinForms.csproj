@@ -115,6 +115,10 @@
       <Project>{333f3209-8da9-4d33-a560-299ed4c6dfa5}</Project>
       <Name>Typography.TextFlow</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\System.Memory\System.Memory.csproj">
+      <Project>{3f501b34-9e57-4610-8087-208f3a53cfb7}</Project>
+      <Name>System.Memory</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -21,13 +21,11 @@ namespace Typography.Contours
         public abstract Typography.OpenFont.Typeface Typeface { get; set; }
 
         public virtual void GenerateGlyphPlan(
-                  char[] textBuffer,
-                  int startAt,
-                  int len,
+                  System.ReadOnlySpan<char> textBuffer,
                   IUnscaledGlyphPlanList unscaledGlyphPlan)
         {
             GlyphLayout glyphLayout = this.GlyphLayoutMan;
-            glyphLayout.Layout(textBuffer, startAt, len);
+            glyphLayout.Layout(textBuffer);
             glyphLayout.GenerateUnscaledGlyphPlans(unscaledGlyphPlan); 
         }
         
@@ -75,14 +73,14 @@ namespace Typography.Contours
         /// <param name="len"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public abstract void DrawString(char[] textBuffer, int startAt, int len, float x, float y);
+        public abstract void DrawString(System.ReadOnlySpan<char> textBuffer, float x, float y);
         /// <summary>
         /// draw glyph plan list at (xpos,ypos) of baseline
         /// </summary>
         /// <param name="glyphPlanList"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public abstract void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y);
+        public abstract void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, float x, float y);
        
         /// <summary>
         /// draw caret at xpos,ypos (sample only)
@@ -90,20 +88,5 @@ namespace Typography.Contours
         /// <param name="x"></param>
         /// <param name="y"></param>
         public abstract void DrawCaret(float x, float y);
-
-
-        //----------------------------------------------------
-        //helper methods
-        public void DrawString(char[] textBuffer, float x, float y)
-        {
-            DrawString(textBuffer, 0, textBuffer.Length, x, y);
-        }
-        public void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, float x, float y)
-        {
-            DrawFromGlyphPlans(glyphPlanSeq, 0, glyphPlanSeq.Count, x, y);
-        }
-        
-
     }
-
 }

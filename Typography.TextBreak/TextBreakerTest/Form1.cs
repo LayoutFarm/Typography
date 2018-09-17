@@ -90,15 +90,12 @@ namespace TextBreakerTest
             var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu62/brkitr" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
-            breaker1.BreakNumberAfterText = true; 
-            char[] test = this.textBox1.Text.ToCharArray();
-            this.listBox1.Items.Clear(); 
-            breaker1.BreakWords(test, 0, test.Length);
-            foreach (BreakSpan span in breaker1.GetBreakSpanIter())
-            {
-                string s = new string(test, span.startAt, span.len);
-                this.listBox1.Items.Add(span.startAt + " " + s);
-            }
+            breaker1.BreakNumberAfterText = true;
+            var test = this.textBox1.Text;
+            this.listBox1.Items.Clear();
+            breaker1.BreakWords(test.AsSpan(), new BreakSpanProcessor(span =>
+                this.listBox1.Items.Add($"{span.startAt} {test.Substring(span.startAt, span.len)}"
+            )));
         }
         static bool StringStartsWithChars(string srcString, string value)
         {
@@ -152,7 +149,7 @@ namespace TextBreakerTest
             stopWatch.Stop();
             long ms2 = stopWatch.ElapsedMilliseconds;
             //----------------------------
-            MessageBox.Show("Managed: " + ms1.ToString() + "ms, Native Icu: " + ms2.ToString() + "ms");
+            MessageBox.Show($"Managed: {ms1}ms, Native Icu: {ms2}ms");
         }
         void ParseWithManaged(int ntimes)
         {
@@ -161,15 +158,14 @@ namespace TextBreakerTest
             var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
-            char[] test = this.textBox1.Text.ToCharArray();
+            var test = this.textBox1.Text.AsSpan();
             //-------------
             for (int i = ntimes - 1; i >= 0; --i)
             {
-                breaker1.BreakWords(test, 0, test.Length);
-                foreach (var span in breaker1.GetBreakSpanIter())
+                breaker1.BreakWords(test, new BreakSpanProcessor(span =>
                 {
 
-                }
+                }));
             }
         }
         void ParseWithIcu(int ntimes)

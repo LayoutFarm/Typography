@@ -176,8 +176,7 @@ namespace Typography.TextLayout
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
             GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang.internalName);
-            GlyphLayoutPlanContext context;
-            if (!collection.TryGetValue(key, out context))
+            if (!collection.TryGetValue(key, out GlyphLayoutPlanContext context))
             {
                 var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.shortname) : null;
                 var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
@@ -306,10 +305,7 @@ namespace Typography.TextLayout
         /// <param name="str"></param>
         /// <param name="startAt"></param>
         /// <param name="len"></param>
-        public void Layout(
-            char[] str,
-            int startAt,
-            int len)
+        public void Layout(ReadOnlySpan<char> str)
         {
 
             //[A]
@@ -327,13 +323,13 @@ namespace Typography.TextLayout
 #if DEBUG
             _dbugReusableCodePointFromUserCharList.Clear();
 #endif
-            for (int i = 0; i < len; ++i)
+            for (int i = 0; i < str.Length; ++i)
             {
-                char ch = str[startAt + i];
+                char ch = str[i];
                 int codepoint = ch;
-                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < len)
+                if (ch >= 0xd800 && ch <= 0xdbff && i + 1 < str.Length)
                 {
-                    char nextCh = str[startAt + i + 1];
+                    char nextCh = str[i + 1];
                     if (nextCh >= 0xdc00 && nextCh <= 0xdfff)
                     {
                         //please note: 

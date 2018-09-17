@@ -97,10 +97,10 @@ namespace Typography.TextServices
 
         }
 
-        public GlyphPlanSequence GetUnscaledGlyphPlanSequence(TextBuffer buffer, int start, int len)
+        public GlyphPlanSequence GetUnscaledGlyphPlanSequence(ReadOnlySpan<char> buffer)
         {
             //under current typeface + scriptlang setting 
-            return _currentGlyphPlanSeqCache.GetUnscaledGlyphPlanSequence(_glyphLayout, buffer, start, len);
+            return _currentGlyphPlanSeqCache.GetUnscaledGlyphPlanSequence(_glyphLayout, buffer);
         }
         internal void ClearAllRegisteredShapingContext()
         {
@@ -108,16 +108,17 @@ namespace Typography.TextServices
         }
 
         Typography.TextBreak.CustomBreaker _textBreaker;
-        public IEnumerable<BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
+        public List<BreakSpan> BreakToLineSegments(ReadOnlySpan<char>str)
         {
+            var outputList = new List<BreakSpan>();
             //user must setup the CustomBreakerBuilder before use              
             if (_textBreaker == null)
             {
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
             }
-            int cur_startAt = startAt;
-            _textBreaker.BreakWords(str, cur_startAt, len);
-            foreach (TextBreak.BreakSpan sp in _textBreaker.GetBreakSpanIter())
+            var breakSpanList = new List<TextBreak.BreakSpan>();
+            _textBreaker.BreakWords(str, breakSpanList);
+            foreach (var sp in breakSpanList)
             {
                 //our service select a proper script lang info and add to the breakspan
 
@@ -126,7 +127,6 @@ namespace Typography.TextServices
                 //has 1 script lang, and we examine it
                 //with sample char
                 char sample = str[sp.startAt];
-
                 ScriptLang selectedScriptLang;
                 if (sample == ' ')
                 {
@@ -159,12 +159,14 @@ namespace Typography.TextServices
                     }
                 }
 
-                BreakSpan breakspan = new BreakSpan();
-                breakspan.startAt = sp.startAt;
-                breakspan.len = sp.len;
-                breakspan.scLang = selectedScriptLang;
-                yield return breakspan;
+                outputList.Add(new BreakSpan
+                {
+                    startAt = sp.startAt,
+                    len = sp.len,
+                    scLang = selectedScriptLang
+                });
             }
+            return outputList;
         }
 
         /// <summary>
@@ -216,7 +218,7 @@ namespace Typography.TextServices
 
         UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
 
-        public void MeasureString(char[] str, int startAt, int len, out int w, out int h)
+        public void MeasureString(ReadOnlySpan<char> str, out int w, out int h)
         {
             //measure string 
             //check if we use cache feature or not
@@ -237,15 +239,15 @@ namespace Typography.TextServices
             //-------------------
             //user must setup the CustomBreakerBuilder before use         
 
-            int cur_startAt = startAt;
+            int cur_startAt = 0;
             float accumW = 0;
             float accumH = 0;
 
 
-            foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            foreach (BreakSpan breakSpan in BreakToLineSegments(str))
             {
 
-                _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
+                _glyphLayout.Layout(str.Slice(breakSpan.startAt, breakSpan.len));
                 //
                 _reusableGlyphPlanList.Clear();
                 _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
@@ -269,7 +271,7 @@ namespace Typography.TextServices
             h = (int)System.Math.Round(accumH);
         }
 
-        public void MeasureString(char[] str, int startAt, int len, int limitWidth, out int charFit, out int charFitWidth)
+        public void MeasureString(ReadOnlySpan<char> str, int limitWidth, out int charFit, out int charFitWidth)
         {
             //measure string 
             if (str.Length < 1)
@@ -288,15 +290,14 @@ namespace Typography.TextServices
             //but in this code, we use our Typography' parser
             //-------------------
             //user must setup the CustomBreakerBuilder before use         
-
-            int cur_startAt = startAt;
+            
             float accumW = 0;
 
-            foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            foreach (BreakSpan breakSpan in BreakToLineSegments(str))
             {
 
                 //measure string at specific px scale 
-                _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
+                _glyphLayout.Layout(str.Slice(breakSpan.startAt, breakSpan.len));
                 //
 
                 _reusableGlyphPlanList.Clear();
@@ -464,42 +465,39 @@ namespace Typography.TextServices
             _scLang = scLang;
             _glyphPlanSeqSet = new GlyphPlanSeqSet();
         }
-        static int CalculateHash(TextBuffer buffer, int startAt, int len)
+        static int CalculateHash(ReadOnlySpan<char> buffer)
         {
             //reference,
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
-            return CRC32.CalculateCRC32(buffer.UnsafeGetInternalBuffer(), startAt, len);
+            return CRC32.CalculateCRC32(buffer);
         }
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(
             GlyphLayout glyphLayout,
-            TextBuffer buffer, int start, int seqLen)
+            ReadOnlySpan<char> buffer)
         {
 
             //UNSCALED VERSION
             //use current typeface + scriptlang
-            int seqHashValue = CalculateHash(buffer, start, seqLen);
+            int seqHashValue = CalculateHash(buffer);
 
             //this func get the raw char from buffer
             //and create glyph list 
             //check if we have the string cache in specific value 
             //---------
-            if (seqLen > _glyphPlanSeqSet.MaxCacheLen)
+            if (buffer.Length > _glyphPlanSeqSet.MaxCacheLen)
             {
                 //layout string is too long to be cache
                 //it need to split into small buffer 
             }
 
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
-            GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(seqLen);
+            GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(buffer.Length);
 
             if (!seqCol.TryGetCacheGlyphPlanSeq(seqHashValue, out planSeq))
             {
                 //create a new one if we don't has a cache
                 //1. layout 
-                glyphLayout.Layout(
-                    buffer.UnsafeGetInternalBuffer(),
-                    start,
-                    seqLen);
+                glyphLayout.Layout(buffer);
 
                 int pre_count = _reusableGlyphPlanList.Count;
                 //create glyph-plan ( UnScaled version) and add it to planList                

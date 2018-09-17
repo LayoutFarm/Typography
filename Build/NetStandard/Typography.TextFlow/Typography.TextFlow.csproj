@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
   </ItemGroup>

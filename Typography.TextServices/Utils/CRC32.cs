@@ -53,10 +53,10 @@ namespace Typography.TextServices
         /// <param name="startAt"></param>
         /// <param name="len"></param>
         /// <returns></returns>
-        public static int CalculateCRC32(char[] charBuffer, int startAt, int len)
+        public static int CalculateCRC32(ReadOnlySpan<char> charBuffer)
         {
             //calculate CRC32 
-            uint register = SlurpBlock2_(charBuffer, startAt, len);
+            uint register = SlurpBlock2_(charBuffer);
             return (Int32)(~register);
         }
         /// <summary>
@@ -66,20 +66,20 @@ namespace Typography.TextServices
         /// <param name="startAt"></param>
         /// <param name="len"></param>
         /// <returns></returns>
-        public static int CalculateCRC32_ReverseBit(char[] charBuffer, int startAt, int len)
+        public static int CalculateCRC32_ReverseBit(ReadOnlySpan<char> charBuffer)
         {
             //calculate CRC32
-            uint register = SlurpBlock2_ReverseBits(charBuffer, startAt, len);
+            uint register = SlurpBlock2_ReverseBits(charBuffer);
             return (Int32)(~register);
         }
-        static uint SlurpBlock2_(char[] block, int offset, int count)
+        static uint SlurpBlock2_(ReadOnlySpan<char> block)
         {
             uint _register = RESET_REGISTER;
             // bzip algorithm
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < block.Length; i++)
             {
 
-                char ch = block[offset + i];
+                char ch = block[i];
                 byte b0 = (byte)(ch >> 8);
                 byte b1 = (byte)ch;
                 //b0
@@ -92,14 +92,14 @@ namespace Typography.TextServices
             }
             return _register;
         }
-        static uint SlurpBlock2_ReverseBits(char[] block, int offset, int count)
+        static uint SlurpBlock2_ReverseBits(ReadOnlySpan<char> block)
         {
             uint _register = RESET_REGISTER;
             // bzip algorithm
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < block.Length; i++)
             {
 
-                char ch = block[offset + i];
+                char ch = block[i];
                 byte b0 = (byte)(ch >> 8);
                 byte b1 = (byte)ch;
                 //b0
