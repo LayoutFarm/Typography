@@ -197,7 +197,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO...
         }
 
-        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float x, float y)
+        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, float x, float y)
         {
 
             Typeface typeface = _textServices.ResolveTypeface(_font);
@@ -385,23 +385,13 @@ namespace PixelFarm.Drawing.Fonts
             //
             _painter.DestBitmapBlender.OutputPixelBlender = prevPxBlender;//restore back
         }
-        public void DrawString(char[] text, int startAt, int len, double x, double y)
+        void ITextPrinter.DrawString(ReadOnlySpan<char> textBuffer, double x, double y) =>
+            DrawString(textBuffer, (float)x, (float)y);
+        public override void DrawString(ReadOnlySpan<char> textBuffer, float x, float y)
         {
-            InternalDrawString(text, startAt, len, (float)x, (float)y);
-        }
-        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
-        {
-            InternalDrawString(textBuffer, startAt, len, x, y);
-        }
-
-        void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
-        {
-
-            //create temp buffer span that describe the part of a whole char buffer
-            TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
             //with specific request font      
-            DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font), startAt, len, x, y);
+            DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(textBuffer, _font), x, y);
         }
     }
 }

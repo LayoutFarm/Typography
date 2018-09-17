@@ -3,7 +3,7 @@
 
 namespace Typography.TextLayout
 {
-
+    [System.Obsolete("", true)]
     public class TextBuffer
     {
         internal char[] _buffer;
@@ -28,6 +28,7 @@ namespace Typography.TextLayout
 
         }
     }
+    [System.Obsolete("", true)]
     public class ReusableTextBuffer : TextBuffer
     {
         public ReusableTextBuffer()

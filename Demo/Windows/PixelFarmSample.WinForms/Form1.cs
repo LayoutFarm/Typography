@@ -621,7 +621,7 @@ namespace SampleWinForms
             //this demostrate step-by-step
 
             //similar to ...  selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos); 
-            string str = txtInputChar.Text;
+            var str = txtInputChar.Text.AsSpan();
             //
             Typeface typeface = _basicOptions.Typeface;
             float fontSizeInPoints = _basicOptions.FontSizeInPoints;
@@ -642,8 +642,7 @@ namespace SampleWinForms
             //3.2 : only MeasuredStringBox
             Typography.TextLayout.MeasuredStringBox box =
                 layout.LayoutAndMeasureString(
-                    str.ToCharArray(), 0,
-                    str.Length,
+                    str,
                     fontSizeInPoints);
 
             this.lblStringSize.Text = "measure (W,H)= (" + box.width.ToString() + "," + (box.ascending - box.descending) + ") px";

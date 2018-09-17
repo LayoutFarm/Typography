@@ -133,16 +133,6 @@ namespace Typography.TextLayout
             _exactX = _exactY = 0;
             _currentGlyphIndex = 0;
         }
-        public GlyphPlanSequenceSnapPixelScaleLayout(GlyphPlanSequence glyphPlans, int start, int len, float pxscale)
-        {
-            _seq = glyphPlans;
-            _pxscale = pxscale;
-            _accW = 0;
-            _index = start;
-            _end = start + len;
-            _exactX = _exactY = 0;
-            _currentGlyphIndex = 0;
-        }
         public ushort CurrentGlyphIndex { get { return _currentGlyphIndex; } }
         public int CurrentIndex { get { return _index; } }
 
@@ -262,14 +252,12 @@ namespace Typography.TextLayout
 
         public static MeasuredStringBox LayoutAndMeasureString(
             this GlyphLayout glyphLayout,
-            char[] textBuffer,
-            int startAt,
-            int len,
+            ReadOnlySpan<char> textBuffer,
             float fontSizeInPoints,
             bool snapToGrid = true)
         {
             //1. unscale layout, in design unit
-            glyphLayout.Layout(textBuffer, startAt, len);
+            glyphLayout.Layout(textBuffer);
 
 
             //2. scale  to specific font size           

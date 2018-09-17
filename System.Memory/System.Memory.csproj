@@ -56,7 +56,6 @@
     <Compile Include="Memory\ReadOnlyMemory.cs" />
     <Compile Include="Memory\NUint.cs" />
     <Compile Include="MethodImplOptions.cs" />
-    <Compile Include="NonVersionable.cs" />
     <Compile Include="Pinnable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadOnlySpan.cs" />

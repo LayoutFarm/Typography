@@ -11,7 +11,7 @@ namespace Typography.TextBreak
     public class CustomBreaker
     {
         //default for latin breaking engine
-        EngBreakingEngine _engBreakingEngine = new EngBreakingEngine();
+        EngAndNonWordBreakingEngine _engBreakingEngine = new EngAndNonWordBreakingEngine();
         //current lang breaking engine
         BreakingEngine _breakingEngine;
         List<BreakingEngine> _otherEngines = new List<BreakingEngine>();
@@ -25,7 +25,7 @@ namespace Typography.TextBreak
             _breakingEngine = _engBreakingEngine; //default eng-breaking engine
         }
 
-        public EngBreakingEngine EngBreakingEngine
+        public EngAndNonWordBreakingEngine EngBreakingEngine
         {
             get { return _engBreakingEngine; }
         }
@@ -81,66 +81,61 @@ namespace Typography.TextBreak
                 return _engBreakingEngine;
             }
         }
+        
+        public BreakingEngine GetBreakingEngineFor(char c)
+        {
+            return SelectEngine(c);
+        }
+        
+        public void BreakWords(string inputstr, ICollection<BreakAtInfo> outputBreakAtList) =>
+            BreakWords(inputstr.AsSpan(), outputBreakAtList);
 
+        public void BreakWords(string inputstr, ICollection<BreakSpan> outputBreakSpanList) =>
+            BreakWords(inputstr.AsSpan(), outputBreakSpanList);
+
+        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakSpan> outputBreakSpanList) =>
+            BreakWords(charBuff, new BreakSpanProcessor(outputBreakSpanList.Add));
 
         public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakAtInfo> outputBreakAtList)
         {
             //conver to char buffer 
             if (charBuff.IsEmpty) return;
+            int startAt = 0;
             var visitor = new WordVisitor(charBuff, outputBreakAtList, new Stack<int>());
-            visitor.LoadText(charBuff);
             //---------------------------------------- 
-            BreakingEngine currentEngine = _breakingEngine = SelectEngine(charBuff[charBuff.]);
+            BreakingEngine currentEngine = _breakingEngine = SelectEngine(visitor.CurrentChar);
             //----------------------------------------
             //select breaking engine
-            int endAt = startAt + len;
 
             for (; ; )
             {
                 //----------------------------------------
-                currentEngine.BreakWord(_visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
-                switch (_visitor.State)
+                currentEngine.BreakWord(visitor, charBuff.Slice(startAt)); //please note that len is decreasing
+                switch (visitor.State)
                 {
                     default: throw new NotSupportedException();
-
                     case VisitorState.End:
                         //ok
                         return;
                     case VisitorState.OutOfRangeChar:
                         {
                             //find proper breaking engine for current char
-
-                            BreakingEngine anotherEngine = SelectEngine(_visitor.Char);
+                            BreakingEngine anotherEngine = SelectEngine(visitor.CurrentChar);
                             if (anotherEngine == currentEngine)
                             {
-                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
-                                visitor. startAt = _visitor.CurrentIndex + 1;
-                                _visitor.SetCurrentIndex(startAt);
-                                _visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
+                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.CurrentChar}' was not found.");
+                                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
+                                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
                             }
                             else
                             {
                                 currentEngine = anotherEngine;
-                                startAt = _visitor.CurrentIndex;
+                                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
                             }
                         }
                         break;
                 }
             }
         }
-
-        public void BreakWords(string inputstr, ICollection<BreakAtInfo> outputBreakAtList)
-        {
-            BreakWords(inputstr.AsSpan(), outputSpans);
-        }
-
-
-        public BreakingEngine GetBreakingEngineFor(char c)
-        {
-            return SelectEngine(c);
-        }
-        //
     }
-
-
 }

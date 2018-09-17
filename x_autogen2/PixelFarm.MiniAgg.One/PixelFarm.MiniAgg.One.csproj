@@ -8,6 +8,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AssemblyName>PixelFarm.MiniAgg.One</AssemblyName>
+    <ProjectGuid>{FB5F78F5-C921-405D-8F21-42F7C15C2AD9}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -803,6 +804,12 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface\SvgRenderVx.cs">
       <Link>PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface\SvgRenderVx.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\System.Memory\System.Memory.csproj">
+      <Project>{3f501b34-9e57-4610-8087-208f3a53cfb7}</Project>
+      <Name>System.Memory</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

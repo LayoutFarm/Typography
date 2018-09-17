@@ -15,6 +15,7 @@ namespace PixelFarm.Drawing
         int StartAt { get; }
     }
 
+    [System.Obsolete("", true)]
     public struct TextBufferSpan
     {
         public readonly int start;
@@ -52,19 +53,19 @@ namespace PixelFarm.Drawing
         //
         bool SupportsWordBreak { get; }
 
-        ILineSegmentList BreakToLineSegments(ref TextBufferSpan textBufferSpan);
+        ILineSegmentList BreakToLineSegments(System.ReadOnlySpan<char> textBufferSpan);
         //
-        Size MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font);
+        Size MeasureString(System.ReadOnlySpan<char> textBufferSpan, RequestFont font);
 
-        void MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
+        void MeasureString(System.ReadOnlySpan<char> textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
 
-        void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, 
+        void CalculateUserCharGlyphAdvancePos(System.ReadOnlySpan<char> textBufferSpan, 
             RequestFont font,
             int[] outputXAdvances,
             out int outputTotalW,
             out int lineHeight);
 
-        void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
+        void CalculateUserCharGlyphAdvancePos(System.ReadOnlySpan<char> textBufferSpan, ILineSegmentList lineSegs,
             RequestFont font, int[] outputXAdvances, out int outputTotalW, out int lineHeight);
     }
 
@@ -76,7 +77,7 @@ namespace PixelFarm.Drawing
     public interface ITextPrinter
     {
         bool StartDrawOnLeftTop { get; set; }
-        void DrawString(char[] text, int startAt, int len, double x, double y);
+        void DrawString(System.ReadOnlySpan<char> charBuffer, double x, double y);
         /// <summary>
         /// render from RenderVxFormattedString object to specific pos
         /// </summary>
@@ -97,7 +98,7 @@ namespace PixelFarm.Drawing
         public static void DrawString(this ITextPrinter textPrinter, string text, double x, double y)
         {
             char[] textBuffer = text.ToCharArray();
-            textPrinter.DrawString(textBuffer, 0, textBuffer.Length, x, y);
+            textPrinter.DrawString(textBuffer, x, y);
         }
     }
 

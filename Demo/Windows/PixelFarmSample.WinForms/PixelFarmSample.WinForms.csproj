@@ -98,6 +98,10 @@
       <Project>{540a2ea6-dae3-4625-8951-b2c3118603a4}</Project>
       <Name>PixelFarm.Typography</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\System.Memory\System.Memory.csproj">
+      <Project>{3f501b34-9e57-4610-8087-208f3a53cfb7}</Project>
+      <Name>System.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>

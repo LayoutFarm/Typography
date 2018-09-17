@@ -3,7 +3,6 @@
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
-
 namespace Typography.TextBreak
 {
     public class KhmerDictionaryBreakingEngine : DictionaryBreakingEngine
@@ -20,6 +19,11 @@ namespace Typography.TextBreak
         }
 
         protected override WordGroup GetWordGroupForFirstChar(char c)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        internal override void BreakWord(WordVisitor visitor, System.ReadOnlySpan<char> charBuff)
         {
             throw new System.NotImplementedException();
         }

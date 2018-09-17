@@ -27,26 +27,19 @@ namespace Typography.TextBreak
         protected abstract WordGroup GetWordGroupForFirstChar(char c);
         public bool BreakPeroidInTextSpan { get; set; }
 
-        int _startAt;
-        int _len;
-        int _endAt;
-
         public bool DontMergeLastIncompleteWord { get; set; }
-        internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
+        internal override void BreakWord(WordVisitor visitor, ReadOnlySpan<char> charBuff)
         {
             visitor.State = VisitorState.Parsing;
-            this._startAt = startAt;
-            this._len = len;
-            this._endAt = startAt + len;
 
             char c_first = this.FirstUnicodeChar;
             char c_last = this.LastUnicodeChar;
-            int endAt = startAt + len;
+            int endAt = charBuff.Length;
 
-            Stack<int> candidateBreakList = visitor.GetTempCandidateBreaks();
+            Stack<int> candidateBreakList = visitor.TempCandidateBreaks;
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
-            for (int i = startAt; i < endAt;)
+            for (int i = 0; i < endAt;)
             {
                 ENTER_LOOP:
 
@@ -200,7 +193,7 @@ namespace Typography.TextBreak
                         //----------------------------------------
                         candidateLen++;
 
-                        if (!breakPeroidInTextSpan && visitor.Char == '.')
+                        if (!breakPeroidInTextSpan && visitor.CurrentChar == '.')
                         {
                             //treat abbrev
                             ++i;
@@ -237,7 +230,7 @@ namespace Typography.TextBreak
                                     visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
                                     if (visitor.State != VisitorState.End)
                                     {
-                                        char next_char = visitor.Char;
+                                        char next_char = visitor.CurrentChar;
                                         if (CanBeStartChar(next_char))
                                         {
                                             //use this
@@ -324,7 +317,7 @@ namespace Typography.TextBreak
 
                                                 //TODO: review here again
 #if DEBUG
-                                                char current_char = visitor.Char;
+                                                char current_char = visitor.CurrentChar;
                                                 if (CanBeStartChar(current_char))
                                                 {
 
@@ -358,7 +351,7 @@ namespace Typography.TextBreak
                                                 //check if we can use this candidate
                                                 if (visitor.State != VisitorState.End)
                                                 {
-                                                    char next_char = visitor.Char;
+                                                    char next_char = visitor.CurrentChar;
                                                     if (CanBeStartChar(next_char))
                                                     {
                                                         //use this
@@ -379,7 +372,7 @@ namespace Typography.TextBreak
                                         {
                                             //no next word, no candidate
                                             //skip this 
-                                            char next_char = visitor.Char;
+                                            char next_char = visitor.CurrentChar;
                                             if (CanBeStartChar(next_char))
                                             {
                                                 //use this
@@ -415,7 +408,7 @@ namespace Typography.TextBreak
                                         return;
                                     }
                                     //check if we can use this candidate
-                                    char next_char = visitor.Char;
+                                    char next_char = visitor.CurrentChar;
                                     if (!CanHandle(next_char))
                                     {
                                         //use this
@@ -450,7 +443,7 @@ namespace Typography.TextBreak
                 }
             }
             //------
-            if (visitor.CurrentIndex >= len - 1)
+            if (visitor.CurrentIndex >= endAt)
             {
                 //the last one 
                 visitor.State = VisitorState.End;
@@ -459,7 +452,7 @@ namespace Typography.TextBreak
         internal WordGroup GetSubGroup(WordVisitor visitor, WordGroup wordGroup)
         {
 
-            char c = visitor.Char;
+            char c = visitor.CurrentChar;
             if (!CanHandle(c))
             {
                 //can't handle
@@ -508,7 +501,7 @@ namespace Typography.TextBreak
 #endif
 
                 int savedIndex = visitor.CurrentIndex;
-                char c = visitor.Char;
+                char c = visitor.CurrentChar;
                 int wordLen = w.len;
                 int matchCharCount = 0;
                 if (wordLen > readLen)
@@ -524,7 +517,7 @@ namespace Typography.TextBreak
                             if (!visitor.IsEnd)
                             {
                                 visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
-                                c = visitor.Char;
+                                c = visitor.CurrentChar;
                             }
                             else
                             {
@@ -551,7 +544,7 @@ namespace Typography.TextBreak
                     }
                     //check next char can be the char of new word or not
                     //this depends on each lang 
-                    char canBeStartChar = visitor.Char;
+                    char canBeStartChar = visitor.CurrentChar;
                     if (CanHandle(canBeStartChar))
                     {
                         if (CanBeStartChar(canBeStartChar))

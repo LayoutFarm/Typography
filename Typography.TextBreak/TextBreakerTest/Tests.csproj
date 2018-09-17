@@ -77,6 +77,10 @@
       <Project>{bc10cc51-a795-40d0-96f0-f87585d59d02}</Project>
       <Name>Typography.TextBreak</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\System.Memory\System.Memory.csproj">
+      <Project>{3f501b34-9e57-4610-8087-208f3a53cfb7}</Project>
+      <Name>System.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Reference_TextBreak.Icu\Reference_TextBreak.Icu.csproj">
       <Project>{777178ca-c706-406f-856d-62cc40ac63e4}</Project>
       <Name>Reference_TextBreak.Icu</Name>

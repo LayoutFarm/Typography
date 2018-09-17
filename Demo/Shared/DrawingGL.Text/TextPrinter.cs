@@ -52,7 +52,7 @@ namespace DrawingGL.Text
         }
 
 
-        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y)
+        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, float x, float y)
         {
             throw new System.NotImplementedException();
         }
@@ -67,10 +67,10 @@ namespace DrawingGL.Text
                 GlyphLayoutMan.Typeface = value;
             }
         }
-        public MeasuredStringBox Measure(char[] textBuffer, int startAt, int len)
+        public MeasuredStringBox Measure(System.ReadOnlySpan<char> textBuffer)
         {
             return GlyphLayoutMan.LayoutAndMeasureString(
-                textBuffer, startAt, len,
+                textBuffer,
                 this.FontSizeInPoints
                 );
         }
@@ -133,7 +133,7 @@ namespace DrawingGL.Text
         /// <param name="charBuffer"></param>
         /// <param name="start"></param>
         /// <param name="len"></param>
-        public void GenerateGlyphRuns(TextRun outputTextRun, char[] charBuffer, int start, int len)
+        public void GenerateGlyphRuns(TextRun outputTextRun, System.ReadOnlySpan<char> charBuffer)
         {
             // layout glyphs with selected layout technique
             float sizeInPoints = this.FontSizeInPoints;
@@ -146,12 +146,12 @@ namespace DrawingGL.Text
 
 
             GlyphLayoutMan.Typeface = this.Typeface;
-            GlyphLayoutMan.Layout(charBuffer, start, len);
+            GlyphLayoutMan.Layout(charBuffer);
 
             float pxscale = this.Typeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
 
             _resuableGlyphPlanList.Clear();
-            GenerateGlyphPlan(charBuffer, 0, charBuffer.Length, _resuableGlyphPlanList);
+            GenerateGlyphPlan(charBuffer, _resuableGlyphPlanList);
 
             // render each glyph 
             int planCount = _resuableGlyphPlanList.Count;
@@ -194,7 +194,7 @@ namespace DrawingGL.Text
                         processGlyph.tessNElements));
             }
         }
-        public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
+        public override void DrawString(System.ReadOnlySpan<char> textBuffer, float x, float y)
         {
 
         }

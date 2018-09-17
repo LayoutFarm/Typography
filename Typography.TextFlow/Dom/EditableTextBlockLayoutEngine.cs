@@ -58,8 +58,8 @@ namespace Typography.TextLayout
             fontStyle.Name = "tahoma";
             fontStyle.SizeInPoints = FontSizeInPts;//10 pts;
 
-            TextBuffer buffer = new TextBuffer(text.ToCharArray());
-            _textBlockLexer.Lex(buffer);
+            var buffer = System.MemoryExtensions.AsMemory(text);
+            _textBlockLexer.Lex(buffer.Span);
 
             //create a set of line
             List<LexWordSpan> spanLists = _textBlockLexer.ResultSpans;
@@ -83,7 +83,7 @@ namespace Typography.TextLayout
                 else
                 {
                     //create a 'Run' for this span
-                    TextRun textRun = new TextRun(buffer, sp.start, sp.len, sp.kind);
+                    TextRun textRun = new TextRun(buffer.Slice(sp.start, sp.len), sp.kind);
                     //add property font style to text run
                     textRun.FontStyle = fontStyle;
                     line.AppendLast(textRun);
@@ -141,8 +141,7 @@ namespace Typography.TextLayout
 
                     TextRunFontStyle fontStyle = tt.FontStyle;
                     //resolve to actual font face
-                    TextBuffer buffer = tt.TextBuffer;
-                    char[] rawBuffer = buffer.UnsafeGetInternalBuffer();
+                    var buffer = tt.TextBuffer;
 
 
                     //TODO: review here again
@@ -150,7 +149,7 @@ namespace Typography.TextLayout
                     int preCount = _outputGlyphPlan.Count;
 
                     _glyphLayout.Typeface = selectedTypeface;
-                    _glyphLayout.Layout(rawBuffer, tt.StartAt, tt.Len);
+                    _glyphLayout.Layout(buffer.Span);
 
                     _glyphLayout.GenerateUnscaledGlyphPlans(_outputGlyphPlan);
 

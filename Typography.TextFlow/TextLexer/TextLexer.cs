@@ -14,11 +14,10 @@ namespace Typography.TextBreak
                 return spans;
             }
         }
-        public virtual void Lex(TextBuffer textBuffer)
+        public virtual void Lex(System.ReadOnlySpan<char> buffer)
         {
             WordSpanKind lexMode = WordSpanKind.Unknown;
             //simple line break / whitespace lexer
-            char[] buffer = textBuffer.UnsafeGetInternalBuffer();
             int j = buffer.Length;
 
             int startIndex = 0;

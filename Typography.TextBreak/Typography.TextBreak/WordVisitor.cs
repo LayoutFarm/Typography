@@ -18,102 +18,49 @@ namespace Typography.TextBreak
 
 
 
-    ref struct WordVisitor
+    public ref struct WordVisitor
     {
-        ICollection<BreakAtInfo> _breakAtList;
-        ReadOnlySpan<char> _buffer;
+        readonly ReadOnlySpan<char> _buffer;
 
-        int _currentIndex;
-        char _currentChar;
-        int _latestBreakAt;
-
-
-        Stack<int> _tempCandidateBreaks;
         public WordVisitor(ReadOnlySpan<char> buffer, ICollection<BreakAtInfo> breakAtList, Stack<int> tempCandidateBreaks)
         {
             _buffer = buffer;
-            _breakAtList = breakAtList;
-            _tempCandidateBreaks = tempCandidateBreaks;
-            _currentIndex = 0;
-            _currentChar = buffer[0];
+            BreakList = breakAtList;
+            TempCandidateBreaks = tempCandidateBreaks;
+            CurrentIndex = 0;
             State = VisitorState.Init;
-            _latestBreakAt = 0;
+            LatestBreakAt = 0;
         }
 
-        public VisitorState State
-        {
-            get;
-            set;
-        }
-        public int CurrentIndex
-        {
-            get { return this._currentIndex; }
-        }
-        public char Char
-        {
-            get { return _currentChar; }
-        }
-        public bool IsEnd
-        {
-            get { return _currentIndex >= _buffer.Length; }
-        }
+        public VisitorState State { get; set; }
+        public int CurrentIndex { get; private set; }
+        public int LatestBreakAt { get; private set; }
+        public ICollection<BreakAtInfo> BreakList { get; }
+        internal Stack<int> TempCandidateBreaks { get; }
 
-
-#if DEBUG
-        //int dbugAddSteps;
-#endif
+        public char CurrentChar => _buffer[CurrentIndex];
+        public bool IsEnd => CurrentIndex >= _buffer.Length;
+        
         public void AddWordBreakAt(int index, WordKind wordKind)
         {
+            if (index == LatestBreakAt)
+                throw new InvalidOperationException("The last break index was the same as the current one.");
 
-#if DEBUG
-            //dbugAddSteps++;
-            //if (dbugAddSteps >= 57)
-            //{
-
-            //}
-            if (index == _latestBreakAt)
-            {
-                throw new NotSupportedException();
-            }
-#endif
-
-
-            this._latestBreakAt = index;
-
-            _breakAtList.Add(new BreakAtInfo(index, wordKind));
+            BreakList.Add(new BreakAtInfo(index, wordKind));
+            this.LatestBreakAt = index;
         }
-        public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
-        {
+        public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text) =>
             AddWordBreakAt(this.CurrentIndex, wordKind);
-        }
-        public int LatestBreakAt
-        {
-            get { return this._latestBreakAt; }
-        }
         public void SetCurrentIndex(int index)
         {
-            this._currentIndex = index;
-            if (index < _buffer.Length)
-            {
-                _currentChar = _buffer[index];
-            }
-            else
-            {
-                //can't read next
-                //the set state= end
+            this.CurrentIndex = index;
+            if (IsEnd) //if can't read next then set state to end
                 this.State = VisitorState.End;
-            }
         }
-        public ICollection<BreakAtInfo> GetBreakList()
+        public void Break(BreakBounds bb)
         {
-            return _breakAtList;
+            AddWordBreakAt(bb.startIndex + bb.length, bb.kind);
+            SetCurrentIndex(LatestBreakAt);
         }
-        internal Stack<int> GetTempCandidateBreaks()
-        {
-            return this._tempCandidateBreaks;
-        }
-
-
     }
-
 }

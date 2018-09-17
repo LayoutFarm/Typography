@@ -8,19 +8,20 @@ public class BasicTests
 
     public void BasicTest(string input, string[] output, bool breakNumberAfterText = false)
     {
-        var customBreaker = new CustomBreaker();
-        customBreaker.BreakNumberAfterText = breakNumberAfterText;
+        var customBreaker = new CustomBreaker
+        {
+            BreakNumberAfterText = breakNumberAfterText
+        };
         //
-        customBreaker.BreakWords(input);
+        var outputList = new List<BreakAtInfo> { BreakAtInfo.Empty };
+        customBreaker.BreakWords(input, outputList);
         //
-        var outputList = new List<int> { 0 };
-        customBreaker.CopyBreakResults(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
             Assert.AreEqual
             (
                 output[i],
-                input.Substring(outputList[i], outputList[i + 1] - outputList[i])
+                input.Substring(outputList[i].breakAt, outputList[i + 1].breakAt - outputList[i].breakAt)
             );
         }
     }

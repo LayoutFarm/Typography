@@ -14,11 +14,12 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -26,7 +27,8 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -40,11 +42,14 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <Target Name="CreateManifestResourceNames" />
   <Target Name="CoreCompile" Inputs="$(MSBuildAllProjects);@(Compile);" Outputs="@(IntermediateAssembly);$(NonExistentFile);">
-    <GetFrameworkPath>
-      <Output TaskParameter="Path" PropertyName="FrameworkPath" />
-    </GetFrameworkPath>
     <PropertyGroup>
-      <IlAsmCommand>"$(FrameworkPath)\Ilasm.exe" /NOLOGO /DLL /OUTPUT:"@(IntermediateAssembly)" </IlAsmCommand>
+      <FrameworkPath>C:\Windows\Microsoft.NET\Framework\v2.0.50727</FrameworkPath>
+    </PropertyGroup>
+    <!--<GetFrameworkPath>
+      <Output TaskParameter="Path" PropertyName="FrameworkPath" />
+    </GetFrameworkPath>-->
+    <PropertyGroup>
+      <IlAsmCommand>"$(FrameworkPath)\ilasm.exe" /NOLOGO /DLL /OUTPUT:"@(IntermediateAssembly)" </IlAsmCommand>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <IlAsmCommand>$(IlAsmCommand) /DEBUG </IlAsmCommand>

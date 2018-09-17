@@ -40,11 +40,11 @@ namespace SampleWinForms.UI
             {
                 //TODO: or font face/font-size change 
                 //re-calculate 
-                char[] textBuffer = _line._charBuffer.ToArray();
+                var textBuffer = _line.Characters;
                 _reusableUnscaledGlyphPlanList.Clear();
                 //userCharToGlyphIndexMap.Clear();
                 //read glyph plan and userCharToGlyphIndexMap          
-                _printer.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
+                _printer.GenerateGlyphPlan(textBuffer, _reusableUnscaledGlyphPlanList);
                 _line.ContentChanged = false;
             }
 
