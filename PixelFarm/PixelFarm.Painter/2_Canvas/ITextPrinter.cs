@@ -15,34 +15,6 @@ namespace PixelFarm.Drawing
         int StartAt { get; }
     }
 
-    [System.Obsolete("", true)]
-    public struct TextBufferSpan
-    {
-        public readonly int start;
-        public readonly int len;
-
-        char[] _rawString;
-        public TextBufferSpan(char[] rawCharBuffer)
-        {
-            this._rawString = rawCharBuffer;
-            this.len = rawCharBuffer.Length;
-            this.start = 0;
-        }
-        public TextBufferSpan(char[] rawCharBuffer, int start, int len)
-        {
-            this.start = start;
-            this.len = len;
-            this._rawString = rawCharBuffer;
-        }
-        public override string ToString()
-        {
-            return start + ":" + len;
-        }
-
-
-        public char[] GetRawCharBuffer() { return _rawString; }
-    }
-
     //implement this interface to handler font measurement/ glyph layout position
     //see current implementation in Gdi32IFonts and OpenFontIFonts
     public interface ITextService
