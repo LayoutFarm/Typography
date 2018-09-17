@@ -15,7 +15,6 @@ namespace Typography.TextBreak
         //current lang breaking engine
         BreakingEngine _breakingEngine;
         List<BreakingEngine> _otherEngines = new List<BreakingEngine>();
-        int _endAt;
         bool _breakNumberAfterText;
 
 

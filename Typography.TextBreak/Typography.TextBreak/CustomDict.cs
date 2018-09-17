@@ -63,8 +63,7 @@ namespace Typography.TextBreak
                     WordSpan wordspan = new WordSpan(startAt, (byte)lineLen);
                     //each wordgroup contains text span
 
-                    DevelopingWordGroup found;
-                    if (!wordGroups.TryGetValue(c0, out found))
+                    if (!wordGroups.TryGetValue(c0, out DevelopingWordGroup found))
                     {
                         found = new DevelopingWordGroup(new WordSpan(startAt, 1));
                         wordGroups.Add(c0, found);
