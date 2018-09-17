@@ -23,7 +23,7 @@ namespace Typography.TextBreak
             throw new System.NotImplementedException();
         }
 
-        internal override void BreakWord(WordVisitor visitor, System.ReadOnlySpan<char> charBuff)
+        internal override WordVisitor BreakWord(WordVisitor visitor, System.ReadOnlySpan<char> charBuff)
         {
             throw new System.NotImplementedException();
         }

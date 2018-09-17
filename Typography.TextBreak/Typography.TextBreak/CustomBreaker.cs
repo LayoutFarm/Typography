@@ -98,19 +98,18 @@ namespace Typography.TextBreak
 
         public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakAtInfo> outputBreakAtList)
         {
-            //conver to char buffer 
+            //convert to char buffer 
             if (charBuff.IsEmpty) return;
-            int startAt = 0;
             var visitor = new WordVisitor(charBuff, outputBreakAtList, new Stack<int>());
             //---------------------------------------- 
             BreakingEngine currentEngine = _breakingEngine = SelectEngine(visitor.CurrentChar);
             //----------------------------------------
             //select breaking engine
 
-            for (; ; )
+            while(!visitor.IsEnd)
             {
                 //----------------------------------------
-                currentEngine.BreakWord(visitor, charBuff.Slice(startAt)); //please note that len is decreasing
+                visitor = currentEngine.BreakWord(visitor, charBuff); //please note that len is decreasing
                 switch (visitor.State)
                 {
                     default: throw new NotSupportedException();
@@ -124,8 +123,8 @@ namespace Typography.TextBreak
                             if (anotherEngine == currentEngine)
                             {
                                 if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.CurrentChar}' was not found.");
-                                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
                                 visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
+                                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
                             }
                             else
                             {

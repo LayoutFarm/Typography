@@ -10,7 +10,7 @@ namespace Typography.TextBreak
 {
     public abstract class BreakingEngine
     {
-        internal abstract void BreakWord(WordVisitor visitor, ReadOnlySpan<char> charBuff);
+        internal abstract WordVisitor BreakWord(WordVisitor visitor, ReadOnlySpan<char> charBuff);
         public abstract bool CanBeStartChar(char c);
         public abstract bool CanHandle(char c);
     }
@@ -28,7 +28,7 @@ namespace Typography.TextBreak
         public bool BreakPeroidInTextSpan { get; set; }
 
         public bool DontMergeLastIncompleteWord { get; set; }
-        internal override void BreakWord(WordVisitor visitor, ReadOnlySpan<char> charBuff)
+        internal override WordVisitor BreakWord(WordVisitor visitor, ReadOnlySpan<char> charBuff)
         {
             visitor.State = VisitorState.Parsing;
 
@@ -57,7 +57,7 @@ namespace Typography.TextBreak
                             //out of our range
                             //should return ?      
                             visitor.State = VisitorState.OutOfRangeChar;
-                            return;
+                            return visitor;
                         }
                         else
                         {
@@ -73,7 +73,7 @@ namespace Typography.TextBreak
                         //out of our range
                         //should return ?      
                         visitor.State = VisitorState.OutOfRangeChar;
-                        return;
+                        return visitor;
                     }
                 }
                 //----------------------
@@ -92,7 +92,7 @@ namespace Typography.TextBreak
                     if (visitor.IsEnd)
                     {
                         visitor.State = VisitorState.End;
-                        return;
+                        return visitor;
                     }
                     //---------------------
                     WordGroup c_wordgroup = wordgroup;
@@ -179,11 +179,11 @@ namespace Typography.TextBreak
                                 {
                                     visitor.AddWordBreakAtCurrentIndex();
                                 }
-                                return;
+                                return visitor;
                             }
                             continueRead = false;
                             //----------------------------------------
-                            return;
+                            return visitor;
                         }
                         //----------------------------------------
                         candidateLen++;
@@ -287,12 +287,12 @@ namespace Typography.TextBreak
                                                 visitor.SetCurrentIndex(p1);
                                                 visitor.AddWordBreakAtCurrentIndex();
                                             }
-                                            return;
+                                            return visitor;
                                         }
                                         else
                                         {
                                             visitor.AddWordBreakAtCurrentIndex();
-                                            return;
+                                            return visitor;
                                         }
                                     }
                                     else
@@ -400,7 +400,7 @@ namespace Typography.TextBreak
                                     if (visitor.State == VisitorState.End)
                                     {
                                         visitor.AddWordBreakAtCurrentIndex();
-                                        return;
+                                        return visitor;
                                     }
                                     //check if we can use this candidate
                                     char next_char = visitor.CurrentChar;
@@ -443,6 +443,7 @@ namespace Typography.TextBreak
                 //the last one 
                 visitor.State = VisitorState.End;
             }
+            return visitor;
         }
         internal WordGroup GetSubGroup(WordVisitor visitor, WordGroup wordGroup)
         {

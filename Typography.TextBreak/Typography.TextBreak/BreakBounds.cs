@@ -3,7 +3,7 @@
 
 namespace Typography.TextBreak
 {
-    public struct BreakBounds
+    public ref struct BreakBounds
     {
         public int startIndex;
         public int length;

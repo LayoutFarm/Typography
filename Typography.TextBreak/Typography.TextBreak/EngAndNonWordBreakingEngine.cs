@@ -39,7 +39,7 @@ namespace Typography.TextBreak
         {
             return true;
         }
-        internal override void BreakWord(WordVisitor visitor, System.ReadOnlySpan<char> input)
+        internal override WordVisitor BreakWord(WordVisitor visitor, System.ReadOnlySpan<char> input)
         {
             visitor.State = VisitorState.Parsing;
             //----------------------------------------
@@ -113,7 +113,7 @@ namespace Typography.TextBreak
 
                                     }
                                     visitor.State = VisitorState.OutOfRangeChar;
-                                    return;
+                                    return visitor;
                                 }
                                 //------------------
                                 //just collect
@@ -227,7 +227,7 @@ namespace Typography.TextBreak
                                     //      like other 'after' onBreak()
                                 }
                                 visitor.State = VisitorState.OutOfRangeChar;
-                                return;
+                                return visitor;
                             }
                             else
                             {
@@ -280,7 +280,7 @@ namespace Typography.TextBreak
                                         //      like other 'after' onBreak()
                                     }
                                     visitor.State = VisitorState.OutOfRangeChar;
-                                    return;
+                                    return visitor;
                                 }
 
                                 if (is_number && BreakNumberAfterText)
@@ -343,6 +343,7 @@ namespace Typography.TextBreak
                 //
             }
             visitor.State = VisitorState.End;
+            return visitor;
         }
     }
 }
