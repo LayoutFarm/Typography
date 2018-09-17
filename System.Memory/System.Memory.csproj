@@ -35,7 +35,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="'$(Configuration)' == 'Debug'">..\System.Runtime.CompilerServices.Unsafe\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <HintPath Condition="'$(Configuration)' == 'Release'">..\System.Runtime.CompilerServices.Unsafe\bin\Release\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>

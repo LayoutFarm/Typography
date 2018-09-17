@@ -108,6 +108,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.CompilerServices.Unsafe", "System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.csproj", "{455F1B7E-768D-4600-AD7D-C3CFC7F47DB3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Memory", "System.Memory\System.Memory.csproj", "{3F501B34-9E57-4610-8087-208F3A53CFB7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{455F1B7E-768D-4600-AD7D-C3CFC7F47DB3} = {455F1B7E-768D-4600-AD7D-C3CFC7F47DB3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
