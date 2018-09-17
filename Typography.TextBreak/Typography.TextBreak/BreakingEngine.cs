@@ -118,7 +118,7 @@ namespace Typography.TextBreak
                     {
                         //not end
                         //then move next
-                        candidateLen++;
+
                         visitor.SetCurrentIndex(i + 1);
                         if (visitor.IsEnd)
                         {
@@ -173,32 +173,27 @@ namespace Typography.TextBreak
                             //choose best match 
                             if (candidateBreakList.Count > 0)
                             {
-
-                                int candi1 = candidateBreakList.Pop();
-                                //try
-
-                                visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
-                                if (latest_candidate_isNotWord)
+                                if (DontMergeLastIncompleteWord)
                                 {
-                                    //use this
-                                    //use this candidate if possible
-                                    visitor.AddWordBreakAtCurrentIndex(WordKind.TextIncomplete);
+                                    int candi1 = candidateBreakList.Pop();
+                                    visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
+                                    visitor.AddWordBreakAtCurrentIndex(
+                                        latest_candidate_isNotWord ?
+                                            WordKind.TextIncomplete :
+                                            WordKind.Text);
                                 }
                                 else
                                 {
-                                    //use this
-                                    //use this candidate if possible
                                     visitor.AddWordBreakAtCurrentIndex();
                                 }
-
-                                break;
+                                return;
                             }
                             continueRead = false;
                             //----------------------------------------
                             return;
                         }
                         //----------------------------------------
-
+                        candidateLen++;
 
                         if (!breakPeroidInTextSpan && visitor.Char == '.')
                         {

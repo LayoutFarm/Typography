@@ -105,6 +105,15 @@ namespace Typography.FontManagement
             {
                 _members[newone.FontName.ToUpper()] = newone;
             }
+
+#if DEBUG
+            public string dbugGroupName;
+            public override string ToString()
+            {
+                return dbugGroupName;
+            }
+#endif
+
         }
 
         /// <summary>
@@ -265,8 +274,12 @@ namespace Typography.FontManagement
                             //create new group, we don't known this font group before 
                             //so we add to 'other group' list
                             selectedFontGroup = new InstalledTypefaceGroup();
+#if DEBUG
+                            selectedFontGroup.dbugGroupName = fontSubFamUpperCaseName;
+#endif
                             _subFamToFontGroup.Add(fontSubFamUpperCaseName, selectedFontGroup);
                             _allGroups.Add(selectedFontGroup);
+
                         }
                     }
                     break;
@@ -277,7 +290,23 @@ namespace Typography.FontManagement
                     selectedFontGroup = _italic;
                     break;
                 case TypefaceStyle.Regular:
-                    selectedFontGroup = _regular;
+                    {
+                        selectedFontGroup = _regular;
+                        string fontSubFamUpperCaseName = newTypeface.FontSubFamily.ToUpper();
+                        if (fontSubFamUpperCaseName != "REGULAR" &&
+                            !_subFamToFontGroup.TryGetValue(fontSubFamUpperCaseName, out selectedFontGroup))
+                        {
+                            //create new group, we don't known this font group before 
+                            //so we add to 'other group' list
+                            selectedFontGroup = new InstalledTypefaceGroup();
+#if DEBUG
+                            selectedFontGroup.dbugGroupName = fontSubFamUpperCaseName;
+#endif
+                            _subFamToFontGroup.Add(fontSubFamUpperCaseName, selectedFontGroup);
+                            _allGroups.Add(selectedFontGroup);
+                        }
+
+                    }
                     break;
                 case (TypefaceStyle.Bold | TypefaceStyle.Italic):
                     selectedFontGroup = _bold_italic;
