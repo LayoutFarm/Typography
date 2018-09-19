@@ -20,7 +20,7 @@ namespace Typography.Contours
     }
 
 
-    class GlyphMeshStore
+    public class GlyphMeshStore
     {
 
         class GlyphMeshData
