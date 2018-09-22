@@ -46,10 +46,8 @@ namespace Typography.TextBreak
             //simple break word/ num/ punc / space
             //similar to lexer function            
             //----------------------------------------
-
-            BreakBounds breakBounds = new BreakBounds();
+            var breakBounds = new BreakBounds();
             LexState lexState = LexState.Init;
-            breakBounds.startIndex = 0;
             int endBefore = input.Length;
 
             char first = (char)0;
@@ -57,7 +55,7 @@ namespace Typography.TextBreak
 
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
-            for (int i = 0; i < endBefore; ++i)
+            for (int i = visitor.CurrentIndex; i < endBefore; ++i)
             {
                 char c = input[i];
                 switch (lexState)

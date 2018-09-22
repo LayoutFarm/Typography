@@ -167,11 +167,18 @@ namespace Typography.TextBreak
 
 
 
-    public struct BreakSpan
+    public readonly struct BreakSpan
     {
-        public int startAt;
-        public ushort len;
-        public WordKind wordKind;
+        public readonly int startAt;
+        public readonly ushort len;
+        public readonly WordKind wordKind;
+
+        public BreakSpan(int startAt, ushort len, WordKind wordKind)
+        {
+            this.startAt = startAt;
+            this.len = len;
+            this.wordKind = wordKind;
+        }
     }
 
     class DevelopingWordGroup

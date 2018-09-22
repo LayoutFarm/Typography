@@ -57,55 +57,52 @@ namespace Typography.TextBreak
             }
             else
             {
+                if (_engBreakingEngine.CanHandle(c)) return _engBreakingEngine;
                 //find other engine
                 for (int i = _otherEngines.Count - 1; i >= 0; --i)
                 {
-                    //not the current engine 
-                    //and can handle the character
+                    //check if engine can handle the character
                     BreakingEngine engine = _otherEngines[i];
-                    if (engine != _breakingEngine && engine.CanHandle(c))
-                    {
-                        return engine;
-                    }
+                    if (engine.CanHandle(c)) return engine;
                 }
-
-                //default 
-#if DEBUG
-                if (!_engBreakingEngine.CanHandle(c))
-                {
-                    //even default can't handle the char
-
-                }
-#endif
-                return _engBreakingEngine;
+                return null;
             }
         }
-        
-        public BreakingEngine GetBreakingEngineFor(char c)
-        {
-            return SelectEngine(c);
-        }
-        
-        public void BreakWords(string inputstr, ICollection<BreakAtInfo> outputBreakAtList) =>
-            BreakWords(inputstr.AsSpan(), outputBreakAtList);
+
+        public BreakingEngine GetBreakingEngineFor(char c) => SelectEngine(c);
 
         public void BreakWords(string inputstr, ICollection<BreakSpan> outputBreakSpanList) =>
             BreakWords(inputstr.AsSpan(), outputBreakSpanList);
 
-        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakSpan> outputBreakSpanList) =>
-            BreakWords(charBuff, new BreakSpanProcessor(outputBreakSpanList.Add));
+        public void BreakWords(string inputstr, ICollection<BreakAtInfo> outputBreakAtList) =>
+            BreakWords(inputstr.AsSpan(), span => outputBreakAtList.Add(BreakAtToSpan(span)));
 
-        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakAtInfo> outputBreakAtList)
+        delegate BreakAtInfo BreakSpanToAtDelegate(BreakSpan span);
+        readonly BreakSpanToAtDelegate BreakAtToSpan = span => new BreakAtInfo(span.startAt + span.len, span.wordKind);
+
+        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakSpan> outputBreakSpanList) =>
+            BreakWords(charBuff, outputBreakSpanList.Add);
+
+        public void BreakWords(ReadOnlySpan<char> charBuff, Action<BreakSpan> outputBreakSpanAction)
         {
             //convert to char buffer 
             if (charBuff.IsEmpty) return;
-            var visitor = new WordVisitor(charBuff, outputBreakAtList, new Stack<int>());
+            var visitor = new WordVisitor(charBuff, outputBreakSpanAction);
             //---------------------------------------- 
-            BreakingEngine currentEngine = _breakingEngine = SelectEngine(visitor.CurrentChar);
+            Select_Engine: BreakingEngine currentEngine = SelectEngine(visitor.CurrentChar);
             //----------------------------------------
+            if (currentEngine == null)
+            {
+                //find proper breaking engine for current char
+                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.CurrentChar}' was not found.");
+                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
+                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
+                goto Select_Engine;
+            }
             //select breaking engine
+            _breakingEngine = currentEngine;
 
-            while(!visitor.IsEnd)
+            while (!visitor.IsEnd)
             {
                 //----------------------------------------
                 visitor = currentEngine.BreakWord(visitor, charBuff); //please note that len is decreasing
@@ -116,22 +113,7 @@ namespace Typography.TextBreak
                         //ok
                         return;
                     case VisitorState.OutOfRangeChar:
-                        {
-                            //find proper breaking engine for current char
-                            BreakingEngine anotherEngine = SelectEngine(visitor.CurrentChar);
-                            if (anotherEngine == currentEngine)
-                            {
-                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.CurrentChar}' was not found.");
-                                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
-                                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
-                            }
-                            else
-                            {
-                                currentEngine = anotherEngine;
-                                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
-                            }
-                        }
-                        break;
+                        goto Select_Engine;
                 }
             }
         }

@@ -2,6 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <DocumentationFile>$(MSBuildThisFileDirectory)System.Runtime.CompilerServices.Unsafe.xml</DocumentationFile>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{455F1B7E-768D-4600-AD7D-C3CFC7F47DB3}</ProjectGuid>
@@ -34,6 +35,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Runtime.CompilerServices.Unsafe.il" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="System.Runtime.CompilerServices.Unsafe.xml" />
   </ItemGroup>
   <!--
   CIL Project properties...

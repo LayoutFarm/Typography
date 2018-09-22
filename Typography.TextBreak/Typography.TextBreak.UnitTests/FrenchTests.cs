@@ -55,9 +55,7 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
         {
             var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
             var breakList = new List<BreakAtInfo>();
-#warning Use `breaker.BreakWords(text, breakList);` once #156 is merged
-            breaker.BreakWords(text);
-            breaker.CopyBreakResults(breakList);
+            breaker.BreakWords(text, breakList);
             var sb = new StringBuilder(text);
             //reverse to ensure earlier inserts do not affect later ones
             foreach (var @break in breakList.Select(i => i.breakAt).Reverse())
@@ -72,9 +70,7 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
     {
         var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
         var breakList = new List<BreakSpan>();
-#warning Use `breaker.BreakWords("«Maître leçon»", breakList);` once #156 is merged
-        breaker.BreakWords("«Maître leçon»");
-        breakList.AddRange(breaker.GetBreakSpanIter());
+        breaker.BreakWords("«Maître leçon»", breakList);
         Assert.AreEqual(breakList.Count, 5);
         void BreakSpanEqual(BreakSpan actual, BreakSpan expected)
         {
@@ -82,10 +78,10 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
             Assert.AreEqual(expected.len, actual.len);
             Assert.AreEqual(expected.wordKind, actual.wordKind);
         }
-        BreakSpanEqual(breakList[0], new BreakSpan { startAt = 0, len = 1, wordKind = WordKind.Punc });
-        BreakSpanEqual(breakList[1], new BreakSpan { startAt = 1, len = 6, wordKind = WordKind.Text });
-        BreakSpanEqual(breakList[2], new BreakSpan { startAt = 7, len = 1, wordKind = WordKind.Whitespace });
-        BreakSpanEqual(breakList[3], new BreakSpan { startAt = 8, len = 5, wordKind = WordKind.Text });
-        BreakSpanEqual(breakList[4], new BreakSpan { startAt = 13, len = 1, wordKind = WordKind.Punc });
+        BreakSpanEqual(breakList[0], new BreakSpan(0, 1, WordKind.Punc));
+        BreakSpanEqual(breakList[1], new BreakSpan(1, 6, WordKind.Text));
+        BreakSpanEqual(breakList[2], new BreakSpan(7, 1, WordKind.Whitespace));
+        BreakSpanEqual(breakList[3], new BreakSpan(8, 5, WordKind.Text));
+        BreakSpanEqual(breakList[4], new BreakSpan(13, 1, WordKind.Punc));
     }
 }

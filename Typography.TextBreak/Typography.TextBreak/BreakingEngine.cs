@@ -37,9 +37,10 @@ namespace Typography.TextBreak
             int endAt = charBuff.Length;
 
             Stack<int> candidateBreakList = visitor.TempCandidateBreaks;
+            void B() { if (candidateBreakList.Count > 2) System.Diagnostics.Debugger.Break(); }
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
-            for (int i = 0; i < endAt;)
+            for (int i = visitor.CurrentIndex; i < endAt;)
             {
                 ENTER_LOOP:
 
@@ -96,6 +97,7 @@ namespace Typography.TextBreak
                     }
                     //---------------------
                     WordGroup c_wordgroup = wordgroup;
+                    B();
                     candidateBreakList.Clear();
 
                     int candidateLen = 1;
@@ -104,7 +106,7 @@ namespace Typography.TextBreak
                     {
                         candidateBreakList.Push(candidateLen);
                     }
-
+                    B();
                     bool continueRead = true;
 
                     while (continueRead)
@@ -133,14 +135,14 @@ namespace Typography.TextBreak
                                 if (next1.PrefixIsWord)
                                 {
 
-                                    candidateBreakList.Push(candidateLen);
+                                    candidateBreakList.Push(candidateLen);B();
                                 }
                                 else
                                 {
                                     if (!DontMergeLastIncompleteWord)
                                     {
                                         latest_candidate_isNotWord = true;//word may has error
-                                        candidateBreakList.Push(candidateLen);
+                                        candidateBreakList.Push(candidateLen);B();
                                     }
                                 }
                                 //---------------------
@@ -154,6 +156,7 @@ namespace Typography.TextBreak
                                     int p2 = FindInWordSpans(visitor, c_wordgroup);
                                     if (p2 - p1 > 0)
                                     {
+                                        B();
                                         visitor.AddWordBreakAt(p2, WordKind.Text);
                                         visitor.SetCurrentIndex(p2);
                                         candidateBreakList.Clear();
@@ -168,6 +171,7 @@ namespace Typography.TextBreak
                             {
                                 if (DontMergeLastIncompleteWord)
                                 {
+                                    B();
                                     int candi1 = candidateBreakList.Pop();
                                     visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
                                     visitor.AddWordBreakAtCurrentIndex(
@@ -203,7 +207,7 @@ namespace Typography.TextBreak
 
                             if (next.PrefixIsWord)
                             {
-                                candidateBreakList.Push(candidateLen);
+                                candidateBreakList.Push(candidateLen);B();
                             }
                             c_wordgroup = next;
                             i = visitor.CurrentIndex;
@@ -219,7 +223,7 @@ namespace Typography.TextBreak
                                 //choose best match 
                                 while (candidateBreakList.Count > 0)
                                 {
-
+                                    B();
                                     int candi1 = candidateBreakList.Pop();
                                     //try
                                     visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
@@ -274,7 +278,7 @@ namespace Typography.TextBreak
                                         {
                                             //choose best match 
                                             int p3 = visitor.CurrentIndex;
-                                            int p4 = p3;
+                                            int p4 = p3;B();
                                             if (candidateBreakList.Count > 0)
                                             {
                                                 int candi1 = candidateBreakList.Pop();
@@ -339,7 +343,7 @@ namespace Typography.TextBreak
                                         else
                                         {
                                             while (candidateBreakList.Count > 0)
-                                            {
+                                            {B();
                                                 int candi1 = candidateBreakList.Pop();
                                                 //try
                                                 visitor.SetCurrentIndex(visitor.LatestBreakAt + candi1);
@@ -347,7 +351,7 @@ namespace Typography.TextBreak
                                                 if (visitor.State != VisitorState.End)
                                                 {
                                                     char next_char = visitor.CurrentChar;
-                                                    if (CanBeStartChar(next_char))
+                                                    if (CanHandle(next_char) && CanBeStartChar(next_char))
                                                     {
                                                         //use this
                                                         //use this candidate if possible
@@ -368,7 +372,7 @@ namespace Typography.TextBreak
                                             //no next word, no candidate
                                             //skip this 
                                             char next_char = visitor.CurrentChar;
-                                            if (CanBeStartChar(next_char))
+                                            if (CanHandle(next_char) && CanBeStartChar(next_char))
                                             {
                                                 //use this
                                                 //use this candidate if possible
@@ -390,7 +394,7 @@ namespace Typography.TextBreak
                             else
                             {
 
-                                bool foundCandidate = false;
+                                bool foundCandidate = false;B();
                                 while (candidateBreakList.Count > 0)
                                 {
 
@@ -513,6 +517,7 @@ namespace Typography.TextBreak
                             if (!visitor.IsEnd)
                             {
                                 visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
+                                if (visitor.IsEnd) break;
                                 c = visitor.CurrentChar;
                             }
                             else
