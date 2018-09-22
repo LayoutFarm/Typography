@@ -133,7 +133,8 @@ namespace Typography.Rendering
 
                 //check if the file exist
 
-                if (StorageService.Provider.DataExists(fontTextureInfoFile))
+                if (StorageService.Provider.DataExists(fontTextureInfoFile) &&
+                    StorageService.Provider.DataExists(fontTextureImg))
                 {
                     SimpleFontAtlasBuilder atlasBuilder2 = new SimpleFontAtlasBuilder();
 
