@@ -15,28 +15,26 @@ namespace Typography.TextBreak
         OutOfRangeChar,
         End,
     }
-
-
-
+    
     public ref struct WordVisitor
     {
         readonly ReadOnlySpan<char> _buffer;
 
-        public WordVisitor(ReadOnlySpan<char> buffer, ICollection<BreakAtInfo> breakAtList, Stack<int> tempCandidateBreaks)
+        public WordVisitor(ReadOnlySpan<char> buffer, Action<BreakSpan> breakSpanAction)
         {
             _buffer = buffer;
-            BreakList = breakAtList;
-            TempCandidateBreaks = tempCandidateBreaks;
+            BreakSpanAction = breakSpanAction;
             CurrentIndex = 0;
             State = VisitorState.Init;
             LatestBreakAt = 0;
+            TempCandidateBreaks = new Stack<int>();
         }
 
         public VisitorState State { get; set; }
         public int CurrentIndex { get; private set; }
         public int LatestBreakAt { get; private set; }
-        public ICollection<BreakAtInfo> BreakList { get; }
-        internal Stack<int> TempCandidateBreaks { get; }
+        public Action<BreakSpan> BreakSpanAction { get; }
+        public Stack<int> TempCandidateBreaks { get; }
 
         public char CurrentChar => _buffer[CurrentIndex];
         public bool IsEnd => CurrentIndex >= _buffer.Length;
@@ -46,7 +44,7 @@ namespace Typography.TextBreak
             if (index == LatestBreakAt)
                 throw new InvalidOperationException("The last break index was the same as the current one.");
 
-            BreakList.Add(new BreakAtInfo(index, wordKind));
+            BreakSpanAction(new BreakSpan(LatestBreakAt, (ushort)(index - LatestBreakAt), wordKind));
             this.LatestBreakAt = index;
         }
         public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text) =>

@@ -93,9 +93,7 @@ namespace TextBreakerTest
             breaker1.BreakNumberAfterText = true;
             var test = this.textBox1.Text;
             this.listBox1.Items.Clear();
-            breaker1.BreakWords(test.AsSpan(), new BreakSpanProcessor(span =>
-                this.listBox1.Items.Add($"{span.startAt} {test.Substring(span.startAt, span.len)}"
-            )));
+            breaker1.BreakWords(test.AsSpan(), span => this.listBox1.Items.Add($"{span.startAt} {test.Substring(span.startAt, span.len)}"));
         }
         static bool StringStartsWithChars(string srcString, string value)
         {
@@ -162,10 +160,10 @@ namespace TextBreakerTest
             //-------------
             for (int i = ntimes - 1; i >= 0; --i)
             {
-                breaker1.BreakWords(test, new BreakSpanProcessor(span =>
+                breaker1.BreakWords(test, span =>
                 {
 
-                }));
+                });
             }
         }
         void ParseWithIcu(int ntimes)

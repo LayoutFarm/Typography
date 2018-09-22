@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <CLSCompliant>true</CLSCompliant>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,9 +39,12 @@
     <Reference Include="System" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath Condition="'$(Configuration)' == 'Debug'">..\System.Runtime.CompilerServices.Unsafe\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <HintPath Condition="'$(Configuration)' == 'Release'">..\System.Runtime.CompilerServices.Unsafe\bin\Release\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>..\System.Runtime.CompilerServices.Unsafe\bin\$(Configuration)\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <ProjectReference Include="..\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.csproj">
+      <Project>{455F1B7E-768D-4600-AD7D-C3CFC7F47DB3}</Project>
+      <Name>System.Runtime.CompilerServices.Unsafe</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionAttribute.cs" />

@@ -21,7 +21,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)EngAndNonWordBreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\LaoDictionaryBreakingEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DictionaryBasedBreakingEngine\ThaiDictionaryBreakingEngine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BreakProcessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WordVisitor.cs" />
   </ItemGroup>
 </Project>
