@@ -70,7 +70,7 @@ namespace Xamarin.iOS.GLES2
             textPrinter.FontFilename = "DroidSans.ttf"; //corresponding to font file Assets/DroidSans.ttf
             textPrinter.FontSizeInPoints = 64; 
             //
-            simpleCanvas.TextPrinter.GenerateGlyphRuns(textRun, text.ToCharArray(), 0, text.Length);
+            simpleCanvas.TextPrinter.GenerateGlyphRuns(textRun, System.MemoryExtensions.AsSpan(text));
             //-------------------------------------------------------------------------- 
 
         }

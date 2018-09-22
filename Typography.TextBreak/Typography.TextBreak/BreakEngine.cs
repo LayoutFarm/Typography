@@ -12,17 +12,17 @@ namespace Typography.TextBreak
    
     public abstract class TextBreaker
     {
-        public abstract void DoBreak(char[] input, int start, int len, OnBreak onbreak);
+        public abstract void DoBreakCore(WordVisitor visitor, System.ReadOnlySpan<char> input);
         public TextBreakKind BreakKind
         {
             get;
             set;
         }
-        public void DoBreak(char[] charBuff, OnBreak onbreak)
+        public void DoBreak(WordVisitor visitor, System.ReadOnlySpan<char> input)
         {
             IsCanceled = false;//reset 
             //to end
-            DoBreak(charBuff, 0, charBuff.Length, onbreak);
+            DoBreakCore(visitor, input);
         }
        
         protected bool IsCanceled { get; set; }
@@ -31,7 +31,7 @@ namespace Typography.TextBreak
         /// </summary>
         public void Cancel() { IsCanceled = true; }
     }
-    public struct SplitBound
+    public readonly struct SplitBound
     {
         public readonly int startIndex;
         public readonly int length;

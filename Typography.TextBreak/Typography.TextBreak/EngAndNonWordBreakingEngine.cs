@@ -3,11 +3,9 @@
 // © 2016 and later: Unicode, Inc. and others.
 // License & terms of use: http://www.unicode.org/copyright.html#License
 
-
-
 namespace Typography.TextBreak
 {
-    public class EngBreakingEngine : BreakingEngine
+    public class EngAndNonWordBreakingEngine : BreakingEngine
     {
         enum LexState
         {
@@ -23,21 +21,9 @@ namespace Typography.TextBreak
         public bool EnableCustomAbbrv { get; set; }
         public CustomAbbrvDic EngCustomAbbrvDic { get; set; }
 
-
-        BreakBounds _breakBounds = new BreakBounds();
-        public EngBreakingEngine()
+        public EngAndNonWordBreakingEngine()
         {
 
-        }
-        internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
-        {
-            visitor.State = VisitorState.Parsing;
-            DoBreak(visitor, charBuff, startAt, len, bb =>
-            {
-                visitor.AddWordBreakAt(bb.startIndex + bb.length, bb.kind);
-                visitor.SetCurrentIndex(visitor.LatestBreakAt);
-
-            });
         }
         public override bool CanHandle(char c)
         {
@@ -53,31 +39,25 @@ namespace Typography.TextBreak
         {
             return true;
         }
-        void DoBreak(WordVisitor visitor, char[] input, int start, int len, OnBreak onBreak)
+        internal override WordVisitor BreakWord(WordVisitor visitor, System.ReadOnlySpan<char> input)
         {
+            visitor.State = VisitorState.Parsing;
             //----------------------------------------
             //simple break word/ num/ punc / space
             //similar to lexer function            
             //----------------------------------------
-            int endBefore = start + len;
-            if (endBefore > input.Length)
-                throw new System.ArgumentOutOfRangeException(nameof(len), len, "The range provided was partially out of bounds.");
-            else if (start < 0)
-                throw new System.ArgumentOutOfRangeException(nameof(start), start, "The starting index was negative.");
-            //throw instead of skipping the entire for loop
-            else if (len < 0)
-                throw new System.ArgumentOutOfRangeException(nameof(len), len, "The length provided was negative.");
-            //----------------------------------------
 
+            BreakBounds breakBounds = new BreakBounds();
             LexState lexState = LexState.Init;
-            _breakBounds.startIndex = start;
+            breakBounds.startIndex = 0;
+            int endBefore = input.Length;
 
             char first = (char)0;
             char last = (char)255;
 
             bool breakPeroidInTextSpan = BreakPeroidInTextSpan;
 
-            for (int i = start; i < endBefore; ++i)
+            for (int i = 0; i < endBefore; ++i)
             {
                 char c = input[i];
                 switch (lexState)
@@ -88,15 +68,15 @@ namespace Typography.TextBreak
                             if (c == '\r' && i < endBefore - 1 && input[i + 1] == '\n')
                             {
                                 //this is '\r\n' linebreak
-                                _breakBounds.startIndex = i;
-                                _breakBounds.length = 2;
-                                _breakBounds.kind = WordKind.NewLine;
+                                breakBounds.startIndex = i;
+                                breakBounds.length = 2;
+                                breakBounds.kind = WordKind.NewLine;
                                 //
-                                onBreak(_breakBounds);
+                                visitor.Break(breakBounds);
 
                                 //
-                                _breakBounds.startIndex += 2;//***
-                                _breakBounds.length = 0;
+                                breakBounds.startIndex += 2;//***
+                                breakBounds.length = 0;
 
                                 lexState = LexState.Init;
 
@@ -105,14 +85,14 @@ namespace Typography.TextBreak
                             }
                             else if (c == '\r' || c == '\n' || c == 0x85) //U+0085 NEXT LINE
                             {
-                                _breakBounds.startIndex = i;
-                                _breakBounds.length = 1;
-                                _breakBounds.kind = WordKind.NewLine;
+                                breakBounds.startIndex = i;
+                                breakBounds.length = 1;
+                                breakBounds.kind = WordKind.NewLine;
                                 //
-                                onBreak(_breakBounds);
+                                visitor.Break(breakBounds);
                                 //
-                                _breakBounds.length = 0;
-                                _breakBounds.startIndex++;//***
+                                breakBounds.length = 0;
+                                breakBounds.startIndex++;//***
                                 lexState = LexState.Init;
                                 continue;
                             }
@@ -122,37 +102,37 @@ namespace Typography.TextBreak
                                 {
                                     //letter is out-of-range or not 
                                     //clear accum state
-                                    if (i > _breakBounds.startIndex)
+                                    if (i > breakBounds.startIndex)
                                     {
 
                                         //some remaining data
-                                        _breakBounds.length = i - _breakBounds.startIndex;
+                                        breakBounds.length = i - breakBounds.startIndex;
                                         //
-                                        onBreak(_breakBounds);
-                                        _breakBounds.startIndex += _breakBounds.length;//***
+                                        visitor.Break(breakBounds);
+                                        breakBounds.startIndex += breakBounds.length;//***
 
                                     }
                                     visitor.State = VisitorState.OutOfRangeChar;
-                                    return;
+                                    return visitor;
                                 }
                                 //------------------
                                 //just collect
-                                _breakBounds.startIndex = i;
-                                _breakBounds.kind = WordKind.Text;
+                                breakBounds.startIndex = i;
+                                breakBounds.kind = WordKind.Text;
                                 lexState = LexState.Text;
                             }
                             else if (char.IsNumber(c))
                             {
-                                _breakBounds.startIndex = i;
-                                _breakBounds.kind = WordKind.Number;
+                                breakBounds.startIndex = i;
+                                breakBounds.kind = WordKind.Number;
                                 lexState = LexState.Number;
 
                             }
                             else if (char.IsWhiteSpace(c))
                             {
                                 //we collect whitespace
-                                _breakBounds.startIndex = i;
-                                _breakBounds.kind = WordKind.Whitespace;
+                                breakBounds.startIndex = i;
+                                breakBounds.kind = WordKind.Whitespace;
                                 lexState = LexState.Whitespace;
                             }
                             else if (char.IsPunctuation(c) || char.IsSymbol(c))
@@ -165,35 +145,35 @@ namespace Typography.TextBreak
                                     if (i < endBefore - 1 &&
                                        char.IsNumber(input[i + 1]))
                                     {
-                                        _breakBounds.startIndex = i;
-                                        _breakBounds.kind = WordKind.Number;
+                                        breakBounds.startIndex = i;
+                                        breakBounds.kind = WordKind.Number;
                                         lexState = LexState.Number;
                                         continue;
                                     }
                                 }
 
-                                _breakBounds.startIndex = i;
-                                _breakBounds.length = 1;
-                                _breakBounds.kind = WordKind.Punc;
+                                breakBounds.startIndex = i;
+                                breakBounds.length = 1;
+                                breakBounds.kind = WordKind.Punc;
 
                                 //we not collect punc
-                                onBreak(_breakBounds);
+                                visitor.Break(breakBounds);
                                 //
-                                _breakBounds.startIndex += 1;
-                                _breakBounds.length = 0;
+                                breakBounds.startIndex += 1;
+                                breakBounds.length = 0;
                                 lexState = LexState.Init;
                                 continue;
                             }
                             else if (char.IsControl(c))
                             {
-                                _breakBounds.startIndex = i;
-                                _breakBounds.length = 1;
-                                _breakBounds.kind = WordKind.Control;
+                                breakBounds.startIndex = i;
+                                breakBounds.length = 1;
+                                breakBounds.kind = WordKind.Control;
                                 //
-                                onBreak(_breakBounds);
+                                visitor.Break(breakBounds);
                                 //
-                                _breakBounds.length = 0;
-                                _breakBounds.startIndex++;
+                                breakBounds.length = 0;
+                                breakBounds.startIndex++;
                                 lexState = LexState.Init;
                                 continue;
                             }
@@ -204,24 +184,24 @@ namespace Typography.TextBreak
                                 {
                                     //surrogate pair 
                                     //clear accum state
-                                    if (i > _breakBounds.startIndex)
+                                    if (i > breakBounds.startIndex)
                                     {
                                         //some remaining data
-                                        _breakBounds.length = i - _breakBounds.startIndex;
+                                        breakBounds.length = i - breakBounds.startIndex;
                                         //
-                                        onBreak(_breakBounds);
+                                        visitor.Break(breakBounds);
                                     }
                                     //-------------------------------
                                     //surrogate pair
-                                    _breakBounds.startIndex = i;
-                                    _breakBounds.length = 2;
-                                    onBreak(_breakBounds);
+                                    breakBounds.startIndex = i;
+                                    breakBounds.length = 2;
+                                    visitor.Break(breakBounds);
                                     //-------------------------------
 
                                     i++;//consume next***
 
-                                    _breakBounds.startIndex += 2;//reset
-                                    _breakBounds.length = 0; //reset
+                                    breakBounds.startIndex += 2;//reset
+                                    breakBounds.length = 0; //reset
                                     lexState = LexState.Init;
                                     continue; //***
                                 }
@@ -235,19 +215,19 @@ namespace Typography.TextBreak
                             {
                                 //letter is out-of-range or not 
                                 //clear accum state
-                                if (i > _breakBounds.startIndex)
+                                if (i > breakBounds.startIndex)
                                 {
                                     //some remaining data
-                                    _breakBounds.length = i - _breakBounds.startIndex;
+                                    breakBounds.length = i - breakBounds.startIndex;
                                     //
-                                    onBreak(_breakBounds);
+                                    visitor.Break(breakBounds);
                                     //
                                     //
                                     //TODO: check if we should set startIndex and length
                                     //      like other 'after' onBreak()
                                 }
                                 visitor.State = VisitorState.OutOfRangeChar;
-                                return;
+                                return visitor;
                             }
                             else
                             {
@@ -264,13 +244,13 @@ namespace Typography.TextBreak
                                 //if not
 
                                 //flush current state 
-                                _breakBounds.length = i - _breakBounds.startIndex;
-                                _breakBounds.kind = WordKind.Number;
+                                breakBounds.length = i - breakBounds.startIndex;
+                                breakBounds.kind = WordKind.Number;
                                 //
-                                onBreak(_breakBounds);
+                                visitor.Break(breakBounds);
                                 //
-                                _breakBounds.length = 0;
-                                _breakBounds.startIndex = i;
+                                breakBounds.length = 0;
+                                breakBounds.startIndex = i;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
@@ -288,44 +268,44 @@ namespace Typography.TextBreak
 
                                 if (c < first || c > last)
                                 {
-                                    if (i > _breakBounds.startIndex)
+                                    if (i > breakBounds.startIndex)
                                     {
                                         //flush
-                                        _breakBounds.length = i - _breakBounds.startIndex;
-                                        _breakBounds.kind = WordKind.Text;
+                                        breakBounds.length = i - breakBounds.startIndex;
+                                        breakBounds.kind = WordKind.Text;
                                         //
-                                        onBreak(_breakBounds);
+                                        visitor.Break(breakBounds);
                                         //
                                         //TODO: check if we should set startIndex and length
                                         //      like other 'after' onBreak()
                                     }
                                     visitor.State = VisitorState.OutOfRangeChar;
-                                    return;
+                                    return visitor;
                                 }
 
                                 if (is_number && BreakNumberAfterText)
                                 {
                                     //flush 
-                                    _breakBounds.length = i - _breakBounds.startIndex;
-                                    _breakBounds.kind = WordKind.Text;
+                                    breakBounds.length = i - breakBounds.startIndex;
+                                    breakBounds.kind = WordKind.Text;
                                     //
-                                    onBreak(_breakBounds);
+                                    visitor.Break(breakBounds);
                                     //
-                                    _breakBounds.length = 1;
-                                    _breakBounds.startIndex = i;
+                                    breakBounds.length = 1;
+                                    breakBounds.startIndex = i;
                                     lexState = LexState.Number;
                                 }
                             }
                             else
                             {
                                 //flush existing text ***
-                                _breakBounds.length = i - _breakBounds.startIndex;
-                                _breakBounds.kind = WordKind.Text;
+                                breakBounds.length = i - breakBounds.startIndex;
+                                breakBounds.kind = WordKind.Text;
                                 //
-                                onBreak(_breakBounds);
+                                visitor.Break(breakBounds);
                                 //
-                                _breakBounds.length = 0;
-                                _breakBounds.startIndex = i;
+                                breakBounds.length = 0;
+                                breakBounds.startIndex = i;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
@@ -336,13 +316,13 @@ namespace Typography.TextBreak
                         {
                             if (!char.IsWhiteSpace(c))
                             {
-                                _breakBounds.length = i - _breakBounds.startIndex;
-                                _breakBounds.kind = WordKind.Whitespace;
+                                breakBounds.length = i - breakBounds.startIndex;
+                                breakBounds.kind = WordKind.Whitespace;
                                 //
-                                onBreak(_breakBounds);
+                                visitor.Break(breakBounds);
                                 //
-                                _breakBounds.length = 0;
-                                _breakBounds.startIndex = i;
+                                breakBounds.length = 0;
+                                breakBounds.startIndex = i;
                                 lexState = LexState.Init;
                                 goto case LexState.Init;
                             }
@@ -353,16 +333,17 @@ namespace Typography.TextBreak
             }
 
             if (lexState != LexState.Init &&
-                _breakBounds.startIndex < start + len)
+                breakBounds.startIndex < endBefore)
             {
                 //some remaining data
 
-                _breakBounds.length = (start + len) - _breakBounds.startIndex;
+                breakBounds.length = endBefore - breakBounds.startIndex;
                 //
-                onBreak(_breakBounds);
+                visitor.Break(breakBounds);
                 //
             }
             visitor.State = VisitorState.End;
+            return visitor;
         }
     }
 }

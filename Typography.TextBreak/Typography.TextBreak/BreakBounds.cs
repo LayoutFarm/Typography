@@ -3,10 +3,7 @@
 
 namespace Typography.TextBreak
 {
-
-    public delegate void OnBreak(BreakBounds breakBounds);
-
-    public class BreakBounds
+    public ref struct BreakBounds
     {
         public int startIndex;
         public int length;
@@ -27,8 +24,9 @@ namespace Typography.TextBreak
         TextIncomplete,
         Control
     }
-    public struct BreakAtInfo
+    public readonly struct BreakAtInfo
     {
+        public static readonly BreakAtInfo Empty = new BreakAtInfo(0, WordKind.Unknown);
         public readonly int breakAt;
         public readonly WordKind wordKind;
         public BreakAtInfo(int breakAt, WordKind w)

@@ -18,118 +18,49 @@ namespace Typography.TextBreak
 
 
 
-    class WordVisitor
+    public ref struct WordVisitor
     {
-        List<BreakAtInfo> _breakAtList = new List<BreakAtInfo>();
-        char[] _buffer;
+        readonly ReadOnlySpan<char> _buffer;
 
-        int _startIndex;
-        int _endIndex;
-
-        int _currentIndex;
-        char _currentChar;
-        int _latestBreakAt;
-
-
-        Stack<int> _tempCandidateBreaks = new Stack<int>();
-        public WordVisitor()
+        public WordVisitor(ReadOnlySpan<char> buffer, ICollection<BreakAtInfo> breakAtList, Stack<int> tempCandidateBreaks)
         {
+            _buffer = buffer;
+            BreakList = breakAtList;
+            TempCandidateBreaks = tempCandidateBreaks;
+            CurrentIndex = 0;
+            State = VisitorState.Init;
+            LatestBreakAt = 0;
         }
 
-        public void LoadText(char[] buffer, int index)
-        {
-            LoadText(buffer, index, buffer.Length);
-        }
-        public void LoadText(char[] buffer, int index, int len)
-        {
-            //check index < buffer
+        public VisitorState State { get; set; }
+        public int CurrentIndex { get; private set; }
+        public int LatestBreakAt { get; private set; }
+        public ICollection<BreakAtInfo> BreakList { get; }
+        internal Stack<int> TempCandidateBreaks { get; }
 
-            //reset all
-            this._buffer = buffer;
-            this._endIndex = index + len;
-
-            this._startIndex = _currentIndex = index;
-            this._currentChar = buffer[_currentIndex];
-            _breakAtList.Clear();
-            _tempCandidateBreaks.Clear();
-            _latestBreakAt = 0;
-        }
-
-
-        public VisitorState State
-        {
-            get;
-            set;
-        }
-        public int CurrentIndex
-        {
-            get { return this._currentIndex; }
-        }
-        public char Char
-        {
-            get { return _currentChar; }
-        }
-        public bool IsEnd
-        {
-            get { return _currentIndex >= _endIndex; }
-        }
-
-
-#if DEBUG
-        //int dbugAddSteps;
-#endif
+        public char CurrentChar => _buffer[CurrentIndex];
+        public bool IsEnd => CurrentIndex >= _buffer.Length;
+        
         public void AddWordBreakAt(int index, WordKind wordKind)
         {
+            if (index == LatestBreakAt)
+                throw new InvalidOperationException("The last break index was the same as the current one.");
 
-#if DEBUG
-            //dbugAddSteps++;
-            //if (dbugAddSteps >= 57)
-            //{
-
-            //}
-            if (index == _latestBreakAt)
-            {
-                throw new NotSupportedException();
-            }
-#endif
-
-
-            this._latestBreakAt = index;
-
-            _breakAtList.Add(new BreakAtInfo(index, wordKind));
+            BreakList.Add(new BreakAtInfo(index, wordKind));
+            this.LatestBreakAt = index;
         }
-        public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
-        {
+        public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text) =>
             AddWordBreakAt(this.CurrentIndex, wordKind);
-        }
-        public int LatestBreakAt
-        {
-            get { return this._latestBreakAt; }
-        }
         public void SetCurrentIndex(int index)
         {
-            this._currentIndex = index;
-            if (index < _endIndex)
-            {
-                _currentChar = _buffer[index];
-            }
-            else
-            {
-                //can't read next
-                //the set state= end
+            this.CurrentIndex = index;
+            if (IsEnd) //if can't read next then set state to end
                 this.State = VisitorState.End;
-            }
         }
-        public List<BreakAtInfo> GetBreakList()
+        public void Break(BreakBounds bb)
         {
-            return _breakAtList;
+            AddWordBreakAt(bb.startIndex + bb.length, bb.kind);
+            SetCurrentIndex(LatestBreakAt);
         }
-        internal Stack<int> GetTempCandidateBreaks()
-        {
-            return this._tempCandidateBreaks;
-        }
-
-
     }
-
 }

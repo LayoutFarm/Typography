@@ -11,25 +11,20 @@ namespace Typography.TextBreak
     public class CustomBreaker
     {
         //default for latin breaking engine
-        EngBreakingEngine _engBreakingEngine = new EngBreakingEngine();
+        EngAndNonWordBreakingEngine _engBreakingEngine = new EngAndNonWordBreakingEngine();
         //current lang breaking engine
         BreakingEngine _breakingEngine;
         List<BreakingEngine> _otherEngines = new List<BreakingEngine>();
-
-        WordVisitor _visitor;
-        int _endAt;
         bool _breakNumberAfterText;
 
 
         public CustomBreaker()
         {
             ThrowIfCharOutOfRange = false;
-            //
-            _visitor = new WordVisitor();
             _breakingEngine = _engBreakingEngine; //default eng-breaking engine
         }
 
-        public EngBreakingEngine EngBreakingEngine
+        public EngAndNonWordBreakingEngine EngBreakingEngine
         {
             get { return _engBreakingEngine; }
         }
@@ -85,130 +80,60 @@ namespace Typography.TextBreak
                 return _engBreakingEngine;
             }
         }
-
-
-        public void BreakWords(char[] charBuff, int startAt, int len)
+        
+        public BreakingEngine GetBreakingEngineFor(char c)
         {
-            //conver to char buffer 
-            int j = charBuff.Length;
-            if (j < 1)
-            {
-                _endAt = 0;
-                return;
-            }
-            _endAt = startAt + len;
-            _visitor.LoadText(charBuff, startAt, len);
+            return SelectEngine(c);
+        }
+        
+        public void BreakWords(string inputstr, ICollection<BreakAtInfo> outputBreakAtList) =>
+            BreakWords(inputstr.AsSpan(), outputBreakAtList);
+
+        public void BreakWords(string inputstr, ICollection<BreakSpan> outputBreakSpanList) =>
+            BreakWords(inputstr.AsSpan(), outputBreakSpanList);
+
+        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakSpan> outputBreakSpanList) =>
+            BreakWords(charBuff, new BreakSpanProcessor(outputBreakSpanList.Add));
+
+        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakAtInfo> outputBreakAtList)
+        {
+            //convert to char buffer 
+            if (charBuff.IsEmpty) return;
+            var visitor = new WordVisitor(charBuff, outputBreakAtList, new Stack<int>());
             //---------------------------------------- 
-            BreakingEngine currentEngine = _breakingEngine = SelectEngine(charBuff[startAt]);
+            BreakingEngine currentEngine = _breakingEngine = SelectEngine(visitor.CurrentChar);
             //----------------------------------------
             //select breaking engine
-            int endAt = startAt + len;
 
-            for (; ; )
+            while(!visitor.IsEnd)
             {
                 //----------------------------------------
-                currentEngine.BreakWord(_visitor, charBuff, startAt, endAt - startAt); //please note that len is decreasing
-                switch (_visitor.State)
+                visitor = currentEngine.BreakWord(visitor, charBuff); //please note that len is decreasing
+                switch (visitor.State)
                 {
                     default: throw new NotSupportedException();
-
                     case VisitorState.End:
                         //ok
                         return;
                     case VisitorState.OutOfRangeChar:
                         {
                             //find proper breaking engine for current char
-
-                            BreakingEngine anotherEngine = SelectEngine(_visitor.Char);
+                            BreakingEngine anotherEngine = SelectEngine(visitor.CurrentChar);
                             if (anotherEngine == currentEngine)
                             {
-                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{_visitor.Char}' was not found.");
-                                startAt = _visitor.CurrentIndex + 1;
-                                _visitor.SetCurrentIndex(startAt);
-                                _visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
+                                if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.CurrentChar}' was not found.");
+                                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
+                                visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
                             }
                             else
                             {
                                 currentEngine = anotherEngine;
-                                startAt = _visitor.CurrentIndex;
+                                visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
                             }
                         }
                         break;
                 }
             }
         }
-
-        public void BreakWords(string inputstr)
-        {
-            //TODO: review here
-            char[] buffer = inputstr.ToCharArray();
-            BreakWords(buffer, 0, inputstr.Length); //all
-        }
-
-        /// <summary>
-        /// copy break-at result to outputList
-        /// </summary>
-        /// <param name="outputList"></param>
-        public void CopyBreakResults(List<BreakAtInfo> outputList)
-        {
-            outputList.AddRange(_visitor.GetBreakList());
-        }
-
-        /// <summary>
-        /// copy break-at result (only break pos) to outputList
-        /// </summary>
-        /// <param name="outputList"></param>
-        public void CopyBreakResults(List<int> outputList)
-        {
-            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
-            int j = breakAtList.Count;
-            for (int i = 0; i < j; ++i)
-            {
-                BreakAtInfo brk = breakAtList[i];
-                outputList.Add(brk.breakAt);
-            }
-        }
-
-
-        public int BreakItemCount
-        {
-            get { return _visitor.GetBreakList().Count; }
-        }
-        public IEnumerable<BreakSpan> GetBreakSpanIter()
-        {
-            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
-            int c_index = 0;
-            int count = breakAtList.Count;
-            for (int i = 0; i < count; ++i)
-            {
-
-                BreakAtInfo brkInfo = breakAtList[i];
-                BreakSpan sp = new BreakSpan();
-                sp.startAt = c_index;
-                sp.len = (ushort)(brkInfo.breakAt - c_index);
-                sp.wordKind = brkInfo.wordKind;
-
-                c_index += sp.len;
-
-                yield return sp;
-            }
-            //-------------------
-            if (c_index < _endAt)
-            {
-                BreakSpan sp = new BreakSpan();
-                sp.startAt = c_index;
-                sp.len = (ushort)(_endAt - c_index);
-                yield return sp;
-            }
-        }
-
-
-        public BreakingEngine GetBreakingEngineFor(char c)
-        {
-            return SelectEngine(c);
-        }
-        //
     }
-
-
 }

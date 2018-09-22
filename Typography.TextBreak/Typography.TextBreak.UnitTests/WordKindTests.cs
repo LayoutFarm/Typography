@@ -10,9 +10,8 @@ public class WordKindTests
     public void WordKindTest(string input, (string section, WordKind wordKind)[] output)
     {
         var customBreaker = new CustomBreaker();
-        customBreaker.BreakWords(input);
-        var outputList = new List<BreakAtInfo> { new BreakAtInfo(0, Unknown) };
-        customBreaker.CopyBreakResults(outputList);
+        var outputList = new List<BreakAtInfo> { BreakAtInfo.Empty };
+        customBreaker.BreakWords(input, outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
             Assert.AreEqual

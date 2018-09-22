@@ -2,9 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
  
 
   <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
+ 
+
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.1" />
+  </ItemGroup>
 
 </Project>

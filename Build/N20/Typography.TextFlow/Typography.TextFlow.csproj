@@ -36,6 +36,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\System.Memory\System.Memory.csproj">
+      <Project>{3f501b34-9e57-4610-8087-208f3a53cfb7}</Project>
+      <Name>System.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>
