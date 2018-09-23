@@ -161,7 +161,7 @@ namespace Typography.Contours
 
 
         VertexStore _temp1 = new VertexStore();
-        VertexStore _temp2 = new VertexStore();
+
 
         /// <summary>
         /// get glyph mesh from current font setting
@@ -184,16 +184,10 @@ namespace Typography.Contours
                     //version 3 
                     if (FlipGlyphUpward)
                     {
-
                         _temp1.Clear();
-                        _temp2.Clear();
-                        _tovxs.WriteOutput(_temp1);//write to temp buffer first
-
-                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _temp1, _temp2);
+                        _tovxs.WriteOutput(_temp1);//write to temp buffer first  
                         //then
-                        glyphMeshData.vxsStore = _temp2.CreateTrim();
-
-
+                        glyphMeshData.vxsStore = _temp1.CreateTrim(_invertY);// _temp2.CreateTrim(); 
                     }
                     else
                     {
@@ -208,12 +202,12 @@ namespace Typography.Contours
                     if (FlipGlyphUpward)
                     {
                         _temp1.Clear();
-                        _temp2.Clear();
+
                         _currentGlyphBuilder.ReadShapes(_tovxs);
                         _tovxs.WriteOutput(_temp1); //write to temp buffer first 
-                        PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_invertY, _temp1, _temp2);
+
                         //then
-                        glyphMeshData.vxsStore = _temp2.CreateTrim();
+                        glyphMeshData.vxsStore = _temp1.CreateTrim(_invertY);
                     }
                     else
                     {
@@ -247,12 +241,13 @@ namespace Typography.Contours
         }
         void SimulateQbliqueGlyph(GlyphMeshData orgGlyphMashData)
         {
-            _temp1.Clear();
-            PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_slantHorizontal, orgGlyphMashData.vxsStore, _temp1);
+            //_temp1.Clear();
+
+            //PixelFarm.CpuBlit.VertexProcessing.VertexStoreTransformExtensions.TransformToVxs(_slantHorizontal, orgGlyphMashData.vxsStore, _temp1);
             //italic mesh data
 
             GlyphMeshData obliqueVersion = new GlyphMeshData();
-            obliqueVersion.vxsStore = _temp1.CreateTrim();
+            obliqueVersion.vxsStore = orgGlyphMashData.vxsStore.CreateTrim(_slantHorizontal);
 
             orgGlyphMashData._synthOblique = obliqueVersion;
 
