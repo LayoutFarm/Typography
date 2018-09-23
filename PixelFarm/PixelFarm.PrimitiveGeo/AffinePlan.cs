@@ -42,7 +42,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public static AffinePlan RotateDeg(double degree)
         {
-            return new AffinePlan(AffineMatrixCommand.Rotate, AggMath.deg2rad(degree));
+            return new AffinePlan(AffineMatrixCommand.Rotate, deg2rad(degree));
         }
         public static AffinePlan Skew(double x, double y)
         {
@@ -55,6 +55,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public static AffinePlan Scale(double both)
         {
             return new AffinePlan(AffineMatrixCommand.Scale, both, both);
+        }
+        static double deg2rad(double degree)
+        {
+            return degree * (System.Math.PI / 180d);
         }
     }
 }
