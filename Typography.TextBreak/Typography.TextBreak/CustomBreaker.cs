@@ -75,14 +75,15 @@ namespace Typography.TextBreak
             BreakWords(inputstr.AsSpan(), outputBreakSpanList);
 
         public void BreakWords(string inputstr, ICollection<BreakAtInfo> outputBreakAtList) =>
-            BreakWords(inputstr.AsSpan(), span => outputBreakAtList.Add(BreakAtToSpan(span)));
+            BreakWords(inputstr.AsSpan(), outputBreakAtList);
 
-        delegate BreakAtInfo BreakSpanToAtDelegate(BreakSpan span);
-        readonly BreakSpanToAtDelegate BreakAtToSpan = span => new BreakAtInfo(span.startAt + span.len, span.wordKind);
+        private static BreakAtInfo BreakSpanToAt(BreakSpan span) => new BreakAtInfo(span.startAt + span.len, span.wordKind);
+        public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakAtInfo> outputBreakAtList) =>
+            BreakWords(inputstr, span => outputBreakAtList.Add(BreakSpanToAt(span)));
 
         public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakSpan> outputBreakSpanList) =>
             BreakWords(charBuff, outputBreakSpanList.Add);
-
+        
         public void BreakWords(ReadOnlySpan<char> charBuff, Action<BreakSpan> outputBreakSpanAction)
         {
             //convert to char buffer 
