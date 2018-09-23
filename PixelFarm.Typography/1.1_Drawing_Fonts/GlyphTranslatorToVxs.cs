@@ -16,19 +16,19 @@ namespace PixelFarm.Drawing.Fonts
     public class GlyphTranslatorToVxs : IGlyphTranslator
     {
         CurveFlattener curveFlattener = new CurveFlattener();
-        PathWriter ps = new PathWriter();
+        PathWriter _pw = new PathWriter();
         public GlyphTranslatorToVxs()
         {
         }
 #if DEBUG
         public PathWriter dbugGetPathWriter()
         {
-            return ps;
+            return _pw;
         }
 #endif
         public void BeginRead(int countourCount)
         {
-            ps.Clear();
+            _pw.Clear();
         }
         public void EndRead()
         {
@@ -36,29 +36,29 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void CloseContour()
         {
-            ps.CloseFigure();
+            _pw.CloseFigure();
         }
         public void Curve3(float x1, float y1, float x2, float y2)
         {
-            ps.Curve3(x1, y1, x2, y2);
+            _pw.Curve3(x1, y1, x2, y2);
         }
         public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
         {
-            ps.Curve4(x1, y1, x2, y2, x3, y3);
+            _pw.Curve4(x1, y1, x2, y2, x3, y3);
         }
         public void LineTo(float x1, float y1)
         {
-            ps.LineTo(x1, y1);
+            _pw.LineTo(x1, y1);
         }
         public void MoveTo(float x0, float y0)
         {
 
-            ps.MoveTo(x0, y0);
+            _pw.MoveTo(x0, y0);
         }
 
         public void Reset()
         {
-            ps.Clear();
+            _pw.Clear();
         }
         /// <summary>
         /// write output to vxs
@@ -69,7 +69,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             if (scale == 1)
             {
-                curveFlattener.MakeVxs(ps.Vxs, output);
+                curveFlattener.MakeVxs(_pw.Vxs, output);
             }
             else
             {
@@ -78,9 +78,11 @@ namespace PixelFarm.Drawing.Fonts
                         PixelFarm.CpuBlit.VertexProcessing.AffineMatrixCommand.Scale, scale, scale));
                 //transform -> flatten ->output
                 //TODO: review here again***
-                VertexStore tmpVxs = new VertexStore();
-                curveFlattener.MakeVxs(ps.Vxs, tmpVxs);
-                mat.TransformToVxs(tmpVxs, output);
+                using (VxsTemp.Borrow(out var v1))
+                using (VectorToolBox.Borrow(out CurveFlattener f))
+                {
+                    curveFlattener.MakeVxs(_pw.Vxs, mat, output);
+                }
             }
         }
     }

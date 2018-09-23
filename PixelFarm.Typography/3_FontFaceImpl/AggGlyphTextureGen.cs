@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-2017, WinterDev
 //-----------------------------------  
 using System;
-using Typography.Contours;
+using PixelFarm.CpuBlit.VertexProcessing;
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
@@ -38,9 +38,8 @@ namespace Typography.Contours
             txToVxs.WriteOutput(glyphVxs, pxscale);
             //find bound
             //-------------------------------------------- 
-            //GlyphImage glyphImg = new GlyphImage()
-            RectD bounds = RectD.ZeroIntersection;
-            PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(glyphVxs, ref bounds);
+
+            RectD bounds = glyphVxs.GetBoundingRect();
 
             ////-------------------------------------------- 
             int w = (int)System.Math.Ceiling(bounds.Width);
