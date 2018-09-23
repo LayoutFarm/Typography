@@ -20,7 +20,7 @@ namespace PixelFarm.Drawing
             get { return this._x; }
             set { this._x = value; }
         }
-        
+
         public int Y
         {
             get { return this._y; }
@@ -48,7 +48,7 @@ namespace PixelFarm.Drawing
             return base.GetHashCode();
         }
 
-       
+
         public int x { get { return this._x; } } //temp
         public int y { get { return this._y; } } //temp
         public static readonly Point Empty = new Point();
@@ -86,6 +86,18 @@ namespace PixelFarm.Drawing
         {
             return this._x == p._x && this._y == p._y;
         }
+        public void Offset(float dx, float dy)
+        {
+            _x += dx;
+            _y += dy;
+        }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + this.X + "," + this.Y + ")";
+        }
+#endif
     }
 
     public struct Size
@@ -128,6 +140,13 @@ namespace PixelFarm.Drawing
         }
 
         public static readonly Size Empty = new Size();
+
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + this._w + "," + this._h + ")";
+        }
+#endif
     }
 
     public struct SizeF
@@ -150,5 +169,12 @@ namespace PixelFarm.Drawing
         {
             return new SizeF(p.Width, p.Height);
         }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + this._w + "," + this._h + ")";
+        }
+#endif
     }
 }

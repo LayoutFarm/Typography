@@ -105,8 +105,10 @@ namespace PixelFarm.CpuBlit
         SvgPathCommand latestSVGPathCmd;
         int figureCount = 0;
         VertexStore myvxs;
+
         public PathWriter()
         {
+            //TODO: review here
             myvxs = new VertexStore();
         }
         public PathWriter(VertexStore externalVxs)
@@ -126,9 +128,9 @@ namespace PixelFarm.CpuBlit
             latestSVGPathCmd = SvgPathCommand.MoveTo;
             figureCount = 0;
         }
-         
+
         public void ResetWithExternalVxs(VertexStore newVxsOutput)
-        {   
+        {
             myvxs = newVxsOutput;
             Clear();
         }
@@ -143,6 +145,7 @@ namespace PixelFarm.CpuBlit
             {
                 //TODO: review here***
                 //NoMore cmd ?
+                //***
                 myvxs.AddVertex(0, 0, VertexCmd.NoMore);
             }
             figureCount++;
@@ -420,10 +423,7 @@ namespace PixelFarm.CpuBlit
         {
             get { return this.myvxs; }
         }
-        public VertexStoreSnap MakeVertexSnap()
-        {
-            return new VertexStoreSnap(this.myvxs);
-        }
+
 
         VertexCmd GetLastVertex(out double x, out double y)
         {
@@ -452,31 +452,32 @@ namespace PixelFarm.CpuBlit
             }
         }
         //// Concatenate path. The path is added as is.
-        public void ConcatPath(VertexStoreSnap s)
+        public void ConcatPath(VertexStore s)
         {
             double x, y;
-            VertexCmd cmd_flags;
-            VertexSnapIter snapIter = s.GetVertexSnapIter();
-            while ((cmd_flags = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
+            VertexCmd cmd;
+            int index = 0;
+            while ((cmd = s.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
             {
-                myvxs.AddVertex(x, y, cmd_flags);
+                myvxs.AddVertex(x, y, cmd);
             }
+            myvxs.ConfirmNoMore(); //TODO: review here, we need to confirm end of myvxs
         }
 
         //--------------------------------------------------------------------
         // Join path. The path is joined with the existing one, that is, 
         // it behaves as if the pen of a plotter was always down (drawing)
         //template<class VertexSource>  
-        public void JoinPath(VertexStoreSnap s)
+        public void JoinPath(VertexStore vxs)
         {
             double x, y;
-            VertexSnapIter snapIter = s.GetVertexSnapIter();
-            VertexCmd cmd = snapIter.GetNextVertex(out x, out y);
+            int index = 0;
+            VertexCmd cmd = vxs.GetVertex(index++, out x, out y);
             if (cmd == VertexCmd.NoMore)
             {
                 return;
             }
-
+            //---------------------
             if (VertexHelper.IsVertextCommand(cmd))
             {
                 double x0, y0;
@@ -507,7 +508,7 @@ namespace PixelFarm.CpuBlit
                 }
             }
 
-            while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
+            while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
             {
                 myvxs.AddVertex(x, y, VertexHelper.IsMoveTo(cmd) ? VertexCmd.LineTo : cmd);
             }

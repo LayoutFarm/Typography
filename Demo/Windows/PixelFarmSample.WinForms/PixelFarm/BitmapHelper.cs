@@ -24,7 +24,7 @@ namespace PixelFarm.CpuBlit.Imaging
             {
                 TempMemPtr memPtr = ActualBitmap.GetBufferPtr(actualImage);
                 MemMx.memcpy((byte*)hBmpScan0, (byte*)memPtr.Ptr, actualImage.Stride * actualImage.Height);
-                memPtr.Release();
+                memPtr.Dispose();
             }
             //System.Runtime.InteropServices.Marshal.Copy(rawBuffer, 0,
             //   hBmpScan0, rawBuffer.Length);
@@ -101,7 +101,7 @@ namespace PixelFarm.CpuBlit.Imaging
                     }
 
                 }
-                srcMemPtr.Release();
+                srcMemPtr.Dispose();
                 bitmap.UnlockBits(bitmapData1);
                 //}
                 //sss.Stop();
@@ -213,7 +213,7 @@ namespace PixelFarm.CpuBlit.Imaging
                     startRowAt -= stride;
                     src += stride;
                 }
-                targetMemPtr.Release();
+                targetMemPtr.Dispose();
                 //////////////////////////////////////////////////////////////////
                 //fixed (byte* targetH = &targetBuffer[0])
                 //{

@@ -29,7 +29,7 @@ namespace PixelFarm.CpuBlit.Imaging
             //System.Runtime.InteropServices.Marshal.Copy(rawBuffer, 0,
             //   hBmpScan0, rawBuffer.Length);
 
-            memPtr.Release();
+            memPtr.Dispose();
         }
 
 
@@ -83,7 +83,7 @@ namespace PixelFarm.CpuBlit.Imaging
                         }
                     }
                 }
-                srcBufferPtr.Release();
+                srcBufferPtr.Dispose();
                 bitmap.UnlockBits(bitmapData1);
                 //}
                 //sss.Stop();
@@ -205,7 +205,7 @@ namespace PixelFarm.CpuBlit.Imaging
                         }
                     }
                 }
-                srcBufferPtr.Release();
+                srcBufferPtr.Dispose();
                 bitmap.UnlockBits(bitmapData1);
                 //}
                 //sss.Stop();
@@ -500,7 +500,7 @@ namespace PixelFarm.CpuBlit.Imaging
                 //    }
                 //}
             }
-            targetBufferPtr.Release();
+            targetBufferPtr.Dispose();
             windowsBitmap.UnlockBits(bitmapData1);
         }
 

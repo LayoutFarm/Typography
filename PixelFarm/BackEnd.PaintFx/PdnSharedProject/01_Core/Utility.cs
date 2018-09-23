@@ -738,17 +738,17 @@ namespace PaintFx
             return Rectangle.Truncate(RectangleF.FromLTRB(left, top, right, bottom));
         }
 
-        public static Stack Reverse(Stack reverseMe)
-        {
-            Stack reversed = new Stack();
+        //public static Stack Reverse(Stack reverseMe)
+        //{
+        //    Stack reversed = new Stack();
 
-            foreach (object o in reverseMe)
-            {
-                reversed.Push(o);
-            }
+        //    foreach (object o in reverseMe)
+        //    {
+        //        reversed.Push(o);
+        //    }
 
-            return reversed;
-        }
+        //    return reversed;
+        //}
 
         /// <summary>
         /// Allows you to find the bounding box for a "region" that is described as an

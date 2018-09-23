@@ -48,6 +48,11 @@ namespace PixelFarm.Drawing
         public abstract int Height { get; }
         public abstract RectInt ClipBox { get; set; }
         public abstract void SetClipBox(int x1, int y1, int x2, int y2);
+        /// <summary>
+        /// we DO NOT store vxs
+        /// </summary>
+        /// <param name="vxs"></param>
+        public abstract void SetClipRgn(VertexStore vxs);
         //
         public abstract double StrokeWidth { get; set; }
         public abstract SmoothingMode SmoothingMode { get; set; }
@@ -86,17 +91,17 @@ namespace PixelFarm.Drawing
 
         ////////////////////////////////////////////////////////////////////////////
         //vertext store/snap/rendervx
-        public abstract void Fill(VertexStoreSnap snap);
+
         public abstract void Fill(VertexStore vxs);
-
-
         public abstract void Draw(VertexStore vxs);
-        public abstract void Draw(VertexStoreSnap vxs);
-        public abstract RenderVx CreateRenderVx(VertexStoreSnap snap);
+
+        public abstract RenderVx CreateRenderVx(VertexStore vxs);
         public abstract RenderVxFormattedString CreateRenderVx(string textspan);
         public abstract void FillRenderVx(Brush brush, RenderVx renderVx);
         public abstract void FillRenderVx(RenderVx renderVx);
         public abstract void DrawRenderVx(RenderVx renderVx);
+        public abstract void Render(RenderVx renderVx);
+
         //////////////////////////////////////////////////////////////////////////////
         //text,string
         //TODO: review text drawing funcs 
@@ -110,48 +115,17 @@ namespace PixelFarm.Drawing
         //////////////////////////////////////////////////////////////////////////////
         //user's object 
         internal Stack<object> _userObjectStack = new Stack<object>();
-        internal Stack<VertexStore> _tempVxsStack = new Stack<VertexStore>();
-        public abstract PainterExtensions.VectorTool VectorTool { get; }
+
     }
 
     namespace PainterExtensions
     {
-        public abstract class VectorTool
-        {
-            public abstract void CreateStroke(VertexStore orgVxs, float strokeW, VertexStore output);
-        }
-
         public static class PainterExt
         {
-            public static void StackPushUserObject(this Painter p, object o)
-            {
-                p._userObjectStack.Push(o);
-            }
-            public static object StackPopUserObject(this Painter p)
-            {
-                return p._userObjectStack.Pop();
-            }
             public static void StackClearUserObject(this Painter p)
             {
                 p._userObjectStack.Clear();
             }
-            public static VertexStore GetTempVxsStore(this Painter p)
-            {
-                if (p._tempVxsStack.Count == 0)
-                {
-                    return new VertexStore();
-                }
-                else
-                {
-                    return p._tempVxsStack.Pop();
-                }
-            }
-            public static void ReleaseTempVxsStore(this Painter p, VertexStore vxs)
-            {
-                p._tempVxsStack.Push(vxs);
-            }
-
-
         }
     }
 

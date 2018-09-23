@@ -55,8 +55,10 @@ namespace PixelFarm.CpuBlit.Rasterization
             public readonly int cover;
             public readonly int area;
 #if DEBUG
+#if !COSMOS
             public int dbugLeft;
             public int dbugRight;
+#endif
 #endif
             private CellAA(int x, int y, int cover, int area)
             {
@@ -65,8 +67,10 @@ namespace PixelFarm.CpuBlit.Rasterization
                 this.cover = cover;
                 this.area = area;
 #if DEBUG
+#if !COSMOS
                 dbugLeft = 0;
                 dbugRight = 0;
+#endif
 #endif
             }
 
@@ -88,16 +92,20 @@ namespace PixelFarm.CpuBlit.Rasterization
                 //cell.y = y;
                 //cell.cover = cover;
                 //cell.area = area;
+#if !COSMOS
                 cell.dbugLeft = left;
                 cell.dbugRight = right;
+#endif
                 return cell;
             }
 #endif
 #if DEBUG
+#if !COSMOS
             public override string ToString()
             {
                 return "x:" + x + ",y:" + y + ",cover:" + cover + ",area:" + area + ",left:" + dbugLeft + ",right:" + dbugRight;
             }
+#endif
 #endif
 
         }

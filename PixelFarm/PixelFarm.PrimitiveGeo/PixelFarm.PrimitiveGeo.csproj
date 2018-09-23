@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,10 +29,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AffinePlan.cs" />
     <Compile Include="BasicGeometries.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="ICoordTransformer.cs" />
+    <Compile Include="MemMx.cs" />
+    <Compile Include="NativeMemMx.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="RectangleF.cs" />
     <Compile Include="RectInt.cs" />

@@ -22,7 +22,8 @@ using System;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
     //==========================================================trans_bilinear
-    public sealed partial class Bilinear : ICoordTransformer
+
+    public sealed class Bilinear : ICoordTransformer
     {
         //readonly double[,] m_mtx = new double[4, 2];//row x column
         //4 row, 2 columns
@@ -140,9 +141,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             x = rc00 + rc10 * xy + rc20 * tx + rc30 * ty;
             y = rc01 + rc11 * xy + rc21 * tx + rc31 * ty;
         }
+        ICoordTransformer ICoordTransformer.MultiplyWith(ICoordTransformer another)
+        {
+            return new CoordTransformationChain(this, another);
+        }
         //-------------------------------------------------------------------------
 
 
-     
+
     }
 }

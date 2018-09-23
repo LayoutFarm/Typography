@@ -136,11 +136,11 @@ namespace PixelFarm.CpuBlit.Imaging
         }
 
 
-        public int[] GetOrgInt32Buffer()
-        {
-            //TODO: review here, this may not correct 
-            return linkedImage.GetOrgInt32Buffer();
-        }
+        //public int[] GetOrgInt32Buffer()
+        //{
+        //    //TODO: review here, this may not correct 
+        //    return linkedImage.GetOrgInt32Buffer();
+        //}
         public TempMemPtr GetBufferPtr()
         {
             return linkedImage.GetBufferPtr();

@@ -90,7 +90,7 @@ namespace PixelFarm.Drawing
         //path,  polygons,ellipse spline,contour,   
         public abstract void FillPath(Color color, GraphicsPath gfxPath);
         public abstract void FillPath(Brush brush, GraphicsPath gfxPath);
-        public abstract void DrawPath(GraphicsPath gfxPath); 
+        public abstract void DrawPath(GraphicsPath gfxPath);
         public abstract void FillPolygon(Brush brush, PointF[] points);
         public abstract void FillPolygon(Color color, PointF[] points);
         //-------------------------------------------------------  
@@ -98,6 +98,7 @@ namespace PixelFarm.Drawing
         public abstract void DrawImage(Image image, RectangleF dest, RectangleF src);
         public abstract void DrawImage(Image image, RectangleF dest);
         public abstract void DrawImages(Image image, RectangleF[] destAndSrcPairs);
+        public abstract void DrawImage(Image image, int x, int y);//draw image unscaled at specific pos
         //---------------------------------------------------------------------------
         //text ,font, strings 
         //TODO: review these funcs
@@ -115,6 +116,9 @@ namespace PixelFarm.Drawing
         public abstract RenderVxFormattedString CreateFormattedString(char[] buffer, int startAt, int len);
         public abstract void DrawRenderVx(RenderVx renderVx, float x, float y);
         public abstract void Dispose();
+
+        //--
+        public abstract Painter GetPainter();
 
     }
 

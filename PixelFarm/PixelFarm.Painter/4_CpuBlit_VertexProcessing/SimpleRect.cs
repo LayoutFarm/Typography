@@ -78,10 +78,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _reusablePathWriter.CloseFigure();
             return output;
         }
-        public VertexStoreSnap MakeVertexSnap(VertexStore output)
-        {
-            return new VertexStoreSnap(this.MakeVxs(output));
-        }
+       
     }
 }
 

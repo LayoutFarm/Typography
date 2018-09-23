@@ -29,7 +29,7 @@
 
 using System;
 using img_subpix_const = PixelFarm.CpuBlit.Imaging.ImageFilterLookUpTable.ImgSubPixConst;
-using CO = PixelFarm.CpuBlit.PixelProcessing.CO;
+
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     // it should be easy to write a 90 rotating or mirroring filter too. LBB 2012/01/14
@@ -66,29 +66,28 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
             unsafe
             {
-                CpuBlit.Imaging.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr();
-                int* pSource = (int*)srcBufferPtr.Ptr + bufferIndex;
+                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = _bmpSrc.GetBufferPtr())
                 {
-                    //int* src_ptr = (int*)pSource;
+                    int* pSource = (int*)srcBufferPtr.Ptr + bufferIndex;
+
                     do
                     {
                         int src_value = *pSource;
-                        //separate each component
-                        byte a = (byte)((src_value >> 24) & 0xff);
-                        byte r = (byte)((src_value >> 16) & 0xff);
-                        byte g = (byte)((src_value >> 8) & 0xff);
-                        byte b = (byte)((src_value) & 0xff);
-
+                        //separate each component 
                         //TODO: review here, color from source buffer
                         //should be in 'pre-multiplied' format.
                         //so it should be converted to 'straight' color by call something like ..'FromPreMult()' 
 
-                        outputColors[startIndex++] = Drawing.Color.FromArgb(a, r, g, b);
+                        outputColors[startIndex++] = Drawing.Color.FromArgb(
+                            (byte)((src_value >> 24) & 0xff), //a
+                            (byte)((src_value >> 16) & 0xff), //r
+                            (byte)((src_value >> 8) & 0xff), //g
+                            (byte)((src_value) & 0xff));//b
 
                         pSource++;//move next
                     } while (--len != 0);
+
                 }
-                srcBufferPtr.Release();
             }
 
 
@@ -168,34 +167,35 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 if (_mode0)
                 {
 
-                    CpuBlit.Imaging.TempMemPtr srcBufferPtr = _imgsrc.GetBufferPtr();
-                    int* srcBuffer = (int*)srcBufferPtr.Ptr;
-                    int bufferIndex = _imgsrc.GetBufferOffsetXY32(x, y);
-                    //unsafe
+
+                    using (CpuBlit.Imaging.TempMemPtr.FromBmp(_imgsrc, out int* srcBuffer))
                     {
-#if true
-                        do
+                        int bufferIndex = _imgsrc.GetBufferOffsetXY32(x, y);
+                        //unsafe
                         {
-                            //TODO: review here, match component?
-                            //ORDER IS IMPORTANT!
-                            //TODO : use CO (color order instead)
-                            int color = srcBuffer[bufferIndex++];
+#if true
+                            do
+                            {
+                                //TODO: review here, match component?
+                                //ORDER IS IMPORTANT!
+                                //TODO : use CO (color order instead)
+                                int color = srcBuffer[bufferIndex++];
 
-                            //byte b = (byte)srcBuffer[bufferIndex++];
-                            //byte g = (byte)srcBuffer[bufferIndex++];
-                            //byte r = (byte)srcBuffer[bufferIndex++];
-                            //byte a = (byte)srcBuffer[bufferIndex++];
+                                //byte b = (byte)srcBuffer[bufferIndex++];
+                                //byte g = (byte)srcBuffer[bufferIndex++];
+                                //byte r = (byte)srcBuffer[bufferIndex++];
+                                //byte a = (byte)srcBuffer[bufferIndex++];
 
-                            //outputColors[startIndex] = Drawing.Color.FromArgb(a, r, g, b);
-                            outputColors[startIndex] = Drawing.Color.FromArgb(
-                                (color >> 24) & 0xff, //a
-                                (color >> 16) & 0xff, //r
-                                (color >> 8) & 0xff, //b
-                                (color) & 0xff //b
-                                );
+                                //outputColors[startIndex] = Drawing.Color.FromArgb(a, r, g, b);
+                                outputColors[startIndex] = Drawing.Color.FromArgb(
+                                    (color >> 24) & 0xff, //a
+                                    (color >> 16) & 0xff, //r
+                                    (color >> 8) & 0xff, //b
+                                    (color) & 0xff //b
+                                    );
 
-                            ++startIndex;
-                        } while (--len != 0);
+                                ++startIndex;
+                            } while (--len != 0);
 #else
                         fixed (byte* pSource = &fg_ptr[bufferIndex])
                         {
@@ -210,18 +210,17 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                             }
                         }
 #endif
+                        }
                     }
-                    srcBufferPtr.Release();
-                    return;
                 }
                 else
                 {
 
 
-                    try
+
+                    ISpanInterpolator spanInterpolator = base.Interpolator;
+                    using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = _imgsrc.GetBufferPtr())
                     {
-                        ISpanInterpolator spanInterpolator = base.Interpolator;
-                        CpuBlit.Imaging.TempMemPtr srcBufferPtr = _imgsrc.GetBufferPtr();
                         int* srcBuffer = (int*)srcBufferPtr.Ptr;
 
                         spanInterpolator.Begin(x + base.dx, y + base.dy, len);
@@ -446,12 +445,6 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                                 spanInterpolator.Next();
                             } while (--len != 0);
                         }
-
-                        srcBufferPtr.Release();
-
-                    }
-                    catch (Exception ex1)
-                    {
                     }
                 }
 

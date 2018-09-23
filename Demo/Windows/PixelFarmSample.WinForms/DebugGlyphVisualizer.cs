@@ -116,7 +116,7 @@ namespace SampleWinForms.UI
             painter.Clear(PixelFarm.Drawing.Color.White);
 
             RectD bounds = RectD.ZeroIntersection;
-            PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(new PixelFarm.Drawing.VertexStoreSnap(vxs), ref bounds);
+            PixelFarm.CpuBlit.VertexProcessing.BoundingRect.GetBoundingRect(vxs, ref bounds);
             //----------------------------------------------------
             float scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoint);
             _pxscale = scale;

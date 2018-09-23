@@ -242,14 +242,14 @@ namespace PixelFarm.CpuBlit.Rasterization
                     break;
             }
         }
-        //------------------------------------------------------------------------
-        void Edge(double x1, double y1, double x2, double y2)
-        {
-            if (m_cellAARas.Sorted) { Reset(); }
-            m_vectorClipper.MoveTo(upscale(x1), upscale(y1));
-            m_vectorClipper.LineTo(upscale(x2), upscale(y2));
-            m_status = Status.MoveTo;
-        }
+        ////------------------------------------------------------------------------
+        //void Edge(double x1, double y1, double x2, double y2)
+        //{
+        //    if (m_cellAARas.Sorted) { Reset(); }
+        //    m_vectorClipper.MoveTo(upscale(x1), upscale(y1));
+        //    m_vectorClipper.LineTo(upscale(x2), upscale(y2));
+        //    m_status = Status.MoveTo;
+        //}
         //-------------------------------------------------------------------
         public float OffsetOriginX
         {
@@ -265,15 +265,110 @@ namespace PixelFarm.CpuBlit.Rasterization
         /// we do NOT store vxs
         /// </summary>
         /// <param name="vxs"></param>
+        public void AddPath(VertexStore vxs, VertexProcessing.ICoordTransformer tx)
+        {
+
+            //-----------------------------------------------------
+            //*** we extract vertext command and coord(x,y) from
+            //the snap but not store the snap inside rasterizer
+            //----------------------------------------------------- 
+            double x = 0;
+            double y = 0;
+            VertexCmd cmd;
+            int index = 0;
+
+            if (m_cellAARas.Sorted) { Reset(); }
+            double offsetOrgX = OffsetOriginX;
+            double offsetOrgY = OffsetOriginY;
+
+#if DEBUG
+            int dbugVertexCount = 0;
+#endif
+
+            if (ExtendWidthX3ForSubPixelLcdEffect)
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+                    //---------------------------------------------
+                    //NOTE: we scale horizontal 3 times.
+                    //subpixel renderer will shrink it to 1 
+                    //--------------------------------------------- 
+                    x = (x + offsetOrgX) * 3;
+                    y = (y + offsetOrgY);
+                    //
+                    tx.Transform(ref x, ref y); //***
+                    AddVertex(cmd, x, y);
+                }
+            }
+            else
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+                    x = (x + offsetOrgX);
+                    y = (y + offsetOrgY);
+                    //
+                    tx.Transform(ref x, ref y); //***
+                    AddVertex(cmd, x, y);
+                }
+            }
+        }
+
+        /// <summary>
+        /// we do NOT store vxs
+        /// </summary>
+        /// <param name="vxs"></param>
         public void AddPath(VertexStore vxs)
         {
 
             //-----------------------------------------------------
             //*** we extract vertext command and coord(x,y) from
             //the snap but not store the snap inside rasterizer
-            //-----------------------------------------------------
+            //----------------------------------------------------- 
+            double x = 0;
+            double y = 0;
+            VertexCmd cmd;
+            int index = 0;
 
-            this.AddPath(new VertexStoreSnap(vxs));
+            if (m_cellAARas.Sorted) { Reset(); }
+            float offsetOrgX = OffsetOriginX;
+            float offsetOrgY = OffsetOriginY;
+
+#if DEBUG
+            int dbugVertexCount = 0;
+#endif
+
+            if (ExtendWidthX3ForSubPixelLcdEffect)
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+                    //---------------------------------------------
+                    //NOTE: we scale horizontal 3 times.
+                    //subpixel renderer will shrink it to 1 
+                    //---------------------------------------------
+
+                    AddVertex(cmd, (x + offsetOrgX) * 3, (y + offsetOrgY));
+                }
+            }
+            else
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+
+                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
+                }
+            }
         }
 
 
@@ -295,134 +390,19 @@ namespace PixelFarm.CpuBlit.Rasterization
                 }
             }
         }
-        /// <summary>
-        /// we do NOT store snap ***
-        /// </summary>
-        /// <param name="snap"></param>
-        public void AddPath(VertexStoreSnap snap)
-        {
-            //-----------------------------------------------------
-            //*** we extract vertext command and coord(x,y) from
-            //the snap but not store the snap inside rasterizer
-            //-----------------------------------------------------
+        ///// <summary>
+        ///// we do NOT store snap ***
+        ///// </summary>
+        ///// <param name="snap"></param>
+        //public void AddPath(VertexStoreSnap snap)
+        //{
+        //    //-----------------------------------------------------
+        //    //*** we extract vertext command and coord(x,y) from
+        //    //the snap but not store the snap inside rasterizer
+        //    //-----------------------------------------------------
+        //    AddPath(VertexStoreSnap.GetInternalVxs(snap));
 
-
-            double x = 0;
-            double y = 0;
-            if (m_cellAARas.Sorted) { Reset(); }
-            float offsetOrgX = OffsetOriginX;
-            float offsetOrgY = OffsetOriginY;
-
-
-            VertexSnapIter snapIter = snap.GetVertexSnapIter();
-            VertexCmd cmd;
-#if DEBUG
-            int dbugVertexCount = 0;
-#endif
-
-            if (ExtendWidthX3ForSubPixelLcdEffect)
-            {
-
-                while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
-                {
-#if DEBUG
-                    dbugVertexCount++;
-#endif
-                    //---------------------------------------------
-                    //NOTE: we scale horizontal 3 times.
-                    //subpixel renderer will shrink it to 1 
-                    //---------------------------------------------
-
-                    AddVertex(cmd, (x + offsetOrgX) * 3, (y + offsetOrgY));
-                }
-
-
-            }
-            else
-            {
-
-                while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
-                {
-#if DEBUG
-                    dbugVertexCount++;
-#endif
-
-                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
-                }
-
-
-            }
-
-
-
-
-
-            //            if (snap.VxsHasMoreThanOnePart)
-            //            {
-            //                //****
-
-            //                //render all parts
-            //                VertexStore vxs = snap.GetInternalVxs();
-            //                int j = vxs.Count;
-
-            //                if (UseSubPixelRendering)
-            //                {
-            //                    for (int i = 0; i < j; ++i)
-            //                    {
-            //                        var cmd = vxs.GetVertex(i, out x, out y);
-            //                        if (cmd != VertexCmd.Stop)
-            //                        {
-            //                            //AddVertext 1 of 4
-            //                            AddVertex(cmd, (x + offsetOrgX) * 3, y + offsetOrgY);
-            //                        }
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    for (int i = 0; i < j; ++i)
-            //                    {
-            //                        var cmd = vxs.GetVertex(i, out x, out y);
-            //                        if (cmd != VertexCmd.Stop)
-            //                        {
-            //                            //AddVertext 2 of 4
-            //                            AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //            else
-            //            {
-            //                VertexSnapIter snapIter = snap.GetVertexSnapIter();
-            //                VertexCmd cmd;
-            //#if DEBUG
-            //                int dbugVertexCount = 0;
-            //#endif
-            //                if (UseSubPixelRendering)
-            //                {
-            //                    while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.Stop)
-            //                    {
-            //#if DEBUG
-            //                        dbugVertexCount++;
-            //#endif
-            //                        //AddVertext 3 of 4
-            //                        AddVertex(cmd, (x + offsetOrgX) * 3, y + offsetOrgY);
-            //                    }
-
-            //                }
-            //                else
-            //                {
-
-            //                    while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.Stop)
-            //                    {
-            //#if DEBUG
-            //                        dbugVertexCount++;
-            //#endif
-            //                        //AddVertext 4 of 4
-            //                        AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
-            //                    }
-            //                }
-            //            }
-        }
+        //}
 
         public int MinX { get { return m_cellAARas.MinX; } }
         public int MinY { get { return m_cellAARas.MinY; } }
@@ -497,6 +477,54 @@ namespace PixelFarm.CpuBlit.Rasterization
                 {
                     unsafe
                     {
+#if COSMOS
+                        int pnt = 0;
+                        CellAA cell = cells[pnt + offset];
+                        int x = cell.x;
+                        int area = cell.area;
+                        cover += cell.cover;
+                        //accumulate all cells with the same X
+                        while (--num_cells != 0)
+                        {
+                            offset++; //move next
+                            cell = cells[pnt + offset];
+                            if (cell.x != x)
+                            {
+                                break;
+                            }
+
+                            area += cell.area;
+                            cover += cell.cover;
+                        }
+                        if (area != 0)
+                        {
+                            //-----------------------------------------------
+                            //single cell, for antialias look
+                            //-----------------------------------------------
+                            //calculate alpha from coverage value
+                            int alpha = CalculateAlpha((cover << (poly_subpix.SHIFT + 1)) - area);
+                            if (alpha != 0)
+                            {
+                                scline.AddCell(x, alpha);
+                            }
+
+                            x++;
+                        }
+
+                        if ((num_cells != 0) && (cell.x > x))
+                        {
+                            //-----------------------------------------------
+                            //this is long span , continuous color, solid look
+                            //-----------------------------------------------
+                            //calculate alpha from coverage value
+                            int alpha = CalculateAlpha(cover << (poly_subpix.SHIFT + 1));
+                            if (alpha != 0)
+                            {
+                                scline.AddSpan(x, (cell.x - x), alpha);
+                            }
+                        }
+
+#else
                         fixed (CellAA* cur_cell_h = &cells[0])
                         {
                             CellAA* cur_cell_ptr = cur_cell_h + offset;
@@ -544,6 +572,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                                 }
                             }
                         }
+#endif
                     }
                 }
 

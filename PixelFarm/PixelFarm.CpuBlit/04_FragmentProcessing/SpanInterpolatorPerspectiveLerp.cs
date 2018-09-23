@@ -155,50 +155,51 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             dy -= y;
             int sy2 = (int)AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
             // Initialize the interpolators
-            m_coord_x = new LineInterpolatorDDA2(x1, x2, (int)len);
-            m_coord_y = new LineInterpolatorDDA2(y1, y2, (int)len);
-            m_scale_x = new LineInterpolatorDDA2(sx1, sx2, (int)len);
-            m_scale_y = new LineInterpolatorDDA2(sy1, sy2, (int)len);
+            m_coord_x = new LineInterpolatorDDA2(x1, x2, len);
+            m_coord_y = new LineInterpolatorDDA2(y1, y2, len);
+            m_scale_x = new LineInterpolatorDDA2(sx1, sx2, len);
+            m_scale_y = new LineInterpolatorDDA2(sy1, sy2, len);
         }
 
 
         //----------------------------------------------------------------
-        public void ReSync(double xe, double ye, int len)
-        {
-            // Assume x1,y1 are equal to the ones at the previous end point 
-            int x1 = m_coord_x.Y;
-            int y1 = m_coord_y.Y;
-            int sx1 = m_scale_x.Y;
-            int sy1 = m_scale_y.Y;
-            // Calculate transformed coordinates at x2,y2 
-            double xt = xe;
-            double yt = ye;
-            m_trans_dir.Transform(ref xt, ref yt);
-            int x2 = AggMath.iround(xt * SUBPIXEL_SCALE);
-            int y2 = AggMath.iround(yt * SUBPIXEL_SCALE);
-            double delta = 1 / (double)SUBPIXEL_SCALE;
-            double dx;
-            double dy;
-            // Calculate scale by X at x2,y2
-            dx = xt + delta;
-            dy = yt;
-            m_trans_inv.Transform(ref dx, ref dy);
-            dx -= xe;
-            dy -= ye;
-            int sx2 = (int)AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
-            // Calculate scale by Y at x2,y2
-            dx = xt;
-            dy = yt + delta;
-            m_trans_inv.Transform(ref dx, ref dy);
-            dx -= xe;
-            dy -= ye;
-            int sy2 = (int)AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
-            // Initialize the interpolators
-            m_coord_x = new LineInterpolatorDDA2(x1, x2, (int)len);
-            m_coord_y = new LineInterpolatorDDA2(y1, y2, (int)len);
-            m_scale_x = new LineInterpolatorDDA2(sx1, sx2, (int)len);
-            m_scale_y = new LineInterpolatorDDA2(sy1, sy2, (int)len);
-        }
+        //public void ReSync(double xe, double ye, int len)
+        //{
+        //    // Assume x1,y1 are equal to the ones at the previous end point 
+        //    int x1 = m_coord_x.Y;
+        //    int y1 = m_coord_y.Y;
+        //    int sx1 = m_scale_x.Y;
+        //    int sy1 = m_scale_y.Y;
+        //    // Calculate transformed coordinates at x2,y2 
+        //    double xt = xe;
+        //    double yt = ye;
+        //    m_trans_dir.Transform(ref xt, ref yt);
+        //    int x2 = AggMath.iround(xt * SUBPIXEL_SCALE);
+        //    int y2 = AggMath.iround(yt * SUBPIXEL_SCALE);
+
+        //    double delta = 1d / SUBPIXEL_SCALE;
+        //    double dx;
+        //    double dy;
+        //    // Calculate scale by X at x2,y2
+        //    dx = xt + delta;
+        //    dy = yt;
+        //    m_trans_inv.Transform(ref dx, ref dy);
+        //    dx -= xe;
+        //    dy -= ye;
+        //    int sx2 = AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
+        //    // Calculate scale by Y at x2,y2
+        //    dx = xt;
+        //    dy = yt + delta;
+        //    m_trans_inv.Transform(ref dx, ref dy);
+        //    dx -= xe;
+        //    dy -= ye;
+        //    int sy2 = AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
+        //    // Initialize the interpolators
+        //    m_coord_x = new LineInterpolatorDDA2(x1, x2, len);
+        //    m_coord_y = new LineInterpolatorDDA2(y1, y2, len);
+        //    m_scale_x = new LineInterpolatorDDA2(sx1, sx2, len);
+        //    m_scale_y = new LineInterpolatorDDA2(sy1, sy2, len);
+        //}
         public VertexProcessing.ICoordTransformer Transformer
         {
             get { throw new System.NotImplementedException(); }

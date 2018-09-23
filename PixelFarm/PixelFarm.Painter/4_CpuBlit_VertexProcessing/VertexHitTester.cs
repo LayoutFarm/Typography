@@ -52,17 +52,25 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         // for the CrossingsTest() code; it is left out here for clarity.
         //
         // Input 2D polygon _pgon_ with _numverts_ number of vertices and test point
-        // _point_, returns 1 if inside, 0 if outside.
+        // _point_, returns 1 if inside, 0 if outside. 
+
         public static bool IsPointInVxs(PixelFarm.Drawing.VertexStore vxs, double tx, double ty)
         {
+            //
+
             int m_num_points = vxs.Count;
             if (m_num_points < 3) return false;
             // if (!m_in_polygon_check) return false;
 
-            int j;
+            int i;
             bool yflag0, yflag1, inside_flag;
             double vtx0, vty0, vtx1, vty1;
-            vxs.GetVertex(m_num_points -1, out vtx0, out vty0);
+
+            //find last point
+            FindActualPointCount(vxs, out m_num_points);
+            VertexCmd cmd = vxs.GetVertex(m_num_points - 1, out vtx0, out vty0);
+
+            //
             //vtx0 = GetXN(m_num_points - 1);
             //vty0 = GetYN(m_num_points - 1);
 
@@ -72,7 +80,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //vty1 = GetYN(0);
             vxs.GetVertex(0, out vtx1, out vty1);
             inside_flag = false;
-            for (j = 1; j <= m_num_points; ++j)
+            //
+            for (i = 1; i <= m_num_points && cmd != VertexCmd.NoMore; ++i)
             {
                 yflag1 = (vty1 >= ty);
                 // Check if endpoints straddle (are on opposite sides) of X axis
@@ -104,12 +113,26 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 yflag0 = yflag1;
                 vtx0 = vtx1;
                 vty0 = vty1;
-                int k = (j >= m_num_points) ? j - m_num_points : j;
+
+                //int k = (i >= m_num_points) ? i - m_num_points : i;
                 //vtx1 = GetXN(k);
                 //vty1 = GetYN(k);
-                vxs.GetVertex(k, out vtx1, out vty1);
+
+                cmd = vxs.GetVertex(i, out vtx1, out vty1);
+
             }
             return inside_flag;
+        }
+        static void FindActualPointCount(PixelFarm.Drawing.VertexStore vxs, out int actualPointCount)
+        {
+            int pp = vxs.Count;
+            double vtx0, vty0;
+            VertexCmd cmd = vxs.GetVertex(--pp, out vtx0, out vty0);
+            while (cmd == VertexCmd.NoMore)
+            {
+                cmd = vxs.GetVertex(--pp, out vtx0, out vty0);
+            }
+            actualPointCount = pp + 1;
         }
     }
 }

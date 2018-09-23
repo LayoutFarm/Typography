@@ -16,7 +16,7 @@
 
 namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
-    public class EllipseBresenhamInterpolator
+    struct EllipseBresenhamInterpolator
     {
         int m_rx2;
         int m_ry2;

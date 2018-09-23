@@ -1,5 +1,5 @@
 ﻿//BSD, 2014-present, WinterDev
- 
+
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
     public enum AffineMatrixCommand : byte
@@ -39,6 +39,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public static AffinePlan Rotate(double radAngle)
         {
             return new AffinePlan(AffineMatrixCommand.Rotate, radAngle);
+        }
+        public static AffinePlan RotateDeg(double degree)
+        {
+            return new AffinePlan(AffineMatrixCommand.Rotate, AggMath.deg2rad(degree));
         }
         public static AffinePlan Skew(double x, double y)
         {

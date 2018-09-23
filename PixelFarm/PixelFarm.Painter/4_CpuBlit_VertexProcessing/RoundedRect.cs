@@ -208,10 +208,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             return VertexStoreBuilder.CreateVxs(this.GetVertexIter(), vxs);
         }
-        public VertexStoreSnap MakeVertexSnap(VertexStore vxs)
-        {
-            return new VertexStoreSnap(this.MakeVxs(vxs));
-        }
+       
     }
 }
 

@@ -23,11 +23,9 @@
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
-
-
-
     public sealed class VertexStore
     {
+        public readonly bool _isTrimed;
         int m_num_vertices;
         int m_allocated_vertices;
         double[] m_coord_xy;
@@ -43,6 +41,10 @@ namespace PixelFarm.Drawing
         public VertexStore()
         {
             AllocIfRequired(2);
+            //if (dbugId == 30)
+            //{
+
+            //}
         }
 
 
@@ -76,11 +78,12 @@ namespace PixelFarm.Drawing
 
         public VertexCmd GetVertex(int index, out double x, out double y)
         {
-
             x = m_coord_xy[index << 1];
             y = m_coord_xy[(index << 1) + 1];
             return (VertexCmd)m_cmds[index];
         }
+
+
         public void GetVertexXY(int index, out double x, out double y)
         {
 
@@ -99,6 +102,11 @@ namespace PixelFarm.Drawing
             //System.Array.Clear(m_cmds, 0, m_cmds.Length);
             System.Array.Clear(m_cmds, 0, m_num_vertices); //only latest 
             m_num_vertices = 0;
+        }
+        public void ConfirmNoMore()
+        {
+            AddVertex(0, 0, VertexCmd.NoMore);
+            m_num_vertices--;//not count
         }
         public void AddVertex(double x, double y, VertexCmd cmd)
         {
@@ -136,9 +144,9 @@ namespace PixelFarm.Drawing
             m_coord_xy[index << 1] = x;
             m_coord_xy[(index << 1) + 1] = y;
         }
-        internal void ReplaceCommand(int index, VertexCmd CommandAndFlags)
+        internal void ReplaceCommand(int index, VertexCmd cmd)
         {
-            m_cmds[index] = (byte)CommandAndFlags;
+            m_cmds[index] = (byte)cmd;
         }
         internal void SwapVertices(int v1, int v2)
         {
@@ -154,8 +162,12 @@ namespace PixelFarm.Drawing
         }
 
 
-
 #if DEBUG
+        public override string ToString()
+        {
+            return m_num_vertices.ToString();
+        }
+
         public bool _dbugIsChanged;
         public static bool dbugCheckNANs(double x, double y)
         {
@@ -206,6 +218,10 @@ namespace PixelFarm.Drawing
                     //----------------------------- 
                     unsafe
                     {
+#if COSMOS
+                        System.Array.Copy(m_coord_xy, new_xy, actualLen);
+                        System.Array.Copy(m_cmds, newCmd, m_num_vertices);
+#else
                         //unsafed version?
                         fixed (double* srcH = &m_coord_xy[0])
                         {
@@ -223,6 +239,8 @@ namespace PixelFarm.Drawing
                                 0,
                                 m_num_vertices);
                         }
+#endif
+
                     }
                 }
                 m_coord_xy = new_xy;
@@ -256,6 +274,8 @@ namespace PixelFarm.Drawing
             m_CommandAndFlags = vstore.m_cmds;
         }
 
+
+
         private VertexStore(VertexStore src, bool trim)
         {
             //for copy from src to this instance
@@ -265,11 +285,13 @@ namespace PixelFarm.Drawing
 
             if (trim)
             {
-                int coord_len = m_num_vertices + 1; //+1 for no more cmd
-                int cmds_len = m_num_vertices + 1; //+1 for no more cmd
 
-                this.m_coord_xy = new double[coord_len << 1];//*2
-                this.m_cmds = new byte[cmds_len];
+                _isTrimed = true;
+                int coord_len = m_num_vertices; //+1 for no more cmd
+                int cmds_len = m_num_vertices; //+1 for no more cmd
+
+                this.m_coord_xy = new double[(coord_len + 1) << 1];//*2
+                this.m_cmds = new byte[(cmds_len + 1)];
 
                 System.Array.Copy(
                      src.m_coord_xy,
@@ -309,7 +331,43 @@ namespace PixelFarm.Drawing
             }
 
         }
+        private VertexStore(VertexStore src, PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx)
+        {
+            //for copy from src to this instance
 
+            this.m_allocated_vertices = src.m_allocated_vertices;
+            this.m_num_vertices = src.m_num_vertices;
+
+            _isTrimed = true;
+            int coord_len = m_num_vertices; //+1 for no more cmd
+            int cmds_len = m_num_vertices; //+1 for no more cmd
+
+            this.m_coord_xy = new double[(coord_len + 1) << 1];//*2
+            this.m_cmds = new byte[(cmds_len + 1)];
+
+
+            System.Array.Copy(
+                 src.m_coord_xy,
+                 0,
+                 this.m_coord_xy,
+                 0,
+                 coord_len << 1); //*2
+
+            System.Array.Copy(
+                 src.m_cmds,
+                 0,
+                 this.m_cmds,
+                 0,
+                 cmds_len);
+
+            //-------------------------
+            int coord_count = coord_len;
+            int a = 0;
+            for (int n = 0; n < coord_count; ++n)
+            {
+                tx.Transform(ref m_coord_xy[a++], ref m_coord_xy[a++]);
+            }
+        }
         /// <summary>
         /// copy from src to the new one
         /// </summary>
@@ -328,6 +386,10 @@ namespace PixelFarm.Drawing
         {
             return new VertexStore(this, true);
         }
+        public VertexStore CreateTrim(PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx)
+        {
+            return new VertexStore(this, tx);
+        }
     }
 
 
@@ -340,8 +402,6 @@ namespace PixelFarm.Drawing
         /// <param name="y"></param>
         public static void AddP2c(this VertexStore vxs, double x, double y)
         {
-
-
             vxs.AddVertex(x, y, VertexCmd.P2c);
         }
         /// <summary>
@@ -375,7 +435,14 @@ namespace PixelFarm.Drawing
         {
             vxs.AddVertex(0, 0, VertexCmd.Close);
         }
-
+        public static void AddCloseFigure(this VertexStore vxs, double x, double y)
+        {
+            vxs.AddVertex(x, y, VertexCmd.Close);
+        }
+        public static void AddNoMore(this VertexStore vxs)
+        {
+            vxs.AddVertex(0, 0, VertexCmd.NoMore);
+        }
         /// <summary>
         /// copy + translate vertext data from src to outputVxs
         /// </summary>

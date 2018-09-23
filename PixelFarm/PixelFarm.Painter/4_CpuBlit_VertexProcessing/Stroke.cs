@@ -135,6 +135,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     default: throw new System.NotSupportedException();
                 }
             }
+
             strkgen.WriteTo(outputVxs);
             strkgen.Reset();
 

@@ -95,13 +95,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     /// <summary>
     /// struct version of Affine (Matrix)
     /// </summary>
-    public struct AffineMat
+    struct AffineMat
     {
-        public double sx, shy, shx, sy, tx, ty;
+        //3x2 matrix (rows x cols)
+        internal double
+            sx, shy,
+            shx, sy,
+            tx, ty;
 
         public void SetValues(double v0_sx, double v1_shy,
-                      double v2_shx, double v3_sy,
-                      double v4_tx, double v5_ty)
+                              double v2_shx, double v3_sy,
+                              double v4_tx, double v5_ty)
         {
             sx = v0_sx; shy = v1_shy;
             shx = v2_shx; sy = v3_sy;
@@ -356,15 +360,29 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                       double v2_shx, double v3_sy,
                       double v4_tx, double v5_ty)
         {
-            //sx = v0_sx; shy = v1_shy;
-            //shx = v2_shx; sy = v3_sy;
-            //tx = v4_tx; ty = v5_ty;
             _elems.SetValues(
                 v0_sx, v1_shy,
                 v2_shx, v3_sy,
                 v4_tx, v5_ty);
 
             isIdenHint = false;
+        }
+        public ICoordTransformer MultiplyWith(ICoordTransformer another)
+        {
+            if (another is Affine)
+            {
+                return this * (Affine)another;
+            }
+            else if (another is Perspective)
+            {
+                Perspective p = new Perspective(this);
+                return p * (Perspective)another;
+            }
+            else
+            {
+
+                return null;
+            }
         }
         public double m11 { get { return _elems.sx; } }
         public double m12 { get { return _elems.shy; } }
@@ -386,28 +404,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// set elements by copy values from input elems
         /// </summary>
         /// <param name="elems"></param>
-        public void SetElements(AffineMat elems)
+        internal void SetElements(AffineMat elems)
         {
             _elems = elems;
             isIdenHint = false;
         }
 
-        //public double m11 { get { return sx; } }
-        //public double m12 { get { return shy; } }
-        //public double m21 { get { return shx; } }
-        //public double m22 { get { return sy; } }
-        //public double dx { get { return tx; } }
-        //public double dy { get { return ty; } }
-        // Custom matrix from m[6]
-        //private Affine(double[] m)
-        //{
-        //    sx = m[0];
-        //    shy = m[1];
-        //    shx = m[2];
-        //    sy = m[3];
-        //    tx = m[4];
-        //    ty = m[5];
-        //}
+        public Affine Clone()
+        {
+            return new Affine(this);
+        }
+
         //-----------------------------------------
         private Affine(Affine a, Affine b)
         {
@@ -536,13 +543,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return new Affine(IdentityMatrix, creationPlan);
         }
 
-        public static Affine NewCustomMatrix(double sx, double shx, double sy, double shy, double tx, double ty)
-        {
-            return new Affine(
-                sx, shx,
-                sy, shy,
-                tx, ty);
-        }
+
         //====================================================trans_affine_rotation
         // Rotation matrix. sin() and cos() are calculated twice for the same angle.
         // There's no harm because the performance of sin()/cos() is very good on all
@@ -801,6 +802,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             shx = t2;
             tx = t4;
         }
+
         /*
 
         // Multiply "m" to "this" and assign the result to "this"
@@ -1104,5 +1106,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //    x = Math.Sqrt(sx * sx + shx * shx);
         //    y = Math.Sqrt(shy * shy + sy * sy);
         //}
+
     }
 }

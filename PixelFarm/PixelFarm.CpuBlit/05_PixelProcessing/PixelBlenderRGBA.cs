@@ -27,25 +27,96 @@
 //----------------------------------------------------------------------------
 #define USE_BLENDER
 
-using PixelFarm.Drawing; 
+using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public abstract class PixelBlender32
     {
         public int NumPixelBits { get { return 32; } }
 
-        internal const byte BASE_MASK = 255; 
+        internal const byte BASE_MASK = 255;
+
+        /// <summary>
+        /// blend single pixel
+        /// </summary>
+        /// <param name="dstBuffer"></param>
+        /// <param name="arrayOffset"></param>
+        /// <param name="srcColor"></param>
         internal abstract void BlendPixel(int[] dstBuffer, int arrayOffset, Color srcColor);
+        //
+        /// <summary>
+        /// blend multiple pixels
+        /// </summary>
+        /// <param name="dstBuffer"></param>
+        /// <param name="arrayOffset"></param>
+        /// <param name="srcColor"></param>
+        internal abstract void BlendPixels(Imaging.TempMemPtr dstBuffer, int arrayOffset, Color srcColor);
+
         internal abstract void BlendPixels(
             int[] dstBuffer, int arrayElemOffset,
             Color[] sourceColors, int sourceColorsOffset,
             byte[] covers, int coversIndex, bool firstCoverForAll, int count);
+        /// <summary>
+        /// blend multiple pixels
+        /// </summary>
+        /// <param name="dstBuffer"></param>
+        /// <param name="arrayElemOffset"></param>
+        /// <param name="sourceColors"></param>
+        /// <param name="sourceColorsOffset"></param>
+        /// <param name="covers"></param>
+        /// <param name="coversIndex"></param>
+        /// <param name="firstCoverForAll"></param>
+        /// <param name="count"></param>
+        internal abstract void BlendPixels(
+           Imaging.TempMemPtr dstBuffer, int arrayElemOffset,
+           Color[] sourceColors, int sourceColorsOffset,
+           byte[] covers, int coversIndex, bool firstCoverForAll, int count);
 
+        /// <summary>
+        /// copy multiple pixels
+        /// </summary>
+        /// <param name="dstBuffer"></param>
+        /// <param name="arrayOffset"></param>
+        /// <param name="srcColor"></param>
+        /// <param name="count"></param>
         internal abstract void CopyPixels(int[] dstBuffer, int arrayOffset, Color srcColor, int count);
+        /// <summary>
+        /// copy single pixel
+        /// </summary>
+        /// <param name="dstBuffer"></param>
+        /// <param name="arrayOffset"></param>
+        /// <param name="srcColor"></param>
         internal abstract void CopyPixel(int[] dstBuffer, int arrayOffset, Color srcColor);
 
-        internal abstract unsafe void BlendPixel32(int* ptr, Color sc);
+        /// <summary>
+        /// copy multiple pixels
+        /// </summary>
+        /// <param name="dstBuffer"></param>
+        /// <param name="arrayOffset"></param>
+        /// <param name="srcColor"></param>
+        /// <param name="count"></param>
+        internal abstract void CopyPixels(Imaging.TempMemPtr dstBuffer, int arrayOffset, Color srcColor, int count);
+        /// <summary>
+        /// copy single pixel
+        /// </summary>
+        /// <param name="dstBuffer"></param>
+        /// <param name="arrayOffset"></param>
+        /// <param name="srcColor"></param>
+        internal abstract void CopyPixel(Imaging.TempMemPtr dstBuffer, int arrayOffset, Color srcColor);
 
+
+        internal abstract unsafe void BlendPixel32(int* ptr, Color sc);
+        //----------------
+        internal unsafe Color PixelToColorRGBA(int* buffer, int bufferOffset32)
+        {
+            int value = buffer[bufferOffset32];
+            return new Color(
+               (byte)((value >> (CO.A * 8)) & 0xff),
+               (byte)((value >> (CO.R * 8)) & 0xff),
+               (byte)((value >> (CO.G * 8)) & 0xff),
+               (byte)((value >> (CO.B * 8)) & 0xff));
+
+        }
         internal Color PixelToColorRGBA(int[] buffer, int bufferOffset32)
         {
             //TODO: review here ...             

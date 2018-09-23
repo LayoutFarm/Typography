@@ -50,33 +50,35 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             unsafe
             {
-                TempMemPtr bufferPtr = img.GetBufferPtr();
-                int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
-
-                fixed (int* outputPtr = &output[0])
+                using (TempMemPtr bufferPtr = img.GetBufferPtr())
                 {
-                    byte* srcBuffer = (byte*)bufferPtr.Ptr;
-                    int* srcBuffer1 = (int*)srcBuffer;
-                    int* outputBuffer1 = (int*)outputPtr;
-                    int stride = img.Stride;
-                    int w = img.Width;
-                    int h = img.Height;
+                    int[] output = new int[bufferPtr.LengthInBytes / 4]; //TODO: review here again
 
-                    MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
-                    Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
-                    //
-                    MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
-                    Surface destSurface = new Surface(stride, w, h, destMemHolder);
-                    //
-                    SharpenRenderer shRenderer1 = new SharpenRenderer();
-                    shRenderer1.Amount = radius;
-                    shRenderer1.Render(srcSurface, destSurface, new PixelFarm.Drawing.Rectangle[]{
+                    fixed (int* outputPtr = &output[0])
+                    {
+                        byte* srcBuffer = (byte*)bufferPtr.Ptr;
+                        int* srcBuffer1 = (int*)srcBuffer;
+                        int* outputBuffer1 = (int*)outputPtr;
+                        int stride = img.Stride;
+                        int w = img.Width;
+                        int h = img.Height;
+
+                        MemHolder srcMemHolder = new MemHolder((IntPtr)srcBuffer1, bufferPtr.LengthInBytes / 4);//
+                        Surface srcSurface = new Surface(stride, w, h, srcMemHolder);
+                        //
+                        MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
+                        Surface destSurface = new Surface(stride, w, h, destMemHolder);
+                        //
+                        SharpenRenderer shRenderer1 = new SharpenRenderer();
+                        shRenderer1.Amount = radius;
+                        shRenderer1.Render(srcSurface, destSurface, new PixelFarm.Drawing.Rectangle[]{
                             new PixelFarm.Drawing.Rectangle(0,0,w,h)
-                    }, 0, 1);
+                        }, 0, 1);
+                    }
+
+                    //ActualImage.SaveImgBufferToPngFile(output, img.Stride, img.Width + 1, img.Height + 1, "d:\\WImageTest\\test_1.png");
+                    img.ReplaceBuffer(output);
                 }
-                bufferPtr.Release();
-                //ActualImage.SaveImgBufferToPngFile(output, img.Stride, img.Width + 1, img.Height + 1, "d:\\WImageTest\\test_1.png");
-                img.ReplaceBuffer(output);
             }
         }
     }
