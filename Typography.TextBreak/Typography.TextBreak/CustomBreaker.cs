@@ -79,7 +79,7 @@ namespace Typography.TextBreak
 
         private static BreakAtInfo BreakSpanToAt(BreakSpan span) => new BreakAtInfo(span.startAt + span.len, span.wordKind);
         public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakAtInfo> outputBreakAtList) =>
-            BreakWords(inputstr, span => outputBreakAtList.Add(BreakSpanToAt(span)));
+            BreakWords(charBuff, span => outputBreakAtList.Add(BreakSpanToAt(span)));
 
         public void BreakWords(ReadOnlySpan<char> charBuff, ICollection<BreakSpan> outputBreakSpanList) =>
             BreakWords(charBuff, outputBreakSpanList.Add);
