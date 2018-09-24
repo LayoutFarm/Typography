@@ -98,6 +98,7 @@ namespace Typography.TextBreak
                 if (ThrowIfCharOutOfRange) throw new NotSupportedException($"A proper breaking engine for character '{visitor.CurrentChar}' was not found.");
                 visitor.SetCurrentIndex(visitor.CurrentIndex + 1);
                 visitor.AddWordBreakAtCurrentIndex(WordKind.Unknown);
+                if (visitor.IsEnd) return;
                 goto Select_Engine;
             }
             //select breaking engine
