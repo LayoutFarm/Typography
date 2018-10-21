@@ -237,8 +237,8 @@ namespace PixelFarm.Drawing.Fonts
             {
 
                 bool savedUseLcdMode = _painter.UseSubPixelLcdEffect; //save,restore later
-                RenderQualtity savedRederQuality = _painter.RenderQuality;
-                _painter.RenderQuality = RenderQualtity.HighQuality;
+                RenderQuality savedRederQuality = _painter.RenderQuality;
+                _painter.RenderQuality = RenderQuality.HighQuality;
                 _painter.UseSubPixelLcdEffect = true;
 
                 int seqLen = seq.Count;
