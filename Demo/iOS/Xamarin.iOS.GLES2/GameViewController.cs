@@ -4,11 +4,8 @@ using System.Diagnostics;
 using Foundation;
 using GLKit;
 using OpenGLES;
-using OpenTK;
 using OpenTK.Graphics.ES20;
 
-//
-using DrawingGL;
 namespace Xamarin.iOS.GLES2
 {
     [Register("GameViewController")]
@@ -84,14 +81,14 @@ namespace Xamarin.iOS.GLES2
         CustomApp customApp;
         int max;
         int view_width;
-        int view_height; 
+        int view_height;
         void SetupGL()
         {
-            
+
             EAGLContext.SetCurrentContext(context);
             max = Math.Max(view_width, view_height);
             customApp = new CustomApp();
-            customApp.Setup(800, 600); 
+            customApp.Setup(800, 600);
         }
         public override void Update()
         {
@@ -102,12 +99,8 @@ namespace Xamarin.iOS.GLES2
         //----------------
         void TearDownGL()
         {
-            
-        } 
-        string LoadResource(string name, string type)
-        {
-            var path = NSBundle.MainBundle.PathForResource(name, type);
-            return System.IO.File.ReadAllText(path);
-        } 
+
+        }
+        
     }
 }
