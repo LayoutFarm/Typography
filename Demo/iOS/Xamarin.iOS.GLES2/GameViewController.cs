@@ -12,10 +12,9 @@ namespace Xamarin.iOS.GLES2
     public class GameViewController : GLKViewController, IGLKViewDelegate
     {
 
-
         EAGLContext context { get; set; }
-        [Export("initWithCoder:")]
-        public GameViewController(NSCoder coder) : base(coder)
+        //[Export("initWithCoder:")]
+        public GameViewController()
         {
         }
 
@@ -101,6 +100,6 @@ namespace Xamarin.iOS.GLES2
         {
 
         }
-        
+
     }
 }
