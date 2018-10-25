@@ -123,7 +123,7 @@ namespace PixelFarm.Drawing
     }
 
 
-    public enum RenderQualtity
+    public enum RenderQuality
     {
         HighQuality,
         Fast,
