@@ -24,8 +24,8 @@ namespace Xamarin.iOS.GLES2
                  {
 
                      if (File.Exists("DroidSans.ttf"))
-                     {
-                         using (Stream s = new FileStream("DroidSans.ttf", FileMode.Open))
+                     {  
+                         using (Stream s = new FileStream("DroidSans.ttf", FileMode.Open, FileAccess.Read))
                          using (var ms = new MemoryStream())// This is a simple hack because on Xamarin.Android, a `Stream` created by `AssetManager.Open` is not seekable.
                          {
                              s.CopyTo(ms);
@@ -68,7 +68,7 @@ namespace Xamarin.iOS.GLES2
 
             TextPrinter textPrinter = simpleCanvas.TextPrinter;
             textPrinter.FontFilename = "DroidSans.ttf"; //corresponding to font file Assets/DroidSans.ttf
-            textPrinter.FontSizeInPoints = 64; 
+            textPrinter.FontSizeInPoints = 64;
             //
             simpleCanvas.TextPrinter.GenerateGlyphRuns(textRun, text.ToCharArray(), 0, text.Length);
             //-------------------------------------------------------------------------- 
