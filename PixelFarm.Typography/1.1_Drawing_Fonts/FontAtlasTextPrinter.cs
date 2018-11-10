@@ -25,7 +25,7 @@ namespace PixelFarm.Drawing.Fonts
         AggPainter _maskBufferPainter;
         ActualBitmap _fontBmp;
         ActualBitmap _alphaBmp;
-       
+
 
         /// <summary>
         /// target canvas
@@ -56,7 +56,7 @@ namespace PixelFarm.Drawing.Fonts
                 atlas =>
                 {
                     GlyphImage totalGlyphImg = atlas.TotalGlyph;
-                    return new ActualBitmap(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
+                    return ActualBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
                 }
             );
             _bmpFontMx.SetCurrentScriptLangs(new ScriptLang[]

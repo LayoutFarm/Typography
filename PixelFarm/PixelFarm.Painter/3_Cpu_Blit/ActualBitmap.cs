@@ -201,7 +201,7 @@ namespace PixelFarm.CpuBlit
         {
             System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, img._pixelBuffer, pixelBuffer.Length);
         }
-        public static ActualBitmap CreateFromBuffer(int width, int height, int[] buffer)
+        public static ActualBitmap CreateFromCopy(int width, int height, int[] buffer)
         {
             var img = new ActualBitmap(width, height);
             unsafe

@@ -261,9 +261,9 @@ namespace Typography.Rendering
         }
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {
-
-            var bmp = new PixelFarm.CpuBlit.ActualBitmap(glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer());
-            StorageService.Provider.SavePngBitmap(bmp, filename);
+            StorageService.Provider.SavePngBitmap(
+                PixelFarm.CpuBlit.ActualBitmap.CreateFromCopy(
+                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer()), filename);
 
         }
 #if DEBUG
