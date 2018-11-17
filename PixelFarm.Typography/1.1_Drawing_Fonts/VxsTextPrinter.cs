@@ -192,16 +192,14 @@ namespace PixelFarm.Drawing.Fonts
             //restore prev origin
             _painter.SetOrigin(ox, oy);
         }
-
-
-        public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float x, float y)
+        public override void DrawFromGlyphPlans(GlyphPlanSequence seq, int startAt, int len, float left, float top)
         {
 
             if (StartDrawOnLeftTop)
             {
                 //version 2
                 //offset y down 
-                y += this.FontLineSpacingPx;
+                top += this.FontLineSpacingPx;
             }
 
             float fontSizePoint = this.FontSizeInPoints;
@@ -237,7 +235,7 @@ namespace PixelFarm.Drawing.Fonts
             {
 
                 bool savedUseLcdMode = _painter.UseSubPixelLcdEffect; //save,restore later
-                RenderQuality savedRederQuality = _painter.RenderQuality; 
+                RenderQuality savedRederQuality = _painter.RenderQuality;
                 _painter.RenderQuality = RenderQuality.HighQuality;
                 _painter.UseSubPixelLcdEffect = true;
 
@@ -252,7 +250,7 @@ namespace PixelFarm.Drawing.Fonts
                 while (snapToPx.Read())
                 {
 
-                    _painter.SetOrigin((float)Math.Round(x + snapToPx.ExactX) + 0.33f, (float)Math.Floor(y + snapToPx.ExactY));
+                    _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(top + snapToPx.ExactY));
                     _painter.Fill(_glyphMeshStore.GetGlyphMesh(snapToPx.CurrentGlyphIndex));
                 }
 
@@ -278,7 +276,7 @@ namespace PixelFarm.Drawing.Fonts
                 while (snapToPx.Read())
                 {
 
-                    _painter.SetOrigin((float)Math.Round(x + snapToPx.ExactX), (float)Math.Floor(y + snapToPx.ExactY));
+                    _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX), (float)Math.Floor(top + snapToPx.ExactY));
 
                     ushort colorLayerStart;
                     if (colrTable.LayerIndices.TryGetValue(snapToPx.CurrentGlyphIndex, out colorLayerStart))

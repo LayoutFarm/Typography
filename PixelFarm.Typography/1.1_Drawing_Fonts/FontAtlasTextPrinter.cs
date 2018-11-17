@@ -23,8 +23,8 @@ namespace PixelFarm.Drawing.Fonts
         PixelBlenderPerColorComponentWithMask maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
 
         AggPainter _maskBufferPainter;
-        ActualBitmap _fontBmp;
-        ActualBitmap _alphaBmp;
+        MemBitmap _fontBmp;
+        MemBitmap _alphaBmp;
 
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace PixelFarm.Drawing.Fonts
 
 
         LayoutFarm.OpenFontTextService _textServices;
-        BitmapFontManager<ActualBitmap> _bmpFontMx;
+        BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleFontAtlas _fontAtlas;
 
         public FontAtlasTextPrinter(AggPainter painter)
@@ -50,13 +50,13 @@ namespace PixelFarm.Drawing.Fonts
 
             _textServices = new LayoutFarm.OpenFontTextService();
             //2. create manager
-            _bmpFontMx = new BitmapFontManager<ActualBitmap>(
+            _bmpFontMx = new BitmapFontManager<MemBitmap>(
                 TextureKind.StencilLcdEffect,
                 _textServices,
                 atlas =>
                 {
                     GlyphImage totalGlyphImg = atlas.TotalGlyph;
-                    return ActualBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
+                    return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
                 }
             );
             _bmpFontMx.SetCurrentScriptLangs(new ScriptLang[]
@@ -149,7 +149,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             //----------
             //same size
-            _alphaBmp = new ActualBitmap(width, height);
+            _alphaBmp = new MemBitmap(width, height);
             _maskBufferPainter = AggPainter.Create(_alphaBmp, new PixelBlenderBGRA());
             _maskBufferPainter.Clear(Color.Black);
             //------------ 
@@ -197,18 +197,18 @@ namespace PixelFarm.Drawing.Fonts
             //TODO...
         }
 
-        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float x, float y)
+        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
 
             Typeface typeface = _textServices.ResolveTypeface(_font);
 
             float scale = typeface.CalculateScaleToPixelFromPointSize(_font.SizeInPoints);
-            int recommendLineSpacing = (int)_font.LineSpacingInPx;
+            int recommendLineSpacing = (int)_font.LineSpacingInPixels;
             //--------------------------
             //TODO:
             //if (x,y) is left top
             //we need to adjust y again
-            y -= ((_font.LineSpacingInPx) * scale);
+            top -= _font.LineSpacingInPixels;
 
             // 
 
@@ -216,13 +216,13 @@ namespace PixelFarm.Drawing.Fonts
 
             float gx = 0;
             float gy = 0;
-            int baseY = (int)Math.Round(y);
+            int baseY = (int)Math.Round(top);
 
 
             float acc_x = 0;
             float acc_y = 0;
 
-            int lineHeight = (int)_font.LineSpacingInPx;//temp
+            int lineHeight = (int)_font.LineSpacingInPixels;//temp
 
             PixelBlender32 prevPxBlender = _painter.DestBitmapBlender.OutputPixelBlender; //save
             _painter.DestBitmapBlender.OutputPixelBlender = maskPixelBlenderPerCompo; //change to new blender  
@@ -264,8 +264,8 @@ namespace PixelFarm.Drawing.Fonts
                     //{
                     //}
 
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
-                    gy = (float)(y + (ngy + glyphData.TextureYOffset - srcH + lineHeight));
+                    gx = (float)(left + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(top + (ngy + glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
                     gy = (float)Math.Floor(gy);// + lineHeight;
@@ -341,8 +341,8 @@ namespace PixelFarm.Drawing.Fonts
                     // -glyphData.TextureXOffset => restore to original pos
                     // -glyphData.TextureYOffset => restore to original pos 
                     //--------------------------
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
-                    gy = (float)(y + (ngy - glyphData.TextureYOffset - srcH + lineHeight));
+                    gx = (float)(left + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(top + (ngy - glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(glyph.AdvanceX * scale);
                     gy = (float)Math.Floor(gy) + lineHeight;

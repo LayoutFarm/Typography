@@ -247,12 +247,12 @@ namespace Typography.Rendering
 
         static GlyphImage ReadGlyphImages(string filename)
         {
-            PixelFarm.CpuBlit.ActualBitmap bmp = StorageService.Provider.ReadPngBitmap(filename);
+            PixelFarm.CpuBlit.MemBitmap bmp = StorageService.Provider.ReadPngBitmap(filename);
             GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
             int[] buffer = new int[bmp.Width * bmp.Height];
             unsafe
             {
-                PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.ActualBitmap.GetBufferPtr(bmp);
+                PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(bmp);
                 System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
                 img.SetImageBuffer(buffer, true);
             }
@@ -262,7 +262,7 @@ namespace Typography.Rendering
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {
             StorageService.Provider.SavePngBitmap(
-                PixelFarm.CpuBlit.ActualBitmap.CreateFromCopy(
+                PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
                     glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer()), filename);
 
         }

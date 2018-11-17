@@ -73,8 +73,8 @@ namespace Typography.Contours
             w = (int)Math.Ceiling(dx + w + horizontal_margin); //+right margin
             h = (int)Math.Ceiling(dy + h + vertical_margin); //+bottom margin 
 
-            ActualBitmap img = new ActualBitmap(w, h);
-            AggPainter painter = AggPainter.Create(img);
+            MemBitmap memBmp = new MemBitmap(w, h);
+            AggPainter painter = AggPainter.Create(memBmp);
 
             if (TextureKind == TextureKind.StencilLcdEffect)
             {
@@ -118,7 +118,7 @@ namespace Typography.Contours
             var glyphImage = new GlyphImage(w, h);
             glyphImage.TextureOffsetX = dx;
             glyphImage.TextureOffsetY = dy;
-            glyphImage.SetImageBuffer(ActualBitmapExtensions.CopyImgBuffer(img, w), false);
+            glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(memBmp, w), false);
             //copy data from agg canvas to glyph image 
             return glyphImage;
 
