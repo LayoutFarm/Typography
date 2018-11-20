@@ -76,6 +76,15 @@ namespace LayoutFarm
                  out langFullName))
             {
                 scLang = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
+                if (scLang == null)
+                {
+                    //use default lang
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine(langFullName + " :use latin");
+#endif
+                    scLang = ScriptLangs.Latin;
+                }
+
                 textservice.SetDefaultScriptLang(scLang);
                 textservice.CurrentScriptLang = scLang;
                 return true;
