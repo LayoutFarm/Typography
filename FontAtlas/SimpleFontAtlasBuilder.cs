@@ -270,7 +270,7 @@ namespace Typography.Rendering
 
                 Rectangle area = cacheGlyph.area;
                 TextureGlyphMapData glyphData = new TextureGlyphMapData();
-                area.Y += area.Height;//*** 
+
 
                 ////set font matrix to glyph font data
                 //glyphData.Rect = Rectangle.FromLTRB(area.X, area.Top, area.Right, area.Bottom);
