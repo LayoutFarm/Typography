@@ -271,11 +271,6 @@ namespace Typography.Rendering
                 Rectangle area = cacheGlyph.area;
                 TextureGlyphMapData glyphData = new TextureGlyphMapData();
 
-
-                ////set font matrix to glyph font data
-                //glyphData.Rect = Rectangle.FromLTRB(area.X, area.Top, area.Right, area.Bottom);
-                //glyphData.AdvanceY = cacheGlyph.glyphMatrix.advanceY;
-
                 glyphData.Width = cacheGlyph.img.Width;
                 glyphData.Left = area.X;
                 glyphData.Top = area.Top;
@@ -283,9 +278,7 @@ namespace Typography.Rendering
 
                 glyphData.TextureXOffset = (float)cacheGlyph.img.TextureOffsetX;
                 glyphData.TextureYOffset = (float)cacheGlyph.img.TextureOffsetY;
-                glyphData.BorderX = cacheGlyph.borderX;
-                glyphData.BorderY = cacheGlyph.borderY;
-
+              
 
                 simpleFontAtlas.AddGlyph(cacheGlyph.glyphIndex, glyphData);
             }

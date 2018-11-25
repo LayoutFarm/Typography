@@ -81,13 +81,9 @@ namespace PixelFarm.Drawing.Fonts
                 glyphMap.Left = reader.ReadUInt16();
                 glyphMap.Top = reader.ReadUInt16();
                 glyphMap.Width = reader.ReadUInt16();
-                glyphMap.Height = reader.ReadUInt16();
-                //3. border x,y
-                int borderXY = reader.ReadUInt16();
-                glyphMap.BorderX = borderXY & 0xff;
-                glyphMap.BorderY = borderXY >> 8;
+                glyphMap.Height = reader.ReadUInt16(); 
                 //---------------------------------------
-                //4. texture offset
+                //3. texture offset
                 glyphMap.TextureXOffset = reader.ReadSingle();
                 glyphMap.TextureYOffset = reader.ReadSingle();
 
@@ -161,16 +157,8 @@ namespace PixelFarm.Drawing.Fonts
                 _writer.Write((ushort)g.area.Width);
                 _writer.Write((ushort)g.area.Height);
 
-                //3. border x,y
 
-                if ((g.borderX > byte.MaxValue) || (g.borderY > byte.MaxValue))
-                {
-                    throw new NotSupportedException();
-                }
-
-                _writer.Write((ushort)(((g.borderY & 0xff) << 8) | (g.borderX & 0xff)));
-
-                //4. texture offset                
+                //3. texture offset                
                 GlyphImage img = g.img;
                 _writer.Write((float)img.TextureOffsetX);
                 _writer.Write((float)img.TextureOffsetY);
