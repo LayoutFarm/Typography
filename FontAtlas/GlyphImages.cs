@@ -55,19 +55,22 @@ namespace Typography.Rendering
         public double TextureOffsetY { get; set; }
     }
 
-    public class CacheGlyph
+    class CacheGlyph
     {
         public int borderX;
         public int borderY;
         internal GlyphImage img;
-        public Rectangle area;
-        public char character;//TODO: this should be code point(int32)
+        public Rectangle area; 
         public ushort glyphIndex;
 
+#if DEBUG
+        public CacheGlyph()
+        {
+        }
+#endif
     }
     public class TextureGlyphMapData
-    {
-
+    { 
         public int Left { get; set; }
         public int Top { get; set; }
         public int Width { get; set; }

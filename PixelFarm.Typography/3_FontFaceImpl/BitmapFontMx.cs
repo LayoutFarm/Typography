@@ -263,7 +263,7 @@ namespace Typography.Rendering
         {
             StorageService.Provider.SavePngBitmap(
                 PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
-                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer()), filename);
+                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), true), filename);
 
         }
 #if DEBUG

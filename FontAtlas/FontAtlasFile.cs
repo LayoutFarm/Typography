@@ -104,13 +104,13 @@ namespace PixelFarm.Drawing.Fonts
 
         //------------------------------------------------------------
         BinaryWriter _writer;
-        public void StartWrite(Stream outputStream)
+        internal void StartWrite(Stream outputStream)
         {
             _writer = new BinaryWriter(outputStream, System.Text.Encoding.UTF8);
             //version            
             _writer.Write((ushort)1);
         }
-        public void EndWrite()
+        internal void EndWrite()
         {
             //write end marker
             _writer.Write((ushort)FontTextureObjectKind.End);
@@ -119,7 +119,7 @@ namespace PixelFarm.Drawing.Fonts
             _writer = null;
         }
 
-        public void WriteOverviewFontInfo(string fontFileName, float sizeInPt)
+        internal void WriteOverviewFontInfo(string fontFileName, float sizeInPt)
         {
             _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
             if (fontFileName == null)
@@ -129,7 +129,7 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Write(fontFileName);
             _writer.Write(sizeInPt);
         }
-        public void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
+        internal void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
         {
             _writer.Write((ushort)FontTextureObjectKind.TotalImageInfo);
             _writer.Write(width);
@@ -137,7 +137,7 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Write(colorComponent);
             _writer.Write((byte)textureKind);
         }
-        public void WriteGlyphList(Dictionary<ushort, CacheGlyph> glyphs)
+        internal void WriteGlyphList(Dictionary<ushort, CacheGlyph> glyphs)
         {
             _writer.Write((ushort)FontTextureObjectKind.GlyphList);
             //total number
@@ -174,7 +174,6 @@ namespace PixelFarm.Drawing.Fonts
                 GlyphImage img = g.img;
                 _writer.Write((float)img.TextureOffsetX);
                 _writer.Write((float)img.TextureOffsetY);
-
 
             }
         }
