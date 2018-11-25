@@ -208,8 +208,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO:
             //if (x,y) is left top
             //we need to adjust y again
-            top -= _font.LineSpacingInPixels;
-
+            
             // 
 
             TextureKind textureKind = _fontAtlas.TextureKind;
