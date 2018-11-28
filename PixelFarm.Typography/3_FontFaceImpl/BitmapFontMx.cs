@@ -234,9 +234,13 @@ namespace Typography.Rendering
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                     {
                         atlasBuilder.SaveFontInfo(ms);
-                        System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
-
+                        //System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
                         StorageService.Provider.SaveData(fontTextureInfoFile, ms.ToArray());
+#if DEBUG
+                        //write temp debug info
+                        System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", reqFont.Name + ",size" + reqFont.SizeInPoints + "pts");
+#endif
+
                     }
                 }
             }

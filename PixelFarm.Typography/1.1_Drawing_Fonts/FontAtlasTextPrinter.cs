@@ -17,7 +17,7 @@ namespace PixelFarm.Drawing.Fonts
         GreyscaleStencil,
         None,
     }
-    public sealed class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter
+    public sealed class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter, IDisposable
     {
         PixelBlenderWithMask maskPixelBlender = new PixelBlenderWithMask();
         PixelBlenderPerColorComponentWithMask maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
@@ -69,6 +69,13 @@ namespace PixelFarm.Drawing.Fonts
             ChangeFont(new RequestFont("tahoma", 10));
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
+        public void Dispose()
+        {
+            //clear this
+            //clear maskbuffer
+            //clear alpha buffer
+        }
+
         /// <summary>
         /// start draw on 'left-top' of a given area box
         /// </summary>
@@ -150,6 +157,9 @@ namespace PixelFarm.Drawing.Fonts
             //----------
             //same size
             _alphaBmp = new MemBitmap(width, height);
+#if DEBUG
+            _alphaBmp._dbugNote = "FontAtlasTextPrinter";
+#endif
             _maskBufferPainter = AggPainter.Create(_alphaBmp, new PixelBlenderBGRA());
             _maskBufferPainter.Clear(Color.Black);
             //------------ 
@@ -208,7 +218,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO:
             //if (x,y) is left top
             //we need to adjust y again
-            
+
             // 
 
             TextureKind textureKind = _fontAtlas.TextureKind;

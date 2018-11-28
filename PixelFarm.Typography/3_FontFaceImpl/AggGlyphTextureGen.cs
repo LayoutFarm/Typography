@@ -74,6 +74,9 @@ namespace Typography.Contours
             h = (int)Math.Ceiling(dy + h + vertical_margin); //+bottom margin 
 
             MemBitmap memBmp = new MemBitmap(w, h);
+#if DEBUG
+            memBmp._dbugNote = "CreateGlyphImage()";
+#endif
             AggPainter painter = AggPainter.Create(memBmp);
 
             if (TextureKind == TextureKind.StencilLcdEffect)
