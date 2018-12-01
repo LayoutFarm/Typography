@@ -68,7 +68,7 @@ namespace PixelFarm.CpuBlit
         public AggPainter(AggRenderSurface aggsx)
         {
             //painter paint to target surface
-            _orientation = DrawBoardOrientation.LeftBottom;
+            _orientation = RenderSurfaceOrientation.LeftBottom;
             //----------------------------------------------------
             _aggsx_0 = aggsx; //set this as default ***            
             TargetBufferName = TargetBufferName.Default;
@@ -243,8 +243,8 @@ namespace PixelFarm.CpuBlit
         }
 
 
-        DrawBoardOrientation _orientation;
-        public override DrawBoardOrientation Orientation
+        RenderSurfaceOrientation _orientation;
+        public override RenderSurfaceOrientation Orientation
         {
             get { return _orientation; }
             set
@@ -351,7 +351,7 @@ namespace PixelFarm.CpuBlit
 
             //----------------------------------------------------------
             //Agg
-            if (_orientation == DrawBoardOrientation.LeftBottom)
+            if (_orientation == RenderSurfaceOrientation.LeftBottom)
             {
                 //as original
                 _lineGen.Clear();
@@ -499,7 +499,7 @@ namespace PixelFarm.CpuBlit
             if (this.RenderQuality == RenderQuality.Fast)
             {
 
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
 
                     this._bxt.DrawRectangle(
@@ -532,7 +532,7 @@ namespace PixelFarm.CpuBlit
 
             using (VectorToolBox.Borrow(out SimpleRect rectTool))
             {
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
                     double right = left + width;
                     double bottom = top + height;
@@ -569,7 +569,7 @@ namespace PixelFarm.CpuBlit
 
             double ox = (left + width / 2);
             double oy = (top + height / 2);
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //modified
                 oy = this.Height - oy;
@@ -619,7 +619,7 @@ namespace PixelFarm.CpuBlit
         {
             double ox = (left + width / 2);
             double oy = (top + height / 2);
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //modified
                 oy = this.Height - oy;
@@ -674,7 +674,7 @@ namespace PixelFarm.CpuBlit
             using (VectorToolBox.Borrow(out SimpleRect rectTool))
             using (VxsTemp.Borrow(out var v1))
             {
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
                     double right = left + width;
                     double bottom = top - height;
@@ -780,7 +780,7 @@ namespace PixelFarm.CpuBlit
             //TODO: review drawing string  with agg here   
             if (_textPrinter != null)
             {
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
                     _textPrinter.DrawString(text, x, y);
                 }
@@ -1053,7 +1053,7 @@ namespace PixelFarm.CpuBlit
             this.UseSubPixelLcdEffect = false;
             _aggsx.UseSubPixelLcdEffect = false;
 
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //place left upper corner at specific x y                    
                 this._aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height));
@@ -1099,7 +1099,7 @@ namespace PixelFarm.CpuBlit
             //before render an image we turn off vxs subpixel rendering
             this.UseSubPixelLcdEffect = false;
 
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //place left upper corner at specific x y                    
                 this._aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height), srcX, srcY, srcW, srcH);

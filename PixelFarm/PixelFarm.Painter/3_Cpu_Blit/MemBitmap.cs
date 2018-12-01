@@ -519,12 +519,11 @@ namespace PixelFarm.CpuBlit
     {
         public static int[] CopyImgBuffer(MemBitmap memBmp, int width, int height)
         {
-            //calculate stride for the width 
+            //calculate stride for the width
+
             int destStride = MemBitmap.CalculateStride(width, CpuBlit.Imaging.PixelFormat.ARGB32);
-
             int newBmpW = destStride / 4;
-
-            int[] buff2 = new int[newBmpW * memBmp.Height];
+            int[] buff2 = new int[newBmpW * height];
             unsafe
             {
 

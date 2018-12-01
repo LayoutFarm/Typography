@@ -182,7 +182,7 @@ namespace PixelFarm.Drawing
         Invalid = -1,
         None = 3
     }
-    public enum DrawBoardOrientation
+    public enum RenderSurfaceOrientation
     {
         LeftTop,
         LeftBottom,
