@@ -53,12 +53,12 @@ namespace Typography.Contours
                 h = 5;
             }
 
-            //translate to positive quadrant 
-            //            
-            double dx = (bounds.Left < 0) ? -bounds.Left : 0;
-            double dy = (bounds.Bottom < 0) ? -bounds.Bottom : 0;
+            //translate to positive quadrant and use minimum space
 
-            //
+            double dx = -bounds.Left;
+            double dy = -bounds.Bottom;
+
+
             dx = Math.Ceiling(dx); //since we need to move it, then move it with integer value
             dy = Math.Ceiling(dy); //since we need to move it, then move it with integer value
 
@@ -68,12 +68,15 @@ namespace Typography.Contours
 
             dx += horizontal_margin; //+ left margin
             dy += vertical_margin; //+ top margin 
-                                   //--------------------------------------------  
-                                   //create glyph img   
-            w = (int)Math.Ceiling(dx + w + horizontal_margin); //+right margin
-            h = (int)Math.Ceiling(dy + h + vertical_margin); //+bottom margin 
 
+            //--------------------------------------------  
+
+            w += horizontal_margin;
+            h += vertical_margin;
+
+            //create glyph img    
             MemBitmap memBmp = new MemBitmap(w, h);
+
 #if DEBUG
             memBmp._dbugNote = "CreateGlyphImage()";
 #endif
