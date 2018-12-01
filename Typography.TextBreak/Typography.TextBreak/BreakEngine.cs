@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 //some code from ICU project with BSD license
 
 namespace Typography.TextBreak
