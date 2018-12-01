@@ -34,23 +34,23 @@ using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
-    /// <summary>
-    /// look up table helper for clamp value from 9 bits to 8 bits
-    /// </summary>
-    static class ClampFrom9To8Bits
-    {
-        internal static readonly byte[] _ = new byte[1 << 9];
-        static ClampFrom9To8Bits()
-        {
-            //this is a clamp table
-            //9 bits to 8 bits
-            //if we don't use this clamp table
-            for (int i = _.Length - 1; i >= 0; --i)
-            {
-                _[i] = (byte)Math.Min(i, 255);
-            }
-        }
-    }
+    ///// <summary>
+    ///// look up table helper for clamp value from 9 bits to 8 bits
+    ///// </summary>
+    //static class ClampFrom9To8Bits
+    //{
+    //    internal static readonly byte[] _ = new byte[1 << 9];
+    //    static ClampFrom9To8Bits()
+    //    {
+    //        //this is a clamp table
+    //        //9 bits to 8 bits
+    //        //if we don't use this clamp table
+    //        for (int i = _.Length - 1; i >= 0; --i)
+    //        {
+    //            _[i] = (byte)Math.Min(i, 255);
+    //        }
+    //    }
+    //}
 
 
     public class PixelBlenderBGRA : PixelBlender32
@@ -74,33 +74,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         //straight.B = premultiplied.B  * ((1/straight.A) * 255);
         //straight.A = premultiplied.A;
 
-        bool _enableGamma;
-        float _gammaValue;
+
         public PixelBlenderBGRA() { }
-
-        public bool EnableGamma
-        {
-            get { return _enableGamma; }
-            set
-            {
-
-                if (value != _enableGamma)
-                {
-
-                }
-                this._enableGamma = value;
-            }
-        }
-        public float GammaValue
-        {
-            get { return _gammaValue; }
-            set
-            {
-                _gammaValue = value;
-                //TODO: 
-                //get new gamma table
-            }
-        }
+        public bool EnableGamma { get; set; }
+        public float GammaValue { get; set; } //get new gamma table
 
 
         internal override void BlendPixel(int[] dstBuffer, int arrayOffset, Color srcColor)

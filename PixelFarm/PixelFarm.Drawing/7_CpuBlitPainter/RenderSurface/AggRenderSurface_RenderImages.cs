@@ -20,22 +20,29 @@
 //----------------------------------------------------------------------------
 
 using System;
+using PixelFarm.Drawing;
+using PixelFarm.VectorMath;
+//
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.Rasterization;
 using PixelFarm.CpuBlit.FragmentProcessing;
-
-using PixelFarm.VectorMath;
-using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.Imaging;
 
 namespace PixelFarm.CpuBlit
 {
     partial class AggRenderSurface
     {
-        public bool UseSubPixelRendering
-        {
-            get { return this._bmpRasterizer.ScanlineRenderMode == ScanlineRenderMode.SubPixelLcdEffect; } 
-        }
+
+        //
+        SubBitmap _subBitmap = new SubBitmap();
+        SpanInterpolatorLinear _spanInterpolator = new SpanInterpolatorLinear();//reusable
+        ImgSpanGenRGBA_BilinearClip _imgSpanGenBilinearClip = new ImgSpanGenRGBA_BilinearClip(Drawing.Color.Black); //reusable
+        ImgSpanGenRGBA_NN_StepXBy1 _img_NN_StepX = new ImgSpanGenRGBA_NN_StepXBy1();
+        Affine _reuseableAffine = Affine.NewIdentity();
+        int _destImageChanged = 0;
+        //
+        //
+        public bool UseSubPixelRendering => this._bmpRasterizer.ScanlineRenderMode == ScanlineRenderMode.SubPixelLcdEffect;
 
         static void BuildOrgImgRectVxs(int srcW, int srcH, VertexStore output)
         {
@@ -202,7 +209,7 @@ namespace PixelFarm.CpuBlit
                     //1. 
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
                     //2. 
-                    Affine destRectTransform = CreateAffine(destX, destY, ox, oy, scaleX, scaleY, angleRadians);
+                    Affine destRectTransform = CreateAffine(destX, destY, _ox, _oy, scaleX, scaleY, angleRadians);
                     //TODO: review reusable span generator an interpolator ***
 
 
@@ -267,7 +274,7 @@ namespace PixelFarm.CpuBlit
         }
 
 
-        Affine _reuseableAffine = Affine.NewIdentity();
+
         /// <summary>
         /// we do NOT store vxs, return original outputVxs
         /// </summary>
@@ -297,7 +304,7 @@ namespace PixelFarm.CpuBlit
                 outputVxs.AddVertex(x, y, cmd);
             }
         }
-        int _destImageChanged = 0;
+
         public void Render(IBitmapSrc source, AffinePlan[] affinePlans)
         {
             using (VxsTemp.Borrow(out var v1, out var v2))
@@ -346,16 +353,13 @@ namespace PixelFarm.CpuBlit
 
         }
 
-        SubBitmap _subBitmap = new SubBitmap();
-        SpanInterpolatorLinear _spanInterpolator = new SpanInterpolatorLinear();//reusable
-        ImgSpanGenRGBA_BilinearClip _imgSpanGenBilinearClip = new ImgSpanGenRGBA_BilinearClip(Drawing.Color.Black); //reusable
-        ImgSpanGenRGBA_NN_StepXBy1 _img_NN_StepX = new ImgSpanGenRGBA_NN_StepXBy1();
+
         public void Render(IBitmapSrc source, double destX, double destY, double srcX, double srcY, double srcW, double srcH)
         {
-            //copy some part of src img to destination
-
+            //copy some part of src img to destination 
             _subBitmap.SetSrcBitmap(source, (int)srcX, (int)srcY, (int)srcW, (int)srcH);
             Render(_subBitmap, destX, destY);
+            _subBitmap.Reset();
         }
         public void Render(IBitmapSrc source, double destX, double destY)
         {
@@ -453,7 +457,7 @@ namespace PixelFarm.CpuBlit
                 using (VxsTemp.Borrow(out var imgBoundsPath, out var v1))
                 {
                     BuildOrgImgRectVxs(source.Width, source.Height, imgBoundsPath);
-                    Affine destRectTransform = CreateAffine(destX, destY, ox, oy, scaleX, scaleY, angleRadians);
+                    Affine destRectTransform = CreateAffine(destX, destY, _ox, _oy, scaleX, scaleY, angleRadians);
 
                     //TODO: review reusable span generator an interpolator ***
 
@@ -549,80 +553,89 @@ namespace PixelFarm.CpuBlit
         }
     }
 
-    class SubBitmap : IBitmapSrc
+
+
+    partial class AggRenderSurface
     {
-        IBitmapSrc _src;
-        int _orgSrcW;
-        int _x, _y, _w, _h;
-        public SubBitmap()
+        class SubBitmap : IBitmapSrc
         {
-        }
-        public void SetSrcBitmap(IBitmapSrc src, int x, int y, int w, int h)
-        {
-            _orgSrcW = src.Width;//
-            _src = src;
-            _x = x;
-            _y = y;
-            _w = w;
-            _h = h;
-        }
-
-        public int BitDepth
-        {
-            get
+            IBitmapSrc _src;
+            int _orgSrcW;
+            int _x, _y, _w, _h;
+            public SubBitmap()
             {
-                return 32; //
             }
-        }
-        public int Width
-        {
-            get { return _w; }
-        }
+            public void SetSrcBitmap(IBitmapSrc src, int x, int y, int w, int h)
+            {
+                _orgSrcW = src.Width;
+                _src = src;
+                _x = x;
+                _y = y;
+                _w = w;
+                _h = h;
+            }
+            public void Reset()
+            {
+                _src = null;
 
-        public int Height
-        {
-            get { return _h; }
-        }
+            }
+            public int BitDepth
+            {
+                get
+                {
+                    return 32; //
+                }
+            }
+            public int Width
+            {
+                get { return _w; }
+            }
 
-        public int Stride
-        {
-            get { return _w << 2; }
-        }
-        public int BytesBetweenPixelsInclusive
-        {
-            get { throw new NotSupportedException(); }
-        }
-        public RectInt GetBounds()
-        {
-            return new RectInt(_x, _y, _x + _w, _y + _h);
-        }
+            public int Height
+            {
+                get { return _h; }
+            }
 
-        public int GetBufferOffsetXY32(int x, int y)
-        {
-            //goto row
-            return ((_y + y) * _orgSrcW) + _x + x;
-        }
-        //public int GetByteBufferOffsetXY(int x, int y)
-        //{
-        //    throw new NotImplementedException();
-        //}
-        public TempMemPtr GetBufferPtr()
-        {
-            return _src.GetBufferPtr();
-        }
-        //public int[] GetOrgInt32Buffer()
-        //{
-        //    return _src.GetOrgInt32Buffer();
-        //}
-        public Color GetPixel(int x, int y)
-        {
-            //TODO: not support here
-            throw new NotImplementedException();
-        }
-        public void ReplaceBuffer(int[] newBuffer)
-        {
-            //not support replace buffer?
+            public int Stride
+            {
+                get { return _w << 2; }
+            }
+            public int BytesBetweenPixelsInclusive
+            {
+                get { throw new NotSupportedException(); }
+            }
+            public RectInt GetBounds()
+            {
+                return new RectInt(_x, _y, _x + _w, _y + _h);
+            }
 
+            public int GetBufferOffsetXY32(int x, int y)
+            {
+                //goto row
+                return ((_y + y) * _orgSrcW) + _x + x;
+            }
+            //public int GetByteBufferOffsetXY(int x, int y)
+            //{
+            //    throw new NotImplementedException();
+            //}
+            public TempMemPtr GetBufferPtr()
+            {
+                return _src.GetBufferPtr();
+            }
+            //public int[] GetOrgInt32Buffer()
+            //{
+            //    return _src.GetOrgInt32Buffer();
+            //}
+            public Color GetPixel(int x, int y)
+            {
+                //TODO: not support here
+                throw new NotImplementedException();
+            }
+            public void WriteBuffer(int[] newBuffer)
+            {
+                //not support replace buffer?
+
+            }
         }
     }
 

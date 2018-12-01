@@ -144,20 +144,20 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             SetClipBox(clippingRect.Left, clippingRect.Bottom, clippingRect.Right, clippingRect.Top);
         }
-        public void SetClipBox(int x1, int y1, int x2, int y2)
+        public void SetClipBox(int left, int bottom, int right, int top)
         {
-            //offset x1,y1,x2,y2
-            x1 += (int)OffsetOriginX;
-            y1 += (int)OffsetOriginY;
-            x2 += (int)OffsetOriginX;
-            y2 += (int)OffsetOriginY;
+
+            left += (int)OffsetOriginX;
+            bottom += (int)OffsetOriginY;
+            right += (int)OffsetOriginX;
+            top += (int)OffsetOriginY;
 
 
-            userModeClipBox = new RectInt(x1, y1, x2, y2);
+            userModeClipBox = new RectInt(left, bottom, right, top);
             Reset();
             m_vectorClipper.SetClipBox(
-                                upscale(x1), upscale(y1),
-                                upscale(x2), upscale(y2));
+                                upscale(left), upscale(bottom),
+                                upscale(right), upscale(top));
         }
         //---------------------------------
         //from vector clipper

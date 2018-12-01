@@ -25,97 +25,73 @@ using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.CpuBlit.Rasterization;
 using PixelFarm.CpuBlit.PixelProcessing;
+//
 namespace PixelFarm.CpuBlit
 {
     public sealed partial class AggRenderSurface
     {
         MemBitmap _destBmp;
         ScanlineRasterizer _sclineRas;
-        Affine _currentTxMatrix = Affine.IdentityMatrix;
+
 
         MyBitmapBlender _destBitmapBlender;
         ScanlinePacked8 _sclinePack8;
+        PixelBlenderBGRA _pixelBlenderBGRA;
 
         DestBitmapRasterizer _bmpRasterizer;
 
-        double ox; //canvas origin x
-        double oy; //canvas origin y
-        int destWidth;
-        int destHeight;
-        RectInt clipBox;
-        ImageInterpolationQuality imgInterpolationQuality = ImageInterpolationQuality.Bilinear;
+        double _ox; //canvas origin x
+        double _oy; //canvas origin y
+        int _destWidth;
+        int _destHeight;
 
 
         public AggRenderSurface(MemBitmap dstBmp)
         {
             //create from actual image 
-
-            this._destBmp = dstBmp;
-
-            this._destBitmapBlender = new MyBitmapBlender(dstBmp, new PixelBlenderBGRA());
+            _destBmp = dstBmp;
+            _pixelBlenderBGRA = new PixelBlenderBGRA();
+            _destBitmapBlender = new MyBitmapBlender(dstBmp, _pixelBlenderBGRA);
             //
-            this._sclineRas = new ScanlineRasterizer();
-            this._bmpRasterizer = new DestBitmapRasterizer();
-            //
-            this.destWidth = dstBmp.Width;
-            this.destHeight = dstBmp.Height;
-            //
-            this.clipBox = new RectInt(0, 0, dstBmp.Width, dstBmp.Height);
-            this._sclineRas.SetClipBox(this.clipBox);
-            this._sclinePack8 = new ScanlinePacked8();
+            _bmpRasterizer = new DestBitmapRasterizer();
+            _sclinePack8 = new ScanlinePacked8();
+            _sclineRas = new ScanlineRasterizer();
+            // 
+            _sclineRas.SetClipBox(
+                new RectInt(0, 0,
+                _destWidth = dstBmp.Width, //**
+                _destHeight = dstBmp.Height) //**
+            );
+            CurrentTransformMatrix = Affine.IdentityMatrix;
         }
 
-
-        public int Width { get { return destWidth; } }
-        public int Height { get { return destHeight; } }
-
-        public ScanlineRasterizer ScanlineRasterizer
-        {
-            get { return _sclineRas; }
-        }
-        public MemBitmap DestBitmap
-        {
-            get { return this._destBmp; }
-        }
-        public BitmapBlenderBase DestBitmapBlender
-        {
-            get { return this._destBitmapBlender; }
-        }
-
-        public ScanlinePacked8 ScanlinePacked8
-        {
-            get { return this._sclinePack8; }
-        }
+        //
+        public int Width => _destWidth;
+        public int Height => _destHeight;
+        public ScanlineRasterizer ScanlineRasterizer => _sclineRas;
+        public MemBitmap DestBitmap => _destBmp;
+        public BitmapBlenderBase DestBitmapBlender => _destBitmapBlender;
+        public ScanlinePacked8 ScanlinePacked8 => _sclinePack8;
+        public DestBitmapRasterizer BitmapRasterizer => _bmpRasterizer;
+        public float ScanlineRasOriginX => _sclineRas.OffsetOriginX;
+        public float ScanlineRasOriginY => _sclineRas.OffsetOriginY;
+        //
+        // 
         public PixelProcessing.PixelBlender32 PixelBlender
         {
-            get
-            {
-                return this._destBitmapBlender.OutputPixelBlender;
-            }
-            set
-            {
-                this._destBitmapBlender.OutputPixelBlender = value;
-            }
+            get => _destBitmapBlender.OutputPixelBlender;
+            set => _destBitmapBlender.OutputPixelBlender = value;
         }
-
-        public DestBitmapRasterizer BitmapRasterizer
-        {
-            get { return this._bmpRasterizer; }
-        }
+        public Affine CurrentTransformMatrix { get; set; }
+        //
+        public RectInt GetClippingRect() => ScanlineRasterizer.GetVectorClipBox();
         public void SetClippingRect(RectInt rect)
         {
             rect.IntersectWithRectangle(new RectInt(0, 0, this.Width, this.Height));
             ScanlineRasterizer.SetClipBox(rect);
         }
-        public RectInt GetClippingRect()
-        {
-            return ScanlineRasterizer.GetVectorClipBox();
-        }
-        public ImageInterpolationQuality ImageInterpolationQuality
-        {
-            get { return this.ImageInterpolationQuality; }
-            set { this.imgInterpolationQuality = value; }
-        }
+
+        public ImageInterpolationQuality ImageInterpolationQuality { get; set; }
 
         public void Clear(Color color)
         {
@@ -225,8 +201,6 @@ namespace PixelFarm.CpuBlit
 
 
 
-
-
         /// <summary>
         /// we do NOT store vxs
         /// </summary>
@@ -251,24 +225,8 @@ namespace PixelFarm.CpuBlit
             //-----------------------------
         }
 
-        public Affine CurrentTransformMatrix
-        {
-            get { return this._currentTxMatrix; }
-            set
-            {
-                this._currentTxMatrix = value;
-            }
-        }
-        //-------------------
-        public float ScanlineRasOriginX
-        {
-            get { return _sclineRas.OffsetOriginX; }
-        }
 
-        public float ScanlineRasOriginY
-        {
-            get { return _sclineRas.OffsetOriginY; }
-        }
+
         public void SetScanlineRasOrigin(float x, float y)
         {
             _sclineRas.OffsetOriginX = x;
@@ -304,7 +262,7 @@ namespace PixelFarm.CpuBlit
         public void dbugLine(double x1, double y1, double x2, double y2, Drawing.Color color)
         {
 
-
+            dbugStroke.Width = 1;
             dbug_v1.AddMoveTo(x1, y1);
             dbug_v1.AddLineTo(x2, y2);
             //dbug_v1.AddStop();
@@ -316,5 +274,24 @@ namespace PixelFarm.CpuBlit
         }
 #endif
 
+    }
+
+
+
+    partial class AggRenderSurface
+    {
+        class MyBitmapBlender : BitmapBlenderBase
+        {
+            MemBitmap _bmp;
+            public MyBitmapBlender(MemBitmap bmp, PixelBlender32 pxBlender)
+            {
+                _bmp = bmp;
+                Attach(bmp, pxBlender);
+            }
+            public override void WriteBuffer(int[] newbuffer)
+            {
+                MemBitmap.ReplaceBuffer(_bmp, newbuffer);
+            }
+        }
     }
 }

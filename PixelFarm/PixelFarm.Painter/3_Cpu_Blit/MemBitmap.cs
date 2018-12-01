@@ -471,7 +471,7 @@ namespace PixelFarm.CpuBlit
             return (y * _width) + x;
         }
 
-        void IBitmapSrc.ReplaceBuffer(int[] newBuffer)
+        void IBitmapSrc.WriteBuffer(int[] newBuffer)
         {
             //TODO: review here 2018-08-26
             //pixelBuffer = newBuffer;
@@ -511,7 +511,7 @@ namespace PixelFarm.CpuBlit
 
 
         int BytesBetweenPixelsInclusive { get; }
-        void ReplaceBuffer(int[] newBuffer);
+        void WriteBuffer(int[] newBuffer);
         Color GetPixel(int x, int y);
     }
 

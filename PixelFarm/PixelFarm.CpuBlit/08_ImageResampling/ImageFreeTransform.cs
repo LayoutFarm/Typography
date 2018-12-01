@@ -21,13 +21,15 @@ namespace PixelFarm.CpuBlit.Imaging
 
         class MyBitmapBlender : BitmapBlenderBase
         {
+            MemBitmap _memBmp;
             public MyBitmapBlender(MemBitmap bmp)
             {
+                _memBmp = bmp;
                 Attach(bmp);
             }
-            public override void ReplaceBuffer(int[] newbuffer)
+            public override void WriteBuffer(int[] newbuffer)
             {
-
+                MemBitmap.ReplaceBuffer(_memBmp, newbuffer);
             }
         }
 
