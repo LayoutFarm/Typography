@@ -31,16 +31,18 @@ namespace Typography.Contours
         {
 
             _txToVxs.Reset();
+            //1. builder read shape and translate it with _txToVxs
             builder.ReadShapes(_txToVxs);
-            //create new one
+
             using (VxsTemp.Borrow(out var glyphVxs, out var vxs2))
             {
+                //2. write translated data (in the _txToVxs) to glyphVxs
+
                 _txToVxs.WriteOutput(glyphVxs, pxscale);
-                //find bound
-                //-------------------------------------------- 
 
                 RectD bounds = glyphVxs.GetBoundingRect();
-                ////-------------------------------------------- 
+
+                //-------------------------------------------- 
                 int w = (int)System.Math.Ceiling(bounds.Width);
                 int h = (int)System.Math.Ceiling(bounds.Height);
                 if (w < 5)
@@ -52,26 +54,32 @@ namespace Typography.Contours
                     h = 5;
                 }
 
+
+                //we need some margin
+                int horizontal_margin = 1;
+                int vertical_margin = 1;
+
+
                 //translate to positive quadrant and use minimum space
 
-                double dx = -bounds.Left;
-                double dy = -bounds.Bottom;
+                double dx = Math.Ceiling((bounds.Left < 0) ? -bounds.Left : 0);
+                double dy = 0;
 
-
-                dx = Math.Ceiling(dx); //since we need to move it, then move it with integer value
-                dy = Math.Ceiling(dy); //since we need to move it, then move it with integer value
-
-                //we need some borders
-                int horizontal_margin = 1; //'margin' 1px
-                int vertical_margin = 1; //margin 1 px
-
-                dx += horizontal_margin; //+ left margin
-                dy += vertical_margin; //+ top margin 
-
+                //vertical adjust =>since we need to move it, then move it with integer value
+                if (bounds.Bottom < 0)
+                {
+                    dy = Math.Ceiling(-bounds.Bottom);
+                }
+                else if (bounds.Bottom > 0)
+                {
+                    dy = Math.Floor(-bounds.Bottom);
+                }
+                dx += horizontal_margin;
+                dy += vertical_margin;
                 //--------------------------------------------  
 
-                w += horizontal_margin;
-                h += vertical_margin;
+                w = (int)Math.Ceiling(dx + w + horizontal_margin); //+right margin
+                h = (int)Math.Ceiling((double)(vertical_margin + h + vertical_margin)); //+bottom margin 
 
                 //create glyph img    
                 using (MemBitmap memBmp = new MemBitmap(w, h))

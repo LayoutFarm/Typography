@@ -664,7 +664,7 @@ namespace SampleWinForms
             var glyphTextureGen = new GlyphTextureBitmapGenerator();
             //
             Typeface typeface = _basicOptions.Typeface;
-            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
+            float fontSizeInPoints = 24;// _basicOptions.FontSizeInPoints;
             //
             glyphTextureGen.CreateTextureFontFromInputChars(
                 typeface,
