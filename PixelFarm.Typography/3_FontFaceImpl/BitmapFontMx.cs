@@ -206,7 +206,7 @@ namespace Typography.Rendering
                     //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                     //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                     ////save image to cache
-                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename); 
+                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
 #endif
 
                     //cache the atlas
@@ -251,23 +251,26 @@ namespace Typography.Rendering
 
         static GlyphImage ReadGlyphImages(string filename)
         {
-            PixelFarm.CpuBlit.MemBitmap bmp = StorageService.Provider.ReadPngBitmap(filename);
-            GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
-            int[] buffer = new int[bmp.Width * bmp.Height];
-            unsafe
+            using (PixelFarm.CpuBlit.MemBitmap bmp = StorageService.Provider.ReadPngBitmap(filename))
             {
-                PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(bmp);
-                System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
-                img.SetImageBuffer(buffer, true);
+                GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
+                int[] buffer = new int[bmp.Width * bmp.Height];
+                unsafe
+                {
+                    PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(bmp);
+                    System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
+                    img.SetImageBuffer(buffer, true);
+                }
+                return img;
             }
-            return img;
-
         }
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {
-            StorageService.Provider.SavePngBitmap(
-                PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
-                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), true), filename);
+            using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
+                   glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), true))
+            {
+                StorageService.Provider.SavePngBitmap(memBmp, filename);
+            }
 
         }
 #if DEBUG
