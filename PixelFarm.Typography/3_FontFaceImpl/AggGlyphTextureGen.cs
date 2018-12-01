@@ -26,7 +26,7 @@ namespace Typography.Contours
         public Color BackGroundColor { get; set; }
         public Color GlyphColor { get; set; }
         public TextureKind TextureKind { get; set; }
-
+        public AggPainter Painter { get; set; }
         public GlyphImage CreateGlyphImage(GlyphPathBuilder builder, float pxscale)
         {
 
@@ -81,62 +81,54 @@ namespace Typography.Contours
                 w = (int)Math.Ceiling(dx + w + horizontal_margin); //+right margin
                 h = (int)Math.Ceiling((double)(vertical_margin + h + vertical_margin)); //+bottom margin 
 
-                //create glyph img    
-                using (MemBitmap memBmp = new MemBitmap(w, h))
+
+
+                AggPainter painter = Painter;
+                if (TextureKind == TextureKind.StencilLcdEffect)
                 {
 
-#if DEBUG
-                    memBmp._dbugNote = "CreateGlyphImage()";
-#endif
-                    //TODO: review painter here
-                    //
-                    AggPainter painter = AggPainter.Create(memBmp);
-                    if (TextureKind == TextureKind.StencilLcdEffect)
+                    glyphVxs.TranslateToNewVxs(dx + 0.33f, dy, vxs2); //offset to proper x of subpixel rendering  ***
+                    glyphVxs = vxs2;
+                    // 
+                    painter.UseSubPixelLcdEffect = true;
+                    //we use white glyph on black bg for this texture                
+                    painter.Clear(Color.Black);
+                    painter.FillColor = Color.White;
+                    painter.Fill(glyphVxs);
+
+                    //apply sharpen filter
+                    //painter.DoFilter(new RectInt(0, h, w, 0), 2);
+                    //painter.DoFilter(new RectInt(0, h, w, 0), 2); //? 
+                }
+                else
+                {
+
+                    glyphVxs.TranslateToNewVxs(dx, dy, vxs2);
+                    glyphVxs = vxs2;
+
+                    painter.UseSubPixelLcdEffect = false;
+
+                    if (TextureKind == TextureKind.StencilGreyScale)
                     {
-
-                        glyphVxs.TranslateToNewVxs(dx + 0.33f, dy, vxs2); //offset to proper x of subpixel rendering  ***
-                        glyphVxs = vxs2;
-                        // 
-                        painter.UseSubPixelLcdEffect = true;
-
-                        //we use white glyph on black bg for this texture                
-                        painter.Clear(Color.Black);
-                        painter.FillColor = Color.White;
-                        painter.Fill(glyphVxs);
-
-                        //apply sharpen filter
-                        //painter.DoFilter(new RectInt(0, h, w, 0), 2);
-                        //painter.DoFilter(new RectInt(0, h, w, 0), 2); //? 
+                        painter.Clear(Color.Empty);
+                        painter.FillColor = Color.Black;
                     }
                     else
                     {
-
-                        glyphVxs.TranslateToNewVxs(dx, dy, vxs2);
-                        glyphVxs = vxs2;
-
-                        painter.UseSubPixelLcdEffect = false;
-
-                        if (TextureKind == TextureKind.StencilGreyScale)
-                        {
-                            painter.Clear(Color.Empty);
-                            painter.FillColor = Color.Black;
-                        }
-                        else
-                        {
-                            painter.Clear(BackGroundColor);
-                            painter.FillColor = this.GlyphColor;
-                        }
-                        painter.Fill(glyphVxs);
-
+                        painter.Clear(BackGroundColor);
+                        painter.FillColor = this.GlyphColor;
                     }
-                    //
-                    var glyphImage = new GlyphImage(w, h);
-                    glyphImage.TextureOffsetX = dx;
-                    glyphImage.TextureOffsetY = dy;
-                    glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(memBmp, w), false);
-                    //copy data from agg canvas to glyph image 
-                    return glyphImage;
+                    painter.Fill(glyphVxs);
+
                 }
+                //
+                var glyphImage = new GlyphImage(w, h);
+                glyphImage.TextureOffsetX = dx;
+                glyphImage.TextureOffsetY = dy;
+                glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
+                //copy data from agg canvas to glyph image 
+                return glyphImage;
+
             }
 
         }

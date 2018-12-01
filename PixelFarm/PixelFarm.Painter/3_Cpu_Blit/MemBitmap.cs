@@ -207,7 +207,7 @@ namespace PixelFarm.CpuBlit
                 _registerMemBmpList.Add(new TempMemBitmapMonitor(detail) { _memBmp = memBmp }); //_memBmp = new WeakReference(memBmp) });
             }
         }
-    } 
+    }
 #endif
 
 
@@ -517,12 +517,11 @@ namespace PixelFarm.CpuBlit
 
     public static class MemBitmapExtensions
     {
-        public static int[] CopyImgBuffer(MemBitmap memBmp, int width)
+        public static int[] CopyImgBuffer(MemBitmap memBmp, int width, int height)
         {
-            //calculate stride for the width
-
+            //calculate stride for the width 
             int destStride = MemBitmap.CalculateStride(width, CpuBlit.Imaging.PixelFormat.ARGB32);
-            int h = memBmp.Height;
+
             int newBmpW = destStride / 4;
 
             int[] buff2 = new int[newBmpW * memBmp.Height];
@@ -537,7 +536,7 @@ namespace PixelFarm.CpuBlit
                     fixed (int* destHead = &buff2[0])
                     {
                         byte* destHead2 = (byte*)destHead;
-                        for (int line = 0; line < h; ++line)
+                        for (int line = 0; line < height; ++line)
                         {
                             //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
                             NativeMemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
