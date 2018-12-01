@@ -129,12 +129,12 @@ namespace Typography.Rendering
                 string fontTextureFile = reqFont.Name + " " + fontKey;
                 string resolveFontFile = fontTextureFile + ".info";
                 string fontTextureInfoFile = resolveFontFile;
-                string fontTextureImg = fontTextureInfoFile + ".png";
+                string fontTextureImgFilename = fontTextureInfoFile + ".png";
 
                 //check if the file exist
 
                 if (StorageService.Provider.DataExists(fontTextureInfoFile) &&
-                    StorageService.Provider.DataExists(fontTextureImg))
+                    StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder2 = new SimpleFontAtlasBuilder();
 
@@ -143,7 +143,7 @@ namespace Typography.Rendering
                         try
                         {
                             fontAtlas = atlasBuilder2.LoadFontInfo(dataStream);
-                            fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImg);
+                            fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImgFilename);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
                             ////
@@ -170,8 +170,8 @@ namespace Typography.Rendering
 
                     GlyphImage totalGlyphsImg = null;
                     SimpleFontAtlasBuilder atlasBuilder = null;
-                    var textureGen = new GlyphTextureBitmapGenerator();
-                    textureGen.CreateTextureFontFromScriptLangs(
+                    var glyphTextureGen = new GlyphTextureBitmapGenerator();
+                    glyphTextureGen.CreateTextureFontFromScriptLangs(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                        _textureKind,
@@ -206,7 +206,7 @@ namespace Typography.Rendering
                     //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                     //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                     ////save image to cache
-                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImg);
+                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename); 
 #endif
 
                     //cache the atlas
