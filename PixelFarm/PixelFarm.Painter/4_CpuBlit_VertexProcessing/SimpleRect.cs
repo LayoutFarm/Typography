@@ -55,6 +55,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             if (left > right) { bounds.Left = right; bounds.Right = left; }
             if (bottom > top) { bounds.Bottom = top; bounds.Top = bottom; }
         }
+        public void SetRectFromLTWH(double left, double top, double width, double height)
+        {
+            SetRect(left, top + height, left + width, top);
+        }
         public void Offset(double dx, double dy)
         {
             bounds.Offset(dx, dy);
@@ -78,7 +82,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _reusablePathWriter.CloseFigure();
             return output;
         }
-       
+        public void MakeVxs(PathWriter pathWriter)
+        {
+            pathWriter.MoveTo(bounds.Left, bounds.Bottom);
+            pathWriter.LineTo(bounds.Right, bounds.Bottom);
+            pathWriter.LineTo(bounds.Right, bounds.Top);
+            pathWriter.LineTo(bounds.Left, bounds.Top);
+            pathWriter.CloseFigure();
+        }
     }
 }
 

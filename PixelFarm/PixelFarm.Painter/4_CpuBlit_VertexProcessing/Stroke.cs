@@ -120,17 +120,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         break;
                     case VertexCmd.LineTo:
                     case VertexCmd.P2c://user must flatten the curve before do stroke
-                    case VertexCmd.P3c://user must flatten the curve before do stroke
-
-                        strkgen.AddVertex(x, y, cmd);
-
+                    case VertexCmd.P3c://user must flatten the curve before do stroke 
+                        strkgen.AddVertex(x, y, cmd); 
                         break;
-                    case VertexCmd.MoveTo:
-
+                    case VertexCmd.MoveTo: 
                         strkgen.AddVertex(x, y, cmd);
                         startX = x;
-                        startY = y;
-
+                        startY = y; 
                         break;
                     default: throw new System.NotSupportedException();
                 }

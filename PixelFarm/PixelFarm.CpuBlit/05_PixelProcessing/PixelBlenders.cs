@@ -351,17 +351,17 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     int dest = *dstPtr;
                     //separate each component
-                    byte a = (byte)((dest >> 24) & 0xff);
-                    byte r = (byte)((dest >> 16) & 0xff);
-                    byte g = (byte)((dest >> 8) & 0xff);
-                    byte b = (byte)((dest) & 0xff);
+                    byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
+                    byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
+                    byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
+                    byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
 
                     *dstPtr =
-                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> (int)ColorEx.BASE_SHIFT) << 8) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT));
+                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> (int)ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
             }
 
@@ -378,18 +378,18 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     int dest = *dstPtr;
                     //separate each component
-                    byte a = (byte)((dest >> 24) & 0xff);
-                    byte r = (byte)((dest >> 16) & 0xff);
-                    byte g = (byte)((dest >> 8) & 0xff);
-                    byte b = (byte)((dest) & 0xff);
+                    byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
+                    byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
+                    byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
+                    byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
                     byte src_a = srcColor.alpha;
 
                     *dstPtr =
-                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 8) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT));
+                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
             }
         }

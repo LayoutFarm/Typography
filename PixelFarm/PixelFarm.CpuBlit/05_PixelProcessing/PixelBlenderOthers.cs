@@ -492,11 +492,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// set mask image, please note that size of mask must be the same size of the dest buffer
         /// </summary>
         /// <param name="maskBmp"></param>
-        public void SetMaskBitmap(ActualBitmap maskBmp)
+        public void SetMaskBitmap(MemBitmap maskBmp)
         {
             //please note that size of mask must be the same size of the dest buffer
 
-            _maskInnerBuffer = ActualBitmap.GetBufferPtr(maskBmp);
+            _maskInnerBuffer = MemBitmap.GetBufferPtr(maskBmp);
         }
         public PixelBlenderColorComponent SelectedMaskComponent
         {
@@ -1010,11 +1010,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// set mask image, please note that size of mask must be the same size of the dest buffer
         /// </summary>
         /// <param name="maskBmp"></param>
-        public void SetMaskBitmap(ActualBitmap maskBmp)
+        public void SetMaskBitmap(MemBitmap maskBmp)
         {
             //in this version
             //please note that size of mask must be the same size of the dest buffer
-            _maskInnerBuffer = ActualBitmap.GetBufferPtr(maskBmp);
+            _maskInnerBuffer = MemBitmap.GetBufferPtr(maskBmp);
         }
 
         public EnableOutputColorComponent EnableOutputColorComponent

@@ -15,14 +15,14 @@ namespace PixelFarm.CpuBlit.Imaging
         /// <param name="actualImage"></param>
         /// <param name="hBmpScan0"></param>
         public static void CopyToWindowsBitmapSameSize(
-           ActualBitmap actualImage,
+           MemBitmap actualImage,
            IntPtr hBmpScan0)
         {
             //1st, fast
             //byte[] rawBuffer = ActualImage.GetBuffer(actualImage);
             unsafe
             {
-                TempMemPtr memPtr = ActualBitmap.GetBufferPtr(actualImage);
+                TempMemPtr memPtr = MemBitmap.GetBufferPtr(actualImage);
                 MemMx.memcpy((byte*)hBmpScan0, (byte*)memPtr.Ptr, actualImage.Stride * actualImage.Height);
                 memPtr.Dispose();
             }
@@ -35,7 +35,7 @@ namespace PixelFarm.CpuBlit.Imaging
         /////////////////////////////////////////////////////////////////////////////////////
 
         public static void CopyToGdiPlusBitmapSameSize(
-            ActualBitmap actualImage,
+            MemBitmap actualImage,
             Bitmap bitmap)
         {
             //agg store image buffer head-down
@@ -58,7 +58,7 @@ namespace PixelFarm.CpuBlit.Imaging
                 IntPtr scan0 = bitmapData1.Scan0;
                 int stride = bitmapData1.Stride;
                 //byte[] srcBuffer = ActualImage.GetBuffer(actualImage);
-                TempMemPtr srcMemPtr = ActualBitmap.GetBufferPtr(actualImage);
+                TempMemPtr srcMemPtr = MemBitmap.GetBufferPtr(actualImage);
                 unsafe
                 {
 
@@ -178,7 +178,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public static void CopyFromGdiPlusBitmapSameSize(
            Bitmap windowsBitmap,
-           ActualBitmap actualImage)
+           MemBitmap actualImage)
         {
             int h = windowsBitmap.Height;
             int w = windowsBitmap.Width;
@@ -199,7 +199,7 @@ namespace PixelFarm.CpuBlit.Imaging
             unsafe
             {
                 //target 
-                TempMemPtr targetMemPtr = ActualBitmap.GetBufferPtr(actualImage);
+                TempMemPtr targetMemPtr = MemBitmap.GetBufferPtr(actualImage);
                 byte* target = (byte*)targetMemPtr.Ptr;
                 int startRowAt = ((h - 1) * stride);
                 byte* src = (byte*)scan0;

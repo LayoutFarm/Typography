@@ -22,7 +22,7 @@ namespace BitmapBufferEx
         Affine affine;
         public MatrixTransform(AffinePlan[] affPlans)
         {
-            affine = Affine.NewMatix(affPlans);
+            affine = Affine.NewMatix2(affPlans);
         }
         public MatrixTransform(Affine affine)
         {

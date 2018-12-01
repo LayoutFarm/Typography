@@ -1481,7 +1481,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             }
 
 
-            Color[] colorArray = tempSpanColors.Array;
+            Color[] colorArray = tempSpanColors.UnsafeInternalArray;
             while (sclineRas.SweepScanline(scline))
             {
                 //render single scanline 

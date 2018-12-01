@@ -34,6 +34,19 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     {
         void Transform(ref double x, ref double y);
         ICoordTransformer MultiplyWith(ICoordTransformer another);
+        ICoordTransformer CreateInvert();
+        CoordTransformerKind Kind { get; }
     }
 
+
+    public enum CoordTransformerKind
+    {
+        Unknown,
+        Affine3x2,
+        Perspective,
+        Bilinear,
+        TransformChain,
+    }
+
+     
 }

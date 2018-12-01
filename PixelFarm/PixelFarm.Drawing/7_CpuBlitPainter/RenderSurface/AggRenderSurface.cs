@@ -29,8 +29,12 @@ namespace PixelFarm.CpuBlit
 {
     public sealed partial class AggRenderSurface
     {
+        MemBitmap _destBmp;
+        ScanlineRasterizer _sclineRas;
+        Affine _currentTxMatrix = Affine.IdentityMatrix;
+
         MyBitmapBlender _destBitmapBlender;
-        ScanlinePacked8 sclinePack8;
+        ScanlinePacked8 _sclinePack8;
 
         DestBitmapRasterizer _bmpRasterizer;
 
@@ -42,23 +46,23 @@ namespace PixelFarm.CpuBlit
         ImageInterpolationQuality imgInterpolationQuality = ImageInterpolationQuality.Bilinear;
 
 
-        public AggRenderSurface(ActualBitmap destImage)
+        public AggRenderSurface(MemBitmap dstBmp)
         {
             //create from actual image 
 
-            this.destActualImage = destImage;
+            this._destBmp = dstBmp;
 
-            this._destBitmapBlender = new MyBitmapBlender(destImage, new PixelBlenderBGRA());
+            this._destBitmapBlender = new MyBitmapBlender(dstBmp, new PixelBlenderBGRA());
             //
-            this._sclineRas = new ScanlineRasterizer(destImage.Width, destImage.Height);
+            this._sclineRas = new ScanlineRasterizer();
             this._bmpRasterizer = new DestBitmapRasterizer();
             //
-            this.destWidth = destImage.Width;
-            this.destHeight = destImage.Height;
+            this.destWidth = dstBmp.Width;
+            this.destHeight = dstBmp.Height;
             //
-            this.clipBox = new RectInt(0, 0, destImage.Width, destImage.Height);
+            this.clipBox = new RectInt(0, 0, dstBmp.Width, dstBmp.Height);
             this._sclineRas.SetClipBox(this.clipBox);
-            this.sclinePack8 = new ScanlinePacked8();
+            this._sclinePack8 = new ScanlinePacked8();
         }
 
 
@@ -69,9 +73,9 @@ namespace PixelFarm.CpuBlit
         {
             get { return _sclineRas; }
         }
-        public ActualBitmap DestActualImage
+        public MemBitmap DestBitmap
         {
-            get { return this.destActualImage; }
+            get { return this._destBmp; }
         }
         public BitmapBlenderBase DestBitmapBlender
         {
@@ -80,7 +84,7 @@ namespace PixelFarm.CpuBlit
 
         public ScanlinePacked8 ScanlinePacked8
         {
-            get { return this.sclinePack8; }
+            get { return this._sclinePack8; }
         }
         public PixelProcessing.PixelBlender32 PixelBlender
         {
@@ -100,6 +104,7 @@ namespace PixelFarm.CpuBlit
         }
         public void SetClippingRect(RectInt rect)
         {
+            rect.IntersectWithRectangle(new RectInt(0, 0, this.Width, this.Height));
             ScanlineRasterizer.SetClipBox(rect);
         }
         public RectInt GetClippingRect()
@@ -155,7 +160,7 @@ namespace PixelFarm.CpuBlit
                             }
                             else if (color == Color.Black)
                             {
-                                //fast cleat with black color
+                                //fast clear with black color
                                 int n = len32;
                                 unsafe
                                 {
@@ -165,6 +170,22 @@ namespace PixelFarm.CpuBlit
                                         for (int i = n - 1; i >= 0; --i)
                                         {
                                             *head_i32 = 0xff000000; //black (ARGB)
+                                            head_i32++;
+                                        }
+                                    }
+                                }
+                            }
+                            else if (color == Color.Empty)
+                            {
+                                int n = len32;
+                                unsafe
+                                {
+                                    //fixed (void* head = &buffer[0])
+                                    {
+                                        uint* head_i32 = (uint*)buffer;
+                                        for (int i = n - 1; i >= 0; --i)
+                                        {
+                                            *head_i32 = 0x00000000; //empty
                                             head_i32++;
                                         }
                                     }
@@ -180,7 +201,7 @@ namespace PixelFarm.CpuBlit
                                 //#endif
 
                                 //ARGB
-                                uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
+                                uint colorARGB = (uint)((color.alpha << CO.A_SHIFT) | ((color.red << CO.R_SHIFT) | (color.green << CO.G_SHIFT) | color.blue << CO.B_SHIFT));
                                 int n = len32;
                                 unsafe
                                 {
@@ -219,37 +240,31 @@ namespace PixelFarm.CpuBlit
             Affine transform = this.CurrentTransformMatrix;
             if (!transform.IsIdentity())
             {
-
                 _sclineRas.AddPath(vxs, transform);
-
-                //-------------------------
-                //since sclineRas do NOT store vxs
-                //then we can reuse the vxs***
-                //-------------------------
             }
             else
             {
                 _sclineRas.AddPath(vxs);
             }
-            _bmpRasterizer.RenderWithColor(_destBitmapBlender, _sclineRas, sclinePack8, c);
-            unchecked { destImageChanged++; };
+            _bmpRasterizer.RenderWithColor(_destBitmapBlender, _sclineRas, _sclinePack8, c);
+            unchecked { _destImageChanged++; };
             //-----------------------------
         }
-        ActualBitmap destActualImage;
-        ScanlineRasterizer _sclineRas;
-        Affine currentTxMatrix = Affine.IdentityMatrix;
+
         public Affine CurrentTransformMatrix
         {
-            get { return this.currentTxMatrix; }
+            get { return this._currentTxMatrix; }
             set
             {
-                this.currentTxMatrix = value;
+                this._currentTxMatrix = value;
             }
         }
+        //-------------------
         public float ScanlineRasOriginX
         {
             get { return _sclineRas.OffsetOriginX; }
         }
+
         public float ScanlineRasOriginY
         {
             get { return _sclineRas.OffsetOriginY; }
@@ -259,6 +274,8 @@ namespace PixelFarm.CpuBlit
             _sclineRas.OffsetOriginX = x;
             _sclineRas.OffsetOriginY = y;
         }
+        //-------------------
+
         public bool UseSubPixelLcdEffect
         {
             get

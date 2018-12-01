@@ -68,7 +68,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             _raw_buffer32 = IntPtr.Zero;
             _rawBufferLenInBytes = 0;
         }
-        
+
         protected void SetBuffer(Imaging.TempMemPtr tmpMem)
         {
             _raw_buffer32 = tmpMem.Ptr;
@@ -77,9 +77,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public abstract void ReplaceBuffer(int[] newbuffer);
 
-        protected void Attach(ActualBitmap img)
+        protected void Attach(MemBitmap bmp)
         {
-            Attach(img.Width, img.Height, img.BitDepth, ActualBitmap.GetBufferPtr(img), new PixelBlenderBGRA());
+            Attach(bmp.Width, bmp.Height, bmp.BitDepth, MemBitmap.GetBufferPtr(bmp), new PixelBlenderBGRA());
         }
         /// <summary>
         /// attach image buffer and its information to the reader
@@ -90,9 +90,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="imgbuffer"></param>
         /// <param name="outputPxBlender"></param>
         protected void Attach(int width, int height, int bitsPerPixel, CpuBlit.Imaging.TempMemPtr imgbuffer, PixelBlender32 outputPxBlender)
-        {
-
-
+        {   
             if (width <= 0 || height <= 0)
             {
                 throw new ArgumentOutOfRangeException("You must have a width and height > than 0.");
@@ -555,10 +553,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
 
 
-        ActualBitmap _filterImage;
-        public void SetFilterImage(ActualBitmap filterImg)
+        MemBitmap _filterBmp;
+        public void SetFilterImage(MemBitmap filterBmp)
         {
-            _filterImage = filterImg;
+            _filterBmp = filterBmp;
         }
         public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {

@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20,WIN32</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -123,6 +123,9 @@
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\Tesselator.cs">
       <Link>0_REF_Tesselate\Tesselator.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\MemBitmapBinder.cs">
+      <Link>0_REF_CpuBlit\05_PixelProcessing\MemBitmapBinder.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs">
       <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs</Link>
@@ -304,11 +307,11 @@
     <Compile Include="..\PixelFarm.Painter\2_Canvas\ITextPrinter.cs">
       <Link>0_REF_Painter\2_Canvas\ITextPrinter.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\ActualBitmap.cs">
-      <Link>0_REF_Painter\0_REF_CpuBlit\ActualBitmap.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs">
       <Link>0_REF_Painter\0_REF_CpuBlit\ColorRGBAf.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\MemBitmap.cs">
+      <Link>0_REF_Painter\0_REF_CpuBlit\MemBitmap.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\PainterExtensions.cs">
       <Link>0_REF_Painter\0_REF_CpuBlit\PainterExtensions.cs</Link>
