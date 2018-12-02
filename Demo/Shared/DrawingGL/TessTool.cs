@@ -15,7 +15,7 @@ using Tesselate;
 
 namespace DrawingGL
 {
-    public struct TessVertex2d
+    struct TessVertex2d
     {
         public double m_X;
         public double m_Y;
@@ -33,13 +33,16 @@ namespace DrawingGL
 
     }
 
-    public class TessListener
+    /// <summary>
+    /// listen and handle the event from tesslator
+    /// </summary>
+    class TessListener
     {
-
         internal List<TessVertex2d> _tempVertexList = new List<TessVertex2d>();
         internal List<ushort> _resultIndexList = new List<ushort>();
         int _inputVertexCount;
         Tesselator.TriangleListType _triangleListType;
+
 
         public TessListener()
         {
@@ -47,10 +50,16 @@ namespace DrawingGL
             //not use first item in temp
             _tempVertexList.Add(new TessVertex2d(0, 0));
         }
-        public void BeginCallBack(Tesselator.TriangleListType type)
+
+        void OnBegin(Tesselator.TriangleListType type)
         {
+            if (type != Tesselator.TriangleListType.Triangles)
+            {
+
+            }
             _triangleListType = type;
 
+            //what type of triangle list
             //Console.WriteLine("begin: " + type.ToString());
             //Assert.IsTrue(GetNextOutputAsString() == "B");
             //switch (type)
@@ -72,44 +81,45 @@ namespace DrawingGL
             //}
         }
 
-        public void EndCallBack()
+        void OnEnd()
         {
             //Assert.IsTrue(GetNextOutputAsString() == "E");
             //Console.WriteLine("end");
         }
 
-        public void VertexCallBack(int index)
+        void OnVertex(int index)
         {
             //Assert.IsTrue(GetNextOutputAsString() == "V");
             //Assert.AreEqual(GetNextOutputAsInt(), index); 
             if (index < 0)
             {
-                //use data from temp store
-                //_resultVertexList.Add(_tempVertexList[-index]);
+                //use data from temp store***
+                //that will be append to the end of result
                 _resultIndexList.Add((ushort)(_inputVertexCount + (-index)));
 
+                //resultVertexList.Add(this.tempVertextList[-index]);
                 //Console.WriteLine("temp_v_cb:" + index + ":(" + tempVertextList[-index] + ")");
             }
             else
             {
                 _resultIndexList.Add((ushort)index);
-                // _resultVertexList.Add(_inputVertextList[index]);
+                //resultVertexList.Add(this.inputVertextList[index]);
                 // Console.WriteLine("v_cb:" + index + ":(" + inputVertextList[index] + ")");
             }
         }
 
-        public void EdgeFlagCallBack(bool IsEdge)
+        void OnEdgeFlag(bool IsEdge)
         {
             //Console.WriteLine("edge: " + IsEdge);
             //Assert.IsTrue(GetNextOutputAsString() == "F");
             //Assert.AreEqual(GetNextOutputAsBool(), IsEdge);
         }
 
-        public void CombineCallBack(double v0,
-             double v1,
-             double v2,
-             ref Tesselator.CombineParameters combinePars,
-             out int outData)
+        void OnCombine(double v0,
+          double v1,
+          double v2,
+          ref Tesselator.CombineParameters combinePars,
+          out int outData)
         {
             //double error = .001;
             //Assert.IsTrue(GetNextOutputAsString() == "C");
@@ -123,9 +133,7 @@ namespace DrawingGL
             //Assert.AreEqual(GetNextOutputAsDouble(), weight4[1], error);
             //Assert.AreEqual(GetNextOutputAsDouble(), weight4[2], error);
             //Assert.AreEqual(GetNextOutputAsDouble(), weight4[3], error); 
-            //here , outData = index of newly add vertext
-
-
+            //here , outData = index of newly add vertext 
             //----------------------------------------------------------------------
             //*** new vertext is added into user vertext list ***            
             //use negative to note that this vertext is from temporary source 
@@ -138,27 +146,36 @@ namespace DrawingGL
             _tempVertexList.Add(new TessVertex2d(v0, v1));
             //----------------------------------------
         }
-        public void Connect(Tesselate.Tesselator tesselator, bool setEdgeFlag)
+
+        /// <summary>
+        /// connect to actual Tesselator
+        /// </summary>
+        /// <param name="tesselator"></param>
+        /// <param name="setEdgeFlag"></param>
+        public void Connect(Tesselator tesselator, bool setEdgeFlag)
         {
-            tesselator.callBegin = BeginCallBack;
-            tesselator.callEnd = EndCallBack;
-            tesselator.callVertex = VertexCallBack;
-            tesselator.callCombine = CombineCallBack;
+            tesselator.callBegin = OnBegin;
+            tesselator.callEnd = OnEnd;
+            tesselator.callVertex = OnVertex;
+            tesselator.callCombine = OnCombine;
             if (setEdgeFlag)
             {
-                tesselator.callEdgeFlag = EdgeFlagCallBack;
+                tesselator.callEdgeFlag = OnEdgeFlag;
             }
         }
+        /// <summary>
+        /// clear previous results and load a new input vertex list
+        /// </summary>
+        /// <param name="inputVertexCount"></param>
         public void ResetAndLoadInputVertexList(int inputVertexCount)
         {
             _inputVertexCount = inputVertexCount;
+            //1. reset
             _triangleListType = Tesselator.TriangleListType.LineLoop;//?
             _tempVertexList.Clear();
-            //_resultVertexList.Clear();
-            //_inputVertextList = vertextList;
+            _resultIndexList.Clear();
         }
     }
-
 
 
     class TessTool
