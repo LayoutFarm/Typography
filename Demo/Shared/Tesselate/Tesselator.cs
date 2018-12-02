@@ -41,8 +41,6 @@
 */
 //MIT,2014- present, WinterDev
 using System;
-using System.Collections.Generic;
-
 namespace Tesselate
 {
     public class Tesselator
@@ -995,6 +993,4 @@ namespace Tesselate
             return true;
         }
     }
-     
-
 }
