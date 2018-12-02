@@ -68,7 +68,7 @@ namespace Test_WinForm_TessGlyph
 
         float[] GetPolygonData(out int[] endContours)
         {
-            endContours = this._contourEnds;
+            endContours = _contourEnds;
             return _glyphPoints2;
 
             ////--
