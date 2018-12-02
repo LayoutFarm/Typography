@@ -60,14 +60,11 @@ namespace Tesselate
             public double x;
             public double y;
         }
-
-        //public struct VertexAndIndex
-        //{
-        //    public double x;
-        //    public double y;
-        //    public int vertexIndex;
-        //}
-
+        public struct CombineParameters
+        {
+            public int d0, d1, d2, d3;
+            public double w0, w1, w2, w3;
+        }
         public enum TriangleListType
         {
             LineLoop,

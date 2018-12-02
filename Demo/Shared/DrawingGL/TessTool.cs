@@ -25,10 +25,8 @@ namespace DrawingGL
 
     public class TessListener
     {
-        //List<TessVertex2d> _inputVertextList;
 
         internal List<TessVertex2d> _tempVertexList = new List<TessVertex2d>();
-        //internal List<TessVertex2d> _resultVertexList = new List<TessVertex2d>();
         internal List<ushort> _resultIndexList = new List<ushort>();
         int _inputVertexCount;
         Tesselator.TriangleListType _triangleListType;
@@ -207,7 +205,7 @@ namespace DrawingGL
             _tess.EndPolygon();
             return true;
 
-           
+
         }
     }
 
