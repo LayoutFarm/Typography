@@ -1,5 +1,6 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -38,7 +39,7 @@ namespace Test_WinForm_TessGlyph
 
                 //--
                 var builder = new Typography.Contours.GlyphPathBuilder(typeface);
-                builder.BuildFromGlyphIndex(typeface.LookupIndex('a'), 256);
+                builder.BuildFromGlyphIndex(typeface.LookupIndex('O'), 256);
 
                 var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();
@@ -134,14 +135,49 @@ namespace Test_WinForm_TessGlyph
                 }
             }
 
-            float[] tessData = _tessTool.TessPolygon(polygon1, _contourEnds);
-            //draw tess 
-            int j = tessData.Length;
+            if (!_tessTool.TessPolygon(polygon1, _contourEnds))
+            {
+                return;
+            }
+
+
+            //1.
+            List<ushort> indexList = _tessTool.TessIndexList;
+            //2.
+            List<TessVertex2d> tempVertexList = _tessTool.TempVertexList;
+            //3.
+            int vertexCount = indexList.Count;
+            //-----------------------------    
+            int orgVertexCount = polygon1.Length / 2;
+            float[] vtx = new float[vertexCount * 2];//***
+            int n = 0;
+
+            for (int p = 0; p < vertexCount; ++p)
+            {
+                ushort index = indexList[p];
+                if (index >= orgVertexCount)
+                {
+                    //extra coord (newly created)
+                    TessVertex2d extraVertex = tempVertexList[index - orgVertexCount];
+                    vtx[n] = (float)extraVertex.m_X;
+                    vtx[n + 1] = (float)extraVertex.m_Y;
+                }
+                else
+                {
+                    //original corrd
+                    vtx[n] = (float)polygon1[index * 2];
+                    vtx[n + 1] = (float)polygon1[(index * 2) + 1];
+                }
+                n += 2;
+            }
+            //-----------------------------    
+            //draw tess result
+            int j = vtx.Length;
             for (int i = 0; i < j;)
             {
-                var p0 = new PointF(tessData[i], tessData[i + 1]);
-                var p1 = new PointF(tessData[i + 2], tessData[i + 3]);
-                var p2 = new PointF(tessData[i + 4], tessData[i + 5]);
+                var p0 = new PointF(vtx[i], vtx[i + 1]);
+                var p1 = new PointF(vtx[i + 2], vtx[i + 3]);
+                var p2 = new PointF(vtx[i + 4], vtx[i + 5]);
 
                 _g.DrawLine(Pens.Red, p0, p1);
                 _g.DrawLine(Pens.Red, p1, p2);
@@ -149,7 +185,6 @@ namespace Test_WinForm_TessGlyph
 
                 i += 6;
             }
-
             //-----------
             //for GDI+ only
             _g.ResetTransform();

@@ -25,10 +25,10 @@ namespace DrawingGL
 
     public class TessListener
     {
-        List<TessVertex2d> _inputVertextList;
+        //List<TessVertex2d> _inputVertextList;
 
         internal List<TessVertex2d> _tempVertexList = new List<TessVertex2d>();
-        internal List<TessVertex2d> _resultVertexList = new List<TessVertex2d>();
+        //internal List<TessVertex2d> _resultVertexList = new List<TessVertex2d>();
         internal List<ushort> _resultIndexList = new List<ushort>();
         int _inputVertexCount;
         Tesselator.TriangleListType _triangleListType;
@@ -77,7 +77,7 @@ namespace DrawingGL
             if (index < 0)
             {
                 //use data from temp store
-                _resultVertexList.Add(_tempVertexList[-index]);
+                //_resultVertexList.Add(_tempVertexList[-index]);
                 _resultIndexList.Add((ushort)(_inputVertexCount + (-index)));
 
                 //Console.WriteLine("temp_v_cb:" + index + ":(" + tempVertextList[-index] + ")");
@@ -85,7 +85,7 @@ namespace DrawingGL
             else
             {
                 _resultIndexList.Add((ushort)index);
-                _resultVertexList.Add(_inputVertextList[index]);
+                // _resultVertexList.Add(_inputVertextList[index]);
                 // Console.WriteLine("v_cb:" + index + ":(" + inputVertextList[index] + ")");
             }
         }
@@ -97,8 +97,12 @@ namespace DrawingGL
             //Assert.AreEqual(GetNextOutputAsBool(), IsEdge);
         }
 
-        public void CombineCallBack(double v0, double v1, double v2, int[] data4,
-            double[] weight4, out int outData)
+        public void CombineCallBack(double v0,
+            double v1,
+            double v2,
+            int[] data4,
+            double[] weight4,
+            out int outData)
         {
             //double error = .001;
             //Assert.IsTrue(GetNextOutputAsString() == "C");
@@ -138,13 +142,13 @@ namespace DrawingGL
                 tesselator.callEdgeFlag = EdgeFlagCallBack;
             }
         }
-        public void Reset(List<TessVertex2d> vertextList)
+        public void ResetAndLoadInputVertexList(int inputVertexCount)
         {
-            _inputVertexCount = vertextList.Count;
+            _inputVertexCount = inputVertexCount;
             _triangleListType = Tesselator.TriangleListType.LineLoop;//?
-            this._tempVertexList.Clear();
-            this._resultVertexList.Clear();
-            this._inputVertextList = vertextList;
+            _tempVertexList.Clear();
+            //_resultVertexList.Clear();
+            //_inputVertextList = vertextList;
         }
     }
 
@@ -166,13 +170,13 @@ namespace DrawingGL
         public List<TessVertex2d> TempVertexList => _tessListener._tempVertexList;
 
 
-        public float[] TessPolygon(float[] vertex2dCoords, int[] contourEndPoints)
+        public bool TessPolygon(float[] vertex2dCoords, int[] contourEndPoints)
         {
             int areaCount = 0;
             _vertexts.Clear();//reset
             //
             int ncoords = vertex2dCoords.Length / 2;
-            if (ncoords == 0) { areaCount = 0; return null; }
+            if (ncoords == 0) { areaCount = 0; return false; }
 
             int nn = 0;
             for (int i = 0; i < ncoords; ++i)
@@ -180,7 +184,7 @@ namespace DrawingGL
                 _vertexts.Add(new TessVertex2d(vertex2dCoords[nn++], vertex2dCoords[nn++]));
             }
             //-----------------------
-            _tessListener.Reset(_vertexts);
+            _tessListener.ResetAndLoadInputVertexList(ncoords);
             //-----------------------
             _tess.BeginPolygon();
 
@@ -201,23 +205,9 @@ namespace DrawingGL
 
 
             _tess.EndPolygon();
-            //-----------------------
-            List<TessVertex2d> vertextList = _tessListener._resultVertexList;
-            //-----------------------------   
-            //switch how to fill polygon
-            int j = vertextList.Count;
-            float[] vtx = new float[j * 2];
-            int n = 0;
-            for (int p = 0; p < j; ++p)
-            {
-                var v = vertextList[p];
-                vtx[n] = (float)v.m_X;
-                vtx[n + 1] = (float)v.m_Y;
-                n += 2;
-            }
-            //triangle list
-            areaCount = j;
-            return vtx;
+            return true;
+
+           
         }
     }
 
