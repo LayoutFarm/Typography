@@ -1558,7 +1558,7 @@ namespace Tesselate
          * order in which vertices cross the sweep line.
          */
         {
-            MiniCollection.MaxFirstList<ContourVertex> priorityQue = tess.vertexPriorityQue = new MiniCollection.MaxFirstList<ContourVertex>();
+            MaxFirstList<ContourVertex> priorityQue = tess.vertexPriorityQue = new MaxFirstList<ContourVertex>();
             ContourVertex vertexHead = tess.mesh.vertexHead;
             for (ContourVertex curVertex = vertexHead.nextVertex; curVertex != vertexHead; curVertex = curVertex.nextVertex)
             {

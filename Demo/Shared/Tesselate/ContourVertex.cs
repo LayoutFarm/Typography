@@ -40,8 +40,7 @@
 **
 */
 
-using System;
-using MiniCollection;
+using System; 
 namespace Tesselate
 {
     public class ContourVertex : IComparable<ContourVertex>

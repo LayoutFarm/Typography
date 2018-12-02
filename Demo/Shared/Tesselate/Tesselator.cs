@@ -39,8 +39,10 @@
 // Copyright (C) 2007
 **
 */
-
+//MIT,2014- present, WinterDev
 using System;
+using System.Collections.Generic;
+
 namespace Tesselate
 {
     public class Tesselator
@@ -50,16 +52,18 @@ namespace Tesselate
         enum ProcessingState
         {
             Dormant, InPolygon, InContour
-        };
+        }
         // We cache vertex data for single-contour polygons so that we can
         // try a quick-and-dirty decomposition first.
         const int MAX_CACHE_SIZE = 100;
         public const double MAX_COORD = 1.0e150;
-        public struct Vertex
+        struct Vertex
         {
             public double x;
             public double y;
         }
+
+
         public struct CombineParameters
         {
             public int d0, d1, d2, d3;
@@ -87,10 +91,11 @@ namespace Tesselate
         public Mesh mesh;		/* stores the input contours, and eventually the tessellation itself */
         public WindingRuleType windingRule;	// rule for determining polygon interior
         public Dictionary edgeDictionary;		/* edge dictionary for sweep line */
-        public MiniCollection.MaxFirstList<ContourVertex> vertexPriorityQue = new MiniCollection.MaxFirstList<ContourVertex>();
-        public ContourVertex currentSweepVertex;		/* current sweep event being processed */
+        internal MaxFirstList<ContourVertex> vertexPriorityQue = new MaxFirstList<ContourVertex>();
+        public ContourVertex currentSweepVertex;        /* current sweep event being processed */
+
         public delegate void CallCombineDelegate(
-             double c1, double c2, double c3, ref CombineParameters combinePars, out int outData);
+            double c1, double c2, double c3, ref CombineParameters combinePars, out int outData);
 
         public CallCombineDelegate callCombine;
         /*** state needed for rendering callbacks (see render.c) ***/
@@ -112,8 +117,8 @@ namespace Tesselate
         /*** state needed to cache single-contour polygons for renderCache() */
 
         bool emptyCache;		/* empty cache on next vertex() call */
-        public int cacheCount;		/* number of cached vertices */
-        public Vertex[] simpleVertexCache = new Vertex[MAX_CACHE_SIZE];	/* the vertex data */
+        public int cacheCount;      /* number of cached vertices */
+        Vertex[] simpleVertexCache = new Vertex[MAX_CACHE_SIZE];	/* the vertex data */
         int[] indexCached = new int[MAX_CACHE_SIZE];
         public Tesselator()
         {
@@ -347,7 +352,6 @@ namespace Tesselate
         public void AddVertex(double x, double y, double z, int data)
         {
             double tmp;
-            double[] clamped = new double[3];
             RequireState(ProcessingState.InContour);
             if (emptyCache)
             {
@@ -532,7 +536,6 @@ namespace Tesselate
             this.mesh = null;
         }
 
-        #region CodeFromRender
         class FaceCount
         {
             public FaceCount(int _size, HalfEdge _eStart, RenderDelegate _render)
@@ -991,6 +994,7 @@ namespace Tesselate
             this.CallEnd();
             return true;
         }
-        #endregion
     }
+     
+
 }
