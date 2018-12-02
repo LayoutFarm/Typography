@@ -9,6 +9,7 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 
+using System;
 using System.Collections.Generic;
 using Tesselate;
 
@@ -227,5 +228,107 @@ namespace DrawingGL
     }
 
 
+    static class TessToolExtensions
+    {
+        /// <summary>
+        /// tess and read result as triangle list vertex array (for GLES draw-array)
+        /// </summary>
+        /// <param name="tessTool"></param>
+        /// <param name="vertex2dCoords"></param>
+        /// <param name="contourEndPoints"></param>
+        /// <param name="vertexCount"></param>
+        /// <returns></returns>
+        public static float[] TessAsTriVertexArray(this TessTool tessTool, float[] vertex2dCoords, int[] contourEndPoints, out int vertexCount)
+        {
+            if (!tessTool.TessPolygon(vertex2dCoords, contourEndPoints))
+            {
+                vertexCount = 0;
+                return null;
+            }
+            //results
+            //1.
+            List<ushort> indexList = tessTool.TessIndexList;
+            //2.
+            List<TessVertex2d> tempVertexList = tessTool.TempVertexList;
+            //3.
+            vertexCount = indexList.Count;
+            //-----------------------------    
+            int orgVertexCount = vertex2dCoords.Length / 2;
+            float[] vtx = new float[vertexCount * 2];//***
+            int n = 0;
 
+            for (int p = 0; p < vertexCount; ++p)
+            {
+                ushort index = indexList[p];
+                if (index >= orgVertexCount)
+                {
+                    //extra coord (newly created)
+                    TessVertex2d extraVertex = tempVertexList[index - orgVertexCount];
+                    vtx[n] = (float)extraVertex.m_X;
+                    vtx[n + 1] = (float)extraVertex.m_Y;
+                }
+                else
+                {
+                    //original corrd
+                    vtx[n] = (float)vertex2dCoords[index * 2];
+                    vtx[n + 1] = (float)vertex2dCoords[(index * 2) + 1];
+                }
+                n += 2;
+            }
+            //triangle list
+            return vtx;
+
+        }
+        /// <summary>
+        /// tess and read result as triangle list index array (for GLES draw element)
+        /// </summary>
+        /// <param name="tessTool"></param>
+        /// <param name="vertex2dCoords"></param>
+        /// <param name="contourEndPoints"></param>
+        /// <param name="outputCoords"></param>
+        /// <param name="vertexCount"></param>
+        /// <returns></returns>
+        public static ushort[] TessAsTriIndexArray(this TessTool tessTool,
+            float[] vertex2dCoords,
+            int[] contourEndPoints,
+            out float[] outputCoords,
+            out int vertexCount)
+        {
+            if (!tessTool.TessPolygon(vertex2dCoords, contourEndPoints))
+            {
+                vertexCount = 0;
+                outputCoords = null;
+                return null; //* early exit
+            }
+            //results
+            //1.
+            List<ushort> indexList = tessTool.TessIndexList;
+            //2.
+            List<TessVertex2d> tempVertexList = tessTool.TempVertexList;
+            //3.
+            vertexCount = indexList.Count;
+            //-----------------------------   
+
+            //create a new array and append with original and new tempVertex list 
+            int tempVertListCount = tempVertexList.Count;
+            outputCoords = new float[vertex2dCoords.Length + tempVertListCount * 2];
+            //1. copy original array
+            Array.Copy(vertex2dCoords, outputCoords, vertex2dCoords.Length);
+            //2. append with newly create vertex (from tempVertList)
+            int endAt = vertex2dCoords.Length + tempVertListCount;
+            int p = 0;
+            int q = vertex2dCoords.Length; //start adding at
+            for (int i = vertex2dCoords.Length; i < endAt; ++i)
+            {
+                TessVertex2d v = tempVertexList[p];
+                outputCoords[q] = (float)v.m_X;
+                outputCoords[q + 1] = (float)v.m_Y;
+                p++;
+                q += 2;
+            }
+
+            return indexList.ToArray();
+        }
+
+    }
 }
