@@ -71,7 +71,7 @@ namespace DrawingGL
     {
 
         int _nsteps = 3;
-        List<float> _pointList = new List<float>();
+        List<float> _xyCoords = new List<float>();
         List<int> _endPointList = new List<int>();
 
         void FlattenBezire(
@@ -114,7 +114,7 @@ namespace DrawingGL
 
             //reset
             _endPointList.Clear();
-            _pointList.Clear();
+            _xyCoords.Clear();
             //----------
             int j = points.Count;
             if (j == 0) { endContours = null; return null; }
@@ -134,14 +134,14 @@ namespace DrawingGL
                     default: throw new System.NotSupportedException();
                     case PathPointKind.Point:
                         {
-                            _pointList.Add(latest_x = p1.x);
-                            _pointList.Add(latest_y = p1.y);
+                            _xyCoords.Add(latest_x = p1.x);
+                            _xyCoords.Add(latest_y = p1.y);
                         }
                         break;
                     case PathPointKind.CloseFigure:
                         {
                             //add stop mark point
-                            _endPointList.Add(_pointList.Count - 1);
+                            _endPointList.Add(_xyCoords.Count - 1);
                         }
                         break;
                     case PathPointKind.CurveControl:
@@ -153,7 +153,7 @@ namespace DrawingGL
                             PathPoint p3 = points[i + 2];
                             //--------------
                             FlattenBezire(
-                                _pointList,
+                                _xyCoords,
                                 latest_x, latest_y,
                                 p1.x, p1.y,
                                 p2.x, p2.y,
@@ -167,7 +167,7 @@ namespace DrawingGL
                 //close 
             }
             endContours = _endPointList.ToArray();
-            return _pointList.ToArray();
+            return _xyCoords.ToArray();
         }
     }
 }
