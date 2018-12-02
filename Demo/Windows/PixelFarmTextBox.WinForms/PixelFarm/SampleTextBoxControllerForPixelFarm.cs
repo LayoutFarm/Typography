@@ -10,7 +10,7 @@ namespace SampleWinForms.UI
     {
         Graphics g;
         VxsTextPrinter _printer;
-        ActualBitmap destImg;
+        MemBitmap destImg;
 
         AggPainter p;
         Bitmap winBmp;
@@ -24,7 +24,7 @@ namespace SampleWinForms.UI
         {
             g = hostControlGraphics;
             //
-            destImg = new ActualBitmap(400, 300);
+            destImg = new MemBitmap(400, 300);
             p = AggPainter.Create(destImg);
             winBmp = new Bitmap(400, 300, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
@@ -67,7 +67,7 @@ namespace SampleWinForms.UI
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
 
-            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(p.RenderSurface.DestActualImage, winBmp);
+            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(p.RenderSurface.DestBitmap, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);

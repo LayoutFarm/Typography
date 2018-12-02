@@ -129,12 +129,12 @@ namespace Typography.Rendering
                 string fontTextureFile = reqFont.Name + " " + fontKey;
                 string resolveFontFile = fontTextureFile + ".info";
                 string fontTextureInfoFile = resolveFontFile;
-                string fontTextureImg = fontTextureInfoFile + ".png";
+                string fontTextureImgFilename = fontTextureInfoFile + ".png";
 
                 //check if the file exist
 
                 if (StorageService.Provider.DataExists(fontTextureInfoFile) &&
-                    StorageService.Provider.DataExists(fontTextureImg))
+                    StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder2 = new SimpleFontAtlasBuilder();
 
@@ -143,7 +143,7 @@ namespace Typography.Rendering
                         try
                         {
                             fontAtlas = atlasBuilder2.LoadFontInfo(dataStream);
-                            fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImg);
+                            fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImgFilename);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
                             ////
@@ -170,8 +170,8 @@ namespace Typography.Rendering
 
                     GlyphImage totalGlyphsImg = null;
                     SimpleFontAtlasBuilder atlasBuilder = null;
-                    var textureGen = new GlyphTextureBitmapGenerator();
-                    textureGen.CreateTextureFontFromScriptLangs(
+                    var glyphTextureGen = new GlyphTextureBitmapGenerator();
+                    glyphTextureGen.CreateTextureFontFromScriptLangs(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                        _textureKind,
@@ -206,7 +206,7 @@ namespace Typography.Rendering
                     //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                     //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                     ////save image to cache
-                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImg);
+                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
 #endif
 
                     //cache the atlas
@@ -234,9 +234,13 @@ namespace Typography.Rendering
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                     {
                         atlasBuilder.SaveFontInfo(ms);
-                        System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
-
+                        //System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
                         StorageService.Provider.SaveData(fontTextureInfoFile, ms.ToArray());
+#if DEBUG
+                        //write temp debug info
+                        System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", reqFont.Name + ",size" + reqFont.SizeInPoints + "pts");
+#endif
+
                     }
                 }
             }
@@ -247,23 +251,26 @@ namespace Typography.Rendering
 
         static GlyphImage ReadGlyphImages(string filename)
         {
-            PixelFarm.CpuBlit.ActualBitmap bmp = StorageService.Provider.ReadPngBitmap(filename);
-            GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
-            int[] buffer = new int[bmp.Width * bmp.Height];
-            unsafe
+            using (PixelFarm.CpuBlit.MemBitmap bmp = StorageService.Provider.ReadPngBitmap(filename))
             {
-                PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.ActualBitmap.GetBufferPtr(bmp);
-                System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
-                img.SetImageBuffer(buffer, true);
+                GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
+                int[] buffer = new int[bmp.Width * bmp.Height];
+                unsafe
+                {
+                    PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(bmp);
+                    System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
+                    img.SetImageBuffer(buffer, true);
+                }
+                return img;
             }
-            return img;
-
         }
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {
-
-            var bmp = new PixelFarm.CpuBlit.ActualBitmap(glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer());
-            StorageService.Provider.SavePngBitmap(bmp, filename);
+            using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
+                   glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), true))
+            {
+                StorageService.Provider.SavePngBitmap(memBmp, filename);
+            }
 
         }
 #if DEBUG

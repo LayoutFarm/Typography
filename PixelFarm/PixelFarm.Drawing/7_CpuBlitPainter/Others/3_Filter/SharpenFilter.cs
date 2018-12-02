@@ -77,7 +77,7 @@ namespace PixelFarm.CpuBlit.Imaging
                     }
 
                     //ActualImage.SaveImgBufferToPngFile(output, img.Stride, img.Width + 1, img.Height + 1, "d:\\WImageTest\\test_1.png");
-                    img.ReplaceBuffer(output);
+                    img.WriteBuffer(output);
                 }
             }
         }

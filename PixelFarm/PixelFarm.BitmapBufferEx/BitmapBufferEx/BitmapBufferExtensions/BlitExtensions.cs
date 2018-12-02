@@ -505,6 +505,152 @@ namespace BitmapBufferEx
             }
         }
 
+        internal static void FastAlphaBlit(this BitmapBuffer bmp,
+            int dstX,
+            int dstY,
+            BitmapBuffer source,
+            int srcX, int srcY, int srcW, int srcH)
+        {
+            unsafe
+            {
+                using (BitmapContext srcContext = source.GetBitmapContext(ReadWriteMode.ReadOnly))
+                using (BitmapContext destContext = bmp.GetBitmapContext())
+                {
+
+                    int sourceWidth = srcContext.Width;
+                    int dpw = destContext.Width;
+                    int dstContextH = destContext.Height;
+                    int dstH = srcH;
+                    int dstW = srcW;
+
+
+                    RectInt32 intersect = new RectInt32(0, 0, dpw, dstContextH); 
+                    intersect.Intersect(new RectInt32(dstX, dstY, dstW, dstH));
+                    if (intersect.IsEmpty)
+                    {
+                        return;
+                    }
+
+                    NativeInt32Arr sourcePixels1 = srcContext.Pixels;
+                    int* sourcePixels = sourcePixels1._inf32Buffer;
+                    NativeInt32Arr destPixels1 = destContext.Pixels;
+                    int* destPixels = destPixels1._inf32Buffer;
+
+                    int sourceLength = srcContext.Length;
+
+                    int sourceIdx = -1;
+                    int px = dstX;
+                    int py = dstY;
+
+                    int x;
+                    int y;
+                    int idx;
+                    int ii;
+                    int jj;
+                    //
+                    int sr = 0;
+                    int sg = 0;
+                    int sb = 0;
+                    //
+                    int dr, dg, db;
+
+                    int sa = 0;
+                    int da;
+
+                    int sw = srcW;
+
+                    int sourceStartX = srcX;
+                    int sourceStartY = srcY;
+
+                    int lastii, lastjj;
+                    lastii = -1;
+                    lastjj = -1;
+                    jj = sourceStartY;
+                    y = py;
+
+                
+                    for (int j = 0; j < dstH; j++)
+                    {
+                        if (y >= 0 && y < dstContextH)
+                        {
+                            ii = sourceStartX;
+                            idx = px + y * dpw;
+                            x = px;
+
+                            // Pixel by pixel copying
+                            int sourcePixel = sourcePixels[0];
+                            for (int i = 0; i < dstW; i++)
+                            {
+                                if (x >= 0 && x < dpw)
+                                {
+                                    if ((int)ii != lastii || (int)jj != lastjj)
+                                    {
+                                        sourceIdx = (int)ii + (int)jj * sourceWidth;
+                                        if (sourceIdx >= 0 && sourceIdx < sourceLength)
+                                        {
+                                            sourcePixel = sourcePixels[sourceIdx];
+                                            sa = ((sourcePixel >> 24) & 0xff);
+                                            sr = ((sourcePixel >> 16) & 0xff);
+                                            sg = ((sourcePixel >> 8) & 0xff);
+                                            sb = ((sourcePixel) & 0xff);
+                                        }
+                                        else
+                                        {
+                                            sa = 0;
+                                        }
+                                    }
+                                    if (sa > 0)
+                                    {
+                                        int destPixel = destPixels[idx];
+                                        da = ((destPixel >> 24) & 0xff);
+
+                                        dr = ((destPixel >> 16) & 0xff);
+                                        dg = ((destPixel >> 8) & 0xff);
+                                        db = ((destPixel) & 0xff);
+
+                                        int isa = 255 - sa;
+#if NETFX_CORE
+                                                     // Special case for WinRT since it does not use pARGB (pre-multiplied alpha)
+                                                     destPixel = ((da & 0xff) << 24) |
+                                                                 ((((sr * sa + isa * dr) >> 8) & 0xff) << 16) |
+                                                                 ((((sg * sa + isa * dg) >> 8) & 0xff) <<  8) |
+                                                                  (((sb * sa + isa * db) >> 8) & 0xff);
+#elif WPF
+                                                    if (isPrgba)
+                                                    {
+                                                        destPixel = ((da & 0xff) << 24) |
+                                                                    (((((sr << 8) + isa * dr) >> 8) & 0xff) << 16) |
+                                                                    (((((sg << 8) + isa * dg) >> 8) & 0xff) <<  8) |
+                                                                     ((((sb << 8) + isa * db) >> 8) & 0xff);
+                                                    }
+                                                    else
+                                                    {
+                                                        destPixel = ((da & 0xff) << 24) |
+                                                                    (((((sr * sa) + isa * dr) >> 8) & 0xff) << 16) |
+                                                                    (((((sg * sa) + isa * dg) >> 8) & 0xff) <<  8) |
+                                                                     ((((sb * sa) + isa * db) >> 8) & 0xff);
+                                                    }
+#else
+                                        destPixel = ((da & 0xff) << 24) |
+                                                    (((((sr << 8) + isa * dr) >> 8) & 0xff) << 16) |
+                                                    (((((sg << 8) + isa * dg) >> 8) & 0xff) << 8) |
+                                                     ((((sb << 8) + isa * db) >> 8) & 0xff);
+#endif
+                                        destPixels[idx] = destPixel;
+                                    }
+                                }
+                                x++;
+                                idx++;
+                                ii += 1;
+                            }
+
+                        }
+                        jj += 1;
+                        y++;
+                    }
+                }
+            }
+        }
         internal static void Blit(this BitmapBuffer bmp,
             int dstX,
             int dstY,
@@ -521,8 +667,8 @@ namespace BitmapBufferEx
 #if WPF
             bool isPrgba = source.Format == PixelFormats.Pbgra32 || source.Format == PixelFormats.Prgba64 || source.Format == PixelFormats.Prgba128Float;
 #endif
-            int dw = dstW;
-            int dh = dstH;
+
+
 
             unsafe
             {
@@ -532,9 +678,9 @@ namespace BitmapBufferEx
 
                     int sourceWidth = srcContext.Width;
                     int dpw = destContext.Width;
-                    int dph = destContext.Height;
+                    int dstContextH = destContext.Height;
 
-                    RectInt32 intersect = new RectInt32(0, 0, dpw, dph);
+                    RectInt32 intersect = new RectInt32(0, 0, dpw, dstContextH);
 
                     intersect.Intersect(new RectInt32(dstX, dstY, dstW, dstH));
                     if (intersect.IsEmpty)
@@ -564,7 +710,7 @@ namespace BitmapBufferEx
                     int sb = 0;
                     //
                     int dr, dg, db;
-                    int sourcePixel;
+
                     int sa = 0;
                     int da;
                     int ca = color.A;
@@ -583,33 +729,39 @@ namespace BitmapBufferEx
                     lastjj = -1;
                     jj = sourceStartY;
                     y = py;
-                    for (int j = 0; j < dh; j++)
+
+
+                    for (int j = 0; j < dstH; j++)
                     {
-                        if (y >= 0 && y < dph)
+                        if (y >= 0 && y < dstContextH)
                         {
                             ii = sourceStartX;
                             idx = px + y * dpw;
                             x = px;
-                            sourcePixel = sourcePixels[0];
 
-                            // Scanline BlockCopy is much faster (3.5x) if no tinting and blending is needed,
-                            // even for smaller sprites like the 32x32 particles. 
+
+
                             if (blendMode == BlendMode.None && !tinted)
                             {
+
+                                // Scanline BlockCopy is much faster (3.5x) if no tinting and blending is needed,
+                                // even for smaller sprites like the 32x32 particles. 
+
                                 sourceIdx = (int)ii + (int)jj * sourceWidth;
                                 int offset = x < 0 ? -x : 0;
                                 int xx = x + offset;
                                 int wx = sourceWidth - offset;
                                 int len = xx + wx < dpw ? wx : dpw - xx;
                                 if (len > sw) len = sw;
-                                if (len > dw) len = dw;
+                                if (len > dstW) len = dstW;
                                 BitmapContext.BlockCopy(srcContext, (sourceIdx + offset) * 4, destContext, (idx + offset) * 4, len * 4);
                             }
-
-                            // Pixel by pixel copying
                             else
                             {
-                                for (int i = 0; i < dw; i++)
+
+                                // Pixel by pixel copying
+                                int sourcePixel = sourcePixels[0];
+                                for (int i = 0; i < dstW; i++)
                                 {
                                     if (x >= 0 && x < dpw)
                                     {
@@ -639,6 +791,7 @@ namespace BitmapBufferEx
                                         }
 
                                         //---------------
+                                        //TODO: review here
 
 
                                         if (blendMode == BlendMode.None)
@@ -916,7 +1069,7 @@ namespace BitmapBufferEx
 
         }
 
-
+        static MatrixTransform s_identityMatrix = new MatrixTransform(PixelFarm.CpuBlit.VertexProcessing.Affine.IdentityMatrix);
         /// <summary>
         /// Renders a bitmap using any affine transformation and transparency into this bitmap
         /// Unlike Silverlight's Render() method, this one uses 2-3 times less memory, and is the same or better quality
@@ -928,7 +1081,9 @@ namespace BitmapBufferEx
         /// <param name="shouldClear">If true, the the destination bitmap will be set to all clear (0) before rendering.</param>
         /// <param name="opacity">opacity of the source bitmap to render, between 0 and 1 inclusive</param>
         /// <param name="transform">Transformation to apply</param>
-        public static unsafe void BlitRender(this BitmapBuffer bmp, BitmapBuffer source, bool shouldClear = true, float opacity = 1f, GeneralTransform transform = null)
+        public static unsafe void BlitRender(this BitmapBuffer bmp, BitmapBuffer source,
+            bool shouldClear = true, float opacity = 1f,
+            GeneralTransform transform = null)
         {
             const int PRECISION_SHIFT = 10;
             const int PRECISION_VALUE = (1 << PRECISION_SHIFT);
@@ -936,13 +1091,13 @@ namespace BitmapBufferEx
 
             using (BitmapContext destContext = bmp.GetBitmapContext())
             {
-                if (transform == null) transform = new MatrixTransform(PixelFarm.CpuBlit.VertexProcessing.Affine.IdentityMatrix);
+                if (transform == null) { transform = s_identityMatrix; }
 
                 int* destPixels = destContext.Pixels._inf32Buffer;
                 int destWidth = destContext.Width;
                 int destHeight = destContext.Height;
                 MatrixTransform inverse = transform.Inverse;
-                if (shouldClear) destContext.Clear();
+                if (shouldClear) { destContext.Clear(); }
 
                 using (BitmapContext sourceContext = source.GetBitmapContext(ReadWriteMode.ReadOnly))
                 {
@@ -1043,19 +1198,20 @@ namespace BitmapBufferEx
                                 int comp1, comp2;
                                 byte a;
 
-                                if ((a1 == a2) && (a1 == a3) && (a1 == a4))
+                                if ((a1 | a2 | a3 | a4) == 0)
                                 {
-                                    if (a1 == 0)
-                                    {
-                                        destPixels[index] = 0;
+                                    //all zero
+                                    //if (a1 == 0)
+                                    //{
+                                    destPixels[index] = 0;
 
-                                        sourceX += dxDx;
-                                        sourceY += dxDy;
-                                        index++;
-                                        continue;
-                                    }
+                                    sourceX += dxDx;
+                                    sourceY += dxDy;
+                                    index++;
+                                    continue;
+                                    //}
 
-                                    a = a1;
+                                    //a = a1;
                                 }
                                 else
                                 {

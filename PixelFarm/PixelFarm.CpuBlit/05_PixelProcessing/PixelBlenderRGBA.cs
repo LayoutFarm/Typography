@@ -32,8 +32,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public abstract class PixelBlender32
     {
-        public int NumPixelBits { get { return 32; } }
-
+        
+        public const int NumPixelBits = 32;
         internal const byte BASE_MASK = 255;
 
         /// <summary>

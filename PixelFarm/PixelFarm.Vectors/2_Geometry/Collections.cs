@@ -20,10 +20,10 @@
 
 namespace PixelFarm.CpuBlit
 {
-    public class ArrayList<T>
+    public sealed class ArrayList<T>
     {
-        int currentSize;
-        T[] internalArray = new T[0];
+        int _currentSize;
+        T[] _internalArray = new T[0];
         public ArrayList()
         {
         }
@@ -34,34 +34,34 @@ namespace PixelFarm.CpuBlit
         public ArrayList(ArrayList<T> srcCopy, int plusSize)
         {
             Allocate(srcCopy.AllocatedSize, srcCopy.AllocatedSize + plusSize);
-            if (srcCopy.currentSize != 0)
+            if (srcCopy._currentSize != 0)
             {
-                srcCopy.internalArray.CopyTo(internalArray, 0);
+                srcCopy._internalArray.CopyTo(_internalArray, 0);
             }
         }
         public void RemoveLast()
         {
-            if (currentSize != 0)
+            if (_currentSize != 0)
             {
-                currentSize--;
+                _currentSize--;
             }
         }
         public int Count
         {
-            get { return currentSize; }
+            get { return _currentSize; }
         }
 
         public int AllocatedSize
         {
             get
             {
-                return internalArray.Length;
+                return _internalArray.Length;
             }
         }
 
         public void Clear()
         {
-            currentSize = 0;
+            _currentSize = 0;
         }
 
         // Set new capacity. All data is lost, size is set to zero.
@@ -71,14 +71,14 @@ namespace PixelFarm.CpuBlit
         }
         public void Clear(int newCapacity, int extraTail)
         {
-            currentSize = 0;
+            _currentSize = 0;
             if (newCapacity > AllocatedSize)
             {
-                internalArray = null;
+                _internalArray = null;
                 int sizeToAllocate = newCapacity + extraTail;
                 if (sizeToAllocate != 0)
                 {
-                    internalArray = new T[sizeToAllocate];
+                    _internalArray = new T[sizeToAllocate];
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace PixelFarm.CpuBlit
         void Allocate(int size, int extraTail)
         {
             Clear(size, extraTail);
-            currentSize = size;
+            _currentSize = size;
         }
 
         /// <summary>
@@ -101,50 +101,53 @@ namespace PixelFarm.CpuBlit
         /// <param name="newSize"></param>
         public void AdjustSize(int newSize)
         {
-            if (newSize > currentSize)
+            if (newSize > _currentSize)
             {
                 if (newSize > AllocatedSize)
                 {
                     //create new array and copy data to that 
                     var newArray = new T[newSize];
-                    if (internalArray != null)
+                    if (_internalArray != null)
                     {
-                        for (int i = internalArray.Length - 1; i >= 0; --i)
+                        for (int i = _internalArray.Length - 1; i >= 0; --i)
                         {
-                            newArray[i] = internalArray[i];
+                            newArray[i] = _internalArray[i];
                         }
                     }
-                    internalArray = newArray;
+                    _internalArray = newArray;
                 }
             }
         }
 
 
-        static T zeroed_object = default(T);
+        static T s_zeroed_object = default(T);
         public void Zero()
         {
-            for (int i = internalArray.Length - 1; i >= 0; --i)
+            for (int i = _internalArray.Length - 1; i >= 0; --i)
             {
-                internalArray[i] = zeroed_object;
+                _internalArray[i] = s_zeroed_object;
             }
         }
 
 
-
-        public virtual void AddVertex(T v)
+        /// <summary>
+        /// append element to latest index
+        /// </summary>
+        /// <param name="v"></param>
+        public void Append(T v)
         {
-            if (internalArray.Length < (currentSize + 1))
+            if (_internalArray.Length < (_currentSize + 1))
             {
-                if (currentSize < 100000)
+                if (_currentSize < 100000)
                 {
-                    AdjustSize(currentSize + (currentSize / 2) + 16);
+                    AdjustSize(_currentSize + (_currentSize / 2) + 16);
                 }
                 else
                 {
-                    AdjustSize(currentSize + currentSize / 4);
+                    AdjustSize(_currentSize + _currentSize / 4);
                 }
             }
-            internalArray[currentSize++] = v;
+            _internalArray[_currentSize++] = v;
         }
 
 
@@ -152,31 +155,32 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return internalArray[i];
+                return _internalArray[i];
             }
-            set { this.internalArray[i] = value; }
+            set { this._internalArray[i] = value; }
         }
 
-        public T[] Array
+
+        /// <summary>
+        /// access to internal array,
+        /// </summary>
+        public T[] UnsafeInternalArray
         {
             get
             {
-                return internalArray;
+                return _internalArray;
             }
-        }
-
-
-
+        } 
         public void SetData(int index, T data)
         {
-            this.internalArray[index] = data;
+            this._internalArray[index] = data;
         }
 
         public int Length
         {
             get
             {
-                return currentSize;
+                return _currentSize;
             }
         }
     }

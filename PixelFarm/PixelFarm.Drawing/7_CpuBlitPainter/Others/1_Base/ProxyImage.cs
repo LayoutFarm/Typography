@@ -29,7 +29,7 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             this.linkedImage = linkedImage;
         }
-        public void ReplaceBuffer(int[] newbuffer)
+        public void WriteBuffer(int[] newbuffer)
         {
             throw new System.NotSupportedException();
         }

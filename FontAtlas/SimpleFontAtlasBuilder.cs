@@ -118,7 +118,7 @@ namespace Typography.Rendering
                                 //start new row
                                 currentY += maxRowHeight;
                                 currentX = 0;
-                                maxRowHeight = 0;//reset, after start new row
+                                maxRowHeight = g.img.Height;//reset, after start new row
                             }
                             //-------------------
                             g.area = new Rectangle(currentX, currentY, g.img.Width, g.img.Height);
@@ -143,7 +143,7 @@ namespace Typography.Rendering
                                 //start new row
                                 currentY += maxRowHeight;
                                 currentX = 0;
-                                maxRowHeight = 0;//reset, after start new row
+                                maxRowHeight = g.img.Height;//reset, after start new row
                             }
                             //-------------------
                             g.area = new Rectangle(currentX, currentY, g.img.Width, g.img.Height);
@@ -206,12 +206,23 @@ namespace Typography.Rendering
                 }
             }
 
+            //new total glyph img
             GlyphImage glyphImage = new GlyphImage(totalImgWidth, imgH);
+            //flip vertical Y 
+            {
+                int[] totalBufferFlipY = new int[totalBuffer.Length];
+                int srcRowIndex = imgH - 1;
+                int strideInBytes = totalImgWidth * 4;
+                for (int i = 0; i < imgH; ++i)
+                {
+                    //copy each row from src to dst
+                    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+                    srcRowIndex--;
+                }
+                totalBuffer = totalBufferFlipY;
+            }
             glyphImage.SetImageBuffer(totalBuffer, true);
-
-
             _latestGenGlyphImage = glyphImage;
-
             return glyphImage;
 
         }
@@ -256,15 +267,9 @@ namespace Typography.Rendering
             simpleFontAtlas.OriginalFontSizePts = this.FontSizeInPoints;
             foreach (CacheGlyph cacheGlyph in _glyphs.Values)
             {
-                //convert char to hex
-                string unicode = ("0x" + ((int)cacheGlyph.character).ToString("X"));//code point
+
                 Rectangle area = cacheGlyph.area;
                 TextureGlyphMapData glyphData = new TextureGlyphMapData();
-                area.Y += area.Height;//*** 
-
-                ////set font matrix to glyph font data
-                //glyphData.Rect = Rectangle.FromLTRB(area.X, area.Top, area.Right, area.Bottom);
-                //glyphData.AdvanceY = cacheGlyph.glyphMatrix.advanceY;
 
                 glyphData.Width = cacheGlyph.img.Width;
                 glyphData.Left = area.X;
@@ -273,16 +278,14 @@ namespace Typography.Rendering
 
                 glyphData.TextureXOffset = (float)cacheGlyph.img.TextureOffsetX;
                 glyphData.TextureYOffset = (float)cacheGlyph.img.TextureOffsetY;
-                glyphData.BorderX = cacheGlyph.borderX;
-                glyphData.BorderY = cacheGlyph.borderY;
-
+              
 
                 simpleFontAtlas.AddGlyph(cacheGlyph.glyphIndex, glyphData);
             }
 
             return simpleFontAtlas;
         }
-        
+
         public SimpleFontAtlas LoadFontInfo(string filename)
         {
 

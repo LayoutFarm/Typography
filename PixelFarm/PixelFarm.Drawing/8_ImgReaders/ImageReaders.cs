@@ -40,10 +40,10 @@ namespace PixelFarm.CpuBlit.Imaging
 
 
 #if DEBUG
-        public static void dbugSaveToPngFile(this ActualBitmap bmp, string filename)
+        public static void dbugSaveToPngFile(this MemBitmap bmp, string filename)
         {
 
-            SaveImgBufferToPngFile(ActualBitmap.GetBufferPtr(bmp),
+            SaveImgBufferToPngFile(MemBitmap.GetBufferPtr(bmp),
                 bmp.Stride,
                 bmp.Width,
                 bmp.Height,
@@ -112,9 +112,9 @@ namespace PixelFarm.CpuBlit.Imaging
 
 
 #if DEBUG
-        public static void dbugSaveToJpgFile(this ActualBitmap bmp, string filename)
+        public static void dbugSaveToJpgFile(this MemBitmap bmp, string filename)
         {
-            TempMemPtr tmpMem = ActualBitmap.GetBufferPtr(bmp);
+            TempMemPtr tmpMem = MemBitmap.GetBufferPtr(bmp);
             SaveImgBufferToJpgFileUnsafe(tmpMem,
                 bmp.Stride,
                 bmp.Width,

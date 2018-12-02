@@ -12,27 +12,29 @@ namespace PixelFarm.Drawing.Fonts
 
     class NOpenFontFace : FontFace
     {
-        readonly string name, path;
-        Typeface typeface;
+        readonly string _name;
+        readonly string _path;
+        Typeface _typeface;
+
         //TODO: review again,
         //remove ...
-        GlyphPathBuilder glyphPathBuilder;
+        GlyphPathBuilder _glyphPathBuilder;
 
         public NOpenFontFace(Typeface typeface, string fontName, string fontPath)
         {
-            this.typeface = typeface;
-            this.name = fontName;
-            this.path = fontPath;
+            this._typeface = typeface;
+            this._name = fontName;
+            this._path = fontPath;
 
-            glyphPathBuilder = new GlyphPathBuilder(typeface);
+            _glyphPathBuilder = new GlyphPathBuilder(typeface);
         }
         public override string Name
         {
-            get { return name; }
+            get { return _name; }
         }
         public override string FontPath
         {
-            get { return path; }
+            get { return _path; }
         }
         protected override void OnDispose() { }
         public override ActualFont GetFontAtPointSize(float pointSize)
@@ -40,7 +42,7 @@ namespace PixelFarm.Drawing.Fonts
             NOpenFont actualFont = new NOpenFont(this, pointSize, FontStyle.Regular);
             return actualFont;
         }
-        public Typeface Typeface { get { return this.typeface; } }
+        public Typeface Typeface { get { return this._typeface; } }
 
         internal GlyphPathBuilder VxsBuilder
         {
@@ -48,37 +50,37 @@ namespace PixelFarm.Drawing.Fonts
             {
                 //TODO: review again,
                 //remove ...
-                return this.glyphPathBuilder;
+                return this._glyphPathBuilder;
             }
         }
         public override float GetScale(float pointSize)
         {
-            return typeface.CalculateScaleToPixelFromPointSize(pointSize);
+            return _typeface.CalculateScaleToPixelFromPointSize(pointSize);
         }
         public override int AscentInDzUnit
         {
-            get { return typeface.Ascender; }
+            get { return _typeface.Ascender; }
         }
         public override int DescentInDzUnit
         {
-            get { return typeface.Descender; }
+            get { return _typeface.Descender; }
         }
         public override int LineGapInDzUnit
         {
-            get { return typeface.LineGap; }
+            get { return _typeface.LineGap; }
         }
 
         public override int RecommendedLineHeight
         {
             get
             {
-                return typeface.CalculateRecommendLineSpacing();
+                return _typeface.CalculateRecommendLineSpacing();
             }
         }
 
         public override object GetInternalTypeface()
         {
-            return typeface;
+            return _typeface;
         }
     }
 

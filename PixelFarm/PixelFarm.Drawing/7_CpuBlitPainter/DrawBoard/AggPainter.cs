@@ -12,29 +12,13 @@ using BitmapBufferEx;
 namespace PixelFarm.CpuBlit
 {
 
-    class MyBitmapBlender : BitmapBlenderBase
-    {
-        ActualBitmap actualImage;
-        public MyBitmapBlender(ActualBitmap actualImage, PixelBlender32 pxBlender)
-        {
-            this.actualImage = actualImage;
-            Attach(actualImage);
-        }
-        public override void ReplaceBuffer(int[] newbuffer)
-        {
-            ActualBitmap.ReplaceBuffer(actualImage, newbuffer);
-        }
-
-    }
-
+ 
 
     public enum LineRenderingTechnique
     {
         StrokeVxsGenerator,
         OutlineAARenderer,
     }
-
-
 
     public class AggPainter : Painter
     {
@@ -43,9 +27,6 @@ namespace PixelFarm.CpuBlit
         //--------------------
         AggRenderSurface _aggsx_0; //primary render surface
         AggRenderSurface _aggsx_mask;
-
-
-
         //--------------------
         //low-level outline renderer
         LineRenderingTechnique _lineRenderingTech;
@@ -80,25 +61,19 @@ namespace PixelFarm.CpuBlit
         PixelBlender32 _defaultPixelBlender;
         PixelBlenderWithMask maskPixelBlender;
         PixelBlenderPerColorComponentWithMask maskPixelBlenderPerCompo;
-        //
+
 
         bool _useDefaultBrush;
-
+        //
         public AggPainter(AggRenderSurface aggsx)
         {
             //painter paint to target surface
-
-            _orientation = DrawBoardOrientation.LeftBottom;
-
+            _orientation = RenderSurfaceOrientation.LeftBottom;
             //----------------------------------------------------
             _aggsx_0 = aggsx; //set this as default ***            
             TargetBufferName = TargetBufferName.Default;
-
-
             this._stroke = new Stroke(1);//default
-
             _useDefaultBrush = true;
-
             _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;
         }
 
@@ -111,6 +86,7 @@ namespace PixelFarm.CpuBlit
 
         ClipingTechnique _currentClipTech;
 
+        public DrawBoard DrawBoard { get; set; }
         /// <summary>
         /// we DO NOT store vxs
         /// </summary>
@@ -119,14 +95,16 @@ namespace PixelFarm.CpuBlit
         {
             //clip rgn implementation
             //this version replace only
-            //TODO: add append clip rgn
-
+            //TODO: add append clip rgn 
             if (vxs != null)
             {
                 if (SimpleRectClipEvaluator.EvaluateRectClip(vxs, out RectangleF clipRect))
                 {
-                    //use simple rect technique
-                    this.SetClipBox((int)clipRect.X, (int)clipRect.Y, (int)clipRect.Right, (int)clipRect.Bottom);
+
+                    this.SetClipBox(
+                        (int)Math.Floor(clipRect.X), (int)Math.Floor(clipRect.Y),
+                        (int)Math.Ceiling(clipRect.Right), (int)Math.Ceiling(clipRect.Bottom));
+
                     _currentClipTech = ClipingTechnique.ClipSimpleRect;
                 }
                 else
@@ -136,12 +114,9 @@ namespace PixelFarm.CpuBlit
 
                     _currentClipTech = ClipingTechnique.ClipMask;
                     this.TargetBufferName = TargetBufferName.AlphaMask;
-                    //aggPainter.TargetBufferName = TargetBufferName.Default; //for debug
                     var prevColor = this.FillColor;
                     this.FillColor = Color.White;
-                    //aggPainter.StrokeColor = Color.Black; //for debug
-                    //aggPainter.StrokeWidth = 1; //for debug  
-                    
+
                     this.Fill(vxs);
                     this.FillColor = prevColor;
                     this.TargetBufferName = TargetBufferName.Default;//swicth to default buffer
@@ -175,8 +150,8 @@ namespace PixelFarm.CpuBlit
             set
             {
 
-                if (value == LineRenderingTechnique.OutlineAARenderer
-                     && _outlineRas == null)
+                if (value == LineRenderingTechnique.OutlineAARenderer &&
+                    _outlineRas == null)
                 {
 
 
@@ -185,7 +160,7 @@ namespace PixelFarm.CpuBlit
                     var blender = new PixelBlenderBGRA();
 
                     var outlineRenderer = new Rasterization.Lines.OutlineRenderer(
-                        new ClipProxyImage(new SubBitmapBlender(_aggsx.DestActualImage, blender)), //Need ClipProxyImage
+                        new ClipProxyImage(new SubBitmapBlender(_aggsx.DestBitmap, blender)), //Need ClipProxyImage
                         blender,
                         _lineProfileAA);
                     outlineRenderer.SetClipBox(0, 0, this.Width, this.Height);
@@ -243,7 +218,7 @@ namespace PixelFarm.CpuBlit
                 _curPen = value;
             }
         }
-        public static AggPainter Create(ActualBitmap bmp, PixelProcessing.PixelBlender32 blender = null)
+        public static AggPainter Create(MemBitmap bmp, PixelProcessing.PixelBlender32 blender = null)
         {
             //helper func
 
@@ -268,8 +243,8 @@ namespace PixelFarm.CpuBlit
         }
 
 
-        DrawBoardOrientation _orientation;
-        public override DrawBoardOrientation Orientation
+        RenderSurfaceOrientation _orientation;
+        public override RenderSurfaceOrientation Orientation
         {
             get { return _orientation; }
             set
@@ -306,8 +281,8 @@ namespace PixelFarm.CpuBlit
             _aggsx.SetScanlineRasOrigin(x, y);
 
         }
-        RenderQualtity _renderQuality;
-        public override RenderQualtity RenderQuality
+        RenderQuality _renderQuality;
+        public override RenderQuality RenderQuality
         {
             get { return _renderQuality; }
             set { _renderQuality = value; }
@@ -327,12 +302,12 @@ namespace PixelFarm.CpuBlit
                     case Drawing.SmoothingMode.AntiAlias:
                         //TODO: review here
                         //anti alias != lcd technique 
-                        this.RenderQuality = RenderQualtity.HighQuality;
+                        this.RenderQuality = RenderQuality.HighQuality;
                         _aggsx.UseSubPixelLcdEffect = true;
                         break;
                     case Drawing.SmoothingMode.HighSpeed:
                     default:
-                        this.RenderQuality = RenderQualtity.Fast;
+                        this.RenderQuality = RenderQuality.Fast;
                         _aggsx.UseSubPixelLcdEffect = false;
                         break;
                 }
@@ -361,7 +336,7 @@ namespace PixelFarm.CpuBlit
         public override void DrawLine(double x1, double y1, double x2, double y2)
         {
             //BitmapExt
-            if (this.RenderQuality == RenderQualtity.Fast)
+            if (this.RenderQuality == RenderQuality.Fast)
             {
                 this._bxt.DrawLine(
                     (int)Math.Round(x1),
@@ -376,7 +351,7 @@ namespace PixelFarm.CpuBlit
 
             //----------------------------------------------------------
             //Agg
-            if (_orientation == DrawBoardOrientation.LeftBottom)
+            if (_orientation == RenderSurfaceOrientation.LeftBottom)
             {
                 //as original
                 _lineGen.Clear();
@@ -430,8 +405,48 @@ namespace PixelFarm.CpuBlit
                 }
             }
         }
+
         public override void Draw(VertexStore vxs)
         {
+            if (RenderQuality == RenderQuality.Fast)
+            {
+
+                VertexCmd cmd;
+                int index = 0;
+                double lastMoveX = 0, lastMoveY = 0;
+                double lastX = 0, lastY = 0;
+                int stroke_color = this._strokeColor.ToARGB();
+                while ((cmd = vxs.GetVertex(index++, out double x, out double y)) != VertexCmd.NoMore)
+                {
+                    switch (cmd)
+                    {
+                        case VertexCmd.MoveTo:
+                            lastX = lastMoveX = x;
+                            lastY = lastMoveY = y;
+
+                            break;
+                        case VertexCmd.LineTo:
+
+                            //need rounding
+                            _bxt.DrawLine((int)Math.Round(lastX), (int)Math.Round(lastY), (int)Math.Round(x), (int)Math.Round(y), stroke_color);
+
+                            lastX = x;
+                            lastY = y;
+
+                            break;
+                        case VertexCmd.Close:
+
+                            _bxt.DrawLine((int)Math.Round(lastX), (int)Math.Round(lastY), (int)Math.Round(lastMoveX), (int)Math.Round(lastMoveY), stroke_color);
+
+                            lastX = x;
+                            lastY = y;
+
+                            break;
+                    }
+                }
+
+                return;
+            }
             if (_lineDashGen == null)
             {
                 //no line dash
@@ -455,7 +470,9 @@ namespace PixelFarm.CpuBlit
 
                     using (VxsTemp.Borrow(out var v1, out var v2))
                     {
-                        _lineDashGen.CreateDash(vxs, v1);
+                        //TODO: check lineDash
+
+                        //_lineDashGen.CreateDash(vxs, v1);
                         _stroke.MakeVxs(v1, v2);
                         _aggsx.Render(v2, this._strokeColor);
                     }
@@ -464,7 +481,10 @@ namespace PixelFarm.CpuBlit
                 {
                     using (VxsTemp.Borrow(out var v1))
                     {
-                        _lineDashGen.CreateDash(vxs, v1);
+
+                        //TODO: check lineDash
+
+                        //_lineDashGen.CreateDash(vxs, v1);
                         _outlineRas.RenderVertexSnap(v1, this._strokeColor);
                     }
                 }
@@ -476,10 +496,10 @@ namespace PixelFarm.CpuBlit
         {
 
             //BitmapExt
-            if (this.RenderQuality == RenderQualtity.Fast)
+            if (this.RenderQuality == RenderQuality.Fast)
             {
 
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
 
                     this._bxt.DrawRectangle(
@@ -512,7 +532,7 @@ namespace PixelFarm.CpuBlit
 
             using (VectorToolBox.Borrow(out SimpleRect rectTool))
             {
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
                     double right = left + width;
                     double bottom = top + height;
@@ -549,7 +569,7 @@ namespace PixelFarm.CpuBlit
 
             double ox = (left + width / 2);
             double oy = (top + height / 2);
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //modified
                 oy = this.Height - oy;
@@ -557,7 +577,7 @@ namespace PixelFarm.CpuBlit
 
             //---------------------------------------------------------- 
             //BitmapExt
-            if (this._renderQuality == RenderQualtity.Fast)
+            if (this._renderQuality == RenderQuality.Fast)
             {
 
                 this._bxt.DrawEllipseCentered(
@@ -599,14 +619,14 @@ namespace PixelFarm.CpuBlit
         {
             double ox = (left + width / 2);
             double oy = (top + height / 2);
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //modified
                 oy = this.Height - oy;
             }
             //---------------------------------------------------------- 
             //BitmapExt
-            if (this._renderQuality == RenderQualtity.Fast)
+            if (this._renderQuality == RenderQuality.Fast)
             {
                 this._bxt.FillEllipseCentered(
                    (int)Math.Round(ox), (int)Math.Round(oy),
@@ -637,7 +657,7 @@ namespace PixelFarm.CpuBlit
 
             //---------------------------------------------------------- 
             //BitmapExt
-            if (_useDefaultBrush && this._renderQuality == RenderQualtity.Fast)
+            if (_useDefaultBrush && this._renderQuality == RenderQuality.Fast)
             {
                 this._bxt.FillRectangle(
                       (int)Math.Round(left),
@@ -654,7 +674,7 @@ namespace PixelFarm.CpuBlit
             using (VectorToolBox.Borrow(out SimpleRect rectTool))
             using (VxsTemp.Borrow(out var v1))
             {
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
                     double right = left + width;
                     double bottom = top - height;
@@ -760,7 +780,7 @@ namespace PixelFarm.CpuBlit
             //TODO: review drawing string  with agg here   
             if (_textPrinter != null)
             {
-                if (this._orientation == DrawBoardOrientation.LeftBottom)
+                if (this._orientation == RenderSurfaceOrientation.LeftBottom)
                 {
                     _textPrinter.DrawString(text, x, y);
                 }
@@ -910,7 +930,7 @@ namespace PixelFarm.CpuBlit
         public override void Fill(VertexStore vxs)
         {
             //
-            if (_useDefaultBrush && this._renderQuality == RenderQualtity.Fast)
+            if (_useDefaultBrush && this._renderQuality == RenderQuality.Fast)
             {
                 FillWithBxt(vxs);
                 return;
@@ -944,8 +964,6 @@ namespace PixelFarm.CpuBlit
                         break;
                     default:
                         {
-                            //_sclineRas.AddPath(vxs);
-                            //_bmpRasterizer.RenderWithColor(this._aggsx.DestImage, _sclineRas, _scline, fillColor);
 
                             _aggsx.Render(vxs, fillColor);
                         }
@@ -955,13 +973,11 @@ namespace PixelFarm.CpuBlit
             else
             {
                 _aggsx.Render(vxs, fillColor);
-
-                //_sclineRas.AddPath(vxs);
-                //_bmpRasterizer.RenderWithColor(this._aggsx.DestImage, _sclineRas, _scline, fillColor);
             }
         }
         public override void Render(RenderVx renderVx)
         {
+            //VG Render?
             //if (renderVx is VgRenderVx)
             //{
 
@@ -1010,18 +1026,18 @@ namespace PixelFarm.CpuBlit
             //this._sclineRas.AddPath(vxs);
             //_bmpRasterizer.RenderWithSpan(this._aggsx.DestImage, _sclineRas, _scline, spanGen);
         }
-        void DrawBitmap(ActualBitmap actualBmp, double left, double top)
+        void DrawBitmap(MemBitmap memBmp, double left, double top)
         {
             //check image caching system 
-            if (this._renderQuality == RenderQualtity.Fast)
+            if (this._renderQuality == RenderQuality.Fast)
             {
-                TempMemPtr tmp = ActualBitmap.GetBufferPtr(actualBmp);
+                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
                 unsafe
                 {
-                    BitmapBuffer srcBmp = new BitmapBuffer(actualBmp.Width, actualBmp.Height, tmp.Ptr, tmp.LengthInBytes);
+                    BitmapBuffer srcBmp = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
                     try
                     {
-                        this._bxt.CopyBlit((int)left, (int)top, srcBmp);
+                        this._bxt.CopyBlit(this.OriginX + (int)left, this.OriginY + (int)top, srcBmp);
                     }
                     catch (Exception ex)
                     {
@@ -1037,47 +1053,44 @@ namespace PixelFarm.CpuBlit
             this.UseSubPixelLcdEffect = false;
             _aggsx.UseSubPixelLcdEffect = false;
 
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //place left upper corner at specific x y                    
-                this._aggsx.Render(actualBmp, left, this.Height - (top + actualBmp.Height));
+                this._aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height));
             }
             else
             {
                 //left-bottom as original
                 //place left-lower of the img at specific (x,y)
-                this._aggsx.Render(actualBmp, left, top);
+                this._aggsx.Render(memBmp, left, top);
             }
 
             //restore...
             this.UseSubPixelLcdEffect = useSubPix;
             _aggsx.UseSubPixelLcdEffect = useSubPix;
         }
-        void DrawBitmap(ActualBitmap actualBmp, double left, double top, int srcX, int srcY, int srcW, int srcH)
+        void DrawBitmap(MemBitmap memBmp, double left, double top, int srcX, int srcY, int srcW, int srcH)
         {
             //check image caching system 
-            if (this._renderQuality == RenderQualtity.Fast)
+            if (this._renderQuality == RenderQuality.Fast)
             {
-                TempMemPtr tmp = ActualBitmap.GetBufferPtr(actualBmp);
+                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
                 unsafe
                 {
-                    BitmapBuffer srcBmp = new BitmapBuffer(actualBmp.Width, actualBmp.Height, tmp.Ptr, tmp.LengthInBytes);
+                    BitmapBuffer srcBmp = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
                     try
                     {
                         var src = new BitmapBufferEx.RectD(srcX, srcY, srcW, srcH);
                         var dest = new BitmapBufferEx.RectD(left, top, srcW, srcH);
 
-                        BitmapBuffer bmpBuffer = new BitmapBuffer(actualBmp.Width, actualBmp.Height, tmp.Ptr, tmp.LengthInBytes);
+                        BitmapBuffer bmpBuffer = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
                         this._bxt.CopyBlit(dest, bmpBuffer, src);
                     }
                     catch (Exception ex)
                     {
 
                     }
-
                 }
-
-
                 return;
             }
 
@@ -1086,16 +1099,16 @@ namespace PixelFarm.CpuBlit
             //before render an image we turn off vxs subpixel rendering
             this.UseSubPixelLcdEffect = false;
 
-            if (this._orientation == DrawBoardOrientation.LeftTop)
+            if (this._orientation == RenderSurfaceOrientation.LeftTop)
             {
                 //place left upper corner at specific x y                    
-                this._aggsx.Render(actualBmp, left, this.Height - (top + actualBmp.Height), srcX, srcY, srcW, srcH);
+                this._aggsx.Render(memBmp, left, this.Height - (top + memBmp.Height), srcX, srcY, srcW, srcH);
             }
             else
             {
                 //left-bottom as original
                 //place left-lower of the img at specific (x,y)
-                this._aggsx.Render(actualBmp, left, top, srcX, srcY, srcW, srcH);
+                this._aggsx.Render(memBmp, left, top, srcX, srcY, srcW, srcH);
             }
 
             //restore...
@@ -1103,67 +1116,150 @@ namespace PixelFarm.CpuBlit
         }
         public override void DrawImage(Image actualImage, double left, double top, int srcX, int srcY, int srcW, int srcH)
         {
-            ActualBitmap actualBmp = actualImage as ActualBitmap;
-            if (actualBmp == null)
+            MemBitmap memBmp = actualImage as MemBitmap;
+            if (memBmp == null)
             {
                 //test with other bitmap 
                 return;
             }
             else
             {
-                DrawBitmap(actualBmp, left, top, srcX, srcY, srcW, srcH);
+                DrawBitmap(memBmp, left, top, srcX, srcY, srcW, srcH);
             }
         }
         public override void DrawImage(Image img, double left, double top)
         {
-            ActualBitmap actualBmp = img as ActualBitmap;
-            if (actualBmp == null)
+            MemBitmap memBmp = img as MemBitmap;
+            if (memBmp == null)
             {
                 //test with other bitmap 
                 return;
             }
             else
             {
-                DrawBitmap(actualBmp, left, top);
+                DrawBitmap(memBmp, left, top);
             }
         }
-        public override void DrawImage(Image img, params AffinePlan[] affinePlans)
+        public override void DrawImage(Image img)
         {
-            ActualBitmap actualImg = img as ActualBitmap;
-            if (actualImg == null)
+            MemBitmap memBmp = img as MemBitmap;
+            if (memBmp == null)
             {
                 //? TODO
                 return;
             }
 
-            if (this._renderQuality == RenderQualtity.Fast)
+            if (this._renderQuality == RenderQuality.Fast)
             {
                 //todo, review here again
-                TempMemPtr tmp = ActualBitmap.GetBufferPtr(actualImg);
-                unsafe
-                {
-                    BitmapBuffer srcBmp = new BitmapBuffer(img.Width, img.Height, tmp.Ptr, tmp.LengthInBytes);
-                    if (affinePlans != null)
-                    {
-                        this._bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
-                    }
-                    else
-                    {
-                        this._bxt.BlitRender(srcBmp, false, 1, null);
-                    }
-                    return;
-                }
+                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
+                BitmapBuffer srcBmp = new BitmapBuffer(img.Width, img.Height, tmp.Ptr, tmp.LengthInBytes);
 
+                //this._bxt.BlitRender(srcBmp, false, 1, null);
+                //this._bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
+                //    ColorInt.FromArgb(255, 255, 255, 255),
+                //    BitmapBufferExtensions.BlendMode.Alpha);
+                this._bxt.FastAlphaBlit(0, 0, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight);
+                return;
+            }
+            //-------------------------------
+            bool useSubPix = UseSubPixelLcdEffect; //save, restore later... 
+                                                   //before render an image we turn off vxs subpixel rendering
+            this.UseSubPixelLcdEffect = false;
+
+            this._aggsx.Render(memBmp, null as AffinePlan[]);
+            //restore...
+            this.UseSubPixelLcdEffect = useSubPix;
+        }
+        public override void DrawImage(Image img, params AffinePlan[] affinePlans)
+        {
+            MemBitmap memBmp = img as MemBitmap;
+            if (memBmp == null)
+            {
+                //? TODO
+                return;
+            }
+
+            if (this._renderQuality == RenderQuality.Fast)
+            {
+                //todo, review here again
+                TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
+                BitmapBuffer srcBmp = new BitmapBuffer(img.Width, img.Height, tmp.Ptr, tmp.LengthInBytes);
+                if (affinePlans != null && affinePlans.Length > 0)
+                {
+                    this._bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
+                }
+                else
+                {
+                    //this._bxt.BlitRender(srcBmp, false, 1, null);
+                    this._bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
+                        ColorInt.FromArgb(255, 255, 255, 255),
+                        BitmapBufferExtensions.BlendMode.Alpha);
+                }
+                return;
             }
 
             bool useSubPix = UseSubPixelLcdEffect; //save, restore later... 
                                                    //before render an image we turn off vxs subpixel rendering
             this.UseSubPixelLcdEffect = false;
 
-            this._aggsx.Render(actualImg, affinePlans);
+            this._aggsx.Render(memBmp, affinePlans);
             //restore...
             this.UseSubPixelLcdEffect = useSubPix;
 
+        }
+        public override void DrawImage(Image actualImage, double left, double top, ICoordTransformer coordTx)
+        {
+            //draw img with transform coord
+            //
+            MemBitmap memBmp = actualImage as MemBitmap;
+            if (memBmp == null)
+            {
+                //? TODO
+                return;
+            }
+
+            if (this._renderQuality == RenderQuality.Fast)
+            {
+                //todo, review here again
+                //TempMemPtr tmp = ActualBitmap.GetBufferPtr(actualImg);
+                //BitmapBuffer srcBmp = new BitmapBuffer(actualImage.Width, actualImage.Height, tmp.Ptr, tmp.LengthInBytes); 
+                //this._bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
+
+                //if (affinePlans != null && affinePlans.Length > 0)
+                //{
+                //    this._bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
+                //}
+                //else
+                //{
+                //    //this._bxt.BlitRender(srcBmp, false, 1, null);
+                //    this._bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
+                //        ColorInt.FromArgb(255, 255, 255, 255),
+                //        BitmapBufferExtensions.BlendMode.Alpha);
+                //}
+                return;
+            }
+
+            bool useSubPix = UseSubPixelLcdEffect; //save, restore later... 
+                                                   //before render an image we turn off vxs subpixel rendering
+            this.UseSubPixelLcdEffect = false;
+
+            if (coordTx is Affine)
+            {
+                Affine aff = (Affine)coordTx;
+                if (this.OriginX != 0 || this.OriginY != 0)
+                {
+                    coordTx = aff = aff * Affine.NewTranslation(this.OriginX, this.OriginY);
+                }
+            }
+
+            //_aggsx.SetScanlineRasOrigin(OriginX, OriginY);
+
+            this._aggsx.Render(memBmp, coordTx);
+
+            //_aggsx.SetScanlineRasOrigin(xx, yy);
+            //restore...
+            this.UseSubPixelLcdEffect = useSubPix;
         }
         public override void ApplyFilter(ImageFilter imgFilter)
         {
@@ -1255,16 +1351,26 @@ namespace PixelFarm.CpuBlit
         //---------------------------------------------------------------
         TargetBufferName _targetBufferName;
         bool _enableBuiltInMaskComposite;
-        ActualBitmap _alphaBitmap;
+        MemBitmap _alphaBitmap;
 
         void SetupMaskPixelBlender()
         {
-            if (_aggsx_mask != null) return;
+            if (_aggsx_mask != null)
+            {
+                //also set the canvas origin for the aggsx_mask
+                _aggsx_mask.SetScanlineRasOrigin(this.OriginX, this.OriginY);
+                return;
+            }
             //----------
             //same size                  
 
-            _alphaBitmap = new ActualBitmap(_aggsx_0.Width, _aggsx_0.Height);
+            _alphaBitmap = new MemBitmap(_aggsx_0.Width, _aggsx_0.Height);
+#if DEBUG
+            _alphaBitmap._dbugNote = "AggPrinter.SetupMaskPixelBlender";
+#endif
+
             _aggsx_mask = new AggRenderSurface(_alphaBitmap) { PixelBlender = new PixelBlenderBGRA() };
+            _aggsx_mask.SetScanlineRasOrigin(this.OriginX, this.OriginY); //also set the canvas origin for the aggsx_mask
 
             maskPixelBlender = new PixelBlenderWithMask();
             maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
@@ -1294,7 +1400,7 @@ namespace PixelFarm.CpuBlit
                     }
 
 
-                    TempMemPtr tmp = ActualBitmap.GetBufferPtr(_aggsx.DestActualImage);
+                    TempMemPtr tmp = MemBitmap.GetBufferPtr(_aggsx.DestBitmap);
                     unsafe
                     {
                         _bxt = new BitmapBuffer(
@@ -1387,6 +1493,8 @@ namespace PixelFarm.CpuBlit
             }
         }
 
+        public CoordTransformerKind Kind => CoordTransformerKind.Affine3x2;
+
         public void Transform(ref double x, ref double y)
         {
             affine.Transform(ref x, ref y);
@@ -1395,6 +1503,10 @@ namespace PixelFarm.CpuBlit
         ICoordTransformer ICoordTransformer.MultiplyWith(ICoordTransformer another)
         {
             return this.affine.MultiplyWith(another);
+        }
+        ICoordTransformer ICoordTransformer.CreateInvert()
+        {
+            return affine.CreateInvert();
         }
 
     }

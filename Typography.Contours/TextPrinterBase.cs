@@ -28,9 +28,9 @@ namespace Typography.Contours
         {
             GlyphLayout glyphLayout = this.GlyphLayoutMan;
             glyphLayout.Layout(textBuffer, startAt, len);
-            glyphLayout.GenerateUnscaledGlyphPlans(unscaledGlyphPlan); 
+            glyphLayout.GenerateUnscaledGlyphPlans(unscaledGlyphPlan);
         }
-        
+
 
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
@@ -73,17 +73,17 @@ namespace Typography.Contours
         /// <param name="textBuffer"></param>
         /// <param name="startAt"></param>
         /// <param name="len"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public abstract void DrawString(char[] textBuffer, int startAt, int len, float x, float y);
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        public abstract void DrawString(char[] textBuffer, int startAt, int len, float left, float top);
         /// <summary>
         /// draw glyph plan list at (xpos,ypos) of baseline
         /// </summary>
         /// <param name="glyphPlanList"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public abstract void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float x, float y);
-       
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        public abstract void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float left, float top);
+
         /// <summary>
         /// draw caret at xpos,ypos (sample only)
         /// </summary>
@@ -94,15 +94,15 @@ namespace Typography.Contours
 
         //----------------------------------------------------
         //helper methods
-        public void DrawString(char[] textBuffer, float x, float y)
+        public void DrawString(char[] textBuffer, float left, float top)
         {
-            DrawString(textBuffer, 0, textBuffer.Length, x, y);
+            DrawString(textBuffer, 0, textBuffer.Length, left, top);
         }
-        public void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, float x, float y)
+        public void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, float left, float top)
         {
-            DrawFromGlyphPlans(glyphPlanSeq, 0, glyphPlanSeq.Count, x, y);
+            DrawFromGlyphPlans(glyphPlanSeq, 0, glyphPlanSeq.Count, left, top);
         }
-        
+
 
     }
 

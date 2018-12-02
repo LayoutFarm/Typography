@@ -119,9 +119,9 @@ namespace PixelFarm.CpuBlit.Imaging
                 fillRule = new ExactMatch(fillColor);
             }
         }
-        public void Fill(ActualBitmap img, int x, int y)
+        public void Fill(MemBitmap memBmp, int x, int y)
         {
-            Fill((IBitmapSrc)img, x, y);
+            Fill((IBitmapSrc)memBmp, x, y);
         }
 
 

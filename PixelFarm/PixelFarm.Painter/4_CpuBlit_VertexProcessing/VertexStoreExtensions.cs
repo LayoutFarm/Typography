@@ -43,7 +43,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             vxs.AddLineTo(x, y);
         }
 
-         
+
 
         public static VertexStore MakeVxs(this Ellipse ellipse, ICoordTransformer tx, VertexStore output)
         {
@@ -92,6 +92,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             return output;
         }
+
         public static VertexStore MakeVxs(this Ellipse ellipse, VertexStore output)
         {
             //1. moveto
@@ -137,7 +138,49 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             return output;
         }
+        public static void MakeVxs(this Ellipse ellipse, PathWriter writer)
+        {
+            //1. moveto
+            writer.MoveTo(ellipse.originX + ellipse.radiusX, ellipse.originY);
+            //2.
+            //
+            int numSteps = ellipse.NumSteps;
+            double anglePerStep = MathHelper.Tau / numSteps;
+            double angle = 0;
 
+
+            double orgX = ellipse.originX;
+            double orgY = ellipse.originY;
+            double radX = ellipse.radiusX;
+            double radY = ellipse.radiusY;
+            if (ellipse.m_cw)
+            {
+                for (int i = 1; i < numSteps; i++)
+                {
+                    angle += anglePerStep;
+                    writer.LineTo(
+                        orgX + Math.Cos(MathHelper.Tau - angle) * radX,
+                        orgY + Math.Sin(MathHelper.Tau - angle) * radY);
+                }
+            }
+            else
+            {
+                for (int i = 1; i < numSteps; i++)
+                {
+                    angle += anglePerStep;
+                    writer.LineTo(
+                     orgX + Math.Cos(angle) * radX,
+                     orgY + Math.Sin(angle) * radY);
+                }
+            }
+
+
+            //3.
+            //output.AddCloseFigure((int)EndVertexOrientation.CCW, 0);
+            writer.CloseFigure();
+            //4.              
+            //add no more?
+        }
         public static void CreateBezierVxs3(VertexStore vxs,
             double x0, double y0,
             double x1, double y1,
@@ -268,7 +311,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
             }
         }
-        
+
         public static IEnumerable<VertexData> GetVertexIter(this Arc arc)
         {
             // go to the start
