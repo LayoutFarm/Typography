@@ -245,7 +245,10 @@ namespace PixelFarm.CpuBlit
             get { return (Right - Left) / 2; }
         }
 
-
+        public double YCenter
+        {
+            get { return (Top - Bottom) / 2; }
+        }
 
         public override string ToString()
         {

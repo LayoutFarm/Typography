@@ -37,6 +37,8 @@
             this.openFontOptions1 = new TypographyTest.WinForms.BasicFontOptionsUserControl();
             this.cmdMeasureString = new System.Windows.Forms.Button();
             this.lblStringSize = new System.Windows.Forms.Label();
+            this.cmdTestFontAtlas = new System.Windows.Forms.Button();
+            this.txtSampleChars = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -118,11 +120,31 @@
             this.lblStringSize.TabIndex = 72;
             this.lblStringSize.Text = "measure_size=";
             // 
+            // cmdTestFontAtlas
+            // 
+            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1260, 119);
+            this.cmdTestFontAtlas.Name = "cmdTestFontAtlas";
+            this.cmdTestFontAtlas.Size = new System.Drawing.Size(121, 28);
+            this.cmdTestFontAtlas.TabIndex = 73;
+            this.cmdTestFontAtlas.Text = "TestFontAtlas";
+            this.cmdTestFontAtlas.UseVisualStyleBackColor = true;
+            this.cmdTestFontAtlas.Click += new System.EventHandler(this.cmdTestFontAtlas_Click);
+            // 
+            // txtSampleChars
+            // 
+            this.txtSampleChars.Location = new System.Drawing.Point(1260, 93);
+            this.txtSampleChars.Name = "txtSampleChars";
+            this.txtSampleChars.Size = new System.Drawing.Size(119, 20);
+            this.txtSampleChars.TabIndex = 74;
+            this.txtSampleChars.Text = "sample!";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1393, 857);
+            this.Controls.Add(this.txtSampleChars);
+            this.Controls.Add(this.cmdTestFontAtlas);
             this.Controls.Add(this.lblStringSize);
             this.Controls.Add(this.cmdMeasureString);
             this.Controls.Add(this.glyphNameListUserControl1);
@@ -151,6 +173,8 @@
         private TypographyTest.WinForms.GlyphNameListUserControl glyphNameListUserControl1;
         private System.Windows.Forms.Button cmdMeasureString;
         private System.Windows.Forms.Label lblStringSize;
+        private System.Windows.Forms.Button cmdTestFontAtlas;
+        private System.Windows.Forms.TextBox txtSampleChars;
     }
 }
 

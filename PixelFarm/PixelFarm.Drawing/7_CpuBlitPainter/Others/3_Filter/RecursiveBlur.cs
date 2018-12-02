@@ -476,9 +476,9 @@ namespace PixelFarm.CpuBlit.Imaging
             m_sum1.AdjustSize(w);
             m_sum2.AdjustSize(w);
             m_buf.Allocate(w);
-            RecursizeBlurCalculator[] Sum1Array = m_sum1.Array;
-            RecursizeBlurCalculator[] Sum2Array = m_sum2.Array;
-            Color[] BufferArray = m_buf.Array;
+            RecursizeBlurCalculator[] Sum1Array = m_sum1.UnsafeInternalArray;
+            RecursizeBlurCalculator[] Sum2Array = m_sum2.UnsafeInternalArray;
+            Color[] BufferArray = m_buf.UnsafeInternalArray;
             for (int i = startCreatingAt; i < w; i++)
             {
                 Sum1Array[i] = m_RecursizeBlurCalculatorFactory.CreateNew();

@@ -71,9 +71,9 @@ namespace PixelFarm.CpuBlit.Imaging
 
         //---------------
         //helper...
-        public static TempMemPtr FromBmp(ActualBitmap actualBmp)
+        public static TempMemPtr FromBmp(MemBitmap memBmp)
         {
-            return ActualBitmap.GetBufferPtr(actualBmp);
+            return MemBitmap.GetBufferPtr(memBmp);
         }
         public unsafe static TempMemPtr FromBmp(IBitmapSrc actualBmp, out int* headPtr)
         {
@@ -82,15 +82,15 @@ namespace PixelFarm.CpuBlit.Imaging
             return ptr;
         }
 
-        public unsafe static TempMemPtr FromBmp(ActualBitmap actualBmp, out int* headPtr)
+        public unsafe static TempMemPtr FromBmp(MemBitmap memBmp, out int* headPtr)
         {
-            TempMemPtr ptr = ActualBitmap.GetBufferPtr(actualBmp);
+            TempMemPtr ptr = MemBitmap.GetBufferPtr(memBmp);
             headPtr = (int*)ptr.Ptr;
             return ptr;
         }
-        public unsafe static TempMemPtr FromBmp(ActualBitmap actualBmp, out byte* headPtr)
+        public unsafe static TempMemPtr FromBmp(MemBitmap bmp, out byte* headPtr)
         {
-            TempMemPtr ptr = ActualBitmap.GetBufferPtr(actualBmp);
+            TempMemPtr ptr = MemBitmap.GetBufferPtr(bmp);
             headPtr = (byte*)ptr.Ptr;
             return ptr;
         }
@@ -99,58 +99,162 @@ namespace PixelFarm.CpuBlit.Imaging
 namespace PixelFarm.CpuBlit
 {
 
-    public sealed class ActualBitmap : Image, IBitmapSrc
+
+
+#if DEBUG
+
+    static class dbugMemBitmapMonitor
+    {
+        class TempMemBitmapMonitor
+        {
+            //public WeakReference _memBmp;
+            public MemBitmap _memBmp;
+            public string _detail;
+            public TempMemBitmapMonitor(string detail) => _detail = detail;
+            public bool CanBeReleased() => InternalNativePtrIsReleased();
+            public override string ToString() => (CanBeReleased() ? "!" : "") + _detail;
+            public bool InternalNativePtrIsReleased()
+            {
+                if (_memBmp != null)
+                {
+                    return _memBmp.IsDisposed();
+                }
+                //if (_memBmp.IsAlive)
+                //{
+                //    return ((MemBitmap)_memBmp.Target).IsDisposed();
+                //}
+                return true;
+            }
+        }
+        static System.Text.StringBuilder s_stbuilder = new System.Text.StringBuilder();
+        static object s_regLock = new object();
+        static System.Timers.Timer s_tim1;
+        static int s_count;
+        static System.Collections.Generic.List<TempMemBitmapMonitor> _registerMemBmpList = new System.Collections.Generic.List<TempMemBitmapMonitor>();
+        static System.Collections.Generic.List<int> _tempToBeRemovedList = new System.Collections.Generic.List<int>();
+        public static int dbugRegisterMemBitmapCount()
+        {
+            lock (s_regLock)
+            {
+                return _registerMemBmpList.Count;
+            }
+        }
+
+        public static void dbugRegisterMemBitmap(MemBitmap memBmp, string detail)
+        {
+            if (s_tim1 == null)
+            {
+                s_tim1 = new System.Timers.Timer();
+                s_tim1.Interval = 10000; //10 sec
+                s_tim1.Elapsed += (s, e) =>
+                {
+                    //check the report
+
+                    lock (s_regLock)
+                    {
+                        s_tim1.Enabled = false;
+                        s_stbuilder.AppendLine((s_count++).ToString());
+
+                        int reg_count = _registerMemBmpList.Count;
+                        _tempToBeRemovedList.Clear();
+                        //
+                        for (int i = 0; i < reg_count; ++i)
+                        {
+                            TempMemBitmapMonitor tmpBmpMonitor = _registerMemBmpList[i];
+
+                            if (tmpBmpMonitor.CanBeReleased())
+                            {
+                                //remove
+                                _tempToBeRemovedList.Add(i);
+                            }
+                            else
+                            {
+                                s_stbuilder.Append(tmpBmpMonitor._detail);
+                                //
+                                if (tmpBmpMonitor._memBmp != null && tmpBmpMonitor._memBmp._dbugNote != null)
+                                {
+                                    s_stbuilder.Append(" ");
+                                    s_stbuilder.Append(tmpBmpMonitor._memBmp._dbugNote);
+                                }
+                                //
+                                s_stbuilder.AppendLine();
+                            }
+                        }
+                        for (int i = _tempToBeRemovedList.Count - 1; i >= 0; --i)
+                        {
+                            _registerMemBmpList.RemoveAt(_tempToBeRemovedList[i]);
+                        }
+
+                        _tempToBeRemovedList.Clear();
+
+                        s_stbuilder.AppendLine("remaing : " + _registerMemBmpList.Count);
+                        s_stbuilder.AppendLine("---");
+                        s_stbuilder.AppendLine();
+
+                        //
+                        System.Diagnostics.Debug.Write(s_stbuilder.ToString());
+                        //
+                        s_stbuilder.Length = 0;//clear
+                        s_tim1.Enabled = true;
+                    }
+                };
+                s_tim1.Enabled = true;
+            }
+            //
+            //
+            lock (s_regLock)
+            {
+                _registerMemBmpList.Add(new TempMemBitmapMonitor(detail) { _memBmp = memBmp }); //_memBmp = new WeakReference(memBmp) });
+            }
+        }
+    }
+#endif
+
+
+
+    /// <summary>
+    /// 32 bpp native memory bitmap
+    /// </summary>
+    public sealed class MemBitmap : Image, IBitmapSrc
     {
 
-
-        int width;
-        int height;
+        int _width;
+        int _height;
 
         int _strideBytes;
-        int bitDepth;
-        CpuBlit.Imaging.PixelFormat pixelFormat;
-
-
+        int _bitDepth;
+        CpuBlit.Imaging.PixelFormat _pixelFormat;
         IntPtr _pixelBuffer;
         int _pixelBufferInBytes;
         bool _pixelBufferFromExternalSrc;
+        bool _isDisposed;
 
-        public ActualBitmap(int width, int height)
+#if DEBUG
+        public string _dbugNote;
+#endif
+        public MemBitmap(int width, int height)
+            : this(width, height, System.Runtime.InteropServices.Marshal.AllocHGlobal(width * height * 4))
+        {
+            _pixelBufferFromExternalSrc = false;//** if we alloc then we are the owner of this MemBmp
+            MemMx.memset_unsafe(_pixelBuffer, 0, _pixelBufferInBytes); //set 
+        }
+        public MemBitmap(int width, int height, IntPtr externalNativeInt32Ptr)
         {
             //width and height must >0 
-            this.width = width;
-            this.height = height;
-            int bytesPerPixel;
+            this._width = width;
+            this._height = height;
             this._strideBytes = CalculateStride(width,
-                this.pixelFormat = CpuBlit.Imaging.PixelFormat.ARGB32, //***
-                out bitDepth,
-                out bytesPerPixel);
+                this._pixelFormat = CpuBlit.Imaging.PixelFormat.ARGB32, //***
+                out _bitDepth,
+                out int bytesPerPixel);
 
-            //alloc mem ***
-            _pixelBuffer = System.Runtime.InteropServices.Marshal.AllocHGlobal(_pixelBufferInBytes = (width * height * 4));
-            MemMx.memset_unsafe(_pixelBuffer, 0, _pixelBufferInBytes);
-        }
-        public ActualBitmap(int width, int height, int[] orgBuffer)
-            : this(width, height)
-        {
-            //copy from managed buffer
-            System.Runtime.InteropServices.Marshal.Copy(orgBuffer, 0, _pixelBuffer, _pixelBufferInBytes / 4);
-        }
-        public ActualBitmap(int width, int height, IntPtr externalNativeInt32Ptr)
-            : this(width, height)
-        {
-            //width and height must >0 
-            this.width = width;
-            this.height = height;
-            int bytesPerPixel;
-            this._strideBytes = CalculateStride(width,
-                this.pixelFormat = CpuBlit.Imaging.PixelFormat.ARGB32, //***
-                out bitDepth,
-                out bytesPerPixel);
-
-            _pixelBufferFromExternalSrc = true;
-            //alloc mem 
+            _pixelBufferInBytes = width * height * 4;
+            _pixelBufferFromExternalSrc = true; //*** we receive ptr from external ***
             _pixelBuffer = externalNativeInt32Ptr;
+
+#if DEBUG
+            dbugMemBitmapMonitor.dbugRegisterMemBitmap(this, width + "x" + height + ": " + DateTime.Now.ToString("u"));
+#endif
         }
         public override void Dispose()
         {
@@ -159,15 +263,17 @@ namespace PixelFarm.CpuBlit
                 System.Runtime.InteropServices.Marshal.FreeHGlobal(_pixelBuffer);
                 _pixelBuffer = IntPtr.Zero;
                 _pixelBufferInBytes = 0;
+                _isDisposed = true;
             }
         }
+        public bool IsDisposed() => _isDisposed;
         public override int Width
         {
-            get { return this.width; }
+            get { return this._width; }
         }
         public override int Height
         {
-            get { return this.height; }
+            get { return this._height; }
         }
         public override int ReferenceX
         {
@@ -179,53 +285,88 @@ namespace PixelFarm.CpuBlit
         }
         public RectInt Bounds
         {
-            get { return new RectInt(0, 0, this.width, this.height); }
+            get { return new RectInt(0, 0, this._width, this._height); }
         }
         public override bool IsReferenceImage
         {
             get { return false; }
         }
 
-        public CpuBlit.Imaging.PixelFormat PixelFormat { get { return this.pixelFormat; } }
+        public CpuBlit.Imaging.PixelFormat PixelFormat { get { return this._pixelFormat; } }
         public int Stride { get { return this._strideBytes; } }
-        public int BitDepth { get { return this.bitDepth; } }
+        public int BitDepth { get { return this._bitDepth; } }
         public bool IsBigEndian { get; set; }
 
 
-        public static CpuBlit.Imaging.TempMemPtr GetBufferPtr(ActualBitmap img)
+        public static CpuBlit.Imaging.TempMemPtr GetBufferPtr(MemBitmap bmp)
         {
-            return new CpuBlit.Imaging.TempMemPtr(img._pixelBuffer, img._pixelBufferInBytes);
+            return new CpuBlit.Imaging.TempMemPtr(bmp._pixelBuffer, bmp._pixelBufferInBytes);
         }
 
-        public static void ReplaceBuffer(ActualBitmap img, int[] pixelBuffer)
+        public static void ReplaceBuffer(MemBitmap bmp, int[] pixelBuffer)
         {
-            System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, img._pixelBuffer, pixelBuffer.Length);
+            System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, bmp._pixelBuffer, pixelBuffer.Length);
         }
-        public static ActualBitmap CreateFromBuffer(int width, int height, int[] buffer)
+        /// <summary>
+        /// create mem bitmap by copy data from managed int32 array pixel data to unmanged side
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="totalBuffer"></param>
+        /// <param name="doFlipY"></param>
+        /// <returns></returns>
+        public static MemBitmap CreateFromCopy(int width, int height, int[] totalBuffer, bool doFlipY = false)
         {
-            var img = new ActualBitmap(width, height);
+
+            var bmp = new MemBitmap(width, height);
+#if DEBUG
+            bmp._dbugNote = "MemBitmap.CreateFromCopy";
+#endif
+            if (doFlipY)
+            {
+                //flip vertical Y  
+                int[] totalBufferFlipY = new int[totalBuffer.Length];
+                int srcRowIndex = height - 1;
+                int strideInBytes = width * 4;//32 bpp
+                for (int i = 0; i < height; ++i)
+                {
+                    //copy each row from src to dst
+                    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+                    srcRowIndex--;
+                }
+                totalBuffer = totalBufferFlipY;
+            }
             unsafe
             {
-                int* header = (int*)img._pixelBuffer;
-                {
-                    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, (IntPtr)header, buffer.Length);
-                }
+                System.Runtime.InteropServices.Marshal.Copy(totalBuffer, 0, bmp._pixelBuffer, totalBuffer.Length);
             }
-            return img;
+            return bmp;
         }
-        public override void RequestInternalBuffer(ref ImgBufferRequestArgs buffRequest)
+        public static MemBitmap CreateFromCopy(int width, int height, int len, IntPtr anotherNativePixelBuffer)
         {
-            //TODO: review here 2018-08-26
-            if (pixelFormat != CpuBlit.Imaging.PixelFormat.ARGB32)
+            var memBmp = new MemBitmap(width, height);
+#if DEBUG
+            memBmp._dbugNote = "MemBitmap.CreateFromCopy";
+#endif
+            unsafe
             {
-                throw new NotSupportedException();
+                MemMx.memcpy((byte*)memBmp._pixelBuffer, (byte*)anotherNativePixelBuffer, len);
             }
-
-
-            int[] newBuff = new int[_pixelBufferInBytes / 4];
-            System.Runtime.InteropServices.Marshal.Copy(_pixelBuffer, newBuff, 0, newBuff.Length);
-            buffRequest.OutputBuffer32 = newBuff;
+            return memBmp;
         }
+        //public override void RequestInternalBuffer(ref ImgBufferRequestArgs buffRequest)
+        //{
+        //    //TODO: review here 2018-08-26
+        //    if (_pixelFormat != CpuBlit.Imaging.PixelFormat.ARGB32)
+        //    {
+        //        throw new NotSupportedException();
+        //    }
+
+
+        //    int[] newBuff = new int[_pixelBufferInBytes / 4];
+        //    System.Runtime.InteropServices.Marshal.Copy(_pixelBuffer, newBuff, 0, newBuff.Length);
+        //    buffRequest.OutputBuffer32 = newBuff;
+        //}
 
 
         public static int CalculateStride(int width, CpuBlit.Imaging.PixelFormat format)
@@ -261,14 +402,14 @@ namespace PixelFarm.CpuBlit
                     throw new NotSupportedException();
             }
         }
-        public static int[] CopyImgBuffer(ActualBitmap img)
+        public static int[] CopyImgBuffer(MemBitmap memBmp)
         {
 
-            int[] buff2 = new int[img.Width * img.Height];
+            int[] buff2 = new int[memBmp.Width * memBmp.Height];
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr pixBuffer = ActualBitmap.GetBufferPtr(img))
+                using (CpuBlit.Imaging.TempMemPtr pixBuffer = MemBitmap.GetBufferPtr(memBmp))
                 {
                     //fixed (byte* header = &pixelBuffer[0])
                     byte* header = (byte*)pixBuffer.Ptr;
@@ -284,7 +425,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this.bitDepth;
+                return this._bitDepth;
             }
         }
 
@@ -292,7 +433,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this.width;
+                return this._width;
             }
         }
 
@@ -300,7 +441,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this.height;
+                return this._height;
             }
         }
 
@@ -317,7 +458,7 @@ namespace PixelFarm.CpuBlit
         }
         RectInt IBitmapSrc.GetBounds()
         {
-            return new RectInt(0, 0, width, height);
+            return new RectInt(0, 0, _width, _height);
         }
 
         CpuBlit.Imaging.TempMemPtr IBitmapSrc.GetBufferPtr()
@@ -327,10 +468,10 @@ namespace PixelFarm.CpuBlit
 
         int IBitmapSrc.GetBufferOffsetXY32(int x, int y)
         {
-            return (y * width) + x;
+            return (y * _width) + x;
         }
 
-        void IBitmapSrc.ReplaceBuffer(int[] newBuffer)
+        void IBitmapSrc.WriteBuffer(int[] newBuffer)
         {
             //TODO: review here 2018-08-26
             //pixelBuffer = newBuffer;
@@ -342,7 +483,7 @@ namespace PixelFarm.CpuBlit
             unsafe
             {
                 int* pxBuff = (int*)_pixelBuffer;
-                int pixelValue = pxBuff[y * width + x];
+                int pixelValue = pxBuff[y * _width + x];
                 return new Color(
                   (byte)(pixelValue >> 24),
                   (byte)(pixelValue >> 16),
@@ -370,33 +511,31 @@ namespace PixelFarm.CpuBlit
 
 
         int BytesBetweenPixelsInclusive { get; }
-        void ReplaceBuffer(int[] newBuffer);
+        void WriteBuffer(int[] newBuffer);
         Color GetPixel(int x, int y);
     }
 
-    public static class ActualBitmapExtensions
+    public static class MemBitmapExtensions
     {
-        public static int[] CopyImgBuffer(ActualBitmap img, int width)
+        public static int[] CopyImgBuffer(MemBitmap memBmp, int width, int height)
         {
             //calculate stride for the width
 
-            int destStride = ActualBitmap.CalculateStride(width, CpuBlit.Imaging.PixelFormat.ARGB32);
-            int h = img.Height;
+            int destStride = MemBitmap.CalculateStride(width, CpuBlit.Imaging.PixelFormat.ARGB32);
             int newBmpW = destStride / 4;
-
-            int[] buff2 = new int[newBmpW * img.Height];
+            int[] buff2 = new int[newBmpW * height];
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = ActualBitmap.GetBufferPtr(img))
+                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(memBmp))
                 {
                     byte* srcBuffer = (byte*)srcBufferPtr.Ptr;
                     int srcIndex = 0;
-                    int srcStride = img.Stride;
+                    int srcStride = memBmp.Stride;
                     fixed (int* destHead = &buff2[0])
                     {
                         byte* destHead2 = (byte*)destHead;
-                        for (int line = 0; line < h; ++line)
+                        for (int line = 0; line < height; ++line)
                         {
                             //System.Runtime.InteropServices.Marshal.Copy(srcBuffer, srcIndex, (IntPtr)destHead2, destStride);
                             NativeMemMx.memcpy((byte*)destHead2, srcBuffer + srcIndex, destStride);
@@ -409,17 +548,17 @@ namespace PixelFarm.CpuBlit
             return buff2;
         }
 
-        public static int[] CopyImgBuffer(ActualBitmap src, int srcX, int srcY, int srcW, int srcH)
+        public static int[] CopyImgBuffer(MemBitmap src, int srcX, int srcY, int srcW, int srcH)
         {
             //calculate stride for the width 
-            int destStride = ActualBitmap.CalculateStride(srcW, CpuBlit.Imaging.PixelFormat.ARGB32);
+            int destStride = MemBitmap.CalculateStride(srcW, CpuBlit.Imaging.PixelFormat.ARGB32);
             int newBmpW = destStride / 4;
 
             int[] buff2 = new int[newBmpW * srcH];
             unsafe
             {
 
-                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = ActualBitmap.GetBufferPtr(src))
+                using (CpuBlit.Imaging.TempMemPtr srcBufferPtr = MemBitmap.GetBufferPtr(src))
                 {
                     byte* srcBuffer = (byte*)srcBufferPtr.Ptr;
                     int srcIndex = 0;

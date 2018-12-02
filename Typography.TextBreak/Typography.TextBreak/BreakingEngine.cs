@@ -367,6 +367,7 @@ namespace Typography.TextBreak
                                                 {
                                                     visitor.AddWordBreakAtCurrentIndex();
                                                     foundCandidate = true;
+                                                    break;
                                                 }
                                             }
                                         }

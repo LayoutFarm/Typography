@@ -17,15 +17,15 @@ namespace PixelFarm.Drawing.Fonts
         GreyscaleStencil,
         None,
     }
-    public sealed class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter
+    public sealed class FontAtlasTextPrinter : TextPrinterBase, ITextPrinter, IDisposable
     {
-        PixelBlenderWithMask maskPixelBlender = new PixelBlenderWithMask();
-        PixelBlenderPerColorComponentWithMask maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
+        PixelBlenderWithMask _maskPixelBlender = new PixelBlenderWithMask();
+        PixelBlenderPerColorComponentWithMask _maskPixelBlenderPerCompo = new PixelBlenderPerColorComponentWithMask();
 
         AggPainter _maskBufferPainter;
-        ActualBitmap _fontBmp;
-        ActualBitmap _alphaBmp;
-       
+        MemBitmap _fontBmp;
+        MemBitmap _alphaBmp;
+
 
         /// <summary>
         /// target canvas
@@ -38,7 +38,7 @@ namespace PixelFarm.Drawing.Fonts
 
 
         LayoutFarm.OpenFontTextService _textServices;
-        BitmapFontManager<ActualBitmap> _bmpFontMx;
+        BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleFontAtlas _fontAtlas;
 
         public FontAtlasTextPrinter(AggPainter painter)
@@ -50,13 +50,13 @@ namespace PixelFarm.Drawing.Fonts
 
             _textServices = new LayoutFarm.OpenFontTextService();
             //2. create manager
-            _bmpFontMx = new BitmapFontManager<ActualBitmap>(
+            _bmpFontMx = new BitmapFontManager<MemBitmap>(
                 TextureKind.StencilLcdEffect,
                 _textServices,
                 atlas =>
                 {
                     GlyphImage totalGlyphImg = atlas.TotalGlyph;
-                    return new ActualBitmap(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
+                    return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
                 }
             );
             _bmpFontMx.SetCurrentScriptLangs(new ScriptLang[]
@@ -69,6 +69,13 @@ namespace PixelFarm.Drawing.Fonts
             ChangeFont(new RequestFont("tahoma", 10));
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
+        public void Dispose()
+        {
+            //clear this
+            //clear maskbuffer
+            //clear alpha buffer
+        }
+
         /// <summary>
         /// start draw on 'left-top' of a given area box
         /// </summary>
@@ -149,14 +156,17 @@ namespace PixelFarm.Drawing.Fonts
         {
             //----------
             //same size
-            _alphaBmp = new ActualBitmap(width, height);
+            _alphaBmp = new MemBitmap(width, height);
+#if DEBUG
+            _alphaBmp._dbugNote = "FontAtlasTextPrinter";
+#endif
             _maskBufferPainter = AggPainter.Create(_alphaBmp, new PixelBlenderBGRA());
             _maskBufferPainter.Clear(Color.Black);
             //------------ 
             //draw glyph bmp to _alpha bmp
             //_maskBufferPainter.DrawImage(_glyphBmp, 0, 0);
-            maskPixelBlender.SetMaskBitmap(_alphaBmp);
-            maskPixelBlenderPerCompo.SetMaskBitmap(_alphaBmp);
+            _maskPixelBlender.SetMaskBitmap(_alphaBmp);
+            _maskPixelBlenderPerCompo.SetMaskBitmap(_alphaBmp);
         }
         public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
         {
@@ -197,18 +207,17 @@ namespace PixelFarm.Drawing.Fonts
             //TODO...
         }
 
-        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float x, float y)
+        public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
 
             Typeface typeface = _textServices.ResolveTypeface(_font);
 
             float scale = typeface.CalculateScaleToPixelFromPointSize(_font.SizeInPoints);
-            int recommendLineSpacing = (int)_font.LineSpacingInPx;
+            int recommendLineSpacing = (int)_font.LineSpacingInPixels;
             //--------------------------
             //TODO:
             //if (x,y) is left top
             //we need to adjust y again
-            y -= ((_font.LineSpacingInPx) * scale);
 
             // 
 
@@ -216,16 +225,16 @@ namespace PixelFarm.Drawing.Fonts
 
             float gx = 0;
             float gy = 0;
-            int baseY = (int)Math.Round(y);
+            int baseY = (int)Math.Round(top);
 
 
             float acc_x = 0;
             float acc_y = 0;
 
-            int lineHeight = (int)_font.LineSpacingInPx;//temp
+            int lineHeight = (int)_font.LineSpacingInPixels;//temp
 
             PixelBlender32 prevPxBlender = _painter.DestBitmapBlender.OutputPixelBlender; //save
-            _painter.DestBitmapBlender.OutputPixelBlender = maskPixelBlenderPerCompo; //change to new blender  
+            _painter.DestBitmapBlender.OutputPixelBlender = _maskPixelBlenderPerCompo; //change to new blender  
 
             bool fillGlyphByGlyph = true;
 
@@ -264,8 +273,8 @@ namespace PixelFarm.Drawing.Fonts
                     //{
                     //}
 
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
-                    gy = (float)(y + (ngy + glyphData.TextureYOffset - srcH + lineHeight));
+                    gx = (float)(left + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(top + (ngy + glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
                     gy = (float)Math.Floor(gy);// + lineHeight;
@@ -283,16 +292,16 @@ namespace PixelFarm.Drawing.Fonts
                             {
                                 //select component to render this need to render 3 times for lcd technique
                                 //1. B
-                                maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.B;
-                                maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.B;
+                                _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.B;
+                                _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.B;
                                 _painter.FillRect(gx + 1, gy, srcW, srcH);
                                 //2. G
-                                maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
-                                maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.G;
+                                _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
+                                _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.G;
                                 _painter.FillRect(gx + 1, gy, srcW, srcH);
                                 //3. R
-                                maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.R;
-                                maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.R;
+                                _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.R;
+                                _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.R;
                                 _painter.FillRect(gx + 1, gy, srcW, srcH);
                             }
                             break;
@@ -300,8 +309,8 @@ namespace PixelFarm.Drawing.Fonts
                             {
                                 //fill once
                                 //we choose greeh channel (middle)
-                                maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
-                                maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.EnableAll;
+                                _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
+                                _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.EnableAll;
                                 _painter.FillRect(gx + 1, gy, srcW, srcH);
                             }
                             break;
@@ -341,8 +350,8 @@ namespace PixelFarm.Drawing.Fonts
                     // -glyphData.TextureXOffset => restore to original pos
                     // -glyphData.TextureYOffset => restore to original pos 
                     //--------------------------
-                    gx = (float)(x + (ngx - glyphData.TextureXOffset)); //ideal x
-                    gy = (float)(y + (ngy - glyphData.TextureYOffset - srcH + lineHeight));
+                    gx = (float)(left + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gy = (float)(top + (ngy - glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(glyph.AdvanceX * scale);
                     gy = (float)Math.Floor(gy) + lineHeight;
@@ -368,16 +377,16 @@ namespace PixelFarm.Drawing.Fonts
                 {
                     //select component to render this need to render 3 times for lcd technique
                     //1. B
-                    maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.B;
-                    maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.B;
+                    _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.B;
+                    _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.B;
                     _painter.FillRect(startX + 1, startY, lenW, lenH);
                     //2. G
-                    maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
-                    maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.G;
+                    _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
+                    _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.G;
                     _painter.FillRect(startX + 1, startY, lenW, lenH);
                     //3. R
-                    maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.R;
-                    maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.R;
+                    _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.R;
+                    _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.R;
                     _painter.FillRect(startX + 1, startY, lenW, lenH);
                 }
             }

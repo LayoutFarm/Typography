@@ -146,22 +146,7 @@ namespace Typography.TextLayout
         public ushort CurrentGlyphIndex { get { return _currentGlyphIndex; } }
         public int CurrentIndex { get { return _index; } }
 
-        public PxScaledGlyphPlan GlyphPlan
-        {
-            get
-            {
-                UnscaledGlyphPlan unscale = _seq[_index];
-                float scaled_advW = (short)Math.Round(unscale.AdvanceX * _pxscale);
-                return new PxScaledGlyphPlan(
-                    unscale.input_cp_offset,
-                    unscale.glyphIndex,
-                    scaled_advW,
-                    unscale.OffsetX * _pxscale,
-                    unscale.OffsetY * _pxscale);
-
-            }
-        }
-
+       
         public bool Read()
         {
             if (_index >= _end)

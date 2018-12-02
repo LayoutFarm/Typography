@@ -108,15 +108,9 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
 
 
-        int _renderSurfaceW;
-        int _renderSurfaceH;
-        //bool _filpY;
 
-        public ScanlineRasterizer(int w, int h)
+        public ScanlineRasterizer()
         {
-            this._renderSurfaceW = w;
-            this._renderSurfaceH = h;
-            //_filpY = true;
 
             m_cellAARas = new CellAARasterizer();
             m_vectorClipper = new VectorClipper(m_cellAARas);
@@ -130,8 +124,11 @@ namespace PixelFarm.CpuBlit.Rasterization
                 m_gammaLut[i] = i;
             }
         }
-        //public bool FlipY { get { return _filpY; } set { _filpY = value; } }
+
         //--------------------------------------------------------------------
+        /// <summary>
+        /// reset scanlineRas cell and status
+        /// </summary>
         public void Reset()
         {
             m_cellAARas.Reset();
@@ -147,13 +144,20 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             SetClipBox(clippingRect.Left, clippingRect.Bottom, clippingRect.Right, clippingRect.Top);
         }
-        public void SetClipBox(int x1, int y1, int x2, int y2)
+        public void SetClipBox(int left, int bottom, int right, int top)
         {
-            userModeClipBox = new RectInt(x1, y1, x2, y2);
+
+            left += (int)OffsetOriginX;
+            bottom += (int)OffsetOriginY;
+            right += (int)OffsetOriginX;
+            top += (int)OffsetOriginY;
+
+
+            userModeClipBox = new RectInt(left, bottom, right, top);
             Reset();
             m_vectorClipper.SetClipBox(
-                                upscale(x1), upscale(y1),
-                                upscale(x2), upscale(y2));
+                                upscale(left), upscale(bottom),
+                                upscale(right), upscale(top));
         }
         //---------------------------------
         //from vector clipper
@@ -254,12 +258,12 @@ namespace PixelFarm.CpuBlit.Rasterization
         public float OffsetOriginX
         {
             get;
-            set;
+            internal set;
         }
         public float OffsetOriginY
         {
             get;
-            set;
+            internal set;
         }
         /// <summary>
         /// we do NOT store vxs
@@ -278,8 +282,8 @@ namespace PixelFarm.CpuBlit.Rasterization
             int index = 0;
 
             if (m_cellAARas.Sorted) { Reset(); }
-            double offsetOrgX = OffsetOriginX;
-            double offsetOrgY = OffsetOriginY;
+            float offsetOrgX = OffsetOriginX;
+            float offsetOrgY = OffsetOriginY;
 
 #if DEBUG
             int dbugVertexCount = 0;
@@ -296,11 +300,10 @@ namespace PixelFarm.CpuBlit.Rasterization
                     //NOTE: we scale horizontal 3 times.
                     //subpixel renderer will shrink it to 1 
                     //--------------------------------------------- 
-                    x = (x + offsetOrgX) * 3;
-                    y = (y + offsetOrgY);
-                    //
-                    tx.Transform(ref x, ref y); //***
-                    AddVertex(cmd, x, y);
+                    //TODO: review here
+                    x *= 3;
+                    tx.Transform(ref x, ref y); //***  
+                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
                 }
             }
             else
@@ -310,11 +313,10 @@ namespace PixelFarm.CpuBlit.Rasterization
 #if DEBUG
                     dbugVertexCount++;
 #endif
-                    x = (x + offsetOrgX);
-                    y = (y + offsetOrgY);
+
                     //
                     tx.Transform(ref x, ref y); //***
-                    AddVertex(cmd, x, y);
+                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
                 }
             }
         }
@@ -353,9 +355,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                     //---------------------------------------------
                     //NOTE: we scale horizontal 3 times.
                     //subpixel renderer will shrink it to 1 
-                    //---------------------------------------------
-
-                    AddVertex(cmd, (x + offsetOrgX) * 3, (y + offsetOrgY));
+                    //--------------------------------------------- 
+                    AddVertex(cmd, (x + offsetOrgX) * 3, y + offsetOrgY);
                 }
             }
             else

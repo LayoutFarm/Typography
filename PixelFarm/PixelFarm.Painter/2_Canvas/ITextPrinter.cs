@@ -58,7 +58,7 @@ namespace PixelFarm.Drawing
 
         void MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
 
-        void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, 
+        void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
             RequestFont font,
             int[] outputXAdvances,
             out int outputTotalW,
@@ -76,14 +76,14 @@ namespace PixelFarm.Drawing
     public interface ITextPrinter
     {
         bool StartDrawOnLeftTop { get; set; }
-        void DrawString(char[] text, int startAt, int len, double x, double y);
+        void DrawString(char[] text, int startAt, int len, double left, double top);
         /// <summary>
         /// render from RenderVxFormattedString object to specific pos
         /// </summary>
         /// <param name="renderVx"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        void DrawString(RenderVxFormattedString renderVx, double x, double y);
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        void DrawString(RenderVxFormattedString renderVx, double left, double top);
         //-------------
         void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len);
         void ChangeFont(RequestFont font);
@@ -94,10 +94,16 @@ namespace PixelFarm.Drawing
 
     public static class ITextPrinterExtensions
     {
-        public static void DrawString(this ITextPrinter textPrinter, string text, double x, double y)
+        public static void DrawString(this ITextPrinter textPrinter, string text, double left, double top)
         {
+#if DEBUG
+            if (text == null)
+            {
+                return;
+            }
+#endif
             char[] textBuffer = text.ToCharArray();
-            textPrinter.DrawString(textBuffer, 0, textBuffer.Length, x, y);
+            textPrinter.DrawString(textBuffer, 0, textBuffer.Length, left, top);
         }
     }
 

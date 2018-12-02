@@ -23,7 +23,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 {
     //=======================================================trans_perspective
 
-    class CoordTransformationChain : ICoordTransformer
+    public class CoordTransformationChain : ICoordTransformer
     {
         ICoordTransformer _left, _right;
         public CoordTransformationChain(ICoordTransformer left, ICoordTransformer right)
@@ -40,6 +40,23 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _left.Transform(ref x, ref y);
             _right.Transform(ref x, ref y);
         }
+        ICoordTransformer ICoordTransformer.CreateInvert()
+        {
+            //TODO: impl 
+            throw new System.NotSupportedException();
+        }
+        public ICoordTransformer Left => _left;
+        public ICoordTransformer Right => _right;
+
+        public CoordTransformerKind Kind => CoordTransformerKind.TransformChain;
+    }
+
+    public struct PerspectiveMat
+    {
+        public double
+                 sx, shy, w0,
+                 shx, sy, w1,
+                 tx, ty, w2;
     }
 
     public sealed class Perspective : ICoordTransformer
@@ -190,6 +207,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return true;
         }
 
+        ICoordTransformer ICoordTransformer.CreateInvert()
+        {
+            Perspective newOne = new Perspective(this);
+            if (newOne.invert())
+            {
+                return newOne;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
 
         // Map square (0,0,1,1) to the quadrilateral and vice versa
@@ -588,6 +617,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
+        public CoordTransformerKind Kind => CoordTransformerKind.Perspective;
+
         bool is_identity()
         {
             return is_equal_eps(sx, 1.0, EPSILON) &&
@@ -666,6 +697,20 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             y = Math.Sqrt(shy * shy + sy * sy);
         }
 
+        public PerspectiveMat GetInternalElements()
+        {
+            PerspectiveMat m = new PerspectiveMat();
+            m.sx = sx;      /**/m.shy = shy;    /**/m.w0 = w0;
+            m.shx = shx;    /**/m.sy = sy;      /**/m.w1 = w1;
+            m.tx = tx;      /**/m.ty = ty;      /**/m.w2 = w2;
+            return m;
+        }
 
     }
+
+
+
+
+
+
 }

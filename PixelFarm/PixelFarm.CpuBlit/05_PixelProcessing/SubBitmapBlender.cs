@@ -71,11 +71,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             Attach(image, blender, image.BytesBetweenPixelsInclusive, 0, image.BitDepth);
         }
 
-        public override void ReplaceBuffer(int[] newbuffer)
+        public override void WriteBuffer(int[] newbuffer)
         {
             if (_sourceImage != null)
             {
-                _sourceImage.ReplaceBuffer(newbuffer);
+                _sourceImage.WriteBuffer(newbuffer);
             }
 
         }
@@ -146,13 +146,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
 
             SetBuffer(src);
-            int32ArrayStartPixelAt = arrayElemOffset;
+            _int32ArrayStartPixelAt = arrayElemOffset;
 
             if (this.Stride < 0) //stride in bytes
             {
                 //TODO: review here 
                 int addAmount = -((height - 1) * Width);
-                int32ArrayStartPixelAt = addAmount + arrayElemOffset;
+                _int32ArrayStartPixelAt = addAmount + arrayElemOffset;
             }
             SetUpLookupTables();
         }

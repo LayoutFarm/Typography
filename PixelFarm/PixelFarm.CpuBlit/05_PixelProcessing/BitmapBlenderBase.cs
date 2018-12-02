@@ -34,24 +34,25 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         //--------------------------------------------
         //look up table , for random access to specific point of image buffer
         //we pre-calculate the offset of each row and column
-        int[] yTableArray;
-        int[] xTableArray;
+        int[] _yTableArray;
+        int[] _xTableArray;
         //--------------------------------------------
+        PixelBlenderBGRA _defaultPixelBlender;
 
-
-        protected IntPtr _raw_buffer32;
+        IntPtr _raw_buffer32;
         int _rawBufferLenInBytes;
 
         //--------------------------------------------
         // Pointer to first pixel depending on strideInBytes and image position         
-        protected int int32ArrayStartPixelAt;
-        int width;  // in pixels
-        int height; // in pixels
-        int strideInBytes; // Number of bytes per row,  Can be < 0
-        int m_DistanceInBytesBetweenPixelsInclusive;
-        int bitDepth;
+        protected internal int _int32ArrayStartPixelAt;
+        int _width;  // in pixels
+        int _height; // in pixels
+        int _strideInBytes; // Number of bytes per row,  Can be < 0
+        int _m_DistanceInBytesBetweenPixelsInclusive;
+        int _bitDepth;
 
         PixelBlender32 _outputPxBlender;
+
         public IntPtr GetInternalBufferPtr32
         {
             get
@@ -68,18 +69,27 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             _raw_buffer32 = IntPtr.Zero;
             _rawBufferLenInBytes = 0;
         }
-        
+
         protected void SetBuffer(Imaging.TempMemPtr tmpMem)
         {
             _raw_buffer32 = tmpMem.Ptr;
             _rawBufferLenInBytes = tmpMem.LengthInBytes;
         }
 
-        public abstract void ReplaceBuffer(int[] newbuffer);
+        public abstract void WriteBuffer(int[] newbuffer);
 
-        protected void Attach(ActualBitmap img)
+        protected void Attach(MemBitmap bmp, PixelBlender32 pixelBlender = null)
         {
-            Attach(img.Width, img.Height, img.BitDepth, ActualBitmap.GetBufferPtr(img), new PixelBlenderBGRA());
+            if (pixelBlender == null)
+            {
+                //use default pixel blender ?
+                if (_defaultPixelBlender == null)
+                {
+                    _defaultPixelBlender = new PixelBlenderBGRA();
+                }
+                pixelBlender = _defaultPixelBlender;
+            }
+            Attach(bmp.Width, bmp.Height, bmp.BitDepth, MemBitmap.GetBufferPtr(bmp), pixelBlender);
         }
         /// <summary>
         /// attach image buffer and its information to the reader
@@ -91,8 +101,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <param name="outputPxBlender"></param>
         protected void Attach(int width, int height, int bitsPerPixel, CpuBlit.Imaging.TempMemPtr imgbuffer, PixelBlender32 outputPxBlender)
         {
-
-
             if (width <= 0 || height <= 0)
             {
                 throw new ArgumentOutOfRangeException("You must have a width and height > than 0.");
@@ -131,10 +139,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
            int bitDepth,
            int distanceInBytesBetweenPixelsInclusive)
         {
-            this.width = width;
-            this.height = height;
-            this.strideInBytes = strideInBytes;
-            this.bitDepth = bitDepth;
+            this._width = width;
+            this._height = height;
+            this._strideInBytes = strideInBytes;
+            this._bitDepth = bitDepth;
 
             if (distanceInBytesBetweenPixelsInclusive > 4)
             {
@@ -144,7 +152,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             {
                 throw new Exception("You do not have enough room between pixels to support your bit depth.");
             }
-            m_DistanceInBytesBetweenPixelsInclusive = distanceInBytesBetweenPixelsInclusive;
+            _m_DistanceInBytesBetweenPixelsInclusive = distanceInBytesBetweenPixelsInclusive;
             if (strideInBytes < distanceInBytesBetweenPixelsInclusive * width)
             {
                 throw new Exception("You do not have enough strideInBytes to hold the width and pixel distance you have described.");
@@ -270,37 +278,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-        public int Width
-        {
-            get
-            {
-                return width;
-            }
-        }
+        public int Width => _width;
+        public int Height => _height;
+        public int Stride => _strideInBytes;
 
-        public int Height
-        {
-            get
-            {
-                return height;
-            }
-        }
-
-        public int Stride { get { return strideInBytes; } }
-
-        public int BytesBetweenPixelsInclusive
-        {
-            get { return m_DistanceInBytesBetweenPixelsInclusive; }
-        }
-        public int BitDepth
-        {
-            get { return bitDepth; }
-        }
-
-        public RectInt GetBounds()
-        {
-            return new RectInt(0, 0, this.width, this.height);
-        }
+        public int BytesBetweenPixelsInclusive => _m_DistanceInBytesBetweenPixelsInclusive;
+        public int BitDepth => _bitDepth;
+        public RectInt GetBounds() => new RectInt(0, 0, this._width, this._height);
 
         /// <summary>
         /// get, set blender of destination image buffer
@@ -308,11 +292,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <returns></returns>
         public PixelBlender32 OutputPixelBlender
         {
-            get { return _outputPxBlender; }
+            get => _outputPxBlender;
             set
             {
 #if DEBUG
-                if (BitDepth != 0 && value != null && value.NumPixelBits != BitDepth)
+                if (BitDepth != 0 && value != null && PixelBlender32.NumPixelBits != BitDepth)
                 {
                     throw new NotSupportedException("The blender has to support the bit depth of this image.");
                 }
@@ -323,30 +307,30 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         protected void SetUpLookupTables()
         {
-            yTableArray = new int[height];
-            xTableArray = new int[width];
+            _yTableArray = new int[_height];
+            _xTableArray = new int[_width];
             unsafe
             {
-                fixed (int* first = &yTableArray[0])
+                fixed (int* first = &_yTableArray[0])
                 {
                     //go last
-                    int* cur = first + height - 1;
-                    for (int i = height - 1; i >= 0;)
+                    int* cur = first + _height - 1;
+                    for (int i = _height - 1; i >= 0;)
                     {
                         //--------------------
                         //*cur = i * strideInBytes;
-                        *cur = i * width;
+                        *cur = i * _width;
                         --i;
                         cur--;
                         //--------------------
                     }
                 }
-                fixed (int* first = &xTableArray[0])
+                fixed (int* first = &_xTableArray[0])
                 {
                     //go last
-                    int* cur = first + width - 1;
+                    int* cur = first + _width - 1;
                     //even
-                    for (int i = width - 1; i >= 0;)
+                    for (int i = _width - 1; i >= 0;)
                     {
                         //--------------------
                         //*cur = i * m_DistanceInBytesBetweenPixelsInclusive;
@@ -359,7 +343,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
 
 
-            if (yTableArray.Length != height || xTableArray.Length != width)
+            if (_yTableArray.Length != _height || _xTableArray.Length != _width)
             {
                 // LBB, don't fix this if you don't understand what it's trying to do.
                 throw new Exception("The yTable and xTable should be allocated correctly at this point. Figure out what happend.");
@@ -413,16 +397,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public int GetBufferOffsetXY32Check(int x, int y)
         {
 
-            if (y >= height || x >= width)
+            if (y >= _height || x >= _width)
             {
                 return -1;
             }
-            return int32ArrayStartPixelAt + yTableArray[y] + xTableArray[x];
+            return _int32ArrayStartPixelAt + _yTableArray[y] + _xTableArray[x];
         }
 
         public int GetBufferOffsetXY32(int x, int y)
         {
-            return int32ArrayStartPixelAt + yTableArray[y] + xTableArray[x];
+            return _int32ArrayStartPixelAt + _yTableArray[y] + _xTableArray[x];
         }
         public void SetPixel(int x, int y, Color color)
         {
@@ -555,10 +539,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
 
 
-        ActualBitmap _filterImage;
-        public void SetFilterImage(ActualBitmap filterImg)
+        MemBitmap _filterBmp;
+        public void SetFilterImage(MemBitmap filterBmp)
         {
-            _filterImage = filterImg;
+            _filterBmp = filterBmp;
         }
         public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {
@@ -634,7 +618,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public void CopyColorVSpan(int x, int y, int len, Color[] colors, int colorsIndex)
         {
             int bufferOffset32 = GetBufferOffsetXY32(x, y);
-            int actualW = strideInBytes / 4;
+            int actualW = _strideInBytes / 4;
             Imaging.TempMemPtr dst = new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
             do
             {

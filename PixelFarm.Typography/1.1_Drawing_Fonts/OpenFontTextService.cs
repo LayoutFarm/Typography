@@ -37,7 +37,7 @@ namespace LayoutFarm
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
                 collection.LoadSystemFonts(); //load system fonts
             });
-            
+
 
             //create typography service
             //you can implement this service on your own
@@ -76,6 +76,15 @@ namespace LayoutFarm
                  out langFullName))
             {
                 scLang = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
+                if (scLang == null)
+                {
+                    //use default lang
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine(langFullName + " :use latin");
+#endif
+                    scLang = ScriptLangs.Latin;
+                }
+
                 textservice.SetDefaultScriptLang(scLang);
                 textservice.CurrentScriptLang = scLang;
                 return true;
@@ -289,11 +298,14 @@ namespace LayoutFarm
                 lineGapInPx,
                 recommedLineSpacingInPx);
 
+            TextBufferSpan w = new TextBufferSpan(new char[] { ' ' });
+            Size whiteSpaceW = MeasureString(ref w, font);
+            PixelFarm.Drawing.Internal.RequestFontCacheAccess.SetWhitespaceWidth(font, _system_id, whiteSpaceW.Width);
             return typeface;
         }
         public float MeasureWhitespace(RequestFont f)
         {
-            throw new NotImplementedException();
+            return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
         }
 
         public GlyphPlanSequence CreateGlyphPlanSeq(ref TextBufferSpan textBufferSpan, RequestFont font)

@@ -59,10 +59,24 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 aff.Transform(ref x, ref y);
                 outputVxs.AddVertex(x, y, cmd);
             }
-
             //outputVxs.HasMoreThanOnePart = src.HasMoreThanOnePart;
             return outputVxs;
         }
+        public static VertexStore TransformToVxs(ref AffineMat aff, VertexStore src, VertexStore outputVxs)
+        {
+            int count = src.Count;
+            VertexCmd cmd;
+            double x, y;
+            for (int i = 0; i < count; ++i)
+            {
+                cmd = src.GetVertex(i, out x, out y);
+                aff.Transform(ref x, ref y);
+                outputVxs.AddVertex(x, y, cmd);
+            }
+            //outputVxs.HasMoreThanOnePart = src.HasMoreThanOnePart;
+            return outputVxs;
+        }
+
         /// <summary>
         /// we do NOT store vxs, return original outputVxs
         /// </summary>

@@ -28,6 +28,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 {
     public static class BoundingRect
     {
+        
         public static RectD GetBoundingRect(this VertexStore vxs)
         {
             RectD bounds = RectD.ZeroIntersection;
@@ -60,6 +61,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return rValue;
         }
 
+        public static void GetBoundingRect(double x, double y, ref RectD rect)
+        {
+            if (x < rect.Left) rect.Left = x;
+            if (y < rect.Bottom) rect.Bottom = y;
+            if (x > rect.Right) rect.Right = x;
+            if (y > rect.Top) rect.Top = y;
+        }
 
 
         //-----------------------------------------------------bounding_rect_single

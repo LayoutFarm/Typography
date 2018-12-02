@@ -33,7 +33,7 @@ using img_subpix_const = PixelFarm.CpuBlit.Imaging.ImageFilterLookUpTable.ImgSub
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     // it should be easy to write a 90 rotating or mirroring filter too. LBB 2012/01/14
-    public class ImgSpanGenRGBA_NN_StepXBy1 : ImgSpanGen
+    class ImgSpanGenRGBA_NN_StepXBy1 : ImgSpanGen
     {
 
         //a span generator generates output color spans => 
@@ -42,16 +42,22 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         const int BASE_SCALE = (int)(1 << BASE_SHITF);
         const int BASE_MASK = BASE_SCALE - 1;
         IBitmapSrc _bmpSrc;
-        public ImgSpanGenRGBA_NN_StepXBy1(IBitmapSrc src, ISpanInterpolator spanInterpolator)
-            : base(spanInterpolator)
+        public ImgSpanGenRGBA_NN_StepXBy1()
         {
-            _bmpSrc = src;
-            if (_bmpSrc.BitDepth != 32)
+
+        } 
+        public void SetSrcBitmap(IBitmapSrc src)
+        {
+            if (src.BitDepth != 32)
             {
                 throw new NotSupportedException("The source is expected to be 32 bit.");
             }
+            _bmpSrc = src;
         }
-
+        public void ReleaseSrcBitmap()
+        {
+            _bmpSrc = null;
+        }
         public sealed override void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len)
         {
             ISpanInterpolator spanInterpolator = Interpolator;
@@ -118,7 +124,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
 
 
-    public class ImgSpanGenRGBA_BilinearClip : ImgSpanGen
+    class ImgSpanGenRGBA_BilinearClip : ImgSpanGen
     {
         const int BASE_SHIFT = 8;
         const int BASE_SCALE = (int)(1 << BASE_SHIFT);
@@ -126,19 +132,22 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         IBitmapSrc _imgsrc;
         Drawing.Color m_bgcolor;
         int bytesBetweenPixelInclusive;
-        bool _mode0 = false;
+        bool _mode0 = false; 
 
-
-        public ImgSpanGenRGBA_BilinearClip(IBitmapSrc src,
-            Drawing.Color back_color,
-            ISpanInterpolator inter)
-            : base(inter)
+        public ImgSpanGenRGBA_BilinearClip(Drawing.Color back_color)
         {
             m_bgcolor = back_color;
+        }
+
+        public void SetSrcBitmap(IBitmapSrc src)
+        {
             _imgsrc = src;
             bytesBetweenPixelInclusive = _imgsrc.BytesBetweenPixelsInclusive;
         }
-
+        public void ReleaseSrcBitmap()
+        {
+            _imgsrc = null;
+        }
         public override void Prepare()
         {
             base.Prepare();

@@ -83,10 +83,7 @@ namespace Typography.TextBreak
 
             breaker.EngBreakingEngine.EngCustomAbbrvDic = s_enAbbrvDic;//optional 
             breaker.EngBreakingEngine.EnableCustomAbbrv = true;//optional 
-            //
-
-
-            //
+            // 
             var thBreaker = new ThaiDictionaryBreakingEngine();
             //thBreaker.DontMergeLastIncompleteWord = true;
             thBreaker.SetDictionaryData(s_thaiDic);

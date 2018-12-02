@@ -42,7 +42,7 @@ namespace Typography.TextServices
         public TextServices()
         {
 
-            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist(); 
+            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
             _glyphLayout = new GlyphLayout();
         }
         public void SetDefaultScriptLang(ScriptLang scLang)
@@ -114,7 +114,15 @@ namespace Typography.TextServices
             if (_textBreaker == null)
             {
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
+#if DEBUG
+                if (_textBreaker == null)
+                {
+
+                }
+#endif
             }
+
+
             int cur_startAt = startAt;
             _textBreaker.BreakWords(str, cur_startAt, len);
             foreach (TextBreak.BreakSpan sp in _textBreaker.GetBreakSpanIter())

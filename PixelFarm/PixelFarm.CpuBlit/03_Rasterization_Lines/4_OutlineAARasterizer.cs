@@ -57,13 +57,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int count = list.Count;
             if (count > 1)
             {
-                var innerArray = list.Array;
+                LineAAVertex[] innerArray = list.UnsafeInternalArray;
                 if (!innerArray[count - 2].IsDiff(innerArray[count - 1]))
                 {
                     list.RemoveLast();
                 }
             }
-            list.AddVertex(val);
+            list.Append(val);
         }
         public LineAAVertex this[int index]
         {
@@ -88,7 +88,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             //----------------------
             //iter backward
             int count = list.Count;
-            var innerArray = list.Array;
+            var innerArray = list.UnsafeInternalArray;
             while (count > 1)
             {
                 if (innerArray[count - 2].IsDiff(innerArray[count - 1]))
