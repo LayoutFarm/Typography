@@ -101,7 +101,8 @@ namespace DrawingGL
                 for (int i = 1; i < n; ++i)
                 {
                     Vector2 vector2 = curve.CalculatePoint(stepSum);
-                    pointList.Add(vector2.X); pointList.Add(vector2.Y);
+                    pointList.Add(vector2.X);
+                    pointList.Add(vector2.Y);
                     stepSum += eachstep;
                 }
             }

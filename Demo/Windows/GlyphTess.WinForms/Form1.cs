@@ -133,8 +133,8 @@ namespace Test_WinForm_TessGlyph
                     startAt = (endAt + 1) + 3;
                 }
             }
-            int areaCount;
-            float[] tessData = _tessTool.TessPolygon(polygon1, _contourEnds, out areaCount);
+
+            float[] tessData = _tessTool.TessPolygon(polygon1, _contourEnds);
             //draw tess 
             int j = tessData.Length;
             for (int i = 0; i < j;)
