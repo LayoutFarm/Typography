@@ -96,11 +96,10 @@ namespace DrawingGL
         }
 
         public void CombineCallBack(double v0,
-            double v1,
-            double v2,
-            int[] data4,
-            double[] weight4,
-            out int outData)
+             double v1,
+             double v2,
+             ref Tesselator.CombineParameters combinePars,
+             out int outData)
         {
             //double error = .001;
             //Assert.IsTrue(GetNextOutputAsString() == "C");

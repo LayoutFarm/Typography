@@ -96,7 +96,7 @@ namespace Tesselate
             while (!tess.vertexPriorityQue.IsEmpty)
             {
                 vertex = tess.vertexPriorityQue.DeleteMin();
-                for (;;)
+                for (; ; )
                 {
                     if (!tess.vertexPriorityQue.IsEmpty)
                     {
@@ -457,7 +457,7 @@ namespace Tesselate
             }
             regPrev = regUp;
             ePrev = eTopLeft;
-            for (;;)
+            for (; ; )
             {
                 reg = RegionBelow(regPrev);
                 e = reg.upperHalfEdge.otherHalfOfThisEdge;
@@ -499,19 +499,19 @@ namespace Tesselate
         }
 
 
-        static void CallCombine(Tesselator tess, ContourVertex intersectionVertex, int[] vertexIndexArray, double[] vertexWeights, bool needed)
+        static void CallCombine(Tesselator tess, ContourVertex intersectionVertex, ref Tesselator.CombineParameters combinePars, bool needed)
         {
             /* Copy coord data in case the callback changes it. */
             double c0 = intersectionVertex.C_0;
             double c1 = intersectionVertex.C_1;
             double c2 = intersectionVertex.C_2;
             intersectionVertex.clientIndex = 0;
-            tess.CallCombine(c0, c1, c2, vertexIndexArray, vertexWeights, out intersectionVertex.clientIndex);
+            tess.CallCombine(c0, c1, c2, ref combinePars, out intersectionVertex.clientIndex);
             if (intersectionVertex.clientIndex == 0)
             {
                 if (!needed)
                 {
-                    intersectionVertex.clientIndex = vertexIndexArray[0];
+                    intersectionVertex.clientIndex = combinePars.d0;
                 }
                 else
                 {
@@ -530,11 +530,12 @@ namespace Tesselate
          * e1.Org is kept, while e2.Org is discarded.
          */
         {
-            int[] data4 = new int[4];
-            double[] weights4 = new double[] { 0.5f, 0.5f, 0, 0 };
-            data4[0] = e1.originVertex.clientIndex;
-            data4[1] = e2.originVertex.clientIndex;
-            CallCombine(tess, e1.originVertex, data4, weights4, false);
+            var combinePars = new Tesselator.CombineParameters();
+            combinePars.w0 = 0.5f; combinePars.w1 = 0.5f;
+            combinePars.d0 = e1.originVertex.clientIndex;
+            combinePars.d1 = e2.originVertex.clientIndex;
+
+            CallCombine(tess, e1.originVertex, ref combinePars, false);
             Mesh.meshSplice(e1, e2);
         }
 
@@ -572,16 +573,17 @@ namespace Tesselate
          * rendering callbacks.
          */
         {
-            int[] data4 = new int[4];
-            double[] weights4 = new double[4];
-            data4[0] = orgUp.clientIndex;
-            data4[1] = dstUp.clientIndex;
-            data4[2] = orgLo.clientIndex;
-            data4[3] = dstLo.clientIndex;
+
+            var combinePars = new Tesselator.CombineParameters();
+            combinePars.d0 = orgUp.clientIndex;
+            combinePars.d1 = dstUp.clientIndex;
+            combinePars.d2 = orgLo.clientIndex;
+            combinePars.d3 = dstLo.clientIndex;
+
             isect.C_0 = isect.C_1 = isect.C_2 = 0;
-            VertexWeights(isect, orgUp, dstUp, out weights4[0], out weights4[1]);
-            VertexWeights(isect, orgLo, dstLo, out weights4[2], out weights4[3]);
-            CallCombine(tess, isect, data4, weights4, true);
+            VertexWeights(isect, orgUp, dstUp, out combinePars.w0, out combinePars.w1);
+            VertexWeights(isect, orgLo, dstLo, out combinePars.w2, out combinePars.w3);
+            CallCombine(tess, isect, ref combinePars, true);
         }
 
         static bool CheckForRightSplice(Tesselator tess, ActiveRegion regUp)
@@ -1075,7 +1077,7 @@ namespace Tesselate
         {
             ActiveRegion regLo = RegionBelow(regUp);
             HalfEdge eUp, eLo;
-            for (;;)
+            for (; ; )
             {
                 /* Find the lowest dirty region (we walk from the bottom up). */
                 while (regLo.dirty)

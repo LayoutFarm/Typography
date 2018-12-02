@@ -90,8 +90,8 @@ namespace Tesselate
         public MiniCollection.MaxFirstList<ContourVertex> vertexPriorityQue = new MiniCollection.MaxFirstList<ContourVertex>();
         public ContourVertex currentSweepVertex;		/* current sweep event being processed */
         public delegate void CallCombineDelegate(
-            double c1, double c2, double c3, int[] data4,
-            double[] weight4, out int outData);
+             double c1, double c2, double c3, ref CombineParameters combinePars, out int outData);
+
         public CallCombineDelegate callCombine;
         /*** state needed for rendering callbacks (see render.c) ***/
 
@@ -202,13 +202,12 @@ namespace Tesselate
             }
         }
 
-        public void CallCombine(double v0, double v1, double v2, int[] data4,
-            double[] weight4, out int outData)
+        public void CallCombine(double v0, double v1, double v2, ref CombineParameters combinePars, out int outData)
         {
             outData = 0;
             if (callCombine != null)
             {
-                callCombine(v0, v1, v2, data4, weight4, out outData);
+                callCombine(v0, v1, v2, ref combinePars, out outData);
             }
         }
 
