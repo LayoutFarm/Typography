@@ -70,9 +70,9 @@ namespace DrawingGL
     class SimpleCurveFlattener
     {
 
-        int nsteps = 3;
-        List<float> pointList = new List<float>();
-        List<int> endPointList = new List<int>();
+        int _nsteps = 3;
+        List<float> _xyCoords = new List<float>();
+        List<int> _endPointList = new List<int>();
 
         void FlattenBezire(
           List<float> pointList,
@@ -81,7 +81,7 @@ namespace DrawingGL
           float x2, float y2,
           float x3, float y3)
         {
-            if (nsteps > 0)
+            if (_nsteps > 0)
             {
                 //--------------------------------
                 //don't add 1st point (x0, y0)
@@ -94,14 +94,15 @@ namespace DrawingGL
                     new Vector2(x1, y1),
                     new Vector2(x2, y2));
 
-                float eachstep = (float)1 / nsteps;
+                float eachstep = (float)1 / _nsteps;
                 float stepSum = eachstep;//start
 
-                int n = nsteps - 1;
+                int n = _nsteps - 1;
                 for (int i = 1; i < n; ++i)
                 {
                     Vector2 vector2 = curve.CalculatePoint(stepSum);
-                    pointList.Add(vector2.X); pointList.Add(vector2.Y);
+                    pointList.Add(vector2.X);
+                    pointList.Add(vector2.Y);
                     stepSum += eachstep;
                 }
             }
@@ -112,8 +113,8 @@ namespace DrawingGL
         {
 
             //reset
-            endPointList.Clear();
-            pointList.Clear();
+            _endPointList.Clear();
+            _xyCoords.Clear();
             //----------
             int j = points.Count;
             if (j == 0) { endContours = null; return null; }
@@ -133,14 +134,14 @@ namespace DrawingGL
                     default: throw new System.NotSupportedException();
                     case PathPointKind.Point:
                         {
-                            pointList.Add(latest_x = p1.x);
-                            pointList.Add(latest_y = p1.y);
+                            _xyCoords.Add(latest_x = p1.x);
+                            _xyCoords.Add(latest_y = p1.y);
                         }
                         break;
                     case PathPointKind.CloseFigure:
                         {
                             //add stop mark point
-                            endPointList.Add(pointList.Count - 1);
+                            _endPointList.Add(_xyCoords.Count - 1);
                         }
                         break;
                     case PathPointKind.CurveControl:
@@ -152,7 +153,7 @@ namespace DrawingGL
                             PathPoint p3 = points[i + 2];
                             //--------------
                             FlattenBezire(
-                                pointList,
+                                _xyCoords,
                                 latest_x, latest_y,
                                 p1.x, p1.y,
                                 p2.x, p2.y,
@@ -165,8 +166,8 @@ namespace DrawingGL
                 }
                 //close 
             }
-            endContours = endPointList.ToArray();
-            return pointList.ToArray();
+            endContours = _endPointList.ToArray();
+            return _xyCoords.ToArray();
         }
     }
 }
