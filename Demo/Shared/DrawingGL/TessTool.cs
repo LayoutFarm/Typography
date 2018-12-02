@@ -183,12 +183,17 @@ namespace DrawingGL
         readonly Tesselator _tess;
         readonly TessListener _tessListener;
 
-        public TessTool() : this(new Tesselator() { WindingRule = Tesselator.WindingRuleType.Odd }) { }
+        public TessTool() : this(new Tesselator() { WindingRule = Tesselator.WindingRuleType.NonZero }) { }
         public TessTool(Tesselator tess)
         {
             _tess = tess;
             _tessListener = new TessListener();
             _tessListener.Connect(tess, true);
+        }
+        public Tesselator.WindingRuleType WindingRuleType
+        {
+            get => _tess.WindingRule;
+            set => _tess.WindingRule = value;
         }
         public List<ushort> TessIndexList => _tessListener._resultIndexList;
         public List<TessVertex2d> TempVertexList => _tessListener._tempVertexList;
