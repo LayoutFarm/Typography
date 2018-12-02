@@ -39,7 +39,7 @@ namespace Test_WinForm_TessGlyph
 
                 //--
                 var builder = new Typography.Contours.GlyphPathBuilder(typeface);
-                builder.BuildFromGlyphIndex(typeface.LookupIndex('i'), 256);
+                builder.BuildFromGlyphIndex(typeface.LookupIndex('m'), 256);
 
                 var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();

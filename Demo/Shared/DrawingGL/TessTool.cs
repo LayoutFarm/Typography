@@ -1,4 +1,13 @@
-﻿//MIT, 2014-present, WinterDev  
+﻿//BSD, 2014-present, WinterDev
+
+/*
+ * Created by SharpDevelop.
+ * User: lbrubaker
+ * Date: 3/26/2010
+ * Time: 4:37 PM
+ * 
+ * To change this template use Tools | Options | Coding | Edit Standard Headers.
+ */
 
 using System.Collections.Generic;
 using Tesselate;
@@ -155,9 +164,9 @@ namespace DrawingGL
     {
         readonly Tesselator _tess;
         readonly TessListener _tessListener;
-        List<TessVertex2d> _vertexts = new List<TessVertex2d>();
+
         public TessTool() : this(new Tesselator() { WindingRule = Tesselator.WindingRuleType.Odd }) { }
-        public TessTool(Tesselate.Tesselator tess)
+        public TessTool(Tesselator tess)
         {
             _tess = tess;
             _tessListener = new TessListener();
@@ -165,46 +174,55 @@ namespace DrawingGL
         }
         public List<ushort> TessIndexList => _tessListener._resultIndexList;
         public List<TessVertex2d> TempVertexList => _tessListener._tempVertexList;
-
-
         public bool TessPolygon(float[] vertex2dCoords, int[] contourEndPoints)
         {
-            int areaCount = 0;
-            _vertexts.Clear();//reset
-            //
             int ncoords = vertex2dCoords.Length / 2;
-            if (ncoords == 0) { areaCount = 0; return false; }
-
-            int nn = 0;
-            for (int i = 0; i < ncoords; ++i)
-            {
-                _vertexts.Add(new TessVertex2d(vertex2dCoords[nn++], vertex2dCoords[nn++]));
-            }
-            //-----------------------
             _tessListener.ResetAndLoadInputVertexList(ncoords);
+            if (ncoords == 0) { return false; }
+            //this support sub contour in the same array of  vertex2dCoords
             //-----------------------
             _tess.BeginPolygon();
 
-            int nContourCount = contourEndPoints.Length;
-            int beginAt = 0;
-            for (int m = 0; m < nContourCount; ++m)
+            if (contourEndPoints == null || contourEndPoints.Length == 1)
             {
-                int thisContourEndAt = (contourEndPoints[m] + 1) / 2;
+                //only 1 contour
+                int beginAt = 0;
+                int thisContourEndAt = vertex2dCoords.Length / 2;
                 _tess.BeginContour();
                 for (int i = beginAt; i < thisContourEndAt; ++i)
                 {
-                    TessVertex2d v = _vertexts[i];
-                    _tess.AddVertex(v.m_X, v.m_Y, 0, i);
+                    _tess.AddVertex(
+                        vertex2dCoords[i << 1], //*2
+                        vertex2dCoords[(i << 1) + 1], 0, i); //*2+1
                 }
                 beginAt = thisContourEndAt + 1;
                 _tess.EndContour();
             }
+            else
+            {
+                int nContourCount = contourEndPoints.Length;
+                int beginAt = 0;
+                for (int m = 0; m < nContourCount; ++m)
+                {
+                    int thisContourEndAt = (contourEndPoints[m] + 1) / 2;
+                    _tess.BeginContour();
+                    for (int i = beginAt; i < thisContourEndAt; ++i)
+                    {
+                        _tess.AddVertex(
+                            vertex2dCoords[i << 1],
+                            vertex2dCoords[(i << 1) + 1],
+                            0,
+                            i);
 
-
+                    }
+                    beginAt = thisContourEndAt + 1;
+                    _tess.EndContour();
+                }
+            }
+            //
+            //
             _tess.EndPolygon();
             return true;
-
-
         }
     }
 
