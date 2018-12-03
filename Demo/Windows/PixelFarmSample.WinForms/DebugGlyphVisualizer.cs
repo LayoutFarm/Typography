@@ -100,16 +100,12 @@ namespace SampleWinForms.UI
 
             builder.ReadShapes(txToVxs1);
 
-#if DEBUG 
-            var ps = txToVxs1.dbugGetPathWriter();
-            _infoView.ShowOrgBorderInfo(ps.Vxs);
+#if DEBUG              
+            _infoView.ShowOrgBorderInfo(txToVxs1.dbugVxs);
 #endif
+
             PixelFarm.Drawing.VertexStore vxs = new PixelFarm.Drawing.VertexStore();
-
             txToVxs1.WriteOutput(vxs);
-            //----------------------------------------------------
-
-            //----------------------------------------------------
             painter.UseSubPixelLcdEffect = this.UseLcdTechnique;
             //5. use PixelFarm's Agg to render to bitmap...
             //5.1 clear background
@@ -180,12 +176,6 @@ namespace SampleWinForms.UI
                 RenderTessTesult();
             }
 
-            //if (DrawDynamicOutline)
-            //{
-            //    GlyphDynamicOutline dynamicOutline = builder.LatestGlyphFitOutline;
-            //    WalkDynamicOutline(painter, dynamicOutline, scale, DrawRegenerateOutline);
-
-            //}
 
         }
 
