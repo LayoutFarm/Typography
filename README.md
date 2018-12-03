@@ -205,6 +205,7 @@ This is a snapshot of Html drawboard from (https://github.com/LayoutFarm/HtmlRen
 The glyphs are generated/layouted with _Typography_, and rendered with PixelFarm (https://github.com/PaintLab/PixelFarm).
 
 ![html_renderer_with_selection2](https://user-images.githubusercontent.com/7447159/49267623-fc952900-f48d-11e8-8ac8-03269c571c2c.png)
+
 _pic 1: HtmlRenderer on GLES2 surface, text are renderered with the Typography_
 
 
