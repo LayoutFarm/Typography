@@ -17,8 +17,10 @@ namespace PixelFarm.Drawing.Fonts
     {
         CurveFlattener _curveFlattener = new CurveFlattener();
         PathWriter _pw = new PathWriter();
+        VertexStore _vxs = new VertexStore();
         public GlyphTranslatorToVxs()
         {
+            _pw.BindVxs(_vxs);
         }
 #if DEBUG
         public PathWriter dbugGetPathWriter()
@@ -69,7 +71,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             if (scale == 1)
             {
-                _curveFlattener.MakeVxs(_pw.Vxs, output);
+                _curveFlattener.MakeVxs(_vxs, output);
             }
             else
             {
@@ -81,7 +83,7 @@ namespace PixelFarm.Drawing.Fonts
                 using (VxsTemp.Borrow(out var v1))
                 using (VectorToolBox.Borrow(out CurveFlattener f))
                 {
-                    _curveFlattener.MakeVxs(_pw.Vxs, mat, output);
+                    _curveFlattener.MakeVxs(_vxs, mat, output);
                 }
             }
         }
