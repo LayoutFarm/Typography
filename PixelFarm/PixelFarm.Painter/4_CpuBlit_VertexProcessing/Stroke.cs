@@ -91,7 +91,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 switch (cmd)
                 {
                     case VertexCmd.NoMore:
-                        break;
+                        goto EXIT_LOOP; //***
                     case VertexCmd.Close:
                         if (i < j)
                         {
@@ -121,17 +121,19 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     case VertexCmd.LineTo:
                     case VertexCmd.P2c://user must flatten the curve before do stroke
                     case VertexCmd.P3c://user must flatten the curve before do stroke 
-                        strkgen.AddVertex(x, y, cmd); 
+                        strkgen.AddVertex(x, y, cmd);
                         break;
-                    case VertexCmd.MoveTo: 
+                    case VertexCmd.MoveTo:
                         strkgen.AddVertex(x, y, cmd);
                         startX = x;
-                        startY = y; 
+                        startY = y;
                         break;
                     default: throw new System.NotSupportedException();
                 }
             }
-
+            //---
+            EXIT_LOOP:
+            //
             strkgen.WriteTo(outputVxs);
             strkgen.Reset();
 

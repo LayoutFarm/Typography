@@ -571,9 +571,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             switch (cmd)
             {
                 case VertexCmd.NoMore:
-                    {
-                    }
-                    break;
+                    //do nothing
+                    return;
                 case VertexCmd.MoveTo:
                     Render(false);
                     MoveTo(x, y);
