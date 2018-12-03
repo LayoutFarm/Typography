@@ -20,7 +20,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         List<IntPolygon> bPolys = new List<IntPolygon>();
         List<IntPolygon> intersectedPolys = new List<IntPolygon>();
         Clipper clipper = new Clipper();
-        PathWriter outputPathWriter = new PathWriter();
+
 
 
         public static void CombinePaths(
@@ -79,52 +79,55 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         //first one
                         IntPoint point = polygon[0];
-                        outputPathWriter.MoveTo(point.X / 1000.0, point.Y / 1000.0);
-                        //next others ...
-                        if (j > 1)
+                        using (VxsTemp.Borrow(out VertexStore v1))
+                        using (VectorToolBox.Borrow(v1, out PathWriter pw))
                         {
-                            for (int i = 1; i < j; ++i)
+                            pw.MoveTo(point.X / 1000.0, point.Y / 1000.0);
+                            //next others ...
+                            if (j > 1)
                             {
-                                point = polygon[i];
-                                outputPathWriter.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                for (int i = 1; i < j; ++i)
+                                {
+                                    point = polygon[i];
+                                    pw.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                }
                             }
-                        }
 
-                        outputPathWriter.CloseFigure();
-                        resultList.Add(outputPathWriter.Vxs);
-                        //---
-                        //clear and set an new Vxs for next operation...
-                        //TODO: review here again
-                        outputPathWriter.ResetWithExternalVxs(new VertexStore());
+                            pw.CloseFigure();
+                            resultList.Add(v1.CreateTrim()); //copy
+                            pw.Clear();
+                        }
                     }
                 }
             }
             else
             {
-                foreach (List<IntPoint> polygon in intersectedPolys)
+                using (VxsTemp.Borrow(out VertexStore v1))
+                using (VectorToolBox.Borrow(v1, out PathWriter pw))
                 {
-                    int j = polygon.Count;
-                    if (j > 0)
+                    foreach (List<IntPoint> polygon in intersectedPolys)
                     {
-                        //first one
-                        IntPoint point = polygon[0];
-                        outputPathWriter.MoveTo(point.X / 1000.0, point.Y / 1000.0);
-                        //next others ...
-                        if (j > 1)
+                        int j = polygon.Count;
+                        if (j > 0)
                         {
-                            for (int i = 1; i < j; ++i)
+                            //first one
+                            IntPoint point = polygon[0];
+                            pw.MoveTo(point.X / 1000.0, point.Y / 1000.0);
+                            //next others ...
+                            if (j > 1)
                             {
-                                point = polygon[i];
-                                outputPathWriter.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                for (int i = 1; i < j; ++i)
+                                {
+                                    point = polygon[i];
+                                    pw.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                }
                             }
+                            pw.CloseFigure();
                         }
-                        outputPathWriter.CloseFigure();
                     }
-                }
-
-                //TODO: review here
-                outputPathWriter.Stop();
-                resultList.Add(outputPathWriter.Vxs);
+                    pw.Stop();
+                    resultList.Add(v1.CreateTrim());
+                } 
             }
         }
 

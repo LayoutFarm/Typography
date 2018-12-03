@@ -70,15 +70,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public struct TempContext<T> : IDisposable
     {
-        internal readonly T vxs;
-        internal TempContext(out T outputvxs)
+        internal readonly T tool;
+        internal TempContext(out T tool)
         {
-            Temp<T>.GetFreeItem(out vxs);
-            outputvxs = this.vxs;
+            Temp<T>.GetFreeItem(out this.tool);
+            tool = this.tool;
         }
         public void Dispose()
         {
-            Temp<T>.Release(vxs);
+            Temp<T>.Release(tool);
         }
     }
 
@@ -90,7 +90,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         static Func<T> s_newHandler;
         [System.ThreadStatic]
         static Action<T> s_releaseCleanUp;
-         
+
         public static TempContext<T> Borrow(out T freeItem)
         {
             return new TempContext<T>(out freeItem);
@@ -198,15 +198,21 @@ namespace PixelFarm.Drawing
             }
             return Temp<Stroke>.Borrow(out stroke);
         }
-        public static TempContext<PixelFarm.CpuBlit.PathWriter> Borrow(out PixelFarm.CpuBlit.PathWriter pathWriter)
+        static TempContext<PixelFarm.CpuBlit.PathWriter> Borrow(out PixelFarm.CpuBlit.PathWriter pathWriter)
         {
             if (!Temp<PixelFarm.CpuBlit.PathWriter>.IsInit())
             {
                 Temp<PixelFarm.CpuBlit.PathWriter>.SetNewHandler(
                     () => new PixelFarm.CpuBlit.PathWriter(),
-                    w => w.Clear());
+                    w => w.UnbindVxs());
             }
             return Temp<PixelFarm.CpuBlit.PathWriter>.Borrow(out pathWriter);
+        }
+        public static TempContext<PixelFarm.CpuBlit.PathWriter> Borrow(VertexStore vxs, out PixelFarm.CpuBlit.PathWriter pathWriter)
+        {
+            var tmpPw = Borrow(out pathWriter);
+            tmpPw.tool.BindVxs(vxs);
+            return tmpPw;
         }
         public static TempContext<Ellipse> Borrow(out Ellipse pathWriter)
         {

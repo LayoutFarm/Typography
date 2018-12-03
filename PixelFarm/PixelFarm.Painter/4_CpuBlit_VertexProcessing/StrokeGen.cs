@@ -220,7 +220,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     out Vertex2d next);
                 //check if we should join or not ?
 
-                //don't join it
+                
                 m_stroker.CreateJoin(m_out_vertices,
                    prev,
                    cur,

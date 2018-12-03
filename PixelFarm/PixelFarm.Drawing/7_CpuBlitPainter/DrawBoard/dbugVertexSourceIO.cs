@@ -29,41 +29,41 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
         //-------------------------------------------------
-        public static void WriteToStream(BinaryWriter writer, PathWriter pathSource)
-        {
-            int num_vertice;
-            int num_alloc_vertice;
-            double[] coord_xy;
-            byte[] cmds;
-            PathWriter.UnsafeDirectGetData(pathSource,
-                out num_alloc_vertice,
-                out num_vertice,
-                out coord_xy,
-                out cmds);
-            //write to binary format ?
-            //1.  
-            writer.Write(num_alloc_vertice);//hint
-            //2. 
-            writer.Write(num_vertice); //actual vertices
-            //3. all vertice
-            int totalCoord = num_vertice << 1;
-            for (int i = 0; i < totalCoord; )
-            {
-                writer.Write(coord_xy[i]);//x
-                i++;
-                writer.Write(coord_xy[i]);//y
-                i++;
-            }
-            writer.Write(num_vertice); //actual vertices
-            //4. all commands
-            for (int i = 0; i < num_vertice; ++i)
-            {
-                writer.Write((byte)cmds[i]);
-            }
-            writer.Write((int)0);
-            writer.Flush();
-            //------------------------------------
-        }
+        //public static void WriteToStream(BinaryWriter writer, PathWriter pathSource)
+        //{
+        //    int num_vertice;
+        //    int num_alloc_vertice;
+        //    double[] coord_xy;
+        //    byte[] cmds;
+        //    PathWriter.UnsafeDirectGetData(pathSource,
+        //        out num_alloc_vertice,
+        //        out num_vertice,
+        //        out coord_xy,
+        //        out cmds);
+        //    //write to binary format ?
+        //    //1.  
+        //    writer.Write(num_alloc_vertice);//hint
+        //    //2. 
+        //    writer.Write(num_vertice); //actual vertices
+        //    //3. all vertice
+        //    int totalCoord = num_vertice << 1;
+        //    for (int i = 0; i < totalCoord; )
+        //    {
+        //        writer.Write(coord_xy[i]);//x
+        //        i++;
+        //        writer.Write(coord_xy[i]);//y
+        //        i++;
+        //    }
+        //    writer.Write(num_vertice); //actual vertices
+        //    //4. all commands
+        //    for (int i = 0; i < num_vertice; ++i)
+        //    {
+        //        writer.Write((byte)cmds[i]);
+        //    }
+        //    writer.Write((int)0);
+        //    writer.Flush();
+        //    //------------------------------------
+        //}
         public static void WriteColorsToStream(BinaryWriter writer, Color[] colors)
         {
             int len = colors.Length;
@@ -91,40 +91,40 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             writer.Write((int)0);
             writer.Flush();
         }
-        public static void ReadPathDataFromStream(BinaryReader reader, out PathWriter newPath)
-        {
-            newPath = new PathWriter();
-            //1.
-            int num_alloc_vertice = reader.ReadInt32();//hint
-            //2.
-            int num_vertice = reader.ReadInt32();//actual vertice num
-            int totalCoord = num_vertice << 1;
-            //3.
-            double[] coord_xy = new double[totalCoord];
-            //4.
-            byte[] cmds = new byte[num_vertice];
-            for (int i = 0; i < totalCoord; )
-            {
-                coord_xy[i] = reader.ReadDouble();
-                i++;
-                coord_xy[i] = reader.ReadDouble();
-                i++;
-            }
-            //4.
-            int cmds_count = reader.ReadInt32();
-            for (int i = 0; i < cmds_count; ++i)
-            {
-                cmds[i] = reader.ReadByte();
-            }
+        //public static void ReadPathDataFromStream(BinaryReader reader, out PathWriter newPath)
+        //{
+        //    //newPath = new PathWriter();
+        //    ////1.
+        //    //int num_alloc_vertice = reader.ReadInt32();//hint
+        //    ////2.
+        //    //int num_vertice = reader.ReadInt32();//actual vertice num
+        //    //int totalCoord = num_vertice << 1;
+        //    ////3.
+        //    //double[] coord_xy = new double[totalCoord];
+        //    ////4.
+        //    //byte[] cmds = new byte[num_vertice];
+        //    //for (int i = 0; i < totalCoord; )
+        //    //{
+        //    //    coord_xy[i] = reader.ReadDouble();
+        //    //    i++;
+        //    //    coord_xy[i] = reader.ReadDouble();
+        //    //    i++;
+        //    //}
+        //    ////4.
+        //    //int cmds_count = reader.ReadInt32();
+        //    //for (int i = 0; i < cmds_count; ++i)
+        //    //{
+        //    //    cmds[i] = reader.ReadByte();
+        //    //}
 
-            PathWriter.UnsafeDirectSetData(
-                newPath,
-                num_alloc_vertice,
-                num_vertice,
-                coord_xy,
-                cmds);
-            int end = reader.ReadInt32();
-        }
+        //    //PathWriter.UnsafeDirectSetData(
+        //    //    newPath,
+        //    //    num_alloc_vertice,
+        //    //    num_vertice,
+        //    //    coord_xy,
+        //    //    cmds);
+        //    //int end = reader.ReadInt32();
+        //}
 
         public static void ReadColorDataFromStream(BinaryReader reader, out Color[] colors)
         {

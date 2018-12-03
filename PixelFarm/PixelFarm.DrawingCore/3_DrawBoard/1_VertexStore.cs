@@ -33,6 +33,8 @@ namespace PixelFarm.Drawing
 #if DEBUG
         static int dbugTotal = 0;
         public readonly int dbugId = dbugGetNewId();
+        public int dbugNote;
+
         static int dbugGetNewId()
         {
             return dbugTotal++;
@@ -41,10 +43,6 @@ namespace PixelFarm.Drawing
         public VertexStore()
         {
             AllocIfRequired(2);
-            //if (dbugId == 30)
-            //{
-
-            //}
         }
 
 
