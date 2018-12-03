@@ -23,7 +23,11 @@ namespace LayoutFarm
         TextServices _txtServices;
         Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>();
         readonly int _system_id;
-        public OpenFontTextService()
+
+
+        public static Typography.OpenFont.ScriptLang DefaultScriptLang { get; set; }
+
+        public OpenFontTextService(Typography.OpenFont.ScriptLang scLang = null)
         {
             // 
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
@@ -49,10 +53,23 @@ namespace LayoutFarm
             //user can set this to other choices...
             //eg. directly specific the script lang  
 
-            if (!TrySettingScriptLangFromCurrentThreadCultureInfo(_txtServices))
+
+            //set script-lang 
+            if (scLang == null)
             {
-                //TODO:
+                //use default
+                scLang = DefaultScriptLang;
             }
+            // if not default then try guess
+            if (scLang == null &&
+                !TryGetScriptLangFromCurrentThreadCultureInfo(out scLang))
+            {
+                //TODO: handle error here
+            }
+
+            _txtServices.SetDefaultScriptLang(scLang);
+            _txtServices.CurrentScriptLang = scLang;
+
             // ... or specific the scriptlang manully, eg. ...
             //_shapingServices.SetDefaultScriptLang(scLang);
             //_shapingServices.SetCurrentScriptLang(scLang);
@@ -64,30 +81,26 @@ namespace LayoutFarm
         {
             _txtServices.InstalledFontCollection.LoadFontsFromFolder(folder);
         }
-        static bool TrySettingScriptLangFromCurrentThreadCultureInfo(TextServices textservice)
+        static bool TryGetScriptLangFromCurrentThreadCultureInfo(out Typography.OpenFont.ScriptLang scLang)
         {
-            //accessory...
             var currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            Typography.OpenFont.ScriptLang scLang = null;
-            string langFullName;
+            scLang = null;
             if (Typography.TextBreak.IcuData.TryGetFullLanguageNameFromLangCode(
                  currentCulture.TwoLetterISOLanguageName,
                  currentCulture.ThreeLetterISOLanguageName,
-                 out langFullName))
+                 out string langFullName))
             {
                 scLang = Typography.OpenFont.ScriptLangs.GetRegisteredScriptLangFromLanguageName(langFullName);
                 if (scLang == null)
                 {
+                    //not found -> use default latin
                     //use default lang
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine(langFullName + " :use latin");
 #endif
                     scLang = ScriptLangs.Latin;
+                    return true;
                 }
-
-                textservice.SetDefaultScriptLang(scLang);
-                textservice.CurrentScriptLang = scLang;
-                return true;
             }
             return false;
         }
