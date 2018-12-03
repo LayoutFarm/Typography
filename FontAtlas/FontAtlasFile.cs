@@ -81,11 +81,11 @@ namespace PixelFarm.Drawing.Fonts
                 glyphMap.Left = reader.ReadUInt16();
                 glyphMap.Top = reader.ReadUInt16();
                 glyphMap.Width = reader.ReadUInt16();
-                glyphMap.Height = reader.ReadUInt16(); 
+                glyphMap.Height = reader.ReadUInt16();
                 //---------------------------------------
                 //3. texture offset
-                glyphMap.TextureXOffset = reader.ReadSingle();
-                glyphMap.TextureYOffset = reader.ReadSingle();
+                glyphMap.TextureXOffset = reader.ReadInt16();
+                glyphMap.TextureYOffset = reader.ReadInt16();
 
                 //---------------------------------------
                 _atlas.AddGlyph(glyphIndex, glyphMap);
@@ -160,8 +160,8 @@ namespace PixelFarm.Drawing.Fonts
 
                 //3. texture offset                
                 GlyphImage img = g.img;
-                _writer.Write((float)img.TextureOffsetX);
-                _writer.Write((float)img.TextureOffsetY);
+                _writer.Write((short)img.TextureOffsetX);//short
+                _writer.Write((short)img.TextureOffsetY);//short
 
             }
         }

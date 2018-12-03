@@ -48,11 +48,11 @@ namespace Typography.Rendering
         /// <summary>
         /// texture offset X from original glyph
         /// </summary>
-        public double TextureOffsetX { get; set; }
+        public short TextureOffsetX { get; set; }
         /// <summary>
         /// texture offset Y from original glyph 
         /// </summary>
-        public double TextureOffsetY { get; set; }
+        public short TextureOffsetY { get; set; }
     }
 
     class CacheGlyph

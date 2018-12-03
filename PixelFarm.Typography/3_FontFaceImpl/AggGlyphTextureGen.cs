@@ -62,27 +62,23 @@ namespace Typography.Contours
 
                 //translate to positive quadrant and use minimum space
 
-                double dx = Math.Ceiling((bounds.Left < 0) ? -bounds.Left : 0);
-                double dy = 0;
+                int dx = (int)Math.Ceiling((bounds.Left < 0) ? -bounds.Left : 0);
+                int dy = 0;
 
                 //vertical adjust =>since we need to move it, then move it with integer value
                 if (bounds.Bottom < 0)
                 {
-                    dy = Math.Ceiling(-bounds.Bottom);
+                    dy = (int)Math.Ceiling(-bounds.Bottom);
                 }
                 else if (bounds.Bottom > 0)
                 {
-                    dy = Math.Floor(-bounds.Bottom);
+                    dy = (int)Math.Floor(-bounds.Bottom);
                 }
                 dx += horizontal_margin;
                 dy += vertical_margin;
                 //--------------------------------------------  
-
-                w = (int)Math.Ceiling(dx + w + horizontal_margin); //+right margin
-                h = (int)Math.Ceiling((double)(vertical_margin + h + vertical_margin)); //+bottom margin 
-
-
-
+                w = dx + w + horizontal_margin; //+right margin
+                h = vertical_margin + h + vertical_margin; //+bottom margin  
                 AggPainter painter = Painter;
                 if (TextureKind == TextureKind.StencilLcdEffect)
                 {
@@ -123,8 +119,20 @@ namespace Typography.Contours
                 }
                 //
                 var glyphImage = new GlyphImage(w, h);
-                glyphImage.TextureOffsetX = dx;
-                glyphImage.TextureOffsetY = dy;
+
+#if DEBUG
+                if (dx < short.MinValue || dx > short.MaxValue)
+                {
+                    throw new NotSupportedException();
+                }
+                if (dy < short.MinValue || dy > short.MaxValue)
+                {
+                    throw new NotSupportedException();
+                }
+#endif
+
+                glyphImage.TextureOffsetX = (short)dx;
+                glyphImage.TextureOffsetY = (short)dy;
                 glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
                 //copy data from agg canvas to glyph image 
                 return glyphImage;
