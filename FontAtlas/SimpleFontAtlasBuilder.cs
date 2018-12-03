@@ -276,9 +276,9 @@ namespace Typography.Rendering
                 glyphData.Top = area.Top;
                 glyphData.Height = area.Height;
 
-                glyphData.TextureXOffset = (float)cacheGlyph.img.TextureOffsetX;
-                glyphData.TextureYOffset = (float)cacheGlyph.img.TextureOffsetY;
-              
+                glyphData.TextureXOffset = cacheGlyph.img.TextureOffsetX;
+                glyphData.TextureYOffset = cacheGlyph.img.TextureOffsetY;
+
 
                 simpleFontAtlas.AddGlyph(cacheGlyph.glyphIndex, glyphData);
             }

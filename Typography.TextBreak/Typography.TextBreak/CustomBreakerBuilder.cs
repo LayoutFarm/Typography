@@ -52,7 +52,6 @@ namespace Typography.TextBreak
             {
                 s_enAbbrvDic = new CustomAbbrvDic();
                 s_enAbbrvDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("abbrv-en"));
-
             }
         }
 

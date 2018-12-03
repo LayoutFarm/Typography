@@ -126,7 +126,7 @@ namespace Typography.Rendering
                 //check from pre-built cache (if availiable) 
                 Typeface resolvedTypeface = textServices.ResolveTypeface(reqFont);
 
-                string fontTextureFile = reqFont.Name + " " + fontKey;
+                string fontTextureFile = reqFont.Name + "_" + fontKey;
                 string resolveFontFile = fontTextureFile + ".info";
                 string fontTextureInfoFile = resolveFontFile;
                 string fontTextureImgFilename = fontTextureInfoFile + ".png";
