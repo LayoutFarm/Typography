@@ -381,8 +381,8 @@ namespace Typography.TextServices
 
             public TextShapingContextKey(Typeface typeface, ScriptLang scLang)
             {
-                this._typeface = typeface;
-                this._scLang = scLang;
+                _typeface = typeface;
+                _scLang = scLang;
             }
 #if DEBUG
             public override string ToString()
@@ -535,7 +535,7 @@ namespace Typography.TextServices
 
         public GlyphPlanSeqCollection(int seqLen)
         {
-            this._seqLen = seqLen;
+            _seqLen = seqLen;
         }
         public int SeqLen
         {
