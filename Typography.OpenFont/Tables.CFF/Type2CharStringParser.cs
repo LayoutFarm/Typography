@@ -309,7 +309,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
         void debugCheck()
         {
-            if (this._dbugMark == 5 && insts.Count > 50)
+            if (_dbugMark == 5 && insts.Count > 50)
             {
 
             }

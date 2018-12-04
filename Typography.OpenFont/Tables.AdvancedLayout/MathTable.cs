@@ -811,7 +811,7 @@ namespace Typography.OpenFont.Tables
             mc.RadicalDegreeBottomRaisePercent = reader.ReadInt16();
 
 
-            this._mathConstTable = mc;
+            _mathConstTable = mc;
         }
 
 

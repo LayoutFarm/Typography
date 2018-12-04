@@ -244,9 +244,9 @@ namespace Typography.OpenFont
             this.dbugId = s_debugTotalId++;
 #endif
 
-            this._ownerCffFont = owner;
+            _ownerCffFont = owner;
             //create from CFF 
-            this._cff1GlyphData = cff1Glyph;
+            _cff1GlyphData = cff1Glyph;
             this.GlyphIndex = cff1Glyph.GlyphIndex;
 
         }

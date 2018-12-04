@@ -1552,8 +1552,8 @@ namespace Typography.OpenFont.CFF
         public readonly double _realNumValue;
         public CffOperand(double number, OperandKind kind)
         {
-            this._kind = kind;
-            this._realNumValue = number;
+            _kind = kind;
+            _realNumValue = number;
         }
 #if DEBUG
         public override string ToString()
@@ -1598,7 +1598,7 @@ namespace Typography.OpenFont.CFF
             this.b0 = b0;
             this.b1 = b1;
             this.Name = name;
-            this._operatorOperandKind = operatorOperandKind;
+            _operatorOperandKind = operatorOperandKind;
         }
         public string Name { get; private set; }
 
