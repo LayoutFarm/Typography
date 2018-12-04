@@ -201,10 +201,10 @@ namespace Typography.TextLayout
     {
         public readonly GlyphSubstitution _glyphSub;
         public readonly GlyphSetPosition _glyphPos;
-        public GlyphLayoutPlanContext(GlyphSubstitution _glyphSub, GlyphSetPosition glyphPos)
+        public GlyphLayoutPlanContext(GlyphSubstitution glyphSub, GlyphSetPosition glyphPos)
         {
-            this._glyphSub = _glyphSub;
-            this._glyphPos = glyphPos;
+            _glyphSub = glyphSub;
+            _glyphPos = glyphPos;
         }
     }
 
@@ -463,9 +463,9 @@ namespace Typography.TextLayout
         }
         void UpdateLayoutPlan()
         {
-            GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(this._typeface, this._scriptLang);
-            this._gpos = context._glyphPos;
-            this._gsub = context._glyphSub;
+            GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(_typeface, _scriptLang);
+            _gpos = context._glyphPos;
+            _gsub = context._glyphSub;
             _needPlanUpdate = false;
         }
 
@@ -549,8 +549,8 @@ namespace Typography.TextLayout
         }
         public Typeface Typeface
         {
-            get { return this._typeface; }
-            set { this._typeface = value; }
+            get { return _typeface; }
+            set { _typeface = value; }
         }
         public void AddGlyph(ushort o_offset, ushort glyphIndex, Glyph glyph)
         {
