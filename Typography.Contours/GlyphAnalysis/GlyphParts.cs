@@ -31,8 +31,8 @@ namespace Typography.Contours
             }
             protected set
             {
-                this._x0 = value.X;
-                this._y0 = value.Y;
+                _x0 = value.X;
+                _y0 = value.Y;
             }
         }
         public abstract GlyphPartKind Kind { get; }

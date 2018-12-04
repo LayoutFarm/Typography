@@ -68,16 +68,16 @@ namespace Typography.Contours
         public void BuildFromGlyph(Glyph glyph, float sizeInPoints)
         {
             //for true type font
-            this._outputGlyphPoints = glyph.GlyphPoints;
-            this._outputContours = glyph.EndPoints;
+            _outputGlyphPoints = glyph.GlyphPoints;
+            _outputContours = glyph.EndPoints;
 
 
             //------------
             //temp fix for Cff Font
             if (glyph.IsCffGlyph)
             {
-                this._cffGlyphData = glyph.GetCff1GlyphData();
-                this._ownerCff = glyph.GetOwnerCff();
+                _cffGlyphData = glyph.GetCff1GlyphData();
+                _ownerCff = glyph.GetOwnerCff();
             }
 
             //---------------
@@ -104,7 +104,7 @@ namespace Typography.Contours
         protected virtual void FitCurrentGlyph(Glyph glyph)
         {
             if (RecentFontSizeInPixels > 0 && UseTrueTypeInstructions &&
-                  this._typeface.HasPrepProgramBuffer &&
+                  _typeface.HasPrepProgramBuffer &&
                   glyph.HasGlyphInstructions)
             {
                 if (_trueTypeInterpreter == null)
@@ -114,7 +114,7 @@ namespace Typography.Contours
                 }
                 _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                 //output as points,
-                this._outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyph.GlyphIndex, RecentFontSizeInPixels);
+                _outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyph.GlyphIndex, RecentFontSizeInPixels);
                 //***
                 //all points are scaled from _trueTypeInterpreter, 
                 //so not need further scale.=> set _recentPixelScale=1
@@ -127,13 +127,13 @@ namespace Typography.Contours
         {
             //read output from glyph points
 
-            if (this._cffGlyphData != null)
+            if (_cffGlyphData != null)
             {
-                cffEvalEngine.Run(tx, this._ownerCff, this._cffGlyphData, _recentPixelScale);
+                cffEvalEngine.Run(tx, _ownerCff, _cffGlyphData, _recentPixelScale);
             }
             else
             {
-                tx.Read(this._outputGlyphPoints, this._outputContours, _recentPixelScale);
+                tx.Read(_outputGlyphPoints, _outputContours, _recentPixelScale);
             }
 
         }

@@ -45,8 +45,8 @@ namespace Typography.Contours
 
         public GlyphPoint(float x, float y, PointKind kind)
         {
-            this._ox = this.newX = x;
-            this._oy = this.newY = y;
+            _ox = this.newX = x;
+            _oy = this.newY = y;
             this.kind = kind;
         }
         public int SeqNo { get; internal set; }
@@ -63,11 +63,11 @@ namespace Typography.Contours
         /// <summary>
         /// original X
         /// </summary>
-        public float OX { get { return this._ox; } }
+        public float OX { get { return _ox; } }
         /// <summary>
         /// original Y
         /// </summary>
-        public float OY { get { return this._oy; } }
+        public float OY { get { return _oy; } }
         /// <summary>
         /// modified X
         /// </summary>
@@ -132,7 +132,7 @@ namespace Typography.Contours
         internal OutsideEdgeLine E0
         {
             //TODO: review inward and outward edge again
-            get { return this._e0; }
+            get { return _e0; }
 
         }
         /// <summary>
@@ -141,7 +141,7 @@ namespace Typography.Contours
         internal OutsideEdgeLine E1
         {
             //TODO: review inward and outward edge again
-            get { return this._e1; }
+            get { return _e1; }
         }
 
         /// <summary>         
