@@ -35,9 +35,9 @@ namespace Typography.TextBreak
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;
-            this._startAt = startAt;
-            this._len = len;
-            this._endAt = startAt + len;
+            _startAt = startAt;
+            _len = len;
+            _endAt = startAt + len;
 
             char c_first = this.FirstUnicodeChar;
             char c_last = this.LastUnicodeChar;
