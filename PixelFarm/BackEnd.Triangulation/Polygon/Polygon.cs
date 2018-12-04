@@ -57,7 +57,7 @@ namespace Poly2Tri
         /// <param name="points">A list of unique points</param>
         public Polygon(TriangulationPoint[] points)
         {
-            this._points = points;
+            _points = points;
             if (points.Length < 3) throw new ArgumentException("List has fewer than 3 points", "points");
             // Lets do one sanity check that first and last point hasn't got same position
             // Its something that often happen when importing polygon data from other formats 
@@ -65,8 +65,8 @@ namespace Poly2Tri
             {
                 //reduce last ***
                 TriangulationPoint[] newPoints = new TriangulationPoint[points.Length - 1];
-                Array.Copy(this._points, 0, newPoints, 0, points.Length - 1);
-                this._points = newPoints;
+                Array.Copy(_points, 0, newPoints, 0, points.Length - 1);
+                _points = newPoints;
             }
         }
 
@@ -83,7 +83,7 @@ namespace Poly2Tri
         //    //recursive
 
         //    Polygon newPolygon = new Polygon();
-        //    var myPoints = this._points;
+        //    var myPoints = _points;
         //    int j = myPoints.Length;
         //    TriangulationPoint[] clonePoints = new TriangulationPoint[j];
         //    newPolygon._points = clonePoints;
@@ -94,7 +94,7 @@ namespace Poly2Tri
         //    }
 
         //    //-----------------------------------------------------------------
-        //    Polygon[] myHoles = this._holes;
+        //    Polygon[] myHoles = _holes;
         //    if (myHoles != null)
         //    {
         //        j = myHoles.Length;
@@ -154,7 +154,7 @@ namespace Poly2Tri
                 Polygon[] newHoles = new Polygon[j + 1];
                 Array.Copy(_holes, 0, newHoles, 0, j);
                 newHoles[j] = poly;
-                this._holes = newHoles;
+                _holes = newHoles;
             }
             // XXX: tests could be made here to be sure it is fully inside
             //        addSubtraction( poly.getPoints() );
@@ -264,7 +264,7 @@ namespace Poly2Tri
             }
 
             // Outer constraints
-            int j = this._points.Length;
+            int j = _points.Length;
             for (int i = 0; i < j - 1; i++)
             {
                 tcx.MakeNewConstraint(_points[i], _points[i + 1]);

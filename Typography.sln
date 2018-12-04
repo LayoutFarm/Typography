@@ -55,10 +55,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reference_TextBreak.Icu", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Typography.TextBreak\TextBreakerTest\Tests.csproj", "{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PixelFarm.NetStandard", "PixelFarm.NetStandard", "{D3510272-077C-438D-AB0D-07AAF4413A25}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PixelFarm.Triangulation", "PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.shproj", "{D487DFD2-3DA4-4A72-93ED-6048EA8029DB}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.Contours", "Typography.Contours\Typography.Contours.shproj", "{16AF3672-531E-4E0D-8F23-65285FE56298}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.Contours", "Build\N20\Typography.Contours\Typography.Contours.csproj", "{B999F927-08C5-4328-B07E-69ACC1392DA4}"
@@ -128,7 +124,6 @@ Global
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{bc10cc51-a795-40d0-96f0-f87585d59d02}*SharedItemsImports = 4
 		Typography.GlyphLayout\Typography.GlyphLayout.projitems*{c6807d05-09be-4313-9f8b-bd2d51c55819}*SharedItemsImports = 4
 		Typography.TextServices\Typography.TextServices.projitems*{d07686ee-2618-4c20-8eb5-32ad4c4d3810}*SharedItemsImports = 13
-		PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems*{d487dfd2-3da4-4a72-93ed-6048ea8029db}*SharedItemsImports = 13
 		Typography.GlyphLayout\Typography.GlyphLayout.projitems*{d8861cf8-c506-472b-8a57-632bd6ca6496}*SharedItemsImports = 13
 		FontAtlas\FontAtlas.projitems*{f6602808-f1d5-4e3b-bb8c-b9ca4ae77437}*SharedItemsImports = 13
 		Typography.OpenFont\Typography.OpenFont.projitems*{f7d71e61-9342-4dd7-9afd-69045f2ec98b}*SharedItemsImports = 4
@@ -1391,8 +1386,6 @@ Global
 		{6C9262B6-F6DD-4C42-A3EF-D8574B324E7A} = {C4F7BE3A-77E3-4B10-A6AB-839CBCCF5163}
 		{777178CA-C706-406F-856D-62CC40AC63E4} = {548A7FB1-834E-4197-B0BB-E32BF886D511}
 		{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0} = {548A7FB1-834E-4197-B0BB-E32BF886D511}
-		{D3510272-077C-438D-AB0D-07AAF4413A25} = {EFD3FB30-FFF6-4717-9D2A-A909E6D01DEE}
-		{D487DFD2-3DA4-4A72-93ED-6048EA8029DB} = {D3510272-077C-438D-AB0D-07AAF4413A25}
 		{16AF3672-531E-4E0D-8F23-65285FE56298} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
 		{B999F927-08C5-4328-B07E-69ACC1392DA4} = {189B365C-127C-4377-88F3-C3D391B43993}
 		{9A99F103-B119-4A4D-8093-6A03BAA6D36B} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}

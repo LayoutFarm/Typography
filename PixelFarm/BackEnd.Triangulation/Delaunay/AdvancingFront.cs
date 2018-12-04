@@ -53,7 +53,7 @@ namespace Poly2Tri
             this.Head = head;
             this.Tail = tail;
             //start search at head front node
-            this._search = head;
+            _search = head;
             //AddNode(head);
             //AddNode(tail);
         }
@@ -93,14 +93,14 @@ namespace Poly2Tri
 
         private AdvancingFrontNode LocateNode(double x)
         {
-            AdvancingFrontNode node = this._search;// FindSearchNode(x);
+            AdvancingFrontNode node = _search;// FindSearchNode(x);
             if (x < node.XValue)
             {
                 while ((node = node.Prev) != null)
                 {
                     if (x >= node.XValue)
                     {
-                        this._search = node;
+                        _search = node;
                         return node;
                     }
                 }
@@ -111,7 +111,7 @@ namespace Poly2Tri
                 {
                     if (x < node.XValue)
                     {
-                        this._search = node.Prev;
+                        _search = node.Prev;
                         return node.Prev;
                     }
                 }
@@ -125,7 +125,7 @@ namespace Poly2Tri
         public AdvancingFrontNode LocatePoint(TriangulationPoint point)
         {
             double px = point.X;
-            AdvancingFrontNode node = this._search;// FindSearchNode(px);
+            AdvancingFrontNode node = _search;// FindSearchNode(px);
             double nx = node.Point.X;
             if (px == nx)
             {
@@ -160,7 +160,7 @@ namespace Poly2Tri
                     if (point == node.Point) { break; }
                 }
             }
-            this._search = node;
+            _search = node;
             return node;
         }
     }
