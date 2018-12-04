@@ -366,7 +366,7 @@ namespace Typography.TextBreak
                 }
             }
             //--------------------------------
-            this._resultWordGroup = new WordGroup(
+            _resultWordGroup = new WordGroup(
                 this.prefixSpan,
                 newsubGroups,
                 null,
@@ -402,7 +402,7 @@ namespace Typography.TextBreak
                 }
             }
 
-            this._resultWordGroup = new WordGroup(
+            _resultWordGroup = new WordGroup(
                 this.prefixSpan,
                 null,
                 this.wordSpanList.ToArray(),

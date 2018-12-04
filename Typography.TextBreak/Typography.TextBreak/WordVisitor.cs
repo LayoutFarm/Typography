@@ -45,11 +45,11 @@ namespace Typography.TextBreak
             //check index < buffer
 
             //reset all
-            this._buffer = buffer;
-            this._endIndex = index + len;
+            _buffer = buffer;
+            _endIndex = index + len;
 
-            this._startIndex = _currentIndex = index;
-            this._currentChar = buffer[_currentIndex];
+            _startIndex = _currentIndex = index;
+            _currentChar = buffer[_currentIndex];
             _breakAtList.Clear();
             _tempCandidateBreaks.Clear();
             _latestBreakAt = 0;
@@ -63,7 +63,7 @@ namespace Typography.TextBreak
         }
         public int CurrentIndex
         {
-            get { return this._currentIndex; }
+            get { return _currentIndex; }
         }
         public char Char
         {
@@ -94,7 +94,7 @@ namespace Typography.TextBreak
 #endif
 
 
-            this._latestBreakAt = index;
+            _latestBreakAt = index;
 
             _breakAtList.Add(new BreakAtInfo(index, wordKind));
         }
@@ -104,11 +104,11 @@ namespace Typography.TextBreak
         }
         public int LatestBreakAt
         {
-            get { return this._latestBreakAt; }
+            get { return _latestBreakAt; }
         }
         public void SetCurrentIndex(int index)
         {
-            this._currentIndex = index;
+            _currentIndex = index;
             if (index < _endIndex)
             {
                 _currentChar = _buffer[index];
@@ -126,7 +126,7 @@ namespace Typography.TextBreak
         }
         internal Stack<int> GetTempCandidateBreaks()
         {
-            return this._tempCandidateBreaks;
+            return _tempCandidateBreaks;
         }
 
 

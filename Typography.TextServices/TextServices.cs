@@ -42,7 +42,7 @@ namespace Typography.TextServices
         public TextServices()
         {
 
-            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist(); 
+            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
             _glyphLayout = new GlyphLayout();
         }
         public void SetDefaultScriptLang(ScriptLang scLang)
@@ -114,7 +114,15 @@ namespace Typography.TextServices
             if (_textBreaker == null)
             {
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
+#if DEBUG
+                if (_textBreaker == null)
+                {
+
+                }
+#endif
             }
+
+
             int cur_startAt = startAt;
             _textBreaker.BreakWords(str, cur_startAt, len);
             foreach (TextBreak.BreakSpan sp in _textBreaker.GetBreakSpanIter())
@@ -373,8 +381,8 @@ namespace Typography.TextServices
 
             public TextShapingContextKey(Typeface typeface, ScriptLang scLang)
             {
-                this._typeface = typeface;
-                this._scLang = scLang;
+                _typeface = typeface;
+                _scLang = scLang;
             }
 #if DEBUG
             public override string ToString()
@@ -527,7 +535,7 @@ namespace Typography.TextServices
 
         public GlyphPlanSeqCollection(int seqLen)
         {
-            this._seqLen = seqLen;
+            _seqLen = seqLen;
         }
         public int SeqLen
         {

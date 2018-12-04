@@ -52,7 +52,6 @@ namespace Typography.TextBreak
             {
                 s_enAbbrvDic = new CustomAbbrvDic();
                 s_enAbbrvDic.LoadSortedUniqueWordList(s_dicProvider.GetSortedUniqueWordList("abbrv-en"));
-
             }
         }
 
@@ -83,10 +82,7 @@ namespace Typography.TextBreak
 
             breaker.EngBreakingEngine.EngCustomAbbrvDic = s_enAbbrvDic;//optional 
             breaker.EngBreakingEngine.EnableCustomAbbrv = true;//optional 
-            //
-
-
-            //
+            // 
             var thBreaker = new ThaiDictionaryBreakingEngine();
             //thBreaker.DontMergeLastIncompleteWord = true;
             thBreaker.SetDictionaryData(s_thaiDic);

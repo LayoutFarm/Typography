@@ -57,7 +57,6 @@ namespace Typography.FontManagement
         {
             //TODO: don't forget to dispose this stream when not use
             return new FileStream(this.PathName, FileMode.Open, FileAccess.Read);
-
         }
     }
 
