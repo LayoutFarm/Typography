@@ -66,9 +66,13 @@ namespace PixelFarm.CpuBlit
         {
             NativeMemMx.MemSet(dest, destIndex, byteValue, count);
         }
-        public static void MemClear(Byte[] dest, int destIndex, int count)
+        public static void memset_unsafe(IntPtr dest, byte byteValue, int count)
         {
-            NativeMemMx.MemSet(dest, destIndex, 0, count);
+            unsafe
+            {
+                NativeMemMx.memset((byte*)dest, byteValue, count);
+            }
         }
+
     }
 }

@@ -104,58 +104,57 @@ namespace PixelFarm.CpuBlit.Rasterization
             unsafe
             {
 
-                CpuBlit.Imaging.TempMemPtr dest_bufferPtr = dest.GetBufferPtr();
-                byte* dest_buffer = (byte*)dest_bufferPtr.Ptr;
-                int dest_stride = this._destImgStride = dest.Stride;
-                //*** set color before call Blend()
-                this._color = color;
-                byte color_alpha = color.alpha;
-                //---------------------------
-                //3. loop, render single scanline with subpixel rendering 
-
-                byte[] lineBuff = _grayScaleLine.GetInternalBuffer();
-
-                while (sclineRas.SweepScanline(scline))
+                using (CpuBlit.Imaging.TempMemPtr dest_bufferPtr = dest.GetBufferPtr())
                 {
+                    byte* dest_buffer = (byte*)dest_bufferPtr.Ptr;
+                    int dest_stride = this._destImgStride = dest.Stride;
+                    //*** set color before call Blend()
+                    this._color = color;
+                    byte color_alpha = color.alpha;
+                    //---------------------------
+                    //3. loop, render single scanline with subpixel rendering 
 
-                    //3.1. clear 
-                    _grayScaleLine.Clear();
-                    //3.2. write grayscale span to temp buffer
-                    //3.3 convert to subpixel value and write to dest buffer 
-                    //render solid single scanline 
-                    int num_spans = scline.SpanCount;
-                    byte[] covers = scline.GetCovers();
-                    //render each span in the scanline
-                    for (int i = 1; i <= num_spans; ++i)
+                    byte[] lineBuff = _grayScaleLine.GetInternalBuffer();
+
+                    while (sclineRas.SweepScanline(scline))
                     {
-                        ScanlineSpan span = scline.GetSpan(i);
-                        if (span.len > 0)
-                        {
-                            //positive len  
-                            _grayScaleLine.BlendSolidHSpan(span.x, span.len, color_alpha, covers, span.cover_index);
-                        }
-                        else
-                        {
-                            //fill the line, same coverage area
-                            int x = span.x;
-                            int x2 = (x - span.len - 1);
-                            _grayScaleLine.BlendHL(x, x2, color_alpha, covers[span.cover_index]);
-                        }
-                    }
 
-                    //
-                    BlendScanlineForAggSubPix(
-                        dest_buffer,
-                        (dest_stride * scline.Y) + (0 * 4), //4 color component, TODO: review destX again, this version we write entire a scanline                 
-                        lineBuff,
-                        sclineRas.MaxX); //for agg subpixel rendering
+                        //3.1. clear 
+                        _grayScaleLine.Clear();
+                        //3.2. write grayscale span to temp buffer
+                        //3.3 convert to subpixel value and write to dest buffer 
+                        //render solid single scanline 
+                        int num_spans = scline.SpanCount;
+                        byte[] covers = scline.GetCovers();
+                        //render each span in the scanline
+                        for (int i = 1; i <= num_spans; ++i)
+                        {
+                            ScanlineSpan span = scline.GetSpan(i);
+                            if (span.len > 0)
+                            {
+                                //positive len  
+                                _grayScaleLine.BlendSolidHSpan(span.x, span.len, color_alpha, covers, span.cover_index);
+                            }
+                            else
+                            {
+                                //fill the line, same coverage area
+                                int x = span.x;
+                                int x2 = (x - span.len - 1);
+                                _grayScaleLine.BlendHL(x, x2, color_alpha, covers[span.cover_index]);
+                            }
+                        }
+
+                        //
+                        BlendScanlineForAggSubPix(
+                            dest_buffer,
+                            (dest_stride * scline.Y) + (0 * 4), //4 color component, TODO: review destX again, this version we write entire a scanline                 
+                            lineBuff,
+                            sclineRas.MaxX); //for agg subpixel rendering
 #if DEBUG
-                    dbugMinScanlineCount++;
+                        dbugMinScanlineCount++;
 #endif
+                    }
                 }
-                dest_bufferPtr.Release();
-
-
             }
 
         }
@@ -1426,6 +1425,7 @@ namespace PixelFarm.CpuBlit.Rasterization
 
                     while (sclineRas.SweepScanline(scline))
                     {
+
                         //render solid single scanline
                         int y = scline.Y;
                         int num_spans = scline.SpanCount;
@@ -1447,6 +1447,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                                 dest.BlendHL(x, y, x2, color, covers[span.cover_index]);
                             }
                         }
+
                     }
                     break;
                 case ScanlineRenderMode.SubPixelLcdEffect:
@@ -1480,7 +1481,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             }
 
 
-            Color[] colorArray = tempSpanColors.Array;
+            Color[] colorArray = tempSpanColors.UnsafeInternalArray;
             while (sclineRas.SweepScanline(scline))
             {
                 //render single scanline 

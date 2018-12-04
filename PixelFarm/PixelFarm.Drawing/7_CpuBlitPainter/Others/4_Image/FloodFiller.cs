@@ -1,6 +1,6 @@
 //BSD, 2014-present, WinterDev
 
-using PixelFarm.Drawing; 
+using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.Imaging
 {
     public class FloodFill
@@ -119,9 +119,9 @@ namespace PixelFarm.CpuBlit.Imaging
                 fillRule = new ExactMatch(fillColor);
             }
         }
-        public void Fill(ActualBitmap img, int x, int y)
+        public void Fill(MemBitmap memBmp, int x, int y)
         {
-            Fill((IBitmapSrc)img, x, y);
+            Fill((IBitmapSrc)memBmp, x, y);
         }
 
 
@@ -138,66 +138,70 @@ namespace PixelFarm.CpuBlit.Imaging
                 }
             }
             _destImgRW = bufferToFillOn;
-            TempMemPtr destBufferPtr = bufferToFillOn.GetBufferPtr();
+
             unsafe
             {
-                imageWidth = bufferToFillOn.Width;
-                imageHeight = bufferToFillOn.Height;
-                //reset new buffer, clear mem?
-                pixelsChecked = new bool[imageWidth * imageHeight];
-
-                int* destBuffer = (int*)destBufferPtr.Ptr;
-                int startColorBufferOffset = bufferToFillOn.GetBufferOffsetXY32(x, y);
-
-                int start_color = *(destBuffer + startColorBufferOffset);
-
-                fillRule.SetStartColor(Drawing.Color.FromArgb(
-                    (start_color >> 16) & 0xff,
-                    (start_color >> 8) & 0xff,
-                    (start_color) & 0xff));
-
-
-                LinearFill(destBuffer, x, y);
-
-                while (ranges.Count > 0)
+                using (TempMemPtr destBufferPtr = bufferToFillOn.GetBufferPtr())
                 {
-                    Range range = ranges.Dequeue();
-                    int downY = range.y - 1;
-                    int upY = range.y + 1;
-                    int downPixelOffset = (imageWidth * (range.y - 1)) + range.startX;
-                    int upPixelOffset = (imageWidth * (range.y + 1)) + range.startX;
-                    for (int rangeX = range.startX; rangeX <= range.endX; rangeX++)
+
+                    imageWidth = bufferToFillOn.Width;
+                    imageHeight = bufferToFillOn.Height;
+                    //reset new buffer, clear mem?
+                    pixelsChecked = new bool[imageWidth * imageHeight];
+
+                    int* destBuffer = (int*)destBufferPtr.Ptr;
+                    int startColorBufferOffset = bufferToFillOn.GetBufferOffsetXY32(x, y);
+
+                    int start_color = *(destBuffer + startColorBufferOffset);
+
+                    fillRule.SetStartColor(Drawing.Color.FromArgb(
+                        (start_color >> 16) & 0xff,
+                        (start_color >> 8) & 0xff,
+                        (start_color) & 0xff));
+
+
+                    LinearFill(destBuffer, x, y);
+
+                    while (ranges.Count > 0)
                     {
-                        if (range.y > 0)
+                        Range range = ranges.Dequeue();
+                        int downY = range.y - 1;
+                        int upY = range.y + 1;
+                        int downPixelOffset = (imageWidth * (range.y - 1)) + range.startX;
+                        int upPixelOffset = (imageWidth * (range.y + 1)) + range.startX;
+                        for (int rangeX = range.startX; rangeX <= range.endX; rangeX++)
                         {
-                            if (!pixelsChecked[downPixelOffset])
+                            if (range.y > 0)
                             {
-                                int bufferOffset = bufferToFillOn.GetBufferOffsetXY32(rangeX, downY);
-
-                                if (fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                                if (!pixelsChecked[downPixelOffset])
                                 {
-                                    LinearFill(destBuffer, rangeX, downY);
+                                    int bufferOffset = bufferToFillOn.GetBufferOffsetXY32(rangeX, downY);
+
+                                    if (fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                                    {
+                                        LinearFill(destBuffer, rangeX, downY);
+                                    }
                                 }
                             }
-                        }
 
-                        if (range.y < (imageHeight - 1))
-                        {
-                            if (!pixelsChecked[upPixelOffset])
+                            if (range.y < (imageHeight - 1))
                             {
-                                int bufferOffset = bufferToFillOn.GetBufferOffsetXY32(rangeX, upY);
-                                if (fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                                if (!pixelsChecked[upPixelOffset])
                                 {
-                                    LinearFill(destBuffer, rangeX, upY);
+                                    int bufferOffset = bufferToFillOn.GetBufferOffsetXY32(rangeX, upY);
+                                    if (fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                                    {
+                                        LinearFill(destBuffer, rangeX, upY);
+                                    }
                                 }
                             }
+                            upPixelOffset++;
+                            downPixelOffset++;
                         }
-                        upPixelOffset++;
-                        downPixelOffset++;
                     }
                 }
             }
-            destBufferPtr.Release();
+
         }
 
         /// <summary>

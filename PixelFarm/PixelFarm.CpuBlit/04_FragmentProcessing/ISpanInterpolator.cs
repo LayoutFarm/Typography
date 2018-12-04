@@ -31,7 +31,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         VertexProcessing.ICoordTransformer Transformer { get; set; }
 
         //------------------------------------------------
-        void ReSync(double xe, double ye, int len);
+        //void ReSync(double xe, double ye, int len);
         void GetLocalScale(out int x, out int y);
     }
 }

@@ -1,5 +1,6 @@
-﻿//MIT, 2017, WinterDev
+﻿//MIT, 2017-present, WinterDev
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -16,18 +17,18 @@ namespace Test_WinForm_TessGlyph
 {
     public partial class FormTess : Form
     {
-        Graphics g;
-        float[] glyphPoints2;
-        int[] contourEnds;
+        Graphics _g;
+        float[] _glyphPoints2;
+        int[] _contourEnds;
 
-        TessTool tessTool = new TessTool();
+        TessTool _tessTool = new TessTool();
         public FormTess()
         {
             InitializeComponent();
         }
         private void FormTess_Load(object sender, EventArgs e)
         {
-            g = this.pnlGlyph.CreateGraphics();
+            _g = this.pnlGlyph.CreateGraphics();
 
             //string testFont = "d:\\WImageTest\\DroidSans.ttf";
             string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
@@ -46,8 +47,8 @@ namespace Test_WinForm_TessGlyph
                 builder.ReadShapes(txToPath);
                 //from contour to  
                 var curveFlattener = new SimpleCurveFlattener();
-                float[] flattenPoints = curveFlattener.Flatten(writablePath._points, out contourEnds);
-                glyphPoints2 = flattenPoints;
+                float[] flattenPoints = curveFlattener.Flatten(writablePath._points, out _contourEnds);
+                _glyphPoints2 = flattenPoints;
                 ////--------------------------------------
                 ////raw glyph points
                 //int j = glyphPoints.Length;
@@ -68,8 +69,8 @@ namespace Test_WinForm_TessGlyph
 
         float[] GetPolygonData(out int[] endContours)
         {
-            endContours = this.contourEnds;
-            return glyphPoints2;
+            endContours = _contourEnds;
+            return _glyphPoints2;
 
             ////--
             ////for test
@@ -92,12 +93,12 @@ namespace Test_WinForm_TessGlyph
             int viewHeight = this.pnlGlyph.Height;
             if (drawInvert)
             {
-                g.ScaleTransform(1, -1);
-                g.TranslateTransform(0, -viewHeight);
+                _g.ScaleTransform(1, -1);
+                _g.TranslateTransform(0, -viewHeight);
             }
             //----------- 
             //show tess
-            g.Clear(Color.White);
+            _g.Clear(Color.White);
             int[] contourEndIndices;
             float[] polygon1 = GetPolygonData(out contourEndIndices);
 
@@ -118,8 +119,8 @@ namespace Test_WinForm_TessGlyph
                     {
                         p0 = new PointF(polygon1[m - 3], polygon1[m - 2]);
                         p1 = new PointF(polygon1[m - 1], polygon1[m]);
-                        g.DrawLine(pen1, p0, p1);
-                        g.DrawString(a.ToString(), this.Font, Brushes.Black, p0);
+                        _g.DrawLine(pen1, p0, p1);
+                        _g.DrawString(a.ToString(), this.Font, Brushes.Black, p0);
                         m += 2;
                         a++;
                     }
@@ -127,32 +128,66 @@ namespace Test_WinForm_TessGlyph
 
                     p0 = new PointF(polygon1[endAt - 1], polygon1[endAt]);
                     p1 = new PointF(polygon1[startAt - 3], polygon1[startAt - 2]);
-                    g.DrawLine(pen1, p0, p1);
-                    g.DrawString(a.ToString(), this.Font, Brushes.Black, p0);
+                    _g.DrawLine(pen1, p0, p1);
+                    _g.DrawString(a.ToString(), this.Font, Brushes.Black, p0);
                     //
                     startAt = (endAt + 1) + 3;
                 }
             }
-            int areaCount;
-            float[] tessData = tessTool.TessPolygon(polygon1, contourEnds, out areaCount);
-            //draw tess 
-            int j = tessData.Length;
+
+            if (!_tessTool.TessPolygon(polygon1, _contourEnds))
+            {
+                return;
+            }
+
+
+            //1.
+            List<ushort> indexList = _tessTool.TessIndexList;
+            //2.
+            List<TessVertex2d> tempVertexList = _tessTool.TempVertexList;
+            //3.
+            int vertexCount = indexList.Count;
+            //-----------------------------    
+            int orgVertexCount = polygon1.Length / 2;
+            float[] vtx = new float[vertexCount * 2];//***
+            int n = 0;
+
+            for (int p = 0; p < vertexCount; ++p)
+            {
+                ushort index = indexList[p];
+                if (index >= orgVertexCount)
+                {
+                    //extra coord (newly created)
+                    TessVertex2d extraVertex = tempVertexList[index - orgVertexCount];
+                    vtx[n] = (float)extraVertex.m_X;
+                    vtx[n + 1] = (float)extraVertex.m_Y;
+                }
+                else
+                {
+                    //original corrd
+                    vtx[n] = (float)polygon1[index * 2];
+                    vtx[n + 1] = (float)polygon1[(index * 2) + 1];
+                }
+                n += 2;
+            }
+            //-----------------------------    
+            //draw tess result
+            int j = vtx.Length;
             for (int i = 0; i < j;)
             {
-                var p0 = new PointF(tessData[i], tessData[i + 1]);
-                var p1 = new PointF(tessData[i + 2], tessData[i + 3]);
-                var p2 = new PointF(tessData[i + 4], tessData[i + 5]);
+                var p0 = new PointF(vtx[i], vtx[i + 1]);
+                var p1 = new PointF(vtx[i + 2], vtx[i + 3]);
+                var p2 = new PointF(vtx[i + 4], vtx[i + 5]);
 
-                g.DrawLine(Pens.Red, p0, p1);
-                g.DrawLine(Pens.Red, p1, p2);
-                g.DrawLine(Pens.Red, p2, p0);
+                _g.DrawLine(Pens.Red, p0, p1);
+                _g.DrawLine(Pens.Red, p1, p2);
+                _g.DrawLine(Pens.Red, p2, p0);
 
                 i += 6;
             }
-
             //-----------
             //for GDI+ only
-            g.ResetTransform();
+            _g.ResetTransform();
             //-----------
         }
         private void cmdDrawGlyph_Click(object sender, EventArgs e)

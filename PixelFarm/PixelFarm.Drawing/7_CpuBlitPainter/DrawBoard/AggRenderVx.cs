@@ -5,10 +5,10 @@ namespace PixelFarm.CpuBlit
 {
     class AggRenderVx : PixelFarm.Drawing.RenderVx
     {
-        internal VertexStoreSnap snap;
-        public AggRenderVx(VertexStoreSnap snap)
+        internal VertexStore vxs;
+        public AggRenderVx(VertexStore vxs)
         {
-            this.snap = snap;
+            this.vxs = vxs;
         }
     }
     class AggRenderVxFormattedString : PixelFarm.Drawing.RenderVxFormattedString

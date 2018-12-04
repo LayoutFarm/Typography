@@ -106,7 +106,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         lineMarker.MoveTo(x, y);
                         break;
                     case VertexCmd.NoMore:
-                        i = count + 1; //force end
+                        i = count + 1; //force end => EXIT_LOOP
                         break;
                     case VertexCmd.LineTo:
                         lineMarker.LineTo(x, y);
@@ -127,11 +127,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             Init,
             PolyLine,
         }
-         
+
 
         class WalkStateManager
         {
-             
+
             List<LineWalkerMark> _segmentMarks = new List<LineWalkerMark>();
             LineWalkerMark _currentMarker;
             int _nextMarkNo;
@@ -348,7 +348,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             protected virtual void OnEndLineSegment(double x, double y, double remainingLen)
             {
                 //remainingLen of current segment
-                if (remainingLen >= 0.5) 
+                if (remainingLen >= 0.5)
                 {
                     //TODO: review here, if remainingLen is too small,
                     //but what about _total_accum_len

@@ -36,11 +36,19 @@ namespace PixelFarm.CpuBlit.Rasterization
     public struct ScanlineSpan
     {
         public readonly short x;
-        public short len; //+ or - 
         public readonly short cover_index;
+
+#if !COSMOS
+        public short len; //+ or - 
+#else
+        public int len; //+ or - 
+#endif
+
+
         public ScanlineSpan(int x, int cover_index)
         {
             //TODO: x should be ushort?
+
             this.x = (short)x;
             this.len = 1;
             this.cover_index = (short)cover_index;
@@ -49,7 +57,11 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             //TODO: x should be ushort?
             this.x = (short)x;
+#if !COSMOS
             this.len = (short)len;
+#else
+            this.len = len;
+#endif
             this.cover_index = (short)cover_index;
         }
 #if DEBUG

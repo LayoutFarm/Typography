@@ -38,8 +38,14 @@
     <Compile Include="..\..\PixelFarm.Vectors\3_Transform\1_Affine.cs">
       <Link>00_Porting\1_Affine.cs</Link>
     </Compile>
-    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\ICoordTransformer.cs">
-      <Link>00_Porting\ICoordTransformer.cs</Link>
+    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\2_Bilinear.cs">
+      <Link>00_Porting\2_Bilinear.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\3_Perspective.cs">
+      <Link>00_Porting\3_Perspective.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\4_SimulEqGeneral.cs">
+      <Link>00_Porting\4_SimulEqGeneral.cs</Link>
     </Compile>
     <Compile Include="BitmapBuffer.cs" />
     <Compile Include="BitmapBufferExtensions\AntialiasingExtensions.cs" />

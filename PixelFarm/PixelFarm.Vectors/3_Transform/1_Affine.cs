@@ -92,16 +92,21 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //----------------------------------------------------------------------
 
 
+
     /// <summary>
     /// struct version of Affine (Matrix)
     /// </summary>
     public struct AffineMat
     {
-        public double sx, shy, shx, sy, tx, ty;
+        //3x2 matrix (rows x cols)
+        public double
+            sx, shy,
+            shx, sy,
+            tx, ty;
 
         public void SetValues(double v0_sx, double v1_shy,
-                      double v2_shx, double v3_sy,
-                      double v4_tx, double v5_ty)
+                              double v2_shx, double v3_sy,
+                              double v4_tx, double v5_ty)
         {
             sx = v0_sx; shy = v1_shy;
             shx = v2_shx; sy = v3_sy;
@@ -145,6 +150,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             tx = t4;
         }
 
+        public void RotateDeg(double degree)
+        {
+            Rotate(DegToRad(degree));
+        }
         /// <summary>
         /// inside-values will be CHANGED after call this
         /// </summary>
@@ -159,7 +168,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             sy *= mm3;
             ty *= mm3;
         }
-
+        public void Scale(double mm)
+        {
+            sx *= mm;
+            shx *= mm;
+            tx *= mm;
+            shy *= mm;
+            sy *= mm;
+            ty *= mm;
+        }
         /// <summary>
         /// inside-values will be CHANGED after call this
         /// </summary>
@@ -329,6 +346,16 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
             }
         }
+        static double DegToRad(double degree)
+        {
+            return degree * (Math.PI / 180d);
+        }
+        static double RadToDeg(double degree)
+        {
+            return degree * (180d / Math.PI);
+        }
+
+
     }
 
     public class Affine : ICoordTransformer
@@ -347,6 +374,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //sy = copyFrom.sy;
             //tx = copyFrom.tx;
             //ty = copyFrom.ty;
+
             _elems = copyFrom._elems;
             isIdenHint = copyFrom.isIdenHint;
         }
@@ -356,15 +384,33 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                       double v2_shx, double v3_sy,
                       double v4_tx, double v5_ty)
         {
-            //sx = v0_sx; shy = v1_shy;
-            //shx = v2_shx; sy = v3_sy;
-            //tx = v4_tx; ty = v5_ty;
             _elems.SetValues(
                 v0_sx, v1_shy,
                 v2_shx, v3_sy,
                 v4_tx, v5_ty);
 
             isIdenHint = false;
+        }
+        ICoordTransformer ICoordTransformer.CreateInvert()
+        {
+            return CreateInvert();
+        }
+        public ICoordTransformer MultiplyWith(ICoordTransformer another)
+        {
+            if (another is Affine)
+            {
+                return this * (Affine)another;
+            }
+            else if (another is Perspective)
+            {
+                Perspective p = new Perspective(this);
+                return p * (Perspective)another;
+            }
+            else
+            {
+                return new CoordTransformationChain(this, another);
+
+            }
         }
         public double m11 { get { return _elems.sx; } }
         public double m12 { get { return _elems.shy; } }
@@ -381,33 +427,24 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public double tx { get { return _elems.tx; } }
         public double ty { get { return _elems.ty; } }
 
+        public CoordTransformerKind Kind => CoordTransformerKind.Affine3x2;
+        public AffineMat GetInternalMat() => _elems;
 
         /// <summary>
         /// set elements by copy values from input elems
         /// </summary>
         /// <param name="elems"></param>
-        public void SetElements(AffineMat elems)
+        internal void SetElements(AffineMat elems)
         {
             _elems = elems;
             isIdenHint = false;
         }
 
-        //public double m11 { get { return sx; } }
-        //public double m12 { get { return shy; } }
-        //public double m21 { get { return shx; } }
-        //public double m22 { get { return sy; } }
-        //public double dx { get { return tx; } }
-        //public double dy { get { return ty; } }
-        // Custom matrix from m[6]
-        //private Affine(double[] m)
-        //{
-        //    sx = m[0];
-        //    shy = m[1];
-        //    shx = m[2];
-        //    sy = m[3];
-        //    tx = m[4];
-        //    ty = m[5];
-        //}
+        public Affine Clone()
+        {
+            return new Affine(this);
+        }
+
         //-----------------------------------------
         private Affine(Affine a, Affine b)
         {
@@ -459,55 +496,106 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
+        void BuildAff(ref AffinePlan plan)
+        {
+            switch (plan.cmd)
+            {
+                case AffineMatrixCommand.None:
+                    break;
+                case AffineMatrixCommand.Rotate:
+
+                    isIdenHint = false;
+                    _elems.Rotate(plan.x);
+                    break;
+                case AffineMatrixCommand.Scale:
+                    isIdenHint = false;
+                    _elems.Scale(plan.x, plan.y);
+                    break;
+                case AffineMatrixCommand.Translate:
+                    isIdenHint = false;
+                    _elems.Translate(plan.x, plan.y);
+                    break;
+                case AffineMatrixCommand.Skew:
+                    isIdenHint = false;
+                    _elems.Skew(plan.x, plan.y);
+                    break;
+                case AffineMatrixCommand.Invert:
+                    isIdenHint = false;
+                    _elems.Invert();
+                    break;
+                default:
+                    throw new NotSupportedException();
+
+            }
+        }
         private Affine(AffinePlan[] creationPlans)
+        {
+            _elems = AffineMat.Iden;//copy
+            isIdenHint = true;
+            if (creationPlans == null) return;
+            //-----------------------
+            for (int i = 0; i < creationPlans.Length; ++i)
+            {
+                BuildAff(ref creationPlans[i]);
+            }
+        }
+        private Affine(int pcount, ref AffinePlan p0, ref AffinePlan p1, ref AffinePlan p2, ref AffinePlan p3, ref AffinePlan p4, params AffinePlan[] creationPlans)
         {
 
             //-----------------------
             //start with identity matrix
             _elems = AffineMat.Iden;//copy
             isIdenHint = true;
-            if (creationPlans == null) return;
-
             //-----------------------
-            int j = creationPlans.Length;
-            for (int i = 0; i < j; ++i)
+            switch (pcount)
             {
-                AffinePlan plan = creationPlans[i];
-                switch (plan.cmd)
-                {
-                    case AffineMatrixCommand.None:
-                        break;
-                    case AffineMatrixCommand.Rotate:
+                case 0:
+                    return;
+                case 1:
+                    BuildAff(ref p0);
+                    break;
+                case 2:
+                    BuildAff(ref p0);
+                    BuildAff(ref p1);
+                    break;
+                case 3:
+                    BuildAff(ref p0);
+                    BuildAff(ref p1);
+                    BuildAff(ref p2);
+                    break;
+                case 4:
+                    BuildAff(ref p0);
+                    BuildAff(ref p1);
+                    BuildAff(ref p2);
+                    BuildAff(ref p3);
+                    break;
+                case 5:
+                    BuildAff(ref p0);
+                    BuildAff(ref p1);
+                    BuildAff(ref p2);
+                    BuildAff(ref p3);
+                    BuildAff(ref p4);
+                    break;
+                default:
+                    BuildAff(ref p0);
+                    BuildAff(ref p1);
+                    BuildAff(ref p2);
+                    BuildAff(ref p3);
+                    BuildAff(ref p4);
+                    if (creationPlans != null)
+                    {
+                        for (int i = 0; i < creationPlans.Length; ++i)
+                        {
+                            BuildAff(ref creationPlans[i]);
+                        }
+                    }
+                    break;
 
-                        isIdenHint = false;
-                        _elems.Rotate(plan.x);
-
-                        break;
-                    case AffineMatrixCommand.Scale:
-
-                        isIdenHint = false;
-                        _elems.Scale(plan.x, plan.y);
-
-                        break;
-                    case AffineMatrixCommand.Translate:
-
-                        isIdenHint = false;
-                        _elems.Translate(plan.x, plan.y);
-
-                        break;
-                    case AffineMatrixCommand.Skew:
-                        isIdenHint = false;
-                        _elems.Skew(plan.x, plan.y);
-                        break;
-                    case AffineMatrixCommand.Invert:
-                        isIdenHint = false;
-                        _elems.Invert();
-                        break;
-                    default:
-                        throw new NotSupportedException();
-
-                }
             }
+
+
+
+
         }
         //----------------------------------------------------------
         public static Affine operator *(Affine a, Affine b)
@@ -527,22 +615,36 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             newIden.isIdenHint = true;
             return newIden;
         }
-        public static Affine NewMatix(params AffinePlan[] creationPlans)
+
+        public static Affine NewMatix(AffinePlan p0, AffinePlan p1)
         {
-            return new Affine(creationPlans);
+            AffinePlan p_empty = new AffinePlan();
+            return new Affine(2, ref p0, ref p1, ref p_empty, ref p_empty, ref p_empty, null);
         }
+        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2)
+        {
+            AffinePlan p_empty = new AffinePlan();
+            return new Affine(3, ref p0, ref p1, ref p2, ref p_empty, ref p_empty, null);
+        }
+        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3)
+        {
+            AffinePlan p_empty = new AffinePlan();
+            return new Affine(4, ref p0, ref p1, ref p2, ref p3, ref p_empty, null);
+        }
+        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3, AffinePlan p4)
+        {
+            return new Affine(5, ref p0, ref p1, ref p2, ref p3, ref p4, null);
+        }
+
         public static Affine NewMatix(AffinePlan creationPlan)
         {
             return new Affine(IdentityMatrix, creationPlan);
         }
-
-        public static Affine NewCustomMatrix(double sx, double shx, double sy, double shy, double tx, double ty)
+        public static Affine NewMatix2(params AffinePlan[] creationPlans)
         {
-            return new Affine(
-                sx, shx,
-                sy, shy,
-                tx, ty);
+            return new Affine(creationPlans);
         }
+
         //====================================================trans_affine_rotation
         // Rotation matrix. sin() and cos() are calculated twice for the same angle.
         // There's no harm because the performance of sin()/cos() is very good on all
@@ -556,7 +658,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 -sin_rad, cos_rad,
                 0.0, 0.0);
         }
-
+        public static Affine NewRotationFromDeg(double degree)
+        {
+            return NewRotation(degree * (Math.PI / 180d));
+        }
         //====================================================trans_affine_scaling
         // Scaling matrix. x, y - scale coefficients by X and Y respectively
         public static Affine NewScaling(double scale)
@@ -801,6 +906,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             shx = t2;
             tx = t4;
         }
+
         /*
 
         // Multiply "m" to "this" and assign the result to "this"
@@ -943,6 +1049,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double tmp = x;
             x = tmp * _elems.sx + y * _elems.shx + _elems.tx;
             y = tmp * _elems.shy + y * _elems.sy + _elems.ty;
+        }
+        public void Transform(ref float x, ref float y)
+        {
+            //accessory 
+            //TODO: move to extension method?
+            double tmp = x;
+            x = (float)(tmp * _elems.sx + y * _elems.shx + _elems.tx);
+            y = (float)(tmp * _elems.shy + y * _elems.sy + _elems.ty);
         }
 
         //public void transform(ref Vector2 pointToTransform)
@@ -1104,5 +1218,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //    x = Math.Sqrt(sx * sx + shx * shx);
         //    y = Math.Sqrt(shy * shy + sy * sy);
         //}
+
     }
 }

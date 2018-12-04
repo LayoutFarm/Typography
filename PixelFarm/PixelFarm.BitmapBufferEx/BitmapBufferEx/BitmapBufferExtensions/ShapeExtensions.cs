@@ -55,7 +55,7 @@ namespace BitmapBufferEx
                 {
 
                     DrawLine(context, w, h,
-                        x1, y1, 
+                        x1, y1,
                         x1 += points[i], y1 += points[i + 1], //also update x1,y1 
                         color);
 
@@ -223,14 +223,14 @@ namespace BitmapBufferEx
         /// <param name="x2">The x-coordinate of the bounding rectangle's right side.</param>
         /// <param name="y2">The y-coordinate of the bounding rectangle's bottom side.</param>
         /// <param name="color">The color.</param>
-        public static void DrawRectangle(this BitmapBuffer bmp, int x1, int y1, int x2, int y2, int color)
+        public static unsafe void DrawRectangle(this BitmapBuffer bmp, int x1, int y1, int x2, int y2, int color)
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
                 // Use refs for faster access (really important!) speeds up a lot!
                 int w = context.Width;
                 int h = context.Height;
-                int[] pixels = context.Pixels;
+                int* pixels = context.Pixels._inf32Buffer;
 
                 // Check boundaries
                 if ((x1 < 0 && x2 < 0) || (y1 < 0 && y2 < 0)
@@ -342,13 +342,14 @@ namespace BitmapBufferEx
         /// <param name="xr">The radius of the ellipse in x-direction.</param>
         /// <param name="yr">The radius of the ellipse in y-direction.</param>
         /// <param name="color">The color for the line.</param>
-        public static void DrawEllipseCentered(this BitmapBuffer bmp, int xc, int yc, int xr, int yr, int color)
+        public static unsafe void DrawEllipseCentered(this BitmapBuffer bmp, int xc, int yc, int xr, int yr, int color)
         {
             // Use refs for faster access (really important!) speeds up a lot!
             using (BitmapContext context = bmp.GetBitmapContext())
             {
 
-                int[] pixels = context.Pixels;
+                int* pixels = context.Pixels._inf32Buffer;
+
                 int w = context.Width;
                 int h = context.Height;
 

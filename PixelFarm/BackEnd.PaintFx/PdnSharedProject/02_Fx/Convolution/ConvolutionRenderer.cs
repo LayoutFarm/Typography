@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 //Apache2, 2017-present, WinterDev
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 using PixelFarm.Drawing;
 namespace PaintFx.Effects
@@ -44,8 +44,8 @@ namespace PaintFx.Effects
             public int[] fEnds;
         }
 
-        static Hashtable fCache = new Hashtable();
-        static Queue fCacheQ = new Queue();
+        static Dictionary<FExtentKey, FExtent> fCache = new Dictionary<FExtentKey, FExtent>();
+        static Queue<FExtentKey> fCacheQ = new Queue<FExtentKey>();
 
         static FExtent GetFExtent(int srcLength, int weightsLength)
         {
@@ -95,7 +95,7 @@ namespace PaintFx.Effects
                 {
                     if (fCache.Count > 16)
                     {
-                        object top = fCacheQ.Dequeue();
+                        FExtentKey top = fCacheQ.Dequeue();
                         fCache.Remove(top);
                     }
 

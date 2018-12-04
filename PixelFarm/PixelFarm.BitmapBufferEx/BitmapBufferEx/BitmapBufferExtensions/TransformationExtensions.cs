@@ -98,7 +98,7 @@ namespace BitmapBufferEx
                         int srcOff = ((y + line) * srcWidth + x) * ARGB_SIZE;
                         int dstOff = line * width * ARGB_SIZE;
                         BitmapContext.BlockCopy(srcContext, srcOff, destContext, dstOff, width * ARGB_SIZE);
-                    } 
+                    }
                     return result;
                 }
             }
@@ -125,7 +125,7 @@ namespace BitmapBufferEx
         /// <param name="height">The new desired height.</param>
         /// <param name="interpolation">The interpolation method that should be used.</param>
         /// <returns>A new WriteableBitmap that is a resized version of the input.</returns>
-        public static BitmapBuffer Resize(this BitmapBuffer bmp, int width, int height, Interpolation interpolation)
+        public static unsafe BitmapBuffer Resize(this BitmapBuffer bmp, int width, int height, Interpolation interpolation)
         {
             using (BitmapContext srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
@@ -134,7 +134,11 @@ namespace BitmapBufferEx
                 BitmapBuffer result = BitmapBufferFactory.New(width, height);
                 using (BitmapContext dstContext = result.GetBitmapContext())
                 {
-                    BitmapContext.BlockCopy(pd, 0, dstContext, 0, ARGB_SIZE * pd.Length);
+                    fixed (int* pd0 = &pd[0])
+                    {
+                        BitmapContext.BlockCopy(pd0, 0, dstContext, 0, ARGB_SIZE * pd.Length);
+                    }                   
+
                 }
                 return result;
             }
@@ -152,7 +156,10 @@ namespace BitmapBufferEx
         /// <returns>A new bitmap that is a resized version of the input.</returns>
         public static int[] Resize(BitmapContext srcContext, int widthSource, int heightSource, int width, int height, Interpolation interpolation)
         {
-            return Resize(srcContext.Pixels, widthSource, heightSource, width, height, interpolation);
+            unsafe
+            {
+                return Resize(srcContext.Pixels._inf32Buffer, widthSource, heightSource, width, height, interpolation);
+            }
         }
 
         /// <summary>
@@ -168,7 +175,7 @@ namespace BitmapBufferEx
 #if WPF
         public static int[] Resize(int* pixels, int widthSource, int heightSource, int width, int height, Interpolation interpolation)
 #else
-        public static int[] Resize(int[] pixels, int widthSource, int heightSource, int width, int height, Interpolation interpolation)
+        public static unsafe int[] Resize(int* pixels, int widthSource, int heightSource, int width, int height, Interpolation interpolation)
 #endif
         {
             int[] pd = new int[width * height];
@@ -302,14 +309,14 @@ namespace BitmapBufferEx
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="angle">The angle in degrees the bitmap should be rotated in 90° steps clockwise.</param>
         /// <returns>A new WriteableBitmap that is a rotated version of the input.</returns>
-        public static BitmapBuffer Rotate(this BitmapBuffer bmp, FastRotateAngle angle)
+        public static unsafe BitmapBuffer Rotate(this BitmapBuffer bmp, FastRotateAngle angle)
         {
             using (BitmapContext context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
                 // Use refs for faster access (really important!) speeds up a lot!
                 int w = context.Width;
                 int h = context.Height;
-                int[] p = context.Pixels;
+                int* p = context.Pixels._inf32Buffer;
                 int i = 0;
 
 
@@ -321,10 +328,10 @@ namespace BitmapBufferEx
                         }
                     case FastRotateAngle.Rotate90:
                         {
-                            var result = BitmapBufferFactory.New(h, w);
+                            BitmapBuffer result = BitmapBufferFactory.New(h, w);
                             using (BitmapContext destContext = result.GetBitmapContext())
                             {
-                                var rp = destContext.Pixels;
+                                int* rp = destContext.Pixels._inf32Buffer;
                                 for (int x = 0; x < w; x++)
                                 {
                                     for (int y = h - 1; y >= 0; y--)
@@ -340,10 +347,10 @@ namespace BitmapBufferEx
 
                     case FastRotateAngle.Rotate180:
                         {
-                            var result = BitmapBufferFactory.New(w, h);
+                            BitmapBuffer result = BitmapBufferFactory.New(w, h);
                             using (BitmapContext destContext = result.GetBitmapContext())
                             {
-                                var rp = destContext.Pixels;
+                                int* rp = destContext.Pixels._inf32Buffer;
                                 for (int y = h - 1; y >= 0; y--)
                                 {
                                     for (int x = w - 1; x >= 0; x--)
@@ -361,7 +368,7 @@ namespace BitmapBufferEx
                             var result = BitmapBufferFactory.New(h, w);
                             using (BitmapContext destContext = result.GetBitmapContext())
                             {
-                                int[] rp = destContext.Pixels;
+                                int* rp = destContext.Pixels._inf32Buffer;
                                 for (int x = w - 1; x >= 0; x--)
                                 {
                                     for (int y = 0; y < h; y++)
@@ -385,7 +392,7 @@ namespace BitmapBufferEx
         /// <param name="angle">Arbitrary angle in 360 Degrees (positive = clockwise).</param>
         /// <param name="crop">if true: keep the size, false: adjust canvas to new size</param>
         /// <returns>A new WriteableBitmap that is a rotated version of the input.</returns>
-        public static BitmapBuffer RotateFree(this BitmapBuffer bmp, double angle, bool crop = true)
+        public static unsafe BitmapBuffer RotateFree(this BitmapBuffer bmp, double angle, bool crop = true)
         {
             // rotating clockwise, so it's negative relative to Cartesian quadrants
             double cnAngle = -1.0 * (Math.PI / 180) * angle;
@@ -443,8 +450,9 @@ namespace BitmapBufferEx
 
                 using (BitmapContext bilinearContext = bmBilinearInterpolation.GetBitmapContext())
                 {
-                    int[] newp = bilinearContext.Pixels;
-                    int[] oldp = bmpContext.Pixels;
+                    int* newp = bilinearContext.Pixels._inf32Buffer;
+                    int* oldp = bmpContext.Pixels._inf32Buffer;
+                    //
                     int oldw = bmpContext.Width;
 
                     // assigning pixels of destination image from source image
@@ -557,14 +565,14 @@ namespace BitmapBufferEx
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="flipMode">The flip mode.</param>
         /// <returns>A new WriteableBitmap that is a flipped version of the input.</returns>
-        public static BitmapBuffer Flip(this BitmapBuffer bmp, FlipMode flipMode)
+        public static unsafe BitmapBuffer Flip(this BitmapBuffer bmp, FlipMode flipMode)
         {
             using (BitmapContext context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
                 // Use refs for faster access (really important!) speeds up a lot!
                 int w = context.Width;
                 int h = context.Height;
-                int[] p = context.Pixels;
+                int* p = context.Pixels._inf32Buffer;
                 int i = 0;
                 BitmapBuffer result = BitmapBufferFactory.New(w, h);
 
@@ -575,7 +583,7 @@ namespace BitmapBufferEx
                     case FlipMode.Vertical:
                         using (BitmapContext destContext = result.GetBitmapContext())
                         {
-                            int[] rp = destContext.Pixels;
+                            int* rp = destContext.Pixels._inf32Buffer;
                             for (int y = h - 1; y >= 0; y--)
                             {
                                 for (int x = 0; x < w; x++)
@@ -590,7 +598,7 @@ namespace BitmapBufferEx
                     case FlipMode.Horizontal:
                         using (BitmapContext destContext = result.GetBitmapContext())
                         {
-                            int[] rp = destContext.Pixels;
+                            int* rp = destContext.Pixels._inf32Buffer;
                             for (int y = 0; y < h; y++)
                             {
                                 for (int x = w - 1; x >= 0; x--)

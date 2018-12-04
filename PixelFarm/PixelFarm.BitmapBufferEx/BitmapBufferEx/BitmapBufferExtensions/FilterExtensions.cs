@@ -23,6 +23,7 @@ namespace BitmapBufferEx
     /// </summary>
     public static partial class BitmapBufferExtensions
     {
+#if !COSMOS
 
         ///<summary>
         /// Gaussian blur kernel with the size 5x5
@@ -53,7 +54,7 @@ namespace BitmapBufferEx
                                                  { 0, -2,  0}
                                               };
 
-
+#endif
 
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace BitmapBufferEx
         /// <param name="kernelFactorSum">The factor used for the kernel summing.</param>
         /// <param name="kernelOffsetSum">The offset used for the kernel summing.</param>
         /// <returns>A new WriteableBitmap that is a filtered version of the input.</returns>
-        public static BitmapBuffer Convolute(this BitmapBuffer bmp, int[,] kernel, int kernelFactorSum, int kernelOffsetSum)
+        public static unsafe BitmapBuffer Convolute(this BitmapBuffer bmp, int[,] kernel, int kernelFactorSum, int kernelOffsetSum)
         {
             int kh = kernel.GetUpperBound(0) + 1;
             int kw = kernel.GetUpperBound(1) + 1;
@@ -102,8 +103,10 @@ namespace BitmapBufferEx
 
                 using (BitmapContext resultContext = result.GetBitmapContext())
                 {
-                    int[] pixels = srcContext.Pixels;
-                    int[] resultPixels = resultContext.Pixels;
+                    int* pixels = srcContext.Pixels._inf32Buffer;
+                    int* resultPixels = resultContext.Pixels._inf32Buffer;
+
+
                     int index = 0;
                     int kwh = kw >> 1;
                     int khh = kh >> 1;
@@ -185,29 +188,35 @@ namespace BitmapBufferEx
                 var result = BitmapBufferFactory.New(srcContext.Width, srcContext.Height);
                 using (BitmapContext resultContext = result.GetBitmapContext())
                 {
-                    int[] rp = resultContext.Pixels;
-                    int[] p = srcContext.Pixels;
-                    int length = srcContext.Length;
-
-                    for (int i = 0; i < length; i++)
+                    unsafe
                     {
-                        // Extract
-                        int c = p[i];
-                        int a = (c >> 24) & 0xff;
-                        int r = (c >> 16) & 0xff;
-                        int g = (c >> 8) & 0xff;
-                        int b = (c) & 0xff;
 
-                        // Invert
-                        r = 255 - r;
-                        g = 255 - g;
-                        b = 255 - b;
+                        int* rp = resultContext.Pixels._inf32Buffer;
+                        int* p = srcContext.Pixels._inf32Buffer;
 
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                        int length = srcContext.Length;
+
+                        for (int i = 0; i < length; i++)
+                        {
+                            // Extract
+                            int c = p[i];
+                            int a = (c >> 24) & 0xff;
+                            int r = (c >> 16) & 0xff;
+                            int g = (c >> 8) & 0xff;
+                            int b = (c) & 0xff;
+
+                            // Invert
+                            r = 255 - r;
+                            g = 255 - g;
+                            b = 255 - b;
+
+                            // Set
+                            rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                        }
+
+                        return result;
                     }
 
-                    return result;
                 }
             }
         }
@@ -225,31 +234,40 @@ namespace BitmapBufferEx
             {
                 int nWidth = context.Width;
                 int nHeight = context.Height;
-                int[] px = context.Pixels;
-                BitmapBuffer result = BitmapBufferFactory.New(nWidth, nHeight);
 
-                using (BitmapContext dest = result.GetBitmapContext())
+                unsafe
                 {
-                    int[] rp = dest.Pixels;
-                    int len = context.Length;
-                    for (int i = 0; i < len; i++)
+
+
+
+                    BitmapBuffer result = BitmapBufferFactory.New(nWidth, nHeight);
+                    using (BitmapContext dest = result.GetBitmapContext())
                     {
-                        // Extract
-                        int c = px[i];
-                        int a = (c >> 24) & 0xff;
-                        int r = (c >> 16) & 0xff;
-                        int g = (c >> 8) & 0xff;
-                        int b = (c) & 0xff;
+                        NativeInt32Arr px1 = context.Pixels;
+                        NativeInt32Arr rp1 = dest.Pixels;
+                        int len = context.Length;
+                        int* px = px1._inf32Buffer;
+                        int* rp = rp1._inf32Buffer;
 
-                        // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
-                        r = g = b = ((r * 6966 + g * 23436 + b * 2366) >> 15);
+                        for (int i = 0; i < len; i++)
+                        {
+                            // Extract
+                            int c = px[i];
+                            int a = (c >> 24) & 0xff;
+                            int r = (c >> 16) & 0xff;
+                            int g = (c >> 8) & 0xff;
+                            int b = (c) & 0xff;
 
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                            // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
+                            r = g = b = ((r * 6966 + g * 23436 + b * 2366) >> 15);
+
+                            // Set
+                            rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                        }
                     }
-                }
 
-                return result;
+                    return result;
+                }
             }
         }
 
@@ -267,39 +285,44 @@ namespace BitmapBufferEx
             {
                 int nWidth = context.Width;
                 int nHeight = context.Height;
-                int[] px = context.Pixels;
-                BitmapBuffer result = BitmapBufferFactory.New(nWidth, nHeight);
 
-                using (BitmapContext dest = result.GetBitmapContext())
+                unsafe
                 {
-                    int[] rp = dest.Pixels;
-                    int len = context.Length;
-                    for (int i = 0; i < len; i++)
+                    NativeInt32Arr px1 = context.Pixels;
+                    int* px = px1._inf32Buffer;
+                    BitmapBuffer result = BitmapBufferFactory.New(nWidth, nHeight);
+
+                    using (BitmapContext dest = result.GetBitmapContext())
                     {
-                        // Extract
-                        int c = px[i];
-                        int a = (c >> 24) & 0xff;
-                        int r = (c >> 16) & 0xff;
-                        int g = (c >> 8) & 0xff;
-                        int b = (c) & 0xff;
+                        NativeInt32Arr rp1 = dest.Pixels;
+                        int* rp = rp1._inf32Buffer;
+                        int len = context.Length;
+                        for (int i = 0; i < len; i++)
+                        {
+                            // Extract
+                            int c = px[i];
+                            int a = (c >> 24) & 0xff;
+                            int r = (c >> 16) & 0xff;
+                            int g = (c >> 8) & 0xff;
+                            int b = (c) & 0xff;
 
-                        // Adjust contrast based on computed factor
-                        //TODO: create lookup table for this
-                        r = ((factor * (r - 128)) >> 8) + 128;
-                        g = ((factor * (g - 128)) >> 8) + 128;
-                        b = ((factor * (b - 128)) >> 8) + 128;
+                            // Adjust contrast based on computed factor
+                            //TODO: create lookup table for this
+                            r = ((factor * (r - 128)) >> 8) + 128;
+                            g = ((factor * (g - 128)) >> 8) + 128;
+                            b = ((factor * (b - 128)) >> 8) + 128;
 
-                        // Clamp
-                        r = r < 0 ? 0 : r > 255 ? 255 : r;
-                        g = g < 0 ? 0 : g > 255 ? 255 : g;
-                        b = b < 0 ? 0 : b > 255 ? 255 : b;
+                            // Clamp
+                            r = r < 0 ? 0 : r > 255 ? 255 : r;
+                            g = g < 0 ? 0 : g > 255 ? 255 : g;
+                            b = b < 0 ? 0 : b > 255 ? 255 : b;
 
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                            // Set
+                            rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                        }
                     }
+                    return result;
                 }
-
-                return result;
             }
         }
 
@@ -309,18 +332,18 @@ namespace BitmapBufferEx
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="nLevel">Level of contrast as double. [-255.0, 255.0] </param>
         /// <returns>The new WriteableBitmap.</returns>
-        public static BitmapBuffer AdjustBrightness(this BitmapBuffer bmp, int nLevel)
+        public static unsafe BitmapBuffer AdjustBrightness(this BitmapBuffer bmp, int nLevel)
         {
             using (BitmapContext context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
                 int nWidth = context.Width;
                 int nHeight = context.Height;
-                int[] px = context.Pixels;
+                int* px = context.Pixels._inf32Buffer;
                 BitmapBuffer result = BitmapBufferFactory.New(nWidth, nHeight);
 
                 using (BitmapContext dest = result.GetBitmapContext())
                 {
-                    int[] rp = dest.Pixels;
+                    int* rp = dest.Pixels._inf32Buffer;
                     int len = context.Length;
                     for (int i = 0; i < len; i++)
                     {
@@ -357,18 +380,18 @@ namespace BitmapBufferEx
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="value">Value of gamma for adjustment. Original is 1.0.</param>
         /// <returns>The new WriteableBitmap.</returns>
-        public static BitmapBuffer AdjustGamma(this BitmapBuffer bmp, double value)
+        public static unsafe BitmapBuffer AdjustGamma(this BitmapBuffer bmp, double value)
         {
             using (BitmapContext context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
                 int nWidth = context.Width;
                 int nHeight = context.Height;
-                int[] srcPixels = context.Pixels;
+                int* srcPixels = context.Pixels._inf32Buffer;
                 BitmapBuffer result = BitmapBufferFactory.New(nWidth, nHeight);
 
                 using (BitmapContext dest = result.GetBitmapContext())
                 {
-                    int[] rp = dest.Pixels;
+                    int* rp = dest.Pixels._inf32Buffer;
                     var gammaCorrection = 1.0 / value;
                     int len = context.Length;
                     for (int i = 0; i < len; i++)

@@ -72,81 +72,85 @@ namespace BitmapBufferEx
 
                 bool noBlending = !doAlphaBlend || sa == 255;
 
-                int[] pixels = context.Pixels;
-
-                // Check boundaries
-                if ((x1 < 0 && x2 < 0) || (y1 < 0 && y2 < 0)
-                 || (x1 >= w && x2 >= w) || (y1 >= h && y2 >= h))
+                unsafe
                 {
-                    return;
-                }
+                    int* pixels = context.Pixels._inf32Buffer;
 
-                // Clamp boundaries
-                if (x1 < 0) { x1 = 0; }
-                if (y1 < 0) { y1 = 0; }
-                if (x2 < 0) { x2 = 0; }
-                if (y2 < 0) { y2 = 0; }
-                if (x1 > w) { x1 = w; }
-                if (y1 > h) { y1 = h; }
-                if (x2 > w) { x2 = w; }
-                if (y2 > h) { y2 = h; }
-
-                //swap values
-                if (y1 > y2)
-                {
-                    y2 -= y1;
-                    y1 += y2;
-                    y2 = (y1 - y2);
-                }
-
-                // Fill first line
-                int startY = y1 * w;
-                int startYPlusX1 = startY + x1;
-                int endOffset = startY + x2;
-
-
-
-                // Copy first line
-                int len = (x2 - x1);
-                int srcOffsetBytes = startYPlusX1 * ARGB_SIZE;
-                int offset2 = y2 * w + x1;
-
-                //-------------------------
-                //NO BLENDING VS BLENDING
-                if (noBlending)
-                {
-
-                    //first rows
-                    for (int idx = startYPlusX1; idx < endOffset; idx++)
+                    // Check boundaries
+                    if ((x1 < 0 && x2 < 0) || (y1 < 0 && y2 < 0)
+                     || (x1 >= w && x2 >= w) || (y1 >= h && y2 >= h))
                     {
-                        pixels[idx] = color;
-                    }
-                    //next rows
-                    int strideInBytes = len * ARGB_SIZE;
-                    for (int y = startYPlusX1 + w; y < offset2; y += w)
-                    {
-                        BitmapContext.BlockCopy(context, srcOffsetBytes, context, y * ARGB_SIZE, strideInBytes);
-                    }
-                }
-                else
-                {
-                    //first rows
-                    for (int idx = startYPlusX1; idx < endOffset; idx++)
-                    {
-                        pixels[idx] = AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
+                        return;
                     }
 
-                    //next rows
-                    for (int y = startYPlusX1 + w; y < offset2; y += w)
+                    // Clamp boundaries
+                    if (x1 < 0) { x1 = 0; }
+                    if (y1 < 0) { y1 = 0; }
+                    if (x2 < 0) { x2 = 0; }
+                    if (y2 < 0) { y2 = 0; }
+                    if (x1 > w) { x1 = w; }
+                    if (y1 > h) { y1 = h; }
+                    if (x2 > w) { x2 = w; }
+                    if (y2 > h) { y2 = h; }
+
+                    //swap values
+                    if (y1 > y2)
                     {
-                        // Alpha blend line
-                        for (int i = 0; i < len; i++)
+                        y2 -= y1;
+                        y1 += y2;
+                        y2 = (y1 - y2);
+                    }
+
+                    // Fill first line
+                    int startY = y1 * w;
+                    int startYPlusX1 = startY + x1;
+                    int endOffset = startY + x2;
+
+
+
+                    // Copy first line
+                    int len = (x2 - x1);
+                    int srcOffsetBytes = startYPlusX1 * ARGB_SIZE;
+                    int offset2 = y2 * w + x1;
+
+                    //-------------------------
+                    //NO BLENDING VS BLENDING
+                    if (noBlending)
+                    {
+
+                        //first rows
+                        for (int idx = startYPlusX1; idx < endOffset; idx++)
                         {
-                            int idx = y + i;
+                            pixels[idx] = color;
+                        }
+                        //next rows
+                        int strideInBytes = len * ARGB_SIZE;
+                        for (int y = startYPlusX1 + w; y < offset2; y += w)
+                        {
+                            BitmapContext.BlockCopy(context, srcOffsetBytes, context, y * ARGB_SIZE, strideInBytes);
+                        }
+                    }
+                    else
+                    {
+                        //first rows
+                        for (int idx = startYPlusX1; idx < endOffset; idx++)
+                        {
                             pixels[idx] = AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
+                        }
+
+                        //next rows
+                        for (int y = startYPlusX1 + w; y < offset2; y += w)
+                        {
+                            // Alpha blend line
+                            for (int i = 0; i < len; i++)
+                            {
+                                int idx = y + i;
+                                pixels[idx] = AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
+                            }
                         }
                     }
                 }
+
             }
         }
 
@@ -237,51 +241,118 @@ namespace BitmapBufferEx
         public static void FillEllipseCentered(this BitmapBuffer bmp, int xc, int yc, int xr, int yr, int color, bool doAlphaBlend = false)
         {
             // Use refs for faster access (really important!) speeds up a lot!
-            using (BitmapContext context = bmp.GetBitmapContext())
+            unsafe
             {
-                int[] pixels = context.Pixels;
-                int w = context.Width;
-                int h = context.Height;
-
-                // Avoid endless loop
-                if (xr < 1 || yr < 1)
+                using (BitmapContext context = bmp.GetBitmapContext())
                 {
-                    return;
-                }
+                    int* pixels = context.Pixels._inf32Buffer;
+                    //
+                    int w = context.Width;
+                    int h = context.Height;
 
-                // Skip completly outside objects
-                if (xc - xr >= w || xc + xr < 0 || yc - yr >= h || yc + yr < 0)
-                {
-                    return;
-                }
+                    // Avoid endless loop
+                    if (xr < 1 || yr < 1)
+                    {
+                        return;
+                    }
 
-                // Init vars
-                int uh, lh, uy, ly, lx, rx;
-                int x = xr;
-                int y = 0;
-                int xrSqTwo = (xr * xr) << 1;
-                int yrSqTwo = (yr * yr) << 1;
-                int xChg = yr * yr * (1 - (xr << 1));
-                int yChg = xr * xr;
-                int err = 0;
-                int xStopping = yrSqTwo * xr;
-                int yStopping = 0;
+                    // Skip completly outside objects
+                    if (xc - xr >= w || xc + xr < 0 || yc - yr >= h || yc + yr < 0)
+                    {
+                        return;
+                    }
 
-                int sa = ((color >> 24) & 0xff);
-                int sr = ((color >> 16) & 0xff);
-                int sg = ((color >> 8) & 0xff);
-                int sb = ((color) & 0xff);
+                    // Init vars
+                    int uh, lh, uy, ly, lx, rx;
+                    int x = xr;
+                    int y = 0;
+                    int xrSqTwo = (xr * xr) << 1;
+                    int yrSqTwo = (yr * yr) << 1;
+                    int xChg = yr * yr * (1 - (xr << 1));
+                    int yChg = xr * xr;
+                    int err = 0;
+                    int xStopping = yrSqTwo * xr;
+                    int yStopping = 0;
 
-                bool noBlending = !doAlphaBlend || sa == 255;
+                    int sa = ((color >> 24) & 0xff);
+                    int sr = ((color >> 16) & 0xff);
+                    int sg = ((color >> 8) & 0xff);
+                    int sb = ((color) & 0xff);
 
-                // Draw first set of points counter clockwise where tangent line slope > -1.
-                while (xStopping >= yStopping)
-                {
-                    // Draw 4 quadrant points at once
+                    bool noBlending = !doAlphaBlend || sa == 255;
+
+                    // Draw first set of points counter clockwise where tangent line slope > -1.
+                    while (xStopping >= yStopping)
+                    {
+                        // Draw 4 quadrant points at once
+                        // Upper half
+                        uy = yc + y;
+                        // Lower half
+                        ly = yc - y - 1;
+
+                        // Clip
+                        if (uy < 0) uy = 0;
+                        if (uy >= h) uy = h - 1;
+                        if (ly < 0) ly = 0;
+                        if (ly >= h) ly = h - 1;
+
+                        // Upper half
+                        uh = uy * w;
+                        // Lower half
+                        lh = ly * w;
+
+                        rx = xc + x;
+                        lx = xc - x;
+
+                        // Clip
+                        if (rx < 0) rx = 0;
+                        if (rx >= w) rx = w - 1;
+                        if (lx < 0) lx = 0;
+                        if (lx >= w) lx = w - 1;
+
+                        // Draw line
+                        if (noBlending)
+                        {
+                            for (int i = lx; i <= rx; i++)
+                            {
+                                pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
+                                pixels[i + lh] = color; // Quadrant III to IV
+                            }
+                        }
+                        else
+                        {
+                            for (int i = lx; i <= rx; i++)
+                            {
+                                // Quadrant II to I (Actually two octants)
+                                pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
+
+                                // Quadrant III to IV
+                                pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
+                            }
+                        }
+
+
+                        y++;
+                        yStopping += xrSqTwo;
+                        err += yChg;
+                        yChg += xrSqTwo;
+                        if ((xChg + (err << 1)) > 0)
+                        {
+                            x--;
+                            xStopping -= yrSqTwo;
+                            err += xChg;
+                            xChg += yrSqTwo;
+                        }
+                    }
+
+                    // ReInit vars
+                    x = 0;
+                    y = yr;
+
                     // Upper half
                     uy = yc + y;
                     // Lower half
-                    ly = yc - y - 1;
+                    ly = yc - y;
 
                     // Clip
                     if (uy < 0) uy = 0;
@@ -294,128 +365,65 @@ namespace BitmapBufferEx
                     // Lower half
                     lh = ly * w;
 
-                    rx = xc + x;
-                    lx = xc - x;
+                    xChg = yr * yr;
+                    yChg = xr * xr * (1 - (yr << 1));
+                    err = 0;
+                    xStopping = 0;
+                    yStopping = xrSqTwo * yr;
 
-                    // Clip
-                    if (rx < 0) rx = 0;
-                    if (rx >= w) rx = w - 1;
-                    if (lx < 0) lx = 0;
-                    if (lx >= w) lx = w - 1;
-
-                    // Draw line
-                    if (noBlending)
+                    // Draw second set of points clockwise where tangent line slope < -1.
+                    while (xStopping <= yStopping)
                     {
-                        for (int i = lx; i <= rx; i++)
+                        // Draw 4 quadrant points at once
+                        rx = xc + x;
+                        lx = xc - x;
+
+                        // Clip
+                        if (rx < 0) rx = 0;
+                        if (rx >= w) rx = w - 1;
+                        if (lx < 0) lx = 0;
+                        if (lx >= w) lx = w - 1;
+
+                        // Draw line
+                        if (noBlending)
                         {
-                            pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
-                            pixels[i + lh] = color; // Quadrant III to IV
+                            for (int i = lx; i <= rx; i++)
+                            {
+                                pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
+                                pixels[i + lh] = color; // Quadrant III to IV
+                            }
                         }
-                    }
-                    else
-                    {
-                        for (int i = lx; i <= rx; i++)
+                        else
                         {
-                            // Quadrant II to I (Actually two octants)
-                            pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
+                            for (int i = lx; i <= rx; i++)
+                            {
+                                // Quadrant II to I (Actually two octants)
+                                pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
 
-                            // Quadrant III to IV
-                            pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
+                                // Quadrant III to IV
+                                pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
+                            }
                         }
-                    }
 
-
-                    y++;
-                    yStopping += xrSqTwo;
-                    err += yChg;
-                    yChg += xrSqTwo;
-                    if ((xChg + (err << 1)) > 0)
-                    {
-                        x--;
-                        xStopping -= yrSqTwo;
+                        x++;
+                        xStopping += yrSqTwo;
                         err += xChg;
                         xChg += yrSqTwo;
-                    }
-                }
-
-                // ReInit vars
-                x = 0;
-                y = yr;
-
-                // Upper half
-                uy = yc + y;
-                // Lower half
-                ly = yc - y;
-
-                // Clip
-                if (uy < 0) uy = 0;
-                if (uy >= h) uy = h - 1;
-                if (ly < 0) ly = 0;
-                if (ly >= h) ly = h - 1;
-
-                // Upper half
-                uh = uy * w;
-                // Lower half
-                lh = ly * w;
-
-                xChg = yr * yr;
-                yChg = xr * xr * (1 - (yr << 1));
-                err = 0;
-                xStopping = 0;
-                yStopping = xrSqTwo * yr;
-
-                // Draw second set of points clockwise where tangent line slope < -1.
-                while (xStopping <= yStopping)
-                {
-                    // Draw 4 quadrant points at once
-                    rx = xc + x;
-                    lx = xc - x;
-
-                    // Clip
-                    if (rx < 0) rx = 0;
-                    if (rx >= w) rx = w - 1;
-                    if (lx < 0) lx = 0;
-                    if (lx >= w) lx = w - 1;
-
-                    // Draw line
-                    if (noBlending)
-                    {
-                        for (int i = lx; i <= rx; i++)
+                        if ((yChg + (err << 1)) > 0)
                         {
-                            pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
-                            pixels[i + lh] = color; // Quadrant III to IV
+                            y--;
+                            uy = yc + y; // Upper half
+                            ly = yc - y; // Lower half
+                            if (uy < 0) uy = 0; // Clip
+                            if (uy >= h) uy = h - 1; // ...
+                            if (ly < 0) ly = 0;
+                            if (ly >= h) ly = h - 1;
+                            uh = uy * w; // Upper half
+                            lh = ly * w; // Lower half
+                            yStopping -= xrSqTwo;
+                            err += yChg;
+                            yChg += xrSqTwo;
                         }
-                    }
-                    else
-                    {
-                        for (int i = lx; i <= rx; i++)
-                        {
-                            // Quadrant II to I (Actually two octants)
-                            pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
-
-                            // Quadrant III to IV
-                            pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
-                        }
-                    }
-
-                    x++;
-                    xStopping += yrSqTwo;
-                    err += xChg;
-                    xChg += yrSqTwo;
-                    if ((yChg + (err << 1)) > 0)
-                    {
-                        y--;
-                        uy = yc + y; // Upper half
-                        ly = yc - y; // Lower half
-                        if (uy < 0) uy = 0; // Clip
-                        if (uy >= h) uy = h - 1; // ...
-                        if (ly < 0) ly = 0;
-                        if (ly >= h) ly = h - 1;
-                        uh = uy * w; // Upper half
-                        lh = ly * w; // Lower half
-                        yStopping -= xrSqTwo;
-                        err += yChg;
-                        yChg += xrSqTwo;
                     }
                 }
             }
@@ -443,7 +451,7 @@ namespace BitmapBufferEx
         /// <param name="points">The points of the polygon in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="doAlphaBlend">True if alpha blending should be performed or false if not.</param>
-        public static void FillPolygon(this BitmapBuffer bmp, int[] points, int color, bool doAlphaBlend = false)
+        public static unsafe void FillPolygon(this BitmapBuffer bmp, int[] points, int color, bool doAlphaBlend = false)
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
@@ -458,7 +466,7 @@ namespace BitmapBufferEx
 
                 bool noBlending = !doAlphaBlend || sa == 255;
 
-                int[] pixels = context.Pixels;
+                int* pixels = context.Pixels._inf32Buffer;
                 int pn = points.Length;
                 int pnh = points.Length >> 1;
                 int[] intersectionsX = new int[pnh];
@@ -651,7 +659,7 @@ namespace BitmapBufferEx
         /// therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).
         /// </param>
         /// <param name="color">The color for the polygon.</param>
-        public static void FillPolygonsEvenOdd(this BitmapBuffer bmp, int[][] polygons, int color)
+        public static unsafe void FillPolygonsEvenOdd(this BitmapBuffer bmp, int[][] polygons, int color)
         {
 
             // Algorithm:
@@ -685,7 +693,7 @@ namespace BitmapBufferEx
                 // Use refs for faster access (really important!) speeds up a lot!
                 int w = context.Width;
                 int h = context.Height;
-                int[] pixels = context.Pixels;
+                int* pixels = context.Pixels._inf32Buffer;
 
                 // Register edges, and find y max
                 List<Edge> edges = new List<Edge>();

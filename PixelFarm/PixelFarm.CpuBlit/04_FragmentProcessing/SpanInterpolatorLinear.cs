@@ -47,27 +47,26 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             double ty = y;
 
             m_trans.Transform(ref tx, ref ty);
-            int x1 = AggMath.iround(tx * (double)SUB_PIXEL_SCALE);
-            int y1 = AggMath.iround(ty * (double)SUB_PIXEL_SCALE);
+            int x1 = AggMath.iround(tx * SUB_PIXEL_SCALE);
+            int y1 = AggMath.iround(ty * SUB_PIXEL_SCALE);
             //
             tx = x + len; //*** 
             ty = y;//**
             m_trans.Transform(ref tx, ref ty);
-            int x2 = AggMath.iround(tx * (double)SUB_PIXEL_SCALE);
-            int y2 = AggMath.iround(ty * (double)SUB_PIXEL_SCALE);
+            int x2 = AggMath.iround(tx * SUB_PIXEL_SCALE);
+            int y2 = AggMath.iround(ty * SUB_PIXEL_SCALE);
             //
-            m_li_x = new LineInterpolatorDDA2(x1, x2, (int)len);
-            m_li_y = new LineInterpolatorDDA2(y1, y2, (int)len);
+            m_li_x = new LineInterpolatorDDA2(x1, x2, len);
+            m_li_y = new LineInterpolatorDDA2(y1, y2, len);
         }
 
-        //----------------------------------------------------------------
-        public void ReSync(double xe, double ye, int len)
-        {
-            m_trans.Transform(ref xe, ref ye);
-            m_li_x = new LineInterpolatorDDA2(m_li_x.Y, AggMath.iround(xe * (double)SUB_PIXEL_SCALE), (int)len);
-            m_li_y = new LineInterpolatorDDA2(m_li_y.Y, AggMath.iround(ye * (double)SUB_PIXEL_SCALE), (int)len);
-        }
-
+        ////----------------------------------------------------------------
+        //public void ReSync(double xe, double ye, int len)
+        //{
+        //    m_trans.Transform(ref xe, ref ye);
+        //    m_li_x = new LineInterpolatorDDA2(m_li_x.Y, AggMath.iround(xe * SUB_PIXEL_SCALE), len);
+        //    m_li_y = new LineInterpolatorDDA2(m_li_y.Y, AggMath.iround(ye * SUB_PIXEL_SCALE), len);
+        //} 
 
         public void Next()
         {

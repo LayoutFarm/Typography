@@ -27,13 +27,13 @@ namespace BitmapBufferEx
 
         internal const int ARGB_SIZE = 4;
 
-        public static void Clear(this BitmapContext context, ColorInt color)
+        public static unsafe void Clear(this BitmapContext context, ColorInt color)
         {
             int colr = color.ToPreMultAlphaColor();
-            int[] pixels = context.Pixels;
+            int* pixels = context.Pixels._inf32Buffer;
             int w = context.Width;
             int h = context.Height;
-            int len = w * ARGB_SIZE;
+            int lenBytes = w * ARGB_SIZE;
 
             // Fill first line
             for (int x = 0; x < w; x++)
@@ -46,7 +46,7 @@ namespace BitmapBufferEx
             int y = 1;
             while (y < h)
             {
-                BitmapContext.BlockCopy(context, 0, context, y * len, blockHeight * len);
+                BitmapContext.BlockCopy(context, 0, context, y * lenBytes, blockHeight * lenBytes);
                 y += blockHeight;
                 blockHeight = Math.Min(2 * blockHeight, h - y);
             }
@@ -58,7 +58,7 @@ namespace BitmapBufferEx
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="color">The color used for filling.</param>
         public static void Clear(this BitmapBuffer bmp, ColorInt color)
-        {            
+        {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
                 Clear(context, color);
@@ -87,7 +87,7 @@ namespace BitmapBufferEx
             using (BitmapContext srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
                 BitmapBuffer result = BitmapBufferFactory.New(srcContext.Width, srcContext.Height);
-                using (var destContext = result.GetBitmapContext())
+                using (BitmapContext destContext = result.GetBitmapContext())
                 {
                     BitmapContext.BlockCopy(srcContext, 0, destContext, 0, srcContext.Length * ARGB_SIZE);
                 }
@@ -174,11 +174,11 @@ namespace BitmapBufferEx
         /// <param name="x">The x coordinate of the pixel.</param>
         /// <param name="y">The y coordinate of the pixel.</param>
         /// <returns>The color of the pixel at x, y.</returns>
-        public static int dbugGetPixeli(this BitmapBuffer bmp, int x, int y)
+        public static unsafe int dbugGetPixeli(this BitmapBuffer bmp, int x, int y)
         {
             using (BitmapContext context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
-                return context.Pixels[y * context.Width + x];
+                return context.Pixels._inf32Buffer[y * context.Width + x];
             }
         }
 
@@ -190,11 +190,11 @@ namespace BitmapBufferEx
         /// <param name="x">The x coordinate of the pixel.</param>
         /// <param name="y">The y coordinate of the pixel.</param>
         /// <returns>The color of the pixel at x, y as a Color struct.</returns>
-        public static ColorInt dbugGetPixel(this BitmapBuffer bmp, int x, int y)
+        public static unsafe ColorInt dbugGetPixel(this BitmapBuffer bmp, int x, int y)
         {
             using (BitmapContext context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
-                int c = context.Pixels[y * context.Width + x];
+                int c = context.Pixels._inf32Buffer[y * context.Width + x];
                 byte a = (byte)(c >> 24);
 
                 // Prevent division by zero
@@ -224,14 +224,17 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
-                // Extract color components
-                int c = context.Pixels[y * context.Width + x];
-                byte r = (byte)(c >> 16);
-                byte g = (byte)(c >> 8);
-                byte b = (byte)(c);
+                unsafe
+                {
+                    // Extract color components
+                    int c = context.Pixels._inf32Buffer[y * context.Width + x];
+                    byte r = (byte)(c >> 16);
+                    byte g = (byte)(c >> 8);
+                    byte b = (byte)(c);
 
-                // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
-                return (byte)((r * 6966 + g * 23436 + b * 2366) >> 15);
+                    // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
+                    return (byte)((r * 6966 + g * 23436 + b * 2366) >> 15);
+                }
             }
         }
 
@@ -248,7 +251,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[index] = (255 << 24) | (r << 16) | (g << 8) | b;
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[index] = (255 << 24) | (r << 16) | (g << 8) | b;
+                }
             }
         }
 
@@ -266,7 +272,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = (255 << 24) | (r << 16) | (g << 8) | b;
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[y * context.Width + x] = (255 << 24) | (r << 16) | (g << 8) | b;
+                }
             }
         }
 
@@ -286,7 +295,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[index] = (a << 24) | (r << 16) | (g << 8) | b;
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[index] = (a << 24) | (r << 16) | (g << 8) | b;
+                }
             }
         }
 
@@ -305,7 +317,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = (a << 24) | (r << 16) | (g << 8) | b;
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[y * context.Width + x] = (a << 24) | (r << 16) | (g << 8) | b;
+                }
             }
         }
 
@@ -322,7 +337,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[index] = color.ToPreMultAlphaColor();
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[index] = color.ToPreMultAlphaColor();
+                }
             }
         }
 
@@ -338,7 +356,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = color.ToPreMultAlphaColor();
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[y * context.Width + x] = color.ToPreMultAlphaColor();
+                }
             }
         }
 
@@ -354,7 +375,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[index] = color.ToPreMultAlphaColor();
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[index] = color.ToPreMultAlphaColor();
+                }
             }
         }
 
@@ -371,8 +395,11 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                // Add one to use mul and cheap bit shift for multiplicaltion
-                context.Pixels[y * context.Width + x] = color.ToPreMultAlphaColor();
+                unsafe
+                {
+                    // Add one to use mul and cheap bit shift for multiplicaltion
+                    context.Pixels._inf32Buffer[y * context.Width + x] = color.ToPreMultAlphaColor();
+                }
             }
         }
 
@@ -387,7 +414,10 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[index] = color;
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[index] = color;
+                }
             }
         }
 
@@ -403,7 +433,11 @@ namespace BitmapBufferEx
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = color;
+                unsafe
+                {
+                    context.Pixels._inf32Buffer[y * context.Width + x] = color;
+                }
+
             }
         }
     }

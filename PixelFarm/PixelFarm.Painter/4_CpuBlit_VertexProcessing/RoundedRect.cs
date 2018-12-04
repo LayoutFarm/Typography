@@ -193,12 +193,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     case VertexCmd.MoveTo:
                         continue;
                     case VertexCmd.NoMore:
-                        break;
+                        goto EXIT_LOOP;
                     default:
                         yield return vertexData;
                         break;
                 }
             }
+
+            EXIT_LOOP:
 
             yield return new VertexData(VertexCmd.Close, (int)EndVertexOrientation.CCW, 0);
             yield return new VertexData(VertexCmd.NoMore);
@@ -208,10 +210,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             return VertexStoreBuilder.CreateVxs(this.GetVertexIter(), vxs);
         }
-        public VertexStoreSnap MakeVertexSnap(VertexStore vxs)
-        {
-            return new VertexStoreSnap(this.MakeVxs(vxs));
-        }
+
     }
 }
 

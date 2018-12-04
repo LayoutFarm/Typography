@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 
-using System; 
+using System;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
     public class Ellipse
@@ -42,10 +42,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             Set(originX, originY, radiusX, radiusY, num_steps, cw);
         }
-        public void Reset(double originX, double originY, double radiusX, double radiusY, int num_steps = 0)
-        {
-            Set(originX, originY, radiusX, radiusY, num_steps, false);
-        }
+
         public void Set(double ox, double oy,
                  double rx, double ry,
                  int num_steps = 0, bool cw = false)
@@ -62,7 +59,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 CalculateNumSteps();
             }
         }
-
+        public void SetFromLTWH(double left, double top, double width, double height, int num_steps = 0, bool cw = false)
+        {
+            double x = (left + width / 2);
+            double y = (top + height / 2);
+            double rx = Math.Abs(width / 2);
+            double ry = Math.Abs(height / 2);
+            Set(x, y, rx, ry, num_steps, cw);
+        }
         public double ApproximateScale
         {
             get { return this.m_scale; }

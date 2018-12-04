@@ -15,7 +15,7 @@
 //   This code is open source. Please read the License.txt for details. No worries, we won't sue you! ;)
 //
 using System;
-namespace BitmapBufferEx 
+namespace BitmapBufferEx
 {
     public static partial class BitmapBufferExtensions
     {
@@ -46,14 +46,14 @@ namespace BitmapBufferEx
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
-        public static void DrawLineBresenham(this BitmapBuffer bmp, int x1, int y1, int x2, int y2, int color, RectD? clipRect = null)
+        public static unsafe void DrawLineBresenham(this BitmapBuffer bmp, int x1, int y1, int x2, int y2, int color, RectD? clipRect = null)
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
                 // Use refs for faster access (really important!) speeds up a lot!
                 int w = context.Width;
                 int h = context.Height;
-                var pixels = context.Pixels;
+                int* pixels = context.Pixels._inf32Buffer;
 
                 // Get clip coordinates
                 int clipX1 = 0;
@@ -181,14 +181,14 @@ namespace BitmapBufferEx
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
-        public static void DrawLineDDA(this BitmapBuffer bmp, int x1, int y1, int x2, int y2, int color, RectD? clipRect = null)
+        public static unsafe void DrawLineDDA(this BitmapBuffer bmp, int x1, int y1, int x2, int y2, int color, RectD? clipRect = null)
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
                 // Use refs for faster access (really important!) speeds up a lot!
                 int w = context.Width;
                 int h = context.Height;
-                int[] pixels = context.Pixels;
+                int* pixels = context.Pixels._inf32Buffer;
 
                 // Get clip coordinates
                 int clipX1 = 0;
@@ -286,7 +286,7 @@ namespace BitmapBufferEx
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
-        public static void DrawLine(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int color, RectD? clipRect = null)
+        public static unsafe void DrawLine(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int color, RectD? clipRect = null)
         {
             // Get clip coordinates
             int clipX1 = 0;
@@ -305,7 +305,7 @@ namespace BitmapBufferEx
             // Perform cohen-sutherland clipping if either point is out of the viewport
             if (!CohenSutherlandLineClip(new RectD(clipX1, clipY1, clipX2 - clipX1, clipY2 - clipY1), ref x1, ref y1, ref x2, ref y2)) return;
 
-            int[] pixels = context.Pixels;
+            int* pixels = context.Pixels._inf32Buffer;
 
             // Distance start and end point
             int dx = x2 - x1;
@@ -766,12 +766,12 @@ namespace BitmapBufferEx
         /// <param name="sg">Premultiplied green color component</param>
         /// <param name="sb">Premultiplied blue color component</param>
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
-        public static void DrawLineWu(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int sa, int sr, int sg, int sb, RectD? clipRect = null)
+        public static unsafe void DrawLineWu(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int sa, int sr, int sg, int sb, RectD? clipRect = null)
         {
             // Perform cohen-sutherland clipping if either point is out of the viewport
             if (!CohenSutherlandLineClip(clipRect ?? new RectD(0, 0, pixelWidth, pixelHeight), ref x1, ref y1, ref x2, ref y2)) return;
 
-            int[] pixels = context.Pixels;
+            int* pixels = context.Pixels._inf32Buffer;
 
             const ushort INTENSITY_BITS = 8;
             const short NUM_LEVELS = 1 << INTENSITY_BITS; // 256
@@ -930,9 +930,9 @@ namespace BitmapBufferEx
         /// <param name="sa">Source alpha (0..255)</param> 
         /// <param name="srb">Source non-premultiplied red and blue component in the format 0x00rr00bb</param> 
         /// <param name="sg">Source green component (0..255)</param> 
-        private static void AlphaBlendNormalOnPremultiplied(BitmapContext context, int index, int sa, uint srb, uint sg)
+        private static unsafe void AlphaBlendNormalOnPremultiplied(BitmapContext context, int index, int sa, uint srb, uint sg)
         {
-            int[] pixels = context.Pixels;
+            int* pixels = context.Pixels._inf32Buffer;
             uint destPixel = (uint)pixels[index];
 
             uint da = (destPixel >> 24);

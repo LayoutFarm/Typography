@@ -33,118 +33,118 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CubicBezier.cs">
-      <Link>4_BurningMineCurves\CubicBezier.cs</Link>
+      <Link>0_REF_BurningMineCurves\CubicBezier.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveBuilder.cs">
-      <Link>4_BurningMineCurves\CurveBuilder.cs</Link>
+      <Link>0_REF_BurningMineCurves\CurveBuilder.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveFit.cs">
-      <Link>4_BurningMineCurves\CurveFit.cs</Link>
+      <Link>0_REF_BurningMineCurves\CurveFit.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveFitBase.cs">
-      <Link>4_BurningMineCurves\CurveFitBase.cs</Link>
+      <Link>0_REF_BurningMineCurves\CurveFitBase.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurvePreprocess.cs">
-      <Link>4_BurningMineCurves\CurvePreprocess.cs</Link>
+      <Link>0_REF_BurningMineCurves\CurvePreprocess.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\Spline.cs">
-      <Link>4_BurningMineCurves\Spline.cs</Link>
+      <Link>0_REF_BurningMineCurves\Spline.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\SplineBuilder.cs">
-      <Link>4_BurningMineCurves\SplineBuilder.cs</Link>
+      <Link>0_REF_BurningMineCurves\SplineBuilder.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\VectorHelper.cs">
-      <Link>4_BurningMineCurves\VectorHelper.cs</Link>
+      <Link>0_REF_BurningMineCurves\VectorHelper.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\AdvancingFront.cs">
-      <Link>4_Triangulation\Delaunay\AdvancingFront.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\AdvancingFront.cs">
+      <Link>0_REF_Triangulation\Delaunay\AdvancingFront.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\AdvancingFrontNode.cs">
-      <Link>4_Triangulation\Delaunay\AdvancingFrontNode.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\AdvancingFrontNode.cs">
+      <Link>0_REF_Triangulation\Delaunay\AdvancingFrontNode.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\DelaunayTriangle.cs">
-      <Link>4_Triangulation\Delaunay\DelaunayTriangle.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\DelaunayTriangle.cs">
+      <Link>0_REF_Triangulation\Delaunay\DelaunayTriangle.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\DTSweep.cs">
-      <Link>4_Triangulation\Delaunay\DTSweep.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\DTSweep.cs">
+      <Link>0_REF_Triangulation\Delaunay\DTSweep.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\DTSweepConstraint.cs">
-      <Link>4_Triangulation\Delaunay\DTSweepConstraint.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\DTSweepConstraint.cs">
+      <Link>0_REF_Triangulation\Delaunay\DTSweepConstraint.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\DTSweepContext.cs">
-      <Link>4_Triangulation\Delaunay\DTSweepContext.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\DTSweepContext.cs">
+      <Link>0_REF_Triangulation\Delaunay\DTSweepContext.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\DTSweepDebugContext.cs">
-      <Link>4_Triangulation\Delaunay\DTSweepDebugContext.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\DTSweepDebugContext.cs">
+      <Link>0_REF_Triangulation\Delaunay\DTSweepDebugContext.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\delaunay\PointOnEdgeException.cs">
-      <Link>4_Triangulation\Delaunay\PointOnEdgeException.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\delaunay\PointOnEdgeException.cs">
+      <Link>0_REF_Triangulation\Delaunay\PointOnEdgeException.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\P2T.cs">
-      <Link>4_Triangulation\P2T.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\P2T.cs">
+      <Link>0_REF_Triangulation\P2T.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\polygon\Polygon.cs">
-      <Link>4_Triangulation\Polygon\Polygon.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\polygon\Polygon.cs">
+      <Link>0_REF_Triangulation\Polygon\Polygon.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\sets\ConstrainedPointSet.cs">
-      <Link>4_Triangulation\Sets\ConstrainedPointSet.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\sets\ConstrainedPointSet.cs">
+      <Link>0_REF_Triangulation\Sets\ConstrainedPointSet.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\sets\PointSet.cs">
-      <Link>4_Triangulation\Sets\PointSet.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\sets\PointSet.cs">
+      <Link>0_REF_Triangulation\Sets\PointSet.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\ITriangulatable.cs">
-      <Link>4_Triangulation\Triangulation\ITriangulatable.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\ITriangulatable.cs">
+      <Link>0_REF_Triangulation\Triangulation\ITriangulatable.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\Orientation.cs">
-      <Link>4_Triangulation\Triangulation\Orientation.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\Orientation.cs">
+      <Link>0_REF_Triangulation\Triangulation\Orientation.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\TriangulationAlgorithm.cs">
-      <Link>4_Triangulation\Triangulation\TriangulationAlgorithm.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\TriangulationAlgorithm.cs">
+      <Link>0_REF_Triangulation\Triangulation\TriangulationAlgorithm.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\TriangulationContext.cs">
-      <Link>4_Triangulation\Triangulation\TriangulationContext.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\TriangulationContext.cs">
+      <Link>0_REF_Triangulation\Triangulation\TriangulationContext.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\TriangulationDebugContext.cs">
-      <Link>4_Triangulation\Triangulation\TriangulationDebugContext.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\TriangulationDebugContext.cs">
+      <Link>0_REF_Triangulation\Triangulation\TriangulationDebugContext.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\TriangulationMode.cs">
-      <Link>4_Triangulation\Triangulation\TriangulationMode.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\TriangulationMode.cs">
+      <Link>0_REF_Triangulation\Triangulation\TriangulationMode.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\TriangulationPoint.cs">
-      <Link>4_Triangulation\Triangulation\TriangulationPoint.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\TriangulationPoint.cs">
+      <Link>0_REF_Triangulation\Triangulation\TriangulationPoint.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\triangulation\TriangulationUtil.cs">
-      <Link>4_Triangulation\Triangulation\TriangulationUtil.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\triangulation\TriangulationUtil.cs">
+      <Link>0_REF_Triangulation\Triangulation\TriangulationUtil.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\util\PointGenerator.cs">
-      <Link>4_Triangulation\Utils\PointGenerator.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\util\PointGenerator.cs">
+      <Link>0_REF_Triangulation\Utils\PointGenerator.cs</Link>
     </Compile>
-    <Compile Include="..\pixelfarm.triangulation\util\PolygonGenerator.cs">
-      <Link>4_Triangulation\Utils\PolygonGenerator.cs</Link>
+    <Compile Include="..\BackEnd.Triangulation\util\PolygonGenerator.cs">
+      <Link>0_REF_Triangulation\Utils\PolygonGenerator.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\ActiveRegion.cs">
-      <Link>3_Tesselate\ActiveRegion.cs</Link>
+      <Link>0_REF_Tesselate\ActiveRegion.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\ContourVertex.cs">
-      <Link>3_Tesselate\ContourVertex.cs</Link>
+      <Link>0_REF_Tesselate\ContourVertex.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\Dictionary.cs">
-      <Link>3_Tesselate\Dictionary.cs</Link>
+      <Link>0_REF_Tesselate\Dictionary.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\Face.cs">
-      <Link>3_Tesselate\Face.cs</Link>
+      <Link>0_REF_Tesselate\Face.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\HalfEdge.cs">
-      <Link>3_Tesselate\HalfEdge.cs</Link>
+      <Link>0_REF_Tesselate\HalfEdge.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\MaxFirstList.cs">
-      <Link>3_Tesselate\MaxFirstList.cs</Link>
+      <Link>0_REF_Tesselate\MaxFirstList.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\mesh.cs">
-      <Link>3_Tesselate\mesh.cs</Link>
+      <Link>0_REF_Tesselate\mesh.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.Tesselate\Tesselator.cs">
-      <Link>3_Tesselate\Tesselator.cs</Link>
+      <Link>0_REF_Tesselate\Tesselator.cs</Link>
     </Compile>
     <Compile Include="1_VectorMaths\AggMath.cs" />
     <Compile Include="1_VectorMaths\AxisAlignedBoundingBox.cs" />
@@ -161,7 +161,6 @@
     <Compile Include="1_VectorMaths\Vector3Float.cs" />
     <Compile Include="1_VectorMaths\Vector4.cs" />
     <Compile Include="3_Transform\1_Affine.cs" />
-    <Compile Include="3_Transform\ICoordTransformer.cs" />
     <Compile Include="3_Transform\2_Bilinear.cs" />
     <Compile Include="3_Transform\3_Perspective.cs" />
     <Compile Include="3_Transform\4_SimulEqGeneral.cs" />

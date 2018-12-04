@@ -34,7 +34,12 @@ namespace BitmapBufferEx
             if (pixelHeight < 1) pixelHeight = 1;
             if (pixelWidth < 1) pixelWidth = 1;
 
-            return new BitmapBuffer(pixelWidth, pixelHeight, new int[pixelWidth * pixelHeight]);
+            //alloc new 
+
+            return new BitmapBuffer(pixelWidth, pixelHeight,
+                System.Runtime.InteropServices.Marshal.AllocHGlobal(pixelWidth * pixelHeight * 4),
+                pixelWidth * pixelHeight * 4,
+                true);
         }
     }
 }
