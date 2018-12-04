@@ -44,7 +44,7 @@ namespace PixelFarm.Drawing.Fonts
         public FontAtlasTextPrinter(AggPainter painter)
         {
             StartDrawOnLeftTop = true;
-            this._painter = painter;
+            _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
 
@@ -185,7 +185,7 @@ namespace PixelFarm.Drawing.Fonts
 
         public void UpdateGlyphLayoutSettings()
         {
-            if (this._font == null)
+            if (_font == null)
             {
                 //this.ScriptLang = canvasPainter.CurrentFont.GetOpenFontScriptLang();
                 ChangeFont(_painter.CurrentFont);

@@ -30,7 +30,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             StartDrawOnLeftTop = true;
             //
-            this._painter = painter;
+            _painter = painter;
             _glyphMeshStore = new GlyphMeshStore();
             _glyphMeshStore.FlipGlyphUpward = true;
             this.PositionTechnique = PositionTechnique.OpenFont;
@@ -49,7 +49,7 @@ namespace PixelFarm.Drawing.Fonts
         public void ChangeFont(RequestFont font)
         {
             //1.  resolve actual font file
-            this._reqFont = font;
+            _reqFont = font;
             this.Typeface = _textServices.ResolveTypeface(font); //resolve for 'actual' font 
             this.FontSizeInPoints = font.SizeInPoints;
         }
@@ -120,7 +120,7 @@ namespace PixelFarm.Drawing.Fonts
         {
 
 
-            if (this._reqFont == null)
+            if (_reqFont == null)
             {
                 //this.ScriptLang = canvasPainter.CurrentFont.GetOpenFontScriptLang();
                 ChangeFont(_painter.CurrentFont);

@@ -396,9 +396,9 @@ namespace LayoutFarm
             int _len;
             public MyLineSegmentList(int startAt, int len)
             {
-                //this._str = str;
-                this._startAt = startAt;
-                this._len = len;
+                //_str = str;
+                _startAt = startAt;
+                _len = len;
             }
             public ILineSegment this[int index]
             {
@@ -410,7 +410,7 @@ namespace LayoutFarm
             }
             public void SetResultLineSegments(MyLineSegment[] segments)
             {
-                this._segments = segments;
+                _segments = segments;
             }
             public MyLineSegment GetSegment(int index)
             {

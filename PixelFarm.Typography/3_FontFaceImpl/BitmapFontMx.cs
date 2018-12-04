@@ -89,7 +89,7 @@ namespace Typography.Rendering
         GlyphTextureBuildDetail[] _textureBuildDetails;
         public void SetCurrentScriptLangs(ScriptLang[] currentScriptLangs)
         {
-            this._currentScriptLangs = currentScriptLangs;
+            _currentScriptLangs = currentScriptLangs;
 
             //TODO: review here again,
             //this is a fixed version for tahoma font

@@ -66,8 +66,8 @@ namespace Typography.Contours
                         //contBuilder.CloseFigure(); 
                         //--------------------------------------------- 
                         _latestDynamicOutline = _fitShapeAnalyzer.CreateDynamicOutline(
-                            this._outputGlyphPoints,
-                            this._outputContours);
+                            _outputGlyphPoints,
+                            _outputContours);
                         //add more information for later scaling process
                         _latestDynamicOutline.OriginalAdvanceWidth = glyph.OriginalAdvanceWidth;
                         _latestDynamicOutline.OriginalGlyphControlBounds = glyph.Bounds;

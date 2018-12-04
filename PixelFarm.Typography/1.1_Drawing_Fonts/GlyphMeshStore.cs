@@ -105,13 +105,13 @@ namespace Typography.Contours
                 _currentGlyphBuilder = new GlyphPathBuilder(typeface);
             }
             //----------------------------------------------
-            this._currentFontSizeInPoints = fontSizeInPoints;
+            _currentFontSizeInPoints = fontSizeInPoints;
 
             //@prepare'note, 2017-10-20
             //temp fix, temp disable customfit if we build emoji font
             _currentGlyphBuilder.TemporaryDisableCustomFit = (typeface.COLRTable != null) && (typeface.CPALTable != null);
             //------------------------------------------ 
-            _hintGlyphCollection.SetCacheInfo(typeface, this._currentFontSizeInPoints, _currentHintTech);
+            _hintGlyphCollection.SetCacheInfo(typeface, _currentFontSizeInPoints, _currentHintTech);
         }
 
         /// <summary>

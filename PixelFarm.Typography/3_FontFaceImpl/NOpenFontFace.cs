@@ -22,9 +22,9 @@ namespace PixelFarm.Drawing.Fonts
 
         public NOpenFontFace(Typeface typeface, string fontName, string fontPath)
         {
-            this._typeface = typeface;
-            this._name = fontName;
-            this._path = fontPath;
+            _typeface = typeface;
+            _name = fontName;
+            _path = fontPath;
 
             _glyphPathBuilder = new GlyphPathBuilder(typeface);
         }
@@ -42,7 +42,7 @@ namespace PixelFarm.Drawing.Fonts
             NOpenFont actualFont = new NOpenFont(this, pointSize, FontStyle.Regular);
             return actualFont;
         }
-        public Typeface Typeface { get { return this._typeface; } }
+        public Typeface Typeface { get { return _typeface; } }
 
         internal GlyphPathBuilder VxsBuilder
         {
@@ -50,7 +50,7 @@ namespace PixelFarm.Drawing.Fonts
             {
                 //TODO: review again,
                 //remove ...
-                return this._glyphPathBuilder;
+                return _glyphPathBuilder;
             }
         }
         public override float GetScale(float pointSize)
