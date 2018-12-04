@@ -25,9 +25,10 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         //---------------------------------------------------------------------
 
         public readonly int x1, y1, x2, y2, len;
-        readonly byte octant;
-        public readonly bool vertical;
         public readonly short inc;
+        public readonly bool vertical;
+        readonly byte octant;
+
 
 
         // The number of the octant is determined as a 3-bit value as follows:
@@ -63,12 +64,22 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             this.x2 = (x2);
             this.y2 = (y2);
 
-            int sx = ((x2 > x1) ? 1 : -1); //sx =1 or -1
-            int sy = ((y2 > y1) ? 1 : -1); //sy = 1 or -1
+            short sx = (short)((x2 > x1) ? 1 : -1); //sx =1 or -1
+            short sy = (short)((y2 > y1) ? 1 : -1); //sy = 1 or -1
 
+            //line_parameters(int x1_, int y1_, int x2_, int y2_, int len_) :
+            //x1(x1_), y1(y1_), x2(x2_), y2(y2_), 
+            //dx(abs(x2_ - x1_)),
+            //dy(abs(y2_ - y1_)),
+            //sx((x2_ > x1_) ? 1 : -1),
+            //sy((y2_ > y1_) ? 1 : -1),
+            //vertical(dy >= dx),
+            //inc(vertical ? sy : sx),
+            //len(len_),
+            //octant((sy & 4) | (sx & 2) | int(vertical))
 
             //assign vertical value and evaluate inc value ***
-            this.inc = (short)((vertical = ((Math.Abs(x2 - x1)) >= (Math.Abs(y2 - y1)))) ?
+            this.inc = ((vertical = (Math.Abs(y2 - y1) >= (Math.Abs(x2 - x1)))) ?
                         sy :
                         sx); //inc is 1 or -1
 
@@ -109,41 +120,31 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         //---------------------------------------------------------------------
 
-        public void HalfDivide(out LineParameters lp1, out LineParameters lp2)
+        public bool Divide(out LineParameters lp1, out LineParameters lp2)
         {
+
             int xmid = (x1 + x2) >> 1;
             int ymid = (y1 + y2) >> 1;
-            int len2 = len >> 1;
+            if (xmid == x1 && ymid == y1)
+            {
+                //stop
+                lp1 = lp2 = new LineParameters(); //empty
+                return false;
+            }
 
-            lp1 = new LineParameters(this.x1, this.y1, xmid, ymid, len2);
+//            int len2 = len >> 1;
+
+//#if DEBUG
+//            if (len2 == 0)
+//            {
+
+//            }
+//#endif
+
+            lp1 = new LineParameters(this.x1, this.y1, xmid, ymid, len >> 1);
             lp2 = new LineParameters(xmid, ymid, this.x2, this.y2, this.len);
-            //lp1.x2 = xmid;
-            //lp1.y2 = ymid;
-            //lp1.len = len2;
-            //lp1.dx = Math.Abs(lp1.x2 - lp1.x1);
-            //lp1.dy = Math.Abs(lp1.y2 - lp1.y1);
-            ////------------------------------------
-            //lp2.x1 = xmid;
-            //lp2.y1 = ymid;
-            //lp2.len = len2;
-            //lp2.dx = Math.Abs(lp2.x2 - lp2.x1);
-            //lp2.dy = Math.Abs(lp2.y2 - lp2.y1);
 
-
-            //old version
-            //lp1 = new LineParameters(this.x1, this.y1, this.x2, this.y2, this.len);
-            //lp2 = new LineParameters(this.x1, this.y1, this.x2, this.y2, this.len);
-            //lp1.x2 = xmid;
-            //lp1.y2 = ymid;
-            //lp1.len = len2;
-            //lp1.dx = Math.Abs(lp1.x2 - lp1.x1);
-            //lp1.dy = Math.Abs(lp1.y2 - lp1.y1);
-            ////------------------------------------
-            //lp2.x1 = xmid;
-            //lp2.y1 = ymid;
-            //lp2.len = len2;
-            //lp2.dx = Math.Abs(lp2.x2 - lp2.x1);
-            //lp2.dy = Math.Abs(lp2.y2 - lp2.y1);
+            return true;
         }
-    };
+    }
 }

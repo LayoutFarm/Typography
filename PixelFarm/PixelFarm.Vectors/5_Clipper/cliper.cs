@@ -63,8 +63,8 @@ namespace ClipperLib
     using cInt = Int64;
 #endif
 
-    using Path = List<IntPoint>;
-    using Paths = List<List<IntPoint>>;
+    using Path = IntPolygon;
+    using Paths = List<IntPolygon>;
     public struct DoublePoint
     {
         public double X;
@@ -99,7 +99,9 @@ namespace ClipperLib
         public void Clear()
         {
             for (int i = 0; i < m_AllPolys.Count; i++)
+            {
                 m_AllPolys[i] = null;
+            }
             m_AllPolys.Clear();
             m_Childs.Clear();
         }
@@ -386,7 +388,7 @@ namespace ClipperLib
         }
     };
     //------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------
+
 
     public struct IntPoint
     {
@@ -913,23 +915,34 @@ namespace ClipperLib
         //------------------------------------------------------------------------------
 
 
-        public bool AddPath(Path pg, PolyType polyType, bool Closed)
+        public bool AddPath(Path pg, PolyType polyType, bool closed)
         {
 #if use_lines
         if (!Closed && polyType == PolyType.ptClip)
           throw new ClipperException("AddPath: Open paths must be subject.");
 #else
-            if (!Closed)
+            if (!closed)
                 throw new ClipperException("AddPath: Open paths have been disabled.");
 #endif
 
             int highI = (int)pg.Count - 1;
-            if (Closed) while (highI > 0 && (pg[highI] == pg[0])) --highI;
+            if (closed)
+            {
+                while (highI > 0 && (pg[highI] == pg[0])) --highI;
+            }
+            //
             while (highI > 0 && (pg[highI] == pg[highI - 1])) --highI;
-            if ((Closed && highI < 2) || (!Closed && highI < 1)) return false;
+            //
+            if ((closed && highI < 2) || (!closed && highI < 1))
+            {
+                return false;
+            }
             //create a new edge array ...
             List<TEdge> edges = new List<TEdge>(highI + 1);
-            for (int i = 0; i <= highI; i++) edges.Add(new TEdge());
+
+            //
+            for (int i = 0; i <= highI; i++) { edges.Add(new TEdge()); }
+            //
             bool IsFlat = true;
             //1. Basic (first) edge initialization ...
             edges[1].Curr = pg[1];
@@ -944,41 +957,41 @@ namespace ClipperLib
             }
             TEdge eStart = edges[0];
             //2. Remove duplicate vertices, and (when closed) collinear edges ...
-            TEdge E = eStart, eLoopStop = eStart;
+            TEdge e = eStart, eLoopStop = eStart;
             for (; ; )
             {
-                if (E.Curr == E.Next.Curr)
+                if (e.Curr == e.Next.Curr)
                 {
-                    if (E == E.Next) break;
-                    if (E == eStart) eStart = E.Next;
-                    E = RemoveEdge(E);
-                    eLoopStop = E;
+                    if (e == e.Next) break;
+                    if (e == eStart) eStart = e.Next;
+                    e = RemoveEdge(e);
+                    eLoopStop = e;
                     continue;
                 }
-                if (E.Prev == E.Next)
+                if (e.Prev == e.Next)
                     break; //only two vertices
-                else if (Closed &&
-                  SlopesEqual(E.Prev.Curr, E.Curr, E.Next.Curr, m_UseFullRange) &&
+                else if (closed &&
+                  SlopesEqual(e.Prev.Curr, e.Curr, e.Next.Curr, m_UseFullRange) &&
                   (!PreserveCollinear ||
-                  !Pt2IsBetweenPt1AndPt3(E.Prev.Curr, E.Curr, E.Next.Curr)))
+                  !Pt2IsBetweenPt1AndPt3(e.Prev.Curr, e.Curr, e.Next.Curr)))
                 {
                     //Collinear edges are allowed for open paths but in closed paths
                     //the default is to merge adjacent collinear edges into a single edge.
                     //However, if the PreserveCollinear property is enabled, only overlapping
                     //collinear edges (ie spikes) will be removed from closed paths.
-                    if (E == eStart) eStart = E.Next;
-                    E = RemoveEdge(E);
-                    E = E.Prev;
-                    eLoopStop = E;
+                    if (e == eStart) eStart = e.Next;
+                    e = RemoveEdge(e);
+                    e = e.Prev;
+                    eLoopStop = e;
                     continue;
                 }
-                E = E.Next;
-                if (E == eLoopStop) break;
+                e = e.Next;
+                if (e == eLoopStop) break;
             }
 
-            if ((!Closed && (E == E.Next)) || (Closed && (E.Prev == E.Next)))
+            if ((!closed && (e == e.Next)) || (closed && (e.Prev == e.Next)))
                 return false;
-            if (!Closed)
+            if (!closed)
             {
                 m_HasOpenPaths = true;
                 eStart.Prev.OutIdx = Skip;
@@ -986,35 +999,35 @@ namespace ClipperLib
 
             //3. Do second stage of edge initialization ...
             TEdge eHighest = eStart;
-            E = eStart;
+            e = eStart;
             do
             {
-                InitEdge2(E, polyType);
-                E = E.Next;
-                if (IsFlat && E.Curr.Y != eStart.Curr.Y) IsFlat = false;
+                InitEdge2(e, polyType);
+                e = e.Next;
+                if (IsFlat && e.Curr.Y != eStart.Curr.Y) IsFlat = false;
             }
-            while (E != eStart);
+            while (e != eStart);
             //4. Finally, add edge bounds to LocalMinima list ...
 
             //Totally flat paths must be handled differently when adding them
             //to LocalMinima list to avoid endless loops etc ...
             if (IsFlat)
             {
-                if (Closed) return false;
-                E.Prev.OutIdx = Skip;
-                if (E.Prev.Bot.X < E.Prev.Top.X) ReverseHorizontal(E.Prev);
+                if (closed) return false;
+                e.Prev.OutIdx = Skip;
+                if (e.Prev.Bot.X < e.Prev.Top.X) ReverseHorizontal(e.Prev);
                 LocalMinima locMin = new LocalMinima();
                 locMin.Next = null;
-                locMin.Y = E.Bot.Y;
+                locMin.Y = e.Bot.Y;
                 locMin.LeftBound = null;
-                locMin.RightBound = E;
+                locMin.RightBound = e;
                 locMin.RightBound.Side = EdgeSide.esRight;
                 locMin.RightBound.WindDelta = 0;
-                while (E.Next.OutIdx != Skip)
+                while (e.Next.OutIdx != Skip)
                 {
-                    E.NextInLML = E.Next;
-                    if (E.Bot.X != E.Prev.Top.X) ReverseHorizontal(E);
-                    E = E.Next;
+                    e.NextInLML = e.Next;
+                    if (e.Bot.X != e.Prev.Top.X) ReverseHorizontal(e);
+                    e = e.Next;
                 }
                 InsertLocalMinima(locMin);
                 m_edges.Add(edges);
@@ -1026,41 +1039,41 @@ namespace ClipperLib
             TEdge EMin = null;
             for (; ; )
             {
-                E = FindNextLocMin(E);
-                if (E == EMin) break;
-                else if (EMin == null) EMin = E;
+                e = FindNextLocMin(e);
+                if (e == EMin) break;
+                else if (EMin == null) EMin = e;
                 //E and E.Prev now share a local minima (left aligned if horizontal).
                 //Compare their slopes to find which starts which bound ...
                 LocalMinima locMin = new LocalMinima();
                 locMin.Next = null;
-                locMin.Y = E.Bot.Y;
-                if (E.Dx < E.Prev.Dx)
+                locMin.Y = e.Bot.Y;
+                if (e.Dx < e.Prev.Dx)
                 {
-                    locMin.LeftBound = E.Prev;
-                    locMin.RightBound = E;
+                    locMin.LeftBound = e.Prev;
+                    locMin.RightBound = e;
                     clockwise = false; //Q.nextInLML = Q.prev
                 }
                 else
                 {
-                    locMin.LeftBound = E;
-                    locMin.RightBound = E.Prev;
+                    locMin.LeftBound = e;
+                    locMin.RightBound = e.Prev;
                     clockwise = true; //Q.nextInLML = Q.next
                 }
                 locMin.LeftBound.Side = EdgeSide.esLeft;
                 locMin.RightBound.Side = EdgeSide.esRight;
-                if (!Closed) locMin.LeftBound.WindDelta = 0;
+                if (!closed) locMin.LeftBound.WindDelta = 0;
                 else if (locMin.LeftBound.Next == locMin.RightBound)
                     locMin.LeftBound.WindDelta = -1;
                 else locMin.LeftBound.WindDelta = 1;
                 locMin.RightBound.WindDelta = -locMin.LeftBound.WindDelta;
-                E = ProcessBound(locMin.LeftBound, clockwise);
+                e = ProcessBound(locMin.LeftBound, clockwise);
                 TEdge E2 = ProcessBound(locMin.RightBound, !clockwise);
                 if (locMin.LeftBound.OutIdx == Skip)
                     locMin.LeftBound = null;
                 else if (locMin.RightBound.OutIdx == Skip)
                     locMin.RightBound = null;
                 InsertLocalMinima(locMin);
-                if (!clockwise) E = E2;
+                if (!clockwise) e = E2;
             }
             return true;
         }
@@ -1083,7 +1096,7 @@ namespace ClipperLib
         }
         //------------------------------------------------------------------------------
 
-        TEdge RemoveEdge(TEdge e)
+        static TEdge RemoveEdge(TEdge e)
         {
             //removes e from double_linked_list (but without removing from memory)
             e.Prev.Next = e.Next;
@@ -1094,7 +1107,7 @@ namespace ClipperLib
         }
         //------------------------------------------------------------------------------
 
-        private void SetDx(TEdge e)
+        static void SetDx(TEdge e)
         {
             e.Delta.X = (e.Top.X - e.Bot.X);
             e.Delta.Y = (e.Top.Y - e.Bot.Y);
@@ -1103,7 +1116,7 @@ namespace ClipperLib
         }
         //---------------------------------------------------------------------------
 
-        private void InsertLocalMinima(LocalMinima newLm)
+        void InsertLocalMinima(LocalMinima newLm)
         {
             if (m_MinimaList == null)
             {
@@ -1197,6 +1210,12 @@ namespace ClipperLib
         }
     } //end ClipperBase
 
+
+    public class IntPolygon : List<IntPoint>
+    {
+        public IntPolygon() { }
+        public IntPolygon(int capacity) : base(capacity) { }
+    }
     public class Clipper : ClipperBase
     {
         //InitOptions that can be passed to the constructor ...
@@ -1315,8 +1334,8 @@ namespace ClipperLib
         {
             if (m_ExecuteLocked) return false;
             if (m_HasOpenPaths)
-                throw
-new ClipperException("Error: PolyTree struct is need for open path clipping.");
+                throw new ClipperException("Error: PolyTree struct is need for open path clipping.");
+
             m_ExecuteLocked = true;
             solution.Clear();
             m_SubjFillType = subjFillType;
@@ -2800,8 +2819,7 @@ new ClipperException("Error: PolyTree struct is need for open path clipping.");
                             else
                                 IntersectEdges(e, horzEdge, e.Top);
                             if (eMaxPair.OutIdx >= 0)
-                                throw
-        new ClipperException("ProcessHorizontal error");
+                                throw new ClipperException("ProcessHorizontal error");
                             return;
                         }
                         else if (dir == Direction.dLeftToRight)
@@ -3971,19 +3989,19 @@ new ClipperException("ProcessHorizontal error");
                             }
                             else
                                 if (Poly2ContainsPoly1(outrec.Pts, outrec2.Pts))
-                                {
-                                    //OutRec1 is contained by OutRec2 ...
-                                    outrec2.IsHole = outrec.IsHole;
-                                    outrec.IsHole = !outrec2.IsHole;
-                                    outrec2.FirstLeft = outrec.FirstLeft;
-                                    outrec.FirstLeft = outrec2;
-                                }
-                                else
-                                {
-                                    //the 2 polygons are separate ...
-                                    outrec2.IsHole = outrec.IsHole;
-                                    outrec2.FirstLeft = outrec.FirstLeft;
-                                }
+                            {
+                                //OutRec1 is contained by OutRec2 ...
+                                outrec2.IsHole = outrec.IsHole;
+                                outrec.IsHole = !outrec2.IsHole;
+                                outrec2.FirstLeft = outrec.FirstLeft;
+                                outrec.FirstLeft = outrec2;
+                            }
+                            else
+                            {
+                                //the 2 polygons are separate ...
+                                outrec2.IsHole = outrec.IsHole;
+                                outrec2.FirstLeft = outrec.FirstLeft;
+                            }
                             op2 = op; //ie get ready for the next iteration
                         }
                         op2 = op2.Next;
@@ -4030,7 +4048,7 @@ new ClipperException("ProcessHorizontal error");
             Paths result = new Paths();
             ClipperOffset co = new ClipperOffset(MiterLimit, MiterLimit);
             co.AddPaths(polys, jointype, (EndType)endtype);
-            co.Execute(ref result, delta);
+            co.Execute(result, delta);
             return result;
         }
         //------------------------------------------------------------------------------
@@ -4603,7 +4621,7 @@ new ClipperException("ProcessHorizontal error");
         }
         //------------------------------------------------------------------------------
 
-        public void Execute(ref Paths solution, double delta)
+        public void Execute(Paths solution, double delta)
         {
             solution.Clear();
             FixOrientations();
@@ -4632,7 +4650,7 @@ new ClipperException("ProcessHorizontal error");
         }
         //------------------------------------------------------------------------------
 
-        public void Execute(ref PolyTree solution, double delta)
+        public void Execute(PolyTree solution, double delta)
         {
             solution.Clear();
             FixOrientations();
@@ -4679,13 +4697,16 @@ new ClipperException("ProcessHorizontal error");
             else if (m_sinA < -1.0) m_sinA = -1.0;
             if (m_sinA * m_delta < 0)
             {
-                m_destPoly.Add(new IntPoint(Round(m_srcPoly[j].X + m_normals[k].X * m_delta),
-                  Round(m_srcPoly[j].Y + m_normals[k].Y * m_delta)));
+                m_destPoly.Add(
+                    new IntPoint(Round(m_srcPoly[j].X + m_normals[k].X * m_delta),
+                    Round(m_srcPoly[j].Y + m_normals[k].Y * m_delta)));
                 m_destPoly.Add(m_srcPoly[j]);
-                m_destPoly.Add(new IntPoint(Round(m_srcPoly[j].X + m_normals[j].X * m_delta),
-                  Round(m_srcPoly[j].Y + m_normals[j].Y * m_delta)));
+                m_destPoly.Add(
+                    new IntPoint(Round(m_srcPoly[j].X + m_normals[j].X * m_delta),
+                    Round(m_srcPoly[j].Y + m_normals[j].Y * m_delta)));
             }
             else
+            {
                 switch (jointype)
                 {
                     case JoinType.jtMiter:
@@ -4698,6 +4719,7 @@ new ClipperException("ProcessHorizontal error");
                     case JoinType.jtSquare: DoSquare(j, k); break;
                     case JoinType.jtRound: DoRound(j, k); break;
                 }
+            }
             k = j;
         }
         //------------------------------------------------------------------------------

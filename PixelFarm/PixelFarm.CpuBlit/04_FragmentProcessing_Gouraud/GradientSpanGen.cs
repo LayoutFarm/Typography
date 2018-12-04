@@ -84,6 +84,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             //set interpolation start point
             //spanLen => horizontal span len
+#if COSMOS
+
+#else
 
             _interpolator.Begin(_grad0X + _xoffset + x + 0.5, _grad0Y + _yoffset + y + 0.5, spanLen);
             int gradientSteps = _colorsProvider.GradientSteps;
@@ -161,6 +164,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                 scanline_x++;
             }
             while (--spanLen != 0);
+#endif
         }
     }
 

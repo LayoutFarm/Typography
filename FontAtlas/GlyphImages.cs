@@ -48,33 +48,32 @@ namespace Typography.Rendering
         /// <summary>
         /// texture offset X from original glyph
         /// </summary>
-        public double TextureOffsetX { get; set; }
+        public short TextureOffsetX { get; set; }
         /// <summary>
         /// texture offset Y from original glyph 
         /// </summary>
-        public double TextureOffsetY { get; set; }
+        public short TextureOffsetY { get; set; }
     }
 
-    public class CacheGlyph
+    class CacheGlyph
     {
-        public int borderX;
-        public int borderY;
         internal GlyphImage img;
         public Rectangle area;
-        public char character;//TODO: this should be code point(int32)
         public ushort glyphIndex;
 
+#if DEBUG
+        public CacheGlyph()
+        {
+        }
+#endif
     }
     public class TextureGlyphMapData
     {
-
         public int Left { get; set; }
         public int Top { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
-        public float BorderX { get; set; }
-        public float BorderY { get; set; }
-
+         
         public float TextureXOffset { get; set; }
         public float TextureYOffset { get; set; }
 

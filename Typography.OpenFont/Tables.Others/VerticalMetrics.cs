@@ -59,7 +59,7 @@ namespace Typography.OpenFont.Tables
         AdvanceHeightAndTopSideBearing[] _advHeightAndTopSideBearings;
         public VerticalMetrics(ushort numOfLongVerMetrics)
         {
-            this._numOfLongVerMetrics = numOfLongVerMetrics;
+            _numOfLongVerMetrics = numOfLongVerMetrics;
         }
 
         public override string Name

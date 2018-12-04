@@ -36,19 +36,22 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         double m_dy_dbl;
         int m_dx_int;
         int m_dy_int;
-        public ImgSpanGen(ISpanInterpolator interpolator)
+        public ImgSpanGen()
         {
-            m_interpolator = interpolator;
             m_dx_dbl = 0.5;
             m_dy_dbl = 0.5;
             m_dx_int = (img_subpix_const.SCALE / 2);
             m_dy_int = (img_subpix_const.SCALE / 2);
         }
-
+        public void SetInterpolator(ISpanInterpolator interpolator)
+        {
+            m_interpolator = interpolator;
+        }
         public abstract void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len);
         protected ISpanInterpolator Interpolator
         {
             get { return m_interpolator; }
+
         }
 
         public double dx { get { return m_dx_dbl; } }

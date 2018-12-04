@@ -182,7 +182,10 @@ namespace PixelFarm.Drawing
         {
             get { return _lineGapInPx; }
         }
-        public float LineSpacingInPx
+        /// <summary>
+        /// already in pixels
+        /// </summary>
+        public float LineSpacingInPixels
         {
             get { return _generalLineSpacingInPx; }
         }

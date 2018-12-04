@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-namespace MiniCollection
+namespace Tesselate
 {
     //-----
     //design for our tess only

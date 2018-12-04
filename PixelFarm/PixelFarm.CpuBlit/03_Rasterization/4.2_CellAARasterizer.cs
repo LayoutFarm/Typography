@@ -55,8 +55,10 @@ namespace PixelFarm.CpuBlit.Rasterization
             public readonly int cover;
             public readonly int area;
 #if DEBUG
+#if !COSMOS
             public int dbugLeft;
             public int dbugRight;
+#endif
 #endif
             private CellAA(int x, int y, int cover, int area)
             {
@@ -65,8 +67,10 @@ namespace PixelFarm.CpuBlit.Rasterization
                 this.cover = cover;
                 this.area = area;
 #if DEBUG
+#if !COSMOS
                 dbugLeft = 0;
                 dbugRight = 0;
+#endif
 #endif
             }
 
@@ -88,16 +92,20 @@ namespace PixelFarm.CpuBlit.Rasterization
                 //cell.y = y;
                 //cell.cover = cover;
                 //cell.area = area;
+#if !COSMOS
                 cell.dbugLeft = left;
                 cell.dbugRight = right;
+#endif
                 return cell;
             }
 #endif
 #if DEBUG
+#if !COSMOS
             public override string ToString()
             {
                 return "x:" + x + ",y:" + y + ",cover:" + cover + ",area:" + area + ",left:" + dbugLeft + ",right:" + dbugRight;
             }
+#endif
 #endif
 
         }
@@ -125,6 +133,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             //------------------
             int m_min_x;
             int m_min_y;
+
             int m_max_x;
             int m_max_y;
             bool m_sorted;
@@ -323,6 +332,7 @@ namespace PixelFarm.CpuBlit.Rasterization
 
             public int MinX { get { return m_min_x; } }
             public int MinY { get { return m_min_y; } }
+            //
             public int MaxX { get { return m_max_x; } }
             public int MaxY { get { return m_max_y; } }
 
@@ -344,9 +354,9 @@ namespace PixelFarm.CpuBlit.Rasterization
                 // Allocate and zero the Y array
                 m_sorted_y.Allocate((int)(m_max_y - m_min_y + 1));
                 m_sorted_y.Zero();
-                CellAA[] cells = m_cells.Array;
-                SortedY[] sortedYData = m_sorted_y.Array;
-                CellAA[] sortedCellsData = m_sorted_cells.Array;
+                CellAA[] cells = m_cells.UnsafeInternalArray;
+                SortedY[] sortedYData = m_sorted_y.UnsafeInternalArray;
+                CellAA[] sortedCellsData = m_sorted_cells.UnsafeInternalArray;
                 // Create the Y-histogram (count the numbers of cells for each Y)
                 for (int i = 0; i < m_num_used_cells; ++i)
                 {
@@ -396,7 +406,7 @@ namespace PixelFarm.CpuBlit.Rasterization
 
             public void GetCells(int y, out CellAA[] cellData, out int offset, out int num)
             {
-                cellData = m_sorted_cells.Array;
+                cellData = m_sorted_cells.UnsafeInternalArray;
                 SortedY d = m_sorted_y[y - m_min_y];
                 offset = d.start;
                 num = d.num;

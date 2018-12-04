@@ -8,6 +8,8 @@ namespace PixelFarm.CpuBlit
     {
         public double Left, Bottom, Right, Top;
         public static readonly RectD ZeroIntersection = new RectD(double.MaxValue, double.MaxValue, double.MinValue, double.MinValue);
+
+
         public RectD(double left, double bottom, double right, double top)
         {
             this.Left = left;
@@ -16,12 +18,20 @@ namespace PixelFarm.CpuBlit
             this.Top = top;
         }
 
+
+
         public RectD(RectInt intRect)
         {
             Left = intRect.Left;
             Bottom = intRect.Bottom;
             Right = intRect.Right;
             Top = intRect.Top;
+        }
+
+
+        public static RectD CreateFromLTWH(double left, double top, double width, double height)
+        {
+            return new RectD(left, top + height, left + width, top);
         }
 
         public void SetRect(double left, double bottom, double right, double top)
@@ -235,7 +245,10 @@ namespace PixelFarm.CpuBlit
             get { return (Right - Left) / 2; }
         }
 
-
+        public double YCenter
+        {
+            get { return (Top - Bottom) / 2; }
+        }
 
         public override string ToString()
         {

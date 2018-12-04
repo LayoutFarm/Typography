@@ -24,7 +24,7 @@ namespace Typography.Contours
         {
             //this canbe inside edge or outside edge
 
-            this._ownerTriangle = ownerTriangle;
+            _ownerTriangle = ownerTriangle;
             //------------------------------------
             //an edge line connects 2 glyph points.
             //it is created from triangulation process.
@@ -32,8 +32,8 @@ namespace Typography.Contours
             //some edge line is either 'INSIDE' edge  OR 'OUTSIDE'.
             //
             //------------------------------------   
-            this._glyphPoint_P = p;
-            this._glyphPoint_Q = q;
+            _glyphPoint_P = p;
+            _glyphPoint_Q = q;
 
             //new dynamic mid point is calculate from original X,Y 
             //-------------------------------
@@ -69,19 +69,19 @@ namespace Typography.Contours
         /// <summary>
         /// original px
         /// </summary>
-        public double PX { get { return this._glyphPoint_P.OX; } }
+        public double PX { get { return _glyphPoint_P.OX; } }
         /// <summary>
         /// original py
         /// </summary>
-        public double PY { get { return this._glyphPoint_P.OY; } }
+        public double PY { get { return _glyphPoint_P.OY; } }
         /// <summary>
         /// original qx
         /// </summary>
-        public double QX { get { return this._glyphPoint_Q.OX; } }
+        public double QX { get { return _glyphPoint_Q.OX; } }
         /// <summary>
         /// original qy
         /// </summary>
-        public double QY { get { return this._glyphPoint_Q.OY; } }
+        public double QY { get { return _glyphPoint_Q.OY; } }
 
 
         public bool IsTip { get; internal set; }
@@ -114,7 +114,7 @@ namespace Typography.Contours
             private set;
         }
 
-        internal GlyphTriangle OwnerTriangle { get { return this._ownerTriangle; } }
+        internal GlyphTriangle OwnerTriangle { get { return _ownerTriangle; } }
 
         public abstract bool IsOutside
         {
@@ -151,7 +151,7 @@ namespace Typography.Contours
         internal bool _earlyInsideAnalysis;
         internal bool ContainsGlyphPoint(GlyphPoint p)
         {
-            return this._glyphPoint_P == p || this._glyphPoint_Q == p;
+            return _glyphPoint_P == p || _glyphPoint_Q == p;
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Typography.Contours
             Vector2 _deltaVector = _rotate.NewLength(newEdgeOffsetFromMasterOutline);
 
             //new dynamic mid point  
-            this._newDynamicMidPoint = this.GetMidPoint() + _deltaVector;
+            _newDynamicMidPoint = this.GetMidPoint() + _deltaVector;
         }
         public override bool IsOutside
         {

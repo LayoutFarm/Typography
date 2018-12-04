@@ -87,7 +87,7 @@ namespace Typography.OpenFont.CFF
             //all fields are set to new values***
 
             this.cff1Font = cff1Font;
-            this._scale = scale;
+            _scale = scale;
 
             //-------------
             //from Technical Note #5176 (CFF spec)

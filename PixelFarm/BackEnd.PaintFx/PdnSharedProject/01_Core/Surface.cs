@@ -230,10 +230,7 @@ namespace PaintFx
             //1. windowWidth in 'pixel' unit 
             //2. we use only 32 bit version of the pixel
             //   so stride = pixelWidth *4
-            //---------------------
-
-
-
+            //--------------------- 
             //if (disposed)
             //{
             //    throw new ObjectDisposedException("Surface");

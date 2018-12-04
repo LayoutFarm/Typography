@@ -204,7 +204,8 @@ The HtmlRenderer example!
 This is a snapshot of Html drawboard from (https://github.com/LayoutFarm/HtmlRenderer).
 The glyphs are generated/layouted with _Typography_, and rendered with PixelFarm (https://github.com/PaintLab/PixelFarm).
 
-![html_renderer_with_selection2](https://user-images.githubusercontent.com/7447159/34453250-b149ecce-ed81-11e7-885b-e4b02460fcf7.png)
+![html_renderer_with_selection2](https://user-images.githubusercontent.com/7447159/49267623-fc952900-f48d-11e8-8ac8-03269c571c2c.png)
+
 _pic 1: HtmlRenderer on GLES2 surface, text are renderered with the Typography_
 
 
@@ -215,7 +216,7 @@ Also, please note the text selection on the Html Surface.
 License
 -----------
 
-The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**. No GPL madness!
+The project is based on multiple open-sourced projects (listed below) **all using permissive licenses**.
 
 A license for a whole project is [**MIT**](https://opensource.org/licenses/MIT).
 

@@ -16,7 +16,7 @@ namespace PaintFx.Effects
 {
 
 
-    public abstract class EffectConfigToken : ICloneable
+    public abstract class EffectConfigToken
     {
         /// <summary>
         /// This should simply call "new myType(this)" ... do not call base class'

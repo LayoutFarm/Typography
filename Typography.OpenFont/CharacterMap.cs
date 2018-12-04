@@ -351,7 +351,7 @@ namespace Typography.OpenFont
         //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
         //{
         //    // TODO: Fast segment lookup using bit operations?
-        //    switch (this._cmapFormat)
+        //    switch (_cmapFormat)
         //    {
         //        default: throw new NotSupportedException();
         //        case 4:

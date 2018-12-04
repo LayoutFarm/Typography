@@ -478,8 +478,7 @@ namespace PaintFx
 
 
         public class Level
-            : ChannelCurve,
-              ICloneable
+            : ChannelCurve
         {
             private ColorBgra colorInLow;
             public ColorBgra ColorInLow

@@ -14,7 +14,7 @@ namespace Typography.TextBreak
         CustomDic _customDic;
         public void SetDictionaryData(CustomDic customDic)
         {
-            this._customDic = customDic;
+            _customDic = customDic;
 
         }
         protected override CustomDic CurrentCustomDic

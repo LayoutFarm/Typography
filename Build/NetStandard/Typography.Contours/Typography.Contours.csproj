@@ -6,8 +6,9 @@
   </PropertyGroup>
 
   <Import Project="..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
-  <Import Project="..\..\..\PixelFarm.NetStandard\PixelFarm.Triangulation\PixelFarm.Triangulation.projitems" Label="Shared" />
 
+  <Import Project="..\..\..\PixelFarm\BackEnd.Triangulation\Triangulation.projitems" Label="Shared" />
+   
   <ItemGroup>
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
     <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />

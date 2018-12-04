@@ -33,16 +33,16 @@ namespace Typography.TextLayout
         float _runWidth;
         public TextRun(TextBuffer srcTextBuffer, int startAt, int len, WordSpanKind kind)
         {
-            this._srcText = srcTextBuffer;
-            this._startAt = startAt;
-            this._len = len;
-            this._kind = kind;
+            _srcText = srcTextBuffer;
+            _startAt = startAt;
+            _len = len;
+            _kind = kind;
 
         }
         internal void SetGlyphPlanSeq(GlyphPlanSequence seq)
         {
             this.glyphPlanSeq = seq;
-            this._runWidth = seq.CalculateWidth();
+            _runWidth = seq.CalculateWidth();
         }
         public GlyphPlanSequence GetGlyphPlanSeq()
         {
@@ -68,7 +68,7 @@ namespace Typography.TextLayout
             switch (_kind)
             {
                 case WordSpanKind.Text:
-                    return _srcText.CopyString(this._startAt, _len);
+                    return _srcText.CopyString(_startAt, _len);
                 default:
                 case WordSpanKind.WhiteSpace:
                 case WordSpanKind.Tab:

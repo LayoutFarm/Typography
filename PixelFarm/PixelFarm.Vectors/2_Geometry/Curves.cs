@@ -291,9 +291,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     double x2, double y2,
                     double x3, double y3)
         {
-            m_points.AddVertex(new Vector2(x1, y1));
+            m_points.Append(new Vector2(x1, y1));
             AddRecursiveBezier(x1, y1, x2, y2, x3, y3, 0);
-            m_points.AddVertex(new Vector2(x3, y3));
+            m_points.Append(new Vector2(x3, y3));
         }
 
         private void AddRecursiveBezier(double x1, double y1,
@@ -329,7 +329,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     //----------------------
                     if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                     {
-                        m_points.AddVertex(new Vector2(x123, y123));
+                        m_points.Append(new Vector2(x123, y123));
                         return;
                     }
 
@@ -341,7 +341,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         // Finally we can stop the recursion
                         //----------------------
-                        m_points.AddVertex(new Vector2(x123, y123));
+                        m_points.Append(new Vector2(x123, y123));
                         return;
                     }
                 }
@@ -370,7 +370,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
                 if (d < m_distance_tolerance_square)
                 {
-                    m_points.AddVertex(new Vector2(x2, y2));
+                    m_points.Append(new Vector2(x2, y2));
                     return;
                 }
             }
@@ -670,9 +670,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                   double x3, double y3,
                   double x4, double y4)
         {
-            m_points.AddVertex(new Vector2(x1, y1));
+            m_points.Append(new Vector2(x1, y1));
             AddRecursiveBezier(x1, y1, x2, y2, x3, y3, x4, y4, 0);
-            m_points.AddVertex(new Vector2(x4, y4));
+            m_points.Append(new Vector2(x4, y4));
         }
 
 
@@ -756,7 +756,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         if (d2 < m_distance_tolerance_square)
                         {
-                            m_points.AddVertex(new Vector2(x2, y2));
+                            m_points.Append(new Vector2(x2, y2));
                             return;
                         }
                     }
@@ -764,7 +764,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         if (d3 < m_distance_tolerance_square)
                         {
-                            m_points.AddVertex(new Vector2(x3, y3));
+                            m_points.Append(new Vector2(x3, y3));
                             return;
                         }
                     }
@@ -776,7 +776,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            m_points.AddVertex(new Vector2(x23, y23));
+                            m_points.Append(new Vector2(x23, y23));
                             return;
                         }
 
@@ -786,8 +786,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
                         if (da1 < m_angle_tolerance)
                         {
-                            m_points.AddVertex(new Vector2(x2, y2));
-                            m_points.AddVertex(new Vector2(x3, y3));
+                            m_points.Append(new Vector2(x2, y2));
+                            m_points.Append(new Vector2(x3, y3));
                             return;
                         }
 
@@ -795,7 +795,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         {
                             if (da1 > m_cusp_limit)
                             {
-                                m_points.AddVertex(new Vector2(x3, y3));
+                                m_points.Append(new Vector2(x3, y3));
                                 return;
                             }
                         }
@@ -808,7 +808,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            m_points.AddVertex(new Vector2(x23, y23));
+                            m_points.Append(new Vector2(x23, y23));
                             return;
                         }
 
@@ -818,8 +818,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
                         if (da1 < m_angle_tolerance)
                         {
-                            m_points.AddVertex(new Vector2(x2, y2));
-                            m_points.AddVertex(new Vector2(x3, y3));
+                            m_points.Append(new Vector2(x2, y2));
+                            m_points.Append(new Vector2(x3, y3));
                             return;
                         }
 
@@ -827,7 +827,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         {
                             if (da1 > m_cusp_limit)
                             {
-                                m_points.AddVertex(new Vector2(x2, y2));
+                                m_points.Append(new Vector2(x2, y2));
                                 return;
                             }
                         }
@@ -843,7 +843,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //----------------------
                         if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            m_points.AddVertex(new Vector2(x23, y23));
+                            m_points.Append(new Vector2(x23, y23));
                             return;
                         }
 
@@ -858,7 +858,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         {
                             // Finally we can stop the recursion
                             //----------------------
-                            m_points.AddVertex(new Vector2(x23, y23));
+                            m_points.Append(new Vector2(x23, y23));
                             return;
                         }
 
@@ -866,13 +866,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         {
                             if (da1 > m_cusp_limit)
                             {
-                                m_points.AddVertex(new Vector2(x2, y2));
+                                m_points.Append(new Vector2(x2, y2));
                                 return;
                             }
 
                             if (da2 > m_cusp_limit)
                             {
-                                m_points.AddVertex(new Vector2(x3, y3));
+                                m_points.Append(new Vector2(x3, y3));
                                 return;
                             }
                         }

@@ -23,18 +23,18 @@
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
-
-
-
     public sealed class VertexStore
     {
-        int m_num_vertices;
-        int m_allocated_vertices;
-        double[] m_coord_xy;
-        byte[] m_cmds;
+        public readonly bool _isTrimed;
+        int _vertices_count;
+        int _allocated_vertices_count;
+        double[] _coord_xy;
+        byte[] _cmds;
 #if DEBUG
         static int dbugTotal = 0;
         public readonly int dbugId = dbugGetNewId();
+        public int dbugNote;
+
         static int dbugGetNewId()
         {
             return dbugTotal++;
@@ -51,22 +51,22 @@ namespace PixelFarm.Drawing
         /// </summary>
         public int Count
         {
-            get { return m_num_vertices; }
+            get { return _vertices_count; }
         }
         public VertexCmd GetLastCommand()
         {
-            if (m_num_vertices != 0)
+            if (_vertices_count != 0)
             {
-                return GetCommand(m_num_vertices - 1);
+                return GetCommand(_vertices_count - 1);
             }
 
             return VertexCmd.NoMore;
         }
         public VertexCmd GetLastVertex(out double x, out double y)
         {
-            if (m_num_vertices != 0)
+            if (_vertices_count != 0)
             {
-                return GetVertex((int)(m_num_vertices - 1), out x, out y);
+                return GetVertex((int)(_vertices_count - 1), out x, out y);
             }
 
             x = 0;
@@ -76,20 +76,21 @@ namespace PixelFarm.Drawing
 
         public VertexCmd GetVertex(int index, out double x, out double y)
         {
-
-            x = m_coord_xy[index << 1];
-            y = m_coord_xy[(index << 1) + 1];
-            return (VertexCmd)m_cmds[index];
+            x = _coord_xy[index << 1];
+            y = _coord_xy[(index << 1) + 1];
+            return (VertexCmd)_cmds[index];
         }
+
+
         public void GetVertexXY(int index, out double x, out double y)
         {
 
-            x = m_coord_xy[index << 1];
-            y = m_coord_xy[(index << 1) + 1];
+            x = _coord_xy[index << 1];
+            y = _coord_xy[(index << 1) + 1];
         }
         public VertexCmd GetCommand(int index)
         {
-            return (VertexCmd)m_cmds[index];
+            return (VertexCmd)_cmds[index];
         }
 
         public void Clear()
@@ -97,8 +98,13 @@ namespace PixelFarm.Drawing
             //we clear only command part!
             //clear only latest
             //System.Array.Clear(m_cmds, 0, m_cmds.Length);
-            System.Array.Clear(m_cmds, 0, m_num_vertices); //only latest 
-            m_num_vertices = 0;
+            System.Array.Clear(_cmds, 0, _vertices_count); //only latest 
+            _vertices_count = 0;
+        }
+        public void ConfirmNoMore()
+        {
+            AddVertex(0, 0, VertexCmd.NoMore);
+            _vertices_count--;//not count
         }
         public void AddVertex(double x, double y, VertexCmd cmd)
         {
@@ -108,23 +114,23 @@ namespace PixelFarm.Drawing
 
             }
 #endif
-            if (m_num_vertices >= m_allocated_vertices)
+            if (_vertices_count >= _allocated_vertices_count)
             {
-                AllocIfRequired(m_num_vertices);
+                AllocIfRequired(_vertices_count);
             }
-            m_coord_xy[m_num_vertices << 1] = x;
-            m_coord_xy[(m_num_vertices << 1) + 1] = y;
-            m_cmds[m_num_vertices] = (byte)cmd;
-            m_num_vertices++;
+            _coord_xy[_vertices_count << 1] = x;
+            _coord_xy[(_vertices_count << 1) + 1] = y;
+            _cmds[_vertices_count] = (byte)cmd;
+            _vertices_count++;
         }
         //--------------------------------------------------
 
 
         public void EndGroup()
         {
-            if (m_num_vertices > 0)
+            if (_vertices_count > 0)
             {
-                m_cmds[m_num_vertices - 1] = (byte)VertexCmd.CloseAndEndFigure;
+                _cmds[_vertices_count - 1] = (byte)VertexCmd.CloseAndEndFigure;
             }
 
         }
@@ -133,29 +139,33 @@ namespace PixelFarm.Drawing
 #if DEBUG
             _dbugIsChanged = true;
 #endif
-            m_coord_xy[index << 1] = x;
-            m_coord_xy[(index << 1) + 1] = y;
+            _coord_xy[index << 1] = x;
+            _coord_xy[(index << 1) + 1] = y;
         }
-        internal void ReplaceCommand(int index, VertexCmd CommandAndFlags)
+        internal void ReplaceCommand(int index, VertexCmd cmd)
         {
-            m_cmds[index] = (byte)CommandAndFlags;
+            _cmds[index] = (byte)cmd;
         }
         internal void SwapVertices(int v1, int v2)
         {
-            double x_tmp = m_coord_xy[v1 << 1];
-            double y_tmp = m_coord_xy[(v1 << 1) + 1];
-            m_coord_xy[v1 << 1] = m_coord_xy[v2 << 1];//x
-            m_coord_xy[(v1 << 1) + 1] = m_coord_xy[(v2 << 1) + 1];//y
-            m_coord_xy[v2 << 1] = x_tmp;
-            m_coord_xy[(v2 << 1) + 1] = y_tmp;
-            byte cmd = m_cmds[v1];
-            m_cmds[v1] = m_cmds[v2];
-            m_cmds[v2] = cmd;
+            double x_tmp = _coord_xy[v1 << 1];
+            double y_tmp = _coord_xy[(v1 << 1) + 1];
+            _coord_xy[v1 << 1] = _coord_xy[v2 << 1];//x
+            _coord_xy[(v1 << 1) + 1] = _coord_xy[(v2 << 1) + 1];//y
+            _coord_xy[v2 << 1] = x_tmp;
+            _coord_xy[(v2 << 1) + 1] = y_tmp;
+            byte cmd = _cmds[v1];
+            _cmds[v1] = _cmds[v2];
+            _cmds[v2] = cmd;
         }
 
 
-
 #if DEBUG
+        public override string ToString()
+        {
+            return _vertices_count.ToString();
+        }
+
         public bool _dbugIsChanged;
         public static bool dbugCheckNANs(double x, double y)
         {
@@ -172,7 +182,7 @@ namespace PixelFarm.Drawing
 #endif
         void AllocIfRequired(int indexToAdd)
         {
-            if (indexToAdd < m_allocated_vertices)
+            if (indexToAdd < _allocated_vertices_count)
             {
                 return;
             }
@@ -180,7 +190,7 @@ namespace PixelFarm.Drawing
 #if DEBUG
             int nrounds = 0;
 #endif
-            while (indexToAdd >= m_allocated_vertices)
+            while (indexToAdd >= _allocated_vertices_count)
             {
 #if DEBUG
 
@@ -197,17 +207,21 @@ namespace PixelFarm.Drawing
                 double[] new_xy = new double[newSize << 1];
                 byte[] newCmd = new byte[newSize];
 
-                if (m_coord_xy != null)
+                if (_coord_xy != null)
                 {
                     //copy old buffer to new buffer 
-                    int actualLen = m_num_vertices << 1;
+                    int actualLen = _vertices_count << 1;
                     //-----------------------------
                     //TODO: review faster copy
                     //----------------------------- 
                     unsafe
                     {
+#if COSMOS
+                        System.Array.Copy(m_coord_xy, new_xy, actualLen);
+                        System.Array.Copy(m_cmds, newCmd, m_num_vertices);
+#else
                         //unsafed version?
-                        fixed (double* srcH = &m_coord_xy[0])
+                        fixed (double* srcH = &_coord_xy[0])
                         {
                             System.Runtime.InteropServices.Marshal.Copy(
                                 (System.IntPtr)srcH,
@@ -215,19 +229,21 @@ namespace PixelFarm.Drawing
                                 0,
                                 actualLen);
                         }
-                        fixed (byte* srcH = &m_cmds[0])
+                        fixed (byte* srcH = &_cmds[0])
                         {
                             System.Runtime.InteropServices.Marshal.Copy(
                                 (System.IntPtr)srcH,
                                 newCmd, //dest
                                 0,
-                                m_num_vertices);
+                                _vertices_count);
                         }
+#endif
+
                     }
                 }
-                m_coord_xy = new_xy;
-                m_cmds = newCmd;
-                m_allocated_vertices = newSize;
+                _coord_xy = new_xy;
+                _cmds = newCmd;
+                _allocated_vertices_count = newSize;
             }
         }
         //internal use only!
@@ -238,10 +254,10 @@ namespace PixelFarm.Drawing
             double[] m_coord_xy,
             byte[] m_CommandAndFlags)
         {
-            vstore.m_num_vertices = m_num_vertices;
-            vstore.m_allocated_vertices = m_allocated_vertices;
-            vstore.m_coord_xy = m_coord_xy;
-            vstore.m_cmds = m_CommandAndFlags;
+            vstore._vertices_count = m_num_vertices;
+            vstore._allocated_vertices_count = m_allocated_vertices;
+            vstore._coord_xy = m_coord_xy;
+            vstore._cmds = m_CommandAndFlags;
         }
         public static void UnsafeDirectGetData(
             VertexStore vstore,
@@ -250,66 +266,174 @@ namespace PixelFarm.Drawing
             out double[] m_coord_xy,
             out byte[] m_CommandAndFlags)
         {
-            m_num_vertices = vstore.m_num_vertices;
-            m_allocated_vertices = vstore.m_allocated_vertices;
-            m_coord_xy = vstore.m_coord_xy;
-            m_CommandAndFlags = vstore.m_cmds;
+            m_num_vertices = vstore._vertices_count;
+            m_allocated_vertices = vstore._allocated_vertices_count;
+            m_coord_xy = vstore._coord_xy;
+            m_CommandAndFlags = vstore._cmds;
         }
+        public void AppendVertexStore(VertexStore another)
+        {
 
+            //append data from another
+
+            if (this._allocated_vertices_count < _vertices_count + another._vertices_count)
+            {
+                //alloc a new one
+                int new_alloc = _vertices_count + another._vertices_count;
+
+                _allocated_vertices_count = new_alloc;
+                _vertices_count = new_alloc;//new 
+
+                var new_coord_xy = new double[(new_alloc + 1) << 1];//*2
+                var new_cmds = new byte[(new_alloc + 1)];
+                //copy org
+
+                //A.1
+                System.Array.Copy(
+                     this._coord_xy,
+                     0,
+                     new_coord_xy,
+                     0,
+                     _vertices_count << 1);
+
+
+                //A.2
+                System.Array.Copy(
+                    _cmds,
+                    0,
+                    new_cmds,
+                    0,
+                    _vertices_count);
+
+                //B.1
+                System.Array.Copy(
+                   another._coord_xy,
+                   _vertices_count << 1,
+                   new_coord_xy,
+                   0,
+                   another._vertices_count << 1);
+
+                //B.2 
+                System.Array.Copy(
+                        another._cmds,
+                       _vertices_count,
+                        new_cmds,
+                        0,
+                        another._vertices_count);
+
+                this._coord_xy = new_coord_xy;
+                this._cmds = new_cmds;
+            }
+            else
+            {
+                System.Array.Copy(
+                  another._coord_xy,
+                  _vertices_count << 1,
+                  _coord_xy,
+                  0,
+                  another._vertices_count << 1);
+
+                //B.2 
+                System.Array.Copy(
+                        another._cmds,
+                       _vertices_count,
+                       _cmds,
+                        0,
+                      another._vertices_count);
+            }
+        }
         private VertexStore(VertexStore src, bool trim)
         {
             //for copy from src to this instance
 
-            this.m_allocated_vertices = src.m_allocated_vertices;
-            this.m_num_vertices = src.m_num_vertices;
+            this._allocated_vertices_count = src._allocated_vertices_count;
+            this._vertices_count = src._vertices_count;
 
             if (trim)
             {
-                int coord_len = m_num_vertices + 1; //+1 for no more cmd
-                int cmds_len = m_num_vertices + 1; //+1 for no more cmd
 
-                this.m_coord_xy = new double[coord_len << 1];//*2
-                this.m_cmds = new byte[cmds_len];
+                _isTrimed = true;
+                int coord_len = _vertices_count; //+1 for no more cmd
+                int cmds_len = _vertices_count; //+1 for no more cmd
+
+                this._coord_xy = new double[(coord_len + 1) << 1];//*2
+                this._cmds = new byte[(cmds_len + 1)];
 
                 System.Array.Copy(
-                     src.m_coord_xy,
+                     src._coord_xy,
                      0,
-                     this.m_coord_xy,
+                     this._coord_xy,
                      0,
                      coord_len << 1); //*2
 
                 System.Array.Copy(
-                     src.m_cmds,
+                     src._cmds,
                      0,
-                     this.m_cmds,
+                     this._cmds,
                      0,
                      cmds_len);
             }
             else
             {
-                int coord_len = src.m_coord_xy.Length;
-                int cmds_len = src.m_cmds.Length;
+                int coord_len = src._coord_xy.Length;
+                int cmds_len = src._cmds.Length;
 
-                this.m_coord_xy = new double[coord_len];
-                this.m_cmds = new byte[cmds_len];
+                this._coord_xy = new double[(coord_len + 1) << 1];
+                this._cmds = new byte[(cmds_len + 1) << 1];
 
                 System.Array.Copy(
-                     src.m_coord_xy,
+                     src._coord_xy,
                      0,
-                     this.m_coord_xy,
+                     this._coord_xy,
                      0,
                      coord_len);
 
                 System.Array.Copy(
-                     src.m_cmds,
+                     src._cmds,
                      0,
-                     this.m_cmds,
+                     this._cmds,
                      0,
                      cmds_len);
             }
 
         }
+        private VertexStore(VertexStore src, PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx)
+        {
+            //for copy from src to this instance
 
+            this._allocated_vertices_count = src._allocated_vertices_count;
+            this._vertices_count = src._vertices_count;
+
+            _isTrimed = true;
+            int coord_len = _vertices_count; //+1 for no more cmd
+            int cmds_len = _vertices_count; //+1 for no more cmd
+
+            this._coord_xy = new double[(coord_len + 1) << 1];//*2
+            this._cmds = new byte[(cmds_len + 1)];
+
+
+            System.Array.Copy(
+                 src._coord_xy,
+                 0,
+                 this._coord_xy,
+                 0,
+                 coord_len << 1); //*2
+
+            System.Array.Copy(
+                 src._cmds,
+                 0,
+                 this._cmds,
+                 0,
+                 cmds_len);
+
+            //-------------------------
+            int coord_count = coord_len;
+            int a = 0;
+            for (int n = 0; n < coord_count; ++n)
+            {
+                tx.Transform(ref _coord_xy[a++], ref _coord_xy[a++]);
+            }
+        }
         /// <summary>
         /// copy from src to the new one
         /// </summary>
@@ -328,6 +452,10 @@ namespace PixelFarm.Drawing
         {
             return new VertexStore(this, true);
         }
+        public VertexStore CreateTrim(PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx)
+        {
+            return new VertexStore(this, tx);
+        }
     }
 
 
@@ -340,8 +468,6 @@ namespace PixelFarm.Drawing
         /// <param name="y"></param>
         public static void AddP2c(this VertexStore vxs, double x, double y)
         {
-
-
             vxs.AddVertex(x, y, VertexCmd.P2c);
         }
         /// <summary>
@@ -375,7 +501,14 @@ namespace PixelFarm.Drawing
         {
             vxs.AddVertex(0, 0, VertexCmd.Close);
         }
-
+        public static void AddCloseFigure(this VertexStore vxs, double x, double y)
+        {
+            vxs.AddVertex(x, y, VertexCmd.Close);
+        }
+        public static void AddNoMore(this VertexStore vxs)
+        {
+            vxs.AddVertex(0, 0, VertexCmd.NoMore);
+        }
         /// <summary>
         /// copy + translate vertext data from src to outputVxs
         /// </summary>

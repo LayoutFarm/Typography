@@ -37,7 +37,7 @@ namespace PaintFx
         /// <summary>
         /// Lets you change B, G, R, and A at the same time.
         /// </summary>
-        [NonSerialized]
+       
         [FieldOffset(0)]
         public uint Bgra;
 

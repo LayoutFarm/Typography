@@ -27,12 +27,12 @@ namespace Typography.Contours
         {
 
             //both p and q is INSIDE, contact edge
-            this._p_contact_edge = p_contact_edge;
-            this._q_contact_edge = q_contact_edge;
+            _p_contact_edge = p_contact_edge;
+            _q_contact_edge = q_contact_edge;
             //this is original x,y
             Vector2 midpos = p_contact_edge.GetMidPoint();
-            this._fitX = midpos.X;
-            this._fitY = midpos.Y;
+            _fitX = midpos.X;
+            _fitY = midpos.Y;
 
 #if DEBUG
             if (p_contact_edge.inside_joint != null ||
@@ -60,8 +60,8 @@ namespace Typography.Contours
         }
         internal void SetFitXY(float newx, float newy)
         {
-            this._fitX = newx;
-            this._fitY = newy;
+            _fitX = newx;
+            _fitY = newy;
         }
         internal GlyphTriangle P_Tri
         {
@@ -123,7 +123,7 @@ namespace Typography.Contours
             }
 #endif
             e.IsTip = true;
-            this._tipEdge_p = e;
+            _tipEdge_p = e;
         }
         internal void SetTipEdge_Q(EdgeLine e)
         {
@@ -138,16 +138,16 @@ namespace Typography.Contours
             }
 #endif
             e.IsTip = true;
-            this._tipEdge_q = e;
+            _tipEdge_q = e;
 
         }
         public bool HasTipP
         {
-            get { return this._tipEdge_p != null; }
+            get { return _tipEdge_p != null; }
         }
         public bool HasTipQ
         {
-            get { return this._tipEdge_q != null; }
+            get { return _tipEdge_q != null; }
         }
         public Vector2 TipPointP { get { return _tipEdge_p.GetMidPoint(); } }
         public EdgeLine TipEdgeP { get { return _tipEdge_p; } }

@@ -31,28 +31,31 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public static class VertexSourceExtensions
     {
-        public static VertexStoreSnap MakeVertexSnap(this Ellipse ellipse, VertexStore output)
+
+        public static void AddMoveTo(this VertexStore vxs, double x, double y, ICoordTransformer tx)
         {
-            return new VertexStoreSnap(MakeVxs(ellipse, output));
+            tx.Transform(ref x, ref y);
+            vxs.AddMoveTo(x, y);
         }
-        public static VertexStore MakeVxs(this Ellipse ellipse, VertexStore output)
+        public static void AddLineTo(this VertexStore vxs, double x, double y, ICoordTransformer tx)
         {
-            //TODO: review here
-            return VertexStoreBuilder.CreateVxs(GetVertexIter(ellipse), output);
+            tx.Transform(ref x, ref y);
+            vxs.AddLineTo(x, y);
         }
-        public static IEnumerable<VertexData> GetVertexIter(this Ellipse ellipse)
+
+
+
+        public static VertexStore MakeVxs(this Ellipse ellipse, ICoordTransformer tx, VertexStore output)
         {
-            //TODO: review here again
-            VertexData vertexData = new VertexData();
-            vertexData.command = VertexCmd.MoveTo;
-            vertexData.x = ellipse.originX + ellipse.radiusX;
-            vertexData.y = ellipse.originY;
-            yield return vertexData; // move to cmd
+            //1. moveto
+            output.AddMoveTo(ellipse.originX + ellipse.radiusX, ellipse.originY, tx);//**
+
+            //2.
             //
             int numSteps = ellipse.NumSteps;
             double anglePerStep = MathHelper.Tau / numSteps;
             double angle = 0;
-            vertexData.command = VertexCmd.LineTo;
+
 
             double orgX = ellipse.originX;
             double orgY = ellipse.originY;
@@ -63,9 +66,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 for (int i = 1; i < numSteps; i++)
                 {
                     angle += anglePerStep;
-                    vertexData.x = orgX + Math.Cos(MathHelper.Tau - angle) * radX;
-                    vertexData.y = orgY + Math.Sin(MathHelper.Tau - angle) * radY;
-                    yield return vertexData;
+                    output.AddLineTo(
+                        orgX + Math.Cos(MathHelper.Tau - angle) * radX,
+                        orgY + Math.Sin(MathHelper.Tau - angle) * radY,
+                        tx);//**
                 }
             }
             else
@@ -73,21 +77,110 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 for (int i = 1; i < numSteps; i++)
                 {
                     angle += anglePerStep;
-                    vertexData.x = orgX + Math.Cos(angle) * radX;
-                    vertexData.y = orgY + Math.Sin(angle) * radY;
-                    yield return vertexData;
+                    output.AddLineTo(
+                     orgX + Math.Cos(angle) * radX,
+                     orgY + Math.Sin(angle) * radY,
+                     tx);//**
                 }
             }
-            vertexData.x = (int)EndVertexOrientation.CCW;
-            vertexData.y = 0;
-            vertexData.command = VertexCmd.Close;
-            yield return vertexData;
-            vertexData.command = VertexCmd.NoMore;
-            yield return vertexData;
+
+
+            //3.
+            output.AddCloseFigure((int)EndVertexOrientation.CCW, 0);
+            //4. 
+            output.AddNoMore();
+
+            return output;
         }
 
+        public static VertexStore MakeVxs(this Ellipse ellipse, VertexStore output)
+        {
+            //1. moveto
+            output.AddMoveTo(ellipse.originX + ellipse.radiusX, ellipse.originY);
 
-        static int NSteps = 20;
+            //2.
+            //
+            int numSteps = ellipse.NumSteps;
+            double anglePerStep = MathHelper.Tau / numSteps;
+            double angle = 0;
+
+
+            double orgX = ellipse.originX;
+            double orgY = ellipse.originY;
+            double radX = ellipse.radiusX;
+            double radY = ellipse.radiusY;
+            if (ellipse.m_cw)
+            {
+                for (int i = 1; i < numSteps; i++)
+                {
+                    angle += anglePerStep;
+                    output.AddLineTo(
+                        orgX + Math.Cos(MathHelper.Tau - angle) * radX,
+                        orgY + Math.Sin(MathHelper.Tau - angle) * radY);
+                }
+            }
+            else
+            {
+                for (int i = 1; i < numSteps; i++)
+                {
+                    angle += anglePerStep;
+                    output.AddLineTo(
+                     orgX + Math.Cos(angle) * radX,
+                     orgY + Math.Sin(angle) * radY);
+                }
+            }
+
+
+            //3.
+            output.AddCloseFigure((int)EndVertexOrientation.CCW, 0);
+            //4. 
+            output.AddNoMore();
+
+            return output;
+        }
+        public static void MakeVxs(this Ellipse ellipse, PathWriter writer)
+        {
+            //1. moveto
+            writer.MoveTo(ellipse.originX + ellipse.radiusX, ellipse.originY);
+            //2.
+            //
+            int numSteps = ellipse.NumSteps;
+            double anglePerStep = MathHelper.Tau / numSteps;
+            double angle = 0;
+
+
+            double orgX = ellipse.originX;
+            double orgY = ellipse.originY;
+            double radX = ellipse.radiusX;
+            double radY = ellipse.radiusY;
+            if (ellipse.m_cw)
+            {
+                for (int i = 1; i < numSteps; i++)
+                {
+                    angle += anglePerStep;
+                    writer.LineTo(
+                        orgX + Math.Cos(MathHelper.Tau - angle) * radX,
+                        orgY + Math.Sin(MathHelper.Tau - angle) * radY);
+                }
+            }
+            else
+            {
+                for (int i = 1; i < numSteps; i++)
+                {
+                    angle += anglePerStep;
+                    writer.LineTo(
+                     orgX + Math.Cos(angle) * radX,
+                     orgY + Math.Sin(angle) * radY);
+                }
+            }
+
+
+            //3.
+            //output.AddCloseFigure((int)EndVertexOrientation.CCW, 0);
+            writer.CloseFigure();
+            //4.              
+            //add no more?
+        }
         public static void CreateBezierVxs3(VertexStore vxs,
             double x0, double y0,
             double x1, double y1,
@@ -130,10 +223,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         static Curve3Div s_curve3Div = new Curve3Div();
 
         static void CreateBezierVxs4(VertexStore vxs,
-        double x0, double y0,
-        double x1, double y1,
-        double x2, double y2,
-        double x3, double y3)
+            double x0, double y0,
+            double x1, double y1,
+            double x2, double y2,
+            double x3, double y3)
         {
 
             //1. subdiv technique
@@ -218,28 +311,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
             }
         }
-        public static IEnumerable<VertexData> GetVertexIter(this Curve3Div curve)
-        {
-            throw new NotImplementedException();
-        }
-        public static IEnumerable<VertexData> GetVertexIter(this Curve4Div curve)
-        {
-            ArrayList<Vector2> m_points = curve.GetInternalPoints();
-            VertexData vertexData = new VertexData();
-            vertexData.command = VertexCmd.MoveTo;
-            vertexData.position = m_points[0];
-            yield return vertexData;
-            vertexData.command = VertexCmd.LineTo;
-            for (int i = 1; i < m_points.Count; i++)
-            {
-                vertexData.position = m_points[i];
-                yield return vertexData;
-            }
 
-            vertexData.command = VertexCmd.NoMore;
-            vertexData.position = new Vector2();
-            yield return vertexData;
-        }
         public static IEnumerable<VertexData> GetVertexIter(this Arc arc)
         {
             // go to the start

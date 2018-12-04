@@ -54,7 +54,7 @@ namespace Typography.OpenFont
 
 
             //------
-            this._glyphs = _cffTable.Cff1FontSet._fonts[0].glyphs;
+            _glyphs = _cffTable.Cff1FontSet._fonts[0].glyphs;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Typography.OpenFont
         internal Kern KernTable
         {
             get { return _kern; }
-            set { this._kern = value; }
+            set { _kern = value; }
         }
         internal Gasp GaspTable
         {
@@ -318,7 +318,7 @@ namespace Typography.OpenFont
                 //{
 
                 //}
-                //else if (this._cffTable != null)
+                //else if (_cffTable != null)
                 //{
                 //    //post script outline
                 //    //TODO: fill gdef for cff font
