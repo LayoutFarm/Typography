@@ -45,7 +45,7 @@ namespace Typography.Contours
             get { return _hintTech; }
             set
             {
-                this._hintTech = value;
+                _hintTech = value;
             }
         }
 

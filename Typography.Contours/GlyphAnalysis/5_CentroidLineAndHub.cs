@@ -36,7 +36,7 @@ namespace Typography.Contours
         /// </summary>
         public void AnalyzeEdgesAndCreateBoneJoints()
         {
-            List<GlyphCentroidPair> pairs = this._centroid_pairs;
+            List<GlyphCentroidPair> pairs = _centroid_pairs;
             int j = pairs.Count;
             for (int i = 0; i < j; ++i)
             {

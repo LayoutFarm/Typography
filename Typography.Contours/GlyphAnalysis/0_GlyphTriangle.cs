@@ -15,7 +15,7 @@ namespace Typography.Contours
 
         public GlyphTriangle(DelaunayTriangle tri)
         {
-            this._tri = tri;
+            _tri = tri;
             //---------------------------------------------
             TriangulationPoint p0 = _tri.P0;
             TriangulationPoint p1 = _tri.P1;
@@ -138,14 +138,14 @@ namespace Typography.Contours
         public bool IsConnectedTo(GlyphTriangle anotherTri)
         {
             DelaunayTriangle t2 = anotherTri._tri;
-            if (t2 == this._tri)
+            if (t2 == _tri)
             {
                 throw new NotSupportedException();
             }
             //compare each neighbor 
-            return this._tri.N0 == t2 ||
-                   this._tri.N1 == t2 ||
-                   this._tri.N2 == t2;
+            return _tri.N0 == t2 ||
+                   _tri.N1 == t2 ||
+                   _tri.N2 == t2;
         }
         /// <summary>
         /// neighbor triangle 0

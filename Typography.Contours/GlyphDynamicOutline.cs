@@ -101,7 +101,7 @@ namespace Typography.Contours
             //preserve original outline
             //regenerate outline from original outline
             //----------------------------------------------------------        
-            if ((this._offsetFromMasterOutline = offsetFromMasterOutline) != 0)
+            if ((_offsetFromMasterOutline = offsetFromMasterOutline) != 0)
             {
                 //if 0, new other action
                 List<GlyphContour> cnts = _contours;
@@ -155,7 +155,7 @@ namespace Typography.Contours
                 _needAdjustGridFitValues = true;
             }
             //
-            this._pxScale = pxScale;
+            _pxScale = pxScale;
             //
             if (EnableGridFit)
             {
@@ -175,7 +175,7 @@ namespace Typography.Contours
 
             if (tx != null)
             {
-                List<GlyphContour> contours = this._contours;
+                List<GlyphContour> contours = _contours;
                 int j = contours.Count;
                 tx.BeginRead(j);
                 for (int i = 0; i < j; ++i)
@@ -391,7 +391,7 @@ namespace Typography.Contours
             //------------------------------------------------- 
             Bounds controlBounds = this.OriginalGlyphControlBounds;
             //walk along the edge in the contour to generate new edge output
-            float pxscale = this._pxScale;
+            float pxscale = _pxScale;
 
 
 #if DEBUG

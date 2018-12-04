@@ -20,7 +20,7 @@ namespace Typography.Contours
         {
             //init value
 
-            this._contours = contours;
+            _contours = contours;
             //1. create centroid line hubs: 
             CreateCentroidLineHubs(polygon, subPolygons);
             //2. create bone joints (create joint before bone)
@@ -37,7 +37,7 @@ namespace Typography.Contours
             _lineHubs = new List<CentroidLineHub>();
 #if DEBUG            
             EdgeLine.s_dbugTotalId = 0;//reset 
-            this._dbugTriangles = new List<GlyphTriangle>();
+            _dbugTriangles = new List<GlyphTriangle>();
 #endif
 
             //main polygon
@@ -189,7 +189,7 @@ namespace Typography.Contours
             _bounds_minX = _bounds_minY = float.MaxValue;
             _bounds_maxX = _bounds_maxY = float.MinValue;
 
-            List<GlyphContour> contours = this._contours;
+            List<GlyphContour> contours = _contours;
             int j = contours.Count;
             for (int i = 0; i < j; ++i)
             {
@@ -266,12 +266,12 @@ namespace Typography.Contours
 
         public List<CentroidLineHub> GetCentroidLineHubs()
         {
-            return this._lineHubs;
+            return _lineHubs;
         }
 
         public List<GlyphContour> GetContours()
         {
-            return this._contours;
+            return _contours;
         }
 
 
