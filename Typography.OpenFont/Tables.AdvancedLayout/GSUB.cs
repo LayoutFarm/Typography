@@ -88,7 +88,7 @@ namespace Typography.OpenFont.Tables
             string _message;
             public UnImplementedLookupSubTable(string msg)
             {
-                this._message = msg;
+                _message = msg;
                 Utils.WarnUnimplemented(msg);
             }
             public override string ToString()
