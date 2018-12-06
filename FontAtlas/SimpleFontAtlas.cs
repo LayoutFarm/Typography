@@ -17,7 +17,7 @@ namespace PixelFarm.Drawing.Fonts
     }
     public class SimpleFontAtlas
     {
-        GlyphImage totalGlyphImage;
+        GlyphImage _totalGlyphImage;
         Dictionary<ushort, TextureGlyphMapData> _glyphLocations = new Dictionary<ushort, TextureGlyphMapData>();
 
         public int Width { get; set; }
@@ -27,6 +27,8 @@ namespace PixelFarm.Drawing.Fonts
         /// </summary>
         public float OriginalFontSizePts { get; set; }
         public TextureKind TextureKind { get; set; }
+        public string FontFilename { get; set; }
+
         public void AddGlyph(ushort glyphIndex, TextureGlyphMapData glyphData)
         {
             _glyphLocations.Add(glyphIndex, glyphData);
@@ -34,8 +36,8 @@ namespace PixelFarm.Drawing.Fonts
 
         public GlyphImage TotalGlyph
         {
-            get { return totalGlyphImage; }
-            set { totalGlyphImage = value; }
+            get => _totalGlyphImage;
+            set => _totalGlyphImage = value;
         }
         public bool TryGetGlyphMapData(ushort glyphIndex, out TextureGlyphMapData glyphdata)
         {
@@ -47,7 +49,7 @@ namespace PixelFarm.Drawing.Fonts
             return true;
         }
 
-        public string FontFilename { get; set; }
+
 
     }
 
