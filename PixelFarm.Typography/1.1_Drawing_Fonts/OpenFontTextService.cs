@@ -105,10 +105,8 @@ namespace LayoutFarm
             return false;
         }
 
-        public ScriptLang CurrentScriptLang
-        {
-            get { return _txtServices.CurrentScriptLang; }
-        }
+        //
+        public ScriptLang CurrentScriptLang => _txtServices.CurrentScriptLang;
 
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, int[] outputGlyphAdvances, out int outputTotalW, out int outputLineHeight)
         {
@@ -141,8 +139,6 @@ namespace LayoutFarm
             for (int i = 0; i < j; ++i)
             {
 
-                //userGlyphPlanList.Clear();
-                //userCharToGlyphMapList.Clear(); 
                 //get each segment
                 MyLineSegment lineSeg = mylineSegs.GetSegment(i);
                 //each line seg may has different script lang
@@ -155,97 +151,6 @@ namespace LayoutFarm
                 GlyphPlanSequence seq = _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer,
                      lineSeg.StartAt,
                      lineSeg.Length);
-
-
-                //IMPORTANT
-                //num of glyph may more or less than original user input char buffer
-                // 
-
-
-                //float g_x = 0;
-                //float g_y = 0;
-                //int baseY = (int)Math.Round(y);
-                //int n = glyphPlanSeq.len;
-                //int endBefore = glyphPlanSeq.startAt + n;
-
-                ////***
-                //_glsx.SetAssociatedTextureInfo(_glBmp);
-
-                //List<float> vboBufferList = new List<float>();
-                //List<ushort> indexList = new List<ushort>();
-
-                //for (int i = glyphPlanSeq.startAt; i < endBefore; ++i)
-                //{
-                //    GlyphPlanList glyphPlanList = GlyphPlanSequence.UnsafeGetInteralGlyphPlanList(glyphPlanSeq);
-                //    GlyphPlan glyph = glyphPlanList[i];
-
-                //    Typography.Rendering.TextureGlyphMapData glyphData;
-                //    if (!_fontAtlas.TryGetGlyphDataByCodePoint(glyph.glyphIndex, out glyphData))
-                //    {
-                //        //if no glyph data, we should render a missing glyph ***
-                //        continue;
-                //    }
-                //    //if (scaleFromTexture != 1)
-                //    //{
-
-                //    //}
-                //    //--------------------------------------
-                //    //TODO: review precise height in float
-                //    //-------------------------------------- 
-                //    PixelFarm.Drawing.Rectangle srcRect = ConvToRect(glyphData.Rect);
-                //    g_x = (float)(x + (glyph.ExactX * scale - glyphData.TextureXOffset) * scaleFromTexture); //ideal x
-                //    g_y = (float)(y + (glyph.ExactY * scale - glyphData.TextureYOffset + srcRect.Height) * scaleFromTexture);
-
-
-                //    //for sharp glyph
-                //    //we adjust g_x,g_y to integer value                
-                //    //float g_y2 = (float)Math.Floor(g_y);
-
-                //    g_x = (float)Math.Round(g_x);
-                //    g_y = (float)Math.Floor(g_y);
-
-
-                //    switch (textureKind)
-                //    {
-                //        case TextureKind.Msdf:
-
-                //            _glsx.DrawSubImageWithMsdf(_glBmp,
-                //                ref srcRect,
-                //                g_x,
-                //                g_y,
-                //                scaleFromTexture);
-
-                //            break;
-                //        case TextureKind.StencilGreyScale:
-
-                //            //stencil gray scale with fill-color
-                //            _glsx.DrawGlyphImageWithStecil(_glBmp,
-                //             ref srcRect,
-                //                g_x,
-                //                g_y,
-                //                scaleFromTexture);
-
-                //            break;
-                //        case TextureKind.Bitmap:
-                //            _glsx.DrawSubImage(_glBmp,
-                //             ref srcRect,
-                //                g_x,
-                //                g_y,
-                //                scaleFromTexture);
-                //            break;
-                //        case TextureKind.StencilLcdEffect:
-                //            _glsx.WriteVboToList(
-                //              vboBufferList,
-                //              indexList,
-                //              ref srcRect,
-                //              g_x,
-                //              g_y,
-                //              scaleFromTexture);
-                //            break;
-                //    }
-                //}
-                ////---------
-
 
                 int seqLen = seq.Count;
 
