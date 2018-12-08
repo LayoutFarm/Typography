@@ -25,13 +25,30 @@ namespace Test_WinForm_TessGlyph
         public FormTess()
         {
             InitializeComponent();
+            this.textBox1.KeyUp += TextBox1_KeyUp;
         }
-        private void FormTess_Load(object sender, EventArgs e)
+
+        private void TextBox1_KeyUp(object sender, KeyEventArgs e)
         {
-            _g = this.pnlGlyph.CreateGraphics();
+            string oneChar = this.textBox1.Text.Trim();
+            if (string.IsNullOrEmpty(oneChar)) return;
+            //
+            char selectedChar = oneChar[0];
+            //
+            //
+            //selectedChar = 'e'; 
+            if (_g == null)
+            {
+                _g = this.pnlGlyph.CreateGraphics();
+            }
+            _g.Clear(Color.White);
+
+
 
             //string testFont = "d:\\WImageTest\\DroidSans.ttf";
-            string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
+            //string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
+            string testFont = "d:\\WImageTest\\Alfa_Slab.ttf";
+
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
                 OpenFontReader reader = new OpenFontReader();
@@ -39,7 +56,7 @@ namespace Test_WinForm_TessGlyph
 
                 //--
                 var builder = new Typography.Contours.GlyphPathBuilder(typeface);
-                builder.BuildFromGlyphIndex(typeface.LookupIndex('a'), 256);
+                builder.BuildFromGlyphIndex(typeface.LookupIndex(selectedChar), 300);
 
                 var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();
@@ -65,6 +82,14 @@ namespace Test_WinForm_TessGlyph
                 //}
                 ////--------------------------------------
             }
+            DrawOutput();
+        }
+
+
+
+        private void FormTess_Load(object sender, EventArgs e)
+        {
+
         }
 
         float[] GetPolygonData(out int[] endContours)
@@ -87,6 +112,10 @@ namespace Test_WinForm_TessGlyph
         }
         void DrawOutput()
         {
+            if (_g == null)
+            {
+                return;
+            }
             //-----------
             //for GDI+ only
             bool drawInvert = chkInvert.Checked;
@@ -139,7 +168,6 @@ namespace Test_WinForm_TessGlyph
             {
                 return;
             }
-
 
             //1.
             List<ushort> indexList = _tessTool.TessIndexList;

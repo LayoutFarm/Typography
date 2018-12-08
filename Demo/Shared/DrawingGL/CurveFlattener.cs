@@ -70,7 +70,7 @@ namespace DrawingGL
     class SimpleCurveFlattener
     {
 
-        int _nsteps = 3;
+        int _nsteps = 7;
         List<float> _xyCoords = new List<float>();
         List<int> _endPointList = new List<int>();
 

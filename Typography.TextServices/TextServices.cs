@@ -122,7 +122,14 @@ namespace Typography.TextServices
 #endif
             }
 
+#if DEBUG
 
+#endif
+            if (len < 1)
+            {
+                yield break;
+            }
+            //----------------------------
             int cur_startAt = startAt;
             _textBreaker.BreakWords(str, cur_startAt, len);
             foreach (TextBreak.BreakSpan sp in _textBreaker.GetBreakSpanIter())

@@ -60,9 +60,8 @@ namespace Typography.FontManagement
         }
     }
 
-    public delegate void FirstInitFontCollectionDelegate(InstalledTypefaceCollection fontCollection);
-
-    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection fontCollection, string fontName, string fontSubFam);
+    public delegate void FirstInitFontCollectionDelegate(InstalledTypefaceCollection typefaceCollection);
+    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection typefaceCollection, string fontName, string fontSubFam);
     public delegate FontNameDuplicatedDecision FontNameDuplicatedHandler(InstalledTypeface existing, InstalledTypeface newAddedFont);
     public enum FontNameDuplicatedDecision
     {
