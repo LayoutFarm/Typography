@@ -37,80 +37,12 @@ namespace SampleWinForms
         {
             InitializeComponent();
 
-            //
-            _basicOptions = openFontOptions1.Options;
-            _basicOptions.TypefaceChanged += (s, e) =>
-            {
-                if (e.SelectedTypeface == null) return;
-                //
-                if (_devVxsTextPrinter != null)
-                {
-                    _devVxsTextPrinter.Typeface = e.SelectedTypeface;
-                    var reqFont = new PixelFarm.Drawing.RequestFont(e.SelectedTypeface.Name, _basicOptions.FontSizeInPoints);
-                    _devVxsTextPrinter.ChangeFont(reqFont);
-                    _painter.CurrentFont = reqFont;
-                }
+            var dicProvider = new Typography.TextBreak.IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../../../Typography.TextBreak/icu62/brkitr" };
+            Typography.TextBreak.CustomBreakerBuilder.Setup(dicProvider);
 
-
-                this.glyphNameListUserControl1.Typeface = e.SelectedTypeface;
-            };
-
-            _basicOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
-            //
-            _glyphRenderOptions = glyphRenderOptionsUserControl1.Options;
-            _glyphRenderOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
-            //
-            _contourAnalysisOpts = glyphContourAnalysisOptionsUserControl1.Options;
-            _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
-
-
-
-            txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
-            button1.Click += (s, e) => UpdateRenderOutput();
-
-            //
-            this.glyphNameListUserControl1.GlyphNameChanged += (s, e) =>
-            {
-                //test render 
-                //just our convention by add & and ;
-                RenderByGlyphName(glyphNameListUserControl1.SelectedGlyphName);
-            };
-            //----------------
-            //string inputstr = "ก้า";
-            //string inputstr = "น้ำน้ำ";
-            //string inputstr = "example";
-            //string inputstr = "lllll";
-            //string inputstr = "e";
-            //string inputstr = "T";
-            //string inputstr = "u";
-            //string inputstr = "t";
-            //string inputstr = "2";
-            //string inputstr = "3";
-            //string inputstr = "o";
-            //string inputstr = "l";
-            //string inputstr = "k";
-            //string inputstr = "8";
-            //string inputstr = "#";
-            //string inputstr = "a";
-            string inputstr = "0";
-            //string inputstr = "e";
-            //string inputstr = "l";
-            //string inputstr = "t";
-            //string inputstr = "i";
-            //string inputstr = "ma"; 
-            //string inputstr = "po";
-            //string inputstr = "Å";
-            //string inputstr = "fi";
-            //string inputstr = "ก่นกิ่น";
-            //string inputstr = "ญญู";
-            //string inputstr = "ป่า"; //for gpos test 
-            //string inputstr = "快速上手";
-            //string inputstr = "啊";
-
-            //----------------
-            this.txtInputChar.Text = inputstr;
-            _readyToRender = true;
+            this.Load += new System.EventHandler(this.Form1_Load);  
         }
+        
         void RenderByGlyphName(string selectedGlyphName)
         {
             //---------------------------------------------
@@ -609,9 +541,85 @@ namespace SampleWinForms
                 var readbackFontAtlas = atlasBuilder2.LoadFontInfo("d:\\WImageTest\\a_info.bin");
             }
         }
-        private void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e1)
         {
             this.Text = "Render with PixelFarm";
+            //
+            _basicOptions = openFontOptions1.Options;
+            _basicOptions.TypefaceChanged += (s, e) =>
+            {
+                if (e.SelectedTypeface == null) return;
+                //
+                if (_devVxsTextPrinter != null)
+                {
+                    _devVxsTextPrinter.Typeface = e.SelectedTypeface;
+                    var reqFont = new PixelFarm.Drawing.RequestFont(e.SelectedTypeface.Name, _basicOptions.FontSizeInPoints);
+                    _devVxsTextPrinter.ChangeFont(reqFont);
+                    _painter.CurrentFont = reqFont;
+                }
+
+
+                this.glyphNameListUserControl1.Typeface = e.SelectedTypeface;
+            };
+
+            _basicOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
+            //
+            _glyphRenderOptions = glyphRenderOptionsUserControl1.Options;
+            _glyphRenderOptions.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
+            //
+            _contourAnalysisOpts = glyphContourAnalysisOptionsUserControl1.Options;
+            _contourAnalysisOpts.UpdateRenderOutput += (s, e) => UpdateRenderOutput();
+
+
+
+            txtInputChar.TextChanged += (s, e) => UpdateRenderOutput();
+            button1.Click += (s, e) => UpdateRenderOutput();
+
+            //
+            this.glyphNameListUserControl1.GlyphNameChanged += (s, e) =>
+            {
+                //test render 
+                //just our convention by add & and ;
+                RenderByGlyphName(glyphNameListUserControl1.SelectedGlyphName);
+            };
+            //----------------
+            //string inputstr = "ก้า";
+            //string inputstr = "น้ำน้ำ";
+            //string inputstr = "example";
+            //string inputstr = "lllll";
+            //string inputstr = "e";
+            //string inputstr = "T";
+            //string inputstr = "u";
+            //string inputstr = "t";
+            //string inputstr = "2";
+            //string inputstr = "3";
+            //string inputstr = "o";
+            //string inputstr = "l";
+            //string inputstr = "k";
+            //string inputstr = "8";
+            //string inputstr = "#";
+            //string inputstr = "a";
+            string inputstr = "0";
+            //string inputstr = "e";
+            //string inputstr = "l";
+            //string inputstr = "t";
+            //string inputstr = "i";
+            //string inputstr = "ma"; 
+            //string inputstr = "po";
+            //string inputstr = "Å";
+            //string inputstr = "fi";
+            //string inputstr = "ก่นกิ่น";
+            //string inputstr = "ญญู";
+            //string inputstr = "ป่า"; //for gpos test 
+            //string inputstr = "快速上手";
+            //string inputstr = "啊";
+            this.txtInputChar.Text = inputstr;
+            _readyToRender = true;
+
+            if (_readyToRender)
+            {
+                UpdateRenderOutput();
+            }
         }
 
         private void cmdMeasureString_Click(object sender, EventArgs e)

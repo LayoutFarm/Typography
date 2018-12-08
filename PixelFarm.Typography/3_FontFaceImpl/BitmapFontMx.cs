@@ -61,12 +61,13 @@ namespace Typography.Rendering
     public class BitmapFontManager<B>
         where B : IDisposable
     {
-        static FontBitmapCache<SimpleFontAtlas, B> _loadedGlyphs;
-        static Dictionary<int, SimpleFontAtlas> _createdAtlases = new Dictionary<int, SimpleFontAtlas>();
+        FontBitmapCache<SimpleFontAtlas, B> _loadedGlyphs;
+        Dictionary<int, SimpleFontAtlas> _createdAtlases = new Dictionary<int, SimpleFontAtlas>();
 
-        LayoutFarm.OpenFontTextService textServices;
-        ScriptLang[] _currentScriptLangs;
+        LayoutFarm.OpenFontTextService _textServices;
         TextureKind _textureKind;
+        GlyphTextureBuildDetail[] _textureBuildDetails;
+
         public BitmapFontManager(TextureKind textureKind,
             LayoutFarm.OpenFontTextService textServices,
             LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
@@ -77,19 +78,17 @@ namespace Typography.Rendering
         }
         public BitmapFontManager(TextureKind textureKind, LayoutFarm.OpenFontTextService textServices)
         {
-            this.textServices = textServices;
+            _textServices = textServices;
             _textureKind = textureKind;
         }
-
-
         protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
         {
             _loadedGlyphs = new FontBitmapCache<SimpleFontAtlas, B>(_createNewDel);
         }
-        GlyphTextureBuildDetail[] _textureBuildDetails;
+
         public void SetCurrentScriptLangs(ScriptLang[] currentScriptLangs)
         {
-            _currentScriptLangs = currentScriptLangs;
+
 
             //TODO: review here again,
             //this is a fixed version for tahoma font
@@ -124,7 +123,7 @@ namespace Typography.Rendering
             if (!_createdAtlases.TryGetValue(fontKey, out fontAtlas))
             {
                 //check from pre-built cache (if availiable) 
-                Typeface resolvedTypeface = textServices.ResolveTypeface(reqFont);
+                Typeface resolvedTypeface = _textServices.ResolveTypeface(reqFont);
 
                 string fontTextureFile = reqFont.Name + "_" + fontKey;
                 string resolveFontFile = fontTextureFile + ".info";
@@ -136,13 +135,13 @@ namespace Typography.Rendering
                 if (StorageService.Provider.DataExists(fontTextureInfoFile) &&
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
-                    SimpleFontAtlasBuilder atlasBuilder2 = new SimpleFontAtlasBuilder();
+                    SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
 
                     using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
                     {
                         try
                         {
-                            fontAtlas = atlasBuilder2.LoadFontInfo(dataStream);
+                            fontAtlas = atlasBuilder.LoadFontInfo(dataStream);
                             fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImgFilename);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);

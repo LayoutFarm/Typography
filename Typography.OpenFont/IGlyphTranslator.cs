@@ -289,8 +289,10 @@ namespace Typography.OpenFont
 
 
                                         tx.MoveTo(latest_moveto_x = mid2.X, latest_moveto_y = mid2.Y);
-                                        // curveControlPointCount--;
+
+                                        offCurveMode = true;
                                         foundFirstOnCurvePoint = true;
+
                                         c1 = new Vector2(p_x, p_y);
                                         continue;
 
