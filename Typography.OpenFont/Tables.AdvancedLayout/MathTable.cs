@@ -673,12 +673,10 @@ namespace Typography.OpenFont.Tables
 
     class MathTable : TableEntry
     {
+        public override string Name => "MATH";
+        //
         internal MathConstants _mathConstTable;
 
-        public override string Name
-        {
-            get { return "MATH"; }
-        }
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //eg. latin-modern-math-regular.otf, asana-math.otf
