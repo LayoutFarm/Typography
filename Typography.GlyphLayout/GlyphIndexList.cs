@@ -48,7 +48,6 @@ namespace Typography.TextLayout
             _glyphIndices.Clear();
             _originalCodePointOffset = 0;
             _inputCodePointIndexList.Clear();
-
             _mapGlyphIndexToUserCodePoint.Clear();
 
         }
@@ -75,14 +74,10 @@ namespace Typography.TextLayout
         /// <summary>
         /// glyph count may be more or less than original user char list (from substitution process)
         /// </summary>
-        public int Count { get { return _glyphIndices.Count; } }
-        public ushort this[int index]
-        {
-            get
-            {
-                return _glyphIndices[index];
-            }
-        }
+        public int Count => _glyphIndices.Count;
+        //
+        public ushort this[int index] => _glyphIndices[index];
+        //
         public void GetGlyphIndexAndMap(int index, out ushort glyphIndex, out ushort input_codepointOffset, out ushort input_mapLen)
         {
             glyphIndex = _glyphIndices[index];

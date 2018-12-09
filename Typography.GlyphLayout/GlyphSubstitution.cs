@@ -39,16 +39,13 @@ namespace Typography.TextLayout
                 }
             }
         }
-        public string Lang
-        {
-            get { return _language; }
-        }
+        public string Lang => _language;
         /// <summary>
         /// enable GSUB type 4, ligation (liga)
         /// </summary>
         public bool EnableLigation
         {
-            get { return _enableLigation; }
+            get => _enableLigation;
             set
             {
                 if (value != _enableLigation)
@@ -65,7 +62,7 @@ namespace Typography.TextLayout
         /// </summary>
         public bool EnableComposition
         {
-            get { return _enableComposition; }
+            get => _enableComposition;
             set
             {
                 if (value != _enableComposition)
@@ -77,16 +74,14 @@ namespace Typography.TextLayout
 
             }
         }
-        private readonly string _language;
-        private bool _enableLigation = true; // enable by default
-        private bool _enableComposition = true;
+        readonly string _language;
+        bool _enableLigation = true; // enable by default
+        bool _enableComposition = true;
+        bool _mustRebuildTables = true;
+        Typeface _typeface;
+        List<GSUB.LookupTable> _lookupTables = new List<GSUB.LookupTable>();
 
-        private bool _mustRebuildTables = true;
-
-        private Typeface _typeface;
-        private List<GSUB.LookupTable> _lookupTables = new List<GSUB.LookupTable>();
-
-        private void RebuildTables()
+        void RebuildTables()
         {
             _lookupTables.Clear();
 

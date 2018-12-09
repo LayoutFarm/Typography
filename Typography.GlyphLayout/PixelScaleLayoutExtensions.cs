@@ -68,7 +68,9 @@ namespace Typography.TextLayout
             _exactX = _exactY = 0;
             _currentGlyphIndex = 0;
         }
-        public int CurrentIndex { get { return _index; } }
+        //
+        public int CurrentIndex => _index;
+        //
         public PxScaledGlyphPlan GlyphPlan
         {
             get
@@ -84,10 +86,10 @@ namespace Typography.TextLayout
             }
         }
 
-        public float AccumWidth { get { return _accW; } }
-        public float ExactX { get { return _exactX; } }
-        public float ExactY { get { return _exactY; } }
-        public ushort CurrentGlyphIndex { get { return _currentGlyphIndex; } }
+        public float AccumWidth => _accW;
+        public float ExactX => _exactX;
+        public float ExactY => _exactY;
+        public ushort CurrentGlyphIndex => _currentGlyphIndex;
         public bool Read()
         {
             if (_index >= _end)
@@ -143,10 +145,10 @@ namespace Typography.TextLayout
             _exactX = _exactY = 0;
             _currentGlyphIndex = 0;
         }
-        public ushort CurrentGlyphIndex { get { return _currentGlyphIndex; } }
-        public int CurrentIndex { get { return _index; } }
-
-       
+        //
+        public ushort CurrentGlyphIndex => _currentGlyphIndex;
+        public int CurrentIndex => _index;
+        //
         public bool Read()
         {
             if (_index >= _end)
@@ -170,11 +172,9 @@ namespace Typography.TextLayout
             _index++;
             return true;
         }
-        public int AccumWidth { get { return _accW; } }
-        public int ExactX { get { return _exactX; } }
-        public int ExactY { get { return _exactY; } }
-
-
+        public int AccumWidth => _accW;
+        public int ExactX => _exactX;
+        public int ExactY => _exactY;
     }
     public static class PixelScaleLayoutExtensions
     {
@@ -199,12 +199,10 @@ namespace Typography.TextLayout
         }
 #endif
 
-
-
         static void GenerateScaledGlyphPlans(this GlyphLayout glyphLayout,
-         float pxscale,
-         bool snapToGrid,
-         out float accumW)
+             float pxscale,
+             bool snapToGrid,
+             out float accumW)
         {
             //user can implement this with some 'PixelScaleEngine'  
             IGlyphPositions glyphPositions = glyphLayout.ResultUnscaledGlyphPositions;
