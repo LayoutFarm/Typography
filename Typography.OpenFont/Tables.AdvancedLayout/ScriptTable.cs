@@ -164,10 +164,7 @@ namespace Typography.OpenFont.Tables
                 featureIndexList = Utils.ReadUInt16Array(reader, featureCount);
 
             }
-            public bool HasRequireFeature
-            {
-                get { return RequireFeatureIndex != 0xFFFF; }
-            }
+            public bool HasRequireFeature => RequireFeatureIndex != 0xFFFF;
 #if DEBUG
             public override string ToString()
             {
