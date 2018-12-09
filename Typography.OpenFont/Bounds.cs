@@ -21,10 +21,10 @@ namespace Typography.OpenFont
             _ymax = ymax;
         }
 
-        public short XMin { get { return _xmin; } }
-        public short YMin { get { return _ymin; } }
-        public short XMax { get { return _xmax; } }
-        public short YMax { get { return _ymax; } }
+        public short XMin => _xmin;
+        public short YMin => _ymin;
+        public short XMax => _xmax;
+        public short YMax => _ymax;
 #if DEBUG
         public override string ToString()
         {
