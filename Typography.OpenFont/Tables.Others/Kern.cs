@@ -63,7 +63,7 @@ namespace Typography.OpenFont.Tables
             ushort rangeShift = reader.ReadUInt16();
             //----------------------------------------------  
             var ksubTable = new KerningSubTable(npairs);
-            this._kernSubTables.Add(ksubTable);
+            _kernSubTables.Add(ksubTable);
             while (npairs > 0)
             {
                 ksubTable.AddKernPair(

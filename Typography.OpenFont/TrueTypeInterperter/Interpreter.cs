@@ -12,7 +12,7 @@ namespace Typography.OpenFont
         SharpFontInterpreter _interpreter;
         public void SetTypeFace(Typeface typeface)
         {
-            this._currentTypeFace = typeface;
+            _currentTypeFace = typeface;
             Tables.MaxProfile maximumProfile = _currentTypeFace.MaxProfile;
             _interpreter = new SharpFontInterpreter(
                 maximumProfile.MaxStackElements,
@@ -172,7 +172,7 @@ namespace Typography.OpenFont
 
         public void SetControlValueTable(int[] cvt, float scale, float ppem, byte[] cvProgram)
         {
-            if (this._scale == scale || cvt == null)
+            if (_scale == scale || cvt == null)
                 return;
 
             if (_controlValueTable == null)
@@ -181,8 +181,8 @@ namespace Typography.OpenFont
             for (int i = cvt.Length - 1; i >= 0; --i)
                 _controlValueTable[i] = cvt[i] * scale;
 
-            this._scale = scale;
-            this._ppem = (int)Math.Round(ppem);
+            _scale = scale;
+            _ppem = (int)Math.Round(ppem);
             _zp0 = _zp1 = _zp2 = _points;
             _state.Reset();
             _stack.Clear();
@@ -220,7 +220,7 @@ namespace Typography.OpenFont
             // TODO: round the phantom points?
 
             // save contours and points
-            this._contours = contours;
+            _contours = contours;
             _zp0 = _zp1 = _zp2 = _points = new Zone(glyphPoints, isTwilight: false);
 
             // reset all of our shared state

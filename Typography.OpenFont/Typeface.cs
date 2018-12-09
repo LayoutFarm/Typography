@@ -49,7 +49,7 @@ namespace Typography.OpenFont
 
 
             //------
-            _glyphs = _cffTable.Cff1FontSet._fonts[0].glyphs;
+            _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs;
         }
 
         /// <summary>

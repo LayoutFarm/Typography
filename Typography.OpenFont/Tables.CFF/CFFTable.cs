@@ -54,19 +54,16 @@ namespace Typography.OpenFont.Tables
 
     class CFFTable : TableEntry
     {
-        Cff1FontSet _cff1FontSet;
-        public override string Name
-        {
-            get { return "CFF "; } //4 char, left 1 blank whitespace
-        }
 
-        internal Cff1FontSet Cff1FontSet { get { return _cff1FontSet; } }
+        public override string Name => "CFF ";//4 chars, left 1 blank whitespace
+        //
 
+        Cff1FontSet _cff1FontSet; 
+        //
+        internal Cff1FontSet Cff1FontSet => _cff1FontSet;
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            uint tableOffset = this.Header.Offset;
-
-
+            uint tableOffset = this.Header.Offset; 
             //
             //
             //Table 8 Header Format

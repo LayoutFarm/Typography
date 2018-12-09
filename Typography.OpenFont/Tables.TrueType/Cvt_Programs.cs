@@ -21,7 +21,7 @@ namespace Typography.OpenFont.Tables
             {
                 results[i] = reader.ReadInt16();
             }
-            this._controlValues = results;
+            _controlValues = results;
         }
     }
     class PrepTable : TableEntry

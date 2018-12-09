@@ -264,7 +264,7 @@ namespace Typography.OpenFont.CFF
         List<Type2Instruction> _insts;
         public Type2GlyphInstructionList()
         {
-            this._insts = new List<Type2Instruction>();
+            _insts = new List<Type2Instruction>();
         }
         public List<Type2Instruction> Insts => _insts;
         public Type2GlyphInstructionListKind Kind { get; set; }
