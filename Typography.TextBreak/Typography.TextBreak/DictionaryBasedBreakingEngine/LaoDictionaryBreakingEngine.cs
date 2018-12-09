@@ -15,34 +15,29 @@ namespace Typography.TextBreak
         {
             _customDic = customDic;
         }
-        protected override CustomDic CurrentCustomDic
-        {
-            get { return _customDic; }
-        }
+        //
+        protected override CustomDic CurrentCustomDic => _customDic;
+        //
         public override bool CanBeStartChar(char c)
         {
-            return canbeStartChars[c - _customDic.FirstChar];
+            return s_canbeStartChars[c - _customDic.FirstChar];
         }
         protected override WordGroup GetWordGroupForFirstChar(char c)
         {
             return _customDic.GetWordGroupForFirstChar(c);
         }
-        public override char FirstUnicodeChar
-        {
-            //0E80–0EFF 
-            get { return s_firstChar; }
-        }
-        public override char LastUnicodeChar
-        {
-            get { return s_lastChar; }
-        }
 
-        static bool[] canbeStartChars;
+        //0E80–0EFF 
+        public override char FirstUnicodeChar => s_firstChar;
+        public override char LastUnicodeChar => s_lastChar;
+        //
+        static bool[] s_canbeStartChars;
         const char s_firstChar = (char)0x0E80;
         const char s_lastChar = (char)0x0EFF;
-        public static char FirstChar { get { return s_firstChar; } }
-        public static char LastChar { get { return s_lastChar; } }
-
+        //
+        public static char FirstChar => s_firstChar;
+        public static char LastChar => s_lastChar;
+        //
 
 
         static LaoDictionaryBreakingEngine()
@@ -70,17 +65,17 @@ namespace Typography.TextBreak
             };
             //-------------------------------------------------------
 
-            canbeStartChars = new bool[s_lastChar - s_firstChar + 1];
-            for (int i = canbeStartChars.Length - 1; i >= 0; --i)
+            s_canbeStartChars = new bool[s_lastChar - s_firstChar + 1];
+            for (int i = s_canbeStartChars.Length - 1; i >= 0; --i)
             {
-                canbeStartChars[i] = true;
+                s_canbeStartChars[i] = true;
             }
             //------------------------------------------------
             for (int i = laoCantStartWithChars.Length - 1; i >= 0; --i)
             {
                 int shiftedIndex = laoCantStartWithChars[i] - s_firstChar;
                 //some char can't be start char
-                canbeStartChars[shiftedIndex] = false;
+                s_canbeStartChars[shiftedIndex] = false;
             }
 
         }

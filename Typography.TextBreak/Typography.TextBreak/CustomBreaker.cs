@@ -28,16 +28,12 @@ namespace Typography.TextBreak
             _visitor = new WordVisitor();
             _breakingEngine = _engBreakingEngine; //default eng-breaking engine
         }
-
-        public EngBreakingEngine EngBreakingEngine
-        {
-            get { return _engBreakingEngine; }
-        }
-
-
+        //
+        public EngBreakingEngine EngBreakingEngine => _engBreakingEngine;
+        //
         public bool BreakNumberAfterText
         {
-            get { return _breakNumberAfterText; }
+            get => _breakNumberAfterText;
             set
             {
                 _breakNumberAfterText = value;
@@ -169,11 +165,9 @@ namespace Typography.TextBreak
             }
         }
 
-
-        public int BreakItemCount
-        {
-            get { return _visitor.GetBreakList().Count; }
-        }
+        //
+        public int BreakItemCount => _visitor.GetBreakList().Count;
+        //
         public IEnumerable<BreakSpan> GetBreakSpanIter()
         {
             List<BreakAtInfo> breakAtList = _visitor.GetBreakList();

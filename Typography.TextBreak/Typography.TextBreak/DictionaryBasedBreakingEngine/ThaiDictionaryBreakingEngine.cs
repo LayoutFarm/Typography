@@ -17,45 +17,32 @@ namespace Typography.TextBreak
             _customDic = customDic;
 
         }
-        protected override CustomDic CurrentCustomDic
-        {
-            get { return _customDic; }
-        }
-
+        //
+        protected override CustomDic CurrentCustomDic => _customDic;
+        //
         public override bool CanBeStartChar(char c)
         {
+            //refactor note, ease of debug 
             return s_canbeStartChars[c - this.FirstUnicodeChar];
-
         }
         protected override WordGroup GetWordGroupForFirstChar(char c)
-        {
+        { 
             return _customDic.GetWordGroupForFirstChar(c);
         }
-
-        public override char FirstUnicodeChar
-        {
-            //0E00-0E7F 
-
-            get { return s_firstChar; }
-        }
-        public override char LastUnicodeChar
-        {
-            get
-            {
-                return s_lastChar;
-            }
-        }
+        //
+        //0E00-0E7F 
+        public override char FirstUnicodeChar => s_firstChar;
+        public override char LastUnicodeChar => s_lastChar;
         //------------------------------------
         //eg thai sara
 
         static bool[] s_canbeStartChars;
         const char s_firstChar = (char)0x0E00;
         const char s_lastChar = (char)0xE7F;
-
-        public static char FirstChar { get { return s_firstChar; } }
-        public static char LastChar { get { return s_lastChar; } }
-
-
+        //
+        public static char FirstChar => s_firstChar;
+        public static char LastChar => s_lastChar;
+        //
         static ThaiDictionaryBreakingEngine()
         {
 
