@@ -73,8 +73,8 @@ namespace Typography.OpenFont.Tables
 
     class Cmap : TableEntry
     {
-        public override string Name { get { return "cmap"; } }
-
+        public override string Name => "cmap";
+        //
         public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
@@ -122,8 +122,8 @@ namespace Typography.OpenFont.Tables
             return ret;
         }
 
-        private List<CharacterMap> _charMaps = new List<CharacterMap>();
-        private Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
+        List<CharacterMap> _charMaps = new List<CharacterMap>();
+        Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         protected override void ReadContentFrom(BinaryReader input)
         {

@@ -11,6 +11,8 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class HorizontalMetrics : TableEntry
     {
+        public override string Name => "hmtx";
+        //
         //https://www.microsoft.com/typography/otspec/hmtx.htm
         // A font rendering engine must use the advanceWidths in the hmtx table for the advances of a CFF OFF font,
         //even though the CFF table specifies its own glyph widths.
@@ -32,10 +34,6 @@ namespace Typography.OpenFont.Tables
             _leftSideBearings = new List<short>(numGlyphs);
             _numOfHMetrics = numOfHMetrics;
             _numGlyphs = numGlyphs;
-        }
-        public override string Name
-        {
-            get { return "hmtx"; }
         }
         public ushort GetAdvanceWidth(int index)
         {
