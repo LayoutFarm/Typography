@@ -12,61 +12,61 @@ namespace Typography.OpenFont.CFF
     public class CffEvaluationEngine
     {
 
-        CFF.Cff1Font cff1Font;
+        CFF.Cff1Font _cff1Font;
         int _cffBias;
         float _scale = 1;//default 
         Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
 
         class PxScaleGlyphTx : IGlyphTranslator
         {
-            float scale;
-            IGlyphTranslator tx;
+            float _scale;
+            IGlyphTranslator _tx;
 
             bool _is_contour_opened;
 
             public PxScaleGlyphTx(float scale, IGlyphTranslator tx)
             {
-                this.scale = scale;
-                this.tx = tx;
+                _scale = scale;
+                _tx = tx;
             }
 
             public void BeginRead(int contourCount)
             {
-                tx.BeginRead(contourCount);
+                _tx.BeginRead(contourCount);
             }
 
             public void CloseContour()
             {
                 _is_contour_opened = false;
-                tx.CloseContour();
+                _tx.CloseContour();
             }
 
             public void Curve3(float x1, float y1, float x2, float y2)
             {
                 _is_contour_opened = true;
-                tx.Curve3(x1 * scale, y1 * scale, x2 * scale, y2 * scale);
+                _tx.Curve3(x1 * _scale, y1 * _scale, x2 * _scale, y2 * _scale);
             }
 
             public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
             {
                 _is_contour_opened = true;
-                tx.Curve4(x1 * scale, y1 * scale, x2 * scale, y2 * scale, x3 * scale, y3 * scale);
+                _tx.Curve4(x1 * _scale, y1 * _scale, x2 * _scale, y2 * _scale, x3 * _scale, y3 * _scale);
             }
 
             public void EndRead()
             {
-                tx.EndRead();
+                _tx.EndRead();
             }
 
             public void LineTo(float x1, float y1)
             {
                 _is_contour_opened = true;
-                tx.LineTo(x1 * scale, y1 * scale);
+                _tx.LineTo(x1 * _scale, y1 * _scale);
             }
 
             public void MoveTo(float x0, float y0)
             {
-                tx.MoveTo(x0 * scale, y0 * scale);
+                _tx.MoveTo(x0 * _scale, y0 * _scale);
             }
             //
 
@@ -86,7 +86,7 @@ namespace Typography.OpenFont.CFF
 
             //all fields are set to new values***
 
-            this.cff1Font = cff1Font;
+            _cff1Font = cff1Font;
             _scale = scale;
 
             //-------------
@@ -242,7 +242,7 @@ namespace Typography.OpenFont.CFF
                         {
                             //resolve local subrountine
                             int rawSubRoutineNum = (int)evalStack.Pop();
-                            Type2GlyphInstructionList resolvedSubroutine = cff1Font._localSubrs[rawSubRoutineNum + _cffBias];
+                            Type2GlyphInstructionList resolvedSubroutine = _cff1Font._localSubrs[rawSubRoutineNum + _cffBias];
                             //then we move to another context
                             //recursive ***
                             Run(tx, resolvedSubroutine, ref evalStack._currentX, ref evalStack._currentY);
@@ -299,8 +299,8 @@ namespace Typography.OpenFont.CFF
         }
         public IGlyphTranslator GlyphTranslator
         {
-            get { return _glyphTranslator; }
-            set { _glyphTranslator = value; }
+            get => _glyphTranslator;
+            set => _glyphTranslator = value;
         }
         public void Push(double value)
         {
@@ -355,7 +355,7 @@ namespace Typography.OpenFont.CFF
                 _currentX += _argStack[i];
                 _currentY += _argStack[i + 1];
                 i += 2;
-            } 
+            }
 
             _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
 
