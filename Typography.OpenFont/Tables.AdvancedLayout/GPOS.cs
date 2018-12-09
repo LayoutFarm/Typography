@@ -119,12 +119,12 @@ namespace Typography.OpenFont.Tables
                 public LkSubTableType1(ValueRecord singleValue)
                 {
                     this.Format = 1;
-                    this._singleValue = singleValue;
+                    _singleValue = singleValue;
                 }
                 public LkSubTableType1(ValueRecord[] valueRecords)
                 {
                     this.Format = 2;
-                    this._multiValues = valueRecords;
+                    _multiValues = valueRecords;
                 }
                 public int Format { get; private set; }
                 public CoverageTable CoverageTable { get; set; }
@@ -195,7 +195,7 @@ namespace Typography.OpenFont.Tables
                 PairSetTable[] _pairSetTables;
                 public LkSubTableType2Fmt1(PairSetTable[] pairSetTables)
                 {
-                    this._pairSetTables = pairSetTables;
+                    _pairSetTables = pairSetTables;
                 }
                 public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
@@ -210,7 +210,7 @@ namespace Typography.OpenFont.Tables
                         if (firstGlyphFound > -1)
                         {
                             //test this with Palatino A-Y sequence
-                            PairSetTable pairSet = this._pairSetTables[firstGlyphFound];
+                            PairSetTable pairSet = _pairSetTables[firstGlyphFound];
                             //check second glyph 
                             ushort second_glyph_w;
                             ushort second_glyph_index = inputGlyphs.GetGlyph(i + 1, out second_glyph_w);
