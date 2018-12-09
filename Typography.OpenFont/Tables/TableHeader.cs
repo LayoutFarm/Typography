@@ -17,7 +17,8 @@ namespace Typography.OpenFont.Tables
             _offset = offset;
             _length = len;
         }
-        public string Tag { get { return Utils.TagToString(_tag); } }
+        //
+        public string Tag => Utils.TagToString(_tag);
 
         //// TODO: Take offset parameter as commonly two seeks are made in a row
         //public BinaryReader GetDataReader()
@@ -26,9 +27,9 @@ namespace Typography.OpenFont.Tables
         //    // TODO: Limit reading to _length by wrapping BinaryReader (or Stream)?
         //    return _input;
         //}
-        public uint Offset { get { return _offset; } }
-        public uint CheckSum { get { return _checkSum; } }
-        public uint Length { get { return _length; } }
+        public uint Offset => _offset;
+        public uint CheckSum => _checkSum;
+        public uint Length => _length;
 
         public override string ToString()
         {

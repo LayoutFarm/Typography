@@ -29,7 +29,7 @@ namespace Typography.OpenFont.Tables
 
     class AttachmentListTable
     {
-        AttachPoint[] attachPoints;
+        AttachPoint[] _attachPoints;
         public CoverageTable CoverageTable { get; private set; }
         public static AttachmentListTable CreateFrom(BinaryReader reader, long beginAt)
         {
@@ -41,12 +41,12 @@ namespace Typography.OpenFont.Tables
             ushort[] attachPointOffsets = Utils.ReadUInt16Array(reader, glyphCount);
             //-----------------------
             attachmentListTable.CoverageTable = CoverageTable.CreateFrom(reader, beginAt + coverageOffset);
-            attachmentListTable.attachPoints = new AttachPoint[glyphCount];
+            attachmentListTable._attachPoints = new AttachPoint[glyphCount];
             for (int i = 0; i < glyphCount; ++i)
             {
                 reader.BaseStream.Seek(beginAt + attachPointOffsets[i], SeekOrigin.Begin);
                 ushort pointCount = reader.ReadUInt16();
-                attachmentListTable.attachPoints[i] = new AttachPoint()
+                attachmentListTable._attachPoints[i] = new AttachPoint()
                 {
                     pointIndices = Utils.ReadUInt16Array(reader, pointCount)
                 };
