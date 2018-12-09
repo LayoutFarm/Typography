@@ -6,12 +6,13 @@ namespace Typography.OpenFont.Tables
 
     class CvtTable : TableEntry
     {
+        public override string Name => "cvt "; //need 4 chars//***
+        //
+
         /// <summary>
         /// control value in font unit
         /// </summary>
         internal int[] _controlValues;
-        public override string Name => "cvt "; //need 4 chars//***
-
         protected override void ReadContentFrom(BinaryReader reader)
         {
             int nelems = (int)(this.TableLength / sizeof(short));
@@ -25,8 +26,11 @@ namespace Typography.OpenFont.Tables
     }
     class PrepTable : TableEntry
     {
-        internal byte[] _programBuffer;
+
         public override string Name => "prep";
+        //
+
+        internal byte[] _programBuffer;
         //
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -35,8 +39,10 @@ namespace Typography.OpenFont.Tables
     }
     class FpgmTable : TableEntry
     {
-        internal byte[] _programBuffer;
         public override string Name => "fpgm";
+        //
+
+        internal byte[] _programBuffer; 
         protected override void ReadContentFrom(BinaryReader reader)
         {
             _programBuffer = reader.ReadBytes((int)this.TableLength);
