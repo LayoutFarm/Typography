@@ -157,7 +157,7 @@ namespace PixelFarm.CpuBlit
             {
                 return _internalArray[i];
             }
-            set { this._internalArray[i] = value; }
+            set { _internalArray[i] = value; }
         }
 
 
@@ -173,7 +173,7 @@ namespace PixelFarm.CpuBlit
         } 
         public void SetData(int index, T data)
         {
-            this._internalArray[index] = data;
+            _internalArray[index] = data;
         }
 
         public int Length

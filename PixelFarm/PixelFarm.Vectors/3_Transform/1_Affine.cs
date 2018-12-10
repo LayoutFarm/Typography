@@ -452,13 +452,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //multiply with b
 
             isIdenHint = a.isIdenHint;
-            this._elems = a._elems; //copy
-            this._elems.Multiply(ref b._elems);
+            _elems = a._elems; //copy
+            _elems.Multiply(ref b._elems);
 
         }
         private Affine(Affine copyFrom, AffinePlan creationPlan)
         {
-            this._elems = copyFrom._elems;
+            _elems = copyFrom._elems;
             //-----------------------             
             switch (creationPlan.cmd)
             {
