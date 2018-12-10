@@ -19,6 +19,7 @@ namespace Typography.TextLayout
 
 namespace Typography.TextServices
 {
+    using Typography.TextBreak;
 
     public class TextServices
     {
@@ -101,7 +102,7 @@ namespace Typography.TextServices
             _registerShapingContexts.Clear();
         }
 
-        Typography.TextBreak.CustomBreaker _textBreaker;
+        CustomBreaker _textBreaker;
         List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
         public IEnumerable<BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
         {
@@ -109,15 +110,8 @@ namespace Typography.TextServices
             if (_textBreaker == null)
             {
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
-                int ss = 0;
-                _textBreaker.SetNewBreakHandler((index, wordkind) =>
-                {
-                   
-                    var span = new TextBreak.BreakSpan() { startAt = ss, len = (ushort)(index - ss) };
-                    _breakSpans.Add(span);
-                    ss += span.len;
-                });
-                 
+                _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
+
 #if DEBUG
                 if (_textBreaker == null)
                 {

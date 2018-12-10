@@ -55,9 +55,9 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
         {
             var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
             var breakList = new List<BreakAtInfo>();
-            breaker.SetNewBreakHandler((index, wordkind) =>
+            breaker.SetNewBreakHandler(vis =>
             {
-                breakList.Add(new BreakAtInfo(index, wordkind));
+                breakList.Add(new BreakAtInfo(vis.LatestBreakAt, vis.LatestWordKind));
             });
 
 #warning Use `breaker.BreakWords(text, breakList);` once #156 is merged
@@ -81,12 +81,11 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
         var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
         var breakList = new List<BreakSpan>();
         char[] test = "«Maître leçon»".ToCharArray();
-        int startAt = 0;
-        breaker.SetNewBreakHandler((index, wordkind) =>
+         
+        breaker.SetNewBreakHandler(vis =>
         {
-            var span = new BreakSpan() { startAt = startAt, len = (ushort)(index - startAt), wordKind = wordkind };
-            breakList.Add(span);
-            startAt += span.len;
+            var span = new BreakSpan() { startAt = vis.LatestBreakAt, len = vis.LatestSpanLen, wordKind = vis.LatestWordKind };
+            breakList.Add(span);            
         });
 
 

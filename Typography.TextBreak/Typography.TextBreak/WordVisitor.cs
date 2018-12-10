@@ -17,9 +17,10 @@ namespace Typography.TextBreak
     }
 
 
-    public delegate void NewWordBreakHandlerDelegate(int pos, WordKind wordKind);
+    public delegate void NewWordBreakHandlerDelegate(WordVisitor vistor);
     //
-    class WordVisitor
+
+    public class WordVisitor
     {
 
 #if DEBUG
@@ -34,20 +35,20 @@ namespace Typography.TextBreak
         char _currentChar;
         int _latestBreakAt;
 
-        
+
         NewWordBreakHandlerDelegate _newWordBreakHandler;
 
         Stack<int> _tempCandidateBreaks = new Stack<int>();
-        public WordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
+        internal WordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
         {
             _newWordBreakHandler = newWordBreakHandler;
         }
 
-        public void LoadText(char[] buffer, int index)
+        internal void LoadText(char[] buffer, int index)
         {
             LoadText(buffer, index, buffer.Length);
         }
-        public void LoadText(char[] buffer, int index, int len)
+        internal void LoadText(char[] buffer, int index, int len)
         {
             //check index < buffer
 
@@ -68,7 +69,7 @@ namespace Typography.TextBreak
         }
 
 
-        public VisitorState State { get; set; }
+        public VisitorState State { get; internal set; }
         //
         public int CurrentIndex => _currentIndex;
         //
@@ -80,7 +81,7 @@ namespace Typography.TextBreak
 #if DEBUG
         //int dbugAddSteps;
 #endif
-        public void AddWordBreakAt(int index, WordKind wordKind)
+        internal void AddWordBreakAt(int index, WordKind wordKind)
         {
 
 #if DEBUG
@@ -95,22 +96,26 @@ namespace Typography.TextBreak
             }
 #endif
 
-
+            LatestSpanLen = (ushort)(index - LatestBreakAt);
             _latestBreakAt = index;
-            _newWordBreakHandler(index, wordKind);
+            this.LatestWordKind = wordKind;
+            _newWordBreakHandler(this);
 
 #if DEBUG
             dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
 #endif
         }
-        public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
+        internal void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
         {
+
             AddWordBreakAt(this.CurrentIndex, wordKind);
         }
         //
         public int LatestBreakAt => _latestBreakAt;
+        public WordKind LatestWordKind { get; private set; }
+        public ushort LatestSpanLen { get; private set; }
         //
-        public void SetCurrentIndex(int index)
+        internal void SetCurrentIndex(int index)
         {
             _currentIndex = index;
             if (index < _endIndex)
@@ -124,8 +129,20 @@ namespace Typography.TextBreak
                 this.State = VisitorState.End;
             }
         }
-         
         internal Stack<int> GetTempCandidateBreaks() => _tempCandidateBreaks;
     }
 
+
+    public static class WordBreakExtensions
+    {
+        public static BreakSpan GetBreakSpan(this WordVisitor vis)
+        {
+            return new BreakSpan()
+            {
+                startAt = vis.LatestBreakAt,
+                len = vis.LatestSpanLen,
+                wordKind = vis.LatestWordKind
+            };
+        }
+    }
 }

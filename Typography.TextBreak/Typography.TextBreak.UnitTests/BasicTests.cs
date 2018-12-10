@@ -10,14 +10,14 @@ public class BasicTests
     {
         var outputList = new List<int> { 0 };
         var customBreaker = new CustomBreaker();
-        customBreaker.SetNewBreakHandler((index, wordkind) =>
+        customBreaker.SetNewBreakHandler(vis =>
         {
-            outputList.Add(index);
+            outputList.Add(vis.LatestBreakAt);
         });
 
         customBreaker.BreakNumberAfterText = breakNumberAfterText;
         //
-        customBreaker.BreakWords(input); 
+        customBreaker.BreakWords(input);
 
 
         //customBreaker.CopyBreakResults(outputList);
