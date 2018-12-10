@@ -128,7 +128,7 @@ namespace Tesselate
             * are initialized where they are used.
             */
             _processingState = ProcessingState.Dormant;
-            this._windingRule = Tesselator.WindingRuleType.Odd;//default
+            _windingRule = Tesselator.WindingRuleType.Odd;//default
             _boundaryOnly = false;
         }
 
@@ -147,8 +147,8 @@ namespace Tesselate
 
         public bool BoundaryOnly
         {
-            get => this._boundaryOnly;
-            set => this._boundaryOnly = value;
+            get => _boundaryOnly;
+            set => _boundaryOnly = value;
         }
 
         public bool IsWindingInside(int numCrossings)
@@ -263,7 +263,7 @@ namespace Tesselate
         bool AddVertex(double x, double y, int data)
         {
             HalfEdge e;
-            e = this._lastHalfEdge;
+            e = _lastHalfEdge;
             if (e == null)
             {
                 /* Make a self-loop (one vertex, one edge). */
@@ -293,23 +293,23 @@ namespace Tesselate
             */
             e.winding = 1;
             e.otherHalfOfThisEdge.winding = -1;
-            this._lastHalfEdge = e;
+            _lastHalfEdge = e;
             return true;
         }
 
         void EmptyCache()
         {
-            Vertex[] vCaches = this._simpleVertexCache;
-            int[] index_caches = this._indexCached;
+            Vertex[] vCaches = _simpleVertexCache;
+            int[] index_caches = _indexCached;
             this.mesh = new Mesh();
-            int count = this._cacheCount;
+            int count = _cacheCount;
             for (int i = 0; i < count; i++)
             {
                 Vertex v = vCaches[i];
                 this.AddVertex(v.x, v.y, index_caches[i]);
             }
-            this._cacheCount = 0;
-            this._emptyCache = false;
+            _cacheCount = 0;
+            _emptyCache = false;
         }
 
         void CacheVertex(double x, double y, double z, int data)
@@ -317,18 +317,18 @@ namespace Tesselate
             Vertex v = new Vertex();
             v.x = x;
             v.y = y;
-            this._simpleVertexCache[this._cacheCount] = v;
-            this._indexCached[_cacheCount] = data;
-            ++this._cacheCount;
+            _simpleVertexCache[_cacheCount] = v;
+            _indexCached[_cacheCount] = data;
+            ++_cacheCount;
         }
         void CacheVertex(double x, double y, int data)
         {
             Vertex v = new Vertex();
             v.x = x;
             v.y = y;
-            this._simpleVertexCache[this._cacheCount] = v;
-            this._indexCached[_cacheCount] = data;
-            ++this._cacheCount;
+            _simpleVertexCache[_cacheCount] = v;
+            _indexCached[_cacheCount] = data;
+            ++_cacheCount;
         }
         public void AddVertex(double x, double y, double z, int data)
         {
@@ -478,7 +478,7 @@ namespace Tesselate
             * except those which separate the interior from the exterior.
             * Otherwise we tessellate all the regions marked "inside".
             */
-            if (this._boundaryOnly)
+            if (_boundaryOnly)
             {
                 rc = this.mesh.SetWindingNumber(1, true);
             }
@@ -491,7 +491,7 @@ namespace Tesselate
             if (this.callBegin != null || this.callEnd != null
                 || this.callVertex != null || this.callEdgeFlag != null)
             {
-                if (this._boundaryOnly)
+                if (_boundaryOnly)
                 {
                     RenderBoundary(mesh);  /* output boundary contours */
                 }
@@ -550,7 +550,7 @@ namespace Tesselate
         {
             Face f;
             /* Make a list of separate triangles so we can render them all at once */
-            this._lonelyTriList = null;
+            _lonelyTriList = null;
             for (f = mesh.faceHead.nextFace; f != mesh.faceHead; f = f.nextFace)
             {
                 f.marked = false;
@@ -570,10 +570,10 @@ namespace Tesselate
                     }
                 }
             }
-            if (this._lonelyTriList != null)
+            if (_lonelyTriList != null)
             {
-                RenderLonelyTriangles(this._lonelyTriList);
-                this._lonelyTriList = null;
+                RenderLonelyTriangles(_lonelyTriList);
+                _lonelyTriList = null;
             }
         }
 
@@ -708,7 +708,7 @@ namespace Tesselate
             {
                 throw new Exception();
             }
-            Face.AddToTrail(ref e.leftFace, ref this._lonelyTriList);
+            Face.AddToTrail(ref e.leftFace, ref _lonelyTriList);
         }
 
 
@@ -844,7 +844,7 @@ namespace Tesselate
         * SIGN_INCONSISTENT.
         */
         {
-            var vCache = this._simpleVertexCache;
+            var vCache = _simpleVertexCache;
             Vertex v0 = vCache[0];
             int vcIndex;
             double dot, xc, yc, xp, yp;
@@ -869,7 +869,7 @@ namespace Tesselate
             var v = vCache[vcIndex];
             xc = v.x - v0.x;
             yc = v.y - v0.y;
-            int c_count = this._cacheCount;
+            int c_count = _cacheCount;
             while (++vcIndex < c_count)
             {
                 xp = xc; yp = yc;
@@ -916,7 +916,7 @@ namespace Tesselate
         public bool RenderCache()
         {
             int sign;
-            if (this._cacheCount < 3)
+            if (_cacheCount < 3)
             {
                 /* Degenerate contour -- no output */
                 return true;
@@ -937,7 +937,7 @@ namespace Tesselate
             }
 
             /* Make sure we do the right thing for each winding rule */
-            switch (this._windingRule)
+            switch (_windingRule)
             {
                 case Tesselator.WindingRuleType.Odd:
                 case Tesselator.WindingRuleType.NonZero:
@@ -953,12 +953,12 @@ namespace Tesselate
             }
 
             this.CallBegin(this.BoundaryOnly ? Tesselator.TriangleListType.LineLoop
-                : (this._cacheCount > 3) ? Tesselator.TriangleListType.TriangleFan
+                : (_cacheCount > 3) ? Tesselator.TriangleListType.TriangleFan
                 : Tesselator.TriangleListType.Triangles);
-            this.CallVertex(this._indexCached[0]);
+            this.CallVertex(_indexCached[0]);
             if (sign > 0)
             {
-                int c_count = this._cacheCount;
+                int c_count = _cacheCount;
                 for (int vcIndex = 1; vcIndex < c_count; ++vcIndex)
                 {
                     this.CallVertex(_indexCached[vcIndex]);
@@ -966,7 +966,7 @@ namespace Tesselate
             }
             else
             {
-                for (int vcIndex = this._cacheCount - 1; vcIndex > 0; --vcIndex)
+                for (int vcIndex = _cacheCount - 1; vcIndex > 0; --vcIndex)
                 {
                     this.CallVertex(_indexCached[vcIndex]);
                 }
