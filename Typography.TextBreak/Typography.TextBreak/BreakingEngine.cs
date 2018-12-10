@@ -27,11 +27,11 @@ namespace Typography.TextBreak
         protected abstract WordGroup GetWordGroupForFirstChar(char c);
         public bool BreakPeroidInTextSpan { get; set; }
 
-      
+
         public bool DontMergeLastIncompleteWord { get; set; }
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
-            visitor.State = VisitorState.Parsing; 
+            visitor.State = VisitorState.Parsing;
             char c_first = this.FirstUnicodeChar;
             char c_last = this.LastUnicodeChar;
             int endAt = startAt + len;
@@ -184,12 +184,12 @@ namespace Typography.TextBreak
                             continueRead = false;
                             //----------------------------------------                            
                             if (visitor.CurrentIndex >= len - 1)
-                            {  
+                            {
                                 //flush remaining char
-                                if (visitor.LatestSpanStartAt < startAt + len)
+                                if (visitor.LatestBreakAt < startAt + len)
                                 {
                                     visitor.AddWordBreakAtCurrentIndex();
-                                } 
+                                }
                             }
                             return;
                         }
@@ -451,10 +451,10 @@ namespace Typography.TextBreak
             {
                 //the last one 
                 visitor.State = VisitorState.End;
-                if (visitor.LatestSpanStartAt < startAt + len)
+                if (visitor.LatestBreakAt < startAt + len)
                 {
-                    visitor.AddWordBreakAtCurrentIndex();
-                } 
+                    visitor.AddWordBreakAt(startAt + len, WordKind.Text);
+                }
             }
         }
         internal WordGroup GetSubGroup(WordVisitor visitor, WordGroup wordGroup)
