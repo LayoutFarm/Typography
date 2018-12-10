@@ -104,7 +104,7 @@ namespace Typography.TextServices
 
         CustomBreaker _textBreaker;
         List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
-        public IEnumerable<BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
+        public IEnumerable<Typography.TextLayout.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
         {
             //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
@@ -176,7 +176,7 @@ namespace Typography.TextServices
                     }
                 }
 
-                BreakSpan breakspan = new BreakSpan();
+                Typography.TextLayout.BreakSpan breakspan = new Typography.TextLayout.BreakSpan();
                 breakspan.startAt = sp.startAt;
                 breakspan.len = sp.len;
                 breakspan.scLang = selectedScriptLang;
@@ -259,7 +259,7 @@ namespace Typography.TextServices
             float accumH = 0;
 
 
-            foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            foreach (Typography.TextLayout.BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
             {
 
                 _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
@@ -309,7 +309,7 @@ namespace Typography.TextServices
             int cur_startAt = startAt;
             float accumW = 0;
 
-            foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            foreach (Typography.TextLayout.BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
             {
 
                 //measure string at specific px scale 

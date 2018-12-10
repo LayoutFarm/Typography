@@ -10,10 +10,7 @@ public class BasicTests
     {
         var outputList = new List<int> { 0 };
         var customBreaker = new CustomBreaker();
-        customBreaker.SetNewBreakHandler(vis =>
-        {
-            outputList.Add(vis.LatestBreakAt);
-        });
+        customBreaker.SetNewBreakHandler(vis => outputList.Add(vis.LatestBreakAt));
 
         customBreaker.BreakNumberAfterText = breakNumberAfterText;
         //

@@ -11,10 +11,8 @@ public class WordKindTests
     {
         var customBreaker = new CustomBreaker();
         var outputList = new List<BreakAtInfo> { new BreakAtInfo(0, Unknown) };
-        customBreaker.SetNewBreakHandler(vis =>
-        {
-            outputList.Add(new BreakAtInfo(vis.LatestBreakAt, vis.LatestWordKind));
-        });
+        customBreaker.SetNewBreakHandler(vis => outputList.Add(new BreakAtInfo(vis.LatestBreakAt, vis.LatestWordKind)));
+
         customBreaker.BreakWords(input);
 
         for (int i = 0; i < outputList.Count - 1; i++)

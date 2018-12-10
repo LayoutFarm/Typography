@@ -57,6 +57,8 @@ namespace Typography.TextBreak
             _endIndex = index + len;
 
             _startIndex = _currentIndex = index;
+            LatestSpanStartAt = _startIndex;
+
             _currentChar = buffer[_currentIndex];
 
 
@@ -97,7 +99,9 @@ namespace Typography.TextBreak
 #endif
 
             LatestSpanLen = (ushort)(index - LatestBreakAt);
-            _latestBreakAt = index;
+            LatestSpanStartAt = _latestBreakAt;
+            _latestBreakAt = index; 
+
             this.LatestWordKind = wordKind;
             _newWordBreakHandler(this);
 
@@ -111,6 +115,7 @@ namespace Typography.TextBreak
             AddWordBreakAt(this.CurrentIndex, wordKind);
         }
         //
+        public int LatestSpanStartAt { get; private set; }
         public int LatestBreakAt => _latestBreakAt;
         public WordKind LatestWordKind { get; private set; }
         public ushort LatestSpanLen { get; private set; }
@@ -139,7 +144,7 @@ namespace Typography.TextBreak
         {
             return new BreakSpan()
             {
-                startAt = vis.LatestBreakAt,
+                startAt = vis.LatestSpanStartAt,
                 len = vis.LatestSpanLen,
                 wordKind = vis.LatestWordKind
             };

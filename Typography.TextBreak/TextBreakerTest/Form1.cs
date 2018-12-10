@@ -96,13 +96,7 @@ namespace TextBreakerTest
 
             breaker1.SetNewBreakHandler(vis =>
             {
-                var span = new BreakSpan()
-                {
-                    startAt = vis.LatestBreakAt,
-                    len = vis.LatestSpanLen,
-                    wordKind = vis.LatestWordKind
-                };
-
+                BreakSpan span = vis.GetBreakSpan();
                 string s = new string(test, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
 
