@@ -2,11 +2,10 @@
 
 namespace PixelFarm.Drawing
 {
-    public interface ILineSegmentList
+    public interface ILineSegmentList : System.IDisposable
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
-        void AddLineSegment(ILineSegment lineSeg);
     }
     public interface ILineSegment
     {
@@ -52,7 +51,7 @@ namespace PixelFarm.Drawing
         //
         bool SupportsWordBreak { get; }
 
-        void BreakToLineSegments(ref TextBufferSpan textBufferSpan, ILineSegmentList outputLineSegmentList);
+        ILineSegmentList BreakToLineSegments(ref TextBufferSpan textBufferSpan);
         //
         Size MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font);
 
