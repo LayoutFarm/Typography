@@ -71,43 +71,43 @@ namespace PixelFarm.Drawing
         byte _r, _g, _b, _a;
         public Color(byte a, byte r, byte g, byte b)
         {
-            this._r = r;
-            this._g = g;
-            this._b = b;
-            this._a = a;
+            _r = r;
+            _g = g;
+            _b = b;
+            _a = a;
         }
         public Color(byte r, byte g, byte b)
         {
-            this._r = r;
-            this._g = g;
-            this._b = b;
-            this._a = 255;
+            _r = r;
+            _g = g;
+            _b = b;
+            _a = 255;
         }
         public byte R
         {
-            get { return this._r; }
+            get { return _r; }
         }
         public byte G
         {
-            get { return this._g; }
+            get { return _g; }
         }
         public byte B
         {
-            get { return this._b; }
+            get { return _b; }
         }
         public byte A
         {
-            get { return this._a; }
+            get { return _a; }
         }
         public byte alpha
         {
-            get { return this._a; }
+            get { return _a; }
 
         }
 
-        public byte red { get { return this._r; } }
-        public byte green { get { return this._g; } }
-        public byte blue { get { return this._b; } }
+        public byte red { get { return _r; } }
+        public byte green { get { return _g; } }
+        public byte blue { get { return _b; } }
 
 
         public static Color FromArgb(int a, Color c)
@@ -131,10 +131,10 @@ namespace PixelFarm.Drawing
             if (obj is Color)
             {
                 Color c = (Color)obj;
-                return c._a == this._a &&
-                    c._b == this._b &&
-                    c._r == this._r &&
-                    c._g == this._g;
+                return c._a == _a &&
+                    c._b == _b &&
+                    c._r == _r &&
+                    c._g == _g;
             }
             return false;
         }
@@ -171,11 +171,11 @@ namespace PixelFarm.Drawing
         }
         public int ToARGB()
         {
-            return ((this._a << 24) | (this._r << 16) | (this._g << 8) | this._b);
+            return ((_a << 24) | (_r << 16) | (_g << 8) | _b);
         }
         public uint ToABGR()
         {
-            return (uint)((this._a << 24) | (this._b << 16) | (this._g << 8) | this._r);
+            return (uint)((_a << 24) | (_b << 16) | (_g << 8) | _r);
         }
         
         public byte Red0To255
@@ -306,7 +306,7 @@ namespace PixelFarm.Drawing
 #if DEBUG
         public override string ToString()
         {
-            return "r:" + this._r + ",g:" + this._g + ",b:" + this._b + ",a:" + this._a;
+            return "r:" + _r + ",g:" + _g + ",b:" + _b + ",a:" + _a;
         }
 #endif
     }
