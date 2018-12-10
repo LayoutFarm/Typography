@@ -13,57 +13,7 @@ using Typography.FontManagement;
 
 namespace LayoutFarm
 {
-    struct TempContext<O, T> : IDisposable
-    {
-        T _sharedObj;
-        public TempContext(T sharedObject)
-        {
-            _sharedObj = sharedObject;
-        }
 
-        [ThreadStatic]
-        static Stack<T> s_objPool;
-        static Func<T> s_getNewObjDel;
-        static Action<T> s_objCleanUpDelegate;
-        public static ShortCut Setup(Func<T> getNewObjDelegate, Action<T> objCleanUpDelegate)
-        {
-#if DEBUG
-            if (s_objPool != null)
-            {
-                throw new System.NotSupportedException();
-            }
-#endif
-
-            s_getNewObjDel = getNewObjDelegate;
-            s_objCleanUpDelegate = objCleanUpDelegate;
-            return new ShortCut();
-        }
-        public static TempContext<O, T> Borrow(out T shared)
-        {
-            if (s_objPool == null)
-            {
-                s_objPool = new Stack<T>();
-            }
-            return (s_objPool.Count == 0) ?
-                    new TempContext<O, T>(shared = s_getNewObjDel()) :
-                    new TempContext<O, T>(shared = s_objPool.Pop());
-        }
-        public void Dispose()
-        {
-            s_objCleanUpDelegate(_sharedObj);
-            s_objPool.Push(_sharedObj);
-            _sharedObj = default(T);
-        }
-        public static bool IsInit() => s_objPool != null;
-
-        public struct ShortCut
-        {
-            public TempContext<O, T> Borrow(out T shared)
-            {
-                return TempContext<O, T>.Borrow(out shared);
-            }
-        }
-    }
 
 
     public class OpenFontTextService : ITextService
@@ -77,8 +27,6 @@ namespace LayoutFarm
         //
         public static Typography.OpenFont.ScriptLang DefaultScriptLang { get; set; }
 
-        //
-        static TempContext<OpenFontTextService, MyLineSegmentList>.ShortCut s_lineSegmentListPool;
 
 
 
@@ -166,11 +114,8 @@ namespace LayoutFarm
 
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, int[] outputGlyphAdvances, out int outputTotalW, out int outputLineHeight)
         {
-            using (s_lineSegmentListPool.Borrow(out MyLineSegmentList sharedLineSegList))
-            {
-                this.BreakToLineSegments(ref textBufferSpan, sharedLineSegList);
-                CalculateUserCharGlyphAdvancePos(ref textBufferSpan, sharedLineSegList, font, outputGlyphAdvances, out outputTotalW, out outputLineHeight);
-            }
+            CalculateUserCharGlyphAdvancePos(ref textBufferSpan, this.BreakToLineSegments(ref textBufferSpan), font, outputGlyphAdvances, out outputTotalW, out outputLineHeight);
+
         }
 
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
@@ -352,7 +297,7 @@ namespace LayoutFarm
         class MyLineSegmentList : ILineSegmentList
         {
             List<ILineSegment> _segments = new List<ILineSegment>();
-            public MyLineSegmentList()
+            private MyLineSegmentList()
             {
             }
 
@@ -379,22 +324,56 @@ namespace LayoutFarm
             public int dbugStartAt;
             public int dbugLen;
 #endif
+
+
+            void IDisposable.Dispose()
+            {
+                if (s_lineSegmentPool.Count > 100)
+                {
+                    _segments.Clear();
+                    _segments = null;
+                }
+                else
+                {
+                    _segments.Clear();
+                    s_lineSegmentPool.Push(this);
+                }
+            }
+
+            [ThreadStatic]
+            static Stack<MyLineSegmentList> s_lineSegmentPool;
+            public static MyLineSegmentList GetFreeLineSegmentList()
+            {
+                if (s_lineSegmentPool == null) s_lineSegmentPool = new Stack<MyLineSegmentList>();
+                if (s_lineSegmentPool.Count == 0)
+                {
+                    return new MyLineSegmentList();
+                }
+                else
+                {
+                    return s_lineSegmentPool.Pop();
+                }
+
+            }
         }
 
 
 
-        public void BreakToLineSegments(ref TextBufferSpan textBufferSpan, ILineSegmentList outputLineSegments)
+        public ILineSegmentList BreakToLineSegments(ref TextBufferSpan textBufferSpan)
         {
             //a text buffer span is separated into multiple line segment list 
             char[] str = textBufferSpan.GetRawCharBuffer();
             int cur_startAt = textBufferSpan.start;
+
+
+            MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                MyLineSegment lineSeg = new MyLineSegment(outputLineSegments, breakSpan.startAt, breakSpan.len);
+                MyLineSegment lineSeg = new MyLineSegment(lineSegments, breakSpan.startAt, breakSpan.len);
                 lineSeg.scriptLang = breakSpan.scLang;
-                outputLineSegments.AddLineSegment(lineSeg);
+                lineSegments.AddLineSegment(lineSeg);
             }
-
+            return lineSegments;
         }
         //-----------------------------------
         static OpenFontTextService()
@@ -402,12 +381,6 @@ namespace LayoutFarm
             CurrentEnv.CurrentOSName = (IsOnMac()) ?
                          CurrentOSName.Mac :
                          CurrentOSName.Windows;
-
-            s_lineSegmentListPool = TempContext<OpenFontTextService, MyLineSegmentList>.Setup(
-                () => new MyLineSegmentList(),
-                recycle_lineSegmentList => recycle_lineSegmentList.Clear()
-            );
-
         }
         static bool _s_evaluatedOS;
         static bool _s_onMac;
