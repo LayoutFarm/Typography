@@ -64,10 +64,10 @@ namespace PixelFarm.CpuBlit
             get { return AggMath.uround_f(alpha * (float)BASE_MASK); }
         }
 
-        public float Red0To1 { get { return red; } }
-        public float Green0To1 { get { return green; } }
-        public float Blue0To1 { get { return blue; } }
-        public float Alpha0To1 { get { return alpha; } }
+        public float Red0To1 => red;
+        public float Green0To1 => green;
+        public float Blue0To1 => blue;
+        public float Alpha0To1 => alpha;
 
         public static readonly ColorRGBAf White = new ColorRGBAf(1, 1, 1, 1);
         public static readonly ColorRGBAf Black = new ColorRGBAf(0, 0, 0, 1);

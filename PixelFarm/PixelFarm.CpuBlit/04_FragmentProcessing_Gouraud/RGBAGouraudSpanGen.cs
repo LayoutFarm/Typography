@@ -29,11 +29,11 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
     //=======================================================span_gouraud_rgba
     public sealed class RGBAGouraudSpanGen : GouraudSpanGen, ISpanGenerator
     {
-        bool m_swap;
-        int m_y2;
-        RGBA_Calculator m_rgba1;
-        RGBA_Calculator m_rgba2;
-        RGBA_Calculator m_rgba3;
+        bool _swap;
+        int _y2;
+        RGBA_Calculator _rgba1;
+        RGBA_Calculator _rgba2;
+        RGBA_Calculator _rgba3;
         const int SUBPIXEL_SHIFT = 4;
         const int SUBPIXEL_SCALE = 1 << SUBPIXEL_SHIFT;
         //--------------------------------------------------------------------
@@ -41,50 +41,50 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             public void Init(GouraudSpanGen.CoordAndColor c1, GouraudSpanGen.CoordAndColor c2)
             {
-                m_x1 = c1.x - 0.5;
-                m_y1 = c1.y - 0.5;
-                m_dx = c2.x - c1.x;
+                _x1 = c1.x - 0.5;
+                _y1 = c1.y - 0.5;
+                _dx = c2.x - c1.x;
                 double dy = c2.y - c1.y;
-                m_1dy = (dy < 1e-5) ? 1e5 : 1.0 / dy;
-                m_r1 = (int)c1.color.red;
-                m_g1 = (int)c1.color.green;
-                m_b1 = (int)c1.color.blue;
-                m_a1 = (int)c1.color.alpha;
-                m_dr = (int)c2.color.red - m_r1;
-                m_dg = (int)c2.color.green - m_g1;
-                m_db = (int)c2.color.blue - m_b1;
-                m_da = (int)c2.color.alpha - m_a1;
+                _1dy = (dy < 1e-5) ? 1e5 : 1.0 / dy;
+                _r1 = (int)c1.color.red;
+                _g1 = (int)c1.color.green;
+                _b1 = (int)c1.color.blue;
+                _a1 = (int)c1.color.alpha;
+                _dr = (int)c2.color.red - _r1;
+                _dg = (int)c2.color.green - _g1;
+                _db = (int)c2.color.blue - _b1;
+                _da = (int)c2.color.alpha - _a1;
             }
 
             public void Calculate(double y)
             {
-                double k = (y - m_y1) * m_1dy;
+                double k = (y - _y1) * _1dy;
                 if (k < 0.0) k = 0.0;
                 if (k > 1.0) k = 1.0;
-                m_r = m_r1 + AggMath.iround(m_dr * k);
-                m_g = m_g1 + AggMath.iround(m_dg * k);
-                m_b = m_b1 + AggMath.iround(m_db * k);
-                m_a = m_a1 + AggMath.iround(m_da * k);
-                m_x = AggMath.iround((m_x1 + m_dx * k) * (double)SUBPIXEL_SCALE);
+                _r = _r1 + AggMath.iround(_dr * k);
+                _g = _g1 + AggMath.iround(_dg * k);
+                _b = _b1 + AggMath.iround(_db * k);
+                _a = _a1 + AggMath.iround(_da * k);
+                _x = AggMath.iround((_x1 + _dx * k) * (double)SUBPIXEL_SCALE);
             }
 
-            public double m_x1;
-            public double m_y1;
-            public double m_dx;
-            public double m_1dy;
-            public int m_r1;
-            public int m_g1;
-            public int m_b1;
-            public int m_a1;
-            public int m_dr;
-            public int m_dg;
-            public int m_db;
-            public int m_da;
-            public int m_r;
-            public int m_g;
-            public int m_b;
-            public int m_a;
-            public int m_x;
+            public double _x1;
+            public double _y1;
+            public double _dx;
+            public double _1dy;
+            public int _r1;
+            public int _g1;
+            public int _b1;
+            public int _a1;
+            public int _dr;
+            public int _dg;
+            public int _db;
+            public int _da;
+            public int _r;
+            public int _g;
+            public int _b;
+            public int _a;
+            public int _x;
         }
 
         //--------------------------------------------------------------------
@@ -113,35 +113,35 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             CoordAndColor c0, c1, c2;
             base.LoadArrangedVertices(out c0, out c1, out c2);
-            m_y2 = (int)c1.y;
-            m_swap = AggMath.Cross(c0.x, c0.y,
+            _y2 = (int)c1.y;
+            _swap = AggMath.Cross(c0.x, c0.y,
                                    c2.x, c2.y,
                                    c1.x, c1.y) < 0.0;
-            m_rgba1.Init(c0, c2);
-            m_rgba2.Init(c0, c1);
-            m_rgba3.Init(c1, c2);
+            _rgba1.Init(c0, c2);
+            _rgba2.Init(c0, c1);
+            _rgba3.Init(c1, c2);
         }
 
         public void GenerateColors(Color[] outputColors, int startIndex, int x, int y, int len)
         {
-            m_rgba1.Calculate(y);//(m_rgba1.m_1dy > 2) ? m_rgba1.m_y1 : y);
-            RGBA_Calculator pc1 = m_rgba1;
-            RGBA_Calculator pc2 = m_rgba2;
-            if (y <= m_y2)
+            _rgba1.Calculate(y);//(m_rgba1.m_1dy > 2) ? m_rgba1.m_y1 : y);
+            RGBA_Calculator pc1 = _rgba1;
+            RGBA_Calculator pc2 = _rgba2;
+            if (y <= _y2)
             {
                 // Bottom part of the triangle (first subtriangle)
                 //-------------------------
-                m_rgba2.Calculate(y + m_rgba2.m_1dy);
+                _rgba2.Calculate(y + _rgba2._1dy);
             }
             else
             {
                 // Upper part (second subtriangle)
-                m_rgba3.Calculate(y - m_rgba3.m_1dy);
+                _rgba3.Calculate(y - _rgba3._1dy);
                 //-------------------------
-                pc2 = m_rgba3;
+                pc2 = _rgba3;
             }
 
-            if (m_swap)
+            if (_swap)
             {
                 // It means that the triangle is oriented clockwise, 
                 // so that we need to swap the controlling structures
@@ -154,18 +154,18 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             // Get the horizontal length with subpixel accuracy
             // and protect it from division by zero
             //-------------------------
-            int nlen = Math.Abs(pc2.m_x - pc1.m_x);
+            int nlen = Math.Abs(pc2._x - pc1._x);
             if (nlen <= 0) nlen = 1;
-            var line_r = new LineInterpolatorDDA(pc1.m_r, pc2.m_r, nlen, 14);
-            var line_g = new LineInterpolatorDDA(pc1.m_g, pc2.m_g, nlen, 14);
-            var line_b = new LineInterpolatorDDA(pc1.m_b, pc2.m_b, nlen, 14);
-            var line_a = new LineInterpolatorDDA(pc1.m_a, pc2.m_a, nlen, 14);
+            var line_r = new LineInterpolatorDDA(pc1._r, pc2._r, nlen, 14);
+            var line_g = new LineInterpolatorDDA(pc1._g, pc2._g, nlen, 14);
+            var line_b = new LineInterpolatorDDA(pc1._b, pc2._b, nlen, 14);
+            var line_a = new LineInterpolatorDDA(pc1._a, pc2._a, nlen, 14);
             // Calculate the starting point of the gradient with subpixel 
             // accuracy and correct (roll back) the interpolators.
             // This operation will also clip the beginning of the span
             // if necessary.
             //-------------------------
-            int start = pc1.m_x - (x << (int)SUBPIXEL_SHIFT);
+            int start = pc1._x - (x << (int)SUBPIXEL_SHIFT);
             line_r.Prev(start);
             line_g.Prev(start);
             line_b.Prev(start);

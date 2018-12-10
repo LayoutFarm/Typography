@@ -24,12 +24,12 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
     //============================================================span_gouraud
     public abstract class GouraudSpanGen
     {
-        CoordAndColor m_coord_0;
-        CoordAndColor m_coord_1;
-        CoordAndColor m_coord_2;
-        double[] m_x = new double[8];
-        double[] m_y = new double[8];
-        VertexCmd[] m_cmd = new VertexCmd[8];
+        CoordAndColor _coord_0;
+        CoordAndColor _coord_1;
+        CoordAndColor _coord_2;
+        double[] _x = new double[8];
+        double[] _y = new double[8];
+        VertexCmd[] _cmd = new VertexCmd[8];
         public struct CoordAndColor
         {
             public double x;
@@ -39,7 +39,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
         public GouraudSpanGen()
         {
-            m_cmd[0] = VertexCmd.NoMore;
+            _cmd[0] = VertexCmd.NoMore;
         }
 
         public GouraudSpanGen(Drawing.Color c1,
@@ -56,9 +56,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
         public void SetColor(Drawing.Color c1, Drawing.Color c2, Drawing.Color c3)
         {
-            m_coord_0.color = c1;
-            m_coord_1.color = c2;
-            m_coord_2.color = c3;
+            _coord_0.color = c1;
+            _coord_1.color = c2;
+            _coord_2.color = c3;
         }
 
         //--------------------------------------------------------------------
@@ -73,35 +73,35 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
                       double x3, double y3,
                       double d)
         {
-            m_coord_0.x = m_x[0] = x1;
-            m_coord_0.y = m_y[0] = y1;
-            m_coord_1.x = m_x[1] = x2;
-            m_coord_1.y = m_y[1] = y2;
-            m_coord_2.x = m_x[2] = x3;
-            m_coord_2.y = m_y[2] = y3;
-            m_cmd[0] = VertexCmd.MoveTo;
-            m_cmd[1] = VertexCmd.LineTo;
-            m_cmd[2] = VertexCmd.LineTo;
-            m_cmd[3] = VertexCmd.NoMore;
+            _coord_0.x = _x[0] = x1;
+            _coord_0.y = _y[0] = y1;
+            _coord_1.x = _x[1] = x2;
+            _coord_1.y = _y[1] = y2;
+            _coord_2.x = _x[2] = x3;
+            _coord_2.y = _y[2] = y3;
+            _cmd[0] = VertexCmd.MoveTo;
+            _cmd[1] = VertexCmd.LineTo;
+            _cmd[2] = VertexCmd.LineTo;
+            _cmd[3] = VertexCmd.NoMore;
             if (d != 0.0)
             {
-                AggMath.DilateTriangle(m_coord_0.x, m_coord_0.y,
-                                m_coord_1.x, m_coord_1.y,
-                                m_coord_2.x, m_coord_2.y,
-                                m_x, m_y, d);
-                AggMath.CalcIntersect(m_x[4], m_y[4], m_x[5], m_y[5],
-                                  m_x[0], m_y[0], m_x[1], m_y[1],
-                                  out m_coord_0.x, out m_coord_0.y);
-                AggMath.CalcIntersect(m_x[0], m_y[0], m_x[1], m_y[1],
-                                  m_x[2], m_y[2], m_x[3], m_y[3],
-                                  out m_coord_1.x, out m_coord_1.y);
-                AggMath.CalcIntersect(m_x[2], m_y[2], m_x[3], m_y[3],
-                                  m_x[4], m_y[4], m_x[5], m_y[5],
-                                  out m_coord_2.x, out m_coord_2.y);
-                m_cmd[3] = VertexCmd.LineTo;
-                m_cmd[4] = VertexCmd.LineTo;
-                m_cmd[5] = VertexCmd.LineTo;
-                m_cmd[6] = VertexCmd.NoMore;
+                AggMath.DilateTriangle(_coord_0.x, _coord_0.y,
+                                _coord_1.x, _coord_1.y,
+                                _coord_2.x, _coord_2.y,
+                                _x, _y, d);
+                AggMath.CalcIntersect(_x[4], _y[4], _x[5], _y[5],
+                                  _x[0], _y[0], _x[1], _y[1],
+                                  out _coord_0.x, out _coord_0.y);
+                AggMath.CalcIntersect(_x[0], _y[0], _x[1], _y[1],
+                                  _x[2], _y[2], _x[3], _y[3],
+                                  out _coord_1.x, out _coord_1.y);
+                AggMath.CalcIntersect(_x[2], _y[2], _x[3], _y[3],
+                                  _x[4], _y[4], _x[5], _y[5],
+                                  out _coord_2.x, out _coord_2.y);
+                _cmd[3] = VertexCmd.LineTo;
+                _cmd[4] = VertexCmd.LineTo;
+                _cmd[5] = VertexCmd.LineTo;
+                _cmd[6] = VertexCmd.NoMore;
             }
         }
         public VertexStore MakeVxs(VertexStore outputVxs)
@@ -109,7 +109,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             for (int i = 0; i < 8; ++i)
             {
                 VertexCmd cmd;
-                outputVxs.AddVertex(m_x[i], m_y[i], cmd = m_cmd[i]);
+                outputVxs.AddVertex(_x[i], _y[i], cmd = _cmd[i]);
                 if (cmd == VertexCmd.NoMore)
                 {
                     break;
@@ -121,13 +121,13 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         // Vertex Source Interface to feed the coordinates to the rasterizer 
         protected void LoadArrangedVertices(out CoordAndColor c0, out CoordAndColor c1, out CoordAndColor c2)
         {
-            c0 = m_coord_0;
-            c1 = m_coord_1;
-            c2 = m_coord_2;
-            if (m_coord_0.y > m_coord_2.y)
+            c0 = _coord_0;
+            c1 = _coord_1;
+            c2 = _coord_2;
+            if (_coord_0.y > _coord_2.y)
             {
-                c0 = m_coord_2;
-                c2 = m_coord_0;
+                c0 = _coord_2;
+                c2 = _coord_0;
             }
 
             CoordAndColor tmp;

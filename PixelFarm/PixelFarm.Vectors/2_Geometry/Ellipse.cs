@@ -31,9 +31,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public double originY;
         public double radiusX;
         public double radiusY;
-        double m_scale = 1;
-        int numSteps;
-        public bool m_cw;
+        double _scale = 1;
+        int _numSteps;
+        public bool _cw;
         public Ellipse()
         {
             Set(0, 0, 1, 1, 4, false);
@@ -51,10 +51,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             originY = oy;
             radiusX = rx;
             radiusY = ry;
-            m_cw = cw;
-            m_scale = 1;
-            numSteps = num_steps;
-            if (numSteps == 0)
+            _cw = cw;
+            _scale = 1;
+            _numSteps = num_steps;
+            if (_numSteps == 0)
             {
                 CalculateNumSteps();
             }
@@ -69,21 +69,21 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public double ApproximateScale
         {
-            get { return this.m_scale; }
+            get => _scale;
             set
             {
-                this.m_scale = value;
+                _scale = value;
                 CalculateNumSteps();
             }
         }
 
-        public int NumSteps { get { return this.numSteps; } }
+        public int NumSteps => _numSteps;
 
         void CalculateNumSteps()
         {
             double ra = (Math.Abs(radiusX) + Math.Abs(radiusY)) / 2;
-            double da = Math.Acos(ra / (ra + 0.125 / m_scale)) * 2;
-            numSteps = (int)Math.Round(2 * Math.PI / da);
+            double da = Math.Acos(ra / (ra + 0.125 / _scale)) * 2;
+            _numSteps = (int)Math.Round(2 * Math.PI / da);
         }
 
 

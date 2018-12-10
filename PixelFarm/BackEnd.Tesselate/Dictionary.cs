@@ -45,7 +45,7 @@ namespace Tesselate
     public class Dictionary
     {
         public Node head = new Node();
-        public Tesselator tesseator;
+        public Tesselator tess;
         public class Node
         {
             DictKey key = new DictKey();
@@ -70,7 +70,7 @@ namespace Tesselate
             nodeHead.Key = null;
             nodeHead.next = nodeHead;
             nodeHead.prev = nodeHead;
-            this.tesseator = tesselator;
+            this.tess = tesselator;
         }
 
         public static void dictDeleteDict(Dictionary dict)
@@ -96,8 +96,8 @@ namespace Tesselate
             do
             {
                 node = node.prev;
-            } while (node.Key != null &&
-                !ActiveRegion.EdgeLeq(this.tesseator, node.Key, key));
+            } while (node.Key != null && !ActiveRegion.EdgeLeq(this.tess, node.Key, key));
+
             newNode = new Node();
             newNode.Key = key;
             newNode.next = node.next;
@@ -118,7 +118,7 @@ namespace Tesselate
             do
             {
                 node = node.next;
-            } while (node.Key != null && !ActiveRegion.EdgeLeq(dict.tesseator, key, node.Key));
+            } while (node.Key != null && !ActiveRegion.EdgeLeq(dict.tess, key, node.Key));
             return node;
         }
     }

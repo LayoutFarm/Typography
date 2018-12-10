@@ -24,16 +24,16 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
     //================================================span_interpolator_linear
     public struct SpanInterpolatorLinear : FragmentProcessing.ISpanInterpolator
     {
-        VertexProcessing.ICoordTransformer m_trans;
-        LineInterpolatorDDA2 m_li_x;
-        LineInterpolatorDDA2 m_li_y;
+        VertexProcessing.ICoordTransformer _trans;
+        LineInterpolatorDDA2 _li_x;
+        LineInterpolatorDDA2 _li_y;
         const int SUB_PIXEL_SHIFT = 8;
         const int SUB_PIXEL_SCALE = 1 << SUB_PIXEL_SHIFT;
 
         public VertexProcessing.ICoordTransformer Transformer
         {
-            get { return this.m_trans; }
-            set { this.m_trans = value; }
+            get { return _trans; }
+            set { _trans = value; }
         }
         public void GetLocalScale(out int x, out int y)
         {
@@ -46,18 +46,18 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             double tx = x;
             double ty = y;
 
-            m_trans.Transform(ref tx, ref ty);
+            _trans.Transform(ref tx, ref ty);
             int x1 = AggMath.iround(tx * SUB_PIXEL_SCALE);
             int y1 = AggMath.iround(ty * SUB_PIXEL_SCALE);
             //
             tx = x + len; //*** 
             ty = y;//**
-            m_trans.Transform(ref tx, ref ty);
+            _trans.Transform(ref tx, ref ty);
             int x2 = AggMath.iround(tx * SUB_PIXEL_SCALE);
             int y2 = AggMath.iround(ty * SUB_PIXEL_SCALE);
             //
-            m_li_x = new LineInterpolatorDDA2(x1, x2, len);
-            m_li_y = new LineInterpolatorDDA2(y1, y2, len);
+            _li_x = new LineInterpolatorDDA2(x1, x2, len);
+            _li_y = new LineInterpolatorDDA2(y1, y2, len);
         }
 
         ////----------------------------------------------------------------
@@ -70,15 +70,15 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
         public void Next()
         {
-            m_li_x.Next();
-            m_li_y.Next();
+            _li_x.Next();
+            _li_y.Next();
         }
 
         //----------------------------------------------------------------
         public void GetCoord(out int x, out int y)
         {
-            x = m_li_x.Y;
-            y = m_li_y.Y;
+            x = _li_x.Y;
+            y = _li_y.Y;
         }
     }
 }

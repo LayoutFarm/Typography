@@ -8,7 +8,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     /// </summary>
     public static class BezierCurve
     {
-        static int NSteps = 20; 
+        static int s_NSteps = 20;
 
         public static void Curve3GetControlPoints(Vector2 start, Vector2 controlPoint, Vector2 endPoint, out Vector2 control1, out Vector2 control2)
         {

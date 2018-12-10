@@ -61,7 +61,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double orgY = ellipse.originY;
             double radX = ellipse.radiusX;
             double radY = ellipse.radiusY;
-            if (ellipse.m_cw)
+            if (ellipse._cw)
             {
                 for (int i = 1; i < numSteps; i++)
                 {
@@ -109,7 +109,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double orgY = ellipse.originY;
             double radX = ellipse.radiusX;
             double radY = ellipse.radiusY;
-            if (ellipse.m_cw)
+            if (ellipse._cw)
             {
                 for (int i = 1; i < numSteps; i++)
                 {
@@ -153,7 +153,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double orgY = ellipse.originY;
             double radX = ellipse.radiusX;
             double radY = ellipse.radiusY;
-            if (ellipse.m_cw)
+            if (ellipse._cw)
             {
                 for (int i = 1; i < numSteps; i++)
                 {

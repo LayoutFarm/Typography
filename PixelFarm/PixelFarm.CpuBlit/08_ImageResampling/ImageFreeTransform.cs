@@ -35,10 +35,10 @@ namespace PixelFarm.CpuBlit.Imaging
 
 
         PointF _p0, _p1, _p2, _p3;
-        Vector AB, BC, CD, DA;
+        Vector _AB, _BC, _CD, _DA;
         PixelFarm.Drawing.Rectangle _destBounds;
-        int srcW = 0;
-        int srcH = 0;
+        int _srcW = 0;
+        int _srcH = 0;
 
         IBitmapSrc _srcBmp;
 
@@ -46,34 +46,6 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             Interpolation = InterpolationMode.Bilinear;
         }
-
-        //public IBitmapSrc Bitmap
-        //{
-        //    get
-        //    {
-        //        return _srcBmp;
-        //    }
-        //    set
-        //    {
-        //        _srcBmp = value;
-
-        //        if (value == null)
-        //        {
-        //            return;
-        //        }
-        //        try
-        //        {
-        //            _srcBmp = value;
-        //            srcH = value.Height;
-        //            srcW = value.Width;
-        //        }
-        //        catch
-        //        {
-        //            srcW = 0; srcH = 0;
-        //        }
-        //    }
-        //}
-
         public Point ImageLocation
         {
             //left bottom?
@@ -84,33 +56,27 @@ namespace PixelFarm.CpuBlit.Imaging
             get;
             set;
         }
-
-        public int ImageWidth
-        {
-            get { return _destBounds.Width; }
-        }
-
-        public int ImageHeight
-        {
-            get { return _destBounds.Height; }
-        }
-
+        //
+        public int ImageWidth => _destBounds.Width;
+        //
+        public int ImageHeight => _destBounds.Height;
+        //
         public PointF VertexLeftTop
         {
-            get { return _p0; }
+            get => _p0;
             set { _p0 = value; UpdateVertices(); }
 
         }
 
         public PointF VertexRightTop
         {
-            get { return _p1; }
+            get => _p1;
             set { _p1 = value; UpdateVertices(); }
         }
 
         public PointF VertexRightBottom
         {
-            get { return _p2; }
+            get => _p2;
             set
             {
                 _p2 = value;
@@ -119,7 +85,7 @@ namespace PixelFarm.CpuBlit.Imaging
         }
         public PointF VertexBottomLeft
         {
-            get { return _p3; }
+            get => _p3;
             set { _p3 = value; UpdateVertices(); }
         }
         public void SetFourCorners(PointF leftTop, PointF rightTop, PointF rightBottom, PointF leftBottom)
@@ -164,16 +130,16 @@ namespace PixelFarm.CpuBlit.Imaging
 
 
             _destBounds = new Drawing.Rectangle((int)xmin, (int)ymin, (int)(xmax - xmin), (int)(ymax - ymin));
-            AB = MyVectorHelper.NewFromTwoPoints(_p0, _p1);
-            BC = MyVectorHelper.NewFromTwoPoints(_p1, _p2);
-            CD = MyVectorHelper.NewFromTwoPoints(_p2, _p3);
-            DA = MyVectorHelper.NewFromTwoPoints(_p3, _p0);
+            _AB = MyVectorHelper.NewFromTwoPoints(_p0, _p1);
+            _BC = MyVectorHelper.NewFromTwoPoints(_p1, _p2);
+            _CD = MyVectorHelper.NewFromTwoPoints(_p2, _p3);
+            _DA = MyVectorHelper.NewFromTwoPoints(_p3, _p0);
             //-----------------------------------------------------------------------
             // get unit vector
-            AB /= AB.Magnitude;
-            BC /= BC.Magnitude;
-            CD /= CD.Magnitude;
-            DA /= DA.Magnitude;
+            _AB /= _AB.Magnitude;
+            _BC /= _BC.Magnitude;
+            _CD /= _CD.Magnitude;
+            _DA /= _DA.Magnitude;
             //-----------------------------------------------------------------------
 
         }
@@ -196,12 +162,12 @@ namespace PixelFarm.CpuBlit.Imaging
             }
 
             _srcBmp = bitmap;
-            srcH = bitmap.Height;
-            srcW = bitmap.Width;
+            _srcH = bitmap.Height;
+            _srcW = bitmap.Width;
 
 
             //-------------------
-            if (srcH == 0 || srcW == 0) return null;
+            if (_srcH == 0 || _srcW == 0) return null;
             switch (this.Interpolation)
             {
                 default: throw new NotSupportedException();
@@ -230,10 +196,10 @@ namespace PixelFarm.CpuBlit.Imaging
 
             int rectWidth = _destBounds.Width;
             int rectHeight = _destBounds.Height;
-            Vector ab_vec = this.AB;
-            Vector bc_vec = this.BC;
-            Vector cd_vec = this.CD;
-            Vector da_vec = this.DA;
+            Vector ab_vec = _AB;
+            Vector bc_vec = _BC;
+            Vector cd_vec = _CD;
+            Vector da_vec = _DA;
             int rectLeft = _destBounds.Left;
             int rectTop = _destBounds.Top;
 
@@ -265,8 +231,8 @@ namespace PixelFarm.CpuBlit.Imaging
                             dbc = Math.Abs((MyVectorHelper.NewFromTwoPoints(_p1, srcPt)).CrossProduct(bc_vec));
                             dcd = Math.Abs((MyVectorHelper.NewFromTwoPoints(_p2, srcPt)).CrossProduct(cd_vec));
                             dda = Math.Abs((MyVectorHelper.NewFromTwoPoints(_p3, srcPt)).CrossProduct(da_vec));
-                            ptInPlane.X = (float)(srcW * (dda / (dda + dbc)));
-                            ptInPlane.Y = (float)(srcH * (dab / (dab + dcd)));
+                            ptInPlane.X = (float)(_srcW * (dda / (dda + dbc)));
+                            ptInPlane.Y = (float)(_srcH * (dab / (dab + dcd)));
                         }
                     }
                     return destCB;
@@ -289,15 +255,15 @@ namespace PixelFarm.CpuBlit.Imaging
             float dx1, dx2, dy1, dy2, dx1y1, dx1y2, dx2y1, dx2y2;
             int rectWidth = _destBounds.Width;
             int rectHeight = _destBounds.Height;
-            Vector ab_vec = this.AB;
-            Vector bc_vec = this.BC;
-            Vector cd_vec = this.CD;
-            Vector da_vec = this.DA;
+            Vector ab_vec = _AB;
+            Vector bc_vec = _BC;
+            Vector cd_vec = _CD;
+            Vector da_vec = _DA;
             int rectLeft = _destBounds.Left;
             int rectTop = _destBounds.Top;
 
-            int srcW_lim = srcW - 1;
-            int srcH_lim = srcH - 1;
+            int srcW_lim = _srcW - 1;
+            int srcH_lim = _srcH - 1;
 
             using (TempMemPtr.FromBmp(_srcBmp, out int* bufferPtr))
             {
@@ -318,8 +284,8 @@ namespace PixelFarm.CpuBlit.Imaging
                         dcd = Math.Abs(MyVectorHelper.NewFromTwoPoints(_p2, srcPt).CrossProduct(cd_vec));
                         dda = Math.Abs(MyVectorHelper.NewFromTwoPoints(_p3, srcPt).CrossProduct(da_vec));
 
-                        ptInPlane.X = (float)(srcW * (dda / (dda + dbc)));
-                        ptInPlane.Y = (float)(srcH * (dab / (dab + dcd)));
+                        ptInPlane.X = (float)(_srcW * (dda / (dda + dbc)));
+                        ptInPlane.Y = (float)(_srcH * (dab / (dab + dcd)));
                         x1 = (int)ptInPlane.X;
                         y1 = (int)ptInPlane.Y;
 
@@ -466,10 +432,10 @@ namespace PixelFarm.CpuBlit.Imaging
             //float dx1, dx2, dy1, dy2, dx1y1, dx1y2, dx2y1, dx2y2;
             int destRectWidth = _destBounds.Width;
             int dectRectHeight = _destBounds.Height;
-            Vector ab_vec = this.AB;
-            Vector bc_vec = this.BC;
-            Vector cd_vec = this.CD;
-            Vector da_vec = this.DA;
+            Vector ab_vec = _AB;
+            Vector bc_vec = _BC;
+            Vector cd_vec = _CD;
+            Vector da_vec = _DA;
 
             using (TempMemPtr.FromBmp(_srcBmp, out int* bufferPtr))
             {
@@ -486,8 +452,8 @@ namespace PixelFarm.CpuBlit.Imaging
                 //***
                 PixelFarm.Drawing.Color[] colors = new PixelFarm.Drawing.Color[16];
 
-                int srcW_lim = srcW - 2;
-                int srcH_lim = srcH - 2;
+                int srcW_lim = _srcW - 2;
+                int srcH_lim = _srcH - 2;
 
                 for (int y = 0; y < dectRectHeight; ++y)
                 {
@@ -504,8 +470,8 @@ namespace PixelFarm.CpuBlit.Imaging
                         dbc = Math.Abs(MyVectorHelper.NewFromTwoPoints(_p1, srcPt).CrossProduct(bc_vec));
                         dcd = Math.Abs(MyVectorHelper.NewFromTwoPoints(_p2, srcPt).CrossProduct(cd_vec));
                         dda = Math.Abs(MyVectorHelper.NewFromTwoPoints(_p3, srcPt).CrossProduct(da_vec));
-                        ptInPlane.X = (float)(srcW * (dda / (dda + dbc)));
-                        ptInPlane.Y = (float)(srcH * (dab / (dab + dcd)));
+                        ptInPlane.X = (float)(_srcW * (dda / (dda + dbc)));
+                        ptInPlane.Y = (float)(_srcH * (dab / (dab + dcd)));
                         x1 = (int)ptInPlane.X;
                         y1 = (int)ptInPlane.Y;
                         if (x1 >= 2 && x1 < srcW_lim &&

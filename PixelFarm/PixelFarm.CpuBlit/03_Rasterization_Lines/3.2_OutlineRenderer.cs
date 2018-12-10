@@ -35,11 +35,11 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         const int AA_SCALE = 1 << AA_SHIFT;
         const int AA_MASK = AA_SCALE - 1;
 
-        byte[] m_profile = new byte[64];
-        byte[] m_gamma;
-        float m_subpixel_width;
-        double m_min_width;
-        double m_smoother_width;
+        byte[] _profile = new byte[64];
+        byte[] _gamma;
+        float _subpixel_width;
+        double _min_width;
+        double _smoother_width;
 
 
         static byte[] s_gamma_none;
@@ -56,9 +56,9 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public LineProfileAnitAlias(double w, IGammaFunction gamma_function)
         {
             //1. init value
-            m_subpixel_width = 0;
-            m_min_width = 1.0;
-            m_smoother_width = 1.0;
+            _subpixel_width = 0;
+            _min_width = 1.0;
+            _smoother_width = 1.0;
 
             //2. set gamma before set width
             SetGamma(gamma_function);
@@ -67,15 +67,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         }
         public float SubPixelWidth
         {
-            get
-            {
-                return m_subpixel_width;
-            }
-            set
-            {
-                //subpixel width
-                SetWidth(value);
-            }
+            get => _subpixel_width;
+            set => SetWidth(value);               //subpixel width
         }
 
         //#if DEBUG
@@ -102,34 +95,34 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             //}
 #endif
 
-            return m_profile[dist + SUBPIX_SCALE * 2];
+            return _profile[dist + SUBPIX_SCALE * 2];
         }
         byte[] GetProfileBuffer(double w)
         {
-            m_subpixel_width = AggMath.uround(w * SUBPIX_SCALE);
-            int size = (int)m_subpixel_width + SUBPIX_SCALE * 6;
-            if (size > m_profile.Length)
+            _subpixel_width = AggMath.uround(w * SUBPIX_SCALE);
+            int size = (int)_subpixel_width + SUBPIX_SCALE * 6;
+            if (size > _profile.Length)
             {
                 //clear ?
-                m_profile = new byte[size];
+                _profile = new byte[size];
                 //m_profile.Resize(size);
             }
-            return m_profile;
+            return _profile;
         }
         void SetGamma(IGammaFunction gamma_function)
         {
             //TODO:review gamma again***
             if (gamma_function == null)
             {
-                m_gamma = s_gamma_none;
+                _gamma = s_gamma_none;
             }
             else
             {
-                m_gamma = new byte[AA_SCALE];
+                _gamma = new byte[AA_SCALE];
                 for (int i = AA_SCALE - 1; i >= 0; --i)
                 {
                     //pass i to gamma func ***
-                    m_gamma[i] = (byte)(AggMath.uround(gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK));
+                    _gamma[i] = (byte)(AggMath.uround(gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK));
                 }
             }
         }
@@ -140,12 +133,12 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         {
             if (w < 0.0) w = 0.0;
             //
-            if (w < m_smoother_width) w += w;
-            else/**/                  w += m_smoother_width;
+            if (w < _smoother_width) w += w;
+            else/**/                  w += _smoother_width;
             //
             w *= 0.5;
-            w -= m_smoother_width;
-            double s = m_smoother_width;
+            w -= _smoother_width;
+            double s = _smoother_width;
             if (w < 0.0)
             {
                 s += w;
@@ -162,9 +155,9 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             if (smoother_width == 0.0) smoother_width = 1.0 / SUBPIX_SCALE;
             //
             double width = center_width + smoother_width;
-            if (width < m_min_width)
+            if (width < _min_width)
             {
-                double k = width / m_min_width;
+                double k = width / _min_width;
                 base_val *= k;
                 center_width /= k;
                 smoother_width /= k;
@@ -187,7 +180,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int ch_smoother = ch_center + subpixel_center_width;
             //
             int i;
-            int val = m_gamma[(int)(base_val * AA_MASK)];
+            int val = _gamma[(int)(base_val * AA_MASK)];
             chIndex = ch_center;
             for (i = 0; i < subpixel_center_width; i++)
             {
@@ -197,7 +190,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             for (i = 0; i < subpixel_smoother_width; i++)
             {
                 ch[ch_smoother++] =
-                    m_gamma[(int)((base_val -
+                    _gamma[(int)((base_val -
                                       base_val *
                                       ((double)(i) / subpixel_smoother_width)) * AA_MASK)];
             }
@@ -206,7 +199,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                   subpixel_smoother_width -
                                   subpixel_center_width -
                                   SUBPIX_SCALE * 2;
-            val = m_gamma[0];
+            val = _gamma[0];
             for (i = 0; i < n_smoother; i++)
             {
                 ch[ch_smoother++] = (byte)val;
@@ -220,7 +213,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
             for (i = ch.Length - 1; i >= 0; --i)
             {
-                m_profile[i] = ch[i];
+                _profile[i] = ch[i];
             }
         }
     }
@@ -232,11 +225,11 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
     public class OutlineRenderer : LineRenderer
     {
         const int MAX_HALF_WIDTH = 64;
-        PixelProcessing.IBitmapBlender destImageSurface;
-        LineProfileAnitAlias lineProfile;
-        RectInt clippingRectangle;
-        bool doClipping;
-        PixelProcessing.PixelBlender32 destPixelBlender;
+        PixelProcessing.IBitmapBlender _destImageSurface;
+        LineProfileAnitAlias _lineProfile;
+        RectInt _clippingRectangle;
+        bool _doClipping;
+        PixelProcessing.PixelBlender32 _destPixelBlender;
 
 #if false
         public int min_x() { throw new System.NotImplementedException(); }
@@ -253,47 +246,47 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             PixelProcessing.PixelBlender32 destPixelBlender,
             LineProfileAnitAlias profile)
         {
-            destImageSurface = destImage;
-            lineProfile = profile;
-            clippingRectangle = new RectInt(0, 0, 0, 0);
-            doClipping = false;
-            this.destPixelBlender = destPixelBlender;
+            _destImageSurface = destImage;
+            _lineProfile = profile;
+            _clippingRectangle = new RectInt(0, 0, 0, 0);
+            _doClipping = false;
+            _destPixelBlender = destPixelBlender;
         }
 
 
         //---------------------------------------------------------------------
-        public int SubPixelWidth { get { return (int)lineProfile.SubPixelWidth; } }
+        public int SubPixelWidth => (int)_lineProfile.SubPixelWidth;
 
         //---------------------------------------------------------------------
-        public void ResetClipping() { doClipping = false; }
+        public void ResetClipping() { _doClipping = false; }
         public void SetClipBox(double x1, double y1, double x2, double y2)
         {
-            clippingRectangle.Left = LineCoordSat.Convert(x1);
-            clippingRectangle.Bottom = LineCoordSat.Convert(y1);
-            clippingRectangle.Right = LineCoordSat.Convert(x2);
-            clippingRectangle.Top = LineCoordSat.Convert(y2);
+            _clippingRectangle.Left = LineCoordSat.Convert(x1);
+            _clippingRectangle.Bottom = LineCoordSat.Convert(y1);
+            _clippingRectangle.Right = LineCoordSat.Convert(x2);
+            _clippingRectangle.Top = LineCoordSat.Convert(y2);
 
             //clippingRectangle.Left = LineCoordSat.Convert(x1);
             //clippingRectangle.Top = LineCoordSat.Convert(y1);
             //clippingRectangle.Right = LineCoordSat.Convert(x2);
             //clippingRectangle.Bottom = LineCoordSat.Convert(y2);
-            doClipping = true;
+            _doClipping = true;
         }
 
         //---------------------------------------------------------------------
         public byte GetCover(int d)
         {
-            return lineProfile.GetProfileValue(d);
+            return _lineProfile.GetProfileValue(d);
         }
 
         public void BlendSolidHSpan(int x, int y, int len, byte[] covers, int coversOffset)
         {
-            destImageSurface.BlendSolidHSpan(x, y, len, Color, covers, coversOffset);
+            _destImageSurface.BlendSolidHSpan(x, y, len, Color, covers, coversOffset);
         }
 
         public void BlendSolidVSpan(int x, int y, int len, byte[] covers, int coversOffset)
         {
-            destImageSurface.BlendSolidVSpan(x, y, len, Color, covers, coversOffset);
+            _destImageSurface.BlendSolidVSpan(x, y, len, Color, covers, coversOffset);
         }
 
         public static bool AccurateJoinOnly { get { return false; } }
@@ -327,7 +320,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 di.IncX();
             }
             while (++x1 <= x2);
-            destImageSurface.BlendSolidHSpan(x0, y1,
+            _destImageSurface.BlendSolidHSpan(x0, y1,
                                      offset1 - offset0,
                                      Color, covers,
                                      offset0);
@@ -335,7 +328,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public override void SemiDot(CompareFunction cmp, int xc1, int yc1, int xc2, int yc2)
         {
-            if (doClipping && ClipLiangBarsky.Flags(xc1, yc1, clippingRectangle) != 0) return;
+            if (_doClipping && ClipLiangBarsky.Flags(xc1, yc1, _clippingRectangle) != 0) return;
             int r = ((SubPixelWidth + LineAA.SUBPIXEL_MARK) >> LineAA.SUBPIXEL_SHIFT);
             if (r < 1) r = 1;
             EllipseBresenhamInterpolator ei = new EllipseBresenhamInterpolator(r, r);
@@ -365,7 +358,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public void PineHLine(int xc, int yc, int xp1, int yp1, int xp2, int yp2,
                        int xh1, int yh1, int xh2)
         {
-            if (doClipping && ClipLiangBarsky.Flags(xc, yc, clippingRectangle) != 0) return;
+            if (_doClipping && ClipLiangBarsky.Flags(xc, yc, _clippingRectangle) != 0) return;
             byte[] covers = new byte[MAX_HALF_WIDTH * 2 + 4];
             int index0 = 0;
             int index1 = 0;
@@ -391,7 +384,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 di.IncX();
             }
             while (++xh1 <= xh2);
-            destImageSurface.BlendSolidHSpan(xh0, yh1, index1 - index0, Color, covers, index0);
+            _destImageSurface.BlendSolidHSpan(xh0, yh1, index1 - index0, Color, covers, index0);
         }
 
         public override void Pie(int xc, int yc, int x1, int y1, int x2, int y2)
@@ -448,13 +441,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public override void Line0(LineParameters lp)
         {
-            if (doClipping)
+            if (_doClipping)
             {
                 int x1 = lp.x1;
                 int y1 = lp.y1;
                 int x2 = lp.x2;
                 int y2 = lp.y2;
-                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, clippingRectangle);
+                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, _clippingRectangle);
                 if ((flags & 4) == 0)
                 {
                     if (flags != 0)
@@ -497,13 +490,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public override void Line1(LineParameters lp, int sx, int sy)
         {
-            if (doClipping)
+            if (_doClipping)
             {
                 int x1 = lp.x1;
                 int y1 = lp.y1;
                 int x2 = lp.x2;
                 int y2 = lp.y2;
-                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, clippingRectangle);
+                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, _clippingRectangle);
                 if ((flags & 4) == 0)
                 {
                     if (flags != 0)
@@ -560,13 +553,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public override void Line2(LineParameters lp, int ex, int ey)
         {
-            if (doClipping)
+            if (_doClipping)
             {
                 int x1 = lp.x1;
                 int y1 = lp.y1;
                 int x2 = lp.x2;
                 int y2 = lp.y2;
-                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, clippingRectangle);
+                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, _clippingRectangle);
                 if ((flags & 4) == 0)
                 {
                     if (flags != 0)
@@ -628,13 +621,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public override void Line3(LineParameters lp,
                    int sx, int sy, int ex, int ey)
         {
-            if (doClipping)
+            if (_doClipping)
             {
                 int x1 = lp.x1;
                 int y1 = lp.y1;
                 int x2 = lp.x2;
                 int y2 = lp.y2;
-                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, clippingRectangle);
+                int flags = ClipLiangBarsky.ClipLineSegment(ref x1, ref y1, ref x2, ref y2, _clippingRectangle);
                 if ((flags & 4) == 0)
                 {
                     if (flags != 0)

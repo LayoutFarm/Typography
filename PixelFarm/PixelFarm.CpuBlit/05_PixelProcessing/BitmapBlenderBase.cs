@@ -296,7 +296,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             set
             {
 #if DEBUG
-                if (BitDepth != 0 && value != null && PixelBlender32.NumPixelBits != BitDepth)
+                if (BitDepth != 0 && value != null && PixelBlender32.NUM_PIXEL_BITS != BitDepth)
                 {
                     throw new NotSupportedException("The blender has to support the bit depth of this image.");
                 }

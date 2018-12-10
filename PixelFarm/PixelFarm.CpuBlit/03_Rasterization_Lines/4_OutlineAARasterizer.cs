@@ -51,35 +51,29 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
     class LineAAVertexSequence
     {
-        ArrayList<LineAAVertex> list = new ArrayList<LineAAVertex>();
+        ArrayList<LineAAVertex> _list = new ArrayList<LineAAVertex>();
         public void AddVertex(LineAAVertex val)
         {
-            int count = list.Count;
+            int count = _list.Count;
             if (count > 1)
             {
-                LineAAVertex[] innerArray = list.UnsafeInternalArray;
+                LineAAVertex[] innerArray = _list.UnsafeInternalArray;
                 if (!innerArray[count - 2].IsDiff(innerArray[count - 1]))
                 {
-                    list.RemoveLast();
+                    _list.RemoveLast();
                 }
             }
-            list.Append(val);
+            _list.Append(val);
         }
-        public LineAAVertex this[int index]
-        {
-            get
-            {
-                return this.list[index];
-            }
-        }
-        public void Clear() { this.list.Clear(); }
-        public int Count
-        {
-            get { return this.list.Count; }
-        }
+        //
+        public LineAAVertex this[int index] => _list[index];
+        public int Count => _list.Count;
+        //
+        public void Clear() { _list.Clear(); }
+        //
         public void ModifyLast(LineAAVertex val)
         {
-            list.RemoveLast();
+            _list.RemoveLast();
             AddVertex(val);
         }
 
@@ -87,8 +81,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         {
             //----------------------
             //iter backward
-            int count = list.Count;
-            var innerArray = list.UnsafeInternalArray;
+            int count = _list.Count;
+            var innerArray = _list.UnsafeInternalArray;
             while (count > 1)
             {
                 if (innerArray[count - 2].IsDiff(innerArray[count - 1]))
@@ -97,8 +91,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 }
                 else
                 {
-                    LineAAVertex t = list[count - 1];
-                    list.RemoveLast();
+                    LineAAVertex t = _list[count - 1];
+                    _list.RemoveLast();
                     ModifyLast(t);
                     count--;
                 }
@@ -108,7 +102,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             if (closed)
             {
                 //if close figure
-                count = list.Count;
+                count = _list.Count;
                 var first = innerArray[0];
                 while (count > 1)
                 {
@@ -117,7 +111,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         break;
                     }
                     count--;
-                    list.RemoveLast();
+                    _list.RemoveLast();
                 }
             }
         }
@@ -126,12 +120,12 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
     //=======================================================rasterizer_outline_aa
     public class OutlineAARasterizer
     {
-        LineRenderer m_ren;
-        LineAAVertexSequence m_src_vertices = new LineAAVertexSequence();
-        OutlineJoin m_line_join;
-        bool m_round_cap;
-        int m_start_x;
-        int m_start_y;
+        LineRenderer _ren;
+        LineAAVertexSequence _src_vertices = new LineAAVertexSequence();
+        OutlineJoin _line_join;
+        bool _round_cap;
+        int _start_x;
+        int _start_y;
         public enum OutlineJoin
         {
             NoJoin,             //-----outline_no_join
@@ -140,8 +134,8 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             AccurateJoin  //-----outline_accurate_join
         }
 
-        public bool CompareDistStart(int d) { return d > 0; }
-        public bool CompareDistEnd(int d) { return d <= 0; }
+        public bool CompareDistStart(int d) => d > 0;
+        public bool CompareDistEnd(int d) => d <= 0;
 
         struct DrawVarsPart0
         {
@@ -183,7 +177,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
                     }
 #endif
-                    if (m_line_join == OutlineJoin.Round)
+                    if (_line_join == OutlineJoin.Round)
                     {
                         dv2.xb1 = curr.x1 + (curr.y2 - curr.y1);
                         dv2.yb1 = curr.y1 - (curr.x2 - curr.x1);
@@ -193,15 +187,15 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
                     switch (dv.flags)
                     {
-                        case 0: m_ren.Line3(curr, dv2.xb1, dv2.yb1, dv2.xb2, dv2.yb2); break;
-                        case 1: m_ren.Line2(curr, dv2.xb2, dv2.yb2); break;
-                        case 2: m_ren.Line1(curr, dv2.xb1, dv2.yb1); break;
-                        case 3: m_ren.Line0(curr); break;
+                        case 0: _ren.Line3(curr, dv2.xb1, dv2.yb1, dv2.xb2, dv2.yb2); break;
+                        case 1: _ren.Line2(curr, dv2.xb2, dv2.yb2); break;
+                        case 2: _ren.Line1(curr, dv2.xb1, dv2.yb1); break;
+                        case 3: _ren.Line0(curr); break;
                     }
 
-                    if (m_line_join == OutlineJoin.Round && (dv.flags & 2) == 0)
+                    if (_line_join == OutlineJoin.Round && (dv.flags & 2) == 0)
                     {
-                        m_ren.Pie(curr.x2, curr.y2,
+                        _ren.Pie(curr.x2, curr.y2,
                                    curr.x2 + (curr.y2 - curr.y1),
                                    curr.y2 - (curr.x2 - curr.x1),
                                    curr.x2 + (next.y2 - next.y1),
@@ -211,16 +205,16 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                     dv1.x1 = dv1.x2;
                     dv1.y1 = dv1.y2;
                     dv.lcurr = dv.lnext;
-                    dv.lnext = m_src_vertices[dv.idx].len;
+                    dv.lnext = _src_vertices[dv.idx].len;
                     ++dv.idx;
-                    if (dv.idx >= m_src_vertices.Count) dv.idx = 0;
-                    dv1.x2 = m_src_vertices[dv.idx].x;
-                    dv1.y2 = m_src_vertices[dv.idx].y;
+                    if (dv.idx >= _src_vertices.Count) dv.idx = 0;
+                    dv1.x2 = _src_vertices[dv.idx].x;
+                    dv1.y2 = _src_vertices[dv.idx].y;
                     curr = next;
                     next = new LineParameters(dv1.x1, dv1.y1, dv1.x2, dv1.y2, dv.lnext);
                     dv2.xb1 = dv2.xb2;
                     dv2.yb1 = dv2.yb2;
-                    switch (m_line_join)
+                    switch (_line_join)
                     {
                         case OutlineJoin.NoJoin:
                             dv.flags = 3;
@@ -255,41 +249,41 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public OutlineAARasterizer(LineRenderer ren)
         {
-            m_ren = ren;
-            m_line_join = (OutlineRenderer.AccurateJoinOnly ?
+            _ren = ren;
+            _line_join = (OutlineRenderer.AccurateJoinOnly ?
                             OutlineJoin.AccurateJoin :
                             OutlineJoin.Round);
-            m_round_cap = (false);
-            m_start_x = (0);
-            m_start_y = (0);
+            _round_cap = (false);
+            _start_x = (0);
+            _start_y = (0);
         }
 
-        public void Attach(LineRenderer ren) { m_ren = ren; }
+        public void Attach(LineRenderer ren) { _ren = ren; }
 
 
         public OutlineJoin LineJoin
         {
-            get { return this.m_line_join; }
+            get { return _line_join; }
             set
             {
-                m_line_join = OutlineRenderer.AccurateJoinOnly ?
+                _line_join = OutlineRenderer.AccurateJoinOnly ?
                 OutlineJoin.AccurateJoin : value;
             }
         }
 
         public bool RoundCap
         {
-            get { return this.m_round_cap; }
-            set { this.m_round_cap = value; }
+            get => _round_cap;
+            set => _round_cap = value;
         }
         public void MoveTo(int x, int y)
         {
-            m_src_vertices.ModifyLast(new LineAAVertex(m_start_x = x, m_start_y = y));
+            _src_vertices.ModifyLast(new LineAAVertex(_start_x = x, _start_y = y));
         }
 
         public void LineTo(int x, int y)
         {
-            m_src_vertices.AddVertex(new LineAAVertex(x, y));
+            _src_vertices.AddVertex(new LineAAVertex(x, y));
         }
 
         public void MoveTo(double x, double y)
@@ -304,7 +298,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public void Render(bool close_polygon)
         {
-            m_src_vertices.Close(close_polygon);
+            _src_vertices.Close(close_polygon);
             DrawVarsPart0 dv = new DrawVarsPart0();
             DrawVarsPart1 dv1 = new DrawVarsPart1();
             DrawVarsPart2 dv2 = new DrawVarsPart2();
@@ -318,24 +312,24 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             LineParameters next;
             if (close_polygon)
             {
-                if (m_src_vertices.Count >= 3)
+                if (_src_vertices.Count >= 3)
                 {
                     dv.idx = 2;
-                    v = m_src_vertices[m_src_vertices.Count - 1];
+                    v = _src_vertices[_src_vertices.Count - 1];
                     x1 = v.x;
                     y1 = v.y;
                     lprev = v.len;
-                    v = m_src_vertices[0];
+                    v = _src_vertices[0];
                     x2 = v.x;
                     y2 = v.y;
                     dv.lcurr = v.len;
                     LineParameters prev = new LineParameters(x1, y1, x2, y2, lprev);
-                    v = m_src_vertices[1];
+                    v = _src_vertices[1];
                     dv1.x1 = v.x;
                     dv1.y1 = v.y;
                     dv.lnext = v.len;
                     curr = new LineParameters(x2, y2, dv1.x1, dv1.y1, dv.lcurr);
-                    v = m_src_vertices[dv.idx];
+                    v = _src_vertices[dv.idx];
                     dv1.x2 = v.x;
                     dv1.y2 = v.y;
                     next = new LineParameters(dv1.x1, dv1.y1, dv1.x2, dv1.y2, dv.lnext);
@@ -343,7 +337,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                     dv2.yb1 = 0;
                     dv2.xb2 = 0;
                     dv2.yb2 = 0;
-                    switch (m_line_join)
+                    switch (_line_join)
                     {
                         case OutlineJoin.NoJoin:
                             dv.flags = 3;
@@ -359,7 +353,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                             break;
                     }
 
-                    if (m_line_join != OutlineJoin.Round)
+                    if (_line_join != OutlineJoin.Round)
                     {
                         if ((dv.flags & 1) == 0)
                         {
@@ -372,38 +366,38 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         }
                     }
 
-                    Draw(ref dv, ref dv1, ref dv2, ref curr, ref next, 0, m_src_vertices.Count);
+                    Draw(ref dv, ref dv1, ref dv2, ref curr, ref next, 0, _src_vertices.Count);
                 }
             }
             else
             {
-                switch (m_src_vertices.Count)
+                switch (_src_vertices.Count)
                 {
                     case 0:
                     case 1:
                         break;
                     case 2:
                         {
-                            v = m_src_vertices[0];
+                            v = _src_vertices[0];
                             x1 = v.x;
                             y1 = v.y;
                             lprev = v.len;
-                            v = m_src_vertices[1];
+                            v = _src_vertices[1];
                             x2 = v.x;
                             y2 = v.y;
                             LineParameters lp = new LineParameters(x1, y1, x2, y2, lprev);
-                            if (m_round_cap)
+                            if (_round_cap)
                             {
-                                m_ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
+                                _ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
                             }
-                            m_ren.Line3(lp,
+                            _ren.Line3(lp,
                                          x1 + (y2 - y1),
                                          y1 - (x2 - x1),
                                          x2 + (y2 - y1),
                                          y2 - (x2 - x1));
-                            if (m_round_cap)
+                            if (_round_cap)
                             {
-                                m_ren.SemiDot(CompareDistEnd, x2, y2, x2 + (y2 - y1), y2 - (x2 - x1));
+                                _ren.SemiDot(CompareDistEnd, x2, y2, x2 + (y2 - y1), y2 - (x2 - x1));
                             }
                         }
                         break;
@@ -411,66 +405,66 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         {
                             int x3, y3;
                             int lnext;
-                            v = m_src_vertices[0];
+                            v = _src_vertices[0];
                             x1 = v.x;
                             y1 = v.y;
                             lprev = v.len;
-                            v = m_src_vertices[1];
+                            v = _src_vertices[1];
                             x2 = v.x;
                             y2 = v.y;
                             lnext = v.len;
-                            v = m_src_vertices[2];
+                            v = _src_vertices[2];
                             x3 = v.x;
                             y3 = v.y;
 
                             LineParameters lp1 = new LineParameters(x1, y1, x2, y2, lprev);
                             LineParameters lp2 = new LineParameters(x2, y2, x3, y3, lnext);
-                            if (m_round_cap)
+                            if (_round_cap)
                             {
-                                m_ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
+                                _ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
                             }
 
-                            if (m_line_join == OutlineJoin.Round)
+                            if (_line_join == OutlineJoin.Round)
                             {
-                                m_ren.Line3(lp1, x1 + (y2 - y1), y1 - (x2 - x1),
+                                _ren.Line3(lp1, x1 + (y2 - y1), y1 - (x2 - x1),
                                                   x2 + (y2 - y1), y2 - (x2 - x1));
-                                m_ren.Pie(x2, y2, x2 + (y2 - y1), y2 - (x2 - x1),
+                                _ren.Pie(x2, y2, x2 + (y2 - y1), y2 - (x2 - x1),
                                                    x2 + (y3 - y2), y2 - (x3 - x2));
-                                m_ren.Line3(lp2, x2 + (y3 - y2), y2 - (x3 - x2),
+                                _ren.Line3(lp2, x2 + (y3 - y2), y2 - (x3 - x2),
                                                   x3 + (y3 - y2), y3 - (x3 - x2));
                             }
                             else
                             {
                                 LineAA.Bisectrix(lp1, lp2, out dv2.xb1, out dv2.yb1);
-                                m_ren.Line3(lp1, x1 + (y2 - y1), y1 - (x2 - x1),
+                                _ren.Line3(lp1, x1 + (y2 - y1), y1 - (x2 - x1),
                                                   dv2.xb1, dv2.yb1);
-                                m_ren.Line3(lp2, dv2.xb1, dv2.yb1,
+                                _ren.Line3(lp2, dv2.xb1, dv2.yb1,
                                                   x3 + (y3 - y2), y3 - (x3 - x2));
                             }
-                            if (m_round_cap)
+                            if (_round_cap)
                             {
-                                m_ren.SemiDot(CompareDistEnd, x3, y3, x3 + (y3 - y2), y3 - (x3 - x2));
+                                _ren.SemiDot(CompareDistEnd, x3, y3, x3 + (y3 - y2), y3 - (x3 - x2));
                             }
                         }
                         break;
                     default:
                         {
                             dv.idx = 3;
-                            v = m_src_vertices[0];
+                            v = _src_vertices[0];
                             x1 = v.x;
                             y1 = v.y;
                             lprev = v.len;
-                            v = m_src_vertices[1];
+                            v = _src_vertices[1];
                             x2 = v.x;
                             y2 = v.y;
                             dv.lcurr = v.len;
                             var prev = new LineParameters(x1, y1, x2, y2, lprev);
-                            v = m_src_vertices[2];
+                            v = _src_vertices[2];
                             dv1.x1 = v.x;
                             dv1.y1 = v.y;
                             dv.lnext = v.len;
                             curr = new LineParameters(x2, y2, dv1.x1, dv1.y1, dv.lcurr);
-                            v = m_src_vertices[dv.idx];
+                            v = _src_vertices[dv.idx];
                             dv1.x2 = v.x;
                             dv1.y2 = v.y;
                             next = new LineParameters(dv1.x1, dv1.y1, dv1.x2, dv1.y2, dv.lnext);
@@ -478,7 +472,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                             dv2.yb1 = 0;
                             dv2.xb2 = 0;
                             dv2.yb2 = 0;
-                            switch (m_line_join)
+                            switch (_line_join)
                             {
                                 case OutlineJoin.NoJoin:
                                     dv.flags = 3;
@@ -494,17 +488,17 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                     break;
                             }
 
-                            if (m_round_cap)
+                            if (_round_cap)
                             {
-                                m_ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
+                                _ren.SemiDot(CompareDistStart, x1, y1, x1 + (y2 - y1), y1 - (x2 - x1));
                             }
                             if ((dv.flags & 1) == 0)
                             {
-                                if (m_line_join == OutlineJoin.Round)
+                                if (_line_join == OutlineJoin.Round)
                                 {
-                                    m_ren.Line3(prev, x1 + (y2 - y1), y1 - (x2 - x1),
+                                    _ren.Line3(prev, x1 + (y2 - y1), y1 - (x2 - x1),
                                                        x2 + (y2 - y1), y2 - (x2 - x1));
-                                    m_ren.Pie(prev.x2, prev.y2,
+                                    _ren.Pie(prev.x2, prev.y2,
                                                x2 + (y2 - y1), y2 - (x2 - x1),
                                                 curr.x1 + (curr.y2 - curr.y1),
                                                curr.y1 - (curr.x2 - curr.x1));
@@ -512,28 +506,28 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                 else
                                 {
                                     LineAA.Bisectrix(prev, curr, out dv2.xb1, out dv2.yb1);
-                                    m_ren.Line3(prev, x1 + (y2 - y1), y1 - (x2 - x1),
+                                    _ren.Line3(prev, x1 + (y2 - y1), y1 - (x2 - x1),
                                                        dv2.xb1, dv2.yb1);
                                 }
                             }
                             else
                             {
-                                m_ren.Line1(prev,
+                                _ren.Line1(prev,
                                              x1 + (y2 - y1),
                                              y1 - (x2 - x1));
                             }
 
-                            if ((dv.flags & 2) == 0 && m_line_join != OutlineJoin.Round)
+                            if ((dv.flags & 2) == 0 && _line_join != OutlineJoin.Round)
                             {
                                 LineAA.Bisectrix(curr, next, out dv2.xb2, out dv2.yb2);
                             }
 
-                            Draw(ref dv, ref dv1, ref dv2, ref curr, ref next, 1, m_src_vertices.Count - 2);
+                            Draw(ref dv, ref dv1, ref dv2, ref curr, ref next, 1, _src_vertices.Count - 2);
                             if ((dv.flags & 1) == 0)
                             {
-                                if (m_line_join == OutlineJoin.Round)
+                                if (_line_join == OutlineJoin.Round)
                                 {
-                                    m_ren.Line3(curr,
+                                    _ren.Line3(curr,
                                                  curr.x1 + (curr.y2 - curr.y1),
                                                  curr.y1 - (curr.x2 - curr.x1),
                                                  curr.x2 + (curr.y2 - curr.y1),
@@ -541,20 +535,20 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                                 }
                                 else
                                 {
-                                    m_ren.Line3(curr, dv2.xb1, dv2.yb1,
+                                    _ren.Line3(curr, dv2.xb1, dv2.yb1,
                                                  curr.x2 + (curr.y2 - curr.y1),
                                                  curr.y2 - (curr.x2 - curr.x1));
                                 }
                             }
                             else
                             {
-                                m_ren.Line2(curr,
+                                _ren.Line2(curr,
                                              curr.x2 + (curr.y2 - curr.y1),
                                              curr.y2 - (curr.x2 - curr.x1));
                             }
-                            if (m_round_cap)
+                            if (_round_cap)
                             {
-                                m_ren.SemiDot(CompareDistEnd, curr.x2, curr.y2,
+                                _ren.SemiDot(CompareDistEnd, curr.x2, curr.y2,
                                                curr.x2 + (curr.y2 - curr.y1),
                                                curr.y2 - (curr.x2 - curr.x1));
                             }
@@ -563,7 +557,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 }
             }
 
-            m_src_vertices.Clear();
+            _src_vertices.Clear();
         }
 
         public void AddVertex(double x, double y, VertexCmd cmd)
@@ -581,7 +575,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 case VertexCmd.Close:
                 case VertexCmd.CloseAndEndFigure:
                     Render(true);
-                    MoveTo(m_start_x, m_start_y);
+                    MoveTo(_start_x, _start_y);
                     break;
                 default:
                     LineTo(x, y);
@@ -606,7 +600,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         }
         public void RenderVertexSnap(VertexStore s, Drawing.Color c)
         {
-            m_ren.Color = c;
+            _ren.Color = c;
             AddPath(s);
         }
     }

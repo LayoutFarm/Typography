@@ -46,19 +46,11 @@ namespace PixelFarm.CpuBlit
                 _currentSize--;
             }
         }
-        public int Count
-        {
-            get { return _currentSize; }
-        }
-
-        public int AllocatedSize
-        {
-            get
-            {
-                return _internalArray.Length;
-            }
-        }
-
+        //
+        public int Count => _currentSize;
+        //
+        public int AllocatedSize => _internalArray.Length;
+        //
         public void Clear()
         {
             _currentSize = 0;
@@ -153,35 +145,20 @@ namespace PixelFarm.CpuBlit
 
         public T this[int i]
         {
-            get
-            {
-                return _internalArray[i];
-            }
-            set { _internalArray[i] = value; }
+            get => _internalArray[i];
+            set => _internalArray[i] = value;
         }
 
 
         /// <summary>
         /// access to internal array,
         /// </summary>
-        public T[] UnsafeInternalArray
-        {
-            get
-            {
-                return _internalArray;
-            }
-        } 
+        public T[] UnsafeInternalArray => _internalArray;
         public void SetData(int index, T data)
         {
             _internalArray[index] = data;
         }
-
-        public int Length
-        {
-            get
-            {
-                return _currentSize;
-            }
-        }
+        //
+        public int Length => _currentSize;
     }
 }

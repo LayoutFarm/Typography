@@ -92,22 +92,11 @@ namespace PixelFarm.VectorMath
             _y = end.Y - st.Y;
         }
 
-        public double X
-        {
-            get { return _x; }
-            //set { _x = value; }
-        }
+        public double X => _x;
 
-        public double Y
-        {
-            get { return _y; }
-            //set { _y = value; }
-        }
+        public double Y => _y;
 
-        public double Magnitude
-        {
-            get { return Math.Sqrt(X * X + Y * Y); }
-        }
+        public double Magnitude => Math.Sqrt(X * X + Y * Y);
 
         public static Vector operator +(Vector v1, Vector v2)
         {

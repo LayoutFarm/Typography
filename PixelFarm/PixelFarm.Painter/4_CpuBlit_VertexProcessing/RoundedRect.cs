@@ -34,36 +34,36 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //
     public class RoundedRect
     {
-        RectD bounds;
-        Vector2 leftBottomRadius;
-        Vector2 rightBottomRadius;
-        Vector2 rightTopRadius;
-        Vector2 leftTopRadius;
-        Arc currentProcessingArc = new Arc();
+        RectD _bounds;
+        Vector2 _leftBottomRadius;
+        Vector2 _rightBottomRadius;
+        Vector2 _rightTopRadius;
+        Vector2 _leftTopRadius;
+        Arc _currentProcessingArc = new Arc();
         public RoundedRect()
         {
         }
         public RoundedRect(double left, double bottom, double right, double top, double radius)
         {
-            bounds = new RectD(left, bottom, right, top);
-            leftBottomRadius.x = radius;
-            leftBottomRadius.y = radius;
-            rightBottomRadius.x = radius;
-            rightBottomRadius.y = radius;
-            rightTopRadius.x = radius;
-            rightTopRadius.y = radius;
-            leftTopRadius.x = radius;
-            leftTopRadius.y = radius;
+            _bounds = new RectD(left, bottom, right, top);
+            _leftBottomRadius.x = radius;
+            _leftBottomRadius.y = radius;
+            _rightBottomRadius.x = radius;
+            _rightBottomRadius.y = radius;
+            _rightTopRadius.x = radius;
+            _rightTopRadius.y = radius;
+            _leftTopRadius.x = radius;
+            _leftTopRadius.y = radius;
             if (left > right)
             {
-                bounds.Left = right;
-                bounds.Right = left;
+                _bounds.Left = right;
+                _bounds.Right = left;
             }
 
             if (bottom > top)
             {
-                bounds.Bottom = top;
-                bounds.Top = bottom;
+                _bounds.Bottom = top;
+                _bounds.Top = bottom;
             }
         }
 
@@ -79,65 +79,65 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public void SetRect(double left, double bottom, double right, double top)
         {
-            bounds = new RectD(left, bottom, right, top);
-            if (left > right) { bounds.Left = right; bounds.Right = left; }
-            if (bottom > top) { bounds.Bottom = top; bounds.Top = bottom; }
+            _bounds = new RectD(left, bottom, right, top);
+            if (left > right) { _bounds.Left = right; _bounds.Right = left; }
+            if (bottom > top) { _bounds.Bottom = top; _bounds.Top = bottom; }
         }
 
         public void SetRadius(double r)
         {
-            leftBottomRadius.x = leftBottomRadius.y = rightBottomRadius.x = rightBottomRadius.y = rightTopRadius.x = rightTopRadius.y = leftTopRadius.x = leftTopRadius.y = r;
+            _leftBottomRadius.x = _leftBottomRadius.y = _rightBottomRadius.x = _rightBottomRadius.y = _rightTopRadius.x = _rightTopRadius.y = _leftTopRadius.x = _leftTopRadius.y = r;
         }
 
         public void SetRadius(double rx, double ry)
         {
-            leftBottomRadius.x = rightBottomRadius.x = rightTopRadius.x = leftTopRadius.x = rx;
-            leftBottomRadius.y = rightBottomRadius.y = rightTopRadius.y = leftTopRadius.y = ry;
+            _leftBottomRadius.x = _rightBottomRadius.x = _rightTopRadius.x = _leftTopRadius.x = rx;
+            _leftBottomRadius.y = _rightBottomRadius.y = _rightTopRadius.y = _leftTopRadius.y = ry;
         }
 
         public void SetRadius(double leftBottomRadius, double rightBottomRadius, double rightTopRadius, double leftTopRadius)
         {
-            this.leftBottomRadius = new Vector2(leftBottomRadius, leftBottomRadius);
-            this.rightBottomRadius = new Vector2(rightBottomRadius, rightBottomRadius);
-            this.rightTopRadius = new Vector2(rightTopRadius, rightTopRadius);
-            this.leftTopRadius = new Vector2(leftTopRadius, leftTopRadius);
+            _leftBottomRadius = new Vector2(leftBottomRadius, leftBottomRadius);
+            _rightBottomRadius = new Vector2(rightBottomRadius, rightBottomRadius);
+            _rightTopRadius = new Vector2(rightTopRadius, rightTopRadius);
+            _leftTopRadius = new Vector2(leftTopRadius, leftTopRadius);
         }
 
         public void SetRadius(double rx1, double ry1, double rx2, double ry2,
                               double rx3, double ry3, double rx4, double ry4)
         {
-            leftBottomRadius.x = rx1; leftBottomRadius.y = ry1; rightBottomRadius.x = rx2; rightBottomRadius.y = ry2;
-            rightTopRadius.x = rx3; rightTopRadius.y = ry3; leftTopRadius.x = rx4; leftTopRadius.y = ry4;
+            _leftBottomRadius.x = rx1; _leftBottomRadius.y = ry1; _rightBottomRadius.x = rx2; _rightBottomRadius.y = ry2;
+            _rightTopRadius.x = rx3; _rightTopRadius.y = ry3; _leftTopRadius.x = rx4; _leftTopRadius.y = ry4;
         }
 
         public void NormalizeRadius()
         {
-            double dx = Math.Abs(bounds.Top - bounds.Bottom);
-            double dy = Math.Abs(bounds.Right - bounds.Left);
+            double dx = Math.Abs(_bounds.Top - _bounds.Bottom);
+            double dy = Math.Abs(_bounds.Right - _bounds.Left);
             double k = 1.0;
             double t;
-            t = dx / (leftBottomRadius.x + rightBottomRadius.x); if (t < k) k = t;
-            t = dx / (rightTopRadius.x + leftTopRadius.x); if (t < k) k = t;
-            t = dy / (leftBottomRadius.y + rightBottomRadius.y); if (t < k) k = t;
-            t = dy / (rightTopRadius.y + leftTopRadius.y); if (t < k) k = t;
+            t = dx / (_leftBottomRadius.x + _rightBottomRadius.x); if (t < k) k = t;
+            t = dx / (_rightTopRadius.x + _leftTopRadius.x); if (t < k) k = t;
+            t = dy / (_leftBottomRadius.y + _rightBottomRadius.y); if (t < k) k = t;
+            t = dy / (_rightTopRadius.y + _leftTopRadius.y); if (t < k) k = t;
             if (k < 1.0)
             {
-                leftBottomRadius.x *= k; leftBottomRadius.y *= k; rightBottomRadius.x *= k; rightBottomRadius.y *= k;
-                rightTopRadius.x *= k; rightTopRadius.y *= k; leftTopRadius.x *= k; leftTopRadius.y *= k;
+                _leftBottomRadius.x *= k; _leftBottomRadius.y *= k; _rightBottomRadius.x *= k; _rightBottomRadius.y *= k;
+                _rightTopRadius.x *= k; _rightTopRadius.y *= k; _leftTopRadius.x *= k; _leftTopRadius.y *= k;
             }
         }
         public double ApproximationScale
         {
-            get { return currentProcessingArc.ApproximateScale; }
-            set { currentProcessingArc.ApproximateScale = value; }
+            get => _currentProcessingArc.ApproximateScale;
+            set => _currentProcessingArc.ApproximateScale = value;
         }
         IEnumerable<VertexData> GetVertexIter()
         {
-            currentProcessingArc.UseStartEndLimit = true;
-            currentProcessingArc.Init(bounds.Left + leftBottomRadius.x, bounds.Bottom + leftBottomRadius.y, leftBottomRadius.x, leftBottomRadius.y, Math.PI, Math.PI + Math.PI * 0.5);
-            currentProcessingArc.SetStartEndLimit(bounds.Left, bounds.Bottom + leftBottomRadius.y,
-                bounds.Left + leftBottomRadius.x, bounds.Bottom);
-            foreach (VertexData vertexData in currentProcessingArc.GetVertexIter())
+            _currentProcessingArc.UseStartEndLimit = true;
+            _currentProcessingArc.Init(_bounds.Left + _leftBottomRadius.x, _bounds.Bottom + _leftBottomRadius.y, _leftBottomRadius.x, _leftBottomRadius.y, Math.PI, Math.PI + Math.PI * 0.5);
+            _currentProcessingArc.SetStartEndLimit(_bounds.Left, _bounds.Bottom + _leftBottomRadius.y,
+                _bounds.Left + _leftBottomRadius.x, _bounds.Bottom);
+            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
             {
                 if (VertexHelper.IsEmpty(vertexData.command))
                 {
@@ -147,28 +147,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
 
 
-            currentProcessingArc.Init(bounds.Right - rightBottomRadius.x, bounds.Bottom + rightBottomRadius.y, rightBottomRadius.x, rightBottomRadius.y, Math.PI + Math.PI * 0.5, 0.0);
-            currentProcessingArc.SetStartEndLimit(bounds.Right - rightBottomRadius.x,
-                bounds.Bottom, bounds.Right, bounds.Bottom + rightBottomRadius.y);
-            foreach (VertexData vertexData in currentProcessingArc.GetVertexIter())
-            {
-                if (VertexHelper.IsMoveTo(vertexData.command))
-                {
-                    // skip the initial moveto
-                    continue;
-                }
-                if (VertexHelper.IsEmpty(vertexData.command))
-                {
-                    break;
-                }
-                yield return vertexData;
-            }
-
-
-            currentProcessingArc.Init(bounds.Right - rightTopRadius.x, bounds.Top - rightTopRadius.y, rightTopRadius.x, rightTopRadius.y, 0.0, Math.PI * 0.5);
-            currentProcessingArc.SetStartEndLimit(bounds.Right, bounds.Top - rightTopRadius.y,
-                bounds.Right - rightTopRadius.x, bounds.Top);
-            foreach (VertexData vertexData in currentProcessingArc.GetVertexIter())
+            _currentProcessingArc.Init(_bounds.Right - _rightBottomRadius.x, _bounds.Bottom + _rightBottomRadius.y, _rightBottomRadius.x, _rightBottomRadius.y, Math.PI + Math.PI * 0.5, 0.0);
+            _currentProcessingArc.SetStartEndLimit(_bounds.Right - _rightBottomRadius.x,
+                _bounds.Bottom, _bounds.Right, _bounds.Bottom + _rightBottomRadius.y);
+            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
             {
                 if (VertexHelper.IsMoveTo(vertexData.command))
                 {
@@ -183,10 +165,28 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
 
 
-            currentProcessingArc.Init(bounds.Left + leftTopRadius.x, bounds.Top - leftTopRadius.y, leftTopRadius.x, leftTopRadius.y, Math.PI * 0.5, Math.PI);
-            currentProcessingArc.SetStartEndLimit(bounds.Left - leftTopRadius.x, bounds.Top,
-                  bounds.Left, bounds.Top - leftTopRadius.y);
-            foreach (VertexData vertexData in currentProcessingArc.GetVertexIter())
+            _currentProcessingArc.Init(_bounds.Right - _rightTopRadius.x, _bounds.Top - _rightTopRadius.y, _rightTopRadius.x, _rightTopRadius.y, 0.0, Math.PI * 0.5);
+            _currentProcessingArc.SetStartEndLimit(_bounds.Right, _bounds.Top - _rightTopRadius.y,
+                _bounds.Right - _rightTopRadius.x, _bounds.Top);
+            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
+            {
+                if (VertexHelper.IsMoveTo(vertexData.command))
+                {
+                    // skip the initial moveto
+                    continue;
+                }
+                if (VertexHelper.IsEmpty(vertexData.command))
+                {
+                    break;
+                }
+                yield return vertexData;
+            }
+
+
+            _currentProcessingArc.Init(_bounds.Left + _leftTopRadius.x, _bounds.Top - _leftTopRadius.y, _leftTopRadius.x, _leftTopRadius.y, Math.PI * 0.5, Math.PI);
+            _currentProcessingArc.SetStartEndLimit(_bounds.Left - _leftTopRadius.x, _bounds.Top,
+                  _bounds.Left, _bounds.Top - _leftTopRadius.y);
+            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
             {
                 switch (vertexData.command)
                 {

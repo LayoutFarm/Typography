@@ -28,98 +28,98 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
     //===================================================dda_line_interpolator
     public struct LineInterpolatorDDA
     {
-        int m_y;
-        int m_dy;
-        readonly int m_inc;
-        readonly int m_fractionShift;
+        int _y;
+        int _dy;
+        readonly int _inc;
+        readonly int _fractionShift;
 
         public LineInterpolatorDDA(int y1, int y2, int count, int fractionShift)
         {
-            m_fractionShift = fractionShift;
-            m_y = (y1);
-            m_inc = (((y2 - y1) << m_fractionShift) / (int)(count));
-            m_dy = (0);
+            _fractionShift = fractionShift;
+            _y = (y1);
+            _inc = (((y2 - y1) << _fractionShift) / (int)(count));
+            _dy = (0);
         }
 
         //--------------------------------------------------------------------
         //public void operator ++ ()
         public void Next()
         {
-            m_dy += m_inc;
+            _dy += _inc;
         }
 
         //--------------------------------------------------------------------
         //public void operator -- ()
         public void Prev()
         {
-            m_dy -= m_inc;
+            _dy -= _inc;
         }
 
         //--------------------------------------------------------------------
         //public void operator += (int n)
         public void Next(int n)
         {
-            m_dy += m_inc * n;
+            _dy += _inc * n;
         }
 
         //--------------------------------------------------------------------
         //public void operator -= (int n)
         public void Prev(int n)
         {
-            m_dy -= m_inc * n;
+            _dy -= _inc * n;
         }
-
-
         //--------------------------------------------------------------------
-        public int y() { return m_y + (m_dy >> (m_fractionShift)); } // - m_YShift)); }
-        public int dy() { return m_dy; }
+        public int y() => _y + (_dy >> (_fractionShift));  // - m_YShift)); }
+        //
+        public int dy() => _dy;
+        //
     }
 
     //=================================================dda2_line_interpolator
 
     class LineInterpolatorDDA2
     {
-        
+
         //----------------------
         //this need to be class ***
         //----------------------
 
-        readonly int m_cnt;
-        readonly int m_lft;
-        readonly int m_rem;
-        int m_mod;
-        int m_y;
+        readonly int _cnt;
+        readonly int _lft;
+        readonly int _rem;
+        int _mod;
+        int _y;
         //-------------------------------------------- Forward-adjusted line
         public LineInterpolatorDDA2(int y1, int y2, int count)
         {
             //dbugIdN = 0;
-            m_cnt = (count <= 0 ? 1 : count);
-            m_lft = ((y2 - y1) / m_cnt);
-            m_rem = ((y2 - y1) % m_cnt);
+            _cnt = (count <= 0 ? 1 : count);
+            _lft = ((y2 - y1) / _cnt);
+            _rem = ((y2 - y1) % _cnt);
 
-            m_mod = (m_rem);
-            m_y = (y1);
-            if (m_mod <= 0)
+            _mod = (_rem);
+            _y = (y1);
+            if (_mod <= 0)
             {
-                m_mod += count;
-                m_rem += count;
-                m_lft--;
+                _mod += count;
+                _rem += count;
+                _lft--;
             }
-            m_mod -= count;
+            _mod -= count;
         }
         public LineInterpolatorDDA2(int y, int count)
         {
             //dbugIdN = 0;
-            m_cnt = (count <= 0 ? 1 : count);
-            m_lft = ((y) / m_cnt);
-            m_rem = ((y) % m_cnt);
-            m_mod = (m_rem);
-            m_y = (0);
-            if (m_mod <= 0)
+            _cnt = (count <= 0 ? 1 : count);
+            _lft = ((y) / _cnt);
+            _rem = ((y) % _cnt);
+            _mod = (_rem);
+            _y = (0);
+            if (_mod <= 0)
             {
-                m_mod += count;
-                m_rem += count;
-                m_lft--;
+                _mod += count;
+                _rem += count;
+                _lft--;
             }
         }
 #if DEBUG
@@ -130,12 +130,12 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             //dbugIdN++;
 
-            m_mod += m_rem;
-            m_y += m_lft;
-            if (m_mod > 0)
+            _mod += _rem;
+            _y += _lft;
+            if (_mod > 0)
             {
-                m_mod -= m_cnt;
-                m_y++;
+                _mod -= _cnt;
+                _y++;
             }
         }
 
@@ -143,134 +143,140 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         //public void operator--()
         public void Prev()
         {
-            if (m_mod <= m_rem)
+            if (_mod <= _rem)
             {
-                m_mod += m_cnt;
-                m_y--;
+                _mod += _cnt;
+                _y--;
             }
-            m_mod -= m_rem;
-            m_y -= m_lft;
+            _mod -= _rem;
+            _y -= _lft;
         }
 
         //--------------------------------------------------------------------
         public void adjust_forward()
         {
-            m_mod -= m_cnt;
+            _mod -= _cnt;
         }
         //--------------------------------------------------------------------
         public void adjust_backward()
         {
-            m_mod += m_cnt;
+            _mod += _cnt;
         }
-        public int Y { get { return m_y; } }
+        //
+        public int Y => _y;
+        //
     }
 
 
     struct LineInterpolatorDDA2S
     {
-        readonly int m_cnt;
-        readonly int m_lft;
-        readonly int m_rem;
-        int m_mod;
-        int m_y;
+        readonly int _cnt;
+        readonly int _lft;
+        readonly int _rem;
+        int _mod;
+        int _y;
         //-------------------------------------------- Forward-adjusted line
         public LineInterpolatorDDA2S(int y1, int y2, int count)
         {
 
-            m_cnt = (count <= 0 ? 1 : count);
-            m_lft = ((y2 - y1) / m_cnt);
-            m_rem = ((y2 - y1) % m_cnt);
+            _cnt = (count <= 0 ? 1 : count);
+            _lft = ((y2 - y1) / _cnt);
+            _rem = ((y2 - y1) % _cnt);
 
-            m_mod = (m_rem);
-            m_y = (y1);
-            if (m_mod <= 0)
+            _mod = (_rem);
+            _y = (y1);
+            if (_mod <= 0)
             {
-                m_mod += count;
-                m_rem += count;
-                m_lft--;
+                _mod += count;
+                _rem += count;
+                _lft--;
             }
-            m_mod -= count;
+            _mod -= count;
         }
 
         //public void operator ++()
         public void Next()
         {
-            m_mod += m_rem;
-            m_y += m_lft;
-            if (m_mod > 0)
+            _mod += _rem;
+            _y += _lft;
+            if (_mod > 0)
             {
-                m_mod -= m_cnt;
-                m_y++;
+                _mod -= _cnt;
+                _y++;
             }
         }
-        public int Y { get { return m_y; } }
+        //
+        public int Y => _y;
+        //
     }
 
     //---------------------------------------------line_bresenham_interpolator
     sealed class LineInterpolatorBresenham
     {
-        int m_x1_lr;
-        int m_y1_lr;
-        int m_x2_lr;
-        int m_y2_lr;
-        bool m_ver;
-        int m_len;
-        int m_inc;
-        LineInterpolatorDDA2 m_interpolator;
+        int _x1_lr;
+        int _y1_lr;
+        int _x2_lr;
+        int _y2_lr;
+        bool _ver;
+        int _len;
+        int _inc;
+        LineInterpolatorDDA2 _interpolator;
+        //
         const int SUBPIXEL_SHIFT = 8;
         const int SUBPIXEL_SCALE = 1 << SUBPIXEL_SHIFT;
         const int SUBPIXEL_MASK = SUBPIXEL_SCALE - 1;
+        //
         //--------------------------------------------------------------------
-        public static int line_lr(int v) { return v >> (int)SUBPIXEL_SHIFT; }
+        public static int line_lr(int v) => v >> (int)SUBPIXEL_SHIFT;
 
         //--------------------------------------------------------------------
         public LineInterpolatorBresenham(int x1, int y1, int x2, int y2)
         {
-            m_x1_lr = (line_lr(x1));
-            m_y1_lr = (line_lr(y1));
-            m_x2_lr = (line_lr(x2));
-            m_y2_lr = (line_lr(y2));
-            m_ver = (Math.Abs(m_x2_lr - m_x1_lr) < Math.Abs(m_y2_lr - m_y1_lr));
-            if (m_ver)
+            _x1_lr = (line_lr(x1));
+            _y1_lr = (line_lr(y1));
+            _x2_lr = (line_lr(x2));
+            _y2_lr = (line_lr(y2));
+            _ver = (Math.Abs(_x2_lr - _x1_lr) < Math.Abs(_y2_lr - _y1_lr));
+            if (_ver)
             {
-                m_len = (int)Math.Abs(m_y2_lr - m_y1_lr);
+                _len = (int)Math.Abs(_y2_lr - _y1_lr);
             }
             else
             {
-                m_len = (int)Math.Abs(m_x2_lr - m_x1_lr);
+                _len = (int)Math.Abs(_x2_lr - _x1_lr);
             }
 
-            m_inc = (m_ver ? ((y2 > y1) ? 1 : -1) : ((x2 > x1) ? 1 : -1));
-            m_interpolator = new LineInterpolatorDDA2(m_ver ? x1 : y1,
-                           m_ver ? x2 : y2,
-                           m_len);
+            _inc = (_ver ? ((y2 > y1) ? 1 : -1) : ((x2 > x1) ? 1 : -1));
+            _interpolator = new LineInterpolatorDDA2(_ver ? x1 : y1,
+                           _ver ? x2 : y2,
+                           _len);
         }
 
         //--------------------------------------------------------------------
-        public bool is_ver() { return m_ver; }
-        public int len() { return m_len; }
-        public int inc() { return m_inc; }
+        public bool is_ver() => _ver;
+        public int len() => _len;
+        public int inc() => _inc;
 
         //--------------------------------------------------------------------
         public void hstep()
         {
-            m_interpolator.Next();
-            m_x1_lr += m_inc;
+            _interpolator.Next();
+            _x1_lr += _inc;
         }
 
         //--------------------------------------------------------------------
         public void vstep()
         {
-            m_interpolator.Next();
-            m_y1_lr += m_inc;
+            _interpolator.Next();
+            _y1_lr += _inc;
         }
 
         //--------------------------------------------------------------------
-        public int x1() { return m_x1_lr; }
-        public int y1() { return m_y1_lr; }
-        public int x2() { return line_lr(m_interpolator.Y); }
-        public int y2() { return line_lr(m_interpolator.Y); }
-        public int x2_hr() { return m_interpolator.Y; }
-        public int y2_hr() { return m_interpolator.Y; }
+        public int x1() => _x1_lr;
+        public int y1() => _y1_lr;
+        public int x2() => line_lr(_interpolator.Y);
+        public int y2() => line_lr(_interpolator.Y);
+        public int x2_hr() => _interpolator.Y;
+        public int y2_hr() => _interpolator.Y;
     }
 }

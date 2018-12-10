@@ -73,21 +73,21 @@ namespace PixelFarm.CpuBlit.Rasterization
 
     public sealed partial class ScanlineRasterizer
     {
-        CellAARasterizer m_cellAARas;
-        VectorClipper m_vectorClipper;
-        int[] m_gammaLut = new int[AA_SCALE];
-        FillingRule m_filling_rule;
-        bool m_auto_close;
+        CellAARasterizer _cellAARas;
+        VectorClipper _vectorClipper;
+        int[] _gammaLut = new int[AA_SCALE];
+        FillingRule _filling_rule;
+        bool _auto_close;
         /// <summary>
         /// multiplied move to start x
         /// </summary>
-        int mul_start_x;
+        int _mul_start_x;
         /// <summary>
         /// multiplied move to starty
         /// </summary>
-        int mul_start_y;
-        Status m_status;
-        int m_scan_y;
+        int _mul_start_y;
+        Status _status;
+        int _scan_y;
         //---------------------------
         const int AA_SHIFT = 8;
         const int AA_SCALE = 1 << AA_SHIFT; //256
@@ -112,16 +112,16 @@ namespace PixelFarm.CpuBlit.Rasterization
         public ScanlineRasterizer()
         {
 
-            m_cellAARas = new CellAARasterizer();
-            m_vectorClipper = new VectorClipper(m_cellAARas);
-            m_filling_rule = FillingRule.NonZero;
-            m_auto_close = true;
-            mul_start_x = 0;
-            mul_start_y = 0;
-            m_status = Status.Initial;
+            _cellAARas = new CellAARasterizer();
+            _vectorClipper = new VectorClipper(_cellAARas);
+            _filling_rule = FillingRule.NonZero;
+            _auto_close = true;
+            _mul_start_x = 0;
+            _mul_start_y = 0;
+            _status = Status.Initial;
             for (int i = AA_SCALE - 1; i >= 0; --i)
             {
-                m_gammaLut[i] = i;
+                _gammaLut[i] = i;
             }
         }
 
@@ -131,8 +131,8 @@ namespace PixelFarm.CpuBlit.Rasterization
         /// </summary>
         public void Reset()
         {
-            m_cellAARas.Reset();
-            m_status = Status.Initial;
+            _cellAARas.Reset();
+            _status = Status.Initial;
         }
         public RectInt GetVectorClipBox()
         {
@@ -155,21 +155,15 @@ namespace PixelFarm.CpuBlit.Rasterization
 
             userModeClipBox = new RectInt(left, bottom, right, top);
             Reset();
-            m_vectorClipper.SetClipBox(
+            _vectorClipper.SetClipBox(
                                 upscale(left), upscale(bottom),
                                 upscale(right), upscale(top));
         }
         //---------------------------------
         //from vector clipper
-        static int upscale(double v)
-        {
-            return AggMath.iround(v * poly_subpix.SCALE);
-        }
-        static int upscale(int v)
-        {
-            return v << poly_subpix.SHIFT;
-            //return v * poly_subpix.SCALE; 
-        }
+        static int upscale(double v) => AggMath.iround(v * poly_subpix.SCALE);
+        static int upscale(int v) => v << poly_subpix.SHIFT;
+        //
         ////from vector clipper
         //static int downscale(int v)
         //{
@@ -178,8 +172,8 @@ namespace PixelFarm.CpuBlit.Rasterization
         //---------------------------------
         FillingRule ScanlineFillingRule
         {
-            get { return this.m_filling_rule; }
-            set { this.m_filling_rule = value; }
+            get => _filling_rule;
+            set => _filling_rule = value;
         }
         //bool AutoClose
         //{
@@ -191,7 +185,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             for (int i = AA_SCALE - 1; i >= 0; --i)
             {
-                m_gammaLut[i] = AggMath.uround(
+                _gammaLut[i] = AggMath.uround(
                     gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK);
             }
         }
@@ -199,27 +193,27 @@ namespace PixelFarm.CpuBlit.Rasterization
         //------------------------------------------------------------------------
         public void MoveTo(double x, double y)
         {
-            if (m_cellAARas.Sorted) { Reset(); }
-            if (m_auto_close) { ClosePolygon(); }
+            if (_cellAARas.Sorted) { Reset(); }
+            if (_auto_close) { ClosePolygon(); }
 
-            m_vectorClipper.MoveTo(
-                mul_start_x = upscale(x),
-                mul_start_y = upscale(y));
-            m_status = Status.MoveTo;
+            _vectorClipper.MoveTo(
+                _mul_start_x = upscale(x),
+                _mul_start_y = upscale(y));
+            _status = Status.MoveTo;
         }
         //------------------------------------------------------------------------
         public void LineTo(double x, double y)
         {
-            m_vectorClipper.LineTo(upscale(x), upscale(y));
-            m_status = Status.LineTo;
+            _vectorClipper.LineTo(upscale(x), upscale(y));
+            _status = Status.LineTo;
         }
 
         void ClosePolygon()
         {
-            if (m_status == Status.LineTo)
+            if (_status == Status.LineTo)
             {
-                m_vectorClipper.LineTo(mul_start_x, mul_start_y);
-                m_status = Status.Closed;
+                _vectorClipper.LineTo(_mul_start_x, _mul_start_y);
+                _status = Status.Closed;
             }
         }
 
@@ -281,7 +275,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             VertexCmd cmd;
             int index = 0;
 
-            if (m_cellAARas.Sorted) { Reset(); }
+            if (_cellAARas.Sorted) { Reset(); }
             float offsetOrgX = OffsetOriginX;
             float offsetOrgY = OffsetOriginY;
 
@@ -337,7 +331,7 @@ namespace PixelFarm.CpuBlit.Rasterization
             VertexCmd cmd;
             int index = 0;
 
-            if (m_cellAARas.Sorted) { Reset(); }
+            if (_cellAARas.Sorted) { Reset(); }
             float offsetOrgX = OffsetOriginX;
             float offsetOrgY = OffsetOriginY;
 
@@ -383,11 +377,11 @@ namespace PixelFarm.CpuBlit.Rasterization
                 if (value)
                 {
                     //expand to 3 times
-                    m_vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(true);
+                    _vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(true);
                 }
                 else
                 {
-                    m_vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(false);
+                    _vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(false);
                 }
             }
         }
@@ -405,28 +399,28 @@ namespace PixelFarm.CpuBlit.Rasterization
 
         //}
 
-        public int MinX { get { return m_cellAARas.MinX; } }
-        public int MinY { get { return m_cellAARas.MinY; } }
-        public int MaxX { get { return m_cellAARas.MaxX; } }
-        public int MaxY { get { return m_cellAARas.MaxY; } }
+        public int MinX => _cellAARas.MinX;
+        public int MinY => _cellAARas.MinY;
+        public int MaxX => _cellAARas.MaxX;
+        public int MaxY => _cellAARas.MaxY;
 
 
         //--------------------------------------------------------------------
         void Sort()
         {
-            if (m_auto_close) { ClosePolygon(); }
+            if (_auto_close) { ClosePolygon(); }
 
-            m_cellAARas.SortCells();
+            _cellAARas.SortCells();
         }
 
         //------------------------------------------------------------------------
         internal bool RewindScanlines()
         {
-            if (m_auto_close) { ClosePolygon(); }
+            if (_auto_close) { ClosePolygon(); }
 
-            m_cellAARas.SortCells();
-            if (m_cellAARas.TotalCells == 0) return false;
-            m_scan_y = m_cellAARas.MinY;
+            _cellAARas.SortCells();
+            if (_cellAARas.TotalCells == 0) return false;
+            _scan_y = _cellAARas.MinY;
             return true;
         }
 
@@ -440,7 +434,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 cover = -cover;
             }
 
-            if (m_filling_rule == FillingRule.EvenOdd)
+            if (_filling_rule == FillingRule.EvenOdd)
             {
                 cover &= AA_SCALE2;
                 if (cover > AA_SCALE)
@@ -454,7 +448,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 cover = AA_MASK;
             }
             //look up from gamma
-            return m_gammaLut[cover];
+            return _gammaLut[cover];
         }
 
         //--------------------------------------------------------------------
@@ -462,7 +456,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             for (; ; )
             {
-                if (m_scan_y > m_cellAARas.MaxY)
+                if (_scan_y > _cellAARas.MaxY)
                 {
                     return false;
                 }
@@ -472,7 +466,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 CellAA[] cells;
                 int offset;
                 int num_cells;
-                m_cellAARas.GetCells(m_scan_y, out cells, out offset, out num_cells);
+                _cellAARas.GetCells(_scan_y, out cells, out offset, out num_cells);
                 int cover = 0;
                 while (num_cells != 0)
                 {
@@ -579,11 +573,11 @@ namespace PixelFarm.CpuBlit.Rasterization
 
                 if (scline.SpanCount != 0) { break; }
 
-                ++m_scan_y;
+                ++_scan_y;
             }
 
-            scline.CloseLine(m_scan_y);
-            ++m_scan_y;
+            scline.CloseLine(_scan_y);
+            ++_scan_y;
             return true;
         }
     }

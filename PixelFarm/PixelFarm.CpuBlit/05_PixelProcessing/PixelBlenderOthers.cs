@@ -1019,21 +1019,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public EnableOutputColorComponent EnableOutputColorComponent
         {
-            get
-            {
-                return _selectedDestMaskComponent;
-            }
-            set
-            {
-                _selectedDestMaskComponent = value;
-            }
+            get => _selectedDestMaskComponent;
+            set => _selectedDestMaskComponent = value;
         }
         public PixelBlenderColorComponent SelectedMaskComponent
         {
-            get
-            {
-                return _selectedMaskComponent;
-            }
+            get => _selectedMaskComponent;
             set
             {
                 _selectedMaskComponent = value;
