@@ -149,7 +149,7 @@ namespace Typography.OpenFont.Tables
                 this.MarkAttachmentClassDef = (markAttachClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, _tableStartAt + markAttachClassDefOffset);
             }
 #else
-            this.MarkAttachmentClassDef = (markAttachClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, tableStartAt + markAttachClassDefOffset);
+            this.MarkAttachmentClassDef = (markAttachClassDefOffset == 0) ? null : ClassDefTable.CreateFrom(reader, _tableStartAt + markAttachClassDefOffset);
 #endif
 
             this.MarkGlyphSetsTable = (markGlyphSetsDefOffset == 0) ? null : MarkGlyphSetsTable.CreateFrom(reader, _tableStartAt + markGlyphSetsDefOffset);
