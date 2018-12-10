@@ -54,11 +54,11 @@ namespace PixelFarm.Drawing
         }
         public override int Width
         {
-            get { return this._memBmp.Width; }
+            get { return _memBmp.Width; }
         }
         public override int Height
         {
-            get { return this._memBmp.Height; }
+            get { return _memBmp.Height; }
         }
     }
 }
