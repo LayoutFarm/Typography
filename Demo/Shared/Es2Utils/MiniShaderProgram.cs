@@ -218,26 +218,26 @@ namespace OpenTK.Graphics.ES20
 
     public class MiniShaderProgram
     {
-        int mProgram;
-        string vs;
-        string fs;
+        int _mProgram;
+        string _vs;
+        string _fs;
         public void LoadVertexShaderSource(string vs)
         {
-            this.vs = vs;
+            _vs = vs;
         }
         public void LoadFragmentShaderSource(string fs)
         {
-            this.fs = fs;
+            _fs = fs;
         }
         public void DeleteMe()
         {
-            GL.DeleteProgram(mProgram);
-            this.mProgram = 0;
+            GL.DeleteProgram(_mProgram);
+            _mProgram = 0;
         }
         public bool Build()
         {
-            mProgram = OpenTK.Graphics.ES20.ES2Utils.CompileProgram(vs, fs);
-            if (mProgram == 0)
+            _mProgram = OpenTK.Graphics.ES20.ES2Utils.CompileProgram(_vs, _fs);
+            if (_mProgram == 0)
             {
                 return false;
             }
@@ -249,12 +249,12 @@ namespace OpenTK.Graphics.ES20
             LoadFragmentShaderSource(fs);
             try
             {
-                mProgram = OpenTK.Graphics.ES20.ES2Utils.CompileProgram(vs, fs);
+                _mProgram = OpenTK.Graphics.ES20.ES2Utils.CompileProgram(vs, fs);
             }
             catch (Exception ex)
             {
             }
-            if (mProgram == 0)
+            if (_mProgram == 0)
             {
                 return false;
             }
@@ -262,47 +262,47 @@ namespace OpenTK.Graphics.ES20
         }
         public ShaderVtxAttrib2f GetAttrV2f(string attrName)
         {
-            return new ShaderVtxAttrib2f(GL.GetAttribLocation(mProgram, attrName));
+            return new ShaderVtxAttrib2f(GL.GetAttribLocation(_mProgram, attrName));
         }
         public ShaderVtxAttrib3f GetAttrV3f(string attrName)
         {
-            return new ShaderVtxAttrib3f(GL.GetAttribLocation(mProgram, attrName));
+            return new ShaderVtxAttrib3f(GL.GetAttribLocation(_mProgram, attrName));
         }
         public ShaderVtxAttrib4f GetAttrV4f(string attrName)
         {
-            return new ShaderVtxAttrib4f(GL.GetAttribLocation(mProgram, attrName));
+            return new ShaderVtxAttrib4f(GL.GetAttribLocation(_mProgram, attrName));
         }
         public ShaderUniformVar1 GetUniform1(string uniformVarName)
         {
-            return new ShaderUniformVar1(GL.GetUniformLocation(this.mProgram, uniformVarName));
+            return new ShaderUniformVar1(GL.GetUniformLocation(_mProgram, uniformVarName));
         }
         public ShaderUniformVar2 GetUniform2(string uniformVarName)
         {
-            return new ShaderUniformVar2(GL.GetUniformLocation(this.mProgram, uniformVarName));
+            return new ShaderUniformVar2(GL.GetUniformLocation(_mProgram, uniformVarName));
         }
         public ShaderUniformVar3 GetUniform3(string uniformVarName)
         {
-            return new ShaderUniformVar3(GL.GetUniformLocation(this.mProgram, uniformVarName));
+            return new ShaderUniformVar3(GL.GetUniformLocation(_mProgram, uniformVarName));
         }
         public ShaderUniformVar4 GetUniform4(string uniformVarName)
         {
-            return new ShaderUniformVar4(GL.GetUniformLocation(this.mProgram, uniformVarName));
+            return new ShaderUniformVar4(GL.GetUniformLocation(_mProgram, uniformVarName));
         }
         public ShaderUniformMatrix4 GetUniformMat4(string uniformVarName)
         {
-            return new ShaderUniformMatrix4(GL.GetUniformLocation(this.mProgram, uniformVarName));
+            return new ShaderUniformMatrix4(GL.GetUniformLocation(_mProgram, uniformVarName));
         }
         public ShaderUniformMatrix3 GetUniformMat3(string uniformVarName)
         {
-            return new ShaderUniformMatrix3(GL.GetUniformLocation(this.mProgram, uniformVarName));
+            return new ShaderUniformMatrix3(GL.GetUniformLocation(_mProgram, uniformVarName));
         }
         public void UseProgram()
         {
-            GL.UseProgram(mProgram);
+            GL.UseProgram(_mProgram);
         }
         public int ProgramId
         {
-            get { return this.mProgram; }
+            get { return _mProgram; }
         }
     }
 }
