@@ -27,14 +27,11 @@ namespace DrawingGL
                 unchecked { _orthoViewVersion++; }
             }
         }
-        public int OrthoViewVersion
-        {
-            get { return _orthoViewVersion; }
-        }
+        public int OrthoViewVersion => _orthoViewVersion;
 
         internal Color StrokeColor
         {
-            get { return _strokeColor; }
+            get => _strokeColor;
             set
             {
                 _strokeColor = value;

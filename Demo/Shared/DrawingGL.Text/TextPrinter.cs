@@ -15,9 +15,9 @@ namespace DrawingGL.Text
         //1. layout glyph
         //2. measure glyph
         //3. generate glyph runs into textrun 
-        GlyphTranslatorToPath pathTranslator;
-        string currentFontFile;
-        GlyphPathBuilder currentGlyphPathBuilder;
+        GlyphTranslatorToPath _pathTranslator;
+        string _currentFontFile;
+        GlyphPathBuilder _currentGlyphPathBuilder;
 
         //
         // for tess
@@ -80,12 +80,12 @@ namespace DrawingGL.Text
         /// </summary>
         public string FontFilename
         {
-            get { return currentFontFile; }
+            get { return _currentFontFile; }
             set
             {
-                if (currentFontFile != value)
+                if (_currentFontFile != value)
                 {
-                    currentFontFile = value;
+                    _currentFontFile = value;
 
                     //TODO: review here
                     using (var stream = Utility.ReadFile(value))
@@ -95,17 +95,17 @@ namespace DrawingGL.Text
                     }
 
                     //2. glyph builder
-                    currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
-                    currentGlyphPathBuilder.UseTrueTypeInstructions = false; //reset
-                    currentGlyphPathBuilder.UseVerticalHinting = false; //reset
+                    _currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
+                    _currentGlyphPathBuilder.UseTrueTypeInstructions = false; //reset
+                    _currentGlyphPathBuilder.UseVerticalHinting = false; //reset
                     switch (this.HintTechnique)
                     {
                         case HintTechnique.TrueTypeInstruction:
-                            currentGlyphPathBuilder.UseTrueTypeInstructions = true;
+                            _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
                             break;
                         case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                            currentGlyphPathBuilder.UseTrueTypeInstructions = true;
-                            currentGlyphPathBuilder.UseVerticalHinting = true;
+                            _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
+                            _currentGlyphPathBuilder.UseVerticalHinting = true;
                             break;
                         case HintTechnique.CustomAutoFit:
                             //custom agg autofit 
@@ -113,7 +113,7 @@ namespace DrawingGL.Text
                     }
 
                     //3. glyph translater
-                    pathTranslator = new GlyphTranslatorToPath();
+                    _pathTranslator = new GlyphTranslatorToPath();
 
                     //4. Update GlyphLayout
                     GlyphLayoutMan.ScriptLang = this.ScriptLang;
@@ -158,7 +158,7 @@ namespace DrawingGL.Text
             for (var i = 0; i < planCount; ++i)
             {
 
-                pathTranslator.Reset();
+                _pathTranslator.Reset();
                 //----
                 //glyph path 
                 //---- 
@@ -173,9 +173,9 @@ namespace DrawingGL.Text
                 {
                     //if not found the  create a new one and register it
                     var writablePath = new WritablePath();
-                    pathTranslator.SetOutput(writablePath);
-                    currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
-                    currentGlyphPathBuilder.ReadShapes(pathTranslator);
+                    _pathTranslator.SetOutput(writablePath);
+                    _currentGlyphPathBuilder.BuildFromGlyphIndex(glyphPlan.glyphIndex, sizeInPoints);
+                    _currentGlyphPathBuilder.ReadShapes(_pathTranslator);
 
                     //-------
                     //do tess  
