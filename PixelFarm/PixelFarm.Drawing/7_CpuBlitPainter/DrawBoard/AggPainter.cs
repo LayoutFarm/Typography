@@ -286,7 +286,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void SetClipBox(int x1, int y1, int x2, int y2)
         {
-            this._aggsx.SetClippingRect(new RectInt(x1, y1, x2, y2));
+            _aggsx.SetClippingRect(new RectInt(x1, y1, x2, y2));
         }
 
 
@@ -479,7 +479,7 @@ namespace PixelFarm.CpuBlit
                     throw new NotSupportedException();
                     //int canvasH = this.Height; 
                     ////_simpleRectVxsGen.SetRect(left + 0.5, canvasH - (bottom + 0.5 + height), right - 0.5, canvasH - (top - 0.5 + height));
-                    //this._bmpBuffer.DrawRectangle(
+                    //_bmpBuffer.DrawRectangle(
                     //(int)Math.Round(left),
                     //(int)Math.Round(top),
                     //(int)Math.Round(left + width),
@@ -622,7 +622,7 @@ namespace PixelFarm.CpuBlit
             //BitmapExt
             if (_useDefaultBrush && _renderQuality == RenderQuality.Fast)
             {
-                this._bxt.FillRectangle(
+                _bxt.FillRectangle(
                       (int)Math.Round(left),
                       (int)Math.Round(top),
                       (int)Math.Round(left + width),
@@ -978,8 +978,8 @@ namespace PixelFarm.CpuBlit
         {
             _aggsx.Render(vxs, spanGen);
 
-            //this._sclineRas.AddPath(vxs);
-            //_bmpRasterizer.RenderWithSpan(this._aggsx.DestImage, _sclineRas, _scline, spanGen);
+            //_sclineRas.AddPath(vxs);
+            //_bmpRasterizer.RenderWithSpan(_aggsx.DestImage, _sclineRas, _scline, spanGen);
         }
         void DrawBitmap(MemBitmap memBmp, double left, double top)
         {
@@ -992,7 +992,7 @@ namespace PixelFarm.CpuBlit
                     BitmapBuffer srcBmp = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
                     try
                     {
-                        this._bxt.CopyBlit(this.OriginX + (int)left, this.OriginY + (int)top, srcBmp);
+                        _bxt.CopyBlit(this.OriginX + (int)left, this.OriginY + (int)top, srcBmp);
                     }
                     catch (Exception ex)
                     {
@@ -1039,7 +1039,7 @@ namespace PixelFarm.CpuBlit
                         var dest = new BitmapBufferEx.RectD(left, top, srcW, srcH);
 
                         BitmapBuffer bmpBuffer = new BitmapBuffer(memBmp.Width, memBmp.Height, tmp.Ptr, tmp.LengthInBytes);
-                        this._bxt.CopyBlit(dest, bmpBuffer, src);
+                        _bxt.CopyBlit(dest, bmpBuffer, src);
                     }
                     catch (Exception ex)
                     {
@@ -1110,11 +1110,11 @@ namespace PixelFarm.CpuBlit
                 TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
                 BitmapBuffer srcBmp = new BitmapBuffer(img.Width, img.Height, tmp.Ptr, tmp.LengthInBytes);
 
-                //this._bxt.BlitRender(srcBmp, false, 1, null);
-                //this._bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
+                //_bxt.BlitRender(srcBmp, false, 1, null);
+                //_bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
                 //    ColorInt.FromArgb(255, 255, 255, 255),
                 //    BitmapBufferExtensions.BlendMode.Alpha);
-                this._bxt.FastAlphaBlit(0, 0, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight);
+                _bxt.FastAlphaBlit(0, 0, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight);
                 return;
             }
             //-------------------------------
@@ -1146,7 +1146,7 @@ namespace PixelFarm.CpuBlit
                 }
                 else
                 {
-                    //this._bxt.BlitRender(srcBmp, false, 1, null);
+                    //_bxt.BlitRender(srcBmp, false, 1, null);
                     _bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
                         ColorInt.FromArgb(255, 255, 255, 255),
                         BitmapBufferExtensions.BlendMode.Alpha);
@@ -1179,16 +1179,16 @@ namespace PixelFarm.CpuBlit
                 //todo, review here again
                 //TempMemPtr tmp = ActualBitmap.GetBufferPtr(actualImg);
                 //BitmapBuffer srcBmp = new BitmapBuffer(actualImage.Width, actualImage.Height, tmp.Ptr, tmp.LengthInBytes); 
-                //this._bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
+                //_bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
 
                 //if (affinePlans != null && affinePlans.Length > 0)
                 //{
-                //    this._bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
+                //    _bxt.BlitRender(srcBmp, false, 1, new BitmapBufferEx.MatrixTransform(affinePlans));
                 //}
                 //else
                 //{
-                //    //this._bxt.BlitRender(srcBmp, false, 1, null);
-                //    this._bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
+                //    //_bxt.BlitRender(srcBmp, false, 1, null);
+                //    _bxt.Blit(0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight, srcBmp, 0, 0, srcBmp.PixelWidth, srcBmp.PixelHeight,
                 //        ColorInt.FromArgb(255, 255, 255, 255),
                 //        BitmapBufferExtensions.BlendMode.Alpha);
                 //}
@@ -1226,19 +1226,19 @@ namespace PixelFarm.CpuBlit
             ///// <param name="area"></param>
             //public override void DoFilterBlurStack(RectInt area, int r)
             //{
-            //    ChildImage img = new ChildImage(this._aggsx.DestImage, _aggsx.PixelBlender,
+            //    ChildImage img = new ChildImage(_aggsx.DestImage, _aggsx.PixelBlender,
             //        area.Left, area.Bottom, area.Right, area.Top);
             //    filterMan.DoStackBlur(img, r);
             //}
             //public override void DoFilterBlurRecursive(RectInt area, int r)
             //{
-            //    ChildImage img = new ChildImage(this._aggsx.DestImage, _aggsx.PixelBlender,
+            //    ChildImage img = new ChildImage(_aggsx.DestImage, _aggsx.PixelBlender,
             //        area.Left, area.Bottom, area.Right, area.Top);
             //    filterMan.DoRecursiveBlur(img, r);
             //}
             //public override void DoFilter(RectInt area, int r)
             //{
-            //    ChildImage img = new ChildImage(this._aggsx.DestImage, _aggsx.PixelBlender,
+            //    ChildImage img = new ChildImage(_aggsx.DestImage, _aggsx.PixelBlender,
             //      area.Left, area.Top, area.Right, area.Bottom);
             //    filterMan.DoSharpen(img, r);
             //}

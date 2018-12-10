@@ -29,7 +29,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         StrokeGenerator _strokeGen;
         public Stroke(double initWidth)
         {
-            this._strokeGen = new StrokeGenerator();
+            _strokeGen = new StrokeGenerator();
             this.Width = initWidth;
         }
 

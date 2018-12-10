@@ -8,12 +8,12 @@ namespace Typography.OpenFont
 
     public class TrueTypeInterpreter
     {
-        Typeface currentTypeFace;
+        Typeface _currentTypeFace;
         SharpFontInterpreter _interpreter;
         public void SetTypeFace(Typeface typeface)
         {
-            this.currentTypeFace = typeface;
-            Tables.MaxProfile maximumProfile = currentTypeFace.MaxProfile;
+            _currentTypeFace = typeface;
+            Tables.MaxProfile maximumProfile = _currentTypeFace.MaxProfile;
             _interpreter = new SharpFontInterpreter(
                 maximumProfile.MaxStackElements,
                 maximumProfile.MaxStorage,
@@ -21,9 +21,9 @@ namespace Typography.OpenFont
                 maximumProfile.MaxInstructionDefs,
                 maximumProfile.MaxTwilightPoints);
             // the fpgm table optionally contains a program to run at initialization time 
-            if (currentTypeFace.FpgmProgramBuffer != null)
+            if (_currentTypeFace.FpgmProgramBuffer != null)
             {
-                _interpreter.InitializeFunctionDefs(currentTypeFace.FpgmProgramBuffer);
+                _interpreter.InitializeFunctionDefs(_currentTypeFace.FpgmProgramBuffer);
             }
         }
 
@@ -31,11 +31,11 @@ namespace Typography.OpenFont
         public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPixel)
         {
 
-            Glyph glyph = currentTypeFace.GetGlyphByIndex(glyphIndex);
+            Glyph glyph = _currentTypeFace.GetGlyphByIndex(glyphIndex);
             //-------------------------------------------
             //1. start with original points/contours from glyph 
-            int horizontalAdv = currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
-            int hFrontSideBearing = currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
+            int horizontalAdv = _currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+            int hFrontSideBearing = _currentTypeFace.GetHFrontSideBearingFromGlyphIndex(glyphIndex);
 
             return HintGlyph(horizontalAdv,
                 hFrontSideBearing,
@@ -81,7 +81,7 @@ namespace Typography.OpenFont
             newGlyphPoints[orgLen + 3] = pp4;
 
             //3. scale all point to target pixel size
-            float pxScale = currentTypeFace.CalculateScaleToPixel(glyphSizeInPixel);
+            float pxScale = _currentTypeFace.CalculateScaleToPixel(glyphSizeInPixel);
             for (int i = orgLen + 3; i >= 0; --i)
             {
                 newGlyphPoints[i].ApplyScale(pxScale);
@@ -99,10 +99,10 @@ namespace Typography.OpenFont
             }
 
             //4.  
-            _interpreter.SetControlValueTable(currentTypeFace.ControlValues,
+            _interpreter.SetControlValueTable(_currentTypeFace.ControlValues,
                 pxScale,
                 glyphSizeInPixel,
-                currentTypeFace.PrepProgramBuffer);
+                _currentTypeFace.PrepProgramBuffer);
             //--------------------------------------------------
             //5. hint
             _interpreter.HintGlyph(newGlyphPoints, contourEndPoints, instructions);
@@ -136,33 +136,33 @@ namespace Typography.OpenFont
     /// </summary>
     class SharpFontInterpreter
     {
-        GraphicsState state;
-        GraphicsState cvtState;
-        ExecutionStack stack;
-        InstructionStream[] functions;
-        InstructionStream[] instructionDefs;
-        float[] controlValueTable;
-        int[] storage;
-        ushort[] contours;
-        float scale;
-        int ppem;
-        int callStackSize;
-        float fdotp;
-        float roundThreshold;
-        float roundPhase;
+        GraphicsState _state;
+        GraphicsState _cvtState;
+        ExecutionStack _stack;
+        InstructionStream[] _functions;
+        InstructionStream[] _instructionDefs;
+        float[] _controlValueTable;
+        int[] _storage;
+        ushort[] _contours;
+        float _scale;
+        int _ppem;
+        int _callStackSize;
+        float _fdotp;
+        float _roundThreshold;
+        float _roundPhase;
         float roundPeriod;
-        Zone zp0, zp1, zp2;
-        Zone points, twilight;
+        Zone _zp0, _zp1, _zp2;
+        Zone _points, _twilight;
 
         public SharpFontInterpreter(int maxStack, int maxStorage, int maxFunctions, int maxInstructionDefs, int maxTwilightPoints)
         {
-            stack = new ExecutionStack(maxStack);
-            storage = new int[maxStorage];
-            functions = new InstructionStream[maxFunctions];
-            instructionDefs = new InstructionStream[maxInstructionDefs > 0 ? 256 : 0];
-            state = new GraphicsState();
-            cvtState = new GraphicsState();
-            twilight = new Zone(new GlyphPointF[maxTwilightPoints], isTwilight: true);
+            _stack = new ExecutionStack(maxStack);
+            _storage = new int[maxStorage];
+            _functions = new InstructionStream[maxFunctions];
+            _instructionDefs = new InstructionStream[maxInstructionDefs > 0 ? 256 : 0];
+            _state = new GraphicsState();
+            _cvtState = new GraphicsState();
+            _twilight = new Zone(new GlyphPointF[maxTwilightPoints], isTwilight: true);
         }
 
         public void InitializeFunctionDefs(byte[] instructions)
@@ -172,37 +172,37 @@ namespace Typography.OpenFont
 
         public void SetControlValueTable(int[] cvt, float scale, float ppem, byte[] cvProgram)
         {
-            if (this.scale == scale || cvt == null)
+            if (_scale == scale || cvt == null)
                 return;
 
-            if (controlValueTable == null)
-                controlValueTable = new float[cvt.Length];
+            if (_controlValueTable == null)
+                _controlValueTable = new float[cvt.Length];
             //copy cvt and apply scale
             for (int i = cvt.Length - 1; i >= 0; --i)
-                controlValueTable[i] = cvt[i] * scale;
+                _controlValueTable[i] = cvt[i] * scale;
 
-            this.scale = scale;
-            this.ppem = (int)Math.Round(ppem);
-            zp0 = zp1 = zp2 = points;
-            state.Reset();
-            stack.Clear();
+            _scale = scale;
+            _ppem = (int)Math.Round(ppem);
+            _zp0 = _zp1 = _zp2 = _points;
+            _state.Reset();
+            _stack.Clear();
 
             if (cvProgram != null)
             {
                 Execute(new InstructionStream(cvProgram), false, false);
 
                 // save off the CVT graphics state so that we can restore it for each glyph we hint
-                if ((state.InstructionControl & InstructionControlFlags.UseDefaultGraphicsState) != 0)
-                    cvtState.Reset();
+                if ((_state.InstructionControl & InstructionControlFlags.UseDefaultGraphicsState) != 0)
+                    _cvtState.Reset();
                 else
                 {
                     // always reset a few fields; copy the reset
-                    cvtState = state;
-                    cvtState.Freedom = Vector2.UnitX;
-                    cvtState.Projection = Vector2.UnitX;
-                    cvtState.DualProjection = Vector2.UnitX;
-                    cvtState.RoundState = RoundMode.ToGrid;
-                    cvtState.Loop = 1;
+                    _cvtState = _state;
+                    _cvtState.Freedom = Vector2.UnitX;
+                    _cvtState.Projection = Vector2.UnitX;
+                    _cvtState.DualProjection = Vector2.UnitX;
+                    _cvtState.RoundState = RoundMode.ToGrid;
+                    _cvtState.Loop = 1;
                 }
             }
         }
@@ -213,27 +213,27 @@ namespace Typography.OpenFont
                 return;
 
             // check if the CVT program disabled hinting
-            if ((state.InstructionControl & InstructionControlFlags.InhibitGridFitting) != 0)
+            if ((_state.InstructionControl & InstructionControlFlags.InhibitGridFitting) != 0)
                 return;
 
             // TODO: composite glyphs
             // TODO: round the phantom points?
 
             // save contours and points
-            this.contours = contours;
-            zp0 = zp1 = zp2 = points = new Zone(glyphPoints, isTwilight: false);
+            _contours = contours;
+            _zp0 = _zp1 = _zp2 = _points = new Zone(glyphPoints, isTwilight: false);
 
             // reset all of our shared state
-            state = cvtState;
-            callStackSize = 0;
+            _state = _cvtState;
+            _callStackSize = 0;
 #if DEBUG
             debugList.Clear();
 #endif
-            stack.Clear();
+            _stack.Clear();
             OnVectorsUpdated();
 
             // normalize the round state settings
-            switch (state.RoundState)
+            switch (_state.RoundState)
             {
                 case RoundMode.Super: SetSuperRound(1.0f); break;
                 case RoundMode.Super45: SetSuperRound(Sqrt2Over2); break;
@@ -269,7 +269,7 @@ namespace Typography.OpenFont
                         {
                             var count = opcode == OpCode.NPUSHB ? stream.NextByte() : opcode - OpCode.PUSHB1 + 1;
                             for (int i = count - 1; i >= 0; --i)
-                                stack.Push(stream.NextByte());
+                                _stack.Push(stream.NextByte());
                         }
                         break;
                     case OpCode.NPUSHW:
@@ -284,41 +284,41 @@ namespace Typography.OpenFont
                         {
                             var count = opcode == OpCode.NPUSHW ? stream.NextByte() : opcode - OpCode.PUSHW1 + 1;
                             for (int i = count - 1; i >= 0; --i)
-                                stack.Push(stream.NextWord());
+                                _stack.Push(stream.NextWord());
                         }
                         break;
 
                     // ==== STORAGE MANAGEMENT ====
                     case OpCode.RS:
                         {
-                            var loc = CheckIndex(stack.Pop(), storage.Length);
-                            stack.Push(storage[loc]);
+                            var loc = CheckIndex(_stack.Pop(), _storage.Length);
+                            _stack.Push(_storage[loc]);
                         }
                         break;
                     case OpCode.WS:
                         {
-                            var value = stack.Pop();
-                            var loc = CheckIndex(stack.Pop(), storage.Length);
-                            storage[loc] = value;
+                            var value = _stack.Pop();
+                            var loc = CheckIndex(_stack.Pop(), _storage.Length);
+                            _storage[loc] = value;
                         }
                         break;
 
                     // ==== CONTROL VALUE TABLE ====
                     case OpCode.WCVTP:
                         {
-                            var value = stack.PopFloat();
-                            var loc = CheckIndex(stack.Pop(), controlValueTable.Length);
-                            controlValueTable[loc] = value;
+                            var value = _stack.PopFloat();
+                            var loc = CheckIndex(_stack.Pop(), _controlValueTable.Length);
+                            _controlValueTable[loc] = value;
                         }
                         break;
                     case OpCode.WCVTF:
                         {
-                            var value = stack.Pop();
-                            var loc = CheckIndex(stack.Pop(), controlValueTable.Length);
-                            controlValueTable[loc] = value * scale;
+                            var value = _stack.Pop();
+                            var loc = CheckIndex(_stack.Pop(), _controlValueTable.Length);
+                            _controlValueTable[loc] = value * _scale;
                         }
                         break;
-                    case OpCode.RCVT: stack.Push(ReadCvt()); break;
+                    case OpCode.RCVT: _stack.Push(ReadCvt()); break;
 
                     // ==== STATE VECTORS ====
                     case OpCode.SVTCA0:
@@ -329,7 +329,7 @@ namespace Typography.OpenFont
                             SetProjectionVectorToAxis(axis);
                         }
                         break;
-                    case OpCode.SFVTPV: state.Freedom = state.Projection; OnVectorsUpdated(); break;
+                    case OpCode.SFVTPV: _state.Freedom = _state.Projection; OnVectorsUpdated(); break;
                     case OpCode.SPVTCA0:
                     case OpCode.SPVTCA1: SetProjectionVectorToAxis(opcode - OpCode.SPVTCA0); break;
                     case OpCode.SFVTCA0:
@@ -343,15 +343,15 @@ namespace Typography.OpenFont
                     case OpCode.SPVFS:
                     case OpCode.SFVFS:
                         {
-                            var y = stack.Pop();
-                            var x = stack.Pop();
+                            var y = _stack.Pop();
+                            var x = _stack.Pop();
                             var vec = Vector2.Normalize(new Vector2(F2Dot14ToFloat(x), F2Dot14ToFloat(y)));
                             if (opcode == OpCode.SFVFS)
-                                state.Freedom = vec;
+                                _state.Freedom = vec;
                             else
                             {
-                                state.Projection = vec;
-                                state.DualProjection = vec;
+                                _state.Projection = vec;
+                                _state.DualProjection = vec;
                             }
                             OnVectorsUpdated();
                         }
@@ -359,118 +359,118 @@ namespace Typography.OpenFont
                     case OpCode.GPV:
                     case OpCode.GFV:
                         {
-                            var vec = opcode == OpCode.GPV ? state.Projection : state.Freedom;
-                            stack.Push(FloatToF2Dot14(vec.X));
-                            stack.Push(FloatToF2Dot14(vec.Y));
+                            var vec = opcode == OpCode.GPV ? _state.Projection : _state.Freedom;
+                            _stack.Push(FloatToF2Dot14(vec.X));
+                            _stack.Push(FloatToF2Dot14(vec.Y));
                         }
                         break;
 
                     // ==== GRAPHICS STATE ====
-                    case OpCode.SRP0: state.Rp0 = stack.Pop(); break;
-                    case OpCode.SRP1: state.Rp1 = stack.Pop(); break;
-                    case OpCode.SRP2: state.Rp2 = stack.Pop(); break;
-                    case OpCode.SZP0: zp0 = GetZoneFromStack(); break;
-                    case OpCode.SZP1: zp1 = GetZoneFromStack(); break;
-                    case OpCode.SZP2: zp2 = GetZoneFromStack(); break;
-                    case OpCode.SZPS: zp0 = zp1 = zp2 = GetZoneFromStack(); break;
-                    case OpCode.RTHG: state.RoundState = RoundMode.ToHalfGrid; break;
-                    case OpCode.RTG: state.RoundState = RoundMode.ToGrid; break;
-                    case OpCode.RTDG: state.RoundState = RoundMode.ToDoubleGrid; break;
-                    case OpCode.RDTG: state.RoundState = RoundMode.DownToGrid; break;
-                    case OpCode.RUTG: state.RoundState = RoundMode.UpToGrid; break;
-                    case OpCode.ROFF: state.RoundState = RoundMode.Off; break;
-                    case OpCode.SROUND: state.RoundState = RoundMode.Super; SetSuperRound(1.0f); break;
-                    case OpCode.S45ROUND: state.RoundState = RoundMode.Super45; SetSuperRound(Sqrt2Over2); break;
+                    case OpCode.SRP0: _state.Rp0 = _stack.Pop(); break;
+                    case OpCode.SRP1: _state.Rp1 = _stack.Pop(); break;
+                    case OpCode.SRP2: _state.Rp2 = _stack.Pop(); break;
+                    case OpCode.SZP0: _zp0 = GetZoneFromStack(); break;
+                    case OpCode.SZP1: _zp1 = GetZoneFromStack(); break;
+                    case OpCode.SZP2: _zp2 = GetZoneFromStack(); break;
+                    case OpCode.SZPS: _zp0 = _zp1 = _zp2 = GetZoneFromStack(); break;
+                    case OpCode.RTHG: _state.RoundState = RoundMode.ToHalfGrid; break;
+                    case OpCode.RTG: _state.RoundState = RoundMode.ToGrid; break;
+                    case OpCode.RTDG: _state.RoundState = RoundMode.ToDoubleGrid; break;
+                    case OpCode.RDTG: _state.RoundState = RoundMode.DownToGrid; break;
+                    case OpCode.RUTG: _state.RoundState = RoundMode.UpToGrid; break;
+                    case OpCode.ROFF: _state.RoundState = RoundMode.Off; break;
+                    case OpCode.SROUND: _state.RoundState = RoundMode.Super; SetSuperRound(1.0f); break;
+                    case OpCode.S45ROUND: _state.RoundState = RoundMode.Super45; SetSuperRound(Sqrt2Over2); break;
                     case OpCode.INSTCTRL:
                         {
-                            var selector = stack.Pop();
+                            var selector = _stack.Pop();
                             if (selector >= 1 && selector <= 2)
                             {
                                 // value is false if zero, otherwise shift the right bit into the flags
                                 var bit = 1 << (selector - 1);
-                                if (stack.Pop() == 0)
-                                    state.InstructionControl = (InstructionControlFlags)((int)state.InstructionControl & ~bit);
+                                if (_stack.Pop() == 0)
+                                    _state.InstructionControl = (InstructionControlFlags)((int)_state.InstructionControl & ~bit);
                                 else
-                                    state.InstructionControl = (InstructionControlFlags)((int)state.InstructionControl | bit);
+                                    _state.InstructionControl = (InstructionControlFlags)((int)_state.InstructionControl | bit);
                             }
                         }
                         break;
-                    case OpCode.SCANCTRL: /* instruction unspported */ stack.Pop(); break;
-                    case OpCode.SCANTYPE: /* instruction unspported */ stack.Pop(); break;
-                    case OpCode.SANGW: /* instruction unspported */ stack.Pop(); break;
-                    case OpCode.SLOOP: state.Loop = stack.Pop(); break;
-                    case OpCode.SMD: state.MinDistance = stack.PopFloat(); break;
-                    case OpCode.SCVTCI: state.ControlValueCutIn = stack.PopFloat(); break;
-                    case OpCode.SSWCI: state.SingleWidthCutIn = stack.PopFloat(); break;
-                    case OpCode.SSW: state.SingleWidthValue = stack.Pop() * scale; break;
-                    case OpCode.FLIPON: state.AutoFlip = true; break;
-                    case OpCode.FLIPOFF: state.AutoFlip = false; break;
-                    case OpCode.SDB: state.DeltaBase = stack.Pop(); break;
-                    case OpCode.SDS: state.DeltaShift = stack.Pop(); break;
+                    case OpCode.SCANCTRL: /* instruction unspported */ _stack.Pop(); break;
+                    case OpCode.SCANTYPE: /* instruction unspported */ _stack.Pop(); break;
+                    case OpCode.SANGW: /* instruction unspported */ _stack.Pop(); break;
+                    case OpCode.SLOOP: _state.Loop = _stack.Pop(); break;
+                    case OpCode.SMD: _state.MinDistance = _stack.PopFloat(); break;
+                    case OpCode.SCVTCI: _state.ControlValueCutIn = _stack.PopFloat(); break;
+                    case OpCode.SSWCI: _state.SingleWidthCutIn = _stack.PopFloat(); break;
+                    case OpCode.SSW: _state.SingleWidthValue = _stack.Pop() * _scale; break;
+                    case OpCode.FLIPON: _state.AutoFlip = true; break;
+                    case OpCode.FLIPOFF: _state.AutoFlip = false; break;
+                    case OpCode.SDB: _state.DeltaBase = _stack.Pop(); break;
+                    case OpCode.SDS: _state.DeltaShift = _stack.Pop(); break;
 
                     // ==== POINT MEASUREMENT ====
-                    case OpCode.GC0: stack.Push(Project(zp2.GetCurrent(stack.Pop()))); break;
-                    case OpCode.GC1: stack.Push(DualProject(zp2.GetOriginal(stack.Pop()))); break;
+                    case OpCode.GC0: _stack.Push(Project(_zp2.GetCurrent(_stack.Pop()))); break;
+                    case OpCode.GC1: _stack.Push(DualProject(_zp2.GetOriginal(_stack.Pop()))); break;
                     case OpCode.SCFS:
                         {
-                            var value = stack.PopFloat();
-                            var index = stack.Pop();
-                            var point = zp2.GetCurrent(index);
-                            MovePoint(zp2, index, value - Project(point));
+                            var value = _stack.PopFloat();
+                            var index = _stack.Pop();
+                            var point = _zp2.GetCurrent(index);
+                            MovePoint(_zp2, index, value - Project(point));
 
                             // moving twilight points moves their "original" value also
-                            if (zp2.IsTwilight)
-                                zp2.Original[index].P = zp2.Current[index].P;
+                            if (_zp2.IsTwilight)
+                                _zp2.Original[index].P = _zp2.Current[index].P;
                         }
                         break;
                     case OpCode.MD0:
                         {
-                            var p1 = zp1.GetOriginal(stack.Pop());
-                            var p2 = zp0.GetOriginal(stack.Pop());
-                            stack.Push(DualProject(p2 - p1));
+                            var p1 = _zp1.GetOriginal(_stack.Pop());
+                            var p2 = _zp0.GetOriginal(_stack.Pop());
+                            _stack.Push(DualProject(p2 - p1));
                         }
                         break;
                     case OpCode.MD1:
                         {
-                            var p1 = zp1.GetCurrent(stack.Pop());
-                            var p2 = zp0.GetCurrent(stack.Pop());
-                            stack.Push(Project(p2 - p1));
+                            var p1 = _zp1.GetCurrent(_stack.Pop());
+                            var p2 = _zp0.GetCurrent(_stack.Pop());
+                            _stack.Push(Project(p2 - p1));
                         }
                         break;
                     case OpCode.MPS: // MPS should return point size, but we assume DPI so it's the same as pixel size
-                    case OpCode.MPPEM: stack.Push(ppem); break;
-                    case OpCode.AA: /* deprecated instruction */ stack.Pop(); break;
+                    case OpCode.MPPEM: _stack.Push(_ppem); break;
+                    case OpCode.AA: /* deprecated instruction */ _stack.Pop(); break;
 
                     // ==== POINT MODIFICATION ====
                     case OpCode.FLIPPT:
                         {
-                            for (int i = 0; i < state.Loop; i++)
+                            for (int i = 0; i < _state.Loop; i++)
                             {
-                                var index = stack.Pop();
+                                var index = _stack.Pop();
                                 //review here again!
-                                points.Current[index].onCurve = !points.Current[index].onCurve;
+                                _points.Current[index].onCurve = !_points.Current[index].onCurve;
                                 //if (points.Current[index].onCurve)
                                 //    points.Current[index].onCurve = false;
                                 //else
                                 //    points.Current[index].onCurve = true;
                             }
-                            state.Loop = 1;
+                            _state.Loop = 1;
                         }
                         break;
                     case OpCode.FLIPRGON:
                         {
-                            var end = stack.Pop();
-                            for (int i = stack.Pop(); i <= end; i++)
+                            var end = _stack.Pop();
+                            for (int i = _stack.Pop(); i <= end; i++)
                                 //points.Current[i].Type = PointType.OnCurve;
-                                points.Current[i].onCurve = true;
+                                _points.Current[i].onCurve = true;
                         }
                         break;
                     case OpCode.FLIPRGOFF:
                         {
-                            var end = stack.Pop();
-                            for (int i = stack.Pop(); i <= end; i++)
+                            var end = _stack.Pop();
+                            for (int i = _stack.Pop(); i <= end; i++)
                                 //points.Current[i].Type = PointType.Quadratic;
-                                points.Current[i].onCurve = false;
+                                _points.Current[i].onCurve = false;
                         }
                         break;
                     case OpCode.SHP0:
@@ -482,7 +482,7 @@ namespace Typography.OpenFont
                             ShiftPoints(displacement);
                         }
                         break;
-                    case OpCode.SHPIX: ShiftPoints(stack.PopFloat() * state.Freedom); break;
+                    case OpCode.SHPIX: ShiftPoints(_stack.PopFloat() * _state.Freedom); break;
                     case OpCode.SHC0:
                     case OpCode.SHC1:
                         {
@@ -490,17 +490,17 @@ namespace Typography.OpenFont
                             int point;
                             var displacement = ComputeDisplacement((int)opcode, out zone, out point);
                             var touch = GetTouchState();
-                            var contour = stack.Pop();
-                            var start = contour == 0 ? 0 : contours[contour - 1] + 1;
-                            var count = zp2.IsTwilight ? zp2.Current.Length : contours[contour] + 1;
+                            var contour = _stack.Pop();
+                            var start = contour == 0 ? 0 : _contours[contour - 1] + 1;
+                            var count = _zp2.IsTwilight ? _zp2.Current.Length : _contours[contour] + 1;
 
                             for (int i = start; i < count; i++)
                             {
                                 // don't move the reference point
-                                if (zone.Current != zp2.Current || point != i)
+                                if (zone.Current != _zp2.Current || point != i)
                                 {
-                                    zp2.Current[i].P += displacement;
-                                    zp2.TouchState[i] |= touch;
+                                    _zp2.Current[i].P += displacement;
+                                    _zp2.TouchState[i] |= touch;
                                 }
                             }
                         }
@@ -512,16 +512,16 @@ namespace Typography.OpenFont
                             int point;
                             var displacement = ComputeDisplacement((int)opcode, out zone, out point);
                             var count = 0;
-                            if (zp2.IsTwilight)
-                                count = zp2.Current.Length;
-                            else if (contours.Length > 0)
-                                count = contours[contours.Length - 1] + 1;
+                            if (_zp2.IsTwilight)
+                                count = _zp2.Current.Length;
+                            else if (_contours.Length > 0)
+                                count = _contours[_contours.Length - 1] + 1;
 
                             for (int i = 0; i < count; i++)
                             {
                                 // don't move the reference point
-                                if (zone.Current != zp2.Current || point != i)
-                                    zp2.Current[i].P += displacement;
+                                if (zone.Current != _zp2.Current || point != i)
+                                    _zp2.Current[i].P += displacement;
                             }
                         }
                         break;
@@ -529,37 +529,37 @@ namespace Typography.OpenFont
                     case OpCode.MIAP1:
                         {
                             var distance = ReadCvt();
-                            var pointIndex = stack.Pop();
+                            var pointIndex = _stack.Pop();
 
                             // this instruction is used in the CVT to set up twilight points with original values
-                            if (zp0.IsTwilight)
+                            if (_zp0.IsTwilight)
                             {
-                                var original = state.Freedom * distance;
-                                zp0.Original[pointIndex].P = original;
-                                zp0.Current[pointIndex].P = original;
+                                var original = _state.Freedom * distance;
+                                _zp0.Original[pointIndex].P = original;
+                                _zp0.Current[pointIndex].P = original;
                             }
 
                             // current position of the point along the projection vector
-                            var point = zp0.GetCurrent(pointIndex);
+                            var point = _zp0.GetCurrent(pointIndex);
                             var currentPos = Project(point);
                             if (opcode == OpCode.MIAP1)
                             {
                                 // only use the CVT if we are above the cut-in point
-                                if (Math.Abs(distance - currentPos) > state.ControlValueCutIn)
+                                if (Math.Abs(distance - currentPos) > _state.ControlValueCutIn)
                                     distance = currentPos;
                                 distance = Round(distance);
                             }
 
-                            MovePoint(zp0, pointIndex, distance - currentPos);
-                            state.Rp0 = pointIndex;
-                            state.Rp1 = pointIndex;
+                            MovePoint(_zp0, pointIndex, distance - currentPos);
+                            _state.Rp0 = pointIndex;
+                            _state.Rp1 = pointIndex;
                         }
                         break;
                     case OpCode.MDAP0:
                     case OpCode.MDAP1:
                         {
-                            var pointIndex = stack.Pop();
-                            var point = zp0.GetCurrent(pointIndex);
+                            var pointIndex = _stack.Pop();
+                            var point = _zp0.GetCurrent(pointIndex);
                             var distance = 0.0f;
                             if (opcode == OpCode.MDAP1)
                             {
@@ -567,46 +567,46 @@ namespace Typography.OpenFont
                                 distance = Round(distance) - distance;
                             }
 
-                            MovePoint(zp0, pointIndex, distance);
-                            state.Rp0 = pointIndex;
-                            state.Rp1 = pointIndex;
+                            MovePoint(_zp0, pointIndex, distance);
+                            _state.Rp0 = pointIndex;
+                            _state.Rp1 = pointIndex;
                         }
                         break;
                     case OpCode.MSIRP0:
                     case OpCode.MSIRP1:
                         {
-                            var targetDistance = stack.PopFloat();
-                            var pointIndex = stack.Pop();
+                            var targetDistance = _stack.PopFloat();
+                            var pointIndex = _stack.Pop();
 
                             // if we're operating on the twilight zone, initialize the points
-                            if (zp1.IsTwilight)
+                            if (_zp1.IsTwilight)
                             {
-                                zp1.Original[pointIndex].P = zp0.Original[state.Rp0].P + targetDistance * state.Freedom / fdotp;
-                                zp1.Current[pointIndex].P = zp1.Original[pointIndex].P;
+                                _zp1.Original[pointIndex].P = _zp0.Original[_state.Rp0].P + targetDistance * _state.Freedom / _fdotp;
+                                _zp1.Current[pointIndex].P = _zp1.Original[pointIndex].P;
                             }
 
-                            var currentDistance = Project(zp1.GetCurrent(pointIndex) - zp0.GetCurrent(state.Rp0));
-                            MovePoint(zp1, pointIndex, targetDistance - currentDistance);
+                            var currentDistance = Project(_zp1.GetCurrent(pointIndex) - _zp0.GetCurrent(_state.Rp0));
+                            MovePoint(_zp1, pointIndex, targetDistance - currentDistance);
 
-                            state.Rp1 = state.Rp0;
-                            state.Rp2 = pointIndex;
+                            _state.Rp1 = _state.Rp0;
+                            _state.Rp2 = pointIndex;
                             if (opcode == OpCode.MSIRP1)
-                                state.Rp0 = pointIndex;
+                                _state.Rp0 = pointIndex;
                         }
                         break;
                     case OpCode.IP:
                         {
-                            var originalBase = zp0.GetOriginal(state.Rp1);
-                            var currentBase = zp0.GetCurrent(state.Rp1);
-                            var originalRange = DualProject(zp1.GetOriginal(state.Rp2) - originalBase);
-                            var currentRange = Project(zp1.GetCurrent(state.Rp2) - currentBase);
+                            var originalBase = _zp0.GetOriginal(_state.Rp1);
+                            var currentBase = _zp0.GetCurrent(_state.Rp1);
+                            var originalRange = DualProject(_zp1.GetOriginal(_state.Rp2) - originalBase);
+                            var currentRange = Project(_zp1.GetCurrent(_state.Rp2) - currentBase);
 
-                            for (int i = 0; i < state.Loop; i++)
+                            for (int i = 0; i < _state.Loop; i++)
                             {
-                                var pointIndex = stack.Pop();
-                                var point = zp2.GetCurrent(pointIndex);
+                                var pointIndex = _stack.Pop();
+                                var point = _zp2.GetCurrent(pointIndex);
                                 var currentDistance = Project(point - currentBase);
-                                var originalDistance = DualProject(zp2.GetOriginal(pointIndex) - originalBase);
+                                var originalDistance = DualProject(_zp2.GetOriginal(pointIndex) - originalBase);
 
                                 var newDistance = 0.0f;
                                 if (originalDistance != 0.0f)
@@ -618,37 +618,37 @@ namespace Typography.OpenFont
                                         newDistance = originalDistance * currentRange / originalRange;
                                 }
 
-                                MovePoint(zp2, pointIndex, newDistance - currentDistance);
+                                MovePoint(_zp2, pointIndex, newDistance - currentDistance);
                             }
-                            state.Loop = 1;
+                            _state.Loop = 1;
                         }
                         break;
                     case OpCode.ALIGNRP:
                         {
-                            for (int i = 0; i < state.Loop; i++)
+                            for (int i = 0; i < _state.Loop; i++)
                             {
-                                var pointIndex = stack.Pop();
-                                var p1 = zp1.GetCurrent(pointIndex);
-                                var p2 = zp0.GetCurrent(state.Rp0);
-                                MovePoint(zp1, pointIndex, -Project(p1 - p2));
+                                var pointIndex = _stack.Pop();
+                                var p1 = _zp1.GetCurrent(pointIndex);
+                                var p2 = _zp0.GetCurrent(_state.Rp0);
+                                MovePoint(_zp1, pointIndex, -Project(p1 - p2));
                             }
-                            state.Loop = 1;
+                            _state.Loop = 1;
                         }
                         break;
                     case OpCode.ALIGNPTS:
                         {
-                            var p1 = stack.Pop();
-                            var p2 = stack.Pop();
-                            var distance = Project(zp0.GetCurrent(p2) - zp1.GetCurrent(p1)) / 2;
-                            MovePoint(zp1, p1, distance);
-                            MovePoint(zp0, p2, -distance);
+                            var p1 = _stack.Pop();
+                            var p2 = _stack.Pop();
+                            var distance = Project(_zp0.GetCurrent(p2) - _zp1.GetCurrent(p1)) / 2;
+                            MovePoint(_zp1, p1, distance);
+                            MovePoint(_zp0, p2, -distance);
                         }
                         break;
-                    case OpCode.UTP: zp0.TouchState[stack.Pop()] &= ~GetTouchState(); break;
+                    case OpCode.UTP: _zp0.TouchState[_stack.Pop()] &= ~GetTouchState(); break;
                     case OpCode.IUP0:
                     case OpCode.IUP1:
                         // bail if no contours (empty outline)
-                        if (contours.Length == 0)
+                        if (_contours.Length == 0)
                         {
                             break;
                         }
@@ -810,8 +810,8 @@ namespace Typography.OpenFont
 
                             //unsafe version 
                             //TODO: provide manage version 
-                            fixed (GlyphPointF* currentPtr = points.Current)
-                            fixed (GlyphPointF* originalPtr = points.Original)
+                            fixed (GlyphPointF* currentPtr = _points.Current)
+                            fixed (GlyphPointF* originalPtr = _points.Original)
                             {
                                 // opcode controls whether we care about X or Y direction
                                 // do some pointer trickery so we can operate on the
@@ -833,9 +833,9 @@ namespace Typography.OpenFont
                                 }
 
                                 var point = 0;
-                                for (int i = 0; i < contours.Length; i++)
+                                for (int i = 0; i < _contours.Length; i++)
                                 {
-                                    var endPoint = contours[i];
+                                    var endPoint = _contours[i];
                                     var firstPoint = point;
                                     var firstTouched = -1;
                                     var lastTouched = -1;
@@ -843,7 +843,7 @@ namespace Typography.OpenFont
                                     for (; point <= endPoint; point++)
                                     {
                                         // check whether this point has been touched
-                                        if ((points.TouchState[point] & touchMask) != 0)
+                                        if ((_points.TouchState[point] & touchMask) != 0)
                                         {
                                             // if this is the first touched point in the contour, note it and continue
                                             if (firstTouched < 0)
@@ -894,11 +894,11 @@ namespace Typography.OpenFont
                     case OpCode.ISECT:
                         {
                             // move point P to the intersection of lines A and B
-                            var b1 = zp0.GetCurrent(stack.Pop());
-                            var b0 = zp0.GetCurrent(stack.Pop());
-                            var a1 = zp1.GetCurrent(stack.Pop());
-                            var a0 = zp1.GetCurrent(stack.Pop());
-                            var index = stack.Pop();
+                            var b1 = _zp0.GetCurrent(_stack.Pop());
+                            var b0 = _zp0.GetCurrent(_stack.Pop());
+                            var a1 = _zp1.GetCurrent(_stack.Pop());
+                            var a0 = _zp1.GetCurrent(_stack.Pop());
+                            var index = _stack.Pop();
 
                             // calculate intersection using determinants: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
                             var da = a0 - a1;
@@ -907,7 +907,7 @@ namespace Typography.OpenFont
                             if (Math.Abs(den) <= Epsilon)
                             {
                                 // parallel lines; spec says to put the ppoint "into the middle of the two lines"
-                                zp2.Current[index].P = (a0 + a1 + b0 + b1) / 4;
+                                _zp2.Current[index].P = (a0 + a1 + b0 + b1) / 4;
                             }
                             else
                             {
@@ -917,28 +917,28 @@ namespace Typography.OpenFont
                                     (t * db.X) - (da.X * u),
                                     (t * db.Y) - (da.Y * u)
                                 );
-                                zp2.Current[index].P = p / den;
+                                _zp2.Current[index].P = p / den;
                             }
-                            zp2.TouchState[index] = TouchState.Both;
+                            _zp2.TouchState[index] = TouchState.Both;
                         }
                         break;
 
                     // ==== STACK MANAGEMENT ====
-                    case OpCode.DUP: stack.Duplicate(); break;
-                    case OpCode.POP: stack.Pop(); break;
-                    case OpCode.CLEAR: stack.Clear(); break;
-                    case OpCode.SWAP: stack.Swap(); break;
-                    case OpCode.DEPTH: stack.Depth(); break;
-                    case OpCode.CINDEX: stack.Copy(); break;
-                    case OpCode.MINDEX: stack.Move(); break;
-                    case OpCode.ROLL: stack.Roll(); break;
+                    case OpCode.DUP: _stack.Duplicate(); break;
+                    case OpCode.POP: _stack.Pop(); break;
+                    case OpCode.CLEAR: _stack.Clear(); break;
+                    case OpCode.SWAP: _stack.Swap(); break;
+                    case OpCode.DEPTH: _stack.Depth(); break;
+                    case OpCode.CINDEX: _stack.Copy(); break;
+                    case OpCode.MINDEX: _stack.Move(); break;
+                    case OpCode.ROLL: _stack.Roll(); break;
 
                     // ==== FLOW CONTROL ====
                     case OpCode.IF:
                         {
                             // value is false; jump to the next else block or endif marker
                             // otherwise, we don't have to do anything; we'll keep executing this block
-                            if (!stack.PopBool())
+                            if (!_stack.PopBool())
                             {
                                 int indent = 1;
                                 while (indent > 0)
@@ -977,125 +977,125 @@ namespace Typography.OpenFont
                     case OpCode.JROT:
                     case OpCode.JROF:
                         {
-                            if (stack.PopBool() == (opcode == OpCode.JROT))
-                                stream.Jump(stack.Pop() - 1);
+                            if (_stack.PopBool() == (opcode == OpCode.JROT))
+                                stream.Jump(_stack.Pop() - 1);
                             else
-                                stack.Pop();    // ignore the offset
+                                _stack.Pop();    // ignore the offset
                         }
                         break;
-                    case OpCode.JMPR: stream.Jump(stack.Pop() - 1); break;
+                    case OpCode.JMPR: stream.Jump(_stack.Pop() - 1); break;
 
                     // ==== LOGICAL OPS ====
                     case OpCode.LT:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a < b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a < b);
                         }
                         break;
                     case OpCode.LTEQ:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a <= b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a <= b);
                         }
                         break;
                     case OpCode.GT:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a > b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a > b);
                         }
                         break;
                     case OpCode.GTEQ:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a >= b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a >= b);
                         }
                         break;
                     case OpCode.EQ:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a == b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a == b);
                         }
                         break;
                     case OpCode.NEQ:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a != b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a != b);
                         }
                         break;
                     case OpCode.AND:
                         {
-                            var b = stack.PopBool();
-                            var a = stack.PopBool();
-                            stack.Push(a && b);
+                            var b = _stack.PopBool();
+                            var a = _stack.PopBool();
+                            _stack.Push(a && b);
                         }
                         break;
                     case OpCode.OR:
                         {
-                            var b = stack.PopBool();
-                            var a = stack.PopBool();
-                            stack.Push(a || b);
+                            var b = _stack.PopBool();
+                            var a = _stack.PopBool();
+                            _stack.Push(a || b);
                         }
                         break;
-                    case OpCode.NOT: stack.Push(!stack.PopBool()); break;
+                    case OpCode.NOT: _stack.Push(!_stack.PopBool()); break;
                     case OpCode.ODD:
                         {
-                            var value = (int)Round(stack.PopFloat());
-                            stack.Push(value % 2 != 0);
+                            var value = (int)Round(_stack.PopFloat());
+                            _stack.Push(value % 2 != 0);
                         }
                         break;
                     case OpCode.EVEN:
                         {
-                            var value = (int)Round(stack.PopFloat());
-                            stack.Push(value % 2 == 0);
+                            var value = (int)Round(_stack.PopFloat());
+                            _stack.Push(value % 2 == 0);
                         }
                         break;
 
                     // ==== ARITHMETIC ====
                     case OpCode.ADD:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a + b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a + b);
                         }
                         break;
                     case OpCode.SUB:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
-                            stack.Push(a - b);
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
+                            _stack.Push(a - b);
                         }
                         break;
                     case OpCode.DIV:
                         {
-                            var b = stack.Pop();
+                            var b = _stack.Pop();
                             if (b == 0)
                                 throw new InvalidFontException("Division by zero.");
 
-                            var a = stack.Pop();
+                            var a = _stack.Pop();
                             var result = ((long)a << 6) / b;
-                            stack.Push((int)result);
+                            _stack.Push((int)result);
                         }
                         break;
                     case OpCode.MUL:
                         {
-                            var b = stack.Pop();
-                            var a = stack.Pop();
+                            var b = _stack.Pop();
+                            var a = _stack.Pop();
                             var result = ((long)a * b) >> 6;
-                            stack.Push((int)result);
+                            _stack.Push((int)result);
                         }
                         break;
-                    case OpCode.ABS: stack.Push(Math.Abs(stack.Pop())); break;
-                    case OpCode.NEG: stack.Push(-stack.Pop()); break;
-                    case OpCode.FLOOR: stack.Push(stack.Pop() & ~63); break;
-                    case OpCode.CEILING: stack.Push((stack.Pop() + 63) & ~63); break;
-                    case OpCode.MAX: stack.Push(Math.Max(stack.Pop(), stack.Pop())); break;
-                    case OpCode.MIN: stack.Push(Math.Min(stack.Pop(), stack.Pop())); break;
+                    case OpCode.ABS: _stack.Push(Math.Abs(_stack.Pop())); break;
+                    case OpCode.NEG: _stack.Push(-_stack.Pop()); break;
+                    case OpCode.FLOOR: _stack.Push(_stack.Pop() & ~63); break;
+                    case OpCode.CEILING: _stack.Push((_stack.Pop() + 63) & ~63); break;
+                    case OpCode.MAX: _stack.Push(Math.Max(_stack.Pop(), _stack.Pop())); break;
+                    case OpCode.MIN: _stack.Push(Math.Min(_stack.Pop(), _stack.Pop())); break;
 
                     // ==== FUNCTIONS ====
                     case OpCode.FDEF:
@@ -1103,7 +1103,7 @@ namespace Typography.OpenFont
                             if (!allowFunctionDefs || inFunction)
                                 throw new InvalidFontException("Can't define functions here.");
 
-                            functions[stack.Pop()] = stream;
+                            _functions[_stack.Pop()] = stream;
                             while (SkipNext(ref stream) != OpCode.ENDF) ;
                         }
                         break;
@@ -1112,7 +1112,7 @@ namespace Typography.OpenFont
                             if (!allowFunctionDefs || inFunction)
                                 throw new InvalidFontException("Can't define functions here.");
 
-                            instructionDefs[stack.Pop()] = stream;
+                            _instructionDefs[_stack.Pop()] = stream;
                             while (SkipNext(ref stream) != OpCode.ENDF) ;
                         }
                         break;
@@ -1125,15 +1125,15 @@ namespace Typography.OpenFont
                     case OpCode.CALL:
                     case OpCode.LOOPCALL:
                         {
-                            callStackSize++;
-                            if (callStackSize > MaxCallStack)
+                            _callStackSize++;
+                            if (_callStackSize > MaxCallStack)
                                 throw new InvalidFontException("Stack overflow; infinite recursion?");
 
-                            var function = functions[stack.Pop()];
-                            var count = opcode == OpCode.LOOPCALL ? stack.Pop() : 1;
+                            var function = _functions[_stack.Pop()];
+                            var count = opcode == OpCode.LOOPCALL ? _stack.Pop() : 1;
                             for (int i = 0; i < count; i++)
                                 Execute(function, true, false);
-                            callStackSize--;
+                            _callStackSize--;
                         }
                         break;
 
@@ -1142,7 +1142,7 @@ namespace Typography.OpenFont
                     case OpCode.ROUND0:
                     case OpCode.ROUND1:
                     case OpCode.ROUND2:
-                    case OpCode.ROUND3: stack.Push(Round(stack.PopFloat())); break;
+                    case OpCode.ROUND3: _stack.Push(Round(_stack.PopFloat())); break;
                     case OpCode.NROUND0:
                     case OpCode.NROUND1:
                     case OpCode.NROUND2:
@@ -1153,31 +1153,31 @@ namespace Typography.OpenFont
                     case OpCode.DELTAC2:
                     case OpCode.DELTAC3:
                         {
-                            var last = stack.Pop();
+                            var last = _stack.Pop();
                             for (int i = 1; i <= last; i++)
                             {
-                                var cvtIndex = stack.Pop();
-                                var arg = stack.Pop();
+                                var cvtIndex = _stack.Pop();
+                                var arg = _stack.Pop();
 
                                 // upper 4 bits of the 8-bit arg is the relative ppem
                                 // the opcode specifies the base to add to the ppem
                                 var triggerPpem = (arg >> 4) & 0xF;
                                 triggerPpem += (opcode - OpCode.DELTAC1) * 16;
-                                triggerPpem += state.DeltaBase;
+                                triggerPpem += _state.DeltaBase;
 
                                 // if the current ppem matches the trigger, apply the exception
-                                if (ppem == triggerPpem)
+                                if (_ppem == triggerPpem)
                                 {
                                     // the lower 4 bits of the arg is the amount to shift
                                     // it's encoded such that 0 isn't an allowable value (who wants to shift by 0 anyway?)
                                     var amount = (arg & 0xF) - 8;
                                     if (amount >= 0)
                                         amount++;
-                                    amount *= 1 << (6 - state.DeltaShift);
+                                    amount *= 1 << (6 - _state.DeltaShift);
 
                                     // update the CVT
-                                    CheckIndex(cvtIndex, controlValueTable.Length);
-                                    controlValueTable[cvtIndex] += F26Dot6ToFloat(amount);
+                                    CheckIndex(cvtIndex, _controlValueTable.Length);
+                                    _controlValueTable[cvtIndex] += F26Dot6ToFloat(amount);
                                 }
                             }
                         }
@@ -1186,40 +1186,40 @@ namespace Typography.OpenFont
                     case OpCode.DELTAP2:
                     case OpCode.DELTAP3:
                         {
-                            var last = stack.Pop();
+                            var last = _stack.Pop();
                             for (int i = 1; i <= last; i++)
                             {
-                                var pointIndex = stack.Pop();
-                                var arg = stack.Pop();
+                                var pointIndex = _stack.Pop();
+                                var arg = _stack.Pop();
 
                                 // upper 4 bits of the 8-bit arg is the relative ppem
                                 // the opcode specifies the base to add to the ppem
                                 var triggerPpem = (arg >> 4) & 0xF;
-                                triggerPpem += state.DeltaBase;
+                                triggerPpem += _state.DeltaBase;
                                 if (opcode != OpCode.DELTAP1)
                                     triggerPpem += (opcode - OpCode.DELTAP2 + 1) * 16;
 
                                 // if the current ppem matches the trigger, apply the exception
-                                if (ppem == triggerPpem)
+                                if (_ppem == triggerPpem)
                                 {
                                     // the lower 4 bits of the arg is the amount to shift
                                     // it's encoded such that 0 isn't an allowable value (who wants to shift by 0 anyway?)
                                     var amount = (arg & 0xF) - 8;
                                     if (amount >= 0)
                                         amount++;
-                                    amount *= 1 << (6 - state.DeltaShift);
+                                    amount *= 1 << (6 - _state.DeltaShift);
 
-                                    MovePoint(zp0, pointIndex, F26Dot6ToFloat(amount));
+                                    MovePoint(_zp0, pointIndex, F26Dot6ToFloat(amount));
                                 }
                             }
                         }
                         break;
 
                     // ==== MISCELLANEOUS ====
-                    case OpCode.DEBUG: stack.Pop(); break;
+                    case OpCode.DEBUG: _stack.Pop(); break;
                     case OpCode.GETINFO:
                         {
-                            var selector = stack.Pop();
+                            var selector = _stack.Pop();
                             var result = 0;
                             if ((selector & 0x1) != 0)
                             {
@@ -1237,7 +1237,7 @@ namespace Typography.OpenFont
 
                             // TODO: ClearType flags
 
-                            stack.Push(result);
+                            _stack.Push(result);
                         }
                         break;
 
@@ -1250,15 +1250,15 @@ namespace Typography.OpenFont
                         {
                             // check if this is a runtime-defined opcode
                             var index = (int)opcode;
-                            if (index > instructionDefs.Length || !instructionDefs[index].IsValid)
+                            if (index > _instructionDefs.Length || !_instructionDefs[index].IsValid)
                                 throw new InvalidFontException("Unknown opcode in font program.");
 
-                            callStackSize++;
-                            if (callStackSize > MaxCallStack)
+                            _callStackSize++;
+                            if (_callStackSize > MaxCallStack)
                                 throw new InvalidFontException("Stack overflow; infinite recursion?");
 
-                            Execute(instructionDefs[index], true, false);
-                            callStackSize--;
+                            Execute(_instructionDefs[index], true, false);
+                            _callStackSize--;
                         }
                         break;
                 }
@@ -1272,25 +1272,25 @@ namespace Typography.OpenFont
             return index;
         }
 
-        float ReadCvt() { return controlValueTable[CheckIndex(stack.Pop(), controlValueTable.Length)]; }
+        float ReadCvt() { return _controlValueTable[CheckIndex(_stack.Pop(), _controlValueTable.Length)]; }
 
         void OnVectorsUpdated()
         {
-            fdotp = (float)Vector2.Dot(state.Freedom, state.Projection);
-            if (Math.Abs(fdotp) < Epsilon)
-                fdotp = 1.0f;
+            _fdotp = (float)Vector2.Dot(_state.Freedom, _state.Projection);
+            if (Math.Abs(_fdotp) < Epsilon)
+                _fdotp = 1.0f;
         }
 
         void SetFreedomVectorToAxis(int axis)
         {
-            state.Freedom = axis == 0 ? Vector2.UnitY : Vector2.UnitX;
+            _state.Freedom = axis == 0 ? Vector2.UnitY : Vector2.UnitX;
             OnVectorsUpdated();
         }
 
         void SetProjectionVectorToAxis(int axis)
         {
-            state.Projection = axis == 0 ? Vector2.UnitY : Vector2.UnitX;
-            state.DualProjection = state.Projection;
+            _state.Projection = axis == 0 ? Vector2.UnitY : Vector2.UnitX;
+            _state.DualProjection = _state.Projection;
 
             OnVectorsUpdated();
         }
@@ -1302,21 +1302,21 @@ namespace Typography.OpenFont
             // 1: SPVTL1
             // 2: SFVTL0
             // 3: SFVTL1
-            var index1 = stack.Pop();
-            var index2 = stack.Pop();
-            var p1 = zp2.GetCurrent(index1);
-            var p2 = zp1.GetCurrent(index2);
+            var index1 = _stack.Pop();
+            var index2 = _stack.Pop();
+            var p1 = _zp2.GetCurrent(index1);
+            var p2 = _zp1.GetCurrent(index2);
 
             var line = p2 - p1;
             if (line.LengthSquared() == 0)
             {
                 // invalid; just set to whatever
                 if (mode >= 2)
-                    state.Freedom = Vector2.UnitX;
+                    _state.Freedom = Vector2.UnitX;
                 else
                 {
-                    state.Projection = Vector2.UnitX;
-                    state.DualProjection = Vector2.UnitX;
+                    _state.Projection = Vector2.UnitX;
+                    _state.DualProjection = Vector2.UnitX;
                 }
             }
             else
@@ -1327,29 +1327,29 @@ namespace Typography.OpenFont
                 line = Vector2.Normalize(line);
 
                 if (mode >= 2)
-                    state.Freedom = line;
+                    _state.Freedom = line;
                 else
                 {
-                    state.Projection = line;
-                    state.DualProjection = line;
+                    _state.Projection = line;
+                    _state.DualProjection = line;
                 }
             }
 
             // set the dual projection vector using original points
             if (dual)
             {
-                p1 = zp2.GetOriginal(index1);
-                p2 = zp2.GetOriginal(index2);
+                p1 = _zp2.GetOriginal(index1);
+                p2 = _zp2.GetOriginal(index2);
                 line = p2 - p1;
 
                 if (line.LengthSquared() == 0)
-                    state.DualProjection = Vector2.UnitX;
+                    _state.DualProjection = Vector2.UnitX;
                 else
                 {
                     if ((mode & 0x1) != 0)
                         line = new Vector2(-line.Y, line.X);
 
-                    state.DualProjection = Vector2.Normalize(line);
+                    _state.DualProjection = Vector2.Normalize(line);
                 }
             }
 
@@ -1358,10 +1358,10 @@ namespace Typography.OpenFont
 
         Zone GetZoneFromStack()
         {
-            switch (stack.Pop())
+            switch (_stack.Pop())
             {
-                case 0: return twilight;
-                case 1: return points;
+                case 0: return _twilight;
+                case 1: return _points;
                 default: throw new InvalidFontException("Invalid zone pointer.");
             }
         }
@@ -1370,7 +1370,7 @@ namespace Typography.OpenFont
         {
             // mode is a bunch of packed flags
             // bits 7-6 are the period multiplier
-            var mode = stack.Pop();
+            var mode = _stack.Pop();
             switch (mode & 0xC0)
             {
                 case 0: roundPeriod = period / 2; break;
@@ -1382,17 +1382,17 @@ namespace Typography.OpenFont
             // bits 5-4 are the phase
             switch (mode & 0x30)
             {
-                case 0: roundPhase = 0; break;
-                case 0x10: roundPhase = roundPeriod / 4; break;
-                case 0x20: roundPhase = roundPeriod / 2; break;
-                case 0x30: roundPhase = roundPeriod * 3 / 4; break;
+                case 0: _roundPhase = 0; break;
+                case 0x10: _roundPhase = roundPeriod / 4; break;
+                case 0x20: _roundPhase = roundPeriod / 2; break;
+                case 0x30: _roundPhase = roundPeriod * 3 / 4; break;
             }
 
             // bits 3-0 are the threshold
             if ((mode & 0xF) == 0)
-                roundThreshold = roundPeriod - 1;
+                _roundThreshold = roundPeriod - 1;
             else
-                roundThreshold = ((mode & 0xF) - 4) * roundPeriod / 8;
+                _roundThreshold = ((mode & 0xF) - 4) * roundPeriod / 8;
         }
 
         void MoveIndirectRelative(int flags)
@@ -1401,30 +1401,30 @@ namespace Typography.OpenFont
             // and the reference point rp0 be equivalent to the same distance in the original outline
             // there are a bunch of flags that control how that distance is measured
             var cvt = ReadCvt();
-            var pointIndex = stack.Pop();
+            var pointIndex = _stack.Pop();
 
-            if (Math.Abs(cvt - state.SingleWidthValue) < state.SingleWidthCutIn)
+            if (Math.Abs(cvt - _state.SingleWidthValue) < _state.SingleWidthCutIn)
             {
                 if (cvt >= 0)
-                    cvt = state.SingleWidthValue;
+                    cvt = _state.SingleWidthValue;
                 else
-                    cvt = -state.SingleWidthValue;
+                    cvt = -_state.SingleWidthValue;
             }
 
             // if we're looking at the twilight zone we need to prepare the points there
-            var originalReference = zp0.GetOriginal(state.Rp0);
-            if (zp1.IsTwilight)
+            var originalReference = _zp0.GetOriginal(_state.Rp0);
+            if (_zp1.IsTwilight)
             {
-                var initialValue = originalReference + state.Freedom * cvt;
-                zp1.Original[pointIndex].P = initialValue;
-                zp1.Current[pointIndex].P = initialValue;
+                var initialValue = originalReference + _state.Freedom * cvt;
+                _zp1.Original[pointIndex].P = initialValue;
+                _zp1.Current[pointIndex].P = initialValue;
             }
 
-            var point = zp1.GetCurrent(pointIndex);
-            var originalDistance = DualProject(zp1.GetOriginal(pointIndex) - originalReference);
-            var currentDistance = Project(point - zp0.GetCurrent(state.Rp0));
+            var point = _zp1.GetCurrent(pointIndex);
+            var originalDistance = DualProject(_zp1.GetOriginal(pointIndex) - originalReference);
+            var currentDistance = Project(point - _zp0.GetCurrent(_state.Rp0));
 
-            if (state.AutoFlip && Math.Sign(originalDistance) != Math.Sign(cvt))
+            if (_state.AutoFlip && Math.Sign(originalDistance) != Math.Sign(cvt))
                 cvt = -cvt;
 
             // if bit 2 is set, round the distance and look at the cut-in value
@@ -1432,7 +1432,7 @@ namespace Typography.OpenFont
             if ((flags & 0x4) != 0)
             {
                 // only perform cut-in tests when both points are in the same zone
-                if (zp0.IsTwilight == zp1.IsTwilight && Math.Abs(cvt - originalDistance) > state.ControlValueCutIn)
+                if (_zp0.IsTwilight == _zp1.IsTwilight && Math.Abs(cvt - originalDistance) > _state.ControlValueCutIn)
                     cvt = originalDistance;
                 distance = Round(cvt);
             }
@@ -1441,34 +1441,34 @@ namespace Typography.OpenFont
             if ((flags & 0x8) != 0)
             {
                 if (originalDistance >= 0)
-                    distance = Math.Max(distance, state.MinDistance);
+                    distance = Math.Max(distance, _state.MinDistance);
                 else
-                    distance = Math.Min(distance, -state.MinDistance);
+                    distance = Math.Min(distance, -_state.MinDistance);
             }
 
             // move the point
-            MovePoint(zp1, pointIndex, distance - currentDistance);
-            state.Rp1 = state.Rp0;
-            state.Rp2 = pointIndex;
+            MovePoint(_zp1, pointIndex, distance - currentDistance);
+            _state.Rp1 = _state.Rp0;
+            _state.Rp2 = pointIndex;
             if ((flags & 0x10) != 0)
-                state.Rp0 = pointIndex;
+                _state.Rp0 = pointIndex;
         }
 
         void MoveDirectRelative(int flags)
         {
             // determine the original distance between the two reference points
-            var pointIndex = stack.Pop();
-            var p1 = zp0.GetOriginal(state.Rp0);
-            var p2 = zp1.GetOriginal(pointIndex);
+            var pointIndex = _stack.Pop();
+            var p1 = _zp0.GetOriginal(_state.Rp0);
+            var p2 = _zp1.GetOriginal(pointIndex);
             var originalDistance = DualProject(p2 - p1);
 
             // single width cutin test
-            if (Math.Abs(originalDistance - state.SingleWidthValue) < state.SingleWidthCutIn)
+            if (Math.Abs(originalDistance - _state.SingleWidthValue) < _state.SingleWidthCutIn)
             {
                 if (originalDistance >= 0)
-                    originalDistance = state.SingleWidthValue;
+                    originalDistance = _state.SingleWidthValue;
                 else
-                    originalDistance = -state.SingleWidthValue;
+                    originalDistance = -_state.SingleWidthValue;
             }
 
             // if bit 2 is set, perform rounding
@@ -1480,18 +1480,18 @@ namespace Typography.OpenFont
             if ((flags & 0x8) != 0)
             {
                 if (originalDistance >= 0)
-                    distance = Math.Max(distance, state.MinDistance);
+                    distance = Math.Max(distance, _state.MinDistance);
                 else
-                    distance = Math.Min(distance, -state.MinDistance);
+                    distance = Math.Min(distance, -_state.MinDistance);
             }
 
             // move the point
-            originalDistance = Project(zp1.GetCurrent(pointIndex) - zp0.GetCurrent(state.Rp0));
-            MovePoint(zp1, pointIndex, distance - originalDistance);
-            state.Rp1 = state.Rp0;
-            state.Rp2 = pointIndex;
+            originalDistance = Project(_zp1.GetCurrent(pointIndex) - _zp0.GetCurrent(_state.Rp0));
+            MovePoint(_zp1, pointIndex, distance - originalDistance);
+            _state.Rp1 = _state.Rp0;
+            _state.Rp2 = pointIndex;
             if ((flags & 0x10) != 0)
-                state.Rp0 = pointIndex;
+                _state.Rp0 = pointIndex;
         }
 
         Vector2 ComputeDisplacement(int mode, out Zone zone, out int point)
@@ -1499,25 +1499,25 @@ namespace Typography.OpenFont
             // compute displacement of the reference point
             if ((mode & 1) == 0)
             {
-                zone = zp1;
-                point = state.Rp2;
+                zone = _zp1;
+                point = _state.Rp2;
             }
             else
             {
-                zone = zp0;
-                point = state.Rp1;
+                zone = _zp0;
+                point = _state.Rp1;
             }
 
             var distance = Project(zone.GetCurrent(point) - zone.GetOriginal(point));
-            return distance * state.Freedom / fdotp;
+            return distance * _state.Freedom / _fdotp;
         }
 
         TouchState GetTouchState()
         {
             var touch = TouchState.None;
-            if (state.Freedom.X != 0)
+            if (_state.Freedom.X != 0)
                 touch = TouchState.X;
-            if (state.Freedom.Y != 0)
+            if (_state.Freedom.Y != 0)
                 touch |= TouchState.Y;
 
             return touch;
@@ -1526,18 +1526,18 @@ namespace Typography.OpenFont
         void ShiftPoints(Vector2 displacement)
         {
             var touch = GetTouchState();
-            for (int i = 0; i < state.Loop; i++)
+            for (int i = 0; i < _state.Loop; i++)
             {
-                var pointIndex = stack.Pop();
-                zp2.Current[pointIndex].P += displacement;
-                zp2.TouchState[pointIndex] |= touch;
+                var pointIndex = _stack.Pop();
+                _zp2.Current[pointIndex].P += displacement;
+                _zp2.TouchState[pointIndex] |= touch;
             }
-            state.Loop = 1;
+            _state.Loop = 1;
         }
 
         void MovePoint(Zone zone, int index, float distance)
         {
-            var point = zone.GetCurrent(index) + distance * state.Freedom / fdotp;
+            var point = zone.GetCurrent(index) + distance * _state.Freedom / _fdotp;
             var touch = GetTouchState();
             zone.Current[index].P = point;
             zone.TouchState[index] |= touch;
@@ -1545,7 +1545,7 @@ namespace Typography.OpenFont
 
         float Round(float value)
         {
-            switch (state.RoundState)
+            switch (_state.RoundState)
             {
                 case RoundMode.ToGrid: return value >= 0 ? (float)Math.Round(value) : -(float)Math.Round(-value);
                 case RoundMode.ToHalfGrid: return value >= 0 ? (float)Math.Floor(value) + 0.5f : -((float)Math.Floor(-value) + 0.5f);
@@ -1557,19 +1557,19 @@ namespace Typography.OpenFont
                     float result;
                     if (value >= 0)
                     {
-                        result = value - roundPhase + roundThreshold;
+                        result = value - _roundPhase + _roundThreshold;
                         result = (float)Math.Truncate(result / roundPeriod) * roundPeriod;
-                        result += roundPhase;
+                        result += _roundPhase;
                         if (result < 0)
-                            result = roundPhase;
+                            result = _roundPhase;
                     }
                     else
                     {
-                        result = -value - roundPhase + roundThreshold;
+                        result = -value - _roundPhase + _roundThreshold;
                         result = -(float)Math.Truncate(result / roundPeriod) * roundPeriod;
-                        result -= roundPhase;
+                        result -= _roundPhase;
                         if (result > 0)
-                            result = -roundPhase;
+                            result = -_roundPhase;
                     }
                     return result;
 
@@ -1577,8 +1577,8 @@ namespace Typography.OpenFont
             }
         }
 
-        float Project(Vector2 point) { return (float)Vector2.Dot(point, state.Projection); }
-        float DualProject(Vector2 point) { return (float)Vector2.Dot(point, state.DualProjection); }
+        float Project(Vector2 point) { return (float)Vector2.Dot(point, _state.Projection); }
+        float DualProject(Vector2 point) { return (float)Vector2.Dot(point, _state.DualProjection); }
 
         static OpCode SkipNext(ref InstructionStream stream)
         {
@@ -1851,12 +1851,12 @@ namespace Typography.OpenFont
 
         class ExecutionStack
         {
-            int[] s;
-            int count;
+            int[] _s;
+            int _count;
 
             public ExecutionStack(int maxStack)
             {
-                s = new int[maxStack];
+                _s = new int[maxStack];
             }
 
             public int Peek() { return Peek(0); }
@@ -1865,8 +1865,8 @@ namespace Typography.OpenFont
             public void Push(bool value) { Push(value ? 1 : 0); }
             public void Push(float value) { Push(FloatToF26Dot6(value)); }
 
-            public void Clear() { count = 0; }
-            public void Depth() { Push(count); }
+            public void Clear() { _count = 0; }
+            public void Depth() { Push(_count); }
             public void Duplicate() { Push(Peek()); }
             public void Copy() { Copy(Pop() - 1); }
             public void Copy(int index) { Push(Peek(index)); }
@@ -1876,40 +1876,40 @@ namespace Typography.OpenFont
             public void Move(int index)
             {
                 var val = Peek(index);
-                for (int i = count - index - 1; i < count - 1; i++)
-                    s[i] = s[i + 1];
-                s[count - 1] = val;
+                for (int i = _count - index - 1; i < _count - 1; i++)
+                    _s[i] = _s[i + 1];
+                _s[_count - 1] = val;
             }
 
             public void Swap()
             {
-                if (count < 2)
+                if (_count < 2)
                     throw new InvalidFontException();
 
-                var tmp = s[count - 1];
-                s[count - 1] = s[count - 2];
-                s[count - 2] = tmp;
+                var tmp = _s[_count - 1];
+                _s[_count - 1] = _s[_count - 2];
+                _s[_count - 2] = tmp;
             }
 
             public void Push(int value)
             {
-                if (count == s.Length)
+                if (_count == _s.Length)
                     throw new InvalidFontException();
-                s[count++] = value;
+                _s[_count++] = value;
             }
 
             public int Pop()
             {
-                if (count == 0)
+                if (_count == 0)
                     throw new InvalidFontException();
-                return s[--count];
+                return _s[--_count];
             }
 
             public int Peek(int index)
             {
-                if (index < 0 || index >= count)
+                if (index < 0 || index >= _count)
                     throw new InvalidFontException();
-                return s[count - index - 1];
+                return _s[_count - index - 1];
             }
         }
 

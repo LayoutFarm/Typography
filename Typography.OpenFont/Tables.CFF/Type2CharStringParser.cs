@@ -261,60 +261,52 @@ namespace Typography.OpenFont.CFF
     class Type2GlyphInstructionList
     {
 
-        List<Type2Instruction> insts;
+        List<Type2Instruction> _insts;
         public Type2GlyphInstructionList()
         {
-            this.insts = new List<Type2Instruction>();
+            _insts = new List<Type2Instruction>();
         }
-        public List<Type2Instruction> Insts
-        {
-            get { return insts; }
-        }
-
-        public Type2GlyphInstructionListKind Kind
-        {
-            get;
-            set;
-        }
-
+        public List<Type2Instruction> Insts => _insts;
+        public Type2GlyphInstructionListKind Kind { get; set; }
+        //
         public void AddInt(int intValue)
         {
 #if DEBUG
             debugCheck();
 #endif
-            insts.Add(new Type2Instruction(OperatorName.LoadInt, intValue));
+            _insts.Add(new Type2Instruction(OperatorName.LoadInt, intValue));
         }
         public void AddOp(OperatorName opName)
         {
 #if DEBUG
             debugCheck();
 #endif
-            insts.Add(new Type2Instruction(opName));
+            _insts.Add(new Type2Instruction(opName));
         }
         public void AddOp(OperatorName opName, int value)
         {
 #if DEBUG
             debugCheck();
 #endif
-            insts.Add(new Type2Instruction(opName, value));
+            _insts.Add(new Type2Instruction(opName, value));
         }
         internal void ChangeFirstInstToGlyphWidthValue()
         {
             //check the first element must be loadint
-            Type2Instruction firstInst = insts[0];
+            Type2Instruction firstInst = _insts[0];
             if (firstInst.Op != OperatorName.LoadInt) { throw new NotSupportedException(); }
             //the replace
-            insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
+            _insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
         }
 #if DEBUG
         void debugCheck()
         {
-            if (_dbugMark == 5 && insts.Count > 50)
+            if (_dbugMark == 5 && _insts.Count > 50)
             {
 
             }
         }
-        public int dbugInstCount { get { return insts.Count; } }
+        public int dbugInstCount { get { return _insts.Count; } }
         int _dbugMark;
         public int dbugMark
         {
@@ -336,10 +328,10 @@ namespace Typography.OpenFont.CFF
             using (StreamWriter w = new StreamWriter(fs))
             {
 
-                int j = insts.Count;
+                int j = _insts.Count;
                 for (int i = 0; i < j; ++i)
                 {
-                    Type2Instruction inst = insts[i];
+                    Type2Instruction inst = _insts[i];
 
                     w.Write("[" + i + "] ");
                     if (inst.Op == OperatorName.LoadInt)

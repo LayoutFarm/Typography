@@ -28,8 +28,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         ICoordTransformer _left, _right;
         public CoordTransformationChain(ICoordTransformer left, ICoordTransformer right)
         {
-            this._left = left;
-            this._right = right;
+            _left = left;
+            _right = right;
         }
         ICoordTransformer ICoordTransformer.MultiplyWith(ICoordTransformer another)
         {

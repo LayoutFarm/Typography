@@ -47,10 +47,7 @@ namespace PixelFarm.Drawing.Fonts
                 return false;
             }
             return true;
-        }
-
-
-
+        } 
     }
 
 }

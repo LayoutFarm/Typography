@@ -13,8 +13,8 @@ namespace Typography.OpenFont
         //TODO: implement vertical metrics
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
-
-        Kern _kern;
+        //
+        CFFTable _cffTable;
 
         internal Typeface(
             NameEntry nameEntry,
@@ -30,12 +30,7 @@ namespace Typography.OpenFont
             _glyphs = glyphs;
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
-
-
         }
-
-
-        CFFTable _cffTable;
         internal Typeface(
            NameEntry nameEntry,
            Bounds bounds,
@@ -54,7 +49,7 @@ namespace Typography.OpenFont
 
 
             //------
-            _glyphs = _cffTable.Cff1FontSet._fonts[0].glyphs;
+            _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs;
         }
 
         /// <summary>
@@ -64,30 +59,14 @@ namespace Typography.OpenFont
         internal byte[] PrepProgramBuffer { get; set; }
         internal byte[] FpgmProgramBuffer { get; set; }
         internal MaxProfile MaxProfile { get; set; }
-
-        public bool HasPrepProgramBuffer { get { return PrepProgramBuffer != null; } }
         internal Cmap CmapTable { get; set; }
-        internal Kern KernTable
-        {
-            get { return _kern; }
-            set { _kern = value; }
-        }
-        internal Gasp GaspTable
-        {
-            get;
-            set;
-        }
-        internal HorizontalHeader HheaTable
-        {
-            get;
-            set;
-        }
-        internal OS2Table OS2Table
-        {
-            get;
-            set;
-        }
-        internal CFFTable CffTable { get { return _cffTable; } }
+        internal Kern KernTable { get; set; }
+        internal Gasp GaspTable { get; set; }
+        internal HorizontalHeader HheaTable { get; set; }
+        internal OS2Table OS2Table { get; set; }
+        //
+        public bool HasPrepProgramBuffer => PrepProgramBuffer != null;
+        internal CFFTable CffTable => _cffTable;
         /// <summary>
         /// actual font filename
         /// </summary>
@@ -95,63 +74,39 @@ namespace Typography.OpenFont
         /// <summary>
         /// OS2 sTypoAscender, in font designed unit
         /// </summary>
-        public short Ascender
-        {
-            get
-            {
-
-                return OS2Table.sTypoAscender;
-            }
-        }
+        public short Ascender => OS2Table.sTypoAscender;
         /// <summary>
         /// OS2 sTypoDescender, in font designed unit
         /// </summary>
-        public short Descender
-        {
-            get
-            {
-                return OS2Table.sTypoDescender;
-            }
-        }
+        public short Descender => OS2Table.sTypoDescender;
+
+
         /// <summary>
         /// OS2 Linegap
         /// </summary>
-        public short LineGap
-        {
-            get
-            {
-                //The typographic line gap for this font.
-                //Remember that this is not the same as the LineGap value in the 'hhea' table, 
-                //which Apple defines in a far different manner.
-                //The suggested usage for sTypoLineGap is 
-                //that it be used in conjunction with unitsPerEm 
-                //to compute a typographically correct default line spacing.
-                //
-                //Typical values average 7 - 10 % of units per em.
-                //The goal is to free applications from Macintosh or Windows - specific metrics
-                //which are constrained by backward compatability requirements
-                //(see chapter, “Recommendations for OpenType Fonts”).
-                //These new metrics, when combined with the character design widths,
-                //will allow applications to lay out documents in a typographically correct and portable fashion. 
-                //These metrics will be exposed through Windows APIs.
-                //Macintosh applications will need to access the 'sfnt' resource and 
-                //parse it to extract this data from the “OS / 2” table
-                //(unless Apple exposes the 'OS/2' table through a new API)
+        public short LineGap => OS2Table.sTypoLineGap;
+        //The typographic line gap for this font.
+        //Remember that this is not the same as the LineGap value in the 'hhea' table, 
+        //which Apple defines in a far different manner.
+        //The suggested usage for sTypoLineGap is 
+        //that it be used in conjunction with unitsPerEm 
+        //to compute a typographically correct default line spacing.
+        //
+        //Typical values average 7 - 10 % of units per em.
+        //The goal is to free applications from Macintosh or Windows - specific metrics
+        //which are constrained by backward compatability requirements
+        //(see chapter, “Recommendations for OpenType Fonts”).
+        //These new metrics, when combined with the character design widths,
+        //will allow applications to lay out documents in a typographically correct and portable fashion. 
+        //These metrics will be exposed through Windows APIs.
+        //Macintosh applications will need to access the 'sfnt' resource and 
+        //parse it to extract this data from the “OS / 2” table
+        //(unless Apple exposes the 'OS/2' table through a new API)
+        //---------------
 
-
-                return OS2Table.sTypoLineGap;
-            }
-        }
-
-        public string Name
-        {
-            get { return _nameEntry.FontName; }
-        }
-        public string FontSubFamily
-        {
-            get { return _nameEntry.FontSubFamily; }
-        }
-
+        public string Name => _nameEntry.FontName;
+        public string FontSubFamily => _nameEntry.FontSubFamily;
+        //
         /// <summary>
         /// find glyph index by codepoint
         /// </summary>
@@ -171,13 +126,11 @@ namespace Typography.OpenFont
         {
             return _glyphs[glyphIndex];
         }
-        public int GlyphCount
-        {
-            get { return _glyphs.Length; }
-        }
+        //
+        public int GlyphCount => _glyphs.Length;
+        //
         public Glyph GetGlyphByName(string glyphName)
         {
-
             if (_cffTable != null)
             {
                 //early preview ...
@@ -240,14 +193,16 @@ namespace Typography.OpenFont
         }
         public short GetKernDistance(ushort leftGlyphIndex, ushort rightGlyphIndex)
         {
-            return _kern.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
+            //DEPRECATED -> use OpenFont layout instead
+            return this.KernTable.GetKerningDistance(leftGlyphIndex, rightGlyphIndex);
         }
-        public Bounds Bounds { get { return _bounds; } }
-        public ushort UnitsPerEm { get { return _unitsPerEm; } }
-        public Glyph[] Glyphs { get { return _glyphs; } }
+        //
+        public Bounds Bounds => _bounds;
+        public ushort UnitsPerEm => _unitsPerEm;
+        public Glyph[] Glyphs => _glyphs;
+        //
 
-
-        const int pointsPerInch = 72;
+        const int pointsPerInch = 72; //TODO: should be configurable
         /// <summary>
         /// convert from point-unit value to pixel value
         /// </summary>
@@ -332,30 +287,15 @@ namespace Typography.OpenFont
         //---------        
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
-        internal bool IsCffFont
-        {
-            get
-            {
-                return _cffTable != null;
-            }
-        }
+        internal bool IsCffFont => _cffTable != null;
         //---------
         internal MathTable _mathTable;
         internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
-        internal Glyph[] GetRawGlyphList()
-        {
-            return _glyphs;
-        }
-        public MathGlyphs.MathConstants MathConsts
-        {
-            get
-            {
-                return (_mathTable != null) ? _mathTable._mathConstTable : null;
-            }
-        }
+        internal Glyph[] GetRawGlyphList() => _glyphs;
+        //
+        public MathGlyphs.MathConstants MathConsts => (_mathTable != null) ? _mathTable._mathConstTable : null;
         //---------
         internal SvgTable _svgTable;
-
     }
 
 

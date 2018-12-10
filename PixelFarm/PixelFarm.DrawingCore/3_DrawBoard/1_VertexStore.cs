@@ -276,7 +276,7 @@ namespace PixelFarm.Drawing
 
             //append data from another
 
-            if (this._allocated_vertices_count < _vertices_count + another._vertices_count)
+            if (_allocated_vertices_count < _vertices_count + another._vertices_count)
             {
                 //alloc a new one
                 int new_alloc = _vertices_count + another._vertices_count;
@@ -290,7 +290,7 @@ namespace PixelFarm.Drawing
 
                 //A.1
                 System.Array.Copy(
-                     this._coord_xy,
+                     _coord_xy,
                      0,
                      new_coord_xy,
                      0,
@@ -321,8 +321,8 @@ namespace PixelFarm.Drawing
                         0,
                         another._vertices_count);
 
-                this._coord_xy = new_coord_xy;
-                this._cmds = new_cmds;
+                _coord_xy = new_coord_xy;
+                _cmds = new_cmds;
             }
             else
             {
@@ -346,8 +346,8 @@ namespace PixelFarm.Drawing
         {
             //for copy from src to this instance
 
-            this._allocated_vertices_count = src._allocated_vertices_count;
-            this._vertices_count = src._vertices_count;
+            _allocated_vertices_count = src._allocated_vertices_count;
+            _vertices_count = src._vertices_count;
 
             if (trim)
             {
@@ -356,20 +356,20 @@ namespace PixelFarm.Drawing
                 int coord_len = _vertices_count; //+1 for no more cmd
                 int cmds_len = _vertices_count; //+1 for no more cmd
 
-                this._coord_xy = new double[(coord_len + 1) << 1];//*2
-                this._cmds = new byte[(cmds_len + 1)];
+                _coord_xy = new double[(coord_len + 1) << 1];//*2
+                _cmds = new byte[(cmds_len + 1)];
 
                 System.Array.Copy(
                      src._coord_xy,
                      0,
-                     this._coord_xy,
+                     _coord_xy,
                      0,
                      coord_len << 1); //*2
 
                 System.Array.Copy(
                      src._cmds,
                      0,
-                     this._cmds,
+                     _cmds,
                      0,
                      cmds_len);
             }
@@ -378,20 +378,20 @@ namespace PixelFarm.Drawing
                 int coord_len = src._coord_xy.Length;
                 int cmds_len = src._cmds.Length;
 
-                this._coord_xy = new double[(coord_len + 1) << 1];
-                this._cmds = new byte[(cmds_len + 1) << 1];
+                _coord_xy = new double[(coord_len + 1) << 1];
+                _cmds = new byte[(cmds_len + 1) << 1];
 
                 System.Array.Copy(
                      src._coord_xy,
                      0,
-                     this._coord_xy,
+                     _coord_xy,
                      0,
                      coord_len);
 
                 System.Array.Copy(
                      src._cmds,
                      0,
-                     this._cmds,
+                     _cmds,
                      0,
                      cmds_len);
             }
@@ -401,28 +401,28 @@ namespace PixelFarm.Drawing
         {
             //for copy from src to this instance
 
-            this._allocated_vertices_count = src._allocated_vertices_count;
-            this._vertices_count = src._vertices_count;
+            _allocated_vertices_count = src._allocated_vertices_count;
+            _vertices_count = src._vertices_count;
 
             _isTrimed = true;
             int coord_len = _vertices_count; //+1 for no more cmd
             int cmds_len = _vertices_count; //+1 for no more cmd
 
-            this._coord_xy = new double[(coord_len + 1) << 1];//*2
-            this._cmds = new byte[(cmds_len + 1)];
+            _coord_xy = new double[(coord_len + 1) << 1];//*2
+            _cmds = new byte[(cmds_len + 1)];
 
 
             System.Array.Copy(
                  src._coord_xy,
                  0,
-                 this._coord_xy,
+                 _coord_xy,
                  0,
                  coord_len << 1); //*2
 
             System.Array.Copy(
                  src._cmds,
                  0,
-                 this._cmds,
+                 _cmds,
                  0,
                  cmds_len);
 

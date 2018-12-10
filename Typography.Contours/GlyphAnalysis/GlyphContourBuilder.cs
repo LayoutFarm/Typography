@@ -11,25 +11,23 @@ namespace Typography.Contours
     public class GlyphContourBuilder : OpenFont.IGlyphTranslator
     {
 
-        List<GlyphContour> contours;
-        float curX;
-        float curY;
-        float latestMoveToX;
-        float latestMoveToY;
-        GlyphContour currentCnt;
+        List<GlyphContour> _contours;
+        float _curX;
+        float _curY;
+        float _latestMoveToX;
+        float _latestMoveToY;
+        GlyphContour _currentCnt;
         GlyphPart _latestPart;
+        //
         public GlyphContourBuilder()
         {
 
         }
-        public List<GlyphContour> GetContours()
-        {
-            return contours;
-        }
+        public List<GlyphContour> GetContours() => _contours;
         public void MoveTo(float x0, float y0)
         {
-            this.latestMoveToX = this.curX = x0;
-            this.latestMoveToY = this.curY = y0;
+            _latestMoveToX = _curX = x0;
+            _latestMoveToY = _curY = y0;
             _latestPart = null;
             //----------------------------
 
@@ -38,14 +36,14 @@ namespace Typography.Contours
         {
             if (_latestPart != null)
             {
-                currentCnt.AddPart(_latestPart = new GlyphLine(_latestPart, x1, y1));
+                _currentCnt.AddPart(_latestPart = new GlyphLine(_latestPart, x1, y1));
             }
             else
             {
-                currentCnt.AddPart(_latestPart = new GlyphLine(curX, curY, x1, y1));
+                _currentCnt.AddPart(_latestPart = new GlyphLine(_curX, _curY, x1, y1));
             }
-            this.curX = x1;
-            this.curY = y1;
+            _curX = x1;
+            _curY = y1;
         }
 
 
@@ -53,27 +51,27 @@ namespace Typography.Contours
         {
             if (_latestPart != null)
             {
-                currentCnt.AddPart(_latestPart = new GlyphCurve3(
+                _currentCnt.AddPart(_latestPart = new GlyphCurve3(
                  _latestPart,
                   x1, y1,
                   x2, y2));
             }
             else
             {
-                currentCnt.AddPart(new GlyphCurve3(
-                    curX, curY,
+                _currentCnt.AddPart(new GlyphCurve3(
+                    _curX, _curY,
                     x1, y1,
                     x2, y2));
             }
 
-            this.curX = x2;
-            this.curY = y2;
+            _curX = x2;
+            _curY = y2;
         }
         public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
         {
             if (_latestPart != null)
             {
-                currentCnt.AddPart(_latestPart = new GlyphCurve4(
+                _currentCnt.AddPart(_latestPart = new GlyphCurve4(
                    _latestPart,
                     x1, y1,
                     x2, y2,
@@ -81,19 +79,19 @@ namespace Typography.Contours
             }
             else
             {
-                currentCnt.AddPart(_latestPart = new GlyphCurve4(
-                   curX, curY,
+                _currentCnt.AddPart(_latestPart = new GlyphCurve4(
+                   _curX, _curY,
                    x1, y1,
                    x2, y2,
                    x3, y3));
             }
-            this.curX = x3;
-            this.curY = y3;
+            _curX = x3;
+            _curY = y3;
         }
 
         public void CloseContour()
         {
-            if (curX == latestMoveToX && curY == latestMoveToY)
+            if (_curX == _latestMoveToX && _curY == _latestMoveToY)
             {
                 //we not need to close 
             }
@@ -101,34 +99,34 @@ namespace Typography.Contours
             {
                 if (_latestPart != null)
                 {
-                    currentCnt.AddPart(_latestPart = new GlyphLine(_latestPart, latestMoveToX, latestMoveToY));
+                    _currentCnt.AddPart(_latestPart = new GlyphLine(_latestPart, _latestMoveToX, _latestMoveToY));
                 }
                 else
                 {
-                    currentCnt.AddPart(_latestPart = new GlyphLine(curX, curY, latestMoveToX, latestMoveToY));
+                    _currentCnt.AddPart(_latestPart = new GlyphLine(_curX, _curY, _latestMoveToX, _latestMoveToY));
                 }
             }
 
-            this.curX = latestMoveToX;
-            this.curY = latestMoveToY;
+            _curX = _latestMoveToX;
+            _curY = _latestMoveToY;
 
-            if (currentCnt != null &&
-                currentCnt.parts.Count > 0)
+            if (_currentCnt != null &&
+                _currentCnt.parts.Count > 0)
             {
-                this.contours.Add(currentCnt); 
-                currentCnt = null;
+                _contours.Add(_currentCnt);
+                _currentCnt = null;
             }
             //
-            currentCnt = new GlyphContour();
+            _currentCnt = new GlyphContour();
         }
         public void BeginRead(int contourCount)
         {
             //reset all
-            contours = new List<GlyphContour>();
+            _contours = new List<GlyphContour>();
             _latestPart = null;
-            this.latestMoveToX = this.curX = this.latestMoveToY = this.curY = 0;
+            _latestMoveToX = _curX = _latestMoveToY = _curY = 0;
             //
-            currentCnt = new GlyphContour();
+            _currentCnt = new GlyphContour();
             //new contour, but not add
         }
         public void EndRead()

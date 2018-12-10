@@ -34,37 +34,31 @@ namespace Typography.TextServices
         Typeface _currentTypeface;
         float _fontSizeInPts;
         ScriptLang _defaultScriptLang;
-        ActiveTypefaceCache typefaceStore;
+        ActiveTypefaceCache _typefaceStore;
         InstalledTypefaceCollection _installedTypefaceCollection;
-        ScriptLang scLang;
+        ScriptLang _scLang;
 
 
         public TextServices()
         {
 
-            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
+            _typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
             _glyphLayout = new GlyphLayout();
         }
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
-            this.scLang = _defaultScriptLang = scLang;
+            _scLang = _defaultScriptLang = scLang;
         }
         public InstalledTypefaceCollection InstalledFontCollection
         {
-            get
-            {
-                return _installedTypefaceCollection;
-            }
-            set
-            {
-                _installedTypefaceCollection = value;
-            }
+            get => _installedTypefaceCollection;
+            set => _installedTypefaceCollection = value;
         }
 
         public ScriptLang CurrentScriptLang
         {
-            get { return scLang; }
-            set { this.scLang = _glyphLayout.ScriptLang = value; }
+            get => _scLang;
+            set => _scLang = _glyphLayout.ScriptLang = value;
         }
 
         public void SetCurrentFont(Typeface typeface, float fontSizeInPts)
@@ -91,7 +85,7 @@ namespace Typography.TextServices
             InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
             if (inst != null)
             {
-                return typefaceStore.GetTypeface(inst);
+                return _typefaceStore.GetTypeface(inst);
             }
             return null;
 

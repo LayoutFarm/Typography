@@ -1,4 +1,4 @@
-﻿//Apache2, 2017, WinterDev 
+﻿//Apache2, 2017-present, WinterDev 
 
 using System.Collections.Generic;
 using System.IO;
@@ -6,6 +6,8 @@ namespace Typography.OpenFont.Tables
 {
     class SvgTable : TableEntry
     {
+        public override string Name => "SVG ";    //with 1 whitespace ***
+        //
         // https://www.microsoft.com/typography/otspec/svg.htm
         //OpenType fonts with either TrueType or CFF outlines may also contain an optional 'SVG ' table, 
         //which allows some or all glyphs in the font to be defined with color, gradients, or animation.
@@ -13,12 +15,6 @@ namespace Typography.OpenFont.Tables
 
 
         SvgDocumentEntry[] _entries; //TODO: review again
-        public override string Name
-        {
-            get { return "SVG "; } //with 1 whitespace ***
-        }
-
-
         protected override void ReadContentFrom(BinaryReader reader)
         {
             long svgTableStartAt = reader.BaseStream.Position;

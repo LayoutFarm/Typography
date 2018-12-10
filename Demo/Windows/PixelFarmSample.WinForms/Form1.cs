@@ -250,7 +250,7 @@ namespace SampleWinForms
 
             //---------------
             //we use the debugGlyphVisualize the render it
-            this._debugGlyphVisualizer.SetFont(typeface, sizeInPoint);
+            _debugGlyphVisualizer.SetFont(typeface, sizeInPoint);
             _debugGlyphVisualizer.CanvasPainter = _painter;
             _debugGlyphVisualizer.UseLcdTechnique = _contourAnalysisOpts.LcdTechnique;
             _debugGlyphVisualizer.FillBackGround = _glyphRenderOptions.FillBackground;

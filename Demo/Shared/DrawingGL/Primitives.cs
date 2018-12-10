@@ -3,34 +3,42 @@ namespace DrawingGL
 {
     struct Size
     {
-        private float x, y;
-        private float width;
-        private float height;
+        float _width;
+        float _height;
 
-        public Size(float width, float height) : this()
+        public Size(float width, float height)
         {
-            this.width = width;
-            this.height = height;
+            _width = width;
+            _height = height;
         }
     }
-    
+
     public struct Vector2
     {
-        private float x;
-        private float y;
+        float _x;
+        float _y;
         public Vector2(float x, float y)
         {
-            this.x = x;
-            this.y = y;
+            _x = x;
+            _y = y;
         }
 
-        public float X { get { return x; } set { x = value; } }
+        public float X
+        {
+            get => _x;
+            set => _x = value;
+        }
 
-        public float Y { get { return y; } set { y = value; } }
+
+        public float Y
+        {
+            get => _y;
+            set => _y = value;
+        }
 
         public static Vector2 operator -(Vector2 v0, Vector2 v1)
         {
-            return new Vector2(v0.x - v1.x, v0.y - v1.y);
+            return new Vector2(v0._x - v1._x, v0._y - v1._y);
         }
     }
 }

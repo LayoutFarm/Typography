@@ -25,10 +25,10 @@ namespace Typography.Contours
     {
         readonly float _ox; //original x
         readonly float _oy; //original y
-        readonly PointKind kind;
+        readonly PointKind _kind;
 
-        float newX;
-        float newY;
+        float _newX;
+        float _newY;
         //----------------------------------------  
         //float _adjust_fit_x; //not use 
         float _adjust_fit_y; //px scale specific y fitting value
@@ -45,37 +45,31 @@ namespace Typography.Contours
 
         public GlyphPoint(float x, float y, PointKind kind)
         {
-            _ox = this.newX = x;
-            _oy = this.newY = y;
-            this.kind = kind;
+            _ox = _newX = x;
+            _oy = _newY = y;
+            _kind = kind;
         }
         public int SeqNo { get; internal set; }
-        public PointKind PointKind
-        {
-            get
-            {
-                return this.kind;
-            }
-        }
+        public PointKind PointKind => _kind;
 
         internal bool IsPartOfHorizontalEdge { get; set; }
 
         /// <summary>
         /// original X
         /// </summary>
-        public float OX { get { return _ox; } }
+        public float OX => _ox;
         /// <summary>
         /// original Y
         /// </summary>
-        public float OY { get { return _oy; } }
+        public float OY => _oy;
         /// <summary>
         /// modified X
         /// </summary>
-        public float X { get { return this.newX; } }
+        public float X => _newX;
         /// <summary>
         /// modified Y
         /// </summary>
-        public float Y { get { return this.newY; } }
+        public float Y => _newY;
 
 
         //in this version, we don't use this _adjust_fit_x for each point
@@ -93,10 +87,7 @@ namespace Typography.Contours
         //}
         public float FitAdjustY
         {
-            get
-            {
-                return _adjust_fit_y;
-            }
+            get => _adjust_fit_y;
             internal set
             {
                 _adjust_fit_y = value;
@@ -115,34 +106,27 @@ namespace Typography.Contours
 
         internal void GetFitXY(float pxscale, out float x, out float y)
         {
-            x = this.newX * pxscale;
-            y = (this.newY * pxscale) + _adjust_fit_y;
+            x = _newX * pxscale;
+            y = (_newY * pxscale) + _adjust_fit_y;
         }
 
         internal void SetNewXY(float x, float y)
         {
-            this.newX = x;
-            this.newY = y;
+            _newX = x;
+            _newY = y;
         }
         //-----------
 
         /// <summary>
         /// outside inward edge
         /// </summary>
-        internal OutsideEdgeLine E0
-        {
-            //TODO: review inward and outward edge again
-            get { return _e0; }
+        internal OutsideEdgeLine E0 => _e0; //TODO: review inward and outward edge again
 
-        }
         /// <summary>
         /// outside outward edge
         /// </summary>
-        internal OutsideEdgeLine E1
-        {
-            //TODO: review inward and outward edge again
-            get { return _e1; }
-        }
+        internal OutsideEdgeLine E1 => _e1;//TODO: review inward and outward edge again
+
 
         /// <summary>         
         /// set outside edge that link with this glyph point

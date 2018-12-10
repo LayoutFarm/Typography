@@ -9,7 +9,7 @@ namespace Typography.OpenFont.Tables
 {
     public class COLR : TableEntry
     {
-        public override string Name { get { return "COLR"; } }
+        public override string Name => "COLR";
 
         // Read the COLR table
         // https://www.microsoft.com/typography/otspec/colr.htm

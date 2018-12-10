@@ -238,20 +238,20 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this._sclineRas.ExtendWidthX3ForSubPixelLcdEffect;
+                return _sclineRas.ExtendWidthX3ForSubPixelLcdEffect;
             }
             set
             {
                 if (value)
                 {
                     //TODO: review here again             
-                    this._sclineRas.ExtendWidthX3ForSubPixelLcdEffect = true;
-                    this._bmpRasterizer.ScanlineRenderMode = ScanlineRenderMode.SubPixelLcdEffect;
+                    _sclineRas.ExtendWidthX3ForSubPixelLcdEffect = true;
+                    _bmpRasterizer.ScanlineRenderMode = ScanlineRenderMode.SubPixelLcdEffect;
                 }
                 else
                 {
-                    this._sclineRas.ExtendWidthX3ForSubPixelLcdEffect = false;
-                    this._bmpRasterizer.ScanlineRenderMode = ScanlineRenderMode.Default;
+                    _sclineRas.ExtendWidthX3ForSubPixelLcdEffect = false;
+                    _bmpRasterizer.ScanlineRenderMode = ScanlineRenderMode.Default;
                 }
             }
         }

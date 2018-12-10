@@ -41,7 +41,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public TempMemPtr(IntPtr nativeBuffer32, int lenInBytes, bool isOwner = false)
         {
-            this._lenInBytes = lenInBytes;
+            _lenInBytes = lenInBytes;
             _nativeBuffer = nativeBuffer32;
             _isOwner = isOwner;
         }
@@ -241,10 +241,10 @@ namespace PixelFarm.CpuBlit
         public MemBitmap(int width, int height, IntPtr externalNativeInt32Ptr)
         {
             //width and height must >0 
-            this._width = width;
-            this._height = height;
-            this._strideBytes = CalculateStride(width,
-                this._pixelFormat = CpuBlit.Imaging.PixelFormat.ARGB32, //***
+            _width = width;
+            _height = height;
+            _strideBytes = CalculateStride(width,
+                _pixelFormat = CpuBlit.Imaging.PixelFormat.ARGB32, //***
                 out _bitDepth,
                 out int bytesPerPixel);
 
@@ -269,11 +269,11 @@ namespace PixelFarm.CpuBlit
         public bool IsDisposed() => _isDisposed;
         public override int Width
         {
-            get { return this._width; }
+            get { return _width; }
         }
         public override int Height
         {
-            get { return this._height; }
+            get { return _height; }
         }
         public override int ReferenceX
         {
@@ -285,16 +285,16 @@ namespace PixelFarm.CpuBlit
         }
         public RectInt Bounds
         {
-            get { return new RectInt(0, 0, this._width, this._height); }
+            get { return new RectInt(0, 0, _width, _height); }
         }
         public override bool IsReferenceImage
         {
             get { return false; }
         }
 
-        public CpuBlit.Imaging.PixelFormat PixelFormat { get { return this._pixelFormat; } }
-        public int Stride { get { return this._strideBytes; } }
-        public int BitDepth { get { return this._bitDepth; } }
+        public CpuBlit.Imaging.PixelFormat PixelFormat { get { return _pixelFormat; } }
+        public int Stride { get { return _strideBytes; } }
+        public int BitDepth { get { return _bitDepth; } }
         public bool IsBigEndian { get; set; }
 
 
@@ -425,7 +425,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this._bitDepth;
+                return _bitDepth;
             }
         }
 
@@ -433,7 +433,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this._width;
+                return _width;
             }
         }
 
@@ -441,7 +441,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this._height;
+                return _height;
             }
         }
 
@@ -449,7 +449,7 @@ namespace PixelFarm.CpuBlit
         {
             get
             {
-                return this._strideBytes;
+                return _strideBytes;
             }
         }
         int IBitmapSrc.BytesBetweenPixelsInclusive

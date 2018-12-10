@@ -205,7 +205,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         //---------------------------------------------------------------------
         public LineInterpolatorAA0(OutlineRenderer ren, LineParameters lp)
         {
-            this._ren = ren;
+            _ren = ren;
             _aa_data = new LineInterpolatorAAData(ren, lp);
             _m_di = new DistanceInterpolator1(lp.x1, lp.y1, lp.x2, lp.y2,
                  lp.x1 & ~LineAA.SUBPIXEL_MARK, lp.y1 & ~LineAA.SUBPIXEL_MARK);
@@ -324,7 +324,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         readonly OutlineRenderer _ren;
         public LineInterpolatorAA1(OutlineRenderer ren, LineParameters lp, int sx, int sy)
         {
-            this._ren = ren;
+            _ren = ren;
             _aa_data = new LineInterpolatorAAData(ren, lp);
             _m_di = new DistanceInterpolator2(lp.x1, lp.y1, lp.x2, lp.y2, sx, sy,
                  lp.x1 & ~LineAA.SUBPIXEL_MARK, lp.y1 & ~LineAA.SUBPIXEL_MARK);
@@ -533,7 +533,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             LineParameters lp,
             int ex, int ey)
         {
-            this._ren = ren;
+            _ren = ren;
             _aa_data = new LineInterpolatorAAData(ren, lp);
             _m_di = new DistanceInterpolator2(lp.x1, lp.y1, lp.x2, lp.y2, ex, ey,
                  lp.x1 & ~LineAA.SUBPIXEL_MARK, lp.y1 & ~LineAA.SUBPIXEL_MARK,
@@ -678,7 +678,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public LineInterpolatorAA3(OutlineRenderer ren, LineParameters lp,
                               int sx, int sy, int ex, int ey)
         {
-            this._ren = ren;
+            _ren = ren;
             _aa_data = new LineInterpolatorAAData(ren, lp);
             _m_di = new DistanceInterpolator3(lp.x1, lp.y1, lp.x2, lp.y2, sx, sy, ex, ey,
                  lp.x1 & ~LineAA.SUBPIXEL_MARK, lp.y1 & ~LineAA.SUBPIXEL_MARK);

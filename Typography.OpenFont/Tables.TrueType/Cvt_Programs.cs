@@ -1,19 +1,18 @@
 ﻿//MIT, 2015-2016, Michael Popoloski, WinterDev
- 
+
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
 
     class CvtTable : TableEntry
     {
+        public override string Name => "cvt "; //need 4 chars//***
+        //
+
         /// <summary>
         /// control value in font unit
         /// </summary>
-        internal int[] controlValues;
-        public override string Name
-        {
-            get { return "cvt "; /*need 4 chars*/}
-        }
+        internal int[] _controlValues;
         protected override void ReadContentFrom(BinaryReader reader)
         {
             int nelems = (int)(this.TableLength / sizeof(short));
@@ -22,31 +21,31 @@ namespace Typography.OpenFont.Tables
             {
                 results[i] = reader.ReadInt16();
             }
-            this.controlValues = results;
+            _controlValues = results;
         }
     }
     class PrepTable : TableEntry
     {
-        internal byte[] programBuffer;
-        public override string Name
-        {
-            get { return "prep"; }
-        }
+
+        public override string Name => "prep";
+        //
+
+        internal byte[] _programBuffer;
+        //
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            programBuffer = reader.ReadBytes((int)this.TableLength);
+            _programBuffer = reader.ReadBytes((int)this.TableLength);
         }
     }
     class FpgmTable : TableEntry
     {
-        internal byte[] programBuffer;
-        public override string Name
-        {
-            get { return "fpgm"; }
-        }
+        public override string Name => "fpgm";
+        //
+
+        internal byte[] _programBuffer; 
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            programBuffer = reader.ReadBytes((int)this.TableLength);
+            _programBuffer = reader.ReadBytes((int)this.TableLength);
         }
     }
 }

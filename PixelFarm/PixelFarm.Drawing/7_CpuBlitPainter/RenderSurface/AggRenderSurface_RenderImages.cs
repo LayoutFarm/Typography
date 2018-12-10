@@ -42,7 +42,7 @@ namespace PixelFarm.CpuBlit
         int _destImageChanged = 0;
         //
         //
-        public bool UseSubPixelRendering => this._bmpRasterizer.ScanlineRenderMode == ScanlineRenderMode.SubPixelLcdEffect;
+        public bool UseSubPixelRendering => _bmpRasterizer.ScanlineRenderMode == ScanlineRenderMode.SubPixelLcdEffect;
 
         static void BuildOrgImgRectVxs(int srcW, int srcH, VertexStore output)
         {
@@ -127,7 +127,7 @@ namespace PixelFarm.CpuBlit
             {   // exit early if the dest and source bounds don't touch.
                 // TODO: <BUG> make this do rotation and scalling
                 RectInt sourceBounds = source.GetBounds();
-                RectInt destBounds = this._destBitmapBlender.GetBounds();
+                RectInt destBounds = _destBitmapBlender.GetBounds();
                 sourceBounds.Offset((int)destX, (int)destY);
                 if (!RectInt.DoIntersect(sourceBounds, destBounds))
                 {
@@ -372,7 +372,7 @@ namespace PixelFarm.CpuBlit
             RectInt sourceBounds = new RectInt((int)destX, (int)destY, (int)destX + source.Width, (int)destY + source.Height);
             //sourceBounds.Offset((int)destX, (int)destY);
 
-            RectInt destBounds = this._destBitmapBlender.GetBounds();
+            RectInt destBounds = _destBitmapBlender.GetBounds();
             if (!RectInt.DoIntersect(sourceBounds, destBounds))
             {
                 //if (inScaleX != 1 || inScaleY != 1 || angleRadians != 0)

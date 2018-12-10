@@ -7,17 +7,13 @@ namespace Typography.OpenFont.Tables
 {
     class Head : TableEntry
     {
+        //
+        public override string Name => "head";
+        //
         short _indexToLocFormat;
         Bounds _bounds;
-
-       
-
         public Head()
         {
-        }
-        public override string Name
-        {
-            get { return "head"; }
         }
         protected override void ReadContentFrom(BinaryReader input)
         {

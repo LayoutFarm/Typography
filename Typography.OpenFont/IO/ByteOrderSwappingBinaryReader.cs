@@ -25,16 +25,16 @@ namespace Typography.OpenFont.IO
         // 
         //we override the 4 methods here
         //
-        public override short ReadInt16() { return BitConverter.ToInt16(RR(2), 8 - 2); }
-        public override ushort ReadUInt16() { return BitConverter.ToUInt16(RR(2), 8 - 2); }
-        public override uint ReadUInt32() { return BitConverter.ToUInt32(RR(4), 8 - 4); }
-        public override ulong ReadUInt64() { return BitConverter.ToUInt64(RR(8), 8 - 8); }
+        public override short ReadInt16() => BitConverter.ToInt16(RR(2), 8 - 2);
+        public override ushort ReadUInt16() => BitConverter.ToUInt16(RR(2), 8 - 2);
+        public override uint ReadUInt32() => BitConverter.ToUInt32(RR(4), 8 - 4);
+        public override ulong ReadUInt64() => BitConverter.ToUInt64(RR(8), 8 - 8);
 
 
         //used in CFF font
-        public override double ReadDouble() { return BitConverter.ToDouble(RR(8), 8 - 8); }
+        public override double ReadDouble() => BitConverter.ToDouble(RR(8), 8 - 8);
         //used in CFF font
-        public override int ReadInt32() { return BitConverter.ToInt32(RR(4), 8 - 4); }
+        public override int ReadInt32() => BitConverter.ToInt32(RR(4), 8 - 4);
 
         //
         byte[] _reusable_buffer = new byte[8]; //fix buffer size to 8 bytes

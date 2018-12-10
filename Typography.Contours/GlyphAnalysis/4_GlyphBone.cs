@@ -59,10 +59,7 @@ namespace Typography.Contours
                 throw new NotSupportedException();
             }
         }
-        public bool IsTipBone
-        {
-            get { return this.TipEdge != null; }
-        }
+        public bool IsTipBone => this.TipEdge != null;
 
         internal void EvaluateSlope()
         {
@@ -130,15 +127,9 @@ namespace Typography.Contours
         }
 
         public LineSlopeKind SlopeKind { get; private set; }
-        internal double Length
-        {
-            get
-            {
-                return _len;
-            }
-        }
+        internal double Length => _len;
         public bool IsLongBone { get; internal set; }
-         
+
 #if DEBUG
         public override string ToString()
         {

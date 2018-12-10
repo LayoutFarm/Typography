@@ -64,12 +64,12 @@ namespace Typography.OpenFont.CFF
 
     class Cff1FontSet
     {
-        internal List<string> fontNames;
+        internal List<string> _fontNames;
         internal List<Cff1Font> _fonts = new List<Cff1Font>();
         internal string[] _uniqueStringTable;
         //
-        internal const int nStdStrings = 390;
-        internal static readonly string[] _StdStrings = new string[] {
+        internal const int N_STD_STRINGS = 390;
+        internal static readonly string[] s_StdStrings = new string[] {
             //Appendix A: Standard Strings
             ".notdef",
             "space",
@@ -467,12 +467,11 @@ namespace Typography.OpenFont.CFF
     public class Cff1Font
     {
         internal string FontName { get; set; }
-        internal Glyph[] glyphs;
-
+        internal Glyph[] _glyphs;
         internal List<CffDataDicEntry> _privateDict;
         internal List<Type2GlyphInstructionList> _localSubrs;
-        internal int defaultWidthX;
-        internal int nominalWidthX;
+        internal int _defaultWidthX;
+        internal int _nominalWidthX;
 
         Dictionary<string, Glyph> _cachedGlyphDicByName;
         public Glyph GetGlyphByName(string name)
@@ -480,10 +479,10 @@ namespace Typography.OpenFont.CFF
             if (_cachedGlyphDicByName == null)
             {
                 _cachedGlyphDicByName = new Dictionary<string, Glyph>();
-                int j = glyphs.Length;
+                int j = _glyphs.Length;
                 for (int i = 1; i < j; ++i)
                 {
-                    Glyph cff1Glyph = glyphs[i];
+                    Glyph cff1Glyph = _glyphs[i];
                     _cachedGlyphDicByName.Add(cff1Glyph._cff1GlyphData.Name, cff1Glyph);
                 }
             }
@@ -494,13 +493,13 @@ namespace Typography.OpenFont.CFF
 
         internal IEnumerable<GlyphNameMap> GetGlyphNameIter()
         {
-            int j = glyphs.Length;
+            int j = _glyphs.Length;
 #if DEBUG
             if (j > ushort.MaxValue) { throw new NotSupportedException(); }
 #endif
             for (int i = 1; i < j; ++i)
             {
-                Glyph cff1Glyph = glyphs[i];
+                Glyph cff1Glyph = _glyphs[i];
                 yield return new GlyphNameMap((ushort)i, cff1Glyph._cff1GlyphData.Name);
             }
 
@@ -604,11 +603,8 @@ namespace Typography.OpenFont.CFF
             //...
         }
 
-        public Cff1FontSet ResultCff1FontSet
-        {
-            get { return _cff1FontSet; }
-        }
-
+        public Cff1FontSet ResultCff1FontSet => _cff1FontSet;
+        //
         void ReadNameIndex()
         {
             //7. Name INDEX
@@ -660,7 +656,7 @@ namespace Typography.OpenFont.CFF
             }
 
             //
-            _cff1FontSet.fontNames = fontNames;
+            _cff1FontSet._fontNames = fontNames;
 
 
             //TODO: review here
@@ -917,21 +913,21 @@ namespace Typography.OpenFont.CFF
             //one less element in the glyph name array than nGlyphs because 
             //the .notdef glyph name is omitted.)
 
-            Glyph[] cff1Glyphs = _currentCff1Font.glyphs;
+            Glyph[] cff1Glyphs = _currentCff1Font._glyphs;
             int nGlyphs = cff1Glyphs.Length;
             for (int i = 1; i < nGlyphs; ++i)
             {
 
                 ushort sid = _reader.ReadUInt16();
-                if (sid <= Cff1FontSet.nStdStrings)
+                if (sid <= Cff1FontSet.N_STD_STRINGS)
                 {
                     //use standard name
                     //TODO: review here
-                    cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet._StdStrings[sid];
+                    cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
                 }
                 else
                 {
-                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.nStdStrings - 1];
+                    cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
                 }
             }
         }
@@ -1022,7 +1018,7 @@ namespace Typography.OpenFont.CFF
 
             Glyph[] glyphs = new Glyph[glyphCount];
 
-            _currentCff1Font.glyphs = glyphs;
+            _currentCff1Font._glyphs = glyphs;
             Type2CharStringParser type2Parser = new Type2CharStringParser();
 
 
@@ -1139,10 +1135,10 @@ namespace Typography.OpenFont.CFF
                         }
                         break;
                     case "defaultWidthX":
-                        _currentCff1Font.defaultWidthX = (int)dicEntry.operands[0]._realNumValue;
+                        _currentCff1Font._defaultWidthX = (int)dicEntry.operands[0]._realNumValue;
                         break;
                     case "nominalWidthX":
-                        _currentCff1Font.nominalWidthX = (int)dicEntry.operands[0]._realNumValue;
+                        _currentCff1Font._nominalWidthX = (int)dicEntry.operands[0]._realNumValue;
                         break;
                     default:
                         {
@@ -1282,7 +1278,7 @@ namespace Typography.OpenFont.CFF
             //get registered operator by its key
             return CFFOperator.GetOperatorByKey(b0, b1);
         }
-         
+
         readonly StringBuilder _sbForReadRealNumber = new StringBuilder();
         double ReadRealNumber()
         {
@@ -1587,16 +1583,16 @@ namespace Typography.OpenFont.CFF
     class CFFOperator
     {
 
-        readonly byte b0;
-        readonly byte b1;
+        readonly byte _b0;
+        readonly byte _b1;
         readonly OperatorOperandKind _operatorOperandKind;
 
         //b0 the first byte of a two byte value
         //b1 the second byte of a two byte value
         private CFFOperator(string name, byte b0, byte b1, OperatorOperandKind operatorOperandKind)
         {
-            this.b0 = b0;
-            this.b1 = b1;
+            _b0 = b0;
+            _b1 = b1;
             this.Name = name;
             _operatorOperandKind = operatorOperandKind;
         }

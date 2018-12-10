@@ -234,8 +234,8 @@ namespace PixelFarm.CpuBlit.Imaging
             Vector bc_vec = this.BC;
             Vector cd_vec = this.CD;
             Vector da_vec = this.DA;
-            int rectLeft = this._destBounds.Left;
-            int rectTop = this._destBounds.Top;
+            int rectLeft = _destBounds.Left;
+            int rectTop = _destBounds.Top;
 
 
 
@@ -293,8 +293,8 @@ namespace PixelFarm.CpuBlit.Imaging
             Vector bc_vec = this.BC;
             Vector cd_vec = this.CD;
             Vector da_vec = this.DA;
-            int rectLeft = this._destBounds.Left;
-            int rectTop = this._destBounds.Top;
+            int rectLeft = _destBounds.Left;
+            int rectTop = _destBounds.Top;
 
             int srcW_lim = srcW - 1;
             int srcH_lim = srcH - 1;
@@ -480,8 +480,8 @@ namespace PixelFarm.CpuBlit.Imaging
                 destCB._dbugNote = "GetTransformedBicubicInterpolation()";
 #endif
                 MyBitmapBlender destWriter = new MyBitmapBlender(destCB);
-                int rectLeft = this._destBounds.Left;
-                int rectTop = this._destBounds.Top;
+                int rectLeft = _destBounds.Left;
+                int rectTop = _destBounds.Top;
 
                 //***
                 PixelFarm.Drawing.Color[] colors = new PixelFarm.Drawing.Color[16];

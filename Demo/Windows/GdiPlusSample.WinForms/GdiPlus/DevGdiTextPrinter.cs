@@ -103,7 +103,7 @@ namespace SampleWinForms
 
             _reusableUnscaledGlyphPlanList.Clear();
             //1. unscale layout, in design unit
-            this._glyphLayout.Layout(textBuffer, startAt, len);
+            _glyphLayout.Layout(textBuffer, startAt, len);
             _glyphLayout.GenerateUnscaledGlyphPlans(_reusableUnscaledGlyphPlanList);
 
             //draw from the glyph plan seq
