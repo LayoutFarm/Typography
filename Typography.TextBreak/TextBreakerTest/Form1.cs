@@ -90,15 +90,24 @@ namespace TextBreakerTest
             var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu62/brkitr" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
-            breaker1.BreakNumberAfterText = true; 
+            breaker1.BreakNumberAfterText = true;
             char[] test = this.textBox1.Text.ToCharArray();
-            this.listBox1.Items.Clear(); 
-            breaker1.BreakWords(test, 0, test.Length);
-            foreach (BreakSpan span in breaker1.GetBreakSpanIter())
+            this.listBox1.Items.Clear();
+
+            breaker1.SetNewBreakHandler(vis =>
             {
+                BreakSpan span = vis.GetBreakSpan();
                 string s = new string(test, span.startAt, span.len);
                 this.listBox1.Items.Add(span.startAt + " " + s);
-            }
+
+            });
+            breaker1.BreakWords(test, 0, test.Length);
+
+            //foreach (BreakSpan span in breaker1.GetBreakSpanIter())
+            //{
+            //   
+            //    this.listBox1.Items.Add(span.startAt + " " + s);
+            //}
         }
         static bool StringStartsWithChars(string srcString, string value)
         {
@@ -161,15 +170,12 @@ namespace TextBreakerTest
             var dicProvider = new IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../icu58/brkitr_src" };
             CustomBreakerBuilder.Setup(dicProvider);
             CustomBreaker breaker1 = CustomBreakerBuilder.NewCustomBreaker();
+            breaker1.SetNewBreakHandler(vis => { }); //just break, do nothing about result
             char[] test = this.textBox1.Text.ToCharArray();
             //-------------
             for (int i = ntimes - 1; i >= 0; --i)
             {
                 breaker1.BreakWords(test, 0, test.Length);
-                foreach (var span in breaker1.GetBreakSpanIter())
-                {
-
-                }
             }
         }
         void ParseWithIcu(int ntimes)

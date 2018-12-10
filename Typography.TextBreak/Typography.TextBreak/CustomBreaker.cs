@@ -24,9 +24,11 @@ namespace Typography.TextBreak
         public CustomBreaker()
         {
             ThrowIfCharOutOfRange = false;
-            //
-            _visitor = new WordVisitor();
             _breakingEngine = _engBreakingEngine; //default eng-breaking engine
+        }
+        public void SetNewBreakHandler(NewWordBreakHandlerDelegate newWordBreakHandler)
+        {
+            _visitor = new WordVisitor(newWordBreakHandler);
         }
         //
         public EngBreakingEngine EngBreakingEngine => _engBreakingEngine;
@@ -141,60 +143,60 @@ namespace Typography.TextBreak
             BreakWords(buffer, 0, inputstr.Length); //all
         }
 
-        /// <summary>
-        /// copy break-at result to outputList
-        /// </summary>
-        /// <param name="outputList"></param>
-        public void CopyBreakResults(List<BreakAtInfo> outputList)
-        {
-            outputList.AddRange(_visitor.GetBreakList());
-        }
+        ///// <summary>
+        ///// copy break-at result to outputList
+        ///// </summary>
+        ///// <param name="outputList"></param>
+        //public void CopyBreakResults(List<BreakAtInfo> outputList)
+        //{
+        //    outputList.AddRange(_visitor.GetBreakList());
+        //}
 
-        /// <summary>
-        /// copy break-at result (only break pos) to outputList
-        /// </summary>
-        /// <param name="outputList"></param>
-        public void CopyBreakResults(List<int> outputList)
-        {
-            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
-            int j = breakAtList.Count;
-            for (int i = 0; i < j; ++i)
-            {
-                BreakAtInfo brk = breakAtList[i];
-                outputList.Add(brk.breakAt);
-            }
-        }
+        ///// <summary>
+        ///// copy break-at result (only break pos) to outputList
+        ///// </summary>
+        ///// <param name="outputList"></param>
+        //public void CopyBreakResults(List<int> outputList)
+        //{
+        //    List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
+        //    int j = breakAtList.Count;
+        //    for (int i = 0; i < j; ++i)
+        //    {
+        //        BreakAtInfo brk = breakAtList[i];
+        //        outputList.Add(brk.breakAt);
+        //    }
+        //}
 
-        //
-        public int BreakItemCount => _visitor.GetBreakList().Count;
-        //
-        public IEnumerable<BreakSpan> GetBreakSpanIter()
-        {
-            List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
-            int c_index = 0;
-            int count = breakAtList.Count;
-            for (int i = 0; i < count; ++i)
-            {
+        ////
+        //public int BreakItemCount => _visitor.GetBreakList().Count;
+        ////
+        //public IEnumerable<BreakSpan> GetBreakSpanIter()
+        //{
+        //    List<BreakAtInfo> breakAtList = _visitor.GetBreakList();
+        //    int c_index = 0;
+        //    int count = breakAtList.Count;
+        //    for (int i = 0; i < count; ++i)
+        //    {
 
-                BreakAtInfo brkInfo = breakAtList[i];
-                BreakSpan sp = new BreakSpan();
-                sp.startAt = c_index;
-                sp.len = (ushort)(brkInfo.breakAt - c_index);
-                sp.wordKind = brkInfo.wordKind;
+        //        BreakAtInfo brkInfo = breakAtList[i];
+        //        BreakSpan sp = new BreakSpan();
+        //        sp.startAt = c_index;
+        //        sp.len = (ushort)(brkInfo.breakAt - c_index);
+        //        sp.wordKind = brkInfo.wordKind;
 
-                c_index += sp.len;
+        //        c_index += sp.len;
 
-                yield return sp;
-            }
-            //-------------------
-            if (c_index < _endAt)
-            {
-                BreakSpan sp = new BreakSpan();
-                sp.startAt = c_index;
-                sp.len = (ushort)(_endAt - c_index);
-                yield return sp;
-            }
-        }
+        //        yield return sp;
+        //    }
+        //    //-------------------
+        //    if (c_index < _endAt)
+        //    {
+        //        BreakSpan sp = new BreakSpan();
+        //        sp.startAt = c_index;
+        //        sp.len = (ushort)(_endAt - c_index);
+        //        yield return sp;
+        //    }
+        //}
 
 
         public BreakingEngine GetBreakingEngineFor(char c)
