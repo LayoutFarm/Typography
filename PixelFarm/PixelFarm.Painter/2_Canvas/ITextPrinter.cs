@@ -6,7 +6,7 @@ namespace PixelFarm.Drawing
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
-
+        void AddLineSegment(ILineSegment lineSeg);
     }
     public interface ILineSegment
     {
@@ -52,7 +52,7 @@ namespace PixelFarm.Drawing
         //
         bool SupportsWordBreak { get; }
 
-        ILineSegmentList BreakToLineSegments(ref TextBufferSpan textBufferSpan);
+        void BreakToLineSegments(ref TextBufferSpan textBufferSpan, ILineSegmentList outputLineSegmentList);
         //
         Size MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font);
 
