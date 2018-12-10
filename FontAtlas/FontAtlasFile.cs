@@ -19,10 +19,7 @@ namespace PixelFarm.Drawing.Fonts
             GlyphList,
             OverviewFontInfo,
         }
-        public SimpleFontAtlas Result
-        {
-            get { return _atlas; }
-        }
+        public SimpleFontAtlas Result => _atlas;
 
         public void Read(Stream inputStream)
         {

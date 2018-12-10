@@ -58,11 +58,11 @@ namespace PixelFarm.Drawing
             Name = facename;
             SizeInPoints = fontSizeInPts;
             Style = style;
-            this._fontKey = (new InternalFontKey(facename, fontSizeInPts, style)).GetHashCode();
+            _fontKey = (new InternalFontKey(facename, fontSizeInPts, style)).GetHashCode();
         }
         public int FontKey
         {
-            get { return this._fontKey; }
+            get { return _fontKey; }
         }
 
         /// <summary>

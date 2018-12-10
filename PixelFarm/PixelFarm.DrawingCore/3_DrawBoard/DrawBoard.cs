@@ -236,7 +236,7 @@ namespace PixelFarm.Drawing
             internal SmoothingModeState(DrawBoard drawBoard, SmoothingMode state)
             {
                 _latestSmoothMode = state;
-                this._drawBoard = drawBoard;
+                _drawBoard = drawBoard;
             }
             public void Restore()
             {

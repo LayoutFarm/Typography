@@ -190,16 +190,16 @@ namespace Typography.OpenFont
                     CvtTable cvtTable = ReadTableIfExists(tables, input, new CvtTable());
                     if (cvtTable != null)
                     {
-                        typeface.ControlValues = cvtTable.controlValues;
+                        typeface.ControlValues = cvtTable._controlValues;
                     }
                     if (fpgmTable != null)
                     {
-                        typeface.FpgmProgramBuffer = fpgmTable.programBuffer;
+                        typeface.FpgmProgramBuffer = fpgmTable._programBuffer;
                     }
                     PrepTable propProgramTable = ReadTableIfExists(tables, input, new PrepTable());
                     if (propProgramTable != null)
                     {
-                        typeface.PrepProgramBuffer = propProgramTable.programBuffer;
+                        typeface.PrepProgramBuffer = propProgramTable._programBuffer;
                     }
                 }
                 //-------------------------

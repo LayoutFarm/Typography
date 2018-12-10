@@ -296,10 +296,10 @@ namespace BitmapBufferEx
             if (obj is ColorInt)
             {
                 ColorInt c = (ColorInt)obj;
-                return c._a == this._a &&
-                    c._b == this._b &&
-                    c._r == this._r &&
-                    c._g == this._g;
+                return c._a == _a &&
+                    c._b == _b &&
+                    c._r == _r &&
+                    c._g == _g;
             }
             return false;
         }
@@ -333,12 +333,12 @@ namespace BitmapBufferEx
         /// <returns></returns>
         public bool EqualsOnRGB(ref ColorInt c2)
         {
-            return (uint)((this._r << 16) | (this._g << 8) | (this._b)) ==
+            return (uint)((_r << 16) | (_g << 8) | (_b)) ==
                 (uint)((c2._r << 16) | (c2._g << 8) | (c2._b));
         }
         public bool EqualsOnRGB(int c2_r, int c2_g, int c2_b)
         {
-            return (uint)((this._r << 16) | (this._g << 8) | (this._b)) ==
+            return (uint)((_r << 16) | (_g << 8) | (_b)) ==
                 (uint)((c2_r << 16) | (c2_g << 8) | (c2_b));
         }
     }

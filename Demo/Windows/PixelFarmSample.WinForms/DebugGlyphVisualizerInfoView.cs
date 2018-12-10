@@ -420,7 +420,7 @@ namespace SampleWinForms.UI
         }
         public void SetDebugMarkOnEdgeNo(int edgeNo)
         {
-            this._addDebugMarkOnEdgeNo = edgeNo;
+            _addDebugMarkOnEdgeNo = edgeNo;
         }
 
 

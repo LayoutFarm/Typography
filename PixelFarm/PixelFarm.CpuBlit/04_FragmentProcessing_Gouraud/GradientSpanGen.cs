@@ -65,9 +65,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             _grad0X = _grad0Y = _xoffset = _yoffset = 0;//reset
 
-            this._interpolator = inter;
-            this._grValueCalculator = gvc;
-            this._colorsProvider = m_colorsProvider;
+            _interpolator = inter;
+            _grValueCalculator = gvc;
+            _colorsProvider = m_colorsProvider;
             _dist = AggMath.iround(distance * GR_SUBPIX_SCALE);
 
             if (_dist < 1)

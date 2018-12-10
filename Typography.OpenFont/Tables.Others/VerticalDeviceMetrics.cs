@@ -6,6 +6,8 @@ namespace Typography.OpenFont.Tables
 {
     class VerticalDeviceMetrics : TableEntry
     {
+        public override string Name => "VDMX";
+        //
         //https://www.microsoft.com/typography/otspec/vdmx.htm
         //VDMX - Vertical Device Metrics 
         //The VDMX table relates to OpenType™ fonts with TrueType outlines.
@@ -18,11 +20,7 @@ namespace Typography.OpenFont.Tables
         //In order to avoid grid fitting the entire font to determine the correct height, the VDMX table has been defined.
 
         //The VDMX table consists of a header followed by groupings of VDMX records:
-        Ratio[] ratios;
-        public override string Name
-        {
-            get { return "VDMX"; }
-        }
+        Ratio[] _ratios; 
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //uint16 	version 	Version number (0 or 1).
@@ -40,10 +38,10 @@ namespace Typography.OpenFont.Tables
             ushort version = reader.ReadUInt16();
             ushort numRecs = reader.ReadUInt16();
             ushort numRatios = reader.ReadUInt16();
-            ratios = new Ratio[numRatios];
+            _ratios = new Ratio[numRatios];
             for (int i = 0; i < numRatios; ++i)
             {
-                ratios[i] = new Ratio(
+                _ratios[i] = new Ratio(
                     reader.ReadByte(),
                     reader.ReadByte(),
                     reader.ReadByte(),
@@ -66,7 +64,7 @@ namespace Typography.OpenFont.Tables
                 this.xRatio = xRatio;
                 this.yStartRatio = yStartRatio;
                 this.yEndRatio = yEndRatio;
-            } 
+            }
         }
-    } 
+    }
 }

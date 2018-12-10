@@ -21,10 +21,7 @@ namespace Typography.OpenFont.Tables
             reader.BaseStream.Seek(this.Header.Offset, SeekOrigin.Begin);
             ReadContentFrom(reader);
         }
-        public uint TableLength
-        {
-            get { return this.Header.Length; }
-        }
+        public uint TableLength => this.Header.Length;
 
     }
     class UnreadTableEntry : TableEntry
@@ -33,10 +30,8 @@ namespace Typography.OpenFont.Tables
         {
             this.Header = header;
         }
-        public override string Name
-        {
-            get { return this.Header.Tag; }
-        }
+        public override string Name=> this.Header.Tag;
+        //
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //intend ***

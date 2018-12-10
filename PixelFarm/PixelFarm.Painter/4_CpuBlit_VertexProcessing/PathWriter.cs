@@ -197,18 +197,18 @@ namespace PixelFarm.CpuBlit
         {
             //relative ***
             _latestSVGPathCmd = SvgPathCommand.HorizontalLineTo;
-            _myvxs.AddLineTo(this._latest_x += dx1, _latest_y);
+            _myvxs.AddLineTo(_latest_x += dx1, _latest_y);
         }
         public void VerticalLineTo(double y1)
         {
             _latestSVGPathCmd = SvgPathCommand.VerticalLineTo;
-            _myvxs.AddLineTo(_latest_x, this._latest_y = y1);
+            _myvxs.AddLineTo(_latest_x, _latest_y = y1);
         }
         public void VerticalLineToRel(double dy1)
         {
             //relative ***
             _latestSVGPathCmd = SvgPathCommand.VerticalLineTo;
-            _myvxs.AddLineTo(_latest_x, this._latest_y += dy1);
+            _myvxs.AddLineTo(_latest_x, _latest_y += dy1);
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace PixelFarm.CpuBlit
         /// <param name="y2"></param>
         public void SmoothCurve3(double x2, double y2)
         {
-            switch (this._latestSVGPathCmd)
+            switch (_latestSVGPathCmd)
             {
                 case SvgPathCommand.QuadraticBezierCurve:
                 case SvgPathCommand.TSmoothQuadraticBezierCurveTo:
@@ -273,7 +273,7 @@ namespace PixelFarm.CpuBlit
                     break;
                 default:
                     {
-                        Curve3(this._latest_x, this._latest_y, x2, y2);
+                        Curve3(_latest_x, _latest_y, x2, y2);
                     }
                     break;
             }
@@ -307,7 +307,7 @@ namespace PixelFarm.CpuBlit
             _myvxs.AddP3c(x1, y1);
             _myvxs.AddP3c(x2, y2);
             _c2 = new Vector2(x2, y2);
-            _myvxs.AddLineTo(this._latest_x = x3, this._latest_y = y3);
+            _myvxs.AddLineTo(_latest_x = x3, _latest_y = y3);
         }
 
         public void Curve4Rel(double dx1, double dy1,
@@ -327,7 +327,7 @@ namespace PixelFarm.CpuBlit
                        double x2, double y2,
                        double x3, double y3)
         {
-            switch (this._latestSVGPathCmd)
+            switch (_latestSVGPathCmd)
             {
 
                 case SvgPathCommand.QuadraticBezierCurve:

@@ -116,7 +116,7 @@ namespace SampleWinForms.UI
             //----------------------------------------------------
             float scale = _typeface.CalculateScaleToPixelFromPointSize(_sizeInPoint);
             _pxscale = scale;
-            this._infoView.PxScale = scale;
+            _infoView.PxScale = scale;
 
 
             var left2 = 0;
@@ -259,7 +259,7 @@ namespace SampleWinForms.UI
                             break;
                     }
                 }
-                float scale = this._pxscale;
+                float scale = _pxscale;
                 //show info: => edge point
                 if (this.DrawPerpendicularLine && _infoView.HasDebugMark)
                 {
@@ -491,7 +491,7 @@ namespace SampleWinForms.UI
         {
 
 
-            float pxscale = this._pxscale;
+            float pxscale = _pxscale;
             GlyphBoneJoint jointA = bone.JointA;
             GlyphBoneJoint jointB = bone.JointB;
 
@@ -559,7 +559,7 @@ namespace SampleWinForms.UI
 
         protected override void OnGlyphEdgeN(EdgeLine e)
         {
-            float pxscale = this._pxscale;
+            float pxscale = _pxscale;
 
             //TODO: reimplement this again
 
@@ -575,7 +575,7 @@ namespace SampleWinForms.UI
         protected override void OnCentroidLine(double px, double py, double qx, double qy)
         {
 
-            float pxscale = this._pxscale;
+            float pxscale = _pxscale;
             //red centroid line
             painter.Line(
                 px * pxscale, py * pxscale,
@@ -587,14 +587,14 @@ namespace SampleWinForms.UI
         }
         protected override void OnCentroidLineTip_P(double px, double py, double tip_px, double tip_py)
         {
-            float pxscale = this._pxscale;
+            float pxscale = _pxscale;
             painter.Line(px * pxscale, py * pxscale,
                          tip_px * pxscale, tip_py * pxscale,
                          PixelFarm.Drawing.Color.Blue);
         }
         protected override void OnCentroidLineTip_Q(double qx, double qy, double tip_qx, double tip_qy)
         {
-            float pxscale = this._pxscale;
+            float pxscale = _pxscale;
             painter.Line(qx * pxscale, qy * pxscale,
                          tip_qx * pxscale, tip_qy * pxscale,
                          PixelFarm.Drawing.Color.Green);

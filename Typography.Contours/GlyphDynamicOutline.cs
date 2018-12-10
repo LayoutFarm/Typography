@@ -59,10 +59,7 @@ namespace Typography.Contours
             return new GlyphDynamicOutline();
         }
 
-        internal List<GlyphContour> GetContours()
-        {
-            return _contours;
-        }
+        internal List<GlyphContour> GetContours() => _contours;
         /// <summary>
         ///classify bone group by gridbox(w,h) 
         /// </summary>
@@ -190,53 +187,53 @@ namespace Typography.Contours
         struct FitDiffCollector
         {
 
-            float negative_diff;
-            float positive_diff;
+            float _negative_diff;
+            float _positive_diff;
 
-            float weighted_sum_negativeDiff;
-            float weighted_sum_positiveDiff;
+            float _weighted_sum_negativeDiff;
+            float _weighted_sum_positiveDiff;
 
             public void Collect(float diff, float groupLen)
             {
                 //group len for weighting 
                 if (diff < 0)
                 {
-                    negative_diff += (diff * groupLen);
-                    weighted_sum_negativeDiff += groupLen;
+                    _negative_diff += (diff * groupLen);
+                    _weighted_sum_negativeDiff += groupLen;
                 }
                 else
                 {
-                    positive_diff += (diff * groupLen);
-                    weighted_sum_positiveDiff += groupLen;
+                    _positive_diff += (diff * groupLen);
+                    _weighted_sum_positiveDiff += groupLen;
                 }
             }
 
             public float CalculateProperDiff()
             {
-                if (weighted_sum_positiveDiff != 0 && weighted_sum_negativeDiff != 0)
+                if (_weighted_sum_positiveDiff != 0 && _weighted_sum_negativeDiff != 0)
                 {
                     //check if we should move to positive or negative  
                     //tech: choose minimum move to reach the target
-                    if (positive_diff > -negative_diff)
+                    if (_positive_diff > -_negative_diff)
                     {
                         //move to negative***
-                        return -(positive_diff - negative_diff) / (weighted_sum_positiveDiff + weighted_sum_negativeDiff);
+                        return -(_positive_diff - _negative_diff) / (_weighted_sum_positiveDiff + _weighted_sum_negativeDiff);
                     }
                     else
                     {
                         //avg to positive
-                        return (positive_diff - negative_diff) / (weighted_sum_positiveDiff + weighted_sum_negativeDiff);
+                        return (_positive_diff - _negative_diff) / (_weighted_sum_positiveDiff + _weighted_sum_negativeDiff);
                     }
                 }
-                else if (weighted_sum_positiveDiff != 0)
+                else if (_weighted_sum_positiveDiff != 0)
                 {
                     //only positive side
-                    return positive_diff / weighted_sum_positiveDiff;
+                    return _positive_diff / _weighted_sum_positiveDiff;
                 }
-                else if (weighted_sum_negativeDiff != 0)
+                else if (_weighted_sum_negativeDiff != 0)
                 {
                     //only negative side, preserve negative sign
-                    return negative_diff / weighted_sum_negativeDiff;
+                    return _negative_diff / _weighted_sum_negativeDiff;
                 }
                 else
                 {
@@ -368,10 +365,8 @@ namespace Typography.Contours
         /// <summary>
         /// pxscale-specific, average horizontal diff to fit the grid, this result come from fitting process
         /// </summary>
-        public float AvgXFitOffset
-        {
-            get { return _avg_x_fitOffset; }
-        }
+        public float AvgXFitOffset => _avg_x_fitOffset;
+        //
         void CollectAllCentroidLines(List<CentroidLineHub> lineHubs)
         {
             //collect all centroid lines from each line CentroidLineHub

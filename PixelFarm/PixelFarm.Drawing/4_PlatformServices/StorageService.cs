@@ -223,7 +223,7 @@ namespace LayoutFarm
             //set image to this binder
             if (image != null)
             {
-                this._localImg = image;
+                _localImg = image;
                 this.State = BinderState.Loaded;
                 if (!fromAnotherThread)
                 {
@@ -246,12 +246,12 @@ namespace LayoutFarm
         }
         public bool HasLazyFunc
         {
-            get { return this._lazyLoadImgFunc != null; }
+            get { return _lazyLoadImgFunc != null; }
         }
 
         public void SetImageLoader(LoadImageFunc lazyLoadFunc)
         {
-            this._lazyLoadImgFunc = lazyLoadFunc;
+            _lazyLoadImgFunc = lazyLoadFunc;
         }
         public void LazyLoadImage()
         {

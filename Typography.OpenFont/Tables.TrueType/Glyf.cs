@@ -6,19 +6,14 @@ namespace Typography.OpenFont.Tables
 {
     class Glyf : TableEntry
     {
+        public override string Name => "glyf";
+        //
         Glyph[] _glyphs;
         public Glyf(GlyphLocations glyphLocations)
         {
             this.GlyphLocations = glyphLocations;
         }
-        public Glyph[] Glyphs
-        {
-            get { return _glyphs; }
-        }
-        public override string Name
-        {
-            get { return "glyf"; }
-        }
+        public Glyph[] Glyphs => _glyphs;
         public GlyphLocations GlyphLocations
         {
             get;

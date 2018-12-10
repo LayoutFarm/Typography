@@ -17,7 +17,7 @@ namespace SampleWinForms.UI
         }
         public void BindLine(SmallLine line)
         {
-            this._line = line;
+            _line = line;
         }
         public void BindPrinter(TextPrinterBase printer)
         {

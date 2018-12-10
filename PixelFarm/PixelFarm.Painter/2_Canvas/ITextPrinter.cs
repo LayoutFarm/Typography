@@ -23,7 +23,7 @@ namespace PixelFarm.Drawing
         char[] _rawString;
         public TextBufferSpan(char[] rawCharBuffer)
         {
-            this._rawString = rawCharBuffer;
+            _rawString = rawCharBuffer;
             this.len = rawCharBuffer.Length;
             this.start = 0;
         }
@@ -31,7 +31,7 @@ namespace PixelFarm.Drawing
         {
             this.start = start;
             this.len = len;
-            this._rawString = rawCharBuffer;
+            _rawString = rawCharBuffer;
         }
         public override string ToString()
         {

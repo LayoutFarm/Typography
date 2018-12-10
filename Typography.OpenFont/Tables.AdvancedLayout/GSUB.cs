@@ -33,8 +33,8 @@ namespace Typography.OpenFont.Tables
 
     public class GSUB : GlyphShapingTableEntry
     {
-        public override string Name { get { return "GSUB"; } }
-
+        public override string Name => "GSUB";
+        //
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
                                                 ushort lookupType, ushort lookupFlags,
                                                 ushort[] subTableOffsets, ushort markFilteringSet)
@@ -56,7 +56,7 @@ namespace Typography.OpenFont.Tables
 
         private List<LookupTable> _lookupList = new List<LookupTable>();
 
-        public IList<LookupTable> LookupList { get { return _lookupList; } }
+        public IList<LookupTable> LookupList => _lookupList;
 
 
         //--------------------------
@@ -124,10 +124,9 @@ namespace Typography.OpenFont.Tables
                 this.lookupFlags = lookupFlags;
                 this.markFilteringSet = markFilteringSet;
             }
-            public IList<LookupSubTable> SubTables
-            {
-                get { return _subTables; }
-            }
+            //
+            public IList<LookupSubTable> SubTables => _subTables;
+            //
             public bool DoSubstitutionAt(IGlyphIndexList inputGlyphs, int pos, int len)
             {
                 foreach (LookupSubTable subTable in SubTables)

@@ -107,9 +107,9 @@ namespace PixelFarm.CpuBlit.Rasterization
                 using (CpuBlit.Imaging.TempMemPtr dest_bufferPtr = dest.GetBufferPtr())
                 {
                     byte* dest_buffer = (byte*)dest_bufferPtr.Ptr;
-                    int dest_stride = this._destImgStride = dest.Stride;
+                    int dest_stride = _destImgStride = dest.Stride;
                     //*** set color before call Blend()
-                    this._color = color;
+                    _color = color;
                     byte color_alpha = color.alpha;
                     //---------------------------
                     //3. loop, render single scanline with subpixel rendering 
@@ -309,7 +309,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         //                _tempForwardAccumBuffer.ReadRemaining4(out ec_r1, out ec_r2, out ec_r3, out ec_r4);
 
         //                //we need 2 pixels,  
-        //                int remaining_dest = Math.Min((this._destImgStride - (destImgIndex + 4)), 5);
+        //                int remaining_dest = Math.Min((_destImgStride - (destImgIndex + 4)), 5);
         //                if (remaining_dest < 1)
         //                {
         //                    return;
@@ -530,7 +530,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 _tempForwardAccumBuffer.ReadRemaining4(out ec_r1, out ec_r2, out ec_r3, out ec_r4);
 
                 //we need 2 pixels,  
-                int remaining_dest = Math.Min((this._destImgStride - (destImgIndex + 4)), 5);
+                int remaining_dest = Math.Min((_destImgStride - (destImgIndex + 4)), 5);
                 if (remaining_dest < 1)
                 {
                     return;
@@ -1611,7 +1611,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         int _nLevel;
         public LcdDistributionLut(byte grayLevel, double prim, double second, double tert)
         {
-            this._nLevel = grayLevel;
+            _nLevel = grayLevel;
             //switch (grayLevel)
             //{
             //    default: throw new System.NotSupportedException();

@@ -312,7 +312,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             new_remaining_len -= _expectedSegmentLen;
                             //each segment has its own line production procedure
                             //eg.  
-                            _currentMarker.lineSegDel(_output, VertexCmd.LineTo, this._latest_X = new_x, this._latest_Y = new_y);
+                            _currentMarker.lineSegDel(_output, VertexCmd.LineTo, _latest_X = new_x, _latest_Y = new_y);
                             StepToNextMarkerSegment();
                         }
                         //-----------------   

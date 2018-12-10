@@ -399,8 +399,8 @@ namespace LayoutFarm.TextBreaker.ICU
         int _transform;
         public BytesDictionaryMatcher(byte[] charBuffer, int transform)
         {
-            this._charBuffer = charBuffer;
-            this._transform = transform;
+            _charBuffer = charBuffer;
+            _transform = transform;
         }
         int Transform(int c)
         {

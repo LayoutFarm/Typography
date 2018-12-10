@@ -202,19 +202,19 @@ namespace Typography.Contours
         /// <summary>
         /// min x after fitting process
         /// </summary>
-        public float MinX { get { return _bounds_minX; } }
+        public float MinX => _bounds_minX;
         /// <summary>
         /// min y after fitting process
         /// </summary>
-        public float MinY { get { return _bounds_minY; } }
+        public float MinY => _bounds_minY;
         /// <summary>
         /// max x after fitting process
         /// </summary>
-        public float MaxX { get { return _bounds_maxX; } }
+        public float MaxX => _bounds_maxX;
         /// <summary>
         ///  max y after fitting process
         /// </summary>
-        public float MaxY { get { return _bounds_maxY; } }
+        public float MaxY => _bounds_maxY;
 
         /// <summary>
         /// find link from main triangle of line-hub to another line hub
@@ -263,18 +263,11 @@ namespace Typography.Contours
             }
             return -1;
         }
-
-        public List<CentroidLineHub> GetCentroidLineHubs()
-        {
-            return _lineHubs;
-        }
-
-        public List<GlyphContour> GetContours()
-        {
-            return _contours;
-        }
-
-
+        //
+        public List<CentroidLineHub> GetCentroidLineHubs() => _lineHubs;
+        //
+        public List<GlyphContour> GetContours() => _contours;
+        //
 #if DEBUG
 
 
