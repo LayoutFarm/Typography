@@ -29,7 +29,7 @@ namespace DrawingGL
         }
         public int OrthoViewVersion
         {
-            get { return this._orthoViewVersion; }
+            get { return _orthoViewVersion; }
         }
 
         internal Color StrokeColor

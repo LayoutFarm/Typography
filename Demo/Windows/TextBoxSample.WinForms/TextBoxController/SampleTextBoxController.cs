@@ -126,8 +126,8 @@ namespace SampleWinForms.UI
         public virtual void HostInvokeMouseDown(int xpos, int ypos, UIMouseButtons button)
         {
 
-            this._mousedown_X = xpos;
-            this._mousedown_Y = ypos;
+            _mousedown_X = xpos;
+            _mousedown_Y = ypos;
 
             _isMouseDown = true;
             UpdateOutput();
