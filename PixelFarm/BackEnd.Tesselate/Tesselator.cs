@@ -40,6 +40,7 @@
 **
 */
 //MIT,2014- present, WinterDev
+
 using System;
 namespace Tesselate
 {
@@ -88,21 +89,23 @@ namespace Tesselate
             ABS_GEQ_Two,
         }
 
+
+        WindingRuleType _windingRule; // rule for determining polygon interior
         ProcessingState _processingState;		/* what begin/end calls have we seen? */
         HalfEdge _lastHalfEdge;	/* lastEdge.Org is the most recent vertex */
+
+        //
         public Mesh mesh;       /* stores the input contours, and eventually the tessellation itself */
-        WindingRuleType _windingRule; // rule for determining polygon interior
-
         public Dictionary edgeDictionary;       /* edge dictionary for sweep line */
-
         internal MaxFirstList<ContourVertex> vertexPriorityQue = new MaxFirstList<ContourVertex>();
-
         public ContourVertex currentSweepVertex;        /* current sweep event being processed */
 
         public delegate void CallCombineDelegate(
             double c1, double c2, double c3, ref CombineParameters combinePars, out int outData);
 
         public CallCombineDelegate callCombine;
+
+
         /*** state needed for rendering callbacks (see render.c) ***/
 
         bool _boundaryOnly; /* Extract contours, not triangles */
@@ -119,12 +122,14 @@ namespace Tesselate
         public CallEndDelegate callEnd;
         public delegate void CallMeshDelegate(Mesh mesh);
         public CallMeshDelegate callMesh;
+        //
         /*** state needed to cache single-contour polygons for renderCache() */
 
         bool _emptyCache;       /* empty cache on next vertex() call */
         int _cacheCount;      /* number of cached vertices */
         Vertex[] _simpleVertexCache = new Vertex[MAX_CACHE_SIZE];	/* the vertex data */
         int[] _indexCached = new int[MAX_CACHE_SIZE];
+        //
         public Tesselator()
         {
             /* Only initialize fields which can be changed by the api.  Other fields
@@ -137,6 +142,7 @@ namespace Tesselate
 
         ~Tesselator()
         {
+            //TODO: review here...
             RequireState(ProcessingState.Dormant);
         }
 
@@ -173,28 +179,28 @@ namespace Tesselate
             throw new Exception();
         }
 
-        public void CallBegin(TriangleListType triangleType)
+        void CallBegin(TriangleListType triangleType)
         {
             callBegin?.Invoke(triangleType);
         }
-        public void CallVertex(int vertexData)
+        void CallVertex(int vertexData)
         {
             callVertex?.Invoke(vertexData);
         }
-        public void CallEdgeFlag(bool edgeState)
+        void CallEdgeFlag(bool edgeState)
         {
             callEdgeFlag?.Invoke(edgeState);
         }
 
-        public void CallEnd()
+        void CallEnd()
         {
             callEnd?.Invoke();
         }
 
-        public void CallCombine(double v0,
-            double v1, double v2,
-            ref CombineParameters combinePars,
-            out int outData)
+        internal void CallCombine(double v0,
+           double v1, double v2,
+           ref CombineParameters combinePars,
+           out int outData)
         {
             outData = 0;
             callCombine?.Invoke(v0, v1, v2, ref combinePars, out outData);

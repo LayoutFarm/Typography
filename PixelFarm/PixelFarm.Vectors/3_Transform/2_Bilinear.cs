@@ -239,8 +239,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         //--------------------------------------------------------------------
         // Check if the equations were solved successfully
-        public bool IsValid { get { return m_valid; } }
 
+        public bool IsValid => m_valid;
         public CoordTransformerKind Kind => CoordTransformerKind.Bilinear;
 
         //--------------------------------------------------------------------

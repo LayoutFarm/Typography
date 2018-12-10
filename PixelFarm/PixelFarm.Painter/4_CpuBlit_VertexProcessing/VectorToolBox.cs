@@ -11,57 +11,57 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //-----------------------------------
     public struct VxsContext1 : IDisposable
     {
-        internal readonly VertexStore vxs;
+        internal readonly VertexStore _vxs;
         internal VxsContext1(out VertexStore outputVxs)
         {
             VxsTemp.GetFreeVxs(out outputVxs);
-            vxs = outputVxs;
+            _vxs = outputVxs;
 
         }
         public void Dispose()
         {
-            VxsTemp.ReleaseVxs(vxs);
+            VxsTemp.ReleaseVxs(_vxs);
         }
     }
     public struct VxsContext2 : IDisposable
     {
-        internal readonly VertexStore vxs1;
-        internal readonly VertexStore vxs2;
+        internal readonly VertexStore _vxs1;
+        internal readonly VertexStore _vxs2;
         internal VxsContext2(out VertexStore outputVxs1, out VertexStore outputVxs2)
         {
-            VxsTemp.GetFreeVxs(out vxs1);
-            VxsTemp.GetFreeVxs(out vxs2);
-            outputVxs1 = vxs1;
-            outputVxs2 = vxs2;
+            VxsTemp.GetFreeVxs(out _vxs1);
+            VxsTemp.GetFreeVxs(out _vxs2);
+            outputVxs1 = _vxs1;
+            outputVxs2 = _vxs2;
         }
         public void Dispose()
         {
             //release
-            VxsTemp.ReleaseVxs(vxs1);
-            VxsTemp.ReleaseVxs(vxs2);
+            VxsTemp.ReleaseVxs(_vxs1);
+            VxsTemp.ReleaseVxs(_vxs2);
         }
     }
     public struct VxsContext3 : IDisposable
     {
-        internal readonly VertexStore vxs1;
-        internal readonly VertexStore vxs2;
-        internal readonly VertexStore vxs3;
+        internal readonly VertexStore _vxs1;
+        internal readonly VertexStore _vxs2;
+        internal readonly VertexStore _vxs3;
         internal VxsContext3(out VertexStore outputVxs1, out VertexStore outputVxs2, out VertexStore outputVxs3)
         {
-            VxsTemp.GetFreeVxs(out vxs1);
-            VxsTemp.GetFreeVxs(out vxs2);
-            VxsTemp.GetFreeVxs(out vxs3);
-            outputVxs1 = vxs1;
-            outputVxs2 = vxs2;
-            outputVxs3 = vxs3;
+            VxsTemp.GetFreeVxs(out _vxs1);
+            VxsTemp.GetFreeVxs(out _vxs2);
+            VxsTemp.GetFreeVxs(out _vxs3);
+            outputVxs1 = _vxs1;
+            outputVxs2 = _vxs2;
+            outputVxs3 = _vxs3;
 
         }
         public void Dispose()
         {
             //release
-            VxsTemp.ReleaseVxs(vxs1);
-            VxsTemp.ReleaseVxs(vxs2);
-            VxsTemp.ReleaseVxs(vxs3);
+            VxsTemp.ReleaseVxs(_vxs1);
+            VxsTemp.ReleaseVxs(_vxs2);
+            VxsTemp.ReleaseVxs(_vxs3);
         }
     }
 
@@ -70,15 +70,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public struct TempContext<T> : IDisposable
     {
-        internal readonly T tool;
+        internal readonly T _tool;
         internal TempContext(out T tool)
         {
-            Temp<T>.GetFreeItem(out this.tool);
-            tool = this.tool;
+            Temp<T>.GetFreeItem(out _tool);
+            tool = _tool;
         }
         public void Dispose()
         {
-            Temp<T>.Release(tool);
+            Temp<T>.Release(_tool);
         }
     }
 
@@ -179,7 +179,7 @@ namespace PixelFarm.Drawing
             }
             else
             {
-                return new VertexStore();
+                return new VertexStore(true);
             }
         }
     }
@@ -211,16 +211,24 @@ namespace PixelFarm.Drawing
         public static TempContext<PixelFarm.CpuBlit.PathWriter> Borrow(VertexStore vxs, out PixelFarm.CpuBlit.PathWriter pathWriter)
         {
             var tmpPw = Borrow(out pathWriter);
-            tmpPw.tool.BindVxs(vxs);
+            tmpPw._tool.BindVxs(vxs);
             return tmpPw;
         }
-        public static TempContext<Ellipse> Borrow(out Ellipse pathWriter)
+        public static TempContext<Arc> Borrow(out Arc arc)
+        {
+            if (!Temp<Arc>.IsInit())
+            {
+                Temp<Arc>.SetNewHandler(() => new Arc());
+            }
+            return Temp<Arc>.Borrow(out arc);
+        }
+        public static TempContext<Ellipse> Borrow(out Ellipse ellipse)
         {
             if (!Temp<Ellipse>.IsInit())
             {
                 Temp<Ellipse>.SetNewHandler(() => new Ellipse());
             }
-            return Temp<Ellipse>.Borrow(out pathWriter);
+            return Temp<Ellipse>.Borrow(out ellipse);
         }
         public static TempContext<SimpleRect> Borrow(out SimpleRect simpleRect)
         {

@@ -31,43 +31,41 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
     /// </summary>
     public abstract class ImgSpanGen : ISpanGenerator
     {
-        ISpanInterpolator m_interpolator;
-        double m_dx_dbl;
-        double m_dy_dbl;
-        int m_dx_int;
-        int m_dy_int;
+        ISpanInterpolator _interpolator;
+        double _dx_dbl;
+        double _dy_dbl;
+        int _dx_int;
+        int _dy_int;
         public ImgSpanGen()
         {
-            m_dx_dbl = 0.5;
-            m_dy_dbl = 0.5;
-            m_dx_int = (img_subpix_const.SCALE / 2);
-            m_dy_int = (img_subpix_const.SCALE / 2);
+            _dx_dbl = 0.5;
+            _dy_dbl = 0.5;
+            _dx_int = (img_subpix_const.SCALE / 2);
+            _dy_int = (img_subpix_const.SCALE / 2);
         }
         public void SetInterpolator(ISpanInterpolator interpolator)
         {
-            m_interpolator = interpolator;
+            _interpolator = interpolator;
         }
+
         public abstract void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len);
-        protected ISpanInterpolator Interpolator
-        {
-            get { return m_interpolator; }
-
-        }
-
-        public double dx { get { return m_dx_dbl; } }
-        public double dy { get { return m_dy_dbl; } }
-        public int dxInt { get { return m_dx_int; } }
-        public int dyInt { get { return m_dy_int; } }
-
+        //
+        protected ISpanInterpolator Interpolator => _interpolator;
+        //
+        public double dx => _dx_dbl;
+        public double dy => _dy_dbl;
+        public int dxInt => _dx_int;
+        public int dyInt => _dy_int;
+        //
 
         public void SetFilterOffset(double dx, double dy)
         {
-            m_dx_dbl = dx;
-            m_dy_dbl = dy;
-            m_dx_int = AggMath.iround(dx * img_subpix_const.SCALE);
-            m_dy_int = AggMath.iround(dy * img_subpix_const.SCALE);
+            _dx_dbl = dx;
+            _dy_dbl = dy;
+            _dx_int = AggMath.iround(dx * img_subpix_const.SCALE);
+            _dy_int = AggMath.iround(dy * img_subpix_const.SCALE);
         }
-        public void SetFilterOffset(double d) { SetFilterOffset(d, d); }
+        public void SetFilterOffset(double d) => SetFilterOffset(d, d);
         public virtual void Prepare() { }
     }
 }

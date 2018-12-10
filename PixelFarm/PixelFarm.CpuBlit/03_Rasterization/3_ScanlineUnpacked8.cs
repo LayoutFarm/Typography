@@ -109,7 +109,7 @@ namespace PixelFarm.CpuBlit.Rasterization
     //------------------------------------------------------------------------
     public sealed class ScanlineUnpacked8 : Scanline
     {
-        int minX;
+        int _minX;
         public ScanlineUnpacked8()
         {
         }
@@ -117,53 +117,53 @@ namespace PixelFarm.CpuBlit.Rasterization
         public override void ResetSpans(int min_x, int max_x)
         {
             int max_len = max_x - min_x + 2;
-            if (max_len > m_spans.Length)
+            if (max_len > _spans.Length)
             {
-                m_spans = new ScanlineSpan[max_len];
-                m_covers = new byte[max_len];
+                _spans = new ScanlineSpan[max_len];
+                _covers = new byte[max_len];
             }
-            last_x = 0x7FFFFFF0;
-            minX = min_x;
-            last_span_index = 0;
+            _last_x = 0x7FFFFFF0;
+            _minX = min_x;
+            _last_span_index = 0;
         }
         public override void AddCell(int x, int cover)
         {
-            x -= minX;
-            m_covers[x] = (byte)cover;
-            if (x == last_x + 1)
+            x -= _minX;
+            _covers[x] = (byte)cover;
+            if (x == _last_x + 1)
             {
-                m_spans[last_span_index].len++;
+                _spans[_last_span_index].len++;
             }
             else
             {
-                last_span_index++;
-                m_spans[last_span_index] = new ScanlineSpan(x + minX, x);
+                _last_span_index++;
+                _spans[_last_span_index] = new ScanlineSpan(x + _minX, x);
             }
-            last_x = x;
+            _last_x = x;
         }
         public override void AddSpan(int x, int len, int cover)
         {
-            x -= minX;
+            x -= _minX;
             for (int i = 0; i < len; i++)
             {
-                m_covers[x + i] = (byte)cover;
+                _covers[x + i] = (byte)cover;
             }
 
-            if (x == last_x + 1)
+            if (x == _last_x + 1)
             {
-                m_spans[last_span_index].len += (short)len;
+                _spans[_last_span_index].len += (short)len;
             }
             else
             {
-                last_span_index++;
-                m_spans[last_span_index] = new ScanlineSpan(x + minX, len, x);
+                _last_span_index++;
+                _spans[_last_span_index] = new ScanlineSpan(x + _minX, len, x);
             }
-            last_x = x + (int)len - 1;
+            _last_x = x + (int)len - 1;
         }
         public override void ResetSpans()
         {
-            last_x = 0x7FFFFFF0;
-            last_span_index = 0;
+            _last_x = 0x7FFFFFF0;
+            _last_span_index = 0;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿//BSD, 2014-present, WinterDev
+﻿//BSD, 2014-present, WinterDev_
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -29,79 +29,75 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     class StrokeGenerator
     {
 
-        StrokeMath m_stroker;
+        StrokeMath _stroker;
         Vertex2dList _vtx2dList = new Vertex2dList();
-        VertexStore m_out_vertices;
-        double m_shorten;
-        bool m_closed;
-
-
+        VertexStore _out_vertices;
+        double _shorten;
+        bool _closed;
         public StrokeGenerator()
         {
-            m_stroker = new StrokeMath();
-            m_out_vertices = new VertexStore();
-
-            m_closed = false;
+            _stroker = new StrokeMath();
+            _out_vertices = new VertexStore();
+            _closed = false;
         }
 
         public LineCap LineCap
         {
-            get { return this.m_stroker.LineCap; }
-            set { this.m_stroker.LineCap = value; }
+            get => _stroker.LineCap;
+            set => _stroker.LineCap = value;
         }
         public LineJoin LineJoin
         {
-            get { return this.m_stroker.LineJoin; }
-            set { this.m_stroker.LineJoin = value; }
+            get => _stroker.LineJoin;
+            set => _stroker.LineJoin = value;
         }
         public InnerJoin InnerJoin
         {
-            get { return this.m_stroker.InnerJoin; }
-            set { this.m_stroker.InnerJoin = value; }
+            get => _stroker.InnerJoin;
+            set => _stroker.InnerJoin = value;
         }
 
         public double Width
         {
-            get { return m_stroker.Width; }
-            set { this.m_stroker.Width = value; }
+            get => _stroker.Width;
+            set => _stroker.Width = value;
         }
-        public void SetMiterLimitTheta(double t) { m_stroker.SetMiterLimitTheta(t); }
-
+        public void SetMiterLimitTheta(double t) => _stroker.SetMiterLimitTheta(t);
 
         public double InnerMiterLimit
         {
-            get { return this.m_stroker.InnerMiterLimit; }
-            set { this.m_stroker.InnerMiterLimit = value; }
+            get => _stroker.InnerMiterLimit;
+            set => _stroker.InnerMiterLimit = value;
         }
         public double MiterLimit
         {
-            get { return this.m_stroker.InnerMiterLimit; }
-            set { this.m_stroker.InnerMiterLimit = value; }
+            get => _stroker.InnerMiterLimit;
+            set => _stroker.InnerMiterLimit = value;
         }
         public double ApproximateScale
         {
-            get { return this.m_stroker.ApproximateScale; }
-            set { this.m_stroker.ApproximateScale = value; }
+            get => _stroker.ApproximateScale;
+            set => _stroker.ApproximateScale = value;
         }
         public bool AutoDetectOrientation
         {
-            get { throw new NotSupportedException(); }
+            get => throw new NotSupportedException();
             set { throw new NotSupportedException(); }
         }
         public double Shorten
         {
-            get { return this.m_shorten; }
-            set { this.m_shorten = value; }
+            get => _shorten;
+            set => _shorten = value;
         }
         // Vertex Generator Interface
         public void Reset()
         {
             _vtx2dList.Clear();
-            m_closed = false;
+            _closed = false;
         }
         public void Close()
         {
-            m_closed = true;
+            _closed = true;
             _vtx2dList.Close();
         }
         public void AddVertex(double x, double y, VertexCmd cmd)
@@ -148,11 +144,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             if (_vtx2dList.Count < 3)
             {
                 //force
-                m_closed = false;
+                _closed = false;
             }
 
             //ready
-            if (_vtx2dList.Count < 2 + (m_closed ? 1 : 0))
+            if (_vtx2dList.Count < 2 + (_closed ? 1 : 0))
             {
                 return;
             }
@@ -167,19 +163,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double latest_moveX = 0;
             double latest_moveY = 0;
 
-            if (!m_closed)
+            if (!_closed)
             {
                 //cap1
 
                 _vtx2dList.GetFirst2(out Vertex2d v0, out Vertex2d v1);
-                m_stroker.CreateCap(
-                    m_out_vertices,
+                _stroker.CreateCap(
+                    _out_vertices,
                     v0,
-                    v1,
-                    v0.CalLen(v1));
+                    v1);
 
-                m_out_vertices.GetVertex(0, out latest_moveX, out latest_moveY);
-                AppendVertices(output, m_out_vertices);
+                _out_vertices.GetVertex(0, out latest_moveX, out latest_moveY);
+                AppendVertices(output, _out_vertices);
             }
             else
             {
@@ -194,16 +189,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
 
                 // v_last-> v0-> v1
-                m_stroker.CreateJoin(m_out_vertices,
+                _stroker.CreateJoin(_out_vertices,
                     v_last,
                     v0,
-                    v1,
-                    v_last.CalLen(v0),
-                    v0.CalLen(v1));
-                m_out_vertices.GetVertex(0, out latest_moveX, out latest_moveY);
+                    v1);
+                _out_vertices.GetVertex(0, out latest_moveX, out latest_moveY);
                 output.AddMoveTo(latest_moveX, latest_moveY);
                 //others 
-                AppendVertices(output, m_out_vertices, 1);
+                AppendVertices(output, _out_vertices, 1);
 
             }
             //----------------
@@ -220,32 +213,29 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     out Vertex2d next);
                 //check if we should join or not ?
 
-                
-                m_stroker.CreateJoin(m_out_vertices,
+
+                _stroker.CreateJoin(_out_vertices,
                    prev,
                    cur,
-                   next,
-                   prev.CalLen(cur),
-                   cur.CalLen(next));
+                   next);
 
                 ++m_src_vertex;
 
 
-                AppendVertices(output, m_out_vertices);
+                AppendVertices(output, _out_vertices);
             }
 
             //draw end line
             {
-                if (!m_closed)
+                if (!_closed)
                 {
 
                     _vtx2dList.GetLast2(out Vertex2d beforeLast, out Vertex2d last);
-                    m_stroker.CreateCap(m_out_vertices,
+                    _stroker.CreateCap(_out_vertices,
                         last, //**please note different direction (compare with above)
-                        beforeLast,
-                        beforeLast.CalLen(last));
+                        beforeLast);
 
-                    AppendVertices(output, m_out_vertices);
+                    AppendVertices(output, _out_vertices);
                 }
                 else
                 {
@@ -268,18 +258,16 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                     //**please note different direction (compare with above)
 
-                    m_stroker.CreateJoin(m_out_vertices,
+                    _stroker.CreateJoin(_out_vertices,
                         v1,
                         v0,
-                        v_last,
-                        v1.CalLen(v0),
-                        v0.CalLen(v_last));
+                        v_last);
 
 
-                    m_out_vertices.GetVertex(0, out latest_moveX, out latest_moveY);
+                    _out_vertices.GetVertex(0, out latest_moveX, out latest_moveY);
                     output.AddMoveTo(latest_moveX, latest_moveY);
                     //others 
-                    AppendVertices(output, m_out_vertices, 1);
+                    AppendVertices(output, _out_vertices, 1);
 
                 }
             }
@@ -294,19 +282,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     out Vertex2d cur,
                     out Vertex2d next);
 
-                m_stroker.CreateJoin(m_out_vertices,
+                _stroker.CreateJoin(_out_vertices,
                   next, //**please note different direction (compare with above)
                   cur,
-                  prev,
-                  cur.CalLen(next),
-                  prev.CalLen(cur));
+                  prev);
 
                 --m_src_vertex;
 
-                AppendVertices(output, m_out_vertices);
+                AppendVertices(output, _out_vertices);
             }
 
-            if (!m_closed)
+            if (!_closed)
             {
 
                 output.GetVertex(0, out latest_moveX, out latest_moveY);

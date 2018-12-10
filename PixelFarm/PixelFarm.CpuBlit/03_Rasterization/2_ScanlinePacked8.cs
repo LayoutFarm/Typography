@@ -52,61 +52,61 @@ namespace PixelFarm.CpuBlit.Rasterization
         public override void ResetSpans(int min_x, int max_x)
         {
             int max_len = max_x - min_x + 3;
-            if (max_len > m_spans.Length)
+            if (max_len > _spans.Length)
             {
-                m_spans = new ScanlineSpan[max_len];
-                m_covers = new byte[max_len];
+                _spans = new ScanlineSpan[max_len];
+                _covers = new byte[max_len];
             }
 
-            last_x = 0x7FFFFFF0;
-            m_cover_index = 0; //make it ready for next add
-            last_span_index = 0;
-            m_spans[last_span_index].len = 0;
+            _last_x = 0x7FFFFFF0;
+            _cover_index = 0; //make it ready for next add
+            _last_span_index = 0;
+            _spans[_last_span_index].len = 0;
         }
         public override void AddCell(int x, int cover)
         {
-            m_covers[m_cover_index] = (byte)cover;
-            if (x == last_x + 1 && m_spans[last_span_index].len > 0)
+            _covers[_cover_index] = (byte)cover;
+            if (x == _last_x + 1 && _spans[_last_span_index].len > 0)
             {
                 //append to last cell
-                m_spans[last_span_index].len++;
+                _spans[_last_span_index].len++;
             }
             else
             {
                 //start new  
-                last_span_index++;
-                m_spans[last_span_index] = new ScanlineSpan((short)x, m_cover_index);
+                _last_span_index++;
+                _spans[_last_span_index] = new ScanlineSpan((short)x, _cover_index);
             }
-            last_x = x;
-            m_cover_index++; //make it ready for next add
+            _last_x = x;
+            _cover_index++; //make it ready for next add
         }
         public override void AddSpan(int x, int len, int cover)
         {
             int backupCover = cover;
-            if (x == last_x + 1
-                && m_spans[last_span_index].len < 0
-                && cover == m_spans[last_span_index].cover_index)
+            if (x == _last_x + 1
+                && _spans[_last_span_index].len < 0
+                && cover == _spans[_last_span_index].cover_index)
             {
                 //just append data to latest span ***
-                m_spans[last_span_index].len -= (short)len;
+                _spans[_last_span_index].len -= (short)len;
             }
             else
             {
-                m_covers[m_cover_index] = (byte)cover;
-                last_span_index++;
+                _covers[_cover_index] = (byte)cover;
+                _last_span_index++;
                 //---------------------------------------------------
                 //start new  
-                m_spans[last_span_index] = new ScanlineSpan((short)x, (short)(-len), m_cover_index);
-                m_cover_index++; //make it ready for next add
+                _spans[_last_span_index] = new ScanlineSpan((short)x, (short)(-len), _cover_index);
+                _cover_index++; //make it ready for next add
             }
-            last_x = x + len - 1;
+            _last_x = x + len - 1;
         }
         public override void ResetSpans()
         {
-            last_x = 0x7FFFFFF0;
-            last_span_index = 0;
-            m_cover_index = 0; //make it ready for next add
-            m_spans[last_span_index].len = 0;
+            _last_x = 0x7FFFFFF0;
+            _last_span_index = 0;
+            _cover_index = 0; //make it ready for next add
+            _spans[_last_span_index].len = 0;
         }
     }
 }

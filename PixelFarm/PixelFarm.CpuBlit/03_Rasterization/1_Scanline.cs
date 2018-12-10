@@ -36,37 +36,32 @@ namespace PixelFarm.CpuBlit.Rasterization
     public abstract class Scanline
     {
         //store area coverage value ***
-        protected byte[] m_covers;
-        protected ScanlineSpan[] m_spans;
-        protected int last_span_index;
-        protected int m_cover_index;
-        protected int lineY;
-        protected int last_x;
+        protected byte[] _covers;
+        protected ScanlineSpan[] _spans;
+        protected int _last_span_index;
+        protected int _cover_index;
+        protected int _lineY;
+        protected int _last_x;
         public Scanline()
         {
-            last_x = (0x7FFFFFF0);
-            m_covers = new byte[1000];
-            m_spans = new ScanlineSpan[1000];
+            _last_x = (0x7FFFFFF0);
+            _covers = new byte[1000];
+            _spans = new ScanlineSpan[1000];
         }
         public ScanlineSpan GetSpan(int index)
         {
-            return m_spans[index];
+            return _spans[index];
         }
-        public int SpanCount
-        {
-            get { return last_span_index; }
-        }
-
+        //
+        public int SpanCount => _last_span_index;
+        //
         public void CloseLine(int y)
         {
-            lineY = y;
+            _lineY = y;
         }
-        public int Y { get { return lineY; } }
-        public byte[] GetCovers()
-        {
-            return m_covers;
-        }
-
+        //---------------------------------------------------
+        public int Y => _lineY;
+        public byte[] GetCovers() => _covers;
         //---------------------------------------------------
         public abstract void AddCell(int x, int cover);
         public abstract void AddSpan(int x, int len, int cover);

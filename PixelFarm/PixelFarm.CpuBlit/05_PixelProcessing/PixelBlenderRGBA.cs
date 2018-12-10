@@ -33,7 +33,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     public abstract class PixelBlender32
     {
         
-        public const int NumPixelBits = 32;
+        public const int NUM_PIXEL_BITS = 32;
         internal const byte BASE_MASK = 255;
 
         /// <summary>

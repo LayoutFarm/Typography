@@ -18,40 +18,40 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
     struct EllipseBresenhamInterpolator
     {
-        int m_rx2;
-        int m_ry2;
-        int m_two_rx2;
-        int m_two_ry2;
-        int m_dx;
-        int m_dy;
-        int m_inc_x;
-        int m_inc_y;
-        int m_cur_f;
+        int _rx2;
+        int _ry2;
+        int _two_rx2;
+        int _two_ry2;
+        int _dx;
+        int _dy;
+        int _inc_x;
+        int _inc_y;
+        int _cur_f;
         public EllipseBresenhamInterpolator(int rx, int ry)
         {
-            m_rx2 = (rx * rx);
-            m_ry2 = (ry * ry);
-            m_two_rx2 = (m_rx2 << 1);
-            m_two_ry2 = (m_ry2 << 1);
-            m_dx = (0);
-            m_dy = (0);
-            m_inc_x = (0);
-            m_inc_y = (-ry * m_two_rx2);
-            m_cur_f = (0);
+            _rx2 = (rx * rx);
+            _ry2 = (ry * ry);
+            _two_rx2 = (_rx2 << 1);
+            _two_ry2 = (_ry2 << 1);
+            _dx = (0);
+            _dy = (0);
+            _inc_x = (0);
+            _inc_y = (-ry * _two_rx2);
+            _cur_f = (0);
         }
-
-        public int Dx { get { return m_dx; } }
-        public int Dy { get { return m_dy; } }
-
+        //
+        public int Dx => _dx;
+        public int Dy => _dy;
+        //
         public void Next()
         {
             int mx, my, mxy, min_m;
             int fx, fy, fxy;
-            mx = fx = m_cur_f + m_inc_x + m_ry2;
+            mx = fx = _cur_f + _inc_x + _ry2;
             if (mx < 0) mx = -mx;
-            my = fy = m_cur_f + m_inc_y + m_rx2;
+            my = fy = _cur_f + _inc_y + _rx2;
             if (my < 0) my = -my;
-            mxy = fxy = m_cur_f + m_inc_x + m_ry2 + m_inc_y + m_rx2;
+            mxy = fxy = _cur_f + _inc_x + _ry2 + _inc_y + _rx2;
             if (mxy < 0) mxy = -mxy;
             min_m = mx;
             bool flag = true;
@@ -61,28 +61,28 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 flag = false;
             }
 
-            m_dx = m_dy = 0;
+            _dx = _dy = 0;
             if (min_m > mxy)
             {
-                m_inc_x += m_two_ry2;
-                m_inc_y += m_two_rx2;
-                m_cur_f = fxy;
-                m_dx = 1;
-                m_dy = 1;
+                _inc_x += _two_ry2;
+                _inc_y += _two_rx2;
+                _cur_f = fxy;
+                _dx = 1;
+                _dy = 1;
                 return;
             }
 
             if (flag)
             {
-                m_inc_x += m_two_ry2;
-                m_cur_f = fx;
-                m_dx = 1;
+                _inc_x += _two_ry2;
+                _cur_f = fx;
+                _dx = 1;
                 return;
             }
 
-            m_inc_y += m_two_rx2;
-            m_cur_f = fy;
-            m_dy = 1;
+            _inc_y += _two_rx2;
+            _cur_f = fy;
+            _dy = 1;
         }
     }
 }

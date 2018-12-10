@@ -6,6 +6,7 @@ namespace PixelFarm.Drawing
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
+        
     }
     public interface ILineSegment
     {

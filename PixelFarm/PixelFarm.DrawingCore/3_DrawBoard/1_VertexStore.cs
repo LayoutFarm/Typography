@@ -18,19 +18,26 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-#define UNSAFE_VER 
+
 
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
     public sealed class VertexStore
     {
-        public readonly bool _isTrimed;
+
         int _vertices_count;
         int _allocated_vertices_count;
         double[] _coord_xy;
         byte[] _cmds;
+
+        //***
+        RenderVx _cachedAreaRenderVx;
+        RenderVx _cachedBorderRenerVx;
+        //
+
 #if DEBUG
+        public readonly bool dbugIsTrim;
         static int dbugTotal = 0;
         public readonly int dbugId = dbugGetNewId();
         public int dbugNote;
@@ -44,15 +51,17 @@ namespace PixelFarm.Drawing
         {
             AllocIfRequired(2);
         }
-
-
+        public VertexStore(bool isShared)
+        {
+            AllocIfRequired(2);
+            IsShared = isShared;
+        }
+        public bool IsShared { get; private set; }
         /// <summary>
         /// num of vertex
         /// </summary>
-        public int Count
-        {
-            get { return _vertices_count; }
-        }
+        public int Count => _vertices_count;
+        //
         public VertexCmd GetLastCommand()
         {
             if (_vertices_count != 0)
@@ -100,6 +109,9 @@ namespace PixelFarm.Drawing
             //System.Array.Clear(m_cmds, 0, m_cmds.Length);
             System.Array.Clear(_cmds, 0, _vertices_count); //only latest 
             _vertices_count = 0;
+            //
+            _cachedAreaRenderVx = null;
+            //
         }
         public void ConfirmNoMore()
         {
@@ -134,7 +146,9 @@ namespace PixelFarm.Drawing
             }
 
         }
-        public void ReplaceVertex(int index, double x, double y)
+
+
+        internal void ReplaceVertex(int index, double x, double y)
         {
 #if DEBUG
             _dbugIsChanged = true;
@@ -160,6 +174,49 @@ namespace PixelFarm.Drawing
         }
 
 
+        //--------------------------------------------------
+        public static void SetAreaRenderVx(VertexStore vxs, RenderVx renderVx)
+        {
+#if DEBUG
+            if (vxs.IsShared)
+            {
+                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
+            }
+#endif
+            vxs._cachedAreaRenderVx = renderVx;
+        }
+        public static RenderVx GetAreaRenderVx(VertexStore vxs)
+        {
+#if DEBUG
+            if (vxs.IsShared)
+            {
+                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
+            }
+#endif
+
+            return vxs._cachedAreaRenderVx;
+        }
+        public static void SetBorderRenderVx(VertexStore vxs, RenderVx renderVx)
+        {
+#if DEBUG
+            if (vxs.IsShared)
+            {
+                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
+            }
+#endif
+            vxs._cachedBorderRenerVx = renderVx;
+        }
+        public static RenderVx GetBorderRenderVx(VertexStore vxs)
+        {
+#if DEBUG
+            if (vxs.IsShared)
+            {
+                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
+            }
+#endif
+            return vxs._cachedBorderRenerVx;
+        }
+        //--------------------------------------------------
 #if DEBUG
         public override string ToString()
         {
@@ -246,31 +303,7 @@ namespace PixelFarm.Drawing
                 _allocated_vertices_count = newSize;
             }
         }
-        //internal use only!
-        public static void UnsafeDirectSetData(
-            VertexStore vstore,
-            int m_allocated_vertices,
-            int m_num_vertices,
-            double[] m_coord_xy,
-            byte[] m_CommandAndFlags)
-        {
-            vstore._vertices_count = m_num_vertices;
-            vstore._allocated_vertices_count = m_allocated_vertices;
-            vstore._coord_xy = m_coord_xy;
-            vstore._cmds = m_CommandAndFlags;
-        }
-        public static void UnsafeDirectGetData(
-            VertexStore vstore,
-            out int m_allocated_vertices,
-            out int m_num_vertices,
-            out double[] m_coord_xy,
-            out byte[] m_CommandAndFlags)
-        {
-            m_num_vertices = vstore._vertices_count;
-            m_allocated_vertices = vstore._allocated_vertices_count;
-            m_coord_xy = vstore._coord_xy;
-            m_CommandAndFlags = vstore._cmds;
-        }
+
         public void AppendVertexStore(VertexStore another)
         {
 
@@ -346,13 +379,14 @@ namespace PixelFarm.Drawing
         {
             //for copy from src to this instance
 
-            _allocated_vertices_count = src._allocated_vertices_count;
+
             _vertices_count = src._vertices_count;
 
             if (trim)
             {
-
-                _isTrimed = true;
+#if DEBUG
+                dbugIsTrim = true;
+#endif
                 int coord_len = _vertices_count; //+1 for no more cmd
                 int cmds_len = _vertices_count; //+1 for no more cmd
 
@@ -372,6 +406,8 @@ namespace PixelFarm.Drawing
                      _cmds,
                      0,
                      cmds_len);
+
+                _allocated_vertices_count = _cmds.Length;
             }
             else
             {
@@ -379,7 +415,7 @@ namespace PixelFarm.Drawing
                 int cmds_len = src._cmds.Length;
 
                 _coord_xy = new double[(coord_len + 1) << 1];
-                _cmds = new byte[(cmds_len + 1) << 1];
+                _cmds = new byte[(cmds_len + 1)]; //TODO: review here again***
 
                 System.Array.Copy(
                      src._coord_xy,
@@ -394,6 +430,7 @@ namespace PixelFarm.Drawing
                      _cmds,
                      0,
                      cmds_len);
+                _allocated_vertices_count = _cmds.Length;
             }
 
         }
@@ -403,8 +440,12 @@ namespace PixelFarm.Drawing
 
             _allocated_vertices_count = src._allocated_vertices_count;
             _vertices_count = src._vertices_count;
-
-            _isTrimed = true;
+            //
+            //
+#if DEBUG
+            dbugIsTrim = true;
+#endif
+            //
             int coord_len = _vertices_count; //+1 for no more cmd
             int cmds_len = _vertices_count; //+1 for no more cmd
 
@@ -443,7 +484,6 @@ namespace PixelFarm.Drawing
         {
             return new VertexStore(src, false);
         }
-
         /// <summary>
         /// trim to new vertex store
         /// </summary>

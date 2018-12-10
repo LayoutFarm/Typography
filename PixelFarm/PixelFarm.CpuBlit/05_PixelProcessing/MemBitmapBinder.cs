@@ -22,13 +22,13 @@ namespace PixelFarm.Drawing
         }
         public override void NotifyUsage()
         {
-
-
         }
-        public override bool IsYFlipped
-        {
-            get { return false; }
-        }
+        //
+        public override int Width => _memBmp.Width;
+        public override int Height => _memBmp.Height;
+        //
+        public override bool IsYFlipped => false;
+        //
         public override IntPtr GetRawBufferHead()
         {
             if (_memBmp == null)
@@ -52,13 +52,6 @@ namespace PixelFarm.Drawing
         {
 
         }
-        public override int Width
-        {
-            get { return _memBmp.Width; }
-        }
-        public override int Height
-        {
-            get { return _memBmp.Height; }
-        }
+
     }
 }

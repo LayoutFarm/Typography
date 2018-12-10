@@ -90,23 +90,10 @@ namespace PixelFarm.CpuBlit
         }
 
         // This function assumes the rect is normalized
-        public double Width
-        {
-            get
-            {
-                return Right - Left;
-            }
-        }
-
+        public double Width => Right - Left;
         // This function assumes the rect is normalized
-        public double Height
-        {
-            get
-            {
-                return Top - Bottom;
-            }
-        }
-
+        public double Height => Top - Bottom;
+        //
         public RectD normalize()
         {
             double t;
@@ -123,32 +110,15 @@ namespace PixelFarm.CpuBlit
             if (Bottom < r.Bottom) Bottom = r.Bottom;
             return Left <= Right && Bottom <= Top;
         }
-
-        public bool is_valid()
-        {
-            return Left <= Right && Bottom <= Top;
-        }
-
-        public bool Contains(double x, double y)
-        {
-            return (x >= Left && x <= Right && y >= Bottom && y <= Top);
-        }
-
-        public bool Contains(RectD innerRect)
-        {
-            if (Contains(innerRect.Left, innerRect.Bottom) && Contains(innerRect.Right, innerRect.Top))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool Contains(Vector2 position)
-        {
-            return Contains(position.x, position.y);
-        }
-
+        //
+        public bool is_valid() => Left <= Right && Bottom <= Top;
+        //
+        public bool Contains(double x, double y) => (x >= Left && x <= Right && y >= Bottom && y <= Top);
+        //
+        public bool Contains(RectD innerRect) => Contains(innerRect.Left, innerRect.Bottom) && Contains(innerRect.Right, innerRect.Top);
+        //
+        public bool Contains(Vector2 position) => Contains(position.x, position.y);
+        //
         public bool IntersectRectangles(RectD rectToCopy, RectD rectToIntersectWith)
         {
             Left = rectToCopy.Left;
@@ -240,15 +210,9 @@ namespace PixelFarm.CpuBlit
             return new RectD(a.Left * b, a.Bottom * b, a.Right * b, a.Top * b);
         }
 
-        public double XCenter
-        {
-            get { return (Right - Left) / 2; }
-        }
+        public double XCenter => (Right - Left) / 2;
 
-        public double YCenter
-        {
-            get { return (Top - Bottom) / 2; }
-        }
+        public double YCenter => (Top - Bottom) / 2;
 
         public override string ToString()
         {

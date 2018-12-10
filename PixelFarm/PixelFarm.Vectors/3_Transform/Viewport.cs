@@ -30,56 +30,56 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public sealed class Viewport
     {
-        double m_world_x1;
-        double m_world_y1;
-        double m_world_x2;
-        double m_world_y2;
-        double m_device_x1;
-        double m_device_y1;
-        double m_device_x2;
-        double m_device_y2;
-        AspectRatio m_aspect;
-        bool m_is_valid;
-        double m_align_x;
-        double m_align_y;
-        double m_wx1;
-        double m_wy1;
-        double m_wx2;
-        double m_wy2;
-        double m_dx1;
-        double m_dy1;
-        double m_kx;
-        double m_ky;
+        double _world_x1;
+        double _world_y1;
+        double _world_x2;
+        double _world_y2;
+        double _device_x1;
+        double _device_y1;
+        double _device_x2;
+        double _device_y2;
+        AspectRatio _aspect;
+        bool _is_valid;
+        double _align_x;
+        double _align_y;
+        double _wx1;
+        double _wy1;
+        double _wx2;
+        double _wy2;
+        double _dx1;
+        double _dy1;
+        double _kx;
+        double _ky;
         public enum AspectRatio
         {
             //aspect_ratio_e 
             Stretch,
             Meet,
             Slice
-        };
+        }
         //-------------------------------------------------------------------
         public Viewport()
         {
-            m_world_x1 = (0.0);
-            m_world_y1 = (0.0);
-            m_world_x2 = (1.0);
-            m_world_y2 = (1.0);
-            m_device_x1 = (0.0);
-            m_device_y1 = (0.0);
-            m_device_x2 = (1.0);
-            m_device_y2 = (1.0);
-            m_aspect = AspectRatio.Stretch;
-            m_is_valid = (true);
-            m_align_x = (0.5);
-            m_align_y = (0.5);
-            m_wx1 = (0.0);
-            m_wy1 = (0.0);
-            m_wx2 = (1.0);
-            m_wy2 = (1.0);
-            m_dx1 = (0.0);
-            m_dy1 = (0.0);
-            m_kx = (1.0);
-            m_ky = (1.0);
+            _world_x1 = (0.0);
+            _world_y1 = (0.0);
+            _world_x2 = (1.0);
+            _world_y2 = (1.0);
+            _device_x1 = (0.0);
+            _device_y1 = (0.0);
+            _device_x2 = (1.0);
+            _device_y2 = (1.0);
+            _aspect = AspectRatio.Stretch;
+            _is_valid = (true);
+            _align_x = (0.5);
+            _align_y = (0.5);
+            _wx1 = (0.0);
+            _wy1 = (0.0);
+            _wx2 = (1.0);
+            _wy2 = (1.0);
+            _dx1 = (0.0);
+            _dy1 = (0.0);
+            _kx = (1.0);
+            _ky = (1.0);
         }
 
         //-------------------------------------------------------------------
@@ -87,186 +87,175 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                    double aligny,
                                    AspectRatio aspect)
         {
-            m_align_x = alignx;
-            m_align_y = aligny;
-            m_aspect = aspect;
+            _align_x = alignx;
+            _align_y = aligny;
+            _aspect = aspect;
             update();
         }
 
         //-------------------------------------------------------------------
         public void device_viewport(double x1, double y1, double x2, double y2)
         {
-            m_device_x1 = x1;
-            m_device_y1 = y1;
-            m_device_x2 = x2;
-            m_device_y2 = y2;
+            _device_x1 = x1;
+            _device_y1 = y1;
+            _device_x2 = x2;
+            _device_y2 = y2;
             update();
         }
 
         //-------------------------------------------------------------------
         public void world_viewport(double x1, double y1, double x2, double y2)
         {
-            m_world_x1 = x1;
-            m_world_y1 = y1;
-            m_world_x2 = x2;
-            m_world_y2 = y2;
+            _world_x1 = x1;
+            _world_y1 = y1;
+            _world_x2 = x2;
+            _world_y2 = y2;
             update();
         }
 
         //-------------------------------------------------------------------
         public void device_viewport(out double x1, out double y1, out double x2, out double y2)
         {
-            x1 = m_device_x1;
-            y1 = m_device_y1;
-            x2 = m_device_x2;
-            y2 = m_device_y2;
+            x1 = _device_x1;
+            y1 = _device_y1;
+            x2 = _device_x2;
+            y2 = _device_y2;
         }
 
         //-------------------------------------------------------------------
         public void world_viewport(out double x1, out double y1, out double x2, out double y2)
         {
-            x1 = m_world_x1;
-            y1 = m_world_y1;
-            x2 = m_world_x2;
-            y2 = m_world_y2;
+            x1 = _world_x1;
+            y1 = _world_y1;
+            x2 = _world_x2;
+            y2 = _world_y2;
         }
 
         //-------------------------------------------------------------------
         public void world_viewport_actual(out double x1, out double y1,
                                    out double x2, out double y2)
         {
-            x1 = m_wx1;
-            y1 = m_wy1;
-            x2 = m_wx2;
-            y2 = m_wy2;
+            x1 = _wx1;
+            y1 = _wy1;
+            x2 = _wx2;
+            y2 = _wy2;
         }
 
         //-------------------------------------------------------------------
-        public bool is_valid() { return m_is_valid; }
-        public double align_x() { return m_align_x; }
-        public double align_y() { return m_align_y; }
-        public AspectRatio aspect_ratio() { return m_aspect; }
+        public bool is_valid() => _is_valid;
+        public double align_x() => _align_x;
+        public double align_y() => _align_y;
+        public AspectRatio aspect_ratio() => _aspect;
 
         //-------------------------------------------------------------------
         public void transform(ref double x, ref double y)
         {
-            x = (x - m_wx1) * m_kx + m_dx1;
-            y = (y - m_wy1) * m_ky + m_dy1;
+            x = (x - _wx1) * _kx + _dx1;
+            y = (y - _wy1) * _ky + _dy1;
         }
 
         //-------------------------------------------------------------------
         public void transform_scale_only(ref double x, ref double y)
         {
-            x *= m_kx;
-            y *= m_ky;
+            x *= _kx;
+            y *= _ky;
         }
 
         //-------------------------------------------------------------------
         public void inverse_transform(ref double x, ref double y)
         {
-            x = (x - m_dx1) / m_kx + m_wx1;
-            y = (y - m_dy1) / m_ky + m_wy1;
+            x = (x - _dx1) / _kx + _wx1;
+            y = (y - _dy1) / _ky + _wy1;
         }
 
         //-------------------------------------------------------------------
         public void inverse_transform_scale_only(ref double x, ref double y)
         {
-            x /= m_kx;
-            y /= m_ky;
+            x /= _kx;
+            y /= _ky;
         }
 
         //-------------------------------------------------------------------
-        public double device_dx() { return m_dx1 - m_wx1 * m_kx; }
-        public double device_dy() { return m_dy1 - m_wy1 * m_ky; }
+        public double device_dx() => _dx1 - _wx1 * _kx;
+        public double device_dy() => _dy1 - _wy1 * _ky;
 
         //-------------------------------------------------------------------
-        public double scale_x()
-        {
-            return m_kx;
-        }
+        public double scale_x() => _kx;
 
         //-------------------------------------------------------------------
-        public double scale_y()
-        {
-            return m_ky;
-        }
+        public double scale_y() => _ky;
 
         //-------------------------------------------------------------------
-        public double scale()
-        {
-            return (m_kx + m_ky) * 0.5;
-        }
+        public double scale() => (_kx + _ky) * 0.5;
 
         //-------------------------------------------------------------------
         public Affine to_affine()
         {
-            Affine mtx = Affine.NewTranslation(-m_wx1, -m_wy1);
-            mtx *= Affine.NewScaling(m_kx, m_ky);
-            mtx *= Affine.NewTranslation(m_dx1, m_dy1);
+            Affine mtx = Affine.NewTranslation(-_wx1, -_wy1);
+            mtx *= Affine.NewScaling(_kx, _ky);
+            mtx *= Affine.NewTranslation(_dx1, _dy1);
             return mtx;
         }
 
         //-------------------------------------------------------------------
-        public Affine to_affine_scale_only()
-        {
-            return Affine.NewScaling(m_kx, m_ky);
-        }
+        public Affine to_affine_scale_only() => Affine.NewScaling(_kx, _ky);
 
-        private void update()
+
+        void update()
         {
             double epsilon = 1e-30;
-            if (Math.Abs(m_world_x1 - m_world_x2) < epsilon ||
-               Math.Abs(m_world_y1 - m_world_y2) < epsilon ||
-               Math.Abs(m_device_x1 - m_device_x2) < epsilon ||
-               Math.Abs(m_device_y1 - m_device_y2) < epsilon)
+            if (Math.Abs(_world_x1 - _world_x2) < epsilon ||
+               Math.Abs(_world_y1 - _world_y2) < epsilon ||
+               Math.Abs(_device_x1 - _device_x2) < epsilon ||
+               Math.Abs(_device_y1 - _device_y2) < epsilon)
             {
-                m_wx1 = m_world_x1;
-                m_wy1 = m_world_y1;
-                m_wx2 = m_world_x1 + 1.0;
-                m_wy2 = m_world_y2 + 1.0;
-                m_dx1 = m_device_x1;
-                m_dy1 = m_device_y1;
-                m_kx = 1.0;
-                m_ky = 1.0;
-                m_is_valid = false;
+                _wx1 = _world_x1;
+                _wy1 = _world_y1;
+                _wx2 = _world_x1 + 1.0;
+                _wy2 = _world_y2 + 1.0;
+                _dx1 = _device_x1;
+                _dy1 = _device_y1;
+                _kx = 1.0;
+                _ky = 1.0;
+                _is_valid = false;
                 return;
             }
 
-            double world_x1 = m_world_x1;
-            double world_y1 = m_world_y1;
-            double world_x2 = m_world_x2;
-            double world_y2 = m_world_y2;
-            double device_x1 = m_device_x1;
-            double device_y1 = m_device_y1;
-            double device_x2 = m_device_x2;
-            double device_y2 = m_device_y2;
-            if (m_aspect != AspectRatio.Stretch)
+            double world_x1 = _world_x1;
+            double world_y1 = _world_y1;
+            double world_x2 = _world_x2;
+            double world_y2 = _world_y2;
+            double device_x1 = _device_x1;
+            double device_y1 = _device_y1;
+            double device_x2 = _device_x2;
+            double device_y2 = _device_y2;
+            if (_aspect != AspectRatio.Stretch)
             {
                 double d;
-                m_kx = (device_x2 - device_x1) / (world_x2 - world_x1);
-                m_ky = (device_y2 - device_y1) / (world_y2 - world_y1);
-                if ((m_aspect == AspectRatio.Meet) == (m_kx < m_ky))
+                _kx = (device_x2 - device_x1) / (world_x2 - world_x1);
+                _ky = (device_y2 - device_y1) / (world_y2 - world_y1);
+                if ((_aspect == AspectRatio.Meet) == (_kx < _ky))
                 {
-                    d = (world_y2 - world_y1) * m_ky / m_kx;
-                    world_y1 += (world_y2 - world_y1 - d) * m_align_y;
+                    d = (world_y2 - world_y1) * _ky / _kx;
+                    world_y1 += (world_y2 - world_y1 - d) * _align_y;
                     world_y2 = world_y1 + d;
                 }
                 else
                 {
-                    d = (world_x2 - world_x1) * m_kx / m_ky;
-                    world_x1 += (world_x2 - world_x1 - d) * m_align_x;
+                    d = (world_x2 - world_x1) * _kx / _ky;
+                    world_x1 += (world_x2 - world_x1 - d) * _align_x;
                     world_x2 = world_x1 + d;
                 }
             }
-            m_wx1 = world_x1;
-            m_wy1 = world_y1;
-            m_wx2 = world_x2;
-            m_wy2 = world_y2;
-            m_dx1 = device_x1;
-            m_dy1 = device_y1;
-            m_kx = (device_x2 - device_x1) / (world_x2 - world_x1);
-            m_ky = (device_y2 - device_y1) / (world_y2 - world_y1);
-            m_is_valid = true;
+            _wx1 = world_x1;
+            _wy1 = world_y1;
+            _wx2 = world_x2;
+            _wy2 = world_y2;
+            _dx1 = device_x1;
+            _dy1 = device_y1;
+            _kx = (device_x2 - device_x1) / (world_x2 - world_x1);
+            _ky = (device_y2 - device_y1) / (world_y2 - world_y1);
+            _is_valid = true;
         }
     };
 }

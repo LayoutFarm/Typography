@@ -362,7 +362,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     {
         const double EPSILON = 1e-14;
         AffineMat _elems;
-        bool isIdenHint;
+        bool _isIdenHint;
 
         public static readonly Affine IdentityMatrix = Affine.NewIdentity();
         //------------------------------------------ Construction
@@ -376,7 +376,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //ty = copyFrom.ty;
 
             _elems = copyFrom._elems;
-            isIdenHint = copyFrom.isIdenHint;
+            _isIdenHint = copyFrom._isIdenHint;
         }
 
         // Custom matrix. Usually used in derived classes
@@ -389,7 +389,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 v2_shx, v3_sy,
                 v4_tx, v5_ty);
 
-            isIdenHint = false;
+            _isIdenHint = false;
         }
         ICoordTransformer ICoordTransformer.CreateInvert()
         {
@@ -412,21 +412,21 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             }
         }
-        public double m11 { get { return _elems.sx; } }
-        public double m12 { get { return _elems.shy; } }
-        public double m21 { get { return _elems.shx; } }
-        public double m22 { get { return _elems.sy; } }
-        public double dx { get { return _elems.tx; } }
-        public double dy { get { return _elems.ty; } }
+        public double m11 => _elems.sx;
+        public double m12 => _elems.shy;
+        public double m21 => _elems.shx;
+        public double m22 => _elems.sy;
+        public double dx => _elems.tx;
+        public double dy => _elems.ty;
 
         //-----------------------------------------
-        public double sx { get { return _elems.sx; } }
-        public double shy { get { return _elems.shy; } }
-        public double shx { get { return _elems.shx; } }
-        public double sy { get { return _elems.sy; } }
-        public double tx { get { return _elems.tx; } }
-        public double ty { get { return _elems.ty; } }
-
+        public double sx => _elems.sx;
+        public double shy => _elems.shy;
+        public double shx => _elems.shx;
+        public double sy => _elems.sy;
+        public double tx => _elems.tx;
+        public double ty => _elems.ty;
+        //-----------------------------------------
         public CoordTransformerKind Kind => CoordTransformerKind.Affine3x2;
         public AffineMat GetInternalMat() => _elems;
 
@@ -437,13 +437,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         internal void SetElements(AffineMat elems)
         {
             _elems = elems;
-            isIdenHint = false;
+            _isIdenHint = false;
         }
 
-        public Affine Clone()
-        {
-            return new Affine(this);
-        }
+        public Affine Clone() => new Affine(this);
 
         //-----------------------------------------
         private Affine(Affine a, Affine b)
@@ -451,7 +448,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //copy from a
             //multiply with b
 
-            isIdenHint = a.isIdenHint;
+            _isIdenHint = a._isIdenHint;
             _elems = a._elems; //copy
             _elems.Multiply(ref b._elems);
 
@@ -467,30 +464,30 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         throw new NotSupportedException();
                     }
                 case AffineMatrixCommand.None:
-                    isIdenHint = copyFrom.isIdenHint;
+                    _isIdenHint = copyFrom._isIdenHint;
                     break;
                 case AffineMatrixCommand.Rotate:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Rotate(creationPlan.x);
 
                     break;
                 case AffineMatrixCommand.Scale:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Scale(creationPlan.x, creationPlan.y);
 
                     break;
                 case AffineMatrixCommand.Skew:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Skew(creationPlan.x, creationPlan.y);
 
                     break;
                 case AffineMatrixCommand.Translate:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Translate(creationPlan.x, creationPlan.y);
 
                     break;
                 case AffineMatrixCommand.Invert:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Invert();
                     break;
             }
@@ -504,23 +501,23 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     break;
                 case AffineMatrixCommand.Rotate:
 
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Rotate(plan.x);
                     break;
                 case AffineMatrixCommand.Scale:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Scale(plan.x, plan.y);
                     break;
                 case AffineMatrixCommand.Translate:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Translate(plan.x, plan.y);
                     break;
                 case AffineMatrixCommand.Skew:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Skew(plan.x, plan.y);
                     break;
                 case AffineMatrixCommand.Invert:
-                    isIdenHint = false;
+                    _isIdenHint = false;
                     _elems.Invert();
                     break;
                 default:
@@ -531,7 +528,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         private Affine(AffinePlan[] creationPlans)
         {
             _elems = AffineMat.Iden;//copy
-            isIdenHint = true;
+            _isIdenHint = true;
             if (creationPlans == null) return;
             //-----------------------
             for (int i = 0; i < creationPlans.Length; ++i)
@@ -545,7 +542,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //-----------------------
             //start with identity matrix
             _elems = AffineMat.Iden;//copy
-            isIdenHint = true;
+            _isIdenHint = true;
             //-----------------------
             switch (pcount)
             {
@@ -612,7 +609,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 1, 0,
                 0, 1,
                 0, 0);
-            newIden.isIdenHint = true;
+            newIden._isIdenHint = true;
             return newIden;
         }
 
@@ -1131,7 +1128,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         // Check to see if it's an identity matrix
         public bool IsIdentity()
         {
-            if (!isIdenHint)
+            if (!_isIdenHint)
             {
                 return is_equal_eps(_elems.sx, 1.0) && is_equal_eps(_elems.shy, 0.0) &&
                    is_equal_eps(_elems.shx, 0.0) && is_equal_eps(_elems.sy, 1.0) &&

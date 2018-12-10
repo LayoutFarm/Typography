@@ -26,19 +26,19 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
     public sealed class SpanInterpolatorPerspectiveLerp : FragmentProcessing.ISpanInterpolator
     {
-        Perspective m_trans_dir;
-        Perspective m_trans_inv;
-        LineInterpolatorDDA2 m_coord_x;
-        LineInterpolatorDDA2 m_coord_y;
-        LineInterpolatorDDA2 m_scale_x;
-        LineInterpolatorDDA2 m_scale_y;
+        Perspective _trans_dir;
+        Perspective _trans_inv;
+        LineInterpolatorDDA2 _coord_x;
+        LineInterpolatorDDA2 _coord_y;
+        LineInterpolatorDDA2 _scale_x;
+        LineInterpolatorDDA2 _scale_y;
         const int SUBPIXEL_SHIFT = 8;
         const int SUBPIXEL_SCALE = 1 << SUBPIXEL_SHIFT;
         //--------------------------------------------------------------------
         public SpanInterpolatorPerspectiveLerp()
         {
-            m_trans_dir = new Perspective();
-            m_trans_inv = new Perspective();
+            _trans_dir = new Perspective();
+            _trans_inv = new Perspective();
         }
 
         //--------------------------------------------------------------------
@@ -73,8 +73,8 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         // Set the transformations using two arbitrary quadrangles.
         public void quad_to_quad(double[] src, double[] dst)
         {
-            m_trans_dir.quad_to_quad(src, dst);
-            m_trans_inv.quad_to_quad(dst, src);
+            _trans_dir.quad_to_quad(src, dst);
+            _trans_inv.quad_to_quad(dst, src);
         }
 
         //--------------------------------------------------------------------
@@ -105,7 +105,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
         //--------------------------------------------------------------------
         // Check if the equations were solved successfully
-        public bool IsValid { get { return m_trans_dir.IsValid; } }
+        public bool IsValid { get { return _trans_dir.IsValid; } }
 
         //----------------------------------------------------------------
         public void Begin(double x, double y, int len)
@@ -113,7 +113,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             // Calculate transformed coordinates at x1,y1 
             double xt = x;
             double yt = y;
-            m_trans_dir.Transform(ref xt, ref yt);
+            _trans_dir.Transform(ref xt, ref yt);
             int x1 = AggMath.iround(xt * SUBPIXEL_SCALE);
             int y1 = AggMath.iround(yt * SUBPIXEL_SCALE);
             double dx;
@@ -122,14 +122,14 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             // Calculate scale by X at x1,y1
             dx = xt + delta;
             dy = yt;
-            m_trans_inv.Transform(ref dx, ref dy);
+            _trans_inv.Transform(ref dx, ref dy);
             dx -= x;
             dy -= y;
             int sx1 = (int)AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
             // Calculate scale by Y at x1,y1
             dx = xt;
             dy = yt + delta;
-            m_trans_inv.Transform(ref dx, ref dy);
+            _trans_inv.Transform(ref dx, ref dy);
             dx -= x;
             dy -= y;
             int sy1 = (int)AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
@@ -137,28 +137,28 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             x += len;
             xt = x;
             yt = y;
-            m_trans_dir.Transform(ref xt, ref yt);
+            _trans_dir.Transform(ref xt, ref yt);
             int x2 = AggMath.iround(xt * SUBPIXEL_SCALE);
             int y2 = AggMath.iround(yt * SUBPIXEL_SCALE);
             // Calculate scale by X at x2,y2
             dx = xt + delta;
             dy = yt;
-            m_trans_inv.Transform(ref dx, ref dy);
+            _trans_inv.Transform(ref dx, ref dy);
             dx -= x;
             dy -= y;
             int sx2 = (int)AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
             // Calculate scale by Y at x2,y2
             dx = xt;
             dy = yt + delta;
-            m_trans_inv.Transform(ref dx, ref dy);
+            _trans_inv.Transform(ref dx, ref dy);
             dx -= x;
             dy -= y;
             int sy2 = (int)AggMath.uround(SUBPIXEL_SCALE / Math.Sqrt(dx * dx + dy * dy)) >> SUBPIXEL_SHIFT;
             // Initialize the interpolators
-            m_coord_x = new LineInterpolatorDDA2(x1, x2, len);
-            m_coord_y = new LineInterpolatorDDA2(y1, y2, len);
-            m_scale_x = new LineInterpolatorDDA2(sx1, sx2, len);
-            m_scale_y = new LineInterpolatorDDA2(sy1, sy2, len);
+            _coord_x = new LineInterpolatorDDA2(x1, x2, len);
+            _coord_y = new LineInterpolatorDDA2(y1, y2, len);
+            _scale_x = new LineInterpolatorDDA2(sx1, sx2, len);
+            _scale_y = new LineInterpolatorDDA2(sy1, sy2, len);
         }
 
 
@@ -210,30 +210,30 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         //----------------------------------------------------------------
         public void Next()
         {
-            m_coord_x.Next();
-            m_coord_y.Next();
-            m_scale_x.Next();
-            m_scale_y.Next();
+            _coord_x.Next();
+            _coord_y.Next();
+            _scale_x.Next();
+            _scale_y.Next();
         }
 
         //----------------------------------------------------------------
         public void GetCoord(out int x, out int y)
         {
-            x = m_coord_x.Y;
-            y = m_coord_y.Y;
+            x = _coord_x.Y;
+            y = _coord_y.Y;
         }
 
         //----------------------------------------------------------------
         public void GetLocalScale(out int x, out int y)
         {
-            x = m_scale_x.Y;
-            y = m_scale_y.Y;
+            x = _scale_x.Y;
+            y = _scale_y.Y;
         }
 
         //----------------------------------------------------------------
         public void transform(ref double x, ref double y)
         {
-            m_trans_dir.Transform(ref x, ref y);
+            _trans_dir.Transform(ref x, ref y);
         }
     }
 }

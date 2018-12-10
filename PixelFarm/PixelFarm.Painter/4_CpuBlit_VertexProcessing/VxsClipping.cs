@@ -16,10 +16,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     public class VxsClipper
     {
 
-        List<IntPolygon> aPolys = new List<IntPolygon>();
-        List<IntPolygon> bPolys = new List<IntPolygon>();
-        List<IntPolygon> intersectedPolys = new List<IntPolygon>();
-        Clipper clipper = new Clipper();
+        List<IntPolygon> _aPolys = new List<IntPolygon>();
+        List<IntPolygon> _bPolys = new List<IntPolygon>();
+        List<IntPolygon> _intersectedPolys = new List<IntPolygon>();
+        Clipper _clipper = new Clipper();
 
 
 
@@ -37,17 +37,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-
-
-
-
         internal VxsClipper() { }
         internal void Reset()
         {
-            aPolys.Clear();
-            bPolys.Clear();
-            intersectedPolys.Clear();
-            clipper.Clear();
+            _aPolys.Clear();
+            _bPolys.Clear();
+            _intersectedPolys.Clear();
+            _clipper.Clear();
 
         }
         //
@@ -63,16 +59,16 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //reset all used fields
 
             ClipType clipType = (ClipType)vxsClipType;
-            CreatePolygons(a, aPolys);
-            CreatePolygons(b, bPolys);
+            CreatePolygons(a, _aPolys);
+            CreatePolygons(b, _bPolys);
 
-            clipper.AddPaths(aPolys, PolyType.ptSubject, true);
-            clipper.AddPaths(bPolys, PolyType.ptClip, true);
-            clipper.Execute(clipType, intersectedPolys);
+            _clipper.AddPaths(_aPolys, PolyType.ptSubject, true);
+            _clipper.AddPaths(_bPolys, PolyType.ptClip, true);
+            _clipper.Execute(clipType, _intersectedPolys);
 
             if (separateIntoSmallSubPaths)
             {
-                foreach (List<IntPoint> polygon in intersectedPolys)
+                foreach (List<IntPoint> polygon in _intersectedPolys)
                 {
                     int j = polygon.Count;
                     if (j > 0)
@@ -105,7 +101,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 using (VxsTemp.Borrow(out VertexStore v1))
                 using (VectorToolBox.Borrow(v1, out PathWriter pw))
                 {
-                    foreach (List<IntPoint> polygon in intersectedPolys)
+                    foreach (List<IntPoint> polygon in _intersectedPolys)
                     {
                         int j = polygon.Count;
                         if (j > 0)
@@ -127,7 +123,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     }
                     pw.Stop();
                     resultList.Add(v1.CreateTrim());
-                } 
+                }
             }
         }
 

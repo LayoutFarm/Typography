@@ -138,72 +138,72 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //--------------------------------------------------------------curve3_inc
     public sealed class Curve3Inc
     {
-        int m_num_steps;
-        int m_step;
-        double m_scale;
-        double m_start_x;
-        double m_start_y;
-        double m_end_x;
-        double m_end_y;
-        double m_fx;
-        double m_fy;
-        double m_dfx;
-        double m_dfy;
-        double m_ddfx;
-        double m_ddfy;
-        double m_saved_fx;
-        double m_saved_fy;
-        double m_saved_dfx;
-        double m_saved_dfy;
+        int _num_steps;
+        int _step;
+        double _scale;
+        double _start_x;
+        double _start_y;
+        double _end_x;
+        double _end_y;
+        double _fx;
+        double _fy;
+        double _dfx;
+        double _dfy;
+        double _ddfx;
+        double _ddfy;
+        double _saved_fx;
+        double _saved_fy;
+        double _saved_dfx;
+        double _saved_dfy;
         public Curve3Inc()
         {
-            m_num_steps = (0);
-            m_step = (0);
-            m_scale = (1.0);
+            _num_steps = (0);
+            _step = (0);
+            _scale = (1.0);
         }
 
         public Curve3Inc(double x1, double y1,
                    double x2, double y2,
                    double x3, double y3)
         {
-            m_num_steps = (0);
-            m_step = (0);
-            m_scale = (1.0);
+            _num_steps = (0);
+            _step = (0);
+            _scale = (1.0);
             Init(x1, y1, x2, y2, x3, y3);
         }
 
-        public void Reset() { m_num_steps = 0; m_step = -1; }
+        public void Reset() { _num_steps = 0; _step = -1; }
 
         public void Init(double x1, double y1,
                   double cx, double cy,
                   double x2, double y2)
         {
-            m_start_x = x1;
-            m_start_y = y1;
-            m_end_x = x2;
-            m_end_y = y2;
+            _start_x = x1;
+            _start_y = y1;
+            _end_x = x2;
+            _end_y = y2;
             double dx1 = cx - x1;
             double dy1 = cy - y1;
             double dx2 = x2 - cx;
             double dy2 = y2 - cy;
             double len = Math.Sqrt(dx1 * dx1 + dy1 * dy1) + Math.Sqrt(dx2 * dx2 + dy2 * dy2);
-            m_num_steps = (int)AggMath.uround(len * 0.25 * m_scale);
-            if (m_num_steps < 4)
+            _num_steps = (int)AggMath.uround(len * 0.25 * _scale);
+            if (_num_steps < 4)
             {
-                m_num_steps = 4;
+                _num_steps = 4;
             }
 
-            double eachIncStep = 1.0 / m_num_steps;
+            double eachIncStep = 1.0 / _num_steps;
             double eachIncStep2 = eachIncStep * eachIncStep;
             double tmpx = (x1 - cx * 2.0 + x2) * eachIncStep2;
             double tmpy = (y1 - cy * 2.0 + y2) * eachIncStep2;
-            m_saved_fx = m_fx = x1;
-            m_saved_fy = m_fy = y1;
-            m_saved_dfx = m_dfx = tmpx + (cx - x1) * (2.0 * eachIncStep);
-            m_saved_dfy = m_dfy = tmpy + (cy - y1) * (2.0 * eachIncStep);
-            m_ddfx = tmpx * 2.0;
-            m_ddfy = tmpy * 2.0;
-            m_step = m_num_steps;
+            _saved_fx = _fx = x1;
+            _saved_fy = _fy = y1;
+            _saved_dfx = _dfx = tmpx + (cx - x1) * (2.0 * eachIncStep);
+            _saved_dfy = _dfy = tmpy + (cy - y1) * (2.0 * eachIncStep);
+            _ddfx = tmpx * 2.0;
+            _ddfy = tmpy * 2.0;
+            _step = _num_steps;
         }
 
         public Curves.CurveApproximationMethod ApproximationMethod
@@ -213,17 +213,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public double ApproximationScale
         {
-            get { return this.m_scale; }
-            set { this.m_scale = value; }
+            get => _scale;
+            set => _scale = value;
         }
         public double AngleTolerance
         {
-            get { return 0; }
+            get => 0;
             set { }
         }
         public double CuspLimit
         {
-            get { return 0; }
+            get => 0;
             set { }
         }
     }
@@ -231,69 +231,67 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //-------------------------------------------------------------curve3_div
     public sealed class Curve3Div
     {
-        double m_approximation_scale;
-        double m_distance_tolerance_square;
-        double m_angle_tolerance;
-        int m_count;
-        ArrayList<Vector2> m_points;
+        double _approximation_scale;
+        double _distance_tolerance_square;
+        double _angle_tolerance;
+        int _count;
+        ArrayList<Vector2> _points;
         public Curve3Div()
         {
-            m_points = new ArrayList<Vector2>();
-            m_approximation_scale = (1.0);
-            m_angle_tolerance = (0.0);
-            m_count = 0;
+            _points = new ArrayList<Vector2>();
+            _approximation_scale = (1.0);
+            _angle_tolerance = (0.0);
+            _count = 0;
         }
 
         public Curve3Div(double x1, double y1,
                    double cx, double cy,
                    double x2, double y2)
         {
-            m_approximation_scale = (1.0);
-            m_angle_tolerance = (0.0);
-            m_count = 0;
+            _approximation_scale = (1.0);
+            _angle_tolerance = (0.0);
+            _count = 0;
             Init(x1, y1, cx, cy, x2, y2);
         }
 
-        public void Reset() { m_points.Clear(); m_count = 0; }
+        public void Reset() { _points.Clear(); _count = 0; }
         public void Init(double x1, double y1,
                 double cx, double cy,
                 double x2, double y2)
         {
-            m_points.Clear();
-            m_distance_tolerance_square = 0.5 / m_approximation_scale;
-            m_distance_tolerance_square *= m_distance_tolerance_square;
+            _points.Clear();
+            _distance_tolerance_square = 0.5 / _approximation_scale;
+            _distance_tolerance_square *= _distance_tolerance_square;
             AddBezier(x1, y1, cx, cy, x2, y2);
-            m_count = 0;
+            _count = 0;
         }
 
-        public Curves.CurveApproximationMethod ApproximationMethod
-        {
-            get { return Curves.CurveApproximationMethod.Div; }
-        }
+        public Curves.CurveApproximationMethod ApproximationMethod => Curves.CurveApproximationMethod.Div;
         public double ApproximationScale
         {
-            get { return this.m_approximation_scale; }
-            set { this.m_approximation_scale = value; }
+            get => _approximation_scale;
+            set => _approximation_scale = value;
         }
         public double AngleTolerance
         {
-            get { return this.m_angle_tolerance; }
-            set { this.m_angle_tolerance = value; }
+            get => _angle_tolerance;
+            set => _angle_tolerance = value;
         }
         public double CuspLimit
         {
-            get { return 0; }
+            get => 0;
             set { }
         }
-
-        public ArrayList<Vector2> GetInternalPoints() { return this.m_points; }
+        //
+        public ArrayList<Vector2> GetInternalPoints() => _points;
+        //
         void AddBezier(double x1, double y1,
                     double x2, double y2,
                     double x3, double y3)
         {
-            m_points.Append(new Vector2(x1, y1));
+            _points.Append(new Vector2(x1, y1));
             AddRecursiveBezier(x1, y1, x2, y2, x3, y3, 0);
-            m_points.Append(new Vector2(x3, y3));
+            _points.Append(new Vector2(x3, y3));
         }
 
         private void AddRecursiveBezier(double x1, double y1,
@@ -322,14 +320,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
                 // Regular case
                 //-----------------
-                if (d * d <= m_distance_tolerance_square * (dx * dx + dy * dy))
+                if (d * d <= _distance_tolerance_square * (dx * dx + dy * dy))
                 {
                     // If the curvature doesn't exceed the distance_tolerance value
                     // we tend to finish subdivisions.
                     //----------------------
-                    if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
+                    if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                     {
-                        m_points.Append(new Vector2(x123, y123));
+                        _points.Append(new Vector2(x123, y123));
                         return;
                     }
 
@@ -337,11 +335,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     //----------------------
                     da = Math.Abs(Math.Atan2(y3 - y2, x3 - x2) - Math.Atan2(y2 - y1, x2 - x1));
                     if (da >= Math.PI) da = 2 * Math.PI - da;
-                    if (da < m_angle_tolerance)
+                    if (da < _angle_tolerance)
                     {
                         // Finally we can stop the recursion
                         //----------------------
-                        m_points.Append(new Vector2(x123, y123));
+                        _points.Append(new Vector2(x123, y123));
                         return;
                     }
                 }
@@ -368,9 +366,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     else if (d >= 1) d = AggMath.calc_sq_distance(x2, y2, x3, y3);
                     else d = AggMath.calc_sq_distance(x2, y2, x1 + d * dx, y1 + d * dy);
                 }
-                if (d < m_distance_tolerance_square)
+                if (d < _distance_tolerance_square)
                 {
-                    m_points.Append(new Vector2(x2, y2));
+                    _points.Append(new Vector2(x2, y2));
                     return;
                 }
             }
@@ -402,32 +400,32 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //-------------------------------------------------------------curve4_inc
     public sealed class Curve4Inc
     {
-        int m_num_steps;
-        int m_step;
-        double m_scale;
-        double m_start_x;
-        double m_start_y;
-        double m_end_x;
-        double m_end_y;
-        double m_fx;
-        double m_fy;
-        double m_dfx;
-        double m_dfy;
-        double m_ddfx;
-        double m_ddfy;
-        double m_dddfx;
-        double m_dddfy;
-        double m_saved_fx;
-        double m_saved_fy;
-        double m_saved_dfx;
-        double m_saved_dfy;
-        double m_saved_ddfx;
-        double m_saved_ddfy;
+        int _num_steps;
+        int _step;
+        double _scale;
+        double _start_x;
+        double _start_y;
+        double _end_x;
+        double _end_y;
+        double _fx;
+        double _fy;
+        double _dfx;
+        double _dfy;
+        double _ddfx;
+        double _ddfy;
+        double _dddfx;
+        double _dddfy;
+        double _saved_fx;
+        double _saved_fy;
+        double _saved_dfx;
+        double _saved_dfy;
+        double _saved_ddfx;
+        double _saved_ddfy;
         public Curve4Inc()
         {
-            m_num_steps = (0);
-            m_step = (0);
-            m_scale = (1.0);
+            _num_steps = (0);
+            _step = (0);
+            _scale = (1.0);
         }
 
         public Curve4Inc(double x1, double y1,
@@ -435,17 +433,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                   double cx2, double cy2,
                   double x2, double y2)
         {
-            m_num_steps = (0);
-            m_step = (0);
-            m_scale = (1.0);
+            _num_steps = (0);
+            _step = (0);
+            _scale = (1.0);
             Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
         }
 
         public Curve4Inc(Curve4Points cp)
         {
-            m_num_steps = (0);
-            m_step = (0);
-            m_scale = (1.0);
+            _num_steps = (0);
+            _step = (0);
+            _scale = (1.0);
             Init(
                     cp.c0, cp.c1,
                     cp.c2, cp.c3,
@@ -453,16 +451,16 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     cp.c6, cp.c7);
         }
 
-        public void Reset() { m_num_steps = 0; m_step = -1; }
+        public void Reset() { _num_steps = 0; _step = -1; }
         public void Init(double x1, double y1,
                   double cx1, double cy1,
                   double cx2, double cy2,
                   double x2, double y2)
         {
-            m_start_x = x1;
-            m_start_y = y1;
-            m_end_x = x2;
-            m_end_y = y2;
+            _start_x = x1;
+            _start_y = y1;
+            _end_x = x2;
+            _end_y = y2;
             double dx1 = cx1 - x1;
             double dy1 = cy1 - y1;
             double dx2 = cx2 - cx1;
@@ -471,14 +469,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double dy3 = y2 - cy2;
             double len = (Math.Sqrt(dx1 * dx1 + dy1 * dy1) +
                           Math.Sqrt(dx2 * dx2 + dy2 * dy2) +
-                          Math.Sqrt(dx3 * dx3 + dy3 * dy3)) * 0.25 * m_scale;
-            m_num_steps = (int)AggMath.uround(len);
-            if (m_num_steps < 4)
+                          Math.Sqrt(dx3 * dx3 + dy3 * dy3)) * 0.25 * _scale;
+            _num_steps = (int)AggMath.uround(len);
+            if (_num_steps < 4)
             {
-                m_num_steps = 4;
+                _num_steps = 4;
             }
 
-            double eachIncStep = 1.0 / m_num_steps;
+            double eachIncStep = 1.0 / _num_steps;
             double eachIncStep2 = eachIncStep * eachIncStep;
             double eachIncStep3 = eachIncStep * eachIncStep * eachIncStep;
             double pre1 = 3.0 * eachIncStep;
@@ -489,15 +487,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double tmp1y = y1 - cy1 * 2.0 + cy2;
             double tmp2x = (cx1 - cx2) * 3.0 - x1 + x2;
             double tmp2y = (cy1 - cy2) * 3.0 - y1 + y2;
-            m_saved_fx = m_fx = x1;
-            m_saved_fy = m_fy = y1;
-            m_saved_dfx = m_dfx = (cx1 - x1) * pre1 + tmp1x * pre2 + tmp2x * eachIncStep3;
-            m_saved_dfy = m_dfy = (cy1 - y1) * pre1 + tmp1y * pre2 + tmp2y * eachIncStep3;
-            m_saved_ddfx = m_ddfx = tmp1x * pre4 + tmp2x * pre5;
-            m_saved_ddfy = m_ddfy = tmp1y * pre4 + tmp2y * pre5;
-            m_dddfx = tmp2x * pre5;
-            m_dddfy = tmp2y * pre5;
-            m_step = m_num_steps;
+            _saved_fx = _fx = x1;
+            _saved_fy = _fy = y1;
+            _saved_dfx = _dfx = (cx1 - x1) * pre1 + tmp1x * pre2 + tmp2x * eachIncStep3;
+            _saved_dfy = _dfy = (cy1 - y1) * pre1 + tmp1y * pre2 + tmp2y * eachIncStep3;
+            _saved_ddfx = _ddfx = tmp1x * pre4 + tmp2x * pre5;
+            _saved_ddfy = _ddfy = tmp1y * pre4 + tmp2y * pre5;
+            _dddfx = tmp2x * pre5;
+            _dddfy = tmp2y * pre5;
+            _step = _num_steps;
         }
 
         public void Init(Curve4Points cp)
@@ -509,40 +507,40 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public Curves.CurveApproximationMethod ApproximationMethod
         {
-            get { return Curves.CurveApproximationMethod.Inc; }
+            get => Curves.CurveApproximationMethod.Inc;
             set { }
         }
         public double ApproximationScale
         {
-            get { return this.m_scale; }
-            set { this.m_scale = value; }
+            get => _scale;
+            set => _scale = value;
         }
         public double AngleTolerance
         {
-            get { return 0; }
+            get => 0;
             set { }
         }
         public double CuspLmit
         {
-            get { return 0; }
+            get => 0;
             set { }
         }
 
 
         public void RewindZero()
         {
-            if (m_num_steps == 0)
+            if (_num_steps == 0)
             {
-                m_step = -1;
+                _step = -1;
                 return;
             }
-            m_step = m_num_steps;
-            m_fx = m_saved_fx;
-            m_fy = m_saved_fy;
-            m_dfx = m_saved_dfx;
-            m_dfy = m_saved_dfy;
-            m_ddfx = m_saved_ddfx;
-            m_ddfy = m_saved_ddfy;
+            _step = _num_steps;
+            _fx = _saved_fx;
+            _fy = _saved_fy;
+            _dfx = _saved_dfx;
+            _dfy = _saved_dfy;
+            _ddfx = _saved_ddfx;
+            _ddfy = _saved_ddfy;
         }
 
         //public VertexCmd GetNextVertex(out double x, out double y)
@@ -586,19 +584,19 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //-------------------------------------------------------------curve4_div
     public sealed class Curve4Div
     {
-        double m_approximation_scale;
-        double m_distance_tolerance_square;
-        double m_angle_tolerance;
-        double m_cusp_limit;
-        int m_count;
-        ArrayList<Vector2> m_points;
+        double _approximation_scale;
+        double _distance_tolerance_square;
+        double _angle_tolerance;
+        double _cusp_limit;
+        int _count;
+        ArrayList<Vector2> _points;
         public Curve4Div()
         {
-            m_points = new ArrayList<Vector2>();
-            m_approximation_scale = (1.0);
-            m_angle_tolerance = (0.0);
-            m_cusp_limit = (0.0);
-            m_count = (0);
+            _points = new ArrayList<Vector2>();
+            _approximation_scale = (1.0);
+            _angle_tolerance = (0.0);
+            _cusp_limit = (0.0);
+            _count = (0);
         }
 
         public Curve4Div(double x1, double y1,
@@ -606,36 +604,36 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                    double x3, double y3,
                    double x4, double y4)
         {
-            m_approximation_scale = (1.0);
-            m_angle_tolerance = (0.0);
-            m_cusp_limit = (0.0);
-            m_count = (0);
+            _approximation_scale = (1.0);
+            _angle_tolerance = (0.0);
+            _cusp_limit = (0.0);
+            _count = (0);
             Init(x1, y1, x2, y2, x3, y3, x4, y4);
         }
 
         public Curve4Div(Curve4Points cp)
         {
-            m_approximation_scale = (1.0);
-            m_angle_tolerance = (0.0);
-            m_count = (0);
+            _approximation_scale = (1.0);
+            _angle_tolerance = (0.0);
+            _count = (0);
             Init(
                     cp.c0, cp.c1,
                     cp.c2, cp.c3,
                     cp.c4, cp.c5,
                     cp.c6, cp.c7);
         }
-        public ArrayList<Vector2> GetInternalPoints() { return this.m_points; }
-        public void Reset() { m_points.Clear(); m_count = 0; }
+        public ArrayList<Vector2> GetInternalPoints() => _points;
+        public void Reset() { _points.Clear(); _count = 0; }
         public void Init(double x1, double y1,
                   double x2, double y2,
                   double x3, double y3,
                   double x4, double y4)
         {
-            m_points.Clear();
-            m_distance_tolerance_square = 0.5 / m_approximation_scale;
-            m_distance_tolerance_square *= m_distance_tolerance_square;
+            _points.Clear();
+            _distance_tolerance_square = 0.5 / _approximation_scale;
+            _distance_tolerance_square *= _distance_tolerance_square;
             AddBezier(x1, y1, x2, y2, x3, y3, x4, y4);
-            m_count = 0;
+            _count = 0;
         }
 
 
@@ -649,19 +647,19 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public double ApproximationScale
         {
-            get { return this.m_approximation_scale; }
-            set { this.m_approximation_scale = value; }
+            get => _approximation_scale;
+            set => _approximation_scale = value;
         }
         public double AngleTolerance
         {
-            get { return this.m_angle_tolerance; }
-            set { this.m_angle_tolerance = value; }
+            get => _angle_tolerance;
+            set => _angle_tolerance = value;
         }
 
         public double CuspLimit
         {
-            get { return (m_cusp_limit == 0.0) ? 0.0 : Math.PI - m_cusp_limit; }
-            set { m_cusp_limit = (value == 0.0) ? 0.0 : Math.PI - value; }
+            get => (_cusp_limit == 0.0) ? 0.0 : Math.PI - _cusp_limit;
+            set => _cusp_limit = (value == 0.0) ? 0.0 : Math.PI - value;
         }
 
 
@@ -670,9 +668,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                   double x3, double y3,
                   double x4, double y4)
         {
-            m_points.Append(new Vector2(x1, y1));
+            _points.Append(new Vector2(x1, y1));
             AddRecursiveBezier(x1, y1, x2, y2, x3, y3, x4, y4, 0);
-            m_points.Append(new Vector2(x4, y4));
+            _points.Append(new Vector2(x4, y4));
         }
 
 
@@ -754,17 +752,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     }
                     if (d2 > d3)
                     {
-                        if (d2 < m_distance_tolerance_square)
+                        if (d2 < _distance_tolerance_square)
                         {
-                            m_points.Append(new Vector2(x2, y2));
+                            _points.Append(new Vector2(x2, y2));
                             return;
                         }
                     }
                     else
                     {
-                        if (d3 < m_distance_tolerance_square)
+                        if (d3 < _distance_tolerance_square)
                         {
-                            m_points.Append(new Vector2(x3, y3));
+                            _points.Append(new Vector2(x3, y3));
                             return;
                         }
                     }
@@ -772,11 +770,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 case 1:
                     // p1,p2,p4 are collinear, p3 is significant
                     //----------------------
-                    if (d3 * d3 <= m_distance_tolerance_square * (dx * dx + dy * dy))
+                    if (d3 * d3 <= _distance_tolerance_square * (dx * dx + dy * dy))
                     {
-                        if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
+                        if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            m_points.Append(new Vector2(x23, y23));
+                            _points.Append(new Vector2(x23, y23));
                             return;
                         }
 
@@ -784,18 +782,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //----------------------
                         da1 = Math.Abs(Math.Atan2(y4 - y3, x4 - x3) - Math.Atan2(y3 - y2, x3 - x2));
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
-                        if (da1 < m_angle_tolerance)
+                        if (da1 < _angle_tolerance)
                         {
-                            m_points.Append(new Vector2(x2, y2));
-                            m_points.Append(new Vector2(x3, y3));
+                            _points.Append(new Vector2(x2, y2));
+                            _points.Append(new Vector2(x3, y3));
                             return;
                         }
 
-                        if (m_cusp_limit != 0.0)
+                        if (_cusp_limit != 0.0)
                         {
-                            if (da1 > m_cusp_limit)
+                            if (da1 > _cusp_limit)
                             {
-                                m_points.Append(new Vector2(x3, y3));
+                                _points.Append(new Vector2(x3, y3));
                                 return;
                             }
                         }
@@ -804,11 +802,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 case 2:
                     // p1,p3,p4 are collinear, p2 is significant
                     //----------------------
-                    if (d2 * d2 <= m_distance_tolerance_square * (dx * dx + dy * dy))
+                    if (d2 * d2 <= _distance_tolerance_square * (dx * dx + dy * dy))
                     {
-                        if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
+                        if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            m_points.Append(new Vector2(x23, y23));
+                            _points.Append(new Vector2(x23, y23));
                             return;
                         }
 
@@ -816,18 +814,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //----------------------
                         da1 = Math.Abs(Math.Atan2(y3 - y2, x3 - x2) - Math.Atan2(y2 - y1, x2 - x1));
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
-                        if (da1 < m_angle_tolerance)
+                        if (da1 < _angle_tolerance)
                         {
-                            m_points.Append(new Vector2(x2, y2));
-                            m_points.Append(new Vector2(x3, y3));
+                            _points.Append(new Vector2(x2, y2));
+                            _points.Append(new Vector2(x3, y3));
                             return;
                         }
 
-                        if (m_cusp_limit != 0.0)
+                        if (_cusp_limit != 0.0)
                         {
-                            if (da1 > m_cusp_limit)
+                            if (da1 > _cusp_limit)
                             {
-                                m_points.Append(new Vector2(x2, y2));
+                                _points.Append(new Vector2(x2, y2));
                                 return;
                             }
                         }
@@ -836,14 +834,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 case 3:
                     // Regular case
                     //-----------------
-                    if ((d2 + d3) * (d2 + d3) <= m_distance_tolerance_square * (dx * dx + dy * dy))
+                    if ((d2 + d3) * (d2 + d3) <= _distance_tolerance_square * (dx * dx + dy * dy))
                     {
                         // If the curvature doesn't exceed the distance_tolerance value
                         // we tend to finish subdivisions.
                         //----------------------
-                        if (m_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
+                        if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            m_points.Append(new Vector2(x23, y23));
+                            _points.Append(new Vector2(x23, y23));
                             return;
                         }
 
@@ -854,25 +852,25 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         da2 = Math.Abs(Math.Atan2(y4 - y3, x4 - x3) - k);
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
                         if (da2 >= Math.PI) da2 = 2 * Math.PI - da2;
-                        if (da1 + da2 < m_angle_tolerance)
+                        if (da1 + da2 < _angle_tolerance)
                         {
                             // Finally we can stop the recursion
                             //----------------------
-                            m_points.Append(new Vector2(x23, y23));
+                            _points.Append(new Vector2(x23, y23));
                             return;
                         }
 
-                        if (m_cusp_limit != 0.0)
+                        if (_cusp_limit != 0.0)
                         {
-                            if (da1 > m_cusp_limit)
+                            if (da1 > _cusp_limit)
                             {
-                                m_points.Append(new Vector2(x2, y2));
+                                _points.Append(new Vector2(x2, y2));
                                 return;
                             }
 
-                            if (da2 > m_cusp_limit)
+                            if (da2 > _cusp_limit)
                             {
-                                m_points.Append(new Vector2(x3, y3));
+                                _points.Append(new Vector2(x3, y3));
                                 return;
                             }
                         }
@@ -893,60 +891,60 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     /// </summary>
     public sealed class Curve3
     {
-        Curve3Inc m_curve_inc = new Curve3Inc();
-        Curve3Div m_curve_div = new Curve3Div();
-        Curves.CurveApproximationMethod m_approximation_method;
+        Curve3Inc _curve_inc = new Curve3Inc();
+        Curve3Div _curve_div = new Curve3Div();
+        Curves.CurveApproximationMethod _approximation_method;
         public Curve3()
         {
-            m_approximation_method = Curves.CurveApproximationMethod.Div;
+            _approximation_method = Curves.CurveApproximationMethod.Div;
         }
 
         public void Reset()
         {
-            m_curve_inc.Reset();
-            m_curve_div.Reset();
+            _curve_inc.Reset();
+            _curve_div.Reset();
         }
 
         void Init(double x1, double y1,
              double cx, double cy,
              double x2, double y2)
         {
-            if (m_approximation_method == Curves.CurveApproximationMethod.Inc)
+            if (_approximation_method == Curves.CurveApproximationMethod.Inc)
             {
-                m_curve_inc.Init(x1, y1, cx, cy, x2, y2);
+                _curve_inc.Init(x1, y1, cx, cy, x2, y2);
             }
             else
             {
-                m_curve_div.Init(x1, y1, cx, cy, x2, y2);
+                _curve_div.Init(x1, y1, cx, cy, x2, y2);
             }
         }
         public Curves.CurveApproximationMethod ApproximationMethod
         {
-            get { return this.m_approximation_method; }
-            set { this.m_approximation_method = value; }
+            get { return _approximation_method; }
+            set { _approximation_method = value; }
         }
         public double ApproximationScale
         {
             get
             {
-                return this.m_curve_inc.ApproximationScale;
+                return _curve_inc.ApproximationScale;
             }
             set
             {
-                m_curve_inc.ApproximationScale = m_curve_div.ApproximationScale = value;
+                _curve_inc.ApproximationScale = _curve_div.ApproximationScale = value;
             }
         }
 
         public double AngleTolerance
         {
-            get { return this.m_curve_div.AngleTolerance; }
-            set { this.m_curve_div.AngleTolerance = value; }
+            get => _curve_div.AngleTolerance;
+            set => _curve_div.AngleTolerance = value;
         }
 
         public double CuspLimit
         {
-            get { return this.m_curve_div.CuspLimit; }
-            set { this.m_curve_div.CuspLimit = value; }
+            get => _curve_div.CuspLimit;
+            set => _curve_div.CuspLimit = value;
         }
 
 
@@ -973,12 +971,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //-----------------------------------------------------------------curve4
     public sealed class Curve4
     {
-        Curve4Inc m_curve_inc = new Curve4Inc();
-        Curve4Div m_curve_div = new Curve4Div();
-        Curves.CurveApproximationMethod m_approximation_method;
+        Curve4Inc _curve_inc = new Curve4Inc();
+        Curve4Div _curve_div = new Curve4Div();
+        Curves.CurveApproximationMethod _approximation_method;
         public Curve4()
         {
-            m_approximation_method = Curves.CurveApproximationMethod.Div;
+            _approximation_method = Curves.CurveApproximationMethod.Div;
         }
 
         public Curve4(double x1, double y1,
@@ -987,13 +985,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                double x2, double y2)
             : base()
         {
-            m_approximation_method = Curves.CurveApproximationMethod.Div;
+            _approximation_method = Curves.CurveApproximationMethod.Div;
             Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
         }
 
         public Curve4(Curve4Points cp)
         {
-            m_approximation_method = Curves.CurveApproximationMethod.Div;
+            _approximation_method = Curves.CurveApproximationMethod.Div;
             Init(
                     cp.c0, cp.c1,
                     cp.c2, cp.c3,
@@ -1004,8 +1002,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public void Reset()
         {
-            m_curve_inc.Reset();
-            m_curve_div.Reset();
+            _curve_inc.Reset();
+            _curve_div.Reset();
         }
 
         public void Init(double x1, double y1,
@@ -1013,13 +1011,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                double cx2, double cy2,
                double x2, double y2)
         {
-            if (m_approximation_method == Curves.CurveApproximationMethod.Inc)
+            if (_approximation_method == Curves.CurveApproximationMethod.Inc)
             {
-                m_curve_inc.Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
+                _curve_inc.Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
             }
             else
             {
-                m_curve_div.Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
+                _curve_div.Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
             }
         }
 
@@ -1035,35 +1033,35 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public Curves.CurveApproximationMethod ApproximationMethod
         {
-            get { return m_approximation_method; }
-            set { m_approximation_method = value; }
+            get => _approximation_method;
+            set => _approximation_method = value;
         }
 
 
         public double ApproximationScale
         {
-            get { return m_curve_inc.ApproximationScale; }
+            get => _curve_inc.ApproximationScale;
             set
             {
-                this.m_curve_inc.ApproximationScale = value;
-                this.m_curve_div.ApproximationScale = value;
+                _curve_inc.ApproximationScale = value;
+                _curve_div.ApproximationScale = value;
             }
         }
 
         public double AngleTolerance
         {
-            get { return m_curve_div.AngleTolerance; }
+            get => _curve_div.AngleTolerance;
             set
             {
-                m_curve_div.AngleTolerance = value;
-                m_curve_inc.AngleTolerance = value;
+                _curve_div.AngleTolerance = value;
+                _curve_inc.AngleTolerance = value;
             }
         }
 
         public double CuspLimit
         {
-            get { return this.m_curve_div.CuspLimit; }
-            set { this.m_curve_div.CuspLimit = value; }
+            get => _curve_div.CuspLimit;
+            set => _curve_div.CuspLimit = value;
         }
 
 

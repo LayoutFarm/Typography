@@ -927,7 +927,6 @@ namespace PixelFarm.CpuBlit
                         break;
                     default:
                         {
-
                             _aggsx.Render(vxs, _fillColor);
                         }
                         break;
@@ -977,9 +976,6 @@ namespace PixelFarm.CpuBlit
         public void Fill(VertexStore vxs, ISpanGenerator spanGen)
         {
             _aggsx.Render(vxs, spanGen);
-
-            //_sclineRas.AddPath(vxs);
-            //_bmpRasterizer.RenderWithSpan(_aggsx.DestImage, _sclineRas, _scline, spanGen);
         }
         void DrawBitmap(MemBitmap memBmp, double left, double top)
         {

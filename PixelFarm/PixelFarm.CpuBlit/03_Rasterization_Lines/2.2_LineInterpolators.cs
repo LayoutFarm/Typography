@@ -22,16 +22,16 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
     //================================================line_interpolator_aa_base
     struct LineInterpolatorAAData : IDisposable
     {
-        public readonly LineParameters m_lp;
-        readonly LineInterpolatorDDA2 m_li;
+        public readonly LineParameters _lp;
+        readonly LineInterpolatorDDA2 _li;
 
-        readonly int m_len;
-        public readonly int m_count;
-        public readonly int m_width;
-        public readonly int m_max_extent;
+        readonly int _len;
+        public readonly int _count;
+        public readonly int _width;
+        public readonly int _max_extent;
         //
-        public readonly int[] m_dist;
-        public readonly byte[] m_covers;
+        public readonly int[] _dist;
+        public readonly byte[] _covers;
 
         public int m_x;
         public int m_y;
@@ -42,34 +42,34 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
         public const int MAX_HALF_WIDTH = 64;
 
-        OutlineRenderer ren;
+        OutlineRenderer _ren;
         public LineInterpolatorAAData(OutlineRenderer ren, LineParameters lp)
         {
 
-            this.ren = ren;
+            _ren = ren;
             //TODO: consider resuable array
-            m_dist = ren.GetFreeDistArray();// new int[MAX_HALF_WIDTH + 1];
-            m_covers = ren.GetFreeConvArray(); // new byte[MAX_HALF_WIDTH * 2 + 4];
+            _dist = ren.GetFreeDistArray();// new int[MAX_HALF_WIDTH + 1];
+            _covers = ren.GetFreeConvArray(); // new byte[MAX_HALF_WIDTH * 2 + 4];
 
 
-            m_li = new LineInterpolatorDDA2(
+            _li = new LineInterpolatorDDA2(
                 lp.vertical ? LineAA.DblHr(lp.x2 - lp.x1) :
                               LineAA.DblHr(lp.y2 - lp.y1),
                 lp.vertical ? Math.Abs(lp.y2 - lp.y1) :
                               Math.Abs(lp.x2 - lp.x1) + 1);
 
             //---------------------------------------------------------
-            m_lp = lp;
-            m_len = ((lp.vertical == (lp.inc > 0)) ? -lp.len : lp.len);
+            _lp = lp;
+            _len = ((lp.vertical == (lp.inc > 0)) ? -lp.len : lp.len);
             m_x = (lp.x1 >> LineAA.SUBPIXEL_SHIFT);
             m_y = (lp.y1 >> LineAA.SUBPIXEL_SHIFT);
             m_old_x = (m_x);
             m_old_y = (m_y);
-            m_count = ((lp.vertical ? Math.Abs((lp.y2 >> LineAA.SUBPIXEL_SHIFT) - m_y) :
+            _count = ((lp.vertical ? Math.Abs((lp.y2 >> LineAA.SUBPIXEL_SHIFT) - m_y) :
                                       Math.Abs((lp.x2 >> LineAA.SUBPIXEL_SHIFT) - m_x)));
-            m_width = (ren.SubPixelWidth);
+            _width = (ren.SubPixelWidth);
             //m_max_extent(m_width >> (line_subpixel_shift - 2));
-            m_max_extent = ((m_width + LineAA.SUBPIXEL_MARK) >> LineAA.SUBPIXEL_SHIFT);
+            _max_extent = ((_width + LineAA.SUBPIXEL_MARK) >> LineAA.SUBPIXEL_SHIFT);
             m_step = 0;
 
             //-------------------
@@ -79,7 +79,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 lp.len);
 
             int i;
-            int stop = m_width + LineAA.SUBPIXEL_SCALE * 2;
+            int stop = _width + LineAA.SUBPIXEL_SCALE * 2;
             for (i = 0; i < MAX_HALF_WIDTH; ++i)
             {
                 //assign and eval
@@ -88,112 +88,114 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 //                {
                 //                }
                 //#endif
-                if ((m_dist[i] = li.Y) >= stop)
+                if ((_dist[i] = li.Y) >= stop)
                 {
                     break;
                 }
                 li.Next();
             }
-            m_dist[i++] = 0x7FFF0000;
+            _dist[i++] = 0x7FFF0000;
         }
 
         public void Dispose()
         {
-            ren.ReleaseConvArray(m_covers);
-            ren.ReleaseDistArray(m_dist);
+            _ren.ReleaseConvArray(_covers);
+            _ren.ReleaseDistArray(_dist);
 
 
         }
 
         public void AdjustForward()
         {
-            m_li.adjust_forward();
+            _li.adjust_forward();
         }
         public int Y
         {
-            get { return m_li.Y; }
+            get { return _li.Y; }
         }
         public void Prev()
         {
-            m_li.Prev();
+            _li.Prev();
         }
         public int BaseStepH(ref DistanceInterpolator1 di)
         {
-            m_li.Next();
-            m_x += m_lp.inc;
-            m_y = (m_lp.y1 + m_li.Y) >> LineAA.SUBPIXEL_SHIFT;
+            _li.Next();
+            m_x += _lp.inc;
+            m_y = (_lp.y1 + _li.Y) >> LineAA.SUBPIXEL_SHIFT;
             //
-            if (m_lp.inc > 0) di.IncX(m_y - m_old_y);
+            if (_lp.inc > 0) di.IncX(m_y - m_old_y);
             else /**/         di.DecX(m_y - m_old_y);
             //
             m_old_y = m_y;
             //
-            return di.Distance / m_len;
+            return di.Distance / _len;
         }
 
         public int BaseStepH(ref DistanceInterpolator2 di)
         {
-            m_li.Next();
-            m_x += m_lp.inc;
-            m_y = (m_lp.y1 + m_li.Y) >> LineAA.SUBPIXEL_SHIFT;
+            _li.Next();
+            m_x += _lp.inc;
+            m_y = (_lp.y1 + _li.Y) >> LineAA.SUBPIXEL_SHIFT;
             //
-            if (m_lp.inc > 0) di.IncX(m_y - m_old_y);
+            if (_lp.inc > 0) di.IncX(m_y - m_old_y);
             else/**/          di.DecX(m_y - m_old_y);
             //
             m_old_y = m_y;
-            return di.Distance / m_len;
+            return di.Distance / _len;
         }
         public int BaseStepH(ref DistanceInterpolator3 di)
         {
-            m_li.Next();
-            m_x += m_lp.inc;
-            m_y = (m_lp.y1 + m_li.Y) >> LineAA.SUBPIXEL_SHIFT;
+            _li.Next();
+            m_x += _lp.inc;
+            m_y = (_lp.y1 + _li.Y) >> LineAA.SUBPIXEL_SHIFT;
             //
-            if (m_lp.inc > 0) di.IncX(m_y - m_old_y);
+            if (_lp.inc > 0) di.IncX(m_y - m_old_y);
             else /**/         di.DecX(m_y - m_old_y);
             //
             m_old_y = m_y;
             //
-            return di.Distance / m_len;
+            return di.Distance / _len;
         }
 
         //-------------------------------------------------------
         public int BaseStepV(ref DistanceInterpolator1 di)
         {
-            m_li.Next();
-            m_y += m_lp.inc;
-            m_x = (m_lp.x1 + m_li.Y) >> LineAA.SUBPIXEL_SHIFT;
-            if (m_lp.inc > 0) di.IncY(m_x - m_old_x);
+            _li.Next();
+            m_y += _lp.inc;
+            m_x = (_lp.x1 + _li.Y) >> LineAA.SUBPIXEL_SHIFT;
+            if (_lp.inc > 0) di.IncY(m_x - m_old_x);
             else di.DecY(m_x - m_old_x);
             m_old_x = m_x;
-            return di.Distance / m_len;
+            return di.Distance / _len;
         }
 
         public int BaseStepV(ref DistanceInterpolator2 di)
         {
-            m_li.Next();
-            m_y += m_lp.inc;
-            m_x = (m_lp.x1 + m_li.Y) >> LineAA.SUBPIXEL_SHIFT;
-            if (m_lp.inc > 0) di.IncY(m_x - m_old_x);
+            _li.Next();
+            m_y += _lp.inc;
+            m_x = (_lp.x1 + _li.Y) >> LineAA.SUBPIXEL_SHIFT;
+            if (_lp.inc > 0) di.IncY(m_x - m_old_x);
             else di.DecY(m_x - m_old_x);
             m_old_x = m_x;
-            return di.Distance / m_len;
+            return di.Distance / _len;
         }
 
         public int BaseStepV(ref DistanceInterpolator3 di)
         {
-            m_li.Next();
-            m_y += m_lp.inc;
-            m_x = (m_lp.x1 + m_li.Y) >> LineAA.SUBPIXEL_SHIFT;
-            if (m_lp.inc > 0) di.IncY(m_x - m_old_x);
+            _li.Next();
+            m_y += _lp.inc;
+            m_x = (_lp.x1 + _li.Y) >> LineAA.SUBPIXEL_SHIFT;
+            if (_lp.inc > 0) di.IncY(m_x - m_old_x);
             else di.DecY(m_x - m_old_x);
             m_old_x = m_x;
-            return di.Distance / m_len;
+            return di.Distance / _len;
         }
-
-        public bool IsVertical { get { return m_lp.vertical; } }
-        public int Width { get { return m_width; } }
-        public int Count { get { return m_count; } }
+        //
+        public bool IsVertical => _lp.vertical;
+        //
+        public int Width => _width;
+        public int Count => _count;
+        //
     }
 
     //====================================================line_interpolator_aa0
@@ -209,7 +211,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _aa_data = new LineInterpolatorAAData(ren, lp);
             _m_di = new DistanceInterpolator1(lp.x1, lp.y1, lp.x2, lp.y2,
                  lp.x1 & ~LineAA.SUBPIXEL_MARK, lp.y1 & ~LineAA.SUBPIXEL_MARK);
-            
+
             _aa_data.AdjustForward();
         }
         public void Dispose()
@@ -217,12 +219,11 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _aa_data.Dispose();
 
         }
-
-        int Count { get { return _aa_data.Count; } }
-        bool IsVertical
-        {
-            get { return _aa_data.IsVertical; }
-        }
+        //
+        int Count => _aa_data.Count;
+        //
+        bool IsVertical => _aa_data.IsVertical;
+        //
         public void Loop()
         {
             if (Count > 0)
@@ -245,25 +246,25 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 int s1 = _aa_data.BaseStepH(ref _m_di);
                 int offset0 = LineInterpolatorAAData.MAX_HALF_WIDTH + 2;
                 int offset1 = offset0;
-                _aa_data.m_covers[offset1++] = _ren.GetCover(s1);
+                _aa_data._covers[offset1++] = _ren.GetCover(s1);
                 int dy = 1;
-                while ((dist = _aa_data.m_dist[dy] - s1) <= _aa_data.m_width)
+                while ((dist = _aa_data._dist[dy] - s1) <= _aa_data._width)
                 {
-                    _aa_data.m_covers[offset1++] = _ren.GetCover(dist);
+                    _aa_data._covers[offset1++] = _ren.GetCover(dist);
                     ++dy;
                 }
 
                 dy = 1;
-                while ((dist = _aa_data.m_dist[dy] + s1) <= _aa_data.m_width)
+                while ((dist = _aa_data._dist[dy] + s1) <= _aa_data._width)
                 {
-                    _aa_data.m_covers[--offset0] = _ren.GetCover(dist);
+                    _aa_data._covers[--offset0] = _ren.GetCover(dist);
                     ++dy;
                 }
                 _ren.BlendSolidVSpan(_aa_data.m_x,
                                      _aa_data.m_y - dy + 1,
                                      offset1 - offset0,
-                                     _aa_data.m_covers, offset0);
-                return ++_aa_data.m_step < _aa_data.m_count;
+                                     _aa_data._covers, offset0);
+                return ++_aa_data.m_step < _aa_data._count;
             }
             catch (Exception ex)
             {
@@ -288,25 +289,25 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int s1 = _aa_data.BaseStepV(ref _m_di);
             int offset0 = LineInterpolatorAAData.MAX_HALF_WIDTH + 2;
             int offset1 = offset0;
-            _aa_data.m_covers[offset1++] = _ren.GetCover(s1);
+            _aa_data._covers[offset1++] = _ren.GetCover(s1);
             int dx = 1;
-            while ((dist = _aa_data.m_dist[dx] - s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] - s1) <= _aa_data._width)
             {
-                _aa_data.m_covers[offset1++] = _ren.GetCover(dist);
+                _aa_data._covers[offset1++] = _ren.GetCover(dist);
                 ++dx;
             }
 
             dx = 1;
-            while ((dist = _aa_data.m_dist[dx] + s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] + s1) <= _aa_data._width)
             {
-                _aa_data.m_covers[--offset0] = _ren.GetCover(dist);
+                _aa_data._covers[--offset0] = _ren.GetCover(dist);
                 ++dx;
             }
             _ren.BlendSolidHSpan(_aa_data.m_x - dx + 1,
                                                _aa_data.m_y,
                                                offset1 - offset0,
-                                               _aa_data.m_covers, offset0);
-            return ++_aa_data.m_step < _aa_data.m_count;
+                                               _aa_data._covers, offset0);
+            return ++_aa_data.m_step < _aa_data._count;
 
             //}
             //catch (Exception ex)
@@ -341,7 +342,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                     _aa_data.Prev();
                     _aa_data.m_y -= lp.inc;
                     //_aa_data.m_x = (_aa_data.m_lp.x1 + _aa_data.m_li.Y) >> LineAA.SUBPIXEL_SHIFT;
-                    _aa_data.m_x = (_aa_data.m_lp.x1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
+                    _aa_data.m_x = (_aa_data._lp.x1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
                     //
                     if (lp.inc > 0) _m_di.DecY(_aa_data.m_x - _aa_data.m_old_x);
                     else/**/        _m_di.IncY(_aa_data.m_x - _aa_data.m_old_x);
@@ -359,12 +360,12 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         if (dist2_start < 0) ++npix;
                         ++dx;
 
-                    } while (_aa_data.m_dist[dx] <= _aa_data.m_width);
+                    } while (_aa_data._dist[dx] <= _aa_data._width);
                     --_aa_data.m_step;
                     if (npix == 0) break;
                     npix = 0;
                 }
-                while (_aa_data.m_step >= -_aa_data.m_max_extent);
+                while (_aa_data.m_step >= -_aa_data._max_extent);
             }
             else
             {
@@ -373,7 +374,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                     //_aa_data.m_li.Prev();
                     _aa_data.Prev();
                     _aa_data.m_x -= lp.inc;
-                    _aa_data.m_y = (_aa_data.m_lp.y1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
+                    _aa_data.m_y = (_aa_data._lp.y1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
                     //
                     if (lp.inc > 0) _m_di.DecX(_aa_data.m_y - _aa_data.m_old_y);
                     else /**/       _m_di.IncX(_aa_data.m_y - _aa_data.m_old_y);
@@ -390,13 +391,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         if (dist1_start < 0) ++npix;
                         if (dist2_start < 0) ++npix;
                         ++dy;
-                    } while (_aa_data.m_dist[dy] <= _aa_data.m_width);
+                    } while (_aa_data._dist[dy] <= _aa_data._width);
                     //
                     --_aa_data.m_step;
                     if (npix == 0) break;
                     npix = 0;
                 }
-                while (_aa_data.m_step >= -_aa_data.m_max_extent);
+                while (_aa_data.m_step >= -_aa_data._max_extent);
             }
             //_aa_data.m_li.adjust_forward();
             _aa_data.AdjustForward();
@@ -406,10 +407,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         {
             _aa_data.Dispose();
         }
-        bool IsVertical
-        {
-            get { return _aa_data.IsVertical; }
-        }
+        bool IsVertical => _aa_data.IsVertical;
         public void Loop()
         {
             if (IsVertical)
@@ -431,20 +429,20 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int dist_start = _m_di.DistanceStart;
             int p0 = LineInterpolatorAAData.MAX_HALF_WIDTH + 2;
             int p1 = p0;
-            _aa_data.m_covers[p1] = 0;
+            _aa_data._covers[p1] = 0;
             if (dist_start <= 0)
             {
-                _aa_data.m_covers[p1] = _ren.GetCover(s1);
+                _aa_data._covers[p1] = _ren.GetCover(s1);
             }
             ++p1;
             int dy = 1;
-            while ((dist = _aa_data.m_dist[dy] - s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dy] - s1) <= _aa_data._width)
             {
                 dist_start -= _m_di.DxStart;
-                _aa_data.m_covers[p1] = 0;
+                _aa_data._covers[p1] = 0;
                 if (dist_start <= 0)
                 {
-                    _aa_data.m_covers[p1] = _ren.GetCover(dist);
+                    _aa_data._covers[p1] = _ren.GetCover(dist);
                 }
                 ++p1;
                 ++dy;
@@ -452,13 +450,13 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
             dy = 1;
             dist_start = _m_di.DistanceStart;
-            while ((dist = _aa_data.m_dist[dy] + s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dy] + s1) <= _aa_data._width)
             {
                 dist_start += _m_di.DxStart;
-                _aa_data.m_covers[--p0] = 0;
+                _aa_data._covers[--p0] = 0;
                 if (dist_start <= 0)
                 {
-                    _aa_data.m_covers[p0] = _ren.GetCover(dist);
+                    _aa_data._covers[p0] = _ren.GetCover(dist);
                 }
                 ++dy;
             }
@@ -467,9 +465,9 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             _ren.BlendSolidVSpan(_aa_data.m_x,
                                  _aa_data.m_y - dy + 1,
                                  p1 - p0,
-                                 _aa_data.m_covers,
+                                 _aa_data._covers,
                                  p0);
-            return ++_aa_data.m_step < _aa_data.m_count;
+            return ++_aa_data.m_step < _aa_data._count;
         }
 
 
@@ -483,20 +481,20 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int p0 = LineInterpolatorAAData.MAX_HALF_WIDTH + 2;
             int p1 = p0;
             int dist_start = _m_di.DistanceStart;
-            _aa_data.m_covers[p1] = 0;
+            _aa_data._covers[p1] = 0;
             if (dist_start <= 0)
             {
-                _aa_data.m_covers[p1] = _ren.GetCover(s1);
+                _aa_data._covers[p1] = _ren.GetCover(s1);
             }
             ++p1;
             int dx = 1;
-            while ((dist = _aa_data.m_dist[dx] - s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] - s1) <= _aa_data._width)
             {
                 dist_start += _m_di.DyStart;
-                _aa_data.m_covers[p1] = 0;
+                _aa_data._covers[p1] = 0;
                 if (dist_start <= 0)
                 {
-                    _aa_data.m_covers[p1] = _ren.GetCover(dist);
+                    _aa_data._covers[p1] = _ren.GetCover(dist);
                 }
                 ++p1;
                 ++dx;
@@ -504,21 +502,21 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
             dx = 1;
             dist_start = _m_di.DistanceStart;
-            while ((dist = _aa_data.m_dist[dx] + s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] + s1) <= _aa_data._width)
             {
                 dist_start -= _m_di.DyStart;
-                _aa_data.m_covers[--p0] = 0;
+                _aa_data._covers[--p0] = 0;
                 if (dist_start <= 0)
                 {
-                    _aa_data.m_covers[p0] = _ren.GetCover(dist);
+                    _aa_data._covers[p0] = _ren.GetCover(dist);
                 }
                 ++dx;
             }
             _ren.BlendSolidHSpan(_aa_data.m_x - dx + 1,
                                                _aa_data.m_y,
-                                               p1 - p0, _aa_data.m_covers,
+                                               p1 - p0, _aa_data._covers,
                                                p0);
-            return ++_aa_data.m_step < _aa_data.m_count;
+            return ++_aa_data.m_step < _aa_data._count;
         }
     }
 
@@ -540,7 +538,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                  0);
             //_aa_data.m_li.adjust_forward();
             _aa_data.AdjustForward();
-            _aa_data.m_step -= _aa_data.m_max_extent;
+            _aa_data.m_step -= _aa_data._max_extent;
         }
         public void Dispose()
         {
@@ -557,11 +555,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 while (StepH()) ;
             }
         }
-        bool IsVertical
-        {
-            get { return _aa_data.IsVertical; }
-        }
-
+        bool IsVertical => _aa_data.IsVertical;
 
         bool StepH()
         {
@@ -572,21 +566,21 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int offset1 = offset0;
             int dist_end = _m_di.DistanceEnd;
             int npix = 0;
-            _aa_data.m_covers[offset1] = 0;
+            _aa_data._covers[offset1] = 0;
             if (dist_end > 0)
             {
-                _aa_data.m_covers[offset1] = _ren.GetCover(s1);
+                _aa_data._covers[offset1] = _ren.GetCover(s1);
                 ++npix;
             }
             ++offset1;
             int dy = 1;
-            while ((dist = _aa_data.m_dist[dy] - s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dy] - s1) <= _aa_data._width)
             {
                 dist_end -= _m_di.DxEnd;
-                _aa_data.m_covers[offset1] = 0;
+                _aa_data._covers[offset1] = 0;
                 if (dist_end > 0)
                 {
-                    _aa_data.m_covers[offset1] = _ren.GetCover(dist);
+                    _aa_data._covers[offset1] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++offset1;
@@ -595,22 +589,22 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
             dy = 1;
             dist_end = _m_di.DistanceEnd;
-            while ((dist = _aa_data.m_dist[dy] + s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dy] + s1) <= _aa_data._width)
             {
                 dist_end += _m_di.DxEnd;
-                _aa_data.m_covers[--offset0] = 0;
+                _aa_data._covers[--offset0] = 0;
                 if (dist_end > 0)
                 {
-                    _aa_data.m_covers[offset0] = _ren.GetCover(dist);
+                    _aa_data._covers[offset0] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++dy;
             }
             _ren.BlendSolidVSpan(_aa_data.m_x,
                                                _aa_data.m_y - dy + 1,
-                                               offset1 - offset0, _aa_data.m_covers,
+                                               offset1 - offset0, _aa_data._covers,
                                                offset0);
-            return npix != 0 && ++_aa_data.m_step < _aa_data.m_count;
+            return npix != 0 && ++_aa_data.m_step < _aa_data._count;
         }
 
         //---------------------------------------------------------------------
@@ -624,21 +618,21 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int offset1 = offset0;
             int dist_end = _m_di.DistanceEnd;
             int npix = 0;
-            _aa_data.m_covers[offset1] = 0;
+            _aa_data._covers[offset1] = 0;
             if (dist_end > 0)
             {
-                _aa_data.m_covers[offset1] = _ren.GetCover(s1);
+                _aa_data._covers[offset1] = _ren.GetCover(s1);
                 ++npix;
             }
             ++offset1;
             int dx = 1;
-            while ((dist = _aa_data.m_dist[dx] - s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] - s1) <= _aa_data._width)
             {
                 dist_end += _m_di.DyEnd;
-                _aa_data.m_covers[offset1] = 0;
+                _aa_data._covers[offset1] = 0;
                 if (dist_end > 0)
                 {
-                    _aa_data.m_covers[offset1] = _ren.GetCover(dist);
+                    _aa_data._covers[offset1] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++offset1;
@@ -647,22 +641,22 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 
             dx = 1;
             dist_end = _m_di.DistanceEnd;
-            while ((dist = _aa_data.m_dist[dx] + s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] + s1) <= _aa_data._width)
             {
                 dist_end -= _m_di.DyEnd;
-                _aa_data.m_covers[--offset0] = 0;
+                _aa_data._covers[--offset0] = 0;
                 if (dist_end > 0)
                 {
-                    _aa_data.m_covers[offset0] = _ren.GetCover(dist);
+                    _aa_data._covers[offset0] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++dx;
             }
             _ren.BlendSolidHSpan(_aa_data.m_x - dx + 1,
                                                _aa_data.m_y,
-                                               offset1 - offset0, _aa_data.m_covers,
+                                               offset1 - offset0, _aa_data._covers,
                                                offset0);
-            return npix != 0 && ++_aa_data.m_step < _aa_data.m_count;
+            return npix != 0 && ++_aa_data.m_step < _aa_data._count;
 
 
 
@@ -691,7 +685,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 {
                     _aa_data.Prev();
                     _aa_data.m_y -= lp.inc;
-                    _aa_data.m_x = (_aa_data.m_lp.x1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
+                    _aa_data.m_x = (_aa_data._lp.x1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
                     if (lp.inc > 0)
                     {
                         _m_di.DecY(_aa_data.m_x - _aa_data.m_old_x);
@@ -713,11 +707,11 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         if (dist2_start < 0) ++npix;
                         ++dx;
                     }
-                    while (_aa_data.m_dist[dx] <= _aa_data.m_width);
+                    while (_aa_data._dist[dx] <= _aa_data._width);
                     if (npix == 0) break;
                     npix = 0;
                 }
-                while (--_aa_data.m_step >= -_aa_data.m_max_extent);
+                while (--_aa_data.m_step >= -_aa_data._max_extent);
             }
             else
             {
@@ -725,7 +719,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 {
                     _aa_data.Prev();
                     _aa_data.m_x -= lp.inc;
-                    _aa_data.m_y = (_aa_data.m_lp.y1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
+                    _aa_data.m_y = (_aa_data._lp.y1 + _aa_data.Y) >> LineAA.SUBPIXEL_SHIFT;
                     //
                     if (lp.inc > 0) _m_di.DecX(_aa_data.m_y - _aa_data.m_old_y);
                     else _m_di.IncX(_aa_data.m_y - _aa_data.m_old_y);
@@ -742,15 +736,15 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         if (dist2_start < 0) ++npix;
                         ++dy;
                     }
-                    while (_aa_data.m_dist[dy] <= _aa_data.m_width);
+                    while (_aa_data._dist[dy] <= _aa_data._width);
                     if (npix == 0) break;
                     npix = 0;
                 }
-                while (--_aa_data.m_step >= -_aa_data.m_max_extent);
+                while (--_aa_data.m_step >= -_aa_data._max_extent);
             }
             //_aa_data.m_li.adjust_forward();
             _aa_data.AdjustForward();
-            _aa_data.m_step -= _aa_data.m_max_extent;
+            _aa_data.m_step -= _aa_data._max_extent;
         }
         public void Dispose()
         {
@@ -767,11 +761,9 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 while (StepH()) ;
             }
         }
-        bool IsVertical
-        {
-            get { return _aa_data.IsVertical; }
-        }
-
+        //
+        bool IsVertical => _aa_data.IsVertical;
+        //
         bool StepH()
         {
 
@@ -782,25 +774,25 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int dist_start = _m_di.dist_start;
             int dist_end = _m_di.dist_end;
             int npix = 0;
-            _aa_data.m_covers[offset1] = 0;
+            _aa_data._covers[offset1] = 0;
             if (dist_end > 0)
             {
                 if (dist_start <= 0)
                 {
-                    _aa_data.m_covers[offset1] = _ren.GetCover(s1);
+                    _aa_data._covers[offset1] = _ren.GetCover(s1);
                 }
                 ++npix;
             }
             ++offset1;
             int dy = 1;
-            while ((dist = _aa_data.m_dist[dy] - s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dy] - s1) <= _aa_data._width)
             {
                 dist_start -= _m_di.DxStart;
                 dist_end -= _m_di.DxEnd;
-                _aa_data.m_covers[offset1] = 0;
+                _aa_data._covers[offset1] = 0;
                 if (dist_end > 0 && dist_start <= 0)
                 {
-                    _aa_data.m_covers[offset1] = _ren.GetCover(dist);
+                    _aa_data._covers[offset1] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++offset1;
@@ -810,23 +802,23 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             dy = 1;
             dist_start = _m_di.dist_start;
             dist_end = _m_di.dist_end;
-            while ((dist = _aa_data.m_dist[dy] + s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dy] + s1) <= _aa_data._width)
             {
                 dist_start += _m_di.DxStart;
                 dist_end += _m_di.DxEnd;
-                _aa_data.m_covers[--offset0] = 0;
+                _aa_data._covers[--offset0] = 0;
                 if (dist_end > 0 && dist_start <= 0)
                 {
-                    _aa_data.m_covers[offset0] = _ren.GetCover(dist);
+                    _aa_data._covers[offset0] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++dy;
             }
             _ren.BlendSolidVSpan(_aa_data.m_x,
                                                _aa_data.m_y - dy + 1,
-                                               offset1 - offset0, _aa_data.m_covers,
+                                               offset1 - offset0, _aa_data._covers,
                                                offset0);
-            return npix != 0 && ++_aa_data.m_step < _aa_data.m_count;
+            return npix != 0 && ++_aa_data.m_step < _aa_data._count;
         }
 
         //---------------------------------------------------------------------
@@ -841,25 +833,25 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             int dist_start = _m_di.dist_start;
             int dist_end = _m_di.dist_end;
             int npix = 0;
-            _aa_data.m_covers[offset1] = 0;
+            _aa_data._covers[offset1] = 0;
             if (dist_end > 0)
             {
                 if (dist_start <= 0)
                 {
-                    _aa_data.m_covers[offset1] = _ren.GetCover(s1);
+                    _aa_data._covers[offset1] = _ren.GetCover(s1);
                 }
                 ++npix;
             }
             ++offset1;
             int dx = 1;
-            while ((dist = _aa_data.m_dist[dx] - s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] - s1) <= _aa_data._width)
             {
                 dist_start += _m_di.DyStart;
                 dist_end += _m_di.DyEnd;
-                _aa_data.m_covers[offset1] = 0;
+                _aa_data._covers[offset1] = 0;
                 if (dist_end > 0 && dist_start <= 0)
                 {
-                    _aa_data.m_covers[offset1] = _ren.GetCover(dist);
+                    _aa_data._covers[offset1] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++offset1;
@@ -869,23 +861,23 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             dx = 1;
             dist_start = _m_di.dist_start;
             dist_end = _m_di.dist_end;
-            while ((dist = _aa_data.m_dist[dx] + s1) <= _aa_data.m_width)
+            while ((dist = _aa_data._dist[dx] + s1) <= _aa_data._width)
             {
                 dist_start -= _m_di.DyStart;
                 dist_end -= _m_di.DyEnd;
-                _aa_data.m_covers[--offset0] = 0;
+                _aa_data._covers[--offset0] = 0;
                 if (dist_end > 0 && dist_start <= 0)
                 {
-                    _aa_data.m_covers[offset0] = _ren.GetCover(dist);
+                    _aa_data._covers[offset0] = _ren.GetCover(dist);
                     ++npix;
                 }
                 ++dx;
             }
             _ren.BlendSolidHSpan(_aa_data.m_x - dx + 1,
                                                _aa_data.m_y,
-                                               offset1 - offset0, _aa_data.m_covers,
+                                               offset1 - offset0, _aa_data._covers,
                                                offset0);
-            return npix != 0 && ++_aa_data.m_step < _aa_data.m_count;
+            return npix != 0 && ++_aa_data.m_step < _aa_data._count;
         }
     }
 }

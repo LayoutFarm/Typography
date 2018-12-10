@@ -27,7 +27,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public readonly int x1, y1, x2, y2, len;
         public readonly short inc;
         public readonly bool vertical;
-        readonly byte octant;
+        readonly byte _octant;
 
 
 
@@ -86,36 +86,25 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
             this.len = (len);
 
             //1 byte is enough
-            this.octant = (byte)((sy & 4) | (sx & 2) | (vertical ? 1 : 0));
+            _octant = (byte)((sy & 4) | (sx & 2) | (vertical ? 1 : 0));
         }
 
         //---------------------------------------------------------------------
-        public uint OrthogonalQuadrant { get { return s_orthogonal_quadrant[octant]; } }
-        public uint DiagonalQuadrant { get { return s_diagonal_quadrant[octant]; } }
-
-        public int dx
-        {
-            get
-            {
-                return Math.Abs(x2 - x1);
-            }
-        }
-        public int dy
-        {
-            get
-            {
-                return Math.Abs(y2 - y1);
-            }
-        }
+        public uint OrthogonalQuadrant => s_orthogonal_quadrant[_octant];
+        public uint DiagonalQuadrant => s_diagonal_quadrant[_octant];
+        //
+        //
+        public int dx => Math.Abs(x2 - x1);
+        public int dy => Math.Abs(y2 - y1);
         //---------------------------------------------------------------------
         public bool IsSameOrthogonalQuadrant(LineParameters lp)
         {
-            return s_orthogonal_quadrant[octant] == s_orthogonal_quadrant[lp.octant];
+            return s_orthogonal_quadrant[_octant] == s_orthogonal_quadrant[lp._octant];
         }
         //---------------------------------------------------------------------
         public bool IsSameDiagonalQuadrant(LineParameters lp)
         {
-            return s_diagonal_quadrant[octant] == s_diagonal_quadrant[lp.octant];
+            return s_diagonal_quadrant[_octant] == s_diagonal_quadrant[lp._octant];
         }
 
         //---------------------------------------------------------------------
@@ -132,14 +121,14 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 return false;
             }
 
-//            int len2 = len >> 1;
+            //            int len2 = len >> 1;
 
-//#if DEBUG
-//            if (len2 == 0)
-//            {
+            //#if DEBUG
+            //            if (len2 == 0)
+            //            {
 
-//            }
-//#endif
+            //            }
+            //#endif
 
             lp1 = new LineParameters(this.x1, this.y1, xmid, ymid, len >> 1);
             lp2 = new LineParameters(xmid, ymid, this.x2, this.y2, this.len);
