@@ -84,13 +84,13 @@ namespace Typography.TextLayout
         internal readonly ushort len;
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer)
         {
-            this._glyphBuffer = glyphBuffer;
+            _glyphBuffer = glyphBuffer;
             this.startAt = 0;
             this.len = (ushort)glyphBuffer.Count;
         }
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer, int startAt, int len)
         {
-            this._glyphBuffer = glyphBuffer;
+            _glyphBuffer = glyphBuffer;
             this.startAt = startAt;
             this.len = (ushort)len;
         }

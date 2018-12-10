@@ -18,9 +18,9 @@ namespace Typography.TextLayout
         public GlyphSetPosition(Typeface typeface, string lang)
         {
             this.Lang = lang;
-            this._typeface = typeface;
+            _typeface = typeface;
             //check if this lang has 
-            this._gposTable = typeface.GPOSTable;
+            _gposTable = typeface.GPOSTable;
 
             if (_gposTable == null) { return; }
 
