@@ -49,10 +49,9 @@ namespace Typography.TextBreak
                    char.IsControl(c) ||
                    char.IsSymbol(c);
         }
-        public override bool CanBeStartChar(char c)
-        {
-            return true;
-        }
+        //
+        public override bool CanBeStartChar(char c) => true;
+        //
         void DoBreak(WordVisitor visitor, char[] input, int start, int len, OnBreak onBreak)
         {
             //----------------------------------------

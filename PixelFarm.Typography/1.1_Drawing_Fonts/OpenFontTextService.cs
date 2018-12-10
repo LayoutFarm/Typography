@@ -15,6 +15,7 @@ namespace LayoutFarm
 {
 
 
+
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -23,13 +24,16 @@ namespace LayoutFarm
         TextServices _txtServices;
         Dictionary<int, Typeface> _resolvedTypefaceCache = new Dictionary<int, Typeface>();
         readonly int _system_id;
-
-
+        //
         public static Typography.OpenFont.ScriptLang DefaultScriptLang { get; set; }
+
+
+
 
         public OpenFontTextService(Typography.OpenFont.ScriptLang scLang = null)
         {
-            // 
+
+
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
@@ -111,12 +115,14 @@ namespace LayoutFarm
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, int[] outputGlyphAdvances, out int outputTotalW, out int outputLineHeight)
         {
             CalculateUserCharGlyphAdvancePos(ref textBufferSpan, this.BreakToLineSegments(ref textBufferSpan), font, outputGlyphAdvances, out outputTotalW, out outputLineHeight);
+
         }
 
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
 
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
-            ILineSegmentList lineSegs, RequestFont font,
+            ILineSegmentList lineSegs,
+            RequestFont font,
             int[] outputUserInputCharAdvance, out int outputTotalW, out int lineHeight)
         {
 
@@ -140,7 +146,7 @@ namespace LayoutFarm
             {
 
                 //get each segment
-                MyLineSegment lineSeg = mylineSegs.GetSegment(i);
+                MyLineSegment lineSeg = (MyLineSegment)mylineSegs.GetSegment(i);
                 //each line seg may has different script lang
                 _txtServices.CurrentScriptLang = lineSeg.scriptLang;
                 //
@@ -271,82 +277,103 @@ namespace LayoutFarm
             }
         }
 
-        class MyLineSegment : ILineSegment
+        struct MyLineSegment : ILineSegment
         {
-            MyLineSegmentList owner;
-            readonly int startAt;
-            readonly int len;
+            ILineSegmentList _owner;
+            readonly int _startAt;
+            readonly int _len;
             internal ScriptLang scriptLang;
-
-            public MyLineSegment(MyLineSegmentList owner, int startAt, int len)
+            public MyLineSegment(ILineSegmentList owner, int startAt, int len)
             {
-                this.owner = owner;
-                this.startAt = startAt;
-                this.len = len;
-            }
-            public int Length
-            {
-                get { return len; }
-            }
-            public int StartAt
-            {
-                get { return startAt; }
-            }
-        }
-        class MyLineSegmentList : ILineSegmentList
-        {
-            MyLineSegment[] _segments;
-
-            int _startAt;
-            int _len;
-            public MyLineSegmentList(int startAt, int len)
-            {
-                //_str = str;
+                _owner = owner;
                 _startAt = startAt;
                 _len = len;
+                this.scriptLang = null;
             }
-            public ILineSegment this[int index]
+            public int Length => _len;
+            public int StartAt => _startAt;
+        }
+
+        class MyLineSegmentList : ILineSegmentList
+        {
+            List<ILineSegment> _segments = new List<ILineSegment>();
+            private MyLineSegmentList()
             {
-                get { return _segments[index]; }
             }
-            public int Count
+
+
+            public void AddLineSegment(ILineSegment lineSegment)
             {
-                get { return _segments.Length; }
+                _segments.Add(lineSegment);
             }
-            public void SetResultLineSegments(MyLineSegment[] segments)
+            public void Clear()
             {
-                _segments = segments;
+                _segments.Clear();
             }
-            public MyLineSegment GetSegment(int index)
+            //
+            public ILineSegment this[int index] => _segments[index];
+            //
+            public int Count => _segments.Count;
+
+            public ILineSegment GetSegment(int index)
             {
                 return _segments[index];
             }
 
+#if DEBUG
+            public int dbugStartAt;
+            public int dbugLen;
+#endif
+
+
+            void IDisposable.Dispose()
+            {
+                if (s_lineSegmentPool.Count > 100)
+                {
+                    _segments.Clear();
+                    _segments = null;
+                }
+                else
+                {
+                    _segments.Clear();
+                    s_lineSegmentPool.Push(this);
+                }
+            }
+
+            [ThreadStatic]
+            static Stack<MyLineSegmentList> s_lineSegmentPool;
+            public static MyLineSegmentList GetFreeLineSegmentList()
+            {
+                if (s_lineSegmentPool == null) s_lineSegmentPool = new Stack<MyLineSegmentList>();
+                if (s_lineSegmentPool.Count == 0)
+                {
+                    return new MyLineSegmentList();
+                }
+                else
+                {
+                    return s_lineSegmentPool.Pop();
+                }
+
+            }
         }
-        List<MyLineSegment> _resuableLineSegments = new List<MyLineSegment>();
+
+
 
         public ILineSegmentList BreakToLineSegments(ref TextBufferSpan textBufferSpan)
         {
-            _resuableLineSegments.Clear();
-
-            //a text buffer span is separated into multiple line segment list
-
+            //a text buffer span is separated into multiple line segment list 
             char[] str = textBufferSpan.GetRawCharBuffer();
-
-            MyLineSegmentList lineSegs = new MyLineSegmentList(textBufferSpan.start, textBufferSpan.len);
             int cur_startAt = textBufferSpan.start;
+
+
+            MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                MyLineSegment lineSeg = new MyLineSegment(lineSegs, breakSpan.startAt, breakSpan.len);
+                MyLineSegment lineSeg = new MyLineSegment(lineSegments, breakSpan.startAt, breakSpan.len);
                 lineSeg.scriptLang = breakSpan.scLang;
-                _resuableLineSegments.Add(lineSeg);
+                lineSegments.AddLineSegment(lineSeg);
             }
-
-            //TODO: review here, 
-            //check if we need to create new array everytime?
-            lineSegs.SetResultLineSegments(_resuableLineSegments.ToArray());
-            _resuableLineSegments.Clear();
-            return lineSegs;
+            return lineSegments;
         }
         //-----------------------------------
         static OpenFontTextService()

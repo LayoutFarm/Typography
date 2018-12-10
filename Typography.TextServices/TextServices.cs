@@ -10,6 +10,7 @@ namespace Typography.TextLayout
 {
     public struct BreakSpan
     {
+        //TODO: review here again***
         public int startAt;
         public ushort len;
         public short flags;
@@ -546,10 +547,9 @@ namespace Typography.TextServices
         {
             _seqLen = seqLen;
         }
-        public int SeqLen
-        {
-            get { return _seqLen; }
-        }
+        //
+        public int SeqLen => _seqLen;
+        //
         public void Register(int hashValue, GlyphPlanSequence seq)
         {
             _knownSeqs.Add(hashValue, seq);
