@@ -8,13 +8,16 @@ public class BasicTests
 
     public void BasicTest(string input, string[] output, bool breakNumberAfterText = false)
     {
+        var outputList = new List<int> { 0 };
         var customBreaker = new CustomBreaker();
+        customBreaker.SetNewBreakHandler(vis => outputList.Add(vis.LatestBreakAt));
+
         customBreaker.BreakNumberAfterText = breakNumberAfterText;
         //
         customBreaker.BreakWords(input);
-        //
-        var outputList = new List<int> { 0 };
-        customBreaker.CopyBreakResults(outputList);
+
+
+        //customBreaker.CopyBreakResults(outputList);
         for (int i = 0; i < outputList.Count - 1; i++)
         {
             Assert.AreEqual
@@ -74,7 +77,7 @@ public class BasicTests
     [DataRow("a.m", 0, new[] { "a.m" })]
     [DataRow("a.m.", 0, new[] { "a.m." })]
     [DataRow("a.m", 0, new[] { "a.m" })]
-    [DataRow("9 a.m.", 0, new[] { "9", " ","a.m." })]
+    [DataRow("9 a.m.", 0, new[] { "9", " ", "a.m." })]
     public void DontBreakPerioidInTextSpan(string input, int _, string[] output)
     {
         BasicTest(input, output, true);

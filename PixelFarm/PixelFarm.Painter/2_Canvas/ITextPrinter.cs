@@ -2,11 +2,10 @@
 
 namespace PixelFarm.Drawing
 {
-    public interface ILineSegmentList
+    public interface ILineSegmentList : System.IDisposable
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
-
     }
     public interface ILineSegment
     {
