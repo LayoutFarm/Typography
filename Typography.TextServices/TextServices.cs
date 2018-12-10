@@ -102,12 +102,22 @@ namespace Typography.TextServices
         }
 
         Typography.TextBreak.CustomBreaker _textBreaker;
+        List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
         public IEnumerable<BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
         {
-            //user must setup the CustomBreakerBuilder before use              
+            //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
             {
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
+                int ss = 0;
+                _textBreaker.SetNewBreakHandler((index, wordkind) =>
+                {
+                   
+                    var span = new TextBreak.BreakSpan() { startAt = ss, len = (ushort)(index - ss) };
+                    _breakSpans.Add(span);
+                    ss += span.len;
+                });
+                 
 #if DEBUG
                 if (_textBreaker == null)
                 {
@@ -119,14 +129,18 @@ namespace Typography.TextServices
 #if DEBUG
 
 #endif
+            _breakSpans.Clear();
+            //
             if (len < 1)
             {
                 yield break;
             }
             //----------------------------
             int cur_startAt = startAt;
+
             _textBreaker.BreakWords(str, cur_startAt, len);
-            foreach (TextBreak.BreakSpan sp in _textBreaker.GetBreakSpanIter())
+
+            foreach (TextBreak.BreakSpan sp in _breakSpans)
             {
                 //our service select a proper script lang info and add to the breakspan
 

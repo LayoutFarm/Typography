@@ -55,9 +55,17 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
         {
             var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
             var breakList = new List<BreakAtInfo>();
+            breaker.SetNewBreakHandler((index, wordkind) =>
+            {
+                breakList.Add(new BreakAtInfo(index, wordkind));
+            });
+
 #warning Use `breaker.BreakWords(text, breakList);` once #156 is merged
+
             breaker.BreakWords(text);
-            breaker.CopyBreakResults(breakList);
+            //breaker.CopyBreakResults(breakList);
+
+
             var sb = new StringBuilder(text);
             //reverse to ensure earlier inserts do not affect later ones
             foreach (var @break in breakList.Select(i => i.breakAt).Reverse())
@@ -72,9 +80,20 @@ Jura, mais un peu tard, qu’on ne l’y prendrait plus.";
     {
         var breaker = new CustomBreaker { ThrowIfCharOutOfRange = true };
         var breakList = new List<BreakSpan>();
+        char[] test = "«Maître leçon»".ToCharArray();
+        int startAt = 0;
+        breaker.SetNewBreakHandler((index, wordkind) =>
+        {
+            var span = new BreakSpan() { startAt = startAt, len = (ushort)(index - startAt), wordKind = wordkind };
+            breakList.Add(span);
+            startAt += span.len;
+        });
+
+
 #warning Use `breaker.BreakWords("«Maître leçon»", breakList);` once #156 is merged
-        breaker.BreakWords("«Maître leçon»");
-        breakList.AddRange(breaker.GetBreakSpanIter());
+
+        breaker.BreakWords(test, 0, test.Length);
+
         Assert.AreEqual(breakList.Count, 5);
         void BreakSpanEqual(BreakSpan actual, BreakSpan expected)
         {

@@ -17,10 +17,14 @@ namespace Typography.TextBreak
     }
 
 
-
+    public delegate void NewWordBreakHandlerDelegate(int pos, WordKind wordKind);
+    //
     class WordVisitor
     {
-        List<BreakAtInfo> _breakAtList = new List<BreakAtInfo>();
+
+#if DEBUG
+        List<BreakAtInfo> dbugBreakAtList = new List<BreakAtInfo>();
+#endif
         char[] _buffer;
 
         int _startIndex;
@@ -30,10 +34,13 @@ namespace Typography.TextBreak
         char _currentChar;
         int _latestBreakAt;
 
+        
+        NewWordBreakHandlerDelegate _newWordBreakHandler;
 
         Stack<int> _tempCandidateBreaks = new Stack<int>();
-        public WordVisitor()
+        public WordVisitor(NewWordBreakHandlerDelegate newWordBreakHandler)
         {
+            _newWordBreakHandler = newWordBreakHandler;
         }
 
         public void LoadText(char[] buffer, int index)
@@ -50,9 +57,14 @@ namespace Typography.TextBreak
 
             _startIndex = _currentIndex = index;
             _currentChar = buffer[_currentIndex];
-            _breakAtList.Clear();
+
+
             _tempCandidateBreaks.Clear();
             _latestBreakAt = 0;
+
+#if DEBUG
+            dbugBreakAtList.Clear();
+#endif
         }
 
 
@@ -84,8 +96,12 @@ namespace Typography.TextBreak
 #endif
 
 
-            _latestBreakAt = index; 
-            _breakAtList.Add(new BreakAtInfo(index, wordKind));
+            _latestBreakAt = index;
+            _newWordBreakHandler(index, wordKind);
+
+#if DEBUG
+            dbugBreakAtList.Add(new BreakAtInfo(index, wordKind));
+#endif
         }
         public void AddWordBreakAtCurrentIndex(WordKind wordKind = WordKind.Text)
         {
@@ -109,7 +125,7 @@ namespace Typography.TextBreak
             }
         }
         //
-        public List<BreakAtInfo> GetBreakList() => _breakAtList;
+        public List<BreakAtInfo> GetBreakList() => dbugBreakAtList;
         //
         internal Stack<int> GetTempCandidateBreaks() => _tempCandidateBreaks;
     }
