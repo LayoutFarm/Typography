@@ -17,8 +17,6 @@ namespace Typography.Contours
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
 
-
-
         protected OpenFont.CFF.Cff1Font _ownerCff;
         protected OpenFont.CFF.Cff1GlyphData _cffGlyphData;
 
@@ -34,7 +32,7 @@ namespace Typography.Contours
             this.UseTrueTypeInstructions = true;//default?
             _recentPixelScale = 1;
         }
-        public Typeface Typeface { get { return _typeface; } }
+        public Typeface Typeface => _typeface;
         /// <summary>
         /// use Maxim's Agg Vertical Hinting
         /// </summary>
@@ -44,11 +42,8 @@ namespace Typography.Contours
         /// </summary>
         public bool UseTrueTypeInstructions
         {
-            get { return _useInterpreter; }
-            set
-            {
-                _useInterpreter = value;
-            }
+            get => _useInterpreter;
+            set => _useInterpreter = value;
         }
 
         /// <summary>
@@ -122,24 +117,19 @@ namespace Typography.Contours
             }
         }
 
-        Typography.OpenFont.CFF.CffEvaluationEngine cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();
+        Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();
         public virtual void ReadShapes(IGlyphTranslator tx)
         {
             //read output from glyph points
-
             if (_cffGlyphData != null)
             {
-                cffEvalEngine.Run(tx, _ownerCff, _cffGlyphData, _recentPixelScale);
+                _cffEvalEngine.Run(tx, _ownerCff, _cffGlyphData, _recentPixelScale);
             }
             else
             {
                 tx.Read(_outputGlyphPoints, _outputContours, _recentPixelScale);
             }
-
         }
-
-
-
     }
 
     public static class GlyphPathBuilderExtensions

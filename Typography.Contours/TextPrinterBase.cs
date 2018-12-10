@@ -42,17 +42,14 @@ namespace Typography.Contours
 
         public Typography.Contours.HintTechnique HintTechnique
         {
-            get { return _hintTech; }
-            set
-            {
-                _hintTech = value;
-            }
+            get => _hintTech;
+            set => _hintTech = value;
         }
 
         float _fontSizeInPoints;
         public float FontSizeInPoints
         {
-            get { return _fontSizeInPoints; }
+            get => _fontSizeInPoints;
             set
             {
                 if (_fontSizeInPoints != value)

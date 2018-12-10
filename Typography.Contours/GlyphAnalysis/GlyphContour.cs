@@ -12,10 +12,10 @@ namespace Typography.Contours
 
         public List<GlyphPart> parts = new List<GlyphPart>();
         internal List<GlyphPoint> flattenPoints; //original flatten points 
-        List<OutsideEdgeLine> edges;
-        bool analyzed;
-        bool analyzedClockDirection;
-        bool isClockwise;
+        List<OutsideEdgeLine> _edges;
+        bool _analyzed;
+        bool _analyzedClockDirection;
+        bool _isClockwise;
         public GlyphContour()
         {
         }
@@ -29,7 +29,7 @@ namespace Typography.Contours
         internal void Flatten(GlyphPartFlattener flattener)
         {
             //flatten once
-            if (analyzed) return;
+            if (_analyzed) return;
             //flatten each part ...
             //-------------------------------
             int j = parts.Count;
@@ -61,14 +61,14 @@ namespace Typography.Contours
             }
 
             flattener.Result = prevResult;
-            analyzed = true;
+            _analyzed = true;
         }
         public bool IsClosewise()
         {
             //after flatten
-            if (analyzedClockDirection)
+            if (_analyzedClockDirection)
             {
-                return isClockwise;
+                return _isClockwise;
             }
 
             List<GlyphPoint> f_points = this.flattenPoints;
@@ -76,7 +76,7 @@ namespace Typography.Contours
             {
                 throw new NotSupportedException();
             }
-            analyzedClockDirection = true;
+            _analyzedClockDirection = true;
 
 
             //TODO: review here again***
@@ -109,9 +109,9 @@ namespace Typography.Contours
 
                     total += (p1.OX - p0.OX) * (p1.OY + p0.OY);
                 }
-                isClockwise = total >= 0;
+                _isClockwise = total >= 0;
             }
-            return isClockwise;
+            return _isClockwise;
         }
 
         internal void CreateGlyphEdges()
@@ -119,7 +119,7 @@ namespace Typography.Contours
             int lim = flattenPoints.Count - 1;
             GlyphPoint p = null, q = null;
             OutsideEdgeLine edgeLine = null;
-            edges = new List<OutsideEdgeLine>();
+            _edges = new List<OutsideEdgeLine>();
             //
             for (int i = 0; i < lim; ++i)
             {
@@ -133,7 +133,7 @@ namespace Typography.Contours
                     //edgeLine is outwardEdge for p.
                     //edgeLine is inwardEdge for q.
                     //p.OutwardEdge = q.InwardEdge = edgeLine;
-                    edges.Add(edgeLine);
+                    _edges.Add(edgeLine);
                 }
                 else
                 {
@@ -151,7 +151,7 @@ namespace Typography.Contours
                 //edgeLine is outwardEdge for p.
                 //edgeLine is inwardEdge for q.
                 //p.OutwardEdge = q.InwardEdge = edgeLine;
-                edges.Add(edgeLine);
+                _edges.Add(edgeLine);
             }
             else
             {
@@ -161,11 +161,11 @@ namespace Typography.Contours
 
         internal void ApplyNewEdgeOffsetFromMasterOutline(float newEdgeOffsetFromMasterOutline)
         {
-            int j = edges.Count;
+            int j = _edges.Count;
 
             for (int i = 0; i < j; ++i)
             {
-                edges[i].SetDynamicEdgeOffsetFromMasterOutline(newEdgeOffsetFromMasterOutline);
+                _edges[i].SetDynamicEdgeOffsetFromMasterOutline(newEdgeOffsetFromMasterOutline);
             }
             //calculate edge cutpoint  
             for (int i = flattenPoints.Count - 1; i >= 0; --i)

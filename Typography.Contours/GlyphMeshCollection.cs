@@ -43,26 +43,26 @@ namespace Typography.Contours
             _registerGlyphCollection.Clear();
         }
 
-        List<GlyphKey> tempKeys = new List<GlyphKey>();
+        List<GlyphKey> _tempKeys = new List<GlyphKey>();
 
         public void Clear(Typeface typeface)
         {
             //clear all registered typeface glyph
-            tempKeys.Clear();
+            _tempKeys.Clear();
             foreach (var k in _registerGlyphCollection.Keys)
             {
                 //collect ...
                 if (k.typeface == typeface)
                 {
-                    tempKeys.Add(k);
+                    _tempKeys.Add(k);
                 }
             }
             //
-            for (int i = tempKeys.Count - 1; i >= 0; --i)
+            for (int i = _tempKeys.Count - 1; i >= 0; --i)
             {
-                _registerGlyphCollection.Remove(tempKeys[i]);
+                _registerGlyphCollection.Remove(_tempKeys[i]);
             }
-            tempKeys.Clear();
+            _tempKeys.Clear();
         }
         struct GlyphKey
         {

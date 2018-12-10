@@ -11,7 +11,7 @@ namespace Typography.Contours
     {
         GlyphPartFlattener _glyphFlattener = new GlyphPartFlattener();
         GlyphContourBuilder _glyphToContour = new GlyphContourBuilder();
-        List<Poly2Tri.Polygon> waitingHoles = new List<Poly2Tri.Polygon>();
+        List<Poly2Tri.Polygon> _waitingHoles = new List<Poly2Tri.Polygon>();
 
         public GlyphOutlineAnalyzer()
         {
@@ -66,7 +66,7 @@ namespace Typography.Contours
             // more than 1 contours, with hole => eg.  a,e ,   etc  
 
             //closewise => not hole  
-            waitingHoles.Clear();
+            _waitingHoles.Clear();
             int cntCount = flattenContours.Count;
             Poly2Tri.Polygon mainPolygon = null;
             //
@@ -87,15 +87,15 @@ namespace Typography.Contours
                         //this is main polygon
                         mainPolygon = CreatePolygon(cnt.flattenPoints);
 
-                        if (waitingHoles.Count > 0)
+                        if (_waitingHoles.Count > 0)
                         {
                             //flush all waiting holes to the main polygon
-                            int j = waitingHoles.Count;
+                            int j = _waitingHoles.Count;
                             for (int i = 0; i < j; ++i)
                             {
-                                mainPolygon.AddHole(waitingHoles[i]);
+                                mainPolygon.AddHole(_waitingHoles[i]);
                             }
-                            waitingHoles.Clear();
+                            _waitingHoles.Clear();
                         }
                     }
                     else
@@ -118,7 +118,7 @@ namespace Typography.Contours
                     if (mainPolygon == null)
                     {
                         //add to waiting polygon
-                        waitingHoles.Add(subPolygon);
+                        _waitingHoles.Add(subPolygon);
                     }
                     else
                     {
@@ -127,7 +127,7 @@ namespace Typography.Contours
                     }
                 }
             }
-            if (waitingHoles.Count > 0)
+            if (_waitingHoles.Count > 0)
             {
                 throw new NotSupportedException();
             }

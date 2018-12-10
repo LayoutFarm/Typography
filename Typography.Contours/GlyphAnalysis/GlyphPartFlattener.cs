@@ -12,32 +12,32 @@ namespace Typography.Contours
         /// <summary>
         /// result flatten points
         /// </summary>
-        List<GlyphPoint> points;
-        
+        List<GlyphPoint> _points;
+
         public GlyphPartFlattener()
         {
             this.NSteps = 2;//default
         }
         public List<GlyphPoint> Result
         {
-            get { return points; }
-            set { points = value; }
+            get => _points;
+            set => _points = value;
         }
         public int NSteps { get; set; }
-        
-        
+
+
         void AddPoint(float x, float y, PointKind kind)
         {
             var p = new GlyphPoint(x, y, kind);
 #if DEBUG
             p.dbugOwnerPart = dbug_ownerPart;
 #endif
-            points.Add(p);
+            _points.Add(p);
         }
 
         public void GeneratePointsFromLine(Vector2 start, Vector2 end)
         {
-            if (points.Count == 0)
+            if (_points.Count == 0)
             {
                 AddPoint(start.X, start.Y, PointKind.LineStart);
             }
@@ -52,7 +52,7 @@ namespace Typography.Contours
             var curve = new BezierCurveCubic( //Cubic curve -> curve4
                 start, end,
                 control1, control2);
-            if (points.Count == 0)
+            if (_points.Count == 0)
             {
                 AddPoint(start.X, start.Y, PointKind.C4Start);
             }
@@ -76,7 +76,7 @@ namespace Typography.Contours
             var curve = new BezierCurveQuadric( //Quadric curve-> curve3
                 start, end,
                 control1);
-            if (points.Count == 0)
+            if (_points.Count == 0)
             {
                 AddPoint(start.X, start.Y, PointKind.C3Start);
             }
@@ -90,7 +90,7 @@ namespace Typography.Contours
                 stepSum += eachstep;
             }
             AddPoint(end.X, end.Y, PointKind.C3End);
-        } 
+        }
 
 #if DEBUG
         GlyphPart dbug_ownerPart;
