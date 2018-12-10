@@ -124,9 +124,7 @@ namespace Typography.TextBreak
                 this.State = VisitorState.End;
             }
         }
-        //
-        public List<BreakAtInfo> GetBreakList() => dbugBreakAtList;
-        //
+         
         internal Stack<int> GetTempCandidateBreaks() => _tempCandidateBreaks;
     }
 
