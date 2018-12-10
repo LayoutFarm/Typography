@@ -5,7 +5,7 @@ namespace Typography.Rendering
 {
     public class GlyphImage
     {
-        int[] pixelBuffer;
+        int[] _pixelBuffer;
         public GlyphImage(int w, int h)
         {
             this.Width = w;
@@ -36,13 +36,11 @@ namespace Typography.Rendering
             get;
             set;
         }
-        public int[] GetImageBuffer()
-        {
-            return pixelBuffer;
-        }
+        public int[] GetImageBuffer() => _pixelBuffer;
+        //
         public void SetImageBuffer(int[] pixelBuffer, bool isBigEndian)
         {
-            this.pixelBuffer = pixelBuffer;
+            _pixelBuffer = pixelBuffer;
             this.IsBigEndian = isBigEndian;
         }
         /// <summary>
