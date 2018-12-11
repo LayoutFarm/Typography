@@ -25,7 +25,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
 {
     public struct PatternFilterBilnearColorRGBA : IPatternFilter
     {
-        public int Dilation { get { return 1; } }
+        public int Dilation => 1;
 
         public void SetPixelLowRes(Color[][] buf, Color[] p, int offset, int x, int y)
         {
@@ -61,7 +61,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 g += weight * ((ptr_v >> (CO.G_SHIFT) & 0xff)); //ptr[sourceOffset + CO.G];
                 b += weight * ((ptr_v >> (CO.B_SHIFT) & 0xff)); //ptr[sourceOffset + CO.B];
                 a += weight * ((ptr_v >> (CO.A_SHIFT) & 0xff)); //ptr[sourceOffset + CO.A];
-                                                              //
+                                                                //
                 sourceOffset += 1;// sourceImage.BytesBetweenPixelsInclusive;
                 weight = x * (LineAA.SUBPIXEL_SCALE - y);
                 //r += weight * ptr[sourceOffset + CO.R];
@@ -86,7 +86,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                 g += weight * ((ptr_v >> (CO.G_SHIFT) & 0xff)); //ptr[sourceOffset + CO.G];
                 b += weight * ((ptr_v >> (CO.B_SHIFT) & 0xff)); //ptr[sourceOffset + CO.B];
                 a += weight * ((ptr_v >> (CO.A_SHIFT) & 0xff)); //ptr[sourceOffset + CO.A];
-                                                              //
+                                                                //
                 sourceOffset += 1;// sourceImage.BytesBetweenPixelsInclusive;
                 weight = x * y;
                 //r += weight * ptr[sourceOffset + CO.R];

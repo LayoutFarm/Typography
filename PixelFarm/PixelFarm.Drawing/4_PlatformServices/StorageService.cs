@@ -27,10 +27,7 @@ namespace PixelFarm.Platforms
         {
             s_provider = provider;
         }
-        public static StorageServiceProvider Provider
-        {
-            get { return s_provider; }
-        }
+        public static StorageServiceProvider Provider => s_provider;
     }
 }
 

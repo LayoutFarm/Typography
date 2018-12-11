@@ -105,11 +105,11 @@ namespace PixelFarm.CpuBlit.Imaging
             }
         }
 
-        public RectInt ClipBox { get { return _clippingRect; } }
-        int XMin { get { return _clippingRect.Left; } }
-        int YMin { get { return _clippingRect.Bottom; } }
-        int XMax { get { return _clippingRect.Right; } }
-        int YMax { get { return _clippingRect.Top; } }
+        public RectInt ClipBox => _clippingRect;
+        int XMin => _clippingRect.Left;
+        int YMin => _clippingRect.Bottom;
+        int XMax => _clippingRect.Right;
+        int YMax => _clippingRect.Top;
 
 
 

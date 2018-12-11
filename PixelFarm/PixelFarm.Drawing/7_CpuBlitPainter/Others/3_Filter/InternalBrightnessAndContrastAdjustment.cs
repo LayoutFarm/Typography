@@ -15,9 +15,9 @@ namespace PixelFarm.CpuBlit
     class InternalBrightnessAndContrastAdjustment
     {
 
-        byte[] rgbTable;
-        int brightness;
-        int contrast;
+        byte[] _rgbTable;
+        int _brightness;
+        int _contrast;
         bool _needUpdate;
         public InternalBrightnessAndContrastAdjustment()
         {
@@ -39,13 +39,13 @@ namespace PixelFarm.CpuBlit
         /// </summary>
         public int Brightness
         {
-            get { return brightness; }
+            get { return _brightness; }
             set
             {
                 Clamp(-100, 100, ref value);
-                if (value != brightness)
+                if (value != _brightness)
                 {
-                    brightness = value;
+                    _brightness = value;
                     _needUpdate = true;
                 }
 
@@ -56,13 +56,13 @@ namespace PixelFarm.CpuBlit
         /// </summary>
         public int Contrast
         {
-            get { return contrast; }
+            get { return _contrast; }
             set
             {
                 Clamp(-100, 100, ref value);
-                if (value != contrast)
+                if (value != _contrast)
                 {
-                    contrast = value;
+                    _contrast = value;
                     _needUpdate = true;
                 }
             }
@@ -71,8 +71,8 @@ namespace PixelFarm.CpuBlit
         public void UpdateIfNeed()
         {
             if (_needUpdate)
-            {                
-                SetParameters(this.brightness, this.contrast);
+            {
+                SetParameters(_brightness, _contrast);
                 _needUpdate = false;
             }
         }
@@ -82,17 +82,17 @@ namespace PixelFarm.CpuBlit
             //---------------------------------------
             int multiply;
             int divide;
-            this.brightness = brightness;
-            this.contrast = contrast;
-            if (this.contrast < 0)
+            _brightness = brightness;
+            _contrast = contrast;
+            if (_contrast < 0)
             {
-                multiply = this.contrast + 100;
+                multiply = _contrast + 100;
                 divide = 100;
             }
-            else if (this.contrast > 0)
+            else if (_contrast > 0)
             {
                 multiply = 100;
-                divide = 100 - this.contrast;
+                divide = 100 - _contrast;
             }
             else
             {
@@ -100,9 +100,9 @@ namespace PixelFarm.CpuBlit
                 divide = 1;
             }
 
-            if (this.rgbTable == null)
+            if (_rgbTable == null)
             {
-                this.rgbTable = new byte[65536];//256*256
+                _rgbTable = new byte[65536];//256*256
             }
             //-------------------------------------------------------
             //built table
@@ -110,7 +110,7 @@ namespace PixelFarm.CpuBlit
             {
                 unsafe
                 {
-                    fixed (byte* table_ptr = &this.rgbTable[0])
+                    fixed (byte* table_ptr = &_rgbTable[0])
                     {
 
                         for (int intensity = 0; intensity < 256; ++intensity)
@@ -132,7 +132,7 @@ namespace PixelFarm.CpuBlit
             {
                 unsafe
                 {
-                    fixed (byte* table_ptr = &this.rgbTable[0])
+                    fixed (byte* table_ptr = &_rgbTable[0])
                     {
                         for (int intensity = 0; intensity < 256; ++intensity)
                         {
@@ -151,7 +151,7 @@ namespace PixelFarm.CpuBlit
             {
                 unsafe
                 {
-                    fixed (byte* table_ptr = &this.rgbTable[0])
+                    fixed (byte* table_ptr = &_rgbTable[0])
                     {
                         for (int intensity = 0; intensity < 256; ++intensity)
                         {
@@ -176,9 +176,9 @@ namespace PixelFarm.CpuBlit
             //int shiftIndex = intensity * 256;2
 
             int shiftIndex = GetIntensityByte(b0, g0, r0) << 8;
-            r0 = this.rgbTable[shiftIndex + r0];
-            g0 = this.rgbTable[shiftIndex + g0];
-            b0 = this.rgbTable[shiftIndex + b0];
+            r0 = _rgbTable[shiftIndex + r0];
+            g0 = _rgbTable[shiftIndex + g0];
+            b0 = _rgbTable[shiftIndex + b0];
         }
 #if DEBUG
         public void dbugApply32BGRA(byte[] srcBuffer, byte[] destBuffer, int stride, int h)
@@ -202,9 +202,9 @@ namespace PixelFarm.CpuBlit
                     int intensity = GetIntensityByte(b, g, r);
                     int shiftIndex = intensity * 256;
 
-                    byte new_r = this.rgbTable[shiftIndex + r];
-                    byte new_g = this.rgbTable[shiftIndex + g];
-                    byte new_b = this.rgbTable[shiftIndex + b];
+                    byte new_r = _rgbTable[shiftIndex + r];
+                    byte new_g = _rgbTable[shiftIndex + g];
+                    byte new_b = _rgbTable[shiftIndex + b];
 
                     //save to dest
                     destBuffer[p] = new_b;
