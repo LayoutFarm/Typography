@@ -931,11 +931,6 @@ namespace Typography.OpenFont
                 }
                 typeface._evalCffGlyphBounds = true;
             }
-        }
-
-
-
-
-
+        } 
     }
 }

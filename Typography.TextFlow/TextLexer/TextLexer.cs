@@ -6,14 +6,9 @@ namespace Typography.TextBreak
 {
     public class TextBlockLexer
     {
-        List<LexWordSpan> spans = new List<LexWordSpan>();
-        public List<LexWordSpan> ResultSpans
-        {
-            get
-            {
-                return spans;
-            }
-        }
+        List<LexWordSpan> _spans = new List<LexWordSpan>();
+        public List<LexWordSpan> ResultSpans => _spans;
+        //
         public virtual void Lex(TextBuffer textBuffer)
         {
             WordSpanKind lexMode = WordSpanKind.Unknown;
@@ -24,7 +19,7 @@ namespace Typography.TextBreak
             int startIndex = 0;
             int len = 0;
 
-            spans.Clear();
+            _spans.Clear();
 
             for (int i = 0; i < j; ++i)
             {
@@ -36,7 +31,7 @@ namespace Typography.TextBreak
                         //TODO: check if len > int? 
                         var newspan = new LexWordSpan(startIndex,
                            (ushort)len, lexMode);
-                        spans.Add(newspan);
+                        _spans.Add(newspan);
 
                         startIndex = i;
                         len = 0;
@@ -56,7 +51,7 @@ namespace Typography.TextBreak
                             len++;
                             var newspan = new LexWordSpan(startIndex,
                                 (ushort)len, lexMode);
-                            spans.Add(newspan);
+                            _spans.Add(newspan);
                             startIndex += len;
                             len = 0;
 
@@ -65,7 +60,7 @@ namespace Typography.TextBreak
                         {
                             var newspan = new LexWordSpan(startIndex,
                                (ushort)len, lexMode);
-                            spans.Add(newspan);
+                            _spans.Add(newspan);
                             startIndex += len;
                             len = 0;
 
@@ -76,7 +71,7 @@ namespace Typography.TextBreak
                         //the \r is last char
                         var newspan = new LexWordSpan(startIndex,
                                (ushort)len, lexMode);
-                        spans.Add(newspan);
+                        _spans.Add(newspan);
 
                         startIndex += len;
                         len = 0;
@@ -90,7 +85,7 @@ namespace Typography.TextBreak
                         //TODO: check if len > int? 
                         var newspan = new LexWordSpan(startIndex,
                            (ushort)len, lexMode);
-                        spans.Add(newspan);
+                        _spans.Add(newspan);
                         startIndex = i;
                         len = 0;
                     }
@@ -98,7 +93,7 @@ namespace Typography.TextBreak
                     lexMode = WordSpanKind.NewLine;
                     var newspan2 = new LexWordSpan(startIndex,
                              (ushort)len, lexMode);
-                    spans.Add(newspan2);
+                    _spans.Add(newspan2);
                     len = 0;
                     startIndex = i;
                 }
@@ -113,7 +108,7 @@ namespace Typography.TextBreak
                         {
                             var newspan = new LexWordSpan(startIndex,
                               (ushort)len, lexMode);
-                            spans.Add(newspan);
+                            _spans.Add(newspan);
                             startIndex = i;
                             len = 0;
                         }
@@ -132,7 +127,7 @@ namespace Typography.TextBreak
                             //TODO: check if len > int? 
                             var newspan = new LexWordSpan(startIndex,
                                (ushort)len, lexMode);
-                            spans.Add(newspan);
+                            _spans.Add(newspan);
                             startIndex = i;
                             len = 0;
                         }
@@ -150,7 +145,7 @@ namespace Typography.TextBreak
                             //TODO: check if len > int? 
                             var newspan = new LexWordSpan(startIndex,
                                (ushort)len, lexMode);
-                            spans.Add(newspan);
+                            _spans.Add(newspan);
                             startIndex = i;
                             len = 0;
                         }
@@ -165,14 +160,14 @@ namespace Typography.TextBreak
             {
                 var newspan = new LexWordSpan(startIndex,
                               (ushort)len, lexMode);
-                spans.Add(newspan);
+                _spans.Add(newspan);
                 len = 0;
             }
 
         }
     }
 
-    
+
     public struct LexWordSpan
     {
         public int start;
