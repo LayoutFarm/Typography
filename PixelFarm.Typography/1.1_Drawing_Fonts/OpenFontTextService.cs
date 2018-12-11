@@ -27,9 +27,6 @@ namespace LayoutFarm
         //
         public static Typography.OpenFont.ScriptLang DefaultScriptLang { get; set; }
 
-
-
-
         public OpenFontTextService(Typography.OpenFont.ScriptLang scLang = null)
         {
 
@@ -111,15 +108,15 @@ namespace LayoutFarm
 
         //
         public ScriptLang CurrentScriptLang => _txtServices.CurrentScriptLang;
-
+        //
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, int[] outputGlyphAdvances, out int outputTotalW, out int outputLineHeight)
         {
             CalculateUserCharGlyphAdvancePos(ref textBufferSpan, this.BreakToLineSegments(ref textBufferSpan), font, outputGlyphAdvances, out outputTotalW, out outputLineHeight);
 
         }
-
+        //
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
-
+        //
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
             ILineSegmentList lineSegs,
             RequestFont font,
@@ -229,6 +226,7 @@ namespace LayoutFarm
         }
         public float MeasureWhitespace(RequestFont f)
         {
+            ResolveTypeface(f);
             return PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetWhitespaceWidth(f, _system_id);
         }
 
@@ -246,10 +244,7 @@ namespace LayoutFarm
         {
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-            int w, h;
-
-            //
-            _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out w, out h);
+            _txtServices.MeasureString(textBufferSpan.GetRawCharBuffer(), textBufferSpan.start, textBufferSpan.len, out int w, out int h);
             return new Size(w, h);
         }
         public void MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font, int limitWidth, out int charFit, out int charFitWidth)
@@ -268,15 +263,9 @@ namespace LayoutFarm
             return (int)(Math.Round(typeface.CalculateRecommendLineSpacing(out sel_linespcingChoice) *
                                     typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints)));
         }
-
-        public bool SupportsWordBreak
-        {
-            get
-            {
-                return true;
-            }
-        }
-
+        //
+        public bool SupportsWordBreak => true;
+        //
         struct MyLineSegment : ILineSegment
         {
             ILineSegmentList _owner;
@@ -300,8 +289,6 @@ namespace LayoutFarm
             private MyLineSegmentList()
             {
             }
-
-
             public void AddLineSegment(ILineSegment lineSegment)
             {
                 _segments.Add(lineSegment);
@@ -314,12 +301,9 @@ namespace LayoutFarm
             public ILineSegment this[int index] => _segments[index];
             //
             public int Count => _segments.Count;
-
-            public ILineSegment GetSegment(int index)
-            {
-                return _segments[index];
-            }
-
+            //
+            public ILineSegment GetSegment(int index) => _segments[index];
+            //
 #if DEBUG
             public int dbugStartAt;
             public int dbugLen;
