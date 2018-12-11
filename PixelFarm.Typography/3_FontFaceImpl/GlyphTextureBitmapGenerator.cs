@@ -23,9 +23,7 @@ namespace PixelFarm.Drawing.Fonts
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder);
-
-
+        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder); 
         public GlyphTextureBitmapGenerator()
         {
 
