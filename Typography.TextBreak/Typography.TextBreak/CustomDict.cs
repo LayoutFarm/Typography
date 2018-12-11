@@ -232,8 +232,9 @@ namespace Typography.TextBreak
                 }
             }
         }
-        public int PrefixLen { get { return _prefixSpan.len; } }
-
+        //
+        public int PrefixLen => _prefixSpan.len;
+        //
         internal void AddWordSpan(WordSpan span)
         {
             _wordSpanList.Add(span);
@@ -245,7 +246,6 @@ namespace Typography.TextBreak
         {
             get
             {
-
                 if (_wordSpanList == null) return 0;
                 return _wordSpanList.Count;
             }

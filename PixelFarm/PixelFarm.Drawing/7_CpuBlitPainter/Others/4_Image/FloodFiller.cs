@@ -5,24 +5,33 @@ namespace PixelFarm.CpuBlit.Imaging
 {
     public class FloodFill
     {
+        int _imageWidth;
+        int _imageHeight;
+
+
+        protected bool[] _pixelsChecked;
+        FillingRule _fillRule;
+        Queue<Range> _ranges = new Queue<Range>(9);
+        IBitmapSrc _destImgRW;
+
         abstract class FillingRule
         {
-            protected Color startColor;
-            protected Color fillColor;
+            protected Color _startColor;
+            protected Color _fillColor;
             protected FillingRule(Color fillColor)
             {
-                this.fillColor = fillColor;
+                _fillColor = fillColor;
             }
 
             public void SetStartColor(Color startColor)
             {
-                this.startColor = startColor;
+                _startColor = startColor;
             }
 
             public unsafe void SetPixel(int* dest)
             {
                 //*dest = (fillColor.red << 16) | (fillColor.green << 8) | (fillColor.blue);
-                *dest = (fillColor.blue << 16) | (fillColor.green << 8) | (fillColor.red);
+                *dest = (_fillColor.blue << 16) | (_fillColor.green << 8) | (_fillColor.red);
             }
 
             public abstract bool CheckPixel(int pixelValue32);
@@ -42,9 +51,9 @@ namespace PixelFarm.CpuBlit.Imaging
                 int g = ((pixelValue32 >> (PixelFarm.CpuBlit.PixelProcessing.CO.G * 8)) & 0xff);//8
                 int b = ((pixelValue32 >> (PixelFarm.CpuBlit.PixelProcessing.CO.B * 8)) & 0xff);//0
 
-                return r == startColor.red &&
-                       g == startColor.green &&
-                       b == startColor.blue;
+                return r == _startColor.red &&
+                       g == _startColor.green &&
+                       b == _startColor.blue;
 
                 //return (destBuffer[bufferOffset] == startColor.red) &&
                 //    (destBuffer[bufferOffset + 1] == startColor.green) &&
@@ -69,9 +78,9 @@ namespace PixelFarm.CpuBlit.Imaging
                 int b = ((pixelValue32 >> (PixelFarm.CpuBlit.PixelProcessing.CO.B * 8)) & 0xff);
 
 
-                return (r >= (startColor.red - tolerance0To255)) && (r <= (startColor.red + tolerance0To255)) &&
-                       (g >= (startColor.green - tolerance0To255)) && (r <= (startColor.green + tolerance0To255)) &&
-                       (b >= (startColor.blue - tolerance0To255)) && (r <= (startColor.blue + tolerance0To255));
+                return (r >= (_startColor.red - tolerance0To255)) && (r <= (_startColor.red + tolerance0To255)) &&
+                       (g >= (_startColor.green - tolerance0To255)) && (r <= (_startColor.green + tolerance0To255)) &&
+                       (b >= (_startColor.blue - tolerance0To255)) && (r <= (_startColor.blue + tolerance0To255));
 
 
                 //return (destBuffer[bufferOffset] >= (startColor.red - tolerance0To255)) && destBuffer[bufferOffset] <= (startColor.red + tolerance0To255) &&
@@ -94,42 +103,31 @@ namespace PixelFarm.CpuBlit.Imaging
         }
 
 
-        int imageWidth;
-        int imageHeight;
-
-
-        protected bool[] pixelsChecked;
-        FillingRule fillRule;
-        Queue<Range> ranges = new Queue<Range>(9);
-
+       
 
         public FloodFill(Color fillColor)
         {
-            fillRule = new ExactMatch(fillColor);
+            _fillRule = new ExactMatch(fillColor);
         }
 
         public FloodFill(Color fillColor, int tolerance0To255)
         {
             if (tolerance0To255 > 0)
             {
-                fillRule = new ToleranceMatch(fillColor, tolerance0To255);
+                _fillRule = new ToleranceMatch(fillColor, tolerance0To255);
             }
             else
             {
-                fillRule = new ExactMatch(fillColor);
+                _fillRule = new ExactMatch(fillColor);
             }
         }
         public void Fill(MemBitmap memBmp, int x, int y)
         {
             Fill((IBitmapSrc)memBmp, x, y);
-        }
-
-
-        IBitmapSrc _destImgRW;
-
+        } 
         public void Fill(IBitmapSrc bufferToFillOn, int x, int y)
         {
-            y -= imageHeight;
+            y -= _imageHeight;
             unchecked // this way we can overflow the uint on negative and get a big number
             {
                 if ((uint)x >= bufferToFillOn.Width || (uint)y >= bufferToFillOn.Height)
@@ -144,17 +142,17 @@ namespace PixelFarm.CpuBlit.Imaging
                 using (TempMemPtr destBufferPtr = bufferToFillOn.GetBufferPtr())
                 {
 
-                    imageWidth = bufferToFillOn.Width;
-                    imageHeight = bufferToFillOn.Height;
+                    _imageWidth = bufferToFillOn.Width;
+                    _imageHeight = bufferToFillOn.Height;
                     //reset new buffer, clear mem?
-                    pixelsChecked = new bool[imageWidth * imageHeight];
+                    _pixelsChecked = new bool[_imageWidth * _imageHeight];
 
                     int* destBuffer = (int*)destBufferPtr.Ptr;
                     int startColorBufferOffset = bufferToFillOn.GetBufferOffsetXY32(x, y);
 
                     int start_color = *(destBuffer + startColorBufferOffset);
 
-                    fillRule.SetStartColor(Drawing.Color.FromArgb(
+                    _fillRule.SetStartColor(Drawing.Color.FromArgb(
                         (start_color >> 16) & 0xff,
                         (start_color >> 8) & 0xff,
                         (start_color) & 0xff));
@@ -162,34 +160,34 @@ namespace PixelFarm.CpuBlit.Imaging
 
                     LinearFill(destBuffer, x, y);
 
-                    while (ranges.Count > 0)
+                    while (_ranges.Count > 0)
                     {
-                        Range range = ranges.Dequeue();
+                        Range range = _ranges.Dequeue();
                         int downY = range.y - 1;
                         int upY = range.y + 1;
-                        int downPixelOffset = (imageWidth * (range.y - 1)) + range.startX;
-                        int upPixelOffset = (imageWidth * (range.y + 1)) + range.startX;
+                        int downPixelOffset = (_imageWidth * (range.y - 1)) + range.startX;
+                        int upPixelOffset = (_imageWidth * (range.y + 1)) + range.startX;
                         for (int rangeX = range.startX; rangeX <= range.endX; rangeX++)
                         {
                             if (range.y > 0)
                             {
-                                if (!pixelsChecked[downPixelOffset])
+                                if (!_pixelsChecked[downPixelOffset])
                                 {
                                     int bufferOffset = bufferToFillOn.GetBufferOffsetXY32(rangeX, downY);
 
-                                    if (fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                                    if (_fillRule.CheckPixel(*(destBuffer + bufferOffset)))
                                     {
                                         LinearFill(destBuffer, rangeX, downY);
                                     }
                                 }
                             }
 
-                            if (range.y < (imageHeight - 1))
+                            if (range.y < (_imageHeight - 1))
                             {
-                                if (!pixelsChecked[upPixelOffset])
+                                if (!_pixelsChecked[upPixelOffset])
                                 {
                                     int bufferOffset = bufferToFillOn.GetBufferOffsetXY32(rangeX, upY);
-                                    if (fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                                    if (_fillRule.CheckPixel(*(destBuffer + bufferOffset)))
                                     {
                                         LinearFill(destBuffer, rangeX, upY);
                                     }
@@ -215,15 +213,15 @@ namespace PixelFarm.CpuBlit.Imaging
 
             int leftFillX = x;
             int bufferOffset = _destImgRW.GetBufferOffsetXY32(x, y);
-            int pixelOffset = (imageWidth * y) + x;
+            int pixelOffset = (_imageWidth * y) + x;
             while (true)
             {
-                fillRule.SetPixel(destBuffer + bufferOffset);
-                pixelsChecked[pixelOffset] = true;
+                _fillRule.SetPixel(destBuffer + bufferOffset);
+                _pixelsChecked[pixelOffset] = true;
                 leftFillX--;
                 pixelOffset--;
                 bufferOffset--;
-                if (leftFillX <= 0 || (pixelsChecked[pixelOffset]) || !fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                if (leftFillX <= 0 || (_pixelsChecked[pixelOffset]) || !_fillRule.CheckPixel(*(destBuffer + bufferOffset)))
                 {
                     break;
                 }
@@ -232,21 +230,21 @@ namespace PixelFarm.CpuBlit.Imaging
             //
             int rightFillX = x;
             bufferOffset = _destImgRW.GetBufferOffsetXY32(x, y);
-            pixelOffset = (imageWidth * y) + x;
+            pixelOffset = (_imageWidth * y) + x;
             while (true)
             {
-                fillRule.SetPixel(destBuffer + bufferOffset);
-                pixelsChecked[pixelOffset] = true;
+                _fillRule.SetPixel(destBuffer + bufferOffset);
+                _pixelsChecked[pixelOffset] = true;
                 rightFillX++;
                 pixelOffset++;
                 bufferOffset++;
-                if (rightFillX >= imageWidth || pixelsChecked[pixelOffset] || !fillRule.CheckPixel(*(destBuffer + bufferOffset)))
+                if (rightFillX >= _imageWidth || _pixelsChecked[pixelOffset] || !_fillRule.CheckPixel(*(destBuffer + bufferOffset)))
                 {
                     break;
                 }
             }
             rightFillX--;
-            ranges.Enqueue(new Range(leftFillX, rightFillX, y));
+            _ranges.Enqueue(new Range(leftFillX, rightFillX, y));
         }
     }
 }

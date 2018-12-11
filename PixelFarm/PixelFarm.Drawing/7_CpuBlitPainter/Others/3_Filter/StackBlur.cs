@@ -179,8 +179,8 @@ namespace PixelFarm.CpuBlit.Imaging
 
 
 
-        private static int min(int a, int b) { return Math.Min(a, b); }
-        private static int max(int a, int b) { return Math.Max(a, b); }
+        static int min(int a, int b) => Math.Min(a, b);
+        static int max(int a, int b) => Math.Max(a, b);
 
         struct LimitMinMax
         {

@@ -30,25 +30,25 @@
     }
     public class BrightnessAndContrastAdjustment
     {
-        int brightness;
-        int contrast;
-        byte[] rgbTable;
+        int _brightness;
+        int _contrast;
+        byte[] _rgbTable;
 
         public void SetParameters(int brightness, int contrast)
         {
             int multiply;
             int divide;
-            this.brightness = brightness;
-            this.contrast = contrast;
-            if (this.contrast < 0)
+            _brightness = brightness;
+            _contrast = contrast;
+            if (_contrast < 0)
             {
-                multiply = this.contrast + 100;
+                multiply = _contrast + 100;
                 divide = 100;
             }
-            else if (this.contrast > 0)
+            else if (_contrast > 0)
             {
                 multiply = 100;
-                divide = 100 - this.contrast;
+                divide = 100 - _contrast;
             }
             else
             {
@@ -56,15 +56,15 @@
                 divide = 1;
             }
 
-            if (this.rgbTable == null)
+            if (_rgbTable == null)
             {
-                this.rgbTable = new byte[65536];//256*256
+                _rgbTable = new byte[65536];//256*256
             }
             if (divide == 0)
             {
                 unsafe
                 {
-                    fixed (byte* table_ptr = &this.rgbTable[0])
+                    fixed (byte* table_ptr = &_rgbTable[0])
                     {
 
                         for (int intensity = 0; intensity < 256; ++intensity)
@@ -86,7 +86,7 @@
             {
                 unsafe
                 {
-                    fixed (byte* table_ptr = &this.rgbTable[0])
+                    fixed (byte* table_ptr = &_rgbTable[0])
                     {
                         for (int intensity = 0; intensity < 256; ++intensity)
                         {
@@ -105,7 +105,7 @@
             {
                 unsafe
                 {
-                    fixed (byte* table_ptr = &this.rgbTable[0])
+                    fixed (byte* table_ptr = &_rgbTable[0])
                     {
                         for (int intensity = 0; intensity < 256; ++intensity)
                         {
@@ -144,9 +144,9 @@
                     int intensity = GetIntensityByte(b, g, r);
                     int shiftIndex = intensity * 256;
 
-                    byte new_r = this.rgbTable[shiftIndex + r];
-                    byte new_g = this.rgbTable[shiftIndex + g];
-                    byte new_b = this.rgbTable[shiftIndex + b];
+                    byte new_r = _rgbTable[shiftIndex + r];
+                    byte new_g = _rgbTable[shiftIndex + g];
+                    byte new_b = _rgbTable[shiftIndex + b];
 
                     //save to dest
                     destBuffer[p] = new_b;

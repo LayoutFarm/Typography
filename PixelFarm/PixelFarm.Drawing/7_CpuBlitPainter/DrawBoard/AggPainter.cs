@@ -1251,7 +1251,7 @@ namespace PixelFarm.CpuBlit
         public override void DrawRenderVx(RenderVx renderVx)
         {
             AggRenderVx aggRenderVx = (AggRenderVx)renderVx;
-            Draw(aggRenderVx.vxs);
+            Draw(aggRenderVx._vxs);
         }
         public override void FillRenderVx(Brush brush, RenderVx renderVx)
         {
@@ -1262,18 +1262,18 @@ namespace PixelFarm.CpuBlit
                 SolidBrush solidBrush = (SolidBrush)brush;
                 Color prevColor = _fillColor;
                 _fillColor = solidBrush.Color;
-                Fill(aggRenderVx.vxs);
+                Fill(aggRenderVx._vxs);
                 _fillColor = prevColor;
             }
             else
             {
-                Fill(aggRenderVx.vxs);
+                Fill(aggRenderVx._vxs);
             }
         }
         public override void FillRenderVx(RenderVx renderVx)
         {
             AggRenderVx aggRenderVx = (AggRenderVx)renderVx;
-            Fill(aggRenderVx.vxs);
+            Fill(aggRenderVx._vxs);
         }
         public LineJoin LineJoin
         {

@@ -17,14 +17,14 @@ namespace PixelFarm.Drawing
         }
         public int X
         {
-            get { return _x; }
-            set { _x = value; }
+            get => _x;
+            set => _x = value;
         }
 
         public int Y
         {
-            get { return _y; }
-            set { _y = value; }
+            get => _y;
+            set => _y = value;
         }
 
         public static bool operator ==(Point p1, Point p2)
@@ -70,13 +70,13 @@ namespace PixelFarm.Drawing
         }
         public float X
         {
-            get { return _x; }
-            set { _x = value; }
+            get => _x;
+            set => _x = value;
         }
         public float Y
         {
-            get { return _y; }
-            set { _y = value; }
+            get => _y;
+            set => _y = value;
         }
         public static implicit operator PointF(Point p)
         {
@@ -110,13 +110,13 @@ namespace PixelFarm.Drawing
         }
         public int Width
         {
-            get { return _w; }
-            set { _w = value; }
+            get => _w;
+            set => _w = value;
         }
         public int Height
         {
-            get { return _h; }
-            set { _h = value; }
+            get => _h;
+            set => _h = value;
         }
         public static bool operator ==(Size s1, Size s2)
         {
@@ -157,14 +157,10 @@ namespace PixelFarm.Drawing
             _w = w;
             _h = h;
         }
-        public float Width
-        {
-            get { return _w; }
-        }
-        public float Height
-        {
-            get { return _h; }
-        }
+        //
+        public float Width => _w;
+        public float Height => _h;
+        //
         public static implicit operator SizeF(Size p)
         {
             return new SizeF(p.Width, p.Height);

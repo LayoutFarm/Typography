@@ -28,7 +28,7 @@ namespace Typography.TextLayout
         int _len;
 
         WordSpanKind _kind;
-        GlyphPlanSequence glyphPlanSeq; //1 text run 1 glyph plan sequence
+        GlyphPlanSequence _glyphPlanSeq; //1 text run 1 glyph plan sequence
 
         float _runWidth;
         public TextRun(TextBuffer srcTextBuffer, int startAt, int len, WordSpanKind kind)
@@ -41,27 +41,19 @@ namespace Typography.TextLayout
         }
         internal void SetGlyphPlanSeq(GlyphPlanSequence seq)
         {
-            this.glyphPlanSeq = seq;
+            _glyphPlanSeq = seq;
             _runWidth = seq.CalculateWidth();
         }
-        public GlyphPlanSequence GetGlyphPlanSeq()
-        {
-            return this.glyphPlanSeq;
-        }
-
-        public float Width
-        {
-            get { return _runWidth; }
-        }
-
+        //
+        public GlyphPlanSequence GetGlyphPlanSeq() => _glyphPlanSeq;
+        //
+        public float Width => _runWidth;
         public TextRunFontStyle FontStyle { get; set; }
         internal bool IsMeasured { get; set; }
-        internal TextBuffer TextBuffer
-        {
-            get { return _srcText; }
-        }
-        internal int StartAt { get { return _startAt; } }
-        internal int Len { get { return _len; } }
+        internal TextBuffer TextBuffer => _srcText;
+        //
+        internal int StartAt => _startAt;
+        internal int Len => _len;
 #if DEBUG
         public override string ToString()
         {
@@ -81,6 +73,6 @@ namespace Typography.TextLayout
 
     }
 
-   
+
 
 }

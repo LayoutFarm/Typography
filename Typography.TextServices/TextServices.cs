@@ -23,7 +23,7 @@ namespace Typography.TextLayout
 namespace Typography.TextServices
 {
     using Typography.TextBreak;
-
+    using Typography.TextLayout;
     public class TextServices
     {
         //user can do text shaping by their own
@@ -89,6 +89,7 @@ namespace Typography.TextServices
             InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
             if (inst != null)
             {
+                
                 return _typefaceStore.GetTypeface(inst);
             }
             return null;
