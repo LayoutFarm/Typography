@@ -199,7 +199,7 @@ namespace Typography.TextLayout
         }
 #endif
 
-        static float GenerateScaledGlyphPlans(this GlyphLayout glyphLayout,
+        static float MeasureGlyphPlans(this GlyphLayout glyphLayout,
              float pxscale,
              bool snapToGrid)
         {
@@ -240,7 +240,7 @@ namespace Typography.TextLayout
             }
             return accumW;
         }
-        static float GenerateScaledGlyphPlans(this GlyphLayout glyphLayout,
+        static float MeasureGlyphPlanWithLimitWidth(this GlyphLayout glyphLayout,
              float pxscale,
              float limitWidth,
              bool snapToGrid,
@@ -429,7 +429,7 @@ namespace Typography.TextLayout
             if (limitW < 0)
             {
                 //no limit
-                scaled_accumX = GenerateScaledGlyphPlans(
+                scaled_accumX = MeasureGlyphPlans(
                     glyphLayout,
                     pxscale,
                     snapToGrid);
@@ -445,7 +445,7 @@ namespace Typography.TextLayout
             }
             else if (limitW > 0)
             {
-                scaled_accumX = GenerateScaledGlyphPlans(
+                scaled_accumX = MeasureGlyphPlanWithLimitWidth(
                     glyphLayout,
                     pxscale,
                     limitW,
