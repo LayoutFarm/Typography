@@ -61,7 +61,7 @@ namespace PixelFarm.Drawing
             FontKey = CalculateFontKey(facename, fontSizeInPts, style);
         }
         //
-        public int FontKey { get; private set; } 
+        public int FontKey { get; private set; }
         /// <summary>
         /// font's face name
         /// </summary>
@@ -144,7 +144,7 @@ namespace PixelFarm.Drawing
         //store latest platform's actual font  as WeakReference
         //access this by PixelFarm.Drawing.Internal.RequestFontCacheAccess
         internal int _platform_id;//resolve by system id
-        internal WeakReference _latestResolved; //result of the actual font, we store it as weak reference
+        internal object _latestResolved; //result of the actual font, we store it as weak reference
         internal int _whitespace_width;
         internal int _generalLineSpacingInPx;
 
@@ -189,7 +189,7 @@ namespace PixelFarm.Drawing
             {
                 //replace 
                 reqFont._platform_id = platform_id;
-                reqFont._latestResolved = new WeakReference(platformFont);
+                reqFont._latestResolved = platformFont;
             }
             public static void SetGeneralFontMetricInfo(
                RequestFont reqFont,
@@ -205,19 +205,19 @@ namespace PixelFarm.Drawing
             }
 
             public static T GetActualFont<T>(RequestFont reqFont, int platform_id)
-             where T : class
+               where T : class
             {
                 if (reqFont._platform_id == platform_id &&
-                    reqFont._latestResolved.IsAlive)
+                    reqFont._latestResolved != null)
                 {
-                    return reqFont._latestResolved.Target as T;
+                    return reqFont._latestResolved as T;
                 }
                 return null;
             }
             public static int GetWhitespaceWidth(RequestFont reqFont, int platform_id)
             {
                 if (reqFont._platform_id == platform_id &&
-                    reqFont._latestResolved.IsAlive)
+                    reqFont._latestResolved != null)
                 {
                     return reqFont._whitespace_width;
                 }
@@ -233,7 +233,7 @@ namespace PixelFarm.Drawing
             public static int GetLinespaceHeight(RequestFont reqFont, int platform_id)
             {
                 if (reqFont._platform_id == platform_id &&
-                    reqFont._latestResolved.IsAlive)
+                    reqFont._latestResolved != null)
                 {
                     return reqFont._generalLineSpacingInPx;
                 }
