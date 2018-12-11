@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
+
 using Typography.TextLayout;
 using Typography.FontManagement;
 using System.IO;
@@ -196,15 +198,11 @@ namespace Typography.TextServices
             public void Clear()
             {
                 _glyphPlans.Clear();
-
             }
             public void Append(UnscaledGlyphPlan glyphPlan)
             {
                 _glyphPlans.Add(glyphPlan);
-
             }
-
-
             public UnscaledGlyphPlan this[int index]
             {
                 get
@@ -219,6 +217,7 @@ namespace Typography.TextServices
                     return _glyphPlans.Count;
                 }
             }
+
 
 #if DEBUG
             public UnscaledGlyphPlanList()
@@ -238,55 +237,10 @@ namespace Typography.TextServices
         {
             //measure string 
             //check if we use cache feature or not
-
-            if (str.Length < 1)
-            {
-                w = h = 0;
-            }
-            _reusableMeasureBoxList.Clear(); //reset 
-
-            float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts);
-            //NOET:at this moment, simple operation
-            //may not be simple...  
-            //-------------------
-            //input string may contain more than 1 script lang
-            //user can parse it by other parser
-            //but in this code, we use our Typography' parser
-            //-------------------
-            //user must setup the CustomBreakerBuilder before use         
-
-            int cur_startAt = startAt;
-            float accumW = 0;
-            float accumH = 0;
-
-
-            foreach (Typography.TextLayout.BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
-            {
-
-                _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
-                //
-                _reusableGlyphPlanList.Clear();
-                _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
-                //create pixelscale...
-
-
-
-                ////measure string size
-                //var result = new MeasuredStringBox(
-                //    _reusableGlyphPlanList.AccumAdvanceX,
-                //    _currentTypeface.Ascender * pxscale,
-                //    _currentTypeface.Descender * pxscale,
-                //    _currentTypeface.LineGap * pxscale,
-                //     Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(_currentTypeface) * pxscale);
-                //
-                // ConcatMeasureBox(ref accumW, ref accumH, ref result);
-
-            }
-
-            w = (int)System.Math.Round(accumW);
-            h = (int)System.Math.Round(accumH);
+            MeasuredStringBox measureStringBox = _glyphLayout.LayoutAndMeasureString(str, startAt, len, _fontSizeInPts);
+            w = (int)measureStringBox.width;
+            h = (int)Math.Ceiling(measureStringBox.CalculateLineHeight(_currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts)));
         }
-
         public void MeasureString(char[] str, int startAt, int len, int limitWidth, out int charFit, out int charFitWidth)
         {
             //measure string 
@@ -297,6 +251,7 @@ namespace Typography.TextServices
 
             _reusableMeasureBoxList.Clear(); //reset 
 
+
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts);
             //NOET:at this moment, simple operation
             //may not be simple...  
@@ -310,6 +265,12 @@ namespace Typography.TextServices
             int cur_startAt = startAt;
             float accumW = 0;
 
+            float acc_x = 0;//accum_x
+            float acc_y = 0;//accum_y
+            float g_x = 0;
+            float g_y = 0;
+            float x = 0;
+            float y = 0;
             foreach (Typography.TextLayout.BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
             {
 
@@ -327,12 +288,7 @@ namespace Typography.TextServices
                 int glyphCount = _reusableGlyphPlanList.Count;
 
 
-                float acc_x = 0;//accum_x
-                float acc_y = 0;//accum_y
-                float g_x = 0;
-                float g_y = 0;
-                float x = 0;
-                float y = 0;
+
                 for (int i = 0; i < glyphCount; ++i)
                 {
                     UnscaledGlyphPlan glyphPlan = _reusableGlyphPlanList[i];
