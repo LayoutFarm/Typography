@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev 
 //----------------------------------- 
 using System;
 using System.Collections.Generic;
@@ -58,6 +58,90 @@ namespace Typography.Rendering
         }
     }
 
+    public static class GlyphTextureCustomConfigs
+    {
+        //some font need special treatments...
+
+        static Dictionary<int, GlyphTextureBuildDetail[]> s_registerDetails;
+
+        public static void Register(RequestFont reqFont, GlyphTextureBuildDetail[] details, bool forAnySize = true, bool forAnyStyle = true)
+        {
+            FontStyle fontStyle = reqFont.Style;
+            float sizeInPt = reqFont.SizeInPoints;
+            if (forAnySize)
+            {
+                sizeInPt = 0;
+            }
+            if (forAnyStyle)
+            {
+                fontStyle = FontStyle.Regular | FontStyle.Bold | FontStyle.Italic;
+            }
+            int fontKey = RequestFont.CalculateFontKey(reqFont.Name.ToLower(), sizeInPt, fontStyle);
+            s_registerDetails[fontKey] = details;
+        }
+
+        static GlyphTextureBuildDetail[] s_default;
+
+
+        static void SetupDefaults()
+        {
+
+            //Your Implementation ...
+            s_registerDetails = new Dictionary<int, GlyphTextureBuildDetail[]>();
+            //set default detail
+
+            if (s_default == null)
+            {
+                SetDefaultDetails(new GlyphTextureBuildDetail[] {
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+                });
+            }
+            //
+            //Your Implementation ...
+            //eg. Tahoma             
+            Register(new RequestFont("tahoma", 10), new GlyphTextureBuildDetail[]
+            {
+                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+                new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
+                    DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
+                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+            });
+        }
+        public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
+        {
+            s_default = defaultDetails;
+        }
+
+        public static GlyphTextureBuildDetail[] TryGetGlyphTextureBuildDetail(RequestFont reqFont, bool forAnySize = true, bool forAnyStyle = true)
+        {
+            if (s_registerDetails == null)
+            {
+                SetupDefaults();
+            }
+            //
+            FontStyle fontStyle = reqFont.Style;
+            float sizeInPt = reqFont.SizeInPoints;
+            if (forAnySize)
+            {
+                sizeInPt = 0;
+            }
+            if (forAnyStyle)
+            {
+                fontStyle = FontStyle.Regular | FontStyle.Bold | FontStyle.Italic;
+            }
+            int fontKey = RequestFont.CalculateFontKey(reqFont.Name.ToLower(), sizeInPt, fontStyle);
+            if (!s_registerDetails.TryGetValue(fontKey, out var found))
+            {
+                //not found that font key
+                //create default
+                //...
+                return s_default;
+            }
+            return found;
+        }
+    }
+
     public class BitmapFontManager<B>
         where B : IDisposable
     {
@@ -66,7 +150,6 @@ namespace Typography.Rendering
 
         LayoutFarm.OpenFontTextService _textServices;
         TextureKind _textureKind;
-        GlyphTextureBuildDetail[] _textureBuildDetails;
 
         public BitmapFontManager(TextureKind textureKind,
             LayoutFarm.OpenFontTextService textServices,
@@ -84,22 +167,6 @@ namespace Typography.Rendering
         protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
         {
             _loadedGlyphs = new FontBitmapCache<SimpleFontAtlas, B>(_createNewDel);
-        }
-
-        public void SetCurrentScriptLangs(ScriptLang[] currentScriptLangs)
-        {
-
-
-            //TODO: review here again,
-            //this is a fixed version for tahoma font
-            //temp fix here ...
-            _textureBuildDetails = new GlyphTextureBuildDetail[]
-            {
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
-                    DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
-            };
         }
 
 #if DEBUG
@@ -167,6 +234,8 @@ namespace Typography.Rendering
                 else
                 {
 
+
+
                     GlyphImage totalGlyphsImg = null;
                     SimpleFontAtlasBuilder atlasBuilder = null;
                     var glyphTextureGen = new GlyphTextureBitmapGenerator();
@@ -174,8 +243,8 @@ namespace Typography.Rendering
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                        _textureKind,
-                       _textureBuildDetails,
-                        (glyphIndex, glyphImage, outputAtlasBuilder) =>
+                       GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont),
+                       (glyphIndex, glyphImage, outputAtlasBuilder) =>
                         {
                             if (outputAtlasBuilder != null)
                             {

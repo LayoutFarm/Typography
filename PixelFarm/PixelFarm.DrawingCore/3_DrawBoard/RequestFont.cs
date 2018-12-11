@@ -50,21 +50,18 @@ namespace PixelFarm.Drawing
         //each platform/canvas has its own representation of this Font 
         //this is just a request for specficic font presentation at a time
         //-----
-        float sizeInPoints;
-        int _fontKey;
+
+
         public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
         {
             //Lang = "en";//default
             Name = facename;
             SizeInPoints = fontSizeInPts;
             Style = style;
-            _fontKey = (new InternalFontKey(facename, fontSizeInPts, style)).GetHashCode();
+            FontKey = CalculateFontKey(facename, fontSizeInPts, style);
         }
-        public int FontKey
-        {
-            get { return _fontKey; }
-        }
-
+        //
+        public int FontKey { get; private set; } 
         /// <summary>
         /// font's face name
         /// </summary>
@@ -74,16 +71,13 @@ namespace PixelFarm.Drawing
         /// <summary>
         /// emheight in point unit
         /// </summary>
-        public float SizeInPoints
+        public float SizeInPoints { get; private set; }
+
+        //
+        public static int CalculateFontKey(string facename, float fontSizeInPts, FontStyle style)
         {
-            get { return sizeInPoints; }
-            private set
-            {
-                sizeInPoints = value;
-            }
+            return (new InternalFontKey(facename, fontSizeInPts, style)).GetHashCode();
         }
-
-
 
         struct InternalFontKey
         {
@@ -140,9 +134,7 @@ namespace PixelFarm.Drawing
 
         public static float ConvEmSizeInPointsToPixels(float emsizeInPoint)
         {
-            //TODO: review here again, should be platform-specific funcs?
-
-
+            //TODO: review here again, should be platform-specific funcs? 
             return (int)(((float)emsizeInPoint / (float)s_POINTS_PER_INCH) * (float)s_PIXELS_PER_INCH);
         }
 
@@ -165,30 +157,14 @@ namespace PixelFarm.Drawing
         internal float _ascentInPx;
         internal float _lineGapInPx;
 
-        public float SizeInPixels
-        {
-            get { return _sizeInPx; }
-        }
-        public float DescentInPixels
-        {
-
-            get { return _descentInPx; }
-        }
-        public float AscentInPixels
-        {
-            get { return _ascentInPx; }
-        }
-        public float LineGapInPixels
-        {
-            get { return _lineGapInPx; }
-        }
+        public float SizeInPixels => _sizeInPx;
+        public float DescentInPixels => _descentInPx;
+        public float AscentInPixels => _ascentInPx;
+        public float LineGapInPixels => _lineGapInPx;
         /// <summary>
         /// already in pixels
         /// </summary>
-        public float LineSpacingInPixels
-        {
-            get { return _generalLineSpacingInPx; }
-        }
+        public float LineSpacingInPixels => _generalLineSpacingInPx;
 
     }
 

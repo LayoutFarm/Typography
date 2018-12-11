@@ -59,10 +59,7 @@ namespace PixelFarm.Drawing.Fonts
                     return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
                 }
             );
-            _bmpFontMx.SetCurrentScriptLangs(new ScriptLang[]
-            {
-                ScriptLangs.Latin
-            });
+           
 
             //3.  
 
