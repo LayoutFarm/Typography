@@ -417,8 +417,7 @@ namespace Typography.TextLayout
             bool snapToGrid = true)
         {
             //1. unscale layout, in design unit
-            glyphLayout.Layout(textBuffer, startAt, len);
-
+            glyphLayout.Layout(textBuffer, startAt, len); 
 
             //2. scale  to specific font size           
 

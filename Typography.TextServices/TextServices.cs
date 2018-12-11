@@ -226,13 +226,6 @@ namespace Typography.TextServices
             }
 #endif
         }
-
-
-
-        List<MeasuredStringBox> _reusableMeasureBoxList = new List<MeasuredStringBox>();
-
-        UnscaledGlyphPlanList _reusableGlyphPlanList = new UnscaledGlyphPlanList();
-
         public void MeasureString(char[] str, int startAt, int len, out int w, out int h)
         {
             //measure string 
