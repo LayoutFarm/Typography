@@ -12,19 +12,19 @@ namespace Typography.TextLayout
     class GlyphSetPosition
     {
 
-        Typeface typeface;
-        GPOS gposTable;
-        List<GPOS.LookupTable> lookupTables;
+        Typeface _typeface;
+        GPOS _gposTable;
+        List<GPOS.LookupTable> _lookupTables;
         public GlyphSetPosition(Typeface typeface, string lang)
         {
             this.Lang = lang;
-            this.typeface = typeface;
+            _typeface = typeface;
             //check if this lang has 
-            this.gposTable = typeface.GPOSTable;
+            _gposTable = typeface.GPOSTable;
 
-            if (gposTable == null) { return; }
+            if (_gposTable == null) { return; }
 
-            ScriptTable scriptTable = gposTable.ScriptList[lang];
+            ScriptTable scriptTable = _gposTable.ScriptList[lang];
             //---------
             if (scriptTable == null) { return; }   // early exit if no lookup tables
                                                    //---------
@@ -43,7 +43,7 @@ namespace Typography.TextLayout
                 var features = new List<FeatureList.FeatureTable>();
                 for (int i = 0; i < defaultLang.featureIndexList.Length; ++i)
                 {
-                    FeatureList.FeatureTable feature = gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
+                    FeatureList.FeatureTable feature = _gposTable.FeatureList.featureTables[defaultLang.featureIndexList[i]];
 
                     switch (feature.TagName)
                     {
@@ -70,14 +70,14 @@ namespace Typography.TextLayout
 
                 //-----------------------
 
-                lookupTables = new List<GPOS.LookupTable>();
+                _lookupTables = new List<GPOS.LookupTable>();
                 int j = features.Count;
                 for (int i = 0; i < j; ++i)
                 {
                     FeatureList.FeatureTable feature = features[i];
                     foreach (ushort lookupIndex in feature.LookupListIndices)
                     {
-                        lookupTables.Add(gposTable.LookupList[lookupIndex]);
+                        _lookupTables.Add(_gposTable.LookupList[lookupIndex]);
                     }
                 }
             }
@@ -88,12 +88,12 @@ namespace Typography.TextLayout
         {
             //early exit if no lookup tables
             //load
-            if (lookupTables == null) { return; }
+            if (_lookupTables == null) { return; }
             //
-            int j = lookupTables.Count;
+            int j = _lookupTables.Count;
             for (int i = 0; i < j; ++i)
             {
-                lookupTables[i].DoGlyphPosition(glyphPositions, 0, glyphPositions.Count);
+                _lookupTables[i].DoGlyphPosition(glyphPositions, 0, glyphPositions.Count);
             }
         }
     }

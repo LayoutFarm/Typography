@@ -27,6 +27,7 @@
 //----------------------------------------------------------------------------
 
 using System;
+using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
@@ -36,7 +37,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     /// </summary>
     public class PixelBlenderGrey : PixelBlender32
     {
-         
+
         internal override void BlendPixel(int[] dstBuffer, int arrayOffset, Color srcColor)
         {
             unsafe
@@ -168,17 +169,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             unsafe
             {
-                unchecked
-                {
-                    fixed (int* ptr = &dstBuffer[arrayOffset])
-                    {
-                        //TODO: consider use memcpy() impl*** 
-                        byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
-                        srcColor = new Color(srcColor.alpha, y, y, y);
 
-                        *ptr = srcColor.ToARGB();
-                    }
+                fixed (int* ptr = &dstBuffer[arrayOffset])
+                {
+                    //TODO: consider use memcpy() impl*** 
+                    byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
+                    srcColor = new Color(srcColor.alpha, y, y, y);
+
+                    *ptr = srcColor.ToARGB();
                 }
+
             }
 
         }
@@ -293,6 +293,184 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
             }
         }
+
+        internal override void BlendPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor)
+        {
+            unsafe
+            {
+                int* ptr = (int*)dstBuffer.Ptr;
+                int* head = &ptr[arrayOffset];
+                {
+                    BlendPixel32Internal(head, srcColor);
+                }
+            }
+        }
+
+        internal override void BlendPixels(TempMemPtr dstBuffer1, int arrayElemOffset, Color[] srcColors, int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+        {
+            if (firstCoverForAll)
+            {
+                int cover = covers[coversIndex];
+                if (cover == 255)
+                {
+                    unsafe
+                    {
+                        int* dstBuffer = (int*)dstBuffer1.Ptr;
+                        int* head = &dstBuffer[arrayElemOffset];
+                        {
+                            int* header2 = (int*)(IntPtr)head;
+
+                            if (count % 2 != 0)
+                            {
+                                //odd
+                                //
+                                BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                                header2++;//move next
+                                count--;
+                            }
+
+                            //now count is even number
+                            while (count > 0)
+                            {
+                                //now count is even number
+                                //---------
+                                //1
+                                BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                                header2++;//move next
+                                count--;
+                                //---------
+                                //2
+                                BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                                header2++;//move next
+                                count--;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+
+                    unsafe
+                    {
+                        int* dstBuffer = (int*)dstBuffer1.Ptr;
+                        int* head = &dstBuffer[arrayElemOffset];
+                        {
+                            int* header2 = (int*)(IntPtr)head;
+
+                            if (count % 2 != 0)
+                            {
+                                //odd
+                                //
+                                BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                header2++;//move next
+                                count--;
+                            }
+                            while (count > 0)
+                            {
+                                //Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++].NewFromChangeCoverage(cover));
+                                //1.
+                                BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                header2++;//move next
+                                count--;
+                                //2.
+                                BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                header2++;//move next
+                                count--;
+                            }
+
+                        }
+                    }
+                }
+            }
+            else
+            {
+                unsafe
+                {
+                    int* dstBuffer = (int*)dstBuffer1.Ptr;
+                    int* dstHead = &dstBuffer[arrayElemOffset];
+                    {
+                        int* dstBufferPtr = dstHead;
+                        do
+                        {
+                            //cover may diff in each loop
+                            int cover = covers[coversIndex++];
+                            if (cover == 255)
+                            {
+                                BlendPixel32Internal(dstBufferPtr, srcColors[srcColorOffset]);
+                            }
+                            else
+                            {
+                                BlendPixel32Internal(dstBufferPtr, srcColors[srcColorOffset].NewFromChangeCoverage(cover));
+                            }
+                            dstBufferPtr++;
+                            ++srcColorOffset;
+                        }
+                        while (--count != 0);
+                    }
+                }
+
+            }
+        }
+
+        internal override void CopyPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor, int count)
+        {
+            unsafe
+            {
+                int* ptr1 = (int*)dstBuffer.Ptr;
+                int* ptr_byte = &ptr1[arrayOffset];
+                {
+                    //TODO: consider use memcpy() impl***
+
+                    byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
+                    srcColor = new Color(srcColor.alpha, y, y, y);
+
+                    int* ptr = ptr_byte;
+                    int argb = srcColor.ToARGB();
+
+                    //---------
+                    if ((count % 2) != 0)
+                    {
+                        *ptr = argb;
+                        ptr++; //move next
+                        count--;
+                    }
+
+                    while (count > 0)
+                    {
+                        //-----------
+                        //1.
+                        *ptr = argb;
+                        ptr++; //move next
+                        count--;
+                        //-----------
+                        //2
+                        *ptr = argb;
+                        ptr++; //move next
+                        count--;
+                    }
+
+                }
+
+            }
+        }
+
+        internal override void CopyPixel(TempMemPtr dstBuffer, int arrayOffset, Color srcColor)
+        {
+            unsafe
+            {
+                int* ptr1 = (int*)dstBuffer.Ptr;
+                int* ptr = &ptr1[arrayOffset];
+                {
+                    //TODO: consider use memcpy() impl*** 
+                    byte y = (byte)(((srcColor.red * 77) + (srcColor.green * 151) + (srcColor.blue * 28)) >> 8);
+                    srcColor = new Color(srcColor.alpha, y, y, y);
+
+                    *ptr = srcColor.ToARGB();
+                }
+
+            }
+        }
     }
 
     /// <summary>
@@ -302,23 +480,23 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     {
 
 
-        int[] _maskInnerBuffer;
+        TempMemPtr _maskInnerBuffer;
         int _mask_shift = 16;//default
         PixelBlenderColorComponent _selectedMaskComponent;
         public PixelBlenderWithMask()
         {
             SelectedMaskComponent = PixelBlenderColorComponent.R; //default
         }
-        
+
         /// <summary>
         /// set mask image, please note that size of mask must be the same size of the dest buffer
         /// </summary>
         /// <param name="maskBmp"></param>
-        public void SetMaskBitmap(ActualBitmap maskBmp)
+        public void SetMaskBitmap(MemBitmap maskBmp)
         {
             //please note that size of mask must be the same size of the dest buffer
 
-            _maskInnerBuffer = ActualBitmap.GetBuffer(maskBmp);
+            _maskInnerBuffer = MemBitmap.GetBufferPtr(maskBmp);
         }
         public PixelBlenderColorComponent SelectedMaskComponent
         {
@@ -350,7 +528,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         Color NewColorFromMask(Color srcColor, int arrayOffset)
         {
-            return srcColor.NewFromChangeCoverage((byte)((_maskInnerBuffer[arrayOffset]) >> _mask_shift));
+            unsafe
+            {
+                int* buff = (int*)_maskInnerBuffer.Ptr;
+                return srcColor.NewFromChangeCoverage((byte)((buff[arrayOffset]) >> _mask_shift));
+            }
+
         }
         internal override void BlendPixel(int[] dstBuffer, int arrayOffset, Color srcColor)
         {
@@ -514,54 +697,50 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             unsafe
             {
-                unchecked
+
+                fixed (int* ptr_byte = &dstBuffer[arrayOffset])
                 {
-                    fixed (int* ptr_byte = &dstBuffer[arrayOffset])
+                    //TODO: consider use memcpy() impl***
+                    int* ptr = ptr_byte;
+
+                    Color newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                    //---------
+                    if ((count % 2) != 0)
                     {
-                        //TODO: consider use memcpy() impl***
-                        int* ptr = ptr_byte;
+                        BlendPixel32(ptr, newColor);
 
-                        Color newColor = NewColorFromMask(srcColor, arrayOffset);
-
-                        //---------
-                        if ((count % 2) != 0)
-                        {
-                            BlendPixel32(ptr, newColor);
-
-                            arrayOffset++;//move next
-                            ptr++; //move next
-                            count--;
-                        }
-
-                        while (count > 0)
-                        {
-                            //-----------
-
-                            newColor = NewColorFromMask(srcColor, arrayOffset);
-
-                            //1.
-                            BlendPixel32(ptr, newColor);
-                            arrayOffset++;//move next
-                            ptr++; //move next
-                            count--;
-                            //-----------
-
-                            //2
-                            newColor = NewColorFromMask(srcColor, arrayOffset);
-
-                            //1.
-                            BlendPixel32(ptr, newColor);
-                            arrayOffset++;//move next
-                            ptr++; //move next
-                            count--;
-                        }
-
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
                     }
+
+                    while (count > 0)
+                    {
+                        //-----------
+
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                        //-----------
+
+                        //2
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                    }
+
                 }
             }
-
         }
-
 
         static unsafe void BlendPixel32Internal(int* dstPtr, Color srcColor)
         {
@@ -591,6 +770,204 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
             }
         }
+
+        internal override void BlendPixels(TempMemPtr dst, int arrayOffset, Color srcColor)
+        {
+            unsafe
+            {
+                int* dstBuffer = (int*)dst.Ptr;
+                int* head = &dstBuffer[arrayOffset];
+                {
+                    BlendPixel32Internal(head, NewColorFromMask(srcColor, arrayOffset));
+                }
+            }
+        }
+
+        internal override void BlendPixels(TempMemPtr dst, int arrayElemOffset, Color[] srcColors, int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+        {
+            if (firstCoverForAll)
+            {
+                int cover = covers[coversIndex];
+                if (cover == 255)
+                {
+
+                    unsafe
+                    {
+                        int* dstBuffer = (int*)dst.Ptr;
+                        int* head = &dstBuffer[arrayElemOffset];
+                        {
+                            int* header2 = head;
+
+                            if (count % 2 != 0)
+                            {
+                                //odd
+                                //
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                header2++;//move next
+                                count--;
+                                arrayElemOffset++;
+                            }
+
+                            //now count is even number
+                            while (count > 0)
+                            {
+                                //now count is even number
+                                //---------
+                                //1
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                header2++;//move next
+                                count--;
+                                arrayElemOffset++;
+                                //---------
+                                //2
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                header2++;//move next
+                                count--;
+                                arrayElemOffset++;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    unsafe
+                    {
+                        int* dstBuffer = (int*)dst.Ptr;
+                        int* head = &dstBuffer[arrayElemOffset];
+                        {
+                            int* header2 = head;
+
+                            if (count % 2 != 0)
+                            {
+                                //odd
+                                //
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                arrayElemOffset++;
+                                header2++;//move next
+                                count--;
+                            }
+                            while (count > 0)
+                            {
+                                //Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++].NewFromChangeCoverage(cover));
+                                //1.
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                arrayElemOffset++;
+
+                                header2++;//move next
+                                count--;
+                                //2.
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                arrayElemOffset++;
+
+                                header2++;//move next
+                                count--;
+                            }
+
+                        }
+                    }
+                }
+            }
+            else
+            {
+                unsafe
+                {
+                    int* dstBuffer = (int*)dst.Ptr;
+                    int* head = &dstBuffer[arrayElemOffset];
+                    {
+                        int* dstBufferPtr = head;
+                        do
+                        {
+                            //cover may diff in each loop
+                            int cover = covers[coversIndex++];
+                            if (cover == 255)
+                            {
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset], arrayElemOffset));
+                            }
+                            else
+                            {
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset].NewFromChangeCoverage(cover), arrayElemOffset));
+                            }
+
+
+                            arrayElemOffset++;
+                            dstBufferPtr++;
+                            ++srcColorOffset;
+                        }
+                        while (--count != 0);
+                    }
+                }
+            }
+        }
+
+        internal override void CopyPixels(TempMemPtr dst, int arrayOffset, Color srcColor, int count)
+        {
+            unsafe
+            {
+                int* dstBuffer = (int*)dst.Ptr;
+                int* ptr_byte = &dstBuffer[arrayOffset];
+                {
+                    //TODO: consider use memcpy() impl***
+                    int* ptr = ptr_byte;
+
+                    Color newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                    //---------
+                    if ((count % 2) != 0)
+                    {
+                        BlendPixel32(ptr, newColor);
+
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                    }
+
+                    while (count > 0)
+                    {
+                        //-----------
+
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                        //-----------
+
+                        //2
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                    }
+
+                }
+
+            }
+        }
+
+        internal override void CopyPixel(TempMemPtr dst, int arrayOffset, Color srcColor)
+        {
+
+            unsafe
+            {
+                int* dstBuffer = (int*)dst.Ptr;
+                int* ptr = &dstBuffer[arrayOffset];
+                {
+                    BlendPixel32(ptr, NewColorFromMask(srcColor, arrayOffset));
+                }
+
+            }
+        }
     }
 
     public enum PixelBlenderColorComponent
@@ -616,9 +993,9 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     /// </summary>
     public class PixelBlenderPerColorComponentWithMask : PixelBlender32
     {
- 
 
-        int[] _maskInnerBuffer;
+
+        TempMemPtr _maskInnerBuffer;
         int _mask_shift = 16;//default
 
         PixelBlenderColorComponent _selectedMaskComponent;
@@ -628,35 +1005,26 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             SelectedMaskComponent = PixelBlenderColorComponent.R; //default
             EnableOutputColorComponent = EnableOutputColorComponent.EnableAll;
-        } 
+        }
         /// <summary>
         /// set mask image, please note that size of mask must be the same size of the dest buffer
         /// </summary>
         /// <param name="maskBmp"></param>
-        public void SetMaskBitmap(ActualBitmap maskBmp)
+        public void SetMaskBitmap(MemBitmap maskBmp)
         {
             //in this version
             //please note that size of mask must be the same size of the dest buffer
-            _maskInnerBuffer = ActualBitmap.GetBuffer(maskBmp);
+            _maskInnerBuffer = MemBitmap.GetBufferPtr(maskBmp);
         }
-       
+
         public EnableOutputColorComponent EnableOutputColorComponent
         {
-            get
-            {
-                return _selectedDestMaskComponent;
-            }
-            set
-            {
-                _selectedDestMaskComponent = value;
-            }
+            get => _selectedDestMaskComponent;
+            set => _selectedDestMaskComponent = value;
         }
         public PixelBlenderColorComponent SelectedMaskComponent
         {
-            get
-            {
-                return _selectedMaskComponent;
-            }
+            get => _selectedMaskComponent;
             set
             {
                 _selectedMaskComponent = value;
@@ -686,7 +1054,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         /// <returns></returns>
         Color NewColorFromMask(Color srcColor, int arrayOffset)
         {
-            return srcColor.NewFromChangeCoverage((byte)((_maskInnerBuffer[arrayOffset]) >> _mask_shift));
+            unsafe
+            {
+                int* ptr = (int*)_maskInnerBuffer.Ptr;
+                return srcColor.NewFromChangeCoverage((byte)((ptr[arrayOffset]) >> _mask_shift));
+            }
+
         }
         internal override void BlendPixel(int[] dstBuffer, int arrayOffset, Color srcColor)
         {
@@ -835,13 +1208,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
             unsafe
             {
-                unchecked
+                fixed (int* ptr = &dstBuffer[arrayOffset])
                 {
-                    fixed (int* ptr = &dstBuffer[arrayOffset])
-                    {
-                        BlendPixel32(ptr, NewColorFromMask(srcColor, arrayOffset));
-                    }
+                    BlendPixel32(ptr, NewColorFromMask(srcColor, arrayOffset));
                 }
+
             }
 
         }
@@ -850,48 +1221,45 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             unsafe
             {
-                unchecked
+
+                fixed (int* ptr_byte = &dstBuffer[arrayOffset])
                 {
-                    fixed (int* ptr_byte = &dstBuffer[arrayOffset])
+                    //TODO: consider use memcpy() impl***
+                    int* ptr = ptr_byte;
+
+                    Color newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                    //---------
+                    if ((count % 2) != 0)
                     {
-                        //TODO: consider use memcpy() impl***
-                        int* ptr = ptr_byte;
+                        BlendPixel32(ptr, newColor);
 
-                        Color newColor = NewColorFromMask(srcColor, arrayOffset);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                    }
 
-                        //---------
-                        if ((count % 2) != 0)
-                        {
-                            BlendPixel32(ptr, newColor);
+                    while (count > 0)
+                    {
+                        //-----------
 
-                            arrayOffset++;//move next
-                            ptr++; //move next
-                            count--;
-                        }
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
 
-                        while (count > 0)
-                        {
-                            //-----------
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                        //-----------
 
-                            newColor = NewColorFromMask(srcColor, arrayOffset);
+                        //2
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
 
-                            //1.
-                            BlendPixel32(ptr, newColor);
-                            arrayOffset++;//move next
-                            ptr++; //move next
-                            count--;
-                            //-----------
-
-                            //2
-                            newColor = NewColorFromMask(srcColor, arrayOffset);
-
-                            //1.
-                            BlendPixel32(ptr, newColor);
-                            arrayOffset++;//move next
-                            ptr++; //move next
-                            count--;
-                        }
-
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
                     }
                 }
             }
@@ -959,6 +1327,204 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                             break;
                     }
                 }
+            }
+        }
+
+        internal override void BlendPixels(TempMemPtr dstBuffer, int arrayOffset, Color srcColor)
+        {
+            unsafe
+            {
+                int* dst = (int*)dstBuffer.Ptr;
+                int* head = &dst[arrayOffset];
+                {
+                    BlendPixel32Internal(head, NewColorFromMask(srcColor, arrayOffset), _selectedDestMaskComponent);
+                }
+            }
+        }
+
+        internal override void BlendPixels(TempMemPtr dst, int arrayElemOffset, Color[] srcColors,
+            int srcColorOffset, byte[] covers, int coversIndex, bool firstCoverForAll, int count)
+        {
+            if (firstCoverForAll)
+            {
+                int cover = covers[coversIndex];
+                if (cover == 255)
+                {
+
+                    unsafe
+                    {
+                        int* dstBuffer = (int*)dst.Ptr;
+                        int* head = &dstBuffer[arrayElemOffset];
+                        {
+                            int* header2 = head;
+
+                            if (count % 2 != 0)
+                            {
+                                //odd
+                                //
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                header2++;//move next
+                                count--;
+                                arrayElemOffset++;
+                            }
+
+                            //now count is even number
+                            while (count > 0)
+                            {
+                                //now count is even number
+                                //---------
+                                //1
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                header2++;//move next
+                                count--;
+                                arrayElemOffset++;
+                                //---------
+                                //2
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++]);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                header2++;//move next
+                                count--;
+                                arrayElemOffset++;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    unsafe
+                    {
+                        int* dstBuffer = (int*)dst.Ptr;
+                        int* head = &dstBuffer[arrayElemOffset];
+                        {
+                            int* header2 = head;
+
+                            if (count % 2 != 0)
+                            {
+                                //odd
+                                //
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                arrayElemOffset++;
+                                header2++;//move next
+                                count--;
+                            }
+                            while (count > 0)
+                            {
+                                //Blend32PixelInternal(header2, sourceColors[sourceColorsOffset++].NewFromChangeCoverage(cover));
+                                //1.
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                arrayElemOffset++;
+
+                                header2++;//move next
+                                count--;
+                                //2.
+                                //BlendPixel32Internal(header2, srcColors[srcColorOffset++], cover);
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset++], arrayElemOffset));
+                                arrayElemOffset++;
+
+                                header2++;//move next
+                                count--;
+                            }
+
+                        }
+                    }
+                }
+            }
+            else
+            {
+                unsafe
+                {
+                    int* dstBuffer = (int*)dst.Ptr;
+                    int* dstHead = &dstBuffer[arrayElemOffset];
+                    {
+                        int* dstBufferPtr = dstHead;
+                        do
+                        {
+                            //cover may diff in each loop
+                            int cover = covers[coversIndex++];
+                            if (cover == 255)
+                            {
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset], arrayElemOffset));
+                            }
+                            else
+                            {
+                                BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset].NewFromChangeCoverage(cover), arrayElemOffset));
+                            }
+
+
+                            arrayElemOffset++;
+                            dstBufferPtr++;
+                            ++srcColorOffset;
+                        }
+                        while (--count != 0);
+                    }
+                }
+            }
+        }
+
+        internal override void CopyPixels(TempMemPtr dst, int arrayOffset, Color srcColor, int count)
+        {
+            unsafe
+            {
+                int* dstBuffer = (int*)dst.Ptr;
+                int* ptr_byte = &dstBuffer[arrayOffset];
+                {
+                    //TODO: consider use memcpy() impl***
+                    int* ptr = ptr_byte;
+
+                    Color newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                    //---------
+                    if ((count % 2) != 0)
+                    {
+                        BlendPixel32(ptr, newColor);
+
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                    }
+
+                    while (count > 0)
+                    {
+                        //-----------
+
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                        //-----------
+
+                        //2
+                        newColor = NewColorFromMask(srcColor, arrayOffset);
+
+                        //1.
+                        BlendPixel32(ptr, newColor);
+                        arrayOffset++;//move next
+                        ptr++; //move next
+                        count--;
+                    }
+
+                }
+
+            }
+        }
+
+        internal override void CopyPixel(TempMemPtr dstBuffer, int arrayOffset, Color srcColor)
+        {
+            unsafe
+            {
+                int* dst = (int*)dstBuffer.Ptr;
+                int* ptr = &dst[arrayOffset];
+                {
+                    BlendPixel32(ptr, NewColorFromMask(srcColor, arrayOffset));
+                }
+
             }
         }
     }

@@ -9,8 +9,8 @@ namespace Typography.OpenFont.Tables
     // https://www.microsoft.com/typography/otspec/GPOS.htm
     public partial class GPOS : GlyphShapingTableEntry
     {
-        public override string Name { get { return "GPOS"; } }
-
+        public override string Name => "GPOS";
+        //
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
                                                 ushort lookupType, ushort lookupFlags,
                                                 ushort[] subTableOffsets, ushort markFilteringSet)
@@ -49,7 +49,7 @@ namespace Typography.OpenFont.Tables
             string _msg;
             public UnImplementedLookupSubTable(string message)
             {
-                this._msg = message;
+                _msg = message;
                 Utils.WarnUnimplemented(message);
             }
             public override string ToString()
@@ -114,17 +114,17 @@ namespace Typography.OpenFont.Tables
 
             class LkSubTableType1 : LookupSubTable
             {
-                ValueRecord singleValue;
-                ValueRecord[] multiValues;
+                ValueRecord _singleValue;
+                ValueRecord[] _multiValues;
                 public LkSubTableType1(ValueRecord singleValue)
                 {
                     this.Format = 1;
-                    this.singleValue = singleValue;
+                    _singleValue = singleValue;
                 }
                 public LkSubTableType1(ValueRecord[] valueRecords)
                 {
                     this.Format = 2;
-                    this.multiValues = valueRecords;
+                    _multiValues = valueRecords;
                 }
                 public int Format { get; private set; }
                 public CoverageTable CoverageTable { get; set; }
@@ -192,10 +192,10 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableType2Fmt1 : LookupSubTable
             {
-                PairSetTable[] pairSetTables;
+                PairSetTable[] _pairSetTables;
                 public LkSubTableType2Fmt1(PairSetTable[] pairSetTables)
                 {
-                    this.pairSetTables = pairSetTables;
+                    _pairSetTables = pairSetTables;
                 }
                 public CoverageTable CoverageTable { get; set; }
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
@@ -210,7 +210,7 @@ namespace Typography.OpenFont.Tables
                         if (firstGlyphFound > -1)
                         {
                             //test this with Palatino A-Y sequence
-                            PairSetTable pairSet = this.pairSetTables[firstGlyphFound];
+                            PairSetTable pairSet = _pairSetTables[firstGlyphFound];
                             //check second glyph 
                             ushort second_glyph_w;
                             ushort second_glyph_index = inputGlyphs.GetGlyph(i + 1, out second_glyph_w);

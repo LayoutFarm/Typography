@@ -20,19 +20,19 @@ namespace Typography.Contours
         EdgeLine _tipEdge_q;
 
         float _fitX, _fitY;
- 
+
         internal GlyphBoneJoint(
             InsideEdgeLine p_contact_edge,
             InsideEdgeLine q_contact_edge)
         {
 
             //both p and q is INSIDE, contact edge
-            this._p_contact_edge = p_contact_edge;
-            this._q_contact_edge = q_contact_edge;
+            _p_contact_edge = p_contact_edge;
+            _q_contact_edge = q_contact_edge;
             //this is original x,y
             Vector2 midpos = p_contact_edge.GetMidPoint();
-            this._fitX = midpos.X;
-            this._fitY = midpos.Y;
+            _fitX = midpos.X;
+            _fitY = midpos.Y;
 
 #if DEBUG
             if (p_contact_edge.inside_joint != null ||
@@ -47,59 +47,28 @@ namespace Typography.Contours
         /// <summary>
         /// dynamic fit x
         /// </summary>
-        public float FitX
-        {
-            get { return _fitX; }
-        }
+        public float FitX => _fitX;
         /// <summary>
         /// dynamic fit y
         /// </summary>
-        public float FitY
-        {
-            get { return _fitY; }
-        }
+        public float FitY => _fitY;
+
         internal void SetFitXY(float newx, float newy)
         {
-            this._fitX = newx;
-            this._fitY = newy;
+            _fitX = newx;
+            _fitY = newy;
         }
-        internal GlyphTriangle P_Tri
-        {
-            get
-            {
-                return _p_contact_edge.OwnerTriangle;
-            }
-        }
-        internal GlyphTriangle Q_Tri
-        {
-            get
-            {
-                return _q_contact_edge.OwnerTriangle;
-            }
-        }
-
+        internal GlyphTriangle P_Tri => _p_contact_edge.OwnerTriangle;
+        internal GlyphTriangle Q_Tri => _q_contact_edge.OwnerTriangle;
 
         /// <summary>
         /// get position of this bone joint (mid point of the edge)
         /// </summary>
         /// <returns></returns>
-        public Vector2 OriginalJointPos
-        {
-            get
-            {
-                //mid point of the contact edge line
-                return _p_contact_edge.GetMidPoint();
-            }
-        }
-        public Vector2 DynamicFitPos
-        {
-            get
-            {
-                //mid point of the contact edge line
-                return new Vector2(_fitX, _fitY);
-            }
-        }
-
+        public Vector2 OriginalJointPos => _p_contact_edge.GetMidPoint();//mid point of the contact edge line
+        //
+        public Vector2 DynamicFitPos => new Vector2(_fitX, _fitY);
+        //
         /// <summary>
         /// calculate distance^2 from contact point to specific point v
         /// </summary>
@@ -123,7 +92,7 @@ namespace Typography.Contours
             }
 #endif
             e.IsTip = true;
-            this._tipEdge_p = e;
+            _tipEdge_p = e;
         }
         internal void SetTipEdge_Q(EdgeLine e)
         {
@@ -138,23 +107,18 @@ namespace Typography.Contours
             }
 #endif
             e.IsTip = true;
-            this._tipEdge_q = e;
-
+            _tipEdge_q = e;
         }
-        public bool HasTipP
-        {
-            get { return this._tipEdge_p != null; }
-        }
-        public bool HasTipQ
-        {
-            get { return this._tipEdge_q != null; }
-        }
-        public Vector2 TipPointP { get { return _tipEdge_p.GetMidPoint(); } }
-        public EdgeLine TipEdgeP { get { return _tipEdge_p; } }
-
-        public Vector2 TipPointQ { get { return _tipEdge_q.GetMidPoint(); } }
-        public EdgeLine TipEdgeQ { get { return _tipEdge_q; } }
-
+        //
+        public bool HasTipP => _tipEdge_p != null;
+        public bool HasTipQ => _tipEdge_q != null;
+        //
+        public Vector2 TipPointP => _tipEdge_p.GetMidPoint();
+        public EdgeLine TipEdgeP => _tipEdge_p;
+        //
+        public Vector2 TipPointQ => _tipEdge_q.GetMidPoint();
+        public EdgeLine TipEdgeQ => _tipEdge_q;
+        //
         internal bool ComposeOf(GlyphTriangle tri)
         {
             return this.P_Tri == tri || this.Q_Tri == tri;
@@ -183,7 +147,7 @@ namespace Typography.Contours
         }
 
         public EdgeLine dbugGetEdge_P() { return _p_contact_edge; }
-        public EdgeLine dbugGetEdge_Q() { return _q_contact_edge; } 
+        public EdgeLine dbugGetEdge_Q() { return _q_contact_edge; }
         public void dbugGetCentroidBoneCenters(out float cx0, out float cy0, out float cx1, out float cy1)
         {
 

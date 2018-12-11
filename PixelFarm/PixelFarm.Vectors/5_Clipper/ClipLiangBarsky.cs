@@ -58,10 +58,10 @@ namespace PixelFarm.CpuBlit.PrimitiveProcessing
         //template<class T>
         public static int Flags(int x, int y, RectInt clip_box)
         {
-            return ((x > clip_box.Right) ? 1 : 0)
-                | ((y > clip_box.Top) ? 1 << 1 : 0)
-                | ((x < clip_box.Left) ? 1 << 2 : 0)
-                | ((y < clip_box.Bottom) ? 1 << 3 : 0);
+            return ((x > clip_box.Right) ? 1 : 0) |
+                   ((y > clip_box.Top) ? 1 << 1 : 0) |
+                   ((x < clip_box.Left) ? 1 << 2 : 0) |
+                   ((y < clip_box.Bottom) ? 1 << 3 : 0);
         }
 
         public static int GetFlagsX(int x, RectInt clip_box)
@@ -242,7 +242,7 @@ namespace PixelFarm.CpuBlit.PrimitiveProcessing
                 {
                     return false;
                 }
-                bound = ((flags & ClippingFlags.cX1) != 0) ? clip_box.Bottom : clip_box.Top;
+                bound = ((flags & ClippingFlags.cY1) != 0) ? clip_box.Bottom : clip_box.Top;
                 x = (int)((double)(bound - y1) * (x2 - x1) / (y2 - y1) + x1);
                 y = bound;
             }

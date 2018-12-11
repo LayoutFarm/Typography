@@ -14,35 +14,36 @@ namespace Typography.TextBreak
     /// </summary>
     public class CustomDic
     {
-        CustomDicTextBuffer textBuffer;
-        WordGroup[] wordGroups;
-        char firstChar, lastChar;
+        CustomDicTextBuffer _textBuffer;
+        WordGroup[] _wordGroups;
+        char _firstChar, _lastChar;
 
-        internal CustomDicTextBuffer TextBuffer { get { return textBuffer; } }
+
         public void SetCharRange(char firstChar, char lastChar)
         {
-            this.firstChar = firstChar;
-            this.lastChar = lastChar;
+            _firstChar = firstChar;
+            _lastChar = lastChar;
         }
-        public char FirstChar { get { return firstChar; } }
-        public char LastChar { get { return lastChar; } }
+        public char FirstChar => _firstChar;
+        public char LastChar => _lastChar;
+        internal CustomDicTextBuffer TextBuffer => _textBuffer;
 
 
         public void LoadSortedUniqueWordList(IEnumerable<string> sortedWordList)
         {
             // load unique and sorted word list
-            if (textBuffer != null)
+            if (_textBuffer != null)
             {
                 return;
             }
-            if (firstChar == '\0' || lastChar == '\0')
+            if (_firstChar == '\0' || _lastChar == '\0')
             {
                 throw new NotSupportedException();
             }
 
             //---------------
             Dictionary<char, DevelopingWordGroup> wordGroups = new Dictionary<char, DevelopingWordGroup>();
-            textBuffer = new CustomDicTextBuffer(1024);
+            _textBuffer = new CustomDicTextBuffer(1024);
             foreach (string line in sortedWordList)
             {
                 char[] lineBuffer = line.Trim().ToCharArray();
@@ -50,8 +51,8 @@ namespace Typography.TextBreak
                 char c0;
                 if (lineLen > 0 && (c0 = lineBuffer[0]) != '#')
                 {
-                    int startAt = textBuffer.CurrentPosition;
-                    textBuffer.AddWord(lineBuffer);
+                    int startAt = _textBuffer.CurrentPosition;
+                    _textBuffer.AddWord(lineBuffer);
 
 #if DEBUG
                     if (lineLen > byte.MaxValue)
@@ -74,7 +75,7 @@ namespace Typography.TextBreak
                 //- next line
             }
             //------------------------------------------------------------------
-            textBuffer.Freeze();
+            _textBuffer.Freeze();
             //------------------------------------------------------------------ 
             //do index
             DoIndex(wordGroups);
@@ -84,44 +85,42 @@ namespace Typography.TextBreak
 
         }
 
-        int TransformCharToIndex(char c)
-        {
-            return c - this.firstChar;
-        }
+        int TransformCharToIndex(char c) => c - _firstChar;
+        //
         void DoIndex(Dictionary<char, DevelopingWordGroup> wordGroups)
         {
             //1. expand word group
-            WordGroup[] newWordGroups = new WordGroup[this.lastChar - this.firstChar + 1];
+            WordGroup[] newWordGroups = new WordGroup[_lastChar - _firstChar + 1];
 
             foreach (var kp in wordGroups)
             {
                 //for each dev word group
                 int index = TransformCharToIndex(kp.Key);
                 DevelopingWordGroup devWordGroup = kp.Value;
-                devWordGroup.DoIndex(this.textBuffer, this);
+                devWordGroup.DoIndex(_textBuffer, this);
                 newWordGroups[index] = devWordGroup.ResultWordGroup;
             }
-            this.wordGroups = newWordGroups;
+            _wordGroups = newWordGroups;
         }
         public void GetWordList(char startWithChar, List<string> output)
         {
-            if (startWithChar >= firstChar && startWithChar <= lastChar)
+            if (startWithChar >= _firstChar && startWithChar <= _lastChar)
             {
                 //in range 
-                WordGroup found = this.wordGroups[TransformCharToIndex(startWithChar)];
+                WordGroup found = _wordGroups[TransformCharToIndex(startWithChar)];
                 if (found != null)
                 {
                     //iterate and collect into 
-                    found.CollectAllWords(this.textBuffer, output);
+                    found.CollectAllWords(_textBuffer, output);
                 }
             }
         }
         internal WordGroup GetWordGroupForFirstChar(char c)
         {
-            if (c >= firstChar && c <= lastChar)
+            if (c >= _firstChar && c <= _lastChar)
             {
                 //in range
-                return this.wordGroups[TransformCharToIndex(c)];
+                return _wordGroups[TransformCharToIndex(c)];
             }
             return null;
         }
@@ -177,12 +176,12 @@ namespace Typography.TextBreak
 
     class DevelopingWordGroup
     {
-        List<WordSpan> wordSpanList = new List<WordSpan>();
-        DevelopingWordGroup[] subGroups;
-        WordSpan prefixSpan;
+        List<WordSpan> _wordSpanList = new List<WordSpan>();
+        DevelopingWordGroup[] _subGroups;
+        WordSpan _prefixSpan;
         internal DevelopingWordGroup(WordSpan prefixSpan)
         {
-            this.prefixSpan = prefixSpan;
+            _prefixSpan = prefixSpan;
         }
 
 
@@ -196,13 +195,13 @@ namespace Typography.TextBreak
         }
         static int debugTotalId;
         int debugId = debugTotalId++;
-        public static int DebugTotalId { get { return debugTotalId; } }
+        public static int DebugTotalId => debugTotalId;
         debugDataState dbugDataState;
 #endif
 
         internal string GetPrefix(CustomDicTextBuffer buffer)
         {
-            return prefixSpan.GetString(buffer);
+            return _prefixSpan.GetString(buffer);
         }
         internal bool PrefixIsWord
         {
@@ -215,9 +214,9 @@ namespace Typography.TextBreak
             {
                 output.Add(GetPrefix(textBuffer));
             }
-            if (subGroups != null)
+            if (_subGroups != null)
             {
-                foreach (DevelopingWordGroup wordGroup in subGroups)
+                foreach (DevelopingWordGroup wordGroup in _subGroups)
                 {
                     if (wordGroup != null)
                     {
@@ -225,19 +224,19 @@ namespace Typography.TextBreak
                     }
                 }
             }
-            if (wordSpanList != null)
+            if (_wordSpanList != null)
             {
-                foreach (var span in wordSpanList)
+                foreach (var span in _wordSpanList)
                 {
                     output.Add(span.GetString(textBuffer));
                 }
             }
         }
-        public int PrefixLen { get { return this.prefixSpan.len; } }
+        public int PrefixLen { get { return _prefixSpan.len; } }
 
         internal void AddWordSpan(WordSpan span)
         {
-            wordSpanList.Add(span);
+            _wordSpanList.Add(span);
 #if DEBUG
             dbugDataState = debugDataState.UnIndex;
 #endif
@@ -247,8 +246,8 @@ namespace Typography.TextBreak
             get
             {
 
-                if (wordSpanList == null) return 0;
-                return wordSpanList.Count;
+                if (_wordSpanList == null) return 0;
+                return _wordSpanList.Count;
             }
         }
         WordGroup _resultWordGroup;//after call DoIndex()
@@ -267,27 +266,27 @@ namespace Typography.TextBreak
             //-----------------------------------------------
 
             bool hasEvalPrefix = false;
-            if (subGroups == null)
+            if (_subGroups == null)
             {
-                subGroups = new DevelopingWordGroup[owner.LastChar - owner.FirstChar + 1];
+                _subGroups = new DevelopingWordGroup[owner.LastChar - owner.FirstChar + 1];
             }
             //--------------------------------
-            int j = wordSpanList.Count;
+            int j = _wordSpanList.Count;
             int thisPrefixLen = this.PrefixLen;
             int doSepAt = thisPrefixLen;
             for (int i = 0; i < j; ++i)
             {
-                WordSpan sp = wordSpanList[i];
+                WordSpan sp = _wordSpanList[i];
                 if (sp.len > doSepAt)
                 {
                     char c = sp.GetChar(doSepAt, textBuffer);
                     int c_index = c - owner.FirstChar;
-                    DevelopingWordGroup found = subGroups[c_index];
+                    DevelopingWordGroup found = _subGroups[c_index];
                     if (found == null)
                     {
                         //not found
                         found = new DevelopingWordGroup(new WordSpan(sp.startAt, (byte)(doSepAt + 1)));
-                        subGroups[c_index] = found;
+                        _subGroups[c_index] = found;
                     }
                     found.AddWordSpan(sp);
                 }
@@ -295,7 +294,7 @@ namespace Typography.TextBreak
                 {
                     if (!hasEvalPrefix)
                     {
-                        if (sp.SameTextContent(this.prefixSpan, textBuffer))
+                        if (sp.SameTextContent(_prefixSpan, textBuffer))
                         {
                             hasEvalPrefix = true;
                             this.PrefixIsWord = true;
@@ -307,13 +306,13 @@ namespace Typography.TextBreak
 #if DEBUG
             this.dbugDataState = debugDataState.Indexed;
 #endif
-            wordSpanList.Clear();
-            wordSpanList = null;
+            _wordSpanList.Clear();
+            _wordSpanList = null;
             //--------------------------------
             //do sup index
             //foreach (WordGroup subgroup in this.wordGroups.Values)
             bool hasSomeSubGroup = false;
-            foreach (DevelopingWordGroup subgroup in this.subGroups)
+            foreach (DevelopingWordGroup subgroup in _subGroups)
             {
                 if (subgroup != null)
                 {
@@ -348,17 +347,17 @@ namespace Typography.TextBreak
             if (!hasSomeSubGroup)
             {
                 //clear
-                subGroups = null;
+                _subGroups = null;
             }
 
             //--------------------------------
             WordGroup[] newsubGroups = null;
-            if (subGroups != null)
+            if (_subGroups != null)
             {
-                newsubGroups = new WordGroup[subGroups.Length];
-                for (int i = subGroups.Length - 1; i >= 0; --i)
+                newsubGroups = new WordGroup[_subGroups.Length];
+                for (int i = _subGroups.Length - 1; i >= 0; --i)
                 {
-                    DevelopingWordGroup subg = subGroups[i];
+                    DevelopingWordGroup subg = _subGroups[i];
                     if (subg != null)
                     {
                         newsubGroups[i] = subg.ResultWordGroup;
@@ -366,46 +365,40 @@ namespace Typography.TextBreak
                 }
             }
             //--------------------------------
-            this._resultWordGroup = new WordGroup(
-                this.prefixSpan,
+            _resultWordGroup = new WordGroup(
+                _prefixSpan,
                 newsubGroups,
                 null,
                 this.PrefixIsWord);
 
         }
-
-        public WordGroup ResultWordGroup
-        {
-            get
-            {
-                return _resultWordGroup;
-            }
-        }
-
+        //
+        public WordGroup ResultWordGroup => _resultWordGroup;
+        //
         void DoIndexOfSmallAmount(CustomDicTextBuffer textBuffer)
         {
 
             //convention...
             //data must me sorted (ascending) before use with the wordSpanList 
 
-            for (int i = wordSpanList.Count - 1; i >= 0; --i)
+            for (int i = _wordSpanList.Count - 1; i >= 0; --i)
             {
-                WordSpan sp = wordSpanList[i];
+                WordSpan sp = _wordSpanList[i];
 #if DEBUG
                 //string dbugStr = sp.GetString(textBuffer);
 #endif
 
-                if (sp.SameTextContent(this.prefixSpan, textBuffer))
+                if (sp.SameTextContent(_prefixSpan, textBuffer))
                 {
                     this.PrefixIsWord = true;
                     break;
                 }
             }
 
-            this._resultWordGroup = new WordGroup(
-                this.prefixSpan,
+            _resultWordGroup = new WordGroup(
+                _prefixSpan,
                 null,
-                this.wordSpanList.ToArray(),
+                _wordSpanList.ToArray(),
                 this.PrefixIsWord);
 
         }
@@ -414,13 +407,13 @@ namespace Typography.TextBreak
         public override string ToString()
         {
             StringBuilder stbuilder = new StringBuilder();
-            stbuilder.Append(this.prefixSpan.startAt + " " + this.prefixSpan.len);
+            stbuilder.Append(_prefixSpan.startAt + " " + _prefixSpan.len);
             stbuilder.Append(" " + this.dbugDataState);
             //---------  
 
-            if (wordSpanList != null)
+            if (_wordSpanList != null)
             {
-                stbuilder.Append(",u_index=" + wordSpanList.Count + " ");
+                stbuilder.Append(",u_index=" + _wordSpanList.Count + " ");
             }
             return stbuilder.ToString();
         }
@@ -432,8 +425,8 @@ namespace Typography.TextBreak
     class CustomDicTextBuffer
     {
         List<char> _tmpCharList;
-        int position;
-        char[] charBuffer;
+        int _position;
+        char[] _charBuffer;
         public CustomDicTextBuffer(int initCapacity)
         {
             _tmpCharList = new List<char>(initCapacity);
@@ -443,58 +436,60 @@ namespace Typography.TextBreak
             _tmpCharList.AddRange(wordBuffer);
             //append with  ' ' 
             _tmpCharList.Add(' ');
-            position += wordBuffer.Length + 1;
+            _position += wordBuffer.Length + 1;
         }
         public void Freeze()
         {
-            charBuffer = _tmpCharList.ToArray();
+            _charBuffer = _tmpCharList.ToArray();
             _tmpCharList = null;
         }
-        public int CurrentPosition
-        {
-            get { return position; }
-        }
+        //
+        public int CurrentPosition => _position;
+        //
         public char GetChar(int index)
         {
-            return charBuffer[index];
+            //refactor note:
+            //remain in this style -> easy to debug
+
+            return _charBuffer[index];
         }
         public string GetString(int index, int len)
         {
-            return new string(this.charBuffer, index, len);
+            return new string(_charBuffer, index, len);
         }
     }
 
     public class WordGroup
     {
-        readonly WordGroup[] subGroups;
-        readonly WordSpan[] wordSpans;
-        readonly WordSpan prefixSpan;
-        readonly bool prefixIsWord;
+        readonly WordGroup[] _subGroups;
+        readonly WordSpan[] _wordSpans;
+        readonly WordSpan _prefixSpan;
+        readonly bool _prefixIsWord;
         internal WordGroup(WordSpan prefixSpan, WordGroup[] subGroups, WordSpan[] wordSpanList, bool isPrefixIsWord)
         {
-            this.prefixSpan = prefixSpan;
-            this.subGroups = subGroups;
-            this.wordSpans = wordSpanList;
-            this.prefixIsWord = isPrefixIsWord;
+            _prefixSpan = prefixSpan;
+            _subGroups = subGroups;
+            _wordSpans = wordSpanList;
+            _prefixIsWord = isPrefixIsWord;
         }
 
         internal string GetPrefix(CustomDicTextBuffer buffer)
         {
-            return prefixSpan.GetString(buffer);
+            return _prefixSpan.GetString(buffer);
         }
-        internal bool PrefixIsWord
-        {
-            get { return this.prefixIsWord; }
-        }
+        //
+        internal bool PrefixIsWord => _prefixIsWord;
+        public int PrefixLen => _prefixSpan.len;
+        //
         internal void CollectAllWords(CustomDicTextBuffer textBuffer, List<string> output)
         {
             if (this.PrefixIsWord)
             {
                 output.Add(GetPrefix(textBuffer));
             }
-            if (subGroups != null)
+            if (_subGroups != null)
             {
-                foreach (WordGroup wordGroup in subGroups)
+                foreach (WordGroup wordGroup in _subGroups)
                 {
                     if (wordGroup != null)
                     {
@@ -502,39 +497,31 @@ namespace Typography.TextBreak
                     }
                 }
             }
-            if (wordSpans != null)
+            if (_wordSpans != null)
             {
-                foreach (var span in wordSpans)
+                foreach (var span in _wordSpans)
                 {
                     output.Add(span.GetString(textBuffer));
                 }
             }
         }
-        public int PrefixLen { get { return this.prefixSpan.len; } }
-
-
         public int WordSpanListCount
         {
             get
             {
 
-                if (wordSpans == null) return 0;
-                return wordSpans.Length;
+                if (_wordSpans == null) return 0;
+                return _wordSpans.Length;
             }
         }
-
-
-
-        internal WordSpan[] GetWordSpans() { return wordSpans; }
-        internal WordGroup[] GetSubGroups() { return subGroups; }
-
-
+        internal WordSpan[] GetWordSpans() => _wordSpans;
+        internal WordGroup[] GetSubGroups() => _subGroups;
 
 #if DEBUG
         public override string ToString()
         {
             StringBuilder stbuilder = new StringBuilder();
-            stbuilder.Append(this.prefixSpan.startAt + " " + this.prefixSpan.len);
+            stbuilder.Append(_prefixSpan.startAt + " " + _prefixSpan.len);
 
             return stbuilder.ToString();
         }

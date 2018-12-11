@@ -45,7 +45,9 @@ namespace Tesselate
 {
     public class Face
     {
-        public int indexDebug;
+#if DEBUG
+        public int dbugIndex;
+#endif
         public Face nextFace;		/* next face (never null) */
         public Face prevFace;		/* previous face (never null) */
         public HalfEdge halfEdgeThisIsLeftFaceOf;	/* a half edge with this left face */

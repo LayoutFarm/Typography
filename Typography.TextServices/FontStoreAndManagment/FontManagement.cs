@@ -57,13 +57,11 @@ namespace Typography.FontManagement
         {
             //TODO: don't forget to dispose this stream when not use
             return new FileStream(this.PathName, FileMode.Open, FileAccess.Read);
-
         }
     }
 
-    public delegate void FirstInitFontCollectionDelegate(InstalledTypefaceCollection fontCollection);
-
-    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection fontCollection, string fontName, string fontSubFam);
+    public delegate void FirstInitFontCollectionDelegate(InstalledTypefaceCollection typefaceCollection);
+    public delegate InstalledTypeface FontNotFoundHandler(InstalledTypefaceCollection typefaceCollection, string fontName, string fontSubFam);
     public delegate FontNameDuplicatedDecision FontNameDuplicatedHandler(InstalledTypeface existing, InstalledTypeface newAddedFont);
     public enum FontNameDuplicatedDecision
     {

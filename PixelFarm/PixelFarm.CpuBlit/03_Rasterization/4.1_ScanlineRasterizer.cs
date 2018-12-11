@@ -73,21 +73,21 @@ namespace PixelFarm.CpuBlit.Rasterization
 
     public sealed partial class ScanlineRasterizer
     {
-        CellAARasterizer m_cellAARas;
-        VectorClipper m_vectorClipper;
-        int[] m_gammaLut = new int[AA_SCALE];
-        FillingRule m_filling_rule;
-        bool m_auto_close;
+        CellAARasterizer _cellAARas;
+        VectorClipper _vectorClipper;
+        int[] _gammaLut = new int[AA_SCALE];
+        FillingRule _filling_rule;
+        bool _auto_close;
         /// <summary>
         /// multiplied move to start x
         /// </summary>
-        int mul_start_x;
+        int _mul_start_x;
         /// <summary>
         /// multiplied move to starty
         /// </summary>
-        int mul_start_y;
-        Status m_status;
-        int m_scan_y;
+        int _mul_start_y;
+        Status _status;
+        int _scan_y;
         //---------------------------
         const int AA_SHIFT = 8;
         const int AA_SCALE = 1 << AA_SHIFT; //256
@@ -108,34 +108,31 @@ namespace PixelFarm.CpuBlit.Rasterization
         }
 
 
-        int _renderSurfaceW;
-        int _renderSurfaceH;
-        //bool _filpY;
 
-        public ScanlineRasterizer(int w, int h)
+        public ScanlineRasterizer()
         {
-            this._renderSurfaceW = w;
-            this._renderSurfaceH = h;
-            //_filpY = true;
 
-            m_cellAARas = new CellAARasterizer();
-            m_vectorClipper = new VectorClipper(m_cellAARas);
-            m_filling_rule = FillingRule.NonZero;
-            m_auto_close = true;
-            mul_start_x = 0;
-            mul_start_y = 0;
-            m_status = Status.Initial;
+            _cellAARas = new CellAARasterizer();
+            _vectorClipper = new VectorClipper(_cellAARas);
+            _filling_rule = FillingRule.NonZero;
+            _auto_close = true;
+            _mul_start_x = 0;
+            _mul_start_y = 0;
+            _status = Status.Initial;
             for (int i = AA_SCALE - 1; i >= 0; --i)
             {
-                m_gammaLut[i] = i;
+                _gammaLut[i] = i;
             }
         }
-        //public bool FlipY { get { return _filpY; } set { _filpY = value; } }
+
         //--------------------------------------------------------------------
+        /// <summary>
+        /// reset scanlineRas cell and status
+        /// </summary>
         public void Reset()
         {
-            m_cellAARas.Reset();
-            m_status = Status.Initial;
+            _cellAARas.Reset();
+            _status = Status.Initial;
         }
         public RectInt GetVectorClipBox()
         {
@@ -147,25 +144,26 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             SetClipBox(clippingRect.Left, clippingRect.Bottom, clippingRect.Right, clippingRect.Top);
         }
-        public void SetClipBox(int x1, int y1, int x2, int y2)
+        public void SetClipBox(int left, int bottom, int right, int top)
         {
-            userModeClipBox = new RectInt(x1, y1, x2, y2);
+
+            left += (int)OffsetOriginX;
+            bottom += (int)OffsetOriginY;
+            right += (int)OffsetOriginX;
+            top += (int)OffsetOriginY;
+
+
+            userModeClipBox = new RectInt(left, bottom, right, top);
             Reset();
-            m_vectorClipper.SetClipBox(
-                                upscale(x1), upscale(y1),
-                                upscale(x2), upscale(y2));
+            _vectorClipper.SetClipBox(
+                                upscale(left), upscale(bottom),
+                                upscale(right), upscale(top));
         }
         //---------------------------------
         //from vector clipper
-        static int upscale(double v)
-        {
-            return AggMath.iround(v * poly_subpix.SCALE);
-        }
-        static int upscale(int v)
-        {
-            return v << poly_subpix.SHIFT;
-            //return v * poly_subpix.SCALE; 
-        }
+        static int upscale(double v) => AggMath.iround(v * poly_subpix.SCALE);
+        static int upscale(int v) => v << poly_subpix.SHIFT;
+        //
         ////from vector clipper
         //static int downscale(int v)
         //{
@@ -174,8 +172,8 @@ namespace PixelFarm.CpuBlit.Rasterization
         //---------------------------------
         FillingRule ScanlineFillingRule
         {
-            get { return this.m_filling_rule; }
-            set { this.m_filling_rule = value; }
+            get => _filling_rule;
+            set => _filling_rule = value;
         }
         //bool AutoClose
         //{
@@ -187,7 +185,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             for (int i = AA_SCALE - 1; i >= 0; --i)
             {
-                m_gammaLut[i] = AggMath.uround(
+                _gammaLut[i] = AggMath.uround(
                     gamma_function.GetGamma((float)(i) / AA_MASK) * AA_MASK);
             }
         }
@@ -195,27 +193,27 @@ namespace PixelFarm.CpuBlit.Rasterization
         //------------------------------------------------------------------------
         public void MoveTo(double x, double y)
         {
-            if (m_cellAARas.Sorted) { Reset(); }
-            if (m_auto_close) { ClosePolygon(); }
+            if (_cellAARas.Sorted) { Reset(); }
+            if (_auto_close) { ClosePolygon(); }
 
-            m_vectorClipper.MoveTo(
-                mul_start_x = upscale(x),
-                mul_start_y = upscale(y));
-            m_status = Status.MoveTo;
+            _vectorClipper.MoveTo(
+                _mul_start_x = upscale(x),
+                _mul_start_y = upscale(y));
+            _status = Status.MoveTo;
         }
         //------------------------------------------------------------------------
         public void LineTo(double x, double y)
         {
-            m_vectorClipper.LineTo(upscale(x), upscale(y));
-            m_status = Status.LineTo;
+            _vectorClipper.LineTo(upscale(x), upscale(y));
+            _status = Status.LineTo;
         }
 
         void ClosePolygon()
         {
-            if (m_status == Status.LineTo)
+            if (_status == Status.LineTo)
             {
-                m_vectorClipper.LineTo(mul_start_x, mul_start_y);
-                m_status = Status.Closed;
+                _vectorClipper.LineTo(_mul_start_x, _mul_start_y);
+                _status = Status.Closed;
             }
         }
 
@@ -242,25 +240,81 @@ namespace PixelFarm.CpuBlit.Rasterization
                     break;
             }
         }
-        //------------------------------------------------------------------------
-        void Edge(double x1, double y1, double x2, double y2)
-        {
-            if (m_cellAARas.Sorted) { Reset(); }
-            m_vectorClipper.MoveTo(upscale(x1), upscale(y1));
-            m_vectorClipper.LineTo(upscale(x2), upscale(y2));
-            m_status = Status.MoveTo;
-        }
+        ////------------------------------------------------------------------------
+        //void Edge(double x1, double y1, double x2, double y2)
+        //{
+        //    if (m_cellAARas.Sorted) { Reset(); }
+        //    m_vectorClipper.MoveTo(upscale(x1), upscale(y1));
+        //    m_vectorClipper.LineTo(upscale(x2), upscale(y2));
+        //    m_status = Status.MoveTo;
+        //}
         //-------------------------------------------------------------------
         public float OffsetOriginX
         {
             get;
-            set;
+            internal set;
         }
         public float OffsetOriginY
         {
             get;
-            set;
+            internal set;
         }
+        /// <summary>
+        /// we do NOT store vxs
+        /// </summary>
+        /// <param name="vxs"></param>
+        public void AddPath(VertexStore vxs, VertexProcessing.ICoordTransformer tx)
+        {
+
+            //-----------------------------------------------------
+            //*** we extract vertext command and coord(x,y) from
+            //the snap but not store the snap inside rasterizer
+            //----------------------------------------------------- 
+            double x = 0;
+            double y = 0;
+            VertexCmd cmd;
+            int index = 0;
+
+            if (_cellAARas.Sorted) { Reset(); }
+            float offsetOrgX = OffsetOriginX;
+            float offsetOrgY = OffsetOriginY;
+
+#if DEBUG
+            int dbugVertexCount = 0;
+#endif
+
+            if (ExtendWidthX3ForSubPixelLcdEffect)
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+                    //---------------------------------------------
+                    //NOTE: we scale horizontal 3 times.
+                    //subpixel renderer will shrink it to 1 
+                    //--------------------------------------------- 
+                    //TODO: review here
+                    x *= 3;
+                    tx.Transform(ref x, ref y); //***  
+                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
+                }
+            }
+            else
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+
+                    //
+                    tx.Transform(ref x, ref y); //***
+                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
+                }
+            }
+        }
+
         /// <summary>
         /// we do NOT store vxs
         /// </summary>
@@ -271,9 +325,45 @@ namespace PixelFarm.CpuBlit.Rasterization
             //-----------------------------------------------------
             //*** we extract vertext command and coord(x,y) from
             //the snap but not store the snap inside rasterizer
-            //-----------------------------------------------------
+            //----------------------------------------------------- 
+            double x = 0;
+            double y = 0;
+            VertexCmd cmd;
+            int index = 0;
 
-            this.AddPath(new VertexStoreSnap(vxs));
+            if (_cellAARas.Sorted) { Reset(); }
+            float offsetOrgX = OffsetOriginX;
+            float offsetOrgY = OffsetOriginY;
+
+#if DEBUG
+            int dbugVertexCount = 0;
+#endif
+
+            if (ExtendWidthX3ForSubPixelLcdEffect)
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+                    //---------------------------------------------
+                    //NOTE: we scale horizontal 3 times.
+                    //subpixel renderer will shrink it to 1 
+                    //--------------------------------------------- 
+                    AddVertex(cmd, (x + offsetOrgX) * 3, y + offsetOrgY);
+                }
+            }
+            else
+            {
+                while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+                {
+#if DEBUG
+                    dbugVertexCount++;
+#endif
+
+                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
+                }
+            }
         }
 
 
@@ -287,165 +377,50 @@ namespace PixelFarm.CpuBlit.Rasterization
                 if (value)
                 {
                     //expand to 3 times
-                    m_vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(true);
+                    _vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(true);
                 }
                 else
                 {
-                    m_vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(false);
+                    _vectorClipper.SetClipBoxWidthX3ForSubPixelLcdEffect(false);
                 }
             }
         }
-        /// <summary>
-        /// we do NOT store snap ***
-        /// </summary>
-        /// <param name="snap"></param>
-        public void AddPath(VertexStoreSnap snap)
-        {
-            //-----------------------------------------------------
-            //*** we extract vertext command and coord(x,y) from
-            //the snap but not store the snap inside rasterizer
-            //-----------------------------------------------------
+        ///// <summary>
+        ///// we do NOT store snap ***
+        ///// </summary>
+        ///// <param name="snap"></param>
+        //public void AddPath(VertexStoreSnap snap)
+        //{
+        //    //-----------------------------------------------------
+        //    //*** we extract vertext command and coord(x,y) from
+        //    //the snap but not store the snap inside rasterizer
+        //    //-----------------------------------------------------
+        //    AddPath(VertexStoreSnap.GetInternalVxs(snap));
 
+        //}
 
-            double x = 0;
-            double y = 0;
-            if (m_cellAARas.Sorted) { Reset(); }
-            float offsetOrgX = OffsetOriginX;
-            float offsetOrgY = OffsetOriginY;
-
-
-            VertexSnapIter snapIter = snap.GetVertexSnapIter();
-            VertexCmd cmd;
-#if DEBUG
-            int dbugVertexCount = 0;
-#endif
-
-            if (ExtendWidthX3ForSubPixelLcdEffect)
-            {
-
-                while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
-                {
-#if DEBUG
-                    dbugVertexCount++;
-#endif
-                    //---------------------------------------------
-                    //NOTE: we scale horizontal 3 times.
-                    //subpixel renderer will shrink it to 1 
-                    //---------------------------------------------
-
-                    AddVertex(cmd, (x + offsetOrgX) * 3, (y + offsetOrgY));
-                }
-
-
-            }
-            else
-            {
-
-                while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.NoMore)
-                {
-#if DEBUG
-                    dbugVertexCount++;
-#endif
-
-                    AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
-                }
-
-
-            }
-
-
-
-
-
-            //            if (snap.VxsHasMoreThanOnePart)
-            //            {
-            //                //****
-
-            //                //render all parts
-            //                VertexStore vxs = snap.GetInternalVxs();
-            //                int j = vxs.Count;
-
-            //                if (UseSubPixelRendering)
-            //                {
-            //                    for (int i = 0; i < j; ++i)
-            //                    {
-            //                        var cmd = vxs.GetVertex(i, out x, out y);
-            //                        if (cmd != VertexCmd.Stop)
-            //                        {
-            //                            //AddVertext 1 of 4
-            //                            AddVertex(cmd, (x + offsetOrgX) * 3, y + offsetOrgY);
-            //                        }
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    for (int i = 0; i < j; ++i)
-            //                    {
-            //                        var cmd = vxs.GetVertex(i, out x, out y);
-            //                        if (cmd != VertexCmd.Stop)
-            //                        {
-            //                            //AddVertext 2 of 4
-            //                            AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //            else
-            //            {
-            //                VertexSnapIter snapIter = snap.GetVertexSnapIter();
-            //                VertexCmd cmd;
-            //#if DEBUG
-            //                int dbugVertexCount = 0;
-            //#endif
-            //                if (UseSubPixelRendering)
-            //                {
-            //                    while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.Stop)
-            //                    {
-            //#if DEBUG
-            //                        dbugVertexCount++;
-            //#endif
-            //                        //AddVertext 3 of 4
-            //                        AddVertex(cmd, (x + offsetOrgX) * 3, y + offsetOrgY);
-            //                    }
-
-            //                }
-            //                else
-            //                {
-
-            //                    while ((cmd = snapIter.GetNextVertex(out x, out y)) != VertexCmd.Stop)
-            //                    {
-            //#if DEBUG
-            //                        dbugVertexCount++;
-            //#endif
-            //                        //AddVertext 4 of 4
-            //                        AddVertex(cmd, x + offsetOrgX, y + offsetOrgY);
-            //                    }
-            //                }
-            //            }
-        }
-
-        public int MinX { get { return m_cellAARas.MinX; } }
-        public int MinY { get { return m_cellAARas.MinY; } }
-        public int MaxX { get { return m_cellAARas.MaxX; } }
-        public int MaxY { get { return m_cellAARas.MaxY; } }
+        public int MinX => _cellAARas.MinX;
+        public int MinY => _cellAARas.MinY;
+        public int MaxX => _cellAARas.MaxX;
+        public int MaxY => _cellAARas.MaxY;
 
 
         //--------------------------------------------------------------------
         void Sort()
         {
-            if (m_auto_close) { ClosePolygon(); }
+            if (_auto_close) { ClosePolygon(); }
 
-            m_cellAARas.SortCells();
+            _cellAARas.SortCells();
         }
 
         //------------------------------------------------------------------------
         internal bool RewindScanlines()
         {
-            if (m_auto_close) { ClosePolygon(); }
+            if (_auto_close) { ClosePolygon(); }
 
-            m_cellAARas.SortCells();
-            if (m_cellAARas.TotalCells == 0) return false;
-            m_scan_y = m_cellAARas.MinY;
+            _cellAARas.SortCells();
+            if (_cellAARas.TotalCells == 0) return false;
+            _scan_y = _cellAARas.MinY;
             return true;
         }
 
@@ -459,7 +434,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 cover = -cover;
             }
 
-            if (m_filling_rule == FillingRule.EvenOdd)
+            if (_filling_rule == FillingRule.EvenOdd)
             {
                 cover &= AA_SCALE2;
                 if (cover > AA_SCALE)
@@ -473,7 +448,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 cover = AA_MASK;
             }
             //look up from gamma
-            return m_gammaLut[cover];
+            return _gammaLut[cover];
         }
 
         //--------------------------------------------------------------------
@@ -481,7 +456,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         {
             for (; ; )
             {
-                if (m_scan_y > m_cellAARas.MaxY)
+                if (_scan_y > _cellAARas.MaxY)
                 {
                     return false;
                 }
@@ -491,12 +466,60 @@ namespace PixelFarm.CpuBlit.Rasterization
                 CellAA[] cells;
                 int offset;
                 int num_cells;
-                m_cellAARas.GetCells(m_scan_y, out cells, out offset, out num_cells);
+                _cellAARas.GetCells(_scan_y, out cells, out offset, out num_cells);
                 int cover = 0;
                 while (num_cells != 0)
                 {
                     unsafe
                     {
+#if COSMOS
+                        int pnt = 0;
+                        CellAA cell = cells[pnt + offset];
+                        int x = cell.x;
+                        int area = cell.area;
+                        cover += cell.cover;
+                        //accumulate all cells with the same X
+                        while (--num_cells != 0)
+                        {
+                            offset++; //move next
+                            cell = cells[pnt + offset];
+                            if (cell.x != x)
+                            {
+                                break;
+                            }
+
+                            area += cell.area;
+                            cover += cell.cover;
+                        }
+                        if (area != 0)
+                        {
+                            //-----------------------------------------------
+                            //single cell, for antialias look
+                            //-----------------------------------------------
+                            //calculate alpha from coverage value
+                            int alpha = CalculateAlpha((cover << (poly_subpix.SHIFT + 1)) - area);
+                            if (alpha != 0)
+                            {
+                                scline.AddCell(x, alpha);
+                            }
+
+                            x++;
+                        }
+
+                        if ((num_cells != 0) && (cell.x > x))
+                        {
+                            //-----------------------------------------------
+                            //this is long span , continuous color, solid look
+                            //-----------------------------------------------
+                            //calculate alpha from coverage value
+                            int alpha = CalculateAlpha(cover << (poly_subpix.SHIFT + 1));
+                            if (alpha != 0)
+                            {
+                                scline.AddSpan(x, (cell.x - x), alpha);
+                            }
+                        }
+
+#else
                         fixed (CellAA* cur_cell_h = &cells[0])
                         {
                             CellAA* cur_cell_ptr = cur_cell_h + offset;
@@ -544,16 +567,17 @@ namespace PixelFarm.CpuBlit.Rasterization
                                 }
                             }
                         }
+#endif
                     }
                 }
 
                 if (scline.SpanCount != 0) { break; }
 
-                ++m_scan_y;
+                ++_scan_y;
             }
 
-            scline.CloseLine(m_scan_y);
-            ++m_scan_y;
+            scline.CloseLine(_scan_y);
+            ++_scan_y;
             return true;
         }
     }

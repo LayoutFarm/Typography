@@ -31,52 +31,40 @@ namespace PixelFarm.CpuBlit
         //not thread safe ***
 
 
-        static Stroke stroke = new Stroke(1);
-        static RoundedRect roundRect = new RoundedRect();
-        static SimpleRect simpleRect = new SimpleRect();
-        static Ellipse ellipse = new Ellipse();
+        [ThreadStatic]
+        static object s_threadInit = null;
+        [ThreadStatic]
+        static Stroke s_stroke;
+        [ThreadStatic]
+        static RoundedRect s_roundRect;
+        [ThreadStatic]
+        static SimpleRect s_simpleRect;
+        [ThreadStatic]
+        static Ellipse s_ellipse;
 
-        //static SvgFontStore svgFontStore = new SvgFontStore();
-        //public static void DrawString(this ImageGraphics2D gx,
-        //    string text,
-        //    double x,
-        //    double y,
-        //    double pointSize = 12,
-        //    Justification justification = Justification.Left,
-        //    Baseline baseline = Baseline.Text,
-        //    Color color = new Color(),
-        //    bool drawFromHintedCache = false,
-        //    Color backgroundColor = new Color())
-        //{
-        //    ////use svg font 
-        //    var svgFont = svgFontStore.LoadFont(SvgFontStore.DEFAULT_SVG_FONTNAME, (int)pointSize);
-        //    //TODO: review here
-        //    //stringPrinter on each platform may not interchangeable ***
-        //    if (stringPrinter == null)
-        //    {
-        //        stringPrinter = new MyTypeFacePrinter(gx.GfxPlatform);
-
-        //    }
-
-        //    stringPrinter.CurrentActualFont = svgFont;
-        //    stringPrinter.DrawFromHintedCache = false;
-        //    stringPrinter.LoadText(text);
-        //    VertexStore vxs = stringPrinter.MakeVxs();
-        //    vxs = Affine.NewTranslation(x, y).TransformToVxs(vxs);
-        //    gx.Render(vxs, Color.Black);
-        //}
-
+        static void CheckInit()
+        {
+            if (s_threadInit == null)
+            {
+                s_threadInit = new object();
+                s_stroke = new Stroke(1);
+                s_roundRect = new RoundedRect();
+                s_simpleRect = new SimpleRect();
+                s_ellipse = new Ellipse();
+            }
+        }
         public static void Rectangle(this AggRenderSurface gx, double left, double bottom, double right, double top, Color color, double strokeWidth = 1)
         {
-            stroke.Width = strokeWidth;
-            simpleRect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
 
+            if (s_threadInit == null) CheckInit();
+            //------------------------------------
+            s_stroke.Width = strokeWidth;
+            s_simpleRect.SetRect(left + .5, bottom + .5, right - .5, top - .5);
 
-            VectorToolBox.GetFreeVxs(out VertexStore v1, out VertexStore v2);
-
-            gx.Render(stroke.MakeVxs(simpleRect.MakeVxs(v1), v2), color);
-
-            VectorToolBox.ReleaseVxs(ref v1, ref v2);
+            using (VxsTemp.Borrow(out var v1, out var v2))
+            {
+                gx.Render(s_stroke.MakeVxs(s_simpleRect.MakeVxs(v1), v2), color);
+            }
 
         }
         public static void Rectangle(this AggRenderSurface gx, RectD rect, Color color, double strokeWidth = 1)
@@ -114,18 +102,28 @@ namespace PixelFarm.CpuBlit
                 throw new ArgumentException();
             }
 
-            simpleRect.SetRect(left, bottom, right, top);
 
-            VectorToolBox.GetFreeVxs(out var v1);
-            gx.Render(simpleRect.MakeVertexSnap(v1), fillColor);
-            VectorToolBox.ReleaseVxs(ref v1);
+            if (s_threadInit == null) CheckInit();
+            //------------------------------------
+
+            s_simpleRect.SetRect(left, bottom, right, top);
+            using (VxsTemp.Borrow(out var v1))
+            {
+                gx.Render(s_simpleRect.MakeVxs(v1), fillColor);
+            }
+
         }
         public static void Circle(this AggRenderSurface g, double x, double y, double radius, Color color)
         {
-            ellipse.Set(x, y, radius, radius);
-            VectorToolBox.GetFreeVxs(out var v1);
-            g.Render(ellipse.MakeVxs(v1), color);
-            VectorToolBox.ReleaseVxs(ref v1);
+            if (s_threadInit == null) CheckInit();
+            //------------------------------------
+
+            s_ellipse.Set(x, y, radius, radius);
+            using (VxsTemp.Borrow(out var v1))
+            {
+                g.Render(s_ellipse.MakeVxs(v1), color);
+            }
+
         }
         public static void Circle(this AggRenderSurface g, Vector2 origin, double radius, Color color)
         {

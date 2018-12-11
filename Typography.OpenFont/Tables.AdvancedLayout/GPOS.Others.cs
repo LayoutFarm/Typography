@@ -35,11 +35,11 @@ namespace Typography.OpenFont.Tables
 
         class PairSetTable
         {
-            PairSet[] pairSets;
+            PairSet[] _pairSets;
             public void ReadFrom(BinaryReader reader, ushort v1format, ushort v2format)
             {
                 ushort rowCount = reader.ReadUInt16();
-                pairSets = new PairSet[rowCount];
+                _pairSets = new PairSet[rowCount];
                 for (int i = 0; i < rowCount; ++i)
                 {
                     //GlyphID 	SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
@@ -49,18 +49,18 @@ namespace Typography.OpenFont.Tables
                     ValueRecord v1 = ValueRecord.CreateFrom(reader, v1format);
                     ValueRecord v2 = ValueRecord.CreateFrom(reader, v2format);
                     //
-                    pairSets[i] = new PairSet(secondGlyph, v1, v2);
+                    _pairSets[i] = new PairSet(secondGlyph, v1, v2);
                 }
             }
             public bool FindPairSet(ushort secondGlyphIndex, out PairSet foundPairSet)
             {
-                int j = pairSets.Length;
+                int j = _pairSets.Length;
                 for (int i = 0; i < j; ++i)
                 {
-                    if (pairSets[i].secondGlyph == secondGlyphIndex)
+                    if (_pairSets[i].secondGlyph == secondGlyphIndex)
                     {
                         //found
-                        foundPairSet = pairSets[i];
+                        foundPairSet = _pairSets[i];
                         return true;
                     }
                 }
@@ -352,34 +352,34 @@ namespace Typography.OpenFont.Tables
             //-------------------
             //uint16 	Class 	                Class defined for this mark
             //Offset16 	MarkAnchor 	            Offset to Anchor table-from beginning of MarkArray table
-            MarkRecord[] records;
-            AnchorPoint[] anchorPoints;
+            MarkRecord[] _records;
+            AnchorPoint[] _anchorPoints;
             public AnchorPoint GetAnchorPoint(int index)
             {
-                return anchorPoints[index];
+                return _anchorPoints[index];
             }
             public ushort GetMarkClass(int index)
             {
-                return records[index].markClass;
+                return _records[index].markClass;
             }
             void ReadFrom(BinaryReader reader)
             {
                 long markTableBeginAt = reader.BaseStream.Position;
                 ushort markCount = reader.ReadUInt16();
-                records = new MarkRecord[markCount];
+                _records = new MarkRecord[markCount];
                 for (int i = 0; i < markCount; ++i)
                 {
                     //1 mark : 1 anchor
-                    records[i] = new MarkRecord(
+                    _records[i] = new MarkRecord(
                         reader.ReadUInt16(),//mark class
                         reader.ReadUInt16()); //offset to anchor table
                 }
                 //---------------------------
                 //read anchor
-                anchorPoints = new AnchorPoint[markCount];
+                _anchorPoints = new AnchorPoint[markCount];
                 for (int i = 0; i < markCount; ++i)
                 {
-                    MarkRecord markRec = records[i];
+                    MarkRecord markRec = _records[i];
                     //bug?
                     if (markRec.offset < 0)
                     {
@@ -388,14 +388,14 @@ namespace Typography.OpenFont.Tables
                         continue;
                     }
                     //read table detail
-                    anchorPoints[i] = AnchorPoint.CreateFrom(reader, markTableBeginAt + markRec.offset);
+                    _anchorPoints[i] = AnchorPoint.CreateFrom(reader, markTableBeginAt + markRec.offset);
                 }
 
             }
 #if DEBUG
             public int dbugGetAnchorCount()
             {
-                return anchorPoints.Length;
+                return _anchorPoints.Length;
             }
 #endif
             public static MarkArrayTable CreateFrom(BinaryReader reader, long beginAt)
@@ -499,11 +499,11 @@ namespace Typography.OpenFont.Tables
             // Note: Anchor tables are not tagged with class value identifiers.
             //Instead, the index value of an Anchor table in the array defines the class value represented by the Anchor table.
 
-            BaseRecord[] records;
+            BaseRecord[] _records;
 
             public BaseRecord GetBaseRecords(int index)
             {
-                return records[index];
+                return _records[index];
             }
             public static BaseArrayTable CreateFrom(BinaryReader reader, long beginAt, ushort classCount)
             {
@@ -511,7 +511,7 @@ namespace Typography.OpenFont.Tables
                 //---
                 var baseArrTable = new BaseArrayTable();
                 ushort baseCount = reader.ReadUInt16();
-                baseArrTable.records = new BaseRecord[baseCount];
+                baseArrTable._records = new BaseRecord[baseCount];
                 // Read all baseAnchorOffsets in one go
                 ushort[] baseAnchorOffsets = Utils.ReadUInt16Array(reader, classCount * baseCount);
                 for (int i = 0; i < baseCount; ++i)
@@ -531,7 +531,7 @@ namespace Typography.OpenFont.Tables
                         baseRec.anchors[n] = AnchorPoint.CreateFrom(reader, beginAt + offset);
                     }
 
-                    baseArrTable.records[i] = baseRec;
+                    baseArrTable._records[i] = baseRec;
                 }
                 return baseArrTable;
             }
@@ -539,7 +539,7 @@ namespace Typography.OpenFont.Tables
 #if DEBUG
             public int dbugGetRecordCount()
             {
-                return records.Length;
+                return _records.Length;
             }
 #endif
         }
@@ -610,20 +610,20 @@ namespace Typography.OpenFont.Tables
         //Offset16 	LigatureAnchor[ClassCount] 	Array of offsets (one per class) to Anchor tables-from beginning of LigatureAttach table-ordered by class-NULL if a component does not have an attachment for a class-zero-based array
         class LigatureArrayTable
         {
-            LigatureAttachTable[] ligatures;
+            LigatureAttachTable[] _ligatures;
             public void ReadFrom(BinaryReader reader, ushort classCount)
             {
                 long startPos = reader.BaseStream.Position;
                 ushort ligatureCount = reader.ReadUInt16();
                 ushort[] offsets = Utils.ReadUInt16Array(reader, ligatureCount);
 
-                ligatures = new LigatureAttachTable[ligatureCount];
+                _ligatures = new LigatureAttachTable[ligatureCount];
 
                 for (int i = 0; i < ligatureCount; ++i)
                 {
                     //each ligature table
                     reader.BaseStream.Seek(startPos + offsets[i], SeekOrigin.Begin);
-                    ligatures[i] = LigatureAttachTable.ReadFrom(reader, classCount);
+                    _ligatures[i] = LigatureAttachTable.ReadFrom(reader, classCount);
                 }
             }
         }
@@ -634,13 +634,13 @@ namespace Typography.OpenFont.Tables
             //uint16 	ComponentCount 	                    Number of ComponentRecords in this ligature
             //struct 	ComponentRecord[ComponentCount] 	Array of Component records-ordered in writing direction
             //-------------------------------
-            ComponentRecord[] records;
+            ComponentRecord[] _records;
             public static LigatureAttachTable ReadFrom(BinaryReader reader, ushort classCount)
             {
                 LigatureAttachTable table = new LigatureAttachTable();
                 ushort componentCount = reader.ReadUInt16();
                 ComponentRecord[] componentRecs = new ComponentRecord[componentCount];
-                table.records = componentRecs;
+                table._records = componentRecs;
                 for (int i = 0; i < componentCount; ++i)
                 {
                     componentRecs[i] = new ComponentRecord(
@@ -705,21 +705,21 @@ namespace Typography.OpenFont.Tables
 
             //Example 10 at the end of this chapter demonstrates glyph kerning in context with a ContextPosFormat1 subtable.
 
-            PosRuleTable[] posRuleTables;
+            PosRuleTable[] _posRuleTables;
             void ReadFrom(BinaryReader reader)
             {
                 long tableStartAt = reader.BaseStream.Position;
                 ushort posRuleCount = reader.ReadUInt16();
                 ushort[] posRuleTableOffsets = Utils.ReadUInt16Array(reader, posRuleCount);
                 int j = posRuleTableOffsets.Length;
-                posRuleTables = new PosRuleTable[posRuleCount];
+                _posRuleTables = new PosRuleTable[posRuleCount];
                 for (int i = 0; i < j; ++i)
                 {
                     //move to and read
                     reader.BaseStream.Seek(tableStartAt + posRuleTableOffsets[i], SeekOrigin.Begin);
                     var posRuleTable = new PosRuleTable();
                     posRuleTable.ReadFrom(reader);
-                    posRuleTables[i] = posRuleTable;
+                    _posRuleTables[i] = posRuleTable;
 
                 }
             }
@@ -742,14 +742,14 @@ namespace Typography.OpenFont.Tables
             //uint16 	PosCount 	Number of PosLookupRecords
             //uint16 	Input[GlyphCount - 1]  Array of input GlyphIDs-starting with the second glyph***
             //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
-            PosLookupRecord[] posLookupRecords;
-            ushort[] inputGlyphIds;
+            PosLookupRecord[] _posLookupRecords;
+            ushort[] _inputGlyphIds;
             public void ReadFrom(BinaryReader reader)
             {
                 ushort glyphCount = reader.ReadUInt16();
                 ushort posCount = reader.ReadUInt16();
-                inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
-                posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
+                _inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
+                _posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
             }
         }
 
@@ -782,7 +782,7 @@ namespace Typography.OpenFont.Tables
             //struct 	PosLookupRecord[PosCount] 	Array of positioning lookups-in design order
             //----------------------
 
-            PosClassRule[] posClasses;
+            PosClassRule[] _posClasses;
             void ReadFrom(BinaryReader reader)
             {
                 long tableStartAt = reader.BaseStream.Position;
@@ -791,11 +791,11 @@ namespace Typography.OpenFont.Tables
                 ushort[] posClassRuleOffsets = Utils.ReadUInt16Array(reader, posClassRuleCnt);
                 int j = posClassRuleOffsets.Length;
 
-                posClasses = new PosClassRule[posClassRuleCnt];
+                _posClasses = new PosClassRule[posClassRuleCnt];
                 for (int i = 0; i < j; ++i)
                 {
                     //move to and read                     
-                    posClasses[i] = PosClassRule.CreateFrom(reader, tableStartAt + posClassRuleOffsets[i]);
+                    _posClasses[i] = PosClassRule.CreateFrom(reader, tableStartAt + posClassRuleOffsets[i]);
                 }
             }
 
@@ -810,8 +810,8 @@ namespace Typography.OpenFont.Tables
         }
         class PosClassRule
         {
-            PosLookupRecord[] posLookupRecords;
-            ushort[] inputGlyphIds;
+            PosLookupRecord[] _posLookupRecords;
+            ushort[] _inputGlyphIds;
 
             public static PosClassRule CreateFrom(BinaryReader reader, long beginAt)
             {
@@ -821,8 +821,8 @@ namespace Typography.OpenFont.Tables
                 PosClassRule posClassRule = new PosClassRule();
                 ushort glyphCount = reader.ReadUInt16();
                 ushort posCount = reader.ReadUInt16();
-                posClassRule.inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
-                posClassRule.posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
+                posClassRule._inputGlyphIds = Utils.ReadUInt16Array(reader, glyphCount - 1);
+                posClassRule._posLookupRecords = CreateMultiplePosLookupRecords(reader, posCount);
                 return posClassRule;
             }
         }

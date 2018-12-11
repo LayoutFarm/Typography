@@ -46,44 +46,44 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
     //====================================================gradient_radial_focus
     public class GvcRadialFocus : IGradientValueCalculator
     {
-        int m_r;
-        int m_fx;
-        int m_fy;
-        double m_r2;
-        double m_fx2;
-        double m_fy2;
-        double m_mul;
+        int _r;
+        int _fx;
+        int _fy;
+        double _r2;
+        double _fx2;
+        double _fy2;
+        double _mul;
         //---------------------------------------------------------------------
         public GvcRadialFocus()
         {
-            m_r = (100 * GradientSpanGen.GR_SUBPIX_SCALE);
-            m_fx = 0;
-            m_fy = 0;
+            _r = (100 * GradientSpanGen.GR_SUBPIX_SCALE);
+            _fx = 0;
+            _fy = 0;
             UpdateValues();
         }
 
         //---------------------------------------------------------------------
         public void Setup(double r, double fx, double fy)
         {
-            m_r = AggMath.iround(r * GradientSpanGen.GR_SUBPIX_SCALE);
-            m_fx = AggMath.iround(fx * GradientSpanGen.GR_SUBPIX_SCALE);
-            m_fy = AggMath.iround(fy * GradientSpanGen.GR_SUBPIX_SCALE);
+            _r = AggMath.iround(r * GradientSpanGen.GR_SUBPIX_SCALE);
+            _fx = AggMath.iround(fx * GradientSpanGen.GR_SUBPIX_SCALE);
+            _fy = AggMath.iround(fy * GradientSpanGen.GR_SUBPIX_SCALE);
             UpdateValues();
         }
 
         //---------------------------------------------------------------------
-        public double Radius { get { return (double)(m_r) / GradientSpanGen.GR_SUBPIX_SCALE; } }
-        public double FocusX { get { return (double)(m_fx) / GradientSpanGen.GR_SUBPIX_SCALE; } }
-        public double FocusY { get { return (double)(m_fy) / GradientSpanGen.GR_SUBPIX_SCALE; } }
+        public double Radius => (double)(_r) / GradientSpanGen.GR_SUBPIX_SCALE;
+        public double FocusX => (double)(_fx) / GradientSpanGen.GR_SUBPIX_SCALE;
+        public double FocusY => (double)(_fy) / GradientSpanGen.GR_SUBPIX_SCALE;
 
         //---------------------------------------------------------------------
         public int Calculate(int x, int y, int d)
         {
-            double dx = x - m_fx;
-            double dy = y - m_fy;
-            double d2 = dx * m_fy - dy * m_fx;
-            double d3 = m_r2 * (dx * dx + dy * dy) - d2 * d2;
-            return AggMath.iround((dx * m_fx + dy * m_fy + System.Math.Sqrt(System.Math.Abs(d3))) * m_mul);
+            double dx = x - _fx;
+            double dy = y - _fy;
+            double d2 = dx * _fy - dy * _fx;
+            double d3 = _r2 * (dx * dx + dy * dy) - d2 * d2;
+            return AggMath.iround((dx * _fx + dy * _fy + System.Math.Sqrt(System.Math.Abs(d3))) * _mul);
         }
 
         //---------------------------------------------------------------------
@@ -95,41 +95,38 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             // one subpixel unit possibly in the direction to the origin (0,0)
             // and calculate the values again.
             //-------------------------
-            m_r2 = m_r * m_r;
-            m_fx2 = m_fx * m_fx;
-            m_fy2 = m_fy * m_fy;
-            double d = (m_r2 - (m_fx2 + m_fy2));
+            _r2 = _r * _r;
+            _fx2 = _fx * _fx;
+            _fy2 = _fy * _fy;
+            double d = (_r2 - (_fx2 + _fy2));
             if (d == 0)
             {
-                if (m_fx != 0)
+                if (_fx != 0)
                 {
-                    if (m_fx < 0) ++m_fx; else --m_fx;
+                    if (_fx < 0) ++_fx; else --_fx;
                 }
 
-                if (m_fy != 0)
+                if (_fy != 0)
                 {
-                    if (m_fy < 0) ++m_fy; else --m_fy;
+                    if (_fy < 0) ++_fy; else --_fy;
                 }
 
-                m_fx2 = m_fx * m_fx;
-                m_fy2 = m_fy * m_fy;
-                d = (m_r2 - (m_fx2 + m_fy2));
+                _fx2 = _fx * _fx;
+                _fy2 = _fy * _fy;
+                d = (_r2 - (_fx2 + _fy2));
             }
-            m_mul = m_r / d;
+            _mul = _r / d;
         }
     }
     //==============================================================gradient_x
     public class GvcX : IGradientValueCalculator
     {
-        public int Calculate(int x, int y, int d)
-        {
-            return x;
-        }
+        public int Calculate(int x, int y, int d) => x;
     }
     //==============================================================gradient_y
     public class GvcY : IGradientValueCalculator
     {
-        public int Calculate(int x, int y, int d) { return y; }
+        public int Calculate(int x, int y, int d) => y;
     }
 
     //========================================================gradient_diamond

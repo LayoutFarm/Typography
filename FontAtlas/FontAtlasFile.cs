@@ -19,10 +19,7 @@ namespace PixelFarm.Drawing.Fonts
             GlyphList,
             OverviewFontInfo,
         }
-        public SimpleFontAtlas Result
-        {
-            get { return _atlas; }
-        }
+        public SimpleFontAtlas Result => _atlas;
 
         public void Read(Stream inputStream)
         {
@@ -82,14 +79,10 @@ namespace PixelFarm.Drawing.Fonts
                 glyphMap.Top = reader.ReadUInt16();
                 glyphMap.Width = reader.ReadUInt16();
                 glyphMap.Height = reader.ReadUInt16();
-                //3. border x,y
-                int borderXY = reader.ReadUInt16();
-                glyphMap.BorderX = borderXY & 0xff;
-                glyphMap.BorderY = borderXY >> 8;
                 //---------------------------------------
-                //4. texture offset
-                glyphMap.TextureXOffset = reader.ReadSingle();
-                glyphMap.TextureYOffset = reader.ReadSingle();
+                //3. texture offset
+                glyphMap.TextureXOffset = reader.ReadInt16();
+                glyphMap.TextureYOffset = reader.ReadInt16();
 
                 //---------------------------------------
                 _atlas.AddGlyph(glyphIndex, glyphMap);
@@ -104,13 +97,13 @@ namespace PixelFarm.Drawing.Fonts
 
         //------------------------------------------------------------
         BinaryWriter _writer;
-        public void StartWrite(Stream outputStream)
+        internal void StartWrite(Stream outputStream)
         {
             _writer = new BinaryWriter(outputStream, System.Text.Encoding.UTF8);
             //version            
             _writer.Write((ushort)1);
         }
-        public void EndWrite()
+        internal void EndWrite()
         {
             //write end marker
             _writer.Write((ushort)FontTextureObjectKind.End);
@@ -119,7 +112,7 @@ namespace PixelFarm.Drawing.Fonts
             _writer = null;
         }
 
-        public void WriteOverviewFontInfo(string fontFileName, float sizeInPt)
+        internal void WriteOverviewFontInfo(string fontFileName, float sizeInPt)
         {
             _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
             if (fontFileName == null)
@@ -129,7 +122,7 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Write(fontFileName);
             _writer.Write(sizeInPt);
         }
-        public void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
+        internal void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
         {
             _writer.Write((ushort)FontTextureObjectKind.TotalImageInfo);
             _writer.Write(width);
@@ -137,7 +130,7 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Write(colorComponent);
             _writer.Write((byte)textureKind);
         }
-        public void WriteGlyphList(Dictionary<ushort, CacheGlyph> glyphs)
+        internal void WriteGlyphList(Dictionary<ushort, CacheGlyph> glyphs)
         {
             _writer.Write((ushort)FontTextureObjectKind.GlyphList);
             //total number
@@ -161,20 +154,11 @@ namespace PixelFarm.Drawing.Fonts
                 _writer.Write((ushort)g.area.Width);
                 _writer.Write((ushort)g.area.Height);
 
-                //3. border x,y
 
-                if ((g.borderX > byte.MaxValue) || (g.borderY > byte.MaxValue))
-                {
-                    throw new NotSupportedException();
-                }
-
-                _writer.Write((ushort)(((g.borderY & 0xff) << 8) | (g.borderX & 0xff)));
-
-                //4. texture offset                
+                //3. texture offset                
                 GlyphImage img = g.img;
-                _writer.Write((float)img.TextureOffsetX);
-                _writer.Write((float)img.TextureOffsetY);
-
+                _writer.Write((short)img.TextureOffsetX);//short
+                _writer.Write((short)img.TextureOffsetY);//short
 
             }
         }

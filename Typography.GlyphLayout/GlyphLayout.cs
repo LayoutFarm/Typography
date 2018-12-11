@@ -52,31 +52,23 @@ namespace Typography.TextLayout
 
     public class UnscaledGlyphPlanList : IUnscaledGlyphPlanList
     {
-        List<UnscaledGlyphPlan> list = new List<UnscaledGlyphPlan>();
-        public int Count
-        {
-            get { return list.Count; }
-        }
-        public UnscaledGlyphPlan this[int index]
-        {
-            get
-            {
-                return list[index];
-            }
-        }
+        List<UnscaledGlyphPlan> _list = new List<UnscaledGlyphPlan>();
         float _accumAdvanceX;
+
+        public int Count => _list.Count;
+        public UnscaledGlyphPlan this[int index] => _list[index];
 
         public void Clear()
         {
-            list.Clear();
+            _list.Clear();
             _accumAdvanceX = 0;
         }
         public void Append(UnscaledGlyphPlan glyphPlan)
         {
-            list.Add(glyphPlan);
+            _list.Add(glyphPlan);
             _accumAdvanceX += glyphPlan.AdvanceX;
         }
-        public float AccumAdvanceX { get { return _accumAdvanceX; } }
+        public float AccumAdvanceX => _accumAdvanceX;
     }
 
     /// <summary>
@@ -87,18 +79,18 @@ namespace Typography.TextLayout
         //
         public static GlyphPlanSequence Empty = new GlyphPlanSequence();
         //
-        readonly IUnscaledGlyphPlanList glyphBuffer;
+        readonly IUnscaledGlyphPlanList _glyphBuffer;
         internal readonly int startAt;
         internal readonly ushort len;
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer)
         {
-            this.glyphBuffer = glyphBuffer;
+            _glyphBuffer = glyphBuffer;
             this.startAt = 0;
             this.len = (ushort)glyphBuffer.Count;
         }
         public GlyphPlanSequence(IUnscaledGlyphPlanList glyphBuffer, int startAt, int len)
         {
-            this.glyphBuffer = glyphBuffer;
+            _glyphBuffer = glyphBuffer;
             this.startAt = startAt;
             this.len = (ushort)len;
         }
@@ -108,7 +100,7 @@ namespace Typography.TextLayout
             {
                 if (index >= 0 && index < (startAt + len))
                 {
-                    return glyphBuffer[startAt + index];
+                    return _glyphBuffer[startAt + index];
                 }
                 else
                 {
@@ -116,25 +108,14 @@ namespace Typography.TextLayout
                 }
             }
         }
-        public int Count
-        {
-            get
-            {
-                if (glyphBuffer != null)
-                {
-                    return len;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-        }
+        //
+        public int Count => (_glyphBuffer != null) ? len : 0;
+        //
         public float CalculateWidth()
         {
-            if (glyphBuffer == null) return 0;
+            if (_glyphBuffer == null) return 0;
             //
-            IUnscaledGlyphPlanList plans = glyphBuffer;
+            IUnscaledGlyphPlanList plans = _glyphBuffer;
             int end = startAt + len;
             float width = 0;
             for (int i = startAt; i < end; ++i)
@@ -143,11 +124,7 @@ namespace Typography.TextLayout
             }
             return width;
         }
-        public bool IsEmpty()
-        {
-            return glyphBuffer == null;
-        }
-
+        public bool IsEmpty() => _glyphBuffer == null;
 
     }
 
@@ -166,7 +143,7 @@ namespace Typography.TextLayout
 
     class GlyphLayoutPlanCollection
     {
-        Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext> collection = new Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext>();
+        Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext> _collection = new Dictionary<GlyphLayoutPlanKey, GlyphLayoutPlanContext>();
         /// <summary>
         /// get glyph layout plan or create if not exists
         /// </summary>
@@ -177,11 +154,11 @@ namespace Typography.TextLayout
         {
             GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang.internalName);
             GlyphLayoutPlanContext context;
-            if (!collection.TryGetValue(key, out context))
+            if (!_collection.TryGetValue(key, out context))
             {
                 var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.shortname) : null;
                 var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
-                collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
+                _collection.Add(key, context = new GlyphLayoutPlanContext(glyphSubstitution, glyphPosition));
             }
             return context;
         }
@@ -201,10 +178,10 @@ namespace Typography.TextLayout
     {
         public readonly GlyphSubstitution _glyphSub;
         public readonly GlyphSetPosition _glyphPos;
-        public GlyphLayoutPlanContext(GlyphSubstitution _glyphSub, GlyphSetPosition glyphPos)
+        public GlyphLayoutPlanContext(GlyphSubstitution glyphSub, GlyphSetPosition glyphPos)
         {
-            this._glyphSub = _glyphSub;
-            this._glyphPos = glyphPos;
+            _glyphSub = glyphSub;
+            _glyphPos = glyphPos;
         }
     }
 
@@ -256,16 +233,13 @@ namespace Typography.TextLayout
         }
 
 
-        internal IGlyphPositions ResultUnscaledGlyphPositions
-        {
-            //unscaled version
-            get { return _glyphPositions; }
-        }
-
+        //unscaled version
+        internal IGlyphPositions ResultUnscaledGlyphPositions => _glyphPositions;
+        //
         public PositionTechnique PositionTechnique { get; set; }
         public ScriptLang ScriptLang
         {
-            get { return _scriptLang; }
+            get => _scriptLang;
             set
             {
                 if (_scriptLang != value)
@@ -280,7 +254,7 @@ namespace Typography.TextLayout
         public bool EnableComposition { get; set; }
         public Typeface Typeface
         {
-            get { return _typeface; }
+            get => _typeface;
             set
             {
                 if (_typeface != value)
@@ -463,9 +437,9 @@ namespace Typography.TextLayout
         }
         void UpdateLayoutPlan()
         {
-            GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(this._typeface, this._scriptLang);
-            this._gpos = context._glyphPos;
-            this._gsub = context._glyphSub;
+            GlyphLayoutPlanContext context = _layoutPlanCollection.GetPlanOrCreate(_typeface, _scriptLang);
+            _gpos = context._glyphPos;
+            _gsub = context._glyphSub;
             _needPlanUpdate = false;
         }
 
@@ -535,13 +509,8 @@ namespace Typography.TextLayout
         Typeface _typeface;
         public GlyphPosStream() { }
 
-        public int Count
-        {
-            get
-            {
-                return _glyphPosList.Count;
-            }
-        }
+        public int Count => _glyphPosList.Count;
+        //
         public void Clear()
         {
             _typeface = null;
@@ -549,8 +518,8 @@ namespace Typography.TextLayout
         }
         public Typeface Typeface
         {
-            get { return this._typeface; }
-            set { this._typeface = value; }
+            get => _typeface;
+            set => _typeface = value;
         }
         public void AddGlyph(ushort o_offset, ushort glyphIndex, Glyph glyph)
         {
@@ -563,15 +532,9 @@ namespace Typography.TextLayout
 
             _glyphPosList.Add(new GlyphPos(o_offset, glyphIndex, glyph.GlyphClass, glyph.OriginalAdvanceWidth));
         }
-
-        public GlyphPos this[int index]
-        {
-
-            get
-            {
-                return _glyphPosList[index];
-            }
-        }
+        //
+        public GlyphPos this[int index] => _glyphPosList[index];
+        //
         public GlyphClassKind GetGlyphClassKind(int index)
         {
             return _glyphPosList[index].classKind;
@@ -657,13 +620,10 @@ namespace Typography.TextLayout
             this.advanceW = (short)orgAdvanced;
             xoffset = yoffset = 0;
         }
-        public GlyphClassKind classKind
-        {
-            get { return glyphClass; }
-        }
+        public GlyphClassKind classKind => glyphClass;
 
-        public short OffsetX { get { return xoffset; } }
-        public short OffsetY { get { return yoffset; } }
+        public short OffsetX => xoffset;
+        public short OffsetY => yoffset;
 #if DEBUG
         public override string ToString()
         {

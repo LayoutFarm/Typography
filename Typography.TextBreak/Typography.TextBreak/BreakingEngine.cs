@@ -27,18 +27,11 @@ namespace Typography.TextBreak
         protected abstract WordGroup GetWordGroupForFirstChar(char c);
         public bool BreakPeroidInTextSpan { get; set; }
 
-        int _startAt;
-        int _len;
-        int _endAt;
 
         public bool DontMergeLastIncompleteWord { get; set; }
         internal override void BreakWord(WordVisitor visitor, char[] charBuff, int startAt, int len)
         {
             visitor.State = VisitorState.Parsing;
-            this._startAt = startAt;
-            this._len = len;
-            this._endAt = startAt + len;
-
             char c_first = this.FirstUnicodeChar;
             char c_last = this.LastUnicodeChar;
             int endAt = startAt + len;
@@ -189,7 +182,15 @@ namespace Typography.TextBreak
                                 return;
                             }
                             continueRead = false;
-                            //----------------------------------------
+                            //----------------------------------------                            
+                            if (visitor.CurrentIndex >= len - 1)
+                            {
+                                //flush remaining char
+                                if (visitor.LatestBreakAt < startAt + len)
+                                {
+                                    visitor.AddWordBreakAtCurrentIndex();
+                                }
+                            }
                             return;
                         }
                         //----------------------------------------
@@ -367,6 +368,7 @@ namespace Typography.TextBreak
                                                 {
                                                     visitor.AddWordBreakAtCurrentIndex();
                                                     foundCandidate = true;
+                                                    break;
                                                 }
                                             }
                                         }
@@ -449,6 +451,10 @@ namespace Typography.TextBreak
             {
                 //the last one 
                 visitor.State = VisitorState.End;
+                if (visitor.LatestBreakAt < startAt + len)
+                {
+                    visitor.AddWordBreakAt(startAt + len, WordKind.Text);
+                }
             }
         }
         internal WordGroup GetSubGroup(WordVisitor visitor, WordGroup wordGroup)

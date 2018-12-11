@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 
 using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.Contours;
 using Typography.Rendering;
@@ -22,9 +23,7 @@ namespace PixelFarm.Drawing.Fonts
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder);
-
-
+        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder); 
         public GlyphTextureBitmapGenerator()
         {
 
@@ -157,26 +156,41 @@ namespace PixelFarm.Drawing.Fonts
             {
                 AggGlyphTextureGen aggTextureGen = new AggGlyphTextureGen();
                 aggTextureGen.TextureKind = atlasBuilder.TextureKind;
-                int j = glyphIndices.Length;
-                for (int i = 0; i < j; ++i)
+                //create reusable agg painter***
+
+                //assume each glyph size= 2 * line height
+                //TODO: review here again...
+                int tmpMemBmpHeight = (int)(2 * typeface.CalculateRecommendLineSpacing() * typeface.CalculateScaleToPixelFromPointSize(sizeInPoint));
+                //create glyph img    
+                using (PixelFarm.CpuBlit.MemBitmap tmpMemBmp = new PixelFarm.CpuBlit.MemBitmap(tmpMemBmpHeight, tmpMemBmpHeight)) //square
                 {
-                    //build glyph
-                    ushort gindex = glyphIndices[i];
-                    builder.BuildFromGlyphIndex(gindex, sizeInPoint);
+                    //draw a glyph into tmpMemBmp and then copy to a GlyphImage                     
+                    aggTextureGen.Painter = PixelFarm.CpuBlit.AggPainter.Create(tmpMemBmp);
+#if DEBUG
+                    tmpMemBmp._dbugNote = "CreateGlyphImage()";
+#endif
 
-                    GlyphImage glyphImg = aggTextureGen.CreateGlyphImage(builder, 1);
-                    if (applyFilter)
+                    int j = glyphIndices.Length;
+                    for (int i = 0; i < j; ++i)
                     {
+                        //build glyph
+                        ushort gindex = glyphIndices[i];
+                        builder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
-                        glyphImg = Sharpen(glyphImg, 1);
-                        //TODO:
-                        //the filter make the image shift x and y 1 px
-                        //temp fix with this,
-                        glyphImg.TextureOffsetX += 1;
-                        glyphImg.TextureOffsetY += 1;
+                        GlyphImage glyphImg = aggTextureGen.CreateGlyphImage(builder, 1);
+                        if (applyFilter)
+                        {
+
+                            glyphImg = Sharpen(glyphImg, 1);
+                            //TODO:
+                            //the filter make the image shift x and y 1 px
+                            //temp fix with this,
+                            glyphImg.TextureOffsetX += 1;
+                            glyphImg.TextureOffsetY += 1;
+                        }
+                        //
+                        atlasBuilder.AddGlyph(gindex, glyphImg);
                     }
-                    //
-                    atlasBuilder.AddGlyph(gindex, glyphImg);
                 }
             }
         }

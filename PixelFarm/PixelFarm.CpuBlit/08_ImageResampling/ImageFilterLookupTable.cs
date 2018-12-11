@@ -32,10 +32,10 @@ namespace PixelFarm.CpuBlit.Imaging
     //-----------------------------------------------------ImageFilterLookUpTable
     public class ImageFilterLookUpTable
     {
-        double m_radius;
-        int m_diameter;
-        int m_start;
-        int[] m_weight_array;
+        double _radius;
+        int _diameter;
+        int _start;
+        int[] _weight_array;
         public static class ImgFilterConst
         {
             public const int SHIFT = 14;                     //----image_filter_shift
@@ -65,11 +65,11 @@ namespace PixelFarm.CpuBlit.Imaging
             {
                 double x = (double)i / (double)ImgSubPixConst.SCALE;
                 double y = filter.CalculateWeight(x);
-                m_weight_array[pivot + i] =
-                m_weight_array[pivot - i] = AggMath.iround(y * ImgFilterConst.SCALE);
+                _weight_array[pivot + i] =
+                _weight_array[pivot - i] = AggMath.iround(y * ImgFilterConst.SCALE);
             }
             int end = (Diameter << ImgSubPixConst.SHIFT) - 1;
-            m_weight_array[0] = m_weight_array[end];
+            _weight_array[0] = _weight_array[end];
             if (normalization)
             {
                 Normalize();
@@ -78,8 +78,8 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public ImageFilterLookUpTable()
         {
-            m_weight_array = new int[256];
-            m_radius = m_diameter = m_start = 0;
+            _weight_array = new int[256];
+            _radius = _diameter = _start = 0;
         }
 
         public ImageFilterLookUpTable(Imaging.IImageFilter filter)
@@ -88,15 +88,16 @@ namespace PixelFarm.CpuBlit.Imaging
         }
         public ImageFilterLookUpTable(Imaging.IImageFilter filter, bool normalization)
         {
-            m_weight_array = new int[256];
+            _weight_array = new int[256];
             Calculate(filter, normalization);
         }
 
-
-        public double Radius { get { return m_radius; } }
-        public int Diameter { get { return m_diameter; } }
-        public int Start { get { return m_start; } }
-        public int[] WeightArray { get { return m_weight_array; } }
+        //
+        public double Radius => _radius;
+        public int Diameter => _diameter;
+        public int Start => _start;
+        public int[] WeightArray => _weight_array;
+        //
 
         //--------------------------------------------------------------------
         // This function normalizes integer values and corrects the rounding 
@@ -111,58 +112,58 @@ namespace PixelFarm.CpuBlit.Imaging
             int flip = 1;
             for (i = 0; i < (int)ImgSubPixConst.SCALE; i++)
             {
-                for (;;)
+                for (; ; )
                 {
                     int sum = 0;
                     int j;
-                    for (j = 0; j < m_diameter; j++)
+                    for (j = 0; j < _diameter; j++)
                     {
-                        sum += m_weight_array[j * (int)ImgSubPixConst.SCALE + i];
+                        sum += _weight_array[j * (int)ImgSubPixConst.SCALE + i];
                     }
 
                     if (sum == (int)ImgFilterConst.SCALE) break;
                     double k = (double)((int)ImgFilterConst.SCALE) / (double)(sum);
                     sum = 0;
-                    for (j = 0; j < m_diameter; j++)
+                    for (j = 0; j < _diameter; j++)
                     {
-                        sum += m_weight_array[j * (int)ImgSubPixConst.SCALE + i] =
-                            (int)AggMath.iround(m_weight_array[j * (int)ImgSubPixConst.SCALE + i] * k);
+                        sum += _weight_array[j * (int)ImgSubPixConst.SCALE + i] =
+                            (int)AggMath.iround(_weight_array[j * (int)ImgSubPixConst.SCALE + i] * k);
                     }
 
                     sum -= (int)ImgFilterConst.SCALE;
                     int inc = (sum > 0) ? -1 : 1;
-                    for (j = 0; j < m_diameter && sum != 0; j++)
+                    for (j = 0; j < _diameter && sum != 0; j++)
                     {
                         flip ^= 1;
-                        int idx = flip != 0 ? m_diameter / 2 + j / 2 : m_diameter / 2 - j / 2;
-                        int v = m_weight_array[idx * (int)ImgSubPixConst.SCALE + i];
+                        int idx = flip != 0 ? _diameter / 2 + j / 2 : _diameter / 2 - j / 2;
+                        int v = _weight_array[idx * (int)ImgSubPixConst.SCALE + i];
                         if (v < (int)ImgFilterConst.SCALE)
                         {
-                            m_weight_array[idx * (int)ImgSubPixConst.SCALE + i] += (int)inc;
+                            _weight_array[idx * (int)ImgSubPixConst.SCALE + i] += (int)inc;
                             sum += inc;
                         }
                     }
                 }
             }
 
-            int pivot = m_diameter << (ImgSubPixConst.SHIFT - 1);
+            int pivot = _diameter << (ImgSubPixConst.SHIFT - 1);
             for (i = 0; i < pivot; i++)
             {
-                m_weight_array[pivot + i] = m_weight_array[pivot - i];
+                _weight_array[pivot + i] = _weight_array[pivot - i];
             }
             int end = (Diameter << ImgSubPixConst.SHIFT) - 1;
-            m_weight_array[0] = m_weight_array[end];
+            _weight_array[0] = _weight_array[end];
         }
 
         void ReallocLut(double radius)
         {
-            m_radius = radius;
-            m_diameter = AggMath.uceil(radius) * 2;
-            m_start = -(m_diameter / 2 - 1);
-            int size = m_diameter << ImgSubPixConst.SHIFT;
-            if (size > m_weight_array.Length)
+            _radius = radius;
+            _diameter = AggMath.uceil(radius) * 2;
+            _start = -(_diameter / 2 - 1);
+            int size = _diameter << ImgSubPixConst.SHIFT;
+            if (size > _weight_array.Length)
             {
-                m_weight_array = new int[size];
+                _weight_array = new int[size];
             }
         }
     }

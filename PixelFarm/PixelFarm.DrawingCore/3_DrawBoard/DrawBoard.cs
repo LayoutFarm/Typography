@@ -15,11 +15,10 @@ namespace PixelFarm.Drawing
         //(0,0) is on left-upper corner
         //-------------------------------
         //who implement this class
-        //1. PixelFarm.Drawing.WinGdi.MyGdiPlusCanvas (for win32,legacy)
-        //2. Agg's 
-        //3. PixelFarm.Drawing.GLES2.MyGLCanvas  (for GLES2)
-        //4. PixelFarm.Drawing.Pdf.MyPdfCanvas (future)
-        //5. PixelFarm.Drawing.Skia.MySkia Canvas (not complete)
+        //1. PixelFarm.Drawing.WinGdi.MyGdiPlusCanvas (for win32,legacy) 
+        //2. PixelFarm.Drawing.GLES2.MyGLCanvas  (for GLES2)
+        //3. PixelFarm.Drawing.Pdf.MyPdfCanvas (future)
+        //4. PixelFarm.Drawing.Skia.MySkia Canvas (not complete)
         //------------------------------
         //who use this interface
         //the HtmlRenderer
@@ -90,7 +89,7 @@ namespace PixelFarm.Drawing
         //path,  polygons,ellipse spline,contour,   
         public abstract void FillPath(Color color, GraphicsPath gfxPath);
         public abstract void FillPath(Brush brush, GraphicsPath gfxPath);
-        public abstract void DrawPath(GraphicsPath gfxPath); 
+        public abstract void DrawPath(GraphicsPath gfxPath);
         public abstract void FillPolygon(Brush brush, PointF[] points);
         public abstract void FillPolygon(Color color, PointF[] points);
         //-------------------------------------------------------  
@@ -98,6 +97,7 @@ namespace PixelFarm.Drawing
         public abstract void DrawImage(Image image, RectangleF dest, RectangleF src);
         public abstract void DrawImage(Image image, RectangleF dest);
         public abstract void DrawImages(Image image, RectangleF[] destAndSrcPairs);
+        public abstract void DrawImage(Image image, int x, int y);//draw image unscaled at specific pos
         //---------------------------------------------------------------------------
         //text ,font, strings 
         //TODO: review these funcs
@@ -115,11 +115,46 @@ namespace PixelFarm.Drawing
         public abstract RenderVxFormattedString CreateFormattedString(char[] buffer, int startAt, int len);
         public abstract void DrawRenderVx(RenderVx renderVx, float x, float y);
         public abstract void Dispose();
+        //--
+        public abstract Painter GetPainter();
+        /// <summary>
+        /// get software rendering surface drawboard
+        /// </summary>
+        /// <returns></returns>
+        public abstract DrawBoard GetCpuBlitDrawBoard();
+        public abstract bool IsGpuDrawBoard { get; }
+        public abstract void BlitFrom(DrawBoard src, float srcX, float srcY, float srcW, float srcH, float dstX, float dstY);
+        public abstract BitmapBufferProvider GetInternalBitmapProvider();
 
     }
 
+    public enum BitmapBufferFormat
+    {
+        BGRA, //eg. System.Drawing.Bitmap
+        BGR, //eg. Native Windows GDI surface
+        RGBA //eg. OpenGL 
+    }
 
-    public enum RenderQualtity
+
+    public abstract class BitmapBufferProvider : Image
+    {
+        public abstract System.IntPtr GetRawBufferHead();
+        public abstract void ReleaseBufferHead();
+
+        public abstract bool IsYFlipped { get; }
+
+        /// <summary>
+        /// notify the bitmap provider that it can release the local bmp (eg. we have use it, not need anymore)
+        /// </summary>
+        public abstract void ReleaseLocalBitmapIfRequired();
+        public abstract void NotifyUsage();
+        public BitmapBufferFormat BitmapFormat { get; set; }
+        public override bool IsReferenceImage => true;
+        public override int ReferenceX => 0;
+        public override int ReferenceY => 0;
+    }
+
+    public enum RenderQuality
     {
         HighQuality,
         Fast,
@@ -147,7 +182,7 @@ namespace PixelFarm.Drawing
         Invalid = -1,
         None = 3
     }
-    public enum DrawBoardOrientation
+    public enum RenderSurfaceOrientation
     {
         LeftTop,
         LeftBottom,
@@ -193,23 +228,41 @@ namespace PixelFarm.Drawing
             drawBoard.SmoothingMode = value;
             return saveState;
         }
-
-
-
-
-
-        public struct SmoothingModeState
+        public static StrokeState SaveStroke(this DrawBoard drawBoard)
         {
-            readonly DrawBoard drawBoard;
+            return new StrokeState(drawBoard);
+        }
+        public struct SmoothingModeState : System.IDisposable
+        {
+            readonly DrawBoard _drawBoard;
             readonly SmoothingMode _latestSmoothMode;
             internal SmoothingModeState(DrawBoard drawBoard, SmoothingMode state)
             {
                 _latestSmoothMode = state;
-                this.drawBoard = drawBoard;
+                _drawBoard = drawBoard;
             }
-            public void Restore()
+            public void Dispose()
             {
-                drawBoard.SmoothingMode = _latestSmoothMode;
+                _drawBoard.SmoothingMode = _latestSmoothMode;
+            }
+        }
+        //--------------------------------------------------
+
+        public struct StrokeState : System.IDisposable
+        {
+            readonly DrawBoard _d;
+            readonly Color _stokeColor;
+            readonly float _strokeW;
+            public StrokeState(DrawBoard d)
+            {
+                _d = d;
+                _stokeColor = d.StrokeColor;
+                _strokeW = d.StrokeWidth;
+            }
+            public void Dispose()
+            {
+                _d.StrokeColor = _stokeColor;
+                _d.StrokeWidth = _strokeW;
             }
         }
 
@@ -217,27 +270,8 @@ namespace PixelFarm.Drawing
     }
 
 
-    public static class DrawBoardCreator
-    {
-        public delegate DrawBoard CreateNewDrawBoardDelegate(int w, int h);
-        static System.Collections.Generic.Dictionary<int, CreateNewDrawBoardDelegate> _s_creators = new System.Collections.Generic.Dictionary<int, CreateNewDrawBoardDelegate>();
-        public static void RegisterCreator(int creatorName, CreateNewDrawBoardDelegate del)
-        {
-            _s_creators.Add(creatorName, del);
-        }
-        public static DrawBoard CreateNewDrawBoard(int name, int w, int h)
-        {
-            if (_s_creators.TryGetValue(name, out CreateNewDrawBoardDelegate foundCreator))
-            {
-                return foundCreator(w, h);
-            }
-            else
-            {
-                //not found this creator
-                return null;
-            }
-        }
-    }
+
+
 }
 
 

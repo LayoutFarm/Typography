@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev 
 //----------------------------------- 
 using System;
 using System.Collections.Generic;
@@ -58,15 +58,99 @@ namespace Typography.Rendering
         }
     }
 
+    public static class GlyphTextureCustomConfigs
+    {
+        //some font need special treatments...
+
+        static Dictionary<int, GlyphTextureBuildDetail[]> s_registerDetails;
+
+        public static void Register(RequestFont reqFont, GlyphTextureBuildDetail[] details, bool forAnySize = true, bool forAnyStyle = true)
+        {
+            FontStyle fontStyle = reqFont.Style;
+            float sizeInPt = reqFont.SizeInPoints;
+            if (forAnySize)
+            {
+                sizeInPt = 0;
+            }
+            if (forAnyStyle)
+            {
+                fontStyle = FontStyle.Regular | FontStyle.Bold | FontStyle.Italic;
+            }
+            int fontKey = RequestFont.CalculateFontKey(reqFont.Name.ToLower(), sizeInPt, fontStyle);
+            s_registerDetails[fontKey] = details;
+        }
+
+        static GlyphTextureBuildDetail[] s_default;
+
+
+        static void SetupDefaults()
+        {
+
+            //Your Implementation ...
+            s_registerDetails = new Dictionary<int, GlyphTextureBuildDetail[]>();
+            //set default detail
+
+            if (s_default == null)
+            {
+                SetDefaultDetails(new GlyphTextureBuildDetail[] {
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+                });
+            }
+            //
+            //Your Implementation ...
+            //eg. Tahoma             
+            Register(new RequestFont("tahoma", 10), new GlyphTextureBuildDetail[]
+            {
+                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+                new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
+                    DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
+                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+            });
+        }
+        public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
+        {
+            s_default = defaultDetails;
+        }
+
+        public static GlyphTextureBuildDetail[] TryGetGlyphTextureBuildDetail(RequestFont reqFont, bool forAnySize = true, bool forAnyStyle = true)
+        {
+            if (s_registerDetails == null)
+            {
+                SetupDefaults();
+            }
+            //
+            FontStyle fontStyle = reqFont.Style;
+            float sizeInPt = reqFont.SizeInPoints;
+            if (forAnySize)
+            {
+                sizeInPt = 0;
+            }
+            if (forAnyStyle)
+            {
+                fontStyle = FontStyle.Regular | FontStyle.Bold | FontStyle.Italic;
+            }
+            int fontKey = RequestFont.CalculateFontKey(reqFont.Name.ToLower(), sizeInPt, fontStyle);
+            if (!s_registerDetails.TryGetValue(fontKey, out var found))
+            {
+                //not found that font key
+                //create default
+                //...
+                return s_default;
+            }
+            return found;
+        }
+    }
+
     public class BitmapFontManager<B>
         where B : IDisposable
     {
-        static FontBitmapCache<SimpleFontAtlas, B> _loadedGlyphs;
-        static Dictionary<int, SimpleFontAtlas> _createdAtlases = new Dictionary<int, SimpleFontAtlas>();
+        FontBitmapCache<SimpleFontAtlas, B> _loadedGlyphs;
+        Dictionary<int, SimpleFontAtlas> _createdAtlases = new Dictionary<int, SimpleFontAtlas>();
 
-        LayoutFarm.OpenFontTextService textServices;
-        ScriptLang[] _currentScriptLangs;
+        LayoutFarm.OpenFontTextService _textServices;
         TextureKind _textureKind;
+
         public BitmapFontManager(TextureKind textureKind,
             LayoutFarm.OpenFontTextService textServices,
             LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
@@ -77,30 +161,12 @@ namespace Typography.Rendering
         }
         public BitmapFontManager(TextureKind textureKind, LayoutFarm.OpenFontTextService textServices)
         {
-            this.textServices = textServices;
+            _textServices = textServices;
             _textureKind = textureKind;
         }
-
-
         protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
         {
             _loadedGlyphs = new FontBitmapCache<SimpleFontAtlas, B>(_createNewDel);
-        }
-        GlyphTextureBuildDetail[] _textureBuildDetails;
-        public void SetCurrentScriptLangs(ScriptLang[] currentScriptLangs)
-        {
-            this._currentScriptLangs = currentScriptLangs;
-
-            //TODO: review here again,
-            //this is a fixed version for tahoma font
-            //temp fix here ...
-            _textureBuildDetails = new GlyphTextureBuildDetail[]
-            {
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
-                    DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
-            };
         }
 
 #if DEBUG
@@ -124,25 +190,26 @@ namespace Typography.Rendering
             if (!_createdAtlases.TryGetValue(fontKey, out fontAtlas))
             {
                 //check from pre-built cache (if availiable) 
-                Typeface resolvedTypeface = textServices.ResolveTypeface(reqFont);
+                Typeface resolvedTypeface = _textServices.ResolveTypeface(reqFont);
 
-                string fontTextureFile = reqFont.Name + " " + fontKey;
+                string fontTextureFile = reqFont.Name + "_" + fontKey;
                 string resolveFontFile = fontTextureFile + ".info";
                 string fontTextureInfoFile = resolveFontFile;
-                string fontTextureImg = fontTextureInfoFile + ".png";
+                string fontTextureImgFilename = fontTextureInfoFile + ".png";
 
                 //check if the file exist
 
-                if (StorageService.Provider.DataExists(fontTextureInfoFile))
+                if (StorageService.Provider.DataExists(fontTextureInfoFile) &&
+                    StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
-                    SimpleFontAtlasBuilder atlasBuilder2 = new SimpleFontAtlasBuilder();
+                    SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
 
                     using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
                     {
                         try
                         {
-                            fontAtlas = atlasBuilder2.LoadFontInfo(dataStream);
-                            fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImg);
+                            fontAtlas = atlasBuilder.LoadFontInfo(dataStream);
+                            fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImgFilename);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
                             ////
@@ -167,15 +234,17 @@ namespace Typography.Rendering
                 else
                 {
 
+
+
                     GlyphImage totalGlyphsImg = null;
                     SimpleFontAtlasBuilder atlasBuilder = null;
-                    var textureGen = new GlyphTextureBitmapGenerator();
-                    textureGen.CreateTextureFontFromScriptLangs(
+                    var glyphTextureGen = new GlyphTextureBitmapGenerator();
+                    glyphTextureGen.CreateTextureFontFromScriptLangs(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                        _textureKind,
-                       _textureBuildDetails,
-                        (glyphIndex, glyphImage, outputAtlasBuilder) =>
+                       GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont),
+                       (glyphIndex, glyphImage, outputAtlasBuilder) =>
                         {
                             if (outputAtlasBuilder != null)
                             {
@@ -205,7 +274,7 @@ namespace Typography.Rendering
                     //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                     //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                     ////save image to cache
-                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImg);
+                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
 #endif
 
                     //cache the atlas
@@ -233,9 +302,13 @@ namespace Typography.Rendering
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                     {
                         atlasBuilder.SaveFontInfo(ms);
-                        System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
-
+                        //System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
                         StorageService.Provider.SaveData(fontTextureInfoFile, ms.ToArray());
+#if DEBUG
+                        //write temp debug info
+                        System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", reqFont.Name + ",size" + reqFont.SizeInPoints + "pts");
+#endif
+
                     }
                 }
             }
@@ -246,23 +319,26 @@ namespace Typography.Rendering
 
         static GlyphImage ReadGlyphImages(string filename)
         {
-            PixelFarm.CpuBlit.ActualBitmap bmp = StorageService.Provider.ReadPngBitmap(filename);
-            GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
-            int[] buffer = new int[bmp.Width * bmp.Height];
-            unsafe
+            using (PixelFarm.CpuBlit.MemBitmap bmp = StorageService.Provider.ReadPngBitmap(filename))
             {
-                PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.ActualBitmap.GetBufferPtr(bmp);
-                System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
-                img.SetImageBuffer(buffer, true);
+                GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
+                int[] buffer = new int[bmp.Width * bmp.Height];
+                unsafe
+                {
+                    PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(bmp);
+                    System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
+                    img.SetImageBuffer(buffer, true);
+                }
+                return img;
             }
-            return img;
-
         }
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {
-
-            var bmp = new PixelFarm.CpuBlit.ActualBitmap(glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer());
-            StorageService.Provider.SavePngBitmap(bmp, filename);
+            using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
+                   glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), true))
+            {
+                StorageService.Provider.SavePngBitmap(memBmp, filename);
+            }
 
         }
 #if DEBUG

@@ -26,42 +26,33 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         const int GAMMA_SHIFT = 8;
         const int GAMMA_SIZE = 1 << GAMMA_SHIFT;
         const int GAMMA_MASK = GAMMA_SIZE - 1;
-        float m_gamma;
-        byte[] m_dir_gamma;
-        byte[] m_inv_gamma;
+        float _gamma;
+        byte[] _dir_gamma;
+        byte[] _inv_gamma;
         public GammaLookUpTable(float gamma)
         {
-            m_gamma = gamma;
-            m_dir_gamma = new byte[GAMMA_SIZE];
-            m_inv_gamma = new byte[GAMMA_SIZE];
-            SetGamma(m_gamma);
+            _gamma = gamma;
+            _dir_gamma = new byte[GAMMA_SIZE];
+            _inv_gamma = new byte[GAMMA_SIZE];
+            SetGamma(_gamma);
         }
 
         void SetGamma(float g)
         {
-            m_gamma = g;
+            _gamma = g;
             float inv_g = (float)(1.0 / g);
             for (int i = GAMMA_SIZE - 1; i >= 0; --i)
             {
-                m_dir_gamma[i] = (byte)AggMath.uround(Math.Pow(i / (float)GAMMA_MASK, m_gamma) * (float)GAMMA_MASK);
-                m_inv_gamma[i] = (byte)AggMath.uround(Math.Pow(i / (float)GAMMA_MASK, inv_g) * (float)GAMMA_MASK);
+                _dir_gamma[i] = (byte)AggMath.uround(Math.Pow(i / (float)GAMMA_MASK, _gamma) * (float)GAMMA_MASK);
+                _inv_gamma[i] = (byte)AggMath.uround(Math.Pow(i / (float)GAMMA_MASK, inv_g) * (float)GAMMA_MASK);
             }
         }
-
-        public double Gamma
-        {
-            get { return m_gamma; }
-        }
-
-        public byte dir(int v)
-        {
-            return m_dir_gamma[v];
-        }
-
-        public byte inv(int v)
-        {
-            return m_inv_gamma[v];
-        }
+        //
+        public double Gamma => _gamma;
+        //
+        public byte dir(int v) => _dir_gamma[v];
+        //
+        public byte inv(int v) => _inv_gamma[v];
     }
 }
 

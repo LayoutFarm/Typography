@@ -23,7 +23,7 @@
 //
 //----------------------------------------------------------------------------
 using System;
-using PixelFarm.Drawing; 
+using PixelFarm.Drawing;
 
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
@@ -67,63 +67,63 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     class StrokeMath
     {
 
-        double m_width;
-        double m_width_abs;
-        double m_width_eps;
-        int m_width_sign;
-        double m_miter_limit;
-        double m_inner_miter_limit;
-        double m_approx_scale;
-        LineCap m_line_cap;
-        LineJoin m_line_join;
-        InnerJoin m_inner_join;
+        double _width;
+        double _width_abs;
+        double _width_eps;
+        int _width_sign;
+        double _miter_limit;
+        double _inner_miter_limit;
+        double _approx_scale;
+        LineCap _line_cap;
+        LineJoin _line_join;
+        InnerJoin _inner_join;
         public StrokeMath()
         {
-            m_width = 0.5;
-            m_width_abs = 0.5;
-            m_width_eps = 0.5 / 1024.0;
-            m_width_sign = 1;
-            m_miter_limit = 4.0;
-            m_inner_miter_limit = 1.01;
-            m_approx_scale = 1.0;
-            m_line_cap = LineCap.Butt;
-            m_line_join = LineJoin.Miter;
-            m_inner_join = InnerJoin.Miter;
+            _width = 0.5;
+            _width_abs = 0.5;
+            _width_eps = 0.5 / 1024.0;
+            _width_sign = 1;
+            _miter_limit = 4.0;
+            _inner_miter_limit = 1.01;
+            _approx_scale = 1.0;
+            _line_cap = LineCap.Butt;
+            _line_join = LineJoin.Miter;
+            _inner_join = InnerJoin.Miter;
         }
 
         public LineCap LineCap
         {
-            get { return this.m_line_cap; }
-            set { this.m_line_cap = value; }
+            get => _line_cap;
+            set => _line_cap = value;
         }
         public LineJoin LineJoin
         {
-            get { return this.m_line_join; }
-            set { this.m_line_join = value; }
+            get => _line_join;
+            set => _line_join = value;
         }
         public InnerJoin InnerJoin
         {
-            get { return this.m_inner_join; }
-            set { this.m_inner_join = value; }
+            get => _inner_join;
+            set => _inner_join = value;
         }
 
         public double Width
         {
-            get { return this.m_width * 2.0; }
+            get => _width * 2.0;
             set
             {
-                m_width = value / 2.0;
-                if (m_width < 0)
+                _width = value / 2.0;
+                if (_width < 0)
                 {
-                    m_width_abs = -m_width;
-                    m_width_sign = -1;
+                    _width_abs = -_width;
+                    _width_sign = -1;
                 }
                 else
                 {
-                    m_width_abs = m_width;
-                    m_width_sign = 1;
+                    _width_abs = _width;
+                    _width_sign = 1;
                 }
-                m_width_eps = m_width / 1024.0;
+                _width_eps = _width / 1024.0;
             }
         }
 
@@ -131,44 +131,42 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public double MiterLimit
         {
-            get { return this.m_miter_limit; }
-            set { this.m_miter_limit = value; }
+            get => _miter_limit;
+            set => _miter_limit = value;
         }
         public void SetMiterLimitTheta(double t)
         {
-            m_miter_limit = 1.0 / Math.Sin(t * 0.5);
-        }
-
-
-
+            _miter_limit = 1.0 / Math.Sin(t * 0.5);
+        } 
         public double InnerMiterLimit
         {
-            get { return this.m_inner_miter_limit; }
-            set { this.m_inner_miter_limit = value; }
-        }
-
-
+            get => _inner_miter_limit;
+            set => _inner_miter_limit = value;
+        } 
         public double ApproximateScale
         {
-            get { return this.m_approx_scale; }
-            set { this.m_approx_scale = value; }
+            get { return _approx_scale; }
+            set { _approx_scale = value; }
         }
 
-        public void CreateCap(VertexStore output, Vertex2d v0, Vertex2d v1, double len)
+        public void CreateCap(VertexStore output, Vertex2d v0, Vertex2d v1)
         {
+
             output.Clear();
+
+            double len = v0.CalLen(v1);
             double dx1 = (v1.y - v0.y) / len;
             double dy1 = (v1.x - v0.x) / len;
             double dx2 = 0;
             double dy2 = 0;
-            dx1 *= m_width;
-            dy1 *= m_width;
-            if (m_line_cap != LineCap.Round)
+            dx1 *= _width;
+            dy1 *= _width;
+            if (_line_cap != LineCap.Round)
             {
-                if (m_line_cap == LineCap.Square)
+                if (_line_cap == LineCap.Square)
                 {
-                    dx2 = dy1 * m_width_sign;
-                    dy2 = dx1 * m_width_sign;
+                    dx2 = dy1 * _width_sign;
+                    dy2 = dx1 * _width_sign;
                 }
                 AddVertex(output, v0.x - dx1 - dx2, v0.y + dy1 - dy2);
                 AddVertex(output, v0.x + dx1 - dx2, v0.y - dy1 - dy2);
@@ -176,20 +174,20 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             else
             {
                 //round cap
-                double da = Math.Acos(m_width_abs / (m_width_abs + 0.125 / m_approx_scale)) * 2;
+                double da = Math.Acos(_width_abs / (_width_abs + 0.125 / _approx_scale)) * 2;
                 double a1;
                 int i;
                 int n = (int)(Math.PI / da);
                 da = Math.PI / (n + 1);
                 AddVertex(output, v0.x - dx1, v0.y + dy1);
-                if (m_width_sign > 0)
+                if (_width_sign > 0)
                 {
                     a1 = Math.Atan2(dy1, -dx1);
                     a1 += da;
                     for (i = 0; i < n; i++)
                     {
-                        AddVertex(output, v0.x + Math.Cos(a1) * m_width,
-                                       v0.y + Math.Sin(a1) * m_width);
+                        AddVertex(output, v0.x + Math.Cos(a1) * _width,
+                                       v0.y + Math.Sin(a1) * _width);
                         a1 += da;
                     }
                 }
@@ -199,8 +197,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     a1 -= da;
                     for (i = 0; i < n; i++)
                     {
-                        AddVertex(output, v0.x + Math.Cos(a1) * m_width,
-                                       v0.y + Math.Sin(a1) * m_width);
+                        AddVertex(output, v0.x + Math.Cos(a1) * _width,
+                                       v0.y + Math.Sin(a1) * _width);
                         a1 -= da;
                     }
                 }
@@ -211,27 +209,29 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public void CreateJoin(VertexStore output,
                                Vertex2d v0,
                                Vertex2d v1,
-                               Vertex2d v2,
-                               double len1,
-                               double len2)
+                               Vertex2d v2)
         {
-            double dx1 = m_width * (v1.y - v0.y) / len1;
-            double dy1 = m_width * (v1.x - v0.x) / len1;
-            double dx2 = m_width * (v2.y - v1.y) / len2;
-            double dy2 = m_width * (v2.x - v1.x) / len2;
+
+            double len1 = v1.CalLen(v0);
+            double len2 = v2.CalLen(v1);
+
+            double dx1 = _width * (v1.y - v0.y) / len1;
+            double dy1 = _width * (v1.x - v0.x) / len1;
+            double dx2 = _width * (v2.y - v1.y) / len2;
+            double dy2 = _width * (v2.x - v1.x) / len2;
             output.Clear();
             double cp = AggMath.Cross(v0.x, v0.y, v1.x, v1.y, v2.x, v2.y);
-            if (cp != 0 && (cp > 0) == (m_width > 0))
+            if (cp != 0 && (cp > 0) == (_width > 0))
             {
                 // Inner join
                 //---------------
-                double limit = ((len1 < len2) ? len1 : len2) / m_width_abs;
-                if (limit < m_inner_miter_limit)
+                double limit = ((len1 < len2) ? len1 : len2) / _width_abs;
+                if (limit < _inner_miter_limit)
                 {
-                    limit = m_inner_miter_limit;
+                    limit = _inner_miter_limit;
                 }
 
-                switch (m_inner_join)
+                switch (_inner_join)
                 {
                     default: // inner_bevel
                         AddVertex(output, v1.x + dx1, v1.y - dy1);
@@ -255,7 +255,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         }
                         else
                         {
-                            if (m_inner_join == InnerJoin.Jag)
+                            if (_inner_join == InnerJoin.Jag)
                             {
                                 AddVertex(output, v1.x + dx1, v1.y - dy1);
                                 AddVertex(output, v1.x, v1.y);
@@ -284,7 +284,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 double dx = (dx1 + dx2) / 2;
                 double dy = (dy1 + dy2) / 2;
                 double dbevel = Math.Sqrt(dx * dx + dy * dy);
-                if (m_line_join == LineJoin.Round || m_line_join == LineJoin.Bevel)
+                if (_line_join == LineJoin.Round || _line_join == LineJoin.Bevel)
                 {
                     // This is an optimization that reduces the number of points 
                     // in cases of almost collinear segments. If there's no
@@ -303,7 +303,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     // the same as in round joins and caps. You can safely comment 
                     // out this entire "if".
                     //-------------------
-                    if (m_approx_scale * (m_width_abs - dbevel) < m_width_eps)
+                    if (_approx_scale * (_width_abs - dbevel) < _width_eps)
                     {
                         if (AggMath.CalcIntersect(v0.x + dx1, v0.y - dy1,
                                              v1.x + dx1, v1.y - dy1,
@@ -321,15 +321,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     }
                 }
 
-                switch (m_line_join)
+                switch (_line_join)
                 {
                     case LineJoin.Miter:
                     case LineJoin.MiterRevert:
                     case LineJoin.MiterRound:
                         CreateMiter(output,
                                    v0, v1, v2, dx1, dy1, dx2, dy2,
-                                   m_line_join,
-                                   m_miter_limit,
+                                   _line_join,
+                                   _miter_limit,
                                    dbevel);
                         break;
                     case LineJoin.Round:
@@ -352,13 +352,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                       double dx1, double dy1,
                       double dx2, double dy2)
         {
-            double a1 = Math.Atan2(dy1 * m_width_sign, dx1 * m_width_sign);
-            double a2 = Math.Atan2(dy2 * m_width_sign, dx2 * m_width_sign);
+            double a1 = Math.Atan2(dy1 * _width_sign, dx1 * _width_sign);
+            double a2 = Math.Atan2(dy2 * _width_sign, dx2 * _width_sign);
             double da = a1 - a2;
             int i, n;
-            da = Math.Acos(m_width_abs / (m_width_abs + 0.125 / m_approx_scale)) * 2;
+            da = Math.Acos(_width_abs / (_width_abs + 0.125 / _approx_scale)) * 2;
             AddVertex(output, x + dx1, y + dy1);
-            if (m_width_sign > 0)
+            if (_width_sign > 0)
             {
                 if (a1 > a2) a2 += 2 * Math.PI;
                 n = (int)((a2 - a1) / da);
@@ -366,7 +366,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 a1 += da;
                 for (i = 0; i < n; i++)
                 {
-                    AddVertex(output, x + Math.Cos(a1) * m_width, y + Math.Sin(a1) * m_width);
+                    AddVertex(output, x + Math.Cos(a1) * _width, y + Math.Sin(a1) * _width);
                     a1 += da;
                 }
             }
@@ -378,7 +378,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 a1 -= da;
                 for (i = 0; i < n; i++)
                 {
-                    AddVertex(output, x + Math.Cos(a1) * m_width, y + Math.Sin(a1) * m_width);
+                    AddVertex(output, x + Math.Cos(a1) * _width, y + Math.Sin(a1) * _width);
                     a1 -= da;
                 }
             }
@@ -398,7 +398,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double xi = v1.x;
             double yi = v1.y;
             double di = 1;
-            double lim = m_width_abs * mlimit;
+            double lim = _width_abs * mlimit;
             bool miter_limit_exceeded = true; // Assume the worst
             bool intersection_failed = true; // Assume the worst
             if (AggMath.CalcIntersect(v0.x + dx1, v0.y - dy1,
@@ -464,7 +464,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //----------------
                         if (intersection_failed)
                         {
-                            mlimit *= m_width_sign;
+                            mlimit *= _width_sign;
                             AddVertex(output, v1.x + dx1 + dy1 * mlimit,
                                            v1.y - dy1 + dx1 * mlimit);
                             AddVertex(output, v1.x + dx2 - dy2 * mlimit,

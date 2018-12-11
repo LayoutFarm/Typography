@@ -32,7 +32,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             int height)
         {
             this.OutputPixelBlender = image.OutputPixelBlender;
-            AttachBuffer(image.GetOrgInt32Buffer(),
+            AttachBuffer(image.GetBufferPtr(),
                 arrayOffset32,
                 width,
                 height,
@@ -41,7 +41,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 image.BytesBetweenPixelsInclusive);
         }
 
-        public SubBitmapBlender(int[] buffer,
+        public SubBitmapBlender(PixelFarm.CpuBlit.Imaging.TempMemPtr buffer,
             int arrayOffset32,
             int width,
             int height,
@@ -71,16 +71,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             Attach(image, blender, image.BytesBetweenPixelsInclusive, 0, image.BitDepth);
         }
 
-        public override void ReplaceBuffer(int[] newbuffer)
+        public override void WriteBuffer(int[] newbuffer)
         {
             if (_sourceImage != null)
             {
-                _sourceImage.ReplaceBuffer(newbuffer);
+                _sourceImage.WriteBuffer(newbuffer);
             }
 
         }
 
-        void AttachBuffer(int[] buffer,
+        void AttachBuffer(PixelFarm.CpuBlit.Imaging.TempMemPtr buffer,
           int elemOffset,
           int width,
           int height,
@@ -97,6 +97,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
 
         IBitmapSrc _sourceImage;
+
         void Attach(IBitmapSrc sourceImage,
           PixelBlender32 outputPxBlender,
           int distanceBetweenPixelsInclusive,
@@ -111,9 +112,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 distanceBetweenPixelsInclusive);
 
             int srcOffset32 = sourceImage.GetBufferOffsetXY32(0, 0);
-            int[] buffer = sourceImage.GetOrgInt32Buffer();
-            SetBuffer(buffer, srcOffset32 + arrayElemOffset);
-
+            SetBuffer(sourceImage.GetBufferPtr(), srcOffset32 + arrayElemOffset);
             this.OutputPixelBlender = outputPxBlender;
         }
         //bool Attach(IBitmapBlender sourceImage, int x1, int y1, int x2, int y2)
@@ -137,23 +136,23 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         //    return false;
         //}
 
-        void SetBuffer(int[] int32Buffer, int arrayElemOffset)
+        void SetBuffer(PixelFarm.CpuBlit.Imaging.TempMemPtr src, int arrayElemOffset)
         {
             int height = this.Height;
 
-            if (int32Buffer.Length < height * Width)
+            if ((src.LengthInBytes / 4) < height * Width)
             {
                 throw new Exception("Your buffer does not have enough room it it for your height and strideInBytes.");
             }
 
-            SetBuffer(int32Buffer);
-            int32ArrayStartPixelAt = arrayElemOffset;
+            SetBuffer(src);
+            _int32ArrayStartPixelAt = arrayElemOffset;
 
             if (this.Stride < 0) //stride in bytes
             {
                 //TODO: review here 
                 int addAmount = -((height - 1) * Width);
-                int32ArrayStartPixelAt = addAmount + arrayElemOffset;
+                _int32ArrayStartPixelAt = addAmount + arrayElemOffset;
             }
             SetUpLookupTables();
         }

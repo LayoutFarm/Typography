@@ -208,8 +208,8 @@ namespace Typography.Rendering
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
 
             GlyphImage img = new GlyphImage(w, h);
-            img.TextureOffsetX = translate.x;
-            img.TextureOffsetY = translate.y;
+            img.TextureOffsetX = (short)translate.x;
+            img.TextureOffsetY = (short)translate.y;
             img.SetImageBuffer(buffer, false);
             return img;
         }

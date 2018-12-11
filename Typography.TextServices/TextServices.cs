@@ -10,6 +10,7 @@ namespace Typography.TextLayout
 {
     public struct BreakSpan
     {
+        //TODO: review here again***
         public int startAt;
         public ushort len;
         public short flags;
@@ -19,6 +20,7 @@ namespace Typography.TextLayout
 
 namespace Typography.TextServices
 {
+    using Typography.TextBreak;
 
     public class TextServices
     {
@@ -34,37 +36,31 @@ namespace Typography.TextServices
         Typeface _currentTypeface;
         float _fontSizeInPts;
         ScriptLang _defaultScriptLang;
-        ActiveTypefaceCache typefaceStore;
+        ActiveTypefaceCache _typefaceStore;
         InstalledTypefaceCollection _installedTypefaceCollection;
-        ScriptLang scLang;
+        ScriptLang _scLang;
 
 
         public TextServices()
         {
 
-            typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist(); 
+            _typefaceStore = ActiveTypefaceCache.GetTypefaceStoreOrCreateNewIfNotExist();
             _glyphLayout = new GlyphLayout();
         }
         public void SetDefaultScriptLang(ScriptLang scLang)
         {
-            this.scLang = _defaultScriptLang = scLang;
+            _scLang = _defaultScriptLang = scLang;
         }
         public InstalledTypefaceCollection InstalledFontCollection
         {
-            get
-            {
-                return _installedTypefaceCollection;
-            }
-            set
-            {
-                _installedTypefaceCollection = value;
-            }
+            get => _installedTypefaceCollection;
+            set => _installedTypefaceCollection = value;
         }
 
         public ScriptLang CurrentScriptLang
         {
-            get { return scLang; }
-            set { this.scLang = _glyphLayout.ScriptLang = value; }
+            get => _scLang;
+            set => _scLang = _glyphLayout.ScriptLang = value;
         }
 
         public void SetCurrentFont(Typeface typeface, float fontSizeInPts)
@@ -91,7 +87,7 @@ namespace Typography.TextServices
             InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
             if (inst != null)
             {
-                return typefaceStore.GetTypeface(inst);
+                return _typefaceStore.GetTypeface(inst);
             }
             return null;
 
@@ -107,17 +103,39 @@ namespace Typography.TextServices
             _registerShapingContexts.Clear();
         }
 
-        Typography.TextBreak.CustomBreaker _textBreaker;
-        public IEnumerable<BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
+        CustomBreaker _textBreaker;
+        List<TextBreak.BreakSpan> _breakSpans = new List<TextBreak.BreakSpan>();
+        public IEnumerable<Typography.TextLayout.BreakSpan> BreakToLineSegments(char[] str, int startAt, int len)
         {
-            //user must setup the CustomBreakerBuilder before use              
+            //user must setup the CustomBreakerBuilder before use      
             if (_textBreaker == null)
             {
                 _textBreaker = Typography.TextBreak.CustomBreakerBuilder.NewCustomBreaker();
+                _textBreaker.SetNewBreakHandler(vis => _breakSpans.Add(vis.GetBreakSpan()));
+
+#if DEBUG
+                if (_textBreaker == null)
+                {
+
+                }
+#endif
             }
+
+#if DEBUG
+
+#endif
+            _breakSpans.Clear();
+            //
+            if (len < 1)
+            {
+                yield break;
+            }
+            //----------------------------
             int cur_startAt = startAt;
+
             _textBreaker.BreakWords(str, cur_startAt, len);
-            foreach (TextBreak.BreakSpan sp in _textBreaker.GetBreakSpanIter())
+
+            foreach (TextBreak.BreakSpan sp in _breakSpans)
             {
                 //our service select a proper script lang info and add to the breakspan
 
@@ -159,7 +177,7 @@ namespace Typography.TextServices
                     }
                 }
 
-                BreakSpan breakspan = new BreakSpan();
+                Typography.TextLayout.BreakSpan breakspan = new Typography.TextLayout.BreakSpan();
                 breakspan.startAt = sp.startAt;
                 breakspan.len = sp.len;
                 breakspan.scLang = selectedScriptLang;
@@ -242,7 +260,7 @@ namespace Typography.TextServices
             float accumH = 0;
 
 
-            foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            foreach (Typography.TextLayout.BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
             {
 
                 _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
@@ -292,7 +310,7 @@ namespace Typography.TextServices
             int cur_startAt = startAt;
             float accumW = 0;
 
-            foreach (BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            foreach (Typography.TextLayout.BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
             {
 
                 //measure string at specific px scale 
@@ -373,8 +391,8 @@ namespace Typography.TextServices
 
             public TextShapingContextKey(Typeface typeface, ScriptLang scLang)
             {
-                this._typeface = typeface;
-                this._scLang = scLang;
+                _typeface = typeface;
+                _scLang = scLang;
             }
 #if DEBUG
             public override string ToString()
@@ -527,12 +545,11 @@ namespace Typography.TextServices
 
         public GlyphPlanSeqCollection(int seqLen)
         {
-            this._seqLen = seqLen;
+            _seqLen = seqLen;
         }
-        public int SeqLen
-        {
-            get { return _seqLen; }
-        }
+        //
+        public int SeqLen => _seqLen;
+        //
         public void Register(int hashValue, GlyphPlanSequence seq)
         {
             _knownSeqs.Add(hashValue, seq);

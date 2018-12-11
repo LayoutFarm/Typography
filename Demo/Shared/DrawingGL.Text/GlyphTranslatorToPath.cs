@@ -11,11 +11,11 @@ namespace DrawingGL.Text
     /// </summary>
     class GlyphTranslatorToPath : IGlyphTranslator
     {
-        IWritablePath ps;
-        float lastMoveX;
-        float lastMoveY;
-        float lastX;
-        float lastY;
+        IWritablePath _ps;
+        float _lastMoveX;
+        float _lastMoveY;
+        float _lastX;
+        float _lastY;
         System.Text.StringBuilder _stbuilder = null;
 
         public GlyphTranslatorToPath()
@@ -23,7 +23,7 @@ namespace DrawingGL.Text
         }
         public void SetOutput(IWritablePath ps, System.Text.StringBuilder stbuilder = null)
         {
-            this.ps = ps;
+            _ps = ps;
             _stbuilder = stbuilder;
         }
         public void BeginRead(int contourCount)
@@ -37,9 +37,9 @@ namespace DrawingGL.Text
         public void MoveTo(float x0, float y0)
         {
 
-            lastX = lastMoveX = (float)x0;
-            lastY = lastMoveY = (float)y0;
-            ps.MoveTo(x0, y0);
+            _lastX = _lastMoveX = (float)x0;
+            _lastY = _lastMoveY = (float)y0;
+            _ps.MoveTo(x0, y0);
             if (_stbuilder != null)
             {
                 _stbuilder.AppendLine(string.Format("move_to ({0:0.00}, {1:0.00})", x0, y0));
@@ -47,7 +47,7 @@ namespace DrawingGL.Text
         }
         public void CloseContour()
         {
-            ps.CloseFigure();
+            _ps.CloseFigure();
 
             if (_stbuilder != null)
             {
@@ -61,16 +61,16 @@ namespace DrawingGL.Text
             //Control1X = StartX + (.66 * (ControlX - StartX))
             //Control2X = EndX + (.66 * (ControlX - EndX)) 
 
-            float c1x = lastX + (float)((2f / 3f) * (x1 - lastX));
-            float c1y = lastY + (float)((2f / 3f) * (y1 - lastY));
+            float c1x = _lastX + (float)((2f / 3f) * (x1 - _lastX));
+            float c1y = _lastY + (float)((2f / 3f) * (y1 - _lastY));
             //---------------------------------------------------------------------
             float c2x = (float)(x2 + ((2f / 3f) * (x1 - x2)));
             float c2y = (float)(y2 + ((2f / 3f) * (y1 - y2)));
             //---------------------------------------------------------------------
-            ps.BezireTo(
+            _ps.BezireTo(
                  c1x, c1y,
                  c2x, c2y,
-                 lastX = x2, lastY = y2);
+                 _lastX = x2, _lastY = y2);
             //---------------------------------------------------------------------
             if (_stbuilder != null)
             {
@@ -81,10 +81,10 @@ namespace DrawingGL.Text
         }
         public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
         {
-            ps.BezireTo(
+            _ps.BezireTo(
               x1, y1,
               x2, y2,
-              lastX = x3, lastY = y3);
+              _lastX = x3, _lastY = y3);
 
             if (_stbuilder != null)
             {
@@ -95,12 +95,12 @@ namespace DrawingGL.Text
         }
         public void LineTo(float x1, float y1)
         {
-            ps.LineTo(lastX = x1, lastY = y1);
+            _ps.LineTo(_lastX = x1, _lastY = y1);
         }
         public void Reset()
         {
-            ps = null;
-            lastMoveX = lastMoveY = lastX = lastY;
+            _ps = null;
+            _lastMoveX = _lastMoveY = _lastX = _lastY;
         }
     }
 }

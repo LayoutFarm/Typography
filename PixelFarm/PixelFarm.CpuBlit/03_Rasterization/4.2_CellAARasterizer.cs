@@ -55,8 +55,10 @@ namespace PixelFarm.CpuBlit.Rasterization
             public readonly int cover;
             public readonly int area;
 #if DEBUG
+#if !COSMOS
             public int dbugLeft;
             public int dbugRight;
+#endif
 #endif
             private CellAA(int x, int y, int cover, int area)
             {
@@ -65,8 +67,10 @@ namespace PixelFarm.CpuBlit.Rasterization
                 this.cover = cover;
                 this.area = area;
 #if DEBUG
+#if !COSMOS
                 dbugLeft = 0;
                 dbugRight = 0;
+#endif
 #endif
             }
 
@@ -88,16 +92,20 @@ namespace PixelFarm.CpuBlit.Rasterization
                 //cell.y = y;
                 //cell.cover = cover;
                 //cell.area = area;
+#if !COSMOS
                 cell.dbugLeft = left;
                 cell.dbugRight = right;
+#endif
                 return cell;
             }
 #endif
 #if DEBUG
+#if !COSMOS
             public override string ToString()
             {
                 return "x:" + x + ",y:" + y + ",cover:" + cover + ",area:" + area + ",left:" + dbugLeft + ",right:" + dbugRight;
             }
+#endif
 #endif
 
         }
@@ -108,26 +116,27 @@ namespace PixelFarm.CpuBlit.Rasterization
         // Used in the rasterizer. Should not be used directly.
         sealed class CellAARasterizer
         {
-            int m_num_used_cells;
-            ArrayList<CellAA> m_cells;
-            ArrayList<CellAA> m_sorted_cells;
-            ArrayList<SortedY> m_sorted_y;
+            int _num_used_cells;
+            ArrayList<CellAA> _cells;
+            ArrayList<CellAA> _sorted_cells;
+            ArrayList<SortedY> _sorted_y;
             //------------------
-            int cCell_x;
-            int cCell_y;
-            int cCell_cover;
-            int cCell_area;
+            int _cCell_x;
+            int _cCell_y;
+            int _cCell_cover;
+            int _cCell_area;
             //------------------
 #if DEBUG
-            int cCell_left;
-            int cCell_right;
+            int _cCell_left;
+            int _cCell_right;
 #endif
             //------------------
-            int m_min_x;
-            int m_min_y;
-            int m_max_x;
-            int m_max_y;
-            bool m_sorted;
+            int _min_x;
+            int _min_y;
+
+            int _max_x;
+            int _max_y;
+            bool _sorted;
             const int BLOCK_SHIFT = 12;
             const int BLOCK_SIZE = 1 << BLOCK_SHIFT;
             const int BLOCK_MASK = BLOCK_SIZE - 1;
@@ -141,37 +150,37 @@ namespace PixelFarm.CpuBlit.Rasterization
 
             public CellAARasterizer()
             {
-                m_sorted_cells = new ArrayList<CellAA>();
-                m_sorted_y = new ArrayList<SortedY>();
-                m_min_x = (0x7FFFFFFF);
-                m_min_y = (0x7FFFFFFF);
-                m_max_x = (-0x7FFFFFFF);
-                m_max_y = (-0x7FFFFFFF);
-                m_sorted = false;
+                _sorted_cells = new ArrayList<CellAA>();
+                _sorted_y = new ArrayList<SortedY>();
+                _min_x = (0x7FFFFFFF);
+                _min_y = (0x7FFFFFFF);
+                _max_x = (-0x7FFFFFFF);
+                _max_y = (-0x7FFFFFFF);
+                _sorted = false;
                 ResetCurrentCell();
-                this.m_cells = new ArrayList<CellAA>(BLOCK_SIZE);
+                _cells = new ArrayList<CellAA>(BLOCK_SIZE);
             }
             void ResetCurrentCell()
             {
-                cCell_x = 0x7FFFFFFF;
-                cCell_y = 0x7FFFFFFF;
-                cCell_cover = 0;
-                cCell_area = 0;
+                _cCell_x = 0x7FFFFFFF;
+                _cCell_y = 0x7FFFFFFF;
+                _cCell_cover = 0;
+                _cCell_area = 0;
 #if DEBUG
-                cCell_left = -1;
-                cCell_right = -1;
+                _cCell_left = -1;
+                _cCell_right = -1;
 #endif
             }
 
             public void Reset()
             {
-                m_num_used_cells = 0;
+                _num_used_cells = 0;
                 ResetCurrentCell();
-                m_sorted = false;
-                m_min_x = 0x7FFFFFFF;
-                m_min_y = 0x7FFFFFFF;
-                m_max_x = -0x7FFFFFFF;
-                m_max_y = -0x7FFFFFFF;
+                _sorted = false;
+                _min_x = 0x7FFFFFFF;
+                _min_y = 0x7FFFFFFF;
+                _max_x = -0x7FFFFFFF;
+                _max_y = -0x7FFFFFFF;
             }
 
 
@@ -199,14 +208,14 @@ namespace PixelFarm.CpuBlit.Rasterization
                 int fy2 = y2 & POLY_SUBPIXEL_MASK;
                 int x_from, x_to;
                 int p, rem, mod, lift, delta, first, incr;
-                if (ex1 < m_min_x) m_min_x = ex1;
-                if (ex1 > m_max_x) m_max_x = ex1;
-                if (ey1 < m_min_y) m_min_y = ey1;
-                if (ey1 > m_max_y) m_max_y = ey1;
-                if (ex2 < m_min_x) m_min_x = ex2;
-                if (ex2 > m_max_x) m_max_x = ex2;
-                if (ey2 < m_min_y) m_min_y = ey2;
-                if (ey2 > m_max_y) m_max_y = ey2;
+                if (ex1 < _min_x) _min_x = ex1;
+                if (ex1 > _max_x) _max_x = ex1;
+                if (ey1 < _min_y) _min_y = ey1;
+                if (ey1 > _max_y) _max_y = ey1;
+                if (ex2 < _min_x) _min_x = ex2;
+                if (ex2 > _max_x) _max_x = ex2;
+                if (ey2 < _min_y) _min_y = ey2;
+                if (ey2 > _max_y) _max_y = ey2;
                 //***
                 AddNewCell(ex1, ey1);
                 //***
@@ -236,8 +245,8 @@ namespace PixelFarm.CpuBlit.Rasterization
 
                     x_from = x1;
                     delta = first - fy1;
-                    cCell_cover += delta;
-                    cCell_area += two_fx * delta;
+                    _cCell_cover += delta;
+                    _cCell_area += two_fx * delta;
                     ey1 += incr;
                     //***
                     AddNewCell(ex, ey1);
@@ -246,16 +255,16 @@ namespace PixelFarm.CpuBlit.Rasterization
                     area = two_fx * delta;
                     while (ey1 != ey2)
                     {
-                        cCell_cover = delta;
-                        cCell_area = area;
+                        _cCell_cover = delta;
+                        _cCell_area = area;
                         ey1 += incr;
                         //***
                         AddNewCell(ex, ey1);
                         //***
                     }
                     delta = fy2 - POLY_SUBPIXEL_SCALE + first;
-                    cCell_cover += delta;
-                    cCell_area += two_fx * delta;
+                    _cCell_cover += delta;
+                    _cCell_area += two_fx * delta;
                     return;
                 }
 
@@ -321,42 +330,43 @@ namespace PixelFarm.CpuBlit.Rasterization
 
 
 
-            public int MinX { get { return m_min_x; } }
-            public int MinY { get { return m_min_y; } }
-            public int MaxX { get { return m_max_x; } }
-            public int MaxY { get { return m_max_y; } }
+            public int MinX => _min_x;
+            public int MinY => _min_y;
+            //
+            public int MaxX => _max_x;
+            public int MaxY => _max_y;
 
             public void SortCells()
             {
-                if (m_sorted) return; //Perform sort only the first time.
+                if (_sorted) return; //Perform sort only the first time.
                 WriteCurrentCell();
                 //----------------------------------
                 //reset current cell 
-                cCell_x = 0x7FFFFFFF;
-                cCell_y = 0x7FFFFFFF;
-                cCell_cover = 0;
-                cCell_area = 0;
+                _cCell_x = 0x7FFFFFFF;
+                _cCell_y = 0x7FFFFFFF;
+                _cCell_cover = 0;
+                _cCell_area = 0;
                 //----------------------------------
 
-                if (m_num_used_cells == 0) return;
+                if (_num_used_cells == 0) return;
                 // Allocate the array of cell pointers 
-                m_sorted_cells.Allocate(m_num_used_cells);
+                _sorted_cells.Allocate(_num_used_cells);
                 // Allocate and zero the Y array
-                m_sorted_y.Allocate((int)(m_max_y - m_min_y + 1));
-                m_sorted_y.Zero();
-                CellAA[] cells = m_cells.Array;
-                SortedY[] sortedYData = m_sorted_y.Array;
-                CellAA[] sortedCellsData = m_sorted_cells.Array;
+                _sorted_y.Allocate((int)(_max_y - _min_y + 1));
+                _sorted_y.Zero();
+                CellAA[] cells = _cells.UnsafeInternalArray;
+                SortedY[] sortedYData = _sorted_y.UnsafeInternalArray;
+                CellAA[] sortedCellsData = _sorted_cells.UnsafeInternalArray;
                 // Create the Y-histogram (count the numbers of cells for each Y)
-                for (int i = 0; i < m_num_used_cells; ++i)
+                for (int i = 0; i < _num_used_cells; ++i)
                 {
-                    int index = cells[i].y - m_min_y;
+                    int index = cells[i].y - _min_y;
                     sortedYData[index].start++;
                 }
 
                 // Convert the Y-histogram into the array of starting indexes
                 int start = 0;
-                int sortedYSize = m_sorted_y.Count;
+                int sortedYSize = _sorted_y.Count;
                 for (int i = 0; i < sortedYSize; i++)
                 {
                     int v = sortedYData[i].start;
@@ -365,9 +375,9 @@ namespace PixelFarm.CpuBlit.Rasterization
                 }
 
                 // Fill the cell pointer array sorted by Y
-                for (int i = 0; i < m_num_used_cells; ++i)
+                for (int i = 0; i < _num_used_cells; ++i)
                 {
-                    int sortedIndex = cells[i].y - m_min_y;
+                    int sortedIndex = cells[i].y - _min_y;
                     int curr_y_start = sortedYData[sortedIndex].start;
                     int curr_y_num = sortedYData[sortedIndex].num;
                     sortedCellsData[curr_y_start + curr_y_num] = cells[i];
@@ -385,56 +395,47 @@ namespace PixelFarm.CpuBlit.Rasterization
                             yData.start + yData.num - 1);
                     }
                 }
-                m_sorted = true;
+                _sorted = true;
             }
 
-            public int TotalCells
-            {
-                get { return this.m_num_used_cells; }
-            }
+            public int TotalCells => _num_used_cells;
 
 
             public void GetCells(int y, out CellAA[] cellData, out int offset, out int num)
             {
-                cellData = m_sorted_cells.Array;
-                SortedY d = m_sorted_y[y - m_min_y];
+                cellData = _sorted_cells.UnsafeInternalArray;
+                SortedY d = _sorted_y[y - _min_y];
                 offset = d.start;
                 num = d.num;
             }
 
-
-            public bool Sorted
-            {
-                get
-                {
-                    return this.m_sorted;
-                }
-            }
-
+            //
+            public bool Sorted => _sorted;
+            //
             void AddNewCell(int x, int y)
             {
                 WriteCurrentCell();
-                cCell_x = x;
-                cCell_y = y;
+                _cCell_x = x;
+                _cCell_y = y;
                 //reset area and coverage after add new cell
-                cCell_cover = 0;
-                cCell_area = 0;
+                _cCell_cover = 0;
+                _cCell_area = 0;
             }
 
             void WriteCurrentCell()
             {
-                if ((cCell_area | cCell_cover) != 0)
+                if ((_cCell_area | _cCell_cover) != 0)
                 {
                     //check cell limit
-                    if (m_num_used_cells >= BLOCK_LIMIT)
+                    if (_num_used_cells >= BLOCK_LIMIT)
                     {
                         return;
                     }
                     //------------------------------------------
                     //alloc if required
-                    if ((m_num_used_cells + 1) >= m_cells.AllocatedSize)
+                    if ((_num_used_cells + 1) >= _cells.AllocatedSize)
                     {
-                        m_cells = new ArrayList<CellAA>(m_cells, BLOCK_SIZE);
+                        _cells = new ArrayList<CellAA>(_cells, BLOCK_SIZE);
                     }
 #if DEBUG
                     //m_cells.SetData(m_num_used_cells, CellAA.dbugCreate(
@@ -442,15 +443,15 @@ namespace PixelFarm.CpuBlit.Rasterization
                     //    cCell_cover, cCell_area,
                     //    cCell_left,
                     //    cCell_right));
-                    m_cells.SetData(m_num_used_cells, CellAA.Create(
-                     cCell_x, cCell_y,
-                     cCell_cover, cCell_area));
+                    _cells.SetData(_num_used_cells, CellAA.Create(
+                     _cCell_x, _cCell_y,
+                     _cCell_cover, _cCell_area));
 #else
                      m_cells.SetData(m_num_used_cells, CellAA.Create(
                      cCell_x, cCell_y,
                      cCell_cover, cCell_area));
 #endif
-                    m_num_used_cells++;
+                    _num_used_cells++;
                 }
             }
 
@@ -475,8 +476,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                 if (ex1 == ex2)
                 {
                     delta = y2 - y1;
-                    cCell_cover += delta;
-                    cCell_area += (fx1 + fx2) * delta;
+                    _cCell_cover += delta;
+                    _cCell_area += (fx1 + fx2) * delta;
                     return;
                 }
                 //----------------------------
@@ -506,8 +507,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                     mod += dx;
                 }
 
-                cCell_cover += delta;
-                cCell_area += (fx1 + first) * delta;
+                _cCell_cover += delta;
+                _cCell_area += (fx1 + first) * delta;
                 ex1 += incr;
                 //***
                 AddNewCell(ex1, ey);
@@ -535,8 +536,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                             delta++;
                         }
 
-                        cCell_cover += delta;
-                        cCell_area += (int)poly_subpix.SCALE * delta;
+                        _cCell_cover += delta;
+                        _cCell_area += (int)poly_subpix.SCALE * delta;
                         y1 += delta;
                         ex1 += incr;
                         //***
@@ -545,8 +546,8 @@ namespace PixelFarm.CpuBlit.Rasterization
                     }
                 }
                 delta = y2 - y1;
-                cCell_cover += delta;
-                cCell_area += (fx2 + (int)poly_subpix.SCALE - first) * delta;
+                _cCell_cover += delta;
+                _cCell_area += (fx2 + (int)poly_subpix.SCALE - first) * delta;
             }
 
             //------------

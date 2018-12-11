@@ -20,8 +20,8 @@ namespace Typography.OpenFont
             P = position;
             this.onCurve = onCurve;
         }
-        public float X { get { return this.P.X; } }
-        public float Y { get { return this.P.Y; } }
+        public float X => this.P.X;
+        public float Y => this.P.Y;
 
         public static GlyphPointF operator *(GlyphPointF p, float n)
         {

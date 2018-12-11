@@ -27,60 +27,59 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public class SimpleRect
     {
-        RectD bounds;
-        //TODO: review here again
-        PathWriter _reusablePathWriter = new PathWriter();
-
+        RectD _bounds;
         public SimpleRect()
         {
         }
         public SimpleRect(double left, double bottom, double right, double top)
         {
-            bounds = new RectD(left, bottom, right, top);
+            _bounds = new RectD(left, bottom, right, top);
             if (left > right)
             {
-                bounds.Left = right;
-                bounds.Right = left;
+                _bounds.Left = right;
+                _bounds.Right = left;
             }
 
             if (bottom > top)
             {
-                bounds.Bottom = top;
-                bounds.Top = bottom;
+                _bounds.Bottom = top;
+                _bounds.Top = bottom;
             }
         }
         public void SetRect(double left, double bottom, double right, double top)
         {
-            bounds = new RectD(left, bottom, right, top);
-            if (left > right) { bounds.Left = right; bounds.Right = left; }
-            if (bottom > top) { bounds.Bottom = top; bounds.Top = bottom; }
+            _bounds = new RectD(left, bottom, right, top);
+            if (left > right) { _bounds.Left = right; _bounds.Right = left; }
+            if (bottom > top) { _bounds.Bottom = top; _bounds.Top = bottom; }
+        }
+        public void SetRectFromLTWH(double left, double top, double width, double height)
+        {
+            SetRect(left, top + height, left + width, top);
         }
         public void Offset(double dx, double dy)
         {
-            bounds.Offset(dx, dy);
+            _bounds.Offset(dx, dy);
         }
-        public double Height
-        {
-            get { return bounds.Height; }
-        }
-        public double Width
-        {
-            get { return bounds.Width; }
-        }
+        //
+        public double Height => _bounds.Height;
+        public double Width => _bounds.Width;
+        //
         public VertexStore MakeVxs(VertexStore output)
         {
+            using (VectorToolBox.Borrow(output, out PathWriter pw))
+            {
+                MakeVxs(pw);
+            }
 
-            _reusablePathWriter.ResetWithExternalVxs(output);
-            _reusablePathWriter.MoveTo(bounds.Left, bounds.Bottom);
-            _reusablePathWriter.LineTo(bounds.Right, bounds.Bottom);
-            _reusablePathWriter.LineTo(bounds.Right, bounds.Top);
-            _reusablePathWriter.LineTo(bounds.Left, bounds.Top);
-            _reusablePathWriter.CloseFigure();
             return output;
         }
-        public VertexStoreSnap MakeVertexSnap(VertexStore output)
+        public void MakeVxs(PathWriter pathWriter)
         {
-            return new VertexStoreSnap(this.MakeVxs(output));
+            pathWriter.MoveTo(_bounds.Left, _bounds.Bottom);
+            pathWriter.LineTo(_bounds.Right, _bounds.Bottom);
+            pathWriter.LineTo(_bounds.Right, _bounds.Top);
+            pathWriter.LineTo(_bounds.Left, _bounds.Top);
+            pathWriter.CloseFigure();
         }
     }
 }

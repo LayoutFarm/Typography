@@ -13,96 +13,142 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         Xor = ClipType.ctXor,
     }
 
-    public static class VxsClipper
+    public class VxsClipper
     {
-        public static List<VertexStore> CombinePaths(VertexStoreSnap a, VertexStoreSnap b, VxsClipperType vxsClipType, bool separateIntoSmallSubPaths)
+
+        List<IntPolygon> _aPolys = new List<IntPolygon>();
+        List<IntPolygon> _bPolys = new List<IntPolygon>();
+        List<IntPolygon> _intersectedPolys = new List<IntPolygon>();
+        Clipper _clipper = new Clipper();
+
+
+
+        public static void CombinePaths(
+            VertexStore a,
+            VertexStore b,
+            VxsClipperType vxsClipType,
+            bool separateIntoSmallSubPaths,
+            List<VertexStore> results)
         {
-            //TODO: optimize here
+
+            using (VectorToolBox.Borrow(out VxsClipper clipper))
+            {
+                clipper.CombinePathsInternal(a, b, vxsClipType, separateIntoSmallSubPaths, results);
+            }
+        }
+
+        internal VxsClipper() { }
+        internal void Reset()
+        {
+            _aPolys.Clear();
+            _bPolys.Clear();
+            _intersectedPolys.Clear();
+            _clipper.Clear();
+
+        }
+        //
+        void CombinePathsInternal(
+           VertexStore a,
+           VertexStore b,
+           VxsClipperType vxsClipType,
+           bool separateIntoSmallSubPaths,
+           List<VertexStore> resultList)
+        {
+
+            //prepare instance
+            //reset all used fields
 
             ClipType clipType = (ClipType)vxsClipType;
-            List<List<IntPoint>> aPolys = CreatePolygons(a);
-            List<List<IntPoint>> bPolys = CreatePolygons(b);
-            Clipper clipper = new Clipper();
-            clipper.AddPaths(aPolys, PolyType.ptSubject, true);
-            clipper.AddPaths(bPolys, PolyType.ptClip, true);
-            List<List<IntPoint>> intersectedPolys = new List<List<IntPoint>>();
-            clipper.Execute(clipType, intersectedPolys);
-            List<VertexStore> resultList = new List<VertexStore>();
+            CreatePolygons(a, _aPolys);
+            CreatePolygons(b, _bPolys);
 
-            PathWriter outputPathWriter = new PathWriter();
+            _clipper.AddPaths(_aPolys, PolyType.ptSubject, true);
+            _clipper.AddPaths(_bPolys, PolyType.ptClip, true);
+            _clipper.Execute(clipType, _intersectedPolys);
 
             if (separateIntoSmallSubPaths)
             {
-                foreach (List<IntPoint> polygon in intersectedPolys)
+                foreach (List<IntPoint> polygon in _intersectedPolys)
                 {
                     int j = polygon.Count;
                     if (j > 0)
                     {
                         //first one
                         IntPoint point = polygon[0];
-                        outputPathWriter.MoveTo(point.X / 1000.0, point.Y / 1000.0);
-                        //next others ...
-                        if (j > 1)
+                        using (VxsTemp.Borrow(out VertexStore v1))
+                        using (VectorToolBox.Borrow(v1, out PathWriter pw))
                         {
-                            for (int i = 1; i < j; ++i)
+                            pw.MoveTo(point.X / 1000.0, point.Y / 1000.0);
+                            //next others ...
+                            if (j > 1)
                             {
-                                point = polygon[i];
-                                outputPathWriter.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                for (int i = 1; i < j; ++i)
+                                {
+                                    point = polygon[i];
+                                    pw.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                }
                             }
-                        }
 
-                        outputPathWriter.CloseFigure();
-                        resultList.Add(outputPathWriter.Vxs);
-                        //---
-                        //clear 
-                        outputPathWriter.ResetWithExternalVxs(new VertexStore());
+                            pw.CloseFigure();
+                            resultList.Add(v1.CreateTrim()); //copy
+                            pw.Clear();
+                        }
                     }
                 }
             }
             else
             {
-                foreach (List<IntPoint> polygon in intersectedPolys)
+                using (VxsTemp.Borrow(out VertexStore v1))
+                using (VectorToolBox.Borrow(v1, out PathWriter pw))
                 {
-                    int j = polygon.Count;
-                    if (j > 0)
+                    foreach (List<IntPoint> polygon in _intersectedPolys)
                     {
-                        //first one
-                        IntPoint point = polygon[0];
-                        outputPathWriter.MoveTo(point.X / 1000.0, point.Y / 1000.0);
-                        //next others ...
-                        if (j > 1)
+                        int j = polygon.Count;
+                        if (j > 0)
                         {
-                            for (int i = 1; i < j; ++i)
+                            //first one
+                            IntPoint point = polygon[0];
+                            pw.MoveTo(point.X / 1000.0, point.Y / 1000.0);
+                            //next others ...
+                            if (j > 1)
                             {
-                                point = polygon[i];
-                                outputPathWriter.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                for (int i = 1; i < j; ++i)
+                                {
+                                    point = polygon[i];
+                                    pw.LineTo(point.X / 1000.0, point.Y / 1000.0);
+                                }
                             }
+                            pw.CloseFigure();
                         }
-                        outputPathWriter.CloseFigure();
                     }
+                    pw.Stop();
+                    resultList.Add(v1.CreateTrim());
                 }
-
-                //TODO: review here
-                outputPathWriter.Stop();
-                resultList.Add(outputPathWriter.Vxs);
             }
-
-            return resultList;
         }
-        static List<List<IntPoint>> CreatePolygons(VertexStoreSnap a)
+
+
+        static void CreatePolygons(VertexStore a, List<IntPolygon> allPolys)
         {
-            List<List<IntPoint>> allPolys = new List<List<IntPoint>>();
-            List<IntPoint> currentPoly = null;
+
+            IntPolygon currentPoly = null;
             VertexData last = new VertexData();
             VertexData first = new VertexData();
             bool addedFirst = false;
-            var snapIter = a.GetVertexSnapIter();
             double x, y;
-            VertexCmd cmd = snapIter.GetNextVertex(out x, out y);
-            do
+
+            int index = 0;
+            VertexCmd cmd;
+            while ((cmd = a.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
             {
                 if (cmd == VertexCmd.LineTo)
                 {
+                    if (currentPoly == null)
+                    {
+                        currentPoly = new IntPolygon();
+                        allPolys.Add(currentPoly);
+                    }
+                    //
                     if (!addedFirst)
                     {
                         currentPoly.Add(new IntPoint((long)(last.x * 1000), (long)(last.y * 1000)));
@@ -115,7 +161,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 else
                 {
                     addedFirst = false;
-                    currentPoly = new List<IntPoint>();
+                    currentPoly = new IntPolygon();
                     allPolys.Add(currentPoly);
                     if (cmd == VertexCmd.MoveTo)
                     {
@@ -126,9 +172,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         last = first;
                     }
                 }
-                cmd = snapIter.GetNextVertex(out x, out y);
-            } while (cmd != VertexCmd.NoMore);
-            return allPolys;
+            }
+
+
         }
     }
 }

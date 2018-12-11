@@ -12,7 +12,7 @@ namespace Typography.OpenFont.Tables
 {
     class BASE : TableEntry
     {
-        public override string Name { get { return "BASE"; } }
+        public override string Name => "BASE";
 
         protected override void ReadContentFrom(BinaryReader reader)
         {

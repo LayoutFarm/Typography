@@ -20,7 +20,7 @@ namespace Typography.Contours
         {
             //init value
 
-            this._contours = contours;
+            _contours = contours;
             //1. create centroid line hubs: 
             CreateCentroidLineHubs(polygon, subPolygons);
             //2. create bone joints (create joint before bone)
@@ -37,7 +37,7 @@ namespace Typography.Contours
             _lineHubs = new List<CentroidLineHub>();
 #if DEBUG            
             EdgeLine.s_dbugTotalId = 0;//reset 
-            this._dbugTriangles = new List<GlyphTriangle>();
+            _dbugTriangles = new List<GlyphTriangle>();
 #endif
 
             //main polygon
@@ -189,7 +189,7 @@ namespace Typography.Contours
             _bounds_minX = _bounds_minY = float.MaxValue;
             _bounds_maxX = _bounds_maxY = float.MinValue;
 
-            List<GlyphContour> contours = this._contours;
+            List<GlyphContour> contours = _contours;
             int j = contours.Count;
             for (int i = 0; i < j; ++i)
             {
@@ -202,19 +202,19 @@ namespace Typography.Contours
         /// <summary>
         /// min x after fitting process
         /// </summary>
-        public float MinX { get { return _bounds_minX; } }
+        public float MinX => _bounds_minX;
         /// <summary>
         /// min y after fitting process
         /// </summary>
-        public float MinY { get { return _bounds_minY; } }
+        public float MinY => _bounds_minY;
         /// <summary>
         /// max x after fitting process
         /// </summary>
-        public float MaxX { get { return _bounds_maxX; } }
+        public float MaxX => _bounds_maxX;
         /// <summary>
         ///  max y after fitting process
         /// </summary>
-        public float MaxY { get { return _bounds_maxY; } }
+        public float MaxY => _bounds_maxY;
 
         /// <summary>
         /// find link from main triangle of line-hub to another line hub
@@ -263,18 +263,11 @@ namespace Typography.Contours
             }
             return -1;
         }
-
-        public List<CentroidLineHub> GetCentroidLineHubs()
-        {
-            return this._lineHubs;
-        }
-
-        public List<GlyphContour> GetContours()
-        {
-            return this._contours;
-        }
-
-
+        //
+        public List<CentroidLineHub> GetCentroidLineHubs() => _lineHubs;
+        //
+        public List<GlyphContour> GetContours() => _contours;
+        //
 #if DEBUG
 
 

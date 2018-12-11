@@ -38,27 +38,25 @@ namespace Typography.OpenFont
         }
         public Bounds Bounds
         {
-            get { return _bounds; }
-            internal set { _bounds = value; }
+            get => _bounds;
+            internal set => _bounds = value;
         }
-
-        public ushort[] EndPoints { get { return _contourEndPoints; } }
-        public GlyphPointF[] GlyphPoints { get { return glyphPoints; } }
-
-
-
+        //
+        public ushort[] EndPoints => _contourEndPoints;
+        public GlyphPointF[] GlyphPoints => glyphPoints;
+        //
         public ushort OriginalAdvanceWidth
         {
-            get { return _orgAdvWidth; }
+            get => _orgAdvWidth;
             set
             {
                 _orgAdvWidth = value;
                 _hasOrgAdvWidth = true;
             }
         }
-        public bool HasOriginalAdvancedWidth { get { return _hasOrgAdvWidth; } }
-        //--------------
-
+        public bool HasOriginalAdvancedWidth => _hasOrgAdvWidth;
+        //
+        //
 
 
         internal static void OffsetXY(Glyph glyph, short dx, short dy)
@@ -81,7 +79,7 @@ namespace Typography.OpenFont
         }
         internal byte[] GlyphInstructions { get; set; }
 
-        public bool HasGlyphInstructions { get { return this.GlyphInstructions != null; } }
+        public bool HasGlyphInstructions => this.GlyphInstructions != null;
 
         internal static void TransformNormalWith2x2Matrix(Glyph glyph, float m00, float m01, float m10, float m11)
         {
@@ -134,7 +132,7 @@ namespace Typography.OpenFont
             //TODO: review here
             glyph._bounds = new Bounds(
                (short)new_xmin, (short)new_ymin,
-               (short)new_xmax, (short)new_ymax); 
+               (short)new_xmax, (short)new_ymax);
         }
 
         internal static Glyph Clone(Glyph original, ushort newGlyphIndex)
@@ -178,25 +176,13 @@ namespace Typography.OpenFont
             dest._bounds = new Bounds(newXmin, newYMin, newXMax, newYMax);
         }
 
-
+        //
         public GlyphClassKind GlyphClass { get; set; }
         internal ushort MarkClassDef { get; set; }
-        public short MinX
-        {
-            get { return _bounds.XMin; }
-        }
-        public short MaxX
-        {
-            get { return _bounds.XMax; }
-        }
-        public short MinY
-        {
-            get { return _bounds.YMin; }
-        }
-        public short MaxY
-        {
-            get { return _bounds.YMax; }
-        }
+        public short MinX => _bounds.XMin;
+        public short MaxX => _bounds.XMax;
+        public short MinY => _bounds.YMin;
+        public short MaxY => _bounds.YMax;
 
         //--------------------
         //both ttf and cff
@@ -244,28 +230,15 @@ namespace Typography.OpenFont
             this.dbugId = s_debugTotalId++;
 #endif
 
-            this._ownerCffFont = owner;
+            _ownerCffFont = owner;
             //create from CFF 
-            this._cff1GlyphData = cff1Glyph;
+            _cff1GlyphData = cff1Glyph;
             this.GlyphIndex = cff1Glyph.GlyphIndex;
 
         }
-        public bool IsCffGlyph
-        {
-            get
-            {
-                return _ownerCffFont != null;
-            }
-        }
-        public CFF.Cff1Font GetOwnerCff()
-        {
-            //temp 
-            return _ownerCffFont;
-        }
-        public CFF.Cff1GlyphData GetCff1GlyphData()
-        {
-            return _cff1GlyphData;
-        }
+        public bool IsCffGlyph => _ownerCffFont != null;
+        public CFF.Cff1Font GetOwnerCff() => _ownerCffFont;
+        public CFF.Cff1GlyphData GetCff1GlyphData() => _cff1GlyphData;
         //math glyph info, temp , TODO: review here again
         public MathGlyphs.MathGlyphInfo MathGlyphInfo { get; internal set; }
         public bool HasMathGlyphInfo { get; internal set; }

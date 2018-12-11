@@ -134,7 +134,7 @@ namespace Typography.OpenFont.Tables
             //uint16 	LookupListIndex[LookupCount] 	Array of LookupList indices for this feature -zero-based (first lookup is LookupListIndex = 0)
             //--------------------------
 
-            private ushort[] _lookupListIndices;
+            ushort[] _lookupListIndices;
             public static FeatureTable CreateFrom(BinaryReader reader, long beginAt)
             {
                 reader.BaseStream.Seek(beginAt, SeekOrigin.Begin);
@@ -146,16 +146,9 @@ namespace Typography.OpenFont.Tables
                 featureTable._lookupListIndices = Utils.ReadUInt16Array(reader, lookupCount);
                 return featureTable;
             }
-            public ushort[] LookupListIndices { get { return _lookupListIndices; } }
-            public uint FeatureTag
-            {
-                get;
-                set;
-            }
-            public string TagName
-            {
-                get { return Utils.TagToString(this.FeatureTag); }
-            }
+            public ushort[] LookupListIndices => _lookupListIndices;
+            public uint FeatureTag { get; set; }
+            public string TagName => Utils.TagToString(this.FeatureTag);
 #if DEBUG
             public override string ToString()
             {

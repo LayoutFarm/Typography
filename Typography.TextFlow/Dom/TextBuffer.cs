@@ -9,7 +9,7 @@ namespace Typography.TextLayout
         internal char[] _buffer;
         public TextBuffer(char[] buffer)
         {
-            this._buffer = buffer;
+            _buffer = buffer;
         }
 
         public int Len { get { return _buffer.Length; } }
@@ -36,7 +36,7 @@ namespace Typography.TextLayout
         }
         public void SetRawCharBuffer(char[] buffer)
         {
-            this._buffer = buffer;
+            _buffer = buffer;
         }
     }
      

@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5EB9544F-51E1-42CC-ABFD-B9AFBA6A2A0D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BackEnd.BitmapBufferEx</RootNamespace>
+    <AssemblyName>BackEnd.BitmapBufferEx</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\1_Affine.cs">
+      <Link>00_Porting\1_Affine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\2_Bilinear.cs">
+      <Link>00_Porting\2_Bilinear.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\3_Perspective.cs">
+      <Link>00_Porting\3_Perspective.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm.Vectors\3_Transform\4_SimulEqGeneral.cs">
+      <Link>00_Porting\4_SimulEqGeneral.cs</Link>
+    </Compile>
+    <Compile Include="BitmapBuffer.cs" />
+    <Compile Include="BitmapBufferExtensions\AntialiasingExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\BaseExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\BlitExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\ConvertExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\FillExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\FilterExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\LineAaExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\LineExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\ShapeExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\SplineExtensions.cs" />
+    <Compile Include="BitmapBufferExtensions\TransformationExtensions.cs" />
+    <Compile Include="BitmapContext.cs" />
+    <Compile Include="BitmapBufferFactory.cs" />
+    <Compile Include="00_Porting\NativeMethods.cs" />
+    <Compile Include="00_Porting\PORTING_NOTMERGE.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PixelFarm.PrimitiveGeo\PixelFarm.PrimitiveGeo.csproj">
+      <Project>{b951ff5b-d7a0-4259-880d-cb7a0c001956}</Project>
+      <Name>PixelFarm.PrimitiveGeo</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

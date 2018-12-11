@@ -231,13 +231,18 @@ namespace Tesselate
         * the new face *before* fNext so that algorithms which walk the face
         * list will not see the newly created faces.
         */
-        static int faceIndex = 0;
+
+#if DEBUG
+        static int s_dbugFaceIndexTotal = 0;
+#endif
         static void MakeFace(Face newFace, HalfEdge eOrig, Face fNext)
         {
             HalfEdge e;
             Face fPrev;
             Face fNew = newFace;
-            fNew.indexDebug = faceIndex++;
+#if DEBUG
+            fNew.dbugIndex = s_dbugFaceIndexTotal++;
+#endif
             // insert in circular doubly-linked list before fNext
 
             fPrev = fNext.prevFace;

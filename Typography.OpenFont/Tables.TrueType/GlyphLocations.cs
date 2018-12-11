@@ -7,6 +7,8 @@ namespace Typography.OpenFont.Tables
 {
     class GlyphLocations : TableEntry
     {
+        public override string Name => "loca";
+
         // loca - Index to Location
 
         //The indexToLoc table stores the offsets to the locations of the glyphs in the font,
@@ -34,14 +36,10 @@ namespace Typography.OpenFont.Tables
         {
             _offsets = new uint[glyphCount + 1];
             this.IsLongVersion = isLongVersion;
-        }
-        public override string Name
-        {
-            get { return "loca"; }
-        }
+        } 
         public bool IsLongVersion { get; private set; }
-        public uint[] Offsets { get { return _offsets; } }
-        public int GlyphCount { get { return _offsets.Length - 1; } }
+        public uint[] Offsets => _offsets;
+        public int GlyphCount => _offsets.Length - 1;
 
         protected override void ReadContentFrom(BinaryReader reader)
         {

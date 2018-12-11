@@ -24,7 +24,7 @@ namespace Typography.Contours
         {
             //this canbe inside edge or outside edge
 
-            this._ownerTriangle = ownerTriangle;
+            _ownerTriangle = ownerTriangle;
             //------------------------------------
             //an edge line connects 2 glyph points.
             //it is created from triangulation process.
@@ -32,8 +32,8 @@ namespace Typography.Contours
             //some edge line is either 'INSIDE' edge  OR 'OUTSIDE'.
             //
             //------------------------------------   
-            this._glyphPoint_P = p;
-            this._glyphPoint_Q = q;
+            _glyphPoint_P = p;
+            _glyphPoint_Q = q;
 
             //new dynamic mid point is calculate from original X,Y 
             //-------------------------------
@@ -69,19 +69,19 @@ namespace Typography.Contours
         /// <summary>
         /// original px
         /// </summary>
-        public double PX { get { return this._glyphPoint_P.OX; } }
+        public double PX => _glyphPoint_P.OX;
         /// <summary>
         /// original py
         /// </summary>
-        public double PY { get { return this._glyphPoint_P.OY; } }
+        public double PY => _glyphPoint_P.OY;
         /// <summary>
         /// original qx
         /// </summary>
-        public double QX { get { return this._glyphPoint_Q.OX; } }
+        public double QX => _glyphPoint_Q.OX;
         /// <summary>
         /// original qy
         /// </summary>
-        public double QY { get { return this._glyphPoint_Q.OY; } }
+        public double QY => _glyphPoint_Q.OY;
 
 
         public bool IsTip { get; internal set; }
@@ -94,52 +94,17 @@ namespace Typography.Contours
         }
 
 
-        public GlyphPoint P
-        {
-            get
-            {
-                return _glyphPoint_P;
-            }
-        }
-        public GlyphPoint Q
-        {
-            get
-            {
-                return _glyphPoint_Q;
-            }
-        }
-        public LineSlopeKind SlopeKind
-        {
-            get;
-            private set;
-        }
+        public GlyphPoint P => _glyphPoint_P;
+        public GlyphPoint Q => _glyphPoint_Q;
+        public LineSlopeKind SlopeKind { get; internal set; }
 
-        internal GlyphTriangle OwnerTriangle { get { return this._ownerTriangle; } }
+        internal GlyphTriangle OwnerTriangle => _ownerTriangle;
 
-        public abstract bool IsOutside
-        {
-            get;
-        }
-        public bool IsInside
-        {
-            get { return !this.IsOutside; }
-        }
-        //
-        public bool IsUpper
-        {
-            get;
-            internal set;
-        }
-        public bool IsLeftSide
-        {
-            get;
-            internal set;
-        }
-        internal double SlopeAngleNoDirection
-        {
-            get;
-            private set;
-        }
+        public abstract bool IsOutside { get; }
+        public bool IsInside => !this.IsOutside;
+        public bool IsUpper { get; internal set; }
+        public bool IsLeftSide { get; internal set; }
+        internal double SlopeAngleNoDirection { get; private set; }
         public override string ToString()
         {
             return SlopeKind + ":" + PX + "," + PY + "," + QX + "," + QY;
@@ -147,11 +112,11 @@ namespace Typography.Contours
 
         static readonly double _85degreeToRad = MyMath.DegreesToRadians(85);
         static readonly double _01degreeToRad = MyMath.DegreesToRadians(1);
-       
+
         internal bool _earlyInsideAnalysis;
         internal bool ContainsGlyphPoint(GlyphPoint p)
         {
-            return this._glyphPoint_P == p || this._glyphPoint_Q == p;
+            return _glyphPoint_P == p || _glyphPoint_Q == p;
         }
 
         /// <summary>
@@ -215,20 +180,13 @@ namespace Typography.Contours
             Vector2 _deltaVector = _rotate.NewLength(newEdgeOffsetFromMasterOutline);
 
             //new dynamic mid point  
-            this._newDynamicMidPoint = this.GetMidPoint() + _deltaVector;
+            _newDynamicMidPoint = this.GetMidPoint() + _deltaVector;
         }
-        public override bool IsOutside
-        {
-            get { return true; }
-        }
-        public EdgeLine ControlEdge_P
-        {
-            get { return _ctrlEdge_P; }
-        }
-        public EdgeLine ControlEdge_Q
-        {
-            get { return _ctrlEdge_Q; }
-        }
+        //
+        public override bool IsOutside => true;
+        public EdgeLine ControlEdge_P => _ctrlEdge_P;
+        public EdgeLine ControlEdge_Q => _ctrlEdge_Q;
+        //
         internal void SetControlEdge(EdgeLine controlEdge)
         {
             //check if edge is connect to p or q
@@ -285,17 +243,14 @@ namespace Typography.Contours
         }
     }
     public class InsideEdgeLine : EdgeLine
-    {   
-        
+    {
+
         internal GlyphBoneJoint inside_joint;
         internal InsideEdgeLine(GlyphTriangle ownerTriangle, GlyphPoint p, GlyphPoint q)
             : base(ownerTriangle, p, q)
         {
         }
-        public override bool IsOutside
-        {
-            get { return false; }
-        }
+        public override bool IsOutside => false;
     }
     public static class EdgeLineExtensions
     {

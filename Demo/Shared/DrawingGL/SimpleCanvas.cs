@@ -16,21 +16,21 @@ namespace DrawingGL
         //provide data and tool for simple rendering
         //-------------------------------- 
 
-        int max;
-        MyMat4 orthoView;
-        MyMat4 flipVerticalView;
-        MyMat4 orthoAndFlip;
+        int _max;
+        MyMat4 _orthoView;
+        MyMat4 _flipVerticalView;
+        MyMat4 _orthoAndFlip;
 
-        TessTool tessTool;
-        SimpleCurveFlattener curveFlattener;
+        TessTool _tessTool;
+        SimpleCurveFlattener _curveFlattener;
         //---------------------------------
-        CanvasToShaderSharedResource shaderRes;
-        GlyphFillShader fillShader;
+        CanvasToShaderSharedResource _shaderRes;
+        GlyphFillShader _fillShader;
         //--------------------------------
         TextPrinter _textPrinter = new TextPrinter();
         //--------------------------------
-        int view_width;
-        int view_height;
+        int _view_width;
+        int _view_height;
         public SimpleCanvas(int view_width, int view_height)
         {
 
@@ -38,26 +38,26 @@ namespace DrawingGL
             StrokeColor = Color.Black;
 
             //dimension
-            this.view_width = view_width;
-            this.view_height = view_height;
-            this.max = Math.Max(view_width, view_height);
+            _view_width = view_width;
+            _view_height = view_height;
+            _max = Math.Max(view_width, view_height);
             //------------
             //matrix
             ////square viewport 
-            orthoView = MyMat4.ortho(0, max, 0, max, 0, 1);
-            flipVerticalView = MyMat4.scale(1, -1) * MyMat4.translate(new OpenTK.Vector3(0, -max, 0));
-            orthoAndFlip = orthoView * flipVerticalView;
+            _orthoView = MyMat4.ortho(0, _max, 0, _max, 0, 1);
+            _flipVerticalView = MyMat4.scale(1, -1) * MyMat4.translate(new OpenTK.Vector3(0, -_max, 0));
+            _orthoAndFlip = _orthoView * _flipVerticalView;
             //----------------------------------------------------------------------- 
             //shader
-            shaderRes = new CanvasToShaderSharedResource();
-            shaderRes.OrthoView = orthoView;
+            _shaderRes = new CanvasToShaderSharedResource();
+            _shaderRes.OrthoView = _orthoView;
             //
-            fillShader = new GlyphFillShader(shaderRes);
+            _fillShader = new GlyphFillShader(_shaderRes);
             //------------
             //tools
             Tesselate.Tesselator tt = new Tesselate.Tesselator();
-            tessTool = new TessTool(tt);
-            curveFlattener = new SimpleCurveFlattener();
+            _tessTool = new TessTool(tt);
+            _curveFlattener = new SimpleCurveFlattener();
             ClearColor = Color.White;
             //--------
             //set blend mode
@@ -82,7 +82,7 @@ namespace DrawingGL
         public void PreRender()
         {
             //prepare canvas before actual render
-            GL.Viewport(0, 0, max, max);
+            GL.Viewport(0, 0, _max, _max);
 
         }
         public void ClearCanvas()
@@ -95,7 +95,7 @@ namespace DrawingGL
         }
         public void DrawLine(float x0, float y0, float x1, float y1)
         {
-            fillShader.DrawLine(x0, y0, x1, y1, this.StrokeColor);
+            _fillShader.DrawLine(x0, y0, x1, y1, this.StrokeColor);
         }
         internal TextPrinter TextPrinter
         {
@@ -128,17 +128,17 @@ namespace DrawingGL
                 nx = x + accX + plan.OffsetX * pxscale;
                 ny = y + accY + plan.OffsetY * pxscale;
 
-                fillShader.SetOffset(nx, ny);
+                _fillShader.SetOffset(nx, ny);
                 accX += (plan.AdvanceX * pxscale);
 
 
-                fillShader.FillTriangles(
+                _fillShader.FillTriangles(
                     run.tessData,
                     run.nTessElements,
                     this.FillColor
                     );
             }
-            fillShader.SetOffset(0, 0);
+            _fillShader.SetOffset(0, 0);
         }
     }
 

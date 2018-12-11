@@ -81,10 +81,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     }
     public class LineWalker
     {
-        WalkStateManager lineMarker = new WalkStateManager();
+        WalkStateManager _lineMarker = new WalkStateManager();
         public void AddWalkMark(LineWalkerMark walkerMark)
         {
-            lineMarker.AddSegmentMark(walkerMark);
+            _lineMarker.AddSegmentMark(walkerMark);
         }
 
         public void Walk(VertexStore src, VertexStore output)
@@ -92,8 +92,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //
             //we do not flatten the curve 
             // 
-            lineMarker._output = output;
-            lineMarker.Reset();
+            _lineMarker._output = output;
+            _lineMarker.Reset();
             int count = src.Count;
             VertexCmd cmd;
             double x, y;
@@ -103,20 +103,20 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 switch (cmd)
                 {
                     case VertexCmd.MoveTo:
-                        lineMarker.MoveTo(x, y);
+                        _lineMarker.MoveTo(x, y);
                         break;
                     case VertexCmd.NoMore:
-                        i = count + 1; //force end
+                        i = count + 1; //force end => EXIT_LOOP
                         break;
                     case VertexCmd.LineTo:
-                        lineMarker.LineTo(x, y);
+                        _lineMarker.LineTo(x, y);
                         break;
                     case VertexCmd.P2c:
                     case VertexCmd.P3c:
                         throw new NotSupportedException();
                     case VertexCmd.Close:
                     case VertexCmd.CloseAndEndFigure:
-                        lineMarker.CloseFigure();
+                        _lineMarker.CloseFigure();
                         break;
                 }
             }
@@ -127,11 +127,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             Init,
             PolyLine,
         }
-         
+
 
         class WalkStateManager
         {
-             
+
             List<LineWalkerMark> _segmentMarks = new List<LineWalkerMark>();
             LineWalkerMark _currentMarker;
             int _nextMarkNo;
@@ -312,7 +312,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             new_remaining_len -= _expectedSegmentLen;
                             //each segment has its own line production procedure
                             //eg.  
-                            _currentMarker.lineSegDel(_output, VertexCmd.LineTo, this._latest_X = new_x, this._latest_Y = new_y);
+                            _currentMarker.lineSegDel(_output, VertexCmd.LineTo, _latest_X = new_x, _latest_Y = new_y);
                             StepToNextMarkerSegment();
                         }
                         //-----------------   
@@ -348,7 +348,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             protected virtual void OnEndLineSegment(double x, double y, double remainingLen)
             {
                 //remainingLen of current segment
-                if (remainingLen >= 0.5) 
+                if (remainingLen >= 0.5)
                 {
                     //TODO: review here, if remainingLen is too small,
                     //but what about _total_accum_len

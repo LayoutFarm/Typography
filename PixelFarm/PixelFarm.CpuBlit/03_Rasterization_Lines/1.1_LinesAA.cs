@@ -32,28 +32,20 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int Mr(int x)
-        {
-            return x >> (SUBPIXEL_SHIFT - MR_SUBPIXEL_SHIFT);
-        }
+        public static int Mr(int x) => x >> (SUBPIXEL_SHIFT - MR_SUBPIXEL_SHIFT);
+
         /// <summary>
         /// line_hr
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int Hr(int x)
-        {
-            return x << (SUBPIXEL_SHIFT - MR_SUBPIXEL_SHIFT);
-        }
+        public static int Hr(int x) => x << (SUBPIXEL_SHIFT - MR_SUBPIXEL_SHIFT);
         /// <summary>
         /// line_dbl_hr
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int DblHr(int x)
-        {
-            return x << SUBPIXEL_SHIFT;
-        }
+        public static int DblHr(int x) => x << SUBPIXEL_SHIFT;
 
 
         public static void Bisectrix(LineParameters l1,

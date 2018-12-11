@@ -29,7 +29,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public void SetDashPattern(LineWalker lineWalker)
         {
-            this._dashGenLineWalker = lineWalker;
+            _dashGenLineWalker = lineWalker;
         }
 
         public void CreateDash(VertexStore srcVxs, VertexStore output)

@@ -22,7 +22,7 @@ namespace Typography.Contours
         public void Walk(GlyphDynamicOutline dynamicOutline)
         {
 #if DEBUG
-            this._dynamicOutline = dynamicOutline;
+            _dynamicOutline = dynamicOutline;
             int triNumber = 0;
             if (WalkTrianglesAndEdges)
             {

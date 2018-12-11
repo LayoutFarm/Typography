@@ -1,22 +1,20 @@
 ﻿//Apache2, 2017-present, WinterDev
 
 
-using System.Text;
 using System.IO;
-using System.Collections.Generic;
 namespace Typography.OpenFont
 {
     static class MacPostFormat1
     {
 
 
-        static string[] stdMacGlyphNames;
+        static string[] s_stdMacGlyphNames;
 
         public static string[] GetStdMacGlyphNames()
         {
-            if (stdMacGlyphNames == null)
+            if (s_stdMacGlyphNames == null)
             {
-                stdMacGlyphNames = new string[260];
+                s_stdMacGlyphNames = new string[260];
                 using (StringReader strReader = new StringReader(orgGlyphNames))
                 {
                     string[] seps = new string[] { " " };
@@ -42,7 +40,7 @@ namespace Typography.OpenFont
 
                                 }
 #endif
-                                stdMacGlyphNames[index] = key_value[1].Trim();
+                                s_stdMacGlyphNames[index] = key_value[1].Trim();
                             }
                             else
                             {
@@ -54,7 +52,7 @@ namespace Typography.OpenFont
                     }
                 }
             }
-            return stdMacGlyphNames;
+            return s_stdMacGlyphNames;
         }
 
 

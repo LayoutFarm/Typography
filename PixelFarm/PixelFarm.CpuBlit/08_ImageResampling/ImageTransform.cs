@@ -11,15 +11,15 @@ namespace PixelFarm.CpuBlit.Imaging
     }
     public class BicubicInterpolator : CubicInterpolator
     {
-        private double[] arr = new double[4];
+        double[] _arr = new double[4];
         public double getValue(double[][] p, double x, double y)
         {
             var mm = p[0];
-            arr[0] = getValue(p[0], y);
-            arr[1] = getValue(p[1], y);
-            arr[2] = getValue(p[2], y);
-            arr[3] = getValue(p[3], y);
-            return getValue(arr, x);
+            _arr[0] = getValue(p[0], y);
+            _arr[1] = getValue(p[1], y);
+            _arr[2] = getValue(p[2], y);
+            _arr[3] = getValue(p[3], y);
+            return getValue(_arr, x);
         }
     }
     //------------------------------------------------------------------------
@@ -150,23 +150,23 @@ namespace PixelFarm.CpuBlit.Imaging
     struct BufferReader4
     {
         //matrix four ,four reader
-        unsafe int* buffer; 
-        int width;
-        int height;
-        int cX;
-        int cY;
+        unsafe int* _buffer;
+        int _width;
+        int _height;
+        int _cX;
+        int _cY;
         unsafe public BufferReader4(int* buffer, int width, int height)
         {
-            this.buffer = buffer;
+            _buffer = buffer;
 
-            this.width = width;
-            this.height = height;
-            cX = cY = 0;
+            _width = width;
+            _height = height;
+            _cX = _cY = 0;
         }
         public void SetStartPixel(int x, int y)
         {
-            cX = x;
-            cY = y;
+            _cX = x;
+            _cY = y;
         }
         static Color FromInt(int value)
         {
@@ -181,7 +181,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
             unsafe
             {
-                return FromInt(buffer[((cY * width) + cX)]);
+                return FromInt(_buffer[((_cY * _width) + _cX)]);
 
             }
         }
@@ -190,7 +190,7 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             unsafe
             {
-                return FromInt(buffer[(this.cY * width) + cX]);
+                return FromInt(_buffer[(_cY * _width) + _cX]);
             }
         }
         /// <summary>
@@ -204,22 +204,22 @@ namespace PixelFarm.CpuBlit.Imaging
         {
             //byte b, g, r, a; 
 
-            int index = (this.cY * width) + cX;
+            int index = (_cY * _width) + _cX;
             unsafe
             {
-                x0y0 = FromInt(buffer[index]);
+                x0y0 = FromInt(_buffer[index]);
                 index++;
                 //----------------------------------- 
-                x1y0 = FromInt(buffer[index]);
+                x1y0 = FromInt(_buffer[index]);
                 index++;
                 //------------------------------------
                 //newline
-                index = ((this.cY + 1) * width) + cX;
+                index = ((_cY + 1) * _width) + _cX;
                 //------------------------------------ 
-                x0y1 = FromInt(buffer[index]);
+                x0y1 = FromInt(_buffer[index]);
                 index++;
                 //------------------------------------ 
-                x1y1 = FromInt(buffer[index]);
+                x1y1 = FromInt(_buffer[index]);
                 index++;
             }
 
@@ -234,38 +234,38 @@ namespace PixelFarm.CpuBlit.Imaging
             //16 px 
             //byte b, g, r, a;
             int m = 0;
-            int tmpY = this.cY - 1;
-            int index = (tmpY * width) + cX;
+            int tmpY = _cY - 1;
+            int index = (tmpY * _width) + _cX;
             index--;
 
             unsafe
             {  //-------------------------------------------------             
                 for (int n = 0; n < 4; ++n)
                 {
-                    outputBuffer[m] = FromInt(buffer[index]);
+                    outputBuffer[m] = FromInt(_buffer[index]);
                     index++;
                     //------------------------------------------------ 
-                    outputBuffer[m + 1] = FromInt(buffer[index]);
+                    outputBuffer[m + 1] = FromInt(_buffer[index]);
                     index++;
                     //------------------------------------------------ 
-                    outputBuffer[m + 2] = FromInt(buffer[index]);
+                    outputBuffer[m + 2] = FromInt(_buffer[index]);
                     index++;
                     //------------------------------------------------ 
-                    outputBuffer[m + 3] = FromInt(buffer[index]);
+                    outputBuffer[m + 3] = FromInt(_buffer[index]);
                     index++;
                     //------------------------------------------------
                     m += 4;
                     //go next row
                     tmpY++;
-                    index = (tmpY * width) + cX;
+                    index = (tmpY * _width) + _cX;
                     index--;
                 }
             }
         }
         public bool CanReadAsBlock()
         {
-            return cX > 2 && cY > 2 &&
-                   cX < width - 2 && cY < height - 2;
+            return _cX > 2 && _cY > 2 &&
+                   _cX < _width - 2 && _cY < _height - 2;
 
         }
     }
