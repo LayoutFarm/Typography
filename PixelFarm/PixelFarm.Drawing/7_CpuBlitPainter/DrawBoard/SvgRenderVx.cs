@@ -10,12 +10,13 @@ namespace PixelFarm.CpuBlit
     public class VxsRenderVx : RenderVx
     {
         public VertexStore _vxs;
+        object _resolvedObject;
         public VxsRenderVx(VertexStore vxs)
         {
             _vxs = vxs;
 
         }
-        object _resolvedObject;
+        
         public static object GetResolvedObject(VxsRenderVx vxsRenerVx)
         {
             return vxsRenerVx._resolvedObject;
@@ -157,11 +158,6 @@ namespace PixelFarm.CpuBlit
             return false;
 
         }
-    }
-
-
-
-
-
+    } 
 
 }

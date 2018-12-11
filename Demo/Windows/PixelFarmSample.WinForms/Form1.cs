@@ -654,7 +654,7 @@ namespace SampleWinForms
                     str.Length,
                     fontSizeInPoints);
 
-            this.lblStringSize.Text = "measure (W,H)= (" + box.width.ToString() + "," + (box.ascending - box.descending) + ") px";
+            this.lblStringSize.Text = "measure (W,H)= (" + box.width.ToString() + "," + (box.AscendingInPx - box.DescendingInPx) + ") px";
         }
 
         private void cmdTestFontAtlas_Click(object sender, EventArgs e)

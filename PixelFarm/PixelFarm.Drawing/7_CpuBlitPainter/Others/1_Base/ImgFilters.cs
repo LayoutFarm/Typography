@@ -4,33 +4,14 @@ namespace PaintFx.Effects
 {
     public class ImgFilterStackBlur : ImageFilter
     {
-        public override ImageFilterName Name
-        {
-            get
-            {
-                return ImageFilterName.StackBlur;
-            }
-        }
+        public override ImageFilterName Name => ImageFilterName.StackBlur;
     }
     public class ImgFilterRecursiveBlur : ImageFilter
     {
-        public override ImageFilterName Name
-        {
-            get
-            {
-                return ImageFilterName.RecursiveBlur;
-            }
-        }
+        public override ImageFilterName Name => ImageFilterName.RecursiveBlur;
     }
     public class ImgFilterSharpen : ImageFilter
     {
-        public override ImageFilterName Name
-        {
-            get
-            {
-                return ImageFilterName.Sharpen;
-            }
-        }
-
+        public override ImageFilterName Name => ImageFilterName.Sharpen;
     }
 }

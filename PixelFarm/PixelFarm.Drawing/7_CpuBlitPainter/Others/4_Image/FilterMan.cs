@@ -28,18 +28,18 @@ namespace PixelFarm.CpuBlit.Imaging
 
     class FilterMan
     {
-        StackBlur stackBlur;
+        StackBlur _stackBlur;
         RecursiveBlur m_recursive_blur;
 
         ShapenFilterPdn pdnSharpen;
 
         public void DoStackBlur(BitmapBlenderBase readerWriter, int radius)
         {
-            if (stackBlur == null)
+            if (_stackBlur == null)
             {
-                stackBlur = new StackBlur();
+                _stackBlur = new StackBlur();
             }
-            stackBlur.Blur(readerWriter, radius, radius);
+            _stackBlur.Blur(readerWriter, radius, radius);
         }
         public void DoRecursiveBlur(BitmapBlenderBase readerWriter, int radius)
         {

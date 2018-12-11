@@ -12,17 +12,14 @@ namespace Typography.TextLayout
             _buffer = buffer;
         }
 
-        public int Len { get { return _buffer.Length; } }
+        public int Len => _buffer.Length;
 
         public string CopyString(int start, int len)
         {
             return new string(_buffer, start, len);
         }
         //-------- 
-        internal char[] UnsafeGetInternalBuffer()
-        {
-            return _buffer;
-        }
+        internal char[] UnsafeGetInternalBuffer() => _buffer;
         internal TextBuffer()
         {
 
@@ -39,6 +36,6 @@ namespace Typography.TextLayout
             _buffer = buffer;
         }
     }
-     
+
 
 }

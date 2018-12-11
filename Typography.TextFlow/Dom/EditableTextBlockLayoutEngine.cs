@@ -16,28 +16,20 @@ namespace Typography.TextLayout
 
         TextBlockLexer _textBlockLexer;
         List<EditableTextLine> _lines = new List<EditableTextLine>();
-        GlyphLayout _glyphLayout; 
+        GlyphLayout _glyphLayout;
+        UnscaledGlyphPlanList _outputGlyphPlan = new UnscaledGlyphPlanList();
 
         public EditableTextBlockLayoutEngine()
         {
             _textBlockLexer = new TextBlockLexer();
             _glyphLayout = new GlyphLayout();
-            FontSizeInPts = 10;
-
+            FontSizeInPts = 10; 
         }
-        public Typeface DefaultTypeface
-        {
-            get;
-            set;
-        }
+        public Typeface DefaultTypeface { get; set; }
         /// <summary>
         /// font size in points
         /// </summary>
-        public float FontSizeInPts
-        {
-            get;
-            set;
-        }
+        public float FontSizeInPts { get; set; }
         public float ContentWidth { get; set; }
         public float ContentHeight { get; set; }
 
@@ -98,7 +90,7 @@ namespace Typography.TextLayout
         }
 
 
-        UnscaledGlyphPlanList _outputGlyphPlan = new UnscaledGlyphPlanList();
+
 
         public void DoLayout()
         {
@@ -165,16 +157,14 @@ namespace Typography.TextLayout
                 }
             }
         }
+        //
         public TextBlockLexer CurrentLexer
         {
-            get { return _textBlockLexer; }
-            set { _textBlockLexer = value; }
+            get => _textBlockLexer;
+            set => _textBlockLexer = value;
         }
 
-        public List<EditableTextLine> UnsafeGetEditableTextLine()
-        {
-            return _lines;
-        }
+        public List<EditableTextLine> UnsafeGetEditableTextLine() => _lines;
     }
 
 

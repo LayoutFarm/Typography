@@ -29,7 +29,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //-----------------------------------------------image_filter_bilinear
     public struct ImageFilterBilinear : IImageFilter
     {
-        public double GetRadius() { return 1.0; }
+        public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
         {
             if (Math.Abs(x) < 1)
@@ -51,7 +51,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //-----------------------------------------------image_filter_hanning
     public struct ImageFilterHanning : IImageFilter
     {
-        public double GetRadius() { return 1.0; }
+        public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
         {
             return 0.5 + 0.5 * Math.Cos(Math.PI * x);
@@ -61,7 +61,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //-----------------------------------------------image_filter_hamming
     public struct ImageFilterHamming : IImageFilter
     {
-        public double GetRadius() { return 1.0; }
+        public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
         {
             return 0.54 + 0.46 * Math.Cos(Math.PI * x);
@@ -70,7 +70,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //-----------------------------------------------image_filter_hermite
     public struct ImageFilterHermite : IImageFilter
     {
-        public double GetRadius() { return 1.0; }
+        public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
         {
             return (2.0 * x - 3.0) * x * x + 1.0;
@@ -79,7 +79,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //------------------------------------------------image_filter_quadric
     public struct ImageFilterQuadric : IImageFilter
     {
-        public double GetRadius() { return 1.5; }
+        public double GetRadius() => 1.5;
         public double CalculateWeight(double x)
         {
             double t;
@@ -91,12 +91,12 @@ namespace PixelFarm.CpuBlit.Imaging
     //------------------------------------------------image_filter_bicubic
     public class ImageFilterBicubic : IImageFilter
     {
+        public double GetRadius() => 2.0;
         private static double pow3(double x)
         {
             return (x <= 0.0) ? 0.0 : x * x * x;
         }
 
-        public double GetRadius() { return 2.0; }
         public double CalculateWeight(double x)
         {
             return
@@ -107,24 +107,24 @@ namespace PixelFarm.CpuBlit.Imaging
     //-------------------------------------------------image_filter_kaiser
     public class ImageFilterKaiser : IImageFilter
     {
-        double a;
-        double i0a;
-        double epsilon;
+        double _a;
+        double _i0a;
+        double _epsilon;
         public ImageFilterKaiser()
             : this(6.33)
         {
         }
         public ImageFilterKaiser(double b)
         {
-            a = (b);
-            epsilon = (1e-12);
-            i0a = 1.0 / Bessel_i0(b);
+            _a = (b);
+            _epsilon = (1e-12);
+            _i0a = 1.0 / Bessel_i0(b);
         }
 
-        public double GetRadius() { return 1.0; }
+        public double GetRadius() => 1.0;
         public double CalculateWeight(double x)
         {
-            return Bessel_i0(a * Math.Sqrt(1.0 - x * x)) * i0a;
+            return Bessel_i0(_a * Math.Sqrt(1.0 - x * x)) * _i0a;
         }
 
         double Bessel_i0(double x)
@@ -134,7 +134,7 @@ namespace PixelFarm.CpuBlit.Imaging
             sum = 1.0;
             y = x * x / 4.0;
             t = y;
-            for (i = 2; t > epsilon; i++)
+            for (i = 2; t > _epsilon; i++)
             {
                 sum += t;
                 t *= (double)y / (i * i);
@@ -145,7 +145,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //----------------------------------------------image_filter_catrom
     public struct ImageFilterCatrom : IImageFilter
     {
-        public double GetRadius() { return 2.0; }
+        public double GetRadius() => 2.0;
         public double CalculateWeight(double x)
         {
             if (x < 1.0) return 0.5 * (2.0 + x * x * (-5.0 + x * 3.0));
@@ -156,8 +156,8 @@ namespace PixelFarm.CpuBlit.Imaging
     //---------------------------------------------image_filter_mitchell
     public class ImageFilterMichell : IImageFilter
     {
-        private double p0, p2, p3;
-        private double q0, q1, q2, q3;
+        double _p0, _p2, _p3;
+        double _q0, _q1, _q2, q3;
         public ImageFilterMichell()
             : this(1.0 / 3.0, 1.0 / 3.0)
         {
@@ -165,27 +165,27 @@ namespace PixelFarm.CpuBlit.Imaging
 
         public ImageFilterMichell(double b, double c)
         {
-            p0 = ((6.0 - 2.0 * b) / 6.0);
-            p2 = ((-18.0 + 12.0 * b + 6.0 * c) / 6.0);
-            p3 = ((12.0 - 9.0 * b - 6.0 * c) / 6.0);
-            q0 = ((8.0 * b + 24.0 * c) / 6.0);
-            q1 = ((-12.0 * b - 48.0 * c) / 6.0);
-            q2 = ((6.0 * b + 30.0 * c) / 6.0);
+            _p0 = ((6.0 - 2.0 * b) / 6.0);
+            _p2 = ((-18.0 + 12.0 * b + 6.0 * c) / 6.0);
+            _p3 = ((12.0 - 9.0 * b - 6.0 * c) / 6.0);
+            _q0 = ((8.0 * b + 24.0 * c) / 6.0);
+            _q1 = ((-12.0 * b - 48.0 * c) / 6.0);
+            _q2 = ((6.0 * b + 30.0 * c) / 6.0);
             q3 = ((-b - 6.0 * c) / 6.0);
         }
 
         public double GetRadius() { return 2.0; }
         public double CalculateWeight(double x)
         {
-            if (x < 1.0) return p0 + x * x * (p2 + x * p3);
-            if (x < 2.0) return q0 + x * (q1 + x * (q2 + x * q3));
+            if (x < 1.0) return _p0 + x * x * (_p2 + x * _p3);
+            if (x < 2.0) return _q0 + x * (_q1 + x * (_q2 + x * q3));
             return 0.0;
         }
     }
     //----------------------------------------------image_filter_spline16
     public struct ImageFilterSpline16 : IImageFilter
     {
-        public double GetRadius() { return 2.0; }
+        public double GetRadius() => 2.0;
         public double CalculateWeight(double x)
         {
             if (x < 1.0)
@@ -198,7 +198,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //---------------------------------------------image_filter_spline36
     public struct ImageFilterSpline36 : IImageFilter
     {
-        public double GetRadius() { return 3.0; }
+        public double GetRadius() => 3.0;
         public double CalculateWeight(double x)
         {
             if (x < 1.0)
@@ -215,7 +215,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //----------------------------------------------image_filter_gaussian
     public struct ImageFilterGaussian : IImageFilter
     {
-        public double GetRadius() { return 2.0; }
+        public double GetRadius() => 2.0;
         public double CalculateWeight(double x)
         {
             return Math.Exp(-2.0 * x * x) * Math.Sqrt(2.0 / Math.PI);
@@ -224,7 +224,7 @@ namespace PixelFarm.CpuBlit.Imaging
     //------------------------------------------------image_filter_bessel
     public struct ImageFilterBessel : IImageFilter
     {
-        public double GetRadius() { return 3.2383; }
+        public double GetRadius() => 3.2383;
         public double CalculateWeight(double x)
         {
             return (x == 0.0) ? Math.PI / 4.0 : AggMath.besj(Math.PI * x, 1) / (2.0 * x);
@@ -235,34 +235,34 @@ namespace PixelFarm.CpuBlit.Imaging
     {
         public ImageFilterSinc(double r)
         {
-            m_radius = (r < 2.0 ? 2.0 : r);
+            _radius = (r < 2.0 ? 2.0 : r);
         }
-        public double GetRadius() { return m_radius; }
+        public double GetRadius() => _radius;
         public double CalculateWeight(double x)
         {
             if (x == 0.0) return 1.0;
             x *= Math.PI;
             return Math.Sin(x) / x;
         }
-        private double m_radius;
+        double _radius;
     }
     //-----------------------------------------------image_filter_lanczos
     public class ImageFilterLanczos : IImageFilter
     {
         public ImageFilterLanczos(double r)
         {
-            m_radius = (r < 2.0 ? 2.0 : r);
+            _radius = (r < 2.0 ? 2.0 : r);
         }
-        public double GetRadius() { return m_radius; }
+        public double GetRadius() => _radius;
         public double CalculateWeight(double x)
         {
             if (x == 0.0) return 1.0;
-            if (x > m_radius) return 0.0;
+            if (x > _radius) return 0.0;
             x *= Math.PI;
-            double xr = x / m_radius;
+            double xr = x / _radius;
             return (Math.Sin(x) / x) * (Math.Sin(xr) / xr);
         }
-        private double m_radius;
+        double _radius;
     }
     //----------------------------------------------image_filter_blackman
     public class ImageFilterBlackMan : IImageFilter
@@ -272,7 +272,7 @@ namespace PixelFarm.CpuBlit.Imaging
             m_radius = (r < 2.0 ? 2.0 : r);
         }
 
-        public double GetRadius() { return m_radius; }
+        public double GetRadius() => m_radius;
 
         public double CalculateWeight(double x)
         {

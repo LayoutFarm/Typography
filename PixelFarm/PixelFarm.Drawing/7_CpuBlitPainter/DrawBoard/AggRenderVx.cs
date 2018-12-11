@@ -5,23 +5,20 @@ namespace PixelFarm.CpuBlit
 {
     class AggRenderVx : PixelFarm.Drawing.RenderVx
     {
-        internal VertexStore vxs;
+        internal VertexStore _vxs;
         public AggRenderVx(VertexStore vxs)
         {
-            this.vxs = vxs;
+            _vxs = vxs;
         }
     }
     class AggRenderVxFormattedString : PixelFarm.Drawing.RenderVxFormattedString
     {
-        string str;
+        string _str;
         public AggRenderVxFormattedString(string str)
         {
-            this.str = str;
+            _str = str;
 
         }
-        public override string OriginalString
-        {
-            get { return this.str; }
-        }
+        public override string OriginalString => _str;
     }
 }

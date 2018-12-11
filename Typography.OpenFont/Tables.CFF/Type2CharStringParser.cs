@@ -370,26 +370,26 @@ namespace Typography.OpenFont.CFF
         int _dbugInstructionListMark = 0;
 #endif
 
-        bool foundSomeStem = false;
-        Type2GlyphInstructionList insts;
-        int current_int_count = 0;
-        bool doStemCount = true;
+        bool _foundSomeStem = false;
+        Type2GlyphInstructionList _insts;
+        int _current_int_count = 0;
+        bool _doStemCount = true;
 
         public Type2GlyphInstructionList ParseType2CharString(byte[] buffer)
         {
             //reset
-            current_int_count = 0;
-            foundSomeStem = false;
-            doStemCount = true;
+            _current_int_count = 0;
+            _foundSomeStem = false;
+            _doStemCount = true;
             _msBuffer.SetLength(0);
             _msBuffer.Position = 0;
             _msBuffer.Write(buffer, 0, buffer.Length);
             _msBuffer.Position = 0;
             int len = buffer.Length;
             //
-            insts = new Type2GlyphInstructionList();
+            _insts = new Type2GlyphInstructionList();
 #if DEBUG
-            insts.dbugMark = _dbugInstructionListMark;
+            _insts.dbugMark = _dbugInstructionListMark;
             //if (_dbugInstructionListMark == 5)
             //{
 
@@ -422,10 +422,10 @@ namespace Typography.OpenFont.CFF
                                 Debug.WriteLine("err!:" + b0);
                                 return null;
                             }
-                            insts.AddInt(ReadIntegerNumber(b0));
-                            if (doStemCount)
+                            _insts.AddInt(ReadIntegerNumber(b0));
+                            if (_doStemCount)
                             {
-                                current_int_count++;
+                                _current_int_count++;
                             }
                         }
                         break;
@@ -438,11 +438,11 @@ namespace Typography.OpenFont.CFF
                         //most significant byte follows the(28)
                         byte s_b0 = _reader.ReadByte();
                         byte s_b1 = _reader.ReadByte();
-                        insts.AddInt((short)((s_b0 << 8) | (s_b1)));
+                        _insts.AddInt((short)((s_b0 << 8) | (s_b1)));
                         //
-                        if (doStemCount)
+                        if (_doStemCount)
                         {
-                            current_int_count++;
+                            _current_int_count++;
                         }
                         break;
                     //---------------------------------------------------
@@ -456,7 +456,7 @@ namespace Typography.OpenFont.CFF
                         //reserved, do nothing ?
                         break;
                     case (byte)Type2Operator1.endchar:
-                        insts.AddOp(OperatorName.endchar);
+                        _insts.AddOp(OperatorName.endchar);
                         cont = false;
                         //when we found end char
                         //stop reading this...
@@ -476,56 +476,56 @@ namespace Typography.OpenFont.CFF
                                     break;
                                 //-------------------------
                                 //4.1: Path Construction Operators
-                                case Type2Operator2.flex: insts.AddOp(OperatorName.flex); break;
-                                case Type2Operator2.hflex: insts.AddOp(OperatorName.hflex); break;
-                                case Type2Operator2.hflex1: insts.AddOp(OperatorName.hflex1); break;
-                                case Type2Operator2.flex1: insts.AddOp(OperatorName.flex1); ; break;
+                                case Type2Operator2.flex: _insts.AddOp(OperatorName.flex); break;
+                                case Type2Operator2.hflex: _insts.AddOp(OperatorName.hflex); break;
+                                case Type2Operator2.hflex1: _insts.AddOp(OperatorName.hflex1); break;
+                                case Type2Operator2.flex1: _insts.AddOp(OperatorName.flex1); ; break;
                                 //-------------------------
                                 //4.4: Arithmetic Operators
-                                case Type2Operator2.abs: insts.AddOp(OperatorName.abs); break;
-                                case Type2Operator2.add: insts.AddOp(OperatorName.add); break;
-                                case Type2Operator2.sub: insts.AddOp(OperatorName.sub); break;
-                                case Type2Operator2.div: insts.AddOp(OperatorName.div); break;
-                                case Type2Operator2.neg: insts.AddOp(OperatorName.neg); break;
-                                case Type2Operator2.random: insts.AddOp(OperatorName.random); break;
-                                case Type2Operator2.mul: insts.AddOp(OperatorName.mul); break;
-                                case Type2Operator2.sqrt: insts.AddOp(OperatorName.sqrt); break;
-                                case Type2Operator2.drop: insts.AddOp(OperatorName.drop); break;
-                                case Type2Operator2.exch: insts.AddOp(OperatorName.exch); break;
-                                case Type2Operator2.index: insts.AddOp(OperatorName.index); break;
-                                case Type2Operator2.roll: insts.AddOp(OperatorName.roll); break;
-                                case Type2Operator2.dup: insts.AddOp(OperatorName.dup); break;
+                                case Type2Operator2.abs: _insts.AddOp(OperatorName.abs); break;
+                                case Type2Operator2.add: _insts.AddOp(OperatorName.add); break;
+                                case Type2Operator2.sub: _insts.AddOp(OperatorName.sub); break;
+                                case Type2Operator2.div: _insts.AddOp(OperatorName.div); break;
+                                case Type2Operator2.neg: _insts.AddOp(OperatorName.neg); break;
+                                case Type2Operator2.random: _insts.AddOp(OperatorName.random); break;
+                                case Type2Operator2.mul: _insts.AddOp(OperatorName.mul); break;
+                                case Type2Operator2.sqrt: _insts.AddOp(OperatorName.sqrt); break;
+                                case Type2Operator2.drop: _insts.AddOp(OperatorName.drop); break;
+                                case Type2Operator2.exch: _insts.AddOp(OperatorName.exch); break;
+                                case Type2Operator2.index: _insts.AddOp(OperatorName.index); break;
+                                case Type2Operator2.roll: _insts.AddOp(OperatorName.roll); break;
+                                case Type2Operator2.dup: _insts.AddOp(OperatorName.dup); break;
 
                                 //-------------------------
                                 //4.5: Storage Operators 
-                                case Type2Operator2.put: insts.AddOp(OperatorName.put); break;
-                                case Type2Operator2.get: insts.AddOp(OperatorName.get); break;
+                                case Type2Operator2.put: _insts.AddOp(OperatorName.put); break;
+                                case Type2Operator2.get: _insts.AddOp(OperatorName.get); break;
                                 //-------------------------
                                 //4.6: Conditional
-                                case Type2Operator2.and: insts.AddOp(OperatorName.and); break;
-                                case Type2Operator2.or: insts.AddOp(OperatorName.or); break;
-                                case Type2Operator2.not: insts.AddOp(OperatorName.not); break;
-                                case Type2Operator2.eq: insts.AddOp(OperatorName.eq); break;
-                                case Type2Operator2.ifelse: insts.AddOp(OperatorName.ifelse); break;
+                                case Type2Operator2.and: _insts.AddOp(OperatorName.and); break;
+                                case Type2Operator2.or: _insts.AddOp(OperatorName.or); break;
+                                case Type2Operator2.not: _insts.AddOp(OperatorName.not); break;
+                                case Type2Operator2.eq: _insts.AddOp(OperatorName.eq); break;
+                                case Type2Operator2.ifelse: _insts.AddOp(OperatorName.ifelse); break;
                             }
 
                             StopStemCount();
                         }
                         break;
-                    case (byte)Type2Operator1.rmoveto: insts.AddOp(OperatorName.rmoveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.hmoveto: insts.AddOp(OperatorName.hmoveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.vmoveto: insts.AddOp(OperatorName.vmoveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.rmoveto: _insts.AddOp(OperatorName.rmoveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hmoveto: _insts.AddOp(OperatorName.hmoveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.vmoveto: _insts.AddOp(OperatorName.vmoveto); StopStemCount(); break;
                     //---------------------------------------------------------------------------
-                    case (byte)Type2Operator1.rlineto: insts.AddOp(OperatorName.rlineto); StopStemCount(); break;
-                    case (byte)Type2Operator1.hlineto: insts.AddOp(OperatorName.hlineto); StopStemCount(); break;
-                    case (byte)Type2Operator1.vlineto: insts.AddOp(OperatorName.vlineto); StopStemCount(); break;
-                    case (byte)Type2Operator1.rrcurveto: insts.AddOp(OperatorName.rrcurveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.hhcurveto: insts.AddOp(OperatorName.hhcurveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.hvcurveto: insts.AddOp(OperatorName.hvcurveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.rcurveline: insts.AddOp(OperatorName.rcurveline); StopStemCount(); break;
-                    case (byte)Type2Operator1.rlinecurve: insts.AddOp(OperatorName.rlinecurve); StopStemCount(); break;
-                    case (byte)Type2Operator1.vhcurveto: insts.AddOp(OperatorName.vhcurveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.vvcurveto: insts.AddOp(OperatorName.vvcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.rlineto: _insts.AddOp(OperatorName.rlineto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hlineto: _insts.AddOp(OperatorName.hlineto); StopStemCount(); break;
+                    case (byte)Type2Operator1.vlineto: _insts.AddOp(OperatorName.vlineto); StopStemCount(); break;
+                    case (byte)Type2Operator1.rrcurveto: _insts.AddOp(OperatorName.rrcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hhcurveto: _insts.AddOp(OperatorName.hhcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hvcurveto: _insts.AddOp(OperatorName.hvcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.rcurveline: _insts.AddOp(OperatorName.rcurveline); StopStemCount(); break;
+                    case (byte)Type2Operator1.rlinecurve: _insts.AddOp(OperatorName.rlinecurve); StopStemCount(); break;
+                    case (byte)Type2Operator1.vhcurveto: _insts.AddOp(OperatorName.vhcurveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.vvcurveto: _insts.AddOp(OperatorName.vvcurveto); StopStemCount(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
                     case (byte)Type2Operator1.hstem: AddStemToList(OperatorName.hstem, ref hintStemCount); break;
@@ -537,18 +537,18 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(_reader, ref hintStemCount); StopStemCount(); break;
                     //-------------------------------------------------------------------
                     //4.7: Subroutine Operators
-                    case (byte)Type2Operator1.callsubr: insts.AddOp(OperatorName.callsubr); StopStemCount(); break;
-                    case (byte)Type2Operator1.callgsubr: insts.AddOp(OperatorName.callgsubr); StopStemCount(); break;
-                    case (byte)Type2Operator1._return: insts.AddOp(OperatorName._return); StopStemCount(); break;
+                    case (byte)Type2Operator1.callsubr: _insts.AddOp(OperatorName.callsubr); StopStemCount(); break;
+                    case (byte)Type2Operator1.callgsubr: _insts.AddOp(OperatorName.callgsubr); StopStemCount(); break;
+                    case (byte)Type2Operator1._return: _insts.AddOp(OperatorName._return); StopStemCount(); break;
                 }
             }
-            return insts;
+            return _insts;
         }
 
         void StopStemCount()
         {
-            current_int_count = 0;
-            doStemCount = false;
+            _current_int_count = 0;
+            _doStemCount = false;
         }
         OperatorName _latestOpName = OperatorName.Unknown;
         void AddStemToList(OperatorName stemName, ref int hintStemCount)
@@ -570,35 +570,35 @@ namespace Typography.OpenFont.CFF
             //represented as:
             //w? { hs* vs*cm * hm * mt subpath}? { mt subpath} *endchar 
 
-            if ((current_int_count % 2) != 0)
+            if ((_current_int_count % 2) != 0)
             {
                 //all kind has even number of stem               
 
-                if (foundSomeStem)
+                if (_foundSomeStem)
                 {
 #if DEBUG
-                    insts.dbugDumpInstructionListToFile("d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
+                    _insts.dbugDumpInstructionListToFile("d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
 #endif
                     throw new NotSupportedException();
                 }
                 else
                 {
                     //the first one is 'width'
-                    insts.ChangeFirstInstToGlyphWidthValue();
-                    current_int_count--;
+                    _insts.ChangeFirstInstToGlyphWidthValue();
+                    _current_int_count--;
                 }
             }
-            hintStemCount += (current_int_count / 2); //save a snapshot of stem count
-            insts.AddOp(stemName);
-            current_int_count = 0;//clear
-            foundSomeStem = true;
+            hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
+            _insts.AddOp(stemName);
+            _current_int_count = 0;//clear
+            _foundSomeStem = true;
             _latestOpName = stemName;
         }
         void AddHintMaskToList(BinaryReader reader, ref int hintStemCount)
         {
 
 
-            if (foundSomeStem && current_int_count > 0)
+            if (_foundSomeStem && _current_int_count > 0)
             {
 
                 //type2 5177.pdf
@@ -609,7 +609,7 @@ namespace Typography.OpenFont.CFF
                 //the vstem hint operator need not be included ***
 
 #if DEBUG
-                if ((current_int_count % 2) != 0)
+                if ((_current_int_count % 2) != 0)
                 {
                     throw new NotSupportedException();
                 }
@@ -624,27 +624,27 @@ namespace Typography.OpenFont.CFF
                     case OperatorName.hstem:
                         //add vstem  ***( from reason above)
 
-                        hintStemCount += (current_int_count / 2); //save a snapshot of stem count
-                        insts.AddOp(OperatorName.vstem);
+                        hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
+                        _insts.AddOp(OperatorName.vstem);
 
                         _latestOpName = OperatorName.vstem;
-                        current_int_count = 0; //clear
+                        _current_int_count = 0; //clear
                         break;
                     case OperatorName.hstemhm:
                         //add vstem  ***( from reason above) ??
-                        hintStemCount += (current_int_count / 2); //save a snapshot of stem count
-                        insts.AddOp(OperatorName.vstem);
+                        hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
+                        _insts.AddOp(OperatorName.vstem);
                         _latestOpName = OperatorName.vstem;
-                        current_int_count = 0;//clear
+                        _current_int_count = 0;//clear
                         break;
                     case OperatorName.vstemhm:
                         //-------
                         //TODO: review here? 
                         //found this in xits.otf
-                        hintStemCount += (current_int_count / 2); //save a snapshot of stem count
-                        insts.AddOp(OperatorName.vstem);
+                        hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
+                        _insts.AddOp(OperatorName.vstem);
                         _latestOpName = OperatorName.vstem;
-                        current_int_count = 0;//clear
+                        _current_int_count = 0;//clear
                         break;
                     default:
                         throw new NotSupportedException();
@@ -653,10 +653,10 @@ namespace Typography.OpenFont.CFF
 
             if (hintStemCount == 0)
             {
-                if (!foundSomeStem)
+                if (!_foundSomeStem)
                 {
-                    hintStemCount = (current_int_count / 2);
-                    foundSomeStem = true;//?
+                    hintStemCount = (_current_int_count / 2);
+                    _foundSomeStem = true;//?
                 }
                 else
                 {
@@ -677,7 +677,7 @@ namespace Typography.OpenFont.CFF
 
                 for (; remaining > 3;)
                 {
-                    insts.AddInt((
+                    _insts.AddInt((
                        (_reader.ReadByte() << 24) |
                        (_reader.ReadByte() << 16) |
                        (_reader.ReadByte() << 8) |
@@ -691,16 +691,16 @@ namespace Typography.OpenFont.CFF
                         //do nothing
                         break;
                     case 1:
-                        insts.AddInt(_reader.ReadByte() << 24);
+                        _insts.AddInt(_reader.ReadByte() << 24);
                         break;
                     case 2:
-                        insts.AddInt(
+                        _insts.AddInt(
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16));
 
                         break;
                     case 3:
-                        insts.AddInt(
+                        _insts.AddInt(
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8));
@@ -708,7 +708,7 @@ namespace Typography.OpenFont.CFF
                     default: throw new NotSupportedException();//should not occur !
                 }
 
-                insts.AddOp(OperatorName.hintmask_bits, properNumberOfMaskBytes);
+                _insts.AddOp(OperatorName.hintmask_bits, properNumberOfMaskBytes);
             }
             else
             {
@@ -718,23 +718,23 @@ namespace Typography.OpenFont.CFF
                     case 0:
                     default: throw new NotSupportedException();//should not occur !
                     case 1:
-                        insts.AddOp(OperatorName.hintmask1, (_reader.ReadByte() << 24));
+                        _insts.AddOp(OperatorName.hintmask1, (_reader.ReadByte() << 24));
                         break;
                     case 2:
-                        insts.AddOp(OperatorName.hintmask2,
+                        _insts.AddOp(OperatorName.hintmask2,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16)
                             );
                         break;
                     case 3:
-                        insts.AddOp(OperatorName.hintmask3,
+                        _insts.AddOp(OperatorName.hintmask3,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8)
                             );
                         break;
                     case 4:
-                        insts.AddOp(OperatorName.hintmask4,
+                        _insts.AddOp(OperatorName.hintmask4,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8) |
@@ -749,11 +749,11 @@ namespace Typography.OpenFont.CFF
         {
             if (hintStemCount == 0)
             {
-                if (!foundSomeStem)
+                if (!_foundSomeStem)
                 {
                     //????
-                    hintStemCount = (current_int_count / 2);
-                    foundSomeStem = true;//?
+                    hintStemCount = (_current_int_count / 2);
+                    _foundSomeStem = true;//?
                 }
                 else
                 {
@@ -774,7 +774,7 @@ namespace Typography.OpenFont.CFF
 
                 for (; remaining > 3;)
                 {
-                    insts.AddInt((
+                    _insts.AddInt((
                        (_reader.ReadByte() << 24) |
                        (_reader.ReadByte() << 16) |
                        (_reader.ReadByte() << 8) |
@@ -788,16 +788,16 @@ namespace Typography.OpenFont.CFF
                         //do nothing
                         break;
                     case 1:
-                        insts.AddInt(_reader.ReadByte() << 24);
+                        _insts.AddInt(_reader.ReadByte() << 24);
                         break;
                     case 2:
-                        insts.AddInt(
+                        _insts.AddInt(
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16));
 
                         break;
                     case 3:
-                        insts.AddInt(
+                        _insts.AddInt(
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8));
@@ -805,7 +805,7 @@ namespace Typography.OpenFont.CFF
                     default: throw new NotSupportedException();//should not occur !
                 }
 
-                insts.AddOp(OperatorName.cntrmask_bits, properNumberOfMaskBytes);
+                _insts.AddOp(OperatorName.cntrmask_bits, properNumberOfMaskBytes);
             }
             else
             {
@@ -815,23 +815,23 @@ namespace Typography.OpenFont.CFF
                     case 0:
                     default: throw new NotSupportedException();//should not occur !
                     case 1:
-                        insts.AddOp(OperatorName.cntrmask1, (_reader.ReadByte() << 24));
+                        _insts.AddOp(OperatorName.cntrmask1, (_reader.ReadByte() << 24));
                         break;
                     case 2:
-                        insts.AddOp(OperatorName.cntrmask2,
+                        _insts.AddOp(OperatorName.cntrmask2,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16)
                             );
                         break;
                     case 3:
-                        insts.AddOp(OperatorName.cntrmask3,
+                        _insts.AddOp(OperatorName.cntrmask3,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8)
                             );
                         break;
                     case 4:
-                        insts.AddOp(OperatorName.cntrmask4,
+                        _insts.AddOp(OperatorName.cntrmask4,
                             (_reader.ReadByte() << 24) |
                             (_reader.ReadByte() << 16) |
                             (_reader.ReadByte() << 8) |
