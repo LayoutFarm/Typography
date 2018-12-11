@@ -308,8 +308,102 @@ namespace Typography.TextLayout
                 }
             }
             return accumW;
+
+
+            ////measure string 
+            //if (str.Length < 1)
+            //{
+            //    charFitWidth = 0;
+            //}
+
+            //_reusableMeasureBoxList.Clear(); //reset 
+
+
+            //float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts);
+            ////NOET:at this moment, simple operation
+            ////may not be simple...  
+            ////-------------------
+            ////input string may contain more than 1 script lang
+            ////user can parse it by other parser
+            ////but in this code, we use our Typography' parser
+            ////-------------------
+            ////user must setup the CustomBreakerBuilder before use         
+
+            //int cur_startAt = startAt;
+            //float accumW = 0;
+
+            //float acc_x = 0;//accum_x
+            //float acc_y = 0;//accum_y
+            //float g_x = 0;
+            //float g_y = 0;
+            //float x = 0;
+            //float y = 0;
+            //foreach (Typography.TextLayout.BreakSpan breakSpan in BreakToLineSegments(str, startAt, len))
+            //{
+
+            //    //measure string at specific px scale 
+            //    _glyphLayout.Layout(str, breakSpan.startAt, breakSpan.len);
+            //    //
+
+            //    _reusableGlyphPlanList.Clear();
+            //    _glyphLayout.GenerateUnscaledGlyphPlans(_reusableGlyphPlanList);
+            //    //measure ...
+
+
+            //    //measure each glyph
+            //    //limit at specific width
+            //    int glyphCount = _reusableGlyphPlanList.Count;
+
+
+
+            //    for (int i = 0; i < glyphCount; ++i)
+            //    {
+            //        UnscaledGlyphPlan glyphPlan = _reusableGlyphPlanList[i];
+
+            //        float ngx = acc_x + (float)Math.Round(glyphPlan.OffsetX * pxscale);
+            //        float ngy = acc_y + (float)Math.Round(glyphPlan.OffsetY * pxscale);
+            //        //NOTE:
+            //        // -glyphData.TextureXOffset => restore to original pos
+            //        // -glyphData.TextureYOffset => restore to original pos 
+            //        //--------------------------
+            //        g_x = (float)(x + (ngx)); //ideal x
+            //        g_y = (float)(y + (ngy));
+            //        float g_w = (float)Math.Round(glyphPlan.AdvanceX * pxscale);
+            //        acc_x += g_w;
+            //        //g_x = (float)Math.Round(g_x);
+            //        g_y = (float)Math.Floor(g_y);
+
+            //        float right = g_x + g_w;
+
+            //        if (right >= accumW)
+            //        {
+            //            //stop here at this glyph
+            //            charFit = i - 1;
+            //            //TODO: review this
+            //            charFitWidth = (int)System.Math.Round(accumW);
+            //            return;
+            //        }
+            //        else
+            //        {
+            //            accumW = right;
+            //        }
+            //    }
+            //}
+
+            //charFit = 0;
+            //charFitWidth = 0;
         }
 
+
+        //static void ConcatMeasureBox(ref float accumW, ref float accumH, ref MeasuredStringBox measureBox)
+        //{
+        //    accumW += measureBox.width;
+        //    float h = measureBox.CalculateLineHeight();
+        //    if (h > accumH)
+        //    {
+        //        accumH = h;
+        //    }
+        //}
 
 
 

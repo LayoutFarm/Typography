@@ -14,7 +14,7 @@ namespace Typography.TextLayout
         readonly short _lineGap; //2
         readonly short _btbd;//Baseline-to-Baseline Distance,  2 byte
 
-        public ushort stopAt;
+        ushort _stopAt;
 
         public MeasuredStringBox(float width,
             short ascending,
@@ -24,7 +24,7 @@ namespace Typography.TextLayout
             float pxscale)
         {
             this.width = width;
-            this.stopAt = 0;
+            _stopAt = 0;
             _ascending = ascending;
             _descending = descending;
             _lineGap = lineGap;
@@ -32,10 +32,24 @@ namespace Typography.TextLayout
             _pxscale = pxscale;
 
         }
-        public float ascending => _ascending * _pxscale;
-        public float descending => _descending * _pxscale;
-        public float lineGap => _lineGap * _pxscale;
-        public float btbd => _btbd * _pxscale;
+        /// <summary>
+        /// scaled ascending (in pixel)
+        /// </summary>
+        public float AscendingInPx => _ascending * _pxscale;
+        /// <summary>
+        /// scaled descending (in pixel)
+        /// </summary>
+        public float DescendingInPx => _descending * _pxscale;
+        /// <summary>
+        /// scaled line gap (in pixel)
+        /// </summary>
+        public float LineGapInPx => _lineGap * _pxscale;
+        public float BtbdInPx => _btbd * _pxscale;
+        public ushort StopAt
+        {
+            get => _stopAt;
+            internal set => _stopAt = value;
+        }
 
         public static MeasuredStringBox operator *(MeasuredStringBox box, float scale)
         {
@@ -47,7 +61,7 @@ namespace Typography.TextLayout
                                 box._btbd,
                                 box._pxscale * scale
                                 );
-            measureBox.stopAt = box.stopAt;
+            measureBox._stopAt = box._stopAt;
             return measureBox;
         }
     }
@@ -57,7 +71,7 @@ namespace Typography.TextLayout
 
         public static float CalculateLineHeight(this MeasuredStringBox box, float scale = 1)
         {
-            return box.btbd;
+            return box.BtbdInPx;
             //return box.ascending - box.descending + box.lineGap;
         }
     }
