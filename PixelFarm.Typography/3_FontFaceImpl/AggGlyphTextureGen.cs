@@ -52,13 +52,10 @@ namespace Typography.Contours
                 if (h < 5)
                 {
                     h = 5;
-                }
-
-
+                } 
                 //we need some margin
                 int horizontal_margin = 1;
-                int vertical_margin = 1;
-
+                int vertical_margin = 1; 
 
                 //translate to positive quadrant and use minimum space
 
@@ -74,10 +71,11 @@ namespace Typography.Contours
                 {
                     dy = (int)Math.Floor(-bounds.Bottom);
                 }
-                dx += horizontal_margin;
+                dx += horizontal_margin; //margin left
                 dy += vertical_margin;
                 //--------------------------------------------  
                 w = dx + w + horizontal_margin; //+right margin
+
                 h = vertical_margin + h + vertical_margin; //+bottom margin  
                 AggPainter painter = Painter;
                 if (TextureKind == TextureKind.StencilLcdEffect)
@@ -85,6 +83,12 @@ namespace Typography.Contours
 
                     glyphVxs.TranslateToNewVxs(dx + 0.33f, dy, vxs2); //offset to proper x of subpixel rendering  ***
                     glyphVxs = vxs2;
+
+                    RectD bounds2 = vxs2.GetBoundingRect();
+                    if (w < bounds2.Right)
+                    {
+                        w = (int)Math.Ceiling(bounds2.Right);
+                    }
                     // 
                     painter.UseSubPixelLcdEffect = true;
                     //we use white glyph on black bg for this texture                
