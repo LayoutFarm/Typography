@@ -52,10 +52,10 @@ namespace Typography.Contours
                 if (h < 5)
                 {
                     h = 5;
-                } 
+                }
                 //we need some margin
                 int horizontal_margin = 1;
-                int vertical_margin = 1; 
+                int vertical_margin = 1;
 
                 //translate to positive quadrant and use minimum space
 
@@ -122,6 +122,17 @@ namespace Typography.Contours
 
                 }
                 //
+
+
+                if (w > painter.RenderSurface.DestBitmap.Width)
+                {
+                    w = painter.RenderSurface.DestBitmap.Width;
+                }
+                if (h > painter.RenderSurface.DestBitmap.Height)
+                {
+                    h = painter.RenderSurface.DestBitmap.Height;
+                }
+
                 var glyphImage = new GlyphImage(w, h);
 
 #if DEBUG
@@ -137,6 +148,7 @@ namespace Typography.Contours
 
                 glyphImage.TextureOffsetX = (short)dx;
                 glyphImage.TextureOffsetY = (short)dy;
+
                 glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
                 //copy data from agg canvas to glyph image 
                 return glyphImage;
