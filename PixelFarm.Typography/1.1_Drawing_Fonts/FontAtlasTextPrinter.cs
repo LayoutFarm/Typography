@@ -59,7 +59,7 @@ namespace PixelFarm.Drawing.Fonts
                     return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
                 }
             );
-           
+
 
             //3.  
 
@@ -266,11 +266,7 @@ namespace PixelFarm.Drawing.Fonts
                     // -glyphData.TextureYOffset => restore to original pos 
                     //--------------------------
 
-                    //if (glyphData.TextureXOffset != 0)
-                    //{
-                    //}
-
-                    gx = (float)(left + (ngx - glyphData.TextureXOffset)); //ideal x
+                    gx = (float)(left + (ngx - glyphData.TextureXOffset));
                     gy = (float)(top + (ngy + glyphData.TextureYOffset - srcH + lineHeight));
 
                     acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
