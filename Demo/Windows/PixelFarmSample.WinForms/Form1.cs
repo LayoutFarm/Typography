@@ -40,9 +40,9 @@ namespace SampleWinForms
             var dicProvider = new Typography.TextBreak.IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../../../Typography.TextBreak/icu62/brkitr" };
             Typography.TextBreak.CustomBreakerBuilder.Setup(dicProvider);
 
-            this.Load += new System.EventHandler(this.Form1_Load);  
+            this.Load += new System.EventHandler(this.Form1_Load);
         }
-        
+
         void RenderByGlyphName(string selectedGlyphName)
         {
             //---------------------------------------------
@@ -672,7 +672,7 @@ namespace SampleWinForms
             var glyphTextureGen = new GlyphTextureBitmapGenerator();
             //
             Typeface typeface = _basicOptions.Typeface;
-            float fontSizeInPoints = 24;// _basicOptions.FontSizeInPoints;
+            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
             //
             glyphTextureGen.CreateTextureFontFromInputChars(
                 typeface,
