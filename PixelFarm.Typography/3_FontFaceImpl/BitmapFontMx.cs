@@ -2,14 +2,12 @@
 //----------------------------------- 
 using System;
 using System.Collections.Generic;
-using PixelFarm;
+
 using PixelFarm.Drawing;
 using PixelFarm.Drawing.Fonts;
+using PixelFarm.Platforms;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-
-using PixelFarm.Platforms;
 
 namespace Typography.Rendering
 {
@@ -114,8 +112,6 @@ namespace Typography.Rendering
                 new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
                     DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None}
             });
-
-
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
@@ -212,7 +208,6 @@ namespace Typography.Rendering
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
-
                     using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
                     {
                         try
