@@ -64,6 +64,11 @@ namespace Typography.Rendering
 
         public static void Register(RequestFont reqFont, GlyphTextureBuildDetail[] details, bool forAnySize = true, bool forAnyStyle = true)
         {
+            if (s_registerDetails == null)
+            {
+                SetupDefaults();
+            }
+            //
             FontStyle fontStyle = reqFont.Style;
             float sizeInPt = reqFont.SizeInPoints;
             if (forAnySize)
@@ -106,7 +111,7 @@ namespace Typography.Rendering
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
             });
 
-          
+
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
