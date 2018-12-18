@@ -106,12 +106,7 @@ namespace Typography.Rendering
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
             });
 
-            Register(new RequestFont("MS Reference Sans Serif", 9), new GlyphTextureBuildDetail[]
-            {
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
-                    DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None}
-            });
+          
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
