@@ -2,14 +2,12 @@
 //----------------------------------- 
 using System;
 using System.Collections.Generic;
-using PixelFarm;
+
 using PixelFarm.Drawing;
 using PixelFarm.Drawing.Fonts;
+using PixelFarm.Platforms;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-
-using PixelFarm.Platforms;
 
 namespace Typography.Rendering
 {
@@ -66,6 +64,11 @@ namespace Typography.Rendering
 
         public static void Register(RequestFont reqFont, GlyphTextureBuildDetail[] details, bool forAnySize = true, bool forAnyStyle = true)
         {
+            if (s_registerDetails == null)
+            {
+                SetupDefaults();
+            }
+            //
             FontStyle fontStyle = reqFont.Style;
             float sizeInPt = reqFont.SizeInPoints;
             if (forAnySize)
@@ -107,6 +110,8 @@ namespace Typography.Rendering
                     DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
             });
+
+
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
@@ -203,7 +208,6 @@ namespace Typography.Rendering
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
-
                     using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
                     {
                         try
@@ -212,7 +216,7 @@ namespace Typography.Rendering
                             fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImgFilename);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
-                     
+
                         }
                         catch (Exception ex)
                         {
@@ -223,13 +227,10 @@ namespace Typography.Rendering
                 }
                 else
                 {
-
-
-
                     GlyphImage totalGlyphsImg = null;
                     SimpleFontAtlasBuilder atlasBuilder = null;
                     var glyphTextureGen = new GlyphTextureBitmapGenerator();
-                    glyphTextureGen.CreateTextureFontFromScriptLangs(
+                    glyphTextureGen.CreateTextureFontBuildDetail(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                        _textureKind,
