@@ -29,7 +29,7 @@ namespace PixelFarm.Drawing.Fonts
 
 
         }
-        public void CreateTextureFontFromScriptLangs(
+        public void CreateTextureFontBuildDetail(
             Typeface typeface, float sizeInPoint,
             TextureKind textureKind,
             GlyphTextureBuildDetail[] details,
