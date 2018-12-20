@@ -2,14 +2,12 @@
 //----------------------------------- 
 using System;
 using System.Collections.Generic;
-using PixelFarm;
+
 using PixelFarm.Drawing;
 using PixelFarm.Drawing.Fonts;
+using PixelFarm.Platforms;
 
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-
-using PixelFarm.Platforms;
 
 namespace Typography.Rendering
 {
@@ -66,6 +64,11 @@ namespace Typography.Rendering
 
         public static void Register(RequestFont reqFont, GlyphTextureBuildDetail[] details, bool forAnySize = true, bool forAnyStyle = true)
         {
+            if (s_registerDetails == null)
+            {
+                SetupDefaults();
+            }
+            //
             FontStyle fontStyle = reqFont.Style;
             float sizeInPt = reqFont.SizeInPoints;
             if (forAnySize)
@@ -106,13 +109,6 @@ namespace Typography.Rendering
                 new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
                     DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
-            });
-
-            Register(new RequestFont("MS Reference Sans Serif", 9), new GlyphTextureBuildDetail[]
-            {
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
-                    DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None}
             });
 
 
@@ -212,7 +208,6 @@ namespace Typography.Rendering
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
-
                     using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
                     {
                         try

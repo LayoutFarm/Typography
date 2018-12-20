@@ -53,12 +53,9 @@ namespace Typography.Contours
                 {
                     h = 5;
                 }
-
-
                 //we need some margin
                 int horizontal_margin = 1;
                 int vertical_margin = 1;
-
 
                 //translate to positive quadrant and use minimum space
 
@@ -74,10 +71,11 @@ namespace Typography.Contours
                 {
                     dy = (int)Math.Floor(-bounds.Bottom);
                 }
-                dx += horizontal_margin;
+                dx += horizontal_margin; //margin left
                 dy += vertical_margin;
                 //--------------------------------------------  
                 w = dx + w + horizontal_margin; //+right margin
+
                 h = vertical_margin + h + vertical_margin; //+bottom margin  
                 AggPainter painter = Painter;
                 if (TextureKind == TextureKind.StencilLcdEffect)
@@ -85,6 +83,12 @@ namespace Typography.Contours
 
                     glyphVxs.TranslateToNewVxs(dx + 0.33f, dy, vxs2); //offset to proper x of subpixel rendering  ***
                     glyphVxs = vxs2;
+
+                    RectD bounds2 = vxs2.GetBoundingRect();
+                    if (w < bounds2.Right)
+                    {
+                        w = (int)Math.Ceiling(bounds2.Right);
+                    }
                     // 
                     painter.UseSubPixelLcdEffect = true;
                     //we use white glyph on black bg for this texture                
@@ -118,6 +122,17 @@ namespace Typography.Contours
 
                 }
                 //
+
+
+                if (w > painter.RenderSurface.DestBitmap.Width)
+                {
+                    w = painter.RenderSurface.DestBitmap.Width;
+                }
+                if (h > painter.RenderSurface.DestBitmap.Height)
+                {
+                    h = painter.RenderSurface.DestBitmap.Height;
+                }
+
                 var glyphImage = new GlyphImage(w, h);
 
 #if DEBUG
@@ -133,6 +148,7 @@ namespace Typography.Contours
 
                 glyphImage.TextureOffsetX = (short)dx;
                 glyphImage.TextureOffsetY = (short)dy;
+
                 glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
                 //copy data from agg canvas to glyph image 
                 return glyphImage;
