@@ -366,22 +366,21 @@ namespace LayoutFarm
                          CurrentOSName.Mac :
                          CurrentOSName.Windows;
         }
-        static bool _s_evaluatedOS;
-        static bool _s_onMac;
 
-
+        static bool s_evaluatedOS;
+        static bool s_onMac;
         static bool IsOnMac()
         {
 
-            if (_s_evaluatedOS) return _s_onMac;
+            if (s_evaluatedOS) return s_onMac;
             // 
-            _s_evaluatedOS = true;
+            s_evaluatedOS = true;
 #if NETCORE
                 return _s_onMac=  System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
                   System.Runtime.InteropServices.OSPlatform.OSX);                    
 #else
 
-            return _s_onMac = (System.Environment.OSVersion.Platform == System.PlatformID.MacOSX);
+            return s_onMac = (System.Environment.OSVersion.Platform == System.PlatformID.MacOSX);
 #endif
         }
 

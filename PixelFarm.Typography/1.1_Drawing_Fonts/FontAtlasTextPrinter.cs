@@ -79,11 +79,7 @@ namespace PixelFarm.Drawing.Fonts
         public bool StartDrawOnLeftTop { get; set; }
 
 
-        public AntialiasTechnique AntialiasTech
-        {
-            get;
-            set;
-        }
+        public AntialiasTechnique AntialiasTech { get; set; }
 
 
         public void ChangeFont(RequestFont font)
@@ -95,11 +91,8 @@ namespace PixelFarm.Drawing.Fonts
             FontSizeInPoints = font.SizeInPoints;
 
         }
-        public RequestFont CurrentFont
-        {
-            get { return _font; }
 
-        }
+        public RequestFont CurrentFont => _font;
 
         public void ChangeFillColor(Color fontColor)
         {
@@ -124,20 +117,11 @@ namespace PixelFarm.Drawing.Fonts
             }
 
         }
-        public override GlyphLayout GlyphLayoutMan
-        {
-            get
-            {
-                throw new NotSupportedException();
-            }
-        }
+        public override GlyphLayout GlyphLayoutMan => throw new NotSupportedException();
 
         public override Typeface Typeface
         {
-            get
-            {
-                return _currentTypeface;
-            }
+            get => _currentTypeface;
             set
             {
 
@@ -202,8 +186,7 @@ namespace PixelFarm.Drawing.Fonts
         public void DrawString(RenderVxFormattedString renderVx, double x, double y)
         {
             //TODO...
-        }
-
+        } 
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
 
