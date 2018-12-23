@@ -177,6 +177,10 @@ namespace LayoutFarm
             _reusableTextBuffer.SetRawCharBuffer(null);
         }
 
+        public float CalculateScaleToPixelsFromPoint(RequestFont font)
+        {
+            return ResolveTypeface(font).CalculateScaleToPixelFromPointSize(font.SizeInPoints);
+        }
         public Typeface ResolveTypeface(RequestFont font)
         {
             //from user's request font
