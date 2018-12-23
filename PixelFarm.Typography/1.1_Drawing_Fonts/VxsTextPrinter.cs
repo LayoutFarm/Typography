@@ -16,14 +16,8 @@ namespace PixelFarm.Drawing.Fonts
         /// </summary>
         Painter _painter;
         RequestFont _reqFont;
-        //----------------------------------------------------------- 
-
-
-
         Typeface _currentTypeface;
-
         GlyphMeshStore _glyphMeshStore;
-
         float _currentFontSizePxScale;
 
         public VxsTextPrinter(Painter painter, LayoutFarm.OpenFontTextService textService)
@@ -146,6 +140,16 @@ namespace PixelFarm.Drawing.Fonts
         public void DrawGlyph(Glyph glyph, double x, double y)
         {
             //TODO...
+        }
+        public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
+        {
+            UpdateGlyphLayoutSettings();
+            _glyphMeshStore.SetFont(_currentTypeface, this.FontSizeInPoints);
+            _glyphMeshStore.SimulateOblique = this.SimulateSlant;
+            TextBufferSpan textBuffSpan = new TextBufferSpan(buffer, startAt, len);
+            Size s = _textServices.MeasureString(ref textBuffSpan, _painter.CurrentFont);
+            w = s.Width;
+            h = s.Height;
         }
         public void DrawString(RenderVxFormattedString renderVx, double x, double y)
         {
@@ -334,6 +338,7 @@ namespace PixelFarm.Drawing.Fonts
             GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(ref buffSpan, _reqFont);
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
+
     }
 
 

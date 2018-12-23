@@ -172,7 +172,13 @@ namespace PixelFarm.Drawing.Fonts
                 ChangeFont(_painter.CurrentFont);
             }
         }
-
+        public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
+        {
+            TextBufferSpan textBuffSpan = new TextBufferSpan(buffer, startAt, len);
+            Size s = _textServices.MeasureString(ref textBuffSpan, _painter.CurrentFont);
+            w = s.Width;
+            h = s.Height;
+        }
         /// <summary>
         /// draw specfic glyph with current settings, at specific position
         /// </summary>
@@ -186,7 +192,7 @@ namespace PixelFarm.Drawing.Fonts
         public void DrawString(RenderVxFormattedString renderVx, double x, double y)
         {
             //TODO...
-        } 
+        }
         public override void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanSeq, int startAt, int len, float left, float top)
         {
 
