@@ -68,8 +68,11 @@ Subpixel Rendering
  
 ![lcd_09](https://cloud.githubusercontent.com/assets/7447159/22780526/a0e65712-eef1-11e6-948a-eca8e8158aaa.png)
 
+_Tahoma, grey-scale vs lcd-effect subpixel rendering_
+
 ![typography_thanamas](https://user-images.githubusercontent.com/7447159/44314099-d4357180-a43e-11e8-95c3-56894bfea1e4.png)
 
+_lcd-effect subpixel rendering, Sov_Tahanamas font from https://www.f0nt.com/release/sov_thanamas/_
 
 ---
 A Multi-channel signed distance field (Msdf) Texture (https://github.com/Chlumsky/msdfgen) 
