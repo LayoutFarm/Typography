@@ -552,8 +552,21 @@ namespace SampleWinForms
                 //
                 if (_devVxsTextPrinter != null)
                 {
+                    PixelFarm.Drawing.FontStyle fontstyle = PixelFarm.Drawing.FontStyle.Regular;
+                    switch (_basicOptions.SelectedTypefaceStyle)
+                    {
+                        case Typography.FontManagement.TypefaceStyle.Bold:
+                            fontstyle = PixelFarm.Drawing.FontStyle.Bold;
+                            break;
+                        case Typography.FontManagement.TypefaceStyle.Italic:
+                            fontstyle = PixelFarm.Drawing.FontStyle.Italic;
+                            break;
+                    }
                     _devVxsTextPrinter.Typeface = e.SelectedTypeface;
-                    var reqFont = new PixelFarm.Drawing.RequestFont(e.SelectedTypeface.Name, _basicOptions.FontSizeInPoints);
+                    var reqFont = new PixelFarm.Drawing.RequestFont(
+                        e.SelectedTypeface.Name,
+                        _basicOptions.FontSizeInPoints,
+                        fontstyle);
                     _devVxsTextPrinter.ChangeFont(reqFont);
                     _painter.CurrentFont = reqFont;
                 }
