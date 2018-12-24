@@ -139,8 +139,13 @@ _pic 3: Testing with Thai glyphs (complex script), showing glyph substitution_
 
 _pic 4: testing with Thai glyph (complex script)_
 
-(see more: https://github.com/LayoutFarm/Typography/issues/82#issue-274483803)
 
+![th_sarabun](https://user-images.githubusercontent.com/7447159/50389175-61743400-0759-11e9-94c1-00586919a443.png)
+
+_pic 5: complex GSUB-GPOS, Sarabun font from https://github.com/cadsondemak/Sarabun_
+
+
+(see more: https://github.com/LayoutFarm/Typography/issues/82#issue-274483803)
 ---
 
 **Fun with Emojis!**
