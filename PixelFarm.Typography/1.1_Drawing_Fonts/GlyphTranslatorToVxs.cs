@@ -23,8 +23,6 @@ namespace PixelFarm.Drawing.Fonts
             _pw.BindVxs(_vxs);
         }
 
-
-
 #if DEBUG
         public VertexStore dbugVxs => _vxs;
         public PathWriter dbugGetPathWriter()

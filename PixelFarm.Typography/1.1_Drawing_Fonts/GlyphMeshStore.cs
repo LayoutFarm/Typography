@@ -154,13 +154,10 @@ namespace Typography.Contours
         }
 
 
-        static readonly PixelFarm.CpuBlit.VertexProcessing.Affine _invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
+        static readonly PixelFarm.CpuBlit.VertexProcessing.Affine s_invertY = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(1, -1);
 
         //shearing horizontal axis to right side, 20 degree, TODO: user can configure this value
-        static PixelFarm.CpuBlit.VertexProcessing.Affine _slantHorizontal = PixelFarm.CpuBlit.VertexProcessing.Affine.NewSkewing(PixelFarm.CpuBlit.AggMath.deg2rad(-15), 0);
-
-
-
+        static PixelFarm.CpuBlit.VertexProcessing.Affine s_slantHorizontal = PixelFarm.CpuBlit.VertexProcessing.Affine.NewSkewing(PixelFarm.CpuBlit.AggMath.deg2rad(-15), 0);
 
         /// <summary>
         /// get glyph mesh from current font setting
@@ -189,7 +186,7 @@ namespace Typography.Contours
                             _tovxs.WriteOutput(v1);
                             //write to temp buffer first  
                             //then
-                            glyphMeshData.vxsStore = v1.CreateTrim(_invertY);// _temp2.CreateTrim(); 
+                            glyphMeshData.vxsStore = v1.CreateTrim(s_invertY);// _temp2.CreateTrim(); 
                         }
 
                     }
@@ -213,7 +210,7 @@ namespace Typography.Contours
                             _tovxs.WriteOutput(v1); //write to temp buffer first 
 
                             //then
-                            glyphMeshData.vxsStore = v1.CreateTrim(_invertY);
+                            glyphMeshData.vxsStore = v1.CreateTrim(s_invertY);
                         }
                     }
                     else
@@ -255,7 +252,7 @@ namespace Typography.Contours
             //italic mesh data
 
             GlyphMeshData obliqueVersion = new GlyphMeshData();
-            obliqueVersion.vxsStore = orgGlyphMashData.vxsStore.CreateTrim(_slantHorizontal);
+            obliqueVersion.vxsStore = orgGlyphMashData.vxsStore.CreateTrim(s_slantHorizontal);
 
             orgGlyphMashData._synthOblique = obliqueVersion;
 

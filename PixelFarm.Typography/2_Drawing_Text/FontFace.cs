@@ -13,10 +13,6 @@ namespace PixelFarm.Drawing.Fonts
         {
             OnDispose();
         }
-        ~FontFace()
-        {
-            OnDispose();
-        }
         public abstract ActualFont GetFontAtPointSize(float pointSize);
         public abstract string Name { get; }
         public abstract string FontPath { get; }

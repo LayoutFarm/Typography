@@ -22,10 +22,10 @@ namespace PixelFarm.Drawing.Text
 
     public abstract class TextLayoutService
     {
-        static TextLayoutService defaultTextLayoutServices;
+        static TextLayoutService s_defaultTextLayoutServices;
         public void SetAsCurrentImplementation()
         {
-            defaultTextLayoutServices = this;
+            s_defaultTextLayoutServices = this;
         }
 
         public abstract Size MeasureStringImpl(char[] buff, int startAt, int len, RequestFont font);
