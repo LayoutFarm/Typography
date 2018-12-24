@@ -32,7 +32,7 @@ namespace TypographyTest
         Typography.TextServices.TextServices _textServices;
         public BasicFontOptions()
         {
-
+            SelectedTypefaceStyle = TypefaceStyle.Regular;
             FontSizeInPoints = 10;
             this.RenderChoice = RenderChoice.RenderWithTextPrinterAndMiniAgg;
             _textServices = new TextServices();
@@ -89,7 +89,7 @@ namespace TypographyTest
 
         }
         public PositionTechnique PositionTech { get; set; }
-        
+
         public Typeface Typeface
         {
             get
@@ -99,6 +99,8 @@ namespace TypographyTest
         }
         public float FontSizeInPoints { get; set; }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
+        public TypefaceStyle SelectedTypefaceStyle { get; set; }
+
         public InstalledTypeface InstalledTypeface
         {
             get
@@ -113,7 +115,8 @@ namespace TypographyTest
                 if (value == null) return;
 
                 //TODO: review here again
-                Typeface selected_typeface = _textServices.GetTypeface(value.FontName, TypefaceStyle.Regular);
+                SelectedTypefaceStyle = _instTypeface.TypefaceStyle;
+                Typeface selected_typeface = _textServices.GetTypeface(value.FontName, _instTypeface.TypefaceStyle);// TypefaceStyle.Regular);
                 if (selected_typeface != _selectedTypeface)
                 {
                     _typefaceChanged = true;
