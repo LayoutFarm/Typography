@@ -118,14 +118,6 @@ namespace Typography.Contours
             }
         }
 
-        public GlyphDynamicOutline LatestGlyphFitOutline
-        {
-            get
-            {
-                return _latestDynamicOutline;
-            }
-        }
-
-
+        public GlyphDynamicOutline LatestGlyphFitOutline => _latestDynamicOutline;
     }
 }
