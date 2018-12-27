@@ -124,13 +124,8 @@ namespace TypographyTest
                 _selectedTypeface = selected_typeface;
             }
         }
-        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter()
-        {
-            foreach (InstalledTypeface ff in _textServices.InstalledFontCollection.GetInstalledFontIter())
-            {
-                yield return ff;
-            }
-        }
+        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter() => _textServices.InstalledFontCollection.GetInstalledFontIter();
+
         public void InvokeAttachEvents()
         {
             if (TypefaceChanged != null && _typefaceChanged)
@@ -141,6 +136,7 @@ namespace TypographyTest
             //
             //
             UpdateRenderOutput?.Invoke(this, EventArgs.Empty);
+
 
         }
     }

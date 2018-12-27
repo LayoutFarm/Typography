@@ -272,7 +272,7 @@
             // 
             this.treeView1.Location = new System.Drawing.Point(174, 194);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(302, 349);
+            this.treeView1.Size = new System.Drawing.Size(302, 106);
             this.treeView1.TabIndex = 87;
             // 
             // chkSimulateSlant
@@ -312,7 +312,7 @@
             this.Controls.Add(this.chkShowTess);
             this.Controls.Add(this.chkShowControlPoints);
             this.Name = "GlyphContourAnalysisOptionsUserControl";
-            this.Size = new System.Drawing.Size(488, 563);
+            this.Size = new System.Drawing.Size(488, 305);
             this.Load += new System.EventHandler(this.GlyphContourAnalysisOptionsUserControl_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

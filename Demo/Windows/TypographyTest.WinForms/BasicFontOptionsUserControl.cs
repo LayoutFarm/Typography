@@ -31,6 +31,7 @@ namespace TypographyTest.WinForms
             //
             SetupScriptLangComboBox();
             SetupFontList();
+            SetupFontsList2();
             SetupFontSizeList();
             SetupRenderOptions();
             //
@@ -72,8 +73,7 @@ namespace TypographyTest.WinForms
                 ffcount++;
             }
             //set default font for current text printer
-            //
-
+            // 
 
             if (selected_index < 0) { selected_index = 0; }
 
@@ -89,6 +89,10 @@ namespace TypographyTest.WinForms
                     _options.InvokeAttachEvents();
                 }
             };
+        }
+        void SetupFontsList2()
+        {
+
         }
         void SetupFontSizeList()
         {
