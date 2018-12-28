@@ -92,8 +92,41 @@ namespace TypographyTest.WinForms
         }
         void SetupFontsList2()
         {
+            {
+                InstalledTypefaceCollection typefaceCollection = _options.InstallTypefaceCollection;
+                lstFontNameList.Items.Clear();
+                foreach (string fontName in typefaceCollection.GetFontNameIter())
+                {
+                    lstFontNameList.Items.Add(fontName);
+                }
+            }
+            lstFontNameList.Click += delegate
+            {
+                lstFontStyle.Items.Clear();
+                string fontName = lstFontNameList.SelectedItem as string;
+                //iterate all subFam
+                if (fontName != null)
+                {
+                    foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
+                    {
+                        lstFontStyle.Items.Add(installedTypeface);
+                    }
+                }
+            };
+            //
+            lstFontStyle.Click += delegate
+            {
+                InstalledTypeface installedTypeface = lstFontStyle.SelectedItem as InstalledTypeface;
+                if(installedTypeface != null)
+                {
+                    _options.InstalledTypeface = installedTypeface;
+                    _options.InvokeAttachEvents();
+                }
 
+            };
         }
+
+
         void SetupFontSizeList()
         {
             lstFontSizes.Items.AddRange(

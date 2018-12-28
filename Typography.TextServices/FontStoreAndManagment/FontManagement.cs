@@ -81,16 +81,11 @@ namespace Typography.FontManagement
         InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style);
     }
 
-
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
-
-
-
         class InstalledTypefaceGroup
         {
-
-            internal Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
+            public Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
             public void AddFont(InstalledTypeface installedFont)
             {
                 _members.Add(installedFont.FontName.ToUpper(), installedFont);
@@ -118,12 +113,15 @@ namespace Typography.FontManagement
         /// map from font subfam to internal group name
         /// </summary>
         Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
+        Dictionary<string, bool> _onlyFontNames = new Dictionary<string, bool>();
 
 
         InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
         List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
         FontNameDuplicatedHandler _fontNameDuplicatedHandler;
         FontNotFoundHandler _fontNotFoundHandler;
+
+
 
         public InstalledTypefaceCollection()
         {
@@ -200,7 +198,7 @@ namespace Typography.FontManagement
                     //if (previewFont.fontName.StartsWith("Bungee"))
                     //{ 
                     //}
-
+                    _onlyFontNames[previewFont.fontName] = true;
 
                     TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
                     switch (previewFont.OS2TranslatedStyle)
@@ -466,6 +464,21 @@ namespace Typography.FontManagement
                 }
             }
         }
+
+
+        public IEnumerable<string> GetFontNameIter() => _onlyFontNames.Keys;
+        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter(string fontName)
+        {
+            fontName = fontName.ToUpper();
+            foreach (InstalledTypefaceGroup typefaceGroup in _subFamToFontGroup.Values)
+            {
+                if (typefaceGroup.TryGetValue(fontName, out InstalledTypeface found))
+                {
+                    yield return found;
+                }
+            }
+        }
+
     }
 
 

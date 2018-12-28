@@ -37,8 +37,8 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.lstTypefaceName = new System.Windows.Forms.ListBox();
             this.lstFontStyle = new System.Windows.Forms.ListBox();
+            this.lstFontNameList = new System.Windows.Forms.ListBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -120,7 +120,7 @@
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.lstFontStyle);
-            this.tabPage2.Controls.Add(this.lstTypefaceName);
+            this.tabPage2.Controls.Add(this.lstFontNameList);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -129,21 +129,21 @@
             this.tabPage2.Text = "Fonts under Management";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // lstTypefaceName
-            // 
-            this.lstTypefaceName.FormattingEnabled = true;
-            this.lstTypefaceName.Location = new System.Drawing.Point(3, 6);
-            this.lstTypefaceName.Name = "lstTypefaceName";
-            this.lstTypefaceName.Size = new System.Drawing.Size(109, 251);
-            this.lstTypefaceName.TabIndex = 69;
-            // 
             // lstFontStyle
             // 
             this.lstFontStyle.FormattingEnabled = true;
-            this.lstFontStyle.Location = new System.Drawing.Point(118, 6);
+            this.lstFontStyle.Location = new System.Drawing.Point(178, 6);
             this.lstFontStyle.Name = "lstFontStyle";
-            this.lstFontStyle.Size = new System.Drawing.Size(109, 251);
+            this.lstFontStyle.Size = new System.Drawing.Size(188, 251);
             this.lstFontStyle.TabIndex = 70;
+            // 
+            // lstFontNameList
+            // 
+            this.lstFontNameList.FormattingEnabled = true;
+            this.lstFontNameList.Location = new System.Drawing.Point(3, 6);
+            this.lstFontNameList.Name = "lstFontNameList";
+            this.lstFontNameList.Size = new System.Drawing.Size(169, 251);
+            this.lstFontNameList.TabIndex = 69;
             // 
             // BasicFontOptionsUserControl
             // 
@@ -178,6 +178,6 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.ListBox lstFontStyle;
-        private System.Windows.Forms.ListBox lstTypefaceName;
+        private System.Windows.Forms.ListBox lstFontNameList;
     }
 }
