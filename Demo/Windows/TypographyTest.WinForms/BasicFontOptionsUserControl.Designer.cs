@@ -39,6 +39,7 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.lstFontStyle = new System.Windows.Forms.ListBox();
             this.lstFontNameList = new System.Windows.Forms.ListBox();
+            this._txtTypefaceInfo = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -108,6 +109,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this._txtTypefaceInfo);
             this.tabPage1.Controls.Add(this.lstFontList);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
@@ -145,6 +147,14 @@
             this.lstFontNameList.Size = new System.Drawing.Size(169, 251);
             this.lstFontNameList.TabIndex = 69;
             // 
+            // _txtTypefaceInfo
+            // 
+            this._txtTypefaceInfo.Location = new System.Drawing.Point(185, 7);
+            this._txtTypefaceInfo.Multiline = true;
+            this._txtTypefaceInfo.Name = "_txtTypefaceInfo";
+            this._txtTypefaceInfo.Size = new System.Drawing.Size(181, 250);
+            this._txtTypefaceInfo.TabIndex = 69;
+            // 
             // BasicFontOptionsUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -160,6 +170,7 @@
             this.Load += new System.EventHandler(this.OpenFontOptions_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -179,5 +190,6 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.ListBox lstFontStyle;
         private System.Windows.Forms.ListBox lstFontNameList;
+        private System.Windows.Forms.TextBox _txtTypefaceInfo;
     }
 }

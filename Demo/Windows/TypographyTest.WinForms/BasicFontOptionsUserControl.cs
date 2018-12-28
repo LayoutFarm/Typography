@@ -77,18 +77,8 @@ namespace TypographyTest.WinForms
 
             if (selected_index < 0) { selected_index = 0; }
 
-
-
             lstFontList.SelectedIndex = selected_index;
-            lstFontList.SelectedIndexChanged += (s, e) =>
-            {
-                InstalledTypeface ff = lstFontList.SelectedItem as InstalledTypeface;
-                if (ff != null)
-                {
-                    _options.InstalledTypeface = ff;
-                    _options.InvokeAttachEvents();
-                }
-            };
+            lstFontList.SelectedIndexChanged += (s, e) => ChangeSelectedTypeface(lstFontList.SelectedItem as InstalledTypeface);
         }
         void SetupFontsList2()
         {
@@ -100,11 +90,12 @@ namespace TypographyTest.WinForms
                     lstFontNameList.Items.Add(fontName);
                 }
             }
+            //
             lstFontNameList.Click += delegate
             {
                 lstFontStyle.Items.Clear();
                 string fontName = lstFontNameList.SelectedItem as string;
-                //iterate all subFam
+
                 if (fontName != null)
                 {
                     foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
@@ -114,16 +105,17 @@ namespace TypographyTest.WinForms
                 }
             };
             //
-            lstFontStyle.Click += delegate
-            {
-                InstalledTypeface installedTypeface = lstFontStyle.SelectedItem as InstalledTypeface;
-                if(installedTypeface != null)
-                {
-                    _options.InstalledTypeface = installedTypeface;
-                    _options.InvokeAttachEvents();
-                }
+            lstFontStyle.Click += (s, e) => ChangeSelectedTypeface(lstFontStyle.SelectedItem as InstalledTypeface);
 
-            };
+        }
+        void ChangeSelectedTypeface(InstalledTypeface typeface)
+        {
+            if (typeface == null) return;
+            //
+            _options.InstalledTypeface = typeface;
+            _options.InvokeAttachEvents();
+            _txtTypefaceInfo.Text = "file: " + typeface.FontPath + "\r\n" + "weight:" + typeface.Weight;
+
         }
 
 

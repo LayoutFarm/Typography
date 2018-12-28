@@ -13,19 +13,21 @@ namespace Typography.FontManagement
         internal InstalledTypeface(string fontName,
             string fontSubFamily,
             string fontPath,
-            TypefaceStyle typefaceStyle)
+            TypefaceStyle typefaceStyle,
+            ushort weight)
         {
             FontName = fontName;
             FontSubFamily = fontSubFamily;
             FontPath = fontPath;
             TypefaceStyle = typefaceStyle;
+            Weight = weight;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
         public string FontPath { get; internal set; }
         public TypefaceStyle TypefaceStyle { get; internal set; }
-
+        public ushort Weight { get; internal set; }
         public override string ToString()
         {
             return FontName + " " + FontSubFamily;
@@ -195,9 +197,7 @@ namespace Typography.FontManagement
                         //err!
                         return false;
                     }
-                    //if (previewFont.fontName.StartsWith("Bungee"))
-                    //{ 
-                    //}
+
                     _onlyFontNames[previewFont.fontName] = true;
 
                     TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
@@ -246,7 +246,7 @@ namespace Typography.FontManagement
                         }
                     }
 
-                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName, typefaceStyle));
+                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName, typefaceStyle, previewFont.weight));
                 }
             }
             catch (IOException)
