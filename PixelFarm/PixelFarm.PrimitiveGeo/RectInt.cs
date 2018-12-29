@@ -35,22 +35,14 @@ namespace PixelFarm.CpuBlit
 
 
         // This function assumes the rect is normalized
-        public int Width
-        {
-            get
-            {
-                return Right - Left;
-            }
-        }
+        public int Width => Right - Left;
+
+
 
         // This function assumes the rect is normalized
-        public int Height
-        {
-            get
-            {
-                return Top - Bottom;
-            }
-        }
+        public int Height => Top - Bottom;
+
+
 
         public void Normalize()
         {
@@ -76,15 +68,11 @@ namespace PixelFarm.CpuBlit
             return Left <= Right && Bottom <= Top;
         }
 
-        public bool is_valid()
-        {
-            return Left <= Right && Bottom <= Top;
-        }
+        public bool is_valid() => Left <= Right && Bottom <= Top;
 
-        public bool Contains(int x, int y)
-        {
-            return (x >= Left && x <= Right && y >= Bottom && y <= Top);
-        }
+
+        public bool Contains(int x, int y) => (x >= Left && x <= Right && y >= Bottom && y <= Top);
+
 
         public bool IntersectRectangles(RectInt rectToCopy, RectInt rectToIntersectWith)
         {

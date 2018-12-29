@@ -106,6 +106,7 @@ namespace PixelFarm.Drawing
         public abstract void DrawText(char[] buffer, int x, int y);
         public abstract void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment);
         public abstract void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment);
+        public abstract void MeasureString(char[] buffer, Rectangle logicalTextBox, out int width, out int height);
         //-------------------------------------------------------
         /// <summary>
         /// create formatted string base on current font,font-size, font style

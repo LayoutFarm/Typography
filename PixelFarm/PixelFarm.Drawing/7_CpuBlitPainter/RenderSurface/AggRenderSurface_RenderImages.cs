@@ -577,38 +577,17 @@ namespace PixelFarm.CpuBlit
             public void Reset()
             {
                 _src = null;
-
             }
-            public int BitDepth
-            {
-                get
-                {
-                    return 32; //
-                }
-            }
-            public int Width
-            {
-                get { return _w; }
-            }
-
-            public int Height
-            {
-                get { return _h; }
-            }
-
-            public int Stride
-            {
-                get { return _w << 2; }
-            }
+            public int BitDepth => 32; // 
+            public int Width => _w;
+            public int Height => _h;
+            public int Stride => _w << 2; //stride = w /4 , we use <<2 
             public int BytesBetweenPixelsInclusive
             {
                 get { throw new NotSupportedException(); }
             }
-            public RectInt GetBounds()
-            {
-                return new RectInt(_x, _y, _x + _w, _y + _h);
-            }
 
+            public RectInt GetBounds() => new RectInt(_x, _y, _x + _w, _y + _h); 
             public int GetBufferOffsetXY32(int x, int y)
             {
                 //goto row

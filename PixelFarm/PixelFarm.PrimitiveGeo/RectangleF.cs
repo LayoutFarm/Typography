@@ -33,7 +33,7 @@ namespace PixelFarm.Drawing
 {
     public struct RectangleF
     {
-        float x, y, width, height;
+        float _x, _y, _width, _height;
         /// <summary>
         ///	Empty Shared Field
         /// </summary>
@@ -98,10 +98,10 @@ namespace PixelFarm.Drawing
 
         public void Inflate(SizeF size)
         {
-            x -= size.Width;
-            y -= size.Height;
-            width += size.Width * 2;
-            height += size.Height * 2;
+            _x -= size.Width;
+            _y -= size.Height;
+            _width += size.Width * 2;
+            _height += size.Height * 2;
         }
 
         /// <summary>
@@ -218,10 +218,10 @@ namespace PixelFarm.Drawing
 
         public RectangleF(PointF location, SizeF size)
         {
-            x = location.X;
-            y = location.Y;
-            width = size.Width;
-            height = size.Height;
+            _x = location.X;
+            _y = location.Y;
+            _width = size.Width;
+            _height = size.Height;
         }
 
         /// <summary>
@@ -235,10 +235,10 @@ namespace PixelFarm.Drawing
 
         public RectangleF(float x, float y, float width, float height)
         {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
+            _x = x;
+            _y = y;
+            _width = width;
+            _height = height;
         }
         /// <summary>
         ///	Bottom Property
@@ -249,13 +249,9 @@ namespace PixelFarm.Drawing
         ///	Read only.
         /// </remarks> 
 
-        public float Bottom
-        {
-            get
-            {
-                return Y + Height;
-            }
-        }
+        public float Bottom => Y + Height;
+
+
 
         /// <summary>
         ///	Height Property
@@ -267,14 +263,10 @@ namespace PixelFarm.Drawing
 
         public float Height
         {
-            get
-            {
-                return height;
-            }
-            set
-            {
-                height = value;
-            }
+            get => _height;
+
+            set => _height = value;
+
         }
 
         /// <summary>
@@ -286,13 +278,7 @@ namespace PixelFarm.Drawing
         /// </remarks>
         //		
 
-        public bool IsEmpty
-        {
-            get
-            {
-                return (width <= 0 || height <= 0);
-            }
-        }
+        public bool IsEmpty => (_width <= 0 || _height <= 0);
 
         /// <summary>
         ///	Left Property
@@ -304,13 +290,7 @@ namespace PixelFarm.Drawing
         /// </remarks>
 
 
-        public float Left
-        {
-            get
-            {
-                return X;
-            }
-        }
+        public float Left => X;
 
         /// <summary>
         ///	Location Property
@@ -320,17 +300,14 @@ namespace PixelFarm.Drawing
         ///	The Location of the top-left corner of the RectangleF.
         /// </remarks>
 
-
         public PointF Location
         {
-            get
-            {
-                return new PointF(x, y);
-            }
+            get => new PointF(_x, _y);
+
             set
             {
-                x = value.X;
-                y = value.Y;
+                _x = value.X;
+                _y = value.Y;
             }
         }
 
@@ -342,15 +319,7 @@ namespace PixelFarm.Drawing
         ///	The X coordinate of the right edge of the RectangleF.
         ///	Read only.
         /// </remarks>
-
-
-        public float Right
-        {
-            get
-            {
-                return X + Width;
-            }
-        }
+        public float Right => X + Width;
 
         /// <summary>
         ///	Size Property
@@ -359,18 +328,14 @@ namespace PixelFarm.Drawing
         /// <remarks>
         ///	The Size of the RectangleF.
         /// </remarks>
-
-
         public SizeF Size
         {
-            get
-            {
-                return new SizeF(width, height);
-            }
+            get => new SizeF(_width, _height);
+
             set
             {
-                width = value.Width;
-                height = value.Height;
+                _width = value.Width;
+                _height = value.Height;
             }
         }
 
@@ -382,15 +347,9 @@ namespace PixelFarm.Drawing
         ///	The Y coordinate of the top edge of the RectangleF.
         ///	Read only.
         /// </remarks>
+        public float Top => Y;
 
 
-        public float Top
-        {
-            get
-            {
-                return Y;
-            }
-        }
 
         /// <summary>
         ///	Width Property
@@ -402,14 +361,10 @@ namespace PixelFarm.Drawing
 
         public float Width
         {
-            get
-            {
-                return width;
-            }
-            set
-            {
-                width = value;
-            }
+            get => _width;
+
+            set => _width = value;
+
         }
 
         /// <summary>
@@ -422,14 +377,10 @@ namespace PixelFarm.Drawing
 
         public float X
         {
-            get
-            {
-                return x;
-            }
-            set
-            {
-                x = value;
-            }
+            get => _x;
+
+            set => _x = value;
+
         }
 
         /// <summary>
@@ -442,14 +393,10 @@ namespace PixelFarm.Drawing
 
         public float Y
         {
-            get
-            {
-                return y;
-            }
-            set
-            {
-                y = value;
-            }
+            get => _y;
+
+            set => _y = value;
+
         }
 
         /// <summary>
@@ -514,11 +461,12 @@ namespace PixelFarm.Drawing
         ///
         /// <remarks>
         ///	Calculates a hashing value.
-        /// </remarks>
-
+        /// </remarks> 
         public override int GetHashCode()
         {
-            return (int)(x + y + width + height);
+            //TODO: review here !!!!
+            //return (int)(_x + _y + _width + _height);
+            return (int)(_height + _width) ^ (int)(_x + _y);
         }
 
         /// <summary>
@@ -579,7 +527,7 @@ namespace PixelFarm.Drawing
         public override string ToString()
         {
             return String.Format("{{X={0},Y={1},Width={2},Height={3}}}",
-                         x, y, width, height);
+                         _x, _y, _width, _height);
         }
     }
 }

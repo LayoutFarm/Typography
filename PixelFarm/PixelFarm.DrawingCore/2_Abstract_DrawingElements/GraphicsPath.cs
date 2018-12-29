@@ -19,48 +19,48 @@ namespace PixelFarm.Drawing
     public sealed class GraphicsPath : System.IDisposable
     {
 
-        List<float> points = new List<float>();
-        List<PathCommand> cmds = new List<PathCommand>();
+        List<float> _points = new List<float>();
+        List<PathCommand> _cmds = new List<PathCommand>();
         public GraphicsPath() { }
         public void AddArc(float x, float y,
             float width, float height,
             float startAngle,
             float sweepAngle)
         {
-            cmds.Add(PathCommand.Arc);
-            points.Add(x);
-            points.Add(y);
-            points.Add(width);
-            points.Add(height);
-            points.Add(startAngle);//***
-            points.Add(sweepAngle);//***
+            _cmds.Add(PathCommand.Arc);
+            _points.Add(x);
+            _points.Add(y);
+            _points.Add(width);
+            _points.Add(height);
+            _points.Add(startAngle);//***
+            _points.Add(sweepAngle);//***
 
         }
         public void AddArc(RectangleF rectF, float startAngle, float sweepAngle)
         {
-            cmds.Add(PathCommand.Arc);
-            points.Add(rectF.X);
-            points.Add(rectF.Y);
-            points.Add(rectF.Width);
-            points.Add(rectF.Height);
-            points.Add(startAngle);//***
-            points.Add(sweepAngle);//***
+            _cmds.Add(PathCommand.Arc);
+            _points.Add(rectF.X);
+            _points.Add(rectF.Y);
+            _points.Add(rectF.Width);
+            _points.Add(rectF.Height);
+            _points.Add(startAngle);//***
+            _points.Add(sweepAngle);//***
         }
         public void AddLine(float x1, float y1, float x2, float y2)
         {
-            cmds.Add(PathCommand.Line);
-            points.Add(x1); points.Add(y1);
-            points.Add(x2); points.Add(y2);
+            _cmds.Add(PathCommand.Line);
+            _points.Add(x1); _points.Add(y1);
+            _points.Add(x2); _points.Add(y2);
         }
         public void AddLine(PointF p1, PointF p2)
         {
-            cmds.Add(PathCommand.Line);
-            points.Add(p1.X); points.Add(p1.Y);
-            points.Add(p2.X); points.Add(p2.Y);
+            _cmds.Add(PathCommand.Line);
+            _points.Add(p1.X); _points.Add(p1.Y);
+            _points.Add(p2.X); _points.Add(p2.Y);
         }
         public void CloseFigure()
         {
-            cmds.Add(PathCommand.CloseFigure);
+            _cmds.Add(PathCommand.CloseFigure);
 
             //no points
         }
@@ -69,40 +69,40 @@ namespace PixelFarm.Drawing
         }
         public void StartFigure()
         {
-            cmds.Add(PathCommand.StartFigure);
+            _cmds.Add(PathCommand.StartFigure);
             //no points
         }
         public void AddEllipse(float x, float y, float w, float h)
         {
-            cmds.Add(PathCommand.Ellipse);
-            points.Add(x);
-            points.Add(y);
-            points.Add(w);
-            points.Add(h);
+            _cmds.Add(PathCommand.Ellipse);
+            _points.Add(x);
+            _points.Add(y);
+            _points.Add(w);
+            _points.Add(h);
 
         }
         public void AddRectangle(RectangleF rectF)
         {
-            cmds.Add(PathCommand.Rect);
-            points.Add(rectF.X);
-            points.Add(rectF.Y);
-            points.Add(rectF.Width);
-            points.Add(rectF.Height);
+            _cmds.Add(PathCommand.Rect);
+            _points.Add(rectF.X);
+            _points.Add(rectF.Y);
+            _points.Add(rectF.Width);
+            _points.Add(rectF.Height);
         }
         public object InnerPath { get; set; }
         public void AddBezierCurve(PointF p1, PointF p2, PointF p3, PointF p4)
         {
-            cmds.Add(PathCommand.Bezier);
-            points.Add(p1.X); points.Add(p1.Y);
-            points.Add(p2.X); points.Add(p2.Y);
-            points.Add(p3.X); points.Add(p3.Y);
-            points.Add(p4.X); points.Add(p4.Y);
+            _cmds.Add(PathCommand.Bezier);
+            _points.Add(p1.X); _points.Add(p1.Y);
+            _points.Add(p2.X); _points.Add(p2.Y);
+            _points.Add(p3.X); _points.Add(p3.Y);
+            _points.Add(p4.X); _points.Add(p4.Y);
 
         } 
         public static void GetPathData(GraphicsPath p, out List<float> points, out List<PathCommand> cmds)
         {
-            points = p.points;
-            cmds = p.cmds;
+            points = p._points;
+            cmds = p._cmds;
         }
     }
 
