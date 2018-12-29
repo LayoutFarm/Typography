@@ -61,7 +61,7 @@
             // 
             // cmdBuildMsdfTexture
             // 
-            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1260, 27);
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1266, 445);
             this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
             this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 28);
             this.cmdBuildMsdfTexture.TabIndex = 22;
@@ -80,15 +80,15 @@
             // glyphContourAnalysisOptionsUserControl1
             // 
             this.glyphContourAnalysisOptionsUserControl1.BackColor = System.Drawing.Color.White;
-            this.glyphContourAnalysisOptionsUserControl1.Location = new System.Drawing.Point(772, 164);
+            this.glyphContourAnalysisOptionsUserControl1.Location = new System.Drawing.Point(772, 446);
             this.glyphContourAnalysisOptionsUserControl1.Name = "glyphContourAnalysisOptionsUserControl1";
-            this.glyphContourAnalysisOptionsUserControl1.Size = new System.Drawing.Size(488, 607);
+            this.glyphContourAnalysisOptionsUserControl1.Size = new System.Drawing.Size(488, 302);
             this.glyphContourAnalysisOptionsUserControl1.TabIndex = 69;
             // 
             // glyphRenderOptionsUserControl1
             // 
             this.glyphRenderOptionsUserControl1.BackColor = System.Drawing.Color.White;
-            this.glyphRenderOptionsUserControl1.Location = new System.Drawing.Point(772, 12);
+            this.glyphRenderOptionsUserControl1.Location = new System.Drawing.Point(1126, 12);
             this.glyphRenderOptionsUserControl1.Name = "glyphRenderOptionsUserControl1";
             this.glyphRenderOptionsUserControl1.Size = new System.Drawing.Size(261, 146);
             this.glyphRenderOptionsUserControl1.TabIndex = 68;
@@ -98,7 +98,7 @@
             this.openFontOptions1.BackColor = System.Drawing.Color.White;
             this.openFontOptions1.Location = new System.Drawing.Point(567, 12);
             this.openFontOptions1.Name = "openFontOptions1";
-            this.openFontOptions1.Size = new System.Drawing.Size(199, 428);
+            this.openFontOptions1.Size = new System.Drawing.Size(553, 428);
             this.openFontOptions1.TabIndex = 67;
             // 
             // cmdMeasureString
@@ -122,7 +122,7 @@
             // 
             // cmdTestFontAtlas
             // 
-            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1260, 119);
+            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1266, 537);
             this.cmdTestFontAtlas.Name = "cmdTestFontAtlas";
             this.cmdTestFontAtlas.Size = new System.Drawing.Size(121, 28);
             this.cmdTestFontAtlas.TabIndex = 73;
@@ -132,7 +132,7 @@
             // 
             // txtSampleChars
             // 
-            this.txtSampleChars.Location = new System.Drawing.Point(1260, 93);
+            this.txtSampleChars.Location = new System.Drawing.Point(1266, 511);
             this.txtSampleChars.Name = "txtSampleChars";
             this.txtSampleChars.Size = new System.Drawing.Size(119, 20);
             this.txtSampleChars.TabIndex = 74;
@@ -156,7 +156,6 @@
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Form1";
-           
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -26,17 +26,18 @@ namespace Typography.OpenFont.Tables
         public ushort usWeightClass;    //visual weight (degree of blackness or thickness of strokes), 0-1000
         public ushort usWidthClass;     //A relative change from the normal aspect ratio (width to height ratio)
         public ushort fsType;           //Type flags., embedding licensing rights for the font
-                                        //int16 	ySubscriptXSize 	 
-                                        //int16 	ySubscriptYSize 	 
-                                        //int16 	ySubscriptXOffset 	 
-                                        //int16 	ySubscriptYOffset 	 
-                                        //int16 	ySuperscriptXSize 	 
-                                        //int16 	ySuperscriptYSize 	 
-                                        //int16 	ySuperscriptXOffset 	 
-                                        //int16 	ySuperscriptYOffset 	 
-                                        //int16 	yStrikeoutSize 	 
-                                        //int16 	yStrikeoutPosition 	 
-                                        //int16 	sFamilyClass 	
+
+        //int16 	ySubscriptXSize 	 
+        //int16 	ySubscriptYSize 	 
+        //int16 	ySubscriptXOffset 	 
+        //int16 	ySubscriptYOffset 	 
+        //int16 	ySuperscriptXSize 	 
+        //int16 	ySuperscriptYSize 	 
+        //int16 	ySuperscriptXOffset 	 
+        //int16 	ySuperscriptYOffset 	 
+        //int16 	yStrikeoutSize 	 
+        //int16 	yStrikeoutPosition 	 
+        //int16 	sFamilyClass 	
         public short ySubscriptXSize;
         public short ySubscriptYSize;
         public short ySubscriptXOffset;

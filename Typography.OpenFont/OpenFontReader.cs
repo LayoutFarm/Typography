@@ -22,13 +22,15 @@ namespace Typography.OpenFont
         public readonly string fontName;
         public readonly string fontSubFamily;
         public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
-
+        public readonly ushort weight;
 
         public PreviewFontInfo(string fontName, string fontSubFam,
+            ushort weight,
             Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
         {
             this.fontName = fontName;
             this.fontSubFamily = fontSubFam;
+            this.weight = weight;
             OS2TranslatedStyle = os2TranslatedStyle;
         }
 #if DEBUG
@@ -71,6 +73,7 @@ namespace Typography.OpenFont
                 return new PreviewFontInfo(
                     nameEntry.FontName,
                     nameEntry.FontSubFamily,
+                    os2Table.usWeightClass,
                     Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
                     );
             }

@@ -12,17 +12,19 @@ namespace Typography.TextServices
     {
         internal InstalledFont(string fontName,
             string fontSubFamily,
-            string fontPath)
+            string fontPath,
+            ushort weight)
         {
             FontName = fontName;
             FontSubFamily = fontSubFamily;
             FontPath = fontPath;
+            Weight = weight;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
         public string FontPath { get; internal set; }
-
+        public ushort Weight { get; internal set; }
 #if DEBUG
         public override string ToString()
         {
@@ -243,7 +245,7 @@ namespace Typography.TextServices
                     //err!
                     return false;
                 }
-                return RegisterFont(new InstalledFont(previewFont.fontName, previewFont.fontSubFamily, src.PathName));
+                return RegisterFont(new InstalledFont(previewFont.fontName, previewFont.fontSubFamily, src.PathName, previewFont.weight));
             }
         }
         bool RegisterFont(InstalledFont newfont)
