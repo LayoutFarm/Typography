@@ -92,7 +92,7 @@ namespace PixelFarm.CpuBlit.Imaging
     public class ImageFilterBicubic : IImageFilter
     {
         public double GetRadius() => 2.0;
-        private static double pow3(double x)
+        static double pow3(double x)
         {
             return (x <= 0.0) ? 0.0 : x * x * x;
         }
@@ -269,10 +269,10 @@ namespace PixelFarm.CpuBlit.Imaging
     {
         public ImageFilterBlackMan(double r)
         {
-            m_radius = (r < 2.0 ? 2.0 : r);
+            _radius = (r < 2.0 ? 2.0 : r);
         }
 
-        public double GetRadius() => m_radius;
+        public double GetRadius() => _radius;
 
         public double CalculateWeight(double x)
         {
@@ -281,17 +281,17 @@ namespace PixelFarm.CpuBlit.Imaging
                 return 1.0;
             }
 
-            if (x > m_radius)
+            if (x > _radius)
             {
                 return 0.0;
             }
 
             x *= Math.PI;
-            double xr = x / m_radius;
+            double xr = x / _radius;
             return (Math.Sin(x) / x) * (0.42 + 0.5 * Math.Cos(xr) + 0.08 * Math.Cos(2 * xr));
         }
 
-        private double m_radius;
+        private double _radius;
     }
 }
 

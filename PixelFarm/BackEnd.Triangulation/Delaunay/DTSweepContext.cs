@@ -69,6 +69,9 @@ namespace Poly2Tri
         public DTSweepContext()
         {
         }
+
+        public override TriangulationAlgorithm Algorithm => TriangulationAlgorithm.DTSweep;
+
         //public   bool IsDebugEnabled
         //{
         //    get
@@ -180,10 +183,6 @@ namespace Poly2Tri
             middle.Prev = Front.Head;
             Front.Tail.Prev = middle;
         }
-
-
-
-
 
         /// <summary>
         /// Try to map a node to all sides of this triangle that don't have 
@@ -322,9 +321,6 @@ namespace Poly2Tri
             DTSweepConstraintMaker.BuildConstraint(a, b);
         }
 
-        public override TriangulationAlgorithm Algorithm
-        {
-            get { return TriangulationAlgorithm.DTSweep; }
-        }
+
     }
 }

@@ -70,7 +70,9 @@
     <Compile Include="2_Abstract_DrawingElements\Region.cs" />
     <Compile Include="3_DrawBoard\0_VertexCommandAndOrientation.cs" />
     <Compile Include="3_DrawBoard\1_VertexStore.cs" />
+    <Compile Include="3_DrawBoard\CRC32Calculator.cs" />
     <Compile Include="3_DrawBoard\DrawBoard.cs" />
+    <Compile Include="3_DrawBoard\Others.cs" />
     <Compile Include="3_DrawBoard\Painter.cs" />
     <Compile Include="3_DrawBoard\RenderVx.cs" />
     <Compile Include="3_DrawBoard\RequestFont.cs" />

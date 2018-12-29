@@ -51,7 +51,7 @@ namespace Poly2Tri
             EdgeIndex = index;
         }
 
-        public override TriangulationMode TriangulationMode { get { return TriangulationMode.Constrained; } }
+        public override TriangulationMode TriangulationMode => TriangulationMode.Constrained;
 
         public override void Prepare(TriangulationContext tcx)
         {

@@ -447,9 +447,9 @@ namespace PixelFarm.CpuBlit.Rasterization
                      _cCell_x, _cCell_y,
                      _cCell_cover, _cCell_area));
 #else
-                     m_cells.SetData(m_num_used_cells, CellAA.Create(
-                     cCell_x, cCell_y,
-                     cCell_cover, cCell_area));
+                     _cells.SetData(_num_used_cells, CellAA.Create(
+                     _cCell_x, _cCell_y,
+                     _cCell_cover, _cCell_area));
 #endif
                     _num_used_cells++;
                 }

@@ -48,7 +48,7 @@
 ///   Comments!
 
 
-using System; 
+using System;
 namespace Poly2Tri
 {
     public static class DTSweep
@@ -123,7 +123,9 @@ namespace Poly2Tri
                         for (int m = 0; m < j; ++m)
                         {
                             var e = internalEdgeList[m];
+#if DEBUG
                             tcx.DTDebugContext.ActiveConstraint = e;
+#endif
                             EdgeEvent(tcx, e, node);
                         }
                     }
@@ -215,7 +217,9 @@ namespace Poly2Tri
             AdvancingFrontNode first = b;
             while (c != tcx.Front.Tail)
             {
+#if DEBUG
                 if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = c;
+#endif
                 if (TriangulationUtil.Orient2d(b.Point, c.Point, c.Next.Point) == Orientation.CCW)
                 {
                     // [b,c,d] Concave - fill around c
@@ -264,11 +268,12 @@ namespace Poly2Tri
         {
             AdvancingFrontNode node, newNode;
             node = tcx.LocateNode(point);
+#if DEBUG
             if (tcx.IsDebugEnabled)
             {
                 tcx.DTDebugContext.ActiveNode = node;
             }
-
+#endif
             newNode = NewFrontTriangle(tcx, point, node);
             // Only need to check +epsilon since point never have smaller 
             // x value than node due to how we fetch nodes from the front
@@ -298,7 +303,9 @@ namespace Poly2Tri
             node.Next = newNode;
             //tcx.AddNode(newNode); // XXX: BST
 
+#if DEBUG
             if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = newNode;
+#endif
             if (!Legalize(tcx, triangle)) tcx.MapTriangleToNodes(triangle);
             return newNode;
         }
@@ -309,8 +316,9 @@ namespace Poly2Tri
             {
                 tcx.EdgeEventConstrainedEdge = edge;
                 tcx.EdgeEventRight = edge.P.X > edge.Q.X;
+#if DEBUG
                 if (tcx.IsDebugEnabled) { tcx.DTDebugContext.PrimaryTriangle = node.Triangle; }
-
+#endif
                 if (MarkEdgeSideOfTriangle(node.Triangle, edge.P, edge.Q)) return;
                 // For now we will do all needed filling
                 // TODO: integrate with flip process might give some better performance 
@@ -385,7 +393,9 @@ namespace Poly2Tri
 
         private static void FillRightBelowEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node)
         {
+#if DEBUG
             if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
+#endif
             if (node.Point.X < edge.P.X)
             { // needed?
                 if (TriangulationUtil.Orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW)
@@ -407,8 +417,9 @@ namespace Poly2Tri
         {
             while (node.Next.Point.X < edge.P.X)
             {
+#if DEBUG
                 if (tcx.IsDebugEnabled) { tcx.DTDebugContext.ActiveNode = node; }
-
+#endif
                 Orientation o1 = TriangulationUtil.Orient2d(edge.Q, node.Next.Point, edge.P);
                 if (o1 == Orientation.CCW)
                 {
@@ -420,6 +431,7 @@ namespace Poly2Tri
                 }
             }
         }
+
 
         private static void FillLeftConvexEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node)
         {
@@ -469,7 +481,9 @@ namespace Poly2Tri
 
         private static void FillLeftBelowEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node)
         {
+#if DEBUG
             if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
+#endif
             if (node.Point.X > edge.P.X)
             {
                 if (TriangulationUtil.Orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW)
@@ -491,7 +505,9 @@ namespace Poly2Tri
         {
             while (node.Prev.Point.X > edge.P.X)
             {
+#if DEBUG
                 if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
+#endif
                 // Check if next node is below the edge
                 Orientation o1 = TriangulationUtil.Orient2d(edge.Q, node.Prev.Point, edge.P);
                 if (o1 == Orientation.CW)
@@ -540,7 +556,9 @@ namespace Poly2Tri
         private static void EdgeEvent(DTSweepContext tcx, TriangulationPoint ep, TriangulationPoint eq, DelaunayTriangle triangle, TriangulationPoint point)
         {
             TriangulationPoint p1, p2;
+#if DEBUG
             if (tcx.IsDebugEnabled) tcx.DTDebugContext.PrimaryTriangle = triangle;
+#endif
             if (MarkEdgeSideOfTriangle(triangle, ep, eq)) return;
             p1 = triangle.PointCCWFrom(point);
             Orientation o1 = TriangulationUtil.Orient2d(eq, p1, ep);
@@ -626,13 +644,13 @@ namespace Poly2Tri
                 // With current implementation we should never get here
                 throw new InvalidOperationException("[BUG:FIXME] FLIP failed due to missing triangle");
             }
-
+#if DEBUG
             if (tcx.IsDebugEnabled)
             {
                 tcx.DTDebugContext.PrimaryTriangle = t;
                 tcx.DTDebugContext.SecondaryTriangle = ot;
             } // TODO: remove
-
+#endif
 
 
             int p_indexOnT = t.IndexOf(p);//p is point in t ***
@@ -759,6 +777,7 @@ namespace Poly2Tri
                 throw new Exception("[BUG:FIXME] FLIP failed due to missing triangle");
             }
 
+#if DEBUG
             if (tcx.IsDebugEnabled)
             {
                 Console.WriteLine("[FLIP:SCAN] - scan next point"); // TODO: remove
@@ -766,6 +785,7 @@ namespace Poly2Tri
                 tcx.DTDebugContext.SecondaryTriangle = ot;
             }
 
+#endif
             int index_of_eq = flipTriangle.IndexOf(eq);
             if (TriangulationUtil.InScanArea(eq,
                 flipTriangle.PointCCWFrom(index_of_eq),
