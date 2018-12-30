@@ -60,6 +60,12 @@ namespace PixelFarm.Drawing
         public abstract Color FillColor { get; set; }
         public abstract Color StrokeColor { get; set; }
 
+        public abstract LineJoin LineJoin { get; set; }
+        public abstract LineCap LineCap { get; set; }
+        public abstract IDashGenerator LineDashGen { get; set; }
+        //
+
+
         //
         public abstract Brush CurrentBrush { get; set; }
         public abstract Pen CurrentPen { get; set; }
@@ -131,4 +137,33 @@ namespace PixelFarm.Drawing
         }
     }
 
+    public interface IDashGenerator
+    {
+
+    }
+    public enum LineCap
+    {
+        Butt,
+        Square,
+        Round
+    }
+
+    public enum LineJoin
+    {
+        Miter,
+        MiterRevert,
+        Round,
+        Bevel,
+        MiterRound
+
+        //TODO: implement svg arg join
+    }
+
+    public enum InnerJoin
+    {
+        Bevel,
+        Miter,
+        Jag,
+        Round
+    }
 }

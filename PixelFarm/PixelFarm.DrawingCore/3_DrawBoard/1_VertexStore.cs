@@ -304,11 +304,14 @@ namespace PixelFarm.Drawing
             }
         }
 
+        /// <summary>
+        /// copy data from 'another' append to this vxs,we DO NOT store 'another' vxs inside this
+        /// </summary>
+        /// <param name="another"></param>
         public void AppendVertexStore(VertexStore another)
         {
 
             //append data from another
-
             if (_allocated_vertices_count < _vertices_count + another._vertices_count)
             {
                 //alloc a new one
@@ -323,56 +326,63 @@ namespace PixelFarm.Drawing
 
                 //A.1
                 System.Array.Copy(
-                     _coord_xy,
-                     0,
-                     new_coord_xy,
-                     0,
-                     _vertices_count << 1);
+                     _coord_xy,//src_arr
+                     0, //src_index
+                     new_coord_xy,//dst
+                     0, //dst index
+                     _vertices_count << 1); //len
 
 
                 //A.2
                 System.Array.Copy(
-                    _cmds,
-                    0,
-                    new_cmds,
-                    0,
-                    _vertices_count);
+                    _cmds,//src_arr
+                    0,//src_index
+                    new_cmds,//dst
+                    0, //dst index
+                    _vertices_count);//len
+
 
                 //B.1
                 System.Array.Copy(
-                   another._coord_xy,
-                   _vertices_count << 1,
-                   new_coord_xy,
-                   0,
+                   another._coord_xy,//src
+                   0, //srcIndex
+                   new_coord_xy, //dst
+                   _vertices_count << 1,//dst index
                    another._vertices_count << 1);
+                //**             
 
                 //B.2 
                 System.Array.Copy(
-                        another._cmds,
-                       _vertices_count,
-                        new_cmds,
-                        0,
+                        another._cmds,//src
+                        0,//srcIndex
+                        new_cmds, //dst
+                        _vertices_count, //dst index
                         another._vertices_count);
 
                 _coord_xy = new_coord_xy;
                 _cmds = new_cmds;
+                _vertices_count += another._vertices_count;
             }
             else
             {
                 System.Array.Copy(
-                  another._coord_xy,
-                  _vertices_count << 1,
-                  _coord_xy,
-                  0,
+                  another._coord_xy,//src
+                  0,//src index
+                  _coord_xy,//dst
+                  _vertices_count << 1,//*2 //
                   another._vertices_count << 1);
+
+                
 
                 //B.2 
                 System.Array.Copy(
-                        another._cmds,
-                       _vertices_count,
-                       _cmds,
-                        0,
+                        another._cmds,//src
+                        0,//src index
+                       _cmds,//dst
+                       _vertices_count, //dst index
                       another._vertices_count);
+
+                _vertices_count += another._vertices_count;
             }
         }
         private VertexStore(VertexStore src, bool trim)
