@@ -6,7 +6,7 @@ namespace PixelFarm.Drawing
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
-        
+
     }
     public interface ILineSegment
     {
@@ -90,6 +90,8 @@ namespace PixelFarm.Drawing
         //-------------
         void ChangeFillColor(Color fillColor);
         void ChangeStrokeColor(Color strokColor);
+        //-------------
+        void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
     }
 
     public static class ITextPrinterExtensions

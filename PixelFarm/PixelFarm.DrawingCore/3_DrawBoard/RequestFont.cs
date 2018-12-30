@@ -49,17 +49,23 @@ namespace PixelFarm.Drawing
     {
         //each platform/canvas has its own representation of this Font 
         //this is just a request for specficic font presentation at a time
-        //-----
-
+        //----- 
 
         public RequestFont(string facename, float fontSizeInPts, FontStyle style = FontStyle.Regular)
+            : this(facename, Len.Pt(fontSizeInPts), style)
+        {
+        }
+        public RequestFont(string facename, Len fontSize, FontStyle style = FontStyle.Regular)
         {
             //Lang = "en";//default
             Name = facename;
-            SizeInPoints = fontSizeInPts;
+            Size = fontSize; //store user font size here
+            //SizeInPoints = fontSizeInPts;
             Style = style;
+            float fontSizeInPts = SizeInPoints = fontSize.ToPoints();
             FontKey = CalculateFontKey(facename, fontSizeInPts, style);
         }
+        public Len Size { get; private set; }
         //
         public int FontKey { get; private set; }
         /// <summary>
@@ -73,7 +79,6 @@ namespace PixelFarm.Drawing
         /// </summary>
         public float SizeInPoints { get; private set; }
 
-        //
         public static int CalculateFontKey(string facename, float fontSizeInPts, FontStyle style)
         {
             return (new InternalFontKey(facename, fontSizeInPts, style)).GetHashCode();
@@ -94,7 +99,8 @@ namespace PixelFarm.Drawing
                 this.FontStyle = fs;
             }
 
-            static Dictionary<string, int> registerFontNames = new Dictionary<string, int>();
+            static Dictionary<string, int> s_registerFontNames = new Dictionary<string, int>();
+
             static InternalFontKey()
             {
                 RegisterFontName(""); //blank font name
@@ -102,12 +108,11 @@ namespace PixelFarm.Drawing
             static int RegisterFontName(string fontName)
             {
                 fontName = fontName.ToUpper();
-                int found;
-                if (!registerFontNames.TryGetValue(fontName, out found))
+                if (!s_registerFontNames.TryGetValue(fontName, out int found))
                 {
-                    int nameIndex = registerFontNames.Count;
-                    registerFontNames.Add(fontName, nameIndex);
-                    return nameIndex;
+                    int nameCrc32 = CRC32Calculator.CalculateCrc32(fontName);
+                    s_registerFontNames.Add(fontName, nameCrc32);
+                    return nameCrc32;
                 }
                 return found;
             }
@@ -129,16 +134,6 @@ namespace PixelFarm.Drawing
             }
         }
 
-        static int s_POINTS_PER_INCH = 72; //default value
-        static int s_PIXELS_PER_INCH = 96; //default value         
-
-        public static float ConvEmSizeInPointsToPixels(float emsizeInPoint)
-        {
-            //TODO: review here again, should be platform-specific funcs? 
-            return (int)(((float)emsizeInPoint / (float)s_POINTS_PER_INCH) * (float)s_PIXELS_PER_INCH);
-        }
-
-
         //------------------ 
         //caching ...
         //store latest platform's actual font  as WeakReference
@@ -150,7 +145,7 @@ namespace PixelFarm.Drawing
 
         //------------------ 
 
-        //commonly used metricx
+
         //TODO: review here again
         internal float _sizeInPx;
         internal float _descentInPx;

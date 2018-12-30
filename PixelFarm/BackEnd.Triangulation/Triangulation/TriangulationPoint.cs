@@ -41,7 +41,7 @@ namespace Poly2Tri
         public object userData;
 
         //TODO: review myEdges...
-        List<DTSweepConstraint> myEdges = new List<DTSweepConstraint>(3);
+        List<DTSweepConstraint> _myEdges = new List<DTSweepConstraint>(3);
 #if DEBUG
         static int dbugTotalId;
         public readonly int dbugId = dbugTotalId++;
@@ -50,30 +50,22 @@ namespace Poly2Tri
         {
             X = x;
             Y = y;
+        }
 
-        }
-        public override string ToString()
-        {
-            return "[" + X + "," + Y + "]";
-        }
-        public float Xf
-        {
-            get { return (float)X; }
-        }
-        public float Yf
-        {
-            get { return (float)Y; }
-        }
+        public override string ToString() => "[" + X + "," + Y + "]";
+
+        public float Xf => (float)X;
+
+        public float Yf => (float)Y;
 
         public void AddEdge(DTSweepConstraint e)
         {
             //TODO: review myEdges, ***
-            myEdges.Add(e);
+            _myEdges.Add(e);
         }
-        internal List<DTSweepConstraint> GetInternalEdgeList()
-        {
-            return this.myEdges;
-        }
+
+        internal List<DTSweepConstraint> GetInternalEdgeList() => _myEdges;
+
 #if DEBUG
         public static bool dbugIsEqualPointCoord(TriangulationPoint a, TriangulationPoint b)
         {

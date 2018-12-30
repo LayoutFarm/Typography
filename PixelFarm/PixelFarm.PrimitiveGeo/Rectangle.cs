@@ -36,7 +36,7 @@ namespace PixelFarm.Drawing
 {
     public struct Rectangle
     {
-        int x, y, width, height;
+        int _x, _y, _width, _height;
         /// <summary>
         ///	Empty Shared Field
         /// </summary>
@@ -125,8 +125,8 @@ namespace PixelFarm.Drawing
 
         public void Inflate(Size size)
         {
-            x -= size.Width;
-            y -= size.Height;
+            _x -= size.Width;
+            _y -= size.Height;
             Width += size.Width * 2;
             Height += size.Height * 2;
         }
@@ -279,10 +279,10 @@ namespace PixelFarm.Drawing
 
         public Rectangle(Point location, Size size)
         {
-            x = location.X;
-            y = location.Y;
-            width = size.Width;
-            height = size.Height;
+            _x = location.X;
+            _y = location.Y;
+            _width = size.Width;
+            _height = size.Height;
         }
 
         /// <summary>
@@ -296,10 +296,10 @@ namespace PixelFarm.Drawing
 
         public Rectangle(int x, int y, int width, int height)
         {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
+            _x = x;
+            _y = y;
+            _width = width;
+            _height = height;
         }
 
 
@@ -314,13 +314,7 @@ namespace PixelFarm.Drawing
         /// </remarks>
 
 
-        public int Bottom
-        {
-            get
-            {
-                return y + height;
-            }
-        }
+        public int Bottom => _y + _height;
 
         /// <summary>
         ///	Height Property
@@ -329,17 +323,12 @@ namespace PixelFarm.Drawing
         /// <remarks>
         ///	The Height of the Rectangle.
         /// </remarks>
-
         public int Height
         {
-            get
-            {
-                return height;
-            }
-            set
-            {
-                height = value;
-            }
+            get => _height;
+
+            set => _height = value;
+
         }
 
         /// <summary>
@@ -350,13 +339,7 @@ namespace PixelFarm.Drawing
         ///	Indicates if the width or height are zero. Read only.
         /// </remarks>		
 
-        public bool IsEmpty
-        {
-            get
-            {
-                return ((x == 0) && (y == 0) && (width == 0) && (height == 0));
-            }
-        }
+        public bool IsEmpty => ((_x == 0) && (_y == 0) && (_width == 0) && (_height == 0));
 
         /// <summary>
         ///	Left Property
@@ -367,13 +350,7 @@ namespace PixelFarm.Drawing
         ///	Read only.
         /// </remarks>
 
-        public int Left
-        {
-            get
-            {
-                return X;
-            }
-        }
+        public int Left => X;
 
         /// <summary>
         ///	Location Property
@@ -381,19 +358,15 @@ namespace PixelFarm.Drawing
         ///
         /// <remarks>
         ///	The Location of the top-left corner of the Rectangle.
-        /// </remarks>
-
-
+        /// </remarks> 
         public Point Location
         {
-            get
-            {
-                return new Point(x, y);
-            }
+            get => new Point(_x, _y);
+
             set
             {
-                x = value.X;
-                y = value.Y;
+                _x = value.X;
+                _y = value.Y;
             }
         }
 
@@ -404,16 +377,10 @@ namespace PixelFarm.Drawing
         /// <remarks>
         ///	The X coordinate of the right edge of the Rectangle.
         ///	Read only.
-        /// </remarks>
+        /// </remarks> 
+        public int Right => X + Width;
 
 
-        public int Right
-        {
-            get
-            {
-                return X + Width;
-            }
-        }
 
         /// <summary>
         ///	Size Property
@@ -421,15 +388,11 @@ namespace PixelFarm.Drawing
         ///
         /// <remarks>
         ///	The Size of the Rectangle.
-        /// </remarks>
-
-
+        /// </remarks> 
         public Size Size
         {
-            get
-            {
-                return new Size(Width, Height);
-            }
+            get => new Size(Width, Height);
+
             set
             {
                 Width = value.Width;
@@ -445,15 +408,7 @@ namespace PixelFarm.Drawing
         ///	The Y coordinate of the top edge of the Rectangle.
         ///	Read only.
         /// </remarks>
-
-
-        public int Top
-        {
-            get
-            {
-                return y;
-            }
-        }
+        public int Top => _y;
 
         /// <summary>
         ///	Width Property
@@ -465,14 +420,8 @@ namespace PixelFarm.Drawing
 
         public int Width
         {
-            get
-            {
-                return width;
-            }
-            set
-            {
-                width = value;
-            }
+            get => _width;
+            set => _width = value;
         }
 
         /// <summary>
@@ -485,14 +434,8 @@ namespace PixelFarm.Drawing
 
         public int X
         {
-            get
-            {
-                return x;
-            }
-            set
-            {
-                x = value;
-            }
+            get => _x;
+            set => _x = value;
         }
 
         /// <summary>
@@ -505,14 +448,10 @@ namespace PixelFarm.Drawing
 
         public int Y
         {
-            get
-            {
-                return y;
-            }
-            set
-            {
-                y = value;
-            }
+            get => _y;
+
+            set => _y = value;
+
         }
 
         /// <summary>
@@ -526,7 +465,7 @@ namespace PixelFarm.Drawing
         public bool Contains(int x, int y)
         {
             return ((x >= Left) && (x < Right) &&
-                (y >= Top) && (y < Bottom));
+                    (y >= Top) && (y < Bottom));
         }
 
         /// <summary>
@@ -537,10 +476,7 @@ namespace PixelFarm.Drawing
         ///	Checks if a Point lies within this Rectangle.
         /// </remarks>
 
-        public bool Contains(Point pt)
-        {
-            return Contains(pt.X, pt.Y);
-        }
+        public bool Contains(Point pt) => Contains(pt.X, pt.Y);
 
         /// <summary>
         ///	Contains Method
@@ -551,10 +487,8 @@ namespace PixelFarm.Drawing
         ///	Rectangle.
         /// </remarks>
 
-        public bool Contains(Rectangle rect)
-        {
-            return (rect == Intersect(this, rect));
-        }
+        public bool Contains(Rectangle rect) => (rect == Intersect(this, rect));
+
 
         /// <summary>
         ///	Equals Method
@@ -580,8 +514,8 @@ namespace PixelFarm.Drawing
         /// </remarks>
 
         public override int GetHashCode()
-        {
-            return (height + width) ^ x + y;
+        {   
+            return (_height + _width) ^ _x + _y;
         }
 
         /// <summary>
@@ -624,8 +558,8 @@ namespace PixelFarm.Drawing
 
         public void Offset(int x, int y)
         {
-            this.x += x;
-            this.y += y;
+            _x += x;
+            _y += y;
         }
 
         /// <summary>
@@ -638,16 +572,16 @@ namespace PixelFarm.Drawing
 
         public void Offset(Point pos)
         {
-            x += pos.X;
-            y += pos.Y;
+            _x += pos.X;
+            _y += pos.Y;
         }
         public void OffsetX(int dx)
         {
-            x += dx;
+            _x += dx;
         }
         public void OffsetY(int dy)
         {
-            y += dy;
+            _y += dy;
         }
         /// <summary>
         ///	ToString Method
@@ -660,7 +594,7 @@ namespace PixelFarm.Drawing
         public override string ToString()
         {
             return String.Format("{{X={0},Y={1},Width={2},Height={3}}}",
-                         x, y, width, height);
+                         _x, _y, _width, _height);
         }
     }
 }

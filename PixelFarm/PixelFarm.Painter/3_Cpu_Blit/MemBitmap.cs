@@ -331,19 +331,20 @@ namespace PixelFarm.CpuBlit
             }
             return memBmp;
         }
-        //public override void RequestInternalBuffer(ref ImgBufferRequestArgs buffRequest)
-        //{
-        //    //TODO: review here 2018-08-26
-        //    if (_pixelFormat != CpuBlit.Imaging.PixelFormat.ARGB32)
-        //    {
-        //        throw new NotSupportedException();
-        //    }
 
+        public static MemBitmap CreateFromCopy(MemBitmap another)
+        {
 
-        //    int[] newBuff = new int[_pixelBufferInBytes / 4];
-        //    System.Runtime.InteropServices.Marshal.Copy(_pixelBuffer, newBuff, 0, newBuff.Length);
-        //    buffRequest.OutputBuffer32 = newBuff;
-        //}
+            var memBmp = new MemBitmap(another.Width, another.Height);
+#if DEBUG
+            memBmp._dbugNote = "MemBitmap.CreateFromCopy";
+#endif
+            unsafe
+            {
+                MemMx.memcpy((byte*)memBmp._pixelBuffer, (byte*)another._pixelBuffer, another._pixelBufferInBytes);
+            }
+            return memBmp;
+        }
 
 
         public static int CalculateStride(int width, CpuBlit.Imaging.PixelFormat format)
@@ -525,6 +526,15 @@ namespace PixelFarm.CpuBlit
             }
 
             return buff2;
+        }
+
+        /// <summary>
+        /// swap from gles ARGB to ABGR (Gdi)
+        /// </summary>
+        /// <param name="src"></param>
+        public static void SwapArgbToAbgr(MemBitmap src)
+        {
+
         }
     }
 

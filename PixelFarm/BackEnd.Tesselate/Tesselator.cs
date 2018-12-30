@@ -39,11 +39,23 @@
 // Copyright (C) 2007
 **
 */
-//MIT,2014- present, WinterDev
+
+//MIT, 2014-present, WinterDev
 
 using System;
 namespace Tesselate
 {
+    public struct TessVertex2d
+    {
+        public double x;
+        public double y;
+        public TessVertex2d(double x, double y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
     public class Tesselator
     {
         // The begin/end calls must be properly nested.  We keep track of
@@ -56,12 +68,6 @@ namespace Tesselate
         // try a quick-and-dirty decomposition first.
         const int MAX_CACHE_SIZE = 100;
         internal const double MAX_COORD = 1.0e150;
-
-        struct Vertex
-        {
-            public double x;
-            public double y;
-        }
 
 
         public struct CombineParameters
@@ -89,45 +95,73 @@ namespace Tesselate
             ABS_GEQ_Two,
         }
 
+        public interface ITessListener
+        {
+
+            /*** state needed for rendering callbacks (see render.c) ***/
+
+            void Combine(double c1, double c2, double c3, ref CombineParameters combinePars, out int outData);
+            void Begin(TriangleListType type);
+            void Vertext(int data);
+            void End();
+
+            //
+            void EdgeFlag(bool boundaryEdge);
+            bool NeedEdgeFlag { get; }
+            //
+            void Mesh(Mesh mesh);
+            bool NeedMash { get; }
+        }
+
+
 
         WindingRuleType _windingRule; // rule for determining polygon interior
         ProcessingState _processingState;		/* what begin/end calls have we seen? */
         HalfEdge _lastHalfEdge;	/* lastEdge.Org is the most recent vertex */
 
         //
-        public Mesh mesh;       /* stores the input contours, and eventually the tessellation itself */
-        public Dictionary edgeDictionary;       /* edge dictionary for sweep line */
-        internal MaxFirstList<ContourVertex> vertexPriorityQue = new MaxFirstList<ContourVertex>();
-        public ContourVertex currentSweepVertex;        /* current sweep event being processed */
+        internal Mesh _mesh;       /* stores the input contours, and eventually the tessellation itself */
+        internal Dictionary _edgeDictionary;       /* edge dictionary for sweep line */
+        internal MaxFirstList<ContourVertex> _vertexPriorityQue = new MaxFirstList<ContourVertex>();
+        internal ContourVertex currentSweepVertex;        /* current sweep event being processed */
 
-        public delegate void CallCombineDelegate(
-            double c1, double c2, double c3, ref CombineParameters combinePars, out int outData);
 
-        public CallCombineDelegate callCombine;
 
+        //----------------
+        ITessListener _tessListener;
+        bool _doEdgeCallback;
+        bool _doMeshCallback;
 
         /*** state needed for rendering callbacks (see render.c) ***/
-
         bool _boundaryOnly; /* Extract contours, not triangles */
         Face _lonelyTriList;
         /* list of triangles which could not be rendered as strips or fans */
 
-        public delegate void CallBeginDelegate(TriangleListType type);
-        public CallBeginDelegate callBegin;
-        public delegate void CallEdgeFlagDelegate(bool boundaryEdge);
-        public CallEdgeFlagDelegate callEdgeFlag;
-        public delegate void CallVertexDelegate(int data);
-        public CallVertexDelegate callVertex;
-        public delegate void CallEndDelegate();
-        public CallEndDelegate callEnd;
-        public delegate void CallMeshDelegate(Mesh mesh);
-        public CallMeshDelegate callMesh;
+        //public delegate void CallBeginDelegate(TriangleListType type);
+        //public CallBeginDelegate callBegin;
+        //public delegate void CallEdgeFlagDelegate(bool boundaryEdge);
+        //public CallEdgeFlagDelegate callEdgeFlag;
+        //public delegate void CallVertexDelegate(int data);
+        //public CallVertexDelegate callVertex;
+        //public delegate void CallEndDelegate();
+        //public CallEndDelegate callEnd;
+        //public delegate void CallMeshDelegate(Mesh mesh);
+        //public CallMeshDelegate callMesh;
+
+        ////----------------
+        //public delegate void CallCombineDelegate(
+        //   double c1, double c2, double c3, ref CombineParameters combinePars, out int outData);
+        //public CallCombineDelegate callCombine; 
+        //----------------
+
+
+
         //
         /*** state needed to cache single-contour polygons for renderCache() */
 
         bool _emptyCache;       /* empty cache on next vertex() call */
         int _cacheCount;      /* number of cached vertices */
-        Vertex[] _simpleVertexCache = new Vertex[MAX_CACHE_SIZE];	/* the vertex data */
+        TessVertex2d[] _simpleVertexCache = new TessVertex2d[MAX_CACHE_SIZE];	/* the vertex data */
         int[] _indexCached = new int[MAX_CACHE_SIZE];
         //
         public Tesselator()
@@ -136,7 +170,7 @@ namespace Tesselate
             * are initialized where they are used.
             */
             _processingState = ProcessingState.Dormant;
-            _windingRule = Tesselator.WindingRuleType.Odd;//default
+            _windingRule = Tesselator.WindingRuleType.NonZero;//default
             _boundaryOnly = false;
         }
 
@@ -146,7 +180,14 @@ namespace Tesselate
             RequireState(ProcessingState.Dormant);
         }
 
-        public bool EdgeCallBackSet => callEdgeFlag != null;
+        public void SetListener(ITessListener listener)
+        {
+            _tessListener = listener;
+            _doEdgeCallback = listener.NeedEdgeFlag;
+            _doMeshCallback = listener.NeedMash;
+        }
+
+        bool EdgeCallBackSet => _doEdgeCallback;
 
         public WindingRuleType WindingRule
         {
@@ -175,26 +216,27 @@ namespace Tesselate
                 case Tesselator.WindingRuleType.ABS_GEQ_Two:
                     return (numCrossings >= 2) || (numCrossings <= -2);
             }
-
             throw new Exception();
         }
 
         void CallBegin(TriangleListType triangleType)
         {
-            callBegin?.Invoke(triangleType);
+            _tessListener.Begin(triangleType);
+            //callBegin?.Invoke(triangleType);
         }
         void CallVertex(int vertexData)
         {
-            callVertex?.Invoke(vertexData);
+            _tessListener.Vertext(vertexData);
+            //callVertex?.Invoke(vertexData);
         }
         void CallEdgeFlag(bool edgeState)
         {
-            callEdgeFlag?.Invoke(edgeState);
+            _tessListener.EdgeFlag(edgeState);
+            //callEdgeFlag?.Invoke(edgeState);
         }
-
         void CallEnd()
         {
-            callEnd?.Invoke();
+            _tessListener.End();
         }
 
         internal void CallCombine(double v0,
@@ -203,7 +245,7 @@ namespace Tesselate
            out int outData)
         {
             outData = 0;
-            callCombine?.Invoke(v0, v1, v2, ref combinePars, out outData);
+            _tessListener.Combine(v0, v1, v2, ref combinePars, out outData);
         }
 
         void GotoState(ProcessingState newProcessingState)
@@ -254,7 +296,7 @@ namespace Tesselate
             _processingState = ProcessingState.InPolygon;
             _cacheCount = 0;
             _emptyCache = false;
-            mesh = null;
+            _mesh = null;
         }
 
         public void BeginContour()
@@ -269,15 +311,15 @@ namespace Tesselate
             }
         }
 
-        bool AddVertex(double x, double y, int data)
+        bool InnerAddVertex(double x, double y, int data)
         {
             HalfEdge e;
             e = _lastHalfEdge;
             if (e == null)
             {
                 /* Make a self-loop (one vertex, one edge). */
-                e = this.mesh.MakeEdge();
-                Mesh.meshSplice(e, e.otherHalfOfThisEdge);
+                e = _mesh.MakeEdge();
+                Mesh.meshSplice(e, e._otherHalfOfThisEdge);
             }
             else
             {
@@ -288,34 +330,34 @@ namespace Tesselate
                 {
                     return false;
                 }
-                e = e.nextEdgeCCWAroundLeftFace;
+                e = e._nextEdgeCCWAroundLeftFace;
             }
 
             /* The new vertex is now e.Org. */
-            e.originVertex.clientIndex = data;
-            e.originVertex.C_0 = x;
-            e.originVertex.C_1 = y;
+            e._originVertex._clientIndex = data;
+            e._originVertex._C_0 = x;
+            e._originVertex._C_1 = y;
             /* The winding of an edge says how the winding number changes as we
             * cross from the edge''s right face to its left face.  We add the
             * vertices in such an order that a CCW contour will add +1 to
             * the winding number of the region inside the contour.
             */
-            e.winding = 1;
-            e.otherHalfOfThisEdge.winding = -1;
+            e._winding = 1;
+            e._otherHalfOfThisEdge._winding = -1;
             _lastHalfEdge = e;
             return true;
         }
 
         void EmptyCache()
         {
-            Vertex[] vCaches = _simpleVertexCache;
+            TessVertex2d[] vCaches = _simpleVertexCache;
             int[] index_caches = _indexCached;
-            this.mesh = new Mesh();
+            _mesh = new Mesh();
             int count = _cacheCount;
             for (int i = 0; i < count; i++)
             {
-                Vertex v = vCaches[i];
-                this.AddVertex(v.x, v.y, index_caches[i]);
+                TessVertex2d v = vCaches[i];
+                this.InnerAddVertex(v.x, v.y, index_caches[i]);
             }
             _cacheCount = 0;
             _emptyCache = false;
@@ -323,7 +365,7 @@ namespace Tesselate
 
         void CacheVertex(double x, double y, double z, int data)
         {
-            Vertex v = new Vertex();
+            TessVertex2d v = new TessVertex2d();
             v.x = x;
             v.y = y;
             _simpleVertexCache[_cacheCount] = v;
@@ -332,58 +374,33 @@ namespace Tesselate
         }
         void CacheVertex(double x, double y, int data)
         {
-            Vertex v = new Vertex();
+            TessVertex2d v = new TessVertex2d();
             v.x = x;
             v.y = y;
             _simpleVertexCache[_cacheCount] = v;
             _indexCached[_cacheCount] = data;
             ++_cacheCount;
         }
-        public void AddVertex(double x, double y, double z, int data)
-        {
 
+        public void AddVertex(double x, double y, int data)
+        {
             RequireState(ProcessingState.InContour);
+
             if (_emptyCache)
             {
                 EmptyCache();
                 _lastHalfEdge = null;
             }
-            //=============================
-            //expand to 3 times
-            double tmp = x;
-            if (tmp < -MAX_COORD)
+
+            //....
+            if (x < -MAX_COORD || x > MAX_COORD ||
+                y < -MAX_COORD || y > MAX_COORD)
             {
                 throw new Exception("Your coordinate exceeded -" + MAX_COORD.ToString() + ".");
             }
-            if (tmp > MAX_COORD)
-            {
-                throw new Exception("Your coordinate exceeded " + MAX_COORD.ToString() + ".");
-            }
-
-            //=============================
-            tmp = y;
-            if (tmp < -MAX_COORD)
-            {
-                throw new Exception("Your coordinate exceeded -" + MAX_COORD.ToString() + ".");
-            }
-            if (tmp > MAX_COORD)
-            {
-                throw new Exception("Your coordinate exceeded " + MAX_COORD.ToString() + ".");
-            }
-            //=============================
-            tmp = z;
-            if (tmp < -MAX_COORD)
-            {
-                throw new Exception("Your coordinate exceeded -" + MAX_COORD.ToString() + ".");
-            }
-            if (tmp > MAX_COORD)
-            {
-                throw new Exception("Your coordinate exceeded " + MAX_COORD.ToString() + ".");
-            }
-            //=============================
-
-
-            if (mesh == null)
+            //....
+            //
+            if (_mesh == null)
             {
                 if (_cacheCount < MAX_CACHE_SIZE)
                 {
@@ -392,7 +409,39 @@ namespace Tesselate
                 }
                 EmptyCache();
             }
-            AddVertex(x, y, data);
+
+            InnerAddVertex(x, y, data);
+        }
+        public void AddVertex(double x, double y, double z, int data)
+        {
+            RequireState(ProcessingState.InContour);
+
+            if (_emptyCache)
+            {
+                EmptyCache();
+                _lastHalfEdge = null;
+            }
+
+            //....
+            if (x < -MAX_COORD || x > MAX_COORD ||
+                y < -MAX_COORD || y > MAX_COORD ||
+                z < -MAX_COORD || z > MAX_COORD)
+            {
+                throw new Exception("Your coordinate exceeded -" + MAX_COORD.ToString() + ".");
+            }
+            //....
+            //
+            if (_mesh == null)
+            {
+                if (_cacheCount < MAX_CACHE_SIZE)
+                {
+                    CacheVertex(x, y, data);
+                    return;
+                }
+                EmptyCache();
+            }
+
+            InnerAddVertex(x, y, data);
         }
 
         public void EndContour()
@@ -404,32 +453,32 @@ namespace Tesselate
         void CheckOrientation()
         {
             double area = 0;
-            Face curFace, faceHead = this.mesh.faceHead;
-            ContourVertex vHead = this.mesh.vertexHead;
+            Face curFace, faceHead = _mesh._faceHead;
+            ContourVertex vHead = _mesh._vertexHead;
             HalfEdge curHalfEdge;
             /* When we compute the normal automatically, we choose the orientation
              * so that the sum of the signed areas of all contours is non-negative.
              */
-            for (curFace = faceHead.nextFace; curFace != faceHead; curFace = curFace.nextFace)
+            for (curFace = faceHead._nextFace; curFace != faceHead; curFace = curFace._nextFace)
             {
-                curHalfEdge = curFace.halfEdgeThisIsLeftFaceOf;
-                if (curHalfEdge.winding <= 0)
+                curHalfEdge = curFace._halfEdgeThisIsLeftFaceOf;
+                if (curHalfEdge._winding <= 0)
                 {
                     continue;
                 }
 
                 do
                 {
-                    area += (curHalfEdge.originVertex.x - curHalfEdge.directionVertex.x)
-                        * (curHalfEdge.originVertex.y + curHalfEdge.directionVertex.y);
-                    curHalfEdge = curHalfEdge.nextEdgeCCWAroundLeftFace;
-                } while (curHalfEdge != curFace.halfEdgeThisIsLeftFaceOf);
+                    area += (curHalfEdge._originVertex.x - curHalfEdge.DirectionVertex.x)
+                        * (curHalfEdge._originVertex.y + curHalfEdge.DirectionVertex.y);
+                    curHalfEdge = curHalfEdge._nextEdgeCCWAroundLeftFace;
+                } while (curHalfEdge != curFace._halfEdgeThisIsLeftFaceOf);
             }
 
             if (area < 0)
             {
                 /* Reverse the orientation by flipping all the t-coordinates */
-                for (ContourVertex curVertex = vHead.nextVertex; curVertex != vHead; curVertex = curVertex.nextVertex)
+                for (ContourVertex curVertex = vHead._nextVertex; curVertex != vHead; curVertex = curVertex._nextVertex)
                 {
                     curVertex.y = -curVertex.y;
                 }
@@ -438,12 +487,12 @@ namespace Tesselate
 
         void ProjectPolygon()
         {
-            ContourVertex v, vHead = this.mesh.vertexHead;
+            ContourVertex v, vHead = _mesh._vertexHead;
             // Project the vertices onto the sweep plane
-            for (v = vHead.nextVertex; v != vHead; v = v.nextVertex)
+            for (v = vHead._nextVertex; v != vHead; v = v._nextVertex)
             {
-                v.x = v.C_0;
-                v.y = -v.C_1;
+                v.x = v._C_0;
+                v.y = -v._C_1;
             }
 
             CheckOrientation();
@@ -453,9 +502,9 @@ namespace Tesselate
         {
             RequireState(ProcessingState.InPolygon);
             _processingState = ProcessingState.Dormant;
-            if (this.mesh == null)
+            if (_mesh == null)
             {
-                if (!this.EdgeCallBackSet && this.callMesh == null)
+                if (!this.EdgeCallBackSet && !_doMeshCallback)
                 {
                     /* Try some special code to make the easy cases go quickly
                     * (eg. convex polygons).  This code does NOT handle multiple contours,
@@ -489,27 +538,29 @@ namespace Tesselate
             */
             if (_boundaryOnly)
             {
-                rc = this.mesh.SetWindingNumber(1, true);
+                rc = _mesh.SetWindingNumber(1, true);
             }
             else
             {
-                rc = this.mesh.TessellateInterior();
+                rc = _mesh.TessellateInterior();
             }
 
-            this.mesh.CheckMesh();
-            if (this.callBegin != null || this.callEnd != null
-                || this.callVertex != null || this.callEdgeFlag != null)
+            _mesh.CheckMesh();
+
+            //if (this.callBegin != null || this.callEnd != null
+            //    || this.callVertex != null || this.callEdgeFlag != null)
+            //{
+            if (_boundaryOnly)
             {
-                if (_boundaryOnly)
-                {
-                    RenderBoundary(mesh);  /* output boundary contours */
-                }
-                else
-                {
-                    RenderMesh(mesh);	   /* output strips and fans */
-                }
+                RenderBoundary(_mesh);  /* output boundary contours */
             }
-            if (this.callMesh != null)
+            else
+            {
+                RenderMesh(_mesh);      /* output strips and fans */
+            }
+            //}
+
+            if (_doMeshCallback)
             {
                 /* Throw away the exterior faces, so that all faces are interior.
                 * This way the user doesn't have to check the "inside" flag,
@@ -517,12 +568,13 @@ namespace Tesselate
                 * the freedom for an implementation to not generate the exterior
                 * faces in the first place.
                 */
-                mesh.DiscardExterior();
-                callMesh(mesh); /* user wants the mesh itself */
-                this.mesh = null;
+                _mesh.DiscardExterior();
+                _tessListener.Mesh(_mesh);/* user wants the mesh itself */
+                //callMesh(mesh); /* user wants the mesh itself */
+                _mesh = null;
                 return;
             }
-            this.mesh = null;
+            _mesh = null;
         }
 
         class FaceCount
@@ -555,25 +607,25 @@ namespace Tesselate
         *
         * The rendering output is provided as callbacks (see the api).
         */
-        public void RenderMesh(Mesh mesh)
+        void RenderMesh(Mesh mesh)
         {
             Face f;
             /* Make a list of separate triangles so we can render them all at once */
             _lonelyTriList = null;
-            for (f = mesh.faceHead.nextFace; f != mesh.faceHead; f = f.nextFace)
+            for (f = mesh._faceHead._nextFace; f != mesh._faceHead; f = f._nextFace)
             {
-                f.marked = false;
+                f._marked = false;
             }
-            for (f = mesh.faceHead.nextFace; f != mesh.faceHead; f = f.nextFace)
+            for (f = mesh._faceHead._nextFace; f != mesh._faceHead; f = f._nextFace)
             {
                 /* We examine all faces in an arbitrary order.  Whenever we find
                 * an unprocessed face F, we output a group of faces including F
                 * whose size is maximum.
                 */
-                if (f.isInterior && !f.marked)
+                if (f._isInterior && !f._marked)
                 {
                     RenderMaximumFaceGroup(f);
-                    if (!f.marked)
+                    if (!f._marked)
                     {
                         throw new System.Exception();
                     }
@@ -596,7 +648,7 @@ namespace Tesselate
             * is to try all of these, and take the primitive which uses the most
             * triangles (a greedy approach).
             */
-            HalfEdge e = fOrig.halfEdgeThisIsLeftFaceOf;
+            HalfEdge e = fOrig._halfEdgeThisIsLeftFaceOf;
             FaceCount max = new FaceCount(1, e, new FaceCount.RenderDelegate(RenderTriangle));
             FaceCount newFace;
             max.size = 1;
@@ -604,11 +656,11 @@ namespace Tesselate
             if (!this.EdgeCallBackSet)
             {
                 newFace = MaximumFan(e); if (newFace.size > max.size) { max = newFace; }
-                newFace = MaximumFan(e.nextEdgeCCWAroundLeftFace); if (newFace.size > max.size) { max = newFace; }
+                newFace = MaximumFan(e._nextEdgeCCWAroundLeftFace); if (newFace.size > max.size) { max = newFace; }
                 newFace = MaximumFan(e.Lprev); if (newFace.size > max.size) { max = newFace; }
 
                 newFace = MaximumStrip(e); if (newFace.size > max.size) { max = newFace; }
-                newFace = MaximumStrip(e.nextEdgeCCWAroundLeftFace); if (newFace.size > max.size) { max = newFace; }
+                newFace = MaximumStrip(e._nextEdgeCCWAroundLeftFace); if (newFace.size > max.size) { max = newFace; }
                 newFace = MaximumStrip(e.Lprev); if (newFace.size > max.size) { max = newFace; }
             }
 
@@ -624,9 +676,9 @@ namespace Tesselate
             FaceCount newFace = new FaceCount(0, null, new FaceCount.RenderDelegate(RenderFan));
             Face trail = null;
             HalfEdge e;
-            for (e = eOrig; !e.leftFace.Marked(); e = e.nextEdgeCCWAroundOrigin)
+            for (e = eOrig; !e._leftFace.Marked(); e = e._nextEdgeCCWAroundOrigin)
             {
-                Face.AddToTrail(ref e.leftFace, ref trail);
+                Face.AddToTrail(ref e._leftFace, ref trail);
                 ++newFace.size;
             }
             for (e = eOrig; !e.rightFace.Marked(); e = e.Oprev)
@@ -663,13 +715,13 @@ namespace Tesselate
             int headSize = 0, tailSize = 0;
             Face trail = null;
             HalfEdge e, eTail, eHead;
-            for (e = eOrig; !e.leftFace.Marked(); ++tailSize, e = e.nextEdgeCCWAroundOrigin)
+            for (e = eOrig; !e._leftFace.Marked(); ++tailSize, e = e._nextEdgeCCWAroundOrigin)
             {
-                Face.AddToTrail(ref e.leftFace, ref trail);
+                Face.AddToTrail(ref e._leftFace, ref trail);
                 ++tailSize;
                 e = e.Dprev;
-                if (e.leftFace.Marked()) break;
-                Face.AddToTrail(ref e.leftFace, ref trail);
+                if (e._leftFace.Marked()) break;
+                Face.AddToTrail(ref e._leftFace, ref trail);
             }
             eTail = e;
             for (e = eOrig; !e.rightFace.Marked(); ++headSize, e = e.Dnext)
@@ -688,7 +740,7 @@ namespace Tesselate
             newFace.size = tailSize + headSize;
             if (IsEven(tailSize))
             {
-                newFace.eStart = eTail.otherHalfOfThisEdge;
+                newFace.eStart = eTail._otherHalfOfThisEdge;
             }
             else if (IsEven(headSize))
             {
@@ -700,7 +752,7 @@ namespace Tesselate
                 * we must start from eHead to guarantee inclusion of eOrig.Lface.
                 */
                 --newFace.size;
-                newFace.eStart = eHead.nextEdgeCCWAroundOrigin;
+                newFace.eStart = eHead._nextEdgeCCWAroundOrigin;
             }
 
             Face.FreeTrail(ref trail);
@@ -717,7 +769,7 @@ namespace Tesselate
             {
                 throw new Exception();
             }
-            Face.AddToTrail(ref e.leftFace, ref _lonelyTriList);
+            Face.AddToTrail(ref e._leftFace, ref _lonelyTriList);
         }
 
 
@@ -731,11 +783,11 @@ namespace Tesselate
             bool edgeState = false;	/* force edge state output for first vertex */
             bool sentFirstEdge = false;
             this.CallBegin(Tesselator.TriangleListType.Triangles);
-            for (; f != null; f = f.trail)
+            for (; f != null; f = f._trail)
             {
                 /* Loop once for each edge (there will always be 3 edges) */
 
-                e = f.halfEdgeThisIsLeftFaceOf;
+                e = f._halfEdgeThisIsLeftFaceOf;
                 do
                 {
                     if (this.EdgeCallBackSet)
@@ -743,7 +795,7 @@ namespace Tesselate
                         /* Set the "edge state" to TRUE just before we output the
                         * first vertex of each edge on the polygon boundary.
                         */
-                        newState = !e.rightFace.isInterior;
+                        newState = !e.rightFace._isInterior;
                         if (edgeState != newState || !sentFirstEdge)
                         {
                             sentFirstEdge = true;
@@ -752,9 +804,9 @@ namespace Tesselate
                         }
                     }
 
-                    this.CallVertex(e.originVertex.clientIndex);
-                    e = e.nextEdgeCCWAroundLeftFace;
-                } while (e != f.halfEdgeThisIsLeftFaceOf);
+                    this.CallVertex(e._originVertex._clientIndex);
+                    e = e._nextEdgeCCWAroundLeftFace;
+                } while (e != f._halfEdgeThisIsLeftFaceOf);
             }
 
             this.CallEnd();
@@ -768,14 +820,14 @@ namespace Tesselate
             * (otherwise we've goofed up somewhere).
             */
             tess.CallBegin(Tesselator.TriangleListType.TriangleFan);
-            tess.CallVertex(e.originVertex.clientIndex);
-            tess.CallVertex(e.directionVertex.clientIndex);
-            while (!e.leftFace.Marked())
+            tess.CallVertex(e._originVertex._clientIndex);
+            tess.CallVertex(e.DirectionVertex._clientIndex);
+            while (!e._leftFace.Marked())
             {
-                e.leftFace.marked = true;
+                e._leftFace._marked = true;
                 --size;
-                e = e.nextEdgeCCWAroundOrigin;
-                tess.CallVertex(e.directionVertex.clientIndex);
+                e = e._nextEdgeCCWAroundOrigin;
+                tess.CallVertex(e.DirectionVertex._clientIndex);
             }
 
             if (size != 0)
@@ -793,19 +845,19 @@ namespace Tesselate
             * (otherwise we've goofed up somewhere).
             */
             tess.CallBegin(Tesselator.TriangleListType.TriangleStrip);
-            tess.CallVertex(halfEdge.originVertex.clientIndex);
-            tess.CallVertex(halfEdge.directionVertex.clientIndex);
-            while (!halfEdge.leftFace.Marked())
+            tess.CallVertex(halfEdge._originVertex._clientIndex);
+            tess.CallVertex(halfEdge.DirectionVertex._clientIndex);
+            while (!halfEdge._leftFace.Marked())
             {
-                halfEdge.leftFace.marked = true;
+                halfEdge._leftFace._marked = true;
                 --size;
                 halfEdge = halfEdge.Dprev;
-                tess.CallVertex(halfEdge.originVertex.clientIndex);
-                if (halfEdge.leftFace.Marked()) break;
-                halfEdge.leftFace.marked = true;
+                tess.CallVertex(halfEdge._originVertex._clientIndex);
+                if (halfEdge._leftFace.Marked()) break;
+                halfEdge._leftFace._marked = true;
                 --size;
-                halfEdge = halfEdge.nextEdgeCCWAroundOrigin;
-                tess.CallVertex(halfEdge.directionVertex.clientIndex);
+                halfEdge = halfEdge._nextEdgeCCWAroundOrigin;
+                tess.CallVertex(halfEdge.DirectionVertex._clientIndex);
             }
 
             if (size != 0)
@@ -822,19 +874,19 @@ namespace Tesselate
         * contour for each face marked "inside".  The rendering output is
         * provided as callbacks.
         */
-        public void RenderBoundary(Mesh mesh)
+        void RenderBoundary(Mesh mesh)
         {
-            for (Face curFace = mesh.faceHead.nextFace; curFace != mesh.faceHead; curFace = curFace.nextFace)
+            for (Face curFace = mesh._faceHead._nextFace; curFace != mesh._faceHead; curFace = curFace._nextFace)
             {
-                if (curFace.isInterior)
+                if (curFace._isInterior)
                 {
                     this.CallBegin(Tesselator.TriangleListType.LineLoop);
-                    HalfEdge curHalfEdge = curFace.halfEdgeThisIsLeftFaceOf;
+                    HalfEdge curHalfEdge = curFace._halfEdgeThisIsLeftFaceOf;
                     do
                     {
-                        this.CallVertex(curHalfEdge.originVertex.clientIndex);
-                        curHalfEdge = curHalfEdge.nextEdgeCCWAroundLeftFace;
-                    } while (curHalfEdge != curFace.halfEdgeThisIsLeftFaceOf);
+                        this.CallVertex(curHalfEdge._originVertex._clientIndex);
+                        curHalfEdge = curHalfEdge._nextEdgeCCWAroundLeftFace;
+                    } while (curHalfEdge != curFace._halfEdgeThisIsLeftFaceOf);
                     this.CallEnd();
                 }
             }
@@ -854,7 +906,7 @@ namespace Tesselate
         */
         {
             var vCache = _simpleVertexCache;
-            Vertex v0 = vCache[0];
+            TessVertex2d v0 = vCache[0];
             int vcIndex;
             double dot, xc, yc, xp, yp;
             double n0;
@@ -922,7 +974,7 @@ namespace Tesselate
         * Returns TRUE if the polygon was successfully rendered.  The rendering
         * output is provided as callbacks (see the api).
         */
-        public bool RenderCache()
+        bool RenderCache()
         {
             int sign;
             if (_cacheCount < 3)

@@ -151,8 +151,14 @@
     <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\1_VertexStore.cs">
       <Link>0_REF_DrawingCore\3_Canvas\1_VertexStore.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\CRC32Calculator.cs">
+      <Link>0_REF_DrawingCore\3_DrawBoard\CRC32Calculator.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\DrawBoard.cs">
       <Link>0_REF_DrawingCore\3_Canvas\DrawBoard.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\Others.cs">
+      <Link>0_REF_DrawingCore\3_DrawBoard\Others.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\Painter.cs">
       <Link>0_REF_DrawingCore\3_Canvas\Painter.cs</Link>
@@ -548,11 +554,17 @@
       <Link>0_REF_Painter\1_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
     <Compile Include="4_PlatformServices\StorageService.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\AggPainter.cs" />
+    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter.cs" />
+    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" />
+    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" />
+    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs" />
+    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs" />
+    <Compile Include="7_CpuBlitPainter\DrawBoard\AggGradientBrushes.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\AggRenderVx.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\dbugVertexSourceIO.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\LineDashGenerator.cs" />
+    <Compile Include="7_CpuBlitPainter\DrawBoard\RectBorderHelper.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\SvgRenderVx.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\BorderDouble.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\ClipProxyImage.cs" />
@@ -578,7 +590,9 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" />
+  </ItemGroup>
   <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

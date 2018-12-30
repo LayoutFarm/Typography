@@ -6,20 +6,16 @@ namespace PixelFarm.Drawing
 
     public abstract class Image : IDisposable
     {
+        IDisposable _innerImg;
+        bool _handleInnerImgAsOwner;
+
         public abstract void Dispose();
         public abstract int Width { get; }
         public abstract int Height { get; }
-        public Size Size
-        {
-            get { return new Size(this.Width, this.Height); }
-        }
+        public Size Size => new Size(this.Width, this.Height);
         public abstract bool IsReferenceImage { get; }
         public abstract int ReferenceX { get; }
-        public abstract int ReferenceY { get; }
-
-
-        IDisposable _innerImg;
-        bool _handleInnerImgAsOwner;
+        public abstract int ReferenceY { get; } 
 
         public static object GetCacheInnerImage(Image img)
         {

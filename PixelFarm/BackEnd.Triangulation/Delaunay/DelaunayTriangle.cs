@@ -202,19 +202,11 @@ namespace Poly2Tri
             this.D0 = this.D1 = this.D2 = false;
             //this.edgedNoteFlags &= ~0x7;
         }
-        public int IndexCWFrom(TriangulationPoint p)
-        {
-            return (IndexOf(p) + 2) % 3;
-        }
-        public int IndexCCWFrom(TriangulationPoint p)
-        {
-            return (IndexOf(p) + 1) % 3;
-        }
+        public int IndexCWFrom(TriangulationPoint p) => (IndexOf(p) + 2) % 3;
 
-        public bool Contains(TriangulationPoint p)
-        {
-            return ContainsPoint(p);
-        }
+        public int IndexCCWFrom(TriangulationPoint p) => (IndexOf(p) + 1) % 3;
+
+        public bool Contains(TriangulationPoint p) => ContainsPoint(p);
 
         /// <summary>
         /// Update neighbor pointers

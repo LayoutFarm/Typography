@@ -56,6 +56,7 @@ namespace PixelFarm.CpuBlit
             _currentSize = 0;
         }
 
+
         // Set new capacity. All data is lost, size is set to zero.
         public void Clear(int newCapacity)
         {
@@ -110,18 +111,16 @@ namespace PixelFarm.CpuBlit
                 }
             }
         }
-
-
-        static T s_zeroed_object = default(T);
         public void Zero()
         {
-            for (int i = _internalArray.Length - 1; i >= 0; --i)
-            {
-                _internalArray[i] = s_zeroed_object;
-            }
+            System.Array.Clear(_internalArray, 0, _internalArray.Length);
         }
-
-
+        public T[] ToArray()
+        {
+            T[] output = new T[_currentSize];
+            System.Array.Copy(_internalArray, output, _currentSize);
+            return output;
+        }
         /// <summary>
         /// append element to latest index
         /// </summary>
@@ -140,16 +139,12 @@ namespace PixelFarm.CpuBlit
                 }
             }
             _internalArray[_currentSize++] = v;
-        }
-
-
+        } 
         public T this[int i]
         {
             get => _internalArray[i];
             set => _internalArray[i] = value;
-        }
-
-
+        } 
         /// <summary>
         /// access to internal array,
         /// </summary>
