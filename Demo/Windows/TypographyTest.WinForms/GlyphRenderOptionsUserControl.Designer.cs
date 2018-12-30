@@ -39,7 +39,7 @@
             this.lstHintList.FormattingEnabled = true;
             this.lstHintList.Location = new System.Drawing.Point(3, 3);
             this.lstHintList.Name = "lstHintList";
-            this.lstHintList.Size = new System.Drawing.Size(224, 69);
+            this.lstHintList.Size = new System.Drawing.Size(136, 69);
             this.lstHintList.TabIndex = 30;
             // 
             // chkGsubEnableLigature
@@ -83,7 +83,7 @@
             this.Controls.Add(this.chkGsubEnableLigature);
             this.Controls.Add(this.lstHintList);
             this.Name = "GlyphRenderOptionsUserControl";
-            this.Size = new System.Drawing.Size(236, 166);
+            this.Size = new System.Drawing.Size(146, 166);
             this.Load += new System.EventHandler(this.GlyphRenderOptionsUserControl_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
