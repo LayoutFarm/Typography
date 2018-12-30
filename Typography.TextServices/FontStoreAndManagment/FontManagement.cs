@@ -13,19 +13,21 @@ namespace Typography.FontManagement
         internal InstalledTypeface(string fontName,
             string fontSubFamily,
             string fontPath,
-            TypefaceStyle typefaceStyle)
+            TypefaceStyle typefaceStyle,
+            ushort weight)
         {
             FontName = fontName;
             FontSubFamily = fontSubFamily;
             FontPath = fontPath;
             TypefaceStyle = typefaceStyle;
+            Weight = weight;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
         public string FontPath { get; internal set; }
         public TypefaceStyle TypefaceStyle { get; internal set; }
-
+        public ushort Weight { get; internal set; }
         public override string ToString()
         {
             return FontName + " " + FontSubFamily;
@@ -81,16 +83,11 @@ namespace Typography.FontManagement
         InstalledTypeface GetInstalledTypeface(string fontName, TypefaceStyle style);
     }
 
-
     public class InstalledTypefaceCollection : IInstalledTypefaceProvider
     {
-
-
-
         class InstalledTypefaceGroup
         {
-
-            internal Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
+            public Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
             public void AddFont(InstalledTypeface installedFont)
             {
                 _members.Add(installedFont.FontName.ToUpper(), installedFont);
@@ -118,12 +115,15 @@ namespace Typography.FontManagement
         /// map from font subfam to internal group name
         /// </summary>
         Dictionary<string, InstalledTypefaceGroup> _subFamToFontGroup = new Dictionary<string, InstalledTypefaceGroup>();
+        Dictionary<string, bool> _onlyFontNames = new Dictionary<string, bool>();
 
 
         InstalledTypefaceGroup _regular, _bold, _italic, _bold_italic;
         List<InstalledTypefaceGroup> _allGroups = new List<InstalledTypefaceGroup>();
         FontNameDuplicatedHandler _fontNameDuplicatedHandler;
         FontNotFoundHandler _fontNotFoundHandler;
+
+
 
         public InstalledTypefaceCollection()
         {
@@ -197,10 +197,8 @@ namespace Typography.FontManagement
                         //err!
                         return false;
                     }
-                    //if (previewFont.fontName.StartsWith("Bungee"))
-                    //{ 
-                    //}
 
+                    _onlyFontNames[previewFont.fontName] = true;
 
                     TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
                     switch (previewFont.OS2TranslatedStyle)
@@ -248,7 +246,7 @@ namespace Typography.FontManagement
                         }
                     }
 
-                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName, typefaceStyle));
+                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName, typefaceStyle, previewFont.weight));
                 }
             }
             catch (IOException)
@@ -466,6 +464,21 @@ namespace Typography.FontManagement
                 }
             }
         }
+
+
+        public IEnumerable<string> GetFontNameIter() => _onlyFontNames.Keys;
+        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter(string fontName)
+        {
+            fontName = fontName.ToUpper();
+            foreach (InstalledTypefaceGroup typefaceGroup in _subFamToFontGroup.Values)
+            {
+                if (typefaceGroup.TryGetValue(fontName, out InstalledTypeface found))
+                {
+                    yield return found;
+                }
+            }
+        }
+
     }
 
 
