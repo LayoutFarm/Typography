@@ -31,6 +31,7 @@ namespace TypographyTest.WinForms
             //
             SetupScriptLangComboBox();
             SetupFontList();
+            SetupFontsList2();
             SetupFontSizeList();
             SetupRenderOptions();
             //
@@ -72,24 +73,52 @@ namespace TypographyTest.WinForms
                 ffcount++;
             }
             //set default font for current text printer
-            //
-
+            // 
 
             if (selected_index < 0) { selected_index = 0; }
 
-
-
             lstFontList.SelectedIndex = selected_index;
-            lstFontList.SelectedIndexChanged += (s, e) =>
+            lstFontList.SelectedIndexChanged += (s, e) => ChangeSelectedTypeface(lstFontList.SelectedItem as InstalledTypeface);
+        }
+        void SetupFontsList2()
+        {
             {
-                InstalledTypeface ff = lstFontList.SelectedItem as InstalledTypeface;
-                if (ff != null)
+                InstalledTypefaceCollection typefaceCollection = _options.InstallTypefaceCollection;
+                lstFontNameList.Items.Clear();
+                foreach (string fontName in typefaceCollection.GetFontNameIter())
                 {
-                    _options.InstalledTypeface = ff;
-                    _options.InvokeAttachEvents();
+                    lstFontNameList.Items.Add(fontName);
+                }
+            }
+            //
+            lstFontNameList.Click += delegate
+            {
+                lstFontStyle.Items.Clear();
+                string fontName = lstFontNameList.SelectedItem as string;
+
+                if (fontName != null)
+                {
+                    foreach (InstalledTypeface installedTypeface in _options.InstallTypefaceCollection.GetInstalledTypefaceIter(fontName))
+                    {
+                        lstFontStyle.Items.Add(installedTypeface);
+                    }
                 }
             };
+            //
+            lstFontStyle.Click += (s, e) => ChangeSelectedTypeface(lstFontStyle.SelectedItem as InstalledTypeface);
+
         }
+        void ChangeSelectedTypeface(InstalledTypeface typeface)
+        {
+            if (typeface == null) return;
+            //
+            _options.InstalledTypeface = typeface;
+            _options.InvokeAttachEvents();
+            _txtTypefaceInfo.Text = "file: " + typeface.FontPath + "\r\n" + "weight:" + typeface.Weight;
+
+        }
+
+
         void SetupFontSizeList()
         {
             lstFontSizes.Items.AddRange(

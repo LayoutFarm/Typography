@@ -74,20 +74,21 @@ namespace PixelFarm.CpuBlit
             get => _strokeColor;
             set => _strokeColor = value;
         }
-        public LineJoin LineJoin
+        public override LineJoin LineJoin
         {
             get => _stroke.LineJoin;
             set => _stroke.LineJoin = value;
         }
-        public LineCap LineCap
+        public override LineCap LineCap
         {
             get => _stroke.LineCap;
             set => _stroke.LineCap = value;
         }
-        public LineDashGenerator LineDashGen
+
+        public override IDashGenerator LineDashGen
         {
             get => _lineDashGen;
-            set => _lineDashGen = value;
+            set => _lineDashGen = (LineDashGenerator)value;
         }
 
 

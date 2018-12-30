@@ -90,13 +90,9 @@ namespace TypographyTest
         }
         public PositionTechnique PositionTech { get; set; }
 
-        public Typeface Typeface
-        {
-            get
-            {
-                return _selectedTypeface;
-            }
-        }
+        public Typeface Typeface => _selectedTypeface;
+
+
         public float FontSizeInPoints { get; set; }
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public TypefaceStyle SelectedTypefaceStyle { get; set; }
@@ -124,13 +120,8 @@ namespace TypographyTest
                 _selectedTypeface = selected_typeface;
             }
         }
-        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter()
-        {
-            foreach (InstalledTypeface ff in _textServices.InstalledFontCollection.GetInstalledFontIter())
-            {
-                yield return ff;
-            }
-        }
+        public IEnumerable<InstalledTypeface> GetInstalledTypefaceIter() => _textServices.InstalledFontCollection.GetInstalledFontIter();
+        public InstalledTypefaceCollection InstallTypefaceCollection => _textServices.InstalledFontCollection;
         public void InvokeAttachEvents()
         {
             if (TypefaceChanged != null && _typefaceChanged)
@@ -141,7 +132,6 @@ namespace TypographyTest
             //
             //
             UpdateRenderOutput?.Invoke(this, EventArgs.Empty);
-
         }
     }
 }
