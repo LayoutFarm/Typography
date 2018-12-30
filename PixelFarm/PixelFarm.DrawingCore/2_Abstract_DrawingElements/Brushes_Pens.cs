@@ -274,22 +274,7 @@ namespace PixelFarm.Drawing
         public override void Dispose()
         {
         }
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public abstract class PenBase : System.IDisposable
     {
         public abstract void Dispose();
@@ -301,74 +286,25 @@ namespace PixelFarm.Drawing
     }
     public sealed class Pen : PenBase
     {
-        float[] dashPattern;
-        object innerPen;
-        DashStyle dashStyle;
-        float width = 1;//default 
-        Brush brush;
-        Color strokeColor;
+
+        Brush _brush;
+        Color _strokeColor;
         public Pen(Color color)
         {
-            this.strokeColor = color;
-            this.brush = new SolidBrush(color);
-        }
-        public override Brush Brush
-        {
-            get { return this.brush; }
+            Width = 1;
+            _strokeColor = color;
+            _brush = new SolidBrush(color);
         }
         public Pen(Brush brush)
         {
-            this.brush = brush;
+            _brush = brush;
         }
-        public Color StrokeColor
-        {
-            get { return this.strokeColor; }
-        }
-
-        public override float[] DashPattern
-        {
-            get
-            {
-                return dashPattern;
-            }
-            set
-            {
-                dashPattern = value;
-            }
-        }
-        public override object InnerPen
-        {
-            get
-            {
-                return this.innerPen;
-            }
-            set
-            {
-                this.innerPen = value;
-            }
-        }
-        public override float Width
-        {
-            get
-            {
-                return this.width;
-            }
-            set
-            {
-                this.width = value;
-            }
-        }
-        public override DashStyle DashStyle
-        {
-            get
-            {
-                return this.dashStyle;
-            }
-            set
-            {
-                this.dashStyle = value;
-            }
-        }
+        public override Brush Brush => _brush;
+        public Color StrokeColor => _strokeColor;
+        public override float[] DashPattern { get; set; }
+        public override object InnerPen { get; set; }
+        public override float Width { get; set; }
+        public override DashStyle DashStyle { get; set; }
         public override void Dispose()
         {
         }

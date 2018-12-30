@@ -328,9 +328,6 @@
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\CurveFlattener.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\CurveFlattener.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\LineCapAndJoin.cs">
-      <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\LineCapAndJoin.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\LineWalker.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\LineWalker.cs</Link>
     </Compile>

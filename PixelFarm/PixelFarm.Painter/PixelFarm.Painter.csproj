@@ -152,7 +152,6 @@
     <Compile Include="2_Canvas\ColorEx.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\BoundingRect.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\CurveFlattener.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\LineCapAndJoin.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\LineWalker.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\PathWriter.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\RoundedRect.cs" />
