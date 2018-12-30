@@ -86,10 +86,7 @@ namespace Poly2Tri
         /// <summary>
         /// We use a balancing tree to locate a node smaller or equal to given key value (in theory)
         /// </summary>
-        public AdvancingFrontNode LocateNode(TriangulationPoint point)
-        {
-            return LocateNode(point.X);
-        }
+        public AdvancingFrontNode LocateNode(TriangulationPoint point) => LocateNode(point.X);
 
         private AdvancingFrontNode LocateNode(double x)
         {

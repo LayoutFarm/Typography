@@ -45,7 +45,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         public ImgSpanGenRGBA_NN_StepXBy1()
         {
 
-        } 
+        }
         public void SetSrcBitmap(IBitmapSrc src)
         {
             if (src.BitDepth != 32)
@@ -130,19 +130,19 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         const int BASE_SCALE = (int)(1 << BASE_SHIFT);
         const int BASE_MASK = BASE_SCALE - 1;
         IBitmapSrc _imgsrc;
-        Drawing.Color m_bgcolor;
-        int bytesBetweenPixelInclusive;
-        bool _mode0 = false; 
+        Drawing.Color _bgcolor;
+        int _bytesBetweenPixelInclusive;
+        bool _mode0 = false;
 
         public ImgSpanGenRGBA_BilinearClip(Drawing.Color back_color)
         {
-            m_bgcolor = back_color;
+            _bgcolor = back_color;
         }
 
         public void SetSrcBitmap(IBitmapSrc src)
         {
             _imgsrc = src;
-            bytesBetweenPixelInclusive = _imgsrc.BytesBetweenPixelsInclusive;
+            _bytesBetweenPixelInclusive = _imgsrc.BytesBetweenPixelsInclusive;
         }
         public void ReleaseSrcBitmap()
         {
@@ -160,8 +160,8 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         }
         public Drawing.Color BackgroundColor
         {
-            get { return this.m_bgcolor; }
-            set { this.m_bgcolor = value; }
+            get => _bgcolor;
+            set => _bgcolor = value;
         }
 
         public sealed override void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len)
@@ -234,10 +234,10 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
                         spanInterpolator.Begin(x + base.dx, y + base.dy, len);
                         int accColor0, accColor1, accColor2, accColor3;
-                        int back_r = m_bgcolor.red;
-                        int back_g = m_bgcolor.green;
-                        int back_b = m_bgcolor.blue;
-                        int back_a = m_bgcolor.alpha;
+                        int back_r = _bgcolor.red;
+                        int back_g = _bgcolor.green;
+                        int back_b = _bgcolor.blue;
+                        int back_a = _bgcolor.alpha;
                         int maxx = _imgsrc.Width - 1;
                         int maxy = _imgsrc.Height - 1;
                         int color = 0;

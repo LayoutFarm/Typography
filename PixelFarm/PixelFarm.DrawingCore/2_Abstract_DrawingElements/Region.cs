@@ -7,4 +7,7 @@ namespace PixelFarm.Drawing
         public abstract void Dispose();
         public abstract object InnerRegion { get; }
     }
+
+   
+
 }

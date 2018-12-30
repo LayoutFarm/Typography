@@ -48,13 +48,13 @@ namespace Tesselate
 #if DEBUG
         public int dbugIndex;
 #endif
-        public Face nextFace;		/* next face (never null) */
-        public Face prevFace;		/* previous face (never null) */
-        public HalfEdge halfEdgeThisIsLeftFaceOf;	/* a half edge with this left face */
+        internal Face _nextFace;		/* next face (never null) */
+        internal Face _prevFace;		/* previous face (never null) */
+        internal HalfEdge _halfEdgeThisIsLeftFaceOf;	/* a half edge with this left face */
         /* Internal data (keep hidden) */
-        public Face trail;		/* "stack" for conversion to strips */
-        public bool marked;		/* flag for conversion to strips */
-        public bool isInterior;		/* this face is in the polygon interior */
+        internal Face _trail;		/* "stack" for conversion to strips */
+        internal bool _marked;		/* flag for conversion to strips */
+        internal bool _isInterior;		/* this face is in the polygon interior */
         /* Macros which keep track of faces we have marked temporarily, and allow
         * us to backtrack when necessary.  With triangle fans, this is not
         * really necessary, since the only awkward case is a loop of triangles
@@ -62,24 +62,21 @@ namespace Tesselate
         * more complicated, and we need a general tracking method like the
         * one here.
         */
-        public bool Marked()
-        {
-            return (!this.isInterior || this.marked);
-        }
+        public bool Marked() => (!_isInterior || _marked);
 
         public static void AddToTrail(ref Face f, ref Face t)
         {
-            f.trail = t;
+            f._trail = t;
             t = f;
-            f.marked = true;
+            f._marked = true;
         }
 
         static public void FreeTrail(ref Face t)
         {
             while (t != null)
             {
-                t.marked = false;
-                t = t.trail;
+                t._marked = false;
+                t = t._trail;
             }
         }
 
@@ -117,56 +114,56 @@ namespace Tesselate
             * Since the sweep goes from left to right, face.anEdge should
             * be close to the edge we want.
             */
-            HalfEdge up = this.halfEdgeThisIsLeftFaceOf;
-            if (up.nextEdgeCCWAroundLeftFace == up || up.nextEdgeCCWAroundLeftFace.nextEdgeCCWAroundLeftFace == up)
+            HalfEdge up = _halfEdgeThisIsLeftFaceOf;
+            if (up._nextEdgeCCWAroundLeftFace == up || up._nextEdgeCCWAroundLeftFace._nextEdgeCCWAroundLeftFace == up)
             {
                 throw new Exception();
             }
 
-            for (; up.directionVertex.VertLeq(up.originVertex); up = up.Lprev)
+            for (; up.DirectionVertex.VertLeq(up._originVertex); up = up.Lprev)
                 ;
-            for (; up.originVertex.VertLeq(up.directionVertex); up = up.nextEdgeCCWAroundLeftFace)
+            for (; up._originVertex.VertLeq(up.DirectionVertex); up = up._nextEdgeCCWAroundLeftFace)
                 ;
             HalfEdge lo = up.Lprev;
-            while (up.nextEdgeCCWAroundLeftFace != lo)
+            while (up._nextEdgeCCWAroundLeftFace != lo)
             {
-                if (up.directionVertex.VertLeq(lo.originVertex))
+                if (up.DirectionVertex.VertLeq(lo._originVertex))
                 {
                     /* up.Dst is on the left.  It is safe to form triangles from lo.Org.
                     * The EdgeGoesLeft test guarantees progress even when some triangles
                     * are CW, given that the upper and lower chains are truly monotone.
                     */
-                    while (lo.nextEdgeCCWAroundLeftFace != up && (lo.nextEdgeCCWAroundLeftFace.EdgeGoesLeft()
-                        || ContourVertex.EdgeSign(lo.originVertex, lo.directionVertex, lo.nextEdgeCCWAroundLeftFace.directionVertex) <= 0))
+                    while (lo._nextEdgeCCWAroundLeftFace != up && (lo._nextEdgeCCWAroundLeftFace.EdgeGoesLeft()
+                        || ContourVertex.EdgeSign(lo._originVertex, lo.DirectionVertex, lo._nextEdgeCCWAroundLeftFace.DirectionVertex) <= 0))
                     {
-                        HalfEdge tempHalfEdge = Mesh.meshConnect(lo.nextEdgeCCWAroundLeftFace, lo);
-                        lo = tempHalfEdge.otherHalfOfThisEdge;
+                        HalfEdge tempHalfEdge = Mesh.meshConnect(lo._nextEdgeCCWAroundLeftFace, lo);
+                        lo = tempHalfEdge._otherHalfOfThisEdge;
                     }
                     lo = lo.Lprev;
                 }
                 else
                 {
                     /* lo.Org is on the left.  We can make CCW triangles from up.Dst. */
-                    while (lo.nextEdgeCCWAroundLeftFace != up && (up.Lprev.EdgeGoesRight()
-                        || ContourVertex.EdgeSign(up.directionVertex, up.originVertex, up.Lprev.originVertex) >= 0))
+                    while (lo._nextEdgeCCWAroundLeftFace != up && (up.Lprev.EdgeGoesRight()
+                        || ContourVertex.EdgeSign(up.DirectionVertex, up._originVertex, up.Lprev._originVertex) >= 0))
                     {
                         HalfEdge tempHalfEdge = Mesh.meshConnect(up, up.Lprev);
-                        up = tempHalfEdge.otherHalfOfThisEdge;
+                        up = tempHalfEdge._otherHalfOfThisEdge;
                     }
-                    up = up.nextEdgeCCWAroundLeftFace;
+                    up = up._nextEdgeCCWAroundLeftFace;
                 }
             }
 
             // Now lo.Org == up.Dst == the leftmost vertex.  The remaining region
             // can be tessellated in a fan from this leftmost vertex.
-            if (lo.nextEdgeCCWAroundLeftFace == up)
+            if (lo._nextEdgeCCWAroundLeftFace == up)
             {
                 throw new Exception();
             }
-            while (lo.nextEdgeCCWAroundLeftFace.nextEdgeCCWAroundLeftFace != up)
+            while (lo._nextEdgeCCWAroundLeftFace._nextEdgeCCWAroundLeftFace != up)
             {
-                HalfEdge tempHalfEdge = Mesh.meshConnect(lo.nextEdgeCCWAroundLeftFace, lo);
-                lo = tempHalfEdge.otherHalfOfThisEdge;
+                HalfEdge tempHalfEdge = Mesh.meshConnect(lo._nextEdgeCCWAroundLeftFace, lo);
+                lo = tempHalfEdge._otherHalfOfThisEdge;
             }
 
             return true;
