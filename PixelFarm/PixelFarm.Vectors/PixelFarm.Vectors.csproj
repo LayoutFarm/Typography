@@ -146,6 +146,9 @@
     <Compile Include="..\BackEnd.Tesselate\Tesselator.cs">
       <Link>0_REF_Tesselate\Tesselator.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
+      <Link>ExtensionAttribute.cs</Link>
+    </Compile>
     <Compile Include="1_VectorMaths\AggMath.cs" />
     <Compile Include="1_VectorMaths\AxisAlignedBoundingBox.cs" />
     <Compile Include="1_VectorMaths\BezierCurve.cs" />
@@ -172,6 +175,8 @@
     <Compile Include="2_Geometry\Curves.cs" />
     <Compile Include="2_Geometry\Ellipse.cs" />
     <Compile Include="2_Geometry\RectD.cs" />
+    <Compile Include="4_Utils\SvgArc.cs" />
+    <Compile Include="4_Utils\TessTool.cs" />
     <Compile Include="5_Clipper\cliper.cs" />
     <Compile Include="5_Clipper\ClipLiangBarsky.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

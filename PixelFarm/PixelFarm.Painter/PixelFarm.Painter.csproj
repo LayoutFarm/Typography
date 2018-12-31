@@ -39,28 +39,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CubicBezier.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\CubicBezier.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\CubicBezier.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveBuilder.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\CurveBuilder.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\CurveBuilder.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveFit.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\CurveFit.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\CurveFit.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurveFitBase.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\CurveFitBase.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\CurveFitBase.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CurvePreprocess.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\CurvePreprocess.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\CurvePreprocess.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\Spline.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\Spline.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\Spline.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\SplineBuilder.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\SplineBuilder.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\SplineBuilder.cs</Link>
     </Compile>
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\VectorHelper.cs">
-      <Link>0_REF_Vectors\4_BurningMineCurves\VectorHelper.cs</Link>
+      <Link>0_REF_Vectors\0_REF_BurningMineCurves\VectorHelper.cs</Link>
     </Compile>
     <Compile Include="..\pixelfarm.vectors\1_vectormaths\AggMath.cs">
       <Link>0_REF_Vectors\1_VectorMaths\AggMath.cs</Link>

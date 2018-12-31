@@ -22,7 +22,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     //Gouraud shading
     //============================================================span_gouraud
-    public abstract class GouraudSpanGen
+    public sealed class GouraudVerticeBuilder
     {
         CoordAndColor _coord_0;
         CoordAndColor _coord_1;
@@ -30,6 +30,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         double[] _x = new double[8];
         double[] _y = new double[8];
         VertexCmd[] _cmd = new VertexCmd[8];
+
         public struct CoordAndColor
         {
             public double x;
@@ -37,23 +38,11 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             public Drawing.Color color;
         }
 
-        public GouraudSpanGen()
+        public GouraudVerticeBuilder()
         {
             _cmd[0] = VertexCmd.NoMore;
+            DilationValue = 0.175f;//init value
         }
-
-        public GouraudSpanGen(Drawing.Color c1,
-                     Drawing.Color c2,
-                     Drawing.Color c3,
-                     double x1, double y1,
-                     double x2, double y2,
-                     double x3, double y3,
-                     double d)
-        {
-            SetColor(c1, c2, c3);
-            SetTriangle(x1, y1, x2, y2, x3, y3, d);
-        }
-
         public void SetColor(Drawing.Color c1, Drawing.Color c2, Drawing.Color c3)
         {
             _coord_0.color = c1;
@@ -61,6 +50,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _coord_2.color = c3;
         }
 
+        public float DilationValue { get; set; }
         //--------------------------------------------------------------------
         // Sets the triangle and dilates it if needed.
         // The trick here is to calculate beveled joins in the vertices of the 
@@ -70,8 +60,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         // as miter joins (calc_intersection).
         public void SetTriangle(double x1, double y1,
                       double x2, double y2,
-                      double x3, double y3,
-                      double d)
+                      double x3, double y3)
         {
             _coord_0.x = _x[0] = x1;
             _coord_0.y = _y[0] = y1;
@@ -83,12 +72,12 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _cmd[1] = VertexCmd.LineTo;
             _cmd[2] = VertexCmd.LineTo;
             _cmd[3] = VertexCmd.NoMore;
-            if (d != 0.0)
+            if (DilationValue != 0.0)
             {
                 AggMath.DilateTriangle(_coord_0.x, _coord_0.y,
                                 _coord_1.x, _coord_1.y,
                                 _coord_2.x, _coord_2.y,
-                                _x, _y, d);
+                                _x, _y, DilationValue);
                 AggMath.CalcIntersect(_x[4], _y[4], _x[5], _y[5],
                                   _x[0], _y[0], _x[1], _y[1],
                                   out _coord_0.x, out _coord_0.y);
@@ -119,7 +108,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         }
 
         // Vertex Source Interface to feed the coordinates to the rasterizer 
-        protected void LoadArrangedVertices(out CoordAndColor c0, out CoordAndColor c1, out CoordAndColor c2)
+        public void GetArrangedVertices(out CoordAndColor c0, out CoordAndColor c1, out CoordAndColor c2)
         {
             c0 = _coord_0;
             c1 = _coord_1;

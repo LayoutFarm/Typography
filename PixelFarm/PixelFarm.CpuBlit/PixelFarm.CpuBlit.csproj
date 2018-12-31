@@ -36,10 +36,10 @@
   <ItemGroup>
     <Compile Include="05_PixelProcessing\BitmapBlenderBase.cs" />
     <Compile Include="05_PixelProcessing\CO.cs" />
-    <Compile Include="04_FragmentProcessing_Gouraud\GouraudSpanGen.cs" />
-    <Compile Include="04_FragmentProcessing_Gouraud\GradientSpanGen.cs" />
-    <Compile Include="04_FragmentProcessing_Gouraud\IGradientValueCalculator_and_Impl.cs" />
-    <Compile Include="04_FragmentProcessing_Gouraud\RGBAGouraudSpanGen.cs" />
+    <Compile Include="04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs" />
+    <Compile Include="04_FragmentProcessing_Gradient\GradientSpanGen.cs" />
+    <Compile Include="04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs" />
+    <Compile Include="04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs" />
     <Compile Include="05_PixelProcessing\MemBitmapBinder.cs" />
     <Compile Include="05_PixelProcessing\PixelBlenderOthers.cs" />
     <Compile Include="05_PixelProcessing\SubBitmapBlender.cs" />

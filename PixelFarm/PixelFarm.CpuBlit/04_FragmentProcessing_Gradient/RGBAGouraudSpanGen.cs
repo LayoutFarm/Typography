@@ -27,19 +27,22 @@ using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.FragmentProcessing
 {
     //=======================================================span_gouraud_rgba
-    public sealed class RGBAGouraudSpanGen : GouraudSpanGen, ISpanGenerator
+    public sealed class RGBAGouraudSpanGen : ISpanGenerator
     {
         bool _swap;
         int _y2;
         RGBA_Calculator _rgba1;
         RGBA_Calculator _rgba2;
         RGBA_Calculator _rgba3;
+
+        GouraudVerticeBuilder.CoordAndColor _c0, _c1, _c2;
+
         const int SUBPIXEL_SHIFT = 4;
         const int SUBPIXEL_SCALE = 1 << SUBPIXEL_SHIFT;
         //--------------------------------------------------------------------
         struct RGBA_Calculator
         {
-            public void Init(GouraudSpanGen.CoordAndColor c1, GouraudSpanGen.CoordAndColor c2)
+            public void Init(GouraudVerticeBuilder.CoordAndColor c1, GouraudVerticeBuilder.CoordAndColor c2)
             {
                 _x1 = c1.x - 0.5;
                 _y1 = c1.y - 0.5;
@@ -89,40 +92,31 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
         //--------------------------------------------------------------------
         public RGBAGouraudSpanGen() { }
-        public RGBAGouraudSpanGen(Color c1,
-                          Color c2,
-                          Color c3,
-                          double x1, double y1,
-                          double x2, double y2,
-                          double x3, double y3)
-            : this(c1, c2, c3, x1, y1, x2, y2, x3, y3, 0)
-        { }
 
-        public RGBAGouraudSpanGen(Color c1,
-                          Color c2,
-                          Color c3,
-                          double x1, double y1,
-                          double x2, double y2,
-                          double x3, double y3,
-                          double d)
-            : base(c1, c2, c3, x1, y1, x2, y2, x3, y3, d)
-        { }
 
-        //--------------------------------------------------------------------
-        public void Prepare()
+       
+        public void SetColorAndCoords(
+            GouraudVerticeBuilder.CoordAndColor c0, 
+            GouraudVerticeBuilder.CoordAndColor c1, 
+            GouraudVerticeBuilder.CoordAndColor c2)
         {
-            CoordAndColor c0, c1, c2;
-            base.LoadArrangedVertices(out c0, out c1, out c2);
-            _y2 = (int)c1.y;
-            _swap = AggMath.Cross(c0.x, c0.y,
-                                   c2.x, c2.y,
-                                   c1.x, c1.y) < 0.0;
-            _rgba1.Init(c0, c2);
-            _rgba2.Init(c0, c1);
-            _rgba3.Init(c1, c2);
+            _c0 = c0;
+            _c1 = c1;
+            _c2 = c2;
         }
 
-        public void GenerateColors(Color[] outputColors, int startIndex, int x, int y, int len)
+        void ISpanGenerator.Prepare()
+        {
+
+            _y2 = (int)_c1.y;
+            _swap = AggMath.Cross(_c0.x, _c0.y,
+                                   _c2.x, _c2.y,
+                                   _c1.x, _c1.y) < 0.0;
+            _rgba1.Init(_c0, _c2);
+            _rgba2.Init(_c0, _c1);
+            _rgba3.Init(_c1, _c2);
+        }
+        void ISpanGenerator.GenerateColors(Color[] outputColors, int startIndex, int x, int y, int len)
         {
             _rgba1.Calculate(y);//(m_rgba1.m_1dy > 2) ? m_rgba1.m_y1 : y);
             RGBA_Calculator pc1 = _rgba1;
