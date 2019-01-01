@@ -16,8 +16,12 @@ namespace PixelFarm.CpuBlit
         Color _fillColor;
         Brush _curBrush;
         bool _useDefaultBrush;
-        AggLinearGradientBrush _aggGradientBrush = new AggLinearGradientBrush();
-        AggCircularGradientBrush _circularGradBrush = new AggCircularGradientBrush();
+        AggLinearGradientBrush _linearGrBrush = new AggLinearGradientBrush();
+        AggCircularGradientBrush _circularGrBrush = new AggCircularGradientBrush();
+        GouraudVerticeBuilder _gouraudVertBuilder;
+        RGBAGouraudSpanGen _gouraudSpanGen;
+        TessTool _tessTool;
+
 
         List<int> _reusablePolygonList = new List<int>();
 
@@ -49,7 +53,7 @@ namespace PixelFarm.CpuBlit
                         break;
                     case BrushKind.CircularGraident:
                         break;
-                    case BrushKind.GeometryGradient:
+                    case BrushKind.PolygonGradient:
                         break;
                     case BrushKind.Texture:
                         break;
@@ -215,16 +219,21 @@ namespace PixelFarm.CpuBlit
                             //------------------------------------------- 
                             //original agg's gradient fill 
 
-                            _aggGradientBrush.ResolveBrush((LinearGradientBrush)br);
-                            _aggGradientBrush.SetOffset(0, 0);
-                            Fill(vxs, _aggGradientBrush);
+                            _linearGrBrush.ResolveBrush((LinearGradientBrush)br);
+                            _linearGrBrush.SetOffset(0, 0);
+                            Fill(vxs, _linearGrBrush);
                         }
                         break;
                     case BrushKind.CircularGraident:
                         {
-                            _circularGradBrush.ResolveBrush((CircularGradientBrush)br);
-                            _circularGradBrush.SetOffset(0, 0);
-                            Fill(vxs, _circularGradBrush);
+                            _circularGrBrush.ResolveBrush((CircularGradientBrush)br);
+                            _circularGrBrush.SetOffset(0, 0);
+                            Fill(vxs, _circularGrBrush);
+                        }
+                        break;
+                    case BrushKind.PolygonGradient:
+                        {
+                            FillWithPolygonGraidentBrush(vxs, (PolygonGraidentBrush)br);
                         }
                         break;
                     default:
@@ -239,7 +248,54 @@ namespace PixelFarm.CpuBlit
                 _aggsx.Render(vxs, _fillColor);
             }
         }
+        AggPolygonGradientBrush ResolvePolygonGradientBrush(PolygonGraidentBrush polygonGrBrush)
+        {
+            AggPolygonGradientBrush brush = polygonGrBrush.InnerBrush as AggPolygonGradientBrush;
+            if (brush != null) return brush;
 
+            // 
+            if (_tessTool == null) { _tessTool = new TessTool(); }
+            if (_gouraudVertBuilder == null) { _gouraudVertBuilder = new GouraudVerticeBuilder(); }
+            if (_gouraudSpanGen == null) { _gouraudSpanGen = new RGBAGouraudSpanGen(); }
+
+            //
+            brush = new AggPolygonGradientBrush();
+            brush.BuildFrom(polygonGrBrush);
+
+            //tess user data, store tess result in the brush
+            brush._vertIndices = _tessTool.TessAsTriIndexArray(
+                brush.GetXYCoords(),
+                null,
+                out brush._outputCoords,
+                out brush._vertexCount);
+
+            brush.BuildCacheVertices(_gouraudVertBuilder);
+
+            polygonGrBrush.InnerBrush = brush; //cache this brush
+            return brush;
+        }
+
+        void FillWithPolygonGraidentBrush(VertexStore vxs, PolygonGraidentBrush polygonGrBrush)
+        {
+            //we use mask technique (simlar to texture brush) 
+            //1. switch to mask layer
+
+            SetClipRgn(vxs);
+
+            AggPolygonGradientBrush brush = ResolvePolygonGradientBrush(polygonGrBrush);
+
+            //TODO: add gamma here...
+            //aggsx.ScanlineRasterizer.ResetGamma(new GammaLinear(0.0f, this.LinearGamma)); //*** 
+
+            int partCount = brush.CachePartCount;
+            for (int i = 0; i < partCount; i++)
+            {
+                brush.SetSpanGenWithCurrentValues(i, _gouraudSpanGen); //*** this affects assoc gouraudSpanGen
+                this.Fill(brush.CurrentVxs, _gouraudSpanGen);
+            }
+
+            SetClipRgn(null);
+        }
         public override void FillEllipse(double left, double top, double width, double height)
         {
             double ox = (left + width / 2);
@@ -346,16 +402,21 @@ namespace PixelFarm.CpuBlit
                                 //------------------------------------------- 
                                 //original agg's gradient fill 
 
-                                _aggGradientBrush.ResolveBrush((LinearGradientBrush)br);
-                                _aggGradientBrush.SetOffset((float)-left, (float)-top);
-                                Fill(rectTool.MakeVxs(v1), _aggGradientBrush);
+                                _linearGrBrush.ResolveBrush((LinearGradientBrush)br);
+                                _linearGrBrush.SetOffset((float)-left, (float)-top);
+                                Fill(rectTool.MakeVxs(v1), _linearGrBrush);
                             }
                             break;
                         case BrushKind.CircularGraident:
                             {
-                                _circularGradBrush.ResolveBrush((CircularGradientBrush)br);
-                                _circularGradBrush.SetOffset((float)-left, (float)-top);
-                                Fill(rectTool.MakeVxs(v1), _circularGradBrush);
+                                _circularGrBrush.ResolveBrush((CircularGradientBrush)br);
+                                _circularGrBrush.SetOffset((float)-left, (float)-top);
+                                Fill(rectTool.MakeVxs(v1), _circularGrBrush);
+                            }
+                            break;
+                        case BrushKind.PolygonGradient:
+                            {
+                                FillWithPolygonGraidentBrush(rectTool.MakeVxs(v1), (PolygonGraidentBrush)br);
                             }
                             break;
                         default:
