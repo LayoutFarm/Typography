@@ -34,6 +34,7 @@ namespace PixelFarm.Drawing
             _points.Add(height);
             _points.Add(startAngle);//***
             _points.Add(sweepAngle);//***
+            
 
         }
         public void AddArc(RectangleF rectF, float startAngle, float sweepAngle)

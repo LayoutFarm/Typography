@@ -196,8 +196,6 @@ namespace PixelFarm.CpuBlit
         {
 
         }
-
-
         public void ResolveBrush(CircularGradientBrush linearGrBrush)
         {
             //for gradient :
@@ -252,9 +250,6 @@ namespace PixelFarm.CpuBlit
             }
 #endif
         }
-
-
-
         public void SetOffset(float x, float y)
         {
             //apply offset to all span generator
@@ -271,5 +266,100 @@ namespace PixelFarm.CpuBlit
             _grSpanGenPart._spanGenGr.GenerateColors(outputColors, startIndex, x, y, spanLen);
         }
 
+    }
+
+    class AggPolygonGradientBrush
+    {
+
+        float[] _xyCoords;
+        Color[] _colors;
+
+        internal ushort[] _vertIndices;
+        internal float[] _outputCoords;
+        internal int _vertexCount;
+
+        List<VertexStore> _cacheVxsList = new List<VertexStore>();
+        List<GouraudVerticeBuilder.CoordAndColor> _cacheColorAndVertexList = new List<GouraudVerticeBuilder.CoordAndColor>();
+
+        public AggPolygonGradientBrush()
+        {
+            this.DilationValue = 0.175f;
+            this.LinearGamma = 0.809f;
+        }
+        public float[] GetXYCoords() => _xyCoords;
+        public Color[] GetColors() => _colors;
+        public void BuildFrom(PolygonGraidentBrush polygonGrBrush)
+        {
+            List<PolygonGraidentBrush.ColorVertex2d> inputVertexList = polygonGrBrush.Vertices;
+
+            int coordCount = inputVertexList.Count;
+            _xyCoords = new float[coordCount * 2];
+            _colors = new Color[coordCount];
+
+            for (int i = 0; i < coordCount; ++i)
+            {
+                PolygonGraidentBrush.ColorVertex2d v = inputVertexList[i];
+                _xyCoords[i << 1] = v.X;
+                _xyCoords[(i << 1) + 1] = v.Y;
+                _colors[i] = v.C;
+            }
+        }
+        public float DilationValue { get; set; }
+        public float LinearGamma { get; set; }
+
+        public VertexStore CurrentVxs { get; set; }
+        public int CachePartCount => _cacheVxsList.Count;
+
+
+        public void BuildCacheVertices(GouraudVerticeBuilder grBuilder)
+        {
+            _cacheVxsList.Clear(); //clear prev data
+            _cacheColorAndVertexList.Clear(); //clear prev data
+
+            grBuilder.DilationValue = this.DilationValue;
+            using (VxsTemp.Borrow(out var tmpVxs))
+            {
+                for (int i = 0; i < _vertexCount;)
+                {
+                    ushort v0 = _vertIndices[i];
+                    ushort v1 = _vertIndices[i + 1];
+                    ushort v2 = _vertIndices[i + 2];
+
+                    grBuilder.SetColor(_colors[v0], _colors[v1], _colors[v2]);
+                    grBuilder.SetTriangle(
+                        _outputCoords[v0 << 1], _outputCoords[(v0 << 1) + 1],
+                        _outputCoords[v1 << 1], _outputCoords[(v1 << 1) + 1],
+                        _outputCoords[v2 << 1], _outputCoords[(v2 << 1) + 1]);
+
+                    //get result from _gouraudSpanBuilder
+                    grBuilder.MakeVxs(tmpVxs);
+
+                    grBuilder.GetArrangedVertices(
+                        out GouraudVerticeBuilder.CoordAndColor c0,
+                        out GouraudVerticeBuilder.CoordAndColor c1,
+                        out GouraudVerticeBuilder.CoordAndColor c2);
+
+                    _cacheColorAndVertexList.Add(c0);
+                    _cacheColorAndVertexList.Add(c1);
+                    _cacheColorAndVertexList.Add(c2);
+
+                    _cacheVxsList.Add(tmpVxs.CreateTrim());
+
+                    i += 3;
+                    tmpVxs.Clear(); //clear before reuse *** in next round
+                }
+            }
+        }
+
+
+        internal void SetSpanGenWithCurrentValues(int partNo, RGBAGouraudSpanGen spanGen)
+        {
+            CurrentVxs = _cacheVxsList[partNo];
+
+            spanGen.SetColorAndCoords(
+                _cacheColorAndVertexList[partNo * 3],
+                _cacheColorAndVertexList[(partNo * 3) + 1],
+                _cacheColorAndVertexList[(partNo * 3) + 2]);
+        }
     }
 }

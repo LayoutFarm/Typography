@@ -52,8 +52,12 @@ namespace PixelFarm.CpuBlit
                     this.TargetBufferName = TargetBufferName.AlphaMask;
                     //2.
                     Color prevColor = this.FillColor; //save
-                    this.FillColor = Color.White;
-                    this.Fill(vxs); //fill vxs with white color (on black bg)
+
+                    this.FillColor = Color.White; 
+                    _aggsx.Render(vxs, FillColor);
+
+                    //this.Fill(vxs); //fill vxs with white color (on black bg)
+
                     this.FillColor = prevColor; //restore
                     //3. switch back to default layer
                     this.TargetBufferName = TargetBufferName.Default;//swicth to default buffer

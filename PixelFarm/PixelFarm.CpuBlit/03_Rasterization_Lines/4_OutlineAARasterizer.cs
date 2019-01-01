@@ -14,6 +14,26 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
+//Maxim's note on C++ version:
+//see https://pdfium.googlesource.com/pdfium/+/master/third_party/agg23/agg_rasterizer_scanline_aa.cpp#35
+// ...
+// The author gratefully acknowleges the support of David Turner,
+// Robert Wilhelm, and Werner Lemberg - the authors of the FreeType
+// libray - in producing this work. See http://www.freetype.org for details.
+//
+// Initially the rendering algorithm was designed by David Turner and the
+// other authors of the FreeType library - see the above notice. I nearly
+// created a similar renderer, but still I was far from David's work.
+// I completely redesigned the original code and adapted it for Anti-Grain
+// ideas. Two functions - render_line and render_hline are the core of
+// the algorithm - they calculate the exact coverage of each pixel cell
+// of the polygon. I left these functions almost as is, because there's
+// no way to improve the perfection - hats off to David and his group!
+//
+// All other code is very different from the original.
+// 
+//----------------------------------------------------------------------------
+
 using System;
 using PixelFarm.Drawing;
 

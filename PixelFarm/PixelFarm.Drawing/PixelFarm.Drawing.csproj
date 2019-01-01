@@ -124,6 +124,18 @@
     <Compile Include="..\BackEnd.Tesselate\Tesselator.cs">
       <Link>0_REF_Tesselate\Tesselator.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs">
+      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\GradientSpanGen.cs">
+      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\GradientSpanGen.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs">
+      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs">
+      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\MemBitmapBinder.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\MemBitmapBinder.cs</Link>
     </Compile>
@@ -168,9 +180,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\RequestFont.cs">
       <Link>0_REF_DrawingCore\3_Canvas\RequestFont.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
-      <Link>0_REF_DrawingCore\ExtensionAttribute.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\03_rasterization\0_ScanlineSpan.cs">
       <Link>0_REF_CpuBlit\03_Rasterization\0_ScanlineSpan.cs</Link>
@@ -255,18 +264,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing\SpanInterpolatorPerspectiveLerp.cs">
       <Link>0_REF_CpuBlit\04_FragmentProcessing\SpanInterpolatorPerspectiveLerp.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_fragmentprocessing_gouraud\GouraudSpanGen.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gouraund\GouraudSpanGen.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_fragmentprocessing_gouraud\GradientSpanGen.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gouraund\GradientSpanGen.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_fragmentprocessing_gouraud\IGradientValueCalculator_and_Impl.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gouraund\IGradientValueCalculator_and_Impl.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_fragmentprocessing_gouraud\RGBAGouraudSpanGen.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gouraund\RGBAGouraudSpanGen.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\BitmapBlenderBase.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\BitmapBlenderBase.cs</Link>
@@ -544,6 +541,12 @@
     <Compile Include="..\PixelFarm.Vectors\3_transform\Viewport.cs">
       <Link>0_REF_Painter\1_Vectors\3_Transform\Viewport.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Vectors\4_Utils\SvgArc.cs">
+      <Link>0_REF_Painter\1_Vectors\4_Utils\SvgArc.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\4_Utils\TessTool.cs">
+      <Link>0_REF_Painter\1_Vectors\4_Utils\TessTool.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Vectors\5_clipper\cliper.cs">
       <Link>0_REF_Painter\1_Vectors\5_Clipper\cliper.cs</Link>
     </Compile>
@@ -589,6 +592,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="4_Utils\" />
   </ItemGroup>
   <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
