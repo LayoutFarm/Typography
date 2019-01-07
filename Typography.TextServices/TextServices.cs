@@ -89,7 +89,7 @@ namespace Typography.TextServices
             InstalledTypeface inst = _installedTypefaceCollection.GetInstalledTypeface(name, InstalledTypefaceCollection.GetSubFam(installedFontStyle));
             if (inst != null)
             {
-                
+
                 return _typefaceStore.GetTypeface(inst);
             }
             return null;
@@ -456,6 +456,8 @@ namespace Typography.TextServices
                 using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                 {
                     var reader = new OpenFontReader();
+                    fs.Seek(installedFont.ActualStreamOffset, SeekOrigin.Begin); //***
+
                     typeface = reader.Read(fs);
                     typeface.Filename = installedFont.FontPath;
                 }
