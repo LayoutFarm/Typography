@@ -145,6 +145,8 @@ namespace Typography.TextServices
                 using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                 {
                     var reader = new OpenFontReader();
+                    fs.Seek(installedFont.StreamOffset, SeekOrigin.Begin);
+
                     typeface = reader.Read(fs);
                 }
                 return _loadedTypefaces[installedFont] = typeface;
@@ -262,7 +264,7 @@ namespace Typography.TextServices
                                             member.SubFamilyName,
                                             src.PathName,
                                             member.Weight)
-                                            { StreamOffset = member.ActualStreamOffset }))
+                        { StreamOffset = member.ActualStreamOffset }))
                         {
                             passAll = false;
                         }
