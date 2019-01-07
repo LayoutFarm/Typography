@@ -456,9 +456,8 @@ namespace Typography.TextServices
                 using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                 {
                     var reader = new OpenFontReader();
-                    fs.Seek(installedFont.ActualStreamOffset, SeekOrigin.Begin); //***
 
-                    typeface = reader.Read(fs);
+                    typeface = reader.Read(fs, installedFont.ActualStreamOffset);
                     typeface.Filename = installedFont.FontPath;
                 }
                 return _loadedTypefaces[installedFont] = typeface;

@@ -221,10 +221,13 @@ namespace Typography.OpenFont
                 Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
                 );
         }
-        public Typeface Read(Stream stream, ReadFlags readFlags = ReadFlags.Full)
+        public Typeface Read(Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
         {
             //bool little = BitConverter.IsLittleEndian;
-
+            if (streamStartOffset > 0)
+            {
+                stream.Seek(streamStartOffset, SeekOrigin.Begin);
+            }
             using (var input = new ByteOrderSwappingBinaryReader(stream))
             {
                 ushort majorVersion = input.ReadUInt16();
