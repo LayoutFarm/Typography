@@ -22,7 +22,7 @@ and an example (marked with `(2)`) the uses Typography with a 'mini' snapshot of
 Concept
 ---
 
- * 1.Load .ttf, .otf files, with OpenFontReader.
+ * 1.Load .ttf, .otf, .ttc, .otc files, with OpenFontReader.
  
  * 2.Rasterize a character to a bitmap with a pure software renderer which has Agg(anti grain geometry) Quality! with 
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)

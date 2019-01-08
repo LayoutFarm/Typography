@@ -198,7 +198,7 @@ namespace LayoutFarm
                 typeface = _txtServices.GetTypeface(font.Name, font.Style.ConvToInstalledFontStyle());
                 if (typeface == null)
                 {
-                    throw new NotSupportedException();
+                    throw new NotSupportedException(font.Name);
                 }
                 //
                 //cache here (level-1)
