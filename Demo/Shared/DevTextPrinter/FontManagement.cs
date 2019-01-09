@@ -23,8 +23,11 @@ namespace Typography.TextServices
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
-        public string FontPath { get; internal set; }
         public ushort Weight { get; internal set; }
+
+        public string FontPath { get; internal set; }
+        public int StreamOffset { get; internal set; }
+
 #if DEBUG
         public override string ToString()
         {
@@ -142,7 +145,7 @@ namespace Typography.TextServices
                 using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                 {
                     var reader = new OpenFontReader();
-                    typeface = reader.Read(fs);
+                    typeface = reader.Read(fs, installedFont.StreamOffset);
                 }
                 return _loadedTypefaces[installedFont] = typeface;
             }
@@ -240,12 +243,42 @@ namespace Typography.TextServices
             {
                 var reader = new OpenFontReader();
                 PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                if (string.IsNullOrEmpty(previewFont.fontName))
+                if (string.IsNullOrEmpty(previewFont.Name))
                 {
                     //err!
                     return false;
                 }
-                return RegisterFont(new InstalledFont(previewFont.fontName, previewFont.fontSubFamily, src.PathName, previewFont.weight));
+                //***
+                if (previewFont.IsFontCollection)
+                {
+                    int mbCount = previewFont.MemberCount;
+                    bool passAll = true;
+                    for (int i = 0; i < mbCount; ++i)
+                    {
+                        PreviewFontInfo member = previewFont.GetMember(i);
+
+                        if (!RegisterFont(new InstalledFont(
+                                            member.Name,
+                                            member.SubFamilyName,
+                                            src.PathName,
+                                            member.Weight)
+                        { StreamOffset = member.ActualStreamOffset }))
+                        {
+                            passAll = false;
+                        }
+
+                    }
+                    return passAll;
+                }
+                else
+                {
+                    return RegisterFont(new InstalledFont(
+                           previewFont.Name,
+                           previewFont.SubFamilyName,
+                           src.PathName,
+                           previewFont.Weight));
+                }
+
             }
         }
         bool RegisterFont(InstalledFont newfont)
@@ -410,6 +443,8 @@ namespace Typography.TextServices
                         default: break;
                         case ".ttf":
                         case ".otf":
+                        case ".ttc":
+                        case ".otc":
                             fontCollection.AddFont(new FontFileStreamProvider(file));
                             break;
                     }

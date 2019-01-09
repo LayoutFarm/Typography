@@ -17,33 +17,99 @@ namespace Typography.OpenFont
         Variation = 1 << 4
     }
 
-    public struct PreviewFontInfo
-    {
-        public readonly string fontName;
-        public readonly string fontSubFamily;
-        public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
-        public readonly ushort weight;
 
-        public PreviewFontInfo(string fontName, string fontSubFam,
-            ushort weight,
+    public class PreviewFontInfo
+    {
+        public readonly string Name;
+        public readonly string SubFamilyName;
+        public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
+        public readonly ushort Weight;
+        PreviewFontInfo[] _ttcfMembers;
+
+        public PreviewFontInfo(string fontName, string fontSubFam, ushort weight,
             Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
         {
-            this.fontName = fontName;
-            this.fontSubFamily = fontSubFam;
-            this.weight = weight;
+            Name = fontName;
+            SubFamilyName = fontSubFam;
+            Weight = weight;
             OS2TranslatedStyle = os2TranslatedStyle;
         }
+        public PreviewFontInfo(string fontName, PreviewFontInfo[] ttcfMembers)
+        {
+            Name = fontName;
+            SubFamilyName = "";
+            _ttcfMembers = ttcfMembers;
+        }
+        public int ActualStreamOffset { get; internal set; }
+
+        public bool IsFontCollection => _ttcfMembers != null;
+
+        /// <summary>
+        /// get font collection's member count
+        /// </summary>
+        public int MemberCount => _ttcfMembers.Length;
+        /// <summary>
+        /// get font collection's member
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public PreviewFontInfo GetMember(int index) => _ttcfMembers[index];
 #if DEBUG
         public override string ToString()
         {
-            return fontName + ", " + fontSubFamily + ", " + OS2TranslatedStyle;
+            return (IsFontCollection) ? Name : Name + ", " + SubFamilyName + ", " + OS2TranslatedStyle;
         }
 #endif
     }
 
 
+
+
     public class OpenFontReader
     {
+        class FontCollectionHeader
+        {
+            public ushort majorVersion;
+            public ushort minorVersion;
+            public uint numFonts;
+            public int[] offsetTables;
+            //
+            //if version 2
+            public uint dsigTag;
+            public uint dsigLength;
+            public uint dsigOffset;
+        }
+
+        static string BuildTtcfName(PreviewFontInfo[] members)
+        {
+            //THIS IS MY CONVENTION for TrueType collection font name
+            //you can change this to fit your need.
+
+            var stbuilder = new System.Text.StringBuilder();
+            stbuilder.Append("TTCF: " + members.Length);
+            var uniqueNames = new System.Collections.Generic.Dictionary<string, bool>();
+            for (uint i = 0; i < members.Length; ++i)
+            {
+                PreviewFontInfo member = members[i];
+                if (!uniqueNames.ContainsKey(member.Name))
+                {
+                    uniqueNames.Add(member.Name, true);
+                    stbuilder.Append("," + member.Name);
+                }
+            }
+            return stbuilder.ToString();
+        }
+
+        static bool IsTtcf(ushort u1, ushort u2)
+        {
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/otff#ttc-header
+            //check if 1st 4 bytes is ttcf or not 
+
+            return (((u1 >> 8) & 0xff) == (byte)'t') &&
+                   (((u1) & 0xff) == (byte)'t') &&
+                   (((u2 >> 8) & 0xff) == (byte)'c') &&
+                   (((u2) & 0xff) == (byte)'f');
+        }
         /// <summary>
         /// read only name entry
         /// </summary>
@@ -51,38 +117,117 @@ namespace Typography.OpenFont
         /// <returns></returns>
         public PreviewFontInfo ReadPreview(Stream stream)
         {
-            var little = BitConverter.IsLittleEndian;
+            //var little = BitConverter.IsLittleEndian;
             using (var input = new ByteOrderSwappingBinaryReader(stream))
             {
                 ushort majorVersion = input.ReadUInt16();
                 ushort minorVersion = input.ReadUInt16();
-                ushort tableCount = input.ReadUInt16();
-                ushort searchRange = input.ReadUInt16();
-                ushort entrySelector = input.ReadUInt16();
-                ushort rangeShift = input.ReadUInt16();
-                var tables = new TableEntryCollection();
-                for (int i = 0; i < tableCount; i++)
+
+                if (IsTtcf(majorVersion, minorVersion))
                 {
-                    tables.AddEntry(new UnreadTableEntry(ReadTableHeader(input)));
+                    //this font stream is 'The Font Collection'
+                    FontCollectionHeader ttcHeader = ReadTTCHeader(input);
+                    PreviewFontInfo[] members = new PreviewFontInfo[ttcHeader.numFonts];
+                    for (uint i = 0; i < ttcHeader.numFonts; ++i)
+                    {
+                        input.BaseStream.Seek(ttcHeader.offsetTables[i], SeekOrigin.Begin);
+                        PreviewFontInfo member = members[i] = ReadActualFontPreview(input, false);
+                        member.ActualStreamOffset = ttcHeader.offsetTables[i];
+                    }
+                    return new PreviewFontInfo(BuildTtcfName(members), members);
                 }
-
-
-                NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
-                OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
-
-                return new PreviewFontInfo(
-                    nameEntry.FontName,
-                    nameEntry.FontSubFamily,
-                    os2Table.usWeightClass,
-                    Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
-                    );
+                else
+                {
+                    return ReadActualFontPreview(input, true);//skip version data (majorVersion, minorVersion)
+                }
             }
         }
-
-
-        public Typeface Read(Stream stream, ReadFlags readFlags = ReadFlags.Full)
+        FontCollectionHeader ReadTTCHeader(ByteOrderSwappingBinaryReader input)
         {
-            bool little = BitConverter.IsLittleEndian;
+            //https://docs.microsoft.com/en-us/typography/opentype/spec/otff#ttc-header
+            //TTC Header Version 1.0:
+            //Type 	    Name 	        Description
+            //TAG 	    ttcTag 	        Font Collection ID string: 'ttcf' (used for fonts with CFF or CFF2 outlines as well as TrueType outlines)
+            //uint16 	majorVersion 	Major version of the TTC Header, = 1.
+            //uint16 	minorVersion 	Minor version of the TTC Header, = 0.
+            //uint32 	numFonts 	    Number of fonts in TTC
+            //Offset32 	offsetTable[numFonts] 	Array of offsets to the OffsetTable for each font from the beginning of the file
+
+            //TTC Header Version 2.0:
+            //Type 	    Name 	        Description
+            //TAG 	    ttcTag 	        Font Collection ID string: 'ttcf'
+            //uint16 	majorVersion 	Major version of the TTC Header, = 2.
+            //uint16 	minorVersion 	Minor version of the TTC Header, = 0.
+            //uint32 	numFonts 	    Number of fonts in TTC
+            //Offset32 	offsetTable[numFonts] 	Array of offsets to the OffsetTable for each font from the beginning of the file
+            //uint32 	dsigTag 	    Tag indicating that a DSIG table exists, 0x44534947 ('DSIG') (null if no signature)
+            //uint32 	dsigLength 	    The length (in bytes) of the DSIG table (null if no signature)
+            //uint32 	dsigOffset 	    The offset (in bytes) of the DSIG table from the beginning of the TTC file (null if no signature)
+
+            var ttcHeader = new FontCollectionHeader();
+
+            ttcHeader.majorVersion = input.ReadUInt16();
+            ttcHeader.minorVersion = input.ReadUInt16();
+            uint numFonts = input.ReadUInt32();
+            int[] offsetTables = new int[numFonts];
+            for (uint i = 0; i < numFonts; ++i)
+            {
+                offsetTables[i] = input.ReadInt32();
+            }
+
+            ttcHeader.numFonts = numFonts;
+            ttcHeader.offsetTables = offsetTables;
+            //
+            if (ttcHeader.majorVersion == 2)
+            {
+                ttcHeader.dsigTag = input.ReadUInt32();
+                ttcHeader.dsigLength = input.ReadUInt32();
+                ttcHeader.dsigOffset = input.ReadUInt32();
+
+                if (ttcHeader.dsigTag == 0x44534947)
+                {
+                    //Tag indicating that a DSIG table exists
+                    //TODO: goto DSIG add read signature
+                }
+            }
+            return ttcHeader;
+        }
+        PreviewFontInfo ReadActualFontPreview(ByteOrderSwappingBinaryReader input, bool skipVersionData)
+        {
+            if (!skipVersionData)
+            {
+                ushort majorVersion = input.ReadUInt16();
+                ushort minorVersion = input.ReadUInt16();
+            }
+
+            ushort tableCount = input.ReadUInt16();
+            ushort searchRange = input.ReadUInt16();
+            ushort entrySelector = input.ReadUInt16();
+            ushort rangeShift = input.ReadUInt16();
+
+            var tables = new TableEntryCollection();
+            for (int i = 0; i < tableCount; i++)
+            {
+                tables.AddEntry(new UnreadTableEntry(ReadTableHeader(input)));
+            }
+
+            NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
+            OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
+
+            return new PreviewFontInfo(
+                nameEntry.FontName,
+                nameEntry.FontSubFamily,
+                os2Table.usWeightClass,
+                Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
+                );
+        }
+        public Typeface Read(Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
+        {
+            //bool little = BitConverter.IsLittleEndian;
+            if (streamStartOffset > 0)
+            {
+                stream.Seek(streamStartOffset, SeekOrigin.Begin);
+            }
             using (var input = new ByteOrderSwappingBinaryReader(stream))
             {
                 ushort majorVersion = input.ReadUInt16();
