@@ -87,10 +87,7 @@ namespace Typography.WebFont
 
             if (glyfTable == null) throw new System.NotSupportedException();
 
-            ReconstructGlyfTable(reader, TableDir, glyfTable);
-
-
-            //return base.CreateTableEntry(reader, expectedResult);
+            ReconstructGlyfTable(reader, TableDir, glyfTable); 
 
             return expectedResult;
         }
@@ -1378,7 +1375,7 @@ namespace Typography.WebFont
                                 {
                                     //can't read 128=> error
                                 }
-                                expectedTableStartAt += table.transformLength;
+                                expectedTableStartAt += table.transformLength;//***
                             }
                             else if (table.Name == GlyphLocations._N)
                             {
@@ -1387,7 +1384,7 @@ namespace Typography.WebFont
                                 {
                                     //can't read 128=> error
                                 }
-                                expectedTableStartAt += table.origLength;
+                                expectedTableStartAt += table.transformLength;//***
                             }
                             else
                             {
@@ -1426,14 +1423,15 @@ namespace Typography.WebFont
                 UnreadTableEntry unreadTableEntry = null;
 
 
-                TableHeader tableHeader = new TableHeader(woffTableDir.Name, 0,
-                                        (uint)woffTableDir.ExpectedStartAt,
-                                        woffTableDir.origLength);
+
 
                 if (woffTableDir.Name == Glyf._N && woffTableDir.PreprocessingTransformation == 0)
                 {
                     //this is transformed glyf table,
                     //we need another techqniue 
+                    TableHeader tableHeader = new TableHeader(woffTableDir.Name, 0,
+                                       (uint)woffTableDir.ExpectedStartAt,
+                                       woffTableDir.transformLength);
                     unreadTableEntry = new TransformedGlyf(tableHeader, woffTableDir);
 
                 }
@@ -1441,10 +1439,16 @@ namespace Typography.WebFont
                 {
                     //this is transformed glyf table,
                     //we need another techqniue 
+                    TableHeader tableHeader = new TableHeader(woffTableDir.Name, 0,
+                                       (uint)woffTableDir.ExpectedStartAt,
+                                       woffTableDir.transformLength);
                     unreadTableEntry = new TransformedLoca(tableHeader, woffTableDir);
                 }
                 else
                 {
+                    TableHeader tableHeader = new TableHeader(woffTableDir.Name, 0,
+                                          (uint)woffTableDir.ExpectedStartAt,
+                                          woffTableDir.origLength);
                     unreadTableEntry = new UnreadTableEntry(tableHeader);
                 }
                 tableEntryCollection.AddEntry(unreadTableEntry);
