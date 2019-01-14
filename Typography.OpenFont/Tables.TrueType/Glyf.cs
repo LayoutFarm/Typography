@@ -14,11 +14,14 @@ namespace Typography.OpenFont.Tables
         {
             this.GlyphLocations = glyphLocations;
         }
-        public Glyph[] Glyphs => _glyphs;
-        public GlyphLocations GlyphLocations
+        public Glyph[] Glyphs
+        {
+            get => _glyphs;
+            internal set => _glyphs = value;
+        }
+        GlyphLocations GlyphLocations
         {
             get;
-            private set;
         }
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -66,7 +69,7 @@ namespace Typography.OpenFont.Tables
             //--------------------------------
             //resolve composte glyphs 
             //--------------------------------
- 
+
             foreach (ushort glyphIndex in compositeGlyphs)
             {
 
@@ -78,7 +81,7 @@ namespace Typography.OpenFont.Tables
 #endif
                 _glyphs[glyphIndex] = ReadCompositeGlyph(_glyphs, reader, tableOffset, glyphIndex);
 
-              
+
             }
         }
 
