@@ -87,7 +87,7 @@ namespace Typography.WebFont
 
             if (glyfTable == null) throw new System.NotSupportedException();
 
-            ReconstructGlyfTable(reader, TableDir, glyfTable); 
+            ReconstructGlyfTable(reader, TableDir, glyfTable);
 
             return expectedResult;
         }
@@ -182,6 +182,7 @@ namespace Typography.WebFont
                 }
                 else
                 {
+                    
                 }
             }
 
@@ -338,8 +339,8 @@ namespace Typography.WebFont
             //    5) Read instructionLength bytes from instructionStream, and store these in the reconstituted glyph as instructions. 
 
 
-
-            if (numContour < 1) return null; //skip empty glyph 
+            if (numContour == 0) return Glyph.Empty;
+            if (numContour < 0) return null;//skip composite glyph (resolve later)
 
             //-----
             int curX = 0;
@@ -388,8 +389,7 @@ namespace Typography.WebFont
 
                     //int f1 = (f >> 7); // most significant 1 bit -> on/off curve
 
-                    int xyFormat = f & 0x7F; // remainging 7 bits x,y format 
-
+                    int xyFormat = f & 0x7F; // remainging 7 bits x,y format  
 
                     TripleEncodingRecord enc = encTable[xyFormat]; //0-128 
 
