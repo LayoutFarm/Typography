@@ -6,7 +6,8 @@ namespace Typography.OpenFont.Tables
 {
     class VerticalDeviceMetrics : TableEntry
     {
-        public override string Name => "VDMX";
+        public const string _N = "VDMX";
+        public override string Name => _N;
         //
         //https://www.microsoft.com/typography/otspec/vdmx.htm
         //VDMX - Vertical Device Metrics 
@@ -20,7 +21,7 @@ namespace Typography.OpenFont.Tables
         //In order to avoid grid fitting the entire font to determine the correct height, the VDMX table has been defined.
 
         //The VDMX table consists of a header followed by groupings of VDMX records:
-        Ratio[] _ratios; 
+        Ratio[] _ratios;
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //uint16 	version 	Version number (0 or 1).

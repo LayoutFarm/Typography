@@ -8,7 +8,8 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class Gasp : TableEntry
     {
-        public override string Name => "gasp";
+        public const string _N = "gasp";
+        public override string Name => _N;
         //
         //https://www.microsoft.com/typography/otspec/gasp.htm
 
@@ -31,7 +32,7 @@ namespace Typography.OpenFont.Tables
         //the rasterizer may apply default rules to decide how to render the glyphs on grayscale devices.
 
         //The 'gasp' table consists of a header followed by groupings of 'gasp' records:
-        GaspRangeRecord[] _rangeRecords; 
+        GaspRangeRecord[] _rangeRecords;
         protected override void ReadContentFrom(BinaryReader reader)
         {
 

@@ -1,12 +1,13 @@
 ﻿//Apache2, 2017-present, WinterDev 
 
-using System.Collections.Generic;
+
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
     class SvgTable : TableEntry
     {
-        public override string Name => "SVG ";    //with 1 whitespace ***
+        public const string _N = "SVG "; //with 1 whitespace ***
+        public override string Name => _N;
         //
         // https://www.microsoft.com/typography/otspec/svg.htm
         //OpenType fonts with either TrueType or CFF outlines may also contain an optional 'SVG ' table, 

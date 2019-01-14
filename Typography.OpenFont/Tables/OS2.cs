@@ -12,7 +12,8 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class OS2Table : TableEntry
     {
-        public override string Name => "OS/2";
+        public const string _N = "OS/2";
+        public override string Name => _N;
         //
 
         // Type     Name of  Entry        Comments

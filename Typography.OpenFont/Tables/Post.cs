@@ -48,7 +48,8 @@ namespace Typography.OpenFont.Tables
 
     class PostTable : TableEntry
     {
-        public override string Name => "post";
+        public const string _N = "post";
+        public override string Name => _N;
         //
         uint _italicAngle;
         short _underlinePosition;
@@ -60,8 +61,8 @@ namespace Typography.OpenFont.Tables
         Dictionary<string, ushort> _glyphIndiceByName;
 
         public int Version { get; set; }
-        
-        
+
+
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //header
@@ -80,64 +81,89 @@ namespace Typography.OpenFont.Tables
             //The additional entries for versions 2.0 and 2.5 are shown below.
             //Apple has defined a version 4.0 for use with Apple Advanced Typography (AAT), which is described in their documentation.
 
+            // float version_f = (float)(version) / (1 << 16);
 
-            float version_f = (float)(version) / (1 << 16);
-            if (version_f == 1 ||
-                version_f == 3)
+            switch (version)
             {
-                //end here
-                //so _glyphNames=> null!
-                Version = (int)version_f;
-            }
-            else if (version_f == 2)
-            {
-                Version = 2;
-
-                //Version 2.0
-
-                //This is the version required in order to supply PostScript glyph names for fonts which do not supply them elsewhere.
-                //A version 2.0 'post' table can be used in fonts with TrueType or CFF version 2 outlines.
-                //Type 	    Name 	                        Description
-                //uint16 	numberOfGlyphs 	                Number of glyphs (this should be the same as numGlyphs in 'maxp' table).
-                //uint16 	glyphNameIndex[numGlyphs]. 	    This is not an offset, but is the ordinal number of the glyph in 'post' string tables.
-                //int8 	    names[numberNewGlyphs] 	        Glyph names with length bytes [variable] (a Pascal string).
-
-                //This font file contains glyphs not in the standard Macintosh set,
-                //or the ordering of the glyphs in the font file differs from the standard Macintosh set. 
-                //The glyph name array maps the glyphs in this font to name index.
-                //....
-                //If you do not want to associate a PostScript name with a particular glyph, use index number 0 which points to the name .notdef.
-
-                _glyphNames = new Dictionary<ushort, string>();
-                ushort numOfGlyphs = reader.ReadUInt16();
-                ushort[] glyphNameIndice = Utils.ReadUInt16Array(reader, numOfGlyphs);//***  
-                string[] stdMacGlyphNames = MacPostFormat1.GetStdMacGlyphNames();
-
-                for (ushort i = 0; i < numOfGlyphs; ++i)
-                {
-                    ushort glyphNameIndex = glyphNameIndice[i];
-                    if (glyphNameIndex < 258)
+                case 0x00010000: //version 1
+                case 0x00030000: //version3
+                    Version = 1;
+                    break;
+                case 0x00020000: //version 2
                     {
-                        //If the name index is between 0 and 257, treat the name index as a glyph index in the Macintosh standard order.  
-                        //replace? 
-                        _glyphNames[i] = stdMacGlyphNames[glyphNameIndex];
-                    }
-                    else
-                    {
-                        //If the name index is between 258 and 65535, 
-                        //then subtract 258 and use that to index into the list of Pascal strings at the end of the table. 
-                        //Thus a given font may map some of its glyphs to the standard glyph names, and some to its own names.
+                        Version = 2;
 
-                        //258 and 65535, 
-                        int len = reader.ReadByte(); //name len 
-                        _glyphNames.Add(i, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len), 0, len));
+                        //Version 2.0
+
+                        //This is the version required in order to supply PostScript glyph names for fonts which do not supply them elsewhere.
+                        //A version 2.0 'post' table can be used in fonts with TrueType or CFF version 2 outlines.
+                        //Type 	    Name 	                        Description
+                        //uint16 	numberOfGlyphs 	                Number of glyphs (this should be the same as numGlyphs in 'maxp' table).
+                        //uint16 	glyphNameIndex[numGlyphs]. 	    This is not an offset, but is the ordinal number of the glyph in 'post' string tables.
+                        //int8 	    names[numberNewGlyphs] 	        Glyph names with length bytes [variable] (a Pascal string).
+
+                        //This font file contains glyphs not in the standard Macintosh set,
+                        //or the ordering of the glyphs in the font file differs from the standard Macintosh set. 
+                        //The glyph name array maps the glyphs in this font to name index.
+                        //....
+                        //If you do not want to associate a PostScript name with a particular glyph, use index number 0 which points to the name .notdef.
+
+                        _glyphNames = new Dictionary<ushort, string>();
+                        ushort numOfGlyphs = reader.ReadUInt16();
+                        ushort[] glyphNameIndice = Utils.ReadUInt16Array(reader, numOfGlyphs);//***  
+                        string[] stdMacGlyphNames = MacPostFormat1.GetStdMacGlyphNames();
+
+                        for (ushort i = 0; i < numOfGlyphs; ++i)
+                        {
+                            ushort glyphNameIndex = glyphNameIndice[i];
+                            if (glyphNameIndex < 258)
+                            {
+                                //If the name index is between 0 and 257, treat the name index as a glyph index in the Macintosh standard order.  
+                                //replace? 
+                                _glyphNames[i] = stdMacGlyphNames[glyphNameIndex];
+                            }
+                            else
+                            {
+                                //If the name index is between 258 and 65535, 
+                                //then subtract 258 and use that to index into the list of Pascal strings at the end of the table. 
+                                //Thus a given font may map some of its glyphs to the standard glyph names, and some to its own names.
+
+                                //258 and 65535, 
+                                int len = reader.ReadByte(); //name len 
+                                _glyphNames.Add(i, System.Text.Encoding.UTF8.GetString(reader.ReadBytes(len), 0, len));
+                            }
+                        }
+
                     }
-                }
+                    break;
+                default:
+                    {
+                        return;
+                        throw new System.NotSupportedException();
+                    }
+                case 0x00025000:
+                    //deprecated ??
+                    throw new System.NotSupportedException();
             }
-            else
-            {
-                throw new System.NotSupportedException();
-            }
+            //float version_f = (float)(version) / (1 << 16);
+            //if (version_f == 1 ||
+            //    version_f == 3)
+            //{
+            //    //end here
+            //    //so _glyphNames=> null!
+            //    Version = (int)version_f;
+            //}
+            //else if (version_f == 2)
+            //{
+            //    Version = 2;
+
+            //}
+            //else
+            //{
+            //    //? can't read this?
+            //    return;
+            //    throw new System.NotSupportedException();
+            //}
         }
 
 

@@ -33,7 +33,8 @@ namespace Typography.OpenFont.Tables
 
     public class GSUB : GlyphShapingTableEntry
     {
-        public override string Name => "GSUB";
+        public const string _N = "GSUB";
+        public override string Name => _N;
         //
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
                                                 ushort lookupType, ushort lookupFlags,
@@ -42,9 +43,9 @@ namespace Typography.OpenFont.Tables
             LookupTable lookupTable = new LookupTable(lookupType, lookupFlags, markFilteringSet);
             foreach (long subTableOffset in subTableOffsets)
             {
-                LookupSubTable subTable = lookupTable.ReadSubTable(reader, lookupTablePos + subTableOffset);
+                LookupSubTable subTable = lookupTable.ReadSubTable(reader, lookupTablePos + subTableOffset); 
                 subTable.OwnerGSub = this;
-                lookupTable.SubTables.Add(subTable);
+                lookupTable.SubTables.Add(subTable); 
             }
             LookupList.Add(lookupTable);
         }
@@ -387,11 +388,20 @@ namespace Typography.OpenFont.Tables
                 //LookupType 2: Multiple Substitution Subtable 
                 //A Multiple Substitution (MultipleSubst) subtable replaces a single glyph with more than one glyph, 
                 //as when multiple glyphs replace a single ligature. 
-                //The subtable has a single format: MultipleSubstFormat1. The subtable specifies a format identifier (SubstFormat), an offset to a Coverage table that defines the input glyph indices, a count of offsets in the Sequence array (SequenceCount), and an array of offsets to Sequence tables that define the output glyph indices (Sequence). The Sequence table offsets are ordered by the Coverage Index of the input glyphs.
 
-                //For each input glyph listed in the Coverage table, a Sequence table defines the output glyphs. Each Sequence table contains a count of the glyphs in the output glyph sequence (GlyphCount) and an array of output glyph indices (Substitute).
+                //The subtable has a single format: MultipleSubstFormat1. 
 
-                //    Note: The order of the output glyph indices depends on the writing direction of the text. For text written left to right, the left-most glyph will be first glyph in the sequence. Conversely, for text written right to left, the right-most glyph will be first.
+                //The subtable specifies a format identifier (SubstFormat),
+                //an offset to a Coverage table that defines the input glyph indices, a count of offsets in the Sequence array (SequenceCount), 
+                //and an array of offsets to Sequence tables that define the output glyph indices (Sequence). 
+                //The Sequence table offsets are ordered by the Coverage Index of the input glyphs.
+
+                //For each input glyph listed in the Coverage table, a Sequence table defines the output glyphs.
+                //Each Sequence table contains a count of the glyphs in the output glyph sequence (GlyphCount) and an array of output glyph indices (Substitute).
+
+                //    Note: The order of the output glyph indices depends on the writing direction of the text.
+                //For text written left to right, the left-most glyph will be first glyph in the sequence. 
+                //Conversely, for text written right to left, the right-most glyph will be first.
 
                 //The use of multiple substitution for deletion of an input glyph is prohibited. GlyphCount should always be greater than 0. 
                 //Example 4 at the end of this chapter shows how to replace a single ligature with three glyphs. 
@@ -414,7 +424,8 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 switch (format)
                 {
-                    default: throw new NotSupportedException();
+                    default: 
+                        throw new NotSupportedException();
                     case 1:
                         {
                             ushort coverageOffset = reader.ReadUInt16();
