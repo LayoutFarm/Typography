@@ -145,25 +145,7 @@ namespace Typography.OpenFont.Tables
                     //deprecated ??
                     throw new System.NotSupportedException();
             }
-            //float version_f = (float)(version) / (1 << 16);
-            //if (version_f == 1 ||
-            //    version_f == 3)
-            //{
-            //    //end here
-            //    //so _glyphNames=> null!
-            //    Version = (int)version_f;
-            //}
-            //else if (version_f == 2)
-            //{
-            //    Version = 2;
-
-            //}
-            //else
-            //{
-            //    //? can't read this?
-            //    return;
-            //    throw new System.NotSupportedException();
-            //}
+            
         }
 
 
