@@ -173,10 +173,17 @@ namespace Typography.WebFont
                 //try read each compressed table
                 if (DecompressHandler == null)
                 {
+                    if (WoffDefaultZlibDecompressFunc.DecompressHandler != null)
+                    {
+                        DecompressHandler = WoffDefaultZlibDecompressFunc.DecompressHandler;
+                    }
+                    else
+                    {
 #if DEBUG
-                    System.Diagnostics.Debug.WriteLine("no Zlib DecompressHandler ");
+                        System.Diagnostics.Debug.WriteLine("no Zlib DecompressHandler ");
 #endif
-                    return null; //notify user too
+                        return null; //notify user too
+                    }
                 }
 
                 TableEntryCollection tableEntryCollection = CreateTableEntryCollection(woffTableDirs);

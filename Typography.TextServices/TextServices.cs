@@ -455,10 +455,20 @@ namespace Typography.TextServices
                 //TODO: review how to load font here
                 using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                 {
-                    var reader = new OpenFontReader();
+                    if (Path.GetExtension(installedFont.FontPath) == ".woff")
+                    {
 
-                    typeface = reader.Read(fs, installedFont.ActualStreamOffset);
-                    typeface.Filename = installedFont.FontPath;
+                        Typography.WebFont.WoffReader reader = new WebFont.WoffReader();
+                        typeface = reader.Read(fs);
+                        typeface.Filename = installedFont.FontPath;
+
+                    }
+                    else
+                    {
+                        var reader = new OpenFontReader(); 
+                        typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                        typeface.Filename = installedFont.FontPath;
+                    }
                 }
                 return _loadedTypefaces[installedFont] = typeface;
             }

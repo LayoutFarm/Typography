@@ -42,6 +42,70 @@ namespace SampleWinForms
             Typography.TextBreak.CustomBreakerBuilder.Setup(dicProvider);
 
             this.Load += new System.EventHandler(this.Form1_Load);
+
+
+            //
+            //Woff
+            WoffDefaultZlibDecompressFunc.DecompressHandler = (byte[] compressedBytes, byte[] decompressedResult) =>
+            {
+                //ZLIB
+                //****
+                //YOU can change to  your prefer decode libs***
+                //****
+
+                bool result = false;
+                try
+                {
+                    var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater();
+                    inflater.SetInput(compressedBytes);
+                    inflater.Inflate(decompressedResult);
+#if DEBUG
+                    long outputLen = inflater.TotalOut;
+                    if (outputLen != decompressedResult.Length)
+                    {
+
+                    }
+#endif
+
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+
+                }
+                return result;
+            };
+            //Woff2
+
+            Woff2DefaultBrotliDecompressFunc.DecompressHandler = (byte[] compressedBytes, Stream output) =>
+            {
+                //BROTLI
+                //****
+                //YOU can change to  your prefer decode libs***
+                //****
+
+                bool result = false;
+                try
+                {
+                    using (MemoryStream ms = new MemoryStream(compressedBytes))
+                    {
+
+                        ms.Position = 0;//set to start pos
+                        DecompressAndCalculateCrc1(ms, output);
+                        //
+                        //  
+
+                        //Decompress(ms, output);
+                    }
+                    //DecompressBrotli(compressedBytes, output);
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+
+                }
+                return result;
+            };
         }
 
         void RenderByGlyphName(string selectedGlyphName)
@@ -759,35 +823,7 @@ namespace SampleWinForms
 
         private void button2_Click(object sender, EventArgs e)
         {
-            WoffDefaultZlibDecompressFunc.DecompressHandler = (byte[] compressedBytes, byte[] decompressedResult) =>
-            {
-                //ZLIB
-                //****
-                //YOU can change to  your prefer decode libs***
-                //****
 
-                bool result = false;
-                try
-                {
-                    var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater();
-                    inflater.SetInput(compressedBytes);
-                    inflater.Inflate(decompressedResult);
-#if DEBUG
-                    long outputLen = inflater.TotalOut;
-                    if (outputLen != decompressedResult.Length)
-                    {
-
-                    }
-#endif
-
-                    result = true;
-                }
-                catch (Exception ex)
-                {
-
-                }
-                return result;
-            };
 
             OpenFontReader openFontReader = new OpenFontReader();
             string filename = "d:\\WImageTest\\Sarabun-Regular.woff";
@@ -916,36 +952,8 @@ namespace SampleWinForms
             //string filename = "d:\\WImageTest\\Roboto-Regular.woff2"; 
             Woff2Reader reader = new Woff2Reader();
 
-            Woff2DefaultBrotliDecompressFunc.DecompressHandler = (byte[] compressedBytes, Stream output) =>
-            {
-                //BROTLI
-                //****
-                //YOU can change to  your prefer decode libs***
-                //****
+           
 
-                bool result = false;
-                try
-                {
-                    using (MemoryStream ms = new MemoryStream(compressedBytes))
-                    {
-
-                        ms.Position = 0;//set to start pos
-                        DecompressAndCalculateCrc1(ms, output);
-                        //
-                        //  
-
-                        //Decompress(ms, output);
-                    }
-                    //DecompressBrotli(compressedBytes, output);
-                    result = true;
-                }
-                catch (Exception ex)
-                {
-
-                }
-                return result;
-            };
-            
 
             //            //assign woff decompressor here 
             //            reader.DecompressHandler += (byte[] compressBytes, byte[] decompressResult) =>
@@ -982,5 +990,6 @@ namespace SampleWinForms
             }
 
         }
+ 
     }
 }
