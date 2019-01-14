@@ -15,4 +15,8 @@
 
   <Import Project="..\..\..\Unpack_SH\Unpack_SH.projitems" Label="Shared" />
 
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
+  </ItemGroup>
+
 </Project>
