@@ -457,15 +457,13 @@ namespace Typography.TextServices
                 {
                     if (Path.GetExtension(installedFont.FontPath) == ".woff")
                     {
-
                         Typography.WebFont.WoffReader reader = new WebFont.WoffReader();
                         typeface = reader.Read(fs);
                         typeface.Filename = installedFont.FontPath;
-
                     }
                     else
                     {
-                        var reader = new OpenFontReader(); 
+                        var reader = new OpenFontReader();
                         typeface = reader.Read(fs, installedFont.ActualStreamOffset);
                         typeface.Filename = installedFont.FontPath;
                     }

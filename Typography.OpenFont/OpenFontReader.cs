@@ -41,7 +41,7 @@ namespace Typography.OpenFont
             _ttcfMembers = ttcfMembers;
         }
         public int ActualStreamOffset { get; internal set; }
-
+        public bool IsWebFont { get; internal set; }
         public bool IsFontCollection => _ttcfMembers != null;
 
         /// <summary>

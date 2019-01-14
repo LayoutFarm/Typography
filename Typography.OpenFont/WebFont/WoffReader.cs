@@ -133,8 +133,7 @@ namespace Typography.WebFont
                         if (previewFontInfo != null)
                         {
                             //add webfont info to this preview font
-                            //
-
+                            previewFontInfo.IsWebFont = true;
                         }
                         return previewFontInfo;
                     }
