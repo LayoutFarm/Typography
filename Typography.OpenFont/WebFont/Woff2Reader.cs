@@ -1153,7 +1153,52 @@ namespace Typography.WebFont
 
         public PreviewFontInfo ReadPreview(BinaryReader reader)
         {
-            return null;
+
+            _header = ReadHeader(reader);
+            if (_header == null) return null;  //=> return here and notify user too.  
+            Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(reader);
+            if (DecompressHandler == null)
+            {
+                //if no Brotli decoder=> return here and notify user too.
+                if (Woff2DefaultBrotliDecompressFunc.DecompressHandler != null)
+                {
+                    DecompressHandler = Woff2DefaultBrotliDecompressFunc.DecompressHandler;
+                }
+                else
+                {
+                    //return here and notify user too. 
+                    return null;
+                }
+            }
+
+            //try read each compressed tables
+            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
+            if (compressedBuffer.Length != _header.totalCompressSize)
+            {
+                //error!
+                return null; //can't read this, notify user too.
+            }
+            using (MemoryStream decompressedStream = new MemoryStream())
+            {
+                if (!DecompressHandler(compressedBuffer, decompressedStream))
+                {
+                    //...Most notably, 
+                    //the data for the font tables is compressed in a SINGLE data stream comprising all the font tables.
+
+                    //if not pass set to null
+                    //decompressedBuffer = null;
+                    return null;
+                }
+                //from decoded stream we read each table
+                decompressedStream.Position = 0;//reset pos
+
+                using (ByteOrderSwappingBinaryReader reader2 = new ByteOrderSwappingBinaryReader(decompressedStream))
+                {
+                    TableEntryCollection tableEntryCollection = CreateTableEntryCollection(woff2TablDirs);
+                    OpenFontReader openFontReader = new OpenFontReader();
+                    return openFontReader.ReadPreviewFontInfo(tableEntryCollection, reader2);
+                }
+            }
         }
         public Typeface Read(Stream inputstream)
         {
@@ -1161,11 +1206,8 @@ namespace Typography.WebFont
             using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputstream))
             {
                 _header = ReadHeader(reader);
-                if (_header == null) return null;  //=> return here and notify user too. 
-                                                   //
+                if (_header == null) return null;  //=> return here and notify user too.  
                 Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(reader);
-
-
                 if (DecompressHandler == null)
                 {
                     //if no Brotli decoder=> return here and notify user too.
@@ -1179,8 +1221,6 @@ namespace Typography.WebFont
                         return null;
                     }
                 }
-
-
 
                 //try read each compressed tables
                 byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
@@ -1614,7 +1654,7 @@ namespace Typography.WebFont
 
     class Woff2Utils
     {
-         
+
         const byte ONE_MORE_BYTE_CODE1 = 255;
         const byte ONE_MORE_BYTE_CODE2 = 254;
         const byte WORD_CODE = 253;
@@ -1713,5 +1753,5 @@ namespace Typography.WebFont
                 return code;
             }
         }
-    } 
+    }
 }

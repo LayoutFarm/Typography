@@ -166,7 +166,9 @@ namespace Typography.OpenFont
                 else if (KnownFontFiles.IsWoff2(majorVersion, minorVersion))
                 {
                     //check if we enable woff2 or not
-                    return null;
+                    WebFont.Woff2Reader woffReader = new WebFont.Woff2Reader();
+                    input.BaseStream.Position = 0;
+                    return woffReader.ReadPreview(input);
                 }
                 else
                 {
