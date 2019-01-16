@@ -41,7 +41,7 @@ namespace Typography.OpenFont
             _ttcfMembers = ttcfMembers;
         }
         public int ActualStreamOffset { get; internal set; }
-
+        public bool IsWebFont { get; internal set; }
         public bool IsFontCollection => _ttcfMembers != null;
 
         /// <summary>
@@ -166,7 +166,9 @@ namespace Typography.OpenFont
                 else if (KnownFontFiles.IsWoff2(majorVersion, minorVersion))
                 {
                     //check if we enable woff2 or not
-                    return null;
+                    WebFont.Woff2Reader woffReader = new WebFont.Woff2Reader();
+                    input.BaseStream.Position = 0;
+                    return woffReader.ReadPreview(input);
                 }
                 else
                 {
@@ -246,20 +248,47 @@ namespace Typography.OpenFont
         }
         public Typeface Read(Stream stream, int streamStartOffset = 0, ReadFlags readFlags = ReadFlags.Full)
         {
-            //bool little = BitConverter.IsLittleEndian;
+            //bool little = BitConverter.IsLittleEndian; 
+
             if (streamStartOffset > 0)
             {
+                //eg. for ttc
                 stream.Seek(streamStartOffset, SeekOrigin.Begin);
             }
             using (var input = new ByteOrderSwappingBinaryReader(stream))
             {
                 ushort majorVersion = input.ReadUInt16();
                 ushort minorVersion = input.ReadUInt16();
+
+                if (KnownFontFiles.IsTtcf(majorVersion, minorVersion))
+                {
+                    //this font stream is 'The Font Collection'                    
+                    //To read content of ttc=> one must specific the offset
+                    //so use read preview first=> you will know that what are inside the ttc.                    
+
+                    return null;
+                }
+                else if (KnownFontFiles.IsWoff(majorVersion, minorVersion))
+                {
+                    //check if we enable woff or not
+                    WebFont.WoffReader woffReader = new WebFont.WoffReader();
+                    input.BaseStream.Position = 0;
+                    return woffReader.Read(input);
+                }
+                else if (KnownFontFiles.IsWoff2(majorVersion, minorVersion))
+                {
+                    //check if we enable woff2 or not
+                    WebFont.Woff2Reader woffReader = new WebFont.Woff2Reader();
+                    input.BaseStream.Position = 0;
+                    return woffReader.Read(input);
+                }
+                //-----------------------------------------------------------------
+
+
                 ushort tableCount = input.ReadUInt16();
                 ushort searchRange = input.ReadUInt16();
                 ushort entrySelector = input.ReadUInt16();
                 ushort rangeShift = input.ReadUInt16();
-
                 //------------------------------------------------------------------ 
                 var tables = new TableEntryCollection();
                 for (int i = 0; i < tableCount; i++)
