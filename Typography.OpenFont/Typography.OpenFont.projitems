@@ -81,5 +81,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\Interpreter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidFontException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Typeface.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebFont\Woff2Reader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebFont\WoffReader.cs" />
   </ItemGroup>
 </Project>

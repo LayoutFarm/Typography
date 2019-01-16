@@ -30,11 +30,18 @@ namespace Typography.OpenFont.Tables
         {
             this.Header = header;
         }
-        public override string Name=> this.Header.Tag;
+        public override string Name => this.Header.Tag;
         //
-        protected override void ReadContentFrom(BinaryReader reader)
+        protected sealed override void ReadContentFrom(BinaryReader reader)
         {
             //intend ***
+            throw new NotImplementedException();
+        }
+
+        public bool HasCustomContentReader { get; protected set; }
+        public virtual T CreateTableEntry<T>(BinaryReader reader, T expectedResult)
+            where T : TableEntry
+        {
             throw new NotImplementedException();
         }
 #if DEBUG

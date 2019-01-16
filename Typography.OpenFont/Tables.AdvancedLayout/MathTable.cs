@@ -673,7 +673,8 @@ namespace Typography.OpenFont.Tables
 
     class MathTable : TableEntry
     {
-        public override string Name => "MATH";
+        public const string _N = "MATH";
+        public override string Name => _N;
         //
         internal MathConstants _mathConstTable;
 

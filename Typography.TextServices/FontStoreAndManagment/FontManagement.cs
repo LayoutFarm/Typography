@@ -25,9 +25,12 @@ namespace Typography.FontManagement
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
-        public string FontPath { get; internal set; }
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
+
+        public string FontPath { get; internal set; }
+        public int ActualStreamOffset { get; internal set; }
+
         public override string ToString()
         {
             return FontName + " " + FontSubFamily;
@@ -182,7 +185,54 @@ namespace Typography.FontManagement
             return fontGroup;
         }
 
+        bool AddFontPreview(PreviewFontInfo previewFont, string srcPath)
+        {
+            _onlyFontNames[previewFont.Name] = true;
 
+            TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
+            switch (previewFont.OS2TranslatedStyle)
+            {
+                case OpenFont.Extensions.TranslatedOS2FontStyle.BOLD:
+                    typefaceStyle = TypefaceStyle.Bold;
+                    break;
+                case OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC:
+                case OpenFont.Extensions.TranslatedOS2FontStyle.OBLIQUE:
+                    typefaceStyle = TypefaceStyle.Italic;
+                    break;
+                case OpenFont.Extensions.TranslatedOS2FontStyle.REGULAR:
+                    typefaceStyle = TypefaceStyle.Regular;
+                    break;
+                case (OpenFont.Extensions.TranslatedOS2FontStyle.BOLD | OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC):
+                    typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
+                    break;
+            }
+            //---------------
+            //some font subfam="Bold Italic" but OS2TranslatedStyle is only Italic
+            //so we should check the subfam name too!
+            string[] fontSubFamUpperCaseName_split = previewFont.SubFamilyName.ToUpper().Split(' ');
+            if (fontSubFamUpperCaseName_split.Length > 1)
+            {
+                if (typefaceStyle != (TypefaceStyle.Bold | TypefaceStyle.Italic))
+                {
+                    //translate more
+                    if ((fontSubFamUpperCaseName_split[0] == "BOLD" && fontSubFamUpperCaseName_split[1] == "ITALIC") ||
+                        (fontSubFamUpperCaseName_split[0] == "ITALIC" && fontSubFamUpperCaseName_split[1] == "BOLD"))
+                    {
+                        typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
+                    }
+                }
+            }
+            else
+            {
+                //=1
+                switch (fontSubFamUpperCaseName_split[0])
+                {
+                    case "BOLD": typefaceStyle = TypefaceStyle.Bold; break;
+                    case "ITALIC": typefaceStyle = TypefaceStyle.Italic; break;
+                }
+            }
+            return Register(new InstalledTypeface(previewFont.Name, previewFont.SubFamilyName, srcPath, typefaceStyle, previewFont.Weight) { ActualStreamOffset = previewFont.ActualStreamOffset });
+        }
         public bool AddFontStreamSource(IFontStreamSource src)
         {
             //preview data of font
@@ -192,61 +242,30 @@ namespace Typography.FontManagement
                 {
                     var reader = new OpenFontReader();
                     PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                    if (string.IsNullOrEmpty(previewFont.fontName))
+                    if (string.IsNullOrEmpty(previewFont.Name))
                     {
                         //err!
                         return false;
                     }
-
-                    _onlyFontNames[previewFont.fontName] = true;
-
-                    TypefaceStyle typefaceStyle = TypefaceStyle.Regular;
-                    switch (previewFont.OS2TranslatedStyle)
+                    if (previewFont.IsFontCollection)
                     {
-                        case OpenFont.Extensions.TranslatedOS2FontStyle.BOLD:
-                            typefaceStyle = TypefaceStyle.Bold;
-                            break;
-                        case OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC:
-                        case OpenFont.Extensions.TranslatedOS2FontStyle.OBLIQUE:
-                            typefaceStyle = TypefaceStyle.Italic;
-                            break;
-                        case OpenFont.Extensions.TranslatedOS2FontStyle.REGULAR:
-                            typefaceStyle = TypefaceStyle.Regular;
-                            break;
-                        case (OpenFont.Extensions.TranslatedOS2FontStyle.BOLD | OpenFont.Extensions.TranslatedOS2FontStyle.ITALIC):
-                            typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
-                            break;
-                    }
-
-
-                    //---------------
-                    //some font subfam="Bold Italic" but OS2TranslatedStyle is only Italic
-                    //so we should check the subfam name too!
-                    string[] fontSubFamUpperCaseName_split = previewFont.fontSubFamily.ToUpper().Split(' ');
-                    if (fontSubFamUpperCaseName_split.Length > 1)
-                    {
-                        if (typefaceStyle != (TypefaceStyle.Bold | TypefaceStyle.Italic))
+                        int mbCount = previewFont.MemberCount;
+                        bool totalResult = true;
+                        for (int i = 0; i < mbCount; ++i)
                         {
-                            //translate more
-                            if ((fontSubFamUpperCaseName_split[0] == "BOLD" && fontSubFamUpperCaseName_split[1] == "ITALIC") ||
-                                (fontSubFamUpperCaseName_split[0] == "ITALIC" && fontSubFamUpperCaseName_split[1] == "BOLD"))
+                            //extract and each members
+                            if (!AddFontPreview(previewFont.GetMember(i), src.PathName))
                             {
-                                typefaceStyle = TypefaceStyle.Bold | TypefaceStyle.Italic;
+                                totalResult = false;
                             }
-
                         }
+                        return totalResult;
                     }
                     else
                     {
-                        //=1
-                        switch (fontSubFamUpperCaseName_split[0])
-                        {
-                            case "BOLD": typefaceStyle = TypefaceStyle.Bold; break;
-                            case "ITALIC": typefaceStyle = TypefaceStyle.Italic; break;
-                        }
+                        return AddFontPreview(previewFont, src.PathName);
                     }
 
-                    return Register(new InstalledTypeface(previewFont.fontName, previewFont.fontSubFamily, src.PathName, typefaceStyle, previewFont.weight));
                 }
             }
             catch (IOException)
@@ -497,8 +516,12 @@ namespace Typography.FontManagement
                 switch (ext)
                 {
                     default: break;
+                    case ".ttc":
+                    case ".otc":                    
                     case ".ttf":
                     case ".otf":
+                    case ".woff":
+                    case ".woff2":
                         fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
                         break;
                 }

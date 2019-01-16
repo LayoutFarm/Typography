@@ -11,7 +11,8 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class HorizontalMetrics : TableEntry
     {
-        public override string Name => "hmtx";
+        public const string _N = "hmtx";
+        public override string Name => _N;
         //
         //https://www.microsoft.com/typography/otspec/hmtx.htm
         // A font rendering engine must use the advanceWidths in the hmtx table for the advances of a CFF OFF font,

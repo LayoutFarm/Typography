@@ -7,7 +7,8 @@ namespace Typography.OpenFont.Tables
 
     class HorizontalDeviceMetrics : TableEntry
     {
-        public override string Name => "hdmx";
+        public const string _N = "hdmx";
+        public override string Name => _N;
         //
         //https://www.microsoft.com/typography/otspec/hdmx.htm
         //The hdmx table relates to OpenType™ fonts with TrueType outlines. 

@@ -73,7 +73,8 @@ namespace Typography.OpenFont.Tables
 
     class Cmap : TableEntry
     {
-        public override string Name => "cmap";
+        public const string _N = "cmap";
+        public override string Name => _N;
         //
         public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
