@@ -207,6 +207,17 @@ See its action here => [CSharpMath](https://github.com/verybadcat/CSharpMath/iss
 
 
 ---
+**Web Open Font Format (WOFF1 and WOFF2)
+
+https://user-images.githubusercontent.com/7447159/51227867-c867c000-1988-11e9-92df-fb6badfe628f.png
+
+_Roboto-Regular.woff2, Typography reads and restores woff2
+
+see https://github.com/LayoutFarm/Typography/issues/27
+
+
+
+---
 The HtmlRenderer example!
 ---
 
