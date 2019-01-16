@@ -520,6 +520,8 @@ namespace Typography.FontManagement
                     case ".otc":                    
                     case ".ttf":
                     case ".otf":
+                    case ".woff":
+                    case ".woff2":
                         fontCollection.AddFontStreamSource(new FontFileStreamProvider(file));
                         break;
                 }

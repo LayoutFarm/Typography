@@ -7,8 +7,8 @@ namespace Typography.OpenFont.Tables
 {
     class Head : TableEntry
     {
-        //
-        public override string Name => "head";
+        public const string _N = "head";
+        public override string Name => _N;
         //
         short _indexToLocFormat;
         Bounds _bounds;

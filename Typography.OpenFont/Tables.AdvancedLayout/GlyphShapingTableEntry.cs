@@ -124,7 +124,9 @@ namespace Typography.OpenFont.Tables
             // During text processing, a client applies a lookup to each glyph in the string before moving to the next lookup.
             // A lookup is finished for a glyph after the client makes the substitution/positioning operation.
             // To move to the “next” glyph, the client will typically skip all the glyphs that participated in the lookup operation: glyphs
-            // that were substituted/positioned as well as any other glyphs that formed a context for the operation. However, in the case of pair positioning operations (i.e., kerning), the “next” glyph in a sequence may be the second glyph of the positioned pair (see pair positioning lookup for details).
+            // that were substituted/positioned as well as any other glyphs that formed a context for the operation.
+            // However, in the case of pair positioning operations (i.e., kerning),
+            // the “next” glyph in a sequence may be the second glyph of the positioned pair (see pair positioning lookup for details).
             //
             // A Lookup table contains a LookupType, specified as an integer, that defines the type of information stored in the lookup.
             // The LookupFlag specifies lookup qualifiers that assist a text-processing client in substituting or positioning glyphs.
@@ -141,6 +143,31 @@ namespace Typography.OpenFont.Tables
             // uint16    MarkFilteringSet         Index (base 0) into GDEF mark glyph sets structure.
             //                                    *** This field is only present if bit UseMarkFilteringSet of lookup flags is set.
             // --------------------------------
+
+
+            // --------------------------------
+            //The LookupFlag uses two bytes of data: 
+
+            //Each of the first four bits can be set in order to specify additional instructions for applying a lookup to a glyph string.The LookUpFlag bit enumeration table provides details about the use of these bits.
+            //The fifth bit indicates the presence of a MarkFilteringSet field in the Lookup table. 
+            //The next three bits are reserved for future use.
+
+            //The high byte is set to specify the type of mark attachment.
+
+
+            //LookupFlag bit enumeration
+            //Type    Name                    Description
+            //0x0001  rightToLeft             This bit relates only to the correct processing of the cursive attachment lookup type(GPOS lookup type 3).When this bit is set, the last glyph in a given sequence to which the cursive attachment lookup is applied, will be positioned on the baseline.
+            //                                Note: Setting of this bit is not intended to be used by operating systems or applications to determine text direction.
+            //0x0002  ignoreBaseGlyphs        If set, skips over base glyphs
+            //0x0004  ignoreLigatures         If set, skips over ligatures
+            //0x0008  ignoreMarks             If set, skips over all combining marks
+            //0x0010  useMarkFilteringSet     If set, indicates that the lookup table structure is followed by a MarkFilteringSet field.The layout engine skips over all mark glyphs not in the mark filtering set indicated.
+            //0x00E0  reserved                For future use(Set to zero)
+            //0xFF00  markAttachmentType      If not zero, skips over all marks of attachment type different from specified.
+            // --------------------------------
+
+
             reader.BaseStream.Seek(lookupListBeginAt, SeekOrigin.Begin);
             ushort lookupCount = reader.ReadUInt16();
             ushort[] lookupTableOffsets = Utils.ReadUInt16Array(reader, lookupCount);

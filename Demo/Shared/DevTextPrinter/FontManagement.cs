@@ -441,10 +441,12 @@ namespace Typography.TextServices
                     switch (ext)
                     {
                         default: break;
-                        case ".ttf":
-                        case ".otf":
-                        case ".ttc":
-                        case ".otc":
+                         case ".ttf":
+                        //case ".otf":
+                        //case ".ttc":
+                        //case ".otc":
+                        case ".woff":
+                        case ".woff2":
                             fontCollection.AddFont(new FontFileStreamProvider(file));
                             break;
                     }

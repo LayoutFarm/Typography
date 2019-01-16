@@ -7,8 +7,8 @@ namespace Typography.OpenFont.Tables
 {
     class Kern : TableEntry
     {
-
-        public override string Name => "kern";
+        public const string _N = "kern";
+        public override string Name => _N;
         // 
         //https://www.microsoft.com/typography/otspec/kern.htm
 

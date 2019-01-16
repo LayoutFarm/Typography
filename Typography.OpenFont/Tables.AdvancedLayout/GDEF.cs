@@ -64,9 +64,10 @@ namespace Typography.OpenFont.Tables
 
     class GDEF : TableEntry
     {
-        public override string Name => "GDEF";
+        public const string _N = "GDEF";
+        public override string Name => _N;
         //
-        long _tableStartAt;       
+        long _tableStartAt;
         protected override void ReadContentFrom(BinaryReader reader)
         {
             _tableStartAt = reader.BaseStream.Position;

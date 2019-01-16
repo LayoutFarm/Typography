@@ -7,7 +7,9 @@ namespace Typography.OpenFont.Tables
 {
     class GlyphLocations : TableEntry
     {
-        public override string Name => "loca";
+        public const string _N = "loca";
+        public override string Name => _N;
+
 
         // loca - Index to Location
 
@@ -36,7 +38,7 @@ namespace Typography.OpenFont.Tables
         {
             _offsets = new uint[glyphCount + 1];
             this.IsLongVersion = isLongVersion;
-        } 
+        }
         public bool IsLongVersion { get; private set; }
         public uint[] Offsets => _offsets;
         public int GlyphCount => _offsets.Length - 1;
