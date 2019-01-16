@@ -1311,7 +1311,7 @@ namespace Typography.WebFont
 
     }
 
-    public class Woff2Reader
+    class Woff2Reader
     {
 
         Woff2Header _header;
@@ -1367,59 +1367,65 @@ namespace Typography.WebFont
                 }
             }
         }
-        public Typeface Read(Stream inputstream)
+        internal Typeface Read(BinaryReader reader)
         {
-
-            using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputstream))
+            _header = ReadHeader(reader);
+            if (_header == null) return null;  //=> return here and notify user too.  
+            Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(reader);
+            if (DecompressHandler == null)
             {
-                _header = ReadHeader(reader);
-                if (_header == null) return null;  //=> return here and notify user too.  
-                Woff2TableDirectory[] woff2TablDirs = ReadTableDirectories(reader);
-                if (DecompressHandler == null)
+                //if no Brotli decoder=> return here and notify user too.
+                if (Woff2DefaultBrotliDecompressFunc.DecompressHandler != null)
                 {
-                    //if no Brotli decoder=> return here and notify user too.
-                    if (Woff2DefaultBrotliDecompressFunc.DecompressHandler != null)
-                    {
-                        DecompressHandler = Woff2DefaultBrotliDecompressFunc.DecompressHandler;
-                    }
-                    else
-                    {
-                        //return here and notify user too. 
-                        return null;
-                    }
+                    DecompressHandler = Woff2DefaultBrotliDecompressFunc.DecompressHandler;
                 }
-
-                //try read each compressed tables
-                byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
-                if (compressedBuffer.Length != _header.totalCompressSize)
+                else
                 {
-                    //error!
-                    return null; //can't read this, notify user too.
+                    //return here and notify user too. 
+                    return null;
                 }
+            }
 
-                using (MemoryStream decompressedStream = new MemoryStream())
+            //try read each compressed tables
+            byte[] compressedBuffer = reader.ReadBytes((int)_header.totalCompressSize);
+            if (compressedBuffer.Length != _header.totalCompressSize)
+            {
+                //error!
+                return null; //can't read this, notify user too.
+            }
+
+            using (MemoryStream decompressedStream = new MemoryStream())
+            {
+                if (!DecompressHandler(compressedBuffer, decompressedStream))
                 {
-                    if (!DecompressHandler(compressedBuffer, decompressedStream))
-                    {
-                        //...Most notably, 
-                        //the data for the font tables is compressed in a SINGLE data stream comprising all the font tables.
+                    //...Most notably, 
+                    //the data for the font tables is compressed in a SINGLE data stream comprising all the font tables.
 
-                        //if not pass set to null
-                        //decompressedBuffer = null;
-                        return null;
-                    }
-                    //from decoded stream we read each table
-                    decompressedStream.Position = 0;//reset pos
+                    //if not pass set to null
+                    //decompressedBuffer = null;
+                    return null;
+                }
+                //from decoded stream we read each table
+                decompressedStream.Position = 0;//reset pos
 
-                    using (ByteOrderSwappingBinaryReader reader2 = new ByteOrderSwappingBinaryReader(decompressedStream))
-                    {
-                        TableEntryCollection tableEntryCollection = CreateTableEntryCollection(woff2TablDirs);
-                        OpenFontReader openFontReader = new OpenFontReader();
-                        return openFontReader.ReadTableEntryCollection(tableEntryCollection, reader2);
-                    }
+                using (ByteOrderSwappingBinaryReader reader2 = new ByteOrderSwappingBinaryReader(decompressedStream))
+                {
+                    TableEntryCollection tableEntryCollection = CreateTableEntryCollection(woff2TablDirs);
+                    OpenFontReader openFontReader = new OpenFontReader();
+                    return openFontReader.ReadTableEntryCollection(tableEntryCollection, reader2);
                 }
             }
         }
+        public Typeface Read(Stream inputstream)
+        {
+            using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputstream))
+            {
+                return Read(reader);
+            }
+        }
+
+
+
         Woff2Header ReadHeader(BinaryReader reader)
         {
             //WOFF2 Header

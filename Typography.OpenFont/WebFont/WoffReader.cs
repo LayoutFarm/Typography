@@ -70,7 +70,7 @@ namespace Typography.WebFont
     {
         public static ZlibDecompressStreamFunc DecompressHandler;
     }
-    public class WoffReader
+    class WoffReader
     {
         WoffHeader _header;
 
@@ -143,66 +143,70 @@ namespace Typography.WebFont
             return fontPreviewInfo;
 
         }
+        internal Typeface Read(BinaryReader reader)
+        {
+            //WOFF File
+            //WOFFHeader        File header with basic font type and version, along with offsets to metadata and private data blocks.
+            //TableDirectory    Directory of font tables, indicating the original size, compressed size and location of each table within the WOFF file.
+            //FontTables        The font data tables from the input sfnt font, compressed to reduce bandwidth requirements.
+            //ExtendedMetadata  An optional block of extended metadata, represented in XML format and compressed for storage in the WOFF file.
+            //PrivateData       An optional block of private data for the font designer, foundry, or vendor to use.
+            _header = ReadWOFFHeader(reader);
+            if (_header == null)
+            {
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("can't read ");
+#endif
+                return null; //notify user too
+            }
+
+            //
+            WoffTableDirectory[] woffTableDirs = ReadTableDirectories(reader);
+            if (woffTableDirs == null)
+            {
+                return null;
+            }
+            //
+            //try read each compressed table
+            if (DecompressHandler == null)
+            {
+                if (WoffDefaultZlibDecompressFunc.DecompressHandler != null)
+                {
+                    DecompressHandler = WoffDefaultZlibDecompressFunc.DecompressHandler;
+                }
+                else
+                {
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine("no Zlib DecompressHandler ");
+#endif
+                    return null; //notify user too
+                }
+            }
+
+            TableEntryCollection tableEntryCollection = CreateTableEntryCollection(woffTableDirs);
+
+            using (MemoryStream decompressStream = new MemoryStream())
+            {
+                if (Extract(reader, woffTableDirs, decompressStream))
+                {
+                    using (ByteOrderSwappingBinaryReader reader2 = new ByteOrderSwappingBinaryReader(decompressStream))
+                    {
+                        decompressStream.Position = 0;
+                        OpenFontReader openFontReader = new OpenFontReader();
+                        return openFontReader.ReadTableEntryCollection(tableEntryCollection, reader2);
+                    }
+                }
+            }
+            return null;
+        }
         public Typeface Read(Stream inputStream)
         {
             using (ByteOrderSwappingBinaryReader reader = new ByteOrderSwappingBinaryReader(inputStream))
             {
-                //WOFF File
-                //WOFFHeader        File header with basic font type and version, along with offsets to metadata and private data blocks.
-                //TableDirectory    Directory of font tables, indicating the original size, compressed size and location of each table within the WOFF file.
-                //FontTables        The font data tables from the input sfnt font, compressed to reduce bandwidth requirements.
-                //ExtendedMetadata  An optional block of extended metadata, represented in XML format and compressed for storage in the WOFF file.
-                //PrivateData       An optional block of private data for the font designer, foundry, or vendor to use.
-                _header = ReadWOFFHeader(reader);
-                if (_header == null)
-                {
-#if DEBUG
-                    System.Diagnostics.Debug.WriteLine("can't read ");
-#endif
-                    return null; //notify user too
-                }
-
-                //
-                WoffTableDirectory[] woffTableDirs = ReadTableDirectories(reader);
-                if (woffTableDirs == null)
-                {
-                    return null;
-                }
-                //
-                //try read each compressed table
-                if (DecompressHandler == null)
-                {
-                    if (WoffDefaultZlibDecompressFunc.DecompressHandler != null)
-                    {
-                        DecompressHandler = WoffDefaultZlibDecompressFunc.DecompressHandler;
-                    }
-                    else
-                    {
-#if DEBUG
-                        System.Diagnostics.Debug.WriteLine("no Zlib DecompressHandler ");
-#endif
-                        return null; //notify user too
-                    }
-                }
-
-                TableEntryCollection tableEntryCollection = CreateTableEntryCollection(woffTableDirs);
-
-                using (MemoryStream decompressStream = new MemoryStream())
-                {
-                    if (Extract(reader, woffTableDirs, decompressStream))
-                    {
-                        using (ByteOrderSwappingBinaryReader reader2 = new ByteOrderSwappingBinaryReader(decompressStream))
-                        {
-                            decompressStream.Position = 0;
-                            OpenFontReader openFontReader = new OpenFontReader();
-                            return openFontReader.ReadTableEntryCollection(tableEntryCollection, reader2);
-                        }
-                    }
-                }
-            }
-
-            return null;
+                return Read(reader);
+            } 
         }
+
         static TableEntryCollection CreateTableEntryCollection(WoffTableDirectory[] woffTableDirs)
         {
             TableEntryCollection tableEntryCollection = new TableEntryCollection();

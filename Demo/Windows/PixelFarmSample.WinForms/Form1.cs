@@ -830,16 +830,11 @@ namespace SampleWinForms
             //using (FileStream fs = new FileStream(filename, FileMode.Open))
             //{
             //    PreviewFontInfo previewFont = openFontReader.ReadPreview(fs);
-            //}
-
-
-
-            WoffReader reader = new WoffReader();
-            //assign woff decompressor here  
-
+            //} 
+            //assign woff decompressor here   
             using (FileStream fs = new FileStream(filename, FileMode.Open))
             {
-                reader.Read(fs);
+                openFontReader.Read(fs);
             }
         }
 
@@ -950,46 +945,16 @@ namespace SampleWinForms
         {
             string filename = "d:\\WImageTest\\Sarabun-Regular.woff2";
             //string filename = "d:\\WImageTest\\Roboto-Regular.woff2"; 
-            Woff2Reader reader = new Woff2Reader();
-
-           
 
 
-            //            //assign woff decompressor here 
-            //            reader.DecompressHandler += (byte[] compressBytes, byte[] decompressResult) =>
-            //            {
-            //                //****
-            //                //YOU can change to  your prefer decode libs***
-            //                //****
-
-            //                bool result = false;
-            //                try
-            //                {
-            //                    var inflater = new ICSharpCode.SharpZipLib.Zip.Compression.Inflater();
-            //                    inflater.SetInput(compressBytes);
-            //                    inflater.Inflate(decompressResult);
-            //#if DEBUG
-            //                    long outputLen = inflater.TotalOut;
-            //                    if (outputLen != decompressResult.Length)
-            //                    {
-
-            //                    }
-            //#endif
-
-            //                    result = true;
-            //                }
-            //                catch (Exception ex)
-            //                {
-
-            //                }
-            //                return result;
-            //            };
+            OpenFontReader openFontReader = new OpenFontReader();
             using (FileStream fs = new FileStream(filename, FileMode.Open))
             {
-                reader.Read(fs);
+                PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
+
             }
 
         }
- 
+
     }
 }
