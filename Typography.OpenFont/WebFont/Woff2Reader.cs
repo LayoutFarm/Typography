@@ -96,7 +96,7 @@ namespace Typography.WebFont
         }
 
 
-        class TempGlyph
+        struct TempGlyph
         {
             public readonly ushort glyphIndex;
             public readonly short numContour;
@@ -107,7 +107,16 @@ namespace Typography.WebFont
             {
                 this.glyphIndex = glyphIndex;
                 this.numContour = contourCount;
+
+                instructionLen = 0;
+                compositeHasInstructions = false;
             }
+#if DEBUG
+            public override string ToString()
+            {
+                return glyphIndex + " " + numContour;
+            }
+#endif
         }
 
 
@@ -305,7 +314,7 @@ namespace Typography.WebFont
             for (int i = 0; i < allGlyphs.Length; ++i)
             {
                 glyphs[i] = BuildSimpleGlyphStructure(reader,
-                    allGlyphs[i],
+                    ref allGlyphs[i],
                     pntPerContours, ref pntContourIndex,
                     flagStream, ref curFlagsIndex);
             }
@@ -429,8 +438,7 @@ namespace Typography.WebFont
                 TempGlyph tempGlyph = allGlyphs[i];
                 if (tempGlyph.instructionLen > 0)
                 {
-                    Glyph glyph = glyphs[i];
-                    glyph.GlyphInstructions = reader.ReadBytes(tempGlyph.instructionLen);
+                    glyphs[i].GlyphInstructions = reader.ReadBytes(tempGlyph.instructionLen);
                 }
             }
 
@@ -491,7 +499,7 @@ namespace Typography.WebFont
         }
 
         static Glyph BuildSimpleGlyphStructure(BinaryReader glyphStreamReader,
-            TempGlyph tmpGlyph,
+            ref TempGlyph tmpGlyph,
             ushort[] pntPerContours, ref int pntContourIndex,
             byte[] flagStream, ref int flagStreamIndex)
         {
