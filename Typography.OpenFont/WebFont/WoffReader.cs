@@ -1,9 +1,10 @@
 ﻿//MIT, 2019-present, WinterDev 
+//see https://www.w3.org/TR/2012/REC-WOFF-20121213/
+
 using System.IO;
 using Typography.OpenFont;
 using Typography.OpenFont.IO;
 using Typography.OpenFont.Tables;
-//see https://www.w3.org/TR/2012/REC-WOFF-20121213/
 
 namespace Typography.WebFont
 {
