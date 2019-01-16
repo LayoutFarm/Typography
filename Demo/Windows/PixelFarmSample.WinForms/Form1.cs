@@ -827,10 +827,10 @@ namespace SampleWinForms
 
             OpenFontReader openFontReader = new OpenFontReader();
             string filename = "d:\\WImageTest\\Sarabun-Regular.woff";
-            using (FileStream fs = new FileStream(filename, FileMode.Open))
-            {
-                PreviewFontInfo previewFont = openFontReader.ReadPreview(fs);
-            }
+            //using (FileStream fs = new FileStream(filename, FileMode.Open))
+            //{
+            //    PreviewFontInfo previewFont = openFontReader.ReadPreview(fs);
+            //}
 
 
 

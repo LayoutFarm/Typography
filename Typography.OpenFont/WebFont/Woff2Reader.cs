@@ -74,6 +74,9 @@ namespace Typography.WebFont
 
     class TransformedGlyf : UnreadTableEntry
     {
+
+        static TripleEncodingTable s_encTable = TripleEncodingTable.GetEncTable();
+
         public TransformedGlyf(TableHeader header, Woff2TableDirectory tableDir) : base(header)
         {
             HasCustomContentReader = true;
@@ -149,8 +152,8 @@ namespace Typography.WebFont
             uint bboxStreamSize = reader.ReadUInt32(); //in bytes
             uint instructionStreamSize = reader.ReadUInt32(); //in bytes
 
-            long pos1 = reader.BaseStream.Position;
-            long expected_nCountStartAt = pos1;
+
+            long expected_nCountStartAt = reader.BaseStream.Position;
             long expected_nPointStartAt = expected_nCountStartAt + nContourStreamSize;
             long expected_FlagStreamStartAt = expected_nPointStartAt + nPointsStreamSize;
             long expected_GlyphStreamStartAt = expected_FlagStreamStartAt + flagStreamSize;
@@ -163,17 +166,14 @@ namespace Typography.WebFont
             int contourCount = 0;
             for (ushort i = 0; i < numGlyphs; ++i)
             {
-
                 short numContour = reader.ReadInt16();
                 allGlyphs[i] = numContour;
-
                 if (numContour > 0)
                 {
                     contourCount += numContour;
                     //>0 => simple glyph
                     //-1 = compound
                     //0 = empty glyph
-
                 }
                 else if (numContour < 0)
                 {
@@ -182,11 +182,9 @@ namespace Typography.WebFont
                 }
                 else
                 {
-                    
+
                 }
             }
-
-
 
             //--------------------------------------------------------------------------------------------
             //glyphStream 
@@ -231,10 +229,12 @@ namespace Typography.WebFont
             //    4) Read one 255UInt16 value from the glyph stream, which is instructionLength, the number of instruction bytes.
             //    5) Read instructionLength bytes from instructionStream, and store these in the reconstituted glyph as instructions.
             //--------
+#if DEBUG
             if (reader.BaseStream.Position != expected_nPointStartAt)
             {
-
+                System.Diagnostics.Debug.WriteLine("ERR!!");
             }
+#endif
             //
             //1) nPoints stream,  npoint for each contour
 
@@ -242,23 +242,54 @@ namespace Typography.WebFont
             for (int i = 0; i < contourCount; ++i)
             {
                 // Each of these is the number of points of that contour.
-                pntPerContours[i] = Woff2Utils.Read255UShort(reader);
+                pntPerContours[i] = Woff2Utils.Read255UInt16(reader);
             }
-
+#if DEBUG
             if (reader.BaseStream.Position != expected_FlagStreamStartAt)
             {
-
+                System.Diagnostics.Debug.WriteLine("ERR!!");
             }
+#endif
             //2) flagStream, flags value for each point
             //each byte in flags stream represents one point
             byte[] flagStream = reader.ReadBytes((int)flagStreamSize);
 
+#if DEBUG
             if (reader.BaseStream.Position != expected_GlyphStreamStartAt)
             {
-
+                System.Diagnostics.Debug.WriteLine("ERR!!");
             }
+#endif
 
-            TripleEncodingTable tripleEncodeTable = TripleEncodingTable.GetEncTable();
+
+            //***
+            //some composite glyphs have instructions=> so we must check all composite glyphs
+            //before read the glyph stream
+            //**
+
+            byte[] compositeHasInstructions = new byte[numGlyphs];
+            //0= not a composite glyph(simple or empty glyph), 
+            //1 = a composite glyph that has instructions
+            //255 = a composite glyph that dose not have instructions
+            using (MemoryStream compositeMS = new MemoryStream())
+            {
+                reader.BaseStream.Position = expected_CompositeStreamStartAt;
+                compositeMS.Write(reader.ReadBytes((int)compositeStreamSize), 0, (int)compositeStreamSize);
+                compositeMS.Position = 0;
+
+                int j = compositeGlyphs.Count;
+                ByteOrderSwappingBinaryReader compositeReader = new ByteOrderSwappingBinaryReader(compositeMS);
+                for (ushort i = 0; i < j; ++i)
+                {
+                    ushort compositeGlyphIndex = compositeGlyphs[i];
+                    compositeHasInstructions[compositeGlyphIndex] = (byte)(CompositeHasInstructions(compositeReader, compositeGlyphIndex) ? 1 : 255);
+                }
+
+
+                reader.BaseStream.Position = expected_GlyphStreamStartAt;
+            }
+            //-------- 
+
             int curFlagsIndex = 0;
             int pntContourIndex = 0;
             for (int i = 0; i < allGlyphs.Length; ++i)
@@ -268,37 +299,41 @@ namespace Typography.WebFont
                     allGlyphs[i],
                     pntPerContours, ref pntContourIndex,
                     flagStream, ref curFlagsIndex,
-                    tripleEncodeTable);
+                    compositeHasInstructions);
             }
 
+#if DEBUG
+            if (pntContourIndex != pntPerContours.Length)
+            {
 
+            }
+            if (curFlagsIndex != flagStream.Length)
+            {
+
+            }
+#endif
             //--------------------------------------------------------------------------------------------
             //compositeStream
             //--------------------------------------------------------------------------------------------
+#if DEBUG
             if (expected_CompositeStreamStartAt != reader.BaseStream.Position)
             {
+                //***
+
                 reader.BaseStream.Position = expected_CompositeStreamStartAt;
             }
-            int j = compositeGlyphs.Count;
-            for (ushort i = 0; i < j; ++i)
+#endif
             {
-                int compositeGlyphIndex = compositeGlyphs[i];
-                glyphs[compositeGlyphIndex] = ReadCompositeGlyph(glyphs, reader, i);
+                //now we read the composite stream again
+                //and create composite glyphs
+                int j = compositeGlyphs.Count;
+                for (ushort i = 0; i < j; ++i)
+                {
+                    int compositeGlyphIndex = compositeGlyphs[i];
+                    glyphs[compositeGlyphIndex] = ReadCompositeGlyph(glyphs, reader, i);
+                }
             }
-            long stop = reader.BaseStream.Position;
-            long len = stop - start;
-            if (len < woff2TableDir.transformLength)
-            {
-                reader.BaseStream.Position += (woff2TableDir.transformLength - len);
-            }
-            else if (len == woff2TableDir.transformLength)
-            {
 
-            }
-            else
-            {
-                reader.BaseStream.Position -= (len - woff2TableDir.transformLength);
-            }
 
             glyfTable.Glyphs = glyphs;
         }
@@ -308,8 +343,8 @@ namespace Typography.WebFont
           ushort glyphIndex,
           int numContour,
           ushort[] pntPerContours, ref int pntContourIndex,
-          byte[] flagStream, ref int flagsStreamIndex,
-          TripleEncodingTable encTable)
+          byte[] flagStream, ref int flagStreamIndex,
+          byte[] compositeHasInstructions)
         {
 
             //reading from glyphstream***
@@ -340,12 +375,31 @@ namespace Typography.WebFont
 
 
             if (numContour == 0) return Glyph.Empty;
-            if (numContour < 0) return null;//skip composite glyph (resolve later)
+            if (numContour < 0)
+            {
+
+                //some composites have instructions...
+                if (compositeHasInstructions[glyphIndex] == 1)
+                {
+                    ushort _instructionLen1 = Woff2Utils.Read255UInt16(glyphStreamReader);
+                    if (_instructionLen1 == 0)
+                    {
+                        glyphStreamReader.BaseStream.Position--;
+                    }
+                }
+                return null;//skip composite glyph (resolve later)     
+            }
+
 
             //-----
+
             int curX = 0;
             int curY = 0;
 
+            if (glyphIndex == 497)
+            {
+
+            }
 
             var _endContours = new ushort[numContour];
             ushort pointCount = 0;
@@ -356,8 +410,8 @@ namespace Typography.WebFont
                 ushort numPoint = pntPerContours[pntContourIndex++];//increament pntContourIndex AFTER
                 pointCount += numPoint;
                 _endContours[i] = (ushort)(pointCount - 1);
-
             }
+
             //collect point for our contours
             var _glyphPoints = new GlyphPointF[pointCount];
             int n = 0;
@@ -382,16 +436,16 @@ namespace Typography.WebFont
                 //more efficient application of the entropy coding applied as the second stage of encoding process. 
 
                 int endContour = _endContours[i];
-                for (; n < endContour; ++n)
+                for (; n <= endContour; ++n)
                 {
 
-                    byte f = flagStream[flagsStreamIndex++]; //increment the flagStreamIndex AFTER read
+                    byte f = flagStream[flagStreamIndex++]; //increment the flagStreamIndex AFTER read
 
                     //int f1 = (f >> 7); // most significant 1 bit -> on/off curve
 
                     int xyFormat = f & 0x7F; // remainging 7 bits x,y format  
 
-                    TripleEncodingRecord enc = encTable[xyFormat]; //0-128 
+                    TripleEncodingRecord enc = s_encTable[xyFormat]; //0-128 
 
                     byte[] packedXY = glyphStreamReader.ReadBytes(enc.ByteCount - 1); //byte count include 1 byte flags, so actual read=> byteCount-1
                                                                                       //read x and y 
@@ -418,8 +472,10 @@ namespace Typography.WebFont
                                     0;
                             break;
                         case 12: //12,12
-                            x = enc.Tx((packedXY[0] << 8) | (packedXY[1] >> 4));
-                            y = enc.Ty(((packedXY[1] & 0xF) << 8) | (packedXY[2] >> 4));
+                                 //x = enc.Tx((packedXY[0] << 8) | (packedXY[1] >> 4));
+                                 //y = enc.Ty(((packedXY[1] & 0xF)) | (packedXY[2] >> 4));
+                            x = enc.Tx((packedXY[0] << 4) | (packedXY[1] >> 4));
+                            y = enc.Ty(((packedXY[1] & 0xF) << 8) | (packedXY[2]));
                             break;
                         case 16: //16,16
                             x = enc.Tx((packedXY[0] << 8) | packedXY[1]);
@@ -434,7 +490,7 @@ namespace Typography.WebFont
 
             //----
             //step 4) Read one 255UInt16 value from the glyph stream, which is instructionLength, the number of instruction bytes.
-            ushort _instructionLen = Woff2Utils.Read255UShort(glyphStreamReader);
+            ushort _instructionLen = Woff2Utils.Read255UInt16(glyphStreamReader);
 
             //step 5) resolve it later
 
@@ -447,8 +503,87 @@ namespace Typography.WebFont
                glyphIndex);
         }
 
+        static bool CompositeHasInstructions(BinaryReader reader, ushort compositeGlyphIndex)
+        {
 
-        Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, ushort compositeGlyphIndex)
+            //To find if a composite has instruction or not.
+
+            //This method is similar to  ReadCompositeGlyph() (below)
+            //but this dose not create actual composite glyph.
+
+            Glyf.CompositeGlyphFlags flags;
+            do
+            {
+                flags = (Glyf.CompositeGlyphFlags)reader.ReadUInt16();
+                ushort glyphIndex = reader.ReadUInt16();
+                short arg1 = 0;
+                short arg2 = 0;
+                ushort arg1and2 = 0;
+
+                if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.ARG_1_AND_2_ARE_WORDS))
+                {
+                    arg1 = reader.ReadInt16();
+                    arg2 = reader.ReadInt16();
+                }
+                else
+                {
+                    arg1and2 = reader.ReadUInt16();
+                }
+                //-----------------------------------------
+                float xscale = 1;
+                float scale01 = 0;
+                float scale10 = 0;
+                float yscale = 1;
+
+                bool useMatrix = false;
+                //-----------------------------------------
+                bool hasScale = false;
+                if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_A_SCALE))
+                {
+                    //If the bit WE_HAVE_A_SCALE is set,
+                    //the scale value is read in 2.14 format-the value can be between -2 to almost +2.
+                    //The glyph will be scaled by this value before grid-fitting. 
+                    xscale = yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    hasScale = true;
+                }
+                else if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_AN_X_AND_Y_SCALE))
+                {
+                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    hasScale = true;
+                }
+                else if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_A_TWO_BY_TWO))
+                {
+
+                    //The bit WE_HAVE_A_TWO_BY_TWO allows for linear transformation of the X and Y coordinates by specifying a 2 × 2 matrix.
+                    //This could be used for scaling and 90-degree*** rotations of the glyph components, for example.
+
+                    //2x2 matrix
+
+                    //The purpose of USE_MY_METRICS is to force the lsb and rsb to take on a desired value.
+                    //For example, an i-circumflex (U+00EF) is often composed of the circumflex and a dotless-i. 
+                    //In order to force the composite to have the same metrics as the dotless-i,
+                    //set USE_MY_METRICS for the dotless-i component of the composite. 
+                    //Without this bit, the rsb and lsb would be calculated from the hmtx entry for the composite 
+                    //(or would need to be explicitly set with TrueType instructions).
+
+                    //Note that the behavior of the USE_MY_METRICS operation is undefined for rotated composite components. 
+                    useMatrix = true;
+                    hasScale = true;
+                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    scale01 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    scale10 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+
+                }
+
+            } while (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.MORE_COMPONENTS));
+
+            //
+            return Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_INSTRUCTIONS);
+        }
+
+        static Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, ushort compositeGlyphIndex)
         {
 
             //Decoding of Composite Glyphs
@@ -662,6 +797,7 @@ namespace Typography.WebFont
                 }
 
             } while (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.MORE_COMPONENTS));
+
             //
             if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_INSTRUCTIONS))
             {
@@ -670,35 +806,6 @@ namespace Typography.WebFont
                 //byte[] insts = reader.ReadBytes(numInstr);
                 //finalGlyph.GlyphInstructions = insts;
             }
-            //F2DOT14 	16-bit signed fixed number with the low 14 bits of fraction (2.14).
-            //Transformation Option
-            //
-            //The C pseudo-code fragment below shows how the composite glyph information is stored and parsed; definitions for “flags” bits follow this fragment:
-            //  do {
-            //    USHORT flags;
-            //    USHORT glyphIndex;
-            //    if ( flags & ARG_1_AND_2_ARE_WORDS) {
-            //    (SHORT or FWord) argument1;
-            //    (SHORT or FWord) argument2;
-            //    } else {
-            //        USHORT arg1and2; /* (arg1 << 8) | arg2 */
-            //    }
-            //    if ( flags & WE_HAVE_A_SCALE ) {
-            //        F2Dot14  scale;    /* Format 2.14 */
-            //    } else if ( flags & WE_HAVE_AN_X_AND_Y_SCALE ) {
-            //        F2Dot14  xscale;    /* Format 2.14 */
-            //        F2Dot14  yscale;    /* Format 2.14 */
-            //    } else if ( flags & WE_HAVE_A_TWO_BY_TWO ) {
-            //        F2Dot14  xscale;    /* Format 2.14 */
-            //        F2Dot14  scale01;   /* Format 2.14 */
-            //        F2Dot14  scale10;   /* Format 2.14 */
-            //        F2Dot14  yscale;    /* Format 2.14 */
-            //    }
-            //} while ( flags & MORE_COMPONENTS ) 
-            //if (flags & WE_HAVE_INSTR){
-            //    USHORT numInstr
-            //    BYTE instr[numInstr]
-            //------------------------------------------------------------ 
 
 
             return finalGlyph ?? Glyph.Empty;
@@ -1091,53 +1198,9 @@ namespace Typography.WebFont
             GlyphLocations loca = expectedResult as GlyphLocations;
             if (loca == null) throw new System.NotSupportedException();
 
-
+            //nothing todo here :)
             return expectedResult;
         }
-
-
-        void ReconstructGlyphLocationTable(BinaryReader reader, Woff2TableDirectory woff2TableDir)
-        {
-
-            //5.3.Transformed loca table format
-
-            //The loca table data can be presented in the WOFF2 file in one of two formats defined by
-            //the transformation version number(encoded in the table directory flag bits, see subclause 4.1 for details).
-
-            //The transformation version "3" defines a null transform where
-            //the content of the loca table is presented in its original, unmodified format.
-
-            //The transformation version "0", although optional,
-            //MUST be applied to the loca table data whenever glyf table data is transformed.
-            //In other words, both glyf and loca tables must either be present in their transformed format or 
-            //with null transform applied to both tables.
-
-            //The version "0" of the loca table transformation(as defined by the table directory flag bits, 
-            //see subclause 4.1 for details) is specified below.
-
-            //The transformLength of the transformed loca table MUST always be zero.//***
-            //The origLength MUST be the appropriate size(determined by numGlyphs + 1, 
-            //times the size per glyph, where that size per glyph is two bytes when indexFormat(defined in subclause 5.1.Transformed glyf table format) is zero
-            //, otherwise four bytes).
-
-            //If the transformLength of the transformed loca table is not equal to zero,
-            //or if the encoded origLength does not match the calculated size defined above the decoder MUST reject the WOFF2 file as invalid.
-
-            //The loca table MUST be reconstructed when the glyf table is decoded.
-            //The process for reconstructing the loca table is specified in subclause 5.1 as part of the transformed glyf table decoding process.
-
-            //For reconstructed glyph records,
-            //a decoder MUST store the corresponding offsets for individual glyphs 
-            //using a format that is indicated by the indexFormat field of the Transformed glyf Table.
-
-            //NOT like the glyf,=> format 0, transform len must be 0***
-            reader.BaseStream.Position += woff2TableDir.origLength;
-
-
-
-
-        }
-
 
     }
 
@@ -1672,17 +1735,8 @@ namespace Typography.WebFont
                 arr[i] = reader.ReadInt16();
             }
             return arr;
-        }
-        public static ushort[] Read255UShortArray(BinaryReader reader, int count)
-        {
-            ushort[] arr = new ushort[count];
-            for (int i = 0; i < count; ++i)
-            {
-                arr[i] = Read255UShort(reader);
-            }
-            return arr;
-        }
-        public static ushort Read255UShort(BinaryReader reader)
+        } 
+        public static ushort Read255UInt16(BinaryReader reader)
         {
             //255UInt16 Variable-length encoding of a 16-bit unsigned integer for optimized intermediate font data storage.
             //255UInt16 Data Type
@@ -1740,9 +1794,16 @@ namespace Typography.WebFont
             if (code == WORD_CODE)
             {
                 /* Read two more bytes and concatenate them to form UInt16 value*/
-                int value = (reader.ReadByte() << 8) & 0xff00;
+                //int value = (reader.ReadByte() << 8) & 0xff00;
+                //int value2 = reader.ReadByte();
+                //return (ushort)(value | (value2 & 0xff));
+                int value = reader.ReadByte();
+                value <<= 8;
+                value &= 0xff00;
                 int value2 = reader.ReadByte();
-                return (ushort)(value | (value2 & 0xff));
+                value |= value2 & 0x00ff;
+
+                return (ushort)value;
             }
             else if (code == ONE_MORE_BYTE_CODE1)
             {
