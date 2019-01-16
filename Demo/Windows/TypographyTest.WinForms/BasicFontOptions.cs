@@ -72,6 +72,8 @@ namespace TypographyTest
                 {
                     switch (ext)
                     {
+                        case ".woff2":
+                        case ".woff":
                         case ".ttc":
                         case ".otc":
                         case ".ttf":

@@ -9,7 +9,8 @@ namespace Typography.OpenFont.Tables
     // https://www.microsoft.com/typography/otspec/GPOS.htm
     public partial class GPOS : GlyphShapingTableEntry
     {
-        public override string Name => "GPOS";
+        public const string _N = "GPOS";
+        public override string Name => _N;
         //
         protected override void ReadLookupTable(BinaryReader reader, long lookupTablePos,
                                                 ushort lookupType, ushort lookupFlags,
@@ -32,7 +33,7 @@ namespace Typography.OpenFont.Tables
 
         private List<LookupTable> _lookupList = new List<LookupTable>();
 
-        public IList<LookupTable> LookupList { get { return _lookupList; } }
+        public IList<LookupTable> LookupList => _lookupList;
 
         public abstract class LookupSubTable
         {

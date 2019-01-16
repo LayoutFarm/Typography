@@ -10,7 +10,8 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class HorizontalHeader : TableEntry
     {
-        public override string Name => "hhea";
+        public const string _N = "hhea";
+        public override string Name => _N;
 
         //-----
         // Type     Name            Description

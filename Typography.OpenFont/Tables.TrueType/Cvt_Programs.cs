@@ -6,7 +6,9 @@ namespace Typography.OpenFont.Tables
 
     class CvtTable : TableEntry
     {
-        public override string Name => "cvt "; //need 4 chars//***
+        public const string _N = "cvt ";//need 4 chars//***
+        public override string Name => _N;
+
         //
 
         /// <summary>
@@ -26,8 +28,8 @@ namespace Typography.OpenFont.Tables
     }
     class PrepTable : TableEntry
     {
-
-        public override string Name => "prep";
+        public const string _N = "prep";
+        public override string Name => _N;
         //
 
         internal byte[] _programBuffer;
@@ -39,10 +41,11 @@ namespace Typography.OpenFont.Tables
     }
     class FpgmTable : TableEntry
     {
-        public override string Name => "fpgm";
+        public const string _N = "fpgm";
+        public override string Name => _N;
         //
 
-        internal byte[] _programBuffer; 
+        internal byte[] _programBuffer;
         protected override void ReadContentFrom(BinaryReader reader)
         {
             _programBuffer = reader.ReadBytes((int)this.TableLength);

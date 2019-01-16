@@ -11,7 +11,8 @@ namespace Typography.OpenFont.Tables
     /// </summary>
     class EBLCTable : TableEntry
     {
-        public override string Name => "EBLC";
+        public const string _N = "EBLC";
+        public override string Name => _N;
         //
         //from https://www.microsoft.com/typography/otspec/eblc.htm
         //EBLC - Embedded Bitmap Location Table

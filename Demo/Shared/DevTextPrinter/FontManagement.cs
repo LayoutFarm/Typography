@@ -445,6 +445,8 @@ namespace Typography.TextServices
                         case ".otf":
                         case ".ttc":
                         case ".otc":
+                        case ".woff":
+                        case ".woff2":
                             fontCollection.AddFont(new FontFileStreamProvider(file));
                             break;
                     }

@@ -22,7 +22,7 @@ and an example (marked with `(2)`) the uses Typography with a 'mini' snapshot of
 Concept
 ---
 
- * 1.Load .ttf, .otf, .ttc, .otc files, with OpenFontReader.
+ * 1.Load .ttf, .otf, .ttc, .otc, .woff, .woff2 files, with OpenFontReader.
  
  * 2.Rasterize a character to a bitmap with a pure software renderer which has Agg(anti grain geometry) Quality! with 
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
@@ -207,6 +207,17 @@ See its action here => [CSharpMath](https://github.com/verybadcat/CSharpMath/iss
 
 
 ---
+**Web Open Font Format (WOFF1 and WOFF2)**
+--- 
+![woff2](https://user-images.githubusercontent.com/7447159/51227867-c867c000-1988-11e9-92df-fb6badfe628f.png)
+
+_Roboto-Regular.woff2, Typography reads and restores woff2_
+
+see https://github.com/LayoutFarm/Typography/issues/27
+
+
+
+---
 The HtmlRenderer example!
 ---
 
@@ -266,6 +277,16 @@ MIT, 2006-2009,  Stefanos Apostolopoulos and other Open Tool Kit Contributors, h
 MIT, 2013, Antonie Blom, https://github.com/andykorth/Pencil.Gaming
 
 MIT, 2004, 2007, Novell Inc., for System.Drawing 
+
+**Unpack, Zlib,Brotli**
+
+MIT, 2018, SharpZipLib, https://github.com/icsharpcode/SharpZipLib 
+
+MIT, 2009, 2010, 2013-2016 by the Brotli Authors., https://github.com/google/brotli
+
+MIT, 2017, brezza92 (C# port from original code, by hand), https://github.com/brezza92/brotli
+
+MIT, 2019, master131, https://github.com/master131/BrotliSharpLib
 
 **Demo**
 
