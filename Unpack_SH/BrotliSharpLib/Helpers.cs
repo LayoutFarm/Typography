@@ -1,4 +1,5 @@
-﻿using System;
+﻿//MIT, 2019, master131, https://github.com/master131/BrotliSharpLib
+using System;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using size_t = BrotliSharpLib.Brotli.SizeT;

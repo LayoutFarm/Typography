@@ -1,3 +1,4 @@
+//MIT, 2019, https://github.com/icsharpcode/SharpZipLib
 using System;
 
 namespace ICSharpCode.SharpZipLib
