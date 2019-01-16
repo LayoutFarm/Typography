@@ -146,7 +146,7 @@ namespace Typography.WebFont
             //UInt8     flagStream[]            Stream of UInt8 values representing flag values for each outline point.
             //Vary      glyphStream[]           Stream of bytes representing point coordinate values using variable length encoding format(defined in subclause 5.2)
             //Vary      compositeStream[]       Stream of bytes representing component flag values and associated composite glyph data
-            //UInt8     bboxBitmap[]            Bitmap(a numGlyphs - long bit array) indicating explicit bounding boxes
+            //UInt8     bboxBitmap[]            Bitmap(a numGlyphs-long bit array) indicating explicit bounding boxes
             //Int16     bboxStream[]            Stream of Int16 values representing glyph bounding box data
             //UInt8     instructionStream[]	    Stream of UInt8 values representing a set of instructions for each corresponding glyph
 
@@ -172,11 +172,12 @@ namespace Typography.WebFont
             long expected_FlagStreamStartAt = expected_nPointStartAt + nPointsStreamSize;
             long expected_GlyphStreamStartAt = expected_FlagStreamStartAt + flagStreamSize;
             long expected_CompositeStreamStartAt = expected_GlyphStreamStartAt + glyphStreamSize;
+
             long expected_BboxStreamStartAt = expected_CompositeStreamStartAt + compositeStreamSize;
             long expected_InstructionStreamStartAt = expected_BboxStreamStartAt + bboxStreamSize;
+            long expected_EndAt = expected_InstructionStreamStartAt + instructionStreamSize;
 
             //--------------------------------------------- 
-
             Glyph[] glyphs = new Glyph[numGlyphs];
             TempGlyph[] allGlyphs = new TempGlyph[numGlyphs];
             List<ushort> compositeGlyphs = new List<ushort>();
@@ -345,14 +346,149 @@ namespace Typography.WebFont
             //bbox stream
             //--------------------------------------------------------------------------------------------
 
+            //Finally, for both simple and composite glyphs,
+            //if the corresponding bit in the bounding box bit vector is set, 
+            //then additionally read 4 Int16 values from the bbox stream, 
+            //representing xMin, yMin, xMax, and yMax, respectively, 
+            //and record these into the corresponding fields of the reconstructed glyph.
+            //For simple glyphs, if the corresponding bit in the bounding box bit vector is not set,
+            //then derive the bounding box by computing the minimum and maximum x and y coordinates in the outline, and storing that.
 
+            //A composite glyph MUST have an explicitly supplied bounding box. 
+            //The motivation is that computing bounding boxes is more complicated,
+            //and would require resolving references to component glyphs taking into account composite glyph instructions and
+            //the specified scales of individual components, which would conflict with a purely streaming implementation of font decoding.
+
+            //A decoder MUST check for presence of the bounding box info as part of the composite glyph record 
+            //and MUST NOT load a font file with the composite bounding box data missing. 
+#if DEBUG
+            if (expected_BboxStreamStartAt != reader.BaseStream.Position)
+            {
+
+            }
+#endif
+            int bitmapCount = (numGlyphs + 7) / 8;
+            byte[] bboxBitmap = ExpandBitmap(reader.ReadBytes(bitmapCount));
+            for (ushort i = 0; i < numGlyphs; ++i)
+            {
+                TempGlyph tempGlyph = allGlyphs[i];
+                Glyph glyph = glyphs[i];
+
+                byte hasBbox = bboxBitmap[i];
+                if (hasBbox == 1)
+                {
+                    //read bbox from the bboxstream
+                    glyph.Bounds = new Bounds(
+                        reader.ReadInt16(),
+                        reader.ReadInt16(),
+                        reader.ReadInt16(),
+                        reader.ReadInt16());
+                }
+                else
+                {
+                    //no bbox
+                    //
+                    if (tempGlyph.numContour < 0)
+                    {
+                        //composite must have bbox
+                        //if not=> err
+                        throw new System.NotSupportedException();
+                    }
+                    else if (tempGlyph.numContour > 0)
+                    {
+                        //simple glyph
+                        //use simple calculation
+                        //...For simple glyphs, if the corresponding bit in the bounding box bit vector is not set,
+                        //then derive the bounding box by computing the minimum and maximum x and y coordinates in the outline, and storing that.
+                        glyph.Bounds = FindSimpleGlyphBounds(glyph);
+                    }
+                }
+            }
             //--------------------------------------------------------------------------------------------
             //instruction stream
+#if DEBUG
+            if (reader.BaseStream.Position < expected_InstructionStreamStartAt)
+            {
 
+            }
+            else if (expected_InstructionStreamStartAt == reader.BaseStream.Position)
+            {
+
+            }
+            else
+            {
+
+            }
+#endif
+
+            reader.BaseStream.Position = expected_InstructionStreamStartAt;
             //--------------------------------------------------------------------------------------------
+
+            for (ushort i = 0; i < numGlyphs; ++i)
+            {
+                TempGlyph tempGlyph = allGlyphs[i];
+                if (tempGlyph.instructionLen > 0)
+                {
+                    Glyph glyph = glyphs[i];
+                    glyph.GlyphInstructions = reader.ReadBytes(tempGlyph.instructionLen);
+                }
+            }
+
+#if DEBUG
+            if (reader.BaseStream.Position != expected_EndAt)
+            {
+
+            }
+#endif
+
             glyfTable.Glyphs = glyphs;
         }
 
+        static Bounds FindSimpleGlyphBounds(Glyph glyph)
+        {
+            GlyphPointF[] glyphPoints = glyph.GlyphPoints;
+
+            int j = glyphPoints.Length;
+            float xmin = float.MaxValue;
+            float ymin = float.MaxValue;
+            float xmax = float.MinValue;
+            float ymax = float.MinValue;
+
+            for (int i = 0; i < j; ++i)
+            {
+                GlyphPointF p = glyphPoints[i];
+                if (p.X < xmin) xmin = p.X;
+                if (p.X > xmax) xmax = p.X;
+                if (p.Y < ymin) ymin = p.Y;
+                if (p.Y > ymax) ymax = p.Y;
+            }
+
+            return new Bounds(
+               (short)System.Math.Round(xmin),
+               (short)System.Math.Round(ymin),
+               (short)System.Math.Round(xmax),
+               (short)System.Math.Round(ymax));
+        }
+
+        static byte[] ExpandBitmap(byte[] orgBBoxBitmap)
+        {
+            byte[] expandArr = new byte[orgBBoxBitmap.Length * 8];
+
+            int index = 0;
+            for (int i = 0; i < orgBBoxBitmap.Length; ++i)
+            {
+                byte b = orgBBoxBitmap[i];
+                expandArr[index++] = (byte)((b >> 7) & 0x1);
+                expandArr[index++] = (byte)((b >> 6) & 0x1);
+                expandArr[index++] = (byte)((b >> 5) & 0x1);
+                expandArr[index++] = (byte)((b >> 4) & 0x1);
+                expandArr[index++] = (byte)((b >> 3) & 0x1);
+                expandArr[index++] = (byte)((b >> 2) & 0x1);
+                expandArr[index++] = (byte)((b >> 1) & 0x1);
+                expandArr[index++] = (byte)((b >> 0) & 0x1);
+            }
+            return expandArr;
+        }
 
         static Glyph BuildSimpleGlyphStructure(BinaryReader glyphStreamReader,
             TempGlyph tmpGlyph,
@@ -602,47 +738,10 @@ namespace Typography.WebFont
             //then read the instructions from the glyph and store them in the reconstructed glyph, 
             //using the same process as described in steps 4 and 5 above (see Building Simple Glyph).
 
-            //Finally, for both simple and composite glyphs,
-            //if the corresponding bit in the bounding box bit vector is set, 
-            //then additionally read 4 Int16 values from the bbox stream, 
-            //representing xMin, yMin, xMax, and yMax, respectively, 
-            //and record these into the corresponding fields of the reconstructed glyph.
-            //For simple glyphs, if the corresponding bit in the bounding box bit vector is not set,
-            //then derive the bounding box by computing the minimum and maximum x and y coordinates in the outline, and storing that.
 
-            //A composite glyph MUST have an explicitly supplied bounding box. 
-            //The motivation is that computing bounding boxes is more complicated,
-            //and would require resolving references to component glyphs taking into account composite glyph instructions and
-            //the specified scales of individual components, which would conflict with a purely streaming implementation of font decoding.
-
-            //A decoder MUST check for presence of the bounding box info as part of the composite glyph record 
-            //and MUST NOT load a font file with the composite bounding box data missing.
-
-            //------------------------------------------------------ 
-            //https://www.microsoft.com/typography/OTSPEC/glyf.htm
-            //Composite Glyph Description
-
-            //This is the table information needed for composite glyphs (numberOfContours is -1). 
-            //A composite glyph starts with two USHORT values (“flags” and “glyphIndex,” i.e. the index of the first contour in this composite glyph); 
-            //the data then varies according to “flags”).
-            //Type 	Name 	Description
-            //USHORT 	flags 	component flag
-            //USHORT 	glyphIndex 	glyph index of component
-            //VARIABLE 	argument1 	x-offset for component or point number; type depends on bits 0 and 1 in component flags
-            //VARIABLE 	argument2 	y-offset for component or point number; type depends on bits 0 and 1 in component flags
-            //---------
-            //see more at https://fontforge.github.io/assets/old/Composites/index.html
-            //---------
-
-            //move to composite glyph position
-            //reader.BaseStream.Seek(tableOffset + GlyphLocations.Offsets[compositeGlyphIndex], SeekOrigin.Begin);//reset
-            //------------------------
-            //short contoursCount = reader.ReadInt16(); // ignored
-            //Bounds bounds = Utils.ReadBounds(reader);
 
             Glyph finalGlyph = null;
             Glyf.CompositeGlyphFlags flags;
-
             do
             {
                 flags = (Glyf.CompositeGlyphFlags)reader.ReadUInt16();
