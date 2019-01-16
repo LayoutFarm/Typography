@@ -95,11 +95,25 @@ namespace Typography.WebFont
             return expectedResult;
         }
 
-        void ReconstructGlyfTable(BinaryReader reader, Woff2TableDirectory woff2TableDir, Glyf glyfTable)
+
+        class TempGlyph
         {
-            //fill the information to glyfTable
+            public readonly ushort glyphIndex;
+            public readonly short numContour;
+
+            public ushort instructionLen;
+            public bool compositeHasInstructions;
+            public TempGlyph(ushort glyphIndex, short contourCount)
+            {
+                this.glyphIndex = glyphIndex;
+                this.numContour = contourCount;
+            }
+        }
 
 
+        static void ReconstructGlyfTable(BinaryReader reader, Woff2TableDirectory woff2TableDir, Glyf glyfTable)
+        {
+            //fill the information to glyfTable 
             //reader.BaseStream.Position += woff2TableDir.transformLength;
             //For greater compression effectiveness,
             //the glyf table is split into several substreams, to group like data together. 
@@ -158,16 +172,19 @@ namespace Typography.WebFont
             long expected_FlagStreamStartAt = expected_nPointStartAt + nPointsStreamSize;
             long expected_GlyphStreamStartAt = expected_FlagStreamStartAt + flagStreamSize;
             long expected_CompositeStreamStartAt = expected_GlyphStreamStartAt + glyphStreamSize;
+            long expected_BboxStreamStartAt = expected_CompositeStreamStartAt + compositeStreamSize;
+            long expected_InstructionStreamStartAt = expected_BboxStreamStartAt + bboxStreamSize;
+
             //--------------------------------------------- 
 
             Glyph[] glyphs = new Glyph[numGlyphs];
-            int[] allGlyphs = new int[numGlyphs];
+            TempGlyph[] allGlyphs = new TempGlyph[numGlyphs];
             List<ushort> compositeGlyphs = new List<ushort>();
             int contourCount = 0;
             for (ushort i = 0; i < numGlyphs; ++i)
             {
                 short numContour = reader.ReadInt16();
-                allGlyphs[i] = numContour;
+                allGlyphs[i] = new TempGlyph(i, numContour);
                 if (numContour > 0)
                 {
                     contourCount += numContour;
@@ -265,12 +282,7 @@ namespace Typography.WebFont
             //***
             //some composite glyphs have instructions=> so we must check all composite glyphs
             //before read the glyph stream
-            //**
-
-            byte[] compositeHasInstructions = new byte[numGlyphs];
-            //0= not a composite glyph(simple or empty glyph), 
-            //1 = a composite glyph that has instructions
-            //255 = a composite glyph that dose not have instructions
+            //** 
             using (MemoryStream compositeMS = new MemoryStream())
             {
                 reader.BaseStream.Position = expected_CompositeStreamStartAt;
@@ -282,24 +294,19 @@ namespace Typography.WebFont
                 for (ushort i = 0; i < j; ++i)
                 {
                     ushort compositeGlyphIndex = compositeGlyphs[i];
-                    compositeHasInstructions[compositeGlyphIndex] = (byte)(CompositeHasInstructions(compositeReader, compositeGlyphIndex) ? 1 : 255);
+                    allGlyphs[compositeGlyphIndex].compositeHasInstructions = CompositeHasInstructions(compositeReader, compositeGlyphIndex);
                 }
-
-
                 reader.BaseStream.Position = expected_GlyphStreamStartAt;
             }
             //-------- 
-
             int curFlagsIndex = 0;
             int pntContourIndex = 0;
             for (int i = 0; i < allGlyphs.Length; ++i)
             {
                 glyphs[i] = BuildSimpleGlyphStructure(reader,
-                    (ushort)i,
                     allGlyphs[i],
                     pntPerContours, ref pntContourIndex,
-                    flagStream, ref curFlagsIndex,
-                    compositeHasInstructions);
+                    flagStream, ref curFlagsIndex);
             }
 
 #if DEBUG
@@ -334,21 +341,26 @@ namespace Typography.WebFont
                 }
             }
 
+            //--------------------------------------------------------------------------------------------
+            //bbox stream
+            //--------------------------------------------------------------------------------------------
 
+
+            //--------------------------------------------------------------------------------------------
+            //instruction stream
+
+            //--------------------------------------------------------------------------------------------
             glyfTable.Glyphs = glyphs;
         }
 
 
-        Glyph BuildSimpleGlyphStructure(BinaryReader glyphStreamReader,
-          ushort glyphIndex,
-          int numContour,
-          ushort[] pntPerContours, ref int pntContourIndex,
-          byte[] flagStream, ref int flagStreamIndex,
-          byte[] compositeHasInstructions)
+        static Glyph BuildSimpleGlyphStructure(BinaryReader glyphStreamReader,
+            TempGlyph tmpGlyph,
+            ushort[] pntPerContours, ref int pntContourIndex,
+            byte[] flagStream, ref int flagStreamIndex)
         {
 
-            //reading from glyphstream***
-
+            //reading from glyphstream*** 
             //Building a SimpleGlyph 
             //    1) Read numberOfContours 255UInt16 values from the nPoints stream.
             //    Each of these is the number of points of that contour.
@@ -374,32 +386,23 @@ namespace Typography.WebFont
             //    5) Read instructionLength bytes from instructionStream, and store these in the reconstituted glyph as instructions. 
 
 
-            if (numContour == 0) return Glyph.Empty;
-            if (numContour < 0)
+            if (tmpGlyph.numContour == 0) return Glyph.Empty;
+            if (tmpGlyph.numContour < 0)
             {
-
-                //some composites have instructions...
-                if (compositeHasInstructions[glyphIndex] == 1)
+                //composite glyph,
+                //check if this has instruction or not
+                if (tmpGlyph.compositeHasInstructions)
                 {
-                    ushort _instructionLen1 = Woff2Utils.Read255UInt16(glyphStreamReader);
-                    if (_instructionLen1 == 0)
-                    {
-                        glyphStreamReader.BaseStream.Position--;
-                    }
+                    tmpGlyph.instructionLen = Woff2Utils.Read255UInt16(glyphStreamReader);
                 }
                 return null;//skip composite glyph (resolve later)     
             }
 
-
             //-----
-
             int curX = 0;
             int curY = 0;
 
-            if (glyphIndex == 497)
-            {
-
-            }
+            int numContour = tmpGlyph.numContour;
 
             var _endContours = new ushort[numContour];
             ushort pointCount = 0;
@@ -490,17 +493,14 @@ namespace Typography.WebFont
 
             //----
             //step 4) Read one 255UInt16 value from the glyph stream, which is instructionLength, the number of instruction bytes.
-            ushort _instructionLen = Woff2Utils.Read255UInt16(glyphStreamReader);
-
+            tmpGlyph.instructionLen = Woff2Utils.Read255UInt16(glyphStreamReader);
             //step 5) resolve it later
-
-
 
             return new Glyph(_glyphPoints,
                _endContours,
                new Bounds(), //calculate later
-               new byte[_instructionLen],  //load instruction later
-               glyphIndex);
+               null,  //load instruction later
+               tmpGlyph.glyphIndex);
         }
 
         static bool CompositeHasInstructions(BinaryReader reader, ushort compositeGlyphIndex)
@@ -818,14 +818,14 @@ namespace Typography.WebFont
             public readonly byte YBits;
             public readonly ushort DeltaX;
             public readonly ushort DeltaY;
-            public readonly short Xsign;
-            public readonly short Ysign;
+            public readonly sbyte Xsign;
+            public readonly sbyte Ysign;
 
             public TripleEncodingRecord(
                 byte byteCount,
                 byte xbits, byte ybits,
                 ushort deltaX, ushort deltaY,
-                short xsign, short ysign)
+                sbyte xsign, sbyte ysign)
             {
                 ByteCount = byteCount;
                 XBits = xbits;
@@ -1135,7 +1135,7 @@ namespace Typography.WebFont
                 BuildRecords(5, 16, 16, new ushort[] { 0 }, new ushort[] { 0 });// 4*1 => 4 records
 
             }
-            void AddRecord(byte byteCount, byte xbits, byte ybits, ushort deltaX, ushort deltaY, short xsign, short ysign)
+            void AddRecord(byte byteCount, byte xbits, byte ybits, ushort deltaX, ushort deltaY, sbyte xsign, sbyte ysign)
             {
                 var rec = new TripleEncodingRecord(byteCount, xbits, ybits, deltaX, deltaY, xsign, ysign);
 #if DEBUG
@@ -1735,7 +1735,7 @@ namespace Typography.WebFont
                 arr[i] = reader.ReadInt16();
             }
             return arr;
-        } 
+        }
         public static ushort Read255UInt16(BinaryReader reader)
         {
             //255UInt16 Variable-length encoding of a 16-bit unsigned integer for optimized intermediate font data storage.
