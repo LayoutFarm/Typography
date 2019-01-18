@@ -310,7 +310,7 @@ namespace Typography.Rendering
 
         static GlyphImage ReadGlyphImages(string filename)
         {
-            using (PixelFarm.CpuBlit.MemBitmap bmp = StorageService.Provider.ReadPngBitmap(filename))
+            using (PixelFarm.CpuBlit.MemBitmap bmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(filename))
             {
                 GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
                 int[] buffer = new int[bmp.Width * bmp.Height];
@@ -328,7 +328,7 @@ namespace Typography.Rendering
             using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), true))
             {
-                StorageService.Provider.SavePngBitmap(memBmp, filename);
+                PixelFarm.CpuBlit.MemBitmapExtensions.SaveImage(memBmp, filename, PixelFarm.CpuBlit.MemBitmapIO.OutputImageFormat.Png);
             }
 
         }
