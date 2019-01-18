@@ -12,7 +12,7 @@ namespace PixelFarm.CpuBlit
     partial class AggPainter
     {
         //image processing,
-        FilterMan _filterMan = new FilterMan();
+
 
         void DrawBitmap(MemBitmap memBmp, double left, double top)
         {
@@ -249,39 +249,16 @@ namespace PixelFarm.CpuBlit
             //restore...
             this.UseSubPixelLcdEffect = useSubPix;
         }
-        public override void ApplyFilter(ImageFilter imgFilter)
+        public override void ApplyFilter(PixelFarm.Drawing.IImageFilter imgFilter)
         {
-            ////----------------------
-            ///// <summary>
-            ///// do filter at specific area
-            ///// </summary>
-            ///// <param name="filter"></param>
-            ///// <param name="area"></param>
-            //public override void DoFilterBlurStack(RectInt area, int r)
-            //{
-            //    ChildImage img = new ChildImage(_aggsx.DestImage, _aggsx.PixelBlender,
-            //        area.Left, area.Bottom, area.Right, area.Top);
-            //    filterMan.DoStackBlur(img, r);
-            //}
-            //public override void DoFilterBlurRecursive(RectInt area, int r)
-            //{
-            //    ChildImage img = new ChildImage(_aggsx.DestImage, _aggsx.PixelBlender,
-            //        area.Left, area.Bottom, area.Right, area.Top);
-            //    filterMan.DoRecursiveBlur(img, r);
-            //}
-            //public override void DoFilter(RectInt area, int r)
-            //{
-            //    ChildImage img = new ChildImage(_aggsx.DestImage, _aggsx.PixelBlender,
-            //      area.Left, area.Top, area.Right, area.Bottom);
-            //    filterMan.DoSharpen(img, r);
-            //}
-            //TODO: implement this
-            //resolve internal img filter
-            //switch (imgFilter.Name)
-            //{ 
-            //} 
+
+            //check if we can use this imgFilter
+            var cpuBlitImgFx = imgFilter as PaintFx.Effects.ICpuBlitImgFilter;
+            if (cpuBlitImgFx == null) return;
+            // 
+            cpuBlitImgFx.SetTarget(_aggsx.DestBitmapBlender);
+            imgFilter.Apply();
         }
-
-
+        
     }
 }

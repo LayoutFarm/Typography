@@ -39,7 +39,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         Vector2 _rightBottomRadius;
         Vector2 _rightTopRadius;
         Vector2 _leftTopRadius;
-        Arc _currentProcessingArc = new Arc();
+        Arc _arc = new Arc();
         public RoundedRect()
         {
         }
@@ -128,16 +128,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public double ApproximationScale
         {
-            get => _currentProcessingArc.ApproximateScale;
-            set => _currentProcessingArc.ApproximateScale = value;
+            get => _arc.ApproximateScale;
+            set => _arc.ApproximateScale = value;
         }
         IEnumerable<VertexData> GetVertexIter()
         {
-            _currentProcessingArc.UseStartEndLimit = true;
-            _currentProcessingArc.Init(_bounds.Left + _leftBottomRadius.x, _bounds.Bottom + _leftBottomRadius.y, _leftBottomRadius.x, _leftBottomRadius.y, Math.PI, Math.PI + Math.PI * 0.5);
-            _currentProcessingArc.SetStartEndLimit(_bounds.Left, _bounds.Bottom + _leftBottomRadius.y,
+            _arc.UseStartEndLimit = true;
+            _arc.Init(_bounds.Left + _leftBottomRadius.x, _bounds.Bottom + _leftBottomRadius.y, _leftBottomRadius.x, _leftBottomRadius.y, Math.PI, Math.PI + Math.PI * 0.5);
+            _arc.SetStartEndLimit(_bounds.Left, _bounds.Bottom + _leftBottomRadius.y,
                 _bounds.Left + _leftBottomRadius.x, _bounds.Bottom);
-            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
+
+            foreach (VertexData vertexData in _arc.GetVertexIter())
             {
                 if (VertexHelper.IsEmpty(vertexData.command))
                 {
@@ -147,10 +148,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
 
 
-            _currentProcessingArc.Init(_bounds.Right - _rightBottomRadius.x, _bounds.Bottom + _rightBottomRadius.y, _rightBottomRadius.x, _rightBottomRadius.y, Math.PI + Math.PI * 0.5, 0.0);
-            _currentProcessingArc.SetStartEndLimit(_bounds.Right - _rightBottomRadius.x,
+            _arc.Init(_bounds.Right - _rightBottomRadius.x, _bounds.Bottom + _rightBottomRadius.y, _rightBottomRadius.x, _rightBottomRadius.y, Math.PI + Math.PI * 0.5, 0.0);
+            _arc.SetStartEndLimit(_bounds.Right - _rightBottomRadius.x,
                 _bounds.Bottom, _bounds.Right, _bounds.Bottom + _rightBottomRadius.y);
-            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
+
+            foreach (VertexData vertexData in _arc.GetVertexIter())
             {
                 if (VertexHelper.IsMoveTo(vertexData.command))
                 {
@@ -165,10 +167,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
 
 
-            _currentProcessingArc.Init(_bounds.Right - _rightTopRadius.x, _bounds.Top - _rightTopRadius.y, _rightTopRadius.x, _rightTopRadius.y, 0.0, Math.PI * 0.5);
-            _currentProcessingArc.SetStartEndLimit(_bounds.Right, _bounds.Top - _rightTopRadius.y,
+            _arc.Init(_bounds.Right - _rightTopRadius.x, _bounds.Top - _rightTopRadius.y, _rightTopRadius.x, _rightTopRadius.y, 0.0, Math.PI * 0.5);
+            _arc.SetStartEndLimit(_bounds.Right, _bounds.Top - _rightTopRadius.y,
                 _bounds.Right - _rightTopRadius.x, _bounds.Top);
-            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
+
+            foreach (VertexData vertexData in _arc.GetVertexIter())
             {
                 if (VertexHelper.IsMoveTo(vertexData.command))
                 {
@@ -183,10 +186,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
 
 
-            _currentProcessingArc.Init(_bounds.Left + _leftTopRadius.x, _bounds.Top - _leftTopRadius.y, _leftTopRadius.x, _leftTopRadius.y, Math.PI * 0.5, Math.PI);
-            _currentProcessingArc.SetStartEndLimit(_bounds.Left - _leftTopRadius.x, _bounds.Top,
+            _arc.Init(_bounds.Left + _leftTopRadius.x, _bounds.Top - _leftTopRadius.y, _leftTopRadius.x, _leftTopRadius.y, Math.PI * 0.5, Math.PI);
+            _arc.SetStartEndLimit(_bounds.Left - _leftTopRadius.x, _bounds.Top,
                   _bounds.Left, _bounds.Top - _leftTopRadius.y);
-            foreach (VertexData vertexData in _currentProcessingArc.GetVertexIter())
+
+            foreach (VertexData vertexData in _arc.GetVertexIter())
             {
                 switch (vertexData.command)
                 {
@@ -206,11 +210,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             yield return new VertexData(VertexCmd.NoMore);
         }
 
-        public VertexStore MakeVxs(VertexStore vxs)
+        public VertexStore MakeVxs(VertexStore output)
         {
-            return VertexStoreBuilder.CreateVxs(this.GetVertexIter(), vxs);
+            return VertexStoreBuilder.CreateVxs(this.GetVertexIter(), output);
         }
-
+        public VertexStore CreateTrim()
+        {
+            using (VxsTemp.Borrow(out var v1))
+            {
+                return MakeVxs(v1).CreateTrim();
+            }
+        }
     }
 }
 

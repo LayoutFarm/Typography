@@ -5,19 +5,18 @@ using System.Collections.Generic;
 using System.IO;
 namespace PixelFarm.Platforms
 {
+
+
     public abstract class StorageServiceProvider
     {
         public abstract bool DataExists(string dataName);
         public abstract void SaveData(string dataName, byte[] content);
-        public abstract byte[] ReadData(string dataName);
+        public abstract byte[] ReadData(string dataName); 
         public Stream ReadDataStream(string dataName)
         {
             byte[] data = ReadData(dataName);
             return new MemoryStream(data);
-        }
-        public abstract PixelFarm.CpuBlit.MemBitmap ReadPngBitmap(string filename);
-        public abstract void SavePngBitmap(PixelFarm.CpuBlit.MemBitmap bmp, string filename);
-
+        } 
     }
 
     public static class StorageService

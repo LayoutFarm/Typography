@@ -4,7 +4,6 @@ using System;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.CpuBlit.PixelProcessing;
-
 using BitmapBufferEx;
 namespace PixelFarm.CpuBlit
 {
@@ -53,7 +52,7 @@ namespace PixelFarm.CpuBlit
                     //2.
                     Color prevColor = this.FillColor; //save
 
-                    this.FillColor = Color.White; 
+                    this.FillColor = Color.White;
                     _aggsx.Render(vxs, FillColor);
 
                     //this.Fill(vxs); //fill vxs with white color (on black bg)
@@ -99,21 +98,25 @@ namespace PixelFarm.CpuBlit
 
         void SetupMaskPixelBlender()
         {
+            //create when need and
+            //after _aggsx_0 is attach to the surface
             if (_aggsx_mask != null)
             {
                 //also set the canvas origin for the aggsx_mask
                 _aggsx_mask.SetScanlineRasOrigin(this.OriginX, this.OriginY);
-                return;
+                return;//***
             }
             //----------
-            //same size                  
+            //same size as primary _aggsx_0
+
 
             _alphaBitmap = new MemBitmap(_aggsx_0.Width, _aggsx_0.Height);
 #if DEBUG
             _alphaBitmap._dbugNote = "AggPrinter.SetupMaskPixelBlender";
 #endif
 
-            _aggsx_mask = new AggRenderSurface(_alphaBitmap) { PixelBlender = new PixelBlenderBGRA() };
+            _aggsx_mask = new AggRenderSurface() { PixelBlender = new PixelBlenderBGRA() };
+            _aggsx_mask.AttachDstBitmap(_alphaBitmap);
             _aggsx_mask.SetScanlineRasOrigin(this.OriginX, this.OriginY); //also set the canvas origin for the aggsx_mask
 
             _maskPixelBlender = new PixelBlenderWithMask();
@@ -122,42 +125,62 @@ namespace PixelFarm.CpuBlit
             _maskPixelBlender.SetMaskBitmap(_alphaBitmap); //same alpha bitmap
             _maskPixelBlenderPerCompo.SetMaskBitmap(_alphaBitmap); //same alpha bitmap
         }
+        void DetachMaskPixelBlender()
+        {
+            if (_aggsx_mask != null)
+            {
+                _aggsx_mask.DetachDstBitmap();
+                _aggsx_mask = null;
+
+                _maskPixelBlender = null; //remove blender
+                _maskPixelBlenderPerCompo = null;
+            }
+            if (_alphaBitmap != null)
+            {
+                _alphaBitmap.Dispose();
+                _alphaBitmap = null;
+            }
+
+        }
+        void UpdateTargetBuffer(TargetBufferName value)
+        {
+            //
+            _targetBufferName = value;
+
+            if (_aggsx.DestBitmap != null)
+            {
+                switch (value)
+                {
+                    default: throw new NotSupportedException();
+                    case TargetBufferName.Default:
+                        //default 
+                        _aggsx = _aggsx_0; //*** 
+                        break;
+                    case TargetBufferName.AlphaMask:
+                        SetupMaskPixelBlender();
+                        _aggsx = _aggsx_mask;//*** 
+                        break;
+                }
+                TempMemPtr tmp = MemBitmap.GetBufferPtr(_aggsx.DestBitmap);
+                unsafe
+                {
+                    _bxt = new BitmapBuffer(
+                       _aggsx.Width,
+                       _aggsx.Height,
+                        tmp.Ptr,
+                        tmp.LengthInBytes);
+                }
+            }
+        }
+
         public TargetBufferName TargetBufferName
         {
             get => _targetBufferName;
             set
             {
-                //change or not
-                if (_targetBufferName != value)
-                {
-                    switch (value)
-                    {
-                        default: throw new NotSupportedException();
-                        case TargetBufferName.Default:
-                            //default 
-                            _aggsx = _aggsx_0; //*** 
-                            break;
-                        case TargetBufferName.AlphaMask:
-                            SetupMaskPixelBlender();
-                            _aggsx = _aggsx_mask;//*** 
-                            break;
-                    }
-
-
-                    TempMemPtr tmp = MemBitmap.GetBufferPtr(_aggsx.DestBitmap);
-                    unsafe
-                    {
-                        _bxt = new BitmapBuffer(
-                       _aggsx.Width,
-                       _aggsx.Height,
-                        tmp.Ptr,
-                        tmp.LengthInBytes);
-                    }
-
-
-                    _targetBufferName = value;
-                }
-
+                if (_targetBufferName == value) { return; }
+                //
+                UpdateTargetBuffer(value);
             }
         }
         public bool EnableBuiltInMaskComposite
@@ -165,20 +188,83 @@ namespace PixelFarm.CpuBlit
             get => _enableBuiltInMaskComposite;
             set
             {
-                if (_enableBuiltInMaskComposite != value)
+                if (_enableBuiltInMaskComposite == value) { return; }
+                //
+                _enableBuiltInMaskComposite = value;
+                if (value)
                 {
-                    _enableBuiltInMaskComposite = value;
-                    if (value)
-                    {
-                        //use mask composite
-                        this.DestBitmapBlender.OutputPixelBlender = _maskPixelBlender;
-                    }
-                    else
-                    {
-                        //use default composite
-                        this.DestBitmapBlender.OutputPixelBlender = _defaultPixelBlender;
-                    }
+                    //use mask composite
+                    this.DestBitmapBlender.OutputPixelBlender = _maskPixelBlender;
                 }
+                else
+                {
+                    //use default composite
+                    this.DestBitmapBlender.OutputPixelBlender = _defaultPixelBlender;
+                }
+
+            }
+        }
+
+        public override void Fill(Region rgn)
+        {
+            var region = rgn as CpuBlitRegion;
+            if (region == null) return;
+            switch (region.Kind)
+            {
+                case CpuBlitRegion.CpuBlitRegionKind.BitmapBasedRegion:
+                    {
+                        var bmpRgn = (PixelFarm.PathReconstruction.BitmapBasedRegion)region;
+                        //for bitmap that is used to be a region...
+                        //our convention is ...
+                        //  non-region => black
+                        //  region => white                        
+                        //(same as the Typography GlyphTexture)
+                        MemBitmap rgnBitmap = bmpRgn.GetRegionBitmap();
+                        DrawImage(rgnBitmap);
+                    }
+                    break;
+                case CpuBlitRegion.CpuBlitRegionKind.VxsRegion:
+                    {
+                        //fill 'hole' of the region
+                        var vxsRgn = (PixelFarm.PathReconstruction.VxsRegion)region;
+                        Fill(vxsRgn.GetVxs());
+                    }
+                    break;
+                case CpuBlitRegion.CpuBlitRegionKind.MixedRegion:
+                    {
+                        var mixedRgn = (PixelFarm.PathReconstruction.MixedRegion)region;
+                    }
+                    break;
+            }
+
+        }
+        public override void Draw(Region rgn)
+        {
+            var region = rgn as PixelFarm.CpuBlit.CpuBlitRegion;
+            if (region == null) return;
+            switch (region.Kind)
+            {
+                case CpuBlitRegion.CpuBlitRegionKind.BitmapBasedRegion:
+                    {
+                        var bmpRgn = (PixelFarm.PathReconstruction.BitmapBasedRegion)region;
+                        //check if it has outline data or not
+                        //if not then just return
+
+
+                    }
+                    break;
+                case CpuBlitRegion.CpuBlitRegionKind.VxsRegion:
+                    {
+                        //draw outline of the region
+                        var vxsRgn = (PixelFarm.PathReconstruction.VxsRegion)region;
+                        Draw(vxsRgn.GetVxs());
+                    }
+                    break;
+                case CpuBlitRegion.CpuBlitRegionKind.MixedRegion:
+                    {
+                        var mixedRgn = (PixelFarm.PathReconstruction.MixedRegion)region;
+                    }
+                    break;
             }
         }
 

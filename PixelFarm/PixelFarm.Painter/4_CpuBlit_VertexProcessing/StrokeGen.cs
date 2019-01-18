@@ -89,6 +89,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             get => _shorten;
             set => _shorten = value;
         }
+
+        public bool GenerateOnlyOuterBorderForClosedShape { get; set; }
         // Vertex Generator Interface
         public void Reset()
         {
@@ -125,6 +127,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
 
+
         void AppendVertices(VertexStore dest, VertexStore src, int src_index = 0)
         {
             int j = src.Count;
@@ -137,6 +140,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
             }
         }
+
+        /// <summary>
+        /// generate stroke for both side of closed and open shape
+        /// </summary>
+        /// <param name="output"></param>
         void GenStroke(VertexStore output)
         {
             //agg_vcgen_stroke.cpp 
@@ -180,6 +188,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
             else
             {
+                if (GenerateOnlyOuterBorderForClosedShape)
+                {
+                    GenHalfStrokeForOutsideOfClosedShape(output);
+                    return;
+                }
+
 
                 //[C]
                 _vtx2dList.GetFirst2(out Vertex2d v0, out Vertex2d v1);
@@ -310,6 +324,115 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
 
+
+
+        /// <summary>
+        /// generate stroke for 'outside' of the closed shape
+        /// </summary>
+        /// <param name="output"></param>
+        void GenHalfStrokeForOutsideOfClosedShape(VertexStore output)
+        {
+            //-----------------
+            //the shape is closed shape***
+            //this is a modified version of GenStroke()
+            //-----------------
+
+            if (_vtx2dList.Count < 3)
+            {
+                //force
+                _closed = false;
+            }
+
+            //ready
+            if (_vtx2dList.Count < 2 + (_closed ? 1 : 0))
+            {
+                return;
+            }
+
+            //[A]
+            //we start at cap1 
+            //check if close polygon or not
+            //if lines( not close) => then start with some kind of line cap
+            //if closed polygon => start with outline
+
+            int m_src_vertex = 0;
+            double latest_moveX = 0;
+            double latest_moveY = 0;
+
+            int _latestFigBeginAt = output.Count;
+
+            if (!_closed)
+            {
+                //[B] cap1
+                throw new NotSupportedException();
+            }
+            else
+            {
+                //[C]
+                _vtx2dList.GetFirst2(out Vertex2d v0, out Vertex2d v1);
+                _vtx2dList.GetLast2(out Vertex2d v_beforeLast, out Vertex2d v_last);
+
+                if (v_last.x == v0.x && v_last.y == v0.y)
+                {
+                    v_last = v_beforeLast;
+                }
+
+                // v_last-> v0-> v1
+                _stroker.CreateJoin(_tmpVxs,
+                    v_last,
+                    v0,
+                    v1);
+                _tmpVxs.GetVertex(0, out latest_moveX, out latest_moveY);
+                output.AddMoveTo(latest_moveX, latest_moveY);
+                //others 
+                AppendVertices(output, _tmpVxs, 1);
+            }
+            //----------------
+            m_src_vertex = 1;
+            //----------------
+
+            //[D] draw lines until end cap ***
+
+            while (m_src_vertex < _vtx2dList.Count - 1)
+            {
+
+                _vtx2dList.GetTripleVertices(m_src_vertex,
+                    out Vertex2d prev,
+                    out Vertex2d cur,
+                    out Vertex2d next);
+                //check if we should join or not ?
+
+
+                _stroker.CreateJoin(_tmpVxs,
+                   prev,
+                   cur,
+                   next);
+
+                ++m_src_vertex;
+
+
+                AppendVertices(output, _tmpVxs);
+            }
+
+            //[E] draw end line
+            {
+                if (!_closed)
+                {
+                    throw new NotSupportedException();
+                }
+                else
+                {
+                    output.GetVertex(_latestFigBeginAt, out latest_moveX, out latest_moveY);
+                    output.AddLineTo(latest_moveX, latest_moveY);
+                    output.AddCloseFigure();
+                }
+            }
+
+
+            //*****
+            //this is a modified version of GenStroke()
+            //*****
+        }
 
         class Vertex2dList
         {

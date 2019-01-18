@@ -444,13 +444,13 @@ namespace PixelFarm.CpuBlit
                 _myvxs.AddVertex(0, 0, VertexCmd.Close);
             }
         }
-        public void EndGroup()
-        {
-            if (VertexHelper.IsCloseOrEnd(_myvxs.GetLastCommand()))
-            {
-                _myvxs.EndGroup();
-            }
-        }
+        //public void EndGroup()
+        //{
+        //    if (VertexHelper.IsCloseOrEnd(_myvxs.GetLastCommand()))
+        //    {
+        //        _myvxs.EndGroup();
+        //    }
+        //}
         //// Concatenate path. The path is added as is.
         public void ConcatPath(VertexStore s)
         {

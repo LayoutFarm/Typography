@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="05_PixelProcessing\BitmapBlenderBase.cs" />
-    <Compile Include="05_PixelProcessing\CO.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\GradientSpanGen.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs" />

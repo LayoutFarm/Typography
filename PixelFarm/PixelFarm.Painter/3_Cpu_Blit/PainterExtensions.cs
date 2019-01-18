@@ -22,9 +22,6 @@
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit
 {
-
-
-
     public static class PainterExtensions
     {
 
@@ -64,8 +61,6 @@ namespace PixelFarm.CpuBlit
             p.FillRect(left, top, width, height);
             p.FillColor = prevColor;
         }
-
-       
         public static void Fill(this Painter p, VertexStore vxs, Color color)
         {
             Color prevColor = p.FillColor;
@@ -80,10 +75,18 @@ namespace PixelFarm.CpuBlit
             p.Draw(vxs);
             p.StrokeColor = prevColor;
         }
+        public static void Fill(this Painter p, Region rgn, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.Fill(rgn);
+            p.FillColor = prevColor;
+        }
+       
 #if DEBUG
         static int dbugId = 0;
 #endif
-         
+
 
     }
 

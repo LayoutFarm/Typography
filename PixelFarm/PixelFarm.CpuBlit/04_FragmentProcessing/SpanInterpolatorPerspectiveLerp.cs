@@ -221,15 +221,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         {
             x = _coord_x.Y;
             y = _coord_y.Y;
-        }
-
-        //----------------------------------------------------------------
-        public void GetLocalScale(out int x, out int y)
-        {
-            x = _scale_x.Y;
-            y = _scale_y.Y;
-        }
-
+        } 
         //----------------------------------------------------------------
         public void transform(ref double x, ref double y)
         {

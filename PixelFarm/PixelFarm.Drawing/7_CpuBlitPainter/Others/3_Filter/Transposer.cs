@@ -22,7 +22,7 @@ using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.Imaging
 {
     //=======================================================pixfmt_transposer
-    public sealed class FormatTransposer : ProxyImage
+    sealed class FormatTransposer : ProxyImage
     {
         public FormatTransposer(PixelProcessing.IBitmapBlender pixelFormat)
             : base(pixelFormat)
