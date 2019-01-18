@@ -29,7 +29,7 @@
 
 namespace PixelFarm.CpuBlit.Imaging
 {
-    public interface IImageFilter
+    public interface IImageFilterFunc
     {
         double GetRadius();
         double CalculateWeight(double x);

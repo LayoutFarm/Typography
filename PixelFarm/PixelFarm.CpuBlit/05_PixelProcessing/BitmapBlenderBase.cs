@@ -41,7 +41,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         IntPtr _raw_buffer32;
         int _rawBufferLenInBytes;
-
+        MemBitmap _filterBmp;
         //--------------------------------------------
         // Pointer to first pixel depending on strideInBytes and image position         
         protected internal int _int32ArrayStartPixelAt;
@@ -53,17 +53,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         PixelBlender32 _outputPxBlender;
 
-        public IntPtr GetInternalBufferPtr32
-        {
-            get
-            {
-                return _raw_buffer32;
-            }
-        }
-        public Imaging.TempMemPtr GetBufferPtr()
-        {
-            return new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
-        }
+        public IntPtr GetInternalBufferPtr32 => _raw_buffer32;
+
+        public Imaging.TempMemPtr GetBufferPtr() => new Imaging.TempMemPtr(_raw_buffer32, _rawBufferLenInBytes);
+
         protected void SetBufferToNull()
         {
             _raw_buffer32 = IntPtr.Zero;
@@ -78,7 +71,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         public abstract void WriteBuffer(int[] newbuffer);
 
-        protected void Attach(MemBitmap bmp, PixelBlender32 pixelBlender = null)
+
+        public void Attach(MemBitmap bmp, PixelBlender32 pixelBlender = null)
         {
             if (pixelBlender == null)
             {
@@ -89,8 +83,13 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 }
                 pixelBlender = _defaultPixelBlender;
             }
+
+            OnAttachingDstBitmap(bmp);
             Attach(bmp.Width, bmp.Height, bmp.BitDepth, MemBitmap.GetBufferPtr(bmp), pixelBlender);
         }
+
+        protected virtual void OnAttachingDstBitmap(MemBitmap bmp) { }
+
         /// <summary>
         /// attach image buffer and its information to the reader
         /// </summary>
@@ -113,7 +112,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             //
             int bytesPerPixel = (bitsPerPixel + 7) / 8;
             int stride = 4 * ((width * bytesPerPixel + 3) / 4);
-
 #if DEBUG
             if (bytesPerPixel == 0)
             {
@@ -123,16 +121,20 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             //
             SetDimmensionAndFormat(width, height, stride, bitsPerPixel, bitsPerPixel / 8);
             SetUpLookupTables();
-            //
-
-            this.OutputPixelBlender = outputPxBlender;
-            //
-
+            OutputPixelBlender = outputPxBlender;
             _raw_buffer32 = imgbuffer.Ptr;
             _rawBufferLenInBytes = imgbuffer.LengthInBytes;
-
         }
-
+        /// <summary>
+        /// detach from current img buffer and output pixel blender
+        /// </summary>
+        public void Detach()
+        {
+            SetDimmensionAndFormat(0, 0, 0, 0, 0);
+            _raw_buffer32 = IntPtr.Zero;
+            _rawBufferLenInBytes = 0;
+            OutputPixelBlender = null;
+        }
 
         protected void SetDimmensionAndFormat(int width, int height,
            int strideInBytes,
@@ -537,13 +539,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
 #endif
         }
-
-
-        MemBitmap _filterBmp;
-        public void SetFilterImage(MemBitmap filterBmp)
-        {
-            _filterBmp = filterBmp;
-        }
+        
         public void BlendSolidHSpan(int x, int y, int len, Color sourceColor, byte[] covers, int coversIndex)
         {
             int colorAlpha = sourceColor.alpha;
@@ -744,7 +740,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             return new RectInt(0, 0, Width, Height);
         }
-
+        //---------
+        public void SetFilterImage(MemBitmap filterBmp)
+        {
+            _filterBmp = filterBmp;
+        }
 #if DEBUG
         static int dbugTotalId;
         public readonly int dbugId = dbugGetNewDebugId();

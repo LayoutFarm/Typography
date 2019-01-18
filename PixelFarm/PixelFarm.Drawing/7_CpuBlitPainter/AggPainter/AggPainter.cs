@@ -29,12 +29,23 @@ namespace PixelFarm.CpuBlit
             //painter paint to target surface
             _orientation = RenderSurfaceOrientation.LeftBottom;
             //----------------------------------------------------
-            _aggsx_0 = aggsx; //set this as default ***            
+            _aggsx =_aggsx_0 = aggsx; //set this as default *** 
+
+            _aggsx_0.DstBitmapAttached += (s, e) =>
+            {
+                UpdateTargetBuffer(_targetBufferName);
+            };
+            _aggsx_0.DstBitmapDetached += (s, e) =>
+            {
+                DetachMaskPixelBlender();
+            };
+
             TargetBufferName = TargetBufferName.Default;
             _stroke = new Stroke(1);//default
             _useDefaultBrush = true;
             _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;
         }
+
 
         public DrawBoard DrawBoard { get; set; }
         public AggRenderSurface RenderSurface => _aggsx;
@@ -102,7 +113,9 @@ namespace PixelFarm.CpuBlit
         {
             //helper func
 
-            AggRenderSurface renderSx = new AggRenderSurface(bmp);
+            AggRenderSurface renderSx = new AggRenderSurface();
+            renderSx.AttachDstBitmap(bmp);
+
             if (blender == null)
             {
                 blender = new PixelProcessing.PixelBlenderBGRA();

@@ -138,14 +138,6 @@ namespace PixelFarm.Drawing
         //--------------------------------------------------
 
 
-        public void EndGroup()
-        {
-            if (_vertices_count > 0)
-            {
-                _cmds[_vertices_count - 1] = (byte)VertexCmd.CloseAndEndFigure;
-            }
-
-        }
 
 
         internal void ReplaceVertex(int index, double x, double y)
@@ -372,7 +364,7 @@ namespace PixelFarm.Drawing
                   _vertices_count << 1,//*2 //
                   another._vertices_count << 1);
 
-                
+
 
                 //B.2 
                 System.Array.Copy(
@@ -527,6 +519,7 @@ namespace PixelFarm.Drawing
         /// <param name="y"></param>
         public static void AddP3c(this VertexStore vxs, double x, double y)
         {
+
             vxs.AddVertex(x, y, VertexCmd.P3c);
         }
         public static void AddMoveTo(this VertexStore vxs, double x0, double y0)
@@ -559,28 +552,8 @@ namespace PixelFarm.Drawing
         {
             vxs.AddVertex(0, 0, VertexCmd.NoMore);
         }
-        /// <summary>
-        /// copy + translate vertext data from src to outputVxs
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="dx"></param>
-        /// <param name="dy"></param>
-        /// <param name="outputVxs"></param>
-        /// <returns></returns>
-        public static VertexStore TranslateToNewVxs(this VertexStore src, double dx, double dy, VertexStore outputVxs)
-        {
-            int count = src.Count;
-            VertexCmd cmd;
-            double x, y;
-            for (int i = 0; i < count; ++i)
-            {
-                cmd = src.GetVertex(i, out x, out y);
-                x += dx;
-                y += dy;
-                outputVxs.AddVertex(x, y, cmd);
-            }
-            return outputVxs;
-        }
+       
+       
     }
 
     public static class VertexHelper

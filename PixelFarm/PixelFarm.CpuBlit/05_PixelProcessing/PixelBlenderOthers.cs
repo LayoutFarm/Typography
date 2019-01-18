@@ -29,6 +29,7 @@
 using System;
 using PixelFarm.CpuBlit.Imaging;
 using PixelFarm.Drawing;
+
 namespace PixelFarm.CpuBlit.PixelProcessing
 {
 
@@ -246,17 +247,17 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     int dest = *dstPtr;
                     //separate each component
-                    byte a = (byte)((dest >> 24) & 0xff);
-                    byte r = (byte)((dest >> 16) & 0xff);
-                    byte g = (byte)((dest >> 8) & 0xff);
-                    byte b = (byte)((dest) & 0xff);
+                    byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
+                    byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
+                    byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
+                    byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
 
                     *dstPtr =
-                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> (int)ColorEx.BASE_SHIFT) << 8) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT));
+                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> (int)ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
             }
         }
@@ -277,20 +278,19 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     int dest = *dstPtr;
                     //separate each component
-                    byte a = (byte)((dest >> 24) & 0xff);
-                    byte r = (byte)((dest >> 16) & 0xff);
-                    byte g = (byte)((dest >> 8) & 0xff);
-                    byte b = (byte)((dest) & 0xff);
+                    byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
+                    byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
+                    byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
+                    byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
                     byte src_a = srcColor.alpha;
 
                     *dstPtr =
-                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 8) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT));
+                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT) |
+                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
-
             }
         }
 
@@ -478,10 +478,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     /// </summary>
     public class PixelBlenderWithMask : PixelBlender32
     {
-
-
         TempMemPtr _maskInnerBuffer;
-        int _mask_shift = 16;//default
+        int _mask_shift;//default
         PixelBlenderColorComponent _selectedMaskComponent;
         public PixelBlenderWithMask()
         {
@@ -495,15 +493,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         public void SetMaskBitmap(MemBitmap maskBmp)
         {
             //please note that size of mask must be the same size of the dest buffer
-
             _maskInnerBuffer = MemBitmap.GetBufferPtr(maskBmp);
         }
+
         public PixelBlenderColorComponent SelectedMaskComponent
         {
-            get
-            {
-                return _selectedMaskComponent;
-            }
+            get => _selectedMaskComponent;
             set
             {
                 _selectedMaskComponent = value;
@@ -511,16 +506,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     default: throw new NotSupportedException();
                     case PixelBlenderColorComponent.A:
-                        _mask_shift = 24;
+                        _mask_shift = CO.A_SHIFT;
                         break;
                     case PixelBlenderColorComponent.R:
-                        _mask_shift = 16;
+                        _mask_shift = CO.R_SHIFT;
                         break;
                     case PixelBlenderColorComponent.G:
-                        _mask_shift = 8;
+                        _mask_shift = CO.G_SHIFT;
                         break;
                     case PixelBlenderColorComponent.B:
-                        _mask_shift = 0;
+                        _mask_shift = CO.B_SHIFT;
                         break;
                 }
             }
@@ -678,8 +673,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
         internal override void CopyPixel(int[] dstBuffer, int arrayOffset, Color srcColor)
         {
-
-
             unsafe
             {
                 unchecked
@@ -690,14 +683,12 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                     }
                 }
             }
-
         }
 
         internal override void CopyPixels(int[] dstBuffer, int arrayOffset, Color srcColor, int count)
         {
             unsafe
             {
-
                 fixed (int* ptr_byte = &dstBuffer[arrayOffset])
                 {
                     //TODO: consider use memcpy() impl***
@@ -746,7 +737,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             unchecked
             {
-
                 if (srcColor.alpha == 255)
                 {
                     *dstPtr = srcColor.ToARGB(); //just copy
@@ -755,18 +745,18 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     int dest = *dstPtr;
                     //separate each component
-                    byte a = (byte)((dest >> 24) & 0xff);
-                    byte r = (byte)((dest >> 16) & 0xff);
-                    byte g = (byte)((dest >> 8) & 0xff);
-                    byte b = (byte)((dest) & 0xff);
+                    byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
+                    byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
+                    byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
+                    byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
                     byte src_a = srcColor.alpha;
 
                     *dstPtr =
-                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
-                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 8) |
-                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT));
+                     ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                     ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                     ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                     ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                 }
             }
         }
@@ -790,7 +780,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 int cover = covers[coversIndex];
                 if (cover == 255)
                 {
-
                     unsafe
                     {
                         int* dstBuffer = (int*)dst.Ptr;
@@ -827,7 +816,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 count--;
                                 arrayElemOffset++;
                             }
-
                         }
                     }
                 }
@@ -868,7 +856,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 header2++;//move next
                                 count--;
                             }
-
                         }
                     }
                 }
@@ -957,7 +944,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
         internal override void CopyPixel(TempMemPtr dst, int arrayOffset, Color srcColor)
         {
-
             unsafe
             {
                 int* dstBuffer = (int*)dst.Ptr;
@@ -987,16 +973,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         G,
         B
     }
+
+
     //TODO: review this again ...
     /// <summary>
     /// only apply to some dest color component
     /// </summary>
     public class PixelBlenderPerColorComponentWithMask : PixelBlender32
     {
-
-
         TempMemPtr _maskInnerBuffer;
-        int _mask_shift = 16;//default
+        int _mask_shift;//default
 
         PixelBlenderColorComponent _selectedMaskComponent;
         EnableOutputColorComponent _selectedDestMaskComponent;
@@ -1032,16 +1018,16 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     default: throw new NotSupportedException();
                     case PixelBlenderColorComponent.A:
-                        _mask_shift = 24;
+                        _mask_shift = CO.A_SHIFT;
                         break;
                     case PixelBlenderColorComponent.R:
-                        _mask_shift = 16;
+                        _mask_shift = CO.R_SHIFT;
                         break;
                     case PixelBlenderColorComponent.G:
-                        _mask_shift = 8;
+                        _mask_shift = CO.G_SHIFT;
                         break;
                     case PixelBlenderColorComponent.B:
-                        _mask_shift = 0;
+                        _mask_shift = CO.B_SHIFT;
                         break;
                 }
             }
@@ -1059,7 +1045,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 int* ptr = (int*)_maskInnerBuffer.Ptr;
                 return srcColor.NewFromChangeCoverage((byte)((ptr[arrayOffset]) >> _mask_shift));
             }
-
         }
         internal override void BlendPixel(int[] dstBuffer, int arrayOffset, Color srcColor)
         {
@@ -1127,7 +1112,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 count--;
                                 arrayElemOffset++;
                             }
-
                         }
                     }
                 }
@@ -1167,7 +1151,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 header2++;//move next
                                 count--;
                             }
-
                         }
                     }
                 }
@@ -1192,7 +1175,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 BlendPixel(dstBuffer, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset].NewFromChangeCoverage(cover), arrayElemOffset));
                             }
 
-
                             arrayElemOffset++;
                             dstBufferPtr++;
                             ++srcColorOffset;
@@ -1204,24 +1186,19 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         }
         internal override void CopyPixel(int[] dstBuffer, int arrayOffset, Color srcColor)
         {
-
-
             unsafe
             {
                 fixed (int* ptr = &dstBuffer[arrayOffset])
                 {
                     BlendPixel32(ptr, NewColorFromMask(srcColor, arrayOffset));
                 }
-
             }
-
         }
 
         internal override void CopyPixels(int[] dstBuffer, int arrayOffset, Color srcColor, int count)
         {
             unsafe
             {
-
                 fixed (int* ptr_byte = &dstBuffer[arrayOffset])
                 {
                     //TODO: consider use memcpy() impl***
@@ -1265,12 +1242,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
             }
         }
 
-
         static unsafe void BlendPixel32Internal(int* dstPtr, Color srcColor, EnableOutputColorComponent enableCompo)
         {
             unchecked
             {
-
                 if (srcColor.alpha == 255)
                 {
                     *dstPtr = srcColor.ToARGB(); //just copy
@@ -1279,10 +1254,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     int dest = *dstPtr;
                     //separate each component
-                    byte a = (byte)((dest >> 24) & 0xff);
-                    byte r = (byte)((dest >> 16) & 0xff);
-                    byte g = (byte)((dest >> 8) & 0xff);
-                    byte b = (byte)((dest) & 0xff);
+                    byte a = (byte)((dest >> CO.A_SHIFT) & 0xff);
+                    byte r = (byte)((dest >> CO.R_SHIFT) & 0xff);
+                    byte g = (byte)((dest >> CO.G_SHIFT) & 0xff);
+                    byte b = (byte)((dest >> CO.B_SHIFT) & 0xff);
 
                     byte src_a = srcColor.alpha;
 
@@ -1291,38 +1266,38 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                         case EnableOutputColorComponent.EnableAll:
                             {
                                 *dstPtr =
-                                 ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                                 ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
-                                 ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 8) |
-                                 ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT));
+                                 ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                                 ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                                 ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                                 ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                             }
                             break;
                         case EnableOutputColorComponent.R:
                             {
                                 *dstPtr =
-                                   ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                                   ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 16) |
-                                    (g << 8) |
-                                    b;
+                                   ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                                   ((byte)(((srcColor.red - r) * src_a + (r << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.R_SHIFT) |
+                                    (g << CO.G_SHIFT) |
+                                    (b << CO.B_SHIFT);
                             }
                             break;
                         case EnableOutputColorComponent.G:
                             {
                                 *dstPtr =
-                                ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                                (r << 16) |
-                                ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << 8) |
-                                b;
+                                ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                                (r << CO.R_SHIFT) |
+                                ((byte)(((srcColor.green - g) * src_a + (g << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.G_SHIFT) |
+                                (b << CO.B_SHIFT);
 
                             }
                             break;
                         case EnableOutputColorComponent.B:
                             {
                                 *dstPtr =
-                                 ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << 24) |
-                                 (r << 16) |
-                                 (g << 8) |
-                                 ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT));
+                                 ((byte)((src_a + a) - ((src_a * a + BASE_MASK) >> ColorEx.BASE_SHIFT)) << CO.A_SHIFT) |
+                                 (r << CO.R_SHIFT) |
+                                 (g << CO.G_SHIFT) |
+                                 ((byte)(((srcColor.blue - b) * src_a + (b << ColorEx.BASE_SHIFT)) >> ColorEx.BASE_SHIFT) << CO.B_SHIFT);
                             }
                             break;
                     }
@@ -1350,7 +1325,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 int cover = covers[coversIndex];
                 if (cover == 255)
                 {
-
                     unsafe
                     {
                         int* dstBuffer = (int*)dst.Ptr;
@@ -1387,7 +1361,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 count--;
                                 arrayElemOffset++;
                             }
-
                         }
                     }
                 }
@@ -1428,7 +1401,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                                 header2++;//move next
                                 count--;
                             }
-
                         }
                     }
                 }
@@ -1453,7 +1425,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                             {
                                 BlendPixels(dst, arrayElemOffset, NewColorFromMask(srcColors[srcColorOffset].NewFromChangeCoverage(cover), arrayElemOffset));
                             }
-
 
                             arrayElemOffset++;
                             dstBufferPtr++;
@@ -1509,9 +1480,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                         ptr++; //move next
                         count--;
                     }
-
                 }
-
             }
         }
 
@@ -1524,7 +1493,6 @@ namespace PixelFarm.CpuBlit.PixelProcessing
                 {
                     BlendPixel32(ptr, NewColorFromMask(srcColor, arrayOffset));
                 }
-
             }
         }
     }

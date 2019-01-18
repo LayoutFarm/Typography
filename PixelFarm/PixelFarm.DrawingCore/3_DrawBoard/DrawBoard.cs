@@ -162,18 +162,14 @@ namespace PixelFarm.Drawing
     }
 
     /// <summary>
-    /// image filter specification
+    /// image filter
     /// </summary>
-    public abstract class ImageFilter
+    public interface IImageFilter
     {
-        public abstract ImageFilterName Name { get; }
+        //implementation for cpu-based and gpu-based may be different
+        void Apply();
     }
-    public enum ImageFilterName
-    {
-        StackBlur,
-        RecursiveBlur,
-        Sharpen,
-    }
+
     public enum SmoothingMode
     {
         AntiAlias = 4,
