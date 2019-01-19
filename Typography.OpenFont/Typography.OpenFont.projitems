@@ -41,11 +41,16 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\SvgTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\BitmapFontsCommon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\EBDT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\EBSC.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\CffEvaluationEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\CFFTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\CFF.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\Type2CharStringParser.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\EBLCTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\CBDT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\CBLC.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\EBLC.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\HorizontalDeviceMetrics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Kern.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\LinearThreashold.cs" />

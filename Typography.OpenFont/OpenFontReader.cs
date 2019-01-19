@@ -357,7 +357,7 @@ namespace Typography.OpenFont
 
             //test math table
             MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
-            EBLCTable fontBmpTable = ReadTableIfExists(tables, input, new EBLCTable());
+            EBLC fontBmpTable = ReadTableIfExists(tables, input, new EBLC());
             //---------------------------------------------
             //about truetype instruction init 
 
@@ -369,7 +369,14 @@ namespace Typography.OpenFont
                 //check if this is cff table ?
                 if (ccf == null)
                 {
-                    //TODO: review here
+
+                    //check  cbdt/cblc ?
+                    CBLC cblcTable = ReadTableIfExists(tables, input, new CBLC());
+
+                    CBDT cbdtTable = ReadTableIfExists(tables, input, new CBDT());
+
+
+
                     throw new NotSupportedException();
                 }
                 //...  
