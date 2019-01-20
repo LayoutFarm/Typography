@@ -357,13 +357,14 @@ namespace Typography.OpenFont
 
             //test math table
             MathTable mathtable = ReadTableIfExists(tables, input, new MathTable());
-            EBLC fontBmpTable = ReadTableIfExists(tables, input, new EBLC());
+
             //---------------------------------------------
             //about truetype instruction init 
 
             //--------------------------------------------- 
             Typeface typeface = null;
             bool isPostScriptOutline = false;
+            bool isBitmapFont = false;
             if (glyf == null)
             {
                 //check if this is cff table ?
@@ -372,25 +373,46 @@ namespace Typography.OpenFont
 
                     //check  cbdt/cblc ?
                     CBLC cblcTable = ReadTableIfExists(tables, input, new CBLC());
+                    if (cblcTable != null)
+                    {
+                        CBDT cbdtTable = ReadTableIfExists(tables, input, new CBDT());
+                        //read cbdt 
+                        //bitmap font 
 
-                    CBDT cbdtTable = ReadTableIfExists(tables, input, new CBDT());
+                        BitmapFontGlyphSource bmpFontGlyphSrc = new BitmapFontGlyphSource(cblcTable, cbdtTable);
+                        Glyph[] glyphs = bmpFontGlyphSrc.BuildGlyphList();
 
 
-
-                    throw new NotSupportedException();
+                        typeface = new Typeface(
+                          nameEntry,
+                          header.Bounds,
+                          header.UnitsPerEm,
+                          bmpFontGlyphSrc,
+                          glyphs,
+                          horizontalMetrics,
+                          os2Table);
+                        isBitmapFont = true;
+                    }
+                    else
+                    {
+                        //TODO:
+                        EBLC fontBmpTable = ReadTableIfExists(tables, input, new EBLC());
+                        throw new NotSupportedException();
+                    }
                 }
-                //...  
-                //PostScript outline font 
-                isPostScriptOutline = true;
-                typeface = new Typeface(
-                      nameEntry,
-                      header.Bounds,
-                      header.UnitsPerEm,
-                      ccf,
-                      horizontalMetrics,
-                      os2Table);
-
-
+                else
+                {
+                    //...  
+                    //PostScript outline font 
+                    isPostScriptOutline = true;
+                    typeface = new Typeface(
+                          nameEntry,
+                          header.Bounds,
+                          header.UnitsPerEm,
+                          ccf,
+                          horizontalMetrics,
+                          os2Table);
+                }
             }
             else
             {
@@ -411,7 +433,7 @@ namespace Typography.OpenFont
             typeface.HheaTable = horizontalHeader;
             //----------------------------
 
-            if (!isPostScriptOutline)
+            if (!isPostScriptOutline && !isBitmapFont)
             {
                 FpgmTable fpgmTable = ReadTableIfExists(tables, input, new FpgmTable());
                 //control values table
@@ -438,7 +460,6 @@ namespace Typography.OpenFont
                 baseTable,
                 colr,
                 cpal);
-
             //------------
 
 

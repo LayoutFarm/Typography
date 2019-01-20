@@ -41,6 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\ScriptTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\CPAL.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.AdvancedLayout\SvgTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\BitmapFontGlyphSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\BitmapFontsCommon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\EBDT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapFonts\EBSC.cs" />

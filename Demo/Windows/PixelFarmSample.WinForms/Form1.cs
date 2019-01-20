@@ -43,7 +43,12 @@ namespace SampleWinForms
 
             this.Load += new System.EventHandler(this.Form1_Load);
 
+            SetupWoffDecompressFunctions();
+           
+        }
 
+        void SetupWoffDecompressFunctions()
+        {
             //
             //Woff
             WoffDefaultZlibDecompressFunc.DecompressHandler = (byte[] compressedBytes, byte[] decompressedResult) =>
@@ -107,6 +112,7 @@ namespace SampleWinForms
                 return result;
             };
         }
+
 
         void RenderByGlyphName(string selectedGlyphName)
         {

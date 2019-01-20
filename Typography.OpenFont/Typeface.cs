@@ -5,6 +5,7 @@ using Typography.OpenFont.Tables;
 
 namespace Typography.OpenFont
 {
+
     public class Typeface
     {
         readonly Bounds _bounds;
@@ -15,6 +16,7 @@ namespace Typography.OpenFont
         readonly NameEntry _nameEntry;
         //
         CFFTable _cffTable;
+        Typography.OpenFont.Tables.BitmapFontGlyphSource _bitmapFontGlyphSource;
 
         internal Typeface(
             NameEntry nameEntry,
@@ -24,6 +26,7 @@ namespace Typography.OpenFont
             HorizontalMetrics horizontalMetrics,
             OS2Table os2Table)
         {
+             
             _nameEntry = nameEntry;
             _bounds = bounds;
             _unitsPerEm = unitsPerEm;
@@ -51,7 +54,25 @@ namespace Typography.OpenFont
             //------
             _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs;
         }
+        internal Typeface(
+             NameEntry nameEntry,
+             Bounds bounds,
+             ushort unitsPerEm,
+             BitmapFontGlyphSource bitmapFontGlyphSource,
+             Glyph[] glyphs,
+             HorizontalMetrics horizontalMetrics,
+             OS2Table os2Table)
+        {
 
+            _nameEntry = nameEntry;
+            _bounds = bounds;
+            _unitsPerEm = unitsPerEm;
+            _bitmapFontGlyphSource = bitmapFontGlyphSource;
+            _horizontalMetrics = horizontalMetrics;
+            OS2Table = os2Table;
+
+            _glyphs = glyphs;
+        }
         /// <summary>
         /// control values in Font unit
         /// </summary>
@@ -287,7 +308,8 @@ namespace Typography.OpenFont
         //---------        
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
-        internal bool IsCffFont => _cffTable != null;
+        public bool IsCffFont => _cffTable != null;
+       
         //---------
         internal MathTable _mathTable;
         internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
@@ -296,6 +318,9 @@ namespace Typography.OpenFont
         public MathGlyphs.MathConstants MathConsts => (_mathTable != null) ? _mathTable._mathConstTable : null;
         //---------
         internal SvgTable _svgTable;
+        //---------
+        public bool IsBitmapFont => _bitmapFontGlyphSource != null;
+        
     }
 
 
@@ -931,6 +956,6 @@ namespace Typography.OpenFont
                 }
                 typeface._evalCffGlyphBounds = true;
             }
-        } 
+        }
     }
 }

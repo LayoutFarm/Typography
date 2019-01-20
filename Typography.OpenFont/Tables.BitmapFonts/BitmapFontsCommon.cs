@@ -1,5 +1,6 @@
 ﻿//MIT, 2019-present, WinterDev
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Typography.OpenFont.Tables.BitmapFonts
@@ -202,6 +203,9 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public IndexSubHeader header;
 
         public abstract int SubTypeNo { get; }
+        public ushort firstGlyphIndex;
+        public ushort lastGlyphIndex;
+
         public static IndexSubTableBase CreateFrom(BitmapSizeTable bmpSizeTable, BinaryReader reader)
         {
             //read IndexSubHeader
@@ -262,7 +266,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                         IndexSubTable2 subtable = new IndexSubTable2();
                         subtable.header = header;
                         subtable.imageSize = reader.ReadUInt32();
-                        ReadBigGlyphMetric(reader, ref subtable.BigGlyphMetrics);
+                        BigGlyphMetrics.ReadBigGlyphMetric(reader, ref subtable.BigGlyphMetrics);
                         return subtable;
                     }
 
@@ -290,7 +294,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                         IndexSubTable4 subTable = new IndexSubTable4();
                         subTable.header = header;
 
-                        uint numGlyphs = subTable.numGlyphs = reader.ReadUInt32();
+                        uint numGlyphs = reader.ReadUInt32();
                         GlyphIdOffsetPair[] glyphArray = subTable.glyphArray = new GlyphIdOffsetPair[numGlyphs + 1];
                         for (int i = 0; i <= numGlyphs; ++i) //***
                         {
@@ -311,9 +315,8 @@ namespace Typography.OpenFont.Tables.BitmapFonts
                         subTable.header = header;
 
                         subTable.imageSize = reader.ReadUInt32();
-                        ReadBigGlyphMetric(reader, ref subTable.BigGlyphMetrics);
-                        subTable.numGlyphs = reader.ReadUInt32();
-                        subTable.glyphIdArray = Utils.ReadUInt16Array(reader, (int)subTable.numGlyphs);
+                        BigGlyphMetrics.ReadBigGlyphMetric(reader, ref subTable.BigGlyphMetrics);
+                        subTable.glyphIdArray = Utils.ReadUInt16Array(reader, (int)reader.ReadUInt32());
                         return subTable;
                     }
 
@@ -358,50 +361,96 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 
             return null;
         }
-        static void ReadBigGlyphMetric(BinaryReader reader, ref BigGlyphMetrics output)
-        {
-            output.height = reader.ReadByte();
-            output.width = reader.ReadByte();
 
-            output.horiBearingX = (sbyte)reader.ReadByte();
-            output.horiBearingY = (sbyte)reader.ReadByte();
-            output.horiAdvance = reader.ReadByte();
-
-            output.vertBearingX = (sbyte)reader.ReadByte();
-            output.vertBearingY = (sbyte)reader.ReadByte();
-            output.vertAdvance = reader.ReadByte();
-        }
+        public abstract void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList);
     }
+    /// <summary>
+    /// IndexSubTable1: variable - metrics glyphs with 4 - byte offsets
+    /// </summary>
     class IndexSubTable1 : IndexSubTableBase
     {
         public override int SubTypeNo => 1;
         public uint[] offsetArray;
-    }
 
+        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        {
+            int n = 0;
+            for (ushort i = firstGlyphIndex; i <= lastGlyphIndex; ++i)
+            {
+                glyphList.Add(new Glyph(bmpGlyphSource, i, header.imageDataOffset + offsetArray[n], 0, header.imageFormat));
+                n++;
+            }
+        }
+    }
+    /// <summary>
+    ///  IndexSubTable2: all glyphs have identical metrics
+    /// </summary>
     class IndexSubTable2 : IndexSubTableBase
     {
         public override int SubTypeNo => 2;
         public uint imageSize;
         public BigGlyphMetrics BigGlyphMetrics = new BigGlyphMetrics();
+        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        {
+            uint incrementalOffset = 0;//TODO: review this
+            for (ushort n = firstGlyphIndex; n <= lastGlyphIndex; ++n)
+            {
+                glyphList.Add(new Glyph(bmpGlyphSource, n, header.imageDataOffset + incrementalOffset, imageSize, header.imageFormat));
+                incrementalOffset += imageSize;
+            }
+        }
     }
+    /// <summary>
+    /// IndexSubTable3: variable - metrics glyphs with 2 - byte offsets
+    /// </summary>
     class IndexSubTable3 : IndexSubTableBase
     {
         public override int SubTypeNo => 3;
         public ushort[] offsetArray;
+        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        {
+            int n = 0;
+            for (ushort i = firstGlyphIndex; i <= lastGlyphIndex; ++i)
+            {
+                glyphList.Add(new Glyph(bmpGlyphSource, i, header.imageDataOffset + offsetArray[n++], 0, header.imageFormat));
+            }
+        }
     }
+    /// <summary>
+    /// IndexSubTable4: variable - metrics glyphs with sparse glyph codes
+    /// </summary>
     class IndexSubTable4 : IndexSubTableBase
     {
         public override int SubTypeNo => 4;
-        public uint numGlyphs;
         public GlyphIdOffsetPair[] glyphArray;
+        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        {
+            for (int i = 0; i < glyphArray.Length; ++i)
+            {
+                GlyphIdOffsetPair pair = glyphArray[i];
+                glyphList.Add(new Glyph(bmpGlyphSource, pair.glyphId, header.imageDataOffset + pair.offset, 0, header.imageFormat));
+            }
+        }
     }
+    /// <summary>
+    /// IndexSubTable5: constant - metrics glyphs with sparse glyph codes
+    /// </summary>
     class IndexSubTable5 : IndexSubTableBase
     {
         public override int SubTypeNo => 5;
         public uint imageSize;
         public BigGlyphMetrics BigGlyphMetrics = new BigGlyphMetrics();
-        public uint numGlyphs;
+
         public ushort[] glyphIdArray;
+        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        {
+            uint incrementalOffset = 0;//TODO: review this
+            for (int i = 0; i < glyphIdArray.Length; ++i)
+            {
+                glyphList.Add(new Glyph(bmpGlyphSource, glyphIdArray[i], header.imageDataOffset + incrementalOffset, imageSize, header.imageFormat));
+                incrementalOffset += imageSize;
+            }
+        }
 
     }
     //GlyphIdOffsetPair record:
@@ -444,6 +493,22 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public sbyte vertBearingX;
         public sbyte vertBearingY;
         public byte vertAdvance;
+
+        public const int SIZE = 8; //size of BigGlyphMetrics
+
+        public static void ReadBigGlyphMetric(BinaryReader reader, ref BigGlyphMetrics output)
+        {
+            output.height = reader.ReadByte();
+            output.width = reader.ReadByte();
+
+            output.horiBearingX = (sbyte)reader.ReadByte();
+            output.horiBearingY = (sbyte)reader.ReadByte();
+            output.horiAdvance = reader.ReadByte();
+
+            output.vertBearingX = (sbyte)reader.ReadByte();
+            output.vertBearingY = (sbyte)reader.ReadByte();
+            output.vertAdvance = reader.ReadByte();
+        }
     }
 
     //SmallGlyphMetrics
@@ -457,10 +522,20 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public byte height;
         public byte width;
-
         public sbyte bearingX;
         public sbyte bearingY;
         public byte advance;
+
+        public const int SIZE = 5; //size of SmallGlyphMetrics
+        public static void ReadSmallGlyphMetric(BinaryReader reader, ref SmallGlyphMetrics output)
+        {
+            output.height = reader.ReadByte();
+            output.width = reader.ReadByte();
+
+            output.bearingX = (sbyte)reader.ReadByte();
+            output.bearingY = (sbyte)reader.ReadByte();
+            output.advance = reader.ReadByte();
+        }
     }
 
 
@@ -469,9 +544,10 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     abstract class GlyphBitmapDataFormatBase
     {
         public abstract int FormatNumber { get; }
-        public int majorVersion;
-        public int minorVersion;
+        public abstract void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph);
+        public abstract void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, System.IO.Stream outputStream);
     }
+     
 
     /// <summary>
     /// Format 1: small metrics, byte-aligned data
@@ -492,6 +568,14 @@ namespace Typography.OpenFont.Tables.BitmapFonts
 
         //1 bits correspond to black, and 0 bits to white.
 
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            throw new NotImplementedException();
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
     /// <summary>
     /// Format 2: small metrics, bit-aligned data
@@ -510,7 +594,14 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         //so the last row of a glyph may require padding.
 
         //This format takes a little more time to parse, but saves file space compared to format 1.
-
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            throw new NotImplementedException();
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     //format 3 Obsolete
@@ -532,7 +623,14 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         //even if the bitmaps have white space on either side of the bitmap image.
         //This allows fonts to store monospaced bitmap glyphs in the efficient Format 5
         //without breaking Windows GetABCWidths call.
-
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            throw new NotImplementedException();
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     /// <summary>
@@ -549,7 +647,14 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         //uint8           imageData[variable]   Byte-aligned bitmap data
 
         //Glyph bitmap format 6 is the same as format 1 except that is uses big glyph metrics instead of small.
-
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            throw new NotImplementedException();
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     /// <summary>
@@ -562,11 +667,18 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public BigGlyphMetrics bigMetrics;
 
         //    
-        //Type Name    Description
-        //BigGlyphMetrics     bigMetrics Metrics information for the glyph
-        //uint8 imageData[variable]     Bit-aligned bitmap data 
+        //Type                Name                  Description
+        //BigGlyphMetrics     bigMetrics            Metrics information for the glyph
+        //uint8               imageData[variable]   Bit-aligned bitmap data 
         //Glyph bitmap format 7 is the same as format 2 except that is uses big glyph metrics instead of small.
-
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            throw new NotImplementedException();
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
@@ -599,11 +711,19 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public byte pad;
         public EbdtComponent[] components;
         //Format 8: small metrics, component data
-        //Type    Name Description
+        //Type              Name            Description
         //SmallGlyphMetrics smallMetrics    Metrics information for the glyph
-        //uint8 pad     Pad to 16-bit boundary
-        //uint16 numComponents   Number of components
-        //EbdtComponent   components[numComponents] Array of EbdtComponent records
+        //uint8             pad             Pad to 16-bit boundary
+        //uint16            numComponents   Number of components
+        //EbdtComponent     components[numComponents] Array of EbdtComponent records
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            throw new NotImplementedException();
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
@@ -617,11 +737,20 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public EbdtComponent[] components;
 
         //Format 9: big metrics, component data
-        //Type    Name Description
-        //BigGlyphMetrics bigMetrics  Metrics information for the glyph
-        //uint16 numComponents   Number of components
-        //EbdtComponent   components[numComponents] Array of EbdtComponent records
+        //Type              Name            Description
+        //BigGlyphMetrics   bigMetrics      Metrics information for the glyph
+        //uint16            numComponents   Number of components
+        //EbdtComponent     components[numComponents] Array of EbdtComponent records
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            throw new NotImplementedException();
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
+
     //Glyph bitmap formats 8 and 9 are used for composite bitmaps.
     //For accented characters and other composite glyphs
     //it may be more efficient to store
@@ -642,14 +771,32 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     class GlyphBitmapDataFmt17 : GlyphBitmapDataFormatBase
     {
         public override int FormatNumber => 17;
-        public SmallGlyphMetrics glyphMetrics;
-        public uint dataLen;
-
+     
         //Format 17: small metrics, PNG image data
-        //Type Name    Description
-        //smallGlyphMetrics   glyphMetrics Metrics information for the glyph
-        //uint32 dataLen     Length of data in bytes
-        //uint8   data[dataLen] Raw PNG data 
+        //Type                Name          Description
+        //smallGlyphMetrics   glyphMetrics  Metrics information for the glyph
+        //uint32              dataLen       Length of data in bytes
+        //uint8               data[dataLen] Raw PNG data 
+
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            SmallGlyphMetrics smallGlyphMetric = new SmallGlyphMetrics();
+            SmallGlyphMetrics.ReadSmallGlyphMetric(reader, ref smallGlyphMetric);
+            uint dataLen = reader.ReadUInt32();
+            bitmapGlyph.OriginalAdvanceWidth = smallGlyphMetric.advance;
+            bitmapGlyph.Bounds = new Bounds(0, 0, smallGlyphMetric.width, smallGlyphMetric.height);
+            //then 
+            //byte[] buff = reader.ReadBytes((int)dataLen);
+            //System.IO.File.WriteAllBytes("d:\\WImageTest\\testBitmapGlyph_" + glyph.GlyphIndex + ".png", buff);
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            //only read raw png data
+            reader.BaseStream.Position += SmallGlyphMetrics.SIZE;
+            uint dataLen = reader.ReadUInt32();
+            byte[] rawPngData = reader.ReadBytes((int)dataLen);
+            outputStream.Write(rawPngData, 0, rawPngData.Length);
+        }
     }
 
     /// <summary>
@@ -658,22 +805,44 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     class GlyphBitmapDataFmt18 : GlyphBitmapDataFormatBase
     {
         //Format 18: big metrics, PNG image data
-        //Type Name    Description
-        //bigGlyphMetrics     glyphMetrics Metrics information for the glyph
-        //uint32 dataLen     Length of data in bytes
-        //uint8   data[dataLen] Raw PNG data
+        //Type              Name            Description
+        //bigGlyphMetrics   glyphMetrics    Metrics information for the glyph
+        //uint32            dataLen         Length of data in bytes
+        //uint8             data[dataLen]   Raw PNG data
         public override int FormatNumber => 18;
-        public BigGlyphMetrics glyphMetrics;
-        public uint dataLen;
+        
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            BigGlyphMetrics bigGlyphMetric = new BigGlyphMetrics();
+            BigGlyphMetrics.ReadBigGlyphMetric(reader, ref bigGlyphMetric);
+            uint dataLen = reader.ReadUInt32();
+
+            bitmapGlyph.OriginalAdvanceWidth = bigGlyphMetric.horiAdvance;
+            bitmapGlyph.Bounds = new Bounds(0, 0, bigGlyphMetric.width, bigGlyphMetric.height);
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            reader.BaseStream.Position += BigGlyphMetrics.SIZE;
+            uint dataLen = reader.ReadUInt32();
+            byte[] rawPngData = reader.ReadBytes((int)dataLen);
+            outputStream.Write(rawPngData, 0, rawPngData.Length);
+        }
     }
 
-    //Format 19: metrics in CBLC table, PNG image data
-    //Type Name    Description
-    //uint32  dataLen Length of data in bytes
-    //uint8   data[dataLen] Raw PNG data
     class GlyphBitmapDataFmt19 : GlyphBitmapDataFormatBase
     {
-        public override int FormatNumber => 19;
-        public uint dataLen;
+        //Format 19: metrics in CBLC table, PNG image data
+        //Type    Name          Description
+        //uint32  dataLen       Length of data in bytes
+        //uint8   data[dataLen] Raw PNG data
+        public override int FormatNumber => 19; 
+        public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
+        {
+            //no glyph info to fill
+        }
+        public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

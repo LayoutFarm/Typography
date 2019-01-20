@@ -1,6 +1,7 @@
 ﻿//MIT, 2019-present, WinterDev
 using System;
 using System.IO;
+using Typography.OpenFont.Tables.BitmapFonts;
 
 namespace Typography.OpenFont.Tables
 {
@@ -26,16 +27,69 @@ namespace Typography.OpenFont.Tables
     //Some of the formats contain metric information plus image data, 
     //and other formats contain only the image data. Long word alignment is not required for these subtables;
     //byte alignment is sufficient.
-    class CBDT : TableEntry
+    class CBDT : TableEntry, IDisposable
     {
         public const string _N = "CBDT";
         public override string Name => _N;
 
+        GlyphBitmapDataFmt17 _format17 = new GlyphBitmapDataFmt17();
+        GlyphBitmapDataFmt18 _format18 = new GlyphBitmapDataFmt18();
+        GlyphBitmapDataFmt19 _format19 = new GlyphBitmapDataFmt19();
+
+
+        System.IO.MemoryStream _ms; //sub-stream contains image data
+        Typography.OpenFont.IO.ByteOrderSwappingBinaryReader _binReader;
+        public void Dispose()
+        {
+            if (_binReader != null)
+            {
+                ((System.IDisposable)_binReader).Dispose();
+                _binReader = null;
+            }
+            if (_ms != null)
+            {
+                _ms.Dispose();
+                _ms = null;
+            }
+        }
         protected override void ReadContentFrom(BinaryReader reader)
         {
-            ushort majorVersion = reader.ReadUInt16();
-            ushort minorVersion = reader.ReadUInt16();
-            
+
+            //we will read this later
+            byte[] data = reader.ReadBytes((int)this.Header.Length);//***
+            _ms = new MemoryStream(data);
+            _binReader = new IO.ByteOrderSwappingBinaryReader(_ms);
+
+            //ushort majorVersion = reader.ReadUInt16();
+            //ushort minorVersion = reader.ReadUInt16();
+            ////--------------
+            //this.Header.Length;
+        }
+        public void FillGlyphInfo(Glyph glyph)
+        {
+            //int srcOffset, int srcLen, int srcFormat,
+            _binReader.BaseStream.Position = glyph.BitmapStreamOffset;
+            switch (glyph.BitmapFormat)
+            {
+                case 17: _format17.FillGlyphInfo(_binReader, glyph); break;
+                case 18: _format18.FillGlyphInfo(_binReader, glyph); break;
+                case 19: _format19.FillGlyphInfo(_binReader, glyph); break;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+        public void CopyBitmapContent(Glyph glyph, System.IO.Stream outputStream)
+        {
+            //1 
+            _binReader.BaseStream.Position = glyph.BitmapStreamOffset;
+            switch (glyph.BitmapFormat)
+            {
+                case 17: _format17.ReadRawBitmap(_binReader, glyph, outputStream); break;
+                case 18: _format18.ReadRawBitmap(_binReader, glyph, outputStream); break;
+                case 19: _format19.ReadRawBitmap(_binReader, glyph, outputStream); break;
+                default:
+                    throw new NotSupportedException();
+            }
         }
     }
 }

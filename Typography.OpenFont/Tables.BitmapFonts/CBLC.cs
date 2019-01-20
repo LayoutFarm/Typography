@@ -1,5 +1,6 @@
 ﻿//MIT, 2019-present, WinterDev
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using Typography.OpenFont.Tables.BitmapFonts;
@@ -101,12 +102,27 @@ namespace Typography.OpenFont.Tables
                     IndexSubTableArray indexSubTableArr = indexSubTableArrs[i];
                     reader.BaseStream.Position = cblcBeginPos + bmpSizeTable.indexSubTableArrayOffset + indexSubTableArr.additionalOffsetToIndexSubtable;
 
-                    subTables[i] = IndexSubTableBase.CreateFrom(bmpSizeTable, reader);
+                    IndexSubTableBase result = subTables[i] = IndexSubTableBase.CreateFrom(bmpSizeTable, reader);
+                    result.firstGlyphIndex = indexSubTableArr.firstGlyphIndex;
+                    result.lastGlyphIndex = indexSubTableArr.lastGlyphIndex;
                 }
             }
         }
-
-
+        public Glyph[] BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource)
+        {
+            List<Glyph> glyphs = new List<Glyph>();
+            int numSizes = _bmpSizeTables.Length;
+            for (int n = 0; n < numSizes; ++n)
+            {
+                BitmapSizeTable bmpSizeTable = _bmpSizeTables[n];
+                uint numberofIndexSubTables = bmpSizeTable.numberOfIndexSubTables;
+                for (uint i = 0; i < numberofIndexSubTables; ++i)
+                {
+                    bmpSizeTable.indexSubTables[i].BuildGlyphList(bmpGlyphSource, glyphs);
+                }
+            }
+            return glyphs.ToArray();
+        }
     }
 
 
