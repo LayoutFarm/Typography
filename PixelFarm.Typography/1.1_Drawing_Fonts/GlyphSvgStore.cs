@@ -22,38 +22,35 @@ namespace PixelFarm.Drawing.Fonts
             {
                 return;
             }
-
             //TODO: you can scale down to proper img size
-            //or create a single texture atlas.
-
-
+            //or create a single texture atlas. 
             //if not create a new one
             _bitmapList = new GlyphBitmapList();
             _cacheGlyphPathBuilders.Add(typeface, _bitmapList);
-
             int glyphCount = typeface.GlyphCount;
             VgVisualDocHost vgDocHost = new VgVisualDocHost();
-            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
+            for (ushort i = 24; i < glyphCount; ++i)
             {
-                for (ushort i = 0; i < glyphCount; ++i)
+                stbuilder.Length = 0;//reset
+                Glyph glyph = typeface.GetGlyphByIndex(i);
+                typeface.ReadSvgContent(glyph, stbuilder);
+                //create bitmap from svg  
+
+                GlyphBitmap glyphBitmap = new GlyphBitmap();
+                glyphBitmap.Width = glyph.MaxX - glyph.MinX;
+                glyphBitmap.Height = glyph.MaxY - glyph.MinY;
+
+                if (glyphBitmap.Width == 0 || glyphBitmap.Height == 0)
                 {
-                    ms.SetLength(0);
-                    Glyph glyph = typeface.GetGlyphByIndex(i);
-                    //create bitmap from svg 
-
-
-
-                    GlyphBitmap glyphBitmap = new GlyphBitmap();
-                    glyphBitmap.Width = glyph.MaxX - glyph.MinX;
-                    glyphBitmap.Height = glyph.MaxY - glyph.MinY;
-
-                    //glyphBitmap.Bitmap = ...                     
-                    glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
-                    //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "d:\\WImageTest\\testGlyphBmp_" + i + ".png");
-
-                    _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
+                    continue;
                 }
+
+                glyphBitmap.Bitmap = ParseAndRenderSvg(stbuilder, vgDocHost);
+                //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "d:\\WImageTest\\testGlyphBmp_" + i + ".png");
+                _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
             }
+
         }
         public GlyphBitmap GetGlyphBitmap(ushort glyphIndex)
         {
@@ -61,21 +58,48 @@ namespace PixelFarm.Drawing.Fonts
             return found;
         }
 
-        void ParseAndRenderSvg(string svgContent, VgVisualDocHost vgDocHost)
+        MemBitmap ParseAndRenderSvg(System.Text.StringBuilder svgContent, VgVisualDocHost vgDocHost)
         {
             //----------
             //copy from HtmlRenderer's SvgViewer demo
             //----------  
             var docBuilder = new SvgDocBuilder();
             var parser = new SvgParser(docBuilder);
-
-            TextSnapshot textSnapshot = new TextSnapshot(svgContent);
+            TextSnapshot textSnapshot = new TextSnapshot(svgContent.ToString());
             parser.ParseDocument(textSnapshot);
+
             VgVisualDocBuilder builder = new VgVisualDocBuilder();
             VgVisualElement vgVisElem = builder.CreateVgVisualDoc(docBuilder.ResultDocument, vgDocHost).VgRootElem;
+            RectD bounds = vgVisElem.GetRectBounds();
+            float actualXOffset = (float)-bounds.Left;
+            float actualYOffset = (float)-bounds.Bottom;
+
+            int bmpW = (int)Math.Round(bounds.Width);
+            int bmpH = (int)Math.Round(bounds.Height);
+
+            MemBitmap memBitmap = new MemBitmap(bmpW, bmpH);
+            using (AggPainterPool.Borrow(memBitmap, out AggPainter p))
+            using (VgPainterArgsPool.Borrow(p, out VgPaintArgs paintArgs))
+            {
+                float orgX = p.OriginX;
+                float orgY = p.OriginY;
+                p.SetOrigin(actualXOffset, actualYOffset);
+
+                p.Clear(Color.White);
+
+                p.FillColor = Color.Black;
+
+                double prevStrokeW = p.StrokeWidth;
+
+                vgVisElem.Paint(paintArgs);
+
+                p.StrokeWidth = prevStrokeW;//restore 
+
+                p.SetOrigin(orgX, orgY);//restore
+            }
+
+            return memBitmap;
         }
-
-
     }
 
 }
