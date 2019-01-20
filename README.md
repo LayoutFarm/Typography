@@ -1,7 +1,7 @@
 ![Typography, this image was rendered with this library, in subpixel rendering mode](https://user-images.githubusercontent.com/7447159/31848163-cc9e00fe-b655-11e7-8a40-69258e440c7a.png)
 ===========
 
-Pure C# TrueType/OpenType/OpenFont Reader, Glyph Layout and Rendering.
+Pure C# Font Reader, Glyph Layout and Rendering.
 ---
 
 During developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
@@ -163,7 +163,7 @@ _pic 1: Segoe UI Symbol Normal, on Windows 7_
  
 ![typo_symbol2](https://user-images.githubusercontent.com/7447159/31386781-3a8b85f8-adf2-11e7-8791-c19abe1fee8f.png)
 
-_pic 2: FireFoxEmoji.ttf from https://github.com/mozilla/fxemoji_
+_pic 2: FirefoxEmoji.ttf from https://github.com/mozilla/fxemoji_
 
 ![typo_symbol3](https://user-images.githubusercontent.com/245089/31382300-77f4a52c-adb7-11e7-9510-1e07a76f41ab.png)
 
