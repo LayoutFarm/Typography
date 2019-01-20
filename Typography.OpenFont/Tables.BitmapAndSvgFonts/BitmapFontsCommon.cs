@@ -362,7 +362,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
             return null;
         }
 
-        public abstract void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList);
+        public abstract void BuildGlyphList(List<Glyph> glyphList);
     }
     /// <summary>
     /// IndexSubTable1: variable - metrics glyphs with 4 - byte offsets
@@ -372,12 +372,12 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public override int SubTypeNo => 1;
         public uint[] offsetArray;
 
-        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        public override void BuildGlyphList(List<Glyph> glyphList)
         {
             int n = 0;
             for (ushort i = firstGlyphIndex; i <= lastGlyphIndex; ++i)
             {
-                glyphList.Add(new Glyph(bmpGlyphSource, i, header.imageDataOffset + offsetArray[n], 0, header.imageFormat));
+                glyphList.Add(new Glyph(i, header.imageDataOffset + offsetArray[n], 0, header.imageFormat));
                 n++;
             }
         }
@@ -390,12 +390,12 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public override int SubTypeNo => 2;
         public uint imageSize;
         public BigGlyphMetrics BigGlyphMetrics = new BigGlyphMetrics();
-        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        public override void BuildGlyphList(List<Glyph> glyphList)
         {
             uint incrementalOffset = 0;//TODO: review this
             for (ushort n = firstGlyphIndex; n <= lastGlyphIndex; ++n)
             {
-                glyphList.Add(new Glyph(bmpGlyphSource, n, header.imageDataOffset + incrementalOffset, imageSize, header.imageFormat));
+                glyphList.Add(new Glyph(n, header.imageDataOffset + incrementalOffset, imageSize, header.imageFormat));
                 incrementalOffset += imageSize;
             }
         }
@@ -407,12 +407,12 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int SubTypeNo => 3;
         public ushort[] offsetArray;
-        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        public override void BuildGlyphList(List<Glyph> glyphList)
         {
             int n = 0;
             for (ushort i = firstGlyphIndex; i <= lastGlyphIndex; ++i)
             {
-                glyphList.Add(new Glyph(bmpGlyphSource, i, header.imageDataOffset + offsetArray[n++], 0, header.imageFormat));
+                glyphList.Add(new Glyph(i, header.imageDataOffset + offsetArray[n++], 0, header.imageFormat));
             }
         }
     }
@@ -423,12 +423,12 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     {
         public override int SubTypeNo => 4;
         public GlyphIdOffsetPair[] glyphArray;
-        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        public override void BuildGlyphList(List<Glyph> glyphList)
         {
             for (int i = 0; i < glyphArray.Length; ++i)
             {
                 GlyphIdOffsetPair pair = glyphArray[i];
-                glyphList.Add(new Glyph(bmpGlyphSource, pair.glyphId, header.imageDataOffset + pair.offset, 0, header.imageFormat));
+                glyphList.Add(new Glyph(pair.glyphId, header.imageDataOffset + pair.offset, 0, header.imageFormat));
             }
         }
     }
@@ -442,12 +442,12 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public BigGlyphMetrics BigGlyphMetrics = new BigGlyphMetrics();
 
         public ushort[] glyphIdArray;
-        public override void BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource, List<Glyph> glyphList)
+        public override void BuildGlyphList(List<Glyph> glyphList)
         {
             uint incrementalOffset = 0;//TODO: review this
             for (int i = 0; i < glyphIdArray.Length; ++i)
             {
-                glyphList.Add(new Glyph(bmpGlyphSource, glyphIdArray[i], header.imageDataOffset + incrementalOffset, imageSize, header.imageFormat));
+                glyphList.Add(new Glyph(glyphIdArray[i], header.imageDataOffset + incrementalOffset, imageSize, header.imageFormat));
                 incrementalOffset += imageSize;
             }
         }
@@ -547,7 +547,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         public abstract void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph);
         public abstract void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, System.IO.Stream outputStream);
     }
-     
+
 
     /// <summary>
     /// Format 1: small metrics, byte-aligned data
@@ -771,7 +771,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
     class GlyphBitmapDataFmt17 : GlyphBitmapDataFormatBase
     {
         public override int FormatNumber => 17;
-     
+
         //Format 17: small metrics, PNG image data
         //Type                Name          Description
         //smallGlyphMetrics   glyphMetrics  Metrics information for the glyph
@@ -810,7 +810,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         //uint32            dataLen         Length of data in bytes
         //uint8             data[dataLen]   Raw PNG data
         public override int FormatNumber => 18;
-        
+
         public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
         {
             BigGlyphMetrics bigGlyphMetric = new BigGlyphMetrics();
@@ -835,7 +835,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
         //Type    Name          Description
         //uint32  dataLen       Length of data in bytes
         //uint8   data[dataLen] Raw PNG data
-        public override int FormatNumber => 19; 
+        public override int FormatNumber => 19;
         public override void FillGlyphInfo(BinaryReader reader, Glyph bitmapGlyph)
         {
             //no glyph info to fill

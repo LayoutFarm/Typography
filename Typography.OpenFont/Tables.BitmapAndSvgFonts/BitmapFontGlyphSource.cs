@@ -18,7 +18,7 @@ namespace Typography.OpenFont.Tables
         }
         public Glyph[] BuildGlyphList()
         {
-            Glyph[] glyphs = _cblc.BuildGlyphList(this);
+            Glyph[] glyphs = _cblc.BuildGlyphList();
             for (int i = 0; i < glyphs.Length; ++i)
             {
                 _cbdt.FillGlyphInfo(glyphs[i]);
