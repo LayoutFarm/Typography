@@ -42,7 +42,7 @@ namespace PixelFarm.Drawing.Fonts
 
     class GlyphBitmapStore
     {
-        
+
 
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;
@@ -72,7 +72,7 @@ namespace PixelFarm.Drawing.Fonts
                     ms.SetLength(0);
 
                     Glyph glyph = typeface.GetGlyphByIndex(i);
-                    glyph.CopyBitmapContent(ms);
+                    typeface.ReadBitmapContent(glyph, ms);                    
 
                     GlyphBitmap glyphBitmap = new GlyphBitmap();
                     glyphBitmap.Width = glyph.MaxX - glyph.MinX;

@@ -245,13 +245,13 @@ namespace Typography.OpenFont
 
         //--------------------
         //Bitmap and Svg
-        Tables.BitmapFontGlyphSource _bmpGlyphSource;
+
         uint _streamOffset;
         uint _streamLen;
         ushort _imgFormat;
-        internal Glyph(Tables.BitmapFontGlyphSource bmpGlyphSource, ushort glyphIndex, uint streamOffset, uint streamLen, ushort imgFormat)
+        internal Glyph(ushort glyphIndex, uint streamOffset, uint streamLen, ushort imgFormat)
         {
-            _bmpGlyphSource = bmpGlyphSource;
+            //_bmpGlyphSource = bmpGlyphSource;
             _streamOffset = streamOffset;
             _streamLen = streamLen;
             _imgFormat = imgFormat;
@@ -260,10 +260,10 @@ namespace Typography.OpenFont
         internal uint BitmapStreamOffset => _streamOffset;
         internal uint BitmapFormat => _imgFormat;
 
-        public void CopyBitmapContent(System.IO.Stream output)
-        {
-            _bmpGlyphSource.CopyBitmapContent(this, output);
-        }
+        //public void CopyBitmapContent(System.IO.Stream output)
+        //{
+        //    _bmpGlyphSource.CopyBitmapContent(this, output);
+        //}
     }
 
 

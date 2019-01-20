@@ -109,7 +109,7 @@ namespace Typography.OpenFont.Tables
                 }
             }
         }
-        public Glyph[] BuildGlyphList(BitmapFontGlyphSource bmpGlyphSource)
+        public Glyph[] BuildGlyphList()
         {
             List<Glyph> glyphs = new List<Glyph>();
             int numSizes = _bmpSizeTables.Length;
@@ -119,7 +119,7 @@ namespace Typography.OpenFont.Tables
                 uint numberofIndexSubTables = bmpSizeTable.numberOfIndexSubTables;
                 for (uint i = 0; i < numberofIndexSubTables; ++i)
                 {
-                    bmpSizeTable.indexSubTables[i].BuildGlyphList(bmpGlyphSource, glyphs);
+                    bmpSizeTable.indexSubTables[i].BuildGlyphList(glyphs);
                 }
             }
             return glyphs.ToArray();

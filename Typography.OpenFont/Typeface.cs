@@ -16,7 +16,7 @@ namespace Typography.OpenFont
         readonly NameEntry _nameEntry;
         //
         CFFTable _cffTable;
-        Typography.OpenFont.Tables.BitmapFontGlyphSource _bitmapFontGlyphSource;
+        BitmapFontGlyphSource _bitmapFontGlyphSource;
 
         internal Typeface(
             NameEntry nameEntry,
@@ -330,7 +330,10 @@ namespace Typography.OpenFont
         }
 
         public bool IsBitmapFont => _bitmapFontGlyphSource != null;
-
+        public void ReadBitmapContent(Glyph glyph, System.IO.Stream output)
+        {
+            _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
+        }
     }
 
 
