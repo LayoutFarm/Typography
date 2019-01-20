@@ -40,11 +40,12 @@ namespace SampleWinForms
 
             var dicProvider = new Typography.TextBreak.IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../../../Typography.TextBreak/icu62/brkitr" };
             Typography.TextBreak.CustomBreakerBuilder.Setup(dicProvider);
-
             this.Load += new System.EventHandler(this.Form1_Load);
-
             SetupWoffDecompressFunctions();
-           
+
+
+            MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
+
         }
 
         void SetupWoffDecompressFunctions()

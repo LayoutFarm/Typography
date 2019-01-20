@@ -49,6 +49,7 @@
     </Compile>
     <Compile Include="IcuSimpleTextFileDictionaryProvider.cs" />
     <Compile Include="PixelFarm\BitmapHelper.cs" />
+    <Compile Include="PixelFarm\GdiBitmapIO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
