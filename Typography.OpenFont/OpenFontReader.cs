@@ -462,8 +462,6 @@ namespace Typography.OpenFont
                 cpal);
             //------------
 
-
-            //test
             {
                 SvgTable svgTable = ReadTableIfExists(tables, input, new SvgTable());
                 if (svgTable != null)
