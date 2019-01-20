@@ -443,6 +443,10 @@ namespace PixelFarm.CpuBlit
         {
             return MemBitmapExtensions.LoadImageFromFile(filename);
         }
+        public static MemBitmap LoadBitmap(System.IO.Stream input)
+        {
+            return MemBitmapExtensions.LoadImage(input);
+        }
     }
 
     public interface IBitmapSrc
@@ -944,6 +948,11 @@ namespace PixelFarm.CpuBlit
         {
             //user need to provider load img func handler
             return DefaultMemBitmapIO.LoadImage(filename);
+        }
+        public static MemBitmap LoadImage(System.IO.Stream stream)
+        {
+            //user need to provider load img func handler
+            return DefaultMemBitmapIO.LoadImage(stream);
         }
         public static void SaveImage(this MemBitmap source, string filename, MemBitmapIO.OutputImageFormat outputFormat = MemBitmapIO.OutputImageFormat.Default, object saveParameters = null)
         {

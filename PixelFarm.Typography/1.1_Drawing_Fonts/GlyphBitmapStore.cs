@@ -1,9 +1,8 @@
 ﻿//MIT, 2019-present, WinterDev 
 using System;
 using System.Collections.Generic;
-using Typography.Contours;
+using System.IO;
 using Typography.OpenFont;
-using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
 
 namespace PixelFarm.Drawing.Fonts
@@ -19,7 +18,7 @@ namespace PixelFarm.Drawing.Fonts
     }
     class GlyphBitmapStore
     {
-        class BitmapList
+        class BitmapList : IDisposable
         {
             Dictionary<ushort, GlyphBitmap> _dic = new Dictionary<ushort, GlyphBitmap>();
             public void RegisterBitmap(ushort glyphIndex, GlyphBitmap bmp)
@@ -29,6 +28,18 @@ namespace PixelFarm.Drawing.Fonts
             public bool TryGetBitmap(ushort glyphIndex, out GlyphBitmap bmp)
             {
                 return _dic.TryGetValue(glyphIndex, out bmp);
+            }
+            public void Dispose()
+            {
+                foreach (GlyphBitmap glyphBmp in _dic.Values)
+                {
+                    if (glyphBmp.Bitmap != null)
+                    {
+                        glyphBmp.Bitmap.Dispose();
+                        glyphBmp.Bitmap = null;
+                    }
+                }
+                _dic.Clear();
             }
         }
 
@@ -67,6 +78,8 @@ namespace PixelFarm.Drawing.Fonts
                     glyphBitmap.Height = glyph.MaxY - glyph.MinY;
 
                     //glyphBitmap.Bitmap = ...                     
+                    glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
+                    //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "d:\\WImageTest\\testGlyphBmp_" + i + ".png");
 
                     _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
                 }
@@ -78,4 +91,9 @@ namespace PixelFarm.Drawing.Fonts
             return found;
         }
     }
+
+
+
+
+
 }

@@ -5,6 +5,8 @@ using Typography.OpenFont.Tables.BitmapFonts;
 
 namespace Typography.OpenFont.Tables
 {
+    //test font=> NotoColorEmoji.ttf
+
     //from https://docs.microsoft.com/en-us/typography/opentype/spec/cbdt
 
     //Table structure
