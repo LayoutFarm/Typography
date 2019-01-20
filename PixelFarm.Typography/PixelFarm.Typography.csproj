@@ -63,6 +63,7 @@
     <Compile Include="1.1_Drawing_Fonts\FontAtlasTextPrinter.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphBitmapStore.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilder.cs" />
+    <Compile Include="1.1_Drawing_Fonts\GlyphSvgStore.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphMeshStore.cs" />
     <Compile Include="1.1_Drawing_Fonts\OpenFontTextService.cs" />

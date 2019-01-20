@@ -6,6 +6,10 @@ namespace Typography.OpenFont.Tables
 {
     class SvgTable : TableEntry
     {
+        
+        //tested with  https://github.com/eosrei/twemoji-color-font/releases
+
+
         public const string _N = "SVG "; //with 1 whitespace ***
         public override string Name => _N;
         //
