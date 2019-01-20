@@ -22,6 +22,7 @@ namespace PixelFarm.Drawing.Fonts
         float _currentFontSizePxScale;
 
         GlyphBitmapStore _glyphBitmapStore;
+        GlyphSvgStore _glyphSvgStore;
 
         public VxsTextPrinter(Painter painter, LayoutFarm.OpenFontTextService textService)
         {
@@ -36,6 +37,7 @@ namespace PixelFarm.Drawing.Fonts
             ChangeFont(new RequestFont("tahoma", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();
+            _glyphSvgStore = new GlyphSvgStore();
         }
         /// <summary>
         /// start draw on 'left-top' of a given area box
@@ -229,14 +231,28 @@ namespace PixelFarm.Drawing.Fonts
             _glyphMeshStore.SimulateOblique = this.SimulateSlant;
             //---------------------------------------------------
 
-#if DEBUG
+
             if (_currentTypeface.HasSvgTable())
             {
+                _glyphSvgStore.SetCurrentTypeface(_currentTypeface);
+                int seqLen = seq.Count;
+                if (len > seqLen)
+                {
+                    len = seqLen;
+                }
 
+                var snapToPx = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, scale);
+                while (snapToPx.Read())
+                {
+                    _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX) + 0.33f, (float)Math.Floor(top + snapToPx.ExactY));
+
+                    GlyphBitmap glyphBmp = _glyphSvgStore.GetGlyphBitmap(snapToPx.CurrentGlyphIndex);
+                    //how to draw the image
+                    //1. 
+                    _painter.DrawImage(glyphBmp.Bitmap);
+                }
             }
-#endif
-
-            if (_currentTypeface.IsBitmapFont)
+            else if (_currentTypeface.IsBitmapFont)
             {
                 //check if we have exported all the glyph bitmap 
                 //to some 'ready' form?

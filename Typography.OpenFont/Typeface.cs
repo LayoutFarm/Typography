@@ -26,7 +26,7 @@ namespace Typography.OpenFont
             HorizontalMetrics horizontalMetrics,
             OS2Table os2Table)
         {
-             
+
             _nameEntry = nameEntry;
             _bounds = bounds;
             _unitsPerEm = unitsPerEm;
@@ -309,7 +309,7 @@ namespace Typography.OpenFont
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
         public bool IsCffFont => _cffTable != null;
-       
+
         //---------
         internal MathTable _mathTable;
         internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
@@ -317,10 +317,20 @@ namespace Typography.OpenFont
         //
         public MathGlyphs.MathConstants MathConsts => (_mathTable != null) ? _mathTable._mathConstTable : null;
         //---------
+
+
+        //svg and bitmap font
         internal SvgTable _svgTable;
-        //---------
+        public void ReadSvgContent(Glyph glyph, System.Text.StringBuilder output)
+        {
+            if (_svgTable != null)
+            {
+                _svgTable.ReadSvgContent(glyph.GlyphIndex, output);
+            }
+        }
+
         public bool IsBitmapFont => _bitmapFontGlyphSource != null;
-        
+
     }
 
 

@@ -1,7 +1,6 @@
 ﻿//MIT, 2019-present, WinterDev 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Typography.OpenFont;
 using PixelFarm.CpuBlit;
 
@@ -16,36 +15,38 @@ namespace PixelFarm.Drawing.Fonts
         public int ImageStartX { get; set; } //in the case Bitmap is an Atlas,
         public int ImageStartY { get; set; } //in the case Bitmap is an Atlas,
     }
+    class GlyphBitmapList : IDisposable
+    {
+        Dictionary<ushort, GlyphBitmap> _dic = new Dictionary<ushort, GlyphBitmap>();
+        public void RegisterBitmap(ushort glyphIndex, GlyphBitmap bmp)
+        {
+            _dic.Add(glyphIndex, bmp);
+        }
+        public bool TryGetBitmap(ushort glyphIndex, out GlyphBitmap bmp)
+        {
+            return _dic.TryGetValue(glyphIndex, out bmp);
+        }
+        public void Dispose()
+        {
+            foreach (GlyphBitmap glyphBmp in _dic.Values)
+            {
+                if (glyphBmp.Bitmap != null)
+                {
+                    glyphBmp.Bitmap.Dispose();
+                    glyphBmp.Bitmap = null;
+                }
+            }
+            _dic.Clear();
+        }
+    }
+
     class GlyphBitmapStore
     {
-        class BitmapList : IDisposable
-        {
-            Dictionary<ushort, GlyphBitmap> _dic = new Dictionary<ushort, GlyphBitmap>();
-            public void RegisterBitmap(ushort glyphIndex, GlyphBitmap bmp)
-            {
-                _dic.Add(glyphIndex, bmp);
-            }
-            public bool TryGetBitmap(ushort glyphIndex, out GlyphBitmap bmp)
-            {
-                return _dic.TryGetValue(glyphIndex, out bmp);
-            }
-            public void Dispose()
-            {
-                foreach (GlyphBitmap glyphBmp in _dic.Values)
-                {
-                    if (glyphBmp.Bitmap != null)
-                    {
-                        glyphBmp.Bitmap.Dispose();
-                        glyphBmp.Bitmap = null;
-                    }
-                }
-                _dic.Clear();
-            }
-        }
+        
 
         Typeface _currentTypeface;
-        BitmapList _bitmapList;
-        Dictionary<Typeface, BitmapList> _cacheGlyphPathBuilders = new Dictionary<Typeface, BitmapList>();
+        GlyphBitmapList _bitmapList;
+        Dictionary<Typeface, GlyphBitmapList> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphBitmapList>();
 
         public void SetCurrentTypeface(Typeface typeface)
         {
@@ -60,7 +61,7 @@ namespace PixelFarm.Drawing.Fonts
 
 
             //if not create a new one
-            _bitmapList = new BitmapList();
+            _bitmapList = new GlyphBitmapList();
             _cacheGlyphPathBuilders.Add(typeface, _bitmapList);
 
             int glyphCount = typeface.GlyphCount;
@@ -91,9 +92,5 @@ namespace PixelFarm.Drawing.Fonts
             return found;
         }
     }
-
-
-
-
 
 }
