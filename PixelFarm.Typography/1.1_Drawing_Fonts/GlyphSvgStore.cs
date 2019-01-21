@@ -30,7 +30,7 @@ namespace PixelFarm.Drawing.Fonts
             int glyphCount = typeface.GlyphCount;
             VgVisualDocHost vgDocHost = new VgVisualDocHost();
             System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
-            for (ushort i = 24; i < glyphCount; ++i)
+            for (ushort i = 0; i < glyphCount; ++i)
             {
                 stbuilder.Length = 0;//reset
                 Glyph glyph = typeface.GetGlyphByIndex(i);
