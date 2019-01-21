@@ -39,6 +39,10 @@ namespace PixelFarm.Drawing.Fonts
             _glyphBitmapStore = new GlyphBitmapStore();
             _glyphSvgStore = new GlyphSvgStore();
         }
+        public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
+        {
+            _glyphSvgStore.SetSvgBmpBuilderFunc(svgBmpBuilderFunc);
+        }
         /// <summary>
         /// start draw on 'left-top' of a given area box
         /// </summary>

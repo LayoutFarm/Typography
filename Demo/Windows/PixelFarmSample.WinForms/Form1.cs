@@ -16,6 +16,8 @@ using Typography.Contours;
 using Typography.WebFont;
 
 using BrotliSharpLib;
+using PaintLab.Svg;
+using LayoutFarm.WebLexer;
 
 namespace SampleWinForms
 {
@@ -177,6 +179,52 @@ namespace SampleWinForms
         bool _readyToRender;
 
         LayoutFarm.OpenFontTextService _textService;
+
+        VgVisualDocHost _vgDocHost = new VgVisualDocHost();
+        MemBitmap ParseAndRenderSvg(System.Text.StringBuilder svgContent)
+        {
+            //----------
+            //copy from HtmlRenderer's SvgViewer demo
+            //----------  
+            var docBuilder = new SvgDocBuilder();
+            var parser = new SvgParser(docBuilder);
+            TextSnapshot textSnapshot = new TextSnapshot(svgContent.ToString());
+            parser.ParseDocument(textSnapshot);
+
+            VgVisualDocBuilder builder = new VgVisualDocBuilder();
+            VgVisualElement vgVisElem = builder.CreateVgVisualDoc(docBuilder.ResultDocument, _vgDocHost).VgRootElem;
+            RectD bounds = vgVisElem.GetRectBounds();
+            float actualXOffset = (float)-bounds.Left;
+            float actualYOffset = (float)-bounds.Bottom;
+
+            int bmpW = (int)Math.Round(bounds.Width);
+            int bmpH = (int)Math.Round(bounds.Height);
+
+            MemBitmap memBitmap = new MemBitmap(bmpW, bmpH);
+            using (AggPainterPool.Borrow(memBitmap, out AggPainter p))
+            using (VgPainterArgsPool.Borrow(p, out VgPaintArgs paintArgs))
+            {
+                float orgX = p.OriginX;
+                float orgY = p.OriginY;
+                p.SetOrigin(actualXOffset, actualYOffset);
+
+                p.Clear(PixelFarm.Drawing.Color.White);
+
+                p.FillColor = PixelFarm.Drawing.Color.Black;
+
+                double prevStrokeW = p.StrokeWidth;
+
+                vgVisElem.Paint(paintArgs);
+
+                p.StrokeWidth = prevStrokeW;//restore 
+
+                p.SetOrigin(orgX, orgY);//restore
+            }
+
+            return memBitmap;
+        }
+
+
         void UpdateRenderOutput()
         {
             if (!_readyToRender) return;
@@ -195,6 +243,8 @@ namespace SampleWinForms
                 _textService.LoadFontsFromFolder("../../../TestFonts");
 
                 _devVxsTextPrinter = new VxsTextPrinter(_painter, _textService);
+                _devVxsTextPrinter.SetSvgBmpBuilderFunc(ParseAndRenderSvg);
+
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
