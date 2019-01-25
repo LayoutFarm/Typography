@@ -2,19 +2,7 @@
 using System;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    [Flags]
-    public enum SvgArcSweep
-    {
-        Negative = 0,
-        Positive = 1
-    }
-
-    [Flags]
-    public enum SvgArcSize
-    {
-        Small = 0,
-        Large = 1
-    }
+  
     public static class SvgPathSegArcInfo
     {
         public const double RAD_PER_DEG = Math.PI / 180.0;

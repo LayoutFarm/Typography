@@ -343,6 +343,9 @@
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\StrokeMath.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\StrokeMath.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\SvgArcSegment.cs">
+      <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\SvgArcSegment.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs</Link>
     </Compile>
