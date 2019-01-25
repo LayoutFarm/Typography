@@ -300,6 +300,7 @@ namespace PixelFarm.CpuBlit
         VertexStore dbug_v1 = new VertexStore();
         VertexStore dbug_v2 = new VertexStore();
         Stroke dbugStroke = new Stroke(1);
+        public string dbugName;
         public void dbugLine(double x1, double y1, double x2, double y2, Drawing.Color color)
         {
 
@@ -313,6 +314,10 @@ namespace PixelFarm.CpuBlit
             dbug_v1.Clear();
             dbug_v2.Clear();
         }
+        public override string ToString()
+        {
+            return dbugName ?? "";
+        }
 #endif
 
     }
@@ -321,6 +326,9 @@ namespace PixelFarm.CpuBlit
 
     partial class AggRenderSurface
     {
+
+
+
         class MyBitmapBlender : BitmapBlenderBase
         {
             MemBitmap _bmp;

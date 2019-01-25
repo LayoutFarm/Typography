@@ -77,6 +77,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                   double rx, double ry,
                   double angle1, double angle2)
         {
+            _scale = 1.0;
             Init(ox, oy, rx, ry, angle1, angle2, ArcDirection.CounterClockWise);
         }
 
@@ -159,4 +160,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _calculateNSteps = (int)Math.Floor(((_endAngle - _startAngle) / _flattenDeltaAngle));
         }
     }
+
+
+
+   
 }

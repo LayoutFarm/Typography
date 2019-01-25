@@ -831,11 +831,13 @@ namespace PixelFarm.PathReconstruction
             for (int i = 0; i < j; ++i)
             {
                 RawContour contour = rgnOutline._contours[i];
-                var simplifiedPoints = PixelFarm.CpuBlit.VertexProcessing.SimplificationHelpers.Simplify(
+                List<Point> simplifiedPoints = new List<Point>(contour._xyCoords.Count);
+                PixelFarm.CpuBlit.VertexProcessing.SimplificationHelpers.Simplify(
                      contour._xyCoords,
                      (p1, p2) => p1 == p2,
                      p => p.x,
                      p => p.y,
+                     simplifiedPoints,
                      tolerance,
                      heighQualityEnable);
                 //replace current raw contour with the new one
@@ -847,7 +849,7 @@ namespace PixelFarm.PathReconstruction
                 //but you can replace internal data of the old contour too,
                 RawContour newContour = new RawContour();
                 newContour.IsOutside = contour.IsOutside;
-                foreach (var point in simplifiedPoints)
+                foreach (Point point in simplifiedPoints)
                 {
                     newContour.AddPoint(point);
                 }

@@ -253,7 +253,10 @@ namespace PixelFarm.Drawing.Fonts
                     GlyphBitmap glyphBmp = _glyphSvgStore.GetGlyphBitmap(snapToPx.CurrentGlyphIndex);
                     //how to draw the image
                     //1. 
-                    _painter.DrawImage(glyphBmp.Bitmap);
+                    if(glyphBmp != null)
+                    {
+                        _painter.DrawImage(glyphBmp.Bitmap);
+                    }                    
                 }
             }
             else if (_currentTypeface.IsBitmapFont)

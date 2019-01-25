@@ -34,7 +34,7 @@ namespace PixelFarm.Drawing.Fonts
             _bitmapList = new GlyphBitmapList();
             _cacheGlyphPathBuilders.Add(typeface, _bitmapList);
             int glyphCount = typeface.GlyphCount;
-           
+
             System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
             for (ushort i = 0; i < glyphCount; ++i)
             {
@@ -53,6 +53,12 @@ namespace PixelFarm.Drawing.Fonts
                 }
 
                 glyphBitmap.Bitmap = _svgBmpBuilderFunc(stbuilder);// ParseAndRenderSvg(stbuilder, vgDocHost);
+                if (glyphBitmap.Bitmap == null)
+                {
+                    continue;
+                }
+
+                //
                 //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "d:\\WImageTest\\testGlyphBmp_" + i + ".png");
                 _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
             }
@@ -62,7 +68,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             _bitmapList.TryGetBitmap(glyphIndex, out GlyphBitmap found);
             return found;
-        } 
+        }
     }
 
 }

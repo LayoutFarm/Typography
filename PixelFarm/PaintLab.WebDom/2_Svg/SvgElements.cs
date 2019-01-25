@@ -105,6 +105,16 @@ namespace PaintLab.Svg
         Stop,
 
         /// <summary>
+        /// filter
+        /// </summary>
+        Filter,
+
+        /// <summary>
+        /// feColorMatrix
+        /// </summary>
+        FeColorMatrix,
+
+        /// <summary>
         /// my extension
         /// </summary>
         ForeignNode
@@ -121,15 +131,29 @@ namespace PaintLab.Svg
         SvgElemSpec _elemSpec;
         List<SvgElement> _childNodes;
         object _controller;
-        
-
+#if DEBUG
+        static int s_dbugTotalId;
+        public readonly int dbugId = s_dbugTotalId++;
+#endif
         public SvgElement(WellknownSvgElementName wellknownName, SvgElemSpec elemSpec)
         {
+#if DEBUG
+            if (dbugId == 3)
+            {
+
+            }
+#endif
             _wellknownName = wellknownName;
             _elemSpec = elemSpec;
         }
         public SvgElement(WellknownSvgElementName wellknownName, string name)
         {
+#if DEBUG
+            if (dbugId == 3)
+            {
+
+            }
+#endif
             _wellknownName = wellknownName;
             _unknownElemName = name;
         }
@@ -144,7 +168,7 @@ namespace PaintLab.Svg
             return elem._controller;
         }
 
-        public WellknownSvgElementName WellknowElemName { get { return _wellknownName; } }
+        public WellknownSvgElementName WellknowElemName => _wellknownName;
 
         public string ElemName
         {
@@ -156,6 +180,7 @@ namespace PaintLab.Svg
                         throw new NotSupportedException();
                     case WellknownSvgElementName.Unknown:
                         return _unknownElemName;
+                    case WellknownSvgElementName.Ellipse: return "ellipse";
                     case WellknownSvgElementName.Circle: return "circle";
                     case WellknownSvgElementName.ClipPath: return "clipPath";
                     case WellknownSvgElementName.Rect: return "rect";
@@ -171,6 +196,9 @@ namespace PaintLab.Svg
                     case WellknownSvgElementName.RadialGradient: return "radialGradient";
                     case WellknownSvgElementName.Use: return "use";
                     case WellknownSvgElementName.Stop: return "stop";
+                    case WellknownSvgElementName.Filter: return "filter";
+                    case WellknownSvgElementName.FeColorMatrix: return "feColorMetrix";
+
                 }
             }
         }
@@ -183,18 +211,17 @@ namespace PaintLab.Svg
             _childNodes.Add(elem);
         }
 
-        public int ChildCount
+        public int ChildCount => _childNodes == null ? 0 : _childNodes.Count;
+
+        public SvgElement GetChild(int index) => _childNodes[index];
+
+        public SvgElemSpec ElemSpec => _elemSpec;
+#if DEBUG
+        public override string ToString()
         {
-            get { return _childNodes == null ? 0 : _childNodes.Count; }
+            return _wellknownName.ToString();
         }
-        public SvgElement GetChild(int index)
-        {
-            return _childNodes[index];
-        }
-        public SvgElemSpec ElemSpec
-        {
-            get { return _elemSpec; }
-        }
+#endif
 
     }
 
@@ -225,17 +252,21 @@ namespace PaintLab.Svg
             {
                 default:
 #if DEBUG
-                    //Console.WriteLine("svg unimplemented element: " + elemName);
+                    System.Diagnostics.Debug.WriteLine("svg unimplemented element: " + elemName);
 #endif
                     return new SvgElement(WellknownSvgElementName.Unknown, elemName);
                 case "svg":
                     return new SvgElement(WellknownSvgElementName.Svg, new SvgBoxSpec());
-
                 case "defs":
                     return new SvgElement(WellknownSvgElementName.Defs, null as string);
                 case "title":
                     return new SvgElement(WellknownSvgElementName.Title, null as string);
-
+                case "filter":
+                    return new SvgElement(WellknownSvgElementName.Filter, new SvgFilterSpec());
+                case "feColorMatrix":
+                    return new SvgElement(WellknownSvgElementName.FeColorMatrix, new SvgFeColorMatrixSpec());
+                case "mask":
+                    return new SvgElement(WellknownSvgElementName.Mask, new SvgMaskSpec());
                 //------------------------------------------------------------------------------
                 case "style":
                     return new SvgElement(WellknownSvgElementName.Style, new SvgStyleSpec());
@@ -260,12 +291,12 @@ namespace PaintLab.Svg
                     return new SvgElement(WellknownSvgElementName.Path, new SvgPathSpec());
                 case "image":
                     return new SvgElement(WellknownSvgElementName.Image, new SvgImageSpec());
-                //case "linearGradient":
-                //    return new SvgElement(WellknownSvgElementName.LinearGradient, new SvgLinearGradientSpec());
-                //case "radialGradient":
-                //    return new SvgElement(WellknownSvgElementName.RadialGradient, new SvgRadialGradientSpec());
-                //case "stop":
-                //    return new SvgElement(WellknownSvgElementName.Stop, new SvgColorStopSpec());
+                case "linearGradient":
+                    return new SvgElement(WellknownSvgElementName.LinearGradient, new SvgLinearGradientSpec());
+                case "radialGradient":
+                    return new SvgElement(WellknownSvgElementName.RadialGradient, new SvgRadialGradientSpec());
+                case "stop":
+                    return new SvgElement(WellknownSvgElementName.Stop, new SvgColorStopSpec());
                 case "circle":
                     return new SvgElement(WellknownSvgElementName.Circle, new SvgCircleSpec());
                 case "ellipse":
@@ -276,13 +307,9 @@ namespace PaintLab.Svg
             }
         }
 
-        public SvgElement Root
-        {
-            get { return _rootElement; }
-        }
+        public SvgElement Root => _rootElement;
+
         public CssActiveSheet CssActiveSheet { get; set; }
-
-
         //hint
         public string OriginalContent { get; set; }
         public string OriginalFilename { get; set; }
@@ -302,13 +329,10 @@ namespace PaintLab.Svg
         }
         public SvgDocument ResultDocument
         {
-            get { return _svgDoc; }
-            set { _svgDoc = value; }
+            get => _svgDoc;
+            set => _svgDoc = value;
         }
-        public SvgElement CurrentSvgElem
-        {
-            get { return _currentElem; }
-        }
+        public SvgElement CurrentSvgElem => _currentElem;
 
         public void OnBegin()
         {
@@ -322,6 +346,7 @@ namespace PaintLab.Svg
         }
         public void OnVisitNewElement(string elemName)
         {
+
             SvgElement newElem = _svgDoc.CreateElement(elemName);
             if (_currentElem != null)
             {
@@ -346,15 +371,11 @@ namespace PaintLab.Svg
         }
         public void OnExitingElementBody()
         {
-
-            //
-
             if (_elems.Count > 0)
             {
                 _currentElem = _elems.Pop();
             }
         }
-
         public void OnEnd()
         {
         }
@@ -387,7 +408,11 @@ namespace PaintLab.Svg
 
                                     default:
                                         break;
+                                    case "opacity":
+                                        {
 
+                                        }
+                                        break;
                                     case "fill-opacity":
                                         {
                                             //TODO:
@@ -404,8 +429,7 @@ namespace PaintLab.Svg
                                         break;
                                     case "stroke":
                                         {
-                                            //stroke color
-
+                                            //stroke color 
                                             //TODO:
                                             //if (attr.Value != "none")
                                             //{
@@ -518,6 +542,164 @@ namespace PaintLab.Svg
                     break;
             }
         }
+        static void AssignFilterSpec(SvgFilterSpec filterSpec, string attrName, string attrValue)
+        {
+            switch (attrName)
+            {
+                //rect 
+                case "x":
+                    filterSpec.X = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "y":
+                    filterSpec.Y = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "width":
+                    filterSpec.Width = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "height":
+                    filterSpec.Height = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+            }
+        }
+        static void AssignMaskSpec(SvgMaskSpec maskSpec, string attrName, string attrValue)
+        {
+
+            switch (attrName)
+            {
+                //rect 
+                case "x":
+                    maskSpec.X = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "y":
+                    maskSpec.Y = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "width":
+                    maskSpec.Width = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "height":
+                    maskSpec.Height = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+            }
+
+        }
+        static void AssignFeColorMatrixSpec(SvgFeColorMatrixSpec feColorMatrixSpec, string attrName, string attrValue)
+        {
+            switch (attrName)
+            {
+                case "values":
+                    {
+                        List<float> numberList = new List<float>();
+                        ParseNumberList(attrValue, numberList);
+                        //last row
+                        numberList.Add(0); numberList.Add(0); numberList.Add(0); numberList.Add(0); numberList.Add(1);
+                        //
+                        feColorMatrixSpec.matrix = numberList.ToArray();
+                    }
+                    break;
+            }
+        }
+        static void AssignGroupSpec(SvgGroupSpec groupSpec, string attrName, string attrValue)
+        {
+            switch (attrName)
+            {
+                case "filter":
+                    {
+                        //value may be in refer form
+                        SvgAttributeLink attrLink = ParseAttributeLink(attrValue);
+                        if (attrLink != null)
+                        {
+                            //resolve later
+                            groupSpec.FilterPathLink = attrLink;
+                        }
+                    }
+                    break;
+                case "mask":
+                    {
+
+                    }
+                    break;
+            }
+        }
+        static void AssignLineSpec(SvgLineSpec spec, string attrName, string attrValue)
+        {
+            switch (attrName)
+            {
+
+                case "x1":
+                    spec.X1 = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "y1":
+                    spec.Y1 = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "x2":
+                    spec.X2 = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "y2":
+                    spec.Y2 = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+            }
+        }
+        static void AssignStopColorSpec(SvgColorStopSpec spec, string attrName, string attrValue)
+        {
+            switch (attrName)
+            {
+                //rect 
+                case "stop-color":
+                    spec.StopColor = CssValueParser.ParseCssColor(attrValue);
+                    break;
+                case "offset":
+                    //default unit of offset=%?
+                    spec.Offset = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "stop-opacity":
+                    {
+                        if (float.TryParse(attrValue, out float result))
+                        {
+                            if (result < 0)
+                            {
+                                spec.StopOpacity = 0;
+                            }
+                            else if (result > 1)
+                            {
+                                spec.StopOpacity = 1;
+                            }
+                            else
+                            {
+                                spec.StopOpacity = result;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        static void AssignRadialGradientSpec(SvgRadialGradientSpec spec, string attrName, string attrValue)
+        {
+            switch (attrName)
+            {
+                //rect 
+                case "cx":
+                    spec.CX = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "cy":
+                    spec.CY = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "fx":
+                    spec.FX = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "fy":
+                    spec.FY = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "fr":
+                    spec.FR = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "r":
+                    spec.R = UserMapUtil.ParseGenericLength(attrValue);
+                    break;
+                case "gradientTransform":
+                    SvgParser.ParseTransform(attrValue, spec);
+                    break;
+            }
+        }
         static void AssignLinearGradientSpec(SvgLinearGradientSpec spec, string attrName, string attrValue)
         {
             switch (attrName)
@@ -548,11 +730,12 @@ namespace PaintLab.Svg
             return output.ToArray();
         }
 
-        static readonly char[] strSeps = new char[] { ' ', ',' };
+
+        static readonly char[] strSeps1 = new char[] { ' ', ',' };
         static void ParsePointList(string str, List<PixelFarm.Drawing.PointF> output)
         {
             //easy parse 01
-            string[] allPoints = str.Split(strSeps, StringSplitOptions.RemoveEmptyEntries);
+            string[] allPoints = str.Split(strSeps1, StringSplitOptions.RemoveEmptyEntries);
             //should be even number
             int j = allPoints.Length - 1;
             if (j > 1)
@@ -572,6 +755,23 @@ namespace PaintLab.Svg
                     output.Add(new PixelFarm.Drawing.PointF(x, y));
                 }
             }
+        }
+
+        static void ParseNumberList(string str, List<float> output)
+        {
+            //easy parse 01
+            string[] allPoints = str.Split(strSeps1, StringSplitOptions.RemoveEmptyEntries);
+            //should be even number 
+            for (int i = 0; i < allPoints.Length; i++)
+            {
+                float x;
+                if (!float.TryParse(allPoints[i], out x))
+                {
+                    x = 0;
+                }
+                output.Add(x);
+            }
+
         }
         static void AssignRectSpec(SvgRectSpec spec, string attrName, string attrValue)
         {
@@ -728,7 +928,7 @@ namespace PaintLab.Svg
             {
                 case "viewBox":
                     {
-                        string[] allPoints = attrValue.Split(strSeps, StringSplitOptions.RemoveEmptyEntries);
+                        string[] allPoints = attrValue.Split(strSeps1, StringSplitOptions.RemoveEmptyEntries);
                         if (allPoints.Length == 4)
                         {
                             //x,y,w,h 
@@ -743,45 +943,6 @@ namespace PaintLab.Svg
             }
         }
 
-        ////------------------------------------------------------------
-        //int j = elem.ChildrenCount;
-        //List<StopColorPoint> stopColorPoints = new List<StopColorPoint>(j);
-        //for (int i = 0; i < j; ++i)
-        //{
-        //    HtmlElement node = elem.GetChildNode(i) as HtmlElement;
-        //    if (node == null)
-        //    {
-        //        continue;
-        //    }
-        //    switch (node.WellknownElementName)
-        //    {
-        //        case WellKnownDomNodeName.svg_stop:
-        //            {
-        //                //stop point
-        //                StopColorPoint stopPoint = new StopColorPoint();
-        //                foreach (WebDom.DomAttribute attr in node.GetAttributeIterForward())
-        //                {
-        //                    WebDom.WellknownName wellknownName = (WebDom.WellknownName)attr.LocalNameIndex;
-        //                    switch (wellknownName)
-        //                    {
-        //                        case WellknownName.Svg_StopColor:
-        //                            {
-        //                                stopPoint.StopColor = CssValueParser2.ParseCssColor(attr.Value);
-        //                            }
-        //                            break;
-        //                        case WellknownName.Svg_Offset:
-        //                            {
-        //                                stopPoint.Offset = UserMapUtil.ParseGenericLength(attr.Value);
-        //                            }
-        //                            break;
-        //                    }
-        //                }
-        //                stopColorPoints.Add(stopPoint);
-        //            }
-        //            break;
-        //    }
-        //}
-
         public void OnTextNode(string content)
         {
             if (_currentElem.ElemName == "text")
@@ -789,8 +950,6 @@ namespace PaintLab.Svg
                 SvgTextSpec elemSpec = (SvgTextSpec)_currentElem.ElemSpec;
                 elemSpec.TextContent = content;
             }
-
-
         }
         public void OnAttribute(string attrName, string value)
         {
@@ -800,6 +959,9 @@ namespace PaintLab.Svg
             SvgVisualSpec spec = elemSpec as SvgVisualSpec;
             switch (attrName)
             {
+                //if it is not common attribute name
+                //then go to specific current element name 
+
                 default:
                     {
                         //unknown attribute
@@ -807,7 +969,30 @@ namespace PaintLab.Svg
                         switch (_currentElem.WellknowElemName)
                         {
                             default:
+                                {
+                                    switch (_currentElem.ElemName)
+                                    {
 
+                                    }
+                                }
+                                break;
+                            case WellknownSvgElementName.Mask:
+                                AssignMaskSpec((SvgMaskSpec)elemSpec, attrName, value);
+                                break;
+                            case WellknownSvgElementName.FeColorMatrix:
+                                AssignFeColorMatrixSpec((SvgFeColorMatrixSpec)elemSpec, attrName, value);
+                                break;
+                            case WellknownSvgElementName.Filter:
+                                AssignFilterSpec((SvgFilterSpec)elemSpec, attrName, value);
+                                break;
+                            case WellknownSvgElementName.Group:
+                                AssignGroupSpec((SvgGroupSpec)elemSpec, attrName, value);
+                                break;
+                            case WellknownSvgElementName.Line:
+                                AssignLineSpec((SvgLineSpec)elemSpec, attrName, value);
+                                break;
+                            case WellknownSvgElementName.Stop:
+                                AssignStopColorSpec((SvgColorStopSpec)elemSpec, attrName, value);
                                 break;
                             case WellknownSvgElementName.Use:
                                 AssignUseSpec((SvgUseSpec)spec, attrName, value);
@@ -826,6 +1011,9 @@ namespace PaintLab.Svg
                                 break;
                             case WellknownSvgElementName.LinearGradient:
                                 AssignLinearGradientSpec((SvgLinearGradientSpec)spec, attrName, value);
+                                break;
+                            case WellknownSvgElementName.RadialGradient:
+                                AssignRadialGradientSpec((SvgRadialGradientSpec)spec, attrName, value);
                                 break;
                             case WellknownSvgElementName.Polyline:
                                 AssignPolylineSpec((SvgPolylineSpec)spec, attrName, value);
@@ -864,15 +1052,32 @@ namespace PaintLab.Svg
                     {
                         if (value != "none")
                         {
-                            spec.FillColor = CssValueParser.ParseCssColor(value);
+                            if (value.StartsWith("url("))
+                            {
+                                //eg. url(#aaa)
+                                SvgAttributeLink attrLink = ParseAttributeLink(value);
+                                if (attrLink != null)
+                                {
+                                    spec.FillPathLink = attrLink;
+                                }
+                            }
+                            else
+                            {
+                                //solid brush
+                                spec.FillColor = CssValueParser.ParseCssColor(value);
+                            }
                         }
                     }
                     break;
-                case "fill-opacity":
+                case "mask":
                     {
-                        //adjust fill opacity
-                        //0f-1f?
-
+                        //eg. url(#aaa)
+                        SvgAttributeLink attrLink = ParseAttributeLink(value);
+                        if (attrLink != null)
+                        {
+                            //resolve later
+                            spec.MaskPathLink = attrLink;
+                        }
                     }
                     break;
                 case "stroke-width":
@@ -889,6 +1094,25 @@ namespace PaintLab.Svg
                         }
                     }
                     break;
+                case "opacity":
+                    {
+                        //apply opacity
+                        //TODO: review here, UserMapUtil => use CssValueParser
+                        spec.Opacity = UserMapUtil.ParseGenericLength(value).Number;
+                    }
+                    break;
+                case "fill-opacity":
+                    {
+                        //adjust fill opacity
+                        //0f-1f?
+
+                    }
+                    break;
+                case "stroke-opacity":
+                    {
+
+                    }
+                    break;
                 case "stroke-linecap":
                     //set line-cap and line join again
 
@@ -897,9 +1121,6 @@ namespace PaintLab.Svg
 
                     break;
                 case "stroke-miterlimit":
-
-                    break;
-                case "stroke-opacity":
 
                     break;
                 case "transform":
@@ -947,7 +1168,6 @@ namespace PaintLab.Svg
             {
                 spec.ClipPathLink = attrLink;
             }
-
         }
 
     }

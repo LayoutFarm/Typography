@@ -112,7 +112,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             shx = v2_shx; sy = v3_sy;
             tx = v4_tx; ty = v5_ty;
         }
-
+        public float[] Get3x3MatrixElements() =>
+            new float[]
+            {
+               (float) sx,(float) shy,(float)0,
+               (float) shx, (float) sy, 0,
+               (float) tx, (float) ty, 1
+            };
         /// <summary>
         /// inside-values will be CHANGED after call this
         /// </summary>
@@ -391,6 +397,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             _isIdenHint = false;
         }
+        public float[] Get3x3MatrixElements() => _elems.Get3x3MatrixElements();
         ICoordTransformer ICoordTransformer.CreateInvert()
         {
             return CreateInvert();

@@ -366,7 +366,7 @@ namespace PaintLab.Svg
         }
         protected override void OnVisitNewElement(TextSpan localName)
         {
-            _currentElemName = _textSnapshot.Substring(localName.startIndex, localName.len);
+            _currentElemName = _textSnapshot.Substring(localName.startIndex, localName.len); 
             _svgDocBuilder.OnVisitNewElement(_currentElemName);
         }
 

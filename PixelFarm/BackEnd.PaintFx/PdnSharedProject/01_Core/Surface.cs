@@ -22,10 +22,10 @@ namespace PaintFx
         /// <param name="len">length of this int32[]</param>
         public MemHolder(IntPtr ptr, int len)
         {
-            this._len = len;
+            _len = len;
             unsafe
             {
-                this._memAddress = (int*)ptr;
+                _memAddress = (int*)ptr;
             }
         }
         /// <summary>
@@ -45,7 +45,7 @@ namespace PaintFx
         }
         public MemHolder CreateSubMem(int startOffset, int len)
         {
-            if (startOffset >= 0 && len <= this._len)
+            if (startOffset >= 0 && len <= _len)
             {
                 unsafe
                 {
@@ -81,10 +81,10 @@ namespace PaintFx
         /// <param name="height">The height, in pixels, of the new Surface.</param>
         public Surface(int stride, int width, int height, MemHolder memHolder)
         {
-            this._stride = stride;
-            this._width = width;
-            this._height = height;
-            this._memHolder = memHolder; //mem buffer 
+            _stride = stride;
+            _width = width;
+            _height = height;
+            _memHolder = memHolder; //mem buffer 
             //try
             //{
             //    stride = checked(width * ColorBgra.SizeOf);
@@ -103,7 +103,7 @@ namespace PaintFx
         {
             get
             {
-                return this._disposed;
+                return _disposed;
             }
         }
 
@@ -118,7 +118,7 @@ namespace PaintFx
         {
             get
             {
-                return this._width;
+                return _width;
             }
         }
 
@@ -132,7 +132,7 @@ namespace PaintFx
         {
             get
             {
-                return this._height;
+                return _height;
             }
         }
 
@@ -149,7 +149,7 @@ namespace PaintFx
         {
             get
             {
-                return this._stride;
+                return _stride;
             }
         }
 
@@ -252,7 +252,7 @@ namespace PaintFx
             int startPos = (windowWidth * y) + x;
             int endPos = (windowWidth * (y + windowHeight)) + (x + windowWidth);
             //also check if 
-            MemHolder newMemHolder = this._memHolder.CreateSubMem(startPos, endPos - startPos + 1);
+            MemHolder newMemHolder = _memHolder.CreateSubMem(startPos, endPos - startPos + 1);
             return new Surface(windowWidth * 4, windowWidth, windowHeight, newMemHolder);
 
 
@@ -306,7 +306,7 @@ namespace PaintFx
         /// <remarks>Since this returns a pointer, it is potentially unsafe to use.</remarks>
         public unsafe ColorBgra* GetRowAddress(int y)
         {
-            return (ColorBgra*)(((byte*)this._memHolder.Ptr) + GetRowByteOffset(y));
+            return (ColorBgra*)(((byte*)_memHolder.Ptr) + GetRowByteOffset(y));
         }
 
         /// <summary>
@@ -328,7 +328,7 @@ namespace PaintFx
             //            }
             //#endif
 
-            return (ColorBgra*)(((byte*)this._memHolder.Ptr)) + GetRowByteOffsetUnchecked(y);
+            return (ColorBgra*)(((byte*)_memHolder.Ptr)) + GetRowByteOffsetUnchecked(y);
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace PaintFx
         /// </returns>
         public long GetColumnByteOffset(int x)
         {
-            if (x < 0 || x >= this._width)
+            if (x < 0 || x >= _width)
             {
                 throw new ArgumentOutOfRangeException("x", x, "Out of bounds");
             }
@@ -847,7 +847,7 @@ namespace PaintFx
                     throw new ObjectDisposedException("Surface");
                 }
 
-                if (x < 0 || y < 0 || x >= this._width || y >= this._height)
+                if (x < 0 || y < 0 || x >= _width || y >= _height)
                 {
                     throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(_width - 1, _height - 1).ToString());
                 }
@@ -865,7 +865,7 @@ namespace PaintFx
                     throw new ObjectDisposedException("Surface");
                 }
 
-                if (x < 0 || y < 0 || x >= this._width || y >= this._height)
+                if (x < 0 || y < 0 || x >= _width || y >= _height)
                 {
                     throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(_width - 1, _height - 1).ToString());
                 }
@@ -966,10 +966,10 @@ namespace PaintFx
                 throw new ObjectDisposedException("Surface");
             }
 
-            if (this._stride == ss._stride &&
-                (this._width * ColorBgra.SizeOf) == this._stride &&
-                this._width == ss._width &&
-                this._height == ss._height)
+            if (_stride == ss._stride &&
+                (_width * ColorBgra.SizeOf) == _stride &&
+                _width == ss._width &&
+                _height == ss._height)
             {
                 unsafe
                 {
@@ -1067,7 +1067,7 @@ namespace PaintFx
             }
 
             sourceRoi.Intersect(source.Bounds);
-            int copiedWidth = Math.Min(this._width, sourceRoi.Width);
+            int copiedWidth = Math.Min(_width, sourceRoi.Width);
             int copiedHeight = Math.Min(this.Height, sourceRoi.Height);
 
             if (copiedWidth == 0 || copiedHeight == 0)
@@ -1268,11 +1268,11 @@ namespace PaintFx
         {
             unsafe
             {
-                for (int y = 0; y < this._height; ++y)
+                for (int y = 0; y < _height; ++y)
                 {
                     ColorBgra* dstPtr = GetRowAddressUnchecked(y);
 
-                    for (int x = 0; x < this._width; ++x)
+                    for (int x = 0; x < _width; ++x)
                     {
                         byte v = (byte)((((x ^ y) & 8) * 8) + 191);
                         *dstPtr = ColorBgra.FromBgra(v, v, v, 255);
@@ -1310,7 +1310,7 @@ namespace PaintFx
             }
             else if (source.Width <= Width || source.Height <= Height)
             {
-                if (source._width < 2 || source._height < 2 || this._width < 2 || this._height < 2)
+                if (source._width < 2 || source._height < 2 || _width < 2 || _height < 2)
                 {
                     this.NearestNeighborFitSurface(source, dstRoi);
                 }
@@ -1496,7 +1496,7 @@ namespace PaintFx
             }
             else if (source.Width <= Width || source.Height <= Height)
             {
-                if (source._width < 2 || source._height < 2 || this._width < 2 || this._height < 2)
+                if (source._width < 2 || source._height < 2 || _width < 2 || _height < 2)
                 {
                     this.NearestNeighborFitSurface(source, dstRoi);
                 }
@@ -1801,7 +1801,7 @@ namespace PaintFx
         private void BicubicFitSurfaceChecked(Surface source, Rectangle dstRoi)
         {
 
-            if (this._width < 2 || this._height < 2 || source._width < 2 || source._height < 2)
+            if (_width < 2 || _height < 2 || source._width < 2 || source._height < 2)
             {
                 SuperSamplingFitSurface(source, dstRoi);
             }
@@ -1942,7 +1942,7 @@ namespace PaintFx
         /// </summary>
         public void BicubicFitSurfaceUnchecked(Surface source, Rectangle dstRoi)
         {
-            if (this._width < 2 || this._height < 2 || source._width < 2 || source._height < 2)
+            if (_width < 2 || _height < 2 || source._width < 2 || source._height < 2)
             {
                 SuperSamplingFitSurface(source, dstRoi);
             }
@@ -2083,7 +2083,7 @@ namespace PaintFx
         /// <remarks>This method was implemented with correctness, not performance, in mind.</remarks>
         public void BilinearFitSurface(Surface source, Rectangle dstRoi)
         {
-            if (dstRoi.Width < 2 || dstRoi.Height < 2 || this._width < 2 || this._height < 2)
+            if (dstRoi.Width < 2 || dstRoi.Height < 2 || _width < 2 || _height < 2)
             {
                 SuperSamplingFitSurface(source, dstRoi);
             }

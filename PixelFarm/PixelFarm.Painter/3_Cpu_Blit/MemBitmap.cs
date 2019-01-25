@@ -546,7 +546,33 @@ namespace PixelFarm.CpuBlit
         {
             //TODO:
         }
+        //public static void InvertColor(this MemBitmap memBmp)
+        //{
+        //    //temp fix
+        //    unsafe
+        //    {
+        //        Imaging.TempMemPtr tmp = MemBitmap.GetBufferPtr(memBmp);
+        //        int* buffer = (int*)tmp.Ptr;
+        //        int len32 = tmp.LengthInBytes / 4;
+        //        unsafe
+        //        {
+        //            {
+        //                int* head_i32 = (int*)buffer;
+        //                for (int n = len32 - 1; n >= 0; --n)
+        //                {
+        //                    int value = *head_i32;
+        //                    int r = (value >> CO.R_SHIFT) & 0xff;
+        //                    int g = (value >> CO.G_SHIFT) & 0xff;
+        //                    int b = (value >> CO.B_SHIFT) & 0xff;
+        //                    int a = (value >> CO.A_SHIFT) & 0xff;
 
+        //                    *head_i32 = ((255 - r) << CO.R_SHIFT) | ((255 - g) << CO.G_SHIFT) | ((255 - b) << CO.B_SHIFT) | ((255 - a) << CO.A_SHIFT);
+        //                    head_i32++;
+        //                }
+        //            }
+        //        } 
+        //    }
+        //}
         internal static void Clear(Imaging.TempMemPtr tmp, Color color)
         {
             unsafe
@@ -634,8 +660,6 @@ namespace PixelFarm.CpuBlit
                         }
                     }
                 }
-
-
             }
         }
         public static void Clear(this MemBitmap bmp, Color color)

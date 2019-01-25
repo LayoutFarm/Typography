@@ -200,6 +200,10 @@ namespace SampleWinForms
             int bmpW = (int)Math.Round(bounds.Width);
             int bmpH = (int)Math.Round(bounds.Height);
 
+            if (bmpW == 0 || bmpH == 0)
+            {
+                return null;
+            }
             MemBitmap memBitmap = new MemBitmap(bmpW, bmpH);
             using (AggPainterPool.Borrow(memBitmap, out AggPainter p))
             using (VgPainterArgsPool.Borrow(p, out VgPaintArgs paintArgs))

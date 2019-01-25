@@ -114,16 +114,49 @@ namespace PaintLab.Svg
 
     public class VgPaintArgs : VgVisitorBase
     {
-        internal VgPaintArgs() { }
+        float _opacity;
+        bool _maskMode;
+        internal VgPaintArgs()
+        {
+            Opacity = 1;
+        }
         public Painter P { get; internal set; }
         public Action<VertexStore, VgPaintArgs> PaintVisitHandler;
+        public bool HasOpacity => _opacity < 1;
+        public float Opacity
+        {
+            get => _opacity;
+            set
+            {
+                if (value < 0)
+                {
+                    _opacity = 0;
+                }
+                else if (value > 1)
+                {
+                    _opacity = 1;//not use this opacity
+                }
+                else
+                {
+                    _opacity = value;
+                }
+            }
+        }
         internal override void Reset()
         {
             base.Reset();//*** reset base class fields too
             //-------
-
+            Opacity = 2;
             P = null;
             PaintVisitHandler = null;
+        }
+        public bool MaskMode
+        {
+            get => _maskMode;
+            set
+            {
+                _maskMode = value;
+            }
         }
     }
 
@@ -180,7 +213,7 @@ namespace PaintLab.Svg
 
 #if DEBUG
         public bool dbugHasParent;
-
+        public string dbugNote;
         public readonly int dbugId = s_dbugTotalId++;
         static int s_dbugTotalId;
 #endif
@@ -262,7 +295,10 @@ namespace PaintLab.Svg
             {
 
             }
+            if (_visualSpec.HasOpacity)
+            {
 
+            }
             if (_visualSpec.HasStrokeWidth)
             {
                 //temp fix
@@ -358,6 +394,7 @@ namespace PaintLab.Svg
         internal Dictionary<string, VgVisualElement> _registeredElemsById = new Dictionary<string, VgVisualElement>();
         internal Dictionary<string, VgVisualElement> _clipPathDic = new Dictionary<string, VgVisualElement>();
         internal Dictionary<string, VgVisualElement> _markerDic = new Dictionary<string, VgVisualElement>();
+        internal Dictionary<string, VgVisualElement> _filterDic = new Dictionary<string, VgVisualElement>();
 
         public VgVisualDoc(VgVisualDocHost vgVisualDocHost = null)
         {
@@ -438,8 +475,9 @@ namespace PaintLab.Svg
             _needBoundUpdate = true;
             _wellknownName = wellknownName;
             _visualSpec = visualSpec;
-            _vgVisualDoc = vgVisualDoc; 
+            _vgVisualDoc = vgVisualDoc;
         }
+
         //
         public VgVisualDoc VgVisualDoc => _vgVisualDoc;
 
@@ -665,9 +703,11 @@ namespace PaintLab.Svg
                     break;
                 case WellknownSvgElementName.Text:
                     break;
-                case WellknownSvgElementName.Group:
+
                 case WellknownSvgElementName.RootSvg:
                 case WellknownSvgElementName.Svg:
+                    break;
+                case WellknownSvgElementName.Mask:
                     break;
                 case WellknownSvgElementName.Image:
                     {
@@ -687,13 +727,15 @@ namespace PaintLab.Svg
                         }
                         goto case WellknownSvgElementName.Rect;
                     }
-                case WellknownSvgElementName.Path:
+
                 case WellknownSvgElementName.Line:
+                case WellknownSvgElementName.Path:
                 case WellknownSvgElementName.Ellipse:
                 case WellknownSvgElementName.Circle:
                 case WellknownSvgElementName.Polygon:
                 case WellknownSvgElementName.Polyline:
                 case WellknownSvgElementName.Rect:
+
                     {
                         //render with rect spec 
 
@@ -782,27 +824,72 @@ namespace PaintLab.Svg
             //***SKIP CLIPPING***
         }
 
-        public SvgVisualSpec VisualSpec
+        public SvgVisualSpec VisualSpec => _visualSpec;
+
+        ICoordTransformer ConvertToICoordTransformer(SvgTransform svgTransform)
         {
-            get { return _visualSpec; }
+            switch (svgTransform.TransformKind)
+            {
+                case SvgTransformKind.Matrix:
+                    {
+                        //   public Affine(
+                        //double v0_sx, double v1_shy,
+                        //double v2_shx, double v3_sy,
+                        //double v4_tx, double v5_ty)
+                        //            public SvgTransformMatrix(
+                        //float sx, float shx,
+                        //float shy, float sy,
+                        //float tx, float ty
+                        //)
+
+                        SvgTransformMatrix svgTxMatrix = (SvgTransformMatrix)svgTransform;
+                        float[] svgMatrixElem = svgTxMatrix.Elements;
+
+                        return new Affine(
+                            svgMatrixElem[0], svgMatrixElem[1],
+                            svgMatrixElem[2], svgMatrixElem[3],
+                            svgMatrixElem[4], svgMatrixElem[5]
+                            );
+                    }
+                default:
+                    return null;
+            }
         }
-
-
         //---------------------------
         public override void Paint(VgPaintArgs vgPainterArgs)
         {
+
             //save
             Painter p = vgPainterArgs.P;
+
             Color color = p.FillColor;
+            bool restoreFillColor;
+            if (p.CurrentBrush != null && p.CurrentBrush.BrushKind != BrushKind.Solid)
+            {
+                restoreFillColor = false;
+            }
+            else
+            {
+                restoreFillColor = true;
+            }
+
+
             double strokeW = p.StrokeWidth;
             Color strokeColor = p.StrokeColor;
             RequestFont currentFont = p.CurrentFont;
-
+            PaintFx.Effects.CpuBlitImgFilter imgFilter = null;
+            VgVisualElement filterElem = null;
             ICoordTransformer prevTx = vgPainterArgs._currentTx; //backup
             ICoordTransformer currentTx = vgPainterArgs._currentTx;
 
             bool hasClip = false;
             bool newFontReq = false;
+            bool useGradientColor = false;
+            bool userGradientWithOpacity = false;
+
+
+            float prevOpacity = vgPainterArgs.Opacity;
+            bool enableMaskMode = false;
 
             if (_visualSpec != null)
             {
@@ -822,9 +909,159 @@ namespace PaintLab.Svg
                 }
                 //apply this to current tx 
 
+                if (_visualSpec.MaskPathLink != null)
+                {
+                    //apply mask path 
+                    if (_visualSpec.ResolvedMask == null)
+                    {
+
+                    }
+
+                    if (_visualSpec.ResolvedMask != null)
+                    {
+                        //check if we have a cache mask or not
+                        //if not we need to create a mask
+
+                        VgVisualElement maskElem = (VgVisualElement)_visualSpec.ResolvedMask;
+                        MemBitmap maskBmp = (MemBitmap)maskElem.BackingImage;
+                        SvgMaskSpec maskSpec = maskElem.VisualSpec as SvgMaskSpec;
+                        if (maskBmp == null)
+                        {
+                            //create a mask bitmap
+                            //TODO: review this num conversion
+                            maskBmp = new MemBitmap((int)maskSpec.Width.Number, (int)maskSpec.Height.Number);
+                            //use software renderer for mask-bitmap
+                            using (AggPainterPool.Borrow(maskBmp, out AggPainter painter))
+                            using (VgPainterArgsPool.Borrow(painter, out VgPaintArgs paintArgs2))
+                            {
+                                painter.FillColor = Color.Black;
+                                painter.Clear(Color.White);
+                                paintArgs2.MaskMode = true;
+                                maskElem.Paint(paintArgs2);
+                                paintArgs2.MaskMode = false;
+
+                            }
+                            //our mask  need a little swap (TODO: review this, this is temp fix)
+                            //maskBmp.SaveImage("d:\\WImageTest\\mask01.png");
+                            // maskBmp.InvertColor();
+                            maskElem.SetBitmapSnapshot(maskBmp, true);
+                            // maskBmp.SaveImage("d:\\WImageTest\\mask01_inverted.png");
+                        }
+
+
+                        if (maskElem.BackingImage != null)
+                        {
+                            //use this as mask bitmap
+                            vgPainterArgs.P.TargetBuffer = TargetBuffer.MaskBuffer;
+                            vgPainterArgs.P.Clear(Color.Black);
+                            vgPainterArgs.P.DrawImage(maskElem.BackingImage, maskSpec.X.Number, maskSpec.Y.Number);
+                            vgPainterArgs.P.TargetBuffer = TargetBuffer.ColorBuffer;
+                            enableMaskMode = vgPainterArgs.P.EnableMask = true;
+
+                        }
+                    }
+                }
+
                 if (_visualSpec.HasFillColor)
                 {
-                    p.FillColor = _visualSpec.FillColor;
+                    if (_visualSpec.ResolvedFillBrush != null)
+                    {
+                        GeometryGradientBrush geoBrush = _visualSpec.ResolvedFillBrush as GeometryGradientBrush;
+                        if (geoBrush == null)
+                        {
+                            VgVisualElement vgVisualElem = _visualSpec.ResolvedFillBrush as VgVisualElement;
+                            if (vgVisualElem != null)
+                            {
+                                if (vgVisualElem.VisualSpec is SvgRadialGradientSpec)
+                                {
+                                    //TODO: review here
+                                    //we should resolve this in some state before Paint
+                                    SvgRadialGradientSpec svgRadialGrdSpec = (SvgRadialGradientSpec)vgVisualElem.VisualSpec;
+                                    int stopListCount = svgRadialGrdSpec.StopList.Count;
+                                    ColorStop[] colorStops = new ColorStop[stopListCount];
+                                    for (int i = 0; i < stopListCount; ++i)
+                                    {
+                                        SvgColorStopSpec stop = svgRadialGrdSpec.StopList[i];
+                                        if (stop.StopOpacity < 1)
+                                        {
+                                            Color stopColor = stop.StopColor.NewFromChangeCoverage((int)(stop.StopOpacity * 255));
+                                            colorStops[i] = new ColorStop(stop.Offset.Number, stopColor);
+                                        }
+                                        else
+                                        {
+                                            colorStops[i] = new ColorStop(stop.Offset.Number, stop.StopColor);
+                                        }
+                                    }
+
+                                    geoBrush = new RadialGradientBrush(
+                                      new PointF(svgRadialGrdSpec.CX.Number, svgRadialGrdSpec.CY.Number),
+                                      svgRadialGrdSpec.R.Number,
+                                      colorStops);
+
+                                    if (svgRadialGrdSpec.Transform != null)
+                                    {
+                                        geoBrush.CoordTransformer = ConvertToICoordTransformer(svgRadialGrdSpec.Transform);
+                                    }
+
+
+                                    _visualSpec.ResolvedFillBrush = geoBrush;
+                                }
+                                else if (vgVisualElem.VisualSpec is SvgLinearGradientSpec)
+                                {
+                                    SvgLinearGradientSpec linearGrSpec = (SvgLinearGradientSpec)vgVisualElem.VisualSpec;
+                                    if (linearGrSpec.Transform != null)
+                                    {
+
+                                    }
+                                    if (linearGrSpec.StopList != null)
+                                    {
+                                        int stopListCount = linearGrSpec.StopList.Count;
+                                        //... 
+                                        if (stopListCount > 1)
+                                        {
+                                            ColorStop[] colorStops = new ColorStop[stopListCount];
+                                            for (int i = 0; i < stopListCount; ++i)
+                                            {
+                                                SvgColorStopSpec stop = linearGrSpec.StopList[i];
+                                                if (stop.StopOpacity < 1)
+                                                {
+                                                    Color stopColor = stop.StopColor.NewFromChangeCoverage((int)(stop.StopOpacity * 255));
+                                                    colorStops[i] = new ColorStop(stop.Offset.Number, stopColor);
+                                                }
+                                                else
+                                                {
+                                                    colorStops[i] = new ColorStop(stop.Offset.Number, stop.StopColor);
+                                                }
+
+                                            }
+
+                                            LinearGradientBrush linearGr = new LinearGradientBrush(
+                                              new PointF(linearGrSpec.X1.Number, linearGrSpec.Y1.Number),
+                                              new PointF(linearGrSpec.X2.Number, linearGrSpec.Y2.Number), colorStops);
+
+
+                                            geoBrush = linearGr;
+                                            _visualSpec.ResolvedFillBrush = geoBrush;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                        }
+                        if (geoBrush != null)
+                        {
+                            useGradientColor = true;
+                        }
+                        p.CurrentBrush = geoBrush;
+
+                    }
+                    else
+                    {
+                        p.FillColor = _visualSpec.FillColor;
+                    }
                 }
 
                 if (_visualSpec.HasStrokeColor)
@@ -847,18 +1084,69 @@ namespace PaintLab.Svg
 
                 }
 
+                if (_visualSpec.HasOpacity)
+                {
+                    vgPainterArgs.Opacity = prevOpacity * _visualSpec.Opacity;
+                }
+
+                if (vgPainterArgs.HasOpacity)
+                {
+                    if (useGradientColor)
+                    {
+                        userGradientWithOpacity = true;
+                        p.FillOpacity = vgPainterArgs.Opacity;
+                    }
+                    else
+                    {
+                        p.FillColor = p.FillColor.NewFromChangeCoverage((int)(vgPainterArgs.Opacity * 255));
+                    }
+
+                }
+
+                if (_visualSpec.FilterPathLink != null)
+                {
+                    //resolve filter
+                    filterElem = _visualSpec.ResolvedFilter as VgVisualElement;
+                    //TODO: implement filter
+                    //TODO: how to get and apply children nodes
+                    VgVisualElement content1 = (VgVisualElement)filterElem.GetChildNode(0);
+                    SvgFeColorMatrixSpec colorMatSpec = content1.VisualSpec as SvgFeColorMatrixSpec;
+                    imgFilter = colorMatSpec.ResolvedFilter as PaintFx.Effects.ImgFilterSvgFeColorMatrix;
+                }
+
+
                 if (_visualSpec.ResolvedClipPath != null)
                 {
                     //clip-path
                     hasClip = true;
-
                     VgVisualElement clipPath = (VgVisualElement)_visualSpec.ResolvedClipPath;
-                    VertexStore clipVxs = ((VgVisualElement)clipPath.GetChildNode(0)).VxsPath;
+                    //inside clipPath definition
+                    //may be local definition or 'use' element
+
+                    //TODO: review here
+                    VgVisualElement clipPathChild = (VgVisualElement)clipPath.GetChildNode(0);
+                    VertexStore clipVxs = null;
+                    switch (clipPathChild.ElemName)
+                    {
+                        case WellknownSvgElementName.Use:
+                            {
+                                //TODO: review here
+                                //
+                                VgUseVisualElement useVisualElem = (VgUseVisualElement)clipPathChild;
+                                clipVxs = useVisualElem.HRefSvgRenderElement.VxsPath;
+                            }
+                            break;
+                        case WellknownSvgElementName.ClipPath:
+
+                            break;
+                        default:
+                            clipVxs = clipPathChild.VxsPath;
+                            break;
+                    }
 
                     //----------
                     //for optimization check if clip path is Rect
                     //if yes => do simple rect clip 
-
                     if (currentTx != null)
                     {
                         //have some tx
@@ -884,6 +1172,14 @@ namespace PaintLab.Svg
                 case WellknownSvgElementName.Group:
                 case WellknownSvgElementName.RootSvg:
                 case WellknownSvgElementName.Svg:
+                    break;
+                case WellknownSvgElementName.Mask:
+                    {
+                        if (!vgPainterArgs.MaskMode)
+                        {
+                            return;
+                        }
+                    }
                     break;
                 case WellknownSvgElementName.Image:
                     {
@@ -1063,8 +1359,8 @@ namespace PaintLab.Svg
                         }
                     }
                     break;
-                case WellknownSvgElementName.Path:
                 case WellknownSvgElementName.Line:
+                case WellknownSvgElementName.Path:
                 case WellknownSvgElementName.Ellipse:
                 case WellknownSvgElementName.Circle:
                 case WellknownSvgElementName.Polygon:
@@ -1072,20 +1368,19 @@ namespace PaintLab.Svg
                 case WellknownSvgElementName.Rect:
                 case WellknownSvgElementName.Marker:
                     {
-                        //render with rect spec 
-
-
+                        //render with rect spec  
                         if (currentTx == null)
                         {
                             //no transform
-
-
                             if (vgPainterArgs.PaintVisitHandler == null)
                             {
-                                if (p.FillColor.A > 0)
+                                if (useGradientColor)
                                 {
                                     p.Fill(VxsPath);
-
+                                }
+                                else if (p.FillColor.A > 0)
+                                {
+                                    p.Fill(VxsPath);
                                 }
                                 //to draw stroke
                                 //stroke width must > 0 and stroke-color must not be transparent color
@@ -1116,8 +1411,6 @@ namespace PaintLab.Svg
                                         }
                                     }
                                     p.Fill(_strokeVxs, p.StrokeColor);
-
-                                    //}
                                 }
                             }
                             else
@@ -1284,11 +1577,34 @@ namespace PaintLab.Svg
                 }
             }
 
+            //-----------------
+            //
+            if (filterElem != null)
+            {
+                vgPainterArgs.P.ApplyFilter(imgFilter);
+            }
+
             //restore
-            p.FillColor = color;
+            if (restoreFillColor)
+            {
+                p.FillColor = color;
+            }
+            else
+            {
+
+            }
+            if (userGradientWithOpacity)
+            {
+                p.FillOpacity = prevOpacity;
+            }
+            if (useGradientColor)
+            {
+                //store back
+                p.CurrentBrush = null;
+            }
             p.StrokeColor = strokeColor;
             p.StrokeWidth = strokeW;
-            //
+            vgPainterArgs.Opacity = prevOpacity;
             vgPainterArgs._currentTx = prevTx;
             if (hasClip)
             {
@@ -1297,6 +1613,10 @@ namespace PaintLab.Svg
             if (newFontReq)
             {
                 p.CurrentFont = currentFont;
+            }
+            if (enableMaskMode)
+            {
+                p.EnableMask = false;
             }
         }
 
@@ -1319,17 +1639,10 @@ namespace PaintLab.Svg
             _childNodes.Add(vgVisElem);
 
         }
-        public int ChildCount
-        {
-            get
-            {
-                return (_childNodes == null) ? 0 : _childNodes.Count;
-            }
-        }
-        public VgVisualElementBase GetChildNode(int index)
-        {
-            return _childNodes[index];
-        }
+        public int ChildCount => (_childNodes == null) ? 0 : _childNodes.Count;
+
+
+        public VgVisualElementBase GetChildNode(int index) => _childNodes[index];
 
         public void RemoveAt(int index)
         {
@@ -1346,9 +1659,6 @@ namespace PaintLab.Svg
 
         public object UserData { get; set; } //optional
         public SvgDocument OwnerDocument { get; set; } //optional
-
-
-
         public void InvalidateBounds()
         {
             _needBoundUpdate = true;
@@ -1413,11 +1723,9 @@ namespace PaintLab.Svg
         }
         public bool HasBitmapSnapshot { get; internal set; }
 
-        public Image BackingImage { get { return _backimg; } }
+        public Image BackingImage => _backimg;
         public bool DisableBackingImage { get; set; }
 
-
-        
         public void ClearBitmapSnapshot()
         {
             SetBitmapSnapshot(null, true);
@@ -1493,7 +1801,7 @@ namespace PaintLab.Svg
         MyVgPathDataParser _pathDataParser = new MyVgPathDataParser();
         List<VgVisualElement> _waitingList = new List<VgVisualElement>();
 
-        
+
         SvgDocument _svgdoc;
         //a copy from
         List<SvgElement> _defsList;
@@ -1501,6 +1809,7 @@ namespace PaintLab.Svg
         Dictionary<string, VgVisualElement> _registeredElemsById;
         Dictionary<string, VgVisualElement> _clipPathDic;
         Dictionary<string, VgVisualElement> _markerDic;
+        Dictionary<string, VgVisualElement> _filterDic;
 
         float _containerWidth = 500;//default?
         float _containerHeight = 500;//default?
@@ -1539,7 +1848,7 @@ namespace PaintLab.Svg
             _registeredElemsById = _vgVisualDoc._registeredElemsById;
             _clipPathDic = _vgVisualDoc._clipPathDic;
             _markerDic = _vgVisualDoc._markerDic;
-
+            _filterDic = _vgVisualDoc._filterDic;
 
             //---------------------------
             //create visual element for the svg
@@ -1558,6 +1867,7 @@ namespace PaintLab.Svg
 
             //resolve
             int j = _waitingList.Count;
+            BuildDefinitionNodes();
             for (int i = 0; i < j; ++i)
             {
                 //resolve
@@ -1569,6 +1879,10 @@ namespace PaintLab.Svg
                     if (_registeredElemsById.TryGetValue(useSpec.Href.Value, out VgVisualElement result))
                     {
                         useNodeVisElem.HRefSvgRenderElement = result;
+                    }
+                    else
+                    {
+
                     }
                 }
             }
@@ -1587,12 +1901,19 @@ namespace PaintLab.Svg
             switch (elem.WellknowElemName)
             {
                 default:
-                    throw new KeyNotFoundException();
+                    throw new NotSupportedException();
                 //-----------------
+                case WellknownSvgElementName.FeColorMatrix:
+                    vgVisElem = CreateFeColorMatrix(parentNode, elem, (SvgFeColorMatrixSpec)elem.ElemSpec);//no more child 
+                    parentNode.AddChildElement(vgVisElem);
+                    return vgVisElem;
+                case WellknownSvgElementName.Filter:
+                    vgVisElem = CreateFilterElem(parentNode, elem, (SvgFilterSpec)elem.ElemSpec);
+                    break;
                 case WellknownSvgElementName.RadialGradient:
                     //TODO: add radial grapdient support 
                     //this version not support linear gradient
-                    return null;
+                    return CreateRadialGradient(parentNode, elem, (SvgRadialGradientSpec)elem.ElemSpec);
                 case WellknownSvgElementName.LinearGradient:
                     //TODO: add linear grapdient support 
                     //this version not support linear gradient
@@ -1609,6 +1930,9 @@ namespace PaintLab.Svg
                 //-----------------
                 case WellknownSvgElementName.Unknown:
                     return null;
+                case WellknownSvgElementName.Mask:
+                    vgVisElem = CreateMask(parentNode, (SvgMaskSpec)elem.ElemSpec);
+                    break;
                 case WellknownSvgElementName.Svg:
                     vgVisElem = new VgVisualElement(WellknownSvgElementName.Svg, (SvgVisualSpec)elem.ElemSpec, _vgVisualDoc);
                     break;
@@ -1630,7 +1954,9 @@ namespace PaintLab.Svg
                 case WellknownSvgElementName.Circle:
                     vgVisElem = CreateCircle(parentNode, (SvgCircleSpec)elem.ElemSpec);
                     break;
-
+                case WellknownSvgElementName.Line:
+                    vgVisElem = CreateLine(parentNode, (SvgLineSpec)elem.ElemSpec);
+                    break;
                 case WellknownSvgElementName.ClipPath:
                     vgVisElem = CreateClipPath(parentNode, (SvgVisualSpec)elem.ElemSpec);
                     break;
@@ -1639,7 +1965,7 @@ namespace PaintLab.Svg
                     break;
                 //---------------------------------------------
                 case WellknownSvgElementName.Path:
-                    vgVisElem = CreatePath(parentNode, (SvgPathSpec)elem.ElemSpec);
+                    vgVisElem = CreatePath(parentNode, (SvgPathSpec)elem.ElemSpec, elem);
                     skipChildrenNode = true;//***
                     break;
                 case WellknownSvgElementName.Text:
@@ -1655,6 +1981,7 @@ namespace PaintLab.Svg
 
             if (vgVisElem == null)
             {
+                //TODO: review here
                 return null;
             }
             //-----------------------------------
@@ -1703,20 +2030,30 @@ namespace PaintLab.Svg
             AssignAttributes(visualSpec);
             return renderE;
         }
-        bool _buildDefs = false;
+        VgVisualElement CreateMask(VgVisualElement parentNode, SvgMaskSpec visualSpec)
+        {
+            VgVisualElement renderE = new VgVisualElement(WellknownSvgElementName.Mask, visualSpec, _vgVisualDoc);
+            AssignAttributes(visualSpec);
+            return renderE;
+        }
+
+        int _lastestBuiltDefIndex = 0;
+
         void BuildDefinitionNodes()
         {
-            if (_buildDefs)
+            int j = _defsList.Count;
+            if (_lastestBuiltDefIndex >= j)
             {
                 return;
             }
-            _buildDefs = true;
             VgVisualElement definitionRoot = new VgVisualElement(WellknownSvgElementName.Defs, null, _vgVisualDoc);
 
-            int j = _defsList.Count;
-            for (int i = 0; i < j; ++i)
+
+            for (int i = _lastestBuiltDefIndex; i < j; ++i)
             {
                 SvgElement defsElem = _defsList[i];
+                _lastestBuiltDefIndex++;
+
                 //get definition content
                 int childCount = defsElem.ChildCount;
                 for (int c = 0; c < childCount; ++c)
@@ -1724,6 +2061,38 @@ namespace PaintLab.Svg
                     SvgElement child = defsElem.GetChild(c);
                     switch (child.WellknowElemName)
                     {
+                        default:
+                            {
+                                switch (child.ElemName)
+                                {
+                                    case "filter":
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            break;
+                        case WellknownSvgElementName.Filter:
+                            {
+                                VgVisualElement renderE = CreateSvgVisualElement(definitionRoot, child);
+                                if (child.ElemId != null)
+                                {
+                                    _filterDic.Add(child.ElemId, renderE);
+                                }
+
+                            }
+                            break;
+                        case WellknownSvgElementName.Ellipse:
+                        case WellknownSvgElementName.Rect:
+                        case WellknownSvgElementName.Polygon:
+                        case WellknownSvgElementName.Circle:
+                        case WellknownSvgElementName.Polyline:
+                        case WellknownSvgElementName.Path:
+                        case WellknownSvgElementName.Text:
+                            {
+                                CreateSvgVisualElement(definitionRoot, child);
+                            }
+                            break;
                         case WellknownSvgElementName.ClipPath:
                             {
                                 //clip path definition  
@@ -1745,29 +2114,80 @@ namespace PaintLab.Svg
             }
         }
 
-        void AssignAttributes(SvgVisualSpec spec)
+        void AssignAttributes(SvgVisualSpec spec, VgVisualElement visualElem = null)
         {
-
+            BuildDefinitionNodes();
             if (spec.ClipPathLink != null)
             {
-                //resolve this clip
-                BuildDefinitionNodes();
+                //resolve this clip 
                 if (_clipPathDic.TryGetValue(spec.ClipPathLink.Value, out VgVisualElement clip))
                 {
                     spec.ResolvedClipPath = clip;
                     //cmds.Add(clip);
                 }
+                else
+                {
+                    if (_registeredElemsById.TryGetValue(spec.ClipPathLink.Value, out VgVisualElement clipElem))
+                    {
+                        spec.ResolvedClipPath = clipElem;
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            if (spec.HasFillColor && spec.FillPathLink != null)
+            {
+                if (_registeredElemsById.TryGetValue(spec.FillPathLink.Value, out VgVisualElement fillElem))
+                {
+                    spec.ResolvedFillBrush = fillElem;
+                }
+                else
+                {
+
+                }
+            }
+            if (spec.MaskPathLink != null)
+            {
+                //TODO: resolve this later
+                if (_registeredElemsById.TryGetValue(spec.MaskPathLink.Value, out VgVisualElement maskElem))
+                {
+                    spec.ResolvedMask = maskElem;
+                }
+                else
+                {
+
+                }
+            }
+            if (spec.FilterPathLink != null)
+            {
+                if (_registeredElemsById.TryGetValue(spec.FilterPathLink.Value, out VgVisualElement filterElem))
+                {
+                    spec.ResolvedFilter = filterElem;
+                }
+                else
+                {
+
+                }
             }
         }
-        VgVisualElement CreatePath(VgVisualElement parentNode, SvgPathSpec pathSpec)
+        VgVisualElement CreatePath(VgVisualElement parentNode, SvgPathSpec pathSpec, SvgElement node)
         {
 
             VgVisualElement vgVisElem = new VgVisualElement(WellknownSvgElementName.Path, pathSpec, _vgVisualDoc); //**
 
+            //#if DEBUG
+            //            if (node.ElemId == "x11")
+            //            {
+            //                vgVisElem.dbugNote = node.ElemId;
+            //            }
+            //#endif
             //d             
             AssignAttributes(pathSpec);
             vgVisElem.VxsPath = ParseSvgPathDefinitionToVxs(pathSpec.D.ToCharArray());
             ResolveMarkers(vgVisElem, pathSpec);
+
 
             if (vgVisElem._pathMarkers != null)
             {
@@ -1995,7 +2415,18 @@ namespace PaintLab.Svg
                 }
             }
         }
-
+        VgVisualElement CreateLine(VgVisualElement parentNode, SvgLineSpec linespec)
+        {
+            VgVisualElement lineVisualElem = new VgVisualElement(WellknownSvgElementName.Line, linespec, _vgVisualDoc);
+            using (VxsTemp.Borrow(out var v1))
+            {
+                v1.AddMoveTo(linespec.X1.Number, linespec.Y1.Number);
+                v1.AddLineTo(linespec.X2.Number, linespec.Y2.Number);
+                v1.AddNoMore();
+                lineVisualElem.VxsPath = v1.CreateTrim();
+            }
+            return lineVisualElem;
+        }
         VgVisualElement CreateCircle(VgVisualElement parentNode, SvgCircleSpec cirSpec)
         {
 
@@ -2016,13 +2447,86 @@ namespace PaintLab.Svg
             }
         }
 
+        void RegisterElementById(SvgElement elem, VgVisualElement vgVisualElem)
+        {
+            if (elem.ElemId != null)
+            {
+                //replace duplicated item ???
+                _registeredElemsById[elem.ElemId] = vgVisualElem;
+            }
 
+        }
+
+        VgVisualElement CreateFilterElem(VgVisualElement parentNode, SvgElement elem, SvgFilterSpec spec)
+        {
+            VgVisualElement filterElem = new VgVisualElement(WellknownSvgElementName.Filter, spec, _vgVisualDoc);
+
+
+            return filterElem;
+        }
+        VgVisualElement CreateFeColorMatrix(VgVisualElement parentNode, SvgElement elem, SvgFeColorMatrixSpec spec)
+        {
+            VgVisualElement feColorMatrixElem = new VgVisualElement(WellknownSvgElementName.FeColorMatrix, spec, _vgVisualDoc);
+            PaintFx.Effects.ImgFilterSvgFeColorMatrix colorMat = new PaintFx.Effects.ImgFilterSvgFeColorMatrix();
+            spec.ResolvedFilter = colorMat;
+            //TODO: check if matrix is identify matrix or not
+            //
+            colorMat.Elements = spec.matrix;
+            return feColorMatrixElem;
+        }
+        VgVisualElement CreateRadialGradient(VgVisualElement parentNode, SvgElement elem, SvgRadialGradientSpec spec)
+        {
+            //<radialGradient id="a" cx="59.6" cy="54.845" r="55.464" fx="27.165" fy="53.715" gradientUnits="userSpaceOnUse">
+            //    <stop stop-color="#FFEB3B" offset="0" />
+            //    <stop stop-color="#FBC02D" offset="1" />
+            //</radialGradient>
+            //create linear gradient texure (or brush)
+            VgVisualElement radialGrd = new VgVisualElement(WellknownSvgElementName.RadialGradient, spec, _vgVisualDoc);
+
+            //read attribute 
+            RegisterElementById(elem, radialGrd);
+
+            int childCount = elem.ChildCount;
+            for (int i = 0; i < childCount; ++i)
+            {
+                SvgElement child = elem.GetChild(i);
+                if (child.ElemName == "stop")
+                {
+                    //color stop
+                    //TODO: implement this.... 
+                    SvgColorStopSpec stopSpec = child.ElemSpec as SvgColorStopSpec;
+                    if (stopSpec != null)
+                    {
+                        if (spec.StopList == null)
+                        {
+                            //TODO
+                            spec.StopList = new List<SvgColorStopSpec>();
+                        }
+                        spec.StopList.Add(stopSpec);
+                    }
+                }
+                else
+                {
+
+                }
+            }
+            return radialGrd;
+        }
         VgVisualElement CreateLinearGradient(VgVisualElement parentNode, SvgElement elem, SvgLinearGradientSpec spec)
         {
+
+            // <linearGradient id="polygon101_1_" gradientUnits="userSpaceOnUse" x1="343.1942" y1="259.6319" x2="424.394" y2="337.1182" gradientTransform="matrix(1.2948 0 0 1.2948 -0.9411 368.7214)">
+            //	<stop offset="1.348625e-002" style="stop-color:#DC2E19"/>
+            //	<stop offset="0.3012" style="stop-color:#DC2B19"/>
+            //	<stop offset="1" style="stop-color:#FDEE00"/>
+            //</linearGradient>
+
 
             //create linear gradient texure (or brush)
             VgVisualElement linearGrd = new VgVisualElement(WellknownSvgElementName.LinearGradient, spec, _vgVisualDoc);
             //read attribute
+
+            RegisterElementById(elem, linearGrd);
 
             float x1 = spec.X1.Number;
             float y1 = spec.Y1.Number;
@@ -2036,15 +2540,23 @@ namespace PaintLab.Svg
                 if (child.ElemName == "stop")
                 {
                     //color stop
-                    //TODO: implement this....
+                    //TODO: implement this.... 
+                    SvgColorStopSpec stopSpec = child.ElemSpec as SvgColorStopSpec;
+                    if (stopSpec != null)
+                    {
+                        if (spec.StopList == null)
+                        {
+                            //TODO
+                            spec.StopList = new List<SvgColorStopSpec>();
+                        }
+                        spec.StopList.Add(stopSpec);
+                    }
+                }
+                else
+                {
+
                 }
             }
-
-            // <linearGradient id="polygon101_1_" gradientUnits="userSpaceOnUse" x1="343.1942" y1="259.6319" x2="424.394" y2="337.1182" gradientTransform="matrix(1.2948 0 0 1.2948 -0.9411 368.7214)">
-            //	<stop offset="1.348625e-002" style="stop-color:#DC2E19"/>
-            //	<stop offset="0.3012" style="stop-color:#DC2B19"/>
-            //	<stop offset="1" style="stop-color:#FDEE00"/>
-            //</linearGradient>
 
             return linearGrd;
         }
@@ -2203,6 +2715,161 @@ namespace PaintLab.Svg
     }
 
 
+    sealed class SvgArcSegment
+    {
+        //from SVG.NET (https://github.com/vvvv/SVG)
+
+        private const double RadiansPerDegree = Math.PI / 180.0;
+        private const double DoublePI = Math.PI * 2;
+
+        public float RadiusX
+        {
+            get;
+            set;
+        }
+
+        public float RadiusY
+        {
+            get;
+            set;
+        }
+
+        public float Angle
+        {
+            get;
+            set;
+        }
+
+        public SvgArcSweep Sweep
+        {
+            get;
+            set;
+        }
+
+        public SvgArcSize Size
+        {
+            get;
+            set;
+        }
+        public PointF Start { get; set; }
+        public PointF End { get; set; }
+        public SvgArcSegment(PointF start, float radiusX, float radiusY, float angle, SvgArcSize size, SvgArcSweep sweep, PointF end)
+        {
+            this.Start = start;
+            this.End = end;
+            this.RadiusX = Math.Abs(radiusX);
+            this.RadiusY = Math.Abs(radiusY);
+            this.Angle = angle;
+            this.Sweep = sweep;
+            this.Size = size;
+        }
+
+        static double CalculateVectorAngle(double ux, double uy, double vx, double vy)
+        {
+            double ta = Math.Atan2(uy, ux);
+            double tb = Math.Atan2(vy, vx);
+
+            if (tb >= ta)
+            {
+                return tb - ta;
+            }
+
+            return SvgArcSegment.DoublePI - (ta - tb);
+        }
+
+        public void AddToPath(PathWriter graphicsPath)
+        {
+            if (PointF.Equals(Start, End))
+            {
+                return;
+            }
+
+            if (this.RadiusX == 0.0f && this.RadiusY == 0.0f)
+            {
+                //graphicsPath.AddLine(this.Start, this.End);
+                graphicsPath.LineTo(this.Start.X, this.Start.Y);
+                graphicsPath.LineTo(this.End.X, this.End.Y);
+                return;
+            }
+
+            double sinPhi = Math.Sin(this.Angle * SvgArcSegment.RadiansPerDegree);
+            double cosPhi = Math.Cos(this.Angle * SvgArcSegment.RadiansPerDegree);
+
+            double x1dash = cosPhi * (this.Start.X - this.End.X) / 2.0 + sinPhi * (this.Start.Y - this.End.Y) / 2.0;
+            double y1dash = -sinPhi * (this.Start.X - this.End.X) / 2.0 + cosPhi * (this.Start.Y - this.End.Y) / 2.0;
+
+            double root;
+            double numerator = this.RadiusX * this.RadiusX * this.RadiusY * this.RadiusY - this.RadiusX * this.RadiusX * y1dash * y1dash - this.RadiusY * this.RadiusY * x1dash * x1dash;
+
+            float rx = this.RadiusX;
+            float ry = this.RadiusY;
+
+            if (numerator < 0.0)
+            {
+                float s = (float)Math.Sqrt(1.0 - numerator / (this.RadiusX * this.RadiusX * this.RadiusY * this.RadiusY));
+
+                rx *= s;
+                ry *= s;
+                root = 0.0;
+            }
+            else
+            {
+                root = ((this.Size == SvgArcSize.Large && this.Sweep == SvgArcSweep.Positive) || (this.Size == SvgArcSize.Small && this.Sweep == SvgArcSweep.Negative) ? -1.0 : 1.0) * Math.Sqrt(numerator / (this.RadiusX * this.RadiusX * y1dash * y1dash + this.RadiusY * this.RadiusY * x1dash * x1dash));
+            }
+
+            double cxdash = root * rx * y1dash / ry;
+            double cydash = -root * ry * x1dash / rx;
+
+            double cx = cosPhi * cxdash - sinPhi * cydash + (this.Start.X + this.End.X) / 2.0;
+            double cy = sinPhi * cxdash + cosPhi * cydash + (this.Start.Y + this.End.Y) / 2.0;
+
+            double theta1 = SvgArcSegment.CalculateVectorAngle(1.0, 0.0, (x1dash - cxdash) / rx, (y1dash - cydash) / ry);
+            double dtheta = SvgArcSegment.CalculateVectorAngle((x1dash - cxdash) / rx, (y1dash - cydash) / ry, (-x1dash - cxdash) / rx, (-y1dash - cydash) / ry);
+
+            if (this.Sweep == SvgArcSweep.Negative && dtheta > 0)
+            {
+                dtheta -= 2.0 * Math.PI;
+            }
+            else if (this.Sweep == SvgArcSweep.Positive && dtheta < 0)
+            {
+                dtheta += 2.0 * Math.PI;
+            }
+
+            int segments = (int)Math.Ceiling((double)Math.Abs(dtheta / (Math.PI / 2.0)));
+            double delta = dtheta / segments;
+            double t = 8.0 / 3.0 * Math.Sin(delta / 4.0) * Math.Sin(delta / 4.0) / Math.Sin(delta / 2.0);
+
+            double startX = this.Start.X;
+            double startY = this.Start.Y;
+
+            for (int i = 0; i < segments; ++i)
+            {
+                double cosTheta1 = Math.Cos(theta1);
+                double sinTheta1 = Math.Sin(theta1);
+                double theta2 = theta1 + delta;
+                double cosTheta2 = Math.Cos(theta2);
+                double sinTheta2 = Math.Sin(theta2);
+
+                double endpointX = cosPhi * rx * cosTheta2 - sinPhi * ry * sinTheta2 + cx;
+                double endpointY = sinPhi * rx * cosTheta2 + cosPhi * ry * sinTheta2 + cy;
+
+                double dx1 = t * (-cosPhi * rx * sinTheta1 - sinPhi * ry * cosTheta1);
+                double dy1 = t * (-sinPhi * rx * sinTheta1 + cosPhi * ry * cosTheta1);
+
+                double dxe = t * (cosPhi * rx * sinTheta2 + sinPhi * ry * cosTheta2);
+                double dye = t * (sinPhi * rx * sinTheta2 - cosPhi * ry * cosTheta2);
+
+                //graphicsPath.AddBezier((float)startX, (float)startY, (float)(startX + dx1), (float)(startY + dy1),
+                //    (float)(endpointX + dxe), (float)(endpointY + dye), (float)endpointX, (float)endpointY);
+                graphicsPath.Curve4((float)(startX + dx1), (float)(startY + dy1),
+                 (float)(endpointX + dxe), (float)(endpointY + dye), (float)endpointX, (float)endpointY);
+                theta1 = theta2;
+                startX = (float)endpointX;
+                startY = (float)endpointY;
+            }
+        }
+
+    }
 
 
     class MyVgPathDataParser : VgPathDataParser
@@ -2215,10 +2882,38 @@ namespace PaintLab.Svg
         }
         protected override void OnArc(float r1, float r2, float xAxisRotation, int largeArcFlag, int sweepFlags, float x, float y, bool isRelative)
         {
-
             //TODO: implement arc again
-            throw new NotSupportedException();
-            //base.OnArc(r1, r2, xAxisRotation, largeArcFlag, sweepFlags, x, y, isRelative);
+            //arc can be approximated by lines or by bezire curve
+            //this version we use lines to approximate arc            
+            using (VectorToolBox.Borrow(out Arc arc))
+            {
+
+                if (isRelative)
+                {
+                    SvgArcSegment argSegment = new SvgArcSegment(
+                        new PointF((float)_writer.CurrentX, (float)_writer.CurrentY),
+                        r1, r2,
+                        xAxisRotation,
+                        (SvgArcSize)largeArcFlag,
+                        (SvgArcSweep)sweepFlags,
+                        new PointF((float)(_writer.CurrentX + x), (float)(_writer.CurrentY + y)));
+                    //
+                    argSegment.AddToPath(_writer);
+                }
+                else
+                {
+                    //approximate with bezier curve
+                    SvgArcSegment argSegment = new SvgArcSegment(
+                        new PointF((float)_writer.CurrentX, (float)_writer.CurrentY),
+                        r1, r2,
+                        xAxisRotation,
+                       (SvgArcSize)largeArcFlag,
+                       (SvgArcSweep)sweepFlags,
+                       new PointF(x, y));
+                    //
+                    argSegment.AddToPath(_writer);
+                }
+            }
         }
         protected override void OnCloseFigure()
         {

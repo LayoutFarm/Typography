@@ -326,11 +326,10 @@ namespace Typography.Rendering
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {
             using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
-                   glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), true))
+                   glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), false)) 
             {
                 PixelFarm.CpuBlit.MemBitmapExtensions.SaveImage(memBmp, filename, PixelFarm.CpuBlit.MemBitmapIO.OutputImageFormat.Png);
             }
-
         }
 #if DEBUG
         /// <summary>

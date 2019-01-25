@@ -145,6 +145,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             return outputVxs;
         }
+
+        public VertexStore CreateTrim(VertexStore sourceVxs)
+        {
+            using (VxsTemp.Borrow(out var v1))
+            {
+                return MakeVxs(sourceVxs, v1).CreateTrim();
+            }
+        }
     }
 
 }

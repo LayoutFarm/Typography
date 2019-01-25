@@ -18,10 +18,7 @@ namespace PaintLab.Svg
     public abstract class SvgTransform
     {
         public abstract SvgTransformKind TransformKind { get; }
-
         public PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer ResolvedICoordTransformer { get; set; }
-        //
-
     }
 
     /// <summary>
@@ -65,10 +62,7 @@ namespace PaintLab.Svg
         {
             _elements = elements;
         }
-        public float[] Elements
-        {
-            get { return _elements; }
-        }
+        public float[] Elements => _elements;
         public override SvgTransformKind TransformKind => SvgTransformKind.Matrix;
     }
 
@@ -118,17 +112,7 @@ namespace PaintLab.Svg
     /// </summary>
     public sealed class SvgShear : SvgTransform
     {
-        public float X
-        {
-            get;
-            set;
-        }
 
-        public float Y
-        {
-            get;
-            set;
-        }
         public SvgShear(float x) : this(x, x) { }
 
         public SvgShear(float x, float y)
@@ -136,58 +120,29 @@ namespace PaintLab.Svg
             this.X = x;
             this.Y = y;
         }
+        public float X { get; set; }
+        public float Y { get; set; }
         public override SvgTransformKind TransformKind => SvgTransformKind.Shear;
     }
 
     public sealed class SvgScale : SvgTransform
     {
-        public float X
-        {
-            get;
-            set;
-        }
-
-        public float Y
-        {
-            get;
-            set;
-        }
         public SvgScale(float x) : this(x, x) { }
-
         public SvgScale(float x, float y)
         {
             this.X = x;
             this.Y = y;
         }
+        public float X { get; set; }
+        public float Y { get; set; }
         public override SvgTransformKind TransformKind => SvgTransformKind.Scale;
     }
 
     public sealed class SvgRotate : SvgTransform
     {
-        public float Angle
-        {
-            get;
-            set;
-        }
-
-        float _cx, _cy;
-        public float CenterX
-        {
-            get { return _cx; }
-            private set
-            {
-                _cx = value;
-            }
-        }
-        public float CenterY
-        {
-            get { return _cy; }
-            private set
-            {
-                _cy = value;
-
-            }
-        }
+        public float Angle { get; set; }
+        public float CenterX { get; set; }
+        public float CenterY { get; set; }
         public SvgRotate(float angle)
         {
             this.Angle = angle;
