@@ -24,7 +24,11 @@ using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
 
-
+    public enum TargetBuffer
+    {
+        ColorBuffer,
+        MaskBuffer
+    }
     /// <summary>
     /// this class provides drawing method on specific drawboard,
     /// (0,0) is on left-lower corner for every implementaion
@@ -53,10 +57,13 @@ namespace PixelFarm.Drawing
         /// </summary>
         /// <param name="vxs"></param>
         public abstract void SetClipRgn(VertexStore vxs);
+        public abstract TargetBuffer TargetBuffer { get; set; }
+        public abstract bool EnableMask { get; set; }
         //
         public abstract double StrokeWidth { get; set; }
         public abstract SmoothingMode SmoothingMode { get; set; }
         public abstract bool UseSubPixelLcdEffect { get; set; }
+        public abstract float FillOpacity { get; set; }
         public abstract Color FillColor { get; set; }
         public abstract Color StrokeColor { get; set; }
 
@@ -94,9 +101,7 @@ namespace PixelFarm.Drawing
         public abstract void DrawImage(Image actualImage, params CpuBlit.VertexProcessing.AffinePlan[] affinePlans);
         public abstract void DrawImage(Image actualImage, double left, double top, CpuBlit.VertexProcessing.ICoordTransformer coordTx);
 
-        public abstract void ApplyFilter(PixelFarm.Drawing.IImageFilter imgFilter);
-
-
+        public abstract void ApplyFilter(IImageFilter imgFilter);
         ////////////////////////////////////////////////////////////////////////////
         //vertext store/snap/rendervx
         public abstract void Fill(VertexStore vxs);

@@ -229,6 +229,14 @@ namespace PixelFarm.Drawing
             }
             return Temp<Arc>.Borrow(out arc);
         }
+        public static TempContext<SvgArcSegment> Borrow(out SvgArcSegment arc)
+        {
+            if (!Temp<SvgArcSegment>.IsInit())
+            {
+                Temp<SvgArcSegment>.SetNewHandler(() => new SvgArcSegment());
+            }
+            return Temp<SvgArcSegment>.Borrow(out arc);
+        }
         public static TempContext<Ellipse> Borrow(out Ellipse ellipse)
         {
             if (!Temp<Ellipse>.IsInit())

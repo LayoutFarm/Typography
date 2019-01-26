@@ -22,14 +22,16 @@ namespace PixelFarm.CpuBlit
         SmoothingMode _smoothingMode;
         RenderQuality _renderQuality;
         RenderSurfaceOrientation _orientation;
-
+        TargetBuffer _targetBuffer;
+        float _fillOpacity = 1;
+        bool _hasFillOpacity = false;
 
         public AggPainter(AggRenderSurface aggsx)
         {
             //painter paint to target surface
             _orientation = RenderSurfaceOrientation.LeftBottom;
             //----------------------------------------------------
-            _aggsx =_aggsx_0 = aggsx; //set this as default *** 
+            _aggsx = _aggsx_0 = aggsx; //set this as default *** 
 
             _aggsx_0.DstBitmapAttached += (s, e) =>
             {
@@ -46,7 +48,55 @@ namespace PixelFarm.CpuBlit
             _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;
         }
 
+        public override float FillOpacity
+        {
+            get => _fillOpacity;
+            set
+            {
+                _fillOpacity = value;
+                if (value < 0)
+                {
+                    _fillOpacity = 0;
+                    _hasFillOpacity = true;
+                }
+                else if (value >= 1)
+                {
+                    _fillOpacity = 1;
+                    _hasFillOpacity = false;
+                }
+                else
+                {
+                    _fillOpacity = value;
+                    _hasFillOpacity = true;
+                }
+            }
+        }
 
+        public override TargetBuffer TargetBuffer
+        {
+            get => _targetBuffer;
+            set
+            {
+                if (_targetBuffer == value) return;
+
+                _targetBuffer = value;
+                switch (value)
+                {
+                    case TargetBuffer.ColorBuffer:
+                        this.TargetBufferName = TargetBufferName.Default;
+                        break;
+                    case TargetBuffer.MaskBuffer:
+                        this.TargetBufferName = TargetBufferName.AlphaMask;
+                        break;
+                    default: throw new NotSupportedException();
+                }
+            }
+        }
+        public override bool EnableMask
+        {
+            get => EnableBuiltInMaskComposite;
+            set => EnableBuiltInMaskComposite = value;
+        }
         public DrawBoard DrawBoard { get; set; }
         public AggRenderSurface RenderSurface => _aggsx;
         public BitmapBlenderBase DestBitmapBlender => _aggsx.DestBitmapBlender;
@@ -80,7 +130,7 @@ namespace PixelFarm.CpuBlit
                         //TODO: review here
                         //anti alias != lcd technique 
                         this.RenderQuality = RenderQuality.HighQuality;
-                        _aggsx.UseSubPixelLcdEffect = true;
+                        //_aggsx.UseSubPixelLcdEffect = true;
                         break;
                     case Drawing.SmoothingMode.HighSpeed:
                     default:

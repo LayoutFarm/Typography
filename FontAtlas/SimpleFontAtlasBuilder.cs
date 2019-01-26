@@ -208,19 +208,33 @@ namespace Typography.Rendering
 
             //new total glyph img
             GlyphImage glyphImage = new GlyphImage(totalImgWidth, imgH);
-            //flip vertical Y 
+            //bool flipY = false;
+            //if (flipY)
+            //{
+            int[] totalBufferFlipY = new int[totalBuffer.Length];
+            int srcRowIndex = imgH - 1;
+            int strideInBytes = totalImgWidth * 4;
+            for (int i = 0; i < imgH; ++i)
             {
-                int[] totalBufferFlipY = new int[totalBuffer.Length];
-                int srcRowIndex = imgH - 1;
-                int strideInBytes = totalImgWidth * 4;
-                for (int i = 0; i < imgH; ++i)
-                {
-                    //copy each row from src to dst
-                    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
-                    srcRowIndex--;
-                }
-                totalBuffer = totalBufferFlipY;
+                //copy each row from src to dst
+                System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+                srcRowIndex--;
             }
+            totalBuffer = totalBufferFlipY;
+            //}
+            //else
+            //{
+            //int[] totalBufferFlipY = new int[totalBuffer.Length];
+            //int srcRowIndex = 0;
+            //int strideInBytes = totalImgWidth * 4;
+            //for (int i = 0; i < imgH; ++i)
+            //{
+            //    //copy each row from src to dst
+            //    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+            //    srcRowIndex++;
+            //}
+            //totalBuffer = totalBufferFlipY;
+            //}
             glyphImage.SetImageBuffer(totalBuffer, true);
             _latestGenGlyphImage = glyphImage;
             return glyphImage;

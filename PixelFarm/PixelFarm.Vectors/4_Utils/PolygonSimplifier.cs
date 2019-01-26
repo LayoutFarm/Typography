@@ -38,29 +38,31 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public class SimplificationHelpers
     {
-        public static IList<T> Simplify<T>(
+        public static void Simplify<T>(
             IList<T> points,
             Func<T, T, Boolean> equalityChecker,
             Func<T, double> xExtractor,
             Func<T, double> yExtractor,
             Func<T, double> zExtractor,
+            IList<T> output,
             double tolerance = 1.0,
             bool highestQuality = false)
         {
             var simplifier3D = new Simplifier3D<T>(equalityChecker, xExtractor, yExtractor, zExtractor);
-            return simplifier3D.Simplify(points, tolerance, highestQuality);
+            simplifier3D.Simplify(points, tolerance, highestQuality, output);
         }
 
-        public static IList<T> Simplify<T>(
+        public static void Simplify<T>(
             IList<T> points,
             Func<T, T, Boolean> equalityChecker,
             Func<T, double> xExtractor,
             Func<T, double> yExtractor,
+            IList<T> output,
             double tolerance = 1.0,
             bool highestQuality = false)
         {
             var simplifier2D = new Simplifier2D<T>(equalityChecker, xExtractor, yExtractor);
-            return simplifier2D.Simplify(points, tolerance, highestQuality);
+            simplifier2D.Simplify(points, tolerance, highestQuality, output);
         }
     }
 
@@ -212,7 +214,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         protected BaseSimplifier(Func<T, T, Boolean> equalityChecker)
         {
             _equalityChecker = equalityChecker;
-        } 
+        }
 
         /// <summary>
         /// Simplified data points
@@ -224,56 +226,57 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// False for Radial-Distance before Douglas-Peucker (Runs Faster)
         /// </param>
         /// <returns>Simplified points</returns>
-        public IList<T> Simplify(IList<T> points,
+        public void Simplify(IList<T> points,
                             double tolerance,
-                            bool highestQuality)
+                            bool highestQuality,
+                            IList<T> output)
         {
 
             if (points == null || points.Count <= 2)
             {
-                return points;
+                //TODO: review here
+                //nothing todo,
+                foreach (T t in points)
+                {
+                    output.Add(t);
+                }
+                return;
             }
 
             double sqTolerance = tolerance * tolerance;
 
             if (!highestQuality)
             {
-                points = SimplifyRadialDistance(points, sqTolerance);
+                List<T> tmpOutput = new List<T>();
+                SimplifyRadialDistance(points, sqTolerance, tmpOutput);
+                points = tmpOutput;
             }
-
-            points = SimplifyDouglasPeucker(points, sqTolerance);
-
-            return points;
+            SimplifyDouglasPeucker(points, sqTolerance, output);
         }
 
-        IList<T> SimplifyRadialDistance(IList<T> points, double sqTolerance)
+        void SimplifyRadialDistance(IList<T> points, double sqTolerance, IList<T> output)
         {
             T point = default(T);
             T prevPoint = points[0];
 
-            var newPoints = new List<T>();
-            newPoints.Add(prevPoint);
-
+            output.Add(prevPoint);
             for (int i = 1; i < points.Count; ++i)
             {
                 point = points[i];
 
                 if (GetSquareDistance(point, prevPoint) > sqTolerance)
                 {
-                    newPoints.Add(point);
+                    output.Add(point);
                     prevPoint = point;
                 }
             }
-
             if (!_equalityChecker(prevPoint, point))
             {
-                newPoints.Add(point);
+                output.Add(point);
             }
-
-            return newPoints.ToArray();
         }
 
-        IList<T> SimplifyDouglasPeucker(IList<T> points, double sqTolerance)
+        void SimplifyDouglasPeucker(IList<T> points, double sqTolerance, IList<T> output)
         {
 
             BitArray bitArray = new BitArray(points.Count);
@@ -312,17 +315,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
             }
 
-            List<T> newPoints = new List<T>(CountNumberOfSetBits(bitArray));
+            //List<T> newPoints = new List<T>(CountNumberOfSetBits(bitArray));
 
             for (int i = 0; i < bitArray.Count; i++)
             {
                 if (bitArray[i])
                 {
-                    newPoints.Add(points[i]);
+                    output.Add(points[i]);
                 }
             }
 
-            return newPoints.ToArray();
+            //return newPoints.ToArray();
         }
 
         int CountNumberOfSetBits(BitArray bitArray)

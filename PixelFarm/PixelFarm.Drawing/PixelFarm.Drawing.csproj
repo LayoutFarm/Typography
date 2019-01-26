@@ -127,12 +127,6 @@
     <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs">
       <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\GradientSpanGen.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\GradientSpanGen.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs">
       <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs</Link>
     </Compile>
@@ -349,6 +343,9 @@
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\StrokeMath.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\StrokeMath.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\SvgArcSegment.cs">
+      <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\SvgArcSegment.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs</Link>
     </Compile>
@@ -562,7 +559,7 @@
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\AggGradientBrushes.cs" />
+    <Compile Include="7_CpuBlitPainter\DrawBoard\GradientBrushes.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\AggRenderVx.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\dbugVertexSourceIO.cs" />
