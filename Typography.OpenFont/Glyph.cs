@@ -16,6 +16,7 @@ namespace Typography.OpenFont
         ushort _orgAdvWidth;
         bool _hasOrgAdvWidth;
 
+
         Bounds _bounds;
 
         internal Glyph(
@@ -35,6 +36,7 @@ namespace Typography.OpenFont
             Bounds = bounds;
             GlyphInstructions = glyphInstructions;
             GlyphIndex = index;
+
         }
         public Bounds Bounds
         {
@@ -55,9 +57,7 @@ namespace Typography.OpenFont
             }
         }
         public bool HasOriginalAdvancedWidth => _hasOrgAdvWidth;
-        //
-        //
-
+        //      
 
         internal static void OffsetXY(Glyph glyph, short dx, short dy)
         {
@@ -234,7 +234,6 @@ namespace Typography.OpenFont
             //create from CFF 
             _cff1GlyphData = cff1Glyph;
             this.GlyphIndex = cff1Glyph.GlyphIndex;
-
         }
         public bool IsCffGlyph => _ownerCffFont != null;
         public CFF.Cff1Font GetOwnerCff() => _ownerCffFont;
@@ -242,7 +241,31 @@ namespace Typography.OpenFont
         //math glyph info, temp , TODO: review here again
         public MathGlyphs.MathGlyphInfo MathGlyphInfo { get; internal set; }
         public bool HasMathGlyphInfo { get; internal set; }
+
+
+        //--------------------
+        //Bitmap and Svg
+
+        uint _streamOffset;
+        uint _streamLen;
+        ushort _imgFormat;
+        internal Glyph(ushort glyphIndex, uint streamOffset, uint streamLen, ushort imgFormat)
+        {
+            //_bmpGlyphSource = bmpGlyphSource;
+            _streamOffset = streamOffset;
+            _streamLen = streamLen;
+            _imgFormat = imgFormat;
+            this.GlyphIndex = glyphIndex;
+        }
+        internal uint BitmapStreamOffset => _streamOffset;
+        internal uint BitmapFormat => _imgFormat;
+
+        //public void CopyBitmapContent(System.IO.Stream output)
+        //{
+        //    _bmpGlyphSource.CopyBitmapContent(this, output);
+        //}
     }
+
 
     //https://www.microsoft.com/typography/otspec/gdef.htm
     public enum GlyphClassKind : byte

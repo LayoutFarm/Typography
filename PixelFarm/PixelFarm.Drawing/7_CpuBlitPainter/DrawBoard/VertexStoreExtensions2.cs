@@ -61,5 +61,12 @@ namespace PixelFarm.Drawing
             Affine aff = Affine.NewScaling(sx, sy);
             return aff.TransformToVxs(src, outputVxs);
         }
+
+        public static VertexStore RotateToNewVxs(this VertexStore src, double deg, VertexStore outputVxs)
+        {
+            //TODO: review here
+            Affine aff = Affine.NewRotationFromDeg(deg);
+            return aff.TransformToVxs(src, outputVxs);
+        }
     }
 }

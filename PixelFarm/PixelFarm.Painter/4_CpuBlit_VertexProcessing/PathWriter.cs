@@ -70,7 +70,6 @@ namespace PixelFarm.CpuBlit
         SmoothCurveTo,
         QuadraticBezierCurve,
         TSmoothQuadraticBezierCurveTo,
-        Arc,
         ZClosePath
     }
 
@@ -138,8 +137,10 @@ namespace PixelFarm.CpuBlit
         }
 
         //-------------------------------------------------------------------
-        public double LastMoveX => _latest_moveTo_X;
-        public double LastMoveY => _latest_moveTo_Y;
+        public double LatestMoveToX => _latest_moveTo_X;
+        public double LatestMoveToY => _latest_moveTo_Y;
+        public double CurrentX => _latest_x;
+        public double CurrentY => _latest_y;
         //-------------------------------------------------------------------
 
         public int StartFigure()
@@ -361,65 +362,7 @@ namespace PixelFarm.CpuBlit
             SmoothCurve4(_latest_x + dx2, _latest_y + dy2, _latest_x + dx3, _latest_y + dy3);
         }
 
-        //=======================================================================
-        //TODO: implement arc to ***
-        /*
-        public void arc_to(double rx, double ry,
-                               double angle,
-                               bool large_arc_flag,
-                               bool sweep_flag,
-                               double x, double y)
-        {
-        if(m_vertices.total_vertices() && is_vertex(m_vertices.last_command()))
-        {
-            double epsilon = 1e-30;
-            double x0 = 0.0;
-            double y0 = 0.0;
-            m_vertices.last_vertex(&x0, &y0);
 
-            rx = fabs(rx);
-            ry = fabs(ry);
-
-            // Ensure radii are valid
-            //-------------------------
-            if(rx < epsilon || ry < epsilon) 
-            {
-                line_to(x, y);
-                return;
-            }
-
-            if(calc_distance(x0, y0, x, y) < epsilon)
-            {
-                // If the endpoints (x, y) and (x0, y0) are identical, then this
-                // is equivalent to omitting the elliptical arc segment entirely.
-                return;
-            }
-            bezier_arc_svg a(x0, y0, rx, ry, angle, large_arc_flag, sweep_flag, x, y);
-            if(a.radii_ok())
-            {
-                join_path(a);
-            }
-            else
-            {
-                line_to(x, y);
-            }
-        }
-        else
-        {
-            move_to(x, y);
-        }
-    } 
-    public void arc_rel(double rx, double ry,
-                                double angle,
-                                bool large_arc_flag,
-                                bool sweep_flag,
-                                double dx, double dy)
-    {
-        rel_to_abs(&dx, &dy);
-        arc_to(rx, ry, angle, large_arc_flag, sweep_flag, dx, dy);
-    }
-     */
-        //=======================================================================
 
 
         VertexCmd GetLastVertex(out double x, out double y)
@@ -513,35 +456,117 @@ namespace PixelFarm.CpuBlit
                 _myvxs.AddVertex(x, y, VertexHelper.IsMoveTo(cmd) ? VertexCmd.LineTo : cmd);
             }
         }
+    }
 
 
-        //public static void UnsafeDirectSetData(
-        //    PathWriter pathStore,
-        //    int m_allocated_vertices,
-        //    int m_num_vertices,
-        //    double[] m_coord_xy,
-        //    byte[] m_CommandAndFlags)
-        //{
-        //    VertexStore.UnsafeDirectSetData(
-        //        pathStore.Vxs,
-        //        m_allocated_vertices,
-        //        m_num_vertices,
-        //        m_coord_xy,
-        //        m_CommandAndFlags);
-        //}
-        //public static void UnsafeDirectGetData(
-        //    PathWriter pathStore,
-        //    out int m_allocated_vertices,
-        //    out int m_num_vertices,
-        //    out double[] m_coord_xy,
-        //    out byte[] m_CommandAndFlags)
-        //{
-        //    VertexStore.UnsafeDirectGetData(
-        //        pathStore.Vxs,
-        //        out m_allocated_vertices,
-        //        out m_num_vertices,
-        //        out m_coord_xy,
-        //        out m_CommandAndFlags);
-        //}
+    public static class PathWriterExtensions
+    {
+
+        //=======================================================================
+        //TODO: implement arc to ***
+        /*
+        public void arc_to(double rx, double ry,
+                               double angle,
+                               bool large_arc_flag,
+                               bool sweep_flag,
+                               double x, double y)
+        {
+        if(m_vertices.total_vertices() && is_vertex(m_vertices.last_command()))
+        {
+            double epsilon = 1e-30;
+            double x0 = 0.0;
+            double y0 = 0.0;
+            m_vertices.last_vertex(&x0, &y0);
+
+            rx = fabs(rx);
+            ry = fabs(ry);
+
+            // Ensure radii are valid
+            //-------------------------
+            if(rx < epsilon || ry < epsilon) 
+            {
+                line_to(x, y);
+                return;
+            }
+
+            if(calc_distance(x0, y0, x, y) < epsilon)
+            {
+                // If the endpoints (x, y) and (x0, y0) are identical, then this
+                // is equivalent to omitting the elliptical arc segment entirely.
+                return;
+            }
+            bezier_arc_svg a(x0, y0, rx, ry, angle, large_arc_flag, sweep_flag, x, y);
+            if(a.radii_ok())
+            {
+                join_path(a);
+            }
+            else
+            {
+                line_to(x, y);
+            }
+        }
+        else
+        {
+            move_to(x, y);
+        }
+    } 
+    public void arc_rel(double rx, double ry,
+                                double angle,
+                                bool large_arc_flag,
+                                bool sweep_flag,
+                                double dx, double dy)
+    {
+        rel_to_abs(&dx, &dy);
+        arc_to(rx, ry, angle, large_arc_flag, sweep_flag, dx, dy);
+    }
+     */
+        //=======================================================================
+
+
+        /// <summary>
+        /// approximate arc with curve4, cubic curve
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <param name="xAxisRotation"></param>
+        /// <param name="largeArcFlag"></param>
+        /// <param name="sweepFlags"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="isRelative"></param>
+        public static void SvgArcToCurve4(this PathWriter _writer, float r1, float r2, float xAxisRotation, int largeArcFlag, int sweepFlags, float x, float y, bool isRelative)
+        {
+
+            using (VectorToolBox.Borrow(out SvgArcSegment arc))
+            {
+                if (isRelative)
+                {
+                    arc.Set(
+                        (float)_writer.CurrentX, (float)_writer.CurrentY,
+                        r1, r2,
+                        xAxisRotation,
+                        (SvgArcSize)largeArcFlag,
+                        (SvgArcSweep)sweepFlags,
+                        (float)(_writer.CurrentX + x), (float)(_writer.CurrentY + y));
+                    //
+                    arc.AddToPath(_writer);
+                }
+                else
+                {
+                    //approximate with bezier curve
+                    arc.Set(
+                       (float)_writer.CurrentX, (float)_writer.CurrentY,
+                        r1, r2,
+                        xAxisRotation,
+                       (SvgArcSize)largeArcFlag,
+                       (SvgArcSweep)sweepFlags,
+                       x, y);
+                    //
+                    arc.AddToPath(_writer);
+                }
+            }
+        }
+
+
     }
 }
