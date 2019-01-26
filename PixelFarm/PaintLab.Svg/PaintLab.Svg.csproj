@@ -36,100 +36,111 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\PaintLab.CssBase\CssBase\CssConstants.cs">
-      <Link>REF_CssBase\CssConstants.cs</Link>
+      <Link>0_REF_PaintLab.CssBase\CssConstants.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.CssBase\CssBase\CssLength.cs">
-      <Link>REF_CssBase\CssLength.cs</Link>
+      <Link>0_REF_PaintLab.CssBase\CssLength.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.CssBase\CssBase\CssProps.cs">
-      <Link>REF_CssBase\CssProps.cs</Link>
+      <Link>0_REF_PaintLab.CssBase\CssProps.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.CssBase\CssBase\CssUnitOrNames.cs">
-      <Link>REF_CssBase\CssUnitOrNames.cs</Link>
+      <Link>0_REF_PaintLab.CssBase\CssUnitOrNames.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.CssBase\CssBase\MapAttribute.cs">
-      <Link>REF_CssBase\MapAttribute.cs</Link>
+      <Link>0_REF_PaintLab.CssBase\MapAttribute.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\CssActiveSheet.cs">
-      <Link>REF_WebDom\1_Css\CssActiveSheet.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\CssActiveSheet.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\CssAttributeSelector.cs">
-      <Link>REF_WebDom\1_Css\CssAttributeSelector.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\CssAttributeSelector.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\CssCodeValueExpressions.cs">
-      <Link>REF_WebDom\1_Css\CssCodeValueExpressions.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\CssCodeValueExpressions.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\CssDocMembers.cs">
-      <Link>REF_WebDom\1_Css\CssDocMembers.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\CssDocMembers.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\CssDocument.cs">
-      <Link>REF_WebDom\1_Css\CssDocument.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\CssDocument.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\CssElementSelectors.cs">
-      <Link>REF_WebDom\1_Css\CssElementSelectors.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\CssElementSelectors.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\CssPropertyDeclaration.cs">
-      <Link>REF_WebDom\1_Css\CssPropertyDeclaration.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\CssPropertyDeclaration.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\UserMapUtil.cs">
-      <Link>REF_WebDom\1_Css\UserMapUtil.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\UserMapUtil.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\ValueMaps.cs">
-      <Link>REF_WebDom\1_Css\ValueMaps.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\ValueMaps.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css\WellknownCssPropertyName.cs">
-      <Link>REF_WebDom\1_Css\WellknownCssPropertyName.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css\WellknownCssPropertyName.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css_Parser\CssParser.cs">
-      <Link>REF_WebDom\1_Css_Parser\CssParser.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css_Parser\CssParser.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css_Parser\CssParserHelper.cs">
-      <Link>REF_WebDom\1_Css_Parser\CssParserHelper.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css_Parser\CssParserHelper.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\1_Css_Parser\CssValueParser.cs">
-      <Link>REF_WebDom\1_Css_Parser\CssValueParser.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\1_Css_Parser\CssValueParser.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\2_Svg\SvgElements.cs">
-      <Link>REF_WebDom\2_Svg\SvgElements.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\2_Svg\SvgElements.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\2_Svg\SvgParser.cs">
-      <Link>REF_WebDom\2_Svg\SvgParser.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\2_Svg\SvgParser.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\2_Svg\SvgPathDataParser.cs">
-      <Link>REF_WebDom\2_Svg\SvgPathDataParser.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\2_Svg\SvgPathDataParser.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\2_Svg\SvgSpec.cs">
-      <Link>REF_WebDom\2_Svg\SvgSpec.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\2_Svg\SvgSpec.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\2_Svg\SvgTransformation.cs">
-      <Link>REF_WebDom\2_Svg\SvgTransformation.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\2_Svg\SvgTransformation.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebDom\IScriptable\JsScriptAttributes.cs">
-      <Link>REF_WebDom\IScriptable\JsScriptAttributes.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\IScriptable\JsScriptAttributes.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebLexer\CssLexer.cs">
-      <Link>REF_WebLexer\CssLexer.cs</Link>
+      <Link>0_REF_PaintLab.WebLexer\CssLexer.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebLexer\dbugLexerReport.cs">
-      <Link>REF_WebLexer\dbugLexerReport.cs</Link>
+      <Link>0_REF_PaintLab.WebLexer\dbugLexerReport.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebLexer\MyXmlLexer.cs">
-      <Link>REF_WebLexer\MyXmlLexer.cs</Link>
+      <Link>0_REF_PaintLab.WebLexer\MyXmlLexer.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebLexer\TextSnapshot.cs">
-      <Link>REF_WebLexer\TextSnapshot.cs</Link>
+      <Link>0_REF_PaintLab.WebLexer\TextSnapshot.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebLexer\XmlLexer.cs">
-      <Link>REF_WebLexer\XmlLexer.cs</Link>
+      <Link>0_REF_PaintLab.WebLexer\XmlLexer.cs</Link>
     </Compile>
     <Compile Include="..\PaintLab.WebLexer\XmlLexer_debug.cs">
-      <Link>REF_WebLexer\XmlLexer_debug.cs</Link>
+      <Link>0_REF_PaintLab.WebLexer\XmlLexer_debug.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\ExtensionAttribute.cs">
-      <Link>REF_WebDom\Net20\ExtensionAttribute.cs</Link>
+      <Link>0_REF_PaintLab.WebDom\Net20\ExtensionAttribute.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SvgRenderVxDocBuilder.cs" />
+    <Compile Include="Visuals\VgDocBuilder.cs" />
+    <Compile Include="Visuals\VgDocument.cs" />
+    <Compile Include="Visuals\VgElemCreators.cs" />
+    <Compile Include="Visuals\VgHitChain.cs" />
+    <Compile Include="Visuals\MyVgPathDataParser.cs" />
+    <Compile Include="Visuals\VgPaintArgs.cs" />
+    <Compile Include="Visuals\VgResourceIO.cs" />
+    <Compile Include="Visuals\VgVisualElements.cs" />
+    <Compile Include="Visuals\VgVisualDoc.cs" />
+    <Compile Include="Visuals\VgVisualDocBuilder.cs" />
+    <Compile Include="Visuals\VgVisitors.cs" />
+    <Compile Include="Visuals\VgVisualDocHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">

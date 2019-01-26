@@ -186,7 +186,7 @@ namespace SampleWinForms
             //----------
             //copy from HtmlRenderer's SvgViewer demo
             //----------  
-            var docBuilder = new SvgDocBuilder();
+            var docBuilder = new VgDocBuilder();
             var parser = new SvgParser(docBuilder);
             TextSnapshot textSnapshot = new TextSnapshot(svgContent.ToString());
             parser.ParseDocument(textSnapshot);
@@ -206,7 +206,7 @@ namespace SampleWinForms
             }
             MemBitmap memBitmap = new MemBitmap(bmpW, bmpH);
             using (AggPainterPool.Borrow(memBitmap, out AggPainter p))
-            using (VgPainterArgsPool.Borrow(p, out VgPaintArgs paintArgs))
+            using (VgPaintArgsPool.Borrow(p, out VgPaintArgs paintArgs))
             {
                 float orgX = p.OriginX;
                 float orgY = p.OriginY;

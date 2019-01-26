@@ -4,69 +4,49 @@ using System;
 using System.Collections.Generic;
 namespace PaintLab.Svg
 {
+    /// <summary>
+    /// svg path data parser
+    /// </summary>
     public class VgPathDataParser
     {
 
+        //derive this class and implement what do you want 
+        List<float> _reusable_nums = new List<float>();
 #if DEBUG
         static int dbugCounter = 0;
 #endif
-        protected virtual void OnMoveTo(float x, float y, bool relative)
-        {
-        }
-        protected virtual void OnLineTo(float x, float y, bool relative)
-        {
-        }
-        protected virtual void OnHLineTo(float x, bool relative)
-        {
-        }
-        protected virtual void OnVLineTo(float y, bool relative)
-        {
-        }
-        protected virtual void OnCloseFigure()
-        {
-        }
+        protected virtual void OnMoveTo(float x, float y, bool relative) { }
+        protected virtual void OnLineTo(float x, float y, bool relative) { }
+        protected virtual void OnHLineTo(float x, bool relative) { }
+        protected virtual void OnVLineTo(float y, bool relative) { }
+        protected virtual void OnCloseFigure() { }
         protected virtual void OnArc(float r1, float r2,
             float xAxisRotation,
             int largeArcFlag,
             int sweepFlags, float x, float y, bool isRelative)
-        {
-
-        }
+        { }
         protected virtual void OnCurveToCubic(
             float x1, float y1,
             float x2, float y2,
             float x, float y, bool isRelative)
-        {
-
-        }
+        { }
         protected virtual void OnCurveToCubicSmooth(
             float x2, float y2,
             float x, float y, bool isRelative)
-        {
-
-        }
-
+        { }
         protected virtual void OnCurveToQuadratic(
             float x1, float y1,
             float x, float y, bool isRelative)
-        {
-
-        }
+        { }
         protected virtual void OnCurveToQuadraticSmooth(
             float x, float y, bool isRelative)
-        {
+        { }
 
-        }
-
-
-        List<float> _reusable_nums = new List<float>();
+        //----------
         public void Parse(char[] pathDataBuffer)
         {
-            //parse pathdata to pathsegments
-            //List<SvgPathSeg> pathSegments = new List<SvgPathSeg>();
 
             int j = pathDataBuffer.Length;
-
             for (int i = 0; i < j;)
             {
                 //lex and parse
@@ -235,7 +215,7 @@ namespace PaintLab.Svg
                                        _reusable_nums[m1 + 2], (int)_reusable_nums[m1 + 3], (int)_reusable_nums[m1 + 4],
                                        _reusable_nums[m1 + 5], _reusable_nums[m1 + 6], isRelative);
                                     m1 += 7;
-                                } 
+                                }
                             }
                             else
                             {
@@ -359,7 +339,7 @@ namespace PaintLab.Svg
 
 
             }
-             
+
         }
 
 
