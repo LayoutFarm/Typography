@@ -190,7 +190,7 @@ namespace Typography.OpenFont.Tables
         }
 
 
-        class AxisRecord
+        public class AxisRecord
         {
             public string axisTagName;
             public ushort axisNameId;
@@ -203,7 +203,7 @@ namespace Typography.OpenFont.Tables
 #endif
         }
 
-        abstract class AxisValueTableBase
+        public abstract class AxisValueTableBase
         {
             public abstract int Format { get; }
 
@@ -217,7 +217,7 @@ namespace Typography.OpenFont.Tables
 
 
 
-        class AxisValueTableFmt1 : AxisValueTableBase
+        public class AxisValueTableFmt1 : AxisValueTableBase
         {
             public override int Format => 1;
             //Axis value table, format 1 
@@ -233,19 +233,22 @@ namespace Typography.OpenFont.Tables
             //Fixed     value           A numeric value for this attribute value. 
 
             //A format 1 table is used simply to associate a specific axis value with a name. 
+
+            public ushort axisIndex;
+            public ushort flags;
+            public ushort valueNameId;
+            public float value;
             public override void ReadContent(BinaryReader reader)
             {
                 //at here, assume we have read format, 
-                //Fixed =>	32-bit signed fixed-point number (16.16)
-
-                ushort axisIndex = reader.ReadUInt16();
-                ushort flags = reader.ReadUInt16();
-                ushort valueNameId = reader.ReadUInt16();
-                float value = reader.ReadFixed();
-
+                //Fixed =>	32-bit signed fixed-point number (16.16) 
+                axisIndex = reader.ReadUInt16();
+                flags = reader.ReadUInt16();
+                valueNameId = reader.ReadUInt16();
+                value = reader.ReadFixed();
             }
         }
-        class AxisValueTableFmt2 : AxisValueTableBase
+        public class AxisValueTableFmt2 : AxisValueTableBase
         {
             public override int Format => 2;
             //Axis value table, format 2 
@@ -288,17 +291,24 @@ namespace Typography.OpenFont.Tables
             //If the range of T2 is contained entirely within the range of T1(T2.rangeMinValue >= T1.rangeMinValue and T2.rangeMaxValue <= T1.rangeMaValue), then T2 is ignored.
 
             //In the case of two tables with identical ranges for the same axis, it will be up to the implementation which is used and which is ignored.
+
+            public ushort axisIndex;
+            public ushort flags;
+            public ushort valueNameId;
+            public float nominalValue;
+            public float rangeMinValue;
+            public float rangeMaxValue;
             public override void ReadContent(BinaryReader reader)
             {
-                ushort axisIndex = reader.ReadUInt16();
-                ushort flags = reader.ReadUInt16();
-                ushort valueNameId = reader.ReadUInt16();
-                float nominalValue = reader.ReadFixed();
-                float rangeMinValue = reader.ReadFixed();
-                float rangeMaxValue = reader.ReadFixed();
+                axisIndex = reader.ReadUInt16();
+                flags = reader.ReadUInt16();
+                valueNameId = reader.ReadUInt16();
+                nominalValue = reader.ReadFixed();
+                rangeMinValue = reader.ReadFixed();
+                rangeMaxValue = reader.ReadFixed();
             }
         }
-        class AxisValueTableFmt3 : AxisValueTableBase
+        public class AxisValueTableFmt3 : AxisValueTableBase
         {
             public override int Format => 3;
             //
@@ -326,18 +336,25 @@ namespace Typography.OpenFont.Tables
             //Note: Applications are not required to use these style - linked mappings when implementing text formatting user interfaces.
             //This data can be provided in a font for the benefit of applications that choose to do so.
             //If a given application does not apply such style mappings for the given axis, then the linkedValue field is ignored.
+
+            public ushort axisIndex;
+            public ushort flags;
+            public ushort valueNameId;
+            public float value;
+            public float linkedValue;
+
             public override void ReadContent(BinaryReader reader)
             {
-                ushort axisIndex = reader.ReadUInt16();
-                ushort flags = reader.ReadUInt16();
-                ushort valueNameId = reader.ReadUInt16();
-                float value = reader.ReadFixed();
-                float linkedValue = reader.ReadFixed();
+                axisIndex = reader.ReadUInt16();
+                flags = reader.ReadUInt16();
+                valueNameId = reader.ReadUInt16();
+                value = reader.ReadFixed();
+                linkedValue = reader.ReadFixed();
             }
         }
 
 
-        class AxisValueTableFmt4 : AxisValueTableBase
+        public class AxisValueTableFmt4 : AxisValueTableBase
         {
             public override int Format => 4;
             //Axis value table, format 4
@@ -352,24 +369,25 @@ namespace Typography.OpenFont.Tables
             //AxisValue axisValues[axisCount]   Array of AxisValue records that provide the combination of axis values, one for each contributing axis.
 
 
-
-
+            public AxisValueRecord[] _axisValueRecords;
+            public ushort flags;
+            public ushort valueNameId;
             public override void ReadContent(BinaryReader reader)
             {
                 ushort axisCount = reader.ReadUInt16();
-                ushort flags = reader.ReadUInt16();
-                ushort valueNameId = reader.ReadUInt16();
-                AxisValueRecord[] axisValueRecords = new AxisValueRecord[axisCount];
+                flags = reader.ReadUInt16();
+                valueNameId = reader.ReadUInt16();
+                _axisValueRecords = new AxisValueRecord[axisCount];
                 for (int i = 0; i < axisCount; ++i)
                 {
-                    axisValueRecords[i] = new AxisValueRecord(
+                    _axisValueRecords[i] = new AxisValueRecord(
                         reader.ReadUInt16(),
                         reader.ReadFixed());
                 }
             }
         }
 
-        struct AxisValueRecord
+        public struct AxisValueRecord
         {
             //The axisValues array uses AxisValue records, which have the following format.
             //AxisValue record:
