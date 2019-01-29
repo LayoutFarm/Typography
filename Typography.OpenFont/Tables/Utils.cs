@@ -37,6 +37,15 @@ namespace Typography.OpenFont
             //16.16 format
             return (float)reader.ReadUInt32() / (1 << 16);
         }
+        /// <summary>
+        /// read float, 2.14 format
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static float ReadF2Dot14(this BinaryReader reader)
+        {
+            return ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+        }
         public static ushort[] ReadUInt16Array(this BinaryReader reader, int nRecords)
         {
             ushort[] arr = new ushort[nRecords];
