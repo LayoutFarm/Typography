@@ -353,6 +353,11 @@ namespace Typography.OpenFont
                 VerticalMetrics vmtx = ReadTableIfExists(tables, input, new VerticalMetrics(vhea.NumOfLongVerMetrics));
             }
 
+            STAT stat = ReadTableIfExists(tables, input, new STAT());
+            if (stat != null)
+            {
+
+            }
 
 
             //test math table
