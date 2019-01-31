@@ -66,6 +66,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.TrueType\Glyf.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.TrueType\GlyphLocations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\AVar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\CVar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\FVar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\GVar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\HVar.cs" />
