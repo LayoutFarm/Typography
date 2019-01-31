@@ -357,7 +357,10 @@ namespace Typography.OpenFont
             if (stat != null)
             {
                 FVar fvar = ReadTableIfExists(tables, input, new FVar());
-
+                if (fvar != null)
+                {
+                    GVar gvar = ReadTableIfExists(tables, input, new GVar());
+                }
             }
 
 

@@ -18,6 +18,7 @@ namespace Typography.OpenFont.Tables
 
         public VariableAxisRecord[] variableAxisRecords;
         public InstanceRecord[] instanceRecords;
+
         //
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -40,7 +41,7 @@ namespace Typography.OpenFont.Tables
             ushort majorVersion = reader.ReadUInt16();
             ushort minorVersion = reader.ReadUInt16();
             ushort axesArrayOffset = reader.ReadUInt16();
-            ushort reserved = reader.ReadUInt16();//set to 2
+            ushort reserved = reader.ReadUInt16();//set to 2 
             ushort axisCount = reader.ReadUInt16();
             ushort axisSize = reader.ReadUInt16();
             ushort instanceCount = reader.ReadUInt16();
