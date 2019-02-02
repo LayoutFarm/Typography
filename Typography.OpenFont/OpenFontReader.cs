@@ -363,6 +363,7 @@ namespace Typography.OpenFont
                     CVar cvar = ReadTableIfExists(tables, input, new CVar());
                     HVar hvar = ReadTableIfExists(tables, input, new HVar());
                     MVar mvar = ReadTableIfExists(tables, input, new MVar());
+                    AVar avar = ReadTableIfExists(tables, input, new AVar());
                 }
             }
 
