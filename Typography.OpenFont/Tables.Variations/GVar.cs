@@ -157,18 +157,7 @@ namespace Typography.OpenFont.Tables
             TupleVariationHeader[] headers = new TupleVariationHeader[tupleCount];
             for (int i = 0; i < tupleCount; ++i)
             {
-                //TupleVariationHeader:
-                //Type      Name                    Description
-                //int16     variationDataSize       The size in bytes of the serialized data for this tuple variation table.
-                //uint16    tupleIndex              A packed field.
-                //                                  The high 4 bits are flags(see below).
-                //                                  The low 12 bits are an index into a shared tuple records array.
-                //Tuple     peakTuple               Peak tuple record for this tuple variation table — optional, 
-                //                                  determined by flags in the tupleIndex value.
-                //                                  Note that this must always be included in the 'cvar' table.
-                //Tuple     intermediateStartTuple  Intermediate start tuple record for this tuple variation table — optional, determined by flags in the tupleIndex value.
-                //Tuple     intermediateEndTuple    Intermediate end tuple record for this tuple variation table — optional, determined by flags in the tupleIndex value.
-
+               
                 TupleVariationHeader header = new TupleVariationHeader();
                 header.variableDataSize = (short)reader.ReadUInt16();
                 header.tupleIndex = reader.ReadUInt16();
@@ -187,42 +176,8 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        [Flags]
-        enum TupleIndexFormat
-        {
-            //tupleIndex format:
-            //Mask    Name                  Description
-            //0x8000  EMBEDDED_PEAK_TUPLE   Flag indicating that this tuple variation header includes an embedded peak tuple record,
-            //                              immediately after the tupleIndex field.
-            //                              If set, the low 12 bits of the tupleIndex value are ignored.
-            //                              Note that this must always be set within the 'cvar' table.
-            //0x4000  INTERMEDIATE_REGION   Flag indicating that this tuple variation table applies to an intermediate region within the variation space. 
-            //                              If set, the header includes the two intermediate - region, start and end tuple records, immediately after the peak tuple record(if present).
-            //0x2000  PRIVATE_POINT_NUMBERS Flag indicating that the serialized data for this tuple variation table includes packed “point” number data.
-            //                              If set, this tuple variation table uses that number data;
-            //                              if clear, this tuple variation table uses shared number data found at the start of the serialized data for this glyph variation data or 'cvar' table.
-            //0x1000  Reserved              Reserved for future use — set to 0.
-            //0x0FFF  TUPLE_INDEX_MASK      Mask for the low 12 bits to give the shared tuple records index.
-
-            EMBEDDED_PEAK_TUPLE = 0x8000,
-            INTERMEDIATE_REGION = 0x4000,
-            PRIVATE_POINT_NUMBERS = 0x2000,
-            Reserved = 0x1000,
-            TUPLE_INDEX_MASK = 0x0FFF
-        }
-
-        struct TupleRecord
-        {
-            public float[] coords;
-        }
-        class TupleVariationHeader
-        {
-            public short variableDataSize;
-            public ushort tupleIndex;
-            public TupleRecord peakTuple;
-            public TupleRecord intermediateStartTuple;
-            public TupleRecord intermediateEndTuple;
-        }
+      
+        
     }
 }
 

@@ -16,6 +16,7 @@ namespace Typography.OpenFont.Tables
         public override string Name => _N;
 
 
+        ItemVariationStoreTable _itemVartionStore;
         public HVar()
         {
             //The HVAR table is used in variable fonts to provide variations for horizontal glyph metrics values.
@@ -42,8 +43,13 @@ namespace Typography.OpenFont.Tables
             uint advanceWidthMappingOffset = reader.ReadUInt32();
             uint lsbMappingOffset = reader.ReadUInt32();
             uint rsbMappingOffset = reader.ReadUInt32();
-
             //
+            //-----------------------------------------
+
+            //itemVariationStore
+            reader.BaseStream.Position = beginAt + itemVariationStoreOffset;
+            _itemVartionStore = new ItemVariationStoreTable();
+            _itemVartionStore.ReadContentFrom(reader);
         }
     }
 }

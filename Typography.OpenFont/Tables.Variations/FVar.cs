@@ -7,6 +7,11 @@ namespace Typography.OpenFont.Tables
     //https://www.microsoft.com/typography/otspec/fvar.htm
     //'fvar' Header 
     //The format of the font variations table header is as follows. 
+
+    //Note: The 'fvar' table describes a font’s variation space, 
+    //and other variation tables provide variation data to describe 
+    //how different data items are varied across the font’s variation space
+
     /// <summary>
     /// fvar font variations
     /// </summary>
