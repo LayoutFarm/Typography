@@ -10,6 +10,8 @@ using Typography.OpenFont;
 using Typography.Rendering;
 using Typography.Contours;
 
+using PixelFarm.Drawing;
+using PixelFarm.CpuBlit;
 
 
 namespace SampleWinForms
@@ -147,10 +149,20 @@ namespace SampleWinForms
             Msdfgen.Shape shape1 = new Msdfgen.Shape();
             //
             Msdfgen.Contour cnt = new Msdfgen.Contour();
-            cnt.AddLine(0, 0, 50, 0);
-            cnt.AddLine(50, 0, 50, 50);
-            cnt.AddLine(50, 50, 0, 50);
-            cnt.AddLine(0, 50, 0, 0);
+            //cnt.AddLine(0, 0, 50, 0);
+            //cnt.AddLine(50, 0, 50, 50);
+            //cnt.AddLine(50, 50, 0, 50);
+            //cnt.AddLine(0, 50, 0, 0);
+            //cnt.AddLine(10, 20, 50, 0);
+            //cnt.AddLine(50, 0, 80, 20);
+            //cnt.AddLine(80, 20, 50, 60);
+            //cnt.AddLine(50, 60, 10, 20);
+
+            //for msdf we draw shape clock-wise 
+            cnt.AddLine(10, 20, 50, 60);
+            cnt.AddLine(50, 60, 80, 20);
+            cnt.AddLine(80, 20, 50, 0);
+            cnt.AddLine(50, 0, 10, 20);
             shape1.contours.Add(cnt);
             //
             //
@@ -167,6 +179,8 @@ namespace SampleWinForms
                 bmp.Save("d:\\WImageTest\\msdf_shape.png");
                 //
             }
+
+            
         }
 
         //public static Msdfgen.Shape CreateMsdfShape(GlyphContourBuilder glyphToContour, float pxScale)

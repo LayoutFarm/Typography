@@ -157,10 +157,16 @@ namespace Typography.Rendering
             // create msdf shape , then convert to actual image
             return CreateMsdfImage(CreateMsdfShape(glyphToContour, genParams.shapeScale), genParams);
         }
+
+        const double MAX = 1e240;
         public static GlyphImage CreateMsdfImage(Msdfgen.Shape shape, MsdfGenParams genParams)
         {
-            double left, bottom, right, top;
-            shape.findBounds(out left, out bottom, out right, out top);
+            double left = MAX;
+            double bottom = MAX;
+            double right = -MAX;
+            double top = -MAX;
+
+            shape.findBounds(ref left, ref bottom, ref right, ref top);
             int w = (int)Math.Ceiling((right - left));
             int h = (int)Math.Ceiling((top - bottom));
 
@@ -183,7 +189,12 @@ namespace Typography.Rendering
 
 
             int borderW = (int)((float)w / 5f);
-            var translate = new Msdfgen.Vector2(left < 0 ? -left + borderW : borderW, bottom < 0 ? -bottom + borderW : borderW);
+
+            //org
+            //var translate = new Msdfgen.Vector2(left < 0 ? -left + borderW : borderW, bottom < 0 ? -bottom + borderW : borderW);
+            //test
+            var translate = new Msdfgen.Vector2(-left + borderW, -bottom + borderW);
+
             w += borderW * 2; //borders,left- right
             h += borderW * 2; //borders, top- bottom
 
@@ -208,8 +219,8 @@ namespace Typography.Rendering
             int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp);
 
             GlyphImage img = new GlyphImage(w, h);
-            img.TextureOffsetX = (short)translate.x;
-            img.TextureOffsetY = (short)translate.y;
+            img.TextureOffsetX = (short)translate.x; //TODO: review here, rounding err
+            img.TextureOffsetY = (short)translate.y; //TODO: review here, rounding err
             img.SetImageBuffer(buffer, false);
             return img;
         }
