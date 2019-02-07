@@ -6,72 +6,7 @@ using System.Collections.Generic;
 
 namespace Msdfgen
 {
-    public struct FloatRGB
-    {
-        public float r, g, b;
-        public FloatRGB(float r, float g, float b)
-        {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-        }
-#if DEBUG
-        public override string ToString()
-        {
-            return r + "," + g + "," + b;
-        }
-#endif
-    }
-    public struct Pair<T, U>
-    {
-        public T first;
-        public U second;
-        public Pair(T first, U second)
-        {
-            this.first = first;
-            this.second = second;
-        }
-    }
-    public class FloatBmp
-    {
-        float[] buffer;
-        public FloatBmp(int w, int h)
-        {
-            this.Width = w;
-            this.Height = h;
-            buffer = new float[w * h];
-        }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public void SetPixel(int x, int y, float value)
-        {
-            this.buffer[x + (y * Width)] = value;
-        }
-        public float GetPixel(int x, int y)
-        {
-            return this.buffer[x + (y * Width)];
-        }
-    }
-    public class FloatRGBBmp
-    {
-        FloatRGB[] buffer;
-        public FloatRGBBmp(int w, int h)
-        {
-            this.Width = w;
-            this.Height = h;
-            buffer = new FloatRGB[w * h];
-        }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public void SetPixel(int x, int y, FloatRGB value)
-        {
-            this.buffer[x + (y * Width)] = value;
-        }
-        public FloatRGB GetPixel(int x, int y)
-        {
-            return this.buffer[x + (y * Width)];
-        }
-    }
+
     public static class SdfGenerator
     {
         //siged distance field generator
@@ -204,13 +139,23 @@ namespace Msdfgen
         }
 
     }
-    struct MultiDistance
-    {
-        public double r, g, b;
-        public double med;
-    }
+  
+
     public static class MsdfGenerator
     {
+        //multi-channel signed distance field generator
+        struct EdgePoint
+        {
+            public SignedDistance minDistance;
+            public EdgeHolder nearEdge;
+            public double nearParam;
+        }
+        struct MultiDistance
+        {
+            public double r, g, b;
+            public double med;
+        }
+
         static float median(float a, float b, float c)
         {
             return Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c));
@@ -294,13 +239,7 @@ namespace Msdfgen
             //    pixel.r = med, pixel.g = med, pixel.b = med;
             //}
         }
-        //multi-channel signed distance field generator
-        struct EdgePoint
-        {
-            public SignedDistance minDistance;
-            public EdgeHolder nearEdge;
-            public double nearParam;
-        }
+        
         public static int[] ConvertToIntBmp(Msdfgen.FloatRGBBmp input)
         {
             int height = input.Height;
@@ -337,6 +276,8 @@ namespace Msdfgen
             }
             return output;
         }
+
+      
         public static void generateMSDF(FloatRGBBmp output, Shape shape, double range, Vector2 scale, Vector2 translate, double edgeThreshold)
         {
             List<Contour> contours = shape.contours;

@@ -648,7 +648,7 @@ namespace SampleWinForms
                     }
                 }
 
-                var glyphImg2 = atlasBuilder.BuildSingleImage();
+                GlyphImage glyphImg2 = atlasBuilder.BuildSingleImage();
                 using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                 {
                     var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
@@ -657,7 +657,7 @@ namespace SampleWinForms
 
                     System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
                     bmp.UnlockBits(bmpdata);
-                    bmp.Save("d:\\WImageTest\\a_total.png");
+                    bmp.Save(outputFile);
                 }
                 atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.bin");
                 //

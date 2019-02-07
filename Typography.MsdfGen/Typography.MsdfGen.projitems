@@ -16,5 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)EquationSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MsdfGen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignedDistance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BasicElements.cs" />
   </ItemGroup>
 </Project>

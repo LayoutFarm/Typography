@@ -8,15 +8,15 @@ namespace Msdfgen
 
     public static class EquationSolver
     {
-        public const double MIN = 1.0e-14;
+        public const double EPSILON = 1.0e-14;
 
         public static int SolveQuadratic(double[] x, double a, double b, double c)
         {
             // ax^2 + bx + c = 0
 
-            if (fabs(a) < MIN)
+            if (fabs(a) < EPSILON)
             {
-                if (fabs(b) < MIN)
+                if (fabs(b) < EPSILON)
                 {
                     if (c == 0)
                         return -1;
@@ -73,7 +73,7 @@ namespace Msdfgen
                 x[0] = (A + B) - a;
                 x[1] = -0.5 * (A + B) - a;
                 x[2] = 0.5 * Math.Sqrt(3.0) * (A - B);
-                if (fabs(x[2]) < 1e-14)
+                if (fabs(x[2]) < EPSILON)
                     return 2;
                 return 1;
             }
@@ -81,7 +81,7 @@ namespace Msdfgen
         public static int SolveCubic(double[] x/*3*/, double a, double b, double c, double d)
         {
             // ax^3 + bx^2 + cx + d = 0
-            if (fabs(a) < 1e-14)
+            if (fabs(a) < EPSILON)
             {
                 return SolveQuadratic(x, b, c, d);
             }
