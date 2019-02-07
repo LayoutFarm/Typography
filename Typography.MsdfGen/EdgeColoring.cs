@@ -31,9 +31,19 @@ namespace Msdfgen
             }
             if (color == EdgeColor.BLACK || color == EdgeColor.WHITE)
             {
-                //TODO: stack alloc
-                EdgeColor[] start = new EdgeColor[] { EdgeColor.CYAN, EdgeColor.MAGENTA, EdgeColor.YELLOW };
-                color = start[seed % 3];
+                //original code use array
+                //EdgeColor[] start = new EdgeColor[] { EdgeColor.CYAN, EdgeColor.MAGENTA, EdgeColor.YELLOW };
+                //color = start[seed % 3];
+
+                //I don't want to alloc new array=>  I use switch
+                switch (seed % 3)
+                {
+                    default: throw new NotSupportedException();
+                    case 0: color = EdgeColor.CYAN; break;
+                    case 1: color = EdgeColor.MAGENTA; break;
+                    case 2: color = EdgeColor.YELLOW; break;
+                }
+
                 seed /= 3;
                 return;
             }
@@ -42,7 +52,7 @@ namespace Msdfgen
             color = (EdgeColor)((shifted | shifted >> 3) & (int)EdgeColor.WHITE);
             seed >>= 1;
         }
-        public static void edgeColoringSimple(Shape shape, double angleThreshold, ulong seed=0)
+        public static void edgeColoringSimple(Shape shape, double angleThreshold, ulong seed = 0)
         {
             double crossThreshold = Math.Sin(angleThreshold);
             List<int> corners = new List<int>(); //TODO: review reusable list
