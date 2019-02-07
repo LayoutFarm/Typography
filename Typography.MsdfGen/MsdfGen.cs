@@ -139,7 +139,7 @@ namespace Msdfgen
         }
 
     }
-  
+
 
     public static class MsdfGenerator
     {
@@ -230,7 +230,8 @@ namespace Msdfgen
                 Pair<int, int> clash = clashes[i];
                 FloatRGB pixel = output.GetPixel(clash.first, clash.second);
                 float med = median(pixel.r, pixel.g, pixel.b);
-                pixel.r = med; pixel.g = med; pixel.b = med;
+                //set new value back
+                output.SetPixel(clash.first, clash.second, new FloatRGB(med, med, med));
             }
             //for (std::vector<std::pair<int, int>>::const_iterator clash = clashes.begin(); clash != clashes.end(); ++clash)
             //{
@@ -239,7 +240,7 @@ namespace Msdfgen
             //    pixel.r = med, pixel.g = med, pixel.b = med;
             //}
         }
-        
+
         public static int[] ConvertToIntBmp(Msdfgen.FloatRGBBmp input)
         {
             int height = input.Height;
@@ -277,7 +278,7 @@ namespace Msdfgen
             return output;
         }
 
-      
+
         public static void generateMSDF(FloatRGBBmp output, Shape shape, double range, Vector2 scale, Vector2 translate, double edgeThreshold)
         {
             List<Contour> contours = shape.contours;
