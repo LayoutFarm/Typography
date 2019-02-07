@@ -324,13 +324,14 @@ namespace Typography.OpenFont.Tables
                     //If the bit WE_HAVE_A_SCALE is set,
                     //the scale value is read in 2.14 format-the value can be between -2 to almost +2.
                     //The glyph will be scaled by this value before grid-fitting. 
-                    xscale = yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+
+                    xscale = yscale = reader.ReadF2Dot14(); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_AN_X_AND_Y_SCALE))
                 {
-                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    xscale = reader.ReadF2Dot14(); /* Format 2.14 */
+                    yscale = reader.ReadF2Dot14(); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (HasFlag(flags, CompositeGlyphFlags.WE_HAVE_A_TWO_BY_TWO))
@@ -351,10 +352,11 @@ namespace Typography.OpenFont.Tables
                     //Note that the behavior of the USE_MY_METRICS operation is undefined for rotated composite components. 
                     useMatrix = true;
                     hasScale = true;
-                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    scale01 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    scale10 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+
+                    xscale = reader.ReadF2Dot14(); /* Format 2.14 */
+                    scale01 = reader.ReadF2Dot14(); /* Format 2.14 */
+                    scale10 = reader.ReadF2Dot14();/* Format 2.14 */
+                    yscale = reader.ReadF2Dot14(); /* Format 2.14 */
 
                     if (HasFlag(flags, CompositeGlyphFlags.UNSCALED_COMPONENT_OFFSET))
                     {
