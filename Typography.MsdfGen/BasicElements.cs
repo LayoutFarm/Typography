@@ -271,7 +271,7 @@ namespace Msdfgen
     {
         //eg. Vector3f
 
-        public float r, g, b;
+        public readonly float r, g, b;
         public FloatRGB(float r, float g, float b)
         {
             this.r = r;
@@ -287,8 +287,8 @@ namespace Msdfgen
     }
     public struct Pair<T, U>
     {
-        public T first;
-        public U second;
+        public readonly T first;
+        public readonly U second;
         public Pair(T first, U second)
         {
             this.first = first;
@@ -301,7 +301,7 @@ namespace Msdfgen
     /// </summary>
     public class FloatBmp
     {
-        float[] _buffer;
+        readonly float[] _buffer;
         readonly int _w;
         readonly int _h;
         public FloatBmp(int w, int h)
@@ -326,7 +326,7 @@ namespace Msdfgen
     /// </summary>
     public class FloatRGBBmp
     {
-        FloatRGB[] _buffer;
+        readonly FloatRGB[] _buffer;
 
         readonly int _w;
         readonly int _h;
