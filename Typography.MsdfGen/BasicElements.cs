@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace Msdfgen
 {
+
     public struct Vector2
     {
         public readonly double x;
@@ -168,9 +169,8 @@ namespace Msdfgen
             }
         }
 
-        public void findBounds(out double left, out double bottom, out double right, out double top)
+        public void findBounds(ref double left, ref double bottom, ref double right, ref double top)
         {
-            left = top = right = bottom = 0;
             int j = contours.Count;
             for (int i = 0; i < j; ++i)
             {
@@ -190,26 +190,31 @@ namespace Msdfgen
         {
             this.AddEdge(new LinearSegment(new Vector2(x0, y0), new Vector2(x1, y1)));
         }
-        public void AddQuadraticSegment(double x0, double y0,
-            double ctrl0X, double ctrl0Y,
-            double x1, double y1)
+
+        public void AddQuadraticSegment(
+            double x0, double y0, //start
+            double x1, double y1, //control  
+            double x2, double y2) //end point
         {
+            //'Curve3'
             this.AddEdge(new QuadraticSegment(
                 new Vector2(x0, y0),
-                new Vector2(ctrl0X, ctrl0Y),
-                new Vector2(x1, y1)
+                new Vector2(x1, y1),
+                new Vector2(x2, y2)
                 ));
         }
         public void AddCubicSegment(double x0, double y0,
-            double ctrl0X, double ctrl0Y,
-            double ctrl1X, double ctrl1Y,
-            double x1, double y1)
+            double x1, double y1,
+            double x2, double y2,
+            double x3, double y3)
         {
+            //'Curve4'
+
             this.AddEdge(new CubicSegment(
                new Vector2(x0, y0),
-               new Vector2(ctrl0X, ctrl0Y),
-               new Vector2(ctrl1X, ctrl1Y),
-               new Vector2(x1, y1)
+               new Vector2(x1, y1),
+               new Vector2(x2, y2),
+               new Vector2(x3, y3)
                ));
         }
         public void findBounds(ref double left, ref double bottom, ref double right, ref double top)
@@ -261,8 +266,11 @@ namespace Msdfgen
 
         }
     }
+
     public struct FloatRGB
     {
+        //eg. Vector3f
+
         public float r, g, b;
         public FloatRGB(float r, float g, float b)
         {
@@ -287,47 +295,60 @@ namespace Msdfgen
             this.second = second;
         }
     }
+
+    /// <summary>
+    /// single channel bitmap
+    /// </summary>
     public class FloatBmp
     {
-        float[] buffer;
+        float[] _buffer;
+        readonly int _w;
+        readonly int _h;
         public FloatBmp(int w, int h)
         {
-            this.Width = w;
-            this.Height = h;
-            buffer = new float[w * h];
+            _w = w;
+            _h = h;
+            _buffer = new float[w * h];
         }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public int Width => _w;
+        public int Height => _h;
         public void SetPixel(int x, int y, float value)
         {
-            this.buffer[x + (y * Width)] = value;
+            _buffer[x + (y * _w)] = value;
         }
         public float GetPixel(int x, int y)
         {
-            return this.buffer[x + (y * Width)];
+            return _buffer[x + (y * _w)];
         }
     }
+    /// <summary>
+    /// triple channel bitmap 
+    /// </summary>
     public class FloatRGBBmp
     {
-        FloatRGB[] buffer;
+        FloatRGB[] _buffer;
+
+        readonly int _w;
+        readonly int _h;
+
         public FloatRGBBmp(int w, int h)
         {
-            this.Width = w;
-            this.Height = h;
-            buffer = new FloatRGB[w * h];
+            _w = w;
+            _h = h;
+            _buffer = new FloatRGB[w * h];
         }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public int Width => _w;
+        public int Height => _h;
         public void SetPixel(int x, int y, FloatRGB value)
         {
-            this.buffer[x + (y * Width)] = value;
+            _buffer[x + (y * _w)] = value;
         }
         public FloatRGB GetPixel(int x, int y)
         {
-            return this.buffer[x + (y * Width)];
+            return _buffer[x + (y * _w)];
         }
     }
 
-    
+
 
 }
