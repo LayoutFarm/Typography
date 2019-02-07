@@ -66,16 +66,16 @@ namespace Msdfgen
                 int edgeCount = edges.Count;
                 if (edgeCount != 0)
                 {
-                    Vector2 prevDirection = edges[edgeCount - 1].Direction(1);// (*(contour->edges.end() - 1))->direction(1); 
+                    Vector2 prevDirection = edges[edgeCount - 1].direction(1);// (*(contour->edges.end() - 1))->direction(1); 
                     for (int i = 0; i < edgeCount; ++i)
                     {
                         EdgeHolder edge = edges[i];
                         if (isCorner(prevDirection.normalize(),
-                            edge.Direction(0).normalize(), crossThreshold))
+                            edge.direction(0).normalize(), crossThreshold))
                         {
                             corners.Add(i);
                         }
-                        prevDirection = edge.Direction(1);
+                        prevDirection = edge.direction(1);
                     }
                 }
 
