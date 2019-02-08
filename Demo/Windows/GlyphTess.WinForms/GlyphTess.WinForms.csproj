@@ -78,9 +78,6 @@
     <Compile Include="..\..\Shared\Tesselate\mesh.cs">
       <Link>Tess\mesh.cs</Link>
     </Compile>
-    <Compile Include="..\..\Shared\Tesselate\Tesselator.cs">
-      <Link>Tess\Tesselator.cs</Link>
-    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

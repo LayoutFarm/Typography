@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
 using Typography.Contours;
+using Tesselate;
 
 namespace DrawingGL.Text
 {
@@ -23,7 +24,7 @@ namespace DrawingGL.Text
         // for tess
         // 
         SimpleCurveFlattener _curveFlattener;
-        TessTool _tessTool;
+        Tesselate.TessTool _tessTool;
 
         Typeface _currentTypeface;
 
@@ -31,11 +32,11 @@ namespace DrawingGL.Text
         struct ProcessedGlyph
         {
             public readonly float[] tessData;
-            public readonly ushort tessNElements;
-            public ProcessedGlyph(float[] tessData, ushort tessNElements)
+            public readonly ushort vertextCount;
+            public ProcessedGlyph(float[] tessData, ushort vertextCount)
             {
                 this.tessData = tessData;
-                this.tessNElements = tessNElements;
+                this.vertextCount = vertextCount;
             }
         }
         GlyphMeshCollection<ProcessedGlyph> _glyphMeshCollection = new GlyphMeshCollection<ProcessedGlyph>();
@@ -48,7 +49,7 @@ namespace DrawingGL.Text
             //
             _curveFlattener = new SimpleCurveFlattener();
 
-            _tessTool = new TessTool();
+            _tessTool = new Tesselate.TessTool();
         }
 
 
@@ -181,17 +182,17 @@ namespace DrawingGL.Text
                     //do tess  
                     int[] endContours;
                     float[] flattenPoints = _curveFlattener.Flatten(writablePath._points, out endContours);
-                    int nTessElems;
-                    tessData = _tessTool.TessPolygon(flattenPoints, endContours, out nTessElems);
-                    //-------
-                    processGlyph = new ProcessedGlyph(tessData, (ushort)nTessElems);
+
+                    tessData = _tessTool.TessAsTriVertexArray(flattenPoints, endContours, out int vertexCount);
+                    processGlyph = new ProcessedGlyph(tessData, (ushort)vertexCount);
+
                     _glyphMeshCollection.RegisterCachedGlyph(glyphPlan.glyphIndex, processGlyph);
                 }
 
                 outputTextRun.AddGlyph(
                     new GlyphRun(glyphPlan,
                         processGlyph.tessData,
-                        processGlyph.tessNElements));
+                        processGlyph.vertextCount));
             }
         }
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)

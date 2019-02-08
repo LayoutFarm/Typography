@@ -21,7 +21,7 @@ namespace DrawingGL
         MyMat4 _flipVerticalView;
         MyMat4 _orthoAndFlip;
 
-        TessTool _tessTool;
+        Tesselate.TessTool _tessTool;
         SimpleCurveFlattener _curveFlattener;
         //---------------------------------
         CanvasToShaderSharedResource _shaderRes;
@@ -56,7 +56,7 @@ namespace DrawingGL
             //------------
             //tools
             Tesselate.Tesselator tt = new Tesselate.Tesselator();
-            _tessTool = new TessTool(tt);
+            _tessTool = new Tesselate.TessTool(tt);
             _curveFlattener = new SimpleCurveFlattener();
             ClearColor = Color.White;
             //--------
@@ -133,8 +133,8 @@ namespace DrawingGL
 
 
                 _fillShader.FillTriangles(
-                    run.tessData,
-                    run.nTessElements,
+                    run._tessData,
+                    run._vertextCount ,
                     this.FillColor
                     );
             }

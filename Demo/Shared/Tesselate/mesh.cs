@@ -189,40 +189,40 @@ namespace Tesselate
 
     public class Mesh
     {
-        public ContourVertex vertexHead = new ContourVertex();		/* dummy header for vertex list */
-        public Face faceHead = new Face();		/* dummy header for face list */
-        public HalfEdge halfEdgeHead = new HalfEdge();		/* dummy header for edge list */
-        HalfEdge otherHalfOfThisEdgeHead = new HalfEdge();	/* and its symmetric counterpart */
+        internal ContourVertex _vertexHead = new ContourVertex();		/* dummy header for vertex list */
+        internal Face _faceHead = new Face();		/* dummy header for face list */
+        internal HalfEdge _halfEdgeHead = new HalfEdge();		/* dummy header for edge list */
+        HalfEdge _otherHalfOfThisEdgeHead = new HalfEdge();	/* and its symmetric counterpart */
         /* Creates a new mesh with no edges, no vertices,
         * and no loops (what we usually call a "face").
         */
         public Mesh()
         {
-            HalfEdge otherHalfOfThisEdge = this.otherHalfOfThisEdgeHead;
-            vertexHead.nextVertex = vertexHead.prevVertex = vertexHead;
-            vertexHead.edgeThisIsOriginOf = null;
-            vertexHead.clientIndex = 0;
-            faceHead.nextFace = faceHead.prevFace = faceHead;
-            faceHead.halfEdgeThisIsLeftFaceOf = null;
-            faceHead.trail = null;
-            faceHead.marked = false;
-            faceHead.isInterior = false;
-            halfEdgeHead.nextHalfEdge = halfEdgeHead;
-            halfEdgeHead.otherHalfOfThisEdge = otherHalfOfThisEdge;
-            halfEdgeHead.nextEdgeCCWAroundOrigin = null;
-            halfEdgeHead.nextEdgeCCWAroundLeftFace = null;
-            halfEdgeHead.originVertex = null;
-            halfEdgeHead.leftFace = null;
-            halfEdgeHead.winding = 0;
-            halfEdgeHead.regionThisIsUpperEdgeOf = null;
-            otherHalfOfThisEdge.nextHalfEdge = otherHalfOfThisEdge;
-            otherHalfOfThisEdge.otherHalfOfThisEdge = halfEdgeHead;
-            otherHalfOfThisEdge.nextEdgeCCWAroundOrigin = null;
-            otherHalfOfThisEdge.nextEdgeCCWAroundLeftFace = null;
-            otherHalfOfThisEdge.originVertex = null;
-            otherHalfOfThisEdge.leftFace = null;
-            otherHalfOfThisEdge.winding = 0;
-            otherHalfOfThisEdge.regionThisIsUpperEdgeOf = null;
+            HalfEdge otherHalfOfThisEdge = _otherHalfOfThisEdgeHead;
+            _vertexHead._nextVertex = _vertexHead._prevVertex = _vertexHead;
+            _vertexHead._edgeThisIsOriginOf = null;
+            _vertexHead._clientIndex = 0;
+            _faceHead._nextFace = _faceHead._prevFace = _faceHead;
+            _faceHead._halfEdgeThisIsLeftFaceOf = null;
+            _faceHead._trail = null;
+            _faceHead._marked = false;
+            _faceHead._isInterior = false;
+            _halfEdgeHead._nextHalfEdge = _halfEdgeHead;
+            _halfEdgeHead._otherHalfOfThisEdge = otherHalfOfThisEdge;
+            _halfEdgeHead._nextEdgeCCWAroundOrigin = null;
+            _halfEdgeHead._nextEdgeCCWAroundLeftFace = null;
+            _halfEdgeHead._originVertex = null;
+            _halfEdgeHead._leftFace = null;
+            _halfEdgeHead._winding = 0;
+            _halfEdgeHead._regionThisIsUpperEdgeOf = null;
+            otherHalfOfThisEdge._nextHalfEdge = otherHalfOfThisEdge;
+            otherHalfOfThisEdge._otherHalfOfThisEdge = _halfEdgeHead;
+            otherHalfOfThisEdge._nextEdgeCCWAroundOrigin = null;
+            otherHalfOfThisEdge._nextEdgeCCWAroundLeftFace = null;
+            otherHalfOfThisEdge._originVertex = null;
+            otherHalfOfThisEdge._leftFace = null;
+            otherHalfOfThisEdge._winding = 0;
+            otherHalfOfThisEdge._regionThisIsUpperEdgeOf = null;
         }
 
         /* MakeFace( newFace, eOrig, fNext ) attaches a new face and makes it the left
@@ -231,32 +231,37 @@ namespace Tesselate
         * the new face *before* fNext so that algorithms which walk the face
         * list will not see the newly created faces.
         */
-        static int faceIndex = 0;
+
+#if DEBUG
+        static int s_dbugFaceIndexTotal = 0;
+#endif
         static void MakeFace(Face newFace, HalfEdge eOrig, Face fNext)
         {
             HalfEdge e;
             Face fPrev;
             Face fNew = newFace;
-            fNew.indexDebug = faceIndex++;
+#if DEBUG
+            fNew.dbugIndex = s_dbugFaceIndexTotal++;
+#endif
             // insert in circular doubly-linked list before fNext
 
-            fPrev = fNext.prevFace;
-            fNew.prevFace = fPrev;
-            fPrev.nextFace = fNew;
-            fNew.nextFace = fNext;
-            fNext.prevFace = fNew;
-            fNew.halfEdgeThisIsLeftFaceOf = eOrig;
-            fNew.trail = null;
-            fNew.marked = false;
+            fPrev = fNext._prevFace;
+            fNew._prevFace = fPrev;
+            fPrev._nextFace = fNew;
+            fNew._nextFace = fNext;
+            fNext._prevFace = fNew;
+            fNew._halfEdgeThisIsLeftFaceOf = eOrig;
+            fNew._trail = null;
+            fNew._marked = false;
             // The new face is marked "inside" if the old one was.  This is a
             // convenience for the common case where a face has been split in two.
-            fNew.isInterior = fNext.isInterior;
+            fNew._isInterior = fNext._isInterior;
             // fix other edges on this face loop
             e = eOrig;
             do
             {
-                e.leftFace = fNew;
-                e = e.nextEdgeCCWAroundLeftFace;
+                e._leftFace = fNew;
+                e = e._nextEdgeCCWAroundLeftFace;
             } while (e != eOrig);
         }
 
@@ -268,10 +273,10 @@ namespace Tesselate
             ContourVertex newVertex2 = new ContourVertex();
             Face newFace = new Face();
             HalfEdge e;
-            e = MakeEdge(this.halfEdgeHead);
-            MakeVertex(newVertex1, e, this.vertexHead);
-            MakeVertex(newVertex2, e.otherHalfOfThisEdge, this.vertexHead);
-            MakeFace(newFace, e, this.faceHead);
+            e = MakeEdge(_halfEdgeHead);
+            MakeVertex(newVertex1, e, _vertexHead);
+            MakeVertex(newVertex2, e._otherHalfOfThisEdge, _vertexHead);
+            MakeFace(newFace, e, _faceHead);
             return e;
         }
 
@@ -287,21 +292,21 @@ namespace Tesselate
             ContourVertex vPrev;
             ContourVertex vNew = newVertex;
             /* insert in circular doubly-linked list before vNext */
-            vPrev = vNext.prevVertex;
-            vNew.prevVertex = vPrev;
-            vPrev.nextVertex = vNew;
-            vNew.nextVertex = vNext;
-            vNext.prevVertex = vNew;
-            vNew.edgeThisIsOriginOf = eOrig;
-            vNew.clientIndex = 0;
+            vPrev = vNext._prevVertex;
+            vNew._prevVertex = vPrev;
+            vPrev._nextVertex = vNew;
+            vNew._nextVertex = vNext;
+            vNext._prevVertex = vNew;
+            vNew._edgeThisIsOriginOf = eOrig;
+            vNew._clientIndex = 0;
             /* leave coords, s, t undefined */
 
             /* fix other edges on this vertex loop */
             e = eOrig;
             do
             {
-                e.originVertex = vNew;
-                e = e.nextEdgeCCWAroundOrigin;
+                e._originVertex = vNew;
+                e = e._nextEdgeCCWAroundOrigin;
             } while (e != eOrig);
         }
 
@@ -310,20 +315,20 @@ namespace Tesselate
         */
         static void KillVertex(ContourVertex vDel, ContourVertex newOrg)
         {
-            HalfEdge e, eStart = vDel.edgeThisIsOriginOf;
+            HalfEdge e, eStart = vDel._edgeThisIsOriginOf;
             ContourVertex vPrev, vNext;
             /* change the origin of all affected edges */
             e = eStart;
             do
             {
-                e.originVertex = newOrg;
-                e = e.nextEdgeCCWAroundOrigin;
+                e._originVertex = newOrg;
+                e = e._nextEdgeCCWAroundOrigin;
             } while (e != eStart);
             /* delete from circular doubly-linked list */
-            vPrev = vDel.prevVertex;
-            vNext = vDel.nextVertex;
-            vNext.prevVertex = vPrev;
-            vPrev.nextVertex = vNext;
+            vPrev = vDel._prevVertex;
+            vNext = vDel._nextVertex;
+            vNext._prevVertex = vPrev;
+            vPrev._nextVertex = vNext;
         }
 
         /* KillFace( fDel ) destroys a face and removes it from the global face
@@ -331,20 +336,20 @@ namespace Tesselate
         */
         static void KillFace(Face fDel, Face newLface)
         {
-            HalfEdge e, eStart = fDel.halfEdgeThisIsLeftFaceOf;
+            HalfEdge e, eStart = fDel._halfEdgeThisIsLeftFaceOf;
             Face fPrev, fNext;
             /* change the left face of all affected edges */
             e = eStart;
             do
             {
-                e.leftFace = newLface;
-                e = e.nextEdgeCCWAroundLeftFace;
+                e._leftFace = newLface;
+                e = e._nextEdgeCCWAroundLeftFace;
             } while (e != eStart);
             /* delete from circular doubly-linked list */
-            fPrev = fDel.prevFace;
-            fNext = fDel.nextFace;
-            fNext.prevFace = fPrev;
-            fPrev.nextFace = fNext;
+            fPrev = fDel._prevFace;
+            fNext = fDel._nextFace;
+            fNext._prevFace = fPrev;
+            fPrev._nextFace = fNext;
         }
 
         /* Splice( a, b ) is best described by the Guibas/Stolfi paper or the
@@ -355,12 +360,12 @@ namespace Tesselate
         */
         static void Splice(HalfEdge a, HalfEdge b)
         {
-            HalfEdge aOnext = a.nextEdgeCCWAroundOrigin;
-            HalfEdge bOnext = b.nextEdgeCCWAroundOrigin;
-            aOnext.otherHalfOfThisEdge.nextEdgeCCWAroundLeftFace = b;
-            bOnext.otherHalfOfThisEdge.nextEdgeCCWAroundLeftFace = a;
-            a.nextEdgeCCWAroundOrigin = bOnext;
-            b.nextEdgeCCWAroundOrigin = aOnext;
+            HalfEdge aOnext = a._nextEdgeCCWAroundOrigin;
+            HalfEdge bOnext = b._nextEdgeCCWAroundOrigin;
+            aOnext._otherHalfOfThisEdge._nextEdgeCCWAroundLeftFace = b;
+            bOnext._otherHalfOfThisEdge._nextEdgeCCWAroundLeftFace = a;
+            a._nextEdgeCCWAroundOrigin = bOnext;
+            b._nextEdgeCCWAroundOrigin = aOnext;
         }
 
         /* __gl_meshSplice( eOrg, eDst ) is the basic operation for changing the
@@ -391,17 +396,17 @@ namespace Tesselate
             bool joiningLoops = false;
             bool joiningVertices = false;
             if (eOrg == eDst) return;
-            if (eDst.originVertex != eOrg.originVertex)
+            if (eDst._originVertex != eOrg._originVertex)
             {
                 /* We are merging two disjoint vertices -- destroy eDst.Org */
                 joiningVertices = true;
-                KillVertex(eDst.originVertex, eOrg.originVertex);
+                KillVertex(eDst._originVertex, eOrg._originVertex);
             }
-            if (eDst.leftFace != eOrg.leftFace)
+            if (eDst._leftFace != eOrg._leftFace)
             {
                 /* We are connecting two disjoint loops -- destroy eDst.Lface */
                 joiningLoops = true;
-                KillFace(eDst.leftFace, eOrg.leftFace);
+                KillFace(eDst._leftFace, eOrg._leftFace);
             }
 
             /* Change the edge structure */
@@ -412,8 +417,8 @@ namespace Tesselate
                 /* We split one vertex into two -- the new vertex is eDst.Org.
                 * Make sure the old vertex points to a valid half-edge.
                 */
-                MakeVertex(newVertex, eDst, eOrg.originVertex);
-                eOrg.originVertex.edgeThisIsOriginOf = eOrg;
+                MakeVertex(newVertex, eDst, eOrg._originVertex);
+                eOrg._originVertex._edgeThisIsOriginOf = eOrg;
             }
             if (!joiningLoops)
             {
@@ -421,8 +426,8 @@ namespace Tesselate
                 /* We split one loop into two -- the new loop is eDst.Lface.
                 * Make sure the old face points to a valid half-edge.
                 */
-                MakeFace(newFace, eDst, eOrg.leftFace);
-                eOrg.leftFace.halfEdgeThisIsLeftFaceOf = eOrg;
+                MakeFace(newFace, eDst, eOrg._leftFace);
+                eOrg._leftFace._halfEdgeThisIsLeftFaceOf = eOrg;
             }
         }
 
@@ -433,16 +438,16 @@ namespace Tesselate
         {
             HalfEdge ePrev, eNext;
             /* Half-edges are allocated in pairs, see EdgePair above */
-            if (eDel.otherHalfOfThisEdge.isFirstHalfEdge)
+            if (eDel._otherHalfOfThisEdge._isFirstHalfEdge)
             {
-                eDel = eDel.otherHalfOfThisEdge;
+                eDel = eDel._otherHalfOfThisEdge;
             }
 
             /* delete from circular doubly-linked list */
-            eNext = eDel.nextHalfEdge;
-            ePrev = eDel.otherHalfOfThisEdge.nextHalfEdge;
-            eNext.otherHalfOfThisEdge.nextHalfEdge = ePrev;
-            ePrev.otherHalfOfThisEdge.nextHalfEdge = eNext;
+            eNext = eDel._nextHalfEdge;
+            ePrev = eDel._otherHalfOfThisEdge._nextHalfEdge;
+            eNext._otherHalfOfThisEdge._nextHalfEdge = ePrev;
+            ePrev._otherHalfOfThisEdge._nextHalfEdge = eNext;
         }
 
         /* __gl_meshDelete( eDel ) removes the edge eDel.  There are several cases:
@@ -457,47 +462,47 @@ namespace Tesselate
         */
         public static void DeleteHalfEdge(HalfEdge edgeToDelete)
         {
-            HalfEdge otherHalfOfEdgeToDelete = edgeToDelete.otherHalfOfThisEdge;
+            HalfEdge otherHalfOfEdgeToDelete = edgeToDelete._otherHalfOfThisEdge;
             bool joiningLoops = false;
             // First step: disconnect the origin vertex eDel.Org.  We make all
             // changes to get a consistent mesh in this "intermediate" state.
-            if (edgeToDelete.leftFace != edgeToDelete.rightFace)
+            if (edgeToDelete._leftFace != edgeToDelete.rightFace)
             {
                 // We are joining two loops into one -- remove the left face
                 joiningLoops = true;
-                KillFace(edgeToDelete.leftFace, edgeToDelete.rightFace);
+                KillFace(edgeToDelete._leftFace, edgeToDelete.rightFace);
             }
 
-            if (edgeToDelete.nextEdgeCCWAroundOrigin == edgeToDelete)
+            if (edgeToDelete._nextEdgeCCWAroundOrigin == edgeToDelete)
             {
-                KillVertex(edgeToDelete.originVertex, null);
+                KillVertex(edgeToDelete._originVertex, null);
             }
             else
             {
                 // Make sure that eDel.Org and eDel.Rface point to valid half-edges
-                edgeToDelete.rightFace.halfEdgeThisIsLeftFaceOf = edgeToDelete.Oprev;
-                edgeToDelete.originVertex.edgeThisIsOriginOf = edgeToDelete.nextEdgeCCWAroundOrigin;
+                edgeToDelete.rightFace._halfEdgeThisIsLeftFaceOf = edgeToDelete.Oprev;
+                edgeToDelete._originVertex._edgeThisIsOriginOf = edgeToDelete._nextEdgeCCWAroundOrigin;
                 Splice(edgeToDelete, edgeToDelete.Oprev);
                 if (!joiningLoops)
                 {
                     Face newFace = new Face();
                     // We are splitting one loop into two -- create a new loop for eDel.
-                    MakeFace(newFace, edgeToDelete, edgeToDelete.leftFace);
+                    MakeFace(newFace, edgeToDelete, edgeToDelete._leftFace);
                 }
             }
 
             // Claim: the mesh is now in a consistent state, except that eDel.Org
             // may have been deleted.  Now we disconnect eDel.Dst.
-            if (otherHalfOfEdgeToDelete.nextEdgeCCWAroundOrigin == otherHalfOfEdgeToDelete)
+            if (otherHalfOfEdgeToDelete._nextEdgeCCWAroundOrigin == otherHalfOfEdgeToDelete)
             {
-                KillVertex(otherHalfOfEdgeToDelete.originVertex, null);
-                KillFace(otherHalfOfEdgeToDelete.leftFace, null);
+                KillVertex(otherHalfOfEdgeToDelete._originVertex, null);
+                KillFace(otherHalfOfEdgeToDelete._leftFace, null);
             }
             else
             {
                 // Make sure that eDel.Dst and eDel.Lface point to valid half-edges
-                edgeToDelete.leftFace.halfEdgeThisIsLeftFaceOf = otherHalfOfEdgeToDelete.Oprev;
-                otherHalfOfEdgeToDelete.originVertex.edgeThisIsOriginOf = otherHalfOfEdgeToDelete.nextEdgeCCWAroundOrigin;
+                edgeToDelete._leftFace._halfEdgeThisIsLeftFaceOf = otherHalfOfEdgeToDelete.Oprev;
+                otherHalfOfEdgeToDelete._originVertex._edgeThisIsOriginOf = otherHalfOfEdgeToDelete._nextEdgeCCWAroundOrigin;
                 Splice(otherHalfOfEdgeToDelete, otherHalfOfEdgeToDelete.Oprev);
             }
 
@@ -513,16 +518,16 @@ namespace Tesselate
         {
             HalfEdge eNewSym;
             HalfEdge eNew = MakeEdge(eOrg);
-            eNewSym = eNew.otherHalfOfThisEdge;
+            eNewSym = eNew._otherHalfOfThisEdge;
             /* Connect the new edge appropriately */
-            Splice(eNew, eOrg.nextEdgeCCWAroundLeftFace);
+            Splice(eNew, eOrg._nextEdgeCCWAroundLeftFace);
             /* Set the vertex and face information */
-            eNew.originVertex = eOrg.directionVertex;
+            eNew._originVertex = eOrg.DirectionVertex;
             {
                 ContourVertex newVertex = new ContourVertex();
-                MakeVertex(newVertex, eNewSym, eNew.originVertex);
+                MakeVertex(newVertex, eNewSym, eNew._originVertex);
             }
-            eNew.leftFace = eNewSym.leftFace = eOrg.leftFace;
+            eNew._leftFace = eNewSym._leftFace = eOrg._leftFace;
             return eNew;
         }
 
@@ -534,16 +539,16 @@ namespace Tesselate
         {
             HalfEdge eNew;
             HalfEdge tempHalfEdge = meshAddEdgeVertex(eOrg);
-            eNew = tempHalfEdge.otherHalfOfThisEdge;
+            eNew = tempHalfEdge._otherHalfOfThisEdge;
             /* Disconnect eOrg from eOrg.Dst and connect it to eNew.Org */
-            Splice(eOrg.otherHalfOfThisEdge, eOrg.otherHalfOfThisEdge.Oprev);
-            Splice(eOrg.otherHalfOfThisEdge, eNew);
+            Splice(eOrg._otherHalfOfThisEdge, eOrg._otherHalfOfThisEdge.Oprev);
+            Splice(eOrg._otherHalfOfThisEdge, eNew);
             /* Set the vertex and face information */
-            eOrg.directionVertex = eNew.originVertex;
-            eNew.directionVertex.edgeThisIsOriginOf = eNew.otherHalfOfThisEdge;	/* may have pointed to eOrg.Sym */
+            eOrg.DirectionVertex = eNew._originVertex;
+            eNew.DirectionVertex._edgeThisIsOriginOf = eNew._otherHalfOfThisEdge;	/* may have pointed to eOrg.Sym */
             eNew.rightFace = eOrg.rightFace;
-            eNew.winding = eOrg.winding;	/* copy old winding information */
-            eNew.otherHalfOfThisEdge.winding = eOrg.otherHalfOfThisEdge.winding;
+            eNew._winding = eOrg._winding;	/* copy old winding information */
+            eNew._otherHalfOfThisEdge._winding = eOrg._otherHalfOfThisEdge._winding;
             return eNew;
         }
 
@@ -574,35 +579,35 @@ namespace Tesselate
             HalfEdge ePrev;
             EdgePair pair = new EdgePair();
             /* Make sure eNext points to the first edge of the edge pair */
-            if (eNext.otherHalfOfThisEdge.isFirstHalfEdge)
+            if (eNext._otherHalfOfThisEdge._isFirstHalfEdge)
             {
-                eNext = eNext.otherHalfOfThisEdge;
+                eNext = eNext._otherHalfOfThisEdge;
             }
 
             /* Insert in circular doubly-linked list before eNext.
             * Note that the prev pointer is stored in Sym.next.
             */
-            ePrev = eNext.otherHalfOfThisEdge.nextHalfEdge;
-            pair.eSym.nextHalfEdge = ePrev;
-            ePrev.otherHalfOfThisEdge.nextHalfEdge = pair.e;
-            pair.e.nextHalfEdge = eNext;
-            eNext.otherHalfOfThisEdge.nextHalfEdge = pair.eSym;
-            pair.e.isFirstHalfEdge = true;
-            pair.e.otherHalfOfThisEdge = pair.eSym;
-            pair.e.nextEdgeCCWAroundOrigin = pair.e;
-            pair.e.nextEdgeCCWAroundLeftFace = pair.eSym;
-            pair.e.originVertex = null;
-            pair.e.leftFace = null;
-            pair.e.winding = 0;
-            pair.e.regionThisIsUpperEdgeOf = null;
-            pair.eSym.isFirstHalfEdge = false;
-            pair.eSym.otherHalfOfThisEdge = pair.e;
-            pair.eSym.nextEdgeCCWAroundOrigin = pair.eSym;
-            pair.eSym.nextEdgeCCWAroundLeftFace = pair.e;
-            pair.eSym.originVertex = null;
-            pair.eSym.leftFace = null;
-            pair.eSym.winding = 0;
-            pair.eSym.regionThisIsUpperEdgeOf = null;
+            ePrev = eNext._otherHalfOfThisEdge._nextHalfEdge;
+            pair.eSym._nextHalfEdge = ePrev;
+            ePrev._otherHalfOfThisEdge._nextHalfEdge = pair.e;
+            pair.e._nextHalfEdge = eNext;
+            eNext._otherHalfOfThisEdge._nextHalfEdge = pair.eSym;
+            pair.e._isFirstHalfEdge = true;
+            pair.e._otherHalfOfThisEdge = pair.eSym;
+            pair.e._nextEdgeCCWAroundOrigin = pair.e;
+            pair.e._nextEdgeCCWAroundLeftFace = pair.eSym;
+            pair.e._originVertex = null;
+            pair.e._leftFace = null;
+            pair.e._winding = 0;
+            pair.e._regionThisIsUpperEdgeOf = null;
+            pair.eSym._isFirstHalfEdge = false;
+            pair.eSym._otherHalfOfThisEdge = pair.e;
+            pair.eSym._nextEdgeCCWAroundOrigin = pair.eSym;
+            pair.eSym._nextEdgeCCWAroundLeftFace = pair.e;
+            pair.eSym._originVertex = null;
+            pair.eSym._leftFace = null;
+            pair.eSym._winding = 0;
+            pair.eSym._regionThisIsUpperEdgeOf = null;
             return pair.e;
         }
 
@@ -621,28 +626,28 @@ namespace Tesselate
             HalfEdge eNewSym;
             bool joiningLoops = false;
             HalfEdge eNew = MakeEdge(eOrg);
-            eNewSym = eNew.otherHalfOfThisEdge;
-            if (eDst.leftFace != eOrg.leftFace)
+            eNewSym = eNew._otherHalfOfThisEdge;
+            if (eDst._leftFace != eOrg._leftFace)
             {
                 /* We are connecting two disjoint loops -- destroy eDst.Lface */
                 joiningLoops = true;
-                KillFace(eDst.leftFace, eOrg.leftFace);
+                KillFace(eDst._leftFace, eOrg._leftFace);
             }
 
             /* Connect the new edge appropriately */
-            Splice(eNew, eOrg.nextEdgeCCWAroundLeftFace);
+            Splice(eNew, eOrg._nextEdgeCCWAroundLeftFace);
             Splice(eNewSym, eDst);
             /* Set the vertex and face information */
-            eNew.originVertex = eOrg.directionVertex;
-            eNewSym.originVertex = eDst.originVertex;
-            eNew.leftFace = eNewSym.leftFace = eOrg.leftFace;
+            eNew._originVertex = eOrg.DirectionVertex;
+            eNewSym._originVertex = eDst._originVertex;
+            eNew._leftFace = eNewSym._leftFace = eOrg._leftFace;
             /* Make sure the old face points to a valid half-edge */
-            eOrg.leftFace.halfEdgeThisIsLeftFaceOf = eNewSym;
+            eOrg._leftFace._halfEdgeThisIsLeftFaceOf = eNewSym;
             if (!joiningLoops)
             {
                 Face newFace = new Face();
                 /* We split one loop into two -- the new loop is eNew.Lface */
-                MakeFace(newFace, eNew, eOrg.leftFace);
+                MakeFace(newFace, eNew, eOrg._leftFace);
             }
             return eNew;
         }
@@ -652,35 +657,35 @@ namespace Tesselate
         */
         Mesh meshUnion(Mesh mesh1, Mesh mesh2)
         {
-            Face f1 = mesh1.faceHead;
-            ContourVertex v1 = mesh1.vertexHead;
-            HalfEdge e1 = mesh1.halfEdgeHead;
-            Face f2 = mesh2.faceHead;
-            ContourVertex v2 = mesh2.vertexHead;
-            HalfEdge e2 = mesh2.halfEdgeHead;
+            Face f1 = mesh1._faceHead;
+            ContourVertex v1 = mesh1._vertexHead;
+            HalfEdge e1 = mesh1._halfEdgeHead;
+            Face f2 = mesh2._faceHead;
+            ContourVertex v2 = mesh2._vertexHead;
+            HalfEdge e2 = mesh2._halfEdgeHead;
             /* Add the faces, vertices, and edges of mesh2 to those of mesh1 */
-            if (f2.nextFace != f2)
+            if (f2._nextFace != f2)
             {
-                f1.prevFace.nextFace = f2.nextFace;
-                f2.nextFace.prevFace = f1.prevFace;
-                f2.prevFace.nextFace = f1;
-                f1.prevFace = f2.prevFace;
+                f1._prevFace._nextFace = f2._nextFace;
+                f2._nextFace._prevFace = f1._prevFace;
+                f2._prevFace._nextFace = f1;
+                f1._prevFace = f2._prevFace;
             }
 
-            if (v2.nextVertex != v2)
+            if (v2._nextVertex != v2)
             {
-                v1.prevVertex.nextVertex = v2.nextVertex;
-                v2.nextVertex.prevVertex = v1.prevVertex;
-                v2.prevVertex.nextVertex = v1;
-                v1.prevVertex = v2.prevVertex;
+                v1._prevVertex._nextVertex = v2._nextVertex;
+                v2._nextVertex._prevVertex = v1._prevVertex;
+                v2._prevVertex._nextVertex = v1;
+                v1._prevVertex = v2._prevVertex;
             }
 
-            if (e2.nextHalfEdge != e2)
+            if (e2._nextHalfEdge != e2)
             {
-                e1.otherHalfOfThisEdge.nextHalfEdge.otherHalfOfThisEdge.nextHalfEdge = e2.nextHalfEdge;
-                e2.nextHalfEdge.otherHalfOfThisEdge.nextHalfEdge = e1.otherHalfOfThisEdge.nextHalfEdge;
-                e2.otherHalfOfThisEdge.nextHalfEdge.otherHalfOfThisEdge.nextHalfEdge = e1;
-                e1.otherHalfOfThisEdge.nextHalfEdge = e2.otherHalfOfThisEdge.nextHalfEdge;
+                e1._otherHalfOfThisEdge._nextHalfEdge._otherHalfOfThisEdge._nextHalfEdge = e2._nextHalfEdge;
+                e2._nextHalfEdge._otherHalfOfThisEdge._nextHalfEdge = e1._otherHalfOfThisEdge._nextHalfEdge;
+                e2._otherHalfOfThisEdge._nextHalfEdge._otherHalfOfThisEdge._nextHalfEdge = e1;
+                e1._otherHalfOfThisEdge._nextHalfEdge = e2._otherHalfOfThisEdge._nextHalfEdge;
             }
 
             mesh2 = null;
@@ -696,49 +701,49 @@ namespace Tesselate
         */
         public static void meshZapFace(Face fZap)
         {
-            HalfEdge eStart = fZap.halfEdgeThisIsLeftFaceOf;
+            HalfEdge eStart = fZap._halfEdgeThisIsLeftFaceOf;
             HalfEdge e, eNext, eSym;
             Face fPrev, fNext;
             /* walk around face, deleting edges whose right face is also null */
-            eNext = eStart.nextEdgeCCWAroundLeftFace;
+            eNext = eStart._nextEdgeCCWAroundLeftFace;
             do
             {
                 e = eNext;
-                eNext = e.nextEdgeCCWAroundLeftFace;
-                e.leftFace = null;
+                eNext = e._nextEdgeCCWAroundLeftFace;
+                e._leftFace = null;
                 if (e.rightFace == null)
                 {
                     /* delete the edge -- see __gl_MeshDelete above */
 
-                    if (e.nextEdgeCCWAroundOrigin == e)
+                    if (e._nextEdgeCCWAroundOrigin == e)
                     {
-                        KillVertex(e.originVertex, null);
+                        KillVertex(e._originVertex, null);
                     }
                     else
                     {
                         /* Make sure that e.Org points to a valid half-edge */
-                        e.originVertex.edgeThisIsOriginOf = e.nextEdgeCCWAroundOrigin;
+                        e._originVertex._edgeThisIsOriginOf = e._nextEdgeCCWAroundOrigin;
                         Splice(e, e.Oprev);
                     }
-                    eSym = e.otherHalfOfThisEdge;
-                    if (eSym.nextEdgeCCWAroundOrigin == eSym)
+                    eSym = e._otherHalfOfThisEdge;
+                    if (eSym._nextEdgeCCWAroundOrigin == eSym)
                     {
-                        KillVertex(eSym.originVertex, null);
+                        KillVertex(eSym._originVertex, null);
                     }
                     else
                     {
                         /* Make sure that eSym.Org points to a valid half-edge */
-                        eSym.originVertex.edgeThisIsOriginOf = eSym.nextEdgeCCWAroundOrigin;
+                        eSym._originVertex._edgeThisIsOriginOf = eSym._nextEdgeCCWAroundOrigin;
                         Splice(eSym, eSym.Oprev);
                     }
                     KillEdge(e);
                 }
             } while (e != eStart);
             /* delete from circular doubly-linked list */
-            fPrev = fZap.prevFace;
-            fNext = fZap.nextFace;
-            fNext.prevFace = fPrev;
-            fPrev.nextFace = fNext;
+            fPrev = fZap._prevFace;
+            fNext = fZap._nextFace;
+            fNext._prevFace = fPrev;
+            fPrev._nextFace = fNext;
             fZap = null;
         }
 
@@ -746,125 +751,125 @@ namespace Tesselate
         */
         public void CheckMesh()
         {
-            Face fHead = this.faceHead;
-            ContourVertex vHead = this.vertexHead;
-            HalfEdge eHead = this.halfEdgeHead;
+            Face fHead = _faceHead;
+            ContourVertex vHead = _vertexHead;
+            HalfEdge eHead = _halfEdgeHead;
             Face f, fPrev;
             ContourVertex v, vPrev;
             HalfEdge e, ePrev;
             fPrev = fHead;
-            for (fPrev = fHead; (f = fPrev.nextFace) != fHead; fPrev = f)
+            for (fPrev = fHead; (f = fPrev._nextFace) != fHead; fPrev = f)
             {
-                if (f.prevFace != fPrev)
+                if (f._prevFace != fPrev)
                 {
                     throw new Exception();
                 }
-                e = f.halfEdgeThisIsLeftFaceOf;
+                e = f._halfEdgeThisIsLeftFaceOf;
                 do
                 {
-                    if (e.otherHalfOfThisEdge == e)
+                    if (e._otherHalfOfThisEdge == e)
                     {
                         throw new Exception();
                     }
-                    if (e.otherHalfOfThisEdge.otherHalfOfThisEdge != e)
+                    if (e._otherHalfOfThisEdge._otherHalfOfThisEdge != e)
                     {
                         throw new Exception();
                     }
-                    if (e.nextEdgeCCWAroundLeftFace.nextEdgeCCWAroundOrigin.otherHalfOfThisEdge != e)
+                    if (e._nextEdgeCCWAroundLeftFace._nextEdgeCCWAroundOrigin._otherHalfOfThisEdge != e)
                     {
                         throw new Exception();
                     }
-                    if (e.nextEdgeCCWAroundOrigin.otherHalfOfThisEdge.nextEdgeCCWAroundLeftFace != e)
+                    if (e._nextEdgeCCWAroundOrigin._otherHalfOfThisEdge._nextEdgeCCWAroundLeftFace != e)
                     {
                         throw new Exception();
                     }
-                    if (e.leftFace != f)
+                    if (e._leftFace != f)
                     {
                         throw new Exception();
                     }
-                    e = e.nextEdgeCCWAroundLeftFace;
-                } while (e != f.halfEdgeThisIsLeftFaceOf);
+                    e = e._nextEdgeCCWAroundLeftFace;
+                } while (e != f._halfEdgeThisIsLeftFaceOf);
             }
-            if (f.prevFace != fPrev || f.halfEdgeThisIsLeftFaceOf != null)
+            if (f._prevFace != fPrev || f._halfEdgeThisIsLeftFaceOf != null)
             {
                 throw new Exception();
             }
 
             vPrev = vHead;
-            for (vPrev = vHead; (v = vPrev.nextVertex) != vHead; vPrev = v)
+            for (vPrev = vHead; (v = vPrev._nextVertex) != vHead; vPrev = v)
             {
-                if (v.prevVertex != vPrev)
+                if (v._prevVertex != vPrev)
                 {
                     throw new Exception();
                 }
-                e = v.edgeThisIsOriginOf;
+                e = v._edgeThisIsOriginOf;
                 do
                 {
-                    if (e.otherHalfOfThisEdge == e)
+                    if (e._otherHalfOfThisEdge == e)
                     {
                         throw new Exception();
                     }
-                    if (e.otherHalfOfThisEdge.otherHalfOfThisEdge != e)
+                    if (e._otherHalfOfThisEdge._otherHalfOfThisEdge != e)
                     {
                         throw new Exception();
                     }
-                    if (e.nextEdgeCCWAroundLeftFace.nextEdgeCCWAroundOrigin.otherHalfOfThisEdge != e)
+                    if (e._nextEdgeCCWAroundLeftFace._nextEdgeCCWAroundOrigin._otherHalfOfThisEdge != e)
                     {
                         throw new Exception();
                     }
-                    if (e.nextEdgeCCWAroundOrigin.otherHalfOfThisEdge.nextEdgeCCWAroundLeftFace != e)
+                    if (e._nextEdgeCCWAroundOrigin._otherHalfOfThisEdge._nextEdgeCCWAroundLeftFace != e)
                     {
                         throw new Exception();
                     }
-                    if (e.originVertex != v)
+                    if (e._originVertex != v)
                     {
                         throw new Exception();
                     }
-                    e = e.nextEdgeCCWAroundOrigin;
-                } while (e != v.edgeThisIsOriginOf);
+                    e = e._nextEdgeCCWAroundOrigin;
+                } while (e != v._edgeThisIsOriginOf);
             }
-            if (v.prevVertex != vPrev || v.edgeThisIsOriginOf != null || v.clientIndex != 0)
+            if (v._prevVertex != vPrev || v._edgeThisIsOriginOf != null || v._clientIndex != 0)
             {
                 throw new Exception();
             }
 
             ePrev = eHead;
-            for (ePrev = eHead; (e = ePrev.nextHalfEdge) != eHead; ePrev = e)
+            for (ePrev = eHead; (e = ePrev._nextHalfEdge) != eHead; ePrev = e)
             {
-                if (e.otherHalfOfThisEdge.nextHalfEdge != ePrev.otherHalfOfThisEdge)
+                if (e._otherHalfOfThisEdge._nextHalfEdge != ePrev._otherHalfOfThisEdge)
                 {
                     throw new Exception();
                 }
-                if (e.otherHalfOfThisEdge == e)
+                if (e._otherHalfOfThisEdge == e)
                 {
                     throw new Exception();
                 }
-                if (e.otherHalfOfThisEdge.otherHalfOfThisEdge != e)
+                if (e._otherHalfOfThisEdge._otherHalfOfThisEdge != e)
                 {
                     throw new Exception();
                 }
-                if (e.originVertex == null)
+                if (e._originVertex == null)
                 {
                     throw new Exception();
                 }
-                if (e.directionVertex == null)
+                if (e.DirectionVertex == null)
                 {
                     throw new Exception();
                 }
-                if (e.nextEdgeCCWAroundLeftFace.nextEdgeCCWAroundOrigin.otherHalfOfThisEdge != e)
+                if (e._nextEdgeCCWAroundLeftFace._nextEdgeCCWAroundOrigin._otherHalfOfThisEdge != e)
                 {
                     throw new Exception();
                 }
-                if (e.nextEdgeCCWAroundOrigin.otherHalfOfThisEdge.nextEdgeCCWAroundLeftFace != e)
+                if (e._nextEdgeCCWAroundOrigin._otherHalfOfThisEdge._nextEdgeCCWAroundLeftFace != e)
                 {
                     throw new Exception();
                 }
             }
-            if (e.otherHalfOfThisEdge.nextHalfEdge != ePrev.otherHalfOfThisEdge
-                || e.otherHalfOfThisEdge != this.otherHalfOfThisEdgeHead
-                || e.otherHalfOfThisEdge.otherHalfOfThisEdge != e
-                || e.originVertex != null || e.directionVertex != null
-                || e.leftFace != null || e.rightFace != null)
+            if (e._otherHalfOfThisEdge._nextHalfEdge != ePrev._otherHalfOfThisEdge
+                || e._otherHalfOfThisEdge != _otherHalfOfThisEdgeHead
+                || e._otherHalfOfThisEdge._otherHalfOfThisEdge != e
+                || e._originVertex != null || e.DirectionVertex != null
+                || e._leftFace != null || e.rightFace != null)
             {
                 throw new Exception();
             }
@@ -881,20 +886,20 @@ namespace Tesselate
         public bool SetWindingNumber(int value, bool keepOnlyBoundary)
         {
             HalfEdge e, eNext;
-            for (e = this.halfEdgeHead.nextHalfEdge; e != this.halfEdgeHead; e = eNext)
+            for (e = _halfEdgeHead._nextHalfEdge; e != _halfEdgeHead; e = eNext)
             {
-                eNext = e.nextHalfEdge;
-                if (e.rightFace.isInterior != e.leftFace.isInterior)
+                eNext = e._nextHalfEdge;
+                if (e.rightFace._isInterior != e._leftFace._isInterior)
                 {
                     /* This is a boundary edge (one side is interior, one is exterior). */
-                    e.winding = (e.leftFace.isInterior) ? value : -value;
+                    e._winding = (e._leftFace._isInterior) ? value : -value;
                 }
                 else
                 {
                     /* Both regions are interior, or both are exterior. */
                     if (!keepOnlyBoundary)
                     {
-                        e.winding = 0;
+                        e._winding = 0;
                     }
                     else
                     {
@@ -914,11 +919,11 @@ namespace Tesselate
         public void DiscardExterior()
         {
             Face f, next;
-            for (f = this.faceHead.nextFace; f != this.faceHead; f = next)
+            for (f = _faceHead._nextFace; f != _faceHead; f = next)
             {
                 /* Since f will be destroyed, save its next pointer. */
-                next = f.nextFace;
-                if (!f.isInterior)
+                next = f._nextFace;
+                if (!f._isInterior)
                 {
                     Mesh.meshZapFace(f);
                 }
@@ -932,11 +937,11 @@ namespace Tesselate
         public bool TessellateInterior()
         {
             Face f, next;
-            for (f = this.faceHead.nextFace; f != this.faceHead; f = next)
+            for (f = _faceHead._nextFace; f != _faceHead; f = next)
             {
                 /* Make sure we don''t try to tessellate the new triangles. */
-                next = f.nextFace;
-                if (f.isInterior)
+                next = f._nextFace;
+                if (f._isInterior)
                 {
                     if (!f.TessellateMonoRegion())
                     {
