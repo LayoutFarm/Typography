@@ -209,7 +209,8 @@ namespace Msdfgen
         }
         static void msdfErrorCorrection(FloatRGBBmp output, Vector2 threshold)
         {
-            List<Pair<int, int>> clashes = new List<Msdfgen.Pair<int, int>>();
+            //Pair<int,int> is List<Point>
+            List<Pair<int, int>> clashes = new List<Pair<int, int>>();
             int w = output.Width, h = output.Height;
             for (int y = 0; y < h; ++y)
             {
@@ -241,7 +242,7 @@ namespace Msdfgen
             //}
         }
 
-        public static int[] ConvertToIntBmp(Msdfgen.FloatRGBBmp input)
+        public static int[] ConvertToIntBmp(FloatRGBBmp input)
         {
             int height = input.Height;
             int width = input.Width;
@@ -253,20 +254,20 @@ namespace Msdfgen
                 {
                     //a b g r
                     //----------------------------------
-                    Msdfgen.FloatRGB pixel = input.GetPixel(x, y);
+                    FloatRGB pixel = input.GetPixel(x, y);
                     //a b g r
                     //for big-endian color
                     //int abgr = (255 << 24) |
-                    //    Msdfgen.Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
-                    //    Msdfgen.Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
-                    //    Msdfgen.Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
+                    //    Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
+                    //    Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                    //    Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
 
                     //for little-endian color
 
                     int abgr = (255 << 24) |
-                        Msdfgen.Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
-                        Msdfgen.Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
-                        Msdfgen.Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
+                        Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
+                        Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                        Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
 
                     output[(y * width) + x] = abgr;
                     //----------------------------------

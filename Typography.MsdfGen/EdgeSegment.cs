@@ -28,7 +28,7 @@ namespace Msdfgen
                     double pseudoDistance = Vector2.crossProduct(aq, dir);
                     if (Math.Abs(pseudoDistance) <= Math.Abs(distance.distance))
                     {
-                        distance = new Msdfgen.SignedDistance(pseudoDistance, 0);
+                        distance = new SignedDistance(pseudoDistance, 0);
                     }
                 }
             }
@@ -42,7 +42,7 @@ namespace Msdfgen
                     double pseudoDistance = Vector2.crossProduct(bq, dir);
                     if (Math.Abs(pseudoDistance) <= Math.Abs(distance.distance))
                     {
-                        distance = new Msdfgen.SignedDistance(pseudoDistance, 0);
+                        distance = new SignedDistance(pseudoDistance, 0);
                     }
                 }
             }
