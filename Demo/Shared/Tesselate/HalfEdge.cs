@@ -44,33 +44,37 @@ namespace Tesselate
 {
     public class HalfEdge
     {
+#if DEBUG
         public int debugIndex;
-        public bool isFirstHalfEdge;
-        public HalfEdge nextHalfEdge;		/* doubly-linked list (prev==Sym.next) */
-        public HalfEdge otherHalfOfThisEdge;		/* same edge, opposite direction */
-        public HalfEdge nextEdgeCCWAroundOrigin;		/* next edge CCW around origin */
-        public HalfEdge nextEdgeCCWAroundLeftFace;		/* next edge CCW around left face */
-        public ContourVertex originVertex;		/* origin vertex */
-        public Face leftFace;		/* left face */
+#endif
+        internal bool _isFirstHalfEdge;
+        internal HalfEdge _nextHalfEdge;		/* doubly-linked list (prev==Sym.next) */
+        internal HalfEdge _otherHalfOfThisEdge;		/* same edge, opposite direction */
+        internal HalfEdge _nextEdgeCCWAroundOrigin;		/* next edge CCW around origin */
+        internal HalfEdge _nextEdgeCCWAroundLeftFace;		/* next edge CCW around left face */
+        internal ContourVertex _originVertex;		/* origin vertex */
+        internal Face _leftFace;		/* left face */
         /* Internal data (keep hidden) */
-        public ActiveRegion regionThisIsUpperEdgeOf;	/* a region with this upper edge (sweep.c) */
-        public int winding;	// change in winding number when crossing from the right face to the left face
-        public Face rightFace { get { return otherHalfOfThisEdge.leftFace; } set { otherHalfOfThisEdge.leftFace = value; } }
-        public HalfEdge Lprev { get { return nextEdgeCCWAroundOrigin.otherHalfOfThisEdge; } set { nextEdgeCCWAroundOrigin.otherHalfOfThisEdge = value; } }
-        public HalfEdge Oprev { get { return otherHalfOfThisEdge.nextEdgeCCWAroundLeftFace; } }
-        public ContourVertex directionVertex { get { return otherHalfOfThisEdge.originVertex; } set { otherHalfOfThisEdge.originVertex = value; } }
-        public HalfEdge Dnext { get { return Rprev.otherHalfOfThisEdge; } }
-        public HalfEdge Dprev { get { return nextEdgeCCWAroundLeftFace.otherHalfOfThisEdge; } }
-        public HalfEdge Rprev { get { return otherHalfOfThisEdge.nextEdgeCCWAroundOrigin; } }
+        internal ActiveRegion _regionThisIsUpperEdgeOf;	/* a region with this upper edge (sweep.c) */
+        internal int _winding;	// change in winding number when crossing from the right face to the left face
+        internal Face rightFace { get => _otherHalfOfThisEdge._leftFace; set => _otherHalfOfThisEdge._leftFace = value; }
 
-        public bool EdgeGoesLeft()
+        internal HalfEdge Lprev { get => _nextEdgeCCWAroundOrigin._otherHalfOfThisEdge; set => _nextEdgeCCWAroundOrigin._otherHalfOfThisEdge = value; }
+        internal HalfEdge Oprev => _otherHalfOfThisEdge._nextEdgeCCWAroundLeftFace;
+
+        internal ContourVertex DirectionVertex { get => _otherHalfOfThisEdge._originVertex; set => _otherHalfOfThisEdge._originVertex = value; }
+        internal HalfEdge Dnext => Rprev._otherHalfOfThisEdge;
+        internal HalfEdge Dprev => _nextEdgeCCWAroundLeftFace._otherHalfOfThisEdge;
+        internal HalfEdge Rprev => _otherHalfOfThisEdge._nextEdgeCCWAroundOrigin;
+
+        internal bool EdgeGoesLeft()
         {
-            return this.directionVertex.VertLeq(this.originVertex);
+            return this.DirectionVertex.VertLeq(_originVertex);
         }
 
-        public bool EdgeGoesRight()
+        internal bool EdgeGoesRight()
         {
-            return this.originVertex.VertLeq(this.directionVertex);
+            return _originVertex.VertLeq(this.DirectionVertex);
         }
     }
 }

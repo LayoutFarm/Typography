@@ -1,15 +1,17 @@
-﻿//BSD, 2014-2017, WinterDev
+﻿//BSD, 2014-present, WinterDev
 
 using System;
 using System.Collections.Generic;
 namespace Tesselate
 {
+
+    //TODO: review this again....
     //-----
     //design for our tess only
     //not for general use.
     //----- 
-    public class RefItem<T>
-        where T : IComparable<T>
+    class RefItem<T>
+      where T : IComparable<T>
     {
         public RefItem(T data)
         {
@@ -25,71 +27,67 @@ namespace Tesselate
 #endif
     }
 
-    public class MaxFirstList<T>
-        where T : IComparable<T>
+    class MaxFirstList<T>
+      where T : IComparable<T>
     {
-        List<RefItem<T>> innerList = new List<RefItem<T>>();
-        bool isSorted = false;
+        List<RefItem<T>> _innerList = new List<RefItem<T>>();
+        bool _isSorted = false;
         public MaxFirstList()
         {
         }
-        public bool IsEmpty
-        {
-            get
-            {
-                return innerList.Count == 0;
-            }
-        }
+        //
+        public bool IsEmpty => _innerList.Count == 0;
+        //
         static int MaxFirstSort(RefItem<T> t1, RefItem<T> t2)
         {
             return t2.Data.CompareTo(t1.Data);
         }
         void SortData()
         {
-            innerList.Sort(MaxFirstSort);
-            for (int i = innerList.Count - 1; i >= 0; --i)
+            _innerList.Sort(MaxFirstSort);
+            for (int i = _innerList.Count - 1; i >= 0; --i)
             {
-                innerList[i].NodeNumber = i;
+                _innerList[i].NodeNumber = i;
             }
-            isSorted = true;
+            _isSorted = true;
         }
         public T DeleteMin()
         {
             //find min and delete 
-            if (!isSorted)
+            if (!_isSorted)
             {
                 SortData();
             }
-            int last = innerList.Count - 1;
-            var tmp = innerList[last];
-            innerList.RemoveAt(last);
+            int last = _innerList.Count - 1;
+            var tmp = _innerList[last];
+            _innerList.RemoveAt(last);
             return tmp.Data;
         }
         public T FindMin()
         {
-            if (!isSorted)
+            if (!_isSorted)
             {
                 SortData();
             }
-            return innerList[innerList.Count - 1].Data;
+            return _innerList[_innerList.Count - 1].Data;
         }
         public void Add(out RefItem<T> refItem, T data)
         {
             RefItem<T> item = new RefItem<T>(data);
-            innerList.Add(item);
-            isSorted = false;
+            _innerList.Add(item);
+            _isSorted = false;
             refItem = item;
         }
         public void Add(T data)
         {
             RefItem<T> item = new RefItem<T>(data);
-            innerList.Add(item);
-            isSorted = false;
+            _innerList.Add(item);
+            _isSorted = false;
         }
         int BinSearch(RefItem<T> refItem, int begin, int end)
         {
             int pos = begin + ((end - begin) / 2);
-            RefItem<T> sample = innerList[pos];
+            RefItem<T> sample = _innerList[pos];
             if (refItem == sample)
             {
             }
@@ -123,24 +121,24 @@ namespace Tesselate
         {
             //delete specfic node 
 
-            if (isSorted)
+            if (_isSorted)
             {
                 //use binary search to find node 
                 //1. find middle point 
                 int removeAt = refItem.NodeNumber;
-                for (int i = innerList.Count - 1; i > removeAt; --i)
+                for (int i = _innerList.Count - 1; i > removeAt; --i)
                 {
-                    innerList[i].NodeNumber = i - 1;
+                    _innerList[i].NodeNumber = i - 1;
                 }
-                innerList.RemoveAt(removeAt);
+                _innerList.RemoveAt(removeAt);
             }
             else
             {
-                for (int i = innerList.Count - 1; i >= 0; --i)
+                for (int i = _innerList.Count - 1; i >= 0; --i)
                 {
-                    if (innerList[i] == refItem)
+                    if (_innerList[i] == refItem)
                     {
-                        this.innerList.RemoveAt(i);
+                        _innerList.RemoveAt(i);
                         break;
                     }
                 }

@@ -11,7 +11,7 @@ using Typography.OpenFont;
 using DrawingGL;
 using DrawingGL.Text;
 //
-
+using Tesselate;
 
 namespace Test_WinForm_TessGlyph
 {
@@ -187,8 +187,8 @@ namespace Test_WinForm_TessGlyph
                 {
                     //extra coord (newly created)
                     TessVertex2d extraVertex = tempVertexList[index - orgVertexCount];
-                    vtx[n] = (float)extraVertex.m_X;
-                    vtx[n + 1] = (float)extraVertex.m_Y;
+                    vtx[n] = (float)extraVertex.x;
+                    vtx[n + 1] = (float)extraVertex.y;
                 }
                 else
                 {
