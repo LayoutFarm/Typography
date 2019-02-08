@@ -42,41 +42,35 @@
 using DictKey = Tesselate.ActiveRegion;
 namespace Tesselate
 {
-    public class Dictionary
+    class Dictionary
     {
-        public Node head = new Node();
-        public Tesselator tesseator;
+        Node _head = new Node();
+        Tesselator _tess;
         public class Node
         {
-            DictKey key = new DictKey();
+            public DictKey Key = new DictKey();
             public Node next;
             public Node prev;
-            public DictKey Key
-            {
-                get { return this.key; }
-                set { this.key = value; }
-            }
-
             public void Delete()
             {
                 this.next.prev = this.prev;
                 this.prev.next = this.next;
             }
-        };
+        }
         public Dictionary(Tesselator tesselator)
         {
             Node nodeHead;
-            nodeHead = this.head;
+            nodeHead = _head;
             nodeHead.Key = null;
             nodeHead.next = nodeHead;
             nodeHead.prev = nodeHead;
-            this.tesseator = tesselator;
+            _tess = tesselator;
         }
 
         public static void dictDeleteDict(Dictionary dict)
         {
             Node node, next;
-            for (node = dict.head.next; node != dict.head; node = next)
+            for (node = dict._head.next; node != dict._head; node = next)
             {
                 next = node.next;
                 node = null;
@@ -87,7 +81,7 @@ namespace Tesselate
 
         public Dictionary.Node Insert(DictKey k)
         {
-            return this.InsertBefore(head, k);
+            return this.InsertBefore(_head, k);
         }
 
         public Node InsertBefore(Node node, DictKey key)
@@ -96,8 +90,8 @@ namespace Tesselate
             do
             {
                 node = node.prev;
-            } while (node.Key != null &&
-                !ActiveRegion.EdgeLeq(this.tesseator, node.Key, key));
+            } while (node.Key != null && !ActiveRegion.EdgeLeq(_tess, node.Key, key));
+
             newNode = new Node();
             newNode.Key = key;
             newNode.next = node.next;
@@ -109,16 +103,16 @@ namespace Tesselate
 
         public Dictionary.Node GetMinNode()
         {
-            return this.head.next;
+            return _head.next;
         }
 
         public static Node dictSearch(Dictionary dict, DictKey key)
         {
-            Node node = dict.head;
+            Node node = dict._head;
             do
             {
                 node = node.next;
-            } while (node.Key != null && !ActiveRegion.EdgeLeq(dict.tesseator, key, node.Key));
+            } while (node.Key != null && !ActiveRegion.EdgeLeq(dict._tess, key, node.Key));
             return node;
         }
     }

@@ -40,23 +40,24 @@
 **
 */
 
-using System; 
+using System;
 namespace Tesselate
 {
     public class ContourVertex : IComparable<ContourVertex>
     {
-        public ContourVertex nextVertex;		/* next vertex (never null) */
-        public ContourVertex prevVertex;		/* previous vertex (never null) */
-        public HalfEdge edgeThisIsOriginOf;	/* a half-edge with this origin */
-        public int clientIndex;		/* client's data */
+        internal ContourVertex _nextVertex;		/* next vertex (never null) */
+        internal ContourVertex _prevVertex;		/* previous vertex (never null) */
+        internal HalfEdge _edgeThisIsOriginOf;	/* a half-edge with this origin */
+        internal int _clientIndex;		/* client's data */
         /* Internal data (keep hidden) */
         /* vertex location in 3D */
 
-        internal double C_0;
-        internal double C_1;
-        internal double C_2;
-        public double x, y;		/* projection onto the sweep plane */
-        public RefItem<ContourVertex> priorityQueueHandle;	/* to allow deletion from priority queue */
+        internal double _C_0;
+        internal double _C_1;
+        internal double _C_2;
+        internal double x, y;		/* projection onto the sweep plane */
+        internal RefItem<ContourVertex> _priorityQueueHandle;	/* to allow deletion from priority queue */
+
         public int CompareTo(ContourVertex otherVertex)
         {
             if (VertEq(otherVertex))
@@ -70,10 +71,8 @@ namespace Tesselate
             return 1;
         }
 
-        public bool Equal2D(ContourVertex OtherVertex)
-        {
-            return (this.x == OtherVertex.x && this.y == OtherVertex.y);
-        }
+        public bool Equal2D(ContourVertex OtherVertex) => (x == OtherVertex.x && y == OtherVertex.y);
+
 
         public static double EdgeEval(ContourVertex u, ContourVertex v, ContourVertex w)
         {
@@ -133,20 +132,12 @@ namespace Tesselate
             return 0;
         }
 
-        public bool VertEq(ContourVertex v)
-        {
-            return ((this.x == v.x) && this.y == v.y);
-        }
+        public bool VertEq(ContourVertex v) => ((x == v.x) && y == v.y);
 
-        public bool VertLeq(ContourVertex v)
-        {
-            return ((this.x < v.x) || (this.x == v.x && this.y <= v.y));
-        }
+        public bool VertLeq(ContourVertex v) => ((x < v.x) || (x == v.x && y <= v.y));
 
-        public bool TransLeq(ContourVertex v)
-        {
-            return ((this.y < v.y) || (this.y == v.y && this.x <= v.x));
-        }
+        public bool TransLeq(ContourVertex v) => ((y < v.y) || (y == v.y && x <= v.x));
+
 
         public static bool VertCCW(ContourVertex u, ContourVertex v, ContourVertex w)
         {
@@ -162,7 +153,7 @@ namespace Tesselate
 #if DEBUG
         public override string ToString()
         {
-            return this.C_0 + "," + this.C_1 + "," + this.C_2;
+            return _C_0 + "," + _C_1 + "," + _C_2;
         }
 #endif
     }
