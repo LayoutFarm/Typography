@@ -84,11 +84,13 @@ namespace Test_WinForm_TessGlyph
             }
             DrawOutput();
         }
-
-
-
         private void FormTess_Load(object sender, EventArgs e)
         {
+            if (_g == null)
+            {
+                _g = this.pnlGlyph.CreateGraphics();
+            }
+            _g.Clear(Color.White);
 
         }
 
@@ -110,26 +112,53 @@ namespace Test_WinForm_TessGlyph
             //        50,100
             //};
         }
+
+
+        float[] TransformPoints(float[] polygonXYs, System.Drawing.Drawing2D.Matrix transformMat)
+        {
+            //for example only
+
+            PointF[] points = new PointF[1];
+            float[] transformXYs = new float[polygonXYs.Length];
+
+            for (int i = 0; i < polygonXYs.Length;)
+            {
+                points[0] = new PointF(polygonXYs[i], polygonXYs[i + 1]);
+                transformMat.TransformPoints(points);
+
+                transformXYs[i] = points[0].X;
+                transformXYs[i + 1] = points[0].Y;
+                i += 2;
+            }
+            return transformXYs;
+        }
         void DrawOutput()
         {
             if (_g == null)
             {
                 return;
             }
+
             //-----------
             //for GDI+ only
             bool drawInvert = chkInvert.Checked;
             int viewHeight = this.pnlGlyph.Height;
-            if (drawInvert)
-            {
-                _g.ScaleTransform(1, -1);
-                _g.TranslateTransform(0, -viewHeight);
-            }
+
             //----------- 
             //show tess
             _g.Clear(Color.White);
             int[] contourEndIndices;
             float[] polygon1 = GetPolygonData(out contourEndIndices);
+            if (polygon1 == null) return;
+            //
+            if (drawInvert)
+            {
+                var transformMat = new System.Drawing.Drawing2D.Matrix();
+                transformMat.Scale(1, -1);
+                transformMat.Translate(0, -viewHeight);
+                //
+                polygon1 = TransformPoints(polygon1, transformMat);
+            }
 
 
             using (Pen pen1 = new Pen(Color.LightGray, 6))
@@ -153,7 +182,7 @@ namespace Test_WinForm_TessGlyph
                         m += 2;
                         a++;
                     }
-                    //close coutour 
+                    //close contour 
 
                     p0 = new PointF(polygon1[endAt - 1], polygon1[endAt]);
                     p1 = new PointF(polygon1[startAt - 3], polygon1[startAt - 2]);
@@ -213,10 +242,7 @@ namespace Test_WinForm_TessGlyph
 
                 i += 6;
             }
-            //-----------
-            //for GDI+ only
-            _g.ResetTransform();
-            //-----------
+
         }
         private void cmdDrawGlyph_Click(object sender, EventArgs e)
         {
