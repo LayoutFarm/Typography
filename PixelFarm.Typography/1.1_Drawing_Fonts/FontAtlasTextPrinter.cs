@@ -231,14 +231,9 @@ namespace PixelFarm.Drawing.Fonts
             //since glyphs may overlap each other
             //then we use fill glyph-by-glyph for best result
 
-
-            //if (fillGlyphByGlyph)
-            //{
-
             //fill glyph-by-glyh
             var aaTech = this.AntialiasTech;
-            int seqLen = glyphPlanSeq.Count;
-
+            int seqLen = glyphPlanSeq.Count; 
 
             for (int i = 0; i < seqLen; ++i)
             {
@@ -318,81 +313,6 @@ namespace PixelFarm.Drawing.Fonts
                         break;
                 }
             }
-            //}
-            //else
-            //{
-            // fill entire line
-            //    //clear entire line
-            //    _maskBufferPainter.FillRect(gx - 1, gy - 1, _maskBufferPainter.Width - gx + 2, lineHeight + 2, Color.Black);
-
-            //    bool isFirst = true;
-            //    int startX = 0, startY = 0;
-            //    float lenW = 0;
-            //    float lenH = 0;
-
-            //    int seqLen = glyphPlanSeq.Count;
-            //    for (int i = 0; i < seqLen; ++i)
-            //    {
-            //        UnscaledGlyphPlan glyph = glyphPlanSeq[i];
-
-            //        TextureGlyphMapData glyphData;
-            //        if (!_fontAtlas.TryGetGlyphMapData(glyph.glyphIndex, out glyphData))
-            //        {
-            //            //if no glyph data, we should render a missing glyph ***
-            //            continue;
-            //        }
-            //        //--------------------------------------
-            //        //TODO: review precise height in float
-            //        //-------------------------------------- 
-            //        int srcX, srcY, srcW, srcH;
-            //        glyphData.GetRect(out srcX, out srcY, out srcW, out srcH);
-
-            //        float ngx = acc_x + (float)Math.Round(glyph.OffsetX * scale);
-            //        float ngy = acc_y + (float)Math.Round(glyph.OffsetY * scale);
-            //        //NOTE:
-            //        // -glyphData.TextureXOffset => restore to original pos
-            //        // -glyphData.TextureYOffset => restore to original pos 
-            //        //--------------------------
-            //        gx = (float)(left + (ngx - glyphData.TextureXOffset)); //ideal x
-            //        gy = (float)(top + (ngy - glyphData.TextureYOffset - srcH + lineHeight));
-
-            //        acc_x += (float)Math.Round(glyph.AdvanceX * scale);
-            //        gy = (float)Math.Floor(gy) + lineHeight;
-
-            //        if (isFirst)
-            //        {
-            //            startX = (int)gx;
-            //            startY = (int)gy;
-            //            isFirst = false;
-            //        }
-
-            //        _maskBufferPainter.DrawImage(_fontBmp, gx + 1, gy, srcX, _fontBmp.Height - (srcY), srcW + 1, srcH);
-
-            //        lenW = gx + srcW;
-            //        if (srcH > lenH)
-            //        {
-            //            lenH = srcH;
-            //        }
-
-            //    }
-            //    //--------------------------
-            //    //fill color on 'stencil' mask
-            //    {
-            //        //select component to render this need to render 3 times for lcd technique
-            //        //1. B
-            //        _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.B;
-            //        _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.B;
-            //        _painter.FillRect(startX + 1, startY, lenW, lenH);
-            //        //2. G
-            //        _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.G;
-            //        _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.G;
-            //        _painter.FillRect(startX + 1, startY, lenW, lenH);
-            //        //3. R
-            //        _maskPixelBlenderPerCompo.SelectedMaskComponent = PixelBlenderColorComponent.R;
-            //        _maskPixelBlenderPerCompo.EnableOutputColorComponent = EnableOutputColorComponent.R;
-            //        _painter.FillRect(startX + 1, startY, lenW, lenH);
-            //    }
-            //}
 
 
             _painter.UseSubPixelLcdEffect = painterUseSubPixelLcdEffect; //restore
