@@ -232,7 +232,7 @@ namespace PixelFarm.Drawing.Fonts
             //then we use fill glyph-by-glyph for best result
 
             //fill glyph-by-glyh
-            var aaTech = this.AntialiasTech;
+            AntialiasTechnique aaTech = this.AntialiasTech;
             int seqLen = glyphPlanSeq.Count; 
 
             for (int i = 0; i < seqLen; ++i)
@@ -267,7 +267,7 @@ namespace PixelFarm.Drawing.Fonts
                 //clear with solid black color 
                 _maskBufferPainter.Clear(Color.Black);
                 //clear mask buffer at specific pos
-                _maskBufferPainter.FillRect(gx - 1, gy - 1, srcW + 2, srcH + 2, Color.Black);
+                //_maskBufferPainter.FillRect(gx - 1, gy - 1, srcW + 2, srcH + 2, Color.Black);
                 //draw 'stencil' glyph on mask-buffer                
                 _maskBufferPainter.DrawImage(_fontBmp, gx, gy, srcX, _fontBmp.Height - (srcY + srcH), srcW, srcH);
 
