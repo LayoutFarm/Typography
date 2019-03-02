@@ -92,8 +92,22 @@ namespace Typography.Contours
                     // 
                     painter.UseSubPixelLcdEffect = true;
                     //we use white glyph on black bg for this texture                
+
+
                     painter.Clear(Color.Black);
                     painter.FillColor = Color.White;
+
+
+                    //painter.Clear(Color.FromArgb(0, 255, 255, 255)); //white -transparent
+                    //painter.FillColor = Color.Black;
+
+
+                    //painter.Clear(Color.White);
+                    //painter.FillColor = Color.Black;
+
+                    //painter.Clear(Color.Empty);
+                    //painter.FillColor = Color.Black;
+
                     painter.Fill(glyphVxs);
 
                     //apply sharpen filter
