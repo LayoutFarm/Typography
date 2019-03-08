@@ -33,7 +33,6 @@ namespace PixelFarm.Drawing.Fonts
         {
             _glyphLocations.Add(glyphIndex, glyphData);
         }
-
         public GlyphImage TotalGlyph
         {
             get => _totalGlyphImage;
