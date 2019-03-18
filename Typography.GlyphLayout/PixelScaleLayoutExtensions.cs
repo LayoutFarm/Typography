@@ -417,7 +417,7 @@ namespace Typography.TextLayout
             bool snapToGrid = true)
         {
             //1. unscale layout, in design unit
-            glyphLayout.Layout(textBuffer, startAt, len); 
+            glyphLayout.Layout(textBuffer, startAt, len);
 
             //2. scale  to specific font size           
 
@@ -439,7 +439,7 @@ namespace Typography.TextLayout
                      typeface.Ascender,
                      typeface.Descender,
                      typeface.LineGap,
-                    (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
+                     (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
                      pxscale);
 
             }
@@ -452,13 +452,16 @@ namespace Typography.TextLayout
                     snapToGrid,
                     out int stopAtChar);
 
-                return new MeasuredStringBox(
+                var mstrbox = new MeasuredStringBox(
                  scaled_accumX,
                  typeface.Ascender,
                  typeface.Descender,
                  typeface.LineGap,
                  (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
                  pxscale);
+
+                mstrbox.StopAt = (ushort)stopAtChar;
+                return mstrbox;
             }
             else
             {

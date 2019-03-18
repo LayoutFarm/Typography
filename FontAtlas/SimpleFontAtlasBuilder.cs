@@ -238,9 +238,7 @@ namespace Typography.Rendering
             glyphImage.SetImageBuffer(totalBuffer, true);
             _latestGenGlyphImage = glyphImage;
             return glyphImage;
-
         }
-
         public void SaveFontInfo(System.IO.Stream outputStream)
         {
 
@@ -261,19 +259,8 @@ namespace Typography.Rendering
             //
             fontAtlasFile.WriteGlyphList(_glyphs);
             fontAtlasFile.EndWrite();
-
         }
-        /// <summary>
-        /// save font info into xml document
-        /// </summary>
-        /// <param name="filename"></param>
-        public void SaveFontInfo(string filename)
-        {
-            using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Create))
-            {
-                SaveFontInfo(fs);
-            }
-        }
+         
         public SimpleFontAtlas CreateSimpleFontAtlas()
         {
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
@@ -299,17 +286,7 @@ namespace Typography.Rendering
 
             return simpleFontAtlas;
         }
-
-        public SimpleFontAtlas LoadFontInfo(string filename)
-        {
-
-            FontAtlasFile atlasFile = new FontAtlasFile();
-            using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Open))
-            {
-                //read font atlas from stream data
-                return LoadFontInfo(fs);
-            }
-        }
+ 
         public SimpleFontAtlas LoadFontInfo(System.IO.Stream dataStream)
         {
             FontAtlasFile atlasFile = new FontAtlasFile();

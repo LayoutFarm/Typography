@@ -112,12 +112,23 @@ namespace SampleWinForms
                     bmp.UnlockBits(bmpdata);
                     bmp.Save(outputFile);
                 }
-                atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.bin");
+
+                string saveToFile = "d:\\WImageTest\\a_info.bin";
+                using (System.IO.FileStream saveFs = new FileStream(saveToFile, FileMode.Create))
+                {
+                    atlasBuilder.SaveFontInfo(saveFs);
+                    saveFs.Flush();
+                    saveFs.Close();
+                }
+
                 //
                 //-----------
                 //test read texture info back
                 var atlasBuilder2 = new SimpleFontAtlasBuilder();
-                var readbackFontAtlas = atlasBuilder2.LoadFontInfo("d:\\WImageTest\\a_info.bin");
+                using (System.IO.FileStream readFromFs = new FileStream(saveToFile, FileMode.Open))
+                {
+                    var readbackFontAtlas = atlasBuilder2.LoadFontInfo(readFromFs);
+                }
             }
         }
 
@@ -180,7 +191,7 @@ namespace SampleWinForms
                 //
             }
 
-            
+
         }
 
         //public static Msdfgen.Shape CreateMsdfShape(GlyphContourBuilder glyphToContour, float pxScale)
