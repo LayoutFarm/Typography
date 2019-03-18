@@ -25,10 +25,20 @@ namespace Test_WinForm_TessGlyph
         public FormTess()
         {
             InitializeComponent();
-            this.textBox1.KeyUp += TextBox1_KeyUp;
+
+            rdoSimpleIncCurveFlattener.Checked = true;
+            rdoSimpleIncCurveFlattener.CheckedChanged += (s, e) => UpdateOutput();
+            //
+            rdoSubdivCureveFlattener.CheckedChanged += (s, e) => UpdateOutput();
+
+            textBox1.KeyUp += (s, e) => UpdateOutput();
+
+            txtIncrementalTessStep.KeyUp += (s, e) => UpdateOutput();
+            txtDivCurveRecursiveLimit.KeyUp += (s, e) => UpdateOutput();
+            txtDivAngleTolerenceEpsilon.KeyUp += (s, e) => UpdateOutput();
         }
 
-        private void TextBox1_KeyUp(object sender, KeyEventArgs e)
+        void UpdateOutput()
         {
             string oneChar = this.textBox1.Text.Trim();
             if (string.IsNullOrEmpty(oneChar)) return;
@@ -39,15 +49,15 @@ namespace Test_WinForm_TessGlyph
             //selectedChar = 'e'; 
             if (_g == null)
             {
-                _g = this.pnlGlyph.CreateGraphics();
+                _g = this.panel1.CreateGraphics();
             }
             _g.Clear(Color.White);
 
 
 
             //string testFont = "d:\\WImageTest\\DroidSans.ttf";
-            //string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
-            string testFont = "d:\\WImageTest\\Alfa_Slab.ttf";
+            string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
+            //string testFont = "d:\\WImageTest\\Alfa_Slab.ttf";
 
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
@@ -62,10 +72,35 @@ namespace Test_WinForm_TessGlyph
                 var writablePath = new WritablePath();
                 txToPath.SetOutput(writablePath);
                 builder.ReadShapes(txToPath);
-                //from contour to  
+
+                //------
+                //
+                //**flatten contour before send to Tess***
                 var curveFlattener = new SimpleCurveFlattener();
-                float[] flattenPoints = curveFlattener.Flatten(writablePath._points, out _contourEnds);
-                _glyphPoints2 = flattenPoints;
+
+                if (rdoSimpleIncCurveFlattener.Checked)
+                {
+                    if (int.TryParse(txtIncrementalTessStep.Text, out int incSteps))
+                    {
+                        curveFlattener.IncrementalStep = incSteps;
+                    }
+                    curveFlattener.FlattenMethod = CurveFlattenMethod.Inc;
+                }
+                else
+                {
+                    if (double.TryParse(txtDivAngleTolerenceEpsilon.Text, out double angleTolerenceEpsilon))
+                    {
+                        //convert degree to rad
+                        curveFlattener.DivCurveAngleTolerenceEpsilon = DegToRad(angleTolerenceEpsilon);
+                    }
+                    if (int.TryParse(txtDivCurveRecursiveLimit.Text, out int recuvesiveLim))
+                    {
+                        curveFlattener.DivCurveRecursiveLimit = recuvesiveLim;
+                    }
+                    curveFlattener.FlattenMethod = CurveFlattenMethod.Div;
+                }
+                _glyphPoints2 = curveFlattener.Flatten(writablePath._points, out _contourEnds);
+
                 ////--------------------------------------
                 ////raw glyph points
                 //int j = glyphPoints.Length;
@@ -84,11 +119,21 @@ namespace Test_WinForm_TessGlyph
             }
             DrawOutput();
         }
+
+        static double DegToRad(double degree)
+        {
+            return degree * (Math.PI / 180d);
+        }
+        static double RadToDeg(double degree)
+        {
+            return degree * (180d / Math.PI);
+        }
+
         private void FormTess_Load(object sender, EventArgs e)
         {
             if (_g == null)
             {
-                _g = this.pnlGlyph.CreateGraphics();
+                _g = this.panel1.CreateGraphics();
             }
             _g.Clear(Color.White);
 
@@ -142,7 +187,7 @@ namespace Test_WinForm_TessGlyph
             //-----------
             //for GDI+ only
             bool drawInvert = chkInvert.Checked;
-            int viewHeight = this.pnlGlyph.Height;
+            int viewHeight = this.panel1.Height;
 
             //----------- 
             //show tess
@@ -253,5 +298,6 @@ namespace Test_WinForm_TessGlyph
         {
             DrawOutput();
         }
+
     }
 }
