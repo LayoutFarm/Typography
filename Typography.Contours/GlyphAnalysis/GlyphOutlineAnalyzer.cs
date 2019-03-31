@@ -65,7 +65,7 @@ namespace Typography.Contours
             // more than 1 contours, no hole => eg.  i, j, ;,  etc
             // more than 1 contours, with hole => eg.  a,e ,   etc  
 
-            //closewise => not hole  
+            //clockwise => not hole  
             _waitingHoles.Clear();
             int cntCount = flattenContours.Count;
             Poly2Tri.Polygon mainPolygon = null;
@@ -78,7 +78,7 @@ namespace Typography.Contours
             for (int n = 0; n < cntCount; ++n)
             {
                 GlyphContour cnt = flattenContours[n];
-                if (cnt.IsClosewise())
+                if (cnt.IsClockwise())
                 {
                     //not a hole
                     if (mainPolygon == null)
