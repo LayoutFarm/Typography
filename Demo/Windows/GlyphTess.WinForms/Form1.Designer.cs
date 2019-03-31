@@ -33,7 +33,6 @@
             this.chkInvert = new System.Windows.Forms.CheckBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label5 = new System.Windows.Forms.Label();
             this.txtDivCurveRecursiveLimit = new System.Windows.Forms.TextBox();
@@ -44,7 +43,12 @@
             this.txtIncrementalTessStep = new System.Windows.Forms.TextBox();
             this.rdoSubdivCureveFlattener = new System.Windows.Forms.RadioButton();
             this.rdoSimpleIncCurveFlattener = new System.Windows.Forms.RadioButton();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.rdoTessPoly2Tri = new System.Windows.Forms.RadioButton();
+            this.rdoTessSGI = new System.Windows.Forms.RadioButton();
+            this.label6 = new System.Windows.Forms.Label();
             this.panel2.SuspendLayout();
+            this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // cmdDrawGlyph
@@ -90,15 +94,6 @@
             this.label1.Size = new System.Drawing.Size(64, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "Single Char:";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(540, 342);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(109, 13);
-            this.label6.TabIndex = 13;
-            this.label6.Text = "Tess Method (TODO)";
             // 
             // panel2
             // 
@@ -198,13 +193,54 @@
             this.rdoSimpleIncCurveFlattener.Text = "1. Incremental Flattener";
             this.rdoSimpleIncCurveFlattener.UseVisualStyleBackColor = true;
             // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.label6);
+            this.panel3.Controls.Add(this.rdoTessPoly2Tri);
+            this.panel3.Controls.Add(this.rdoTessSGI);
+            this.panel3.Location = new System.Drawing.Point(543, 359);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(213, 100);
+            this.panel3.TabIndex = 15;
+            // 
+            // rdoTessPolyTri
+            // 
+            this.rdoTessPoly2Tri.AutoSize = true;
+            this.rdoTessPoly2Tri.Location = new System.Drawing.Point(11, 50);
+            this.rdoTessPoly2Tri.Name = "rdoTessPolyTri";
+            this.rdoTessPoly2Tri.Size = new System.Drawing.Size(145, 17);
+            this.rdoTessPoly2Tri.TabIndex = 23;
+            this.rdoTessPoly2Tri.Text = "2. Poly2Tri (Triangulation)";
+            this.rdoTessPoly2Tri.UseVisualStyleBackColor = true;
+            // 
+            // rdoTessSGI
+            // 
+            this.rdoTessSGI.AutoSize = true;
+            this.rdoTessSGI.Checked = true;
+            this.rdoTessSGI.Location = new System.Drawing.Point(11, 27);
+            this.rdoTessSGI.Name = "rdoTessSGI";
+            this.rdoTessSGI.Size = new System.Drawing.Size(81, 17);
+            this.rdoTessSGI.TabIndex = 22;
+            this.rdoTessSGI.TabStop = true;
+            this.rdoTessSGI.Text = "1. SGI Tess";
+            this.rdoTessSGI.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(10, 10);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(69, 13);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "Tess Method";
+            // 
             // FormTess
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(768, 472);
+            this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);
-            this.Controls.Add(this.label6);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.chkInvert);
@@ -215,6 +251,8 @@
             this.Load += new System.EventHandler(this.FormTess_Load);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -227,7 +265,6 @@
         private System.Windows.Forms.CheckBox chkInvert;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtDivCurveRecursiveLimit;
@@ -238,6 +275,10 @@
         private System.Windows.Forms.TextBox txtIncrementalTessStep;
         private System.Windows.Forms.RadioButton rdoSubdivCureveFlattener;
         private System.Windows.Forms.RadioButton rdoSimpleIncCurveFlattener;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.RadioButton rdoTessPoly2Tri;
+        private System.Windows.Forms.RadioButton rdoTessSGI;
+        private System.Windows.Forms.Label label6;
     }
 }
 

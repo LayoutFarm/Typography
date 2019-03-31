@@ -36,6 +36,72 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\AdvancingFront.cs">
+      <Link>BackEnd.Triangulation\delaunay\AdvancingFront.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\AdvancingFrontNode.cs">
+      <Link>BackEnd.Triangulation\delaunay\AdvancingFrontNode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\DelaunayTriangle.cs">
+      <Link>BackEnd.Triangulation\delaunay\DelaunayTriangle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\DTSweep.cs">
+      <Link>BackEnd.Triangulation\delaunay\DTSweep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\DTSweepConstraint.cs">
+      <Link>BackEnd.Triangulation\delaunay\DTSweepConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\DTSweepContext.cs">
+      <Link>BackEnd.Triangulation\delaunay\DTSweepContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\DTSweepDebugContext.cs">
+      <Link>BackEnd.Triangulation\delaunay\DTSweepDebugContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\PointOnEdgeException.cs">
+      <Link>BackEnd.Triangulation\delaunay\PointOnEdgeException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\P2T.cs">
+      <Link>BackEnd.Triangulation\P2T.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\polygon\Polygon.cs">
+      <Link>BackEnd.Triangulation\polygon\Polygon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\sets\ConstrainedPointSet.cs">
+      <Link>BackEnd.Triangulation\sets\ConstrainedPointSet.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\sets\PointSet.cs">
+      <Link>BackEnd.Triangulation\sets\PointSet.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\ITriangulatable.cs">
+      <Link>BackEnd.Triangulation\triangulation\ITriangulatable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\Orientation.cs">
+      <Link>BackEnd.Triangulation\triangulation\Orientation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\TriangulationAlgorithm.cs">
+      <Link>BackEnd.Triangulation\triangulation\TriangulationAlgorithm.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\TriangulationContext.cs">
+      <Link>BackEnd.Triangulation\triangulation\TriangulationContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\TriangulationDebugContext.cs">
+      <Link>BackEnd.Triangulation\triangulation\TriangulationDebugContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\TriangulationMode.cs">
+      <Link>BackEnd.Triangulation\triangulation\TriangulationMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\TriangulationPoint.cs">
+      <Link>BackEnd.Triangulation\triangulation\TriangulationPoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\triangulation\TriangulationUtil.cs">
+      <Link>BackEnd.Triangulation\triangulation\TriangulationUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\util\PointGenerator.cs">
+      <Link>BackEnd.Triangulation\util\PointGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\pixelfarm\backend.triangulation\util\PolygonGenerator.cs">
+      <Link>BackEnd.Triangulation\util\PolygonGenerator.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
     </Compile>
@@ -84,6 +150,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Poly2TriExampleHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

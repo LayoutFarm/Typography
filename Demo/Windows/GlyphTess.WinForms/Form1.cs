@@ -33,6 +33,11 @@ namespace Test_WinForm_TessGlyph
 
             textBox1.KeyUp += (s, e) => UpdateOutput();
 
+
+            rdoTessPoly2Tri.CheckedChanged += (s, e) => UpdateOutput();
+            rdoTessSGI.CheckedChanged += (s, e) => UpdateOutput();
+
+
             txtIncrementalTessStep.KeyUp += (s, e) => UpdateOutput();
             txtDivCurveRecursiveLimit.KeyUp += (s, e) => UpdateOutput();
             txtDivAngleTolerenceEpsilon.KeyUp += (s, e) => UpdateOutput();
@@ -177,6 +182,11 @@ namespace Test_WinForm_TessGlyph
             }
             return transformXYs;
         }
+
+
+
+
+
         void DrawOutput()
         {
             if (_g == null)
@@ -237,56 +247,82 @@ namespace Test_WinForm_TessGlyph
                     startAt = (endAt + 1) + 3;
                 }
             }
+            //----------------------------------------------------------------------------
 
-            if (!_tessTool.TessPolygon(polygon1, _contourEnds))
+            //tess
+            if (rdoTessSGI.Checked)
             {
-                return;
-            }
 
-            //1.
-            List<ushort> indexList = _tessTool.TessIndexList;
-            //2.
-            List<TessVertex2d> tempVertexList = _tessTool.TempVertexList;
-            //3.
-            int vertexCount = indexList.Count;
-            //-----------------------------    
-            int orgVertexCount = polygon1.Length / 2;
-            float[] vtx = new float[vertexCount * 2];//***
-            int n = 0;
+                //SGI Tess Lib
 
-            for (int p = 0; p < vertexCount; ++p)
-            {
-                ushort index = indexList[p];
-                if (index >= orgVertexCount)
+                if (!_tessTool.TessPolygon(polygon1, _contourEnds))
                 {
-                    //extra coord (newly created)
-                    TessVertex2d extraVertex = tempVertexList[index - orgVertexCount];
-                    vtx[n] = (float)extraVertex.x;
-                    vtx[n + 1] = (float)extraVertex.y;
+                    return;
                 }
-                else
+
+                //1.
+                List<ushort> indexList = _tessTool.TessIndexList;
+                //2.
+                List<TessVertex2d> tempVertexList = _tessTool.TempVertexList;
+                //3.
+                int vertexCount = indexList.Count;
+                //-----------------------------    
+                int orgVertexCount = polygon1.Length / 2;
+                float[] vtx = new float[vertexCount * 2];//***
+                int n = 0;
+
+                for (int p = 0; p < vertexCount; ++p)
                 {
-                    //original corrd
-                    vtx[n] = (float)polygon1[index * 2];
-                    vtx[n + 1] = (float)polygon1[(index * 2) + 1];
+                    ushort index = indexList[p];
+                    if (index >= orgVertexCount)
+                    {
+                        //extra coord (newly created)
+                        TessVertex2d extraVertex = tempVertexList[index - orgVertexCount];
+                        vtx[n] = (float)extraVertex.x;
+                        vtx[n + 1] = (float)extraVertex.y;
+                    }
+                    else
+                    {
+                        //original corrd
+                        vtx[n] = (float)polygon1[index * 2];
+                        vtx[n + 1] = (float)polygon1[(index * 2) + 1];
+                    }
+                    n += 2;
                 }
-                n += 2;
+                //-----------------------------    
+                //draw tess result
+                int j = vtx.Length;
+                for (int i = 0; i < j;)
+                {
+                    var p0 = new PointF(vtx[i], vtx[i + 1]);
+                    var p1 = new PointF(vtx[i + 2], vtx[i + 3]);
+                    var p2 = new PointF(vtx[i + 4], vtx[i + 5]);
+
+                    _g.DrawLine(Pens.Red, p0, p1);
+                    _g.DrawLine(Pens.Red, p1, p2);
+                    _g.DrawLine(Pens.Red, p2, p0);
+
+                    i += 6;
+                }
             }
-            //-----------------------------    
-            //draw tess result
-            int j = vtx.Length;
-            for (int i = 0; i < j;)
+            else
             {
-                var p0 = new PointF(vtx[i], vtx[i + 1]);
-                var p1 = new PointF(vtx[i + 2], vtx[i + 3]);
-                var p2 = new PointF(vtx[i + 4], vtx[i + 5]);
 
-                _g.DrawLine(Pens.Red, p0, p1);
-                _g.DrawLine(Pens.Red, p1, p2);
-                _g.DrawLine(Pens.Red, p2, p0);
+                Poly2Tri.Polygon mainPolygon = Poly2TriExampleHelper.Triangulate(polygon1, contourEndIndices);
+                foreach (Poly2Tri.DelaunayTriangle tri in mainPolygon.Triangles)
+                {
 
-                i += 6;
+                    Poly2Tri.TriangulationPoint p0 = tri.P0;
+                    Poly2Tri.TriangulationPoint p1 = tri.P1;
+                    Poly2Tri.TriangulationPoint p2 = tri.P2;
+
+                    _g.DrawLine(Pens.Red, (float)p0.X, (float)p0.Y, (float)p1.X, (float)p1.Y);
+                    _g.DrawLine(Pens.Red, (float)p1.X, (float)p1.Y, (float)p2.X, (float)p2.Y);
+                    _g.DrawLine(Pens.Red, (float)p2.X, (float)p2.Y, (float)p0.X, (float)p0.Y);
+                }
             }
+
+
 
         }
         private void cmdDrawGlyph_Click(object sender, EventArgs e)
