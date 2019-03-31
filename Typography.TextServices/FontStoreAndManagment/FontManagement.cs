@@ -517,7 +517,7 @@ namespace Typography.FontManagement
                 {
                     default: break;
                     case ".ttc":
-                    case ".otc":                    
+                    case ".otc":
                     case ".ttf":
                     case ".otf":
                     case ".woff":
@@ -536,7 +536,10 @@ namespace Typography.FontManagement
         }
         public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection)
         {
-
+#if DEBUG
+            System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+            stopWatch.Start();
+#endif
             // Windows system fonts
             LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
 
@@ -549,6 +552,10 @@ namespace Typography.FontManagement
             // OS X system fonts (https://support.apple.com/en-us/HT201722)
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
             LoadFontsFromFolder(fontCollection, "/Library/Fonts");
+#if DEBUG
+            stopWatch.Stop();
+            System.Diagnostics.Debug.WriteLine("load_system_fonts:" + stopWatch.ElapsedMilliseconds + " ms");
+#endif
         }
 
 
