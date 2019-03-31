@@ -63,7 +63,7 @@ namespace Typography.Contours
             flattener.Result = prevResult;
             _analyzed = true;
         }
-        public bool IsClosewise()
+        public bool IsClockwise()
         {
             //after flatten
             if (_analyzedClockDirection)
