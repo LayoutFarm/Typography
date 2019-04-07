@@ -96,6 +96,12 @@ namespace Typography.OpenFont
 
     public class OpenFontReader
     {
+
+        public OpenFontReader()
+        {
+
+        }
+
         class FontCollectionHeader
         {
             public ushort majorVersion;
