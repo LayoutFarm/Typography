@@ -267,7 +267,9 @@ namespace Typography.Rendering
                     ////save image to cache
                     SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
 #endif
-
+                   
+                    ////save image to cache
+                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
                     //cache the atlas
                     _createdAtlases.Add(fontKey, fontAtlas);
                     //
@@ -297,7 +299,9 @@ namespace Typography.Rendering
                         StorageService.Provider.SaveData(fontTextureInfoFile, ms.ToArray());
 #if DEBUG
                         //write temp debug info
+#if !__MOBILE__
                         System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", reqFont.Name + ",size" + reqFont.SizeInPoints + "pts");
+#endif
 #endif
 
                     }

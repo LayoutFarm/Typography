@@ -449,17 +449,30 @@ namespace Typography.TextServices
         {
             //load 
             //check if we have create this typeface or not 
-            Typeface typeface;
-            if (!_loadedTypefaces.TryGetValue(installedFont, out typeface))
+
+            if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface typeface))
             {
-                //TODO: review how to load font here
-                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
-                { 
-                    var reader = new OpenFontReader();
-                    typeface = reader.Read(fs, installedFont.ActualStreamOffset);
-                    typeface.Filename = installedFont.FontPath; 
+                //TODO: review how to load font here 
+                if (Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader != null)
+                {
+                    using (var fontStream = Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader(installedFont.FontPath))
+                    {
+                        var reader = new OpenFontReader();
+                        typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
+                        typeface.Filename = installedFont.FontPath;
+                    }
+                }
+                else
+                {
+                    using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
+                    {
+                        var reader = new OpenFontReader();
+                        typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                        typeface.Filename = installedFont.FontPath;
+                    }
                 }
                 return _loadedTypefaces[installedFont] = typeface;
+
             }
             return typeface;
         }

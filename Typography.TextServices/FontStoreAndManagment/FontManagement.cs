@@ -503,6 +503,9 @@ namespace Typography.FontManagement
 
     public static class InstalledTypefaceCollectionExtensions
     {
+        public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
+        public static Func<string,Stream> CustomFontStreamLoader;
+
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder)
         {
             if (!Directory.Exists(folder)) return;
@@ -517,7 +520,7 @@ namespace Typography.FontManagement
                 {
                     default: break;
                     case ".ttc":
-                    case ".otc":                    
+                    case ".otc":
                     case ".ttf":
                     case ".otf":
                     case ".woff":
@@ -537,6 +540,13 @@ namespace Typography.FontManagement
         public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection)
         {
 
+            if (CustomSystemFontListLoader != null)
+            {
+                CustomSystemFontListLoader(fontCollection);
+                return;
+            }
+            //-----
+
             // Windows system fonts
             LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
 
@@ -547,10 +557,11 @@ namespace Typography.FontManagement
             LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts");
 
             // OS X system fonts (https://support.apple.com/en-us/HT201722)
+
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
             LoadFontsFromFolder(fontCollection, "/Library/Fonts");
-        }
 
+        }
 
         //for Windows , how to find Windows' Font Directory from Windows Registry
         //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();
