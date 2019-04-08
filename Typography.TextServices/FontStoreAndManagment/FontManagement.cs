@@ -503,8 +503,13 @@ namespace Typography.FontManagement
 
     public static class InstalledTypefaceCollectionExtensions
     {
+
+        public delegate R MyFunc<T1, T2, R>(T1 t1, T2 t2);
+        public delegate R MyFunc<T, R>(T t);
+
         public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
-        public static Func<string,Stream> CustomFontStreamLoader;
+
+        public static MyFunc<string, Stream> CustomFontStreamLoader;
 
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder)
         {
