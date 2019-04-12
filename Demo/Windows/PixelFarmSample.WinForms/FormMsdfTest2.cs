@@ -311,12 +311,14 @@ namespace SampleWinForms
                 MultiSizeFontAtlasBuilder multiSizeFontAtlasBuilder = new MultiSizeFontAtlasBuilder();
                 {
                     bmpFontMx.TextureKindForNewFont = TextureKind.StencilLcdEffect;
-                    //AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 10), bmpFontMx);
-                    //AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 11), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 10), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 11), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 12), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 13), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 14), bmpFontMx);
 
                     bmpFontMx.TextureKindForNewFont = TextureKind.Msdf;
-                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 18), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 15), bmpFontMx);
                 }
 
                 //-------
