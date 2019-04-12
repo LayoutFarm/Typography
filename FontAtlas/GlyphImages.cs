@@ -71,7 +71,7 @@ namespace Typography.Rendering
         public int Top { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
-         
+
         public float TextureXOffset { get; set; }
         public float TextureYOffset { get; set; }
 
@@ -82,6 +82,12 @@ namespace Typography.Rendering
             w = Width;
             h = Height;
         }
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + Left + "," + Top + "," + Width + "," + Height + ")";
+        }
+#endif
     }
 
 }

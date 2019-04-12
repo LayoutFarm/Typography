@@ -154,29 +154,54 @@ namespace Typography.Rendering
         Dictionary<int, SimpleFontAtlas> _createdAtlases = new Dictionary<int, SimpleFontAtlas>();
 
         LayoutFarm.OpenFontTextService _textServices;
-        TextureKind _textureKind;
 
-        public BitmapFontManager(TextureKind textureKind,
+        public BitmapFontManager(
             LayoutFarm.OpenFontTextService textServices,
             LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
-            : this(textureKind, textServices)
+            : this(textServices)
         {
             //glyph cahce for specific atlas 
             SetLoadNewBmpDel(_createNewDel);
+            TextureKindForNewFont = TextureKind.StencilLcdEffect;
+
         }
-        public BitmapFontManager(TextureKind textureKind, LayoutFarm.OpenFontTextService textServices)
+        public BitmapFontManager(LayoutFarm.OpenFontTextService textServices)
         {
             _textServices = textServices;
-            _textureKind = textureKind;
+
         }
         protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
         {
             _loadedGlyphs = new FontBitmapCache<SimpleFontAtlas, B>(_createNewDel);
         }
 
+        public TextureKind TextureKindForNewFont
+        {
+            get;
+            set;
+        }
+
+
+
 #if DEBUG
         System.Diagnostics.Stopwatch _dbugStopWatch = new System.Diagnostics.Stopwatch();
-#endif 
+#endif
+
+
+        public void AddSimpleFontAtlas(SimpleFontAtlas[] simpleFontAtlases, string totalGlyphImg)
+        {
+            //multiple font atlas that share the same glyphImg
+           
+            GlyphImage glyphImg = ReadGlyphImages(totalGlyphImg);
+            for (int i = 0; i < simpleFontAtlases.Length; ++i)
+            {
+                SimpleFontAtlas simpleFontAtlas = simpleFontAtlases[i];
+                simpleFontAtlas.TotalGlyph = glyphImg;
+                simpleFontAtlas.UseSharedGlyphImage = true;
+                _createdAtlases.Add(simpleFontAtlas.FontKey, simpleFontAtlas);
+            }
+
+        }
         /// <summary>
         /// get from cache or create a new one
         /// </summary>
@@ -191,19 +216,18 @@ namespace Typography.Rendering
 #endif
 
             int fontKey = reqFont.FontKey;
-            SimpleFontAtlas fontAtlas;
-            if (!_createdAtlases.TryGetValue(fontKey, out fontAtlas))
-            {
-                //check from pre-built cache (if availiable) 
-                Typeface resolvedTypeface = _textServices.ResolveTypeface(reqFont);
 
+            if (!_createdAtlases.TryGetValue(fontKey, out SimpleFontAtlas fontAtlas))
+            {
+                //check from pre-built cache (if availiable)     
+                Typeface resolvedTypeface = _textServices.ResolveTypeface(reqFont);
                 string fontTextureFile = reqFont.Name + "_" + fontKey;
                 string resolveFontFile = fontTextureFile + ".info";
                 string fontTextureInfoFile = resolveFontFile;
                 string fontTextureImgFilename = fontTextureInfoFile + ".png";
 
-                //check if the file exist
-
+                //TODO: review here
+                //
                 if (StorageService.Provider.DataExists(fontTextureInfoFile) &&
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
@@ -212,11 +236,11 @@ namespace Typography.Rendering
                     {
                         try
                         {
-                            fontAtlas = atlasBuilder.LoadFontInfo(dataStream);
+                            //TODO: review here
+                            fontAtlas = atlasBuilder.LoadFontAtlasInfo(dataStream)[0];
                             fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImgFilename);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
-
                         }
                         catch (Exception ex)
                         {
@@ -233,7 +257,7 @@ namespace Typography.Rendering
                     glyphTextureGen.CreateTextureFontBuildDetail(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
-                       _textureKind,
+                        TextureKindForNewFont,
                        GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont),
                        (glyphIndex, glyphImage, outputAtlasBuilder) =>
                         {
@@ -245,6 +269,8 @@ namespace Typography.Rendering
                         }
                     );
 
+                    atlasBuilder.FontFilename = reqFont.Name;//TODO: review here, check if we need 'filename' or 'fontname'
+                    atlasBuilder.FontKey = reqFont.FontKey;
                     atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
                     totalGlyphsImg = atlasBuilder.BuildSingleImage();
                     //if (reqFont.SizeInPoints == 14 && cacheImg != null)
@@ -267,9 +293,9 @@ namespace Typography.Rendering
                     ////save image to cache
                     SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
 #endif
-                   
+
                     ////save image to cache
-                    SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
+                    //SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
                     //cache the atlas
                     _createdAtlases.Add(fontKey, fontAtlas);
                     //
@@ -291,6 +317,7 @@ namespace Typography.Rendering
                     System.Diagnostics.Debug.WriteLine("build font atlas: " + _dbugStopWatch.ElapsedMilliseconds + " ms");
 #endif
 
+                    //TODO: review here again
                     //save font info to cache
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                     {
@@ -330,7 +357,7 @@ namespace Typography.Rendering
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {
             using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
-                   glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), false)) 
+                   glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), false))
             {
                 PixelFarm.CpuBlit.MemBitmapExtensions.SaveImage(memBmp, filename, PixelFarm.CpuBlit.MemBitmapIO.OutputImageFormat.Png);
             }

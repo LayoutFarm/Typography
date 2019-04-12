@@ -12,15 +12,18 @@ using Typography.Contours;
 
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
-
+using PixelFarm.Drawing.Fonts;
 
 namespace SampleWinForms
 {
     public partial class FormMsdfTest2 : Form
     {
+        LayoutFarm.OpenFontTextService _textServices;
         public FormMsdfTest2()
         {
             InitializeComponent();
+            //
+            _textServices = new LayoutFarm.OpenFontTextService();
         }
 
         private void cmdTestMsdfGen_Click(object sender, EventArgs e)
@@ -29,6 +32,7 @@ namespace SampleWinForms
             //samples...
             //1. create texture from specific glyph index range
             string sampleFontFile = "../../../TestFonts/tahoma.ttf";
+
             CreateSampleMsdfTextureFont(
                 sampleFontFile,
                 18,
@@ -127,7 +131,7 @@ namespace SampleWinForms
                 var atlasBuilder2 = new SimpleFontAtlasBuilder();
                 using (System.IO.FileStream readFromFs = new FileStream(saveToFile, FileMode.Open))
                 {
-                    var readbackFontAtlas = atlasBuilder2.LoadFontInfo(readFromFs);
+                    var readbackFontAtlas = atlasBuilder2.LoadFontAtlasInfo(readFromFs);
                 }
             }
         }
@@ -193,6 +197,178 @@ namespace SampleWinForms
 
 
         }
+
+
+        class LocalFileStorageProvider : PixelFarm.Platforms.StorageServiceProvider
+        {
+
+
+            readonly string _baseDir;
+            public LocalFileStorageProvider(string baseDir, bool disableAbsolutePath = false)
+            {
+                _baseDir = baseDir;
+                DisableAbsolutePath = disableAbsolutePath;
+            }
+            public string BaseDir => _baseDir;
+
+            public bool DisableAbsolutePath { get; }
+            //public override string[] GetDataNameList(string dir)
+            //{
+            //    if (Path.IsPathRooted(dir))
+            //    {
+            //        if (DisableAbsolutePath) return null;
+            //    }
+            //    else
+            //    {
+            //        dir = Path.Combine(_baseDir, dir);
+            //    }
+            //    return System.IO.Directory.GetFiles(dir);
+            //}
+            //public override string[] GetDataDirNameList(string dir)
+            //{
+            //    if (Path.IsPathRooted(dir))
+            //    {
+            //        if (DisableAbsolutePath) return null;
+            //    }
+            //    else
+            //    {
+            //        dir = Path.Combine(_baseDir, dir);
+            //    }
+            //    return System.IO.Directory.GetFiles(dir);
+            //}
+            public override bool DataExists(string dataName)
+            {
+                //implement with file 
+
+                if (Path.IsPathRooted(dataName))
+                {
+                    if (DisableAbsolutePath) return false;
+                }
+                else
+                {
+                    dataName = Path.Combine(_baseDir, dataName);
+                }
+
+                return System.IO.File.Exists(dataName);
+            }
+            public override byte[] ReadData(string dataName)
+            {
+
+                if (Path.IsPathRooted(dataName))
+                {
+                    if (DisableAbsolutePath) return null;
+                }
+                else
+                {
+                    dataName = Path.Combine(_baseDir, dataName);
+                }
+
+                return System.IO.File.ReadAllBytes(dataName);
+            }
+            public override void SaveData(string dataName, byte[] content)
+            {
+
+                if (Path.IsPathRooted(dataName))
+                {
+                    if (DisableAbsolutePath) return;
+                }
+                else
+                {
+                    dataName = Path.Combine(_baseDir, dataName);
+                }
+
+#if !__MOBILE__
+                //TODO: review here, save data on android
+                System.IO.File.WriteAllBytes(dataName, content);
+#endif
+            }
+        }
+
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+
+            PixelFarm.CpuBlit.MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
+
+
+            var storageProvider = new LocalFileStorageProvider("", true);
+            PixelFarm.Platforms.StorageService.RegisterProvider(storageProvider);
+
+
+            var bmpFontMx = new BitmapFontManager<MemBitmap>(
+                 _textServices,
+                 atlas =>
+                 {
+                     GlyphImage totalGlyphImg = atlas.TotalGlyph;
+                     return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
+                 }
+             );
+
+            string multiSizeFontAtlasFilename = "tahoma_set1.multisize_fontAtlas";
+            string totalImgAtlasFilename = "tahoma_set1.multisize_fontAtlas.png";
+            //in this version, mutlsize font texture must use the same typeface
+            {
+                MultiSizeFontAtlasBuilder multiSizeFontAtlasBuilder = new MultiSizeFontAtlasBuilder();
+                {
+                    bmpFontMx.TextureKindForNewFont = TextureKind.StencilLcdEffect;
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 10), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 11), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 14), bmpFontMx);
+
+                    bmpFontMx.TextureKindForNewFont = TextureKind.Msdf;
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 18), bmpFontMx);
+                }
+
+                //-------
+                multiSizeFontAtlasBuilder.BuildMultiFontSize(multiSizeFontAtlasFilename, totalImgAtlasFilename);
+
+            }
+            {
+                //test load the font altas back
+                FontAtlasFile atlasFile = new FontAtlasFile();
+                using (FileStream fs = new FileStream(multiSizeFontAtlasFilename, FileMode.Open))
+                {
+                    atlasFile.Read(fs);
+                }
+
+            }
+
+        }
+        void AddExistingOrCreateNewSimpleFontAtlas(
+            MultiSizeFontAtlasBuilder multisizeFontAtlasBuilder,
+            RequestFont reqFont,
+            BitmapFontManager<MemBitmap> bmpFontMx)
+        {
+            int fontKey = reqFont.FontKey;
+
+            string fontTextureFile = reqFont.Name + "_" + fontKey;
+            string resolveFontTextureFile = fontTextureFile + ".info";
+            string fontTextureInfoFile = resolveFontTextureFile;
+            string fontTextureImgFilename = fontTextureInfoFile + ".png";
+
+            _textServices.ResolveTypeface(reqFont); //resolve for 'actual' font
+            if (PixelFarm.Platforms.StorageService.Provider.DataExists(resolveFontTextureFile) &&
+                File.Exists(fontTextureImgFilename))
+            {
+                multisizeFontAtlasBuilder.AddSimpleFontAtlasFile(reqFont,
+                    resolveFontTextureFile,
+                    fontTextureImgFilename,
+                    bmpFontMx.TextureKindForNewFont
+                    );
+            }
+            else
+            {
+                //create a new one 
+                PixelFarm.Drawing.Fonts.SimpleFontAtlas fontAtlas = bmpFontMx.GetFontAtlas(reqFont, out MemBitmap fontBmp);
+                bmpFontMx.GetFontAtlas(reqFont, out fontBmp);
+                multisizeFontAtlasBuilder.AddSimpleFontAtlasFile(reqFont,
+                    resolveFontTextureFile,
+                    fontTextureImgFilename,
+                    bmpFontMx.TextureKindForNewFont);
+            }
+
+        }
+
 
         //public static Msdfgen.Shape CreateMsdfShape(GlyphContourBuilder glyphToContour, float pxScale)
         //{
