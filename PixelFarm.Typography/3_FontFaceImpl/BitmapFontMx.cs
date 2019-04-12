@@ -152,6 +152,7 @@ namespace Typography.Rendering
     {
         FontBitmapCache<SimpleFontAtlas, B> _loadedGlyphs;
         Dictionary<int, SimpleFontAtlas> _createdAtlases = new Dictionary<int, SimpleFontAtlas>();
+        Dictionary<string, SimpleFontAtlas> _msdfTextureFonts = new Dictionary<string, SimpleFontAtlas>();
 
         LayoutFarm.OpenFontTextService _textServices;
 
@@ -191,7 +192,7 @@ namespace Typography.Rendering
         public void AddSimpleFontAtlas(SimpleFontAtlas[] simpleFontAtlases, string totalGlyphImg)
         {
             //multiple font atlas that share the same glyphImg
-           
+
             GlyphImage glyphImg = ReadGlyphImages(totalGlyphImg);
             for (int i = 0; i < simpleFontAtlases.Length; ++i)
             {
@@ -199,6 +200,13 @@ namespace Typography.Rendering
                 simpleFontAtlas.TotalGlyph = glyphImg;
                 simpleFontAtlas.UseSharedGlyphImage = true;
                 _createdAtlases.Add(simpleFontAtlas.FontKey, simpleFontAtlas);
+
+                if (simpleFontAtlas.TextureKind == TextureKind.Msdf)
+                {
+                    //if we have msdf texture
+                    //then we can use this to do autoscale
+                    _msdfTextureFonts.Add(simpleFontAtlas.FontFilename, simpleFontAtlas);
+                }
             }
 
         }
@@ -219,6 +227,17 @@ namespace Typography.Rendering
 
             if (!_createdAtlases.TryGetValue(fontKey, out SimpleFontAtlas fontAtlas))
             {
+
+                //-------------
+                //check if we have small msdf texture or not
+                if (_msdfTextureFonts.TryGetValue(reqFont.Name, out SimpleFontAtlas msdfTexture))
+                {
+                    //use this
+                    outputBitmap = _loadedGlyphs.GetOrCreateNewOne(msdfTexture);
+                    return msdfTexture;
+                }
+
+                //-------------
                 //check from pre-built cache (if availiable)     
                 Typeface resolvedTypeface = _textServices.ResolveTypeface(reqFont);
                 string fontTextureFile = reqFont.Name + "_" + fontKey;

@@ -132,8 +132,9 @@ namespace PixelFarm.Drawing.Fonts
         internal void WriteOverviewFontInfo(string fontFileName, int fontKey, float sizeInPt)
         {
             _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
+
 #if DEBUG
-            if (fontFileName == null)
+            if (string.IsNullOrEmpty(fontFileName))
             {
                 throw new NotSupportedException();
             }

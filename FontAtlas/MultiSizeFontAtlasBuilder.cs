@@ -122,7 +122,7 @@ namespace PixelFarm.Drawing.Fonts
                 {
                     SimpleFontAtlasInfo atlasInfo = _simpleFontInfoList[i];
                     RequestFont reqFont = atlasInfo.reqFont;
-                    fontAtlasFile.WriteOverviewFontInfo("", reqFont.FontKey, reqFont.SizeInPoints);//size in points
+                    fontAtlasFile.WriteOverviewFontInfo(reqFont.Name, reqFont.FontKey, reqFont.SizeInPoints);//size in points
 
                     fontAtlasFile.WriteTotalImageInfo(
                         (ushort)atlasW,
