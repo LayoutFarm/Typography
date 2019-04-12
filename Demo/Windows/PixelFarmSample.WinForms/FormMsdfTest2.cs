@@ -318,7 +318,7 @@ namespace SampleWinForms
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 14), bmpFontMx);
 
                     bmpFontMx.TextureKindForNewFont = TextureKind.Msdf;
-                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 15), bmpFontMx);
+                    AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 24), bmpFontMx);
                 }
 
                 //-------
