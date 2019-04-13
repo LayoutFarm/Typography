@@ -1,5 +1,6 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
+using System.Collections.Generic;
 
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.PixelProcessing;
@@ -40,6 +41,7 @@ namespace PixelFarm.Drawing.Fonts
         LayoutFarm.OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleFontAtlas _fontAtlas;
+        Dictionary<GlyphImage, MemBitmap> _sharedGlyphImgs = new Dictionary<GlyphImage, MemBitmap>();
 
         public FontAtlasTextPrinter(AggPainter painter)
         {
@@ -47,25 +49,35 @@ namespace PixelFarm.Drawing.Fonts
             _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
-
             _textServices = new LayoutFarm.OpenFontTextService();
-            //2. create manager
+
+            //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(
-                TextureKind.StencilLcdEffect,
                 _textServices,
                 atlas =>
                 {
                     GlyphImage totalGlyphImg = atlas.TotalGlyph;
-                    return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
+                    if (atlas.UseSharedGlyphImage)
+                    {
+                        if (!_sharedGlyphImgs.TryGetValue(totalGlyphImg, out MemBitmap found))
+                        {
+                            found = MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
+                            _sharedGlyphImgs.Add(totalGlyphImg, found);
+                        }
+                        return found;
+                    }
+                    else
+                    {
+                        return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
+                    }
                 }
             );
 
-
-            //3.  
-
+            //3.   
             ChangeFont(new RequestFont("tahoma", 10));
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
+
         public void Dispose()
         {
             //clear this
@@ -233,7 +245,7 @@ namespace PixelFarm.Drawing.Fonts
 
             //fill glyph-by-glyh
             AntialiasTechnique aaTech = this.AntialiasTech;
-            int seqLen = glyphPlanSeq.Count; 
+            int seqLen = glyphPlanSeq.Count;
 
             for (int i = 0; i < seqLen; ++i)
             {

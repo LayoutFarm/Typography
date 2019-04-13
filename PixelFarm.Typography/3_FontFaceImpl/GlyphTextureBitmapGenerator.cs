@@ -21,7 +21,7 @@ namespace PixelFarm.Drawing.Fonts
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder); 
+        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder);
         public GlyphTextureBitmapGenerator()
         {
 
@@ -135,6 +135,7 @@ namespace PixelFarm.Drawing.Fonts
             {
                 MsdfGenParams msdfGenParams = new MsdfGenParams();
                 int j = glyphIndices.Length;
+                float pxscale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
                 for (int i = 0; i < j; ++i)
                 {
                     ushort gindex = glyphIndices[i];
@@ -144,7 +145,8 @@ namespace PixelFarm.Drawing.Fonts
                     var glyphToContour = new GlyphContourBuilder();
                     builder.ReadShapes(glyphToContour);
                     //msdfgen with  scale the glyph to specific shapescale
-                    msdfGenParams.shapeScale = 1f / 64; //as original
+                    //msdfGenParams.shapeScale = 1f / 64; //as original
+                    msdfGenParams.shapeScale = pxscale;
                     GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, msdfGenParams);
                     //
                     atlasBuilder.AddGlyph(gindex, glyphImg);

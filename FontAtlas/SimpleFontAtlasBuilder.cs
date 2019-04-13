@@ -23,6 +23,7 @@ namespace Typography.Rendering
         public TextureKind TextureKind { get; private set; }
         public float FontSizeInPoints { get; private set; }
         public string FontFilename { get; set; }
+        public int FontKey { get; set; }
         public CompactOption SpaceCompactOption { get; set; }
         //
         public enum CompactOption
@@ -249,7 +250,7 @@ namespace Typography.Rendering
 
             FontAtlasFile fontAtlasFile = new FontAtlasFile();
             fontAtlasFile.StartWrite(outputStream);
-            fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontSizeInPoints);
+            fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontKey, FontSizeInPoints);
 
             fontAtlasFile.WriteTotalImageInfo(
                 (ushort)_latestGenGlyphImage.Width,
@@ -260,7 +261,7 @@ namespace Typography.Rendering
             fontAtlasFile.WriteGlyphList(_glyphs);
             fontAtlasFile.EndWrite();
         }
-         
+
         public SimpleFontAtlas CreateSimpleFontAtlas()
         {
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
@@ -286,13 +287,13 @@ namespace Typography.Rendering
 
             return simpleFontAtlas;
         }
- 
-        public SimpleFontAtlas LoadFontInfo(System.IO.Stream dataStream)
+
+        public List<SimpleFontAtlas> LoadFontAtlasInfo(System.IO.Stream dataStream)
         {
             FontAtlasFile atlasFile = new FontAtlasFile();
             //read font atlas from stream data
             atlasFile.Read(dataStream);
-            return atlasFile.Result;
+            return atlasFile.ResultSimpleFontAtlasList;
         }
 
         static void CopyToDest(int[] srcPixels, int srcW, int srcH, int[] targetPixels, int targetX, int targetY, int totalTargetWidth)
