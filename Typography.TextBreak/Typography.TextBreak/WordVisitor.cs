@@ -80,6 +80,11 @@ namespace Typography.TextBreak
         public bool IsEnd => _currentIndex >= _endIndex;
         //
 
+        public string CopyCurrentSpanString()
+        {
+            return new string(_buffer, LatestSpanStartAt, LatestSpanLen);
+        }
+
 #if DEBUG
         //int dbugAddSteps;
 #endif
@@ -100,7 +105,7 @@ namespace Typography.TextBreak
 
             LatestSpanLen = (ushort)(index - LatestBreakAt);
             LatestSpanStartAt = _latestBreakAt;
-            _latestBreakAt = index; 
+            _latestBreakAt = index;
 
             this.LatestWordKind = wordKind;
             _newWordBreakHandler(this);
