@@ -189,11 +189,11 @@ namespace Typography.Rendering
 #endif
 
 
-        public void AddSimpleFontAtlas(SimpleFontAtlas[] simpleFontAtlases, string totalGlyphImg)
+        public void AddSimpleFontAtlas(SimpleFontAtlas[] simpleFontAtlases, System.IO.Stream totalGlyphImgStream)
         {
             //multiple font atlas that share the same glyphImg
 
-            GlyphImage glyphImg = ReadGlyphImages(totalGlyphImg);
+            GlyphImage glyphImg = ReadGlyphImages(totalGlyphImgStream);
             for (int i = 0; i < simpleFontAtlases.Length; ++i)
             {
                 SimpleFontAtlas simpleFontAtlas = simpleFontAtlases[i];
@@ -251,13 +251,14 @@ namespace Typography.Rendering
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
-                    using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
+                    using (System.IO.Stream textureInfoFileStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
+                    using (System.IO.Stream fontAtlasImgStream = StorageService.Provider.ReadDataStream(fontTextureImgFilename))
                     {
                         try
                         {
                             //TODO: review here
-                            fontAtlas = atlasBuilder.LoadFontAtlasInfo(dataStream)[0];
-                            fontAtlas.TotalGlyph = ReadGlyphImages(fontTextureImgFilename);
+                            fontAtlas = atlasBuilder.LoadFontAtlasInfo(textureInfoFileStream)[0];
+                            fontAtlas.TotalGlyph = ReadGlyphImages(fontAtlasImgStream);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
                         }
@@ -358,9 +359,9 @@ namespace Typography.Rendering
             return fontAtlas;
         }
 
-        static GlyphImage ReadGlyphImages(string filename)
+        static GlyphImage ReadGlyphImages(System.IO.Stream stream)
         {
-            using (PixelFarm.CpuBlit.MemBitmap bmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(filename))
+            using (PixelFarm.CpuBlit.MemBitmap bmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(stream))
             {
                 GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
                 int[] buffer = new int[bmp.Width * bmp.Height];
