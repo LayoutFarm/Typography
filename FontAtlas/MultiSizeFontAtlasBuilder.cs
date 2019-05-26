@@ -96,11 +96,13 @@ namespace PixelFarm.Drawing.Fonts
 
                     atlasInfo.NewCloneLocations = SimpleFontAtlas.CloneLocationWithOffset(fontAtlas, 0, offsetFromBottoms[i]);
 
-                    using (PixelFarm.CpuBlit.MemBitmap atlasBmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(atlasInfo.imgFile))
+                    using (System.IO.Stream fontImgStream = PixelFarm.Platforms.StorageService.Provider.ReadDataStream(atlasInfo.imgFile))
+                    using (PixelFarm.CpuBlit.MemBitmap atlasBmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(fontImgStream))
                     {
                         painter.DrawImage(atlasBmp, 0, top);
                         top += atlasBmp.Height + interAtlasSpace;
                     }
+
                 }
                 memBitmap.SaveImage(imgOutputFilename);
             }
