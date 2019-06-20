@@ -8,13 +8,7 @@ using Typography.Rendering;
 
 namespace PixelFarm.Drawing.Fonts
 {
-    public enum TextureKind : byte
-    {
-        StencilLcdEffect, //default
-        StencilGreyScale,
-        Msdf,
-        Bitmap
-    }
+    
     public class SimpleFontAtlas
     {
         GlyphImage _totalGlyphImage;
@@ -26,7 +20,7 @@ namespace PixelFarm.Drawing.Fonts
         /// original font size in point unit
         /// </summary>
         public float OriginalFontSizePts { get; set; }
-        public TextureKind TextureKind { get; set; }
+        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKind { get; set; }
         public string FontFilename { get; set; }
         public int FontKey { get; set; }
 

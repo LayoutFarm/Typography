@@ -22,10 +22,10 @@ namespace PixelFarm.Drawing.Fonts
             public FontAtlasFile fontAtlasFile;
             public Dictionary<ushort, TextureGlyphMapData> NewCloneLocations;
             public RequestFont reqFont;
-            public TextureKind textureKind;
+            public PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind;
         }
         public void AddSimpleFontAtlasFile(RequestFont reqFont,
-            string simpleFontAtlasFile, string imgFile, TextureKind textureKind)
+            string simpleFontAtlasFile, string imgFile, PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind)
         {
 
             var fontAtlasFile = new FontAtlasFile();

@@ -219,7 +219,7 @@ namespace PixelFarm.Drawing.Fonts
 
             // 
 
-            TextureKind textureKind = _fontAtlas.TextureKind;
+            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind = _fontAtlas.TextureKind;
 
             float gx = 0;
             float gy = 0;

@@ -29,7 +29,7 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void CreateTextureFontBuildDetail(
             Typeface typeface, float sizeInPoint,
-            TextureKind textureKind,
+            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
             GlyphTextureBuildDetail[] details,
             OnEachFinishTotal onFinishTotal)
         {
@@ -78,7 +78,7 @@ namespace PixelFarm.Drawing.Fonts
 
         public void CreateTextureFontFromInputChars(
             Typeface typeface, float sizeInPoint,
-            TextureKind textureKind,
+            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
             char[] chars,
             OnEachFinishTotal onFinishTotal)
         {
@@ -131,7 +131,7 @@ namespace PixelFarm.Drawing.Fonts
             var builder = new GlyphPathBuilder(typeface);
             builder.SetHintTechnique(hintTechnique);
             //
-            if (atlasBuilder.TextureKind == TextureKind.Msdf)
+            if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
             {
                 MsdfGenParams msdfGenParams = new MsdfGenParams();
                 int j = glyphIndices.Length;

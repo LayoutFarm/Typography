@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.Rendering;
+
 namespace PixelFarm.Drawing.Fonts
 {
 
@@ -74,7 +75,7 @@ namespace PixelFarm.Drawing.Fonts
             _atlas.Width = reader.ReadUInt16();
             _atlas.Height = reader.ReadUInt16();
             byte colorComponent = reader.ReadByte(); //1 or 4
-            _atlas.TextureKind = (TextureKind)reader.ReadByte();
+            _atlas.TextureKind = (PixelFarm.Drawing.BitmapAtlas.TextureKind)reader.ReadByte();
         }
         void ReadGlyphList(BinaryReader reader)
         {
@@ -147,7 +148,7 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Write(fontKey);
             _writer.Write(sizeInPt);
         }
-        internal void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
+        internal void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind)
         {
             _writer.Write((ushort)FontTextureObjectKind.TotalImageInfo);
             _writer.Write(width);

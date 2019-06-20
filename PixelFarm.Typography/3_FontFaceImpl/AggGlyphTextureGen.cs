@@ -25,7 +25,7 @@ namespace Typography.Contours
 
         public Color BackGroundColor { get; set; }
         public Color GlyphColor { get; set; }
-        public TextureKind TextureKind { get; set; }
+        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKind { get; set; }
         public AggPainter Painter { get; set; }
         public GlyphImage CreateGlyphImage(GlyphPathBuilder builder, float pxscale)
         {
@@ -78,7 +78,7 @@ namespace Typography.Contours
 
                 h = vertical_margin + h + vertical_margin; //+bottom margin  
                 AggPainter painter = Painter;
-                if (TextureKind == TextureKind.StencilLcdEffect)
+                if (TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect)
                 {
 
                     glyphVxs.TranslateToNewVxs(dx + 0.33f, dy, vxs2); //offset to proper x of subpixel rendering  ***
@@ -122,7 +122,7 @@ namespace Typography.Contours
 
                     painter.UseSubPixelLcdEffect = false;
 
-                    if (TextureKind == TextureKind.StencilGreyScale)
+                    if (TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilGreyScale)
                     {
                         painter.Clear(Color.Empty);
                         painter.FillColor = Color.Black;

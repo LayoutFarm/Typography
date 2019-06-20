@@ -163,7 +163,7 @@ namespace Typography.Rendering
         {
             //glyph cahce for specific atlas 
             SetLoadNewBmpDel(_createNewDel);
-            TextureKindForNewFont = TextureKind.StencilLcdEffect;
+            TextureKindForNewFont = PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect;
 
         }
         public BitmapFontManager(LayoutFarm.OpenFontTextService textServices)
@@ -176,7 +176,7 @@ namespace Typography.Rendering
             _loadedGlyphs = new FontBitmapCache<SimpleFontAtlas, B>(_createNewDel);
         }
 
-        public TextureKind TextureKindForNewFont
+        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKindForNewFont
         {
             get;
             set;
@@ -201,7 +201,7 @@ namespace Typography.Rendering
                 simpleFontAtlas.UseSharedGlyphImage = true;
                 _createdAtlases.Add(simpleFontAtlas.FontKey, simpleFontAtlas);
 
-                if (simpleFontAtlas.TextureKind == TextureKind.Msdf)
+                if (simpleFontAtlas.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
                 {
                     //if we have msdf texture
                     //then we can use this to do autoscale

@@ -151,9 +151,15 @@ namespace LayoutFarm
                 //
                 //we cache used line segment for a while
                 //we ask for caching context for a specific typeface and font size   
+#if DEBUG
+                if (lineSeg.Length > _reusableTextBuffer.Len)
+                {
+
+                }
+#endif
                 GlyphPlanSequence seq = _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer,
-                     lineSeg.StartAt,
-                     lineSeg.Length);
+                 lineSeg.StartAt,
+                 lineSeg.Length);
 
                 int seqLen = seq.Count;
 

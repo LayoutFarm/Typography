@@ -20,7 +20,7 @@ namespace Typography.Rendering
             MaxAtlasWidth = 800;
         }
         public int MaxAtlasWidth { get; set; }
-        public TextureKind TextureKind { get; private set; }
+        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKind { get; private set; }
         public float FontSizeInPoints { get; private set; }
         public string FontFilename { get; set; }
         public int FontKey { get; set; }
@@ -46,7 +46,7 @@ namespace Typography.Rendering
             _glyphs[glyphIndex] = glyphCache;
         }
 
-        public void SetAtlasInfo(TextureKind textureKind, float fontSizeInPts)
+        public void SetAtlasInfo(PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind, float fontSizeInPts)
         {
             this.TextureKind = textureKind;
             this.FontSizeInPoints = fontSizeInPts;
