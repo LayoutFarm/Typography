@@ -13,12 +13,11 @@ namespace PixelFarm.CpuBlit
     }
     class AggRenderVxFormattedString : PixelFarm.Drawing.RenderVxFormattedString
     {
-        string _str;
-        public AggRenderVxFormattedString(string str)
+        public AggRenderVxFormattedString()
         {
-            _str = str;
-
         }
-        public override string OriginalString => _str;
+#if DEBUG
+        public string OriginalString { get; set; }
+#endif
     }
 }

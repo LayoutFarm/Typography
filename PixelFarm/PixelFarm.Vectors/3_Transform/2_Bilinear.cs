@@ -84,7 +84,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         //----------
         //
-        bool m_valid;
+        bool _valid;
         private Bilinear()
         {
         }
@@ -99,7 +99,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             rc11 = result[1, 1];
             rc21 = result[2, 1];
             rc31 = result[3, 1];
-            this.m_valid = true;
+            _valid = true;
 
             _srcQuad = srcQuad;
             _dstQuad = dstQuad;
@@ -240,8 +240,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //--------------------------------------------------------------------
         // Check if the equations were solved successfully
 
-        public bool IsValid => m_valid;
+        public bool IsValid => _valid;
         public CoordTransformerKind Kind => CoordTransformerKind.Bilinear;
+        public bool IsIdentity => false;// *** TODO: review here again
 
         //--------------------------------------------------------------------
         // Transform a point (x, y)

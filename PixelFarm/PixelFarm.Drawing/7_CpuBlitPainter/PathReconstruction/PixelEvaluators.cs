@@ -210,8 +210,11 @@ namespace PixelFarm.PathReconstruction
         }
     }
 
+
+    public delegate bool PixelPreviewDelegate(int orgColor);
     public class Bmp32PixelEvalToleranceMatch : Bmp32PixelEvaluator
     {
+
         byte _tolerance0To255;
         //** only RGB?
         byte _red_min, _red_max;
@@ -225,8 +228,10 @@ namespace PixelFarm.PathReconstruction
         byte _g;
         byte _b;
         byte _a;
-        //--------------
-
+        //-------------- 
+        PixelPreviewDelegate _pixelPreviewDel;
+        bool _hasSkipColor;
+        int _skipColorInt32;
 
         public Bmp32PixelEvalToleranceMatch(byte initTolerance)
         {
@@ -238,6 +243,20 @@ namespace PixelFarm.PathReconstruction
             set => _tolerance0To255 = value;
         }
 
+        public void SetSkipColor(Color c)
+        {
+            _hasSkipColor = true;
+            _skipColorInt32 =
+                (c.A << CO.A_SHIFT) |
+                (c.R << CO.R_SHIFT) |
+                (c.G << CO.G_SHIFT) |
+                (c.B << CO.B_SHIFT);
+
+        }
+        public void SetCustomPixelChecker(PixelPreviewDelegate pixelPreviewDel)
+        {
+            _pixelPreviewDel = pixelPreviewDel;
+        }
         protected override unsafe void SetStartColor(int* colorAddr)
         {
             int pixelValue32 = *colorAddr;
@@ -260,6 +279,16 @@ namespace PixelFarm.PathReconstruction
         protected override unsafe bool CheckPixel(int* pixelAddr)
         {
             int pixelValue32 = _latestInputValue = *pixelAddr;
+
+            if (_hasSkipColor && _skipColorInt32 == pixelValue32)
+            {
+                return false;
+            }
+            //if (_pixelPreviewDel != null && !_pixelPreviewDel(pixelValue32))
+            //{
+            //    //not pass preview 
+            //    return false;
+            //}
 
             int r = (pixelValue32 >> CO.R_SHIFT) & 0xff;
             int g = (pixelValue32 >> CO.G_SHIFT) & 0xff;
@@ -316,4 +345,6 @@ namespace PixelFarm.PathReconstruction
         }
 
     }
+
+
 }

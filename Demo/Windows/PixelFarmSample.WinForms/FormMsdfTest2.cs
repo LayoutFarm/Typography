@@ -212,30 +212,30 @@ namespace SampleWinForms
             public string BaseDir => _baseDir;
 
             public bool DisableAbsolutePath { get; }
-            //public override string[] GetDataNameList(string dir)
-            //{
-            //    if (Path.IsPathRooted(dir))
-            //    {
-            //        if (DisableAbsolutePath) return null;
-            //    }
-            //    else
-            //    {
-            //        dir = Path.Combine(_baseDir, dir);
-            //    }
-            //    return System.IO.Directory.GetFiles(dir);
-            //}
-            //public override string[] GetDataDirNameList(string dir)
-            //{
-            //    if (Path.IsPathRooted(dir))
-            //    {
-            //        if (DisableAbsolutePath) return null;
-            //    }
-            //    else
-            //    {
-            //        dir = Path.Combine(_baseDir, dir);
-            //    }
-            //    return System.IO.Directory.GetFiles(dir);
-            //}
+            public override string[] GetDataNameList(string dir)
+            {
+                if (Path.IsPathRooted(dir))
+                {
+                    if (DisableAbsolutePath) return null;
+                }
+                else
+                {
+                    dir = Path.Combine(_baseDir, dir);
+                }
+                return System.IO.Directory.GetFiles(dir);
+            }
+            public override string[] GetDataDirNameList(string dir)
+            {
+                if (Path.IsPathRooted(dir))
+                {
+                    if (DisableAbsolutePath) return null;
+                }
+                else
+                {
+                    dir = Path.Combine(_baseDir, dir);
+                }
+                return System.IO.Directory.GetFiles(dir);
+            }
             public override bool DataExists(string dataName)
             {
                 //implement with file 
@@ -310,14 +310,14 @@ namespace SampleWinForms
             {
                 MultiSizeFontAtlasBuilder multiSizeFontAtlasBuilder = new MultiSizeFontAtlasBuilder();
                 {
-                    bmpFontMx.TextureKindForNewFont = TextureKind.StencilLcdEffect;
+                    bmpFontMx.TextureKindForNewFont = PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect;
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 10), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 11), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 12), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 13), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 14), bmpFontMx);
 
-                    bmpFontMx.TextureKindForNewFont = TextureKind.Msdf;
+                    bmpFontMx.TextureKindForNewFont = PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf;
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 24), bmpFontMx);
                 }
 

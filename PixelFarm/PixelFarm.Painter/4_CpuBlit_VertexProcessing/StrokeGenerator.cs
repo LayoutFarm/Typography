@@ -24,7 +24,7 @@ using PixelFarm.VectorMath;
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    static class MyMath
+    public static class MyMath
     {
 
 
@@ -112,11 +112,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //return b0;
 
             return p0.Y - (m1) * p0.X;
-        }
-
-
+        } 
     }
-
+   
 
     class LineJoiner
     {

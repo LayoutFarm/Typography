@@ -249,6 +249,20 @@ namespace PixelFarm.CpuBlit
             dbugMemBitmapMonitor.dbugRegisterMemBitmap(this, width + "x" + height + ": " + DateTime.Now.ToString("u"));
 #endif
         }
+        public BitmapBufferFormat BufferPixelFormat
+        {
+            get
+            {
+                if (PixelFormat == Imaging.PixelFormat.ARGB32)
+                {
+                    return BitmapBufferFormat.BGRA;//on windows
+                }
+                else
+                {
+                    return BitmapBufferFormat.BGR;//on Windows
+                }
+            }
+        }
         public override void Dispose()
         {
             if (_pixelBuffer != IntPtr.Zero && !_pixelBufferFromExternalSrc)
@@ -317,6 +331,35 @@ namespace PixelFarm.CpuBlit
             {
                 System.Runtime.InteropServices.Marshal.Copy(totalBuffer, 0, bmp._pixelBuffer, totalBuffer.Length);
             }
+            return bmp;
+        }
+        public static unsafe MemBitmap CreateFromCopy(int width, int height, IntPtr totalBuffer, int totalLen, bool doFlipY = false)
+        {
+
+            var bmp = new MemBitmap(width, height);
+#if DEBUG
+            bmp._dbugNote = "MemBitmap.CreateFromCopy";
+#endif
+            //System.Runtime.InteropServices.Marshal.Copy(totalBuffer, bmp._pixelBuffer, 0, totalLen);
+            MemMx.memcpy((byte*)(bmp._pixelBuffer), (byte*)totalBuffer, totalLen);
+            //if (doFlipY)
+            //{
+            //    //flip vertical Y  
+            //    int[] totalBufferFlipY = new int[totalBuffer.Length];
+            //    int srcRowIndex = height - 1;
+            //    int strideInBytes = width * 4;//32 bpp
+            //    for (int i = 0; i < height; ++i)
+            //    {
+            //        //copy each row from src to dst
+            //        System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+            //        srcRowIndex--;
+            //    }
+            //    totalBuffer = totalBufferFlipY;
+            //}
+            //unsafe
+            //{
+
+            //}
             return bmp;
         }
         public static MemBitmap CreateFromCopy(int width, int height, int len, IntPtr anotherNativePixelBuffer)
@@ -433,16 +476,12 @@ namespace PixelFarm.CpuBlit
                   (byte)(pixelValue >> 16),
                   (byte)(pixelValue >> 8),
                   (byte)(pixelValue));
-            }
-
-        }
-
-
-        //----------
+            } 
+        } 
         public static MemBitmap LoadBitmap(string filename)
         {
-            return MemBitmapExtensions.LoadImageFromFile(filename);
-        }
+            return MemBitmapExtensions.DefaultMemBitmapIO.LoadImage(filename);
+        } 
         public static MemBitmap LoadBitmap(System.IO.Stream input)
         {
             return MemBitmapExtensions.LoadImage(input);
@@ -638,7 +677,7 @@ namespace PixelFarm.CpuBlit
                 else
                 {
                     //other color
-                    //#if WIN
+                    //#if WIN32
                     //                            uint colorARGB = (uint)((color.alpha << 24) | ((color.red << 16) | (color.green << 8) | color.blue));
                     //#else
                     //                            uint colorARGB = (uint)((color.alpha << 24) | ((color.blue << 16) | (color.green << 8) | color.red));
@@ -968,11 +1007,7 @@ namespace PixelFarm.CpuBlit
 
         public static MemBitmapIO DefaultMemBitmapIO { get; set; }
 
-        public static MemBitmap LoadImageFromFile(string filename)
-        {
-            //user need to provider load img func handler
-            return DefaultMemBitmapIO.LoadImage(filename);
-        }
+
         public static MemBitmap LoadImage(System.IO.Stream stream)
         {
             //user need to provider load img func handler

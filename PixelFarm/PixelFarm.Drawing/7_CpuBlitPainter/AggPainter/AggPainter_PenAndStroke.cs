@@ -39,7 +39,7 @@ namespace PixelFarm.CpuBlit
         }
         public LineRenderingTechnique LineRenderingTech
         {
-            get { return _lineRenderingTech; }
+            get => _lineRenderingTech;
             set
             {
 

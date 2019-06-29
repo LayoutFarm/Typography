@@ -397,11 +397,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             _isIdenHint = false;
         }
+
+        
+
         public float[] Get3x3MatrixElements() => _elems.Get3x3MatrixElements();
-        ICoordTransformer ICoordTransformer.CreateInvert()
-        {
-            return CreateInvert();
-        }
+        ICoordTransformer ICoordTransformer.CreateInvert() => CreateInvert();
         public ICoordTransformer MultiplyWith(ICoordTransformer another)
         {
             if (another is Affine)
@@ -1127,31 +1127,27 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         // Check to see if the matrix is not degenerate
-        public bool IsNotDegenerated(double epsilon)
-        {
-            return Math.Abs(_elems.sx) > epsilon && Math.Abs(_elems.sy) > epsilon;
-        }
+        public bool IsNotDegenerated(double epsilon) => Math.Abs(_elems.sx) > epsilon && Math.Abs(_elems.sy) > epsilon;
 
         // Check to see if it's an identity matrix
-        public bool IsIdentity()
+        public bool IsIdentity
         {
-            if (!_isIdenHint)
+            get
             {
-                return is_equal_eps(_elems.sx, 1.0) && is_equal_eps(_elems.shy, 0.0) &&
-                   is_equal_eps(_elems.shx, 0.0) && is_equal_eps(_elems.sy, 1.0) &&
-                   is_equal_eps(_elems.tx, 0.0) && is_equal_eps(_elems.ty, 0.0);
-            }
-            else
-            {
-                return true;
+                if (!_isIdenHint)
+                {
+                    return is_equal_eps(_elems.sx, 1.0) && is_equal_eps(_elems.shy, 0.0) &&
+                       is_equal_eps(_elems.shx, 0.0) && is_equal_eps(_elems.sy, 1.0) &&
+                       is_equal_eps(_elems.tx, 0.0) && is_equal_eps(_elems.ty, 0.0);
+                }
+                else
+                {
+                    return true;
+                }
             }
         }
 
-        static bool is_equal_eps(double v1, double v2)
-        {
-            return Math.Abs(v1 - v2) <= (EPSILON);
-        }
-
+        static bool is_equal_eps(double v1, double v2) => Math.Abs(v1 - v2) <= (EPSILON);
 
         //public static VertexStore TranslateTransformToVxs(VertexStoreSnap src, double dx, double dy, VertexStore vxs)
         //{
@@ -1166,10 +1162,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //    }
         //    return vxs;
         //}
-
-
-
-
         // Check to see if two matrices are equal
         //public bool is_equal(Affine m, double epsilon)
         //{

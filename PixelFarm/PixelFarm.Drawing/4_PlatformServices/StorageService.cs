@@ -9,14 +9,16 @@ namespace PixelFarm.Platforms
 
     public abstract class StorageServiceProvider
     {
+        public abstract string[] GetDataDirNameList(string dir);
+        public abstract string[] GetDataNameList(string dir);
         public abstract bool DataExists(string dataName);
         public abstract void SaveData(string dataName, byte[] content);
-        public abstract byte[] ReadData(string dataName); 
+        public abstract byte[] ReadData(string dataName);
         public Stream ReadDataStream(string dataName)
         {
             byte[] data = ReadData(dataName);
             return new MemoryStream(data);
-        } 
+        }
     }
 
     public static class StorageService
@@ -24,6 +26,12 @@ namespace PixelFarm.Platforms
         static StorageServiceProvider s_provider;
         public static void RegisterProvider(StorageServiceProvider provider)
         {
+#if DEBUG
+            if (s_provider != null)
+            {
+
+            }
+#endif
             s_provider = provider;
         }
         public static StorageServiceProvider Provider => s_provider;
@@ -70,6 +78,8 @@ namespace LayoutFarm
             s_runOnceRegisterImpl = runOnceRegisterImpl;
         }
     }
+
+    public delegate void LoadImageFunc(ImageBinder binder);
     public class ImageBinder : PixelFarm.Drawing.BitmapBufferProvider
     {
 
@@ -78,13 +88,10 @@ namespace LayoutFarm
         /// </summary>
         PixelFarm.Drawing.Image _localImg;
         bool _isLocalImgOwner;
-
         LoadImageFunc _lazyLoadImgFunc;
-
-
         int _previewImgWidth = 16; //default ?
         int _previewImgHeight = 16;
-
+        bool _isAtlasImg;
 #if DEBUG
         static int dbugTotalId;
         public int dbugId = dbugTotalId++;
@@ -126,9 +133,11 @@ namespace LayoutFarm
         }
         public event System.EventHandler ImageChanged;
 
-        public override void NotifyUsage()
+#if DEBUG
+        public override void dbugNotifyUsage()
         {
         }
+#endif
         public override void ReleaseLocalBitmapIfRequired()
         {
 
@@ -253,6 +262,7 @@ namespace LayoutFarm
         public override bool IsYFlipped => false;
         //
         public static readonly ImageBinder NoImage = new NoImageImageBinder();
+        public virtual bool IsAtlasImage => false;
 
         class NoImageImageBinder : ImageBinder
         {
@@ -268,7 +278,7 @@ namespace LayoutFarm
         }
     }
 
-    public delegate void LoadImageFunc(ImageBinder binder);
+
 
     public enum BinderState : byte
     {
@@ -284,11 +294,11 @@ namespace LayoutFarm
     namespace Composers
     {
         //TODO: review here
-        public struct TextSplitBound
+        public struct TextSplitBounds
         {
             public readonly int startIndex;
             public readonly int length;
-            public TextSplitBound(int startIndex, int length)
+            public TextSplitBounds(int startIndex, int length)
             {
                 this.startIndex = startIndex;
                 this.length = length;
@@ -296,7 +306,7 @@ namespace LayoutFarm
 
             public int RightIndex => startIndex + length;
 
-            public static readonly TextSplitBound Empty = new TextSplitBound();
+            public static readonly TextSplitBounds Empty = new TextSplitBounds();
 
 #if DEBUG
             public override string ToString()

@@ -89,7 +89,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public LineAAVertex this[int index] => _list[index];
         public int Count => _list.Count;
         //
-        public void Clear() { _list.Clear(); }
+        public void Clear() => _list.Clear();
         //
         public void ModifyLast(LineAAVertex val)
         {

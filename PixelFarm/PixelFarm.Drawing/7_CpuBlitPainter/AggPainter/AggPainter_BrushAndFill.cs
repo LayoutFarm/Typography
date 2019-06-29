@@ -110,7 +110,7 @@ namespace PixelFarm.CpuBlit
         /// <summary>
         /// fill with BitmapBufferExtension lib
         /// </summary>
-        void FillWithBxt(VertexStore vxs)
+        void FillWithBxt(VertexStore vxs, CustomBlendOp blendOp = null)
         {
             //transate the vxs/snap to command
             double x = 0;
@@ -151,8 +151,8 @@ namespace PixelFarm.CpuBlit
                         }
                         break;
                     case VertexCmd.LineTo:
-                    case VertexCmd.P2c:
-                    case VertexCmd.P3c:
+                    case VertexCmd.C3:
+                    case VertexCmd.C4:
                         {
                             //collect to the polygon
                             _reusablePolygonList.Add(latestX = (int)Math.Round(x));
@@ -168,8 +168,11 @@ namespace PixelFarm.CpuBlit
                                 _reusablePolygonList.Add(latestX = latestMoveToX);
                                 _reusablePolygonList.Add(latestY = latestMoveToY);
 
-                                _bxt.FillPolygon(_reusablePolygonList.ToArray(),
-                                    _fillColor.ToARGB());
+                                //TODO: optimize, using array,
+
+                                _bxt.FillPolygon(
+                                    _reusablePolygonList.ToArray(),
+                                    _fillColor.ToARGB(), blendOp);
                             }
 
                             _reusablePolygonList.Clear();
@@ -191,10 +194,11 @@ namespace PixelFarm.CpuBlit
 
                 _bxt.FillPolygon(
                     _reusablePolygonList.ToArray(),
-                    _fillColor.ToARGB());
+                    _fillColor.ToARGB(), blendOp);
             }
         }
 
+        public BitmapBufferEx.CustomBlendOp CurrentBxtBlendOp { get; set; } //tmp!
         /// <summary>
         /// fill vxs, we do NOT store vxs
         /// </summary>
@@ -204,7 +208,7 @@ namespace PixelFarm.CpuBlit
             //
             if (_useDefaultBrush && _renderQuality == RenderQuality.Fast)
             {
-                FillWithBxt(vxs);
+                FillWithBxt(vxs, CurrentBxtBlendOp);
                 return;
             }
             if (!_useDefaultBrush)
@@ -467,11 +471,7 @@ namespace PixelFarm.CpuBlit
                 {
                     _aggsx.Render(rectTool.MakeVxs(v1), _fillColor);
                 }
-
             }
         }
-
-
     }
-
 }

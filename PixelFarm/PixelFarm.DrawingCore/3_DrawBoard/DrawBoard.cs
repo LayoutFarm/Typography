@@ -15,10 +15,9 @@ namespace PixelFarm.Drawing
         //(0,0) is on left-upper corner
         //-------------------------------
         //who implement this class
-        //1. PixelFarm.Drawing.WinGdi.MyGdiPlusCanvas (for win32,legacy) 
-        //2. PixelFarm.Drawing.GLES2.MyGLCanvas  (for GLES2)
-        //3. PixelFarm.Drawing.Pdf.MyPdfCanvas (future)
-        //4. PixelFarm.Drawing.Skia.MySkia Canvas (not complete)
+        //1. PixelFarm.Drawing.WinGdi.GdiPlusDrawBoard (for win32,legacy) 
+        //2. PixelFarm.Drawing.GLES2.MyGLDrawBoard  (for GLES2)
+
         //------------------------------
         //who use this interface
         //the HtmlRenderer
@@ -67,6 +66,7 @@ namespace PixelFarm.Drawing
         //---------------------------------------------------------------------
         //clip area
         public abstract bool PushClipAreaRect(int width, int height, ref Rectangle updateArea);
+        public abstract bool PushClipAreaRect(int left, int top, int width, int height, ref Rectangle updateArea);
         public abstract void PopClipAreaRect();
         public abstract void SetClipRect(Rectangle clip, CombineMode combineMode = CombineMode.Replace);
         public abstract Rectangle CurrentClipRect { get; }
@@ -80,8 +80,7 @@ namespace PixelFarm.Drawing
         //lines         
         public abstract void DrawLine(float x1, float y1, float x2, float y2);
         //-------------------------------------------------------
-        //rects 
-
+        //rects
         public abstract void FillRectangle(Color color, float left, float top, float width, float height);
         public abstract void FillRectangle(Brush brush, float left, float top, float width, float height);
         public abstract void DrawRectangle(Color color, float left, float top, float width, float height);
@@ -123,17 +122,41 @@ namespace PixelFarm.Drawing
         /// </summary>
         /// <returns></returns>
         public abstract DrawBoard GetCpuBlitDrawBoard();
+        //
+        public abstract DrawboardBuffer CreateBackbuffer(int w, int h);
+        public abstract void EnterNewDrawboardBuffer(DrawboardBuffer backbuffer);
+        public abstract void ExitCurrentDrawboardBuffer();
+        //
         public abstract bool IsGpuDrawBoard { get; }
         public abstract void BlitFrom(DrawBoard src, float srcX, float srcY, float srcW, float srcH, float dstX, float dstY);
         public abstract BitmapBufferProvider GetInternalBitmapProvider();
-
+        public abstract DrawTextTechnique DrawTextTechnique { get; set; }
     }
+
+    public enum DrawTextTechnique : byte
+    {
+        LcdSubPix,
+        Stencil,
+    }
+    public abstract class DrawboardBuffer : System.IDisposable
+    {
+        public abstract Image GetImage();
+        public bool IsValid { get; set; }
+        public abstract int Width { get; }
+        public abstract int Height { get; }
+        public abstract void Dispose();
+        public abstract Image CopyToNewMemBitmap();
+    }
+
+
 
     public enum BitmapBufferFormat
     {
         BGRA, //eg. System.Drawing.Bitmap
         BGR, //eg. Native Windows GDI surface
-        RGBA //eg. OpenGL 
+        RGBA, //eg. OpenGL 
+
+        RGBO, //my extension, 32 bits RGB ignore Alpha, assume its value= 1
     }
 
 
@@ -148,11 +171,16 @@ namespace PixelFarm.Drawing
         /// notify the bitmap provider that it can release the local bmp (eg. we have use it, not need anymore)
         /// </summary>
         public abstract void ReleaseLocalBitmapIfRequired();
-        public abstract void NotifyUsage();
+
         public BitmapBufferFormat BitmapFormat { get; set; }
         public override bool IsReferenceImage => true;
         public override int ReferenceX => 0;
         public override int ReferenceY => 0;
+
+
+#if DEBUG
+        public abstract void dbugNotifyUsage();
+#endif
     }
 
     public enum RenderQuality
@@ -197,16 +225,18 @@ namespace PixelFarm.Drawing
         public static void OffsetCanvasOrigin(this DrawBoard drawBoard, int dx, int dy)
         {
             //TODO: review offset function
+            if (dx == 0 && dy == 0) return;
+
             drawBoard.SetCanvasOrigin(drawBoard.OriginX + dx, drawBoard.OriginY + dy);
         }
         public static void OffsetCanvasOriginX(this DrawBoard drawBoard, int dx)
         {
-            //TODO: review offset function
+            //TODO: review offset function 
             drawBoard.OffsetCanvasOrigin(dx, 0);
         }
         public static void OffsetCanvasOriginY(this DrawBoard drawBoard, int dy)
         {
-            //TODO: review offset function
+            //TODO: review offset function 
             drawBoard.OffsetCanvasOrigin(0, dy);
         }
 

@@ -87,7 +87,8 @@ namespace PixelFarm.PathReconstruction
         {
             if (base.CheckPixel(pixelAddr))
             {
-                *pixelAddr = _fillColorInt32;//action
+                //if pass then fill the pixel with the fill color
+                *pixelAddr = _fillColorInt32;
                 return true;
             }
             return false;
@@ -106,6 +107,7 @@ namespace PixelFarm.PathReconstruction
         FillBmp32PixelEvaluatorWithTolerance _pixEval;
         FloodFillRunner _floodRunner = new FloodFillRunner();
         short[] _diffMap;
+        int _fillColorInt32;
         public ColorBucket(Color fillColor)
           : this(fillColor, 0)
         {
@@ -122,13 +124,13 @@ namespace PixelFarm.PathReconstruction
             _tolerance = tolerance;
             _fillColor = fillColor;
 
-            int fillColorInt32 =
+            _fillColorInt32 =
                 (_fillColor.red << CO.R_SHIFT) |
                 (_fillColor.green << CO.G_SHIFT) |
                 (_fillColor.blue << CO.B_SHIFT) |
                 (_fillColor.alpha << CO.A_SHIFT);
 
-            _pixEval = new FillBmp32PixelEvaluatorWithTolerance(fillColorInt32, tolerance);
+            _pixEval = new FillBmp32PixelEvaluatorWithTolerance(_fillColorInt32, tolerance);
 
         }
 
@@ -151,9 +153,58 @@ namespace PixelFarm.PathReconstruction
                     _diffMap = new short[bmp.Width * bmp.Height];
                     _pixEval.SetDiffMap(_diffMap);
                 }
-                //****
+
                 output.HSpans = _floodRunner.InternalFill(_pixEval, x, y, output != null);
                 _pixEval.ReleaseSourceBitmap();
+            }
+        }
+
+        public Action<List<HSpan[]>> AutoFilled;
+        public void AutoFill(MemBitmap bmp,
+            int x, int y, int w, int h,
+            List<ReconstructedRegionData> output = null)
+        {   
+            if (x < bmp.Width && y < bmp.Height)
+            {
+                //autofill
+                _pixEval.SetSourceBitmap(bmp);
+                if (_pixEval.FillDiffMap)
+                {
+                    _diffMap = new short[bmp.Width * bmp.Height];
+                    _pixEval.SetDiffMap(_diffMap);
+                } 
+                //--------------------
+                //run the filling process
+                _pixEval.SetCustomPixelChecker(p =>
+                {
+                    return p != _fillColorInt32;
+                });
+
+                _pixEval.SetSkipColor(Color.Red);
+
+                int x0 = x;
+                int x1 = x + w;
+                int y0 = y;
+                int y1 = y + h;
+
+                //***
+                _fillColor = Color.Red;
+
+                List<HSpan[]> hSpanList = new List<HSpan[]>();
+                for (int cur_y = y0; cur_y < y1; ++cur_y)
+                {
+                    for (int cur_x = x0; cur_x < x1; ++cur_x)
+                    {
+                        HSpan[] hspans = _floodRunner.InternalFill(_pixEval, cur_x, cur_y, output != null);
+                        if (hspans != null && hspans.Length > 1)
+                        {
+                            hSpanList.Add(hspans);
+                        }
+                    }
+                }
+                //--------------------
+                _pixEval.ReleaseSourceBitmap();
+                AutoFilled?.Invoke(hSpanList);
             }
         }
     }

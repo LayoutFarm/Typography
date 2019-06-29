@@ -21,6 +21,23 @@ using System.Collections.Generic;
 
 namespace BitmapBufferEx
 {
+    public enum BlendKind
+    {
+        NoBlend,
+        Alpha,
+        Custom,
+    }
+    public class CustomBlendOp
+    {
+        public BlendKind Kind { get; set; }
+        public virtual void Begin() { }
+        public virtual void End() { }
+        public virtual int Blend(int currentExistingColor, int inputColor)
+        {
+            return inputColor;
+        }
+    }
+
     /// <summary>
     /// Collection of extension methods for the WriteableBitmap class.
     /// </summary>
@@ -451,7 +468,7 @@ namespace BitmapBufferEx
         /// <param name="points">The points of the polygon in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="doAlphaBlend">True if alpha blending should be performed or false if not.</param>
-        public static unsafe void FillPolygon(this BitmapBuffer bmp, int[] points, int color, bool doAlphaBlend = false)
+        public static unsafe void FillPolygon(this BitmapBuffer bmp, int[] points, int color, CustomBlendOp blendOp = null)
         {
             using (BitmapContext context = bmp.GetBitmapContext())
             {
@@ -459,12 +476,8 @@ namespace BitmapBufferEx
                 int w = context.Width;
                 int h = context.Height;
 
-                int sa = ((color >> 24) & 0xff);
-                int sr = ((color >> 16) & 0xff);
-                int sg = ((color >> 8) & 0xff);
-                int sb = ((color) & 0xff);
 
-                bool noBlending = !doAlphaBlend || sa == 255;
+
 
                 int* pixels = context.Pixels._inf32Buffer;
                 int pn = points.Length;
@@ -527,6 +540,20 @@ namespace BitmapBufferEx
                     }
 
                     // Fill the pixels between the intersections
+                    int sa = ((color >> 24) & 0xff);
+
+                    bool noBlending = true;
+
+                    if (blendOp != null)
+                    {
+                        noBlending = false;
+                    }
+                    else if (sa != 255)
+                    {
+                        noBlending = false;
+                    }
+
+
                     for (int i = 0; i < intersectionCount - 1; i += 2)
                     {
                         int x0 = intersectionsX[i];
@@ -538,12 +565,45 @@ namespace BitmapBufferEx
                             if (x0 < 0) x0 = 0;
                             if (x1 >= w) x1 = w - 1;
 
-                            // Fill the pixels
-                            for (int x = x0; x <= x1; x++)
-                            {
-                                int idx = y * w + x;
+                            // Fill the pixels 
+                            int idx = y * w + x0; //start *** 
 
-                                pixels[idx] = noBlending ? color : AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
+                            //...
+
+
+                            if (noBlending)
+                            {
+                                for (int x = x0; x <= x1; x++)
+                                {
+                                    pixels[idx] = color;
+                                    idx++;
+                                }
+                            }
+                            else
+                            {
+                                //with blending default = alpha
+                                if (blendOp == null)
+                                {
+                                    int sr = ((color >> 16) & 0xff);
+                                    int sg = ((color >> 8) & 0xff);
+                                    int sb = ((color) & 0xff);
+
+                                    for (int x = x0; x <= x1; x++)
+                                    {
+                                        pixels[idx] = AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
+                                        idx++;
+                                    }
+                                }
+                                else
+                                {
+                                    blendOp.Begin();
+                                    for (int x = x0; x <= x1; x++)
+                                    {
+                                        pixels[idx] = blendOp.Blend(pixels[idx], color);
+                                        idx++;
+                                    }
+                                    blendOp.End();
+                                }
                             }
                         }
                     }
@@ -559,7 +619,7 @@ namespace BitmapBufferEx
         /// The following is always true: 
         /// <code>edge.StartY &lt; edge.EndY</code>
         /// </remarks>
-        private class Edge : IComparable<Edge>
+        class Edge : IComparable<Edge>
         {
             /// <summary>
             /// X coordinate of starting point of edge.

@@ -233,7 +233,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double local_sweep = 0.0;
             double prev_sweep;
             m_num_vertices = 2;
-            m_cmd = VertexCmd.P3c;
+            m_cmd = VertexCmd.C4;
 
             bool done = false;
             do

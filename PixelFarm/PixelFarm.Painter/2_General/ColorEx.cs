@@ -14,7 +14,10 @@ namespace PixelFarm.Drawing
         public const int BASE_SCALE = (1 << BASE_SHIFT);
         public const int BASE_MASK = (BASE_SCALE - 1);
         //------------------------------------------
-
+#if DEBUG
+        static System.Random s_dbugRandom = new System.Random();
+        public static Color dbugGetRandomColor() => Color.FromArgb(255, s_dbugRandom.Next(0, 255), s_dbugRandom.Next(0, 255), s_dbugRandom.Next(0, 255));
+#endif
         public static Color Make(double r_, double g_, double b_, double a_)
         {
             return new Color(

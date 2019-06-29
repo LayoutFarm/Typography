@@ -77,7 +77,7 @@ namespace Poly2Tri
             //for clean clone
         }
 
-   
+
         //public Polygon CleanClone()
         //{
         //    //recursive
@@ -112,8 +112,8 @@ namespace Poly2Tri
         //    }
         //    return newPolygon;
         //}
-         
-        public TriangulationMode TriangulationMode { get { return TriangulationMode.Polygon; } }
+
+        public TriangulationMode TriangulationMode => TriangulationMode.Polygon;
 
         //public void AddSteinerPoint(TriangulationPoint point)
         //{
@@ -227,11 +227,9 @@ namespace Poly2Tri
         //    _points.Remove(p);
         //}
 
-        public IList<TriangulationPoint> Points { get { return _points; } }
-        public IList<DelaunayTriangle> Triangles { get { return _triangles; } }
-        public IList<Polygon> Holes { get { return _holes; } }
-
-
+        public IList<TriangulationPoint> Points => _points;
+        public IList<DelaunayTriangle> Triangles => _triangles;
+        public IList<Polygon> Holes => _holes;
 
         public void AddTriangle(DelaunayTriangle t)
         {

@@ -32,7 +32,7 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 {
     public abstract class PixelBlender32
     {
-        
+
         public const int NUM_PIXEL_BITS = 32;
         internal const byte BASE_MASK = 255;
 
@@ -111,10 +111,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             int value = buffer[bufferOffset32];
             return new Color(
-               (byte)((value >> (CO.A * 8)) & 0xff),
-               (byte)((value >> (CO.R * 8)) & 0xff),
-               (byte)((value >> (CO.G * 8)) & 0xff),
-               (byte)((value >> (CO.B * 8)) & 0xff));
+               (byte)((value >> (CO.A_SHIFT)) & 0xff),
+               (byte)((value >> (CO.R_SHIFT)) & 0xff),
+               (byte)((value >> (CO.G_SHIFT)) & 0xff),
+               (byte)((value >> (CO.B_SHIFT)) & 0xff));
 
         }
         internal Color PixelToColorRGBA(int[] buffer, int bufferOffset32)
@@ -127,10 +127,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
 
             int value = buffer[bufferOffset32];
             return new Color(
-               (byte)((value >> (CO.A * 8)) & 0xff),
-               (byte)((value >> (CO.R * 8)) & 0xff),
-               (byte)((value >> (CO.G * 8)) & 0xff),
-               (byte)((value >> (CO.B * 8)) & 0xff));
+               (byte)((value >> (CO.A_SHIFT)) & 0xff),
+               (byte)((value >> (CO.R_SHIFT)) & 0xff),
+               (byte)((value >> (CO.G_SHIFT)) & 0xff),
+               (byte)((value >> (CO.B_SHIFT)) & 0xff));
 
             //        buffer[bufferOffset + CO.A],
             //        buffer[bufferOffset + CO.R],

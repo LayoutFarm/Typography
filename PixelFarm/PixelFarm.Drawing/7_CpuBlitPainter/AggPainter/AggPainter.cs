@@ -48,6 +48,19 @@ namespace PixelFarm.CpuBlit
             _defaultPixelBlender = this.DestBitmapBlender.OutputPixelBlender;
         }
 
+        public void Reset()
+        {
+            //TODO: ...
+            //reset to init state
+            //
+            FillingRule = FillingRule.NonZero;
+        }
+        public override FillingRule FillingRule
+        {
+            //TODO: set filling for both aggsx (default and mask)
+            get => _aggsx.FillingRule;
+            set => _aggsx.FillingRule = value;
+        }
         public override float FillOpacity
         {
             get => _fillOpacity;
@@ -72,6 +85,7 @@ namespace PixelFarm.CpuBlit
             }
         }
 
+        
         public override TargetBuffer TargetBuffer
         {
             get => _targetBuffer;
@@ -97,6 +111,12 @@ namespace PixelFarm.CpuBlit
             get => EnableBuiltInMaskComposite;
             set => EnableBuiltInMaskComposite = value;
         }
+        public override ICoordTransformer CoordTransformer
+        {
+            get => _aggsx.CurrentTransformMatrix;
+            set => _aggsx.CurrentTransformMatrix = value;
+        }
+         
         public DrawBoard DrawBoard { get; set; }
         public AggRenderSurface RenderSurface => _aggsx;
         public BitmapBlenderBase DestBitmapBlender => _aggsx.DestBitmapBlender;

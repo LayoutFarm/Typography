@@ -240,8 +240,8 @@ namespace PixelFarm.PathReconstruction
                     case VertexCmd.MoveTo:
                         _reusableQueue.Enqueue(new Vector2(lastest_moveToX = x, latest_moveToY = y));
                         break;
-                    case VertexCmd.P2c:
-                    case VertexCmd.P3c:
+                    case VertexCmd.C3:
+                    case VertexCmd.C4:
                     case VertexCmd.LineTo:
                         _reusableQueue.Enqueue(new Vector2(x, y));
                         break;

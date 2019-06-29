@@ -157,8 +157,8 @@ namespace PixelFarm.CpuBlit
 
             double scaleX = inScaleX;
             double scaleY = inScaleY;
-            Affine graphicsTransform = this.CurrentTransformMatrix;
-            if (!graphicsTransform.IsIdentity())
+            ICoordTransformer graphicsTransform = this.CurrentTransformMatrix;
+            if (!graphicsTransform.IsIdentity)
             {
                 if (scaleX != 1 || scaleY != 1 || angleRadians != 0)
                 {
@@ -417,8 +417,9 @@ namespace PixelFarm.CpuBlit
 
             double scaleX = inScaleX;
             double scaleY = inScaleY;
-            Affine graphicsTransform = this.CurrentTransformMatrix;
-            if (!graphicsTransform.IsIdentity())
+
+            ICoordTransformer graphicsTransform = this.CurrentTransformMatrix;
+            if (!graphicsTransform.IsIdentity)
             {
                 if (scaleX != 1 || scaleY != 1 || angleRadians != 0)
                 {
@@ -596,7 +597,7 @@ namespace PixelFarm.CpuBlit
         }
 
 
-   
+
     }
 
 
@@ -664,5 +665,5 @@ namespace PixelFarm.CpuBlit
         }
     }
 
-    
+
 }

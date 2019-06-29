@@ -172,7 +172,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 switch (cmd)
                 {
 
-                    case VertexCmd.P2c:
+                    case VertexCmd.C3:
                         {
                             switch (latestCurveMode)
                             {
@@ -198,7 +198,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             latestCurveMode = CurvePointMode.P2;
                         }
                         break;
-                    case VertexCmd.P3c:
+                    case VertexCmd.C4:
                         {
                             //this is p3c
                             switch (latestCurveMode)

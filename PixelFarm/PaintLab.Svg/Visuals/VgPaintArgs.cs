@@ -1,12 +1,7 @@
 ﻿//MIT, 2014-present, WinterDev
 
-using System;
-using System.Collections.Generic;
-
-using PixelFarm.Drawing;
-using PixelFarm.CpuBlit.VertexProcessing;
-
-
+using System; 
+using PixelFarm.Drawing; 
 namespace PaintLab.Svg
 {
     public class VgPaintArgs : VgVisitorBase
@@ -59,16 +54,16 @@ namespace PaintLab.Svg
 
     public static class VgPaintArgsPool
     {
-        public static TempContext<VgPaintArgs> Borrow(Painter painter, out VgPaintArgs paintArgs)
+        public static PixelFarm.TempContext<VgPaintArgs> Borrow(Painter painter, out VgPaintArgs paintArgs)
         {
-            if (!Temp<VgPaintArgs>.IsInit())
+            if (!PixelFarm.Temp<VgPaintArgs>.IsInit())
             {
-                Temp<VgPaintArgs>.SetNewHandler(
+                PixelFarm.Temp<VgPaintArgs>.SetNewHandler(
                     () => new VgPaintArgs(),
                     p => p.Reset());//when relese back
             }
 
-            var context = Temp<VgPaintArgs>.Borrow(out paintArgs);
+            var context = PixelFarm.Temp<VgPaintArgs>.Borrow(out paintArgs);
             paintArgs.P = painter;
             return context;
         }

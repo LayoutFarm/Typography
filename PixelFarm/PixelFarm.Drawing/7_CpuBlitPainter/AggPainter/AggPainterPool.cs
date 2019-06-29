@@ -16,6 +16,7 @@ namespace PixelFarm.CpuBlit
                     p =>
                     {
                         p.RenderSurface.DetachDstBitmap();
+                        p.Reset();
                     }
                     );
             }

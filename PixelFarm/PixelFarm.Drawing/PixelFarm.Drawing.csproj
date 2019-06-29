@@ -133,6 +133,12 @@
     <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\MemBitmapBinder.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\MemBitmapBinder.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\PixelBlender32.cs">
+      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlender32.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\PixelBlenderBGRA.cs">
+      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenderBGRA.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs">
       <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs</Link>
     </Compile>
@@ -271,12 +277,6 @@
     <Compile Include="..\PixelFarm.CpuBlit\05_pixelprocessing\PixelBlenderOthers.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenderOthers.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\PixelBlenderRGBA.cs">
-      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenderRGBA.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\05_pixelprocessing\PixelBlenders.cs">
-      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenders.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\05_pixelprocessing\SubBitmapBlender.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\SubBitmapBlender.cs</Link>
     </Compile>
@@ -298,11 +298,14 @@
     <Compile Include="..\PixelFarm.Painter\0_Base\ForNet20.cs">
       <Link>0_REF_Painter\0_Base\ForNet20.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\2_Canvas\ColorEx.cs">
-      <Link>0_REF_Painter\2_Canvas\ColorEx.cs</Link>
+    <Compile Include="..\PixelFarm.Painter\2_General\ColorEx.cs">
+      <Link>0_REF_Painter\2_General\ColorEx.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\2_Canvas\ITextPrinter.cs">
-      <Link>0_REF_Painter\2_Canvas\ITextPrinter.cs</Link>
+    <Compile Include="..\PixelFarm.Painter\2_General\ITextPrinter.cs">
+      <Link>0_REF_Painter\2_General\ITextPrinter.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Painter\2_General\TempContext.cs">
+      <Link>0_REF_Painter\2_General\TempContext.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs">
       <Link>0_REF_Painter\0_REF_CpuBlit\ColorRGBAf.cs</Link>
@@ -567,6 +570,7 @@
     <Compile Include="7_CpuBlitPainter\DrawBoard\RectBorderHelper.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\SvgRenderVx.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\VertexStoreExtensions2.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeBmpLut.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\BorderDouble.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\ClipProxyImage.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\GammaFuntions.cs" />
@@ -594,6 +598,23 @@
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface.cs" />
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface_RenderImages.cs" />
     <Compile Include="8_ImgReaders\ImageReaders.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\BasicElements.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\ContourCornerAndAnalyzingElems.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeColor.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeColoring.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeSegment.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EquationSolver.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen2.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen3.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\SignedDistance.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\SpriteTextureMapData.cs" />
+    <Compile Include="9_BitmapAtlas\BinPacker.cs" />
+    <Compile Include="9_BitmapAtlas\BitmapAtlasFile.cs" />
+    <Compile Include="9_BitmapAtlas\AtlasItemImage.cs" />
+    <Compile Include="9_BitmapAtlas\BitmapAtlasManager.cs" />
+    <Compile Include="9_BitmapAtlas\SimpleBitmaptAtlas.cs" />
+    <Compile Include="9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -494,7 +494,7 @@ namespace SampleWinForms
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
         {
             FormMsdfTest2 test2 = new FormMsdfTest2();
-            test2.Show(); 
+            test2.Show();
         }
 
 
@@ -647,7 +647,7 @@ namespace SampleWinForms
             glyphTextureGen.CreateTextureFontFromInputChars(
                 typeface,
                 fontSizeInPoints,
-                TextureKind.StencilLcdEffect,
+                PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
                 sampleChars,
                 (glyphIndex, glyphImage, outputAtlasBuilder) =>
                 {

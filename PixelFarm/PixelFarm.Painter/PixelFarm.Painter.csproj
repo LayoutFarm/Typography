@@ -147,9 +147,10 @@
       <Link>0_REF_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
     <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="2_General\TempContext.cs" />
     <Compile Include="3_Cpu_Blit\ColorRGBAf.cs" />
     <Compile Include="3_Cpu_Blit\PainterExtensions.cs" />
-    <Compile Include="2_Canvas\ColorEx.cs" />
+    <Compile Include="2_General\ColorEx.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\BoundingRect.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\CurveFlattener.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\LineWalker.cs" />
@@ -164,7 +165,7 @@
     <Compile Include="4_CpuBlit_VertexProcessing\VectorToolBox.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexData.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs" />
-    <Compile Include="2_Canvas\ITextPrinter.cs" />
+    <Compile Include="2_General\ITextPrinter.cs" />
     <Compile Include="3_Cpu_Blit\MemBitmap.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexHitTester.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />

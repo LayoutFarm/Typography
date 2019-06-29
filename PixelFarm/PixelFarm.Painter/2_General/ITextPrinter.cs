@@ -6,11 +6,9 @@ namespace PixelFarm.Drawing
     {
         int Count { get; }
         ILineSegment this[int index] { get; }
-
     }
     public interface ILineSegment
     {
-
         int Length { get; }
         int StartAt { get; }
     }
@@ -104,6 +102,10 @@ namespace PixelFarm.Drawing
                 return;
             }
 #endif
+            //TODO: review here!!!
+            //Do Not alloc new char[]
+            //plan: use Span<T>  or some ptr to string           
+            
             char[] textBuffer = text.ToCharArray();
             textPrinter.DrawString(textBuffer, 0, textBuffer.Length, left, top);
         }

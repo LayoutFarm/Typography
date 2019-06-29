@@ -23,6 +23,11 @@ using System.Collections.Generic;
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
+    public enum FillingRule
+    {
+        NonZero,//default
+        EvenOdd
+    }
 
     public enum TargetBuffer
     {
@@ -46,6 +51,8 @@ namespace PixelFarm.Drawing
         public abstract float OriginX { get; }
         public abstract float OriginY { get; }
         public abstract void SetOrigin(float ox, float oy);
+        public abstract PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer CoordTransformer { get; set; }
+
         public abstract RenderQuality RenderQuality { get; set; }
 
         public abstract int Width { get; }
@@ -58,6 +65,8 @@ namespace PixelFarm.Drawing
         /// <param name="vxs"></param>
         public abstract void SetClipRgn(VertexStore vxs);
         public abstract TargetBuffer TargetBuffer { get; set; }
+        public abstract FillingRule FillingRule { get; set; }
+
         public abstract bool EnableMask { get; set; }
         //
         public abstract double StrokeWidth { get; set; }
@@ -72,8 +81,6 @@ namespace PixelFarm.Drawing
         public abstract IDashGenerator LineDashGen { get; set; }
         //
 
-
-        //
         public abstract Brush CurrentBrush { get; set; }
         public abstract Pen CurrentPen { get; set; }
 
@@ -114,6 +121,7 @@ namespace PixelFarm.Drawing
 
         public abstract RenderVx CreateRenderVx(VertexStore vxs);
         public abstract RenderVxFormattedString CreateRenderVx(string textspan);
+        public abstract RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len);
         public abstract void FillRenderVx(Brush brush, RenderVx renderVx);
         public abstract void FillRenderVx(RenderVx renderVx);
         public abstract void DrawRenderVx(RenderVx renderVx);
@@ -129,22 +137,11 @@ namespace PixelFarm.Drawing
            double x,
            double y);
         public abstract void DrawString(RenderVxFormattedString renderVx, double x, double y);
-        //////////////////////////////////////////////////////////////////////////////
-        //user's object 
-        internal Stack<object> _userObjectStack = new Stack<object>();
+
+
 
     }
 
-    namespace PainterExtensions
-    {
-        public static class PainterExt
-        {
-            public static void StackClearUserObject(this Painter p)
-            {
-                p._userObjectStack.Clear();
-            }
-        }
-    }
 
     public interface IDashGenerator
     {

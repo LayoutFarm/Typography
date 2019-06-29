@@ -77,12 +77,16 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             get => _strokeGen.Shorten;
             set => _strokeGen.Shorten = value;
         }
-        public bool GenerateOnlyOuterBorderForClosedShape
+        public StrokeSideForClosedShape StrokeSideForClosedShape
         {
-            get => _strokeGen.GenerateOnlyOuterBorderForClosedShape;
-            set => _strokeGen.GenerateOnlyOuterBorderForClosedShape = value;
+            get => _strokeGen.StrokeSideForClosedShape;
+            set => _strokeGen.StrokeSideForClosedShape = value;
         }
-
+        public StrokeSideForOpenShape StrokeSideForOpenShape
+        {
+            get => _strokeGen.StrokeSideForOpenShape;
+            set => _strokeGen.StrokeSideForOpenShape = value;
+        }
         public VertexStore MakeVxs(VertexStore sourceVxs, VertexStore outputVxs)
         {
             StrokeGenerator strkgen = _strokeGen;
@@ -125,8 +129,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         }
                         break;
                     case VertexCmd.LineTo:
-                    case VertexCmd.P2c://user must flatten the curve before do stroke
-                    case VertexCmd.P3c://user must flatten the curve before do stroke 
+                    case VertexCmd.C3://user must flatten the curve before do stroke
+                    case VertexCmd.C4://user must flatten the curve before do stroke 
                         strkgen.AddVertex(x, y, cmd);
                         break;
                     case VertexCmd.MoveTo:

@@ -205,6 +205,7 @@ namespace LayoutFarm.WebDom
                         {
                             //css color function rgb
                             //each is number 
+                            //TODO:  	Defines the intensity of red as an integer between 0 and 255, or as a percentage value between 0% and 100%
                             byte r_value = (byte)_funcArgs[0].AsNumber();
                             byte g_value = (byte)_funcArgs[1].AsNumber();
                             byte b_value = (byte)_funcArgs[2].AsNumber();
@@ -212,6 +213,29 @@ namespace LayoutFarm.WebDom
                                 ConvertByteToStringWithPadding(r_value),
                                 ConvertByteToStringWithPadding(g_value),
                                 ConvertByteToStringWithPadding(b_value));
+                        }
+                    case "rgba":
+                        {
+                            byte r_value = (byte)_funcArgs[0].AsNumber();
+                            byte g_value = (byte)_funcArgs[1].AsNumber();
+                            byte b_value = (byte)_funcArgs[2].AsNumber();
+                            //Defines the opacity as a number between 0.0(fully transparent) and 1.0(fully opaque)
+                            float a_value_f = _funcArgs[3].AsNumber();
+                            if (a_value_f < 0)
+                            {
+                                a_value_f = 0;
+                            }
+                            else if (a_value_f > 1)
+                            {
+                                a_value_f = 1;
+                            }
+                            byte a_value = (byte)(a_value_f * 255);
+                            return _evaluatedStringValue = string.Concat("#",
+                                ConvertByteToStringWithPadding(a_value), //*** argb
+                                ConvertByteToStringWithPadding(r_value),
+                                ConvertByteToStringWithPadding(g_value),
+                                ConvertByteToStringWithPadding(b_value)
+                                );
                         }
                     //TODO: implement rgba here
                     case "url":

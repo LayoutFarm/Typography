@@ -112,7 +112,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
             _noTransformation = (spanInterpolator.GetType() == typeof(SpanInterpolatorLinear)
                 && ((SpanInterpolatorLinear)spanInterpolator).Transformer.GetType() == typeof(VertexProcessing.Affine)
-                && ((VertexProcessing.Affine)((SpanInterpolatorLinear)spanInterpolator).Transformer).IsIdentity());
+                && ((VertexProcessing.Affine)((SpanInterpolatorLinear)spanInterpolator).Transformer).IsIdentity);
         }
         internal unsafe static void NN_StepXBy1(IBitmapSrc bmpsrc, int srcIndex, Drawing.Color[] outputColors, int dstIndex, int len)
         {
@@ -205,7 +205,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
             _noTransformation = (spanInterpolator.GetType() == typeof(SpanInterpolatorLinear)
                 && ((SpanInterpolatorLinear)spanInterpolator).Transformer.GetType() == typeof(VertexProcessing.Affine)
-                && ((VertexProcessing.Affine)((SpanInterpolatorLinear)spanInterpolator).Transformer).IsIdentity());
+                && ((VertexProcessing.Affine)((SpanInterpolatorLinear)spanInterpolator).Transformer).IsIdentity);
         }
         public sealed override void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len)
         {

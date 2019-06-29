@@ -231,16 +231,21 @@ namespace PixelFarm.PathReconstruction
         void TryLinearFill(int x, int y)
         {
             _pixelEvalutor.MoveTo(x, y);
+            int pixelOffset = _pixelEvalutor.BufferOffset;
+
             if (!_pixelEvalutor.Read())
             {
+                //not pass
+                //TODO: review here
+                _pixelsChecked[pixelOffset] = true; //mark as read
                 return;
             }
 
             //if pass then...
-            int pixelOffset = _pixelEvalutor.BufferOffset;
+            _pixelsChecked[pixelOffset] = true;
             //check at current pos 
             //then we will check each pixel on the left side step by step 
-            for (; ; )
+            for (; pixelOffset > 0;)
             {
                 _pixelsChecked[pixelOffset] = true; //mark => current pixel is read 
                 pixelOffset--;
@@ -254,7 +259,9 @@ namespace PixelFarm.PathReconstruction
 
             _pixelEvalutor.RestoreMoveToPos();
             pixelOffset = _pixelEvalutor.BufferOffset;
-            for (; ; )
+
+
+            for (; pixelOffset < _pixelsChecked.Length - 1;)
             {
                 _pixelsChecked[pixelOffset] = true;
                 pixelOffset++;

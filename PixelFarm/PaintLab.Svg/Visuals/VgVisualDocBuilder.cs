@@ -362,6 +362,7 @@ namespace PaintLab.Svg
             //#endif
             //d             
             AssignAttributes(pathSpec);
+
             vgVisElem.VxsPath = CreateVxsFromPathDefinition(pathSpec.D.ToCharArray());
             ResolveMarkers(vgVisElem, pathSpec);
 
@@ -403,6 +404,7 @@ namespace PaintLab.Svg
                 double ry = ConvertToPx(ellipseSpec.RadiusY, ref a);
 
                 ellipse.Set(x, y, rx, ry);////TODO: review here => temp fix for ellipse step  
+
                 vgEllipse.VxsPath = ellipse.MakeVxs(v1).CreateTrim();
                 AssignAttributes(ellipseSpec);
                 return vgEllipse;
@@ -427,7 +429,9 @@ namespace PaintLab.Svg
                     vgImg._imgY + vgImg._imgH,
                     vgImg._imgX + vgImg._imgW,
                     vgImg._imgY);
+
                 vgImg.VxsPath = rectTool.MakeVxs(v1).CreateTrim();
+
                 //
                 AssignAttributes(imgspec);
                 //
@@ -456,6 +460,7 @@ namespace PaintLab.Svg
                     //close
                     v1.AddMoveTo(p0.X, p0.Y);
                     v1.AddCloseFigure();
+
 
                     vgPolygon.VxsPath = v1.CreateTrim();
                 }
@@ -601,6 +606,7 @@ namespace PaintLab.Svg
                 v1.AddMoveTo(linespec.X1.Number, linespec.Y1.Number);
                 v1.AddLineTo(linespec.X2.Number, linespec.Y2.Number);
                 v1.AddNoMore();
+
                 lineVisualElem.VxsPath = v1.CreateTrim();
             }
             return lineVisualElem;
@@ -619,6 +625,7 @@ namespace PaintLab.Svg
                 double r = ConvertToPx(cirSpec.Radius, ref a);
 
                 ellipse.Set(x, y, r, r);////TODO: review here => temp fix for ellipse step  
+
                 cir.VxsPath = ellipse.MakeVxs(v1).CreateTrim();
                 AssignAttributes(cirSpec);
                 return cir;
@@ -850,11 +857,12 @@ namespace PaintLab.Svg
                         ConvertToPx(rectSpec.X, ref a) + ConvertToPx(rectSpec.Width, ref a),
                         ConvertToPx(rectSpec.Y, ref a));
 
-                    roundRect.SetRadius(ConvertToPx(rectSpec.CornerRadiusX, ref a), ConvertToPx(rectSpec.CornerRadiusY, ref a));
-                    rect.VxsPath = roundRect.MakeVxs(v1).CreateTrim();
-                }
+                    roundRect.SetRadius(
+                        ConvertToPx(rectSpec.CornerRadiusX, ref a),
+                        ConvertToPx(rectSpec.CornerRadiusY, ref a));
 
-
+                    rect.VxsPath = roundRect.MakeVxs(v1).CreateTrim(); 
+                } 
             }
             else
             {
@@ -869,8 +877,8 @@ namespace PaintLab.Svg
                         ConvertToPx(rectSpec.X, ref a) + ConvertToPx(rectSpec.Width, ref a),
                         ConvertToPx(rectSpec.Y, ref a));
                     // 
-                    rect.VxsPath = rectTool.MakeVxs(v1).CreateTrim();
 
+                    rect.VxsPath = rectTool.MakeVxs(v1).CreateTrim();
                 }
 
 

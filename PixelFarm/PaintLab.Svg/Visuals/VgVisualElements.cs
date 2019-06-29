@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
- 
+
 
 namespace PaintLab.Svg
 {
@@ -176,7 +176,7 @@ namespace PaintLab.Svg
         public override WellknownSvgElementName ElemName => WellknownSvgElementName.ForeignNode;
     }
 
-    public class VgVisualElement : VgVisualElementBase
+    public class VgVisualElement : VgVisualElementBase, IDisposable
     {
 
         bool _handleBitmapSnapshotAsOwner;
@@ -206,6 +206,8 @@ namespace PaintLab.Svg
         internal float _imgX;
         internal float _imgY;
 
+        VertexStore _vxsPath;
+        bool _isVxsPathOwner;
 
         public VgVisualElement(WellknownSvgElementName wellknownName,
             SvgVisualSpec visualSpec,
@@ -228,8 +230,41 @@ namespace PaintLab.Svg
         public object GetController() => _controller;
         //
         public ICoordTransformer CoordTx { get; set; }
-        public VertexStore VxsPath { get; set; }
 
+        public VertexStore VxsPath
+        {
+            get => _vxsPath;
+            set
+            {
+#if DEBUG
+                if (value.IsShared)
+                {
+                    throw new NotSupportedException("can't not store shared vxs");
+                }
+#endif
+                ReleaseVxsPath(); //release old _vxsPath
+
+                _isVxsPathOwner = true;//
+                _vxsPath = value;
+            }
+        }
+
+        void ReleaseVxsPath()
+        {
+            if (_vxsPath != null)
+            {
+                if (_isVxsPathOwner)
+                {
+                    _vxsPath.Dispose();
+                }
+                //
+                _vxsPath = null;
+            }
+        }
+        public void Dispose()
+        {
+            ReleaseVxsPath();
+        }
 
         public LayoutFarm.ImageBinder ImageBinder
         {
@@ -284,9 +319,9 @@ namespace PaintLab.Svg
                     {
                         //add actual transform vxs ... 
                         hitChain.AddHit(args.Current,
-                            hitChain.X,
-                            hitChain.Y,
-                            hitChain.MakeCopyOfHitVxs ? vxs.CreateTrim() : null);
+                        hitChain.X,
+                        hitChain.Y,
+                        hitChain.MakeCopyOfHitVxs ? vxs.CreateTrim() : null);
                     }
                 };
                 this.Accept(paintArgs);
@@ -298,10 +333,12 @@ namespace PaintLab.Svg
         {
             VgVisualElement clone = new VgVisualElement(_wellknownName, _visualSpec, _vgVisualDoc);
             clone.DomElem = this.DomElem;
+
             if (VxsPath != null)
             {
-                clone.VxsPath = this.VxsPath.CreateTrim();
+                clone.VxsPath = VxsPath.CreateTrim();
             }
+            //
             if (_childNodes != null)
             {
                 //deep clone
@@ -461,7 +498,8 @@ namespace PaintLab.Svg
                                 SvgImageSpec imgSpec = (SvgImageSpec)_visualSpec;
                                 ss.SetRect(0, imgSpec.Height.Number, imgSpec.Width.Number, 0);
                                 ss.MakeVxs(vxs);
-                                VxsPath = vxs.CreateTrim();
+                                //
+                                this.VxsPath = vxs.CreateTrim();
                             }
 
                         }

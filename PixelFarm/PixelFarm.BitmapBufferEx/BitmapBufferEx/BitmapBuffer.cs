@@ -225,7 +225,6 @@ namespace BitmapBufferEx
             this.X = x;
             this.Y = y;
         }
-
     }
     public struct SizeD
     {

@@ -100,6 +100,42 @@ namespace PixelFarm.Drawing
 #endif
     }
 
+    public struct PointD
+    {
+        double _x;
+        double _y;
+        public PointD(double x, double y)
+        {
+            _x = x;
+            _y = y;
+        }
+        public double X
+        {
+            get => _x;
+            set => _x = value;
+        }
+        public double Y
+        {
+            get => _y;
+            set => _y = value;
+        }
+        public bool IsEq(PointD p)
+        {
+            return _x == p._x && _y == p._y;
+        }
+        public void Offset(double dx, double dy)
+        {
+            _x += dx;
+            _y += dy;
+        }
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + this.X + "," + this.Y + ")";
+        }
+#endif
+    }
+
     public struct Size
     {
         int _w, _h;

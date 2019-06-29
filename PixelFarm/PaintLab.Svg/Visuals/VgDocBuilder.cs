@@ -92,8 +92,13 @@ namespace PaintLab.Svg
             }
             else
             {
+                //for unknown
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("UN-IMPL Elem:" + elemName);
+#endif
+                return new SvgElement(WellknownSvgElementName.Unknown, elemName);
                 //not found creator for a specific element
-                throw new NotSupportedException();
+                //throw new NotSupportedException();
             }
         }
 

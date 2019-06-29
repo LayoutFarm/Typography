@@ -45,16 +45,16 @@ namespace PaintLab.Svg
     public static class VgVistorArgsPool
     {
 
-        public static TempContext<VgVisitorArgs> Borrow(out VgVisitorArgs visitor)
+        public static PixelFarm.TempContext<VgVisitorArgs> Borrow(out VgVisitorArgs visitor)
         {
-            if (!Temp<VgVisitorArgs>.IsInit())
+            if (!PixelFarm.Temp<VgVisitorArgs>.IsInit())
             {
-                Temp<VgVisitorArgs>.SetNewHandler(
+                PixelFarm.Temp<VgVisitorArgs>.SetNewHandler(
                     () => new VgVisitorArgs(),
                     p => p.Reset());//when relese back
             }
 
-            return Temp<VgVisitorArgs>.Borrow(out visitor);
+            return PixelFarm.Temp<VgVisitorArgs>.Borrow(out visitor);
         }
     }
 

@@ -278,13 +278,12 @@ namespace LayoutFarm
         //
         struct MyLineSegment : ILineSegment
         {
-            ILineSegmentList _owner;
+
             readonly int _startAt;
             readonly int _len;
             internal ScriptLang scriptLang;
-            public MyLineSegment(ILineSegmentList owner, int startAt, int len)
+            public MyLineSegment(int startAt, int len)
             {
-                _owner = owner;
                 _startAt = startAt;
                 _len = len;
                 this.scriptLang = null;
@@ -363,7 +362,7 @@ namespace LayoutFarm
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                MyLineSegment lineSeg = new MyLineSegment(lineSegments, breakSpan.startAt, breakSpan.len);
+                MyLineSegment lineSeg = new MyLineSegment(breakSpan.startAt, breakSpan.len);
                 lineSeg.scriptLang = breakSpan.scLang;
                 lineSegments.AddLineSegment(lineSeg);
             }
