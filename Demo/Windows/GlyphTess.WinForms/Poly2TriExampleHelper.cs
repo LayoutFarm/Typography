@@ -143,7 +143,7 @@ namespace Test_WinForm_TessGlyph
             return new Poly2Tri.Polygon(points.ToArray());
 
         }
-        public static Poly2Tri.Polygon Triangulate(float[] polygon1, int[] contourEndIndices, bool yAxisFlipped)
+        public static void Triangulate(float[] polygon1, int[] contourEndIndices, bool yAxisFlipped, List<Poly2Tri.Polygon> outputPolygons)
         {
             //create 
             List<GlyphContour> flattenContours = CreateGlyphContours(polygon1, contourEndIndices);
@@ -229,25 +229,17 @@ namespace Test_WinForm_TessGlyph
             //------------------------------------------
             //2. tri angulate 
             Poly2Tri.P2T.Triangulate(mainPolygon); //that poly is triangulated 
+            outputPolygons.Add(mainPolygon);
 
-            Poly2Tri.Polygon[] subPolygons = (otherPolygons != null) ? otherPolygons.ToArray() : null;
-            if (subPolygons != null)
+            if (otherPolygons != null)
             {
-                for (int i = subPolygons.Length - 1; i >= 0; --i)
+                outputPolygons.AddRange(otherPolygons);
+                for (int i = otherPolygons.Count - 1; i >= 0; --i)
                 {
-                    Poly2Tri.P2T.Triangulate(subPolygons[i]);
+                    Poly2Tri.P2T.Triangulate(otherPolygons[i]);
                 }
-            }
-
-            if (mainPolygon == null)
-            {
-
-            }
-
-            return mainPolygon;
+            } 
         }
-
-
     }
 }
 
