@@ -308,21 +308,24 @@ namespace Test_WinForm_TessGlyph
             else
             {
 
-                Poly2Tri.Polygon mainPolygon = Poly2TriExampleHelper.Triangulate(polygon1, contourEndIndices);
-                foreach (Poly2Tri.DelaunayTriangle tri in mainPolygon.Triangles)
+                List<Poly2Tri.Polygon> outputPolygons = new List<Poly2Tri.Polygon>();
+                Poly2TriExampleHelper.Triangulate(polygon1, contourEndIndices, outputPolygons);
+                foreach (Poly2Tri.Polygon polygon in outputPolygons)
                 {
+                    foreach (Poly2Tri.DelaunayTriangle tri in polygon.Triangles)
+                    {
 
-                    Poly2Tri.TriangulationPoint p0 = tri.P0;
-                    Poly2Tri.TriangulationPoint p1 = tri.P1;
-                    Poly2Tri.TriangulationPoint p2 = tri.P2;
+                        Poly2Tri.TriangulationPoint p0 = tri.P0;
+                        Poly2Tri.TriangulationPoint p1 = tri.P1;
+                        Poly2Tri.TriangulationPoint p2 = tri.P2;
 
-                    _g.DrawLine(Pens.Red, (float)p0.X, (float)p0.Y, (float)p1.X, (float)p1.Y);
-                    _g.DrawLine(Pens.Red, (float)p1.X, (float)p1.Y, (float)p2.X, (float)p2.Y);
-                    _g.DrawLine(Pens.Red, (float)p2.X, (float)p2.Y, (float)p0.X, (float)p0.Y);
+                        _g.DrawLine(Pens.Red, (float)p0.X, (float)p0.Y, (float)p1.X, (float)p1.Y);
+                        _g.DrawLine(Pens.Red, (float)p1.X, (float)p1.Y, (float)p2.X, (float)p2.Y);
+                        _g.DrawLine(Pens.Red, (float)p2.X, (float)p2.Y, (float)p0.X, (float)p0.Y);
+                    }
                 }
+
             }
-
-
 
         }
         private void cmdDrawGlyph_Click(object sender, EventArgs e)

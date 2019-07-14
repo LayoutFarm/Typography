@@ -142,7 +142,7 @@ namespace Test_WinForm_TessGlyph
             return new Poly2Tri.Polygon(points.ToArray());
 
         }
-        public static Poly2Tri.Polygon Triangulate(float[] polygon1, int[] contourEndIndices)
+        public static void Triangulate(float[] polygon1, int[] contourEndIndices, List<Poly2Tri.Polygon> outputPolygons)
         {
             //create 
             List<GlyphContour> flattenContours = CreateGlyphContours(polygon1, contourEndIndices);
@@ -214,13 +214,40 @@ namespace Test_WinForm_TessGlyph
                     }
                 }
             }
-            if (_waitingHoles.Count > 0)
+
+            if (mainPolygon == null)
             {
-                throw new NotSupportedException();
+                if (_waitingHoles.Count > 0)
+                {
+                    //found this condition in some glyph,
+                    //eg. Tahoma glyph=> f,j,i,o
+                    mainPolygon = _waitingHoles[0];
+
+                    if (_waitingHoles.Count > 1)
+                    {
+                        if (otherPolygons != null)
+                        {
+                            //????
+                            throw new NotSupportedException();
+                        }
+
+                        otherPolygons = new List<Poly2Tri.Polygon>();
+                        for (int i = 1; i < _waitingHoles.Count; ++i)
+                        {
+                            otherPolygons.Add(_waitingHoles[i]);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
             }
+
             //------------------------------------------
             //2. tri angulate 
             Poly2Tri.P2T.Triangulate(mainPolygon); //that poly is triangulated 
+            outputPolygons.Add(mainPolygon);
 
             Poly2Tri.Polygon[] subPolygons = (otherPolygons != null) ? otherPolygons.ToArray() : null;
             if (subPolygons != null)
@@ -228,18 +255,10 @@ namespace Test_WinForm_TessGlyph
                 for (int i = subPolygons.Length - 1; i >= 0; --i)
                 {
                     Poly2Tri.P2T.Triangulate(subPolygons[i]);
+                    outputPolygons.Add(subPolygons[i]);
                 }
             }
-
-            if (mainPolygon == null)
-            {
-
-            }
-
-            return mainPolygon;
         }
-
-
     }
 }
 
