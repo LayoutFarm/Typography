@@ -36,20 +36,23 @@ namespace PaintFx.Effects
             this.angle = angle;
             this.distance = distance;
             this.centered = centered;
-            PointF start = new PointF(0, 0);
+
+
+            float start_x = 0, start_y = 0;
+
             double theta = ((double)(angle + 180) * 2 * Math.PI) / 360.0;
             double alpha = (double)distance;
-            double x = alpha * Math.Cos(theta);
-            double y = alpha * Math.Sin(theta);
-            PointF end = new PointF((float)x, (float)(-y));
+
+            float end_x = (float)(alpha * Math.Cos(theta));
+            float end_y = (float)(alpha * Math.Sin(theta));
 
             if (centered)
             {
-                start.X = -end.X / 2.0f;
-                start.Y = -end.Y / 2.0f;
+                start_x = -end_x / 2.0f;
+                start_y = -end_y / 2.0f;
 
-                end.X /= 2.0f;
-                end.Y /= 2.0f;
+                end_x /= 2.0f;
+                end_y /= 2.0f;
             }
 
             this.points = new PointF[((1 + distance) * 3) / 2];
@@ -63,7 +66,10 @@ namespace PaintFx.Effects
                 for (int i = 0; i < this.points.Length; ++i)
                 {
                     float frac = (float)i / (float)(this.points.Length - 1);
-                    this.points[i] = PixelUtils.Lerp(start, end, frac);
+                    this.points[i] = PixelUtils.Lerp(
+                        new PointF(start_x, start_y),
+                        new PointF(end_x, end_y),
+                        frac);
                 }
             }
 

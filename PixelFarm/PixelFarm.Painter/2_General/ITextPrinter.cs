@@ -31,6 +31,7 @@ namespace PixelFarm.Drawing
             this.len = len;
             _rawString = rawCharBuffer;
         }
+        
         public override string ToString()
         {
             return start + ":" + len;

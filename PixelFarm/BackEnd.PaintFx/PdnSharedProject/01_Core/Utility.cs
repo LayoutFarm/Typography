@@ -1105,8 +1105,8 @@ namespace PaintFx
         {
             for (int i = 0; i < ptsF.Length; ++i)
             {
-                ptsF[i].X += dx;
-                ptsF[i].Y += dy;
+                PointF p = ptsF[i];
+                ptsF[i] = new PointF(p.X + dx, p.Y + dy);
             }
         }
 
@@ -1114,8 +1114,8 @@ namespace PaintFx
         {
             for (int i = 0; i < pts.Length; ++i)
             {
-                pts[i].X += dx;
-                pts[i].Y += dy;
+                Point p = pts[i];
+                pts[i] = new Point(p.X + dx, p.Y + dy);
             }
         }
 
@@ -1940,9 +1940,7 @@ namespace PaintFx
         public static PointF NormalizeVector(PointF vecF)
         {
             float magnitude = Magnitude(vecF);
-            vecF.X /= magnitude;
-            vecF.Y /= magnitude;
-            return vecF;
+            return new PointF(vecF.X / magnitude, vecF.Y / magnitude);
         }
 
         public static PointF NormalizeVector2(PointF vecF)
@@ -1951,13 +1949,11 @@ namespace PaintFx
 
             if (magnitude == 0)
             {
-                vecF.X = 0;
-                vecF.Y = 0;
+                return new PointF();
             }
             else
             {
-                vecF.X /= magnitude;
-                vecF.Y /= magnitude;
+                return new PointF(vecF.X / magnitude, vecF.Y / magnitude);
             }
 
             return vecF;
@@ -1976,9 +1972,9 @@ namespace PaintFx
             angleDelta *= (float)(Math.PI / 180.0);
             float vecFLen = Magnitude(vecF);
             float vecFAngle = angleDelta + (float)Math.Atan2(vecF.Y, vecF.X);
-            vecF.X = (float)Math.Cos(vecFAngle);
-            vecF.Y = (float)Math.Sin(vecFAngle);
-            return vecF;
+            return new PointF((float)Math.Cos(vecFAngle),
+                              (float)Math.Sin(vecFAngle));
+
         }
 
         public static void RotateVectors(PointF[] vecFs, float angleDelta)

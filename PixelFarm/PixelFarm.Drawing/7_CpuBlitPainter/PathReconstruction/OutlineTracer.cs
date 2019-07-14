@@ -835,8 +835,8 @@ namespace PixelFarm.PathReconstruction
                 PixelFarm.CpuBlit.VertexProcessing.SimplificationHelpers.Simplify(
                      contour._xyCoords,
                      (p1, p2) => p1 == p2,
-                     p => p.x,
-                     p => p.y,
+                     p => p.X,
+                     p => p.Y,
                      simplifiedPoints,
                      tolerance,
                      heighQualityEnable);
@@ -916,22 +916,22 @@ namespace PixelFarm.PathReconstruction
                     if (contour.IsOutside)
                     {
                         Point p = xyCoords[0];
-                        vxs.AddMoveTo(p.x, p.y);
+                        vxs.AddMoveTo(p.X, p.Y);
                         for (int n = 1; n < count; ++n)
                         {
                             p = xyCoords[n];
-                            vxs.AddLineTo(p.x, p.y);
+                            vxs.AddLineTo(p.X, p.Y);
                         }
                         vxs.AddCloseFigure();
                     }
                     else
                     {
                         Point p = xyCoords[count - 1];
-                        vxs.AddMoveTo(p.x, p.y);
+                        vxs.AddMoveTo(p.X, p.Y);
                         for (int n = count - 1; n >= 0; --n)
                         {
                             p = xyCoords[n];
-                            vxs.AddLineTo(p.x, p.y);
+                            vxs.AddLineTo(p.X, p.Y);
                         }
                         vxs.AddCloseFigure();
                     }

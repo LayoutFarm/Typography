@@ -176,6 +176,7 @@
     <Compile Include="2_Geometry\Ellipse.cs" />
     <Compile Include="2_Geometry\RectD.cs" />
     <Compile Include="4_Utils\PolygonSimplifier.cs" />
+    <Compile Include="4_Utils\Spline2D.cs" />
     <Compile Include="4_Utils\SvgArc.cs" />
     <Compile Include="4_Utils\TessTool.cs" />
     <Compile Include="5_Clipper\cliper.cs" />

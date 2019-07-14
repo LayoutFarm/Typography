@@ -544,6 +544,9 @@
     <Compile Include="..\PixelFarm.Vectors\4_Utils\PolygonSimplifier.cs">
       <Link>0_REF_Painter\1_Vectors\4_Utils\PolygonSimplifier.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Vectors\4_Utils\Spline2D.cs">
+      <Link>0_REF_Painter\1_Vectors\4_Utils\Spline2D.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Vectors\4_Utils\SvgArc.cs">
       <Link>0_REF_Painter\1_Vectors\4_Utils\SvgArc.cs</Link>
     </Compile>

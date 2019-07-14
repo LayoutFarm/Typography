@@ -4,53 +4,33 @@ namespace PixelFarm.Drawing
 {
     public struct Point
     {
-        int _x, _y;
+        public readonly int X, Y;
         public Point(int x, int y)
         {
-            _x = x;
-            _y = y;
-        }
-        public void Offset(int dx, int dy)
-        {
-            _x += dx;
-            _y += dy;
-        }
-        public int X
-        {
-            get => _x;
-            set => _x = value;
-        }
-
-        public int Y
-        {
-            get => _y;
-            set => _y = value;
+            X = x;
+            Y = y;
         }
 
         public static bool operator ==(Point p1, Point p2)
         {
-            return p1._x == p2._x &&
-                   p1._y == p2._y;
+            return p1.X == p2.X &&
+                   p1.Y == p2.Y;
         }
         public static bool operator !=(Point p1, Point p2)
         {
-            return p1._x != p2._x ||
-                   p1._y != p2._y;
+            return p1.X != p2.X ||
+                   p1.Y != p2.Y;
         }
         public override bool Equals(object obj)
         {
             Point p2 = (Point)obj;
-            return _x == p2._x &&
-                   _y == p2._y;
+            return X == p2.X &&
+                   Y == p2.Y;
         }
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
-
-
-        public int x { get { return _x; } } //temp
-        public int y { get { return _y; } } //temp
         public static readonly Point Empty = new Point();
 #if DEBUG
         public override string ToString()
@@ -62,21 +42,13 @@ namespace PixelFarm.Drawing
 
     public struct PointF
     {
-        float _x, _y;
+        public readonly float X;
+        public readonly float Y;
+
         public PointF(float x, float y)
         {
-            _x = x;
-            _y = y;
-        }
-        public float X
-        {
-            get => _x;
-            set => _x = value;
-        }
-        public float Y
-        {
-            get => _y;
-            set => _y = value;
+            X = x;
+            Y = y;
         }
         public static implicit operator PointF(Point p)
         {
@@ -84,12 +56,7 @@ namespace PixelFarm.Drawing
         }
         public bool IsEq(PointF p)
         {
-            return _x == p._x && _y == p._y;
-        }
-        public void Offset(float dx, float dy)
-        {
-            _x += dx;
-            _y += dy;
+            return Y == p.Y && Y == p.Y;
         }
 
 #if DEBUG
@@ -102,32 +69,22 @@ namespace PixelFarm.Drawing
 
     public struct PointD
     {
-        double _x;
-        double _y;
+        public readonly double X;
+        public readonly double Y;
         public PointD(double x, double y)
         {
-            _x = x;
-            _y = y;
-        }
-        public double X
-        {
-            get => _x;
-            set => _x = value;
-        }
-        public double Y
-        {
-            get => _y;
-            set => _y = value;
+            X = x;
+            Y = y;
         }
         public bool IsEq(PointD p)
         {
-            return _x == p._x && _y == p._y;
+            return X == p.X && Y == p.Y;
         }
-        public void Offset(double dx, double dy)
+        public static PointD OffsetPoint(PointD p, double dx, double dy)
         {
-            _x += dx;
-            _y += dy;
+            return new PointD(p.X + dx, p.Y + dy);
         }
+
 #if DEBUG
         public override string ToString()
         {
@@ -138,37 +95,29 @@ namespace PixelFarm.Drawing
 
     public struct Size
     {
-        int _w, _h;
+        public readonly int Width, Height;
+
         public Size(int w, int h)
         {
-            _w = w;
-            _h = h;
+            Width = w;
+            Height = h;
         }
-        public int Width
-        {
-            get => _w;
-            set => _w = value;
-        }
-        public int Height
-        {
-            get => _h;
-            set => _h = value;
-        }
+
         public static bool operator ==(Size s1, Size s2)
         {
-            return (s1._w == s2._w) &&
-                  (s1._h == s2._h);
+            return (s1.Width == s2.Width) &&
+                  (s1.Height == s2.Height);
         }
         public static bool operator !=(Size s1, Size s2)
         {
-            return (s1._w != s2._w) ||
-                  (s1._h != s2._h);
+            return (s1.Width != s2.Width) ||
+                  (s1.Height != s2.Height);
         }
         public override bool Equals(object obj)
         {
             Size s2 = (Size)obj;
-            return (_w == s2._w) &&
-                   (_h == s2._h);
+            return (Width == s2.Width) &&
+                   (Height == s2.Height);
         }
         public override int GetHashCode()
         {
@@ -180,23 +129,20 @@ namespace PixelFarm.Drawing
 #if DEBUG
         public override string ToString()
         {
-            return "(" + _w + "," + _h + ")";
+            return "(" + Width + "," + Height + ")";
         }
 #endif
     }
 
     public struct SizeF
     {
-        float _w, _h;
+        public readonly float Width, Height;
         public SizeF(float w, float h)
         {
-            _w = w;
-            _h = h;
+            Width = w;
+            Height = h;
         }
-        //
-        public float Width => _w;
-        public float Height => _h;
-        //
+
         public static implicit operator SizeF(Size p)
         {
             return new SizeF(p.Width, p.Height);
@@ -205,7 +151,7 @@ namespace PixelFarm.Drawing
 #if DEBUG
         public override string ToString()
         {
-            return "(" + _w + "," + _h + ")";
+            return "(" + Width + "," + Height + ")";
         }
 #endif
     }

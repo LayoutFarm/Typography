@@ -360,9 +360,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             return degree * (180d / Math.PI);
         }
-
-
     }
+     
 
     public class Affine : ICoordTransformer
     {
@@ -398,7 +397,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _isIdenHint = false;
         }
 
-        
+
 
         public float[] Get3x3MatrixElements() => _elems.Get3x3MatrixElements();
         ICoordTransformer ICoordTransformer.CreateInvert() => CreateInvert();
@@ -1218,6 +1217,23 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     }
 
 
+
+    public static class AffineTransformExtensions
+    {
+        public static void TransformPoints(this Affine aff, PixelFarm.Drawing.PointF[] points)
+        {
+            for (int i = 0; i < points.Length; ++i)
+            {
+                Drawing.PointF p = points[i];
+
+                float x = p.X;
+                float y = p.Y;
+                aff.Transform(ref x, ref y);
+
+                points[i] = new Drawing.PointF(x, y);
+            }
+        }
+    }
 
 
 

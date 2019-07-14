@@ -8,8 +8,8 @@ namespace ExtMsdfGen
     public enum AreaKind : byte
     {
         BorderInside,
-        BorderOutside,        
-      
+        BorderOutside,
+
         OverlapInside,
         OverlapOutside,
 
@@ -156,9 +156,9 @@ namespace ExtMsdfGen
         public void Offset(double dx, double dy)
         {
             //
-            _pLeft.Offset(dx, dy);
-            _pCenter.Offset(dx, dy);
-            _pRight.Offset(dx, dy);
+            _pLeft = PixelFarm.Drawing.PointD.OffsetPoint(_pLeft, dx, dy);
+            _pCenter = PixelFarm.Drawing.PointD.OffsetPoint(_pCenter, dx, dy);
+            _pRight = PixelFarm.Drawing.PointD.OffsetPoint(_pRight, dx, dy);
         }
 
         public bool MiddlePointKindIsTouchPoint => MiddlePointKind == Vec2PointKind.Touch1 || MiddlePointKind == Vec2PointKind.Touch2;
