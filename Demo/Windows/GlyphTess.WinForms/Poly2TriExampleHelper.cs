@@ -142,7 +142,7 @@ namespace Test_WinForm_TessGlyph
             return new Poly2Tri.Polygon(points.ToArray());
 
         }
-        public static Poly2Tri.Polygon Triangulate(float[] polygon1, int[] contourEndIndices)
+        public static Poly2Tri.Polygon Triangulate(float[] polygon1, int[] contourEndIndices, bool yAxisFlipped)
         {
             //create 
             List<GlyphContour> flattenContours = CreateGlyphContours(polygon1, contourEndIndices);
@@ -165,8 +165,15 @@ namespace Test_WinForm_TessGlyph
             for (int n = 0; n < cntCount; ++n)
             {
                 GlyphContour cnt = flattenContours[n];
-                if (cnt.IsClockwise())
+                bool cntIsMainPolygon = cnt.IsClockwise();
+                if (yAxisFlipped)
                 {
+                    cntIsMainPolygon = !cntIsMainPolygon;
+                }
+
+                if (cntIsMainPolygon)
+                {
+                    //main polygon
                     //not a hole
                     if (mainPolygon == null)
                     {
