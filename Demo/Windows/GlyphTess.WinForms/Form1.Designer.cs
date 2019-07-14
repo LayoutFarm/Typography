@@ -68,11 +68,11 @@
             this.panel1.Size = new System.Drawing.Size(526, 447);
             this.panel1.TabIndex = 1;
             // 
-            // chkInvert
+            // chkFlipY
             // 
             this.chkFlipY.AutoSize = true;
             this.chkFlipY.Location = new System.Drawing.Point(540, 59);
-            this.chkFlipY.Name = "chkInvert";
+            this.chkFlipY.Name = "chkFlipY";
             this.chkFlipY.Size = new System.Drawing.Size(49, 17);
             this.chkFlipY.TabIndex = 2;
             this.chkFlipY.Text = "FlipY";
