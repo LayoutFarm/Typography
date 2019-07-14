@@ -307,7 +307,6 @@ namespace Test_WinForm_TessGlyph
             }
             else
             {
-
                 List<Poly2Tri.Polygon> outputPolygons = new List<Poly2Tri.Polygon>();
                 Poly2TriExampleHelper.Triangulate(polygon1, contourEndIndices, outputPolygons);
                 foreach (Poly2Tri.Polygon polygon in outputPolygons)
