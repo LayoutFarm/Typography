@@ -196,7 +196,7 @@ namespace Test_WinForm_TessGlyph
 
             //-----------
             //for GDI+ only
-            bool drawInvert = chkInvert.Checked;
+            bool flipYAxis = chkFlipY.Checked;
             int viewHeight = this.panel1.Height;
 
             //----------- 
@@ -206,13 +206,20 @@ namespace Test_WinForm_TessGlyph
             float[] polygon1 = GetPolygonData(out contourEndIndices);
             if (polygon1 == null) return;
             //
-            if (drawInvert)
+            if (flipYAxis)
             {
                 var transformMat = new System.Drawing.Drawing2D.Matrix();
                 transformMat.Scale(1, -1);
                 transformMat.Translate(0, -viewHeight);
-                //
                 polygon1 = TransformPoints(polygon1, transformMat);
+
+                //when we flipY, meaning of clockwise-counter clockwise is changed.
+                //    
+                //see https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+                //...(comment)                     
+                //...A minor caveat: this answer assumes a normal Cartesian coordinate system.
+                //The reason that's worth mentioning is that some common contexts, like HTML5 canvas, use an inverted Y-axis.
+                //Then the rule has to be flipped: if the area is negative, the curve is clockwise. – LarsH Oct 11 '13 at 20:49
             }
 
 
@@ -307,13 +314,13 @@ namespace Test_WinForm_TessGlyph
             }
             else
             {
+
                 List<Poly2Tri.Polygon> outputPolygons = new List<Poly2Tri.Polygon>();
-                Poly2TriExampleHelper.Triangulate(polygon1, contourEndIndices, outputPolygons);
+                Poly2TriExampleHelper.Triangulate(polygon1, contourEndIndices, flipYAxis, outputPolygons);
                 foreach (Poly2Tri.Polygon polygon in outputPolygons)
                 {
                     foreach (Poly2Tri.DelaunayTriangle tri in polygon.Triangles)
                     {
-
                         Poly2Tri.TriangulationPoint p0 = tri.P0;
                         Poly2Tri.TriangulationPoint p1 = tri.P1;
                         Poly2Tri.TriangulationPoint p2 = tri.P2;
@@ -324,9 +331,6 @@ namespace Test_WinForm_TessGlyph
                     }
                 }
             }
-
-
-
         }
         private void cmdDrawGlyph_Click(object sender, EventArgs e)
         {
