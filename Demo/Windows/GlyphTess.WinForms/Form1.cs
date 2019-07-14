@@ -24,7 +24,7 @@ namespace Test_WinForm_TessGlyph
         TessTool _tessTool = new TessTool();
         public FormTess()
         {
-            InitializeComponent();
+            InitializeComponent(); 
 
             rdoSimpleIncCurveFlattener.Checked = true;
             rdoSimpleIncCurveFlattener.CheckedChanged += (s, e) => UpdateOutput();
