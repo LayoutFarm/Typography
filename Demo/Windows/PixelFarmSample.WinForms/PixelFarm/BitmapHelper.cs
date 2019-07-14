@@ -3,12 +3,20 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-namespace PixelFarm.CpuBlit.Imaging
+using PixelFarm.CpuBlit.Imaging;
+
+namespace PixelFarm.CpuBlit
 {
     static class BitmapHelper
     {
-
-
+        public static void CopyToGdiPlusGraphics(this AggPainter painter, Graphics g, int xpos = 0, int ypos = 0)
+        {
+            using (Bitmap gdiBmp = new Bitmap(painter.Width, painter.Height))
+            {
+                CopyToGdiPlusBitmapSameSize(painter.RenderSurface.DestBitmap, gdiBmp);
+                g.DrawImage(gdiBmp, new System.Drawing.Point(10, 0));
+            }
+        }
         /// <summary>
         /// copy from actual image direct to hBmpScan0
         /// </summary>

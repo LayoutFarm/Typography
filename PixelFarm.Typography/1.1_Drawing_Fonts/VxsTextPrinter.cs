@@ -178,7 +178,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO: review this again, we should use pixel? 
             float fontSizePoint = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
-            RenderVxGlyphPlan[] glyphPlans = renderVx.glyphList;
+            RenderVxGlyphPlan[] glyphPlans = renderVx.GlyphList;
             int j = glyphPlans.Length;
             //---------------------------------------------------
             //consider use cached glyph, to increase performance 
