@@ -30,7 +30,7 @@
         {
             this.cmdDrawGlyph = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.chkInvert = new System.Windows.Forms.CheckBox();
+            this.chkFlipY = new System.Windows.Forms.CheckBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -44,9 +44,9 @@
             this.rdoSubdivCureveFlattener = new System.Windows.Forms.RadioButton();
             this.rdoSimpleIncCurveFlattener = new System.Windows.Forms.RadioButton();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.label6 = new System.Windows.Forms.Label();
             this.rdoTessPoly2Tri = new System.Windows.Forms.RadioButton();
             this.rdoTessSGI = new System.Windows.Forms.RadioButton();
-            this.label6 = new System.Windows.Forms.Label();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.SuspendLayout();
@@ -70,14 +70,14 @@
             // 
             // chkInvert
             // 
-            this.chkInvert.AutoSize = true;
-            this.chkInvert.Location = new System.Drawing.Point(540, 59);
-            this.chkInvert.Name = "chkInvert";
-            this.chkInvert.Size = new System.Drawing.Size(53, 17);
-            this.chkInvert.TabIndex = 2;
-            this.chkInvert.Text = "Invert";
-            this.chkInvert.UseVisualStyleBackColor = true;
-            this.chkInvert.CheckedChanged += new System.EventHandler(this.chkInvert_CheckedChanged);
+            this.chkFlipY.AutoSize = true;
+            this.chkFlipY.Location = new System.Drawing.Point(540, 59);
+            this.chkFlipY.Name = "chkInvert";
+            this.chkFlipY.Size = new System.Drawing.Size(49, 17);
+            this.chkFlipY.TabIndex = 2;
+            this.chkFlipY.Text = "FlipY";
+            this.chkFlipY.UseVisualStyleBackColor = true;
+            this.chkFlipY.CheckedChanged += new System.EventHandler(this.chkInvert_CheckedChanged);
             // 
             // textBox1
             // 
@@ -203,11 +203,20 @@
             this.panel3.Size = new System.Drawing.Size(213, 100);
             this.panel3.TabIndex = 15;
             // 
-            // rdoTessPolyTri
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(10, 10);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(69, 13);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "Tess Method";
+            // 
+            // rdoTessPoly2Tri
             // 
             this.rdoTessPoly2Tri.AutoSize = true;
             this.rdoTessPoly2Tri.Location = new System.Drawing.Point(11, 50);
-            this.rdoTessPoly2Tri.Name = "rdoTessPolyTri";
+            this.rdoTessPoly2Tri.Name = "rdoTessPoly2Tri";
             this.rdoTessPoly2Tri.Size = new System.Drawing.Size(145, 17);
             this.rdoTessPoly2Tri.TabIndex = 23;
             this.rdoTessPoly2Tri.Text = "2. Poly2Tri (Triangulation)";
@@ -225,15 +234,6 @@
             this.rdoTessSGI.Text = "1. SGI Tess";
             this.rdoTessSGI.UseVisualStyleBackColor = true;
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(10, 10);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(69, 13);
-            this.label6.TabIndex = 16;
-            this.label6.Text = "Tess Method";
-            // 
             // FormTess
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -243,7 +243,7 @@
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.chkInvert);
+            this.Controls.Add(this.chkFlipY);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.cmdDrawGlyph);
             this.Name = "FormTess";
@@ -262,7 +262,7 @@
 
         private System.Windows.Forms.Button cmdDrawGlyph;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.CheckBox chkInvert;
+        private System.Windows.Forms.CheckBox chkFlipY;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel2;

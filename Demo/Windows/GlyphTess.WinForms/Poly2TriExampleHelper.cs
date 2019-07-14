@@ -129,7 +129,8 @@ namespace Test_WinForm_TessGlyph
                 {
                     if (i > 0)
                     {
-                        throw new NotSupportedException();
+                        //skip duplicated point
+                        continue;
                     }
                 }
                 else
@@ -142,7 +143,7 @@ namespace Test_WinForm_TessGlyph
             return new Poly2Tri.Polygon(points.ToArray());
 
         }
-        public static void Triangulate(float[] polygon1, int[] contourEndIndices, List<Poly2Tri.Polygon> outputPolygons)
+        public static void Triangulate(float[] polygon1, int[] contourEndIndices, bool yAxisFlipped, List<Poly2Tri.Polygon> outputPolygons)
         {
             //create 
             List<GlyphContour> flattenContours = CreateGlyphContours(polygon1, contourEndIndices);
@@ -165,8 +166,15 @@ namespace Test_WinForm_TessGlyph
             for (int n = 0; n < cntCount; ++n)
             {
                 GlyphContour cnt = flattenContours[n];
-                if (cnt.IsClockwise())
+                bool cntIsMainPolygon = cnt.IsClockwise();
+                if (yAxisFlipped)
                 {
+                    cntIsMainPolygon = !cntIsMainPolygon;
+                }
+
+                if (cntIsMainPolygon)
+                {
+                    //main polygon
                     //not a hole
                     if (mainPolygon == null)
                     {
@@ -214,48 +222,21 @@ namespace Test_WinForm_TessGlyph
                     }
                 }
             }
-
-            if (mainPolygon == null)
+            if (_waitingHoles.Count > 0)
             {
-                if (_waitingHoles.Count > 0)
-                {
-                    //found this condition in some glyph,
-                    //eg. Tahoma glyph=> f,j,i,o
-                    mainPolygon = _waitingHoles[0];
-
-                    if (_waitingHoles.Count > 1)
-                    {
-                        if (otherPolygons != null)
-                        {
-                            //????
-                            throw new NotSupportedException();
-                        }
-
-                        otherPolygons = new List<Poly2Tri.Polygon>();
-                        for (int i = 1; i < _waitingHoles.Count; ++i)
-                        {
-                            otherPolygons.Add(_waitingHoles[i]);
-                        }
-                    }
-                }
-                else
-                {
-                    throw new NotSupportedException();
-                }
+                throw new NotSupportedException();
             }
-
             //------------------------------------------
             //2. tri angulate 
             Poly2Tri.P2T.Triangulate(mainPolygon); //that poly is triangulated 
             outputPolygons.Add(mainPolygon);
 
-            Poly2Tri.Polygon[] subPolygons = (otherPolygons != null) ? otherPolygons.ToArray() : null;
-            if (subPolygons != null)
+            if (otherPolygons != null)
             {
-                for (int i = subPolygons.Length - 1; i >= 0; --i)
+                outputPolygons.AddRange(otherPolygons);
+                for (int i = otherPolygons.Count - 1; i >= 0; --i)
                 {
-                    Poly2Tri.P2T.Triangulate(subPolygons[i]);
-                    outputPolygons.Add(subPolygons[i]);
+                    Poly2Tri.P2T.Triangulate(otherPolygons[i]);
                 }
             }
         }
