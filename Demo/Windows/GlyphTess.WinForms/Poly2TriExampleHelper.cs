@@ -129,7 +129,8 @@ namespace Test_WinForm_TessGlyph
                 {
                     if (i > 0)
                     {
-                        throw new NotSupportedException();
+                        //skip duplicated point
+                        continue;
                     }
                 }
                 else
