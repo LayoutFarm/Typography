@@ -36,10 +36,10 @@
             this.cmbRenderChoices = new System.Windows.Forms.ComboBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this._txtTypefaceInfo = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.lstFontStyle = new System.Windows.Forms.ListBox();
             this.lstFontNameList = new System.Windows.Forms.ListBox();
-            this._txtTypefaceInfo = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -92,7 +92,7 @@
             // 
             this.cmbRenderChoices.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbRenderChoices.FormattingEnabled = true;
-            this.cmbRenderChoices.Location = new System.Drawing.Point(13, 275);
+            this.cmbRenderChoices.Location = new System.Drawing.Point(13, 295);
             this.cmbRenderChoices.Name = "cmbRenderChoices";
             this.cmbRenderChoices.Size = new System.Drawing.Size(142, 21);
             this.cmbRenderChoices.TabIndex = 72;
@@ -118,6 +118,14 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Actual Font Files";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // _txtTypefaceInfo
+            // 
+            this._txtTypefaceInfo.Location = new System.Drawing.Point(185, 7);
+            this._txtTypefaceInfo.Multiline = true;
+            this._txtTypefaceInfo.Name = "_txtTypefaceInfo";
+            this._txtTypefaceInfo.Size = new System.Drawing.Size(181, 250);
+            this._txtTypefaceInfo.TabIndex = 69;
             // 
             // tabPage2
             // 
@@ -147,14 +155,6 @@
             this.lstFontNameList.Size = new System.Drawing.Size(169, 251);
             this.lstFontNameList.TabIndex = 69;
             // 
-            // _txtTypefaceInfo
-            // 
-            this._txtTypefaceInfo.Location = new System.Drawing.Point(185, 7);
-            this._txtTypefaceInfo.Multiline = true;
-            this._txtTypefaceInfo.Name = "_txtTypefaceInfo";
-            this._txtTypefaceInfo.Size = new System.Drawing.Size(181, 250);
-            this._txtTypefaceInfo.TabIndex = 69;
-            // 
             // BasicFontOptionsUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -166,7 +166,7 @@
             this.Controls.Add(this.cmbScriptLangs);
             this.Controls.Add(this.lstFontSizes);
             this.Name = "BasicFontOptionsUserControl";
-            this.Size = new System.Drawing.Size(555, 299);
+            this.Size = new System.Drawing.Size(555, 330);
             this.Load += new System.EventHandler(this.OpenFontOptions_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
