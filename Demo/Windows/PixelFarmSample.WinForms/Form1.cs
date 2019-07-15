@@ -420,7 +420,11 @@ namespace SampleWinForms
             //7. just render our bitmap
             _g.Clear(Color.White);
             _g.DrawImage(_winBmp, new Point(30, 100));
-            //g.DrawRectangle(Pens.White, new System.Drawing.Rectangle(30, 20, winBmp.Width, winBmp.Height));
+
+
+            PixelFarm.CpuBlit.BitmapHelper.CopyToWindowsBitmapSameSize(_destImg, _winBmp);
+            _g.Clear(System.Drawing.Color.White);
+            _g.DrawImage(_winBmp, new System.Drawing.Point(10, 0));
         }
 
         void RenderWithMsdfImg(Typeface typeface, char testChar, float sizeInPoint)
