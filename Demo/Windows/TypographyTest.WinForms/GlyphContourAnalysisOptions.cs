@@ -20,7 +20,7 @@ namespace TypographyTest
         public int GridSize { get; set; }
         public bool ShowGrid { get; set; }
         public bool ShowTess { get; set; }
-        public bool ShowTriangle { get; set; }
+        public bool ShowTriangles { get; set; }
 
 
         public bool XGridFitting { get; set; }
@@ -33,7 +33,7 @@ namespace TypographyTest
         public bool DrawLineHubConn { get; set; }
         public bool DrawPerpendicularLine { get; set; }
         public bool DrawGlyphPoint { get; set; }
-        public bool DrawTriangles { get; set; }
+       
         public bool DynamicOutline { get; set; }
 
         public bool EnableGridFit { get; set; }

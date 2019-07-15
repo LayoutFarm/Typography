@@ -61,6 +61,7 @@ namespace SampleWinForms.UI
         public bool DrawBorder { get; set; }
         public bool OffsetMinorX { get; set; }
         public bool ShowTess { get; set; }
+        public bool ShowTriangles { get; set; }
 
         public string MinorOffsetInfo { get; set; }
         public DebugGlyphVisualizerInfoView VisualizeInfoView
@@ -263,14 +264,14 @@ namespace SampleWinForms.UI
                 //show info: => edge point
                 if (this.DrawPerpendicularLine && _infoView.HasDebugMark)
                 {
-                    double prevWidth = painter.StrokeWidth;
-                    painter.StrokeWidth = 3;
-                    painter.Line(edge.PX * scale, edge.PY * scale, edge.QX * scale, edge.QY * scale, PixelFarm.Drawing.Color.Yellow);
-                    painter.StrokeWidth = prevWidth;
+                    //double prevWidth = painter.StrokeWidth;
+                    //painter.StrokeWidth = 3;
+                    //painter.Line(edge.PX * scale, edge.PY * scale, edge.QX * scale, edge.QY * scale, PixelFarm.Drawing.Color.Yellow);
+                    //painter.StrokeWidth = prevWidth;
 
-                    //draw
-                    GlyphPoint p = edge.P;
-                    GlyphPoint q = edge.Q;
+                    ////draw
+                    //GlyphPoint p = edge.P;
+                    //GlyphPoint q = edge.Q;
 
                     //
                     //AssocBoneCollection p_bones = glyphEdge._P.dbugGetAssocBones();
@@ -548,13 +549,14 @@ namespace SampleWinForms.UI
 
         protected override void OnTriangle(int triangleId, EdgeLine e0, EdgeLine e1, EdgeLine e2, double centroidX, double centroidY)
         {
-
+           
             DrawEdge(painter, e0);
             DrawEdge(painter, e1);
             DrawEdge(painter, e2);
 
             _infoView.ShowTriangles(new GlyphTriangleInfo(triangleId, e0, e1, e2, centroidX, centroidY));
 
+          
         }
 
         protected override void OnGlyphEdgeN(EdgeLine e)
