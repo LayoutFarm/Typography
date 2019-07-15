@@ -316,7 +316,7 @@ namespace SampleWinForms
 
 
                         //copy from Agg's memory buffer to gdi 
-                        PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
+                        PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSizeNotFlip(_destImg, _winBmp);
                         _g.Clear(Color.White);
                         _g.DrawImage(_winBmp, new Point(10, 0));
 
@@ -414,16 +414,12 @@ namespace SampleWinForms
                 RenderGrids(800, 600, _gridSize, _painter);
             }
             _painter.SetOrigin(0, 0);
+
+
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
             PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
-            //--------------- 
-            //7. just render our bitmap
-            _g.Clear(Color.White);
-            _g.DrawImage(_winBmp, new Point(30, 100));
-
-
-            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
             _g.Clear(System.Drawing.Color.White);
+            //7. just render our bitmap
             _g.DrawImage(_winBmp, new System.Drawing.Point(10, 0));
         }
 
