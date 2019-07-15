@@ -422,7 +422,7 @@ namespace SampleWinForms
             _g.DrawImage(_winBmp, new Point(30, 100));
 
 
-            PixelFarm.CpuBlit.BitmapHelper.CopyToWindowsBitmapSameSize(_destImg, _winBmp);
+            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
             _g.Clear(System.Drawing.Color.White);
             _g.DrawImage(_winBmp, new System.Drawing.Point(10, 0));
         }

@@ -45,6 +45,9 @@
     <Compile Include="..\gdiplussample.winforms\gdiplus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarmSample.WinForms\PixelFarm\BitmapHelper.cs">
+      <Link>PixelFarm\BitmapHelper.cs</Link>
+    </Compile>
     <Compile Include="..\textboxsample.winforms\textboxcontroller\SampleTextBoxController.cs">
       <Link>GdiPlus\SampleTextBoxController.cs</Link>
     </Compile>
@@ -54,7 +57,6 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="PixelFarm\BitmapHelper.cs" />
     <Compile Include="PixelFarm\MouseButtonsAndKeys.cs" />
     <Compile Include="PixelFarm\SampleTextBoxControllerForPixelFarm.cs" />
     <Compile Include="PixelFarm\VisualLine.cs" />
