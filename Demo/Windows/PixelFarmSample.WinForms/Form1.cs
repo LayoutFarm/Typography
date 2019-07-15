@@ -383,12 +383,13 @@ namespace SampleWinForms
             _debugGlyphVisualizer.DrawBorder = _glyphRenderOptions.DrawBorder;
 
             _debugGlyphVisualizer.ShowTess = _contourAnalysisOpts.ShowTess;
-            _debugGlyphVisualizer.WalkTrianglesAndEdges = _contourAnalysisOpts.ShowTriangle;
+            _debugGlyphVisualizer.ShowTriangles = _contourAnalysisOpts.ShowTriangles;
+            _debugGlyphVisualizer.WalkTrianglesAndEdges = _contourAnalysisOpts.ShowTriangles;
             _debugGlyphVisualizer.DrawEndLineHub = _contourAnalysisOpts.DrawLineHubConn;
             _debugGlyphVisualizer.DrawPerpendicularLine = _contourAnalysisOpts.DrawPerpendicularLine;
             _debugGlyphVisualizer.WalkCentroidBone = _contourAnalysisOpts.DrawCentroidBone;
             _debugGlyphVisualizer.WalkGlyphBone = _contourAnalysisOpts.DrawGlyphBone;
-
+            
             _debugGlyphVisualizer.GlyphEdgeOffset = _contourAnalysisOpts.EdgeOffset;
 
             _debugGlyphVisualizer.DrawDynamicOutline = _contourAnalysisOpts.DynamicOutline;
