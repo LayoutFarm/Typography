@@ -67,7 +67,7 @@ namespace SampleWinForms.UI
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
 
-            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(p.RenderSurface.DestBitmap, winBmp);
+            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(p.RenderSurface.DestBitmap, winBmp);
             //--------------- 
             //7. just render our bitmap
             g.Clear(Color.White);
