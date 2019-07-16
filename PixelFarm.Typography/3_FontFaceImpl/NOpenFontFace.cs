@@ -28,136 +28,83 @@ namespace PixelFarm.Drawing.Fonts
 
             _glyphPathBuilder = new GlyphPathBuilder(typeface);
         }
-        public override string Name
-        {
-            get { return _name; }
-        }
-        public override string FontPath
-        {
-            get { return _path; }
-        }
+        public override string Name => _name;
+
+        public override string FontPath => _path;
+
         protected override void OnDispose() { }
         public override ActualFont GetFontAtPointSize(float pointSize)
         {
-            NOpenFont actualFont = new NOpenFont(this, pointSize, FontStyle.Regular);
-            return actualFont;
+            return new NOpenFont(this, pointSize, FontStyle.Regular);
         }
-        public Typeface Typeface { get { return _typeface; } }
+        public Typeface Typeface => _typeface;
 
-        internal GlyphPathBuilder VxsBuilder
-        {
-            get
-            {
-                //TODO: review again,
-                //remove ...
-                return _glyphPathBuilder;
-            }
-        }
-        public override float GetScale(float pointSize)
-        {
-            return _typeface.CalculateScaleToPixelFromPointSize(pointSize);
-        }
-        public override int AscentInDzUnit
-        {
-            get { return _typeface.Ascender; }
-        }
-        public override int DescentInDzUnit
-        {
-            get { return _typeface.Descender; }
-        }
-        public override int LineGapInDzUnit
-        {
-            get { return _typeface.LineGap; }
-        }
+        //TODO: review again,
+        //remove ...
+        internal GlyphPathBuilder VxsBuilder => _glyphPathBuilder;
 
-        public override int RecommendedLineHeight
-        {
-            get
-            {
-                return _typeface.CalculateRecommendLineSpacing();
-            }
-        }
+        public override float GetScale(float pointSize) => _typeface.CalculateScaleToPixelFromPointSize(pointSize);
 
-        public override object GetInternalTypeface()
-        {
-            return _typeface;
-        }
+        public override int AscentInDzUnit => _typeface.Ascender;
+
+        public override int DescentInDzUnit => _typeface.Descender;
+
+        public override int LineGapInDzUnit => _typeface.LineGap;
+
+        public override int RecommendedLineHeight => _typeface.CalculateRecommendLineSpacing();
+
+        public override object GetInternalTypeface() => _typeface;
+
     }
 
     class NOpenFont : ActualFont
     {
-        NOpenFontFace ownerFace;
-        float sizeInPoints;
-        FontStyle style;
-        Typeface typeFace;
-        float scale;
-        Dictionary<uint, VertexStore> glyphVxs = new Dictionary<uint, VertexStore>();
+        NOpenFontFace _ownerFace;
+        readonly float _sizeInPoints;
+        readonly FontStyle _style;
+        readonly Typeface _typeFace;
+        readonly float _scale;
+        readonly Dictionary<uint, VertexStore> _glyphVxs = new Dictionary<uint, VertexStore>();
 
         float _recommendLineSpacing;
 
         public NOpenFont(NOpenFontFace ownerFace, float sizeInPoints, FontStyle style)
         {
-            this.ownerFace = ownerFace;
-            this.sizeInPoints = sizeInPoints;
-            this.style = style;
-            this.typeFace = ownerFace.Typeface;
+            _ownerFace = ownerFace;
+            _sizeInPoints = sizeInPoints;
+            _style = style;
+            _typeFace = ownerFace.Typeface;
             //calculate scale *** 
-            scale = typeFace.CalculateScaleToPixelFromPointSize(sizeInPoints);
-            _recommendLineSpacing = typeFace.CalculateRecommendLineSpacing() * scale;
+            _scale = _typeFace.CalculateScaleToPixelFromPointSize(sizeInPoints);
+            _recommendLineSpacing = _typeFace.CalculateRecommendLineSpacing() * _scale;
 
         }
-        public override float SizeInPoints
-        {
-            get { return this.sizeInPoints; }
-        }
-        public override float SizeInPixels
-        {
-            //font height 
-            get { return sizeInPoints * scale; }
-        }
-        public override float AscentInPixels
-        {
-            get { return typeFace.Ascender * scale; }
-        }
-        public override float DescentInPixels
-        {
-            get { return typeFace.Descender * scale; }
-        }
-        public override float LineGapInPixels
-        {
-            get { return typeFace.LineGap * scale; }
-        }
-        public override float RecommendedLineSpacingInPixels
-        {
-            get
-            {
-                return _recommendLineSpacing;
-            }
-        }
-        public override FontFace FontFace
-        {
-            get { return ownerFace; }
-        }
-        public override string FontName
-        {
-            get { return typeFace.Name; }
-        }
-        public override FontStyle FontStyle
-        {
-            get { return style; }
-        }
+        public override float SizeInPoints => _sizeInPoints;
 
+        public override float SizeInPixels => _sizeInPoints * _scale;
 
-        public override FontGlyph GetGlyph(char c)
-        {
-            return GetGlyphByIndex(typeFace.LookupIndex(c));
-        }
+        public override float AscentInPixels => _typeFace.Ascender * _scale;
+
+        public override float DescentInPixels => _typeFace.Descender * _scale;
+
+        public override float LineGapInPixels => _typeFace.LineGap * _scale;
+
+        public override float RecommendedLineSpacingInPixels => _recommendLineSpacing;
+
+        public override FontFace FontFace => _ownerFace;
+
+        public override string FontName => _typeFace.Name;
+
+        public override FontStyle FontStyle => _style;
+
+        public override FontGlyph GetGlyph(char c)=>GetGlyphByIndex(_typeFace.LookupIndex(c));
+        
         public override FontGlyph GetGlyphByIndex(ushort glyphIndex)
         {
             //1.  
             FontGlyph fontGlyph = new FontGlyph();
             fontGlyph.flattenVxs = GetGlyphVxs(glyphIndex);
-            fontGlyph.horiz_adv_x = typeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
+            fontGlyph.horiz_adv_x = _typeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);
 
             return fontGlyph;
         }
@@ -168,21 +115,21 @@ namespace PixelFarm.Drawing.Fonts
         public VertexStore GetGlyphVxs(uint codepoint)
         {
             VertexStore found;
-            if (glyphVxs.TryGetValue(codepoint, out found))
+            if (_glyphVxs.TryGetValue(codepoint, out found))
             {
                 return found;
             }
             //not found
             //then build it
-            ownerFace.VxsBuilder.BuildFromGlyphIndex((ushort)codepoint, this.sizeInPoints);
+            _ownerFace.VxsBuilder.BuildFromGlyphIndex((ushort)codepoint, _sizeInPoints);
 
             var txToVxs = new Fonts.GlyphTranslatorToVxs();
-            ownerFace.VxsBuilder.ReadShapes(txToVxs);
+            _ownerFace.VxsBuilder.ReadShapes(txToVxs);
             //
             //create new one
             found = new VertexStore();
             txToVxs.WriteOutput(found);
-            glyphVxs.Add(codepoint, found);
+            _glyphVxs.Add(codepoint, found);
             return found;
         }
 

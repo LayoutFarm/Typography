@@ -93,8 +93,7 @@ namespace PixelFarm.Drawing.Fonts
         static Dictionary<int, ActualFont> s_actualFonts = new Dictionary<int, ActualFont>();
         public static ActualFont GetCacheActualFont(RequestFont r)
         {
-            ActualFont font;
-            s_actualFonts.TryGetValue(r.FontKey, out font);
+            s_actualFonts.TryGetValue(r.FontKey, out ActualFont font);
             return font;
         }
         public static void SetCacheActualFont(RequestFont r, ActualFont a)
