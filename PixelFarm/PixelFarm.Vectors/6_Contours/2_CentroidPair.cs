@@ -186,13 +186,11 @@ namespace PixelFarm.Contours
         static double CalculateCentroidPairSlopeNoDirection(CentroidPair centroidPair)
         {
             //calculate centroid pair slope 
-            //p
-            float x0, y0;
-            centroidPair.p.CalculateCentroid(out x0, out y0);
+            //p 
+            centroidPair.p.CalculateCentroid(out float x0, out float y0);
 
-            //q
-            float x1, y1;
-            centroidPair.q.CalculateCentroid(out x1, out y1);
+            //q 
+            centroidPair.q.CalculateCentroid(out float x1, out float y1);
 
             //return slop angle no direction,we don't care direction of vector  
             return Math.Abs(Math.Atan2(Math.Abs(y1 - y0), Math.Abs(x1 - x0)));
@@ -236,16 +234,14 @@ namespace PixelFarm.Contours
           EdgeLine knownInsideEdge)
         {
 
-            int outsideCount;
-            EdgeLine outside0, outside1, outside2, anotherInsideEdge;
             ClassifyTriangleEdges(
                 triangle,
                 knownInsideEdge,
-                out anotherInsideEdge,
-                out outside0,
-                out outside1,
-                out outside2,
-                out outsideCount);
+                out EdgeLine anotherInsideEdge,
+                out EdgeLine outside0,
+                out EdgeLine outside1,
+                out EdgeLine outside2,
+                out int outsideCount);
 
             switch (outsideCount)
             {

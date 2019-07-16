@@ -11,8 +11,6 @@ using Typography.OpenFont;
 
 namespace Typography.Rendering
 {
-
-
     public delegate U LoadNewBmpDelegate<T, U>(T src);
 
     public class FontBitmapCache<T, U> : IDisposable
@@ -47,8 +45,7 @@ namespace Typography.Rendering
         }
         public void Delete(T key)
         {
-            U found;
-            if (_loadBmps.TryGetValue(key, out found))
+            if (_loadBmps.TryGetValue(key, out U found))
             {
                 found.Dispose();
                 _loadBmps.Remove(key);
@@ -176,11 +173,7 @@ namespace Typography.Rendering
             _loadedGlyphs = new FontBitmapCache<SimpleFontAtlas, B>(_createNewDel);
         }
 
-        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKindForNewFont
-        {
-            get;
-            set;
-        }
+        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKindForNewFont { get; set; }
 
 
 

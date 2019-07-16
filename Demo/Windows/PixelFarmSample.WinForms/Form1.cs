@@ -172,7 +172,7 @@ namespace SampleWinForms
 
 
             //copy from Agg's memory buffer to gdi 
-            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
+            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSizeNotFlip(_destImg, _winBmp);
             _g.Clear(System.Drawing.Color.White);
             _g.DrawImage(_winBmp, new System.Drawing.Point(10, 0));
         }

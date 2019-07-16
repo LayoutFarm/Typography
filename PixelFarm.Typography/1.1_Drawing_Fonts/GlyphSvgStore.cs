@@ -10,7 +10,6 @@ namespace PixelFarm.Drawing.Fonts
 
     class GlyphSvgStore
     {
-
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;
         Dictionary<Typeface, GlyphBitmapList> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphBitmapList>();

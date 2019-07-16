@@ -21,11 +21,8 @@ namespace PixelFarm.Contours
             _glyphTxToContourBuilder = new Typography.Contours.GlyphTranslatorToContourBuilder(_contourBuilder);
         }
 
-
-
-
         /// <summary>
-        /// calculate and create GlyphFitOutline
+        /// calculate and create Dynamic outline from original glyph-point
         /// </summary>
         /// <param name="glyphPoints"></param>
         /// <param name="glyphContours"></param>

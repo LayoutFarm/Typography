@@ -46,8 +46,7 @@ namespace PixelFarm.Contours
             //we should know the direction of this triangle
             //then we known that if this triangle is left/right/upper/lower of the 'stroke' line 
 
-            float cent_x, cent_y;
-            this.CalculateCentroid(out cent_x, out cent_y);
+            this.CalculateCentroid(out float cent_x, out float cent_y);
             AnalyzeOutsideEdge(e0, cent_x, cent_y);
             AnalyzeOutsideEdge(e1, cent_x, cent_y);
             AnalyzeOutsideEdge(e2, cent_x, cent_y);
@@ -113,8 +112,7 @@ namespace PixelFarm.Contours
         static void FindPerpendicular(EdgeLine outsideEdge, EdgeLine inside)
         {
             Vector2f m0 = inside.GetMidPoint();
-            Vector2f cut_fromM0;
-            if (MyMath.FindPerpendicularCutPoint(outsideEdge, new Vector2f(m0.X, m0.Y), out cut_fromM0))
+            if (MyMath.FindPerpendicularCutPoint(outsideEdge, new Vector2f(m0.X, m0.Y), out Vector2f cut_fromM0))
             {
                 ((OutsideEdgeLine)outsideEdge).SetControlEdge(inside);
             }
@@ -151,33 +149,18 @@ namespace PixelFarm.Contours
         /// <summary>
         /// neighbor triangle 0
         /// </summary>
-        public Triangle N0
-        {
-            get
-            {
-                return GetGlyphTriFromUserData(_tri.N0);
-            }
-        }
+        public Triangle N0 => GetGlyphTriFromUserData(_tri.N0);
+
         /// <summary>
         /// neighbor triangle 1
         /// </summary>
-        public Triangle N1
-        {
-            get
-            {
-                return GetGlyphTriFromUserData(_tri.N1);
-            }
-        }
+        public Triangle N1 => GetGlyphTriFromUserData(_tri.N1);
+
         /// <summary>
         /// neighbor triangle 2
         /// </summary>
-        public Triangle N2
-        {
-            get
-            {
-                return GetGlyphTriFromUserData(_tri.N2);
-            }
-        }
+        public Triangle N2 => GetGlyphTriFromUserData(_tri.N2);
+
         static Triangle GetGlyphTriFromUserData(DelaunayTriangle tri)
         {
             if (tri == null) return null;

@@ -212,12 +212,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short offsetX, offsetY, advW; //all from pen-pos
+                    //all from pen-pos 
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
                     accumW += (short)Math.Round(advW * pxscale);
                 }
 
@@ -229,12 +229,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short offsetX, offsetY, advW; //all from pen-pos
+                    //all from pen-pos 
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
                     accumW += advW * pxscale;
                 }
             }
@@ -257,12 +257,12 @@ namespace Typography.TextLayout
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
 
-                    short offsetX, offsetY, advW; //all from pen-pos
+                     //all from pen-pos
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
 
                     stopAtGlyphIndex = i; //***
                     //
@@ -285,12 +285,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short offsetX, offsetY, advW; //all from pen-pos
+                    //all from pen-pos
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
 
 
                     stopAtGlyphIndex = i; //***

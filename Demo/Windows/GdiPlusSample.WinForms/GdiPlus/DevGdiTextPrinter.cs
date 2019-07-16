@@ -151,9 +151,7 @@ namespace SampleWinForms
 
             while (snapToPxScale.Read())
             {
-                GraphicsPath foundPath;
-
-                if (!_glyphMeshCollections.TryGetCacheGlyph(snapToPxScale.CurrentGlyphIndex, out foundPath))
+                if (!_glyphMeshCollections.TryGetCacheGlyph(snapToPxScale.CurrentGlyphIndex, out GraphicsPath foundPath))
                 {
                     //if not found then create a new one
                     _currentGlyphPathBuilder.BuildFromGlyphIndex(snapToPxScale.CurrentGlyphIndex, sizeInPoints);
@@ -181,9 +179,9 @@ namespace SampleWinForms
                     g.DrawPath(_outlinePen, foundPath);
                 }
                 //and then we reset back ***
-                g.TranslateTransform(-cx, -cy); 
+                g.TranslateTransform(-cx, -cy);
             }
-             
+
         }
 
     }

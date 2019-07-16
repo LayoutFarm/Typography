@@ -201,8 +201,7 @@ namespace PixelFarm.Contours
             Vector2f tmp_e0_q = e0._newDynamicMidPoint + e0.GetOriginalEdgeVector();
             Vector2f tmp_e1_p = e1._newDynamicMidPoint - e1.GetOriginalEdgeVector();
 
-            Vector2f cutpoint;
-            if (MyMath.FindCutPoint(e0._newDynamicMidPoint, tmp_e0_q, e1._newDynamicMidPoint, tmp_e1_p, out cutpoint))
+            if (MyMath.FindCutPoint(e0._newDynamicMidPoint, tmp_e0_q, e1._newDynamicMidPoint, tmp_e1_p, out Vector2f cutpoint))
             {
                 p.SetNewXY(cutpoint.X, cutpoint.Y);
             }

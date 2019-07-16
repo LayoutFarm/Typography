@@ -100,9 +100,10 @@ namespace SampleWinForms.UI
             _testChar = testChar;
             //----------------------------------------------------
             //
+            _builder.GlyphDynamicEdgeOffset = this.GlyphEdgeOffset;
             _builder.Build(testChar, _sizeInPoint);
             var txToVxs1 = new GlyphTranslatorToVxs();
-            _builder.GlyphDynamicEdgeOffset = this.GlyphEdgeOffset;
+            
 
             _builder.ReadShapes(txToVxs1);
 

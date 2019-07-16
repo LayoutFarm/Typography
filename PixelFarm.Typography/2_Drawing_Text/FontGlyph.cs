@@ -5,7 +5,6 @@ using System;
 using System.Runtime.InteropServices; 
 namespace PixelFarm.Drawing.Fonts
 {
-
     [StructLayout(LayoutKind.Sequential)]
     public struct GlyphMatrix
     {

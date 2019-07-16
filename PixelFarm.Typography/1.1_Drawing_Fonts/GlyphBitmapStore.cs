@@ -42,8 +42,6 @@ namespace PixelFarm.Drawing.Fonts
 
     class GlyphBitmapStore
     {
-
-
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;
         Dictionary<Typeface, GlyphBitmapList> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphBitmapList>();
