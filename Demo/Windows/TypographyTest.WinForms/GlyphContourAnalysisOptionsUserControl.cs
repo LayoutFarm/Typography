@@ -83,6 +83,7 @@ namespace TypographyTest.WinForms
 
             //edge offset
             lstEdgeOffset.Items.Add(0f);
+            lstEdgeOffset.Items.Add(-20f);
             lstEdgeOffset.Items.Add(-10f);
             lstEdgeOffset.Items.Add(-8f);
             lstEdgeOffset.Items.Add(-6f);
@@ -91,6 +92,7 @@ namespace TypographyTest.WinForms
             lstEdgeOffset.Items.Add(6f);
             lstEdgeOffset.Items.Add(8f);
             lstEdgeOffset.Items.Add(10f);
+            lstEdgeOffset.Items.Add(20f);
             lstEdgeOffset.SelectedIndex = 0;
             lstEdgeOffset.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
         }
@@ -130,3 +132,4 @@ namespace TypographyTest.WinForms
         }
     }
 }
+

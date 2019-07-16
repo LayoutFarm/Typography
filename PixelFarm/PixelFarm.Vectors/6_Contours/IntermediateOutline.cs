@@ -231,11 +231,9 @@ namespace PixelFarm.Contours
                     continue;
                 }
 
-                CentroidLine foundOnBr;
-                Joint foundOnJoint;
                 //from a given hub,
                 //find bone joint that close to the main triangle for of the analyzingHub
-                if (otherHub.FindBoneJoint(analyzingHub.StartTriangle, out foundOnBr, out foundOnJoint))
+                if (otherHub.FindBoneJoint(analyzingHub.StartTriangle, out CentroidLine foundOnBr, out Joint foundOnJoint))
                 {
                     //create a new bone joint 
                     // FindNearestEdge(analyzingHub.MainTriangle, foundOnJoint); 

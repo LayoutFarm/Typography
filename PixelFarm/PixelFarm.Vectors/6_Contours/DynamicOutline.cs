@@ -109,7 +109,7 @@ namespace PixelFarm.Contours
                 }
                 //***
                 //changing offset from master outline affects the grid fit-> need to recalculate 
-                _needRefreshBoneGroup = true;
+                //_needRefreshBoneGroup = true;
             }
         }
 
@@ -152,8 +152,9 @@ namespace PixelFarm.Contours
             if (_contours == null) return; //blank
 #if DEBUG
             this.EnableGridFit = dbugTestNewGridFitting;
-#endif
 
+#endif
+            EnableGridFit = false;
             if (_pxScale != pxScale)
             {
                 //new scale need to adjust fit value again
