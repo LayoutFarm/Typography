@@ -97,8 +97,8 @@ namespace PixelFarm.Drawing.Fonts
 
         public override FontStyle FontStyle => _style;
 
-        public override FontGlyph GetGlyph(char c)=>GetGlyphByIndex(_typeFace.LookupIndex(c));
-        
+        public override FontGlyph GetGlyph(char c) => GetGlyphByIndex(_typeFace.LookupIndex(c));
+
         public override FontGlyph GetGlyphByIndex(ushort glyphIndex)
         {
             //1.  
@@ -114,8 +114,7 @@ namespace PixelFarm.Drawing.Fonts
         }
         public VertexStore GetGlyphVxs(uint codepoint)
         {
-            VertexStore found;
-            if (_glyphVxs.TryGetValue(codepoint, out found))
+            if (_glyphVxs.TryGetValue(codepoint, out VertexStore found))
             {
                 return found;
             }
