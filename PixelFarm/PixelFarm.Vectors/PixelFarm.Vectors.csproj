@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PIXEL_FARM,PIXEL_FARM_NET20, DEFINE_VECTOR2</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -181,6 +181,23 @@
     <Compile Include="4_Utils\TessTool.cs" />
     <Compile Include="5_Clipper\cliper.cs" />
     <Compile Include="5_Clipper\ClipLiangBarsky.cs" />
+    <Compile Include="6_Contours\0_Triangle.cs" />
+    <Compile Include="6_Contours\1_Line.cs" />
+    <Compile Include="6_Contours\2_CentroidPair.cs" />
+    <Compile Include="6_Contours\3_BoneJoint.cs" />
+    <Compile Include="6_Contours\4_Bone.cs" />
+    <Compile Include="6_Contours\5_CentroidLineAndHub.cs" />
+    <Compile Include="6_Contours\Contour.cs" />
+    <Compile Include="6_Contours\ContourBuilder.cs" />
+    <Compile Include="6_Contours\ContourParts.cs" />
+    <Compile Include="6_Contours\CurveGen.cs" />
+    <Compile Include="6_Contours\DynamicOutline.cs" />
+    <Compile Include="6_Contours\IntermediateOutline.cs" />
+    <Compile Include="6_Contours\MyMath.cs" />
+    <Compile Include="6_Contours\OutlineWalker.cs" />
+    <Compile Include="6_Contours\PartFlattener.cs" />
+    <Compile Include="6_Contours\Rect.cs" />
+    <Compile Include="6_Contours\Vertex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

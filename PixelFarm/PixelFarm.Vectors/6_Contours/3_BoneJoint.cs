@@ -1,11 +1,11 @@
 ﻿//MIT, 2017-present, WinterDev
 
-using System.Numerics;
+using PixelFarm.VectorMath;
 
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
 
-    public class GlyphBoneJoint
+    public class Joint
     {
 
         //A GlyphBoneJoint is on a midpoint of two 'inside' adjacent edges.
@@ -21,7 +21,7 @@ namespace Typography.Contours
 
         float _fitX, _fitY;
 
-        internal GlyphBoneJoint(
+        internal Joint(
             InsideEdgeLine p_contact_edge,
             InsideEdgeLine q_contact_edge)
         {
@@ -30,7 +30,7 @@ namespace Typography.Contours
             _p_contact_edge = p_contact_edge;
             _q_contact_edge = q_contact_edge;
             //this is original x,y
-            Vector2 midpos = p_contact_edge.GetMidPoint();
+            Vector2f midpos = p_contact_edge.GetMidPoint();
             _fitX = midpos.X;
             _fitY = midpos.Y;
 
@@ -58,26 +58,26 @@ namespace Typography.Contours
             _fitX = newx;
             _fitY = newy;
         }
-        internal GlyphTriangle P_Tri => _p_contact_edge.OwnerTriangle;
-        internal GlyphTriangle Q_Tri => _q_contact_edge.OwnerTriangle;
+        internal Triangle P_Tri => _p_contact_edge.OwnerTriangle;
+        internal Triangle Q_Tri => _q_contact_edge.OwnerTriangle;
 
         /// <summary>
         /// get position of this bone joint (mid point of the edge)
         /// </summary>
         /// <returns></returns>
-        public Vector2 OriginalJointPos => _p_contact_edge.GetMidPoint();//mid point of the contact edge line
+        public Vector2f OriginalJointPos => _p_contact_edge.GetMidPoint();//mid point of the contact edge line
         //
-        public Vector2 DynamicFitPos => new Vector2(_fitX, _fitY);
+        public Vector2f DynamicFitPos => new Vector2f(_fitX, _fitY);
         //
         /// <summary>
         /// calculate distance^2 from contact point to specific point v
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public double CalculateSqrDistance(Vector2 v)
+        public double CalculateSqrDistance(Vector2f v)
         {
 
-            Vector2 contactPoint = this.OriginalJointPos;
+            Vector2f contactPoint = this.OriginalJointPos;
             float xdiff = contactPoint.X - v.X;
             float ydiff = contactPoint.Y - v.Y;
 
@@ -113,13 +113,13 @@ namespace Typography.Contours
         public bool HasTipP => _tipEdge_p != null;
         public bool HasTipQ => _tipEdge_q != null;
         //
-        public Vector2 TipPointP => _tipEdge_p.GetMidPoint();
+        public Vector2f TipPointP => _tipEdge_p.GetMidPoint();
         public EdgeLine TipEdgeP => _tipEdge_p;
         //
-        public Vector2 TipPointQ => _tipEdge_q.GetMidPoint();
+        public Vector2f TipPointQ => _tipEdge_q.GetMidPoint();
         public EdgeLine TipEdgeQ => _tipEdge_q;
         //
-        internal bool ComposeOf(GlyphTriangle tri)
+        internal bool ComposeOf(Triangle tri)
         {
             return this.P_Tri == tri || this.Q_Tri == tri;
         }
@@ -131,7 +131,7 @@ namespace Typography.Contours
         internal void AdjustFitXY(int gridW, int gridH)
         {
 
-            Vector2 jointPos = this.OriginalJointPos;
+            Vector2f jointPos = this.OriginalJointPos;
             //set fit (x,y) to joint, then we will evaluate bone slope again (next step)
             this.SetFitXY(
                 MyMath.FitToHalfGrid(jointPos.X, gridW), //use half?

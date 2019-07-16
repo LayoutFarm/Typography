@@ -2,19 +2,18 @@
 using System;
 using System.Collections.Generic;
 using Poly2Tri;
-
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
 
-    class GlyphIntermediateOutline
+    public class IntermediateOutline
     {
 
-        List<GlyphContour> _contours;
+        List<Contour> _contours;
         List<CentroidLineHub> _lineHubs;
 
         float _bounds_minX, _bounds_minY, _bounds_maxX, _bounds_maxY;
-        public GlyphIntermediateOutline(
-            List<GlyphContour> contours,
+        public IntermediateOutline(
+            List<Contour> contours,
             Polygon polygon,
             Polygon[] subPolygons)
         {
@@ -33,11 +32,11 @@ namespace Typography.Contours
 
         void CreateCentroidLineHubs(Polygon polygon, Polygon[] subPolygons)
         {
-            List<GlyphTriangle> triangles = new List<GlyphTriangle>();
+            List<Triangle> triangles = new List<Triangle>();
             _lineHubs = new List<CentroidLineHub>();
 #if DEBUG            
             EdgeLine.s_dbugTotalId = 0;//reset 
-            _dbugTriangles = new List<GlyphTriangle>();
+            _dbugTriangles = new List<Triangle>();
 #endif
 
             //main polygon
@@ -60,7 +59,7 @@ namespace Typography.Contours
                 }
             }
         }
-        static void CreateCentroidLineHubs(Polygon polygon, List<GlyphTriangle> triangles, List<CentroidLineHub> outputLineHubs)
+        static void CreateCentroidLineHubs(Polygon polygon, List<Triangle> triangles, List<CentroidLineHub> outputLineHubs)
         {
 
             //create triangle list from given DelaunayTriangle polygon.
@@ -68,25 +67,25 @@ namespace Typography.Contours
             foreach (DelaunayTriangle delnTri in polygon.Triangles)
             {
                 delnTri.MarkAsActualTriangle();
-                triangles.Add(new GlyphTriangle(delnTri)); //all triangles are created from Triangulation process
+                triangles.Add(new Triangle(delnTri)); //all triangles are created from Triangulation process
             }
 
             //----------------------------
             //create centroid line hub
             //----------------------------
             //1.
-            var centroidLineHubs = new Dictionary<GlyphTriangle, CentroidLineHub>();
+            var centroidLineHubs = new Dictionary<Triangle, CentroidLineHub>();
             CentroidLineHub currentCentroidLineHub = null;
             //2. temporary list of used triangles
-            List<GlyphTriangle> usedTriList = new List<GlyphTriangle>();
-            GlyphTriangle latestTri = null;
+            List<Triangle> usedTriList = new List<Triangle>();
+            Triangle latestTri = null;
 
             //we may walk forward and backward on each tri
             //so we record the used triangle into a usedTriList.
             int triCount = triangles.Count;
             for (int i = 0; i < triCount; ++i)
             {
-                GlyphTriangle tri = triangles[i];
+                Triangle tri = triangles[i];
                 if (i == 0)
                 {
                     centroidLineHubs[tri] = currentCentroidLineHub = new CentroidLineHub(tri);
@@ -107,7 +106,7 @@ namespace Typography.Contours
                         //record used triangle
                         usedTriList.Add(tri);
 
-                        GlyphTriangle connectWithPrevTri = usedTriList[foundIndex];
+                        Triangle connectWithPrevTri = usedTriList[foundIndex];
                         if (connectWithPrevTri != latestTri)
                         {
                             //branch
@@ -129,7 +128,7 @@ namespace Typography.Contours
                             //ensure start triangle of the branch
                             lineHub.SetCurrentCentroidLine(tri);
                             //create centroid line and add to currrent hub 
-                            currentCentroidLineHub.AddCentroidPair(new GlyphCentroidPair(connectWithPrevTri, tri));
+                            currentCentroidLineHub.AddCentroidPair(new CentroidPair(connectWithPrevTri, tri));
                         }
                         else
                         {
@@ -140,7 +139,7 @@ namespace Typography.Contours
                                 currentCentroidLineHub.SetCurrentCentroidLine(tri);
                             }
                             //create centroid line and add to currrent hub
-                            currentCentroidLineHub.AddCentroidPair(new GlyphCentroidPair(connectWithPrevTri, tri));
+                            currentCentroidLineHub.AddCentroidPair(new CentroidPair(connectWithPrevTri, tri));
                         }
                         latestTri = tri;
                     }
@@ -168,7 +167,7 @@ namespace Typography.Contours
         void CreateBones()
         {
 
-            List<GlyphBone> newBones = new List<GlyphBone>();
+            List<Bone> newBones = new List<Bone>();
             int lineHubCount = _lineHubs.Count;
             for (int i = 0; i < lineHubCount; ++i)
             {
@@ -189,11 +188,11 @@ namespace Typography.Contours
             _bounds_minX = _bounds_minY = float.MaxValue;
             _bounds_maxX = _bounds_maxY = float.MinValue;
 
-            List<GlyphContour> contours = _contours;
+            List<Contour> contours = _contours;
             int j = contours.Count;
             for (int i = 0; i < j; ++i)
             {
-                GlyphContour cnt = contours[i];
+                Contour cnt = contours[i];
                 cnt.CreateGlyphEdges();
                 //this is a new found after fitting process
                 cnt.FindBounds(ref _bounds_minX, ref _bounds_minY, ref _bounds_maxX, ref _bounds_maxY);
@@ -233,7 +232,7 @@ namespace Typography.Contours
                 }
 
                 CentroidLine foundOnBr;
-                GlyphBoneJoint foundOnJoint;
+                Joint foundOnJoint;
                 //from a given hub,
                 //find bone joint that close to the main triangle for of the analyzingHub
                 if (otherHub.FindBoneJoint(analyzingHub.StartTriangle, out foundOnBr, out foundOnJoint))
@@ -251,7 +250,7 @@ namespace Typography.Contours
             }
         }
 
-        static int FindLatestConnectedTri(List<GlyphTriangle> usedTriList, GlyphTriangle tri)
+        static int FindLatestConnectedTri(List<Triangle> usedTriList, Triangle tri)
         {
             //search back ***
             for (int i = usedTriList.Count - 1; i >= 0; --i)
@@ -266,13 +265,13 @@ namespace Typography.Contours
         //
         public List<CentroidLineHub> GetCentroidLineHubs() => _lineHubs;
         //
-        public List<GlyphContour> GetContours() => _contours;
+        public List<Contour> GetContours() => _contours;
         //
 #if DEBUG
 
 
-        List<GlyphTriangle> _dbugTriangles;
-        public List<GlyphTriangle> dbugGetTriangles()
+        List<Triangle> _dbugTriangles;
+        public List<Triangle> dbugGetTriangles()
         {
             return _dbugTriangles;
         }

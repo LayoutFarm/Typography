@@ -1,10 +1,9 @@
 ﻿//MIT, 2016-present, WinterDev
 
-using System.Numerics;
-
-namespace Typography.Contours
+using PixelFarm.VectorMath;
+namespace PixelFarm.Contours
 {
-    public enum GlyphPartKind
+    public enum PartKind
     {
         Unknown,
         Line,
@@ -13,10 +12,10 @@ namespace Typography.Contours
     }
 
 
-    public abstract class GlyphPart
+    public abstract class ContourPart
     {
         float _x0, _y0;
-        public Vector2 FirstPoint
+        public Vector2f FirstPoint
         {
             get
             {
@@ -26,7 +25,7 @@ namespace Typography.Contours
                 }
                 else
                 {
-                    return new Vector2(_x0, _y0);
+                    return new Vector2f(_x0, _y0);
                 }
             }
             protected set
@@ -35,16 +34,16 @@ namespace Typography.Contours
                 _y0 = value.Y;
             }
         }
-        public abstract GlyphPartKind Kind { get; }
-        public GlyphPart NextPart { get; set; }
-        public GlyphPart PrevPart { get; set; }
-        internal abstract void Flatten(GlyphPartFlattener flattener);
+        public abstract PartKind Kind { get; }
+        public ContourPart NextPart { get; set; }
+        public ContourPart PrevPart { get; set; }
+        internal abstract void Flatten(PartFlattener flattener);
 
-        public abstract Vector2 GetLastPoint();
+        public abstract Vector2f GetLastPoint();
 #if DEBUG
         static int dbugTotalId;
         public readonly int dbugId = dbugTotalId++;
-        public GlyphPart()
+        public ContourPart()
         {
             //if (this.dbugId == 16)
             //{
@@ -55,19 +54,19 @@ namespace Typography.Contours
 
 
 
-    public class GlyphLine : GlyphPart
+    public class Line : ContourPart
     {
 
         public float x1;
         public float y1;
 
-        public GlyphLine(float x0, float y0, float x1, float y1)
+        public Line(float x0, float y0, float x1, float y1)
         {
-            this.FirstPoint = new Vector2(x0, y0);
+            this.FirstPoint = new Vector2f(x0, y0);
             this.x1 = x1;
             this.y1 = y1;
         }
-        public GlyphLine(GlyphPart prevPart, float x1, float y1)
+        public Line(ContourPart prevPart, float x1, float y1)
         {
             //this.x0 = x0;
             //this.y0 = y0;
@@ -75,21 +74,21 @@ namespace Typography.Contours
             this.x1 = x1;
             this.y1 = y1;
         }
-        public override Vector2 GetLastPoint()
+        public override Vector2f GetLastPoint()
         {
-            return new Vector2(x1, y1);
+            return new Vector2f(x1, y1);
         }
-        internal override void Flatten(GlyphPartFlattener flattener)
+        internal override void Flatten(PartFlattener flattener)
         {
 #if DEBUG
             flattener.dbugSetCurrentOwnerPart(this);
 #endif
             flattener.GeneratePointsFromLine(
                 this.FirstPoint,
-                new Vector2(x1, y1));
+                new Vector2f(x1, y1));
         }
 
-        public override GlyphPartKind Kind { get { return GlyphPartKind.Line; } }
+        public override PartKind Kind { get { return PartKind.Line; } }
 
 #if DEBUG
         public override string ToString()
@@ -98,18 +97,18 @@ namespace Typography.Contours
         }
 #endif
     }
-    public class GlyphCurve3 : GlyphPart
+    public class Curve3 : ContourPart
     {
         public float x1, y1, x2, y2;
-        public GlyphCurve3(float x0, float y0, float x1, float y1, float x2, float y2)
+        public Curve3(float x0, float y0, float x1, float y1, float x2, float y2)
         {
-            this.FirstPoint = new Vector2(x0, y0);
+            this.FirstPoint = new Vector2f(x0, y0);
             this.x1 = x1;
             this.y1 = y1;
             this.x2 = x2;
             this.y2 = y2;
         }
-        public GlyphCurve3(GlyphPart prevPart, float x1, float y1, float x2, float y2)
+        public Curve3(ContourPart prevPart, float x1, float y1, float x2, float y2)
         {
             this.PrevPart = prevPart;
             //this.x0 = x0;
@@ -119,11 +118,11 @@ namespace Typography.Contours
             this.x2 = x2;
             this.y2 = y2;
         }
-        public override Vector2 GetLastPoint()
+        public override Vector2f GetLastPoint()
         {
-            return new Vector2(x2, y2);
+            return new Vector2f(x2, y2);
         }
-        internal override void Flatten(GlyphPartFlattener flattener)
+        internal override void Flatten(PartFlattener flattener)
         {
 #if DEBUG
             flattener.dbugSetCurrentOwnerPart(this);
@@ -131,11 +130,11 @@ namespace Typography.Contours
             flattener.GeneratePointsFromCurve3(
                 flattener.NSteps,
                 this.FirstPoint, //first
-                new Vector2(x2, y2), //end
-                new Vector2(x1, y1)); //control1
+                new Vector2f(x2, y2), //end
+                new Vector2f(x1, y1)); //control1
         }
 
-        public override GlyphPartKind Kind { get { return GlyphPartKind.Curve3; } }
+        public override PartKind Kind { get { return PartKind.Curve3; } }
 #if DEBUG
         public override string ToString()
         {
@@ -143,15 +142,15 @@ namespace Typography.Contours
         }
 #endif
     }
-    public class GlyphCurve4 : GlyphPart
+    public class Curve4 : ContourPart
     {
         public float x1, y1, x2, y2, x3, y3;
 
-        public GlyphCurve4(float x0, float y0, float x1, float y1,
+        public Curve4(float x0, float y0, float x1, float y1,
             float x2, float y2,
             float x3, float y3)
         {
-            this.FirstPoint = new Vector2(x0, y0);
+            this.FirstPoint = new Vector2f(x0, y0);
             this.x1 = x1;
             this.y1 = y1;
             this.x2 = x2;
@@ -159,7 +158,7 @@ namespace Typography.Contours
             this.x3 = x3;
             this.y3 = y3;
         }
-        public GlyphCurve4(GlyphPart prevPart, float x1, float y1,
+        public Curve4(ContourPart prevPart, float x1, float y1,
          float x2, float y2,
          float x3, float y3)
         {
@@ -173,11 +172,11 @@ namespace Typography.Contours
             this.x3 = x3;
             this.y3 = y3;
         }
-        public override Vector2 GetLastPoint()
+        public override Vector2f GetLastPoint()
         {
-            return new Vector2(x3, y3);
+            return new Vector2f(x3, y3);
         }
-        internal override void Flatten(GlyphPartFlattener flattener)
+        internal override void Flatten(PartFlattener flattener)
         {
 #if DEBUG
             flattener.dbugSetCurrentOwnerPart(this);
@@ -185,13 +184,13 @@ namespace Typography.Contours
             flattener.GeneratePointsFromCurve4(
                 flattener.NSteps,
                 this.FirstPoint,    //first
-                new Vector2(x3, y3), //end
-                new Vector2(x1, y1), //control1
-                new Vector2(x2, y2) //control2
+                new Vector2f(x3, y3), //end
+                new Vector2f(x1, y1), //control1
+                new Vector2f(x2, y2) //control2
                 );
         }
 
-        public override GlyphPartKind Kind { get { return GlyphPartKind.Curve4; } }
+        public override PartKind Kind { get { return PartKind.Curve4; } }
 #if DEBUG
         public override string ToString()
         {

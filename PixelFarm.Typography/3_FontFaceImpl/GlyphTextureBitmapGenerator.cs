@@ -1,6 +1,7 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
+using PixelFarm.Contours;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
@@ -142,8 +143,9 @@ namespace PixelFarm.Drawing.Fonts
                     //create picture with unscaled version set scale=-1
                     //(we will create glyph contours and analyze them)
                     builder.BuildFromGlyphIndex(gindex, -1);
-                    var glyphToContour = new GlyphContourBuilder();
-                    builder.ReadShapes(glyphToContour);
+                    var glyphToContour = new ContourBuilder();
+                    builder.ReadShapes(new GlyphContourBuilder2(glyphToContour));
+
                     //msdfgen with  scale the glyph to specific shapescale
                     //msdfGenParams.shapeScale = 1f / 64; //as original
                     msdfGenParams.shapeScale = pxscale;

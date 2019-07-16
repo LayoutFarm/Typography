@@ -33,7 +33,7 @@
 
 
 
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
     public struct Rectangle
     {

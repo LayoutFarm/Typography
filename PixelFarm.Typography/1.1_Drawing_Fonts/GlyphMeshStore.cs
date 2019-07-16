@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using PixelFarm.Drawing;
 using PixelFarm.Drawing.Fonts;
-
+using PixelFarm.Contours;
 using Typography.OpenFont;
 
 namespace Typography.Contours
@@ -25,7 +25,7 @@ namespace Typography.Contours
 
         class GlyphMeshData
         {
-            public GlyphDynamicOutline dynamicOutline;
+            public DynamicOutline dynamicOutline;
             public VertexStore vxsStore;
             public float avgXOffsetToFit;
             public Bounds orgBounds;
@@ -127,7 +127,7 @@ namespace Typography.Contours
                 //if not found then create new glyph vxs and cache it
                 _currentGlyphBuilder.SetHintTechnique(_currentHintTech);
                 _currentGlyphBuilder.BuildFromGlyphIndex(glyphIndex, _currentFontSizeInPoints);
-                GlyphDynamicOutline dynamicOutline = _currentGlyphBuilder.LatestGlyphFitOutline;
+                DynamicOutline dynamicOutline = _currentGlyphBuilder.LatestGlyphFitOutline;
                 //-----------------------------------  
                 glyphMeshData = new GlyphMeshData();
 
@@ -135,7 +135,10 @@ namespace Typography.Contours
                 {
                     //has dynamic outline data
                     glyphMeshData.avgXOffsetToFit = dynamicOutline.AvgXFitOffset;
-                    glyphMeshData.orgBounds = dynamicOutline.OriginalGlyphControlBounds;
+                    glyphMeshData.orgBounds = new Bounds(
+                        (short)dynamicOutline.MinX, (short)dynamicOutline.MinY,
+                        (short)dynamicOutline.MaxX, (short)dynamicOutline.MaxY);
+
                     glyphMeshData.dynamicOutline = dynamicOutline;
                 }
                 _hintGlyphCollection.RegisterCachedGlyph(glyphIndex, glyphMeshData);
@@ -172,10 +175,12 @@ namespace Typography.Contours
                 //build vxs
                 _tovxs.Reset();
                 float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_currentFontSizeInPoints);
-                GlyphDynamicOutline dynamicOutline = glyphMeshData.dynamicOutline;
+                DynamicOutline dynamicOutline = glyphMeshData.dynamicOutline;
                 if (dynamicOutline != null)
-                {
-                    dynamicOutline.GenerateOutput(_tovxs, pxscale);
+                {                    
+                    
+                    Typography.Contours.ContourBuilder3 cntBuilder = new ContourBuilder3(_tovxs);
+                    dynamicOutline.GenerateOutput(cntBuilder, pxscale);
 
                     //version 3
 

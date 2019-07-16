@@ -7,16 +7,14 @@
  * Contributions by Georg W�chter.
  */
 #endregion
-
-using System.Numerics;
-
-namespace Typography.Contours
+using PixelFarm.VectorMath;
+namespace PixelFarm.Contours
 {
-    static class Vector2Extensions
+    static class Vector2fExtensions
     {
-        public static Vector2 GetPerpendicularRight(this Vector2 v)
+        public static Vector2f GetPerpendicularRight(this Vector2f v)
         {
-            return new Vector2(v.Y, -v.X);
+            return new Vector2f(v.Y, -v.X);
         }
     }
 
@@ -32,19 +30,19 @@ namespace Typography.Contours
         /// <summary>
         /// Start anchor point.
         /// </summary>
-        public Vector2 StartAnchor;
+        public Vector2f StartAnchor;
         /// <summary>
         /// End anchor point.
         /// </summary>
-        public Vector2 EndAnchor;
+        public Vector2f EndAnchor;
         /// <summary>
         /// First control point, controls the direction of the curve start.
         /// </summary>
-        public Vector2 FirstControlPoint;
+        public Vector2f FirstControlPoint;
         /// <summary>
         /// Second control point, controls the direction of the curve end.
         /// </summary>
-        public Vector2 SecondControlPoint;
+        public Vector2f SecondControlPoint;
         /// <summary>
         /// Gets or sets the parallel value.
         /// </summary>
@@ -64,7 +62,7 @@ namespace Typography.Contours
         /// <param name="endAnchor">The end anchor point.</param>
         /// <param name="firstControlPoint">The first control point.</param>
         /// <param name="secondControlPoint">The second control point.</param>
-        public BezierCurveCubic(Vector2 startAnchor, Vector2 endAnchor, Vector2 firstControlPoint, Vector2 secondControlPoint)
+        public BezierCurveCubic(Vector2f startAnchor, Vector2f endAnchor, Vector2f firstControlPoint, Vector2f secondControlPoint)
         {
             this.StartAnchor = startAnchor;
             this.EndAnchor = endAnchor;
@@ -81,7 +79,7 @@ namespace Typography.Contours
         /// <param name="endAnchor">The end anchor point.</param>
         /// <param name="firstControlPoint">The first control point.</param>
         /// <param name="secondControlPoint">The second control point.</param>
-        public BezierCurveCubic(float parallel, Vector2 startAnchor, Vector2 endAnchor, Vector2 firstControlPoint, Vector2 secondControlPoint)
+        public BezierCurveCubic(float parallel, Vector2f startAnchor, Vector2f endAnchor, Vector2f firstControlPoint, Vector2f secondControlPoint)
         {
             this.Parallel = parallel;
             this.StartAnchor = startAnchor;
@@ -99,9 +97,9 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="t">The t value, between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public Vector2 CalculatePoint(float t)
+        public Vector2f CalculatePoint(float t)
         {
-            Vector2 r = new Vector2();
+            Vector2f r = new Vector2f();
             float c = 1.0f - t;
             r.X = (StartAnchor.X * c * c * c) + (FirstControlPoint.X * 3 * t * c * c) + (SecondControlPoint.X * 3 * t * t * c)
                 + EndAnchor.X * t * t * t;
@@ -109,12 +107,12 @@ namespace Typography.Contours
                 + EndAnchor.Y * t * t * t;
             if (Parallel == 0.0f)
                 return r;
-            Vector2 perpendicular = new Vector2();
+            Vector2f perpendicular = new Vector2f();
             if (t == 0.0f)
                 perpendicular = FirstControlPoint - StartAnchor;
             else
                 perpendicular = r - CalculatePointOfDerivative(t);
-            return r + Vector2.Normalize(perpendicular).GetPerpendicularRight() * Parallel;
+            return r + Vector2f.Normalize(perpendicular).GetPerpendicularRight() * Parallel;
         }
 
         /// <summary>
@@ -122,9 +120,9 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="t">The t, value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        private Vector2 CalculatePointOfDerivative(float t)
+        private Vector2f CalculatePointOfDerivative(float t)
         {
-            Vector2 r = new Vector2();
+            Vector2f r = new Vector2f();
             float c = 1.0f - t;
             r.X = (c * c * StartAnchor.X) + (2 * t * c * FirstControlPoint.X) + (t * t * SecondControlPoint.X);
             r.Y = (c * c * StartAnchor.Y) + (2 * t * c * FirstControlPoint.Y) + (t * t * SecondControlPoint.Y);
@@ -141,10 +139,10 @@ namespace Typography.Contours
         //public float CalculateLength(float precision)
         //{
         //    double length = 0.0f;
-        //    Vector2 old = CalculatePoint(0.0f);
+        //    Vector2f old = CalculatePoint(0.0f);
         //    for (float i = precision; i < (1.0f + precision); i += precision)
         //    {
-        //        Vector2 n = CalculatePoint(i);
+        //        Vector2f n = CalculatePoint(i);
         //        length += (n - old).Length;
         //        old = n;
         //    }
@@ -166,15 +164,15 @@ namespace Typography.Contours
         /// <summary>
         /// Start anchor point.
         /// </summary>
-        public Vector2 StartAnchor;
+        public Vector2f StartAnchor;
         /// <summary>
         /// End anchor point.
         /// </summary>
-        public Vector2 EndAnchor;
+        public Vector2f EndAnchor;
         /// <summary>
         /// Control point, controls the direction of both endings of the curve.
         /// </summary>
-        public Vector2 ControlPoint;
+        public Vector2f ControlPoint;
         /// <summary>
         /// The parallel value.
         /// </summary>
@@ -193,7 +191,7 @@ namespace Typography.Contours
         /// <param name="startAnchor">The start anchor.</param>
         /// <param name="endAnchor">The end anchor.</param>
         /// <param name="controlPoint">The control point.</param>
-        public BezierCurveQuadric(Vector2 startAnchor, Vector2 endAnchor, Vector2 controlPoint)
+        public BezierCurveQuadric(Vector2f startAnchor, Vector2f endAnchor, Vector2f controlPoint)
         {
             this.StartAnchor = startAnchor;
             this.EndAnchor = endAnchor;
@@ -208,7 +206,7 @@ namespace Typography.Contours
         /// <param name="startAnchor">The start anchor.</param>
         /// <param name="endAnchor">The end anchor.</param>
         /// <param name="controlPoint">The control point.</param>
-        public BezierCurveQuadric(float parallel, Vector2 startAnchor, Vector2 endAnchor, Vector2 controlPoint)
+        public BezierCurveQuadric(float parallel, Vector2f startAnchor, Vector2f endAnchor, Vector2f controlPoint)
         {
             this.Parallel = parallel;
             this.StartAnchor = startAnchor;
@@ -225,20 +223,20 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="t">The t value, between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public Vector2 CalculatePoint(float t)
+        public Vector2f CalculatePoint(float t)
         {
-            Vector2 r = new Vector2();
+            Vector2f r = new Vector2f();
             float c = 1.0f - t;
             r.X = (c * c * StartAnchor.X) + (2 * t * c * ControlPoint.X) + (t * t * EndAnchor.X);
             r.Y = (c * c * StartAnchor.Y) + (2 * t * c * ControlPoint.Y) + (t * t * EndAnchor.Y);
             if (Parallel == 0.0f)
                 return r;
-            Vector2 perpendicular = new Vector2();
+            Vector2f perpendicular = new Vector2f();
             if (t == 0.0f)
                 perpendicular = ControlPoint - StartAnchor;
             else
                 perpendicular = r - CalculatePointOfDerivative(t);
-            return r + Vector2.Normalize(perpendicular).GetPerpendicularRight() * Parallel;
+            return r + Vector2f.Normalize(perpendicular).GetPerpendicularRight() * Parallel;
         }
 
         /// <summary>
@@ -246,9 +244,9 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="t">The t, value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        private Vector2 CalculatePointOfDerivative(float t)
+        private Vector2f CalculatePointOfDerivative(float t)
         {
-            Vector2 r = new Vector2();
+            Vector2f r = new Vector2f();
             r.X = (1.0f - t) * StartAnchor.X + t * ControlPoint.X;
             r.Y = (1.0f - t) * StartAnchor.Y + t * ControlPoint.Y;
             return r;
@@ -264,10 +262,10 @@ namespace Typography.Contours
         public float CalculateLength(float precision)
         {
             double length = 0.0f;
-            Vector2 old = CalculatePoint(0.0f);
+            Vector2f old = CalculatePoint(0.0f);
             for (float i = precision; i < (1.0f + precision); i += precision)
             {
-                Vector2 n = CalculatePoint(i);
+                Vector2f n = CalculatePoint(i);
                 length += (n - old).Length();
                 old = n;
             }

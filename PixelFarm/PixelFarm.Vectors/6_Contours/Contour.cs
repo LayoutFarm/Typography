@@ -2,31 +2,30 @@
 using System;
 using System.Collections.Generic;
 
-using System.Numerics;
+using PixelFarm.VectorMath;
 
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
 
-    public class GlyphContour
+    public class Contour
     {
-
-        public List<GlyphPart> parts = new List<GlyphPart>();
-        internal List<GlyphPoint> flattenPoints; //original flatten points 
+        public List<ContourPart> parts = new List<ContourPart>();
+        public List<Vertex> flattenPoints; //original flatten points 
         List<OutsideEdgeLine> _edges;
         bool _analyzed;
         bool _analyzedClockDirection;
         bool _isClockwise;
-        public GlyphContour()
+        public Contour()
         {
         }
 
-        public void AddPart(GlyphPart part)
+        public void AddPart(ContourPart part)
         {
             parts.Add(part);
         }
 
 
-        internal void Flatten(GlyphPartFlattener flattener)
+        public void Flatten(PartFlattener flattener)
         {
             //flatten once
             if (_analyzed) return;
@@ -34,8 +33,8 @@ namespace Typography.Contours
             //-------------------------------
             int j = parts.Count;
             //---------------
-            List<GlyphPoint> prevResult = flattener.Result;
-            List<GlyphPoint> tmpFlattenPoints = flattenPoints = flattener.Result = new List<GlyphPoint>();
+            List<Vertex> prevResult = flattener.Result;
+            List<Vertex> tmpFlattenPoints = flattenPoints = flattener.Result = new List<Vertex>();
             //start ...
             for (int i = 0; i < j; ++i)
             {
@@ -45,7 +44,7 @@ namespace Typography.Contours
 
             //check duplicated the first point and last point
             int pointCount = tmpFlattenPoints.Count;
-            if (GlyphPoint.SameCoordAs(tmpFlattenPoints[pointCount - 1], tmpFlattenPoints[0]))
+            if (Vertex.SameCoordAs(tmpFlattenPoints[pointCount - 1], tmpFlattenPoints[0]))
             {
                 //check if the last point is the same value as the first 
                 //if yes => remove the last one
@@ -71,7 +70,7 @@ namespace Typography.Contours
                 return _isClockwise;
             }
 
-            List<GlyphPoint> f_points = this.flattenPoints;
+            List<Vertex> f_points = this.flattenPoints;
             if (f_points == null)
             {
                 throw new NotSupportedException();
@@ -97,15 +96,15 @@ namespace Typography.Contours
 
                 for (int i = 1; i < j; ++i)
                 {
-                    GlyphPoint p0 = f_points[i - 1];
-                    GlyphPoint p1 = f_points[i];
+                    Vertex p0 = f_points[i - 1];
+                    Vertex p1 = f_points[i];
                     total += (p1.OX - p0.OX) * (p1.OY + p0.OY);
 
                 }
                 //the last one
                 {
-                    GlyphPoint p0 = f_points[j - 1];
-                    GlyphPoint p1 = f_points[0];
+                    Vertex p0 = f_points[j - 1];
+                    Vertex p1 = f_points[0];
 
                     total += (p1.OX - p0.OX) * (p1.OY + p0.OY);
                 }
@@ -117,7 +116,7 @@ namespace Typography.Contours
         internal void CreateGlyphEdges()
         {
             int lim = flattenPoints.Count - 1;
-            GlyphPoint p = null, q = null;
+            Vertex p = null, q = null;
             OutsideEdgeLine edgeLine = null;
             _edges = new List<OutsideEdgeLine>();
             //
@@ -184,7 +183,7 @@ namespace Typography.Contours
         {
             for (int i = flattenPoints.Count - 1; i >= 0; --i)
             {
-                GlyphPoint p = flattenPoints[i];
+                Vertex p = flattenPoints[i];
                 MyMath.FindMinMax(ref minX, ref maxX, p.X);
                 MyMath.FindMinMax(ref minY, ref maxY, p.Y);
             }
@@ -194,15 +193,15 @@ namespace Typography.Contours
         /// update dynamic cutpoint of 2 adjacent edges
         /// </summary>
         /// <param name="p"></param>
-        static void UpdateNewEdgeCut(GlyphPoint p)
+        static void UpdateNewEdgeCut(Vertex p)
         {
             OutsideEdgeLine e0 = p.E0;
             OutsideEdgeLine e1 = p.E1;
 
-            Vector2 tmp_e0_q = e0._newDynamicMidPoint + e0.GetOriginalEdgeVector();
-            Vector2 tmp_e1_p = e1._newDynamicMidPoint - e1.GetOriginalEdgeVector();
+            Vector2f tmp_e0_q = e0._newDynamicMidPoint + e0.GetOriginalEdgeVector();
+            Vector2f tmp_e1_p = e1._newDynamicMidPoint - e1.GetOriginalEdgeVector();
 
-            Vector2 cutpoint;
+            Vector2f cutpoint;
             if (MyMath.FindCutPoint(e0._newDynamicMidPoint, tmp_e0_q, e1._newDynamicMidPoint, tmp_e1_p, out cutpoint))
             {
                 p.SetNewXY(cutpoint.X, cutpoint.Y);

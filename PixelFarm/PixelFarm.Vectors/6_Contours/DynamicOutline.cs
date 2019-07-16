@@ -1,15 +1,14 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont;
 
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
 
-    public class GlyphDynamicOutline
+    public class DynamicOutline
     {
 
-        internal List<GlyphContour> _contours;
+        internal List<Contour> _contours;
         List<CentroidLine> _allCentroidLines;
 
         /// <summary>
@@ -26,7 +25,7 @@ namespace Typography.Contours
         float _avg_x_fitOffset = 0;
         BoneGroupingHelper _groupingHelper;
         //
-        internal GlyphDynamicOutline(GlyphIntermediateOutline intermediateOutline)
+        public DynamicOutline(IntermediateOutline intermediateOutline)
         {
 
             //setup default values
@@ -49,17 +48,17 @@ namespace Typography.Contours
             CollectAllCentroidLines(intermediateOutline.GetCentroidLineHubs());
 
         }
-        private GlyphDynamicOutline()
+        private DynamicOutline()
         {
             //for empty dynamic outline
 
         }
-        internal static GlyphDynamicOutline CreateBlankDynamicOutline()
+        public static DynamicOutline CreateBlankDynamicOutline()
         {
-            return new GlyphDynamicOutline();
+            return new DynamicOutline();
         }
 
-        internal List<GlyphContour> GetContours() => _contours;
+        public List<Contour> GetContours() => _contours;
         /// <summary>
         ///classify bone group by gridbox(w,h) 
         /// </summary>
@@ -101,7 +100,7 @@ namespace Typography.Contours
             if ((_offsetFromMasterOutline = offsetFromMasterOutline) != 0)
             {
                 //if 0, new other action
-                List<GlyphContour> cnts = _contours;
+                List<Contour> cnts = _contours;
                 for (int i = cnts.Count - 1; i >= 0; --i)
                 {
                     cnts[i].ApplyNewEdgeOffsetFromMasterOutline(offsetFromMasterOutline);
@@ -125,10 +124,23 @@ namespace Typography.Contours
         /// </summary>
         public int GridBoxHeight { get; private set; }
 
-        /// <summary>
-        /// external glyph bounds 
-        /// </summary>
-        public Bounds OriginalGlyphControlBounds { get; set; }
+        ///// <summary>
+        ///// external glyph bounds 
+        ///// </summary>
+        //public Bounds OriginalGlyphControlBounds { get; set; }
+
+
+        public int MinX { get; private set; }
+        public int MinY { get; private set; }
+        public int MaxX { get; private set; }
+        public int MaxY { get; private set; }
+        public void SetOriginalGlyphControlBounds(int minX, int minY, int maxX, int maxY)
+        {
+            MinX = minX;
+            MinY = minY;
+            MaxX = maxX;
+            MaxY = maxY;
+        }
         /// <summary>
         /// original glyph advance width
         /// </summary>
@@ -139,7 +151,7 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="tx"></param>
         /// <param name="pxScale"></param>
-        public void GenerateOutput(IGlyphTranslator tx, float pxScale)
+        public void GenerateOutput(IContourBuilder tx, float pxScale)
         {
             if (_contours == null) return; //blank
 #if DEBUG
@@ -172,7 +184,7 @@ namespace Typography.Contours
 
             if (tx != null)
             {
-                List<GlyphContour> contours = _contours;
+                List<Contour> contours = _contours;
                 int j = contours.Count;
                 tx.BeginRead(j);
                 for (int i = 0; i < j; ++i)
@@ -253,7 +265,7 @@ namespace Typography.Contours
             //clear all prev adjust value
             for (int i = _contours.Count - 1; i >= 0; --i)
             {
-                List<GlyphPoint> pnts = _contours[i].flattenPoints;
+                List<Vertex> pnts = _contours[i].flattenPoints;
                 for (int m = pnts.Count - 1; m >= 0; --m)
                 {
                     pnts[m].ResetFitAdjustValues();
@@ -377,14 +389,17 @@ namespace Typography.Contours
                 _allCentroidLines.AddRange(lineHubs[i].GetAllCentroidLines().Values);
             }
         }
-        void GenerateContourOutput(IGlyphTranslator tx, GlyphContour contour)
+        void GenerateContourOutput(IContourBuilder tx, Contour contour)
         {
 
-            List<GlyphPoint> points = contour.flattenPoints;
+            List<Vertex> points = contour.flattenPoints;
             int j = points.Count;
             if (j == 0) return;
             //------------------------------------------------- 
-            Bounds controlBounds = this.OriginalGlyphControlBounds;
+            //Bounds controlBounds = this.OriginalGlyphControlBounds;
+
+
+
             //walk along the edge in the contour to generate new edge output
             float pxscale = _pxScale;
 
@@ -440,7 +455,7 @@ namespace Typography.Contours
         public static bool dbugUseHorizontalFitValue { get; set; }
         public static bool dbugTestNewGridFitting { get; set; }
         public static int dbugGridHeight = 50;
-        internal List<GlyphTriangle> dbugGetGlyphTriangles()
+        internal List<Triangle> dbugGetGlyphTriangles()
         {
             return _dbugTempIntermediateOutline.dbugGetTriangles();
         }
@@ -448,7 +463,7 @@ namespace Typography.Contours
         {
             return _dbugTempIntermediateOutline.GetCentroidLineHubs();
         }
-        GlyphIntermediateOutline _dbugTempIntermediateOutline;
+        IntermediateOutline _dbugTempIntermediateOutline;
         public bool dbugDrawRegeneratedOutlines { get; set; }
 #endif
 

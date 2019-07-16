@@ -8,6 +8,7 @@ using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
+using PixelFarm.Contours;
 
 using Typography.OpenFont;
 using Typography.TextLayout;
@@ -138,9 +139,9 @@ namespace SampleWinForms
 
             //test print 3 lines
 #if DEBUG
-            GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-            GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-            GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+            DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+            DynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+            DynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
 
@@ -300,9 +301,9 @@ namespace SampleWinForms
 
                         //test print 3 lines
 #if DEBUG
-                        GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-                        GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-                        GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+                        DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+                        DynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+                        DynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
@@ -389,7 +390,7 @@ namespace SampleWinForms
             _debugGlyphVisualizer.DrawPerpendicularLine = _contourAnalysisOpts.DrawPerpendicularLine;
             _debugGlyphVisualizer.WalkCentroidBone = _contourAnalysisOpts.DrawCentroidBone;
             _debugGlyphVisualizer.WalkGlyphBone = _contourAnalysisOpts.DrawGlyphBone;
-            
+
             _debugGlyphVisualizer.GlyphEdgeOffset = _contourAnalysisOpts.EdgeOffset;
 
             _debugGlyphVisualizer.DrawDynamicOutline = _contourAnalysisOpts.DynamicOutline;
@@ -397,9 +398,9 @@ namespace SampleWinForms
             _debugGlyphVisualizer.DrawGlyphPoint = _contourAnalysisOpts.DrawGlyphPoint;
 
 #if DEBUG
-            GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-            GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-            GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+            DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+            DynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+            DynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
 
@@ -436,10 +437,10 @@ namespace SampleWinForms
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
-            var glyphToContour = new GlyphContourBuilder();
+            var glyphToContour = new ContourBuilder();
             var msdfGenPars = new MsdfGenParams();
 
-            builder.ReadShapes(glyphToContour);
+            builder.ReadShapes(new GlyphContourBuilder2(glyphToContour));
             //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
             MsdfGenParams genParams = new MsdfGenParams();
             GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);

@@ -1,24 +1,24 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
-using System.Numerics;
+using PixelFarm.VectorMath;
 
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
 
     /// <summary>
     /// link between  (GlyphBoneJoint and Joint) or (GlyphBoneJoint and tipEdge)
     /// </summary>
-    public class GlyphBone
+    public class Bone
     {
-        public readonly GlyphBoneJoint JointA;
-        public readonly GlyphBoneJoint JointB;
+        public readonly Joint JointA;
+        public readonly Joint JointB;
         public readonly EdgeLine TipEdge;
         double _len;
 #if DEBUG 
         static int dbugTotalId;
         public readonly int dbugId = dbugTotalId++;
 #endif
-        public GlyphBone(GlyphBoneJoint a, GlyphBoneJoint b)
+        public Bone(Joint a, Joint b)
         {
 #if DEBUG 
             if (a == b)
@@ -29,22 +29,22 @@ namespace Typography.Contours
 
             JointA = a;
             JointB = b;
-            Vector2 bpos = b.OriginalJointPos;
+            Vector2f bpos = b.OriginalJointPos;
             _len = Math.Sqrt(a.CalculateSqrDistance(bpos));
             EvaluateSlope();
 
         }
-        public GlyphBone(GlyphBoneJoint a, EdgeLine tipEdge)
+        public Bone(Joint a, EdgeLine tipEdge)
         {
 
             JointA = a;
             TipEdge = tipEdge;
-            Vector2 midPoint = tipEdge.GetMidPoint();
+            Vector2f midPoint = tipEdge.GetMidPoint();
             _len = Math.Sqrt(a.CalculateSqrDistance(midPoint));
             EvaluateSlope();
 
         }
-        public Vector2 GetVector()
+        public Vector2f GetVector()
         {
             if (this.JointB != null)
             {
@@ -95,7 +95,7 @@ namespace Typography.Contours
                 return (JointA.DynamicFitPos.Y + TipEdge.GetMidPoint().Y) / 2;
             }
         }
-        void EvaluateSlope(Vector2 p, Vector2 q)
+        void EvaluateSlope(Vector2f p, Vector2f q)
         {
 
             double x0 = p.X;
@@ -150,7 +150,7 @@ namespace Typography.Contours
     {
 
         //utils for glyph bones
-        public static Vector2 GetMidPoint(this GlyphBone bone)
+        public static Vector2f GetMidPoint(this Bone bone)
         {
             if (bone.JointB != null)
             {
@@ -158,12 +158,12 @@ namespace Typography.Contours
             }
             else if (bone.TipEdge != null)
             {
-                Vector2 edge = bone.TipEdge.GetMidPoint();
+                Vector2f edge = bone.TipEdge.GetMidPoint();
                 return (edge + bone.JointA.OriginalJointPos) / 2;
             }
             else
             {
-                return Vector2.Zero;
+                return Vector2f.Zero;
             }
         }
 
@@ -174,11 +174,11 @@ namespace Typography.Contours
         /// <param name="bone"></param>
         /// <param name="outsideEdges"></param>
         /// <returns></returns>
-        public static void CollectOutsideEdge(this GlyphBone bone, System.Collections.Generic.List<EdgeLine> outsideEdges)
+        public static void CollectOutsideEdge(this Bone bone, System.Collections.Generic.List<EdgeLine> outsideEdges)
         {
             if (bone.JointB != null)
             {
-                GlyphTriangle commonTri = FindCommonTriangle(bone.JointA, bone.JointB);
+                Triangle commonTri = FindCommonTriangle(bone.JointA, bone.JointB);
                 if (commonTri != null)
                 {
                     if (commonTri.e0.IsOutside) { outsideEdges.Add(commonTri.e0); }
@@ -202,7 +202,7 @@ namespace Typography.Contours
                 }
             }
         }
-        static EdgeLine FindAnotherOutsideEdge(GlyphTriangle tri, EdgeLine knownOutsideEdge)
+        static EdgeLine FindAnotherOutsideEdge(Triangle tri, EdgeLine knownOutsideEdge)
         {
             if (tri.e0.IsOutside && tri.e0 != knownOutsideEdge) { return tri.e0; }
             if (tri.e1.IsOutside && tri.e1 != knownOutsideEdge) { return tri.e1; }
@@ -210,11 +210,11 @@ namespace Typography.Contours
             return null;
         }
 
-        static bool ContainsEdge(GlyphTriangle tri, EdgeLine edge)
+        static bool ContainsEdge(Triangle tri, EdgeLine edge)
         {
             return tri.e0 == edge || tri.e1 == edge || tri.e2 == edge;
         }
-        static GlyphTriangle FindCommonTriangle(GlyphBoneJoint a, GlyphBoneJoint b)
+        static Triangle FindCommonTriangle(Joint a, Joint b)
         {
 
             if (a.P_Tri == b.P_Tri || a.P_Tri == b.Q_Tri)

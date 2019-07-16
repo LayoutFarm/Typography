@@ -1,7 +1,8 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
-using System.Numerics;
-namespace Typography.Contours
+using PixelFarm.VectorMath;
+
+namespace PixelFarm.Contours
 {
     public enum LineSlopeKind : byte
     {
@@ -16,11 +17,11 @@ namespace Typography.Contours
     /// </summary>
     public abstract class EdgeLine
     {
-        internal readonly GlyphPoint _glyphPoint_P;
-        internal readonly GlyphPoint _glyphPoint_Q;
-        GlyphTriangle _ownerTriangle;
+        internal readonly Vertex _glyphPoint_P;
+        internal readonly Vertex _glyphPoint_Q;
+        Triangle _ownerTriangle;
 
-        internal EdgeLine(GlyphTriangle ownerTriangle, GlyphPoint p, GlyphPoint q)
+        internal EdgeLine(Triangle ownerTriangle, Vertex p, Vertex q)
         {
             //this canbe inside edge or outside edge
 
@@ -86,19 +87,19 @@ namespace Typography.Contours
 
         public bool IsTip { get; internal set; }
 
-        internal Vector2 GetOriginalEdgeVector()
+        internal Vector2f GetOriginalEdgeVector()
         {
-            return new Vector2(
+            return new Vector2f(
                 Q.OX - _glyphPoint_P.OX,
                 Q.OY - _glyphPoint_P.OY);
         }
 
 
-        public GlyphPoint P => _glyphPoint_P;
-        public GlyphPoint Q => _glyphPoint_Q;
+        public Vertex P => _glyphPoint_P;
+        public Vertex Q => _glyphPoint_Q;
         public LineSlopeKind SlopeKind { get; internal set; }
 
-        internal GlyphTriangle OwnerTriangle => _ownerTriangle;
+        internal Triangle OwnerTriangle => _ownerTriangle;
 
         public abstract bool IsOutside { get; }
         public bool IsInside => !this.IsOutside;
@@ -114,7 +115,7 @@ namespace Typography.Contours
         static readonly double _01degreeToRad = MyMath.DegreesToRadians(1);
 
         internal bool _earlyInsideAnalysis;
-        internal bool ContainsGlyphPoint(GlyphPoint p)
+        internal bool ContainsGlyphPoint(Vertex p)
         {
             return _glyphPoint_P == p || _glyphPoint_Q == p;
         }
@@ -125,7 +126,7 @@ namespace Typography.Contours
         /// <param name="p"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        internal static OutsideEdgeLine FindCommonOutsideEdge(GlyphPoint p, GlyphPoint q)
+        internal static OutsideEdgeLine FindCommonOutsideEdge(Vertex p, Vertex q)
         {
             if (p.E0 == q.E0 ||
                 p.E0 == q.E1)
@@ -153,19 +154,19 @@ namespace Typography.Contours
 
     public class OutsideEdgeLine : EdgeLine
     {
-        internal Vector2 _newDynamicMidPoint;
+        internal Vector2f _newDynamicMidPoint;
         //if this edge is 'OUTSIDE',
         //it have 1-2 control(s) edge (inside)
         EdgeLine _ctrlEdge_P;
         EdgeLine _ctrlEdge_Q;
-        internal OutsideEdgeLine(GlyphTriangle ownerTriangle, GlyphPoint p, GlyphPoint q)
+        internal OutsideEdgeLine(Triangle ownerTriangle, Vertex p, Vertex q)
             : base(ownerTriangle, p, q)
         {
 
             //set back
             p.SetOutsideEdgeUnconfirmEdgeDirection(this);
             q.SetOutsideEdgeUnconfirmEdgeDirection(this);
-            _newDynamicMidPoint = new Vector2((p.OX + q.OX) / 2, (p.OY + q.OY) / 2);
+            _newDynamicMidPoint = new Vector2f((p.OX + q.OX) / 2, (p.OY + q.OY) / 2);
         }
         internal void SetDynamicEdgeOffsetFromMasterOutline(float newEdgeOffsetFromMasterOutline)
         {
@@ -173,11 +174,11 @@ namespace Typography.Contours
             //TODO: refactor here...
             //this is relative len from current edge              
             //origianl vector
-            Vector2 _o_edgeVector = GetOriginalEdgeVector();
+            Vector2f _o_edgeVector = GetOriginalEdgeVector();
             //rotate 90
-            Vector2 _rotate = _o_edgeVector.Rotate(90);
+            Vector2f _rotate = _o_edgeVector.Rotate(90);
             //
-            Vector2 _deltaVector = _rotate.NewLength(newEdgeOffsetFromMasterOutline);
+            Vector2f _deltaVector = _rotate.NewLength(newEdgeOffsetFromMasterOutline);
 
             //new dynamic mid point  
             _newDynamicMidPoint = this.GetMidPoint() + _deltaVector;
@@ -245,8 +246,8 @@ namespace Typography.Contours
     public class InsideEdgeLine : EdgeLine
     {
 
-        internal GlyphBoneJoint inside_joint;
-        internal InsideEdgeLine(GlyphTriangle ownerTriangle, GlyphPoint p, GlyphPoint q)
+        internal Joint inside_joint;
+        internal InsideEdgeLine(Triangle ownerTriangle, Vertex p, Vertex q)
             : base(ownerTriangle, p, q)
         {
         }
@@ -254,9 +255,9 @@ namespace Typography.Contours
     }
     public static class EdgeLineExtensions
     {
-        public static Vector2 GetMidPoint(this EdgeLine line)
+        public static Vector2f GetMidPoint(this EdgeLine line)
         {
-            return new Vector2((float)((line.PX + line.QX) / 2), (float)((line.PY + line.QY) / 2));
+            return new Vector2f((float)((line.PX + line.QX) / 2), (float)((line.PY + line.QY) / 2));
         }
 
         internal static double GetSlopeAngleNoDirection(this EdgeLine line)
@@ -264,7 +265,7 @@ namespace Typography.Contours
             return Math.Abs(Math.Atan2(Math.Abs(line.QY - line.PY), Math.Abs(line.QX - line.PX)));
         }
 
-        internal static bool ContainsTriangle(this EdgeLine edge, GlyphTriangle p)
+        internal static bool ContainsTriangle(this EdgeLine edge, Triangle p)
         {
             return (p.e0 == edge ||
                     p.e1 == edge ||

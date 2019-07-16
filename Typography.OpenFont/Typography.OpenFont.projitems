@@ -86,7 +86,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables\TableEntryCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\TableHeader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\Utils.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\ForNet20.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\Interpreter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidFontException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Typeface.cs" />

@@ -1,19 +1,19 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
     /// <summary>
     /// a link (line) that connects between centroid of 2 GlyphTriangle(p => q)
     /// </summary>
-    struct GlyphCentroidPair
+    public struct CentroidPair
     {
         //this is a temporary object.
         //we crate glyph
         //1 centroid pair has 1 GlyphBoneJoint
 
-        internal readonly GlyphTriangle p, q;
+        internal readonly Triangle p, q;
 
-        internal GlyphCentroidPair(GlyphTriangle p, GlyphTriangle q)
+        internal CentroidPair(Triangle p, Triangle q)
         {
 
             //each triangle has 1 centroid point
@@ -28,7 +28,7 @@ namespace Typography.Contours
         /// <summary>
         /// add information about edges to each triangle and create BoneJoint and Tip
         /// </summary>
-        public GlyphBoneJoint AnalyzeEdgesAndCreateBoneJoint()
+        public Joint AnalyzeEdgesAndCreateBoneJoint()
         {
 
 #if DEBUG
@@ -45,12 +45,12 @@ namespace Typography.Contours
             //....
             //pick up a edge of p and compare to all edge of q
             //do until complete
-            GlyphBoneJoint boneJoint = null;
+            Joint boneJoint = null;
             InsideEdgeLine p_edge, q_edge;
             if (FindCommonInsideEdges(p, q, out p_edge, out q_edge))
             {
                 //create joint 
-                boneJoint = new GlyphBoneJoint(p_edge, q_edge);
+                boneJoint = new Joint(p_edge, q_edge);
                 double slopeAngle = CalculateCentroidPairSlopeNoDirection(this);
                 //
                 EdgeLine foundTipEdge = null;
@@ -68,7 +68,7 @@ namespace Typography.Contours
             return boneJoint;
         }
 
-        static bool FindCommonInsideEdges(GlyphTriangle a, GlyphTriangle b, out InsideEdgeLine a_edge, out InsideEdgeLine b_edge)
+        static bool FindCommonInsideEdges(Triangle a, Triangle b, out InsideEdgeLine a_edge, out InsideEdgeLine b_edge)
         {
             //2 contact triangles share GlyphBoneJoint.          
 
@@ -102,7 +102,7 @@ namespace Typography.Contours
             a_edge = b_edge = null;
             return false;
         }
-        static InsideEdgeLine FindCommonInsideEdge(GlyphTriangle a, EdgeLine b_edge)
+        static InsideEdgeLine FindCommonInsideEdge(Triangle a, EdgeLine b_edge)
         {
             //2 contact triangles share GlyphBoneJoint.            
             //compare 3 side of a's edge to b_edge
@@ -116,7 +116,7 @@ namespace Typography.Contours
 
 
         static void ClassifyTriangleEdges(
-            GlyphTriangle triangle,
+            Triangle triangle,
             EdgeLine knownInsideEdge,
             out EdgeLine anotherInsideEdge,
             out EdgeLine outside0,
@@ -183,7 +183,7 @@ namespace Typography.Contours
             }
         }
 
-        static double CalculateCentroidPairSlopeNoDirection(GlyphCentroidPair centroidPair)
+        static double CalculateCentroidPairSlopeNoDirection(CentroidPair centroidPair)
         {
             //calculate centroid pair slope 
             //p
@@ -232,7 +232,7 @@ namespace Typography.Contours
         /// <param name="knownInsideEdge"></param>
         static EdgeLine CreateTipEdgeIfNeed(
           double cent_slopAngle,
-          GlyphTriangle triangle,
+          Triangle triangle,
           EdgeLine knownInsideEdge)
         {
 
@@ -271,8 +271,8 @@ namespace Typography.Contours
             }
             return null;
         }
-         
- 
+
+
         /// <summary>
         /// check if the 2 triangle is matching or not
         /// </summary>
