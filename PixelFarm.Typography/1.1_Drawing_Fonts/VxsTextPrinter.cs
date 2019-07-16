@@ -388,98 +388,97 @@ namespace PixelFarm.Drawing.Fonts
             GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(ref buffSpan, _reqFont);
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
-
     }
 
 
-    public static class TextPrinterHelper
-    {
-        //public static void CopyGlyphPlans(RenderVxFormattedString renderVx, PxScaledGlyphPlanList glyphPlans)
-        //{
-        //    int n = glyphPlans.Count;
-        //    //copy 
-        //    var renderVxGlyphPlans = new RenderVxGlyphPlan[n];
-        //    float acc_x = 0;
-        //    float acc_y = 0;
-        //    float x = 0;
-        //    float y = 0;
-        //    float g_x = 0;
-        //    float g_y = 0;
+    //public static class TextPrinterHelper
+    //{
+    //    //public static void CopyGlyphPlans(RenderVxFormattedString renderVx, PxScaledGlyphPlanList glyphPlans)
+    //    //{
+    //    //    int n = glyphPlans.Count;
+    //    //    //copy 
+    //    //    var renderVxGlyphPlans = new RenderVxGlyphPlan[n];
+    //    //    float acc_x = 0;
+    //    //    float acc_y = 0;
+    //    //    float x = 0;
+    //    //    float y = 0;
+    //    //    float g_x = 0;
+    //    //    float g_y = 0;
 
-        //    for (int i = 0; i < n; ++i)
-        //    {
-        //        PxScaledGlyphPlan glyphPlan = glyphPlans[i];
-
-
-        //        float ngx = acc_x + glyphPlan.OffsetX;
-        //        float ngy = acc_y + glyphPlan.OffsetY;
-        //        //NOTE:
-        //        // -glyphData.TextureXOffset => restore to original pos
-        //        // -glyphData.TextureYOffset => restore to original pos 
-        //        //--------------------------
-        //        g_x = (float)(x + ngx); //ideal x
-        //        g_y = (float)(y + ngy);
+    //    //    for (int i = 0; i < n; ++i)
+    //    //    {
+    //    //        PxScaledGlyphPlan glyphPlan = glyphPlans[i];
 
 
-        //        float g_w = glyphPlan.AdvanceX;
-        //        acc_x += g_w;
-
-        //        //g_x = (float)Math.Round(g_x);
-        //        g_y = (float)Math.Floor(g_y);
-
-
-        //        renderVxGlyphPlans[i] = new RenderVxGlyphPlan(
-        //            glyphPlan.glyphIndex,
-        //            g_x,
-        //            g_y,
-        //            g_w
-        //            );
-        //    }
-        //    renderVx.glyphList = renderVxGlyphPlans;
-        //}
-        //public static void CopyGlyphPlans(RenderVxFormattedString renderVx, GlyphPlanSequence glyphPlans, float scale)
-        //{
-        //    int n = glyphPlans.Count;
-        //    //copy 
-        //    var renderVxGlyphPlans = new RenderVxGlyphPlan[n];
-        //    float acc_x = 0;
-        //    float acc_y = 0;
-        //    float x = 0;
-        //    float y = 0;
-        //    float g_x = 0;
-        //    float g_y = 0;
-
-        //    for (int i = 0; i < n; ++i)
-        //    {
-        //        UnscaledGlyphPlan glyphPlan = glyphPlans[i];
+    //    //        float ngx = acc_x + glyphPlan.OffsetX;
+    //    //        float ngy = acc_y + glyphPlan.OffsetY;
+    //    //        //NOTE:
+    //    //        // -glyphData.TextureXOffset => restore to original pos
+    //    //        // -glyphData.TextureYOffset => restore to original pos 
+    //    //        //--------------------------
+    //    //        g_x = (float)(x + ngx); //ideal x
+    //    //        g_y = (float)(y + ngy);
 
 
-        //        float ngx = acc_x + (float)Math.Round(glyphPlan.OffsetX * scale);
-        //        float ngy = acc_y + (float)Math.Round(glyphPlan.OffsetY * scale);
-        //        //NOTE:
-        //        // -glyphData.TextureXOffset => restore to original pos
-        //        // -glyphData.TextureYOffset => restore to original pos 
-        //        //--------------------------
-        //        g_x = (float)(x + ngx); //ideal x
-        //        g_y = (float)(y + ngy);
+    //    //        float g_w = glyphPlan.AdvanceX;
+    //    //        acc_x += g_w;
+
+    //    //        //g_x = (float)Math.Round(g_x);
+    //    //        g_y = (float)Math.Floor(g_y);
 
 
-        //        float g_w = (float)Math.Round(glyphPlan.AdvanceX * scale);
-        //        acc_x += g_w;
+    //    //        renderVxGlyphPlans[i] = new RenderVxGlyphPlan(
+    //    //            glyphPlan.glyphIndex,
+    //    //            g_x,
+    //    //            g_y,
+    //    //            g_w
+    //    //            );
+    //    //    }
+    //    //    renderVx.glyphList = renderVxGlyphPlans;
+    //    //}
+    //    //public static void CopyGlyphPlans(RenderVxFormattedString renderVx, GlyphPlanSequence glyphPlans, float scale)
+    //    //{
+    //    //    int n = glyphPlans.Count;
+    //    //    //copy 
+    //    //    var renderVxGlyphPlans = new RenderVxGlyphPlan[n];
+    //    //    float acc_x = 0;
+    //    //    float acc_y = 0;
+    //    //    float x = 0;
+    //    //    float y = 0;
+    //    //    float g_x = 0;
+    //    //    float g_y = 0;
 
-        //        //g_x = (float)Math.Round(g_x);
-        //        g_y = (float)Math.Floor(g_y);
+    //    //    for (int i = 0; i < n; ++i)
+    //    //    {
+    //    //        UnscaledGlyphPlan glyphPlan = glyphPlans[i];
 
 
-        //        renderVxGlyphPlans[i] = new RenderVxGlyphPlan(
-        //            glyphPlan.glyphIndex,
-        //            g_x,
-        //            g_y,
-        //            g_w
-        //            );
-        //    }
-        //    renderVx.glyphList = renderVxGlyphPlans;
-        //}
-    }
+    //    //        float ngx = acc_x + (float)Math.Round(glyphPlan.OffsetX * scale);
+    //    //        float ngy = acc_y + (float)Math.Round(glyphPlan.OffsetY * scale);
+    //    //        //NOTE:
+    //    //        // -glyphData.TextureXOffset => restore to original pos
+    //    //        // -glyphData.TextureYOffset => restore to original pos 
+    //    //        //--------------------------
+    //    //        g_x = (float)(x + ngx); //ideal x
+    //    //        g_y = (float)(y + ngy);
+
+
+    //    //        float g_w = (float)Math.Round(glyphPlan.AdvanceX * scale);
+    //    //        acc_x += g_w;
+
+    //    //        //g_x = (float)Math.Round(g_x);
+    //    //        g_y = (float)Math.Floor(g_y);
+
+
+    //    //        renderVxGlyphPlans[i] = new RenderVxGlyphPlan(
+    //    //            glyphPlan.glyphIndex,
+    //    //            g_x,
+    //    //            g_y,
+    //    //            g_w
+    //    //            );
+    //    //    }
+    //    //    renderVx.glyphList = renderVxGlyphPlans;
+    //    //}
+    //}
 
 }

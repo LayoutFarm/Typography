@@ -103,6 +103,4 @@ namespace PixelFarm.Drawing.Fonts
             //RequestFont.SetCacheActualFont(r, a);
         }
     }
-
-
 }

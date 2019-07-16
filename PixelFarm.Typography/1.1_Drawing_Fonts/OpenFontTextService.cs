@@ -14,8 +14,6 @@ using Typography.FontManagement;
 namespace LayoutFarm
 {
 
-
-
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -29,8 +27,6 @@ namespace LayoutFarm
 
         public OpenFontTextService(Typography.OpenFont.ScriptLang scLang = null)
         {
-
-
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
@@ -278,7 +274,6 @@ namespace LayoutFarm
         //
         struct MyLineSegment : ILineSegment
         {
-
             readonly int _startAt;
             readonly int _len;
             internal ScriptLang scriptLang;
@@ -317,7 +312,6 @@ namespace LayoutFarm
             public int dbugStartAt;
             public int dbugLen;
 #endif
-
 
             void IDisposable.Dispose()
             {

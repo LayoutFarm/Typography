@@ -9,7 +9,6 @@ using Typography.Contours;
 
 namespace PixelFarm.Drawing.Fonts
 {
-
     class NOpenFontFace : FontFace
     {
         readonly string _name;

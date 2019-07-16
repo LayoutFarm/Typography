@@ -56,7 +56,6 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void MoveTo(float x0, float y0)
         {
-
             _pw.MoveTo(x0, y0);
         }
 

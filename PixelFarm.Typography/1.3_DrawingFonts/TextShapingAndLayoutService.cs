@@ -7,7 +7,6 @@ namespace PixelFarm.Drawing.Text
 {
     public abstract class TextShapingService
     {
-
         protected abstract void GetGlyphPosImpl(ActualFont actualFont, char[] buffer, int startAt, int len, List<UnscaledGlyphPlan> properGlyphs);
         public static void GetGlyphPos(ActualFont actualFont, char[] buffer, int startAt, int len, List<UnscaledGlyphPlan> properGlyphs)
         {

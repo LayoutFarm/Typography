@@ -11,8 +11,6 @@ using Typography.OpenFont;
 
 namespace Typography.Rendering
 {
-
-
     public delegate U LoadNewBmpDelegate<T, U>(T src);
 
     public class FontBitmapCache<T, U> : IDisposable
