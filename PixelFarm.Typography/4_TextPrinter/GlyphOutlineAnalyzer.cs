@@ -12,13 +12,13 @@ namespace PixelFarm.Contours
     public class GlyphOutlineAnalyzer
     {
         readonly PartFlattener _glyphFlattener = new PartFlattener();
-        readonly ContourBuilder _glyphToContour = new ContourBuilder();
         readonly List<Poly2Tri.Polygon> _waitingHoles = new List<Poly2Tri.Polygon>();
-        readonly Typography.Contours.GlyphContourBuilder2 _glyphContourBuilder2;
+        readonly ContourBuilder _contourBuilder = new ContourBuilder();
+        readonly Typography.Contours.GlyphTranslatorToContourBuilder _glyphTxToContourBuilder;
 
         public GlyphOutlineAnalyzer()
         {
-            _glyphContourBuilder2 = new Typography.Contours.GlyphContourBuilder2(_glyphToContour);
+            _glyphTxToContourBuilder = new Typography.Contours.GlyphTranslatorToContourBuilder(_contourBuilder);
         }
 
 
@@ -34,9 +34,9 @@ namespace PixelFarm.Contours
         {
 
             //1. convert original glyph point to contour
-            _glyphContourBuilder2.Read(glyphPoints, glyphContours);
+            _glyphTxToContourBuilder.Read(glyphPoints, glyphContours);
             //2. get result as list of contour
-            List<Contour> contours = _glyphToContour.GetContours();
+            List<Contour> contours = _contourBuilder.GetContours();
 
             int cnt_count = contours.Count;
             //

@@ -440,7 +440,7 @@ namespace SampleWinForms
             var glyphToContour = new ContourBuilder();
             var msdfGenPars = new MsdfGenParams();
 
-            builder.ReadShapes(new GlyphContourBuilder2(glyphToContour));
+            builder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
             //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
             MsdfGenParams genParams = new MsdfGenParams();
             GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
