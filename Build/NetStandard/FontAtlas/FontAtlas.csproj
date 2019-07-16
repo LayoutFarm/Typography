@@ -21,6 +21,6 @@
 
   <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
 
-  <Import Project="..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
+
 
 </Project>

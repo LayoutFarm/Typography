@@ -144,7 +144,7 @@ namespace PixelFarm.Drawing.Fonts
                     //(we will create glyph contours and analyze them)
                     builder.BuildFromGlyphIndex(gindex, -1);
                     var glyphToContour = new ContourBuilder();
-                    builder.ReadShapes(new GlyphContourBuilder2(glyphToContour));
+                    builder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
 
                     //msdfgen with  scale the glyph to specific shapescale
                     //msdfGenParams.shapeScale = 1f / 64; //as original

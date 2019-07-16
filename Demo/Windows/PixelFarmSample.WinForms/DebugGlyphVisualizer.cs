@@ -36,8 +36,8 @@ namespace SampleWinForms.UI
     class DebugGlyphVisualizer : OutlineWalker
     {
         DebugGlyphVisualizerInfoView _infoView;
-        
-       Typeface _typeface;
+
+        Typeface _typeface;
         float _sizeInPoint;
         GlyphPathBuilder _builder;
 
@@ -46,7 +46,12 @@ namespace SampleWinForms.UI
         HintTechnique _latestHint;
         char _testChar;
 
-        public PixelFarm.Drawing.Painter CanvasPainter { get { return _painter; } set { _painter = value; } }
+        public PixelFarm.Drawing.Painter CanvasPainter
+        {
+            get => _painter;
+            set => _painter = value;
+        }
+
         public void SetFont(Typeface typeface, float sizeInPoint)
         {
             _typeface = typeface;
@@ -161,8 +166,8 @@ namespace SampleWinForms.UI
                 _painter.Draw(vxs);
                 //--------------
                 int markOnVertexNo = _infoView.DebugMarkVertexCommand;
-                double x, y;
-                vxs.GetVertex(markOnVertexNo, out x, out y);
+
+                vxs.GetVertex(markOnVertexNo, out double x, out double y);
                 _painter.FillRect(x, y, 4, 4, PixelFarm.Drawing.Color.Red);
                 //--------------
                 _infoView.ShowFlatternBorderInfo(vxs);
@@ -439,8 +444,7 @@ namespace SampleWinForms.UI
             if (joint.TipEdgeP != null)
             {
                 EdgeLine tipEdge = joint.TipEdgeP;
-                double p_x, p_y, q_x, q_y;
-                tipEdge.dbugGetScaledXY(out p_x, out p_y, out q_x, out q_y, _pxscale);
+                tipEdge.dbugGetScaledXY(out double p_x, out double p_y, out double q_x, out double q_y, _pxscale);
                 //
                 painter.Line(
                    jointPos.X, jointPos.Y,
@@ -458,8 +462,7 @@ namespace SampleWinForms.UI
             if (joint.TipEdgeQ != null)
             {
                 EdgeLine tipEdge = joint.TipEdgeQ;
-                double p_x, p_y, q_x, q_y;
-                tipEdge.dbugGetScaledXY(out p_x, out p_y, out q_x, out q_y, _pxscale);
+                tipEdge.dbugGetScaledXY(out double p_x, out double p_y, out double q_x, out double q_y, _pxscale);
                 //
                 painter.Line(
                    jointPos.X, jointPos.Y,
@@ -549,14 +552,14 @@ namespace SampleWinForms.UI
 
         protected override void OnTriangle(int triangleId, EdgeLine e0, EdgeLine e1, EdgeLine e2, double centroidX, double centroidY)
         {
-           
+
             DrawEdge(_painter, e0);
             DrawEdge(_painter, e1);
             DrawEdge(_painter, e2);
 
             _infoView.ShowTriangles(new GlyphTriangleInfo(triangleId, e0, e1, e2, centroidX, centroidY));
 
-          
+
         }
 
         protected override void OnGlyphEdgeN(EdgeLine e)
@@ -629,203 +632,9 @@ namespace SampleWinForms.UI
                             PixelFarm.Drawing.Color.Magenta);
                 }
             }
-        }
-
-#endif
-
-        static System.Drawing.PointF FindCutPoint(System.Drawing.PointF p0, System.Drawing.PointF p1, System.Drawing.PointF p2, float cutAngle)
-        {
-            //a line from p0 to p1
-            //p2 is any point
-            //return p3 -> cutpoint on p0,p1
-
-            //from line equation
-            //y = mx + b ... (1)
-            //from (1)
-            //b = y- mx ... (2) 
-            //----------------------------------
-            //line1:
-            //y1 = (m1 * x1) + b1 ...(3)            
-            //line2:
-            //y2 = (m2 * x2) + b2 ...(4)
-            //----------------------------------
-            //from (3),
-            //b1 = y1 - (m1 * x1) ...(5)
-            //b2 = y2 - (m2 * x2) ...(6)
-            //----------------------------------
-            //y1diff = p1.Y-p0.Y  ...(7)
-            //x1diff = p1.X-p0.X  ...(8)
-            //
-            //m1 = (y1diff/x1diff) ...(9)
-            //m2 = cutAngle of m1 ...(10)
-            //
-            //replace value (x1,y1) and (x2,y2)
-            //we know b1 and b2         
-            //----------------------------------              
-            //at cutpoint of line1 and line2 => (x1,y1)== (x2,y2)
-            //or find (x,y) where (3)==(4)
-            //---------------------------------- 
-            //at cutpoint, find x
-            // (m1 * x1) + b1 = (m2 * x1) + b2  ...(11), replace x2 with x1
-            // (m1 * x1) - (m2 * x1) = b2 - b1  ...(12)
-            //  x1 * (m1-m2) = b2 - b1          ...(13)
-            //  x1 = (b2-b1)/(m1-m2)            ...(14), now we know x1
-            //---------------------------------- 
-            //at cutpoint, find y
-            //  y1 = (m1 * x1) + b1 ... (15), replace x1 with value from (14)
-            //Ans: (x1,y1)
-            //---------------------------------- 
-
-            double y1diff = p1.Y - p0.Y;
-            double x1diff = p1.X - p0.X;
-
-            if (x1diff == 0)
-            {
-                //90 or 180 degree
-                return new System.Drawing.PointF(p1.X, p2.Y);
-            }
-            //------------------------------
-            //
-            //find slope 
-            double m1 = y1diff / x1diff;
-            //from (2) b = y-mx, and (5)
-            //so ...
-            double b1 = p0.Y - (m1 * p0.X);
-            // 
-            //from (10)
-            //double invert_m = -(1 / slope_m);
-            //double m2 = -1 / m1;   //rotate m1
-            //---------------------
-            double angle = Math.Atan2(y1diff, x1diff); //rad in degree 
-                                                       //double m2 = -1 / m1;
-
-            double m2 = cutAngle == 90 ?
-                //short cut
-                (-1 / m1) :
-                //or 
-                Math.Tan(
-                //radial_angle of original line + radial of cutAngle
-                //return new line slope
-                Math.Atan2(y1diff, x1diff) +
-                DegreesToRadians(cutAngle)); //new m 
-                                             //---------------------
-
-
-            //from (6)
-            double b2 = p2.Y - (m2) * p2.X;
-            //find cut point
-
-            //check if (m1-m2 !=0)
-            double cutx = (b2 - b1) / (m1 - m2); //from  (14)
-            double cuty = (m1 * cutx) + b1;  //from (15)
-            return new System.Drawing.PointF((float)cutx, (float)cuty);
-
-
-            //------
-            //at cutpoint of line1 and line2 => (x1,y1)== (x2,y2)
-            //or find (x,y) where (3)==(4)
-            //-----
-            //if (3)==(4)
-            //(m1 * x1) + b1 = (m2 * x2) + b2;
-            //from given p0 and p1,
-            //now we know m1 and b1, ( from (2),  b1 = y1-(m1*x1) )
-            //and we now m2 since => it is a 90 degree of m1.
-            //and we also know x2, since at the cut point x2 also =x1
-            //now we can find b2...
-            // (m1 * x1) + b1 = (m2 * x1) + b2  ...(5), replace x2 with x1
-            // b2 = (m1 * x1) + b1 - (m2 * x1)  ...(6), move  (m2 * x1)
-            // b2 = ((m1 - m2) * x1) + b1       ...(7), we can find b2
-            //---------------------------------------------
-        }
-        static System.Drawing.PointF FindCutPoint(
-            System.Drawing.PointF p0, System.Drawing.PointF p1,
-            System.Drawing.PointF p2, System.Drawing.PointF p3)
-        {
-            //find cut point of 2 line 
-            //y = mx + b
-            //from line equation
-            //y = mx + b ... (1)
-            //from (1)
-            //b = y- mx ... (2) 
-            //----------------------------------
-            //line1:
-            //y1 = (m1 * x1) + b1 ...(3)            
-            //line2:
-            //y2 = (m2 * x2) + b2 ...(4)
-            //----------------------------------
-            //from (3),
-            //b1 = y1 - (m1 * x1) ...(5)
-            //b2 = y2 - (m2 * x2) ...(6)
-            //----------------------------------
-            //at cutpoint of line1 and line2 => (x1,y1)== (x2,y2)
-            //or find (x,y) where (3)==(4)
-            //---------------------------------- 
-            //at cutpoint, find x
-            // (m1 * x1) + b1 = (m2 * x1) + b2  ...(11), replace x2 with x1
-            // (m1 * x1) - (m2 * x1) = b2 - b1  ...(12)
-            //  x1 * (m1-m2) = b2 - b1          ...(13)
-            //  x1 = (b2-b1)/(m1-m2)            ...(14), now we know x1
-            //---------------------------------- 
-            //at cutpoint, find y
-            //  y1 = (m1 * x1) + b1 ... (15), replace x1 with value from (14)
-            //Ans: (x1,y1)
-            //----------------------------------
-
-            double y1diff = p1.Y - p0.Y;
-            double x1diff = p1.X - p0.X;
-
-
-            if (x1diff == 0)
-            {
-                //90 or 180 degree
-                return new System.Drawing.PointF(p1.X, p2.Y);
-            }
-            //------------------------------
-            //
-            //find slope 
-            double m1 = y1diff / x1diff;
-            //from (2) b = y-mx, and (5)
-            //so ...
-            double b1 = p0.Y - (m1 * p0.X);
-
-            //------------------------------
-            double y2diff = p3.Y - p2.Y;
-            double x2diff = p3.X - p2.X;
-            double m2 = y2diff / x2diff;
-
-            // 
-            //from (6)
-            double b2 = p2.Y - (m2) * p2.X;
-            //find cut point
-
-            //check if (m1-m2 !=0)
-            double cutx = (b2 - b1) / (m1 - m2); //from  (14)
-            double cuty = (m1 * cutx) + b1;  //from (15)
-            return new System.Drawing.PointF((float)cutx, (float)cuty);
-
-        }
-        const double degToRad = System.Math.PI / 180.0f;
-        const double radToDeg = 180.0f / System.Math.PI;
-        /// <summary>
-        /// Convert degrees to radians
-        /// </summary>
-        /// <param name="degrees">An angle in degrees</param>
-        /// <returns>The angle expressed in radians</returns>
-        public static double DegreesToRadians(double degrees)
-        {
-
-            return degrees * degToRad;
-        }
-
-        /// <summary>
-        /// Convert radians to degrees
-        /// </summary>
-        /// <param name="radians">An angle in radians</param>
-        /// <returns>The angle expressed in degrees</returns>
-        public static double RadiansToDegrees(double radians)
-        {   
-            return radians * radToDeg;
         } 
+#endif 
+      
     }
 
 }

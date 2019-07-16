@@ -177,11 +177,8 @@ namespace Typography.Contours
                 float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_currentFontSizeInPoints);
                 DynamicOutline dynamicOutline = glyphMeshData.dynamicOutline;
                 if (dynamicOutline != null)
-                {                    
-                    
-                    Typography.Contours.ContourBuilder3 cntBuilder = new ContourBuilder3(_tovxs);
-                    dynamicOutline.GenerateOutput(cntBuilder, pxscale);
-
+                { 
+                    dynamicOutline.GenerateOutput(new ContourToGlyphTranslator(_tovxs), pxscale); 
                     //version 3
 
                     if (FlipGlyphUpward)

@@ -36,14 +36,14 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
+    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphMeshCollection.cs">
+      <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphPathBuilderBase.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Typography.Contours\TextPrinterBase.cs">
-      <Link>DevTextPrinter\DevTextPrinterBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
-      <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
+    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\TextPrinterBase.cs">
+      <Link>DevTextPrinter\TextPrinterBase.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
       <Link>DevTextPrinter\FontManagement.cs</Link>

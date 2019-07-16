@@ -1,6 +1,6 @@
 ﻿//MIT, 2016-present, WinterDev
 using System;
-using Typography.Contours;
+
 using PixelFarm.Contours;
 
 namespace Typography.Rendering
