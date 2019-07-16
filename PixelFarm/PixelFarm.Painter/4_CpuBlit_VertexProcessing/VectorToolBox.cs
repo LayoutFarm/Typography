@@ -70,6 +70,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 namespace PixelFarm.Drawing
 {
 
+    using PixelFarm.CpuBlit;
+
     public static class VxsTemp
     {
 
@@ -181,6 +183,14 @@ namespace PixelFarm.Drawing
             }
             return Temp<Ellipse>.Borrow(out ellipse);
         }
+        public static TempContext<Spiral> Borrow(out Spiral spiral)
+        {
+            if (!Temp<Spiral>.IsInit())
+            {
+                Temp<Spiral>.SetNewHandler(() => new Spiral());
+            }
+            return Temp<Spiral>.Borrow(out spiral);             
+        }
         public static TempContext<SimpleRect> Borrow(out SimpleRect simpleRect)
         {
             if (!Temp<SimpleRect>.IsInit())
@@ -218,5 +228,96 @@ namespace PixelFarm.Drawing
             return Temp<CurveFlattener>.Borrow(out flattener);
         }
 
+    }
+
+
+    public class Spiral
+    {
+        double _x;
+        double _y;
+        double _r1;
+        double _r2;
+        double _step;
+        double _start_angle;
+        double _angle;
+        double _curr_r;
+        double _da;
+        double _dr;
+        bool _start;
+        public Spiral()
+        {
+
+        }
+        public void SetParameters(double x, double y, double r1, double r2, double step, double start_angle = 0)
+        {
+            _x = x;
+            _y = y;
+            _r1 = r1;
+            _r2 = r2;
+            _step = step;
+            _start_angle = start_angle;
+            _angle = start_angle;
+            _da = AggMath.deg2rad(4.0);
+            _dr = _step / 90.0;
+        }
+        IEnumerable<VertexData> GetVertexIter()
+        {
+            //--------------
+            //rewind
+            _angle = _start_angle;
+            _curr_r = _r1;
+            _start = true;
+            //--------------
+
+            VertexCmd cmd;
+            double x, y;
+            for (; ; )
+            {
+                cmd = GetNextVertex(out x, out y);
+                switch (cmd)
+                {
+                    case VertexCmd.NoMore:
+                        {
+                            yield return new VertexData(cmd, x, y);
+                            yield break;
+                        }
+                    default:
+                        {
+                            yield return new VertexData(cmd, x, y);
+                        }
+                        break;
+                }
+            }
+        }
+        public VertexStore MakeVxs(VertexStore vxs)
+        {
+
+            foreach (VertexData v in this.GetVertexIter())
+            {
+                vxs.AddVertex(v.x, v.y, v.command);
+            }
+            return vxs;
+        }
+
+        public VertexCmd GetNextVertex(out double x, out double y)
+        {
+            x = 0;
+            y = 0;
+            if (_curr_r > _r2)
+            {
+                return VertexCmd.NoMore;
+            }
+
+            x = _x + Math.Cos(_angle) * _curr_r;
+            y = _y + Math.Sin(_angle) * _curr_r;
+            _curr_r += _dr;
+            _angle += _da;
+            if (_start)
+            {
+                _start = false;
+                return VertexCmd.MoveTo;
+            }
+            return VertexCmd.LineTo;
+        }
     }
 }

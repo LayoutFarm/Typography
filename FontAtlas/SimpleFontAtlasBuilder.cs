@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using PixelFarm.Drawing.Fonts;
 using Typography.Contours;
+using PixelFarm.Contours;
 
 namespace Typography.Rendering
 {

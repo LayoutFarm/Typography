@@ -9,26 +9,8 @@
     <Import_RootNamespace>Typography.Contours</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)TextPrinterBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\0_GlyphTriangle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\1_EdgeLine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\2_GlyphCentroidPair.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\3_GlyphBoneJoint.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\4_GlyphBone.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\5_CentroidLineAndHub.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\CurveGen.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphContour.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphContourBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphIntermediateOutline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphOutlineAnalyzer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphOutlineWalker.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphPartFlattener.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphParts.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\GlyphPoint.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\MyMath.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphAnalysis\Rect.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphDynamicOutline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphMeshCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilderBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextPrinterBase.cs" />
   </ItemGroup>
 </Project>

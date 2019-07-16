@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Typography.Contours;
-using PixelFarm;
+
+using PixelFarm.Contours; 
 using PixelFarm.CpuBlit;
+using PixelFarm.VectorMath;
+
 namespace SampleWinForms.UI
 {
 
@@ -136,7 +138,7 @@ namespace SampleWinForms.UI
                             _clearInfoView = false;
                             RequestGlyphRender(this, EventArgs.Empty);
 
-                            GlyphBone bone = nodeinfo.Bone;
+                            Bone bone = nodeinfo.Bone;
                             var midPoint = bone.GetMidPoint() * PxScale;
                             Owner.DrawMarker(midPoint.X, midPoint.Y, PixelFarm.Drawing.Color.Yellow);
                             if (_flushOutput != null)
@@ -272,7 +274,7 @@ namespace SampleWinForms.UI
             TreeNode triangleNode = new TreeNode() { Text = "tri:" + tri.ToString(), Tag = new NodeInfo(tri) };
             _trianglesNode.Nodes.Add(triangleNode);
         }
-        public void ShowBone(GlyphBone bone, GlyphBoneJoint jointA, GlyphBoneJoint jointB)
+        public void ShowBone(Bone bone, Joint jointA, Joint jointB)
         {
             if (!_clearInfoView) { return; }
             _treeView.SuspendLayout();
@@ -281,7 +283,7 @@ namespace SampleWinForms.UI
 
             _treeView.ResumeLayout();
         }
-        public void ShowBone(GlyphBone bone, GlyphBoneJoint jointA, EdgeLine tipEdge)
+        public void ShowBone(Bone bone, Joint jointA, EdgeLine tipEdge)
         {
             if (!_clearInfoView) { return; }
             _treeView.SuspendLayout();
@@ -290,7 +292,7 @@ namespace SampleWinForms.UI
 
             _treeView.ResumeLayout();
         }
-        public void ShowJoint(GlyphBoneJoint joint)
+        public void ShowJoint(Joint joint)
         {
             if (!_clearInfoView) { return; }
             //-------------- 
@@ -331,8 +333,8 @@ namespace SampleWinForms.UI
                 return;
             }
 
-            GlyphPoint pnt_P = edge.P;
-            GlyphPoint pnt_Q = edge.Q;
+            Vertex pnt_P = edge.P;
+            Vertex pnt_Q = edge.Q;
 
             //-------------------------------
 
@@ -438,10 +440,10 @@ namespace SampleWinForms.UI
         class NodeInfo
         {
             EdgeLine edge;
-            GlyphBoneJoint joint;
-            GlyphBone bone;
-            System.Numerics.Vector2 pos;
-            System.Numerics.Vector2 pos2;
+            Joint joint;
+            Bone bone;
+            Vector2f pos;
+            Vector2f pos2;
 
             GlyphTriangleInfo tri;
 
@@ -456,19 +458,19 @@ namespace SampleWinForms.UI
                 this.VertexCommandNo = borderNo;
                 this.NodeKind = nodeKind;
             }
-            public NodeInfo(GlyphBoneJoint joint)
+            public NodeInfo(Joint joint)
             {
                 this.joint = joint;
                 this.pos = joint.OriginalJointPos;
                 this.NodeKind = NodeInfoKind.Joint;
             }
-            public NodeInfo(GlyphBone bone, GlyphBoneJoint a, GlyphBoneJoint b)
+            public NodeInfo(Bone bone, Joint a, Joint b)
             {
                 this.bone = bone;
                 this.NodeKind = NodeInfoKind.Bone;
             }
 
-            public NodeInfo(GlyphBone bone, GlyphBoneJoint a, EdgeLine tipEdge)
+            public NodeInfo(Bone bone, Joint a, EdgeLine tipEdge)
             {
                 this.bone = bone;
                 this.NodeKind = NodeInfoKind.Bone;
@@ -476,10 +478,10 @@ namespace SampleWinForms.UI
             public NodeInfo(GlyphTriangleInfo tri)
             {
                 this.tri = tri;
-                this.pos = new System.Numerics.Vector2((float)tri.CentroidX, (float)tri.CentroidY);
+                this.pos = new Vector2f((float)tri.CentroidX, (float)tri.CentroidY);
                 this.NodeKind = NodeInfoKind.Tri;
             }
-            public NodeInfo(NodeInfoKind nodeKind, System.Numerics.Vector2 pos)
+            public NodeInfo(NodeInfoKind nodeKind, Vector2f pos)
             {
                 this.pos = pos;
                 this.NodeKind = NodeInfoKind.Joint;
@@ -487,8 +489,8 @@ namespace SampleWinForms.UI
             public NodeInfo(NodeInfoKind nodeKind, float x0, float y0, float x1, float y1)
             {
                 this.NodeKind = nodeKind;
-                this.pos = new System.Numerics.Vector2(x0, y0);
-                this.pos2 = new System.Numerics.Vector2(x1, y1);
+                this.pos = new Vector2f(x0, y0);
+                this.pos2 = new Vector2f(x1, y1);
             }
             public int VertexCommandNo { get; set; }
             public NodeInfoKind NodeKind { get; set; }
@@ -497,9 +499,9 @@ namespace SampleWinForms.UI
                 get; set;
             }
             public GlyphTriangleInfo GlyphTri { get { return tri; } }
-            public GlyphBone Bone { get { return this.bone; } }
+            public Bone Bone { get { return this.bone; } }
 
-            public System.Numerics.Vector2 Pos { get { return pos; } }
+            public Vector2f Pos { get { return pos; } }
         }
     }
 }

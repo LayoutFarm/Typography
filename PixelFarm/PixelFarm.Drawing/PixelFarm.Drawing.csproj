@@ -559,6 +559,57 @@
     <Compile Include="..\PixelFarm.Vectors\5_Clipper\ClipLiangBarsky.cs">
       <Link>0_REF_Painter\1_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\0_Triangle.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\0_Triangle.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\1_Line.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\1_Line.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\2_CentroidPair.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\2_CentroidPair.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\3_BoneJoint.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\3_BoneJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\4_Bone.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\4_Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\5_CentroidLineAndHub.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\5_CentroidLineAndHub.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\Contour.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\Contour.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\ContourBuilder.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\ContourBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\ContourParts.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\ContourParts.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\CurveGen.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\CurveGen.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\DynamicOutline.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\DynamicOutline.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\IntermediateOutline.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\IntermediateOutline.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\MyMath.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\MyMath.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\OutlineWalker.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\OutlineWalker.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\PartFlattener.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\PartFlattener.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\Rect.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\Rect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\Vertex.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
+    </Compile>
     <Compile Include="4_PlatformServices\StorageService.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" />
@@ -626,7 +677,9 @@
   <ItemGroup>
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="6_Contours\" />
+  </ItemGroup>
   <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

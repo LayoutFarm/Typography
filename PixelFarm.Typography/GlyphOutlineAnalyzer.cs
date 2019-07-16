@@ -2,21 +2,27 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-namespace Typography.Contours
+
+namespace PixelFarm.Contours
 {
+
     //This is PixelFarm's AutoFit
     //NOT FREE TYPE AUTO FIT***
 
     public class GlyphOutlineAnalyzer
     {
-        GlyphPartFlattener _glyphFlattener = new GlyphPartFlattener();
-        GlyphContourBuilder _glyphToContour = new GlyphContourBuilder();
-        List<Poly2Tri.Polygon> _waitingHoles = new List<Poly2Tri.Polygon>();
+        readonly PartFlattener _glyphFlattener = new PartFlattener();
+        readonly ContourBuilder _glyphToContour = new ContourBuilder();
+        readonly List<Poly2Tri.Polygon> _waitingHoles = new List<Poly2Tri.Polygon>();
+        readonly Typography.Contours.GlyphContourBuilder2 _glyphContourBuilder2;
 
         public GlyphOutlineAnalyzer()
         {
-
+            _glyphContourBuilder2 = new Typography.Contours.GlyphContourBuilder2(_glyphToContour);
         }
+
+
+
 
         /// <summary>
         /// calculate and create GlyphFitOutline
@@ -24,13 +30,13 @@ namespace Typography.Contours
         /// <param name="glyphPoints"></param>
         /// <param name="glyphContours"></param>
         /// <returns></returns>
-        public GlyphDynamicOutline CreateDynamicOutline(GlyphPointF[] glyphPoints, ushort[] glyphContours)
+        public DynamicOutline CreateDynamicOutline(GlyphPointF[] glyphPoints, ushort[] glyphContours)
         {
 
             //1. convert original glyph point to contour
-            _glyphToContour.Read(glyphPoints, glyphContours);
+            _glyphContourBuilder2.Read(glyphPoints, glyphContours);
             //2. get result as list of contour
-            List<GlyphContour> contours = _glyphToContour.GetContours();
+            List<Contour> contours = _glyphToContour.GetContours();
 
             int cnt_count = contours.Count;
             //
@@ -49,7 +55,7 @@ namespace Typography.Contours
             }
             else
             {
-                return GlyphDynamicOutline.CreateBlankDynamicOutline();
+                return DynamicOutline.CreateBlankDynamicOutline();
             }
         }
 
@@ -58,7 +64,7 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="flattenContours"></param>
         /// <returns></returns>
-        GlyphDynamicOutline CreateDynamicOutline(List<GlyphContour> flattenContours)
+        DynamicOutline CreateDynamicOutline(List<Contour> flattenContours)
         {
             //--------------------------
             //TODO: review here, add hole or not  
@@ -77,7 +83,7 @@ namespace Typography.Contours
             List<Poly2Tri.Polygon> otherPolygons = null;
             for (int n = 0; n < cntCount; ++n)
             {
-                GlyphContour cnt = flattenContours[n];
+                Contour cnt = flattenContours[n];
                 if (cnt.IsClockwise())
                 {
                     //not a hole
@@ -146,8 +152,8 @@ namespace Typography.Contours
 
             //3. intermediate outline is used inside this lib 
             //and then convert intermediate outline to dynamic outline
-            return new GlyphDynamicOutline(
-                new GlyphIntermediateOutline(flattenContours, mainPolygon, subPolygons));
+            return new DynamicOutline(
+                new IntermediateOutline(flattenContours, mainPolygon, subPolygons));
         }
 
 
@@ -156,7 +162,7 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="cnt"></param>
         /// <returns></returns>
-        static Poly2Tri.Polygon CreatePolygon(List<GlyphPoint> flattenPoints)
+        static Poly2Tri.Polygon CreatePolygon(List<Vertex> flattenPoints)
         {
             List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
 
@@ -174,7 +180,7 @@ namespace Typography.Contours
             //pass
             for (int i = 0; i < j; ++i)
             {
-                GlyphPoint p = flattenPoints[i];
+                Vertex p = flattenPoints[i];
                 double x = p.OX; //start from original X***
                 double y = p.OY; //start from original Y***
 
@@ -215,7 +221,7 @@ namespace Typography.Contours
             }
         }
         static Dictionary<dbugTmpPoint, bool> s_debugTmpPoints = new Dictionary<dbugTmpPoint, bool>();
-        static void dbugCheckAllGlyphsAreUnique(List<GlyphPoint> flattenPoints)
+        static void dbugCheckAllGlyphsAreUnique(List<Vertex> flattenPoints)
         {
             double prevX = 0;
             double prevY = 0;
@@ -223,7 +229,7 @@ namespace Typography.Contours
             int lim = flattenPoints.Count - 1;
             for (int i = 0; i < lim; ++i)
             {
-                GlyphPoint p = flattenPoints[i];
+                Vertex p = flattenPoints[i];
                 double x = p.OX; //start from original X***
                 double y = p.OY; //start from original Y***
 

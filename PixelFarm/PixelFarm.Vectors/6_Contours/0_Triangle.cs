@@ -1,10 +1,11 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
 using Poly2Tri;
-namespace Typography.Contours
+using PixelFarm.VectorMath;
+namespace PixelFarm.Contours
 {
 
-    class GlyphTriangle
+    public class Triangle
     {
 
         DelaunayTriangle _tri;
@@ -13,7 +14,7 @@ namespace Typography.Contours
         public readonly EdgeLine e2;
 
 
-        public GlyphTriangle(DelaunayTriangle tri)
+        public Triangle(DelaunayTriangle tri)
         {
             _tri = tri;
             //---------------------------------------------
@@ -111,9 +112,9 @@ namespace Typography.Contours
         }
         static void FindPerpendicular(EdgeLine outsideEdge, EdgeLine inside)
         {
-            System.Numerics.Vector2 m0 = inside.GetMidPoint();
-            System.Numerics.Vector2 cut_fromM0;
-            if (MyMath.FindPerpendicularCutPoint(outsideEdge, new System.Numerics.Vector2(m0.X, m0.Y), out cut_fromM0))
+            Vector2f m0 = inside.GetMidPoint();
+            Vector2f cut_fromM0;
+            if (MyMath.FindPerpendicularCutPoint(outsideEdge, new Vector2f(m0.X, m0.Y), out cut_fromM0))
             {
                 ((OutsideEdgeLine)outsideEdge).SetControlEdge(inside);
             }
@@ -127,15 +128,15 @@ namespace Typography.Contours
         EdgeLine NewEdgeLine(TriangulationPoint p, TriangulationPoint q, bool isOutside)
         {
             return isOutside ?
-                (EdgeLine)(new OutsideEdgeLine(this, p.userData as GlyphPoint, q.userData as GlyphPoint)) :
-                new InsideEdgeLine(this, p.userData as GlyphPoint, q.userData as GlyphPoint);
+                (EdgeLine)(new OutsideEdgeLine(this, p.userData as Vertex, q.userData as Vertex)) :
+                new InsideEdgeLine(this, p.userData as Vertex, q.userData as Vertex);
         }
 
         public void CalculateCentroid(out float centroidX, out float centroidY)
         {
             _tri.GetCentroid(out centroidX, out centroidY);
         }
-        public bool IsConnectedTo(GlyphTriangle anotherTri)
+        public bool IsConnectedTo(Triangle anotherTri)
         {
             DelaunayTriangle t2 = anotherTri._tri;
             if (t2 == _tri)
@@ -150,7 +151,7 @@ namespace Typography.Contours
         /// <summary>
         /// neighbor triangle 0
         /// </summary>
-        public GlyphTriangle N0
+        public Triangle N0
         {
             get
             {
@@ -160,7 +161,7 @@ namespace Typography.Contours
         /// <summary>
         /// neighbor triangle 1
         /// </summary>
-        public GlyphTriangle N1
+        public Triangle N1
         {
             get
             {
@@ -170,17 +171,17 @@ namespace Typography.Contours
         /// <summary>
         /// neighbor triangle 2
         /// </summary>
-        public GlyphTriangle N2
+        public Triangle N2
         {
             get
             {
                 return GetGlyphTriFromUserData(_tri.N2);
             }
         }
-        static GlyphTriangle GetGlyphTriFromUserData(DelaunayTriangle tri)
+        static Triangle GetGlyphTriFromUserData(DelaunayTriangle tri)
         {
             if (tri == null) return null;
-            return tri.userData as GlyphTriangle;
+            return tri.userData as Triangle;
         }
 
     }

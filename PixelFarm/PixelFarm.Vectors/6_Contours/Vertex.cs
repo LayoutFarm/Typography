@@ -1,9 +1,9 @@
 ﻿//MIT, 2016-present, WinterDev
 
-namespace Typography.Contours
+namespace PixelFarm.Contours
 {
 
-    public enum PointKind : byte
+    public enum VertexKind : byte
     {
         LineStart,
         LineStop,
@@ -21,11 +21,11 @@ namespace Typography.Contours
     }
 
 
-    public class GlyphPoint
+    public class Vertex
     {
         readonly float _ox; //original x
         readonly float _oy; //original y
-        readonly PointKind _kind;
+        readonly VertexKind _kind;
 
         float _newX;
         float _newY;
@@ -43,14 +43,14 @@ namespace Typography.Contours
         /// </summary>
         OutsideEdgeLine _e1;
 
-        public GlyphPoint(float x, float y, PointKind kind)
+        public Vertex(float x, float y, VertexKind kind)
         {
             _ox = _newX = x;
             _oy = _newY = y;
             _kind = kind;
         }
         public int SeqNo { get; internal set; }
-        public PointKind PointKind => _kind;
+        public VertexKind PointKind => _kind;
 
         internal bool IsPartOfHorizontalEdge { get; set; }
 
@@ -165,7 +165,7 @@ namespace Typography.Contours
         }
 
 
-        internal static bool SameCoordAs(GlyphPoint a, GlyphPoint b)
+        internal static bool SameCoordAs(Vertex a, Vertex b)
         {
             return a._ox == b._ox && a._oy == b._oy;
         }
@@ -176,7 +176,7 @@ namespace Typography.Contours
         bool _dbug_has_adjust_y;
         public readonly int dbugId = dbugTotalId++;
         static int dbugTotalId;
-        internal GlyphPart dbugOwnerPart;  //link back to owner part
+        internal ContourPart dbugOwnerPart;  //link back to owner part
         public Poly2Tri.TriangulationPoint dbugTriangulationPoint;
 
         public override string ToString()

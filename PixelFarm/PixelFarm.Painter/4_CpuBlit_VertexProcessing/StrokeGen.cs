@@ -42,19 +42,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     class StrokeGenerator
     {
 
-        StrokeMath _stroker;
+        StrokeMath _stroker = new StrokeMath();
         Vertex2dList _vtx2dList = new Vertex2dList();
-        VertexStore _tmpVxs;
+        VertexStore _tmpVxs = new VertexStore();
         double _shorten;
         bool _closed;
-
         public StrokeGenerator()
         {
-            _stroker = new StrokeMath();
-            _tmpVxs = new VertexStore();
             _closed = false;
         }
-
         public LineCap LineCap
         {
             get => _stroker.LineCap;
@@ -112,12 +108,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             _vtx2dList.Clear();
             _closed = false;
+            _tmpVxs.Clear();
         }
         public void Close()
         {
             _closed = true;
             _vtx2dList.Close();
+            _tmpVxs.Clear();
         }
+        public int VertexCount => _vtx2dList.Count;
         public void AddVertex(double x, double y, VertexCmd cmd)
         {
             //TODO: review 

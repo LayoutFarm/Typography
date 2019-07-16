@@ -13,6 +13,7 @@ using Typography.Contours;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
+using PixelFarm.Contours;
 
 namespace SampleWinForms
 {
@@ -63,6 +64,31 @@ namespace SampleWinForms
             ////
             //CreateSampleMsdfImg(tx, "d:\\WImageTest\\tx_contour2.bmp");
         }
+
+        class GlyphContourBuilder2 : IGlyphTranslator
+        {
+            ContourBuilder _c;
+            public GlyphContourBuilder2(ContourBuilder c)
+            {
+                _c = c;
+            }
+            public void BeginRead(int contourCount) => _c.BeginRead(contourCount);
+
+            public void CloseContour() => _c.CloseContour();
+
+            public void Curve3(float x1, float y1, float x2, float y2) => _c.Curve3(x1, y1, x2, y2);
+
+            public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void EndRead() => _c.EndRead();
+
+            public void LineTo(float x1, float y1) => _c.LineTo(x1, y1);
+
+            public void MoveTo(float x0, float y0) => _c.MoveTo(x0, y0);
+        }
         static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
         {
             //sample
@@ -86,10 +112,10 @@ namespace SampleWinForms
                     //build glyph
                     builder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
-                    var glyphContourBuilder = new GlyphContourBuilder();
+                    var glyphContourBuilder = new ContourBuilder();
                     //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
                     var genParams = new MsdfGenParams();
-                    builder.ReadShapes(glyphContourBuilder);
+                    builder.ReadShapes(new GlyphContourBuilder2(glyphContourBuilder));
                     //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
                     GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphContourBuilder, genParams);
                     atlasBuilder.AddGlyph(gindex, glyphImg);
@@ -136,7 +162,7 @@ namespace SampleWinForms
             }
         }
 
-        static void CreateSampleMsdfImg(GlyphContourBuilder tx, string outputFile)
+        static void CreateSampleMsdfImg(ContourBuilder tx, string outputFile)
         {
             //sample
 

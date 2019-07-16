@@ -27,32 +27,9 @@ SOFTWARE.
 
 namespace System.Numerics
 {
-
-
-    public static class Vector2Ext
-    {
-        public static Vector2 Rotate(this Vector2 v, int degree)
-        {
-            double radian = degree * Math.PI / 180.0;
-            double sin = Math.Sin(radian);
-            double cos = Math.Cos(radian);
-            double nx = v.X * cos - v.Y * sin;
-            double ny = v.X * sin + v.Y * cos;
-
-            return new Vector2((float)nx, (float)ny);
-        }
-        public static Vector2 NewLength(this Vector2 v, double newLength)
-        {
-            //radian
-            double atan = Math.Atan2(v.Y, v.X);
-            return new Vector2(
-                      (float)(Math.Cos(atan) * newLength),
-                      (float)(Math.Sin(atan) * newLength));
-        }
-    }
-
     //FOR NET20
-#if NET20 || COSMOS || DEFINE_VECTOR2
+#if NET20 || COSMOS || DEFINE_VECTOR2 || PIXEL_FARM_NET20
+
     public struct Vector2
     {
         static Vector2 zeroVector = new Vector2(0f, 0f);

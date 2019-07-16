@@ -42,10 +42,6 @@
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj">
-      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
-      <Name>Typography.Contours</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>
@@ -64,5 +60,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
+  <Import Project="..\..\..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

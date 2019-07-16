@@ -1,6 +1,6 @@
 ﻿//MIT, 2017-present, WinterDev
-using System.Numerics;
-namespace Typography.Contours
+using PixelFarm.VectorMath;
+namespace PixelFarm.Contours
 {
 
     public static class MyMath
@@ -48,7 +48,7 @@ namespace Typography.Contours
             }
 
         }
-        public static double AngleBetween(Vector2 vector1, Vector2 vector2)
+        public static double AngleBetween(Vector2f vector1, Vector2f vector2)
         {
             double rad1 = System.Math.Atan2(vector1.Y, vector1.X);
             double rad2 = System.Math.Atan2(vector2.Y, vector2.X);
@@ -75,12 +75,12 @@ namespace Typography.Contours
             const double degToRad = System.Math.PI / 180.0f;
             return degrees * degToRad;
         }
-        public static bool MinDistanceFirst(Vector2 baseVec, Vector2 compare0, Vector2 compare1)
+        public static bool MinDistanceFirst(Vector2f baseVec, Vector2f compare0, Vector2f compare1)
         {
             return (SquareDistance(baseVec, compare0) < SquareDistance(baseVec, compare1)) ? true : false;
         }
 
-        public static double SquareDistance(Vector2 v0, Vector2 v1)
+        public static double SquareDistance(Vector2f v0, Vector2f v1)
         {
             double xdiff = v1.X - v0.X;
             double ydiff = v1.Y - v0.Y;
@@ -117,15 +117,15 @@ namespace Typography.Contours
         /// <param name="p2"></param>
         /// <param name="cutResult"></param>
         /// <returns></returns>
-        public static bool FindPerpendicularCutPoint(EdgeLine edge, Vector2 p2, out Vector2 cutResult)
+        public static bool FindPerpendicularCutPoint(EdgeLine edge, Vector2f p2, out Vector2f cutResult)
         {
             cutResult = FindPerpendicularCutPoint(
-                new Vector2((float)edge.PX, (float)edge.PY),
-                new Vector2((float)edge.QX, (float)edge.QY),
+                new Vector2f((float)edge.PX, (float)edge.PY),
+                new Vector2f((float)edge.QX, (float)edge.QY),
                 p2);
             //also check if result cutpoint is on current line segment or not
 
-            Vector2 min, max;
+            Vector2f min, max;
             GetMinMax(edge, out min, out max);
             return (cutResult.X >= min.X && cutResult.X <= max.X && cutResult.Y >= min.Y && cutResult.Y <= max.Y);
         }
@@ -134,20 +134,20 @@ namespace Typography.Contours
         /// </summary>
         /// <param name="min"></param>
         /// <param name="max"></param>
-        static void GetMinMax(EdgeLine edge, out Vector2 min, out Vector2 max)
+        static void GetMinMax(EdgeLine edge, out Vector2f min, out Vector2f max)
         {
-            Vector2 a_pos = new Vector2((float)edge.PX, (float)edge.PY);
-            Vector2 b_pos = new Vector2((float)edge.QX, (float)edge.QY);
-            min = Vector2.Min(a_pos, b_pos);
-            max = Vector2.Max(a_pos, b_pos);
+            Vector2f a_pos = new Vector2f((float)edge.PX, (float)edge.PY);
+            Vector2f b_pos = new Vector2f((float)edge.QX, (float)edge.QY);
+            min = Vector2f.Min(a_pos, b_pos);
+            max = Vector2f.Max(a_pos, b_pos);
         }
-        static void GetMinMax(Vector2 a_pos, Vector2 b_pos, out Vector2 min, out Vector2 max)
+        static void GetMinMax(Vector2f a_pos, Vector2f b_pos, out Vector2f min, out Vector2f max)
         {
 
-            min = Vector2.Min(a_pos, b_pos);
-            max = Vector2.Max(a_pos, b_pos);
+            min = Vector2f.Min(a_pos, b_pos);
+            max = Vector2f.Max(a_pos, b_pos);
         }
-        public static int FindMin(Vector2 a, Vector2 b)
+        public static int FindMin(Vector2f a, Vector2f b)
         {
             if (a.X < b.X)
             {
@@ -176,23 +176,23 @@ namespace Typography.Contours
 
 
 
-        static void GetMinMax(GlyphBone bone, out Vector2 min, out Vector2 max)
+        static void GetMinMax(Bone bone, out Vector2f min, out Vector2f max)
         {
             if (bone.JointB != null)
             {
                 var a_pos = bone.JointA.OriginalJointPos;
                 var b_pos = bone.JointB.OriginalJointPos;
 
-                min = Vector2.Min(a_pos, b_pos);
-                max = Vector2.Max(a_pos, b_pos);
+                min = Vector2f.Min(a_pos, b_pos);
+                max = Vector2f.Max(a_pos, b_pos);
 
             }
             else if (bone.TipEdge != null)
             {
                 var a_pos = bone.JointA.OriginalJointPos;
                 var tip_pos = bone.TipEdge.GetMidPoint();
-                min = Vector2.Min(a_pos, tip_pos);
-                max = Vector2.Max(a_pos, tip_pos);
+                min = Vector2f.Min(a_pos, tip_pos);
+                max = Vector2f.Max(a_pos, tip_pos);
             }
             else
             {
@@ -206,7 +206,7 @@ namespace Typography.Contours
         /// <param name="p"></param>
         /// <param name="cutPoint"></param>
         /// <returns></returns>
-        public static bool FindPerpendicularCutPoint(GlyphBone bone, Vector2 p, out Vector2 cutPoint)
+        public static bool FindPerpendicularCutPoint(Bone bone, Vector2f p, out Vector2f cutPoint)
         {
             if (bone.JointB != null)
             {
@@ -215,7 +215,7 @@ namespace Typography.Contours
                   bone.JointB.OriginalJointPos,
                   p);
                 //find min /max
-                Vector2 min, max;
+                Vector2f min, max;
                 GetMinMax(bone, out min, out max);
                 return cutPoint.X >= min.X && cutPoint.X <= max.X && cutPoint.Y >= min.Y && cutPoint.Y <= max.Y;
             }
@@ -228,7 +228,7 @@ namespace Typography.Contours
                         bone.JointA.OriginalJointPos,
                         bone.TipEdge.GetMidPoint(),
                         p);
-                    Vector2 min, max;
+                    Vector2f min, max;
                     GetMinMax(bone, out min, out max);
                     return cutPoint.X >= min.X && cutPoint.X <= max.X && cutPoint.Y >= min.Y && cutPoint.Y <= max.Y;
                 }
@@ -238,7 +238,7 @@ namespace Typography.Contours
                 }
             }
         }
-        public static Vector2 FindPerpendicularCutPoint(Vector2 p0, Vector2 p1, Vector2 p2)
+        public static Vector2f FindPerpendicularCutPoint(Vector2f p0, Vector2f p1, Vector2f p2)
         {
             //a line from p0 to p1
             //p2 is any point
@@ -249,11 +249,11 @@ namespace Typography.Contours
             double ydiff = p1.Y - p0.Y;
             if (xdiff == 0)
             {
-                return new Vector2(p1.X, p2.Y);
+                return new Vector2f(p1.X, p2.Y);
             }
             if (ydiff == 0)
             {
-                return new Vector2(p2.X, p1.Y);
+                return new Vector2f(p2.X, p1.Y);
             }
 
             double m1 = ydiff / xdiff;
@@ -264,7 +264,7 @@ namespace Typography.Contours
             //find cut point
             double cutx = (b2 - b1) / (m1 - m2);
             double cuty = (m2 * cutx) + b2;
-            return new Vector2((float)cutx, (float)cuty);
+            return new Vector2f((float)cutx, (float)cuty);
         }
         /// <summary>
         /// find parameter A,B,C from Ax + By = C, with given 2 points
@@ -274,7 +274,7 @@ namespace Typography.Contours
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <param name="c"></param>
-        static void FindABC(Vector2 p0, Vector2 p1, out double a, out double b, out double c)
+        static void FindABC(Vector2f p0, Vector2f p1, out double a, out double b, out double c)
         {
             //line is in the form
             //Ax + By = C 
@@ -285,8 +285,8 @@ namespace Typography.Contours
             c = a * p0.X + b * p0.Y;
         }
         public static bool FindCutPoint(
-              Vector2 p0, Vector2 p1,
-              Vector2 p2, Vector2 p3, out Vector2 result)
+              Vector2f p0, Vector2f p1,
+              Vector2f p2, Vector2f p3, out Vector2f result)
         {
             //TODO: review here
             //from http://stackoverflow.com/questions/4543506/algorithm-for-intersection-of-2-lines
@@ -314,19 +314,19 @@ namespace Typography.Contours
             if (delta == 0)
             {
                 //"Lines are parallel"
-                result = Vector2.Zero;
+                result = Vector2f.Zero;
                 return false; //
                 throw new System.ArgumentException("Lines are parallel");
             }
             double x = (b2 * c1 - b1 * c2) / delta;
             double y = (a1 * c2 - a2 * c1) / delta;
-            result = new Vector2((float)x, (float)y);
+            result = new Vector2f((float)x, (float)y);
             return true; //has cutpoint
         }
 
-        static Vector2 FindCutPoint_Algebra(
-            Vector2 p0, Vector2 p1,
-            Vector2 p2, Vector2 p3)
+        static Vector2f FindCutPoint_Algebra(
+            Vector2f p0, Vector2f p1,
+            Vector2f p2, Vector2f p3)
         {
             //prefer matrix style (upper)
 
@@ -382,7 +382,7 @@ namespace Typography.Contours
                 //x1= (y1-b1)/m1 
                 if (x2diff == 0)
                 {   //p2p3 -> same x, p2p3 is vertical
-                    return new Vector2((float)p3.X, ky);
+                    return new Vector2f((float)p3.X, ky);
                 }
                 else
                 {
@@ -397,7 +397,7 @@ namespace Typography.Contours
                     //replace y2 with ky
                     //x2 = (ky - b2)/m2
                     double findingX = (ky - b2) / m2;
-                    return new Vector2((float)findingX, ky);
+                    return new Vector2f((float)findingX, ky);
                 }
 
             }
@@ -407,7 +407,7 @@ namespace Typography.Contours
                 if (y2diff == 0)
                 {
                     //p2p3 -> same y, p2p3 is horizontal
-                    return new Vector2((float)p1.X, (float)p2.Y);
+                    return new Vector2f((float)p1.X, (float)p2.Y);
                 }
                 else
                 {
@@ -424,7 +424,7 @@ namespace Typography.Contours
                         //check if (m1-m2 !=0)
                         double cutx = cutx_p2p3; //from  (14) 
                         double cuty = (m2 * cutx) + b2;  //from (15)
-                        return new Vector2((float)cutx, (float)cuty);
+                        return new Vector2f((float)cutx, (float)cuty);
                     }
                 }
             }
@@ -436,7 +436,7 @@ namespace Typography.Contours
                 //cutY =  (m1 * cutx) + b1
                 double cutx_p2p3 = p2.X;
                 double cuty_p2p3 = (m1 * cutx_p2p3) + b1;  //from (15)
-                return new Vector2((float)cutx_p2p3, (float)cuty_p2p3);
+                return new Vector2f((float)cutx_p2p3, (float)cuty_p2p3);
             }
             else if (y2diff == 0)
             {
@@ -446,7 +446,7 @@ namespace Typography.Contours
                 //from y1=m1x1 +b1;
                 //x1= (y1-b1)/m1
                 double cutx_p2p3 = (cuty_p2p3 - b1) / m1;
-                return new Vector2((float)cutx_p2p3, (float)cuty_p2p3);
+                return new Vector2f((float)cutx_p2p3, (float)cuty_p2p3);
             }
 
             {
@@ -458,11 +458,11 @@ namespace Typography.Contours
                 //check if (m1-m2 !=0)
                 double cutx = (b2 - b1) / (m1 - m2); //from  (14) 
                 double cuty = (m1 * cutx) + b1;  //from (15)
-                return new Vector2((float)cutx, (float)cuty);
+                return new Vector2f((float)cutx, (float)cuty);
             }
 
         }
-        static Vector2 FindCutPoint(Vector2 p0, Vector2 p1, Vector2 p2, float cutAngle)
+        static Vector2f FindCutPoint(Vector2f p0, Vector2f p1, Vector2f p2, float cutAngle)
         {
             //a line from p0 to p1
             //p2 is any point
@@ -511,11 +511,11 @@ namespace Typography.Contours
             if (x1diff == 0)
             {
                 //90 or 180 degree
-                return new Vector2(p1.X, p2.Y);
+                return new Vector2f(p1.X, p2.Y);
             }
             if (y1diff == 0)
             {
-                return new Vector2(p2.X, p1.Y);
+                return new Vector2f(p2.X, p1.Y);
             }
             //------------------------------
             //
@@ -549,11 +549,11 @@ namespace Typography.Contours
             //check if (m1-m2 !=0)
             double cutx = (b2 - b1) / (m1 - m2); //from  (14)
             double cuty = (m1 * cutx) + b1;  //from (15)
-            return new Vector2((float)cutx, (float)cuty);
+            return new Vector2f((float)cutx, (float)cuty);
 
         }
 
-        public static bool FindPerpendicularCutPoint2(Vector2 p0, Vector2 p1, Vector2 p2, out Vector2 cutPoint)
+        public static bool FindPerpendicularCutPoint2(Vector2f p0, Vector2f p1, Vector2f p2, out Vector2f cutPoint)
         {
             //a line from p0 to p1
             //p2 is any point
@@ -565,16 +565,16 @@ namespace Typography.Contours
             if (xdiff == 0)
             {
                 //90 or 180 degree
-                cutPoint = new Vector2(p1.X, p2.Y);
-                Vector2 min, max;
+                cutPoint = new Vector2f(p1.X, p2.Y);
+                Vector2f min, max;
                 GetMinMax(p0, p1, out min, out max);
                 return cutPoint.X >= min.X && cutPoint.X <= max.X && cutPoint.Y >= min.Y && cutPoint.Y <= max.Y;
 
             }
             if (ydiff == 0)
             {
-                cutPoint = new Vector2(p2.X, p1.Y);
-                Vector2 min, max;
+                cutPoint = new Vector2f(p2.X, p1.Y);
+                Vector2f min, max;
                 GetMinMax(p0, p1, out min, out max);
                 return cutPoint.X >= min.X && cutPoint.X <= max.X && cutPoint.Y >= min.Y && cutPoint.Y <= max.Y;
             }
@@ -587,15 +587,15 @@ namespace Typography.Contours
             //find cut point
             double cutx = (b2 - b1) / (m1 - m2);
             double cuty = (m2 * cutx) + b2;
-            cutPoint = new Vector2((float)cutx, (float)cuty);
+            cutPoint = new Vector2f((float)cutx, (float)cuty);
             //
             {
-                Vector2 min, max;
+                Vector2f min, max;
                 GetMinMax(p0, p1, out min, out max);
                 return cutPoint.X >= min.X && cutPoint.X <= max.X && cutPoint.Y >= min.Y && cutPoint.Y <= max.Y;
             }
         }
-        static double FindB(Vector2 p0, Vector2 p1)
+        static double FindB(Vector2f p0, Vector2f p1)
         {
 
             double m1 = (p1.Y - p0.Y) / (p1.X - p0.X);

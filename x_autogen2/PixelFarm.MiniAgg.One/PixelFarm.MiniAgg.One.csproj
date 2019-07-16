@@ -725,6 +725,9 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\4_Utils\PolygonSimplifier.cs">
       <Link>PixelFarm\PixelFarm.Vectors\4_Utils\PolygonSimplifier.cs</Link>
     </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\4_Utils\Spline2D.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\4_Utils\Spline2D.cs</Link>
+    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\4_Utils\SvgArc.cs">
       <Link>PixelFarm\PixelFarm.Vectors\4_Utils\SvgArc.cs</Link>
     </Compile>
@@ -736,6 +739,57 @@
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\5_Clipper\ClipLiangBarsky.cs">
       <Link>PixelFarm\PixelFarm.Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\0_Triangle.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\0_Triangle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\1_Line.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\1_Line.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\2_CentroidPair.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\2_CentroidPair.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\3_BoneJoint.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\3_BoneJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\4_Bone.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\4_Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\5_CentroidLineAndHub.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\5_CentroidLineAndHub.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Contour.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\Contour.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\ContourBuilder.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\ContourBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\ContourParts.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\ContourParts.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\CurveGen.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\CurveGen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\DynamicOutline.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\DynamicOutline.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\IntermediateOutline.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\IntermediateOutline.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\MyMath.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\MyMath.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\OutlineWalker.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\OutlineWalker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\PartFlattener.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\PartFlattener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Rect.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\Rect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs">
+      <Link>PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs</Link>
     </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_PlatformServices\StorageService.cs">
       <Link>PixelFarm\PixelFarm.Drawing\4_PlatformServices\StorageService.cs</Link>
