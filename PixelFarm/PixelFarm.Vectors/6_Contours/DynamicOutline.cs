@@ -154,7 +154,8 @@ namespace PixelFarm.Contours
             this.EnableGridFit = dbugTestNewGridFitting;
 
 #endif
-            EnableGridFit = false;
+            EnableGridFit = false;//temp fix, disable this value
+
             if (_pxScale != pxScale)
             {
                 //new scale need to adjust fit value again
