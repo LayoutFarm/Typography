@@ -80,7 +80,7 @@
     <Compile Include="4_TextPrinter\GlyphMeshCollection.cs" />
     <Compile Include="4_TextPrinter\GlyphPathBuilderBase.cs" />
     <Compile Include="4_TextPrinter\TextPrinterBase.cs" />
-    <Compile Include="GlyphOutlineAnalyzer.cs" />
+    <Compile Include="4_TextPrinter\GlyphOutlineAnalyzer.cs" />
   </ItemGroup>
   <Import Project="..\Typography.MsdfGen\Typography.MsdfGen.projitems" Label="Shared" />
   <Import Project="..\FontAtlas\FontAtlas.projitems" Label="Shared" />
