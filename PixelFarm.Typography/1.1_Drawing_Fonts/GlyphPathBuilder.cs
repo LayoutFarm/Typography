@@ -12,6 +12,7 @@ namespace Typography.Contours
     {
         IContourBuilder _b;
         public GlyphTranslatorToContourBuilder(IContourBuilder b) => _b = b;
+
         public void BeginRead(int contourCount) => _b.BeginRead(contourCount);
 
         public void CloseContour() => _b.CloseContour();
