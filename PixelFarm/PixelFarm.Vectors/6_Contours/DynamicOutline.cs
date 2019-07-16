@@ -97,18 +97,20 @@ namespace PixelFarm.Contours
             //preserve original outline
             //regenerate outline from original outline
             //----------------------------------------------------------        
-            if ((_offsetFromMasterOutline = offsetFromMasterOutline) != 0)
+            if (_offsetFromMasterOutline != offsetFromMasterOutline)
             {
+                //change
+                _offsetFromMasterOutline = offsetFromMasterOutline;
                 //if 0, new other action
                 List<Contour> cnts = _contours;
                 for (int i = cnts.Count - 1; i >= 0; --i)
                 {
                     cnts[i].ApplyNewEdgeOffsetFromMasterOutline(offsetFromMasterOutline);
                 }
+                //***
+                //changing offset from master outline affects the grid fit-> need to recalculate 
+                _needRefreshBoneGroup = true;
             }
-            //***
-            //changing offset from master outline affects the grid fit-> need to recalculate 
-            _needRefreshBoneGroup = true;
         }
 
         /// <summary>
@@ -123,12 +125,6 @@ namespace PixelFarm.Contours
         /// grid box height in pixels
         /// </summary>
         public int GridBoxHeight { get; private set; }
-
-        ///// <summary>
-        ///// external glyph bounds 
-        ///// </summary>
-        //public Bounds OriginalGlyphControlBounds { get; set; }
-
 
         public int MinX { get; private set; }
         public int MinY { get; private set; }
