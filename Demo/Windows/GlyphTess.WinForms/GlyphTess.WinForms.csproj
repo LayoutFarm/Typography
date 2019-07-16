@@ -36,6 +36,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphPathBuilderBase.cs">
+      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\AdvancingFront.cs">
       <Link>BackEnd.Triangulation\delaunay\AdvancingFront.cs</Link>
     </Compile>
@@ -101,9 +104,6 @@
     </Compile>
     <Compile Include="..\..\..\pixelfarm\backend.triangulation\util\PolygonGenerator.cs">
       <Link>BackEnd.Triangulation\util\PolygonGenerator.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\DrawingGL.Text\GlyphTranslatorToPath.cs">
       <Link>DrawingGL.Text\GlyphTranslatorToPath.cs</Link>

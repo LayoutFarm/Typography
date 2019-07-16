@@ -77,11 +77,13 @@
     <Compile Include="3_FontFaceImpl\TextureFontLoader.cs" />
     <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
     <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
+    <Compile Include="4_TextPrinter\GlyphMeshCollection.cs" />
+    <Compile Include="4_TextPrinter\GlyphPathBuilderBase.cs" />
+    <Compile Include="4_TextPrinter\TextPrinterBase.cs" />
     <Compile Include="GlyphOutlineAnalyzer.cs" />
   </ItemGroup>
   <Import Project="..\Typography.MsdfGen\Typography.MsdfGen.projitems" Label="Shared" />
   <Import Project="..\FontAtlas\FontAtlas.projitems" Label="Shared" />
-  <Import Project="..\Typography.Contours\Typography.Contours.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -55,8 +55,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reference_TextBreak.Icu", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Typography.TextBreak\TextBreakerTest\Tests.csproj", "{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.Contours", "Typography.Contours\Typography.Contours.shproj", "{16AF3672-531E-4E0D-8F23-65285FE56298}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.TextBreak", "Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.shproj", "{9A99F103-B119-4A4D-8093-6A03BAA6D36B}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.TextFlow", "Typography.TextFlow\Typography.TextFlow.shproj", "{7A8A63D2-2CB5-41F5-8E83-6F6E54398CF4}"
@@ -109,14 +107,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PixelFarm.MiniAgg.One", "x_
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Typography.Contours\Typography.Contours.projitems*{16af3672-531e-4e0d-8f23-65285fe56298}*SharedItemsImports = 13
 		Typography.OpenFont\Typography.OpenFont.projitems*{235a071b-8d06-40ae-a5c5-b1ce59715ee9}*SharedItemsImports = 13
 		Demo\Shared\DrawingGL.Common.projitems*{2e1e828f-6d2c-4b0e-a2e2-ddf24798cacf}*SharedItemsImports = 13
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{2e593fca-b809-4270-9eb2-93f380af2d6c}*SharedItemsImports = 4
 		Typography.TextFlow\Typography.TextFlow.projitems*{333f3209-8da9-4d33-a560-299ed4c6dfa5}*SharedItemsImports = 4
 		PixelFarm\BackEnd.Triangulation\Triangulation.projitems*{4f435da3-706a-4e6d-ae29-e1e95bd6f68a}*SharedItemsImports = 13
 		FontAtlas\FontAtlas.projitems*{540a2ea6-dae3-4625-8951-b2c3118603a4}*SharedItemsImports = 4
-		Typography.Contours\Typography.Contours.projitems*{540a2ea6-dae3-4625-8951-b2c3118603a4}*SharedItemsImports = 4
 		Typography.MsdfGen\Typography.MsdfGen.projitems*{540a2ea6-dae3-4625-8951-b2c3118603a4}*SharedItemsImports = 4
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
 		Typography.TextFlow\Typography.TextFlow.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
@@ -1924,7 +1920,6 @@ Global
 		{6C9262B6-F6DD-4C42-A3EF-D8574B324E7A} = {C4F7BE3A-77E3-4B10-A6AB-839CBCCF5163}
 		{777178CA-C706-406F-856D-62CC40AC63E4} = {548A7FB1-834E-4197-B0BB-E32BF886D511}
 		{949DBA60-3DB1-4F6C-8BFA-B0056D320DF0} = {548A7FB1-834E-4197-B0BB-E32BF886D511}
-		{16AF3672-531E-4E0D-8F23-65285FE56298} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
 		{9A99F103-B119-4A4D-8093-6A03BAA6D36B} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
 		{7A8A63D2-2CB5-41F5-8E83-6F6E54398CF4} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
 		{D07686EE-2618-4C20-8EB5-32AD4C4D3810} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
