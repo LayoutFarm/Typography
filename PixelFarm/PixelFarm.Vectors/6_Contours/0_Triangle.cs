@@ -151,33 +151,18 @@ namespace PixelFarm.Contours
         /// <summary>
         /// neighbor triangle 0
         /// </summary>
-        public Triangle N0
-        {
-            get
-            {
-                return GetGlyphTriFromUserData(_tri.N0);
-            }
-        }
+        public Triangle N0 => GetGlyphTriFromUserData(_tri.N0);
+
         /// <summary>
         /// neighbor triangle 1
         /// </summary>
-        public Triangle N1
-        {
-            get
-            {
-                return GetGlyphTriFromUserData(_tri.N1);
-            }
-        }
+        public Triangle N1 => GetGlyphTriFromUserData(_tri.N1);
+
         /// <summary>
         /// neighbor triangle 2
         /// </summary>
-        public Triangle N2
-        {
-            get
-            {
-                return GetGlyphTriFromUserData(_tri.N2);
-            }
-        }
+        public Triangle N2 => GetGlyphTriFromUserData(_tri.N2);
+
         static Triangle GetGlyphTriFromUserData(DelaunayTriangle tri)
         {
             if (tri == null) return null;
