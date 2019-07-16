@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Typography.Rendering;
-using PixelFarm.Drawing;
 using PixelFarm.CpuBlit;
 
 namespace PixelFarm.Drawing.Fonts
@@ -27,7 +26,7 @@ namespace PixelFarm.Drawing.Fonts
         public void AddSimpleFontAtlasFile(RequestFont reqFont,
             string simpleFontAtlasFile, string imgFile, PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind)
         {
-
+            //TODO: use 'File' provider to access system file
             var fontAtlasFile = new FontAtlasFile();
             using (FileStream fs = new FileStream(simpleFontAtlasFile, FileMode.Open))
             {
@@ -108,6 +107,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             //--------------------------------------------
             //save merged font atlas
+            //TODO: use 'File' provider to access system file
             using (FileStream fs = new FileStream(multiFontSizrAtlasFilename, FileMode.Create))
             using (BinaryWriter w = new BinaryWriter(fs))
             {
