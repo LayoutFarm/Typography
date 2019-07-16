@@ -128,7 +128,6 @@ Global
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{9a99f103-b119-4a4d-8093-6a03baa6d36b}*SharedItemsImports = 13
 		Demo\Shared\DrawingGL.Common.projitems*{a09b4bf0-2c5e-42e9-b23c-afd0b5a8697d}*SharedItemsImports = 4
 		FontAtlas\FontAtlas.projitems*{b2667a10-2969-493f-8e7b-23f21cbfb886}*SharedItemsImports = 4
-		Typography.Contours\Typography.Contours.projitems*{b2667a10-2969-493f-8e7b-23f21cbfb886}*SharedItemsImports = 4
 		Demo\Shared\DrawingGL.Common.projitems*{b824ffb2-d057-490a-8967-892c0e20c0b6}*SharedItemsImports = 4
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{bc10cc51-a795-40d0-96f0-f87585d59d02}*SharedItemsImports = 4
 		PixelFarm\BackEnd.Triangulation\Triangulation.projitems*{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}*SharedItemsImports = 4
