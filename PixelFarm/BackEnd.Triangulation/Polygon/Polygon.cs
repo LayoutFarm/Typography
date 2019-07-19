@@ -45,7 +45,7 @@ using System;
 using System.Collections.Generic;
 namespace Poly2Tri
 {
-    public sealed class Polygon : Triangulatable
+    public sealed class Polygon : Triangulable
     {
         TriangulationPoint[] _points;
         //List<TriangulationPoint> _steinerPoints;

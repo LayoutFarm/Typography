@@ -88,7 +88,7 @@ namespace Poly2Tri
                 contextStacks.Push(dtSweepContext);
             }
         }
-        public static void Triangulate(TriangulationAlgorithm algorithm, Triangulatable t)
+        public static void Triangulate(TriangulationAlgorithm algorithm, Triangulable t)
         {
             //long time = System.nanoTime();
             TriangulationContext tcx = GetFreeTcxContext(algorithm);
