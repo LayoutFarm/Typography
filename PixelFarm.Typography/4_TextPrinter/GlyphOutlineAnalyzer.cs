@@ -13,7 +13,7 @@ namespace PixelFarm.Contours
     public class GlyphOutlineAnalyzer
     {
         readonly PartFlattener _partFlattener = new PartFlattener();
-        readonly List<Poly2Tri.Polygon> _waitingHoles = new List<Poly2Tri.Polygon>();
+
         readonly ContourBuilder _contourBuilder = new ContourBuilder();
 
         readonly Typography.Contours.GlyphTranslatorToContourBuilder _glyphTxToContourBuilder;
@@ -64,65 +64,16 @@ namespace PixelFarm.Contours
         /// </summary>
         /// <param name="flattenContours"></param>
         /// <returns></returns>
-        DynamicOutline CreateDynamicOutline(List<Contour> flattenContours)
+        static DynamicOutline CreateDynamicOutline(List<Contour> flattenContours)
         {
             using (Poly2TriTool.Borrow(out var p23tool))
             {
                 List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
                 p23tool.Triangulate(flattenContours, output);
                 return new DynamicOutline(new IntermediateOutline(flattenContours, output));
-            }             
-        }
-
-
-        /// <summary>
-        /// create polygon from GlyphContour
-        /// </summary>
-        /// <param name="cnt"></param>
-        /// <returns></returns>
-        static Poly2Tri.Polygon CreatePolygon(List<Vertex> flattenPoints)
-        {
-            List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
-
-            //limitation: poly tri not accept duplicated points! *** 
-            double prevX = 0;
-            double prevY = 0;
-
-#if DEBUG
-            //dbug check if all point is unique 
-            dbugCheckAllGlyphsAreUnique(flattenPoints);
-#endif
-
-
-            int j = flattenPoints.Count;
-            //pass
-            for (int i = 0; i < j; ++i)
-            {
-                Vertex p = flattenPoints[i];
-                double x = p.OX; //start from original X***
-                double y = p.OY; //start from original Y***
-
-                if (x == prevX && y == prevY)
-                {
-                    if (i > 0)
-                    {
-                        throw new NotSupportedException();
-                    }
-                }
-                else
-                {
-                    var triPoint = new Poly2Tri.TriangulationPoint(prevX = x, prevY = y) { userData = p };
-#if DEBUG
-                    p.dbugTriangulationPoint = triPoint;
-#endif
-                    points.Add(triPoint);
-
-                }
             }
-
-            return new Poly2Tri.Polygon(points.ToArray());
-
         }
+
 #if DEBUG
         struct dbugTmpPoint
         {
