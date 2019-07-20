@@ -102,10 +102,11 @@ namespace PixelFarm.CpuBlit
                     var newArray = new T[newSize];
                     if (_internalArray != null)
                     {
-                        for (int i = _internalArray.Length - 1; i >= 0; --i)
-                        {
-                            newArray[i] = _internalArray[i];
-                        }
+                        System.Array.Copy(_internalArray, newArray, _internalArray.Length);
+                        //for (int i = _internalArray.Length - 1; i >= 0; --i)
+                        //{
+                        //    newArray[i] = _internalArray[i];
+                        //}
                     }
                     _internalArray = newArray;
                 }
@@ -139,12 +140,31 @@ namespace PixelFarm.CpuBlit
                 }
             }
             _internalArray[_currentSize++] = v;
-        } 
+        }
+        public void Append(T[] arr)
+        {
+            //append arr             
+            int newSize = _currentSize + arr.Length;
+            if (_internalArray.Length < newSize)
+            {
+                //copy
+                if (newSize < 100000)
+                {
+                    AdjustSize(newSize + (newSize / 2) + 16);
+                }
+                else
+                {
+                    AdjustSize(newSize + newSize / 4);
+                }
+            }
+            System.Array.Copy(arr, 0, _internalArray, _currentSize, arr.Length);
+            _currentSize = newSize;
+        }
         public T this[int i]
         {
             get => _internalArray[i];
             set => _internalArray[i] = value;
-        } 
+        }
         /// <summary>
         /// access to internal array,
         /// </summary>

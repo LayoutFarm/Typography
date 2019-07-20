@@ -71,19 +71,14 @@ namespace Tesselate
             }
             return _innerList[_innerList.Count - 1].Data;
         }
-        public void Add(out RefItem<T> refItem, T data)
+        public void Add(T data, out RefItem<T> refItem)
         {
             RefItem<T> item = new RefItem<T>(data);
             _innerList.Add(item);
             _isSorted = false;
             refItem = item;
         }
-        public void Add(T data)
-        {
-            RefItem<T> item = new RefItem<T>(data);
-            _innerList.Add(item);
-            _isSorted = false;
-        }
+
         int BinSearch(RefItem<T> refItem, int begin, int end)
         {
             int pos = begin + ((end - begin) / 2);

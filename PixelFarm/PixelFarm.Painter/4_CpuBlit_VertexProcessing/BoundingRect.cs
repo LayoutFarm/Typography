@@ -38,8 +38,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public static bool GetBoundingRect(this VertexStore vxs, ref RectD rect)
         {
-            double x1, y1, x2, y2;
-            bool rValue = GetBoundingRectSingle(vxs, out x1, out y1, out x2, out y2);
+            bool rValue = GetBoundingRectSingle(vxs,
+                out double x1, out double y1,
+                out double x2, out double y2);
+
             if (x1 < rect.Left)
             {
                 rect.Left = x1;
@@ -107,7 +109,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         break;
                 }
             }
-            EXIT_LOOP:
+        EXIT_LOOP:
 
             return x1 <= x2 && y1 <= y2;
         }
@@ -117,15 +119,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //----------------------------------------------------
     public static class BoundingRectInt
     {
-        public static void GetBoundingRect(VertexStore vxs, ref RectInt rect)
+        public static void GetBoundingRect(this VertexStore vxs, ref RectInt rect)
         {
             RectD rect1 = new RectD();
             BoundingRect.GetBoundingRect(vxs, ref rect1);
             rect.Left = (int)System.Math.Round(rect1.Left);
             rect.Bottom = (int)System.Math.Round(rect1.Bottom);
             rect.Right = (int)System.Math.Round(rect1.Right);
-            rect.Top = (int)System.Math.Round(rect1.Top); 
+            rect.Top = (int)System.Math.Round(rect1.Top);
         }
-        
+
     }
 }

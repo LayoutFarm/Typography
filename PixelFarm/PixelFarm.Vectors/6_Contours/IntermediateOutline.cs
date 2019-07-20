@@ -14,14 +14,13 @@ namespace PixelFarm.Contours
         float _bounds_minX, _bounds_minY, _bounds_maxX, _bounds_maxY;
         public IntermediateOutline(
             List<Contour> contours,
-            Polygon polygon,
-            Polygon[] subPolygons)
+            List<Polygon> polygons)
         {
             //init value
 
             _contours = contours;
             //1. create centroid line hubs: 
-            CreateCentroidLineHubs(polygon, subPolygons);
+            CreateCentroidLineHubs(polygons);
             //2. create bone joints (create joint before bone)
             CreateBoneJoints();
             //3. create bones 
@@ -30,34 +29,31 @@ namespace PixelFarm.Contours
             CreateGlyphEdges();
         }
 
-        void CreateCentroidLineHubs(Polygon polygon, Polygon[] subPolygons)
+        void CreateCentroidLineHubs(List<Polygon> polygons)
         {
             List<Triangle> triangles = new List<Triangle>();
             _lineHubs = new List<CentroidLineHub>();
-#if DEBUG            
+#if DEBUG
             EdgeLine.s_dbugTotalId = 0;//reset 
             _dbugTriangles = new List<Triangle>();
 #endif
 
             //main polygon
-            CreateCentroidLineHubs(polygon, triangles, _lineHubs);
+            CreateCentroidLineHubs(polygons[0], triangles, _lineHubs);
 #if DEBUG
             _dbugTriangles.AddRange(triangles);
 #endif
-            if (subPolygons != null)
+            int j = polygons.Count;
+            for (int i = 1; i < j; ++i)
             {
-                int j = subPolygons.Length;
 
-                for (int i = 0; i < j; ++i)
-                {
-
-                    triangles.Clear();//clear, reuse it
-                    CreateCentroidLineHubs(subPolygons[i], triangles, _lineHubs);
+                triangles.Clear();//clear, reuse it
+                CreateCentroidLineHubs(polygons[i], triangles, _lineHubs);
 #if DEBUG
-                    _dbugTriangles.AddRange(triangles);
+                _dbugTriangles.AddRange(triangles);
 #endif
-                }
             }
+
         }
         static void CreateCentroidLineHubs(Polygon polygon, List<Triangle> triangles, List<CentroidLineHub> outputLineHubs)
         {
@@ -193,7 +189,7 @@ namespace PixelFarm.Contours
             for (int i = 0; i < j; ++i)
             {
                 Contour cnt = contours[i];
-                cnt.CreateGlyphEdges();
+                cnt.CreateEdges();
                 //this is a new found after fitting process
                 cnt.FindBounds(ref _bounds_minX, ref _bounds_minY, ref _bounds_maxX, ref _bounds_maxY);
             }

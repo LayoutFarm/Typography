@@ -52,8 +52,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     public class CurveFlattener
     {
         //tools , curve producer
-        readonly Curve3 _curve3 = new Curve3();
-        readonly Curve4 _curve4 = new Curve4();
+        readonly Curve3Flattener _curve3 = new Curve3Flattener();
+        readonly Curve4Flattener _curve4 = new Curve4Flattener();
+
+        int _simpleIncStep;
+
         public CurveFlattener()
         {
         }
@@ -68,6 +71,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
                 _curve3.ApproximationScale = value;
                 _curve4.ApproximationScale = value;
+            }
+        }
+
+        public int SimpleIncStep
+        {
+            get => _simpleIncStep;
+            set
+            {
+                
             }
         }
         public Curves.CurveApproximationMethod ApproximationMethod
@@ -231,7 +243,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             {
                                 case CurvePointMode.P2:
                                     {
-                                        _curve3.MakeLines(output,
+                                        _curve3.Flatten(output,
                                             lastX,
                                             lasty,
                                             c3p2.X,
@@ -243,7 +255,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                                 case CurvePointMode.P3:
                                     {
 
-                                        _curve4.MakeLines(output,
+                                        _curve4.Flatten(output,
                                             lastX, lasty,
                                             c4p2.x, c4p2.y,
                                             c4p3.x, c4p3.y,

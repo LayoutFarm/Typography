@@ -32,18 +32,24 @@ namespace PixelFarm.Drawing
             return base.GetHashCode();
         }
         public static readonly Point Empty = new Point();
+
 #if DEBUG
         public override string ToString()
         {
             return "(" + this.X + "," + this.Y + ")";
         }
 #endif
+        public static Point Round(PointF p)
+        {
+            return new Point((int)System.Math.Round(p.X), (int)System.Math.Round(p.Y));
+        }
+
     }
 
     public struct PointF
     {
-        public readonly float X;
-        public readonly float Y;
+        public float X;
+        public float Y;
 
         public PointF(float x, float y)
         {
@@ -65,6 +71,9 @@ namespace PixelFarm.Drawing
             return "(" + this.X + "," + this.Y + ")";
         }
 #endif
+        public static readonly PointF Empty = new PointF();
+
+        public bool IsEmpty => X == 0 && Y == 0;
     }
 
     public struct PointD
@@ -132,11 +141,15 @@ namespace PixelFarm.Drawing
             return "(" + Width + "," + Height + ")";
         }
 #endif
+        public static Size Round(SizeF s)
+        {
+            return new Size((int)System.Math.Round(s.Width), (int)System.Math.Round(s.Height));
+        }
     }
 
     public struct SizeF
     {
-        public readonly float Width, Height;
+        public float Width, Height;
         public SizeF(float w, float h)
         {
             Width = w;
@@ -154,5 +167,8 @@ namespace PixelFarm.Drawing
             return "(" + Width + "," + Height + ")";
         }
 #endif
+
+        public bool IsEmpty => Width == 0 && Height == 0;
+        public static SizeF Empty => new SizeF();
     }
 }

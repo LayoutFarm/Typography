@@ -1,7 +1,6 @@
 ﻿//MIT, 2019-present, WinterDev
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont;
 namespace Test_WinForm_TessGlyph
 {
 

@@ -287,9 +287,26 @@ namespace PixelFarm.Drawing
             _strokeColor = color;
             _brush = new SolidBrush(color);
         }
+        public Pen(Color color, float width)
+        {
+            Width = width;
+            _strokeColor = color;
+            _brush = new SolidBrush(color);
+        }
         public Pen(Brush brush)
         {
+            Width = 1;//default
             _brush = brush;
+            if (brush is SolidBrush solidBrush)
+            {
+                _strokeColor = solidBrush.Color;
+            }
+            else
+            {
+                _strokeColor = Color.Black;
+            }
+
+            //TODO: review here
         }
         public override Brush Brush => _brush;
         public Color StrokeColor => _strokeColor;
@@ -297,6 +314,8 @@ namespace PixelFarm.Drawing
         public override object InnerPen { get; set; }
         public override float Width { get; set; }
         public override DashStyle DashStyle { get; set; }
+        public Color Color => _strokeColor;
+
         public override void Dispose()
         {
         }

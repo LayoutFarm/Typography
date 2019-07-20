@@ -440,7 +440,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //------------------------
             m_arc.init(0.0, 0.0, rx, ry, start_angle, sweep_angle);
 
-            Affine mtx = Affine.NewMatix(
+            Affine mtx = Affine.New(
                 AffinePlan.Rotate(angle),
                 AffinePlan.Translate(cx, cy)
                 );

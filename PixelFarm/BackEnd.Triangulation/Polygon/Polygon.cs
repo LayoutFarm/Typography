@@ -70,8 +70,6 @@ namespace Poly2Tri
             }
         }
 
-
-
         private Polygon()
         {
             //for clean clone
@@ -273,8 +271,10 @@ namespace Poly2Tri
             // Hole constraints
             if (_holes != null)
             {
-                foreach (Polygon p in _holes)
+                for (int h = 0; h < _holes.Length; ++h)
                 {
+                    Polygon p = _holes[h];
+
                     int p_npoints_lim = p._points.Length - 1;
                     for (int i = 0; i < p_npoints_lim; ++i)
                     {

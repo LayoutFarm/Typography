@@ -30,5 +30,8 @@ namespace PixelFarm.Drawing
         /// <param name="another"></param>
         /// <returns></returns>
         public abstract Region CreateXor(Region another);
+
+        public abstract bool IsVisible(PointF p);
+        public abstract bool IsVisible(RectangleF p);
     }
 }

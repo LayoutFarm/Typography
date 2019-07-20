@@ -6,8 +6,14 @@ using PixelFarm.VectorMath;
 
 namespace PixelFarm.Contours
 {
+    public interface IContour
+    {
+        int VertexCount { get; }
+        void GetVertex(int index, out float x, out float y, out object userData);
+        bool IsClockwise { get; }
+    }
 
-    public class Contour
+    public class Contour : IContour
     {
         public List<ContourPart> parts = new List<ContourPart>();
         public List<Vertex> flattenPoints; //original flatten points 
@@ -15,6 +21,7 @@ namespace PixelFarm.Contours
         bool _analyzed;
         bool _analyzedClockDirection;
         bool _isClockwise;
+
         public Contour()
         {
         }
@@ -113,7 +120,7 @@ namespace PixelFarm.Contours
             return _isClockwise;
         }
 
-        internal void CreateGlyphEdges()
+        internal void CreateEdges()
         {
             int lim = flattenPoints.Count - 1;
             Vertex p = null, q = null;
@@ -210,6 +217,16 @@ namespace PixelFarm.Contours
                 //pararell edges
             }
         }
+
+        int IContour.VertexCount => flattenPoints.Count;
+        void IContour.GetVertex(int index, out float x, out float y, out object userData)
+        {
+            Vertex vertex = flattenPoints[index];
+            x = vertex.X;
+            y = vertex.Y;
+            userData = vertex;
+        }
+        bool IContour.IsClockwise => this.IsClockwise();
 
     }
 

@@ -35,8 +35,8 @@ namespace PixelFarm.Contours
             }
         }
         public abstract PartKind Kind { get; }
-        public ContourPart NextPart { get; set; }
-        public ContourPart PrevPart { get; set; }
+        public ContourPart NextPart { get; protected set; }
+        public ContourPart PrevPart { get; protected set; }
         internal abstract void Flatten(PartFlattener flattener);
 
         public abstract Vector2f GetLastPoint();

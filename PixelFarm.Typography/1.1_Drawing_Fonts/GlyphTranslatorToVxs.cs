@@ -76,7 +76,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             else
             {
-                var mat = PixelFarm.CpuBlit.VertexProcessing.Affine.NewMatix(
+                var mat = PixelFarm.CpuBlit.VertexProcessing.Affine.New(
                     new PixelFarm.CpuBlit.VertexProcessing.AffinePlan(
                         PixelFarm.CpuBlit.VertexProcessing.AffineMatrixCommand.Scale, scale, scale));
                 //transform -> flatten ->output
