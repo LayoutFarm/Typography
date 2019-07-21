@@ -34,10 +34,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         internal const double CURVE_ANGLE_TOLERANCE_EPSILON = 0.01;
         internal const int CURVE_RECURSION_LIMIT = 32;
         //-------------------------------------------------------catrom_to_bezier
-        public static Curve4Points CatromToBezier(double x1, double y1,
+        public static void CatromToBezier(double x1, double y1,
                                               double x2, double y2,
                                               double x3, double y3,
-                                              double x4, double y4)
+                                              double x4, double y4,
+                                              Curve4Points output)
         {
             // Trans. matrix Catmull-Rom to Bezier
             //
@@ -46,9 +47,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //  0       1/6     1       -1/6
             //  0       0       1       0
             //
-            return new Curve4Points(
-                x2,
-                y2,
+            output.Set(
+                 x2,
+                 y2,
                 (-x1 + 6 * x2 + x3) / 6,
                 (-y1 + 6 * y2 + y3) / 6,
                 (x2 + 6 * x3 - x4) / 6,
@@ -57,21 +58,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 y3);
         }
 
-        //-----------------------------------------------------------------------
-        public static Curve4Points CatromToBezier(Curve4Points cp)
-        {
-            return CatromToBezier(
-                    cp.c0, cp.c1,
-                    cp.c2, cp.c3,
-                    cp.c4, cp.c5,
-                    cp.c6, cp.c7);
-        }
-
         //-----------------------------------------------------ubspline_to_bezier
-        public static Curve4Points UbSplineToBezier(double x1, double y1,
+        public static void UbSplineToBezier(double x1, double y1,
                                                 double x2, double y2,
                                                 double x3, double y3,
-                                                double x4, double y4)
+                                                double x4, double y4,
+                                                Curve4Points output)
         {
             // Trans. matrix Uniform BSpline to Bezier
             //
@@ -80,7 +72,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //  0       2/6     4/6     0
             //  0       1/6     4/6     1/6
             //
-            return new Curve4Points(
+            output.Set(
                 (x1 + 4 * x2 + x3) / 6,
                 (y1 + 4 * y2 + y3) / 6,
                 (4 * x2 + 2 * x3) / 6,
@@ -90,22 +82,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 (x2 + 4 * x3 + x4) / 6,
                 (y2 + 4 * y3 + y4) / 6);
         }
-
-        //-----------------------------------------------------------------------
-        public static Curve4Points UbSplineToBezier(Curve4Points cp)
-        {
-            return UbSplineToBezier(
-                    cp.c0, cp.c1,
-                    cp.c2, cp.c3,
-                    cp.c4, cp.c5,
-                    cp.c6, cp.c7);
-        }
-
         //------------------------------------------------------hermite_to_bezier
-        public static Curve4Points HermiteToBezier(double x1, double y1,
+        public static void HermiteToBezier(double x1, double y1,
                                                double x2, double y2,
                                                double x3, double y3,
-                                               double x4, double y4)
+                                               double x4, double y4,
+                                               Curve4Points output)
         {
             // Trans. matrix Hermite to Bezier
             //
@@ -114,7 +96,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //  0       1       0       -1/3
             //  0       1       0       0
             //
-            return new Curve4Points(
+            output.Set(
                 x1,
                 y1,
                 (3 * x1 + x3) / 3,
@@ -123,16 +105,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 (3 * y2 - y4) / 3,
                 x2,
                 y2);
-        }
-
-        //-----------------------------------------------------------------------
-        public static Curve4Points HermiteToBezier(Curve4Points cp)
-        {
-            return HermiteToBezier(
-                    cp.c0, cp.c1,
-                    cp.c2, cp.c3,
-                    cp.c4, cp.c5,
-                    cp.c6, cp.c7);
         }
     }
 
@@ -396,17 +368,16 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //-------------------------------------------------------------curve4_points
     public sealed class Curve4Points
     {
-        public readonly double c0, c1, c2, c3, c4, c5, c6, c7;
-        public Curve4Points() { }
-        public Curve4Points(double x1, double y1,
+        public double x0, y0, x1, y1, x2, y2, x3, y3;
+        public void Set(double x0, double y0,
+                      double x1, double y1,
                       double x2, double y2,
-                      double x3, double y3,
-                      double x4, double y4)
+                      double x3, double y3)
         {
-            c0 = x1; c1 = y1;
-            c2 = x2; c3 = y2;
-            c4 = x3; c5 = y3;
-            c6 = x4; c7 = y4;
+            this.x0 = x0; this.y0 = y0;
+            this.x1 = x1; this.y1 = y1;
+            this.x2 = x2; this.y2 = y2;
+            this.x3 = x3; this.y3 = y3;
         }
     }
 
@@ -522,13 +493,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _step = _num_steps;
         }
 
-        public void Init(Curve4Points cp)
-        {
-            Init(cp.c0, cp.c1,
-                    cp.c2, cp.c3,
-                    cp.c4, cp.c5,
-                    cp.c6, cp.c7);
-        }
+        //public void Init(Curve4Points cp)
+        //{
+        //    Init(cp.x0, cp.y0,
+        //            cp.x1, cp.y1,
+        //            cp.x2, cp.y2,
+        //            cp.x3, cp.y3);
+        //}
         public Curves.CurveApproximationMethod ApproximationMethod
         {
             get => Curves.CurveApproximationMethod.Inc;
@@ -635,17 +606,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //    Init(x1, y1, x2, y2, x3, y3, x4, y4);
         //}
 
-        //public Curve4Div(Curve4Points cp)
-        //{
-        //    _approximation_scale = (1.0);
-        //    _angle_tolerance = (0.0);
 
-        //    Init(
-        //            cp.c0, cp.c1,
-        //            cp.c2, cp.c3,
-        //            cp.c4, cp.c5,
-        //            cp.c6, cp.c7);
-        //}
         public ArrayList<Vector2> GetInternalPoints() => _points;
         public void Reset()
         {
@@ -664,15 +625,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         }
 
-
-        public void Init(Curve4Points cp)
-        {
-            Init(
-                    cp.c0, cp.c1,
-                    cp.c2, cp.c3,
-                    cp.c4, cp.c5,
-                    cp.c6, cp.c7);
-        }
         public double ApproximationScale
         {
             get => _approximation_scale;
@@ -1007,14 +959,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-        public void Init(Curve4Points cp)
-        {
-            Init(
-                    cp.c0, cp.c1,
-                    cp.c2, cp.c3,
-                    cp.c4, cp.c5,
-                    cp.c6, cp.c7);
-        }
+
 
 
         public Curves.CurveApproximationMethod ApproximationMethod

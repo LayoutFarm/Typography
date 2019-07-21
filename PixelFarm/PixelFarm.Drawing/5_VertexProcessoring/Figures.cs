@@ -324,24 +324,30 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     }
 
 
-
     public class Poly2TriTool
     {
         List<Poly2Tri.Polygon> _waitingHoles = new List<Poly2Tri.Polygon>();//resuable
         List<FlattenContour> _flattenContours = new List<FlattenContour>();//reusable
+        FigureBuilder _figBuilder = new FigureBuilder();
+        List<Poly2Tri.Polygon> _otherPolygons = new List<Poly2Tri.Polygon>();
 
         int[] _singlePolygonEndPoint = new int[1];
-        public Poly2TriTool() { }
+        public Poly2TriTool()
+        {
 
-        public void Triangulate(float[] flattenPolygonXYs, List<Poly2Tri.Polygon> outputPolygons)
+        }
+        public bool YAxisPointDown { get; set; }
+
+        public void PreparePolygons(float[] flattenPolygonXYs, List<Poly2Tri.Polygon> outputPolygons)
         {
             _singlePolygonEndPoint[0] = flattenPolygonXYs.Length - 1;//glyph convention
-            Triangulate(flattenPolygonXYs, _singlePolygonEndPoint, outputPolygons);
+            PreparePolygons(flattenPolygonXYs, _singlePolygonEndPoint, outputPolygons);
         }
-        public void Triangulate(float[] flattenPolygonXYs, int[] contourEndIndices, List<Poly2Tri.Polygon> outputPolygons)
+        public void PreparePolygons(float[] flattenPolygonXYs, int[] contourEndIndices, List<Poly2Tri.Polygon> outputPolygons)
         {
             _waitingHoles.Clear();
             _flattenContours.Clear();
+            _otherPolygons.Clear();
 
             //
             SeparateToFlattenContourList(flattenPolygonXYs, contourEndIndices, _flattenContours);
@@ -350,8 +356,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             // more than 1 contours, no hole => eg.  i, j, ;,  etc
             // more than 1 contours, with hole => eg.  a,e ,   etc  
 
-            //clockwise => not hole  
-
+            //clockwise => not hole
 
             int cntCount = _flattenContours.Count;
             Poly2Tri.Polygon mainPolygon = null;
@@ -364,12 +369,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             for (int n = 0; n < cntCount; ++n)
             {
                 FlattenContour cnt = _flattenContours[n];
-                bool cntIsMainPolygon = cnt.IsClockwise;
 
-                //if (yAxisFlipped)
-                //{
-                //    cntIsMainPolygon = !cntIsMainPolygon;
-                //}
+                bool cntIsMainPolygon = YAxisPointDown ? !cnt.IsClockwise : cnt.IsClockwise;
 
                 if (cntIsMainPolygon)
                 {
@@ -397,11 +398,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //if we already have a main polygon
                         //then this is another sub polygon
                         //IsHole is correct after we Analyze() the glyph contour
-                        Poly2Tri.Polygon subPolygon = CreatePolygon(cnt);
-                        if (otherPolygons == null)
-                        {
-                            otherPolygons = new List<Poly2Tri.Polygon>();
-                        }
+                        Poly2Tri.Polygon subPolygon = CreatePolygon(cnt); 
                         otherPolygons.Add(subPolygon);
                     }
                 }
@@ -425,25 +422,102 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
                 throw new NotSupportedException();
             }
-            //------------------------------------------
-            //2. tri angulate 
-            Poly2Tri.P2T.Triangulate(mainPolygon); //that poly is triangulated 
-            outputPolygons.Add(mainPolygon);
 
-            if (otherPolygons != null)
+            outputPolygons.Add(mainPolygon);
+            if (otherPolygons.Count > 0)
             {
                 outputPolygons.AddRange(otherPolygons);
-                for (int i = otherPolygons.Count - 1; i >= 0; --i)
-                {
-                    Poly2Tri.P2T.Triangulate(otherPolygons[i]);
-                }
             }
-            //------------------------------------------
+
+
             _waitingHoles.Clear();
             _flattenContours.Clear();
+            _otherPolygons.Clear();
+        }
+        public void PreparePolygons(VertexStore vxs, List<Poly2Tri.Polygon> outputPolygons)
+        {
+            FigureContainer figContainer = _figBuilder.Build(vxs);
+            if (figContainer.IsSingleFigure)
+            {
+                PreparePolygons(figContainer._figure, outputPolygons);
+            }
+            else
+            {
+                PreparePolygons(figContainer._multiFig, outputPolygons);
+            }
+        }
+        public void PreparePolygons(Figure fig, List<Poly2Tri.Polygon> outputPolyons)
+        {
+            PreparePolygons(fig.coordXYs, outputPolyons);
+        }
+        public void PreparePolygons(MultiFigures figures, List<Poly2Tri.Polygon> outputPolygons)
+        {
+            using (ReusableCoordList.Borrow(out ReusableCoordList reuseableList))
+            {
+                Figure[] figs = figures._figures;
+                for (int i = 0; i < figs.Length; ++i)
+                {
+
+                    Figure fig = figs[i];
+                    float[] figCoords = fig.coordXYs;
+
+                    float prevX = float.MaxValue;
+                    float prevY = float.MinValue;
+
+                    int startAt = reuseableList._coordXYs.Count;
+                    for (int n = 0; n < figCoords.Length;)
+                    {
+                        float x = figCoords[n];
+                        float y = figCoords[n + 1];
+                        reuseableList._coordXYs.Append(prevX = x);
+                        reuseableList._coordXYs.Append(prevY = y);
+                        n += 2;
+                    }
+
+
+                    if (reuseableList._coordXYs[startAt] == prevX && reuseableList._coordXYs[startAt + 1] == prevY)
+                    {
+                        reuseableList._coordXYs.RemoveLast();
+                        reuseableList._coordXYs.RemoveLast();
+                    }
+
+                    reuseableList._contourEndPoints.Append(reuseableList._coordXYs.Count - 1); //glyph convention
+                }
+                PreparePolygons(reuseableList._coordXYs.ToArray(), reuseableList._contourEndPoints.ToArray(), outputPolygons);
+            }
         }
 
 
+        //------------
+        public void Triangulate(float[] flattenPolygonXYs, List<Poly2Tri.Polygon> outputPolygons)
+        {
+            _singlePolygonEndPoint[0] = flattenPolygonXYs.Length - 1;//glyph convention
+            Triangulate(flattenPolygonXYs, _singlePolygonEndPoint, outputPolygons);
+        }
+        public void Triangulate(float[] flattenPolygonXYs, int[] contourEndIndices, List<Poly2Tri.Polygon> outputPolygons)
+        {
+            //1. prepare polygons
+            PreparePolygons(flattenPolygonXYs, contourEndIndices, outputPolygons);
+            //------------------------------------------
+            //2. tri angulate 
+            Triangulate(outputPolygons);
+        }
+
+        public void Triangulate(VertexStore vxs, List<Poly2Tri.Polygon> outputPolygons)
+        {
+            //1. prepare polygon
+            PreparePolygons(vxs, outputPolygons);
+            //2. tri angulate 
+            Triangulate(outputPolygons);
+        }
+        public void Triangulate(List<Poly2Tri.Polygon> outputPolygons)
+        {
+            int count = outputPolygons.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                Poly2Tri.P2T.Triangulate(outputPolygons[i]);
+            }
+        }
         static void SeparateToFlattenContourList(float[] polygonXYs, int[] contourEndIndices, List<FlattenContour> contours)
         {
 
@@ -473,6 +547,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         void Reset()
         {
             _waitingHoles.Clear();
+            _flattenContours.Clear();
+            _otherPolygons.Clear();
+
+            YAxisPointDown = false;
         }
         public static TempContext<Poly2TriTool> Borrow(out Poly2TriTool poly2TriTool)
         {
@@ -672,61 +750,38 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public static class Poly2TriHelper
     {
-        public static List<Poly2Tri.Polygon> GetTrianglulatedArea(this Figure fig)
+        public static List<Poly2Tri.Polygon> GetTrianglulatedArea(this Figure fig, bool yAxisPointDown)
+        {
+            List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
+            GetTrianglulatedArea(fig, yAxisPointDown, output);
+            return output;
+        }
+        public static void GetTrianglulatedArea(this Figure fig, bool yAxisPointDown, List<Poly2Tri.Polygon> output)
         {
             using (Poly2TriTool.Borrow(out Poly2TriTool poly2Tri))
             {
-                List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
-                poly2Tri.Triangulate(fig.coordXYs, output);//glyph convention
-                return fig.Poly2TriPolygons = output;
+                poly2Tri.YAxisPointDown = yAxisPointDown;
+                poly2Tri.Triangulate(fig.coordXYs, output);
+                fig.Poly2TriPolygons = output;
             }
         }
-        public static List<Poly2Tri.Polygon> GetTrianglulatedArea(this MultiFigures figures)
+        public static void GetTrianglulatedArea(this MultiFigures figures, bool yAxisPointDown, List<Poly2Tri.Polygon> output)
         {
             using (Poly2TriTool.Borrow(out Poly2TriTool poly2Tri))
-            using (ReusableCoordList.Borrow(out ReusableCoordList reuseableList))
             {
-                Figure[] figs = figures._figures;
-                for (int i = 0; i < figs.Length; ++i)
-                {
-
-                    Figure fig = figs[i];
-                    float[] figCoords = fig.coordXYs;
-
-                    float prevX = float.MaxValue;
-                    float prevY = float.MinValue;
-
-                    int startAt = reuseableList._coordXYs.Count;
-                    for (int n = 0; n < figCoords.Length;)
-                    {
-                        float x = figCoords[n];
-                        float y = figCoords[n + 1];
-                        reuseableList._coordXYs.Append(prevX = x);
-                        reuseableList._coordXYs.Append(prevY = y);
-                        n += 2;
-                    }
-
-
-                    if (reuseableList._coordXYs[startAt] == prevX && reuseableList._coordXYs[startAt + 1] == prevY)
-                    {
-                        reuseableList._coordXYs.RemoveLast();
-                        reuseableList._coordXYs.RemoveLast();
-                    }
-
-
-                    reuseableList._contourEndPoints.Append(reuseableList._coordXYs.Count - 1); //glyph convention
-                }
-                //--------------------------------
-                List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
-                poly2Tri.Triangulate(reuseableList._coordXYs.ToArray(), reuseableList._contourEndPoints.ToArray(), output);
-
-                return figures.Poly2TriPolygons = output;
+                poly2Tri.YAxisPointDown = yAxisPointDown;
+                poly2Tri.PreparePolygons(figures, output);
+                poly2Tri.Triangulate(output);
+                figures.Poly2TriPolygons = output;
             }
+        }
+        public static List<Poly2Tri.Polygon> GetTrianglulatedArea(this MultiFigures figures, bool yAxisPointDown)
+        {
+            List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
+            GetTrianglulatedArea(figures, yAxisPointDown, output);
+            return output;
         }
     }
-
-
-
 
 
     public struct FigureContainer

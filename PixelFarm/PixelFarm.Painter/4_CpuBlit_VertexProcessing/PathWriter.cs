@@ -83,6 +83,8 @@ namespace PixelFarm.CpuBlit
         double _latest_moveTo_X;
         double _latest_moveTo_Y;
 
+        internal Curve4Points _c4_points = new Curve4Points();//reusable
+
         /// <summary>
         /// latest X
         /// </summary>
@@ -328,7 +330,6 @@ namespace PixelFarm.CpuBlit
                 x2, y2,
                 _latest_x = x3, _latest_y = y3
                 );
-
         }
 
         public void Curve4Rel(double dx1, double dy1,
@@ -422,9 +423,9 @@ namespace PixelFarm.CpuBlit
         //template<class VertexSource>  
         public void JoinPath(VertexStore vxs)
         {
-            double x, y;
+
             int index = 0;
-            VertexCmd cmd = vxs.GetVertex(index++, out x, out y);
+            VertexCmd cmd = vxs.GetVertex(index++, out double x, out double y);
             if (cmd == VertexCmd.NoMore)
             {
                 return;
@@ -432,8 +433,8 @@ namespace PixelFarm.CpuBlit
             //---------------------
             if (VertexHelper.IsVertextCommand(cmd))
             {
-                double x0, y0;
-                VertexCmd flags0 = GetLastVertex(out x0, out y0);
+
+                VertexCmd flags0 = GetLastVertex(out double x0, out double y0);
                 if (VertexHelper.IsVertextCommand(flags0))
                 {
                     if (AggMath.calc_distance(x, y, x0, y0) > AggMath.VERTEX_DISTANCE_EPSILON)
@@ -470,6 +471,69 @@ namespace PixelFarm.CpuBlit
 
     public static class PathWriterExtensions
     {
+        public static void UbSpline(this PathWriter pw, double[] xyCoords)
+        {
+            Curve4Points curve4_points = pw._c4_points;
+            pw.MoveTo(xyCoords[0], xyCoords[1]);
+            for (int i = 0; i < xyCoords.Length - (4 * 2);)
+            {
+                Curves.UbSplineToBezier(
+                    xyCoords[i], xyCoords[i + 1],
+                    xyCoords[i + 2], xyCoords[i + 3],
+                    xyCoords[i + 4], xyCoords[i + 5],
+                    xyCoords[i + 6], xyCoords[i + 7],
+                    curve4_points
+                    );
+                pw.Curve4(curve4_points.x1, curve4_points.y1,
+                    curve4_points.x2, curve4_points.y2,
+                    curve4_points.x3, curve4_points.y3
+                    );
+
+                i += 2;
+            }
+        }
+        public static void Hermite(this PathWriter pw, double[] xyCoords)
+        {
+            Curve4Points curve4_points = pw._c4_points;
+            pw.MoveTo(xyCoords[0], xyCoords[1]);
+            for (int i = 0; i < xyCoords.Length - (4 * 2);)
+            {
+                Curves.HermiteToBezier(
+                    xyCoords[i], xyCoords[i + 1],
+                    xyCoords[i + 2], xyCoords[i + 3],
+                    xyCoords[i + 4], xyCoords[i + 5],
+                    xyCoords[i + 6], xyCoords[i + 7],
+                    curve4_points
+                    );
+                pw.Curve4(curve4_points.x1, curve4_points.y1,
+                    curve4_points.x2, curve4_points.y2,
+                    curve4_points.x3, curve4_points.y3
+                    );
+                i += 2;
+            }
+        }
+        public static void CatmulRom(this PathWriter pw, double[] xyCoords)
+        {
+            Curve4Points curve4_points = pw._c4_points;
+
+            pw.MoveTo(xyCoords[2], xyCoords[3]);//***
+            for (int i = 0; i < xyCoords.Length - (4 * 2);)
+            {
+                Curves.CatromToBezier(
+                    xyCoords[i], xyCoords[i + 1],
+                    xyCoords[i + 2], xyCoords[i + 3],
+                    xyCoords[i + 4], xyCoords[i + 5],
+                    xyCoords[i + 6], xyCoords[i + 7],
+                    pw._c4_points
+                    );
+
+                pw.Curve4(curve4_points.x1, curve4_points.y1,
+                    curve4_points.x2, curve4_points.y2,
+                    curve4_points.x3, curve4_points.y3
+                    );
+                i += 2;
+            }
+        }
 
         //=======================================================================
         //TODO: implement arc to ***
@@ -682,7 +746,7 @@ namespace PixelFarm.CpuBlit
         //-----------------
         const float STEP_FACTOR = 2f;
 
-        static void DrawCurveSegment(
+        static void SplineCurveSegment(
            PathWriter writer,
            double x1, double y1,
            double x2, double y2,
@@ -776,16 +840,16 @@ namespace PixelFarm.CpuBlit
         public static void DrawCurve(this PathWriter writer, float[] points, float tension)
         {
             // First segment
-            DrawCurveSegment(writer, points[0], points[1], points[0], points[1], points[2], points[3], points[4], points[5], tension);
+            SplineCurveSegment(writer, points[0], points[1], points[0], points[1], points[2], points[3], points[4], points[5], tension);
             // Middle segments
             int i = 2;
             for (; i < points.Length - 4; i += 2)
             {
-                DrawCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5], tension);
+                SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5], tension);
             }
 
             // Last segment
-            DrawCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 2], points[i + 3], tension);
+            SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 2], points[i + 3], tension);
         }
 
 
@@ -803,20 +867,20 @@ namespace PixelFarm.CpuBlit
             int pn = points.Length;
 
             // First segment
-            DrawCurveSegment(writer, points[pn - 2], points[pn - 1], points[0], points[1], points[2], points[3], points[4], points[5], tension);
+            SplineCurveSegment(writer, points[pn - 2], points[pn - 1], points[0], points[1], points[2], points[3], points[4], points[5], tension);
 
             // Middle segments 
             int i = 2;
             for (; i < pn - 4; i += 2)
             {
-                DrawCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5], tension);
+                SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5], tension);
             }
 
             // Last segment
-            DrawCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[0], points[1], tension);
+            SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[0], points[1], tension);
 
             // Last-to-First segment
-            DrawCurveSegment(writer, points[i], points[i + 1], points[i + 2], points[i + 3], points[0], points[1], points[2], points[3], tension);
+            SplineCurveSegment(writer, points[i], points[i + 1], points[i + 2], points[i + 3], points[0], points[1], points[2], points[3], tension);
 
         }
     }
@@ -824,6 +888,9 @@ namespace PixelFarm.CpuBlit
 
     public class CpuBlitGraphicsPath : PixelFarm.Drawing.GraphicsPath
     {
+
+        //TODO: review this again
+
         internal VertexStore _vxs;
         PathWriter _writer;
         public CpuBlitGraphicsPath()
