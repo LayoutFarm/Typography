@@ -19,9 +19,9 @@ namespace PixelFarm.Contours
     {
         internal readonly Vertex _glyphPoint_P;
         internal readonly Vertex _glyphPoint_Q;
-        Triangle _ownerTriangle;
+        AnalyzedTriangle _ownerTriangle;
 
-        internal EdgeLine(Triangle ownerTriangle, Vertex p, Vertex q)
+        internal EdgeLine(AnalyzedTriangle ownerTriangle, Vertex p, Vertex q)
         {
             //this canbe inside edge or outside edge
 
@@ -99,7 +99,7 @@ namespace PixelFarm.Contours
         public Vertex Q => _glyphPoint_Q;
         public LineSlopeKind SlopeKind { get; internal set; }
 
-        internal Triangle OwnerTriangle => _ownerTriangle;
+        internal AnalyzedTriangle OwnerTriangle => _ownerTriangle;
 
         public abstract bool IsOutside { get; }
         public bool IsInside => !this.IsOutside;
@@ -159,7 +159,7 @@ namespace PixelFarm.Contours
         //it have 1-2 control(s) edge (inside)
         EdgeLine _ctrlEdge_P;
         EdgeLine _ctrlEdge_Q;
-        internal OutsideEdgeLine(Triangle ownerTriangle, Vertex p, Vertex q)
+        internal OutsideEdgeLine(AnalyzedTriangle ownerTriangle, Vertex p, Vertex q)
             : base(ownerTriangle, p, q)
         {
 
@@ -247,7 +247,7 @@ namespace PixelFarm.Contours
     {
 
         internal Joint inside_joint;
-        internal InsideEdgeLine(Triangle ownerTriangle, Vertex p, Vertex q)
+        internal InsideEdgeLine(AnalyzedTriangle ownerTriangle, Vertex p, Vertex q)
             : base(ownerTriangle, p, q)
         {
         }
@@ -265,7 +265,7 @@ namespace PixelFarm.Contours
             return Math.Abs(Math.Atan2(Math.Abs(line.QY - line.PY), Math.Abs(line.QX - line.PX)));
         }
 
-        internal static bool ContainsTriangle(this EdgeLine edge, Triangle p)
+        internal static bool ContainsTriangle(this EdgeLine edge, AnalyzedTriangle p)
         {
             return (p.e0 == edge ||
                     p.e1 == edge ||

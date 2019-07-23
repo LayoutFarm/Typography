@@ -365,7 +365,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //TODO: add to more proper polygon ***
             //eg i
             //-------------------------- 
-            List<Poly2Tri.Polygon> otherPolygons = null;
+
             for (int n = 0; n < cntCount; ++n)
             {
                 FlattenContour cnt = _flattenContours[n];
@@ -397,9 +397,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         //if we already have a main polygon
                         //then this is another sub polygon
-                        //IsHole is correct after we Analyze() the glyph contour
-                        Poly2Tri.Polygon subPolygon = CreatePolygon(cnt); 
-                        otherPolygons.Add(subPolygon);
+                        //IsHole is correct after we Analyze() the glyph contour 
+                        _otherPolygons.Add(CreatePolygon(cnt));
                     }
                 }
                 else
@@ -424,9 +423,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
 
             outputPolygons.Add(mainPolygon);
-            if (otherPolygons.Count > 0)
+            if (_otherPolygons.Count > 0)
             {
-                outputPolygons.AddRange(otherPolygons);
+                outputPolygons.AddRange(_otherPolygons);
             }
 
 
@@ -1156,7 +1155,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// <param name="glyphPoints"></param>
         /// <param name="glyphContours"></param>
         /// <returns></returns>
-        public DynamicOutline CreateDynamicOutline(VertexStore vxs)
+        public IntermediateOutline CreateIntermediateOutline(VertexStore vxs)
         {
             LoadVxs(_contourBuilder, vxs);
 
@@ -1176,11 +1175,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     contours[i].Flatten(_partFlattener);
                 }
                 //4. after flatten, the we can create fit outline
-                return CreateDynamicOutline(contours);
+                return CreateIntermediateOutline(contours);
             }
             else
             {
-                return DynamicOutline.CreateBlankDynamicOutline();
+                return null;
             }
         }
 
@@ -1189,102 +1188,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         /// </summary>
         /// <param name="flattenContours"></param>
         /// <returns></returns>
-        public DynamicOutline CreateDynamicOutline(List<Contour> flattenContours)
+        public IntermediateOutline CreateIntermediateOutline(List<Contour> flattenContours)
         {
             using (Poly2TriTool.Borrow(out var p23tool))
             {
                 List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
                 p23tool.Triangulate(flattenContours, output);
-                return new DynamicOutline(new IntermediateOutline(flattenContours, output));
-            }
-            ////--------------------------
-            ////TODO: review here, add hole or not  
-            //// more than 1 contours, no hole => eg.  i, j, ;,  etc
-            //// more than 1 contours, with hole => eg.  a,e ,   etc  
-
-            ////clockwise => not hole  
-            //_waitingHoles.Clear();
-            //int cntCount = flattenContours.Count;
-            //Poly2Tri.Polygon mainPolygon = null;
-            ////
-            ////this version if it is a hole=> we add it to main polygon
-            ////TODO: add to more proper polygon ***
-            ////eg i
-            ////-------------------------- 
-            //List<Poly2Tri.Polygon> otherPolygons = null;
-            //for (int n = 0; n < cntCount; ++n)
-            //{
-            //    Contour cnt = flattenContours[n];
-            //    if (cnt.IsClockwise())
-            //    {
-            //        //not a hole
-            //        if (mainPolygon == null)
-            //        {
-            //            //if we don't have mainPolygon before
-            //            //this is main polygon
-            //            mainPolygon = CreatePolygon(cnt.flattenPoints);
-
-            //            if (_waitingHoles.Count > 0)
-            //            {
-            //                //flush all waiting holes to the main polygon
-            //                int j = _waitingHoles.Count;
-            //                for (int i = 0; i < j; ++i)
-            //                {
-            //                    mainPolygon.AddHole(_waitingHoles[i]);
-            //                }
-            //                _waitingHoles.Clear();
-            //            }
-            //        }
-            //        else
-            //        {
-            //            //if we already have a main polygon
-            //            //then this is another sub polygon
-            //            //IsHole is correct after we Analyze() the glyph contour
-            //            Poly2Tri.Polygon subPolygon = CreatePolygon(cnt.flattenPoints);
-            //            if (otherPolygons == null)
-            //            {
-            //                otherPolygons = new List<Poly2Tri.Polygon>();
-            //            }
-            //            otherPolygons.Add(subPolygon);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        //this is a hole
-            //        Poly2Tri.Polygon subPolygon = CreatePolygon(cnt.flattenPoints);
-            //        if (mainPolygon == null)
-            //        {
-            //            //add to waiting polygon
-            //            _waitingHoles.Add(subPolygon);
-            //        }
-            //        else
-            //        {
-            //            //add to mainPolygon
-            //            mainPolygon.AddHole(subPolygon);
-            //        }
-            //    }
-            //}
-            //if (_waitingHoles.Count > 0)
-            //{
-            //    throw new NotSupportedException();
-            //}
-            ////------------------------------------------
-            ////2. tri angulate 
-            //Poly2Tri.P2T.Triangulate(mainPolygon); //that poly is triangulated 
-
-            //Poly2Tri.Polygon[] subPolygons = (otherPolygons != null) ? otherPolygons.ToArray() : null;
-            //if (subPolygons != null)
-            //{
-            //    for (int i = subPolygons.Length - 1; i >= 0; --i)
-            //    {
-            //        Poly2Tri.P2T.Triangulate(subPolygons[i]);
-            //    }
-            //}
-
-            //3. intermediate outline is used inside this lib 
-            //and then convert intermediate outline to dynamic outline
-            //return new DynamicOutline(
-            //    new IntermediateOutline(flattenContours, mainPolygon, subPolygons));
+                return new IntermediateOutline(flattenContours, output);
+            } 
         }
 
 

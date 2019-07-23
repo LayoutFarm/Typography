@@ -10,8 +10,10 @@ namespace PixelFarm.Contours
 
         List<Contour> _contours;
         List<CentroidLineHub> _lineHubs;
+        List<AnalyzedTriangle> _allTriangles;
 
         float _bounds_minX, _bounds_minY, _bounds_maxX, _bounds_maxY;
+
         public IntermediateOutline(
             List<Contour> contours,
             List<Polygon> polygons)
@@ -31,57 +33,55 @@ namespace PixelFarm.Contours
 
         void CreateCentroidLineHubs(List<Polygon> polygons)
         {
-            List<Triangle> triangles = new List<Triangle>();
+
             _lineHubs = new List<CentroidLineHub>();
 #if DEBUG
             EdgeLine.s_dbugTotalId = 0;//reset 
-            _dbugTriangles = new List<Triangle>();
 #endif
-
+            _allTriangles = new List<AnalyzedTriangle>();
             //main polygon
+            List<AnalyzedTriangle> triangles = new List<AnalyzedTriangle>();
             CreateCentroidLineHubs(polygons[0], triangles, _lineHubs);
-#if DEBUG
-            _dbugTriangles.AddRange(triangles);
-#endif
+            _allTriangles.AddRange(triangles);
             int j = polygons.Count;
             for (int i = 1; i < j; ++i)
             {
-
                 triangles.Clear();//clear, reuse it
                 CreateCentroidLineHubs(polygons[i], triangles, _lineHubs);
-#if DEBUG
-                _dbugTriangles.AddRange(triangles);
-#endif
+                _allTriangles.AddRange(triangles);
             }
 
         }
-        static void CreateCentroidLineHubs(Polygon polygon, List<Triangle> triangles, List<CentroidLineHub> outputLineHubs)
+        static void CreateCentroidLineHubs(Polygon polygon, List<AnalyzedTriangle> triangles, List<CentroidLineHub> outputLineHubs)
         {
 
             //create triangle list from given DelaunayTriangle polygon.
             // Generate GlyphTriangle triangle from DelaunayTriangle 
+            int id = 0;
             foreach (DelaunayTriangle delnTri in polygon.Triangles)
             {
                 delnTri.MarkAsActualTriangle();
-                triangles.Add(new Triangle(delnTri)); //all triangles are created from Triangulation process
+                triangles.Add(new AnalyzedTriangle(id, delnTri)); //all triangles are created from Triangulation process
+                id++;
             }
 
             //----------------------------
             //create centroid line hub
             //----------------------------
             //1.
-            var centroidLineHubs = new Dictionary<Triangle, CentroidLineHub>();
+            var centroidLineHubs = new Dictionary<AnalyzedTriangle, CentroidLineHub>();
             CentroidLineHub currentCentroidLineHub = null;
+
             //2. temporary list of used triangles
-            List<Triangle> usedTriList = new List<Triangle>();
-            Triangle latestTri = null;
+            List<AnalyzedTriangle> usedTriList = new List<AnalyzedTriangle>();
+            AnalyzedTriangle latestTri = null;
 
             //we may walk forward and backward on each tri
             //so we record the used triangle into a usedTriList.
             int triCount = triangles.Count;
             for (int i = 0; i < triCount; ++i)
             {
-                Triangle tri = triangles[i];
+                AnalyzedTriangle tri = triangles[i];
                 if (i == 0)
                 {
                     centroidLineHubs[tri] = currentCentroidLineHub = new CentroidLineHub(tri);
@@ -102,7 +102,7 @@ namespace PixelFarm.Contours
                         //record used triangle
                         usedTriList.Add(tri);
 
-                        Triangle connectWithPrevTri = usedTriList[foundIndex];
+                        AnalyzedTriangle connectWithPrevTri = usedTriList[foundIndex];
                         if (connectWithPrevTri != latestTri)
                         {
                             //branch
@@ -244,7 +244,7 @@ namespace PixelFarm.Contours
             }
         }
 
-        static int FindLatestConnectedTri(List<Triangle> usedTriList, Triangle tri)
+        static int FindLatestConnectedTri(List<AnalyzedTriangle> usedTriList, AnalyzedTriangle tri)
         {
             //search back ***
             for (int i = usedTriList.Count - 1; i >= 0; --i)
@@ -260,16 +260,11 @@ namespace PixelFarm.Contours
         public List<CentroidLineHub> GetCentroidLineHubs() => _lineHubs;
         //
         public List<Contour> GetContours() => _contours;
-        //
-#if DEBUG
-
-
-        List<Triangle> _dbugTriangles;
-        public List<Triangle> dbugGetTriangles()
+        // 
+        public List<AnalyzedTriangle> GetTriangles()
         {
-            return _dbugTriangles;
+            return _allTriangles;
         }
-#endif
     }
 
 }

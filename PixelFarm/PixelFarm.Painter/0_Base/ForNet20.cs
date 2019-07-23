@@ -2,6 +2,7 @@
 //for .NET 2.0 
 namespace System
 {
+    //public delegate void Action();
     //public delegate R Func<R>();
     //public delegate R Func<T, R>(T t1);
     //public delegate R Func<T1, T2, R>(T1 t1, T2 t2);

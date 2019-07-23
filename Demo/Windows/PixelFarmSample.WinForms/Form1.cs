@@ -385,11 +385,11 @@ namespace SampleWinForms
 
             _debugGlyphVisualizer.ShowTess = _contourAnalysisOpts.ShowTess;
             _debugGlyphVisualizer.ShowTriangles = _contourAnalysisOpts.ShowTriangles;
-            _debugGlyphVisualizer.WalkTrianglesAndEdges = _contourAnalysisOpts.ShowTriangles;
+            _debugGlyphVisualizer.DrawTrianglesAndEdges = _contourAnalysisOpts.ShowTriangles;
             _debugGlyphVisualizer.DrawEndLineHub = _contourAnalysisOpts.DrawLineHubConn;
             _debugGlyphVisualizer.DrawPerpendicularLine = _contourAnalysisOpts.DrawPerpendicularLine;
-            _debugGlyphVisualizer.WalkCentroidBone = _contourAnalysisOpts.DrawCentroidBone;
-            _debugGlyphVisualizer.WalkGlyphBone = _contourAnalysisOpts.DrawGlyphBone;
+            _debugGlyphVisualizer.DrawCentroid = _contourAnalysisOpts.DrawCentroidBone;
+            _debugGlyphVisualizer.DrawCentroid = _contourAnalysisOpts.DrawGlyphBone;
 
             _debugGlyphVisualizer.GlyphEdgeOffset = _contourAnalysisOpts.EdgeOffset;
 

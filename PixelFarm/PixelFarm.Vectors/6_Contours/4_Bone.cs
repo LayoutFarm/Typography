@@ -178,7 +178,7 @@ namespace PixelFarm.Contours
         {
             if (bone.JointB != null)
             {
-                Triangle commonTri = FindCommonTriangle(bone.JointA, bone.JointB);
+                AnalyzedTriangle commonTri = FindCommonTriangle(bone.JointA, bone.JointB);
                 if (commonTri != null)
                 {
                     if (commonTri.e0.IsOutside) { outsideEdges.Add(commonTri.e0); }
@@ -202,7 +202,7 @@ namespace PixelFarm.Contours
                 }
             }
         }
-        static EdgeLine FindAnotherOutsideEdge(Triangle tri, EdgeLine knownOutsideEdge)
+        static EdgeLine FindAnotherOutsideEdge(AnalyzedTriangle tri, EdgeLine knownOutsideEdge)
         {
             if (tri.e0.IsOutside && tri.e0 != knownOutsideEdge) { return tri.e0; }
             if (tri.e1.IsOutside && tri.e1 != knownOutsideEdge) { return tri.e1; }
@@ -210,11 +210,11 @@ namespace PixelFarm.Contours
             return null;
         }
 
-        static bool ContainsEdge(Triangle tri, EdgeLine edge)
+        static bool ContainsEdge(AnalyzedTriangle tri, EdgeLine edge)
         {
             return tri.e0 == edge || tri.e1 == edge || tri.e2 == edge;
         }
-        static Triangle FindCommonTriangle(Joint a, Joint b)
+        static AnalyzedTriangle FindCommonTriangle(Joint a, Joint b)
         {
 
             if (a.P_Tri == b.P_Tri || a.P_Tri == b.Q_Tri)

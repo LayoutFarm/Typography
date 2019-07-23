@@ -453,15 +453,15 @@ namespace PixelFarm.Contours
         public static bool dbugUseHorizontalFitValue { get; set; }
         public static bool dbugTestNewGridFitting { get; set; }
         public static int dbugGridHeight = 50;
-        internal List<Triangle> dbugGetGlyphTriangles()
+        internal List<AnalyzedTriangle> dbugGetGlyphTriangles()
         {
-            return _dbugTempIntermediateOutline.dbugGetTriangles();
+            return _dbugTempIntermediateOutline.GetTriangles();
         }
         internal List<CentroidLineHub> dbugGetCentroidLineHubs()
         {
             return _dbugTempIntermediateOutline.GetCentroidLineHubs();
         }
-        IntermediateOutline _dbugTempIntermediateOutline;
+        public IntermediateOutline _dbugTempIntermediateOutline;
         public bool dbugDrawRegeneratedOutlines { get; set; }
 #endif
 
