@@ -59,9 +59,7 @@ namespace Poly2Tri
         {
             Triangulate(_defaultAlgorithm, ps);
         }
-
-        //static DTSweepContext context = new DTSweepContext();
-
+ 
         static System.Collections.Generic.Stack<DTSweepContext> contextStacks = new System.Collections.Generic.Stack<DTSweepContext>();
         static TriangulationContext GetFreeTcxContext(TriangulationAlgorithm algorithm)
         {
@@ -88,7 +86,7 @@ namespace Poly2Tri
                 contextStacks.Push(dtSweepContext);
             }
         }
-        public static void Triangulate(TriangulationAlgorithm algorithm, Triangulatable t)
+        public static void Triangulate(TriangulationAlgorithm algorithm, Triangulable t)
         {
             //long time = System.nanoTime();
             TriangulationContext tcx = GetFreeTcxContext(algorithm);

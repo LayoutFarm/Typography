@@ -1,7 +1,6 @@
 ﻿//MIT, 2019-present, WinterDev
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont;
 namespace Test_WinForm_TessGlyph
 {
 
@@ -12,7 +11,7 @@ namespace Test_WinForm_TessGlyph
         static List<Poly2Tri.Polygon> _waitingHoles = new List<Poly2Tri.Polygon>();
         class GlyphContour
         {
-            public List<GlyphPointF> flattenPoints;
+            public List<System.Drawing.PointF> flattenPoints;
             bool _analyzedClockDirection;
             bool _isClockwise;
             public bool IsClockwise()
@@ -23,7 +22,7 @@ namespace Test_WinForm_TessGlyph
                     return _isClockwise;
                 }
 
-                List<GlyphPointF> f_points = this.flattenPoints;
+                List<System.Drawing.PointF> f_points = this.flattenPoints;
                 if (f_points == null)
                 {
                     throw new NotSupportedException();
@@ -47,15 +46,15 @@ namespace Test_WinForm_TessGlyph
                     double total = 0;
                     for (int i = 1; i < j; ++i)
                     {
-                        GlyphPointF p0 = f_points[i - 1];
-                        GlyphPointF p1 = f_points[i];
+                        System.Drawing.PointF p0 = f_points[i - 1];
+                        System.Drawing.PointF p1 = f_points[i];
                         total += (p1.X - p0.X) * (p1.Y + p0.Y);
 
                     }
                     //the last one
                     {
-                        GlyphPointF p0 = f_points[j - 1];
-                        GlyphPointF p1 = f_points[0];
+                        System.Drawing.PointF p0 = f_points[j - 1];
+                        System.Drawing.PointF p1 = f_points[0];
 
                         total += (p1.X - p0.X) * (p1.Y + p0.Y);
                     }
@@ -74,14 +73,14 @@ namespace Test_WinForm_TessGlyph
             for (int c = 0; c < contourCount; ++c)
             {
                 GlyphContour contour = new GlyphContour();
-                List<GlyphPointF> list = new List<GlyphPointF>();
+                List<System.Drawing.PointF> list = new List<System.Drawing.PointF>();
                 contour.flattenPoints = list;
 
                 int endAt = contourEndIndices[c];
 
                 for (; index < endAt;)
                 {
-                    list.Add(new GlyphPointF(polygon1[index], polygon1[index + 1], true));//the point is already flatten so=>false                     
+                    list.Add(new System.Drawing.PointF(polygon1[index], polygon1[index + 1]));
                     index += 2;
                 }
 
@@ -89,14 +88,12 @@ namespace Test_WinForm_TessGlyph
                 //temp hack here!
                 //ensure=> duplicated points,
                 //most common => first point and last point
-                GlyphPointF p0 = list[0];
-                GlyphPointF lastPoint = list[list.Count - 1];
+                System.Drawing.PointF p0 = list[0];
+                System.Drawing.PointF lastPoint = list[list.Count - 1];
                 if (p0.X == lastPoint.X && p0.Y == lastPoint.Y)
                 {
                     list.RemoveAt(list.Count - 1);
-                }
-
-
+                } 
                 //--
                 contours.Add(contour);
             }
@@ -109,7 +106,7 @@ namespace Test_WinForm_TessGlyph
         /// </summary>
         /// <param name="cnt"></param>
         /// <returns></returns>
-        static Poly2Tri.Polygon CreatePolygon(List<GlyphPointF> flattenPoints)
+        static Poly2Tri.Polygon CreatePolygon(List<System.Drawing.PointF> flattenPoints)
         {
             List<Poly2Tri.TriangulationPoint> points = new List<Poly2Tri.TriangulationPoint>();
 
@@ -121,7 +118,7 @@ namespace Test_WinForm_TessGlyph
             //pass
             for (int i = 0; i < j; ++i)
             {
-                GlyphPointF p = flattenPoints[i];
+                System.Drawing.PointF p = flattenPoints[i];
                 double x = p.X; //start from original X***
                 double y = p.Y; //start from original Y***
 

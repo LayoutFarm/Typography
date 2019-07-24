@@ -96,6 +96,15 @@ namespace PixelFarm.PathReconstruction
             return null;
         }
 
+        public override bool IsVisible(PointF p)
+        {
+            throw new NotImplementedException();
+        }
+        public override bool IsVisible(RectangleF p)
+        {
+            throw new NotImplementedException();
+        }
+
 
         struct MaskBitmapReader
         {

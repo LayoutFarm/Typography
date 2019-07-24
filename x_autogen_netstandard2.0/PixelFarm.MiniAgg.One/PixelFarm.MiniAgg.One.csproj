@@ -221,7 +221,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexData.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexData.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs" />
@@ -284,6 +283,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Rect.cs" Link="PixelFarm\PixelFarm.Vectors\6_Contours\Rect.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs" Link="PixelFarm\PixelFarm.Vectors\6_Contours\Vertex.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\4_PlatformServices\StorageService.cs" Link="PixelFarm\PixelFarm.Drawing\4_PlatformServices\StorageService.cs" />
+    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\5_VertexProcessoring\Figures.cs" Link="PixelFarm\PixelFarm.Drawing\5_VertexProcessoring\Figures.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainterPool.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainterPool.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" />
@@ -390,6 +390,7 @@
     <Folder Include="PixelFarm\PixelFarm.Vectors\5_clipper" />
     <Folder Include="PixelFarm\PixelFarm.Vectors\6_Contours" />
     <Folder Include="PixelFarm\PixelFarm.Drawing\4_PlatformServices" />
+    <Folder Include="PixelFarm\PixelFarm.Drawing\5_VertexProcessoring" />
     <Folder Include="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\AggPainter" />
     <Folder Include="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\DrawBoard" />
     <Folder Include="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf" />

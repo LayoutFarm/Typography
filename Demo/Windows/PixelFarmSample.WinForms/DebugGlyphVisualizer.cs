@@ -103,7 +103,7 @@ namespace SampleWinForms.UI
             _builder.GlyphDynamicEdgeOffset = this.GlyphEdgeOffset;
             _builder.Build(testChar, _sizeInPoint);
             var txToVxs1 = new GlyphTranslatorToVxs();
-            
+
 
             _builder.ReadShapes(txToVxs1);
 
@@ -185,15 +185,26 @@ namespace SampleWinForms.UI
 
 
         }
-
+        public bool DrawTrianglesAndEdges { get; set; }
+        public bool DrawCentroid { get; set; }
+        public bool DrawGlyphBone { get; set; }
         public void RenderTessTesult()
         {
-#if DEBUG
 
+#if DEBUG
             DynamicOutline dynamicOutline = _builder.LatestGlyphFitOutline;
             if (dynamicOutline != null)
-            {
-                this.Walk(dynamicOutline);
+            {   
+                //
+                if (DrawTrianglesAndEdges)
+                {
+                    WalkTriangles(dynamicOutline._dbugTempIntermediateOutline);
+                }
+                //
+                if (DrawCentroid || DrawGlyphBone)
+                {
+                    WalkCentroidLine(dynamicOutline._dbugTempIntermediateOutline);
+                }
             }
 #endif
         }
@@ -482,20 +493,17 @@ namespace SampleWinForms.UI
         }
 
         Vector2f _branchHeadPos;
-        protected override void OnBeginDrawingBoneLinks(Vector2f branchHeadPos, int startAt, int endAt)
+        protected override void OnBeginBoneLinks(Vector2f branchHeadPos, int startAt, int endAt)
         {
             _branchHeadPos = branchHeadPos;
         }
-        protected override void OnEndDrawingBoneLinks()
+
+        protected override void OnEndBoneLinks()
         {
 
         }
-
-
-        protected override void OnDrawBone(Bone bone, int boneIndex)
+        protected override void OnBone(Bone bone, int boneIndex)
         {
-
-
             float pxscale = _pxscale;
             Joint jointA = bone.JointA;
             Joint jointB = bone.JointB;
@@ -551,7 +559,12 @@ namespace SampleWinForms.UI
         }
 
 
-        protected override void OnTriangle(int triangleId, EdgeLine e0, EdgeLine e1, EdgeLine e2, double centroidX, double centroidY)
+        protected override void OnTriangle(AnalyzedTriangle tri)
+        {
+            tri.CalculateCentroid(out float centroidX, out float centroidY);
+            OnTriangle(tri.Id, tri.e0, tri.e1, tri.e2, centroidX, centroidY);
+        }
+        void OnTriangle(int triangleId, EdgeLine e0, EdgeLine e1, EdgeLine e2, double centroidX, double centroidY)
         {
 
             DrawEdge(_painter, e0);
@@ -559,11 +572,25 @@ namespace SampleWinForms.UI
             DrawEdge(_painter, e2);
 
             _infoView.ShowTriangles(new GlyphTriangleInfo(triangleId, e0, e1, e2, centroidX, centroidY));
-
-
         }
-
-        protected override void OnGlyphEdgeN(EdgeLine e)
+        protected override void OnJoint(Joint joint)
+        {
+            joint.GetCentroidBoneCenters(out float cx0, out float cy0, out float cx1, out float cy1);
+            OnCentroidLine(cx0, cy0, cx1, cy1);
+            _infoView.ShowJoint(joint);
+            //--------------------------------------------------
+            if (joint.TipEdgeP != null)
+            {
+                Vector2f pos = joint.TipPointP;
+                OnCentroidLineTip_P(cx0, cy0, pos.X, pos.Y);
+            }
+            if (joint.TipEdgeQ != null)
+            {
+                Vector2f pos = joint.TipPointQ;
+                OnCentroidLineTip_Q(cx1, cy1, pos.X, pos.Y);
+            }
+        }
+        protected override void OnEdgeN(EdgeLine e)
         {
             float pxscale = _pxscale;
 
@@ -578,7 +605,8 @@ namespace SampleWinForms.UI
             //    e.newEdgeCut_P_X, e.newEdgeCut_P_Y,
             //    e.newEdgeCut_Q_X, e.newEdgeCut_Q_Y);
         }
-        protected override void OnCentroidLine(double px, double py, double qx, double qy)
+
+        void OnCentroidLine(double px, double py, double qx, double qy)
         {
 
             float pxscale = _pxscale;
@@ -591,30 +619,25 @@ namespace SampleWinForms.UI
             _painter.FillRect(px * pxscale, py * pxscale, 2, 2, PixelFarm.Drawing.Color.Yellow);
             _painter.FillRect(qx * pxscale, qy * pxscale, 2, 2, PixelFarm.Drawing.Color.Yellow);
         }
-        protected override void OnCentroidLineTip_P(double px, double py, double tip_px, double tip_py)
+        void OnCentroidLineTip_P(double px, double py, double tip_px, double tip_py)
         {
             float pxscale = _pxscale;
             _painter.Line(px * pxscale, py * pxscale,
                          tip_px * pxscale, tip_py * pxscale,
                          PixelFarm.Drawing.Color.Blue);
         }
-        protected override void OnCentroidLineTip_Q(double qx, double qy, double tip_qx, double tip_qy)
+        void OnCentroidLineTip_Q(double qx, double qy, double tip_qx, double tip_qy)
         {
             float pxscale = _pxscale;
             _painter.Line(qx * pxscale, qy * pxscale,
                          tip_qx * pxscale, tip_qy * pxscale,
                          PixelFarm.Drawing.Color.Green);
         }
-        protected override void OnBoneJoint(Joint joint)
-        {
-            DrawBoneJoint(_painter, joint);
-            _infoView.ShowJoint(joint);
-        }
-        //----------------------
-        protected override void OnBegingLineHub(float centerX, float centerY)
+        protected override void OnStartLineHub(float centerX, float centerY)
         {
 
         }
+
         protected override void OnEndLineHub(float centerX, float centerY, Joint joint)
         {
 
@@ -633,9 +656,9 @@ namespace SampleWinForms.UI
                             PixelFarm.Drawing.Color.Magenta);
                 }
             }
-        } 
-#endif 
-      
+        }
+#endif
+
     }
 
 }

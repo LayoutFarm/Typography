@@ -11,9 +11,9 @@ namespace PixelFarm.Contours
         //we crate glyph
         //1 centroid pair has 1 GlyphBoneJoint
 
-        internal readonly Triangle p, q;
+        internal readonly AnalyzedTriangle p, q;
 
-        internal CentroidPair(Triangle p, Triangle q)
+        internal CentroidPair(AnalyzedTriangle p, AnalyzedTriangle q)
         {
 
             //each triangle has 1 centroid point
@@ -68,7 +68,7 @@ namespace PixelFarm.Contours
             return boneJoint;
         }
 
-        static bool FindCommonInsideEdges(Triangle a, Triangle b, out InsideEdgeLine a_edge, out InsideEdgeLine b_edge)
+        static bool FindCommonInsideEdges(AnalyzedTriangle a, AnalyzedTriangle b, out InsideEdgeLine a_edge, out InsideEdgeLine b_edge)
         {
             //2 contact triangles share GlyphBoneJoint.          
 
@@ -102,7 +102,7 @@ namespace PixelFarm.Contours
             a_edge = b_edge = null;
             return false;
         }
-        static InsideEdgeLine FindCommonInsideEdge(Triangle a, EdgeLine b_edge)
+        static InsideEdgeLine FindCommonInsideEdge(AnalyzedTriangle a, EdgeLine b_edge)
         {
             //2 contact triangles share GlyphBoneJoint.            
             //compare 3 side of a's edge to b_edge
@@ -116,7 +116,7 @@ namespace PixelFarm.Contours
 
 
         static void ClassifyTriangleEdges(
-            Triangle triangle,
+            AnalyzedTriangle triangle,
             EdgeLine knownInsideEdge,
             out EdgeLine anotherInsideEdge,
             out EdgeLine outside0,
@@ -230,7 +230,7 @@ namespace PixelFarm.Contours
         /// <param name="knownInsideEdge"></param>
         static EdgeLine CreateTipEdgeIfNeed(
           double cent_slopAngle,
-          Triangle triangle,
+          AnalyzedTriangle triangle,
           EdgeLine knownInsideEdge)
         {
 

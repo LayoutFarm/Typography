@@ -160,7 +160,6 @@ namespace PixelFarm.CpuBlit
                         }
                         break;
                     case VertexCmd.Close:
-                    case VertexCmd.CloseAndEndFigure:
                         {
                             if (_reusablePolygonList.Count > 0)
                             {

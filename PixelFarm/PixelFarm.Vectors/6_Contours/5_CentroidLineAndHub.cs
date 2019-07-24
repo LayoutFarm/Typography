@@ -10,8 +10,6 @@ namespace PixelFarm.Contours
     /// </summary>
     public class CentroidLine
     {
-
-
         //temp store centroid pair, we can clear it after AnalyzeEdgesAndCreateBoneJoints()
         List<CentroidPair> _centroid_pairs = new List<CentroidPair>();
         //
@@ -128,7 +126,7 @@ namespace PixelFarm.Contours
         /// </summary>
         /// <param name="tri"></param>
         /// <returns></returns>
-        public Joint FindNearestJoint(Triangle tri)
+        public Joint FindNearestJoint(AnalyzedTriangle tri)
         {
 
             for (int i = _joints.Count - 1; i >= 0; --i)
@@ -145,7 +143,7 @@ namespace PixelFarm.Contours
             return null;
         }
 #if DEBUG
-        internal Triangle dbugStartTri;
+        internal AnalyzedTriangle dbugStartTri;
 #endif
     }
 
@@ -156,8 +154,8 @@ namespace PixelFarm.Contours
         List<BoneGroup> _selectedHorizontalBoneGroups;
         List<BoneGroup> _selectedVerticalBoneGroups;
         List<BoneGroup> _tmpBoneGroups;
-        List<EdgeLine> tmpEdges;
-        int gridBoxW, gridBoxH;
+        List<EdgeLine> _tmpEdges;
+        int _gridBoxW, _gridBoxH;
 
         public static BoneGroupingHelper CreateBoneGroupingHelper()
         {
@@ -165,23 +163,23 @@ namespace PixelFarm.Contours
             helper._selectedHorizontalBoneGroups = new List<BoneGroup>();
             helper._selectedVerticalBoneGroups = new List<BoneGroup>();
             helper._tmpBoneGroups = new List<BoneGroup>();
-            helper.tmpEdges = new List<EdgeLine>();
+            helper._tmpEdges = new List<EdgeLine>();
             return helper;
         }
         public void Reset(int gridBoxW, int gridBoxH)
         {
-            this.gridBoxW = gridBoxW;
-            this.gridBoxH = gridBoxH;
+            _gridBoxW = gridBoxW;
+            _gridBoxH = gridBoxH;
             _selectedHorizontalBoneGroups.Clear();
             _selectedVerticalBoneGroups.Clear();
         }
-        public List<BoneGroup> SelectedHorizontalBoneGroups { get { return _selectedHorizontalBoneGroups; } }
-        public List<BoneGroup> SelectedVerticalBoneGroups { get { return _selectedVerticalBoneGroups; } }
+        public List<BoneGroup> SelectedHorizontalBoneGroups => _selectedHorizontalBoneGroups;
+        public List<BoneGroup> SelectedVerticalBoneGroups => _selectedVerticalBoneGroups;
         public void CollectBoneGroups(CentroidLine line)
         {
             //
             _tmpBoneGroups.Clear();
-            line.ApplyGridBox(_tmpBoneGroups, gridBoxW, gridBoxH);
+            line.ApplyGridBox(_tmpBoneGroups, _gridBoxW, _gridBoxH);
             // 
             for (int i = _tmpBoneGroups.Count - 1; i >= 0; --i)
             {
@@ -211,7 +209,7 @@ namespace PixelFarm.Contours
             //collect outside edge of horizontal group
             for (int i = _selectedHorizontalBoneGroups.Count - 1; i >= 0; --i)
             {
-                _selectedHorizontalBoneGroups[i].CollectOutsideEdges(tmpEdges);
+                _selectedHorizontalBoneGroups[i].CollectOutsideEdges(_tmpEdges);
             }
         }
 
@@ -227,7 +225,7 @@ namespace PixelFarm.Contours
             //collect outside edge of vertical group
             for (int i = _selectedVerticalBoneGroups.Count - 1; i >= 0; --i)
             {
-                _selectedVerticalBoneGroups[i].CollectOutsideEdges(tmpEdges);
+                _selectedVerticalBoneGroups[i].CollectOutsideEdges(_tmpEdges);
             }
         }
 
@@ -349,10 +347,10 @@ namespace PixelFarm.Contours
 
         public BoneGroupSumLengthKind _lengKind;
 
-        internal readonly CentroidLine ownerCentroidLine;
+        internal readonly CentroidLine _ownerCentroidLine;
         public BoneGroup(CentroidLine ownerCentroidLine)
         {
-            this.ownerCentroidLine = ownerCentroidLine;
+            _ownerCentroidLine = ownerCentroidLine;
         }
         internal void CollectOutsideEdges(List<EdgeLine> tmpEdges)
         {
@@ -360,7 +358,7 @@ namespace PixelFarm.Contours
             int index = this.startIndex;
             for (int n = this.count - 1; n >= 0; --n)
             {
-                Bone bone = ownerCentroidLine.bones[index];
+                Bone bone = _ownerCentroidLine.bones[index];
                 //collect all outside edge around glyph bone
                 bone.CollectOutsideEdge(tmpEdges);
                 index++;
@@ -404,55 +402,47 @@ namespace PixelFarm.Contours
         //a centroid line hub start at the same mainTri.
         //and can have more than 1 centroid line.
         //----------------------------------------------- 
-        readonly Triangle startTriangle;
+        readonly AnalyzedTriangle _startTriangle;
         //each centoid line start with main triangle       
-        Dictionary<Triangle, CentroidLine> _lines = new Dictionary<Triangle, CentroidLine>();
+        Dictionary<AnalyzedTriangle, CentroidLine> _lines = new Dictionary<AnalyzedTriangle, CentroidLine>();
         //-----------------------------------------------
-        List<CentroidLineHub> otherConnectedLineHubs;//connections from other hub***
+        List<CentroidLineHub> _otherConnectedLineHubs;//connections from other hub***
         //-----------------------------------------------
-        CentroidLine currentLine;
-        Triangle currentBranchTri;
+        CentroidLine _currentLine;
+        AnalyzedTriangle _currentBranchTri;
 
-        public CentroidLineHub(Triangle startTriangle)
+        public CentroidLineHub(AnalyzedTriangle startTriangle)
         {
-            this.startTriangle = startTriangle;
+            _startTriangle = startTriangle;
         }
-        public Triangle StartTriangle
-        {
-            get { return startTriangle; }
-        }
+        public AnalyzedTriangle StartTriangle => _startTriangle;
+
         /// <summary>
         /// set current centroid line to a centroid line that starts with triangle of centroid-line-head
         /// </summary>
         /// <param name="triOfCentroidLineHead"></param>
-        public void SetCurrentCentroidLine(Triangle triOfCentroidLineHead)
+        public void SetCurrentCentroidLine(AnalyzedTriangle triOfCentroidLineHead)
         {
             //this method is used during centroid line hub creation
-            if (currentBranchTri != triOfCentroidLineHead)
+            if (_currentBranchTri != triOfCentroidLineHead)
             {
                 //check if we have already create it
-                if (!_lines.TryGetValue(triOfCentroidLineHead, out currentLine))
+                if (!_lines.TryGetValue(triOfCentroidLineHead, out _currentLine))
                 {
                     //if not found then create new
-                    currentLine = new CentroidLine();
+                    _currentLine = new CentroidLine();
 #if  DEBUG
-                    currentLine.dbugStartTri = triOfCentroidLineHead;
+                    _currentLine.dbugStartTri = triOfCentroidLineHead;
 #endif
-                    _lines.Add(triOfCentroidLineHead, currentLine);
+                    _lines.Add(triOfCentroidLineHead, _currentLine);
                 }
-                currentBranchTri = triOfCentroidLineHead;
+                _currentBranchTri = triOfCentroidLineHead;
             }
         }
         /// <summary>
         /// member centoid line count
         /// </summary>
-        public int LineCount
-        {
-            get
-            {
-                return _lines.Count;
-            }
-        }
+        public int LineCount => _lines.Count;
         /// <summary>
         /// add centroid pair to current centroid line
         /// </summary>
@@ -460,7 +450,7 @@ namespace PixelFarm.Contours
         public void AddCentroidPair(CentroidPair pair)
         {
             //add centroid pair to line 
-            currentLine.AddCentroidPair(pair);
+            _currentLine.AddCentroidPair(pair);
         }
         /// <summary>
         /// analyze each branch for edge information
@@ -491,7 +481,7 @@ namespace PixelFarm.Contours
                 //
                 Joint joint = jointlist[0]; //first 
                 {
-                    Triangle firstTri = joint.P_Tri;
+                    AnalyzedTriangle firstTri = joint.P_Tri;
                     //test 3 edges, find edge that is inside
                     //and the joint is not the same as first_pair.BoneJoint
                     CreateTipBoneIfNeed(firstTri.e0 as InsideEdgeLine, joint, newlyCreatedBones, glyphBones);
@@ -553,11 +543,11 @@ namespace PixelFarm.Contours
             List<Bone> newlyCreatedBones, List<Bone> glyphBones)
         {
             if (insideEdge != null &&
-                insideEdge.inside_joint != null &&
-                insideEdge.inside_joint != joint)
+                insideEdge._inside_joint != null &&
+                insideEdge._inside_joint != joint)
             {
                 //create connection 
-                Bone tipBone = new Bone(insideEdge.inside_joint, joint);
+                Bone tipBone = new Bone(insideEdge._inside_joint, joint);
                 newlyCreatedBones.Add(tipBone);
                 glyphBones.Add(tipBone);
             }
@@ -569,7 +559,7 @@ namespace PixelFarm.Contours
             {
                 List<Bone> glyphBones = line.bones;
                 Joint firstJoint = line._joints[0];
-                Triangle first_p_tri = firstJoint.P_Tri;
+                AnalyzedTriangle first_p_tri = firstJoint.P_Tri;
                 //                 
                 CreateBoneJointIfNeed(first_p_tri.e0 as InsideEdgeLine, first_p_tri, firstJoint, newlyCreatedBones, glyphBones);
                 CreateBoneJointIfNeed(first_p_tri.e1 as InsideEdgeLine, first_p_tri, firstJoint, newlyCreatedBones, glyphBones);
@@ -578,13 +568,13 @@ namespace PixelFarm.Contours
         }
         static void CreateBoneJointIfNeed(
             InsideEdgeLine insideEdge,
-            Triangle first_p_tri,
+            AnalyzedTriangle first_p_tri,
             Joint firstJoint,
             List<Bone> newlyCreatedBones,
             List<Bone> glyphBones)
         {
             if (insideEdge != null &&
-                insideEdge.inside_joint == null)
+                insideEdge._inside_joint == null)
             {
                 InsideEdgeLine mainEdge = insideEdge;
                 EdgeLine nbEdge = null;
@@ -597,7 +587,7 @@ namespace PixelFarm.Contours
                     if (nbEdge.IsInside)
                     {
                         Joint joint = new Joint((InsideEdgeLine)nbEdge, mainEdge);
-                        Bone bone = new Bone(mainEdge.inside_joint, firstJoint);
+                        Bone bone = new Bone(mainEdge._inside_joint, firstJoint);
                         newlyCreatedBones.Add(bone);
                         glyphBones.Add(bone);
                     }
@@ -617,7 +607,7 @@ namespace PixelFarm.Contours
         /// </summary>
         /// <param name="tri"></param>
         /// <returns></returns>
-        static bool FindSameCoordEdgeLine(Triangle tri, EdgeLine edgeLine, out EdgeLine foundEdge)
+        static bool FindSameCoordEdgeLine(AnalyzedTriangle tri, EdgeLine edgeLine, out EdgeLine foundEdge)
         {
             foundEdge = null;
             if (tri == null)
@@ -643,12 +633,10 @@ namespace PixelFarm.Contours
                     a.Q == b.Q);
         }
 
-        public Dictionary<Triangle, CentroidLine> GetAllCentroidLines()
-        {
-            return _lines;
-        }
+        public Dictionary<AnalyzedTriangle, CentroidLine> GetAllCentroidLines() => _lines;
 
-        public bool FindBoneJoint(Triangle tri,
+
+        public bool FindBoneJoint(AnalyzedTriangle tri,
             out CentroidLine foundOnBranch,
             out Joint foundOnJoint)
         {
@@ -667,29 +655,24 @@ namespace PixelFarm.Contours
         }
         public void AddLineHubConnection(CentroidLineHub anotherHub)
         {
-            if (otherConnectedLineHubs == null)
+            if (_otherConnectedLineHubs == null)
             {
-                otherConnectedLineHubs = new List<CentroidLineHub>();
+                _otherConnectedLineHubs = new List<CentroidLineHub>();
             }
-            otherConnectedLineHubs.Add(anotherHub);
+            _otherConnectedLineHubs.Add(anotherHub);
         }
 
-        CentroidLine anotherCentroidLine;
-        Joint foundOnJoint;
+        CentroidLine _anotherCentroidLine;
+        Joint _foundOnJoint;
 
         public void SetHeadConnnection(CentroidLine anotherCentroidLine, Joint foundOnJoint)
         {
-            this.anotherCentroidLine = anotherCentroidLine;
-            this.foundOnJoint = foundOnJoint;
+            _anotherCentroidLine = anotherCentroidLine;
+            _foundOnJoint = foundOnJoint;
         }
-        public Joint GetHeadConnectedJoint()
-        {
-            return foundOnJoint;
-        }
-        public List<CentroidLineHub> GetConnectedLineHubs()
-        {
-            return this.otherConnectedLineHubs;
-        }
+        public Joint GetHeadConnectedJoint() => _foundOnJoint;
+
+        public List<CentroidLineHub> GetConnectedLineHubs() => _otherConnectedLineHubs;
 
     }
 
@@ -717,7 +700,7 @@ namespace PixelFarm.Contours
 
         public static Vector2f CalculateAvgHeadPosition(this CentroidLineHub lineHub)
         {
-            Dictionary<Triangle, CentroidLine> _lines = lineHub.GetAllCentroidLines();
+            Dictionary<AnalyzedTriangle, CentroidLine> _lines = lineHub.GetAllCentroidLines();
             int j = _lines.Count;
             if (j == 0) return Vector2f.Zero;
             //---------------------------------

@@ -515,7 +515,7 @@ namespace PaintLab.Svg
 
                         //create local-transformation matrix
                         pathMarkers.StartMarkerPos = new PointF(p0.X, p0.Y);
-                        pathMarkers.StartMarkerAffine = Affine.NewMatix(
+                        pathMarkers.StartMarkerAffine = Affine.New(
                             AffinePlan.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number), //move to the ref point
                             AffinePlan.Rotate(rotateRad) //rotate                            
                         );
@@ -539,7 +539,7 @@ namespace PaintLab.Svg
 
                         //create local-transformation matrix
                         pathMarkers.EndMarkerPos = new PointF(p1.X, p1.Y);
-                        pathMarkers.EndMarkerAffine = Affine.NewMatix(
+                        pathMarkers.EndMarkerAffine = Affine.New(
                             AffinePlan.Translate(-markerSpec.RefX.Number, -markerSpec.RefY.Number), //move to the ref point
                             AffinePlan.Rotate(rotateRad) //rotate                            
                         );
@@ -893,14 +893,14 @@ namespace PaintLab.Svg
             return LayoutFarm.WebDom.Parser.CssValueParser.ConvertToPx(length, args.containerW, args);
         }
 
-        VertexStore CreateVxsFromPathDefinition(char[] patgDefinition)
+        VertexStore CreateVxsFromPathDefinition(char[] pathDefinition)
         {
             using (VectorToolBox.Borrow(out CurveFlattener curveFlattener))
             using (VxsTemp.Borrow(out var v1, out var v2))
             using (VectorToolBox.Borrow(v1, out PathWriter pathWriter))
             {
                 _pathDataParser.SetPathWriter(pathWriter);
-                _pathDataParser.Parse(patgDefinition);
+                _pathDataParser.Parse(pathDefinition);
                 curveFlattener.MakeVxs(v1, v2);
                 //create a small copy of the vxs                  
                 return v2.CreateTrim();

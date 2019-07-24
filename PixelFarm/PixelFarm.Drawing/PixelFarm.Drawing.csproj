@@ -358,9 +358,6 @@
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs">
-      <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs</Link>
     </Compile>
@@ -611,6 +608,7 @@
       <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
     </Compile>
     <Compile Include="4_PlatformServices\StorageService.cs" />
+    <Compile Include="5_VertexProcessoring\Figures.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" />

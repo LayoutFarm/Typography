@@ -35,14 +35,14 @@ namespace PixelFarm.Contours
             _fitY = midpos.Y;
 
 #if DEBUG
-            if (p_contact_edge.inside_joint != null ||
-                q_contact_edge.inside_joint != null)
+            if (p_contact_edge._inside_joint != null ||
+                q_contact_edge._inside_joint != null)
             {
                 throw new System.NotSupportedException();
             }
 #endif
-            p_contact_edge.inside_joint = this;
-            q_contact_edge.inside_joint = this;
+            p_contact_edge._inside_joint = this;
+            q_contact_edge._inside_joint = this;
         }
         /// <summary>
         /// dynamic fit x
@@ -58,8 +58,8 @@ namespace PixelFarm.Contours
             _fitX = newx;
             _fitY = newy;
         }
-        internal Triangle P_Tri => _p_contact_edge.OwnerTriangle;
-        internal Triangle Q_Tri => _q_contact_edge.OwnerTriangle;
+        internal AnalyzedTriangle P_Tri => _p_contact_edge.OwnerTriangle;
+        internal AnalyzedTriangle Q_Tri => _q_contact_edge.OwnerTriangle;
 
         /// <summary>
         /// get position of this bone joint (mid point of the edge)
@@ -119,7 +119,7 @@ namespace PixelFarm.Contours
         public Vector2f TipPointQ => _tipEdge_q.GetMidPoint();
         public EdgeLine TipEdgeQ => _tipEdge_q;
         //
-        internal bool ComposeOf(Triangle tri)
+        internal bool ComposeOf(AnalyzedTriangle tri)
         {
             return this.P_Tri == tri || this.Q_Tri == tri;
         }
@@ -137,6 +137,11 @@ namespace PixelFarm.Contours
                 MyMath.FitToHalfGrid(jointPos.X, gridW), //use half?
                 MyMath.FitToHalfGrid(jointPos.Y, gridH));//use half?
         }
+        public void GetCentroidBoneCenters(out float cx0, out float cy0, out float cx1, out float cy1)
+        {   
+            this.P_Tri.CalculateCentroid(out cx0, out cy0);
+            this.Q_Tri.CalculateCentroid(out cx1, out cy1);
+        }
 #if DEBUG
         public readonly int dbugId = dbugTotalId++;
         public static int dbugTotalId;
@@ -148,13 +153,7 @@ namespace PixelFarm.Contours
 
         public EdgeLine dbugGetEdge_P() { return _p_contact_edge; }
         public EdgeLine dbugGetEdge_Q() { return _q_contact_edge; }
-        public void dbugGetCentroidBoneCenters(out float cx0, out float cy0, out float cx1, out float cy1)
-        {
-
-            //for debug 
-            this.P_Tri.CalculateCentroid(out cx0, out cy0);
-            this.Q_Tri.CalculateCentroid(out cx1, out cy1);
-        }
+       
 #endif
 
     }

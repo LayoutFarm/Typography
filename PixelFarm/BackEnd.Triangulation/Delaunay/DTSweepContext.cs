@@ -234,7 +234,7 @@ namespace Poly2Tri
             }
         }
 
-        public override void PrepareTriangulation(Triangulatable t)
+        public override void PrepareTriangulation(Triangulable t)
         {
             //--------------------
             //initialization phase:

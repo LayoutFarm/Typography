@@ -5,17 +5,17 @@ using PixelFarm.VectorMath;
 namespace PixelFarm.Contours
 {
 
-    public class Triangle
+    public class AnalyzedTriangle
     {
-
+        public readonly int Id;
         DelaunayTriangle _tri;
         public readonly EdgeLine e0;
         public readonly EdgeLine e1;
         public readonly EdgeLine e2;
 
-
-        public Triangle(DelaunayTriangle tri)
+        public AnalyzedTriangle(int id, DelaunayTriangle tri)
         {
+            Id = id;
             _tri = tri;
             //---------------------------------------------
             TriangulationPoint p0 = _tri.P0;
@@ -134,7 +134,7 @@ namespace PixelFarm.Contours
         {
             _tri.GetCentroid(out centroidX, out centroidY);
         }
-        public bool IsConnectedTo(Triangle anotherTri)
+        public bool IsConnectedTo(AnalyzedTriangle anotherTri)
         {
             DelaunayTriangle t2 = anotherTri._tri;
             if (t2 == _tri)
@@ -149,22 +149,22 @@ namespace PixelFarm.Contours
         /// <summary>
         /// neighbor triangle 0
         /// </summary>
-        public Triangle N0 => GetGlyphTriFromUserData(_tri.N0);
+        public AnalyzedTriangle N0 => GetGlyphTriFromUserData(_tri.N0);
 
         /// <summary>
         /// neighbor triangle 1
         /// </summary>
-        public Triangle N1 => GetGlyphTriFromUserData(_tri.N1);
+        public AnalyzedTriangle N1 => GetGlyphTriFromUserData(_tri.N1);
 
         /// <summary>
         /// neighbor triangle 2
         /// </summary>
-        public Triangle N2 => GetGlyphTriFromUserData(_tri.N2);
+        public AnalyzedTriangle N2 => GetGlyphTriFromUserData(_tri.N2);
 
-        static Triangle GetGlyphTriFromUserData(DelaunayTriangle tri)
+        static AnalyzedTriangle GetGlyphTriFromUserData(DelaunayTriangle tri)
         {
             if (tri == null) return null;
-            return tri.userData as Triangle;
+            return tri.userData as AnalyzedTriangle;
         }
 
     }

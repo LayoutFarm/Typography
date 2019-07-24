@@ -88,8 +88,49 @@ namespace PixelFarm.Drawing
         {
             return new VxsContext3(out vxs1, out vxs2, out vxs3);
         }
-
-
+        /// <summary>
+        /// create contour(closed, open) from input flatten XYs,and put into output vxs
+        /// </summary>
+        /// <param name="flattenXYs"></param>
+        /// <param name="vxs"></param>
+        /// <param name="closedContour"></param>
+        /// <returns></returns>
+        public static VxsContext1 Borrow(float[] flattenXYs, out VertexStore vxs, bool closedContour = true)
+        {
+            VxsContext1 context1 = Borrow(out vxs);
+            using (VectorToolBox.Borrow(vxs, out PathWriter pw))
+            {
+                pw.MoveTo(flattenXYs[0], flattenXYs[1]);
+                for (int i = 2; i < flattenXYs.Length;)
+                {
+                    pw.LineTo(flattenXYs[i], flattenXYs[i + 1]);
+                    i += 2;
+                }
+                if (closedContour)
+                {
+                    pw.CloseFigure();
+                }
+            }
+            return context1;
+        }
+        public static VxsContext1 Borrow(double[] flattenXYs, out VertexStore vxs, bool closedContour = true)
+        {
+            VxsContext1 context1 = Borrow(out vxs);
+            using (VectorToolBox.Borrow(vxs, out PathWriter pw))
+            {
+                pw.MoveTo(flattenXYs[0], flattenXYs[1]);
+                for (int i = 2; i < flattenXYs.Length;)
+                {
+                    pw.LineTo(flattenXYs[i], flattenXYs[i + 1]);
+                    i += 2;
+                }
+                if (closedContour)
+                {
+                    pw.CloseFigure();
+                }
+            }
+            return context1;
+        }
         //for net20 -- check this
         //TODO: https://stackoverflow.com/questions/18333885/threadstatic-v-s-threadlocalt-is-generic-better-than-attribute
 
@@ -189,7 +230,7 @@ namespace PixelFarm.Drawing
             {
                 Temp<Spiral>.SetNewHandler(() => new Spiral());
             }
-            return Temp<Spiral>.Borrow(out spiral);             
+            return Temp<Spiral>.Borrow(out spiral);
         }
         public static TempContext<SimpleRect> Borrow(out SimpleRect simpleRect)
         {

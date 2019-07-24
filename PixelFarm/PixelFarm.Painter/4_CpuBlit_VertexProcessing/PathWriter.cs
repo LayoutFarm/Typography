@@ -17,7 +17,7 @@
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
-
+using System;
 using PixelFarm.VectorMath;
 using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.VertexProcessing;
@@ -83,6 +83,8 @@ namespace PixelFarm.CpuBlit
         double _latest_moveTo_X;
         double _latest_moveTo_Y;
 
+        internal Curve4Points _c4_points = new Curve4Points();//reusable
+
         /// <summary>
         /// latest X
         /// </summary>
@@ -112,7 +114,19 @@ namespace PixelFarm.CpuBlit
         public void BindVxs(VertexStore vxs)
         {
             _myvxs = vxs;
+            //TODO:
+            //goto latest path command
         }
+        //public void Transform(ref AffineMat aff)
+        //{
+        //    int count = _myvxs.Count;
+        //    for (int i = 0; i < count; ++i)
+        //    {
+        //        VertexCmd cmd = _myvxs.GetVertex(i, out double x, out double y);
+        //        aff.Transform(ref x, ref y);
+        //        _myvxs.ReplaceVertex
+        //    } 
+        //}
         public void UnbindVxs()
         {
             _myvxs = null;
@@ -160,16 +174,21 @@ namespace PixelFarm.CpuBlit
             //TODO: review stop command again
             _myvxs.AddVertex(0, 0, VertexCmd.NoMore);
         }
-        //--------------------------------------------------------------------
+
         public void MoveTo(double x0, double y0)
         {
-            _latestSVGPathCmd = SvgPathCommand.MoveTo;
-            _myvxs.AddMoveTo(
-                _latest_moveTo_X = _latest_x = x0,
-                _latest_moveTo_Y = _latest_y = y0);
+            if (_latest_moveTo_X != x0 || _latest_moveTo_Y != y0)
+            {
+                _latestSVGPathCmd = SvgPathCommand.MoveTo;
+                _myvxs.AddMoveTo(
+                    _latest_moveTo_X = _latest_x = x0,
+                    _latest_moveTo_Y = _latest_y = y0);
+            }
         }
         public void MoveToRel(double dx0, double dy0)
         {
+            if (dx0 == 0 && dy0 == 0) return;
+
             //*** move to, relative to last(x,y) ***
             _latestSVGPathCmd = SvgPathCommand.MoveTo;
             _myvxs.AddMoveTo(
@@ -236,10 +255,10 @@ namespace PixelFarm.CpuBlit
         /// <param name="dy2"></param>
         public void Curve3Rel(double dx1, double dy1, double dx2, double dy2)
         {
-            _latestSVGPathCmd = SvgPathCommand.QuadraticBezierCurve; 
+            _latestSVGPathCmd = SvgPathCommand.QuadraticBezierCurve;
             _myvxs.AddC3To(
               _c1.x = _latest_x + dx1, _c1.y = _latest_y + dy1,
-              _latest_x += dx2, _latest_y += dy2); 
+              _latest_x += dx2, _latest_y += dy2);
         }
 
         /// <summary> 
@@ -311,7 +330,6 @@ namespace PixelFarm.CpuBlit
                 x2, y2,
                 _latest_x = x3, _latest_y = y3
                 );
-
         }
 
         public void Curve4Rel(double dx1, double dy1,
@@ -405,9 +423,9 @@ namespace PixelFarm.CpuBlit
         //template<class VertexSource>  
         public void JoinPath(VertexStore vxs)
         {
-            double x, y;
+
             int index = 0;
-            VertexCmd cmd = vxs.GetVertex(index++, out x, out y);
+            VertexCmd cmd = vxs.GetVertex(index++, out double x, out double y);
             if (cmd == VertexCmd.NoMore)
             {
                 return;
@@ -415,8 +433,8 @@ namespace PixelFarm.CpuBlit
             //---------------------
             if (VertexHelper.IsVertextCommand(cmd))
             {
-                double x0, y0;
-                VertexCmd flags0 = GetLastVertex(out x0, out y0);
+
+                VertexCmd flags0 = GetLastVertex(out double x0, out double y0);
                 if (VertexHelper.IsVertextCommand(flags0))
                 {
                     if (AggMath.calc_distance(x, y, x0, y0) > AggMath.VERTEX_DISTANCE_EPSILON)
@@ -453,6 +471,69 @@ namespace PixelFarm.CpuBlit
 
     public static class PathWriterExtensions
     {
+        public static void UbSpline(this PathWriter pw, double[] xyCoords)
+        {
+            Curve4Points curve4_points = pw._c4_points;
+            pw.MoveTo(xyCoords[0], xyCoords[1]);
+            for (int i = 0; i < xyCoords.Length - (4 * 2);)
+            {
+                Curves.UbSplineToBezier(
+                    xyCoords[i], xyCoords[i + 1],
+                    xyCoords[i + 2], xyCoords[i + 3],
+                    xyCoords[i + 4], xyCoords[i + 5],
+                    xyCoords[i + 6], xyCoords[i + 7],
+                    curve4_points
+                    );
+                pw.Curve4(curve4_points.x1, curve4_points.y1,
+                    curve4_points.x2, curve4_points.y2,
+                    curve4_points.x3, curve4_points.y3
+                    );
+
+                i += 2;
+            }
+        }
+        public static void Hermite(this PathWriter pw, double[] xyCoords)
+        {
+            Curve4Points curve4_points = pw._c4_points;
+            pw.MoveTo(xyCoords[0], xyCoords[1]);
+            for (int i = 0; i < xyCoords.Length - (4 * 2);)
+            {
+                Curves.HermiteToBezier(
+                    xyCoords[i], xyCoords[i + 1],
+                    xyCoords[i + 2], xyCoords[i + 3],
+                    xyCoords[i + 4], xyCoords[i + 5],
+                    xyCoords[i + 6], xyCoords[i + 7],
+                    curve4_points
+                    );
+                pw.Curve4(curve4_points.x1, curve4_points.y1,
+                    curve4_points.x2, curve4_points.y2,
+                    curve4_points.x3, curve4_points.y3
+                    );
+                i += 2;
+            }
+        }
+        public static void CatmulRom(this PathWriter pw, double[] xyCoords)
+        {
+            Curve4Points curve4_points = pw._c4_points;
+
+            pw.MoveTo(xyCoords[2], xyCoords[3]);//***
+            for (int i = 0; i < xyCoords.Length - (4 * 2);)
+            {
+                Curves.CatromToBezier(
+                    xyCoords[i], xyCoords[i + 1],
+                    xyCoords[i + 2], xyCoords[i + 3],
+                    xyCoords[i + 4], xyCoords[i + 5],
+                    xyCoords[i + 6], xyCoords[i + 7],
+                    pw._c4_points
+                    );
+
+                pw.Curve4(curve4_points.x1, curve4_points.y1,
+                    curve4_points.x2, curve4_points.y2,
+                    curve4_points.x3, curve4_points.y3
+                    );
+                i += 2;
+            }
+        }
 
         //=======================================================================
         //TODO: implement arc to ***
@@ -629,13 +710,278 @@ namespace PixelFarm.CpuBlit
 
             return (c + t);
         }
-        public static void CatmullRomToCurve4Rel(this PathWriter _writer, double dx0, double dy0, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3)
+        public static void CatmullRomToCurve4Rel(this PathWriter writer, double dx0, double dy0, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3)
         {
             //https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline
             //relative point
-            double curX = _writer.CurrentX;
-            double curY = _writer.CurrentY;
-            CatmullRomSegmentToCurve4(_writer, curX + dx0, curY + dy0, curX + dx1, curY + dy1, curX + dx2, curY + dy2, curX + dx3, curY + dy3);
+            double curX = writer.CurrentX;
+            double curY = writer.CurrentY;
+            CatmullRomSegmentToCurve4(writer, curX + dx0, curY + dy0, curX + dx1, curY + dy1, curX + dx2, curY + dy2, curX + dx3, curY + dy3);
         }
+
+
+        //-----------------
+        //info, from  https://docs.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-cardinal-splines-about
+
+        // A cardinal spline is a sequence of individual curves joined to form a larger curve.
+        //The spline is specified by an array of points and a tension parameter.
+        //A cardinal spline passes smoothly through each point in the array;
+        //there are no sharp corners and no abrupt changes in the tightness of the curve.
+
+        //A physical spline is a thin piece of wood or
+        //other flexible material.Before the advent of mathematical splines,
+        //designers used physical splines to draw curves.
+        //A designer would place the spline on a piece of paper and anchor it to a given set of points. 
+        //The designer could then create a curve by drawing along the spline with a pencil.
+        //A given set of points could yield a variety of curves,
+        //depending on the properties of the physical spline. 
+        //For example, a spline with a high resistance to bending would produce a different curve than an extremely flexible spline.
+
+        //The formulas for mathematical splines are based on the properties of flexible rods,
+        //so the curves produced by mathematical splines are similar to the curves that were once produced by physical splines.
+        //Just as physical splines of different tension will produce different curves through a given set of points,
+        // mathematical splines with different values for the tension parameter will produce different curves through a given set of points.
+
+
+        //-----------------
+        const float STEP_FACTOR = 2f;
+
+        static void SplineCurveSegment(
+           PathWriter writer,
+           double x1, double y1,
+           double x2, double y2,
+           double x3, double y3,
+           double x4, double y4,
+           float tension)
+        {
+
+            //from SplineExtensions.cs
+            //MIT, 2009-2015, Rene Schulte and WriteableBitmapEx Contributors, https://github.com/teichgraf/WriteableBitmapEx
+            //
+            //   Project:           WriteableBitmapEx - WriteableBitmap extensions
+            //   Description:       Collection of draw spline extension methods for the WriteableBitmap class.
+            //
+            //   Changed by:        $Author: unknown $
+            //   Changed on:        $Date: 2015-03-05 18:18:24 +0100 (Do, 05 Mrz 2015) $
+            //   Changed in:        $Revision: 113191 $
+            //   Project:           $URL: https://writeablebitmapex.svn.codeplex.com/svn/trunk/Source/WriteableBitmapEx/WriteableBitmapSplineExtensions.cs $
+            //   Id:                $Id: WriteableBitmapSplineExtensions.cs 113191 2015-03-05 17:18:24Z unknown $
+            //
+            //
+            //   Copyright © 2009-2015 Rene Schulte and WriteableBitmapEx Contributors
+
+
+
+            // Determine distances between controls points (bounding rect) to find the optimal stepsize
+            double minX = Math.Min(x1, Math.Min(x2, Math.Min(x3, x4)));
+            double minY = Math.Min(y1, Math.Min(y2, Math.Min(y3, y4)));
+            double maxX = Math.Max(x1, Math.Max(x2, Math.Max(x3, x4)));
+            double maxY = Math.Max(y1, Math.Max(y2, Math.Max(y3, y4)));
+
+            // Get slope
+            double lenx = maxX - minX;
+            double len = maxY - minY;
+            if (lenx > len)
+            {
+                len = lenx;
+            }
+
+            // Prevent division by zero
+            if (len != 0)
+            {
+                // Init vars
+                double step = STEP_FACTOR / len;
+                double tx1 = x2;
+                double ty1 = y2;
+
+
+                // Calculate factors
+                double sx1 = tension * (x3 - x1);
+                double sy1 = tension * (y3 - y1);
+                double sx2 = tension * (x4 - x2);
+                double sy2 = tension * (y4 - y2);
+                double ax = sx1 + sx2 + 2 * x2 - 2 * x3;
+                double ay = sy1 + sy2 + 2 * y2 - 2 * y3;
+                double bx = -2 * sx1 - sx2 - 3 * x2 + 3 * x3;
+                double by = -2 * sy1 - sy2 - 3 * y2 + 3 * y3;
+
+                // Interpolate
+                writer.LineTo(tx1, ty1);
+
+
+                double tx2, ty2;
+                for (double t = step; t <= 1; t += step)
+                {
+                    double tSq = t * t;
+
+                    tx2 = (ax * tSq * t + bx * tSq + sx1 * t + x2);
+                    ty2 = (ay * tSq * t + by * tSq + sy1 * t + y2);
+
+                    // Draw line                    //
+                    //DrawLine(context, w, h, tx1, ty1, tx2, ty2, color);
+                    writer.LineTo(tx2, ty2);
+
+                    tx1 = tx2;
+                    ty1 = ty2;
+                }
+                // Prevent rounding gap
+                writer.LineTo(x3, y3);
+                //DrawLine(context, w, h, tx1, ty1, x3, y3, color);
+            }
+        }
+        /// <summary>
+        /// Draws a Cardinal spline (cubic) defined by a point collection. 
+        /// The cardinal spline passes through each point in the collection.
+        /// </summary>
+        /// <param name="bmp">The WriteableBitmap.</param>
+        /// <param name="points">The points for the curve in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, x3, y3, x4, y4, x1, x2 ..., xn, yn).</param>
+        /// <param name="tension">The tension of the curve defines the shape. Usually between 0 and 1. 0 would be a straight line.</param>
+        /// <param name="color">The color for the spline.</param>
+        public static void DrawCurve(this PathWriter writer, float[] points, float tension)
+        {
+            // First segment
+            SplineCurveSegment(writer, points[0], points[1], points[0], points[1], points[2], points[3], points[4], points[5], tension);
+            // Middle segments
+            int i = 2;
+            for (; i < points.Length - 4; i += 2)
+            {
+                SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5], tension);
+            }
+
+            // Last segment
+            SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 2], points[i + 3], tension);
+        }
+
+
+        /// <summary>
+        /// Draws a closed Cardinal spline (cubic) defined by a point collection. 
+        /// The cardinal spline passes through each point in the collection.
+        /// </summary>
+        /// <param name="bmp">The WriteableBitmap.</param>
+        /// <param name="points">The points for the curve in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, x3, y3, x4, y4, x1, x2 ..., xn, yn).</param>
+        /// <param name="tension">The tension of the curve defines the shape. Usually between 0 and 1. 0 would be a straight line.</param>
+        /// <param name="color">The color for the spline.</param>
+        public static void DrawCurveClosed(this PathWriter writer, float[] points, float tension)
+        {
+
+            int pn = points.Length;
+
+            // First segment
+            SplineCurveSegment(writer, points[pn - 2], points[pn - 1], points[0], points[1], points[2], points[3], points[4], points[5], tension);
+
+            // Middle segments 
+            int i = 2;
+            for (; i < pn - 4; i += 2)
+            {
+                SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[i + 4], points[i + 5], tension);
+            }
+
+            // Last segment
+            SplineCurveSegment(writer, points[i - 2], points[i - 1], points[i], points[i + 1], points[i + 2], points[i + 3], points[0], points[1], tension);
+
+            // Last-to-First segment
+            SplineCurveSegment(writer, points[i], points[i + 1], points[i + 2], points[i + 3], points[0], points[1], points[2], points[3], tension);
+
+        }
+    }
+
+
+    public class CpuBlitGraphicsPath : PixelFarm.Drawing.GraphicsPath
+    {
+
+        //TODO: review this again
+
+        internal VertexStore _vxs;
+        PathWriter _writer;
+        public CpuBlitGraphicsPath()
+        {
+            _vxs = new VertexStore();
+            _writer = new PathWriter();
+            _writer.BindVxs(_vxs);
+        }
+        public void ReplaceVxs(VertexStore newVxs)
+        {
+            _vxs = newVxs;
+            _writer = new PathWriter();
+            _writer.BindVxs(_vxs);
+        }
+        public override void AddArc(float x, float y, float width, float height, float startAngle, float sweepAngle)
+        {
+            float r1 = width / 2;
+            float r2 = height / 2;
+            _writer.SvgArcToCurve4(r1, r2, startAngle, 0, 0, x + r1, y + r2, false);
+        }
+        public override void AddArc(RectangleF rectF, float startAngle, float sweepAngle)
+        {
+            AddArc(rectF.Left, rectF.Top, rectF.Width, rectF.Height, startAngle, sweepAngle);
+        }
+        public override void AddBezierCurve(Drawing.PointF p1, Drawing.PointF p2, Drawing.PointF p3, Drawing.PointF p4)
+        {
+            _writer.MoveTo(p1.X, p1.Y);
+            _writer.Curve4(p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y);
+        }
+        public override void AddBeziers(Drawing.PointF[] points)
+        {
+        }
+        public override void AddCurve(Drawing.PointF p1, Drawing.PointF p2, Drawing.PointF p3, Drawing.PointF p4)
+        {
+        }
+        public override void AddCurve(Drawing.PointF[] points)
+        {
+
+        }
+        public override void AddCurve(Drawing.PointF[] points, float tension)
+        {
+
+        }
+
+        public override void AddEllipse(float x, float y, float w, float h)
+        {
+
+        }
+        public override void AddLine(Drawing.PointF p1, Drawing.PointF p2)
+        {
+            _writer.MoveTo(p1.X, p1.Y);
+            _writer.LineTo(p2.X, p2.Y);
+        }
+        public override void AddLine(float x1, float y1, float x2, float y2)
+        {
+            _writer.MoveTo(x1, y1);
+            _writer.LineTo(x1, y2);
+        }
+        public override void AddPath(GraphicsPath another, bool connect)
+        {
+
+        }
+        public override void AddRectangle(RectangleF rectF)
+        {
+        }
+        public override GraphicsPath Clone()
+        {
+            CpuBlitGraphicsPath newClone = new CpuBlitGraphicsPath();
+            newClone._vxs.AppendVertexStore(_vxs);
+
+            return newClone;
+        }
+        public override void CloseFigure()
+        {
+            _writer.CloseFigure();
+
+        }
+        public override int PointCount
+        {
+            get
+            {
+                //TODO: review this again
+                return _vxs.Count;
+            }
+        }
+        public override RectangleF GetBounds()
+        {
+            RectD bounds = _vxs.GetBoundingRect();
+            return new RectangleF((float)(bounds.Left), (float)bounds.Top, (float)(bounds.Width), (float)(bounds.Height));
+        }
+
+
     }
 }

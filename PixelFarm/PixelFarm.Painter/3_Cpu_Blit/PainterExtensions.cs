@@ -104,6 +104,7 @@ namespace PixelFarm.CpuBlit
 
             p.FillColor = prevColor;
         }
+        
 #if DEBUG
         static int dbugId = 0;
 #endif

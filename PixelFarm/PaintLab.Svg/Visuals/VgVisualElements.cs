@@ -385,7 +385,7 @@ namespace PaintLab.Svg
 
                         //translate to center 
                         //rotate and the translate back
-                        return transformation.ResolvedICoordTransformer = Affine.NewMatix(
+                        return transformation.ResolvedICoordTransformer = Affine.New(
                                 PixelFarm.CpuBlit.VertexProcessing.AffinePlan.Translate(-rotateTx.CenterX, -rotateTx.CenterY),
                                 PixelFarm.CpuBlit.VertexProcessing.AffinePlan.Rotate(AggMath.deg2rad(rotateTx.Angle)),
                                 PixelFarm.CpuBlit.VertexProcessing.AffinePlan.Translate(rotateTx.CenterX, rotateTx.CenterY)

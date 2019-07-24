@@ -595,10 +595,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     break;
 
             }
-
-
-
-
         }
         //----------------------------------------------------------
         public static Affine operator *(Affine a, Affine b)
@@ -619,31 +615,31 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return newIden;
         }
 
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1)
+        public static Affine New(AffinePlan p0, AffinePlan p1)
         {
             AffinePlan p_empty = new AffinePlan();
             return new Affine(2, ref p0, ref p1, ref p_empty, ref p_empty, ref p_empty, null);
         }
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2)
+        public static Affine New(AffinePlan p0, AffinePlan p1, AffinePlan p2)
         {
             AffinePlan p_empty = new AffinePlan();
             return new Affine(3, ref p0, ref p1, ref p2, ref p_empty, ref p_empty, null);
         }
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3)
+        public static Affine New(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3)
         {
             AffinePlan p_empty = new AffinePlan();
             return new Affine(4, ref p0, ref p1, ref p2, ref p3, ref p_empty, null);
         }
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3, AffinePlan p4)
+        public static Affine New(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3, AffinePlan p4)
         {
             return new Affine(5, ref p0, ref p1, ref p2, ref p3, ref p4, null);
         }
 
-        public static Affine NewMatix(AffinePlan creationPlan)
+        public static Affine New(AffinePlan creationPlan)
         {
             return new Affine(IdentityMatrix, creationPlan);
         }
-        public static Affine NewMatix2(params AffinePlan[] creationPlans)
+        public static Affine New(params AffinePlan[] creationPlans)
         {
             return new Affine(creationPlans);
         }
