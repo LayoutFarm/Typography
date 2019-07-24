@@ -204,7 +204,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 }
             }
 
-            EXIT_LOOP:
+        EXIT_LOOP:
 
             yield return new VertexData(VertexCmd.Close, (int)EndVertexOrientation.CCW, 0);
             yield return new VertexData(VertexCmd.NoMore);
@@ -212,7 +212,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public VertexStore MakeVxs(VertexStore output)
         {
-            return VertexStoreBuilder.CreateVxs(this.GetVertexIter(), output);
+            return VertexSourceExtensions.CreateVxs(this.GetVertexIter(), output);
         }
         public VertexStore CreateTrim()
         {

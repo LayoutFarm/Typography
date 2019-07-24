@@ -246,7 +246,7 @@ namespace PixelFarm.Contours
     public class InsideEdgeLine : EdgeLine
     {
 
-        internal Joint inside_joint;
+        internal Joint _inside_joint;
         internal InsideEdgeLine(AnalyzedTriangle ownerTriangle, Vertex p, Vertex q)
             : base(ownerTriangle, p, q)
         {

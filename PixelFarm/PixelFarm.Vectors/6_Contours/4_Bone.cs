@@ -230,9 +230,6 @@ namespace PixelFarm.Contours
                 return null;
             }
         }
-
-
-
     }
 
 }

@@ -122,7 +122,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     case VertexCmd.C4:
                         throw new NotSupportedException();
                     case VertexCmd.Close:
-                    case VertexCmd.CloseAndEndFigure:
                         _walkStateMan.CloseFigure();
                         break;
                 }

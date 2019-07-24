@@ -112,9 +112,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //return b0;
 
             return p0.Y - (m1) * p0.X;
-        } 
+        }
     }
-   
+
 
     class LineJoiner
     {
@@ -612,8 +612,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         _lineGen.MoveTo(x, y);
                         break;
                     case VertexCmd.Close:
-                    case VertexCmd.CloseAndEndFigure:
-
                         _lineGen.Close(_positiveSideVectors, _negativeSideVectors);
                         WriteOutput(outputVxs, true);
                         has_some_results = false;

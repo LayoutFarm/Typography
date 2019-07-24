@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup >
+  <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup >
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
@@ -10,7 +10,7 @@
     <FileAlignment>512</FileAlignment>
     <AssemblyName>PixelFarm.MiniAgg.One</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " >
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants> TRACE; DEBUG; PIXEL_FARM; PIXEL_FARM_NET20;</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " >
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <DefineConstants> TRACE; PIXEL_FARM; PIXEL_FARM_NET20;</DefineConstants>
   </PropertyGroup>
-  <ItemGroup >
+  <ItemGroup>
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs" />
@@ -221,7 +221,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexData.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexData.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreTransformExtensions.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs" Link="PixelFarm\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VxsClipping.cs" />
@@ -345,7 +344,7 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" Link="PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmaptAtlas.cs" Link="PixelFarm\PixelFarm.Drawing\9_BitmapAtlas\SimpleBitmaptAtlas.cs" />
   </ItemGroup>
-  <ItemGroup >
+  <ItemGroup>
     <Folder Include="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color" />
     <Folder Include="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core" />
     <Folder Include="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps" />

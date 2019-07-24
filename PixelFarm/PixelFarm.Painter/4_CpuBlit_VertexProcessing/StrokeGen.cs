@@ -127,7 +127,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     _vtx2dList.AddMoveTo(x, y);
                     break;
                 case VertexCmd.Close:
-                case VertexCmd.CloseAndEndFigure:
                     //  m_closed = true;
                     _vtx2dList.Close();
                     break;

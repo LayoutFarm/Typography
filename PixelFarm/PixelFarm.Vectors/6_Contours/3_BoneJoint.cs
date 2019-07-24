@@ -35,14 +35,14 @@ namespace PixelFarm.Contours
             _fitY = midpos.Y;
 
 #if DEBUG
-            if (p_contact_edge.inside_joint != null ||
-                q_contact_edge.inside_joint != null)
+            if (p_contact_edge._inside_joint != null ||
+                q_contact_edge._inside_joint != null)
             {
                 throw new System.NotSupportedException();
             }
 #endif
-            p_contact_edge.inside_joint = this;
-            q_contact_edge.inside_joint = this;
+            p_contact_edge._inside_joint = this;
+            q_contact_edge._inside_joint = this;
         }
         /// <summary>
         /// dynamic fit x

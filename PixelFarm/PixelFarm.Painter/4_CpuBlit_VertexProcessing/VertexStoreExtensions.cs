@@ -182,143 +182,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //4.              
             //add no more?
         }
-        public static void FlattenCurve3(VertexStore vxs,
-            double x0, double y0,
-            double x1, double y1,
-            double x2, double y2)
-        {
-
-            //1. subdiv technique
-            using (BorrowCurve3Div(out Curve3Div curve3))
-            {
-                curve3.Init(x0, y0, x1, y1, x2, y2);
-                ArrayList<Vector2> points = curve3.GetInternalPoints();
-                int n = 0;
-                for (int i = points.Length - 1; i >= 0; --i)
-                {
-                    Vector2 p = points[n++];
-                    vxs.AddLineTo(p.x, p.y);
-                }
-            }
-            //2. old tech --  use incremental
-            //var curve = new VectorMath.BezierCurveQuadric(
-            //    new Vector2(x0, y0),
-            //    new Vector2(x1, y1),
-            //    new Vector2(x2, y2));
-
-            //vxs.AddLineTo(x0, y0);
-            //float eachstep = (float)1 / NSteps;
-            //float stepSum = eachstep;//start
-            //for (int i = NSteps - 1; i >= 0; --i)
-            //{
-            //    var vector2 = curve.CalculatePoint(stepSum);
-            //    vxs.AddLineTo(vector2.x, vector2.y);
-            //    stepSum += eachstep;
-            //}
-            //vxs.AddLineTo(x2, y2);
-
-        }
-         
-
-        static TempContext<Curve4Div> BorrowCurve4Div(out Curve4Div curve4Div)
-        {
-            if (!Temp<Curve4Div>.IsInit())
-            {
-                Temp<Curve4Div>.SetNewHandler(
-                    () => new Curve4Div(),
-                    s => s.Reset());
-            }
-            return PixelFarm.Temp<Curve4Div>.Borrow(out curve4Div);
-        }
-        static TempContext<Curve3Div> BorrowCurve3Div(out Curve3Div curve3Div)
-        {
-            if (!Temp<Curve3Div>.IsInit())
-            {
-                Temp<Curve3Div>.SetNewHandler(
-                    () => new Curve3Div(),
-                    s => s.Reset());
-            }
-            return PixelFarm.Temp<Curve3Div>.Borrow(out curve3Div);
-        }
-
-
-        static void FlattenCurve4(VertexStore vxs,
-            double x0, double y0,
-            double x1, double y1,
-            double x2, double y2,
-            double x3, double y3)
-        {
-
-            //1. subdiv technique
-            using (BorrowCurve4Div(out Curve4Div curve4))
-            {                
-                curve4.Init(x0, y0, x1, y1, x2, y2, x3, y3);
-                ArrayList<Vector2> points = curve4.GetInternalPoints();
-
-                int n = 0;
-                for (int i = points.Length - 1; i >= 0; --i)
-                {
-                    Vector2 p = points[n++];
-                    vxs.AddLineTo(p.x, p.y);
-                }
-            }
-
-            //----------------------------------------
-            //2. old tech --  use incremental
-            //var curve = new VectorMath.BezierCurveCubic(
-            //    start, end,
-            //    control1, control2);
-            //vxs.AddLineTo(start.x, start.y);
-            //float eachstep = (float)1 / NSteps;
-            //float stepSum = eachstep;//start
-            //for (int i = NSteps - 1; i >= 0; --i)
-            //{
-            //    var vector2 = curve.CalculatePoint(stepSum);
-            //    vxs.AddLineTo(vector2.x, vector2.y);
-            //    stepSum += eachstep;
-            //}
-            //vxs.AddLineTo(end.x, end.y);
-        }
-
-        public static void Flatten(this Curve4Flattener curve, VertexStore vxs,
-            double x0, double y0,
-            double x1, double y1,
-            double x2, double y2,
-            double x3, double y3)
-        {
-            FlattenCurve4(vxs,
-                x0, y0,
-                x1, y1,
-                x2, y2,
-                x3, y3);
-        }
-        /// <summary>
-        /// create lines from curve
-        /// </summary>
-        /// <param name="vxs"></param>
-        public static void Flatten(this Curve3Flattener curve, VertexStore vxs, double x0, double y0,
-               double x1, double y1,
-               double x2, double y2)
-        {
-            FlattenCurve3(vxs,
-                x0, y0,
-                x1, y1,
-                x2, y2);
-        }
-        public static void Flatten(this Curve3Div curve, VertexStore vxs)
-        {
-            ArrayList<Vector2> m_points = curve.GetInternalPoints();
-            int j = m_points.Count;
-            if (j > 0)
-            {
-                //others
-                for (int i = 1; i < j; i++)
-                {
-                    var p = m_points[i];
-                    vxs.AddLineTo(p.x, p.y);
-                }
-            }
-        }
 
         public static IEnumerable<VertexData> GetVertexIter(this Arc arc)
         {
@@ -399,6 +262,16 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 vertexData.command = VertexCmd.NoMore;
                 yield return vertexData;
             }
+        }
+
+        public static VertexStore CreateVxs(IEnumerable<VertexData> iter, VertexStore output)
+        {
+
+            foreach (VertexData v in iter)
+            {
+                output.AddVertex(v.x, v.y, v.command);
+            }
+            return output;
         }
     }
 

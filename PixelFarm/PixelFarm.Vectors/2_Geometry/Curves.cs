@@ -16,18 +16,11 @@
 //----------------------------------------------------------------------------
 
 using System;
-using PixelFarm.VectorMath;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
     public static class Curves
     {
-        //--------------------------------------------curve_approximation_method_e
-        public enum CurveApproximationMethod
-        {
-            Inc,
-            Div,
-            SimpleInc, //my extension
-        }
+
 
         //static readonly double CURVE_DISTANCE_EPSILON = 1e-30;
         internal const double CURVE_COLLINEARITY_EPSILON = 1e-30;
@@ -107,264 +100,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 y2);
         }
     }
-
-    //--------------------------------------------------------------curve3_inc
-    public sealed class Curve3Inc
-    {
-        int _num_steps;
-        int _step;
-        double _scale;
-        double _start_x;
-        double _start_y;
-        double _end_x;
-        double _end_y;
-        double _fx;
-        double _fy;
-        double _dfx;
-        double _dfy;
-        double _ddfx;
-        double _ddfy;
-        double _saved_fx;
-        double _saved_fy;
-        double _saved_dfx;
-        double _saved_dfy;
-        public Curve3Inc()
-        {
-            _num_steps = (0);
-            _step = (0);
-            _scale = (1.0);
-        }
-
-        //public Curve3Inc(double x1, double y1,
-        //           double x2, double y2,
-        //           double x3, double y3)
-        //{
-        //    _num_steps = (0);
-        //    _step = (0);
-        //    _scale = (1.0);
-        //    Init(x1, y1, x2, y2, x3, y3);
-        //}
-        public int SimpleIncStep
-        {
-            get;
-            set;
-        }
-        public void Reset()
-        {
-            _num_steps = 0;
-            _step = -1;
-        }
-
-        public void Init(double x1, double y1,
-                  double cx, double cy,
-                  double x2, double y2)
-        {
-            _start_x = x1;
-            _start_y = y1;
-            _end_x = x2;
-            _end_y = y2;
-            double dx1 = cx - x1;
-            double dy1 = cy - y1;
-            double dx2 = x2 - cx;
-            double dy2 = y2 - cy;
-            double len = Math.Sqrt(dx1 * dx1 + dy1 * dy1) + Math.Sqrt(dx2 * dx2 + dy2 * dy2);
-
-            _num_steps = (int)AggMath.uround(len * 0.25 * _scale);
-            if (_num_steps < 4)
-            {
-                _num_steps = 4;
-            }
-
-            double eachIncStep = 1.0 / _num_steps;
-            double eachIncStep2 = eachIncStep * eachIncStep;
-            double tmpx = (x1 - cx * 2.0 + x2) * eachIncStep2;
-            double tmpy = (y1 - cy * 2.0 + y2) * eachIncStep2;
-            _saved_fx = _fx = x1;
-            _saved_fy = _fy = y1;
-            _saved_dfx = _dfx = tmpx + (cx - x1) * (2.0 * eachIncStep);
-            _saved_dfy = _dfy = tmpy + (cy - y1) * (2.0 * eachIncStep);
-            _ddfx = tmpx * 2.0;
-            _ddfy = tmpy * 2.0;
-            _step = _num_steps;
-        }
-
-        public Curves.CurveApproximationMethod ApproximationMethod
-        {
-            get { return Curves.CurveApproximationMethod.Inc; }
-            set { }
-        }
-        public double ApproximationScale
-        {
-            get => _scale;
-            set => _scale = value;
-        }
-        public double AngleTolerance
-        {
-            get => 0;
-            set { }
-        }
-        public double CuspLimit
-        {
-            get => 0;
-            set { }
-        }
-    }
-
-    //-------------------------------------------------------------curve3_div
-    public sealed class Curve3Div
-    {
-        double _approximation_scale;
-        double _distance_tolerance_square;
-        double _angle_tolerance;
-
-        ArrayList<Vector2> _points;
-        public Curve3Div()
-        {
-            _points = new ArrayList<Vector2>();
-            _approximation_scale = (1.0);
-            _angle_tolerance = (0.0);
-
-        }
-
-        //public Curve3Div(double x1, double y1,
-        //           double cx, double cy,
-        //           double x2, double y2)
-        //{
-        //    _approximation_scale = (1.0);
-        //    _angle_tolerance = (0.0);
-
-        //    Init(x1, y1, cx, cy, x2, y2);
-        //}
-
-        public void Reset()
-        {
-            _points.Clear();
-        }
-        public void Init(double x1, double y1,
-                double cx, double cy,
-                double x2, double y2)
-        {
-            _points.Clear();
-            _distance_tolerance_square = 0.5 / _approximation_scale;
-            _distance_tolerance_square *= _distance_tolerance_square;
-            AddBezier(x1, y1, cx, cy, x2, y2);
-        }
-
-        public Curves.CurveApproximationMethod ApproximationMethod => Curves.CurveApproximationMethod.Div;
-
-        public double ApproximationScale
-        {
-            get => _approximation_scale;
-            set => _approximation_scale = value;
-        }
-        public double AngleTolerance
-        {
-            get => _angle_tolerance;
-            set => _angle_tolerance = value;
-        }
-        public double CuspLimit
-        {
-            get => 0;
-            set { }
-        }
-        //
-        public ArrayList<Vector2> GetInternalPoints() => _points;
-        //
-        void AddBezier(double x1, double y1,
-                    double x2, double y2,
-                    double x3, double y3)
-        {
-            _points.Append(new Vector2(x1, y1));
-            AddRecursiveBezier(x1, y1, x2, y2, x3, y3, 0);
-            _points.Append(new Vector2(x3, y3));
-        }
-
-        private void AddRecursiveBezier(double x1, double y1,
-                              double x2, double y2,
-                              double x3, double y3,
-                              int level)
-        {
-            if (level > Curves.CURVE_RECURSION_LIMIT)
-            {
-                return;
-            }
-
-            // Calculate all the mid-points of the line segments
-            //----------------------
-            double x12 = (x1 + x2) / 2;
-            double y12 = (y1 + y2) / 2;
-            double x23 = (x2 + x3) / 2;
-            double y23 = (y2 + y3) / 2;
-            double x123 = (x12 + x23) / 2;
-            double y123 = (y12 + y23) / 2;
-            double dx = x3 - x1;
-            double dy = y3 - y1;
-            double d = Math.Abs(((x2 - x3) * dy - (y2 - y3) * dx));
-            double da;
-            if (d > Curves.CURVE_COLLINEARITY_EPSILON)
-            {
-                // Regular case
-                //-----------------
-                if (d * d <= _distance_tolerance_square * (dx * dx + dy * dy))
-                {
-                    // If the curvature doesn't exceed the distance_tolerance value
-                    // we tend to finish subdivisions.
-                    //----------------------
-                    if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
-                    {
-                        _points.Append(new Vector2(x123, y123));
-                        return;
-                    }
-
-                    // Angle & Cusp Condition
-                    //----------------------
-                    da = Math.Abs(Math.Atan2(y3 - y2, x3 - x2) - Math.Atan2(y2 - y1, x2 - x1));
-                    if (da >= Math.PI) da = 2 * Math.PI - da;
-                    if (da < _angle_tolerance)
-                    {
-                        // Finally we can stop the recursion
-                        //----------------------
-                        _points.Append(new Vector2(x123, y123));
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                // Collinear case
-                //------------------
-                da = dx * dx + dy * dy;
-                if (da == 0)
-                {
-                    d = AggMath.calc_sq_distance(x1, y1, x2, y2);
-                }
-                else
-                {
-                    d = ((x2 - x1) * dx + (y2 - y1) * dy) / da;
-                    if (d > 0 && d < 1)
-                    {
-                        // Simple collinear case, 1---2---3
-                        // We can leave just two endpoints
-                        return;
-                    }
-                    if (d <= 0) d = AggMath.calc_sq_distance(x2, y2, x1, y1);
-                    else if (d >= 1) d = AggMath.calc_sq_distance(x2, y2, x3, y3);
-                    else d = AggMath.calc_sq_distance(x2, y2, x1 + d * dx, y1 + d * dy);
-                }
-                if (d < _distance_tolerance_square)
-                {
-                    _points.Append(new Vector2(x2, y2));
-                    return;
-                }
-            }
-
-            // Continue subdivision
-            //----------------------
-            AddRecursiveBezier(x1, y1, x12, y12, x123, y123, level + 1);
-            AddRecursiveBezier(x123, y123, x23, y23, x3, y3, level + 1);
-        }
-    }
-
     //-------------------------------------------------------------curve4_points
     public sealed class Curve4Points
     {
@@ -380,95 +115,137 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             this.x3 = x3; this.y3 = y3;
         }
     }
+ 
 
-    //-------------------------------------------------------------curve4_inc
-    public sealed class Curve4Inc
+    public interface ICurveFlattenerOutput
     {
-        int _num_steps;
-        int _step;
-        double _scale;
-        double _start_x;
-        double _start_y;
-        double _end_x;
-        double _end_y;
-        double _fx;
-        double _fy;
-        double _dfx;
-        double _dfy;
-        double _ddfx;
-        double _ddfy;
-        double _dddfx;
-        double _dddfy;
-        double _saved_fx;
-        double _saved_fy;
-        double _saved_dfx;
-        double _saved_dfy;
-        double _saved_ddfx;
-        double _saved_ddfy;
-        public Curve4Inc()
-        {
-            _num_steps = 0;
-            _step = 0;
-            _scale = 1;
-        }
-        public int SimpleIncStep
-        {
-            get;
-            set;
-        }
-        //public Curve4Inc(double x1, double y1,
-        //          double cx1, double cy1,
-        //          double cx2, double cy2,
-        //          double x2, double y2)
-        //{
-        //    _num_steps = (0);
-        //    _step = (0);
-        //    _scale = (1.0);
-        //    Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
-        //}
+        void Append(double x, double y);
+    }
 
-        //public Curve4Inc(Curve4Points cp)
-        //{
-        //    _num_steps = (0);
-        //    _step = (0);
-        //    _scale = (1.0);
-        //    Init(
-        //            cp.c0, cp.c1,
-        //            cp.c2, cp.c3,
-        //            cp.c4, cp.c5,
-        //            cp.c6, cp.c7);
-        //}
+    /// <summary>
+    /// incremental curve flattener
+    /// </summary>
+    public sealed class CurveIncFlattener
+    {
+        double _scale;
+        public CurveIncFlattener()
+        {
+            Reset();
+        }
+
+        public double ApproximationScale
+        {
+            get => _scale;
+            set => _scale = value;
+        }
+
+        public bool UseFixedStepCount { get; set; }
+        public int FixedStepCount { get; set; }
 
         public void Reset()
         {
-            _num_steps = 0;
-            _step = -1;
+            _scale = 1;
+            UseFixedStepCount = false;
+            FixedStepCount = 3;
         }
-        public void Init(double x1, double y1,
-                  double cx1, double cy1,
-                  double cx2, double cy2,
-                  double x2, double y2)
-        {
-            _start_x = x1;
-            _start_y = y1;
-            _end_x = x2;
-            _end_y = y2;
-            double dx1 = cx1 - x1;
-            double dy1 = cy1 - y1;
-            double dx2 = cx2 - cx1;
-            double dy2 = cy2 - cy1;
-            double dx3 = x2 - cx2;
-            double dy3 = y2 - cy2;
-            double len = (Math.Sqrt(dx1 * dx1 + dy1 * dy1) +
-                          Math.Sqrt(dx2 * dx2 + dy2 * dy2) +
-                          Math.Sqrt(dx3 * dx3 + dy3 * dy3)) * 0.25 * _scale;
 
-            _num_steps = (int)AggMath.uround(len);
-            if (_num_steps < 4)
+        //curve3_inc
+        public void Flatten(double x0, double y0,
+                  double x1, double y1,
+                  double x2, double y2,
+                  ICurveFlattenerOutput output, bool skipFirstPoint)
+        {
+
+            int _num_steps;
+
+            if (UseFixedStepCount)
             {
-                _num_steps = 4;
+                _num_steps = FixedStepCount;
+            }
+            else
+            {
+                //calculate 
+                double dx1 = x1 - x0;
+                double dy1 = y1 - y0;
+                double dx2 = x2 - x1;
+                double dy2 = y2 - y1;
+                double len = Math.Sqrt(dx1 * dx1 + dy1 * dy1) + Math.Sqrt(dx2 * dx2 + dy2 * dy2);
+                _num_steps = (int)AggMath.uround(len * 0.25 * _scale);
+
+                if (_num_steps < 4)
+                {
+                    _num_steps = 4;
+                }
             }
 
+
+            double eachIncStep = 1.0 / _num_steps;
+            double eachIncStep2 = eachIncStep * eachIncStep;
+            double tmpx = (x0 - x1 * 2.0 + x2) * eachIncStep2;
+            double tmpy = (y0 - y1 * 2.0 + y2) * eachIncStep2;
+            double _fx = x0;
+            double _fy = y0;
+            double _dfx = tmpx + (x1 - x0) * (2.0 * eachIncStep);
+            double _dfy = tmpy + (y1 - y0) * (2.0 * eachIncStep);
+            double _ddfx = tmpx * 2.0;
+            double _ddfy = tmpy * 2.0;
+
+
+            //---------------
+            //skip first step?
+            //---------------
+            if (!skipFirstPoint)
+            {
+                output.Append(x0, y0);
+            }
+            for (int i = 0; i < _num_steps; ++i)
+            {
+                _fx += _dfx;
+                _fy += _dfy;
+                _dfx += _ddfx;
+                _dfy += _ddfy;
+
+                output.Append(_fx, _fy);
+            }
+
+            //last point
+            output.Append(x2, y2);
+        }
+
+        //curve4_inc
+        public void Flatten(double x0, double y0,
+                 double x1, double y1,
+                 double x2, double y2,
+                 double x3, double y3,
+                 ICurveFlattenerOutput output,
+                 bool skipFirstPoint)
+        {
+            int _num_steps = 0;
+
+            if (UseFixedStepCount)
+            {
+                //use fixed step
+                _num_steps = FixedStepCount;
+            }
+            else
+            {
+                //calculate step
+                double dx1 = x1 - x0;
+                double dy1 = y1 - y0;
+                double dx2 = x2 - x1;
+                double dy2 = y2 - y1;
+                double dx3 = x3 - x2;
+                double dy3 = y3 - y2;
+                double len = (Math.Sqrt(dx1 * dx1 + dy1 * dy1) +
+                              Math.Sqrt(dx2 * dx2 + dy2 * dy2) +
+                              Math.Sqrt(dx3 * dx3 + dy3 * dy3)) * 0.25 * _scale;
+
+                _num_steps = (int)AggMath.uround(len);
+                if (_num_steps < 4)
+                {
+                    _num_steps = 4;
+                }
+            }
 
 
             double eachIncStep = 1.0 / _num_steps;
@@ -478,151 +255,104 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double pre2 = 3.0 * eachIncStep2;
             double pre4 = 6.0 * eachIncStep2;
             double pre5 = 6.0 * eachIncStep3;
-            double tmp1x = x1 - cx1 * 2.0 + cx2;
-            double tmp1y = y1 - cy1 * 2.0 + cy2;
-            double tmp2x = (cx1 - cx2) * 3.0 - x1 + x2;
-            double tmp2y = (cy1 - cy2) * 3.0 - y1 + y2;
-            _saved_fx = _fx = x1;
-            _saved_fy = _fy = y1;
-            _saved_dfx = _dfx = (cx1 - x1) * pre1 + tmp1x * pre2 + tmp2x * eachIncStep3;
-            _saved_dfy = _dfy = (cy1 - y1) * pre1 + tmp1y * pre2 + tmp2y * eachIncStep3;
-            _saved_ddfx = _ddfx = tmp1x * pre4 + tmp2x * pre5;
-            _saved_ddfy = _ddfy = tmp1y * pre4 + tmp2y * pre5;
-            _dddfx = tmp2x * pre5;
-            _dddfy = tmp2y * pre5;
-            _step = _num_steps;
-        }
+            double tmp1x = x0 - x1 * 2.0 + x2;
+            double tmp1y = y0 - y1 * 2.0 + y2;
+            double tmp2x = (x1 - x2) * 3.0 - x0 + x3;
+            double tmp2y = (y1 - y2) * 3.0 - y0 + y3;
+            double _fx = x0;
+            double _fy = y0;
+            double _dfx = (x1 - x0) * pre1 + tmp1x * pre2 + tmp2x * eachIncStep3;
+            double _dfy = (y1 - y0) * pre1 + tmp1y * pre2 + tmp2y * eachIncStep3;
+            double _ddfx = tmp1x * pre4 + tmp2x * pre5;
+            double _ddfy = tmp1y * pre4 + tmp2y * pre5;
+            double _dddfx = tmp2x * pre5;
+            double _dddfy = tmp2y * pre5;
 
-        //public void Init(Curve4Points cp)
-        //{
-        //    Init(cp.x0, cp.y0,
-        //            cp.x1, cp.y1,
-        //            cp.x2, cp.y2,
-        //            cp.x3, cp.y3);
-        //}
-        public Curves.CurveApproximationMethod ApproximationMethod
-        {
-            get => Curves.CurveApproximationMethod.Inc;
-            set { }
-        }
-        public double ApproximationScale
-        {
-            get => _scale;
-            set => _scale = value;
-        }
-        public double AngleTolerance
-        {
-            get => 0;
-            set { }
-        }
-        public double CuspLmit
-        {
-            get => 0;
-            set { }
-        }
-
-
-        public void RewindZero()
-        {
-            if (_num_steps == 0)
+            //------------------------------------------------------------------------
+            if (!skipFirstPoint)
             {
-                _step = -1;
-                return;
+                output.Append(x0, y0);
             }
-            _step = _num_steps;
-            _fx = _saved_fx;
-            _fy = _saved_fy;
-            _dfx = _saved_dfx;
-            _dfy = _saved_dfy;
-            _ddfx = _saved_ddfx;
-            _ddfy = _saved_ddfy;
+            //------------------------------------------------------------------------
+            //skip first point?
+            for (int i = 0; i < _num_steps; ++i)
+            {
+                _fx += _dfx;
+                _fy += _dfy;
+                _dfx += _ddfx;
+                _dfy += _ddfy;
+                _ddfx += _dddfx;
+                _ddfy += _dddfy;
+
+                output.Append(_fx, _fy);
+            }
+            output.Append(x3, y3);
         }
-
-        //public VertexCmd GetNextVertex(out double x, out double y)
-        //{
-        //    if (m_step < 0)
-        //    {
-        //        x = 0;
-        //        y = 0;
-        //        return VertexCmd.NoMore;
-        //    }
-
-        //    if (m_step == m_num_steps)
-        //    {
-        //        x = m_start_x;
-        //        y = m_start_y;
-        //        --m_step;
-        //        return VertexCmd.MoveTo;
-        //    }
-
-        //    if (m_step == 0)
-        //    {
-        //        x = m_end_x;
-        //        y = m_end_y;
-        //        --m_step;
-        //        return VertexCmd.LineTo;
-        //    }
-
-        //    m_fx += m_dfx;
-        //    m_fy += m_dfy;
-        //    m_dfx += m_ddfx;
-        //    m_dfy += m_ddfy;
-        //    m_ddfx += m_dddfx;
-        //    m_ddfy += m_dddfy;
-        //    x = m_fx;
-        //    y = m_fy;
-        //    --m_step;
-        //    return VertexCmd.LineTo;
-        //}
     }
 
-    //-------------------------------------------------------------curve4_div
-    public sealed class Curve4Div
+
+    public sealed class CurveSubdivisionFlattener
     {
         double _approximation_scale;
         double _distance_tolerance_square;
         double _angle_tolerance;
         double _cusp_limit;
 
-        ArrayList<Vector2> _points;
-        public Curve4Div()
+        byte _recursiveLimit;
+
+        public CurveSubdivisionFlattener()
         {
-            _points = new ArrayList<Vector2>();
-            _approximation_scale = (1.0);
-            _angle_tolerance = (0.0);
-            _cusp_limit = (0.0);
-
+            Reset();
         }
-
-        //public Curve4Div(double x1, double y1,
-        //           double x2, double y2,
-        //           double x3, double y3,
-        //           double x4, double y4)
-        //{
-        //    _approximation_scale = (1.0);
-        //    _angle_tolerance = (0.0);
-        //    _cusp_limit = (0.0);
-
-        //    Init(x1, y1, x2, y2, x3, y3, x4, y4);
-        //}
-
-
-        public ArrayList<Vector2> GetInternalPoints() => _points;
         public void Reset()
         {
-            _points.Clear();
-
+            _approximation_scale = 1;
+            _angle_tolerance = 1;
+            _cusp_limit = 0;
+            _recursiveLimit = 10;
         }
-        public void Init(double x1, double y1,
+        public byte RecursiveLimit
+        {
+            get => _recursiveLimit;
+            set
+            {
+                if (value > Curves.CURVE_RECURSION_LIMIT)
+                {
+                    value = Curves.CURVE_RECURSION_LIMIT;
+                }
+                _recursiveLimit = value;
+            }
+        }
+        //-------------------------------------------------------------curve4_div
+        /// <summary>
+        /// Flatten Curve4
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="y0"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="x3"></param>
+        /// <param name="y3"></param>
+        /// <param name="output"></param>
+        /// <param name="skipFirstPoint"></param>
+        public void Flatten(double x0, double y0,
+                  double x1, double y1,
                   double x2, double y2,
                   double x3, double y3,
-                  double x4, double y4)
+                  ICurveFlattenerOutput output,
+                  bool skipFirstPoint)
         {
-            _points.Clear();
             _distance_tolerance_square = 0.5 / _approximation_scale;
             _distance_tolerance_square *= _distance_tolerance_square;
-            AddBezier(x1, y1, x2, y2, x3, y3, x4, y4);
 
+            if (!skipFirstPoint)
+            {
+                output.Append(x0, y0);
+            }
+            AddRecursiveBezier(x0, y0, x1, y1, x2, y2, x3, y3, 0, output);
+            output.Append(x3, y3);
         }
 
         public double ApproximationScale
@@ -642,50 +372,39 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             set => _cusp_limit = (value == 0.0) ? 0.0 : Math.PI - value;
         }
 
-
-        void AddBezier(double x1, double y1,
-                  double x2, double y2,
-                  double x3, double y3,
-                  double x4, double y4)
+        void AddRecursiveBezier(double x0, double y0,
+                              double x1, double y1,
+                              double x2, double y2,
+                              double x3, double y3,
+                              int level, ICurveFlattenerOutput output)
         {
-            _points.Append(new Vector2(x1, y1));
-            AddRecursiveBezier(x1, y1, x2, y2, x3, y3, x4, y4, 0);
-            _points.Append(new Vector2(x4, y4));
-        }
-
-
-        void AddRecursiveBezier(double x1, double y1,
-                            double x2, double y2,
-                            double x3, double y3,
-                            double x4, double y4,
-                            int level)
-        {
+            //curve4
             //recursive
-            if (level > Curves.CURVE_RECURSION_LIMIT)
+            if (level > _recursiveLimit)
             {
                 return;
             }
 
             // Calculate all the mid-points of the line segments
             //----------------------
+            double x01 = (x0 + x1) / 2;
+            double y01 = (y0 + y1) / 2;
             double x12 = (x1 + x2) / 2;
             double y12 = (y1 + y2) / 2;
             double x23 = (x2 + x3) / 2;
             double y23 = (y2 + y3) / 2;
-            double x34 = (x3 + x4) / 2;
-            double y34 = (y3 + y4) / 2;
+            double x012 = (x01 + x12) / 2;
+            double y012 = (y01 + y12) / 2;
             double x123 = (x12 + x23) / 2;
             double y123 = (y12 + y23) / 2;
-            double x234 = (x23 + x34) / 2;
-            double y234 = (y23 + y34) / 2;
-            double x1234 = (x123 + x234) / 2;
-            double y1234 = (y123 + y234) / 2;
+            double x0123 = (x012 + x123) / 2;
+            double y0123 = (y012 + y123) / 2;
             // Try to approximate the full cubic curve by a single straight line
             //------------------
-            double dx = x4 - x1;
-            double dy = y4 - y1;
-            double d2 = Math.Abs(((x2 - x4) * dy - (y2 - y4) * dx));
-            double d3 = Math.Abs(((x3 - x4) * dy - (y3 - y4) * dx));
+            double dx = x3 - x0;
+            double dy = y3 - y0;
+            double d2 = Math.Abs(((x1 - x3) * dy - (y1 - y3) * dx));
+            double d3 = Math.Abs(((x2 - x3) * dy - (y2 - y3) * dx));
             double da1, da2, k;
             int SwitchCase = 0;
             if (d2 > Curves.CURVE_COLLINEARITY_EPSILON)
@@ -705,17 +424,17 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     k = dx * dx + dy * dy;
                     if (k == 0)
                     {
-                        d2 = AggMath.calc_sq_distance(x1, y1, x2, y2);
-                        d3 = AggMath.calc_sq_distance(x4, y4, x3, y3);
+                        d2 = AggMath.calc_sq_distance(x0, y0, x1, y1);
+                        d3 = AggMath.calc_sq_distance(x3, y3, x2, y2);
                     }
                     else
                     {
                         k = 1 / k;
-                        da1 = x2 - x1;
-                        da2 = y2 - y1;
+                        da1 = x1 - x0;
+                        da2 = y1 - y0;
                         d2 = k * (da1 * dx + da2 * dy);
-                        da1 = x3 - x1;
-                        da2 = y3 - y1;
+                        da1 = x2 - x0;
+                        da2 = y2 - y0;
                         d3 = k * (da1 * dx + da2 * dy);
                         if (d2 > 0 && d2 < 1 && d3 > 0 && d3 < 1)
                         {
@@ -723,18 +442,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             // We can leave just two endpoints
                             return;
                         }
-                        if (d2 <= 0) d2 = AggMath.calc_sq_distance(x2, y2, x1, y1);
-                        else if (d2 >= 1) d2 = AggMath.calc_sq_distance(x2, y2, x4, y4);
-                        else d2 = AggMath.calc_sq_distance(x2, y2, x1 + d2 * dx, y1 + d2 * dy);
-                        if (d3 <= 0) d3 = AggMath.calc_sq_distance(x3, y3, x1, y1);
-                        else if (d3 >= 1) d3 = AggMath.calc_sq_distance(x3, y3, x4, y4);
-                        else d3 = AggMath.calc_sq_distance(x3, y3, x1 + d3 * dx, y1 + d3 * dy);
+                        if (d2 <= 0) d2 = AggMath.calc_sq_distance(x1, y1, x0, y0);
+                        else if (d2 >= 1) d2 = AggMath.calc_sq_distance(x1, y1, x3, y3);
+                        else d2 = AggMath.calc_sq_distance(x1, y1, x0 + d2 * dx, y0 + d2 * dy);
+                        if (d3 <= 0) d3 = AggMath.calc_sq_distance(x2, y2, x0, y0);
+                        else if (d3 >= 1) d3 = AggMath.calc_sq_distance(x2, y2, x3, y3);
+                        else d3 = AggMath.calc_sq_distance(x2, y2, x0 + d3 * dx, y0 + d3 * dy);
                     }
                     if (d2 > d3)
                     {
                         if (d2 < _distance_tolerance_square)
                         {
-                            _points.Append(new Vector2(x2, y2));
+                            output.Append(x1, y1);
                             return;
                         }
                     }
@@ -742,7 +461,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         if (d3 < _distance_tolerance_square)
                         {
-                            _points.Append(new Vector2(x3, y3));
+                            output.Append(x2, y2);
                             return;
                         }
                     }
@@ -754,18 +473,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            _points.Append(new Vector2(x23, y23));
+                            output.Append(x12, y12);
                             return;
                         }
 
                         // Angle Condition
                         //----------------------
-                        da1 = Math.Abs(Math.Atan2(y4 - y3, x4 - x3) - Math.Atan2(y3 - y2, x3 - x2));
+                        da1 = Math.Abs(Math.Atan2(y3 - y2, x3 - x2) - Math.Atan2(y2 - y1, x2 - x1));
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
                         if (da1 < _angle_tolerance)
                         {
-                            _points.Append(new Vector2(x2, y2));
-                            _points.Append(new Vector2(x3, y3));
+                            output.Append(x1, y1);
+                            output.Append(x2, y2);
                             return;
                         }
 
@@ -773,7 +492,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         {
                             if (da1 > _cusp_limit)
                             {
-                                _points.Append(new Vector2(x3, y3));
+                                output.Append(x2, y2);
                                 return;
                             }
                         }
@@ -786,18 +505,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     {
                         if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            _points.Append(new Vector2(x23, y23));
+                            output.Append(x12, y12);
                             return;
                         }
 
                         // Angle Condition
                         //----------------------
-                        da1 = Math.Abs(Math.Atan2(y3 - y2, x3 - x2) - Math.Atan2(y2 - y1, x2 - x1));
+                        da1 = Math.Abs(Math.Atan2(y2 - y1, x2 - x1) - Math.Atan2(y1 - y0, x1 - x0));
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
                         if (da1 < _angle_tolerance)
                         {
-                            _points.Append(new Vector2(x2, y2));
-                            _points.Append(new Vector2(x3, y3));
+                            output.Append(x1, y1);
+                            output.Append(x2, y2);
                             return;
                         }
 
@@ -805,7 +524,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         {
                             if (da1 > _cusp_limit)
                             {
-                                _points.Append(new Vector2(x2, y2));
+                                output.Append(x1, y1);
                                 return;
                             }
                         }
@@ -821,22 +540,22 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         //----------------------
                         if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
                         {
-                            _points.Append(new Vector2(x23, y23));
+                            output.Append(x12, y12);
                             return;
                         }
 
                         // Angle & Cusp Condition
                         //----------------------
-                        k = Math.Atan2(y3 - y2, x3 - x2);
-                        da1 = Math.Abs(k - Math.Atan2(y2 - y1, x2 - x1));
-                        da2 = Math.Abs(Math.Atan2(y4 - y3, x4 - x3) - k);
+                        k = Math.Atan2(y2 - y1, x2 - x1);
+                        da1 = Math.Abs(k - Math.Atan2(y1 - y0, x1 - x0));
+                        da2 = Math.Abs(Math.Atan2(y3 - y2, x3 - x2) - k);
                         if (da1 >= Math.PI) da1 = 2 * Math.PI - da1;
                         if (da2 >= Math.PI) da2 = 2 * Math.PI - da2;
                         if (da1 + da2 < _angle_tolerance)
                         {
                             // Finally we can stop the recursion
                             //----------------------
-                            _points.Append(new Vector2(x23, y23));
+                            output.Append(x12, y12);
                             return;
                         }
 
@@ -844,13 +563,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         {
                             if (da1 > _cusp_limit)
                             {
-                                _points.Append(new Vector2(x2, y2));
+                                output.Append(x1, y1);
                                 return;
                             }
 
                             if (da2 > _cusp_limit)
                             {
-                                _points.Append(new Vector2(x3, y3));
+                                output.Append(x2, y2);
                                 return;
                             }
                         }
@@ -860,139 +579,130 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             // Continue subdivision
             //----------------------
-            AddRecursiveBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, level + 1);
-            AddRecursiveBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, level + 1);
+            AddRecursiveBezier(x0, y0, x01, y01, x012, y012, x0123, y0123, level + 1, output);
+            AddRecursiveBezier(x0123, y0123, x123, y123, x23, y23, x3, y3, level + 1, output);
         }
-    }
+        //-------------------------------------------------------------------
+        //curve3_div
+        /// <summary>
+        /// Flatten Curve3
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="y0"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="output"></param>
+        /// <param name="skipFirstPoint"></param>
+        public void Flatten(double x0, double y0,
+             double x1, double y1,
+             double x2, double y2,
+             ICurveFlattenerOutput output,
+             bool skipFirstPoint)
+        {
+            _distance_tolerance_square = 0.5 / _approximation_scale;
+            _distance_tolerance_square *= _distance_tolerance_square;
 
-    //-----------------------------------------------------------------curve3
-    /// <summary>
-    /// curve3 flattener
-    /// </summary>
-    public sealed class Curve3Flattener
-    {
-        Curve3Inc _curve_inc = new Curve3Inc();
-        Curve3Div _curve_div = new Curve3Div();
-        Curves.CurveApproximationMethod _approximation_method;
-        public Curve3Flattener()
-        {
-            _approximation_method = Curves.CurveApproximationMethod.Div;
-        }
-        public int SimpleIncStep
-        {
-            get => _curve_inc.SimpleIncStep;
-            set => _curve_inc.SimpleIncStep = value;
-        }
-        public void Reset()
-        {
-            _curve_inc.Reset();
-            _curve_div.Reset();
-        }
-
-        void Init(double x1, double y1,
-             double cx, double cy,
-             double x2, double y2)
-        {
-            if (_approximation_method == Curves.CurveApproximationMethod.Inc)
+            //
+            if (!skipFirstPoint)
             {
-                _curve_inc.Init(x1, y1, cx, cy, x2, y2);
+                output.Append(x0, y0);
+            }
+            AddRecursiveBezier(x0, y0, x1, y1, x2, y2, 0, output);
+            output.Append(x2, y2);
+        }
+
+        void AddRecursiveBezier(double x0, double y0,
+                               double x1, double y1,
+                               double x2, double y2,
+                               int level,
+                               ICurveFlattenerOutput output)
+        {
+            //curve3
+            if (level > _recursiveLimit)
+            {
+                return;
+            }
+
+            // Calculate all the mid-points of the line segments
+            //----------------------
+            double x01 = (x0 + x1) / 2;
+            double y01 = (y0 + y1) / 2;
+            double x12 = (x1 + x2) / 2;
+            double y12 = (y1 + y2) / 2;
+            double x012 = (x01 + x12) / 2;
+            double y012 = (y01 + y12) / 2;
+            double dx = x2 - x0;
+            double dy = y2 - y0;
+
+            double d = Math.Abs(((x1 - x2) * dy - (y1 - y2) * dx));
+           
+            if (d > Curves.CURVE_COLLINEARITY_EPSILON)
+            {
+                // Regular case
+                //-----------------
+                if (d * d <= _distance_tolerance_square * (dx * dx + dy * dy))
+                {
+                    // If the curvature doesn't exceed the distance_tolerance value
+                    // we tend to finish subdivisions.
+                    //----------------------
+                    if (_angle_tolerance < Curves.CURVE_ANGLE_TOLERANCE_EPSILON)
+                    {
+                        output.Append(x012, y012);
+                        return;
+                    }
+
+                    // Angle & Cusp Condition
+                    //----------------------
+                    double da = Math.Abs(Math.Atan2(y2 - y1, x2 - x1) - Math.Atan2(y1 - y0, x1 - x0));
+                    if (da >= Math.PI) da = 2 * Math.PI - da;
+                    if (da < _angle_tolerance)
+                    {
+                        // Finally we can stop the recursion
+                        //----------------------
+                        output.Append(x012, y012);
+                        return;
+                    }
+                }
             }
             else
             {
-                _curve_div.Init(x1, y1, cx, cy, x2, y2);
+                // Collinear case
+                //------------------
+                double da = dx * dx + dy * dy;
+                if (da == 0)
+                {
+                    d = AggMath.calc_sq_distance(x0, y0, x1, y1);
+                }
+                else
+                {
+                    d = ((x1 - x0) * dx + (y1 - y0) * dy) / da;
+                    if (d > 0 && d < 1)
+                    {
+                        // Simple collinear case, 1---2---3
+                        // We can leave just two endpoints
+                        return;
+                    }
+                    if (d <= 0) d = AggMath.calc_sq_distance(x1, y1, x0, y0);
+                    else if (d >= 1) d = AggMath.calc_sq_distance(x1, y1, x2, y2);
+                    else d = AggMath.calc_sq_distance(x1, y1, x0 + d * dx, y0 + d * dy);
+                }
+                if (d < _distance_tolerance_square)
+                {
+                    output.Append(x1, y1);
+                    return;
+                }
             }
-        }
-        public Curves.CurveApproximationMethod ApproximationMethod
-        {
-            get => _approximation_method;
-            set => _approximation_method = value;
-        }
-        public double ApproximationScale
-        {
-            get => _curve_inc.ApproximationScale;
-            set => _curve_inc.ApproximationScale = _curve_div.ApproximationScale = value;
+
+            // Continue subdivision
+            //----------------------
+            AddRecursiveBezier(x0, y0, x01, y01, x012, y012, level + 1, output);
+            AddRecursiveBezier(x012, y012, x12, y12, x2, y2, level + 1, output);
         }
 
-        public double AngleTolerance
-        {
-            get => _curve_div.AngleTolerance;
-            set => _curve_div.AngleTolerance = value;
-        }
 
-        public double CuspLimit
-        {
-            get => _curve_div.CuspLimit;
-            set => _curve_div.CuspLimit = value;
-        }
     }
 
-    //-----------------------------------------------------------------curve4
-    /// <summary>
-    /// curve 4 flattener
-    /// </summary>
-    public sealed class Curve4Flattener
-    {
-        Curve4Inc _curve_inc = new Curve4Inc();
-        Curve4Div _curve_div = new Curve4Div();
-        Curves.CurveApproximationMethod _approximation_method;
-        public Curve4Flattener()
-        {
-            _approximation_method = Curves.CurveApproximationMethod.Div;
-        }
-        public void Reset()
-        {
-            _curve_inc.Reset();
-            _curve_div.Reset();
-        }
-        public void Init(double x1, double y1,
-               double cx1, double cy1,
-               double cx2, double cy2,
-               double x2, double y2)
-        {
-            if (_approximation_method == Curves.CurveApproximationMethod.Inc)
-            {
-                _curve_inc.Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
-            }
-            else
-            {
-                _curve_div.Init(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
-            }
-        }
 
-
-
-
-        public Curves.CurveApproximationMethod ApproximationMethod
-        {
-            get => _approximation_method;
-            set => _approximation_method = value;
-        }
-
-
-        public double ApproximationScale
-        {
-            get => _curve_inc.ApproximationScale;
-            set
-            {
-                _curve_inc.ApproximationScale = value;
-                _curve_div.ApproximationScale = value;
-            }
-        }
-
-        public double AngleTolerance
-        {
-            get => _curve_div.AngleTolerance;
-            set
-            {
-                _curve_div.AngleTolerance = value;
-                _curve_inc.AngleTolerance = value;
-            }
-        }
-
-        public double CuspLimit
-        {
-            get => _curve_div.CuspLimit;
-            set => _curve_div.CuspLimit = value;
-        }
-    }
 }

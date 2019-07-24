@@ -96,7 +96,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 switch (cmd)
                 {
                     case VertexCmd.Close:
-                    case VertexCmd.CloseAndEndFigure:
                         //in this case we don't include that x,y
                         break;
                     case VertexCmd.NoMore:

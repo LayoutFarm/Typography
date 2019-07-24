@@ -358,9 +358,6 @@
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs">
-      <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs</Link>
     </Compile>

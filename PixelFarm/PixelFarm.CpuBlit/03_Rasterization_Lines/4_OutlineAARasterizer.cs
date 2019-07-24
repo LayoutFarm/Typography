@@ -591,9 +591,7 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                     Render(false);
                     MoveTo(x, y);
                     break;
-
                 case VertexCmd.Close:
-                case VertexCmd.CloseAndEndFigure:
                     Render(true);
                     MoveTo(_start_x, _start_y);
                     break;

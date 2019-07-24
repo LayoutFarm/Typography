@@ -893,14 +893,14 @@ namespace PaintLab.Svg
             return LayoutFarm.WebDom.Parser.CssValueParser.ConvertToPx(length, args.containerW, args);
         }
 
-        VertexStore CreateVxsFromPathDefinition(char[] patgDefinition)
+        VertexStore CreateVxsFromPathDefinition(char[] pathDefinition)
         {
             using (VectorToolBox.Borrow(out CurveFlattener curveFlattener))
             using (VxsTemp.Borrow(out var v1, out var v2))
             using (VectorToolBox.Borrow(v1, out PathWriter pathWriter))
             {
                 _pathDataParser.SetPathWriter(pathWriter);
-                _pathDataParser.Parse(patgDefinition);
+                _pathDataParser.Parse(pathDefinition);
                 curveFlattener.MakeVxs(v1, v2);
                 //create a small copy of the vxs                  
                 return v2.CreateTrim();

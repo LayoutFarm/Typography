@@ -123,19 +123,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                         }
                         break;
-                    case VertexCmd.CloseAndEndFigure:
-                        if (i < j)
-                        {
-                            //close command
-                            strkgen.Close();
-                            strkgen.WriteTo(outputVxs);
-                            strkgen.Reset();
-                        }
-                        else
-                        {
-
-                        }
-                        break;
                     case VertexCmd.LineTo:
                     case VertexCmd.C3://user must flatten the curve before do stroke
                     case VertexCmd.C4://user must flatten the curve before do stroke 

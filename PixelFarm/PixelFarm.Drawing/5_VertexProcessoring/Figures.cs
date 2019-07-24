@@ -73,9 +73,20 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     ArrayList<float> coordXYs = resuableCoordList._coordXYs;
                     ArrayList<int> contourEndPoints = resuableCoordList._contourEndPoints;
 
+                    Figure fig = null;
                     for (int i = 0; i < _figures.Length; ++i)
                     {
-                        coordXYs.Append(_figures[i].coordXYs);
+
+                        fig = _figures[i];
+                        coordXYs.Append(fig.coordXYs);
+
+                        if (fig.IsClosedFigure)
+                        {
+                            //for tess,if close figure
+                            coordXYs.Append(fig.coordXYs[0]);
+                            coordXYs.Append(fig.coordXYs[1]);
+                        }
+
                         contourEndPoints.Append(coordXYs.Count - 1);
                     }
 
@@ -263,9 +274,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         public FlattenContour(float[] polygonXYs, int startAt, int len)
         {
-            this._polygonXYs = polygonXYs;
-            this._startAt = startAt;
-            this._len = len;
+            _polygonXYs = polygonXYs;
+            _startAt = startAt;
+            _len = len;
             _isClockWise = _analyzeCloseWise = false;
         }
         public void GetPoint(int coordIndex, out float x, out float y)
@@ -1013,11 +1024,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         break;
                     case PixelFarm.CpuBlit.VertexCmd.Close:
                         {
-                            //from current point,
-                            //TODO: review here,Append prevMoveTo???
+                            //don't add            
+                            //_xylist.Add((float)prevMoveToX);
+                            //_xylist.Add((float)prevMoveToY);
 
-                            _xylist.Add((float)prevMoveToX);
-                            _xylist.Add((float)prevMoveToY);
                             prevX = prevMoveToX;
                             prevY = prevMoveToY;
                             //-----------
@@ -1026,25 +1036,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
                             _figs.Add(newfig);
                             //-----------
-                            _xylist.Clear(); //clear temp list
-
-                        }
-                        break;
-                    case VertexCmd.CloseAndEndFigure:
-                        {
-                            //from current point
-                            //TODO: review here,Append prevMoveTo???
-
-                            _xylist.Add((float)prevMoveToX);
-                            _xylist.Add((float)prevMoveToY);
-                            prevX = prevMoveToX;
-                            prevY = prevMoveToY;
-                            // 
-                            Figure newfig = new Figure(_xylist.ToArray());
-                            newfig.IsClosedFigure = true;
-                            _figs.Add(newfig);
-                            //-----------
-                            _xylist.Clear();//clear temp list
+                            _xylist.Clear(); //clear temp list 
                         }
                         break;
                     case PixelFarm.CpuBlit.VertexCmd.NoMore:
@@ -1064,8 +1056,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             //
             if (_xylist.Count > 1)
             {
-                _xylist.Add((float)prevMoveToX);
-                _xylist.Add((float)prevMoveToY);
                 prevX = prevMoveToX;
                 prevY = prevMoveToY;
                 //
@@ -1113,18 +1103,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             {
                 switch (cmd)
                 {
-                    case PixelFarm.CpuBlit.VertexCmd.MoveTo:
+                    case VertexCmd.MoveTo:
                         contourBuilder.MoveTo((float)x, (float)y);
                         break;
-                    case PixelFarm.CpuBlit.VertexCmd.LineTo:
+                    case VertexCmd.LineTo:
                         contourBuilder.LineTo((float)x, (float)y);
-                        //prevX = x;
-                        //prevY = y;
                         break;
-                    case PixelFarm.CpuBlit.VertexCmd.Close:
-                        contourBuilder.CloseContour();
-                        break;
-                    case VertexCmd.CloseAndEndFigure:
+                    case VertexCmd.Close:
                         contourBuilder.CloseContour();
                         break;
                     case VertexCmd.C4:
@@ -1195,7 +1180,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 List<Poly2Tri.Polygon> output = new List<Poly2Tri.Polygon>();
                 p23tool.Triangulate(flattenContours, output);
                 return new IntermediateOutline(flattenContours, output);
-            } 
+            }
         }
 
 

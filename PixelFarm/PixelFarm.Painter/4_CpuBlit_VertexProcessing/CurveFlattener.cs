@@ -49,121 +49,131 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     // and converts these vertices into a move_to/line_to sequence. 
     //-----------------------------------------------------------------------
 
+    public enum CurveApproximationMethod
+    {
+        Unknow,
+        Div,
+        Inc,
+    }
+
     public class CurveFlattener
     {
-        //tools , curve producer
-        readonly Curve3Flattener _curve3 = new Curve3Flattener();
-        readonly Curve4Flattener _curve4 = new Curve4Flattener();
+        CurveApproximationMethod _selectedApproximationMethod = CurveApproximationMethod.Div;
 
-        int _simpleIncStep;
+        //tools , curve producer 
+        readonly CurveSubdivisionFlattener _div_curveFlattener = new CurveSubdivisionFlattener();
+        readonly CurveIncFlattener _inc_curveFlattener = new CurveIncFlattener();
+        readonly CurveFlattenerOutput _curveFlattenerOutput = new CurveFlattenerOutput();
 
+        class CurveFlattenerOutput : ICurveFlattenerOutput
+        {
+            VertexStore _vxs;
+            public CurveFlattenerOutput()
+            {
+            }
+            public void Append(double x, double y)
+            {
+                _vxs.AddLineTo(x, y);
+            }
+            public void SetVxs(VertexStore vxs)
+            {
+                _vxs = vxs;
+            }
+        }
+
+        double _approximateScale = 1;//default
         public CurveFlattener()
         {
         }
         public double ApproximationScale
         {
             //default 1
-            get
-            {
-                return _curve4.ApproximationScale;
-            }
+            get => _approximateScale;
             set
             {
-                _curve3.ApproximationScale = value;
-                _curve4.ApproximationScale = value;
+                _inc_curveFlattener.ApproximationScale =
+                    _div_curveFlattener.ApproximationScale =
+                    _approximateScale = value;
             }
         }
 
-        public int SimpleIncStep
+        public CurveApproximationMethod ApproximationMethod
         {
-            get => _simpleIncStep;
-            set
-            {
-                
-            }
+            get => _selectedApproximationMethod;
+            set => _selectedApproximationMethod = value;
         }
-        public Curves.CurveApproximationMethod ApproximationMethod
+        /// <summary>
+        ///  curve incremental flattener, use specific step count
+        /// </summary>
+        public bool IncUseFixedStep
         {
-            //default div
-            get
-            {
-                return _curve4.ApproximationMethod;
-            }
-            set
-            {
-                _curve3.ApproximationMethod = value;
-                _curve4.ApproximationMethod = value;
-            }
+            get => _inc_curveFlattener.UseFixedStepCount;
+            set => _inc_curveFlattener.UseFixedStepCount = value;
         }
+        /// <summary>
+        /// curve incremental flattener, incremental step count
+        /// </summary>
+        public int IncStepCount
+        {
+            get => _inc_curveFlattener.FixedStepCount;
+            set => _inc_curveFlattener.FixedStepCount = value;
+        }
+        /// <summary>
+        /// curve subdivision flattener , angle tolerance
+        /// </summary>
         public double AngleTolerance
         {
             //default 0
-            get
-            {
-                return _curve4.AngleTolerance;
-            }
-            set
-            {
-                _curve3.AngleTolerance = value;
-                _curve4.AngleTolerance = value;
-            }
+            get => _div_curveFlattener.AngleTolerance;
+            set => _div_curveFlattener.AngleTolerance = value;
         }
+        /// <summary>
+        /// curve subdivision flattener, recursive limit
+        /// </summary>
+        public byte RecursiveLimit
+        {
+            get => _div_curveFlattener.RecursiveLimit;
+            set => _div_curveFlattener.RecursiveLimit = value;
+        }
+        /// <summary>
+        /// curve subdivision flattener, cusp limit
+        /// </summary>
         public double CuspLimit
         {
             //default 0
-            get
-            {
-                return _curve4.CuspLimit;
-            }
-            set
-            {
-                _curve3.CuspLimit = value;
-                _curve4.CuspLimit = value;
-            }
+            get => _div_curveFlattener.CuspLimit;
+            set => _div_curveFlattener.CuspLimit = value;
         }
-
-        enum CurvePointMode
-        {
-            NotCurve,
-            P2,
-            P3
-        }
-
-
 
         public void Reset()
         {
             ApproximationScale = 1;
-            ApproximationMethod = Curves.CurveApproximationMethod.Div;
+            ApproximationMethod = CurveApproximationMethod.Div;
             AngleTolerance = 0;
             CuspLimit = 0;
+
+
+            _inc_curveFlattener.Reset();
+            _div_curveFlattener.Reset();
         }
 
         public VertexStore MakeVxs(VertexStore vxs, VertexStore output)
         {
             return MakeVxs(vxs, null, output);
         }
-
-
         public VertexStore MakeVxs(VertexStore vxs, ICoordTransformer tx, VertexStore output)
         {
-            _curve3.Reset();
-            _curve4.Reset();
-
-            CurvePointMode latestCurveMode = CurvePointMode.NotCurve;
             double x, y;
             VertexCmd cmd;
-            VectorMath.Vector2 c3p2 = new VectorMath.Vector2();
-            VectorMath.Vector2 c4p2 = new VectorMath.Vector2();
-            VectorMath.Vector2 c4p3 = new VectorMath.Vector2();
             double lastX = 0;
-            double lasty = 0;
+            double lastY = 0;
             double lastMoveX = 0;
             double lastMoveY = 0;
 
-
             int index = 0;
             bool hasTx = tx != null;
+
+            _curveFlattenerOutput.SetVxs(output);
 
             while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
             {
@@ -183,137 +193,94 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 //-----------------
                 switch (cmd)
                 {
-
                     case VertexCmd.C3:
                         {
-                            switch (latestCurveMode)
+                            //for curve3, it contains (x0,y0), (x1,y1), (x2,y2)
+                            //this is (x1,y1) so next point must be (x2,y2)
+
+                            //read next
+                            cmd = vxs.GetVertex(index++, out double x2, out double y2);
+                            if (cmd != VertexCmd.LineTo) { throw new System.NotSupportedException(); }
+
+                            if (_selectedApproximationMethod == CurveApproximationMethod.Inc)
                             {
-                                case CurvePointMode.P2:
-                                    {
-                                    }
-                                    break;
-                                case CurvePointMode.P3:
-                                    {
-                                    }
-                                    break;
-                                case CurvePointMode.NotCurve:
-                                    {
-                                        c3p2.x = x;
-                                        c3p2.y = y;
-                                    }
-                                    break;
-                                default:
-                                    {
-                                    }
-                                    break;
+                                _inc_curveFlattener.Flatten(
+                                   lastX, lastY,
+                                   x, y,
+                                   lastX = x2, lastY = y2,
+                                   _curveFlattenerOutput, true);
+
                             }
-                            latestCurveMode = CurvePointMode.P2;
+                            else
+                            {
+                                _div_curveFlattener.Flatten(
+                                    lastX, lastY,
+                                    x, y,
+                                   lastX = x2, lastY = y2,
+                                    _curveFlattenerOutput,
+                                    true
+                                    );
+                            }
                         }
                         break;
                     case VertexCmd.C4:
                         {
-                            //this is p3c
-                            switch (latestCurveMode)
+                            //for curve4, it contains (x0,y0), (x1,y1), (x2,y2), (x3,y3)                            
+                            //this is (x1,y1) so next point must be (x2,y2) and (x3,y3)
+
+                            cmd = vxs.GetVertex(index++, out double x2, out double y2);
+                            if (cmd != VertexCmd.C4)
                             {
-                                case CurvePointMode.P2:
-                                    {
-                                        c3p2.x = x;
-                                        c3p2.y = y;
-                                    }
-                                    break;
-                                case CurvePointMode.P3:
-                                    {
-                                        c4p3.x = x;
-                                        c4p3.y = y;
-                                    }
-                                    break;
-                                case CurvePointMode.NotCurve:
-                                    {
-                                        c4p2.x = x;
-                                        c4p2.y = y;
-                                    }
-                                    break;
+                                throw new System.NotSupportedException();
                             }
-                            latestCurveMode = CurvePointMode.P3;
+                            cmd = vxs.GetVertex(index++, out double x3, out double y3);
+                            if (cmd != VertexCmd.LineTo)
+                            {
+                                throw new System.NotSupportedException();
+                            }
+
+                            if (_selectedApproximationMethod == CurveApproximationMethod.Inc)
+                            {
+                                _inc_curveFlattener.Flatten(
+                                    lastX, lastY,
+                                    x, y,
+                                    x2, y2,
+                                   lastX = x3, lastY = y3,
+                                    _curveFlattenerOutput, true
+                                    );
+                            }
+                            else
+                            {
+                                _div_curveFlattener.Flatten(
+                                     lastX, lastY,
+                                     x, y,
+                                     x2, y2,
+                                     lastX = x3, lastY = y3,
+                                     _curveFlattenerOutput, true
+                                    );
+                            }
                         }
                         break;
                     case VertexCmd.LineTo:
-                        {
-                            switch (latestCurveMode)
-                            {
-                                case CurvePointMode.P2:
-                                    {
-                                        _curve3.Flatten(output,
-                                            lastX,
-                                            lasty,
-                                            c3p2.X,
-                                            c3p2.Y,
-                                            x,
-                                            y);
-                                    }
-                                    break;
-                                case CurvePointMode.P3:
-                                    {
+                        output.AddLineTo(lastX = x, lastY = y);
 
-                                        _curve4.Flatten(output,
-                                            lastX, lasty,
-                                            c4p2.x, c4p2.y,
-                                            c4p3.x, c4p3.y,
-                                            x, y);
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        output.AddVertex(x, y, cmd);
-                                    }
-                                    break;
-                            }
-                            //-----------
-                            latestCurveMode = CurvePointMode.NotCurve;
-                            lastX = x;
-                            lasty = y;
-                            //-----------
-                        }
                         break;
                     case VertexCmd.MoveTo:
-                        {
-                            //move to, and end command
-                            output.AddVertex(x, y, cmd);
-                            //-----------
-                            latestCurveMode = CurvePointMode.NotCurve;
-                            lastMoveX = lastX = x;
-                            lastMoveY = lasty = y;
-                            //-----------
-                        }
+                        //move to, and end command
+                        output.AddVertex(lastMoveX = lastX = x, lastMoveY = lastY = y, cmd);
                         break;
-
                     case VertexCmd.Close:
-                    case VertexCmd.CloseAndEndFigure:
-                        {
-                            latestCurveMode = CurvePointMode.NotCurve;
-                            output.AddVertex(lastMoveX, lastMoveY, cmd);
-                            //move to begin 
-                            lastX = lastMoveX;
-                            lasty = lastMoveY;
-                        }
+                        //we need only command
+                        //move to begin 
+                        output.AddVertex(lastX = lastMoveX, lastY = lastMoveY, cmd);
                         break;
-
                     default:
-                        {
-                            //move to, and end command
-                            output.AddVertex(x, y, cmd);
-                            //-----------
-                            latestCurveMode = CurvePointMode.NotCurve;
-                            lastX = x;
-                            lasty = y;
-                            //-----------
-                        }
+                        //move to, and end command
+                        output.AddVertex(lastX = x, lastY = y, cmd);
                         break;
                 }
             }
-
             return output;
         }
-
     }
 }

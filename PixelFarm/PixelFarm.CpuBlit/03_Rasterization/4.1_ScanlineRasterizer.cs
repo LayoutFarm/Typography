@@ -261,8 +261,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 case VertexCmd.C4:
                     LineTo(x, y);
                     break;
-                case VertexCmd.Close:
-                case VertexCmd.CloseAndEndFigure:
+                case VertexCmd.Close: 
                     ClosePolygon();
                     break;
                 default:

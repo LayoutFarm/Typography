@@ -15,7 +15,7 @@ namespace PixelFarm.Drawing.Fonts
     /// </summary>
     public class GlyphTranslatorToVxs : IGlyphTranslator
     {
-        CurveFlattener _curveFlattener = new CurveFlattener();
+
         PathWriter _pw = new PathWriter();
         VertexStore _vxs = new VertexStore();
         public GlyphTranslatorToVxs()
@@ -63,6 +63,7 @@ namespace PixelFarm.Drawing.Fonts
         {
             _pw.Clear();
         }
+
         /// <summary>
         /// write output to vxs
         /// </summary>
@@ -70,9 +71,22 @@ namespace PixelFarm.Drawing.Fonts
         /// <param name="scale"></param>
         public void WriteOutput(VertexStore output, float scale = 1)
         {
+            using (VectorToolBox.Borrow(out CurveFlattener f))
+            {
+                WriteOutput(output, f, scale);
+            }
+
+        }
+        /// <summary>
+        /// write output to vxs
+        /// </summary>
+        /// <param name="output"></param> 
+        /// <param name="scale"></param>
+        public void WriteOutput(VertexStore output, CurveFlattener curveFlattener, float scale = 1)
+        {
             if (scale == 1)
             {
-                _curveFlattener.MakeVxs(_vxs, output);
+                curveFlattener.MakeVxs(_vxs, output);
             }
             else
             {
@@ -82,9 +96,8 @@ namespace PixelFarm.Drawing.Fonts
                 //transform -> flatten ->output
                 //TODO: review here again***
                 using (VxsTemp.Borrow(out var v1))
-                using (VectorToolBox.Borrow(out CurveFlattener f))
                 {
-                    _curveFlattener.MakeVxs(_vxs, mat, output);
+                    curveFlattener.MakeVxs(_vxs, mat, output);
                 }
             }
         }
