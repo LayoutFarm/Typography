@@ -57,10 +57,7 @@ namespace Test_WinForm_TessGlyph
                 _g = this.panel1.CreateGraphics();
             }
             _g.Clear(Color.White);
-
-            //string testFont = "d:\\WImageTest\\DroidSans.ttf";
             string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
-            //string testFont = "d:\\WImageTest\\Alfa_Slab.ttf";
 
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
