@@ -305,12 +305,25 @@ namespace Typography.OpenFont
             NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
             OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
 
-            return new PreviewFontInfo(
-                nameEntry.FontName,
-                nameEntry.FontSubFamily,
-                os2Table.usWeightClass,
-                Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
-                );
+            if (nameEntry.TypographicFamilyName != null)
+            {
+                return new PreviewFontInfo(
+                  nameEntry.TypographicFamilyName,
+                  nameEntry.TypographyicSubfamilyName,
+                  os2Table.usWeightClass,
+                  Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
+                  );
+            }
+            else
+            {
+                return new PreviewFontInfo(
+                  nameEntry.FontName,
+                  nameEntry.FontSubFamily,
+                  os2Table.usWeightClass,
+                  Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
+                  );
+            }
+
         }
         internal Typeface ReadTableEntryCollection(TableEntryCollection tables, BinaryReader input)
         {
