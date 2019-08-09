@@ -250,24 +250,21 @@ namespace Typography.OpenFont.CFF
 
 
 
-
-    enum Type2GlyphInstructionListKind
-    {
-        GlyphDescription,
-        LocalSubroutine,
-        GlobalSubroutine,
-    }
-
     class Type2GlyphInstructionList
     {
-
         List<Type2Instruction> _insts;
         public Type2GlyphInstructionList()
         {
             _insts = new List<Type2Instruction>();
         }
         public List<Type2Instruction> Insts => _insts;
-        public Type2GlyphInstructionListKind Kind { get; set; }
+        public Type2Instruction RemoveLast()
+        {
+            int last = _insts.Count - 1;
+            Type2Instruction _lastInst = _insts[last];
+            _insts.RemoveAt(last);
+            return _lastInst;
+        }
         //
         public void AddInt(int intValue)
         {
@@ -283,6 +280,7 @@ namespace Typography.OpenFont.CFF
 #endif
             _insts.Add(new Type2Instruction(opName));
         }
+
         public void AddOp(OperatorName opName, int value)
         {
 #if DEBUG
@@ -306,23 +304,21 @@ namespace Typography.OpenFont.CFF
 
             }
         }
-        public int dbugInstCount { get { return _insts.Count; } }
+        public int dbugInstCount => _insts.Count;
         int _dbugMark;
+
+        public ushort dbugGlyphIndex;
+
         public int dbugMark
         {
-            get { return _dbugMark; }
+            get => _dbugMark;
             set
             {
                 _dbugMark = value;
-                //if (value == 7)
-                //{
-                //    Type2CharStringParser.dbugDumpInstructionListToFile(insts, "d:\\WImageTest\\test_type2.txt");
-
-                //}
             }
         }
 
-        internal void dbugDumpInstructionListToFile(string filename)
+        public void dbugDumpInstructionListToFile(string filename)
         {
             using (FileStream fs = new FileStream(filename, FileMode.Create))
             using (StreamWriter w = new StreamWriter(fs))
@@ -344,7 +340,6 @@ namespace Typography.OpenFont.CFF
                         w.Write(inst.ToString());
                         w.WriteLine();
                     }
-
                 }
             }
         }
@@ -354,15 +349,12 @@ namespace Typography.OpenFont.CFF
 
 
 
-    class Type2CharStringParser : IDisposable
+    class Type2CharStringParser
     {
-        MemoryStream _msBuffer;
-        BinaryReader _reader;
 
         public Type2CharStringParser()
         {
-            _msBuffer = new MemoryStream();
-            _reader = new BinaryReader(_msBuffer);
+
         }
 
 #if DEBUG 
@@ -370,41 +362,84 @@ namespace Typography.OpenFont.CFF
         int _dbugInstructionListMark = 0;
 #endif
 
+
+        int _hintStemCount = 0;
         bool _foundSomeStem = false;
         Type2GlyphInstructionList _insts;
-        int _current_int_count = 0;
+        int _current_integer_count = 0;
         bool _doStemCount = true;
+        Cff1Font _currentCff1Font;
+        int _globalSubrBias;
+        int _localSubrBias;
 
-        public Type2GlyphInstructionList ParseType2CharString(byte[] buffer)
+        public void SetCurrentCff1Font(Cff1Font currentCff1Font)
         {
-            //reset
-            _current_int_count = 0;
-            _foundSomeStem = false;
-            _doStemCount = true;
-            _msBuffer.SetLength(0);
-            _msBuffer.Position = 0;
-            _msBuffer.Write(buffer, 0, buffer.Length);
-            _msBuffer.Position = 0;
-            int len = buffer.Length;
-            //
-            _insts = new Type2GlyphInstructionList();
-#if DEBUG
-            _insts.dbugMark = _dbugInstructionListMark;
-            //if (_dbugInstructionListMark == 5)
-            //{
+            //this will provide subr buffer for callsubr callgsubr
+            _currentCff1Font = currentCff1Font;
 
-            //}
-            _dbugInstructionListMark++;
-#endif
+            if (_currentCff1Font._globalSubrRawBufferList != null)
+            {
+                _globalSubrBias = CalculateBias(currentCff1Font._globalSubrRawBufferList.Count);
+            }
+            if (_currentCff1Font._localSubrRawBufferList != null)
+            {
+                _localSubrBias = CalculateBias(currentCff1Font._localSubrRawBufferList.Count);
+            }
+        }
+        static int CalculateBias(int nsubr)
+        {
+            //-------------
+            //from Technical Note #5176 (CFF spec)
+            //resolve with bias
+            //Card16 bias;
+            //Card16 nSubrs = subrINDEX.count;
+            //if (CharstringType == 1)
+            //    bias = 0;
+            //else if (nSubrs < 1240)
+            //    bias = 107;
+            //else if (nSubrs < 33900)
+            //    bias = 1131;
+            //else
+            //    bias = 32768; 
+            //find local subroutine 
+            return (nsubr < 1240) ? 107 : (nsubr < 33900) ? 1131 : 32768;
+        }
 
+        struct SimpleBinaryReader
+        {
+            byte[] _buffer;
+            int _pos;
+            public SimpleBinaryReader(byte[] buffer)
+            {
+                _buffer = buffer;
+                _pos = 0;
+            }
+            public bool IsEnd() => _pos >= _buffer.Length;
+            public byte ReadByte()
+            {
+                //read current byte to stack and advance pos after read 
+                return _buffer[_pos++];
+            }
+            public int BufferLength => _buffer.Length;
+            public int Position => _pos;
+            public int ReadInt32()
+            {
+                int result = BitConverter.ToInt32(_buffer, _pos);
+                _pos += 4;
+                return result;
+            }
+        }
+
+        void ParseType2CharStringBuffer(byte[] buffer)
+        {
             byte b0 = 0;
-            int hintStemCount = 0;
 
             bool cont = true;
 
-            while (cont && _reader.BaseStream.Position < len)
+            var reader = new SimpleBinaryReader(buffer);
+            while (cont && !reader.IsEnd())
             {
-                b0 = _reader.ReadByte();
+                b0 = reader.ReadByte();
 #if DEBUG
                 //easy for debugging here
                 _dbugCount++;
@@ -420,12 +455,12 @@ namespace Typography.OpenFont.CFF
                             if (b0 < 32)
                             {
                                 Debug.WriteLine("err!:" + b0);
-                                return null;
+                                return;
                             }
-                            _insts.AddInt(ReadIntegerNumber(b0));
+                            _insts.AddInt(ReadIntegerNumber(ref reader, b0));
                             if (_doStemCount)
                             {
-                                _current_int_count++;
+                                _current_integer_count++;
                             }
                         }
                         break;
@@ -436,13 +471,13 @@ namespace Typography.OpenFont.CFF
                         //a ShortInt value is specified by using the operator (28) followed by two bytes
                         //which represent numbers between –32768 and + 32767.The
                         //most significant byte follows the(28)
-                        byte s_b0 = _reader.ReadByte();
-                        byte s_b1 = _reader.ReadByte();
+                        byte s_b0 = reader.ReadByte();
+                        byte s_b1 = reader.ReadByte();
                         _insts.AddInt((short)((s_b0 << 8) | (s_b1)));
                         //
                         if (_doStemCount)
                         {
-                            _current_int_count++;
+                            _current_integer_count++;
                         }
                         break;
                     //---------------------------------------------------
@@ -464,14 +499,14 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.escape: //12
                         {
 
-                            b0 = _reader.ReadByte();
+                            b0 = reader.ReadByte();
                             switch ((Type2Operator2)b0)
                             {
                                 default:
                                     if (b0 <= 38)
                                     {
                                         Debug.WriteLine("err!:" + b0);
-                                        return null;
+                                        return;
                                     }
                                     break;
                                 //-------------------------
@@ -528,26 +563,109 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.vvcurveto: _insts.AddOp(OperatorName.vvcurveto); StopStemCount(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case (byte)Type2Operator1.hstem: AddStemToList(OperatorName.hstem, ref hintStemCount); break;
-                    case (byte)Type2Operator1.vstem: AddStemToList(OperatorName.vstem, ref hintStemCount); break;
-                    case (byte)Type2Operator1.vstemhm: AddStemToList(OperatorName.vstemhm, ref hintStemCount); break;
-                    case (byte)Type2Operator1.hstemhm: AddStemToList(OperatorName.hstemhm, ref hintStemCount); break;
+                    case (byte)Type2Operator1.hstem: AddStemToList(OperatorName.hstem, ref _hintStemCount); break;
+                    case (byte)Type2Operator1.vstem: AddStemToList(OperatorName.vstem, ref _hintStemCount); break;
+                    case (byte)Type2Operator1.vstemhm: AddStemToList(OperatorName.vstemhm, ref _hintStemCount); break;
+                    case (byte)Type2Operator1.hstemhm: AddStemToList(OperatorName.hstemhm, ref _hintStemCount); break;
                     //-------------------------------------------------------------------
-                    case (byte)Type2Operator1.hintmask: AddHintMaskToList(_reader, ref hintStemCount); StopStemCount(); break;
-                    case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(_reader, ref hintStemCount); StopStemCount(); break;
+                    case (byte)Type2Operator1.hintmask: AddHintMaskToList(ref reader, ref _hintStemCount); StopStemCount(); break;
+                    case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(ref reader, ref _hintStemCount); StopStemCount(); break;
                     //-------------------------------------------------------------------
-                    //4.7: Subroutine Operators
-                    case (byte)Type2Operator1.callsubr: _insts.AddOp(OperatorName.callsubr); StopStemCount(); break;
-                    case (byte)Type2Operator1.callgsubr: _insts.AddOp(OperatorName.callgsubr); StopStemCount(); break;
-                    case (byte)Type2Operator1._return: _insts.AddOp(OperatorName._return); StopStemCount(); break;
+                    //4.7: Subroutine Operators                   
+                    case (byte)Type2Operator1._return:
+                        {
+#if DEBUG
+                            if (!reader.IsEnd())
+                            {
+                                throw new NotSupportedException();
+                            }
+
+#endif
+                        }
+                        return;
+                    //-------------------------------------------------------------------
+                    case (byte)Type2Operator1.callsubr:
+                        {
+                            //get local subr proc
+                            if (_currentCff1Font != null)
+                            {
+                                Type2Instruction inst = _insts.RemoveLast();
+                                if (inst.Op != OperatorName.LoadInt)
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                if (_doStemCount)
+                                {
+                                    _current_integer_count--;
+                                }
+                                //subr_no must be adjusted with proper bias value 
+                                ParseType2CharStringBuffer(_currentCff1Font._localSubrRawBufferList[inst.Value + _localSubrBias]);
+                            }
+                        }
+                        break;
+                    case (byte)Type2Operator1.callgsubr:
+                        {
+                            if (_currentCff1Font != null)
+                            {
+                                Type2Instruction inst = _insts.RemoveLast();
+                                if (inst.Op != OperatorName.LoadInt)
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                if (_doStemCount)
+                                {
+                                    _current_integer_count--;
+                                }
+                                //subr_no must be adjusted with proper bias value 
+                                //load global subr
+                                ParseType2CharStringBuffer(_currentCff1Font._globalSubrRawBufferList[inst.Value + _globalSubrBias]);
+                            }
+                        }
+                        break;
                 }
             }
+        }
+#if DEBUG
+        public ushort dbugCurrentGlyphIndex;
+#endif
+        public Type2GlyphInstructionList ParseType2CharString(byte[] buffer)
+        {
+            //reset
+            _hintStemCount = 0;
+            _current_integer_count = 0;
+            _foundSomeStem = false;
+            _doStemCount = true;
+
+            _insts = new Type2GlyphInstructionList();
+            //--------------------
+#if DEBUG
+            _dbugInstructionListMark++;
+            if (_currentCff1Font == null)
+            {
+                throw new NotSupportedException();
+            }
+            //
+            _insts.dbugGlyphIndex = dbugCurrentGlyphIndex;
+
+            if (dbugCurrentGlyphIndex == 496)
+            {
+
+            }
+#endif
+            ParseType2CharStringBuffer(buffer);
+
+#if DEBUG
+            if (dbugCurrentGlyphIndex == 496)
+            {
+                //_insts.dbugDumpInstructionListToFile("glyph_496.txt");
+            }
+#endif
             return _insts;
         }
 
         void StopStemCount()
         {
-            _current_int_count = 0;
+            _current_integer_count = 0;
             _doStemCount = false;
         }
         OperatorName _latestOpName = OperatorName.Unknown;
@@ -570,14 +688,14 @@ namespace Typography.OpenFont.CFF
             //represented as:
             //w? { hs* vs*cm * hm * mt subpath}? { mt subpath} *endchar 
 
-            if ((_current_int_count % 2) != 0)
+            if ((_current_integer_count % 2) != 0)
             {
                 //all kind has even number of stem               
 
                 if (_foundSomeStem)
                 {
 #if DEBUG
-                    _insts.dbugDumpInstructionListToFile("d:\\WImageTest\\test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
+                    _insts.dbugDumpInstructionListToFile("test_type2_" + (_dbugInstructionListMark - 1) + ".txt");
 #endif
                     throw new NotSupportedException();
                 }
@@ -585,20 +703,19 @@ namespace Typography.OpenFont.CFF
                 {
                     //the first one is 'width'
                     _insts.ChangeFirstInstToGlyphWidthValue();
-                    _current_int_count--;
+                    _current_integer_count--;
                 }
             }
-            hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
+            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
             _insts.AddOp(stemName);
-            _current_int_count = 0;//clear
+            _current_integer_count = 0;//clear
             _foundSomeStem = true;
             _latestOpName = stemName;
         }
-        void AddHintMaskToList(BinaryReader reader, ref int hintStemCount)
+
+        void AddHintMaskToList(ref SimpleBinaryReader reader, ref int hintStemCount)
         {
-
-
-            if (_foundSomeStem && _current_int_count > 0)
+            if (_foundSomeStem && _current_integer_count > 0)
             {
 
                 //type2 5177.pdf
@@ -609,7 +726,7 @@ namespace Typography.OpenFont.CFF
                 //the vstem hint operator need not be included ***
 
 #if DEBUG
-                if ((_current_int_count % 2) != 0)
+                if ((_current_integer_count % 2) != 0)
                 {
                     throw new NotSupportedException();
                 }
@@ -618,36 +735,42 @@ namespace Typography.OpenFont.CFF
 
                 }
 #endif
-
-                switch (_latestOpName)
+                if (_doStemCount)
                 {
-                    case OperatorName.hstem:
-                        //add vstem  ***( from reason above)
+                    switch (_latestOpName)
+                    {
+                        case OperatorName.hstem:
+                            //add vstem  ***( from reason above)
 
-                        hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
-                        _insts.AddOp(OperatorName.vstem);
+                            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
+                            _insts.AddOp(OperatorName.vstem);
 
-                        _latestOpName = OperatorName.vstem;
-                        _current_int_count = 0; //clear
-                        break;
-                    case OperatorName.hstemhm:
-                        //add vstem  ***( from reason above) ??
-                        hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
-                        _insts.AddOp(OperatorName.vstem);
-                        _latestOpName = OperatorName.vstem;
-                        _current_int_count = 0;//clear
-                        break;
-                    case OperatorName.vstemhm:
-                        //-------
-                        //TODO: review here? 
-                        //found this in xits.otf
-                        hintStemCount += (_current_int_count / 2); //save a snapshot of stem count
-                        _insts.AddOp(OperatorName.vstem);
-                        _latestOpName = OperatorName.vstem;
-                        _current_int_count = 0;//clear
-                        break;
-                    default:
-                        throw new NotSupportedException();
+                            _latestOpName = OperatorName.vstem;
+                            _current_integer_count = 0; //clear
+                            break;
+                        case OperatorName.hstemhm:
+                            //add vstem  ***( from reason above) ??
+                            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
+                            _insts.AddOp(OperatorName.vstem);
+                            _latestOpName = OperatorName.vstem;
+                            _current_integer_count = 0;//clear
+                            break;
+                        case OperatorName.vstemhm:
+                            //-------
+                            //TODO: review here? 
+                            //found this in xits.otf
+                            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
+                            _insts.AddOp(OperatorName.vstem);
+                            _latestOpName = OperatorName.vstem;
+                            _current_integer_count = 0;//clear
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                }
+                else
+                {
+
                 }
             }
 
@@ -655,7 +778,11 @@ namespace Typography.OpenFont.CFF
             {
                 if (!_foundSomeStem)
                 {
-                    hintStemCount = (_current_int_count / 2);
+                    hintStemCount = (_current_integer_count / 2);
+                    if (hintStemCount == 0)
+                    {
+                        return;
+                    }
                     _foundSomeStem = true;//?
                 }
                 else
@@ -667,7 +794,8 @@ namespace Typography.OpenFont.CFF
             //---------------------- 
             //this is my hintmask extension, => to fit with our Evaluation stack
             int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
-            if (_reader.BaseStream.Position + properNumberOfMaskBytes >= _reader.BaseStream.Length)
+
+            if (reader.Position + properNumberOfMaskBytes >= reader.BufferLength)
             {
                 throw new NotSupportedException();
             }
@@ -678,10 +806,10 @@ namespace Typography.OpenFont.CFF
                 for (; remaining > 3;)
                 {
                     _insts.AddInt((
-                       (_reader.ReadByte() << 24) |
-                       (_reader.ReadByte() << 16) |
-                       (_reader.ReadByte() << 8) |
-                       (_reader.ReadByte())
+                       (reader.ReadByte() << 24) |
+                       (reader.ReadByte() << 16) |
+                       (reader.ReadByte() << 8) |
+                       (reader.ReadByte())
                        ));
                     remaining -= 4; //*** 
                 }
@@ -691,19 +819,19 @@ namespace Typography.OpenFont.CFF
                         //do nothing
                         break;
                     case 1:
-                        _insts.AddInt(_reader.ReadByte() << 24);
+                        _insts.AddInt(reader.ReadByte() << 24);
                         break;
                     case 2:
                         _insts.AddInt(
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16));
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16));
 
                         break;
                     case 3:
                         _insts.AddInt(
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8));
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16) |
+                            (reader.ReadByte() << 8));
                         break;
                     default: throw new NotSupportedException();//should not occur !
                 }
@@ -716,43 +844,42 @@ namespace Typography.OpenFont.CFF
                 switch (properNumberOfMaskBytes)
                 {
                     case 0:
-                    default: throw new NotSupportedException();//should not occur !
+                    default: throw new NotSupportedException();//should not occur !                     
                     case 1:
-                        _insts.AddOp(OperatorName.hintmask1, (_reader.ReadByte() << 24));
+                        _insts.AddOp(OperatorName.hintmask1, (reader.ReadByte() << 24));
                         break;
                     case 2:
                         _insts.AddOp(OperatorName.hintmask2,
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16)
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16)
                             );
                         break;
                     case 3:
                         _insts.AddOp(OperatorName.hintmask3,
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8)
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16) |
+                            (reader.ReadByte() << 8)
                             );
                         break;
                     case 4:
                         _insts.AddOp(OperatorName.hintmask4,
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8) |
-                            (_reader.ReadByte())
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16) |
+                            (reader.ReadByte() << 8) |
+                            (reader.ReadByte())
                             );
                         break;
                 }
             }
-
         }
-        void AddCounterMaskToList(BinaryReader reader, ref int hintStemCount)
+        void AddCounterMaskToList(ref SimpleBinaryReader reader, ref int hintStemCount)
         {
             if (hintStemCount == 0)
             {
                 if (!_foundSomeStem)
                 {
                     //????
-                    hintStemCount = (_current_int_count / 2);
+                    hintStemCount = (_current_integer_count / 2);
                     _foundSomeStem = true;//?
                 }
                 else
@@ -763,7 +890,7 @@ namespace Typography.OpenFont.CFF
             //---------------------- 
             //this is my hintmask extension, => to fit with our Evaluation stack
             int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
-            if (_reader.BaseStream.Position + properNumberOfMaskBytes >= _reader.BaseStream.Length)
+            if (reader.Position + properNumberOfMaskBytes >= reader.BufferLength)
             {
                 throw new NotSupportedException();
             }
@@ -775,10 +902,10 @@ namespace Typography.OpenFont.CFF
                 for (; remaining > 3;)
                 {
                     _insts.AddInt((
-                       (_reader.ReadByte() << 24) |
-                       (_reader.ReadByte() << 16) |
-                       (_reader.ReadByte() << 8) |
-                       (_reader.ReadByte())
+                       (reader.ReadByte() << 24) |
+                       (reader.ReadByte() << 16) |
+                       (reader.ReadByte() << 8) |
+                       (reader.ReadByte())
                        ));
                     remaining -= 4; //*** 
                 }
@@ -788,19 +915,19 @@ namespace Typography.OpenFont.CFF
                         //do nothing
                         break;
                     case 1:
-                        _insts.AddInt(_reader.ReadByte() << 24);
+                        _insts.AddInt(reader.ReadByte() << 24);
                         break;
                     case 2:
                         _insts.AddInt(
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16));
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16));
 
                         break;
                     case 3:
                         _insts.AddInt(
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8));
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16) |
+                            (reader.ReadByte() << 8));
                         break;
                     default: throw new NotSupportedException();//should not occur !
                 }
@@ -815,70 +942,57 @@ namespace Typography.OpenFont.CFF
                     case 0:
                     default: throw new NotSupportedException();//should not occur !
                     case 1:
-                        _insts.AddOp(OperatorName.cntrmask1, (_reader.ReadByte() << 24));
+                        _insts.AddOp(OperatorName.cntrmask1, (reader.ReadByte() << 24));
                         break;
                     case 2:
                         _insts.AddOp(OperatorName.cntrmask2,
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16)
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16)
                             );
                         break;
                     case 3:
                         _insts.AddOp(OperatorName.cntrmask3,
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8)
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16) |
+                            (reader.ReadByte() << 8)
                             );
                         break;
                     case 4:
                         _insts.AddOp(OperatorName.cntrmask4,
-                            (_reader.ReadByte() << 24) |
-                            (_reader.ReadByte() << 16) |
-                            (_reader.ReadByte() << 8) |
-                            (_reader.ReadByte())
+                            (reader.ReadByte() << 24) |
+                            (reader.ReadByte() << 16) |
+                            (reader.ReadByte() << 8) |
+                            (reader.ReadByte())
                             );
                         break;
                 }
             }
         }
 
-
-        int ReadIntegerNumber(byte b0)
+        static int ReadIntegerNumber(ref SimpleBinaryReader _reader, byte b0)
         {
-
             if (b0 >= 32 && b0 <= 246)
             {
                 return b0 - 139;
             }
             else if (b0 <= 250)  // && b0 >= 247 , *** if-else sequence is important! ***
             {
-                int b1 = _reader.ReadByte();
+                byte b1 = _reader.ReadByte();
                 return (b0 - 247) * 256 + b1 + 108;
             }
             else if (b0 <= 254)  //&&  b0 >= 251 ,*** if-else sequence is important! ***
             {
-                int b1 = _reader.ReadByte();
+                byte b1 = _reader.ReadByte();
                 return -(b0 - 251) * 256 - b1 - 108;
             }
             else if (b0 == 255)
             {
-                //First byte of a 5-byte sequence specifying a number.
+                //next 4 bytes interpreted as a 32 - bit two’s-complement number
                 return _reader.ReadInt32();
             }
             else
             {
                 throw new NotSupportedException();
-            }
-        }
-
-
-        public void Dispose()
-        {
-
-            if (_msBuffer != null)
-            {
-                _msBuffer.Dispose();
-                _msBuffer = null;
             }
         }
     }
