@@ -306,11 +306,10 @@ namespace Typography.OpenFont
             OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
 
             return new PreviewFontInfo(
-                nameEntry.FontName,
-                nameEntry.FontSubFamily,
-                os2Table.usWeightClass,
-                Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
-                );
+              nameEntry.TypographicFamilyName ?? nameEntry.FontName,
+              nameEntry.TypographyicSubfamilyName ?? nameEntry.FontSubFamily,
+              os2Table.usWeightClass,
+              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table));
         }
         internal Typeface ReadTableEntryCollection(TableEntryCollection tables, BinaryReader input)
         {

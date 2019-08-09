@@ -58,12 +58,9 @@ namespace Test_WinForm_TessGlyph
             }
             _g.Clear(Color.White);
 
-
-
-            //string testFont = "d:\\WImageTest\\DroidSans.ttf";
-            string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
-            //string testFont = "d:\\WImageTest\\Alfa_Slab.ttf";
-
+            //-------
+            //string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
+            string testFont = @"D:\projects\Typography\Demo\Windows\TestFonts\SourceSerifPro-Regular.otf";
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
                 OpenFontReader reader = new OpenFontReader();

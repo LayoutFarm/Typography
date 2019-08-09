@@ -72,7 +72,7 @@ _Tahoma, grey-scale vs lcd-effect subpixel rendering_
 
 ![typography_thanamas](https://user-images.githubusercontent.com/7447159/44314099-d4357180-a43e-11e8-95c3-56894bfea1e4.png)
 
-_lcd-effect subpixel rendering, Sov_Tahanamas font from https://www.f0nt.com/release/sov_thanamas/_
+_lcd-effect subpixel rendering, Sov_Thanamas font from https://www.f0nt.com/release/sov_thanamas/_
 
 ---
 A Multi-channel signed distance field (Msdf) Texture (https://github.com/Chlumsky/msdfgen) 
@@ -163,7 +163,7 @@ _pic 1: Segoe UI Symbol Normal, on Windows 7_
  
 ![typo_symbol2](https://user-images.githubusercontent.com/7447159/31386781-3a8b85f8-adf2-11e7-8791-c19abe1fee8f.png)
 
-_pic 2: FireFoxEmoji.ttf from https://github.com/mozilla/fxemoji_
+_pic 2: FirefoxEmoji.ttf from https://github.com/mozilla/fxemoji_
 
 ![typo_symbol3](https://user-images.githubusercontent.com/245089/31382300-77f4a52c-adb7-11e7-9510-1e07a76f41ab.png)
 

@@ -469,7 +469,14 @@ namespace Typography.OpenFont.CFF
         internal string FontName { get; set; }
         internal Glyph[] _glyphs;
         internal List<CffDataDicEntry> _privateDict;
-        internal List<Type2GlyphInstructionList> _localSubrs;
+
+        internal List<byte[]> _localSubrRawBufferList;
+        internal List<byte[]> _globalSubrRawBufferList;
+
+
+        //internal List<Type2GlyphInstructionList> _localSubrs;
+        //internal List<Type2GlyphInstructionList> _globalSubrs;
+
         internal int _defaultWidthX;
         internal int _nominalWidthX;
 
@@ -533,6 +540,7 @@ namespace Typography.OpenFont.CFF
 
     class Cff1Parser
     {
+        //from: Adobe's The Compact Font Format Specification, version1.0, Dec 2003
 
         //Table 2 CFF Data Types
         //Name       Range          Description
@@ -592,11 +600,11 @@ namespace Typography.OpenFont.CFF
             ReadGlobalSubrIndex();
 
             //----------------------
-
+            ReadPrivateDict();
             ReadCharStringsIndex();
             ReadCharsets();
             ReadEncodings();
-            ReadPrivateDict();
+
 
             ReadFDSelect();
 
@@ -829,13 +837,12 @@ namespace Typography.OpenFont.CFF
             //Global subrs are stored in an INDEX structure which follows the
             //String INDEX. A FontSet without any global subrs is represented
             //by an empty Global Subrs INDEX.
+            _currentCff1Font._globalSubrRawBufferList = ReadSubrBuffer();
+        }
 
-
-            CffIndexOffset[] offsets = ReadIndexDataOffsets();
-            if (offsets == null) return;
-
-            //TODO: review here
-            throw new NotImplementedException();
+        void ReadLocalSubrs()
+        {
+            _currentCff1Font._localSubrRawBufferList = ReadSubrBuffer();
         }
 
         void ReadEncodings()
@@ -894,8 +901,8 @@ namespace Typography.OpenFont.CFF
                     ReadCharsetsFormat1();
                     break;
                 case 2:
-                    throw new NotSupportedException();
-
+                    ReadCharsetsFormat2();
+                    break;
             }
         }
         void ReadCharsetsFormat0()
@@ -950,17 +957,77 @@ namespace Typography.OpenFont.CFF
             //font are covered. This format is particularly suited to charsets
             //that are well ordered
 
-            throw new NotSupportedException();
+            // throw new NotSupportedException();
+            Glyph[] cff1Glyphs = _currentCff1Font._glyphs;
+            int nGlyphs = cff1Glyphs.Length;
+            for (int i = 1; i < nGlyphs;)
+            {
+                int sid = _reader.ReadUInt16();// First glyph in range 
+                int count = _reader.ReadByte() + 1;//since it not include first elem
+                do
+                {
+                    if (sid <= Cff1FontSet.N_STD_STRINGS)
+                    {
+                        //use standard name
+                        //TODO: review here
+                        cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
+                    }
+                    else
+                    {
+                        cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
+                    }
 
-            //int sid = _reader.ReadUInt16();//string iden (SID)
-            //byte nleft = _reader.ReadByte();
-
-
+                    count--;
+                    i++;
+                    sid++;
+                } while (count > 0);
+            }
         }
-
         void ReadCharsetsFormat2()
-        {
+        {   
 
+            //note:eg, Adobe's source-code-pro font
+
+
+            //Table 20 Format 2
+            //Type          Name              Description
+            //Card8         format            2 
+            //struct        Range2[<varies>]  Range2 array (see Table 21)
+            //
+            //-----------------------------------------------
+            //Table 21 Range2 Format
+            //Type          Name             Description
+            //SID           first            First glyph in range
+            //Card16        nLeft           Glyphs left in range (excluding first)
+            //-----------------------------------------------
+
+            //Format 2 differs from format 1 only in the size of the nLeft field in each range. 
+            //This format is most suitable for fonts with a large well - ordered charset — for example, for Asian CIDFonts.
+
+            Glyph[] cff1Glyphs = _currentCff1Font._glyphs;
+            int nGlyphs = cff1Glyphs.Length;
+            for (int i = 1; i < nGlyphs;)
+            {
+                int sid = _reader.ReadUInt16();// First glyph in range 
+                int count = _reader.ReadUInt16() + 1;//since it not include first elem
+                do
+                {
+                    if (sid <= Cff1FontSet.N_STD_STRINGS)
+                    {
+                        //use standard name
+                        //TODO: review here
+                        cff1Glyphs[i]._cff1GlyphData.Name = Cff1FontSet.s_StdStrings[sid];
+                    }
+                    else
+                    {
+                        cff1Glyphs[i]._cff1GlyphData.Name = _uniqueStringTable[sid - Cff1FontSet.N_STD_STRINGS - 1];
+                    }
+
+                    count--;
+                    i++;
+                    sid++;
+                } while (count > 0);
+            }
         }
         void ReadFDSelect()
         {
@@ -1020,7 +1087,7 @@ namespace Typography.OpenFont.CFF
 
             _currentCff1Font._glyphs = glyphs;
             Type2CharStringParser type2Parser = new Type2CharStringParser();
-
+            type2Parser.SetCurrentCff1Font(_currentCff1Font);
 
             for (int i = 0; i < glyphCount; ++i)
             {
@@ -1028,21 +1095,28 @@ namespace Typography.OpenFont.CFF
                 byte[] buffer = _reader.ReadBytes(offset.len);
 #if DEBUG
                 //check
-                if (buffer[offset.len - 1] != 14)
+                byte lastByte = buffer[offset.len - 1];
+                if (lastByte != (byte)Type2Operator1.endchar &&
+                    lastByte != (byte)Type2Operator1.callgsubr &&
+                    lastByte != (byte)Type2Operator1.callsubr)
                 {
+                    //5177.Type2
+                    //Note 6 The charstring itself may end with a call(g)subr; the subroutine must
+                    //then end with an endchar operator
                     //endchar
-                    throw new Exception("invalid end char?");
+                    throw new Exception("invalid end byte?");
                 }
 #endif
                 //now we can parse the raw glyph instructions 
 
                 Cff1GlyphData glyphData = new Cff1GlyphData();
                 glyphData.GlyphIndex = (ushort)i;
-
+#if DEBUG
+                type2Parser.dbugCurrentGlyphIndex = glyphData.GlyphIndex;
+#endif
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
-                    instList.Kind = Type2GlyphInstructionListKind.GlyphDescription;
                     glyphData.GlyphInstructions = instList;
                 }
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
@@ -1147,40 +1221,27 @@ namespace Typography.OpenFont.CFF
                         break;
                 }
             }
-
         }
 
-
-        void ReadLocalSubrs()
+        List<byte[]> ReadSubrBuffer()
         {
-
             CffIndexOffset[] offsets = ReadIndexDataOffsets();
-            //then read each local subrountine 
+            if (offsets == null) return null;
+            //
+            int nsubrs = offsets.Length;
+            List<byte[]> rawBufferList = new List<byte[]>();
 
-            //temp 
-            Type2CharStringParser type2Parser = new Type2CharStringParser();
-            int j = offsets.Length;
-
-            List<Type2GlyphInstructionList> localSubrs = new List<Type2GlyphInstructionList>(j);
-            _currentCff1Font._localSubrs = localSubrs;
-
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < nsubrs; ++i)
             {
                 CffIndexOffset offset = offsets[i];
                 byte[] charStringBuffer = _reader.ReadBytes(offset.len);
-
-                Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(charStringBuffer);
-                if (instList != null)
-                {
-                    instList.Kind = Type2GlyphInstructionListKind.LocalSubroutine;
-                    localSubrs.Add(instList);
-                }
-                else
-                {
-                    localSubrs.Add(null);
-                }
+                rawBufferList.Add(charStringBuffer);
             }
+            return rawBufferList;
         }
+
+
+
 
 
 
@@ -1467,7 +1528,7 @@ namespace Typography.OpenFont.CFF
             /// <summary>
             /// start offset
             /// </summary>
-            public readonly int startOffset;
+            readonly int startOffset;
             public readonly int len;
 
             public CffIndexOffset(int startOffset, int len)
