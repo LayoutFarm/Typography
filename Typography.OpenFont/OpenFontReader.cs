@@ -43,7 +43,7 @@ namespace Typography.OpenFont
         public int ActualStreamOffset { get; internal set; }
         public bool IsWebFont { get; internal set; }
         public bool IsFontCollection => _ttcfMembers != null;
-        public bool IsItalic { get; internal set; }
+
         /// <summary>
         /// get font collection's member count
         /// </summary>
@@ -309,17 +309,13 @@ namespace Typography.OpenFont
         internal PreviewFontInfo ReadPreviewFontInfo(TableEntryCollection tables, BinaryReader input)
         {
             NameEntry nameEntry = ReadTableIfExists(tables, input, new NameEntry());
-            OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table()); 
+            OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
 
             return new PreviewFontInfo(
               nameEntry.TypographicFamilyName ?? nameEntry.FontName,
               nameEntry.TypographyicSubfamilyName ?? nameEntry.FontSubFamily,
               os2Table.usWeightClass,
-              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table)
-              )
-            {
-                IsItalic = nameEntry.FontSubFamily == "Italic"
-            }; 
+              Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table));
         }
         internal Typeface ReadTableEntryCollection(TableEntryCollection tables, BinaryReader input)
         {
