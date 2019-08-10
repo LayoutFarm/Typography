@@ -80,7 +80,7 @@ namespace SampleWinForms
             bool found = false;
             foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
             {
-                if (!found && ff.FontName == "Tahoma")
+                if (!found && ff.FontName == "Source Sans Pro")
                 {
                     selectedFF = ff;
                     selected_index = ffcount;

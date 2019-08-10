@@ -243,7 +243,7 @@ namespace Typography.TextServices
             {
                 var reader = new OpenFontReader();
                 PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                if (string.IsNullOrEmpty(previewFont.Name))
+                if (previewFont == null || string.IsNullOrEmpty(previewFont.Name))
                 {
                     //err!
                     return false;

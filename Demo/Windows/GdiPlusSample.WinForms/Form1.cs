@@ -66,7 +66,7 @@ namespace SampleWinForms
             bool found = false;
             foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
             {
-                if (!found && ff.FontName == "Tahoma")
+                if (!found && ff.FontName == "Source Sans Pro")
                 {
                     selectedFF = ff;
                     selected_index = ffcount;
@@ -296,7 +296,7 @@ namespace SampleWinForms
             _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(userGlyphPlans);
 
             MeasuredStringBox strBox = new MeasuredStringBox();
-            throw new System.NotSupportedException();
+            //throw new System.NotSupportedException();
 
             //_currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
             //  textBuffer, 0, textBuffer.Length,
@@ -330,7 +330,7 @@ namespace SampleWinForms
                 //
                 float glyph_x = x_pos + glyphPlan.OffsetX;
                 g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
-
+                x_pos += glyphPlan.AdvanceX * pxscale;
             }
 
 
