@@ -74,7 +74,7 @@ namespace PixelFarm.Drawing.Fonts
             );
 
             //3.   
-            ChangeFont(new RequestFont("tahoma", 10));
+            ChangeFont(new RequestFont("Source Sans Pro", 10));
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
 

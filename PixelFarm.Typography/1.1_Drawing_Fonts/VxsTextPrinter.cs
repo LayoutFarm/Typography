@@ -34,7 +34,7 @@ namespace PixelFarm.Drawing.Fonts
             this.PositionTechnique = PositionTechnique.OpenFont;
             //
             _textServices = textService;
-            ChangeFont(new RequestFont("tahoma", 10));
+            ChangeFont(new RequestFont("Source Sans Pro", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();
             _glyphSvgStore = new GlyphSvgStore();

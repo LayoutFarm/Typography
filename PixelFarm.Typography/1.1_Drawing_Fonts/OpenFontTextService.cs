@@ -36,7 +36,7 @@ namespace LayoutFarm
             _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-                collection.LoadSystemFonts(); //load system fonts
+                
             });
 
 
@@ -72,7 +72,10 @@ namespace LayoutFarm
             //_shapingServices.SetCurrentScriptLang(scLang);
             //--------------- 
         }
-
+        public void LoadSystemFonts()
+        {
+            _txtServices.InstalledFontCollection.LoadSystemFonts();
+        }
 
         public void LoadFontsFromFolder(string folder)
         {
