@@ -603,7 +603,7 @@ namespace Typography.OpenFont
 
             public static int CalculateRecommendLineSpacing(this Typeface typeface, out LineSpacingChoice choice)
             {
-                //check if we are on Windows env or macOS eve
+                
                 if (RecommendToUseTypoMetricsForLineSpacing(typeface))
                 {
                     choice = LineSpacingChoice.TypoMetric;
