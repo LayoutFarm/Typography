@@ -295,26 +295,16 @@ namespace SampleWinForms
 
             _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(userGlyphPlans);
 
-            MeasuredStringBox strBox = new MeasuredStringBox();
-            //throw new System.NotSupportedException();
-
-            //_currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
-            //  textBuffer, 0, textBuffer.Length,
-            //  _currentTextPrinter.FontSizeInPoints,
-            //  true,
-            //  userGlyphPlans);
-
-            float x_pos2 = x_pos + strBox.width + 10;
-            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.CalculateLineHeight());
-            g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
-            g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
-            g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.AscendingInPx, x_pos2, y_pos + strBox.AscendingInPx);//ascending
+            MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
+              textBuffer, 0, textBuffer.Length,
+              _currentTextPrinter.FontSizeInPoints);
 
 
             Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
 
             int j = userGlyphPlans.Count;
+            float backup_xpos = x_pos;
             for (int i = 0; i < j; ++i)
             {
                 UnscaledGlyphPlan glyphPlan = userGlyphPlans[i];
@@ -332,6 +322,13 @@ namespace SampleWinForms
                 g.DrawRectangle(Pens.Red, glyph_x + xmin, y_pos + ymin, xmax - xmin, ymax - ymin);
                 x_pos += glyphPlan.AdvanceX * pxscale;
             }
+
+            x_pos = backup_xpos;
+            float x_pos2 = x_pos + strBox.width + 10;
+            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.CalculateLineHeight());
+            g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
+            g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
+            g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.AscendingInPx, x_pos2, y_pos + strBox.AscendingInPx);//ascending
 
 
             //------------
