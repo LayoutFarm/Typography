@@ -10,24 +10,24 @@ namespace Typography.OpenFont.Tables
         public override string Name => _N;
         //
         Glyph[] _glyphs;
+        GlyphLocations _glyphLocations;
         public Glyf(GlyphLocations glyphLocations)
         {
-            this.GlyphLocations = glyphLocations;
+            _glyphLocations = glyphLocations;
         }
         public Glyph[] Glyphs
         {
             get => _glyphs;
             internal set => _glyphs = value;
         }
-        GlyphLocations GlyphLocations
-        {
-            get;
-        }
+
+       
+
         protected override void ReadContentFrom(BinaryReader reader)
         {
 
             uint tableOffset = this.Header.Offset;
-            GlyphLocations locations = this.GlyphLocations;
+            GlyphLocations locations = _glyphLocations;
             int glyphCount = locations.GlyphCount;
             _glyphs = new Glyph[glyphCount];
 
@@ -274,7 +274,7 @@ namespace Typography.OpenFont.Tables
             //---------
 
             //move to composite glyph position
-            reader.BaseStream.Seek(tableOffset + GlyphLocations.Offsets[compositeGlyphIndex], SeekOrigin.Begin);//reset
+            reader.BaseStream.Seek(tableOffset + _glyphLocations.Offsets[compositeGlyphIndex], SeekOrigin.Begin);//reset
             //------------------------
             short contoursCount = reader.ReadInt16(); // ignored
             Bounds bounds = Utils.ReadBounds(reader);
@@ -299,7 +299,6 @@ namespace Typography.OpenFont.Tables
 
                 short arg1 = 0;
                 short arg2 = 0;
-                ushort arg1and2 = 0;
 
                 if (HasFlag(flags, CompositeGlyphFlags.ARG_1_AND_2_ARE_WORDS))
                 {
@@ -308,7 +307,7 @@ namespace Typography.OpenFont.Tables
                 }
                 else
                 {
-                    arg1and2 = reader.ReadUInt16();
+                    ushort arg1and2 = reader.ReadUInt16();
                     arg1 = (short)((arg1and2 >> 8) & 0xff);
                     arg2 = (short)((arg1and2) & 0xff);
                 }

@@ -11,8 +11,11 @@ namespace Typography.OpenFont
     {
         public static Bounds ReadBounds(this BinaryReader input)
         {
-            short xmin = input.ReadInt16(), ymin = input.ReadInt16(), xmax = input.ReadInt16(), ymax = input.ReadInt16();
-            return new Bounds(xmin, ymin, xmax, ymax);
+            return new Bounds(
+                input.ReadInt16(),//xmin
+                input.ReadInt16(), //ymin
+                input.ReadInt16(), //xmax
+                input.ReadInt16());//ymax
         }
 
         public static string TagToString(uint tag)
@@ -49,7 +52,7 @@ namespace Typography.OpenFont
         public static ushort[] ReadUInt16Array(this BinaryReader reader, int nRecords)
         {
             ushort[] arr = new ushort[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            for (int i = 0; i < arr.Length; ++i)
             {
                 arr[i] = reader.ReadUInt16();
             }
@@ -58,7 +61,7 @@ namespace Typography.OpenFont
         public static uint[] ReadUInt16ArrayAsUInt32Array(this BinaryReader reader, int nRecords)
         {
             uint[] arr = new uint[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            for (int i = 0; i < arr.Length; ++i)
             {
                 arr[i] = reader.ReadUInt16();
             }
@@ -67,7 +70,7 @@ namespace Typography.OpenFont
         public static uint[] ReadUInt32Array(this BinaryReader reader, int nRecords)
         {
             uint[] arr = new uint[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            for (int i = 0; i < arr.Length; ++i)
             {
                 arr[i] = reader.ReadUInt32();
             }

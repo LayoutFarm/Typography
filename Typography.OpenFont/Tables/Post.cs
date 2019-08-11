@@ -60,7 +60,7 @@ namespace Typography.OpenFont.Tables
         Dictionary<ushort, string> _glyphNames;
         Dictionary<string, ushort> _glyphIndiceByName;
 
-        public int Version { get; set; }
+        public int Version { get; private set; }
 
 
         protected override void ReadContentFrom(BinaryReader reader)
@@ -145,7 +145,7 @@ namespace Typography.OpenFont.Tables
                     //deprecated ??
                     throw new System.NotSupportedException();
             }
-            
+
         }
 
 
