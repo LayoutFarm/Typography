@@ -503,7 +503,7 @@ namespace Typography.FontManagement
 
     public static class InstalledTypefaceCollectionExtensions
     {
-        public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder)
+        public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
         {
             if (!Directory.Exists(folder)) return;
             //-------------------------------------
@@ -517,7 +517,7 @@ namespace Typography.FontManagement
                 {
                     default: break;
                     case ".ttc":
-                    case ".otc":                    
+                    case ".otc":
                     case ".ttf":
                     case ".otf":
                     case ".woff":
@@ -530,21 +530,21 @@ namespace Typography.FontManagement
             //2. browse recursively; on Linux, fonts are organised in subdirectories
             foreach (string subfolder in Directory.GetDirectories(folder))
             {
-                LoadFontsFromFolder(fontCollection, subfolder);
+                LoadFontsFromFolder(fontCollection, subfolder, recursive);
             }
 
         }
-        public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection)
+        public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection, bool recursive = false)
         {
 
             // Windows system fonts
             LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
 
-            // These are reasonable places to look for fonts on Linux
-            LoadFontsFromFolder(fontCollection, "/usr/share/fonts");
-            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts");
-            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts");
-            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts");
+            // These are reasonable places to look for fonts on Linux            
+            LoadFontsFromFolder(fontCollection, "/usr/share/fonts", recursive);
+            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", recursive);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts", recursive);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts", recursive);
 
             // OS X system fonts (https://support.apple.com/en-us/HT201722)
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");

@@ -603,7 +603,7 @@ namespace Typography.OpenFont
 
             public static int CalculateRecommendLineSpacing(this Typeface typeface, out LineSpacingChoice choice)
             {
-                //check if we are on Windows env or macOS eve
+                
                 if (RecommendToUseTypoMetricsForLineSpacing(typeface))
                 {
                     choice = LineSpacingChoice.TypoMetric;
@@ -626,8 +626,7 @@ namespace Typography.OpenFont
             }
             public static int CalculateRecommendLineSpacing(this Typeface typeface)
             {
-                LineSpacingChoice selectedChoice;
-                return CalculateRecommendLineSpacing(typeface, out selectedChoice);
+                return CalculateRecommendLineSpacing(typeface, out var _);
             }
 
 
@@ -931,6 +930,6 @@ namespace Typography.OpenFont
                 }
                 typeface._evalCffGlyphBounds = true;
             }
-        } 
+        }
     }
 }

@@ -60,7 +60,9 @@ namespace Test_WinForm_TessGlyph
 
             //-------
             //string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
-            string testFont = @"D:\projects\Typography\Demo\Windows\TestFonts\SourceSerifPro-Regular.otf";
+            //string testFont = @"D:\projects\Typography\Demo\Windows\TestFonts\SourceSerifPro-Regular.otf";
+            string testFont = @"D:\projects\Typography\Demo\Windows\TestFonts\SourceSansPro-Light.ttf";
+
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
                 OpenFontReader reader = new OpenFontReader();
