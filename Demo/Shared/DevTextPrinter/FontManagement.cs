@@ -429,7 +429,7 @@ namespace Typography.TextServices
 
     public static class InstalledFontCollectionExtension
     {
-        public static void LoadFontsFromFolder(this InstalledFontCollection fontCollection, string folder)
+        public static void LoadFontsFromFolder(this InstalledFontCollection fontCollection, string folder, bool recursive = false)
         {
             try
             {
@@ -453,10 +453,14 @@ namespace Typography.TextServices
                 }
 
                 //2. browse recursively; on Linux, fonts are organised in subdirectories
-                foreach (string subfolder in Directory.GetDirectories(folder))
+                if (recursive)
                 {
-                    LoadFontsFromFolder(fontCollection, subfolder);
+                    foreach (string subfolder in Directory.GetDirectories(folder))
+                    {
+                        LoadFontsFromFolder(fontCollection, subfolder, recursive);
+                    }
                 }
+
             }
             catch (DirectoryNotFoundException e)
             {
@@ -469,10 +473,10 @@ namespace Typography.TextServices
             LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
 
             // These are reasonable places to look for fonts on Linux
-            LoadFontsFromFolder(fontCollection, "/usr/share/fonts");
-            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts");
-            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts");
-            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts");
+            LoadFontsFromFolder(fontCollection, "/usr/share/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts", true);
 
             // OS X system fonts (https://support.apple.com/en-us/HT201722)
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
