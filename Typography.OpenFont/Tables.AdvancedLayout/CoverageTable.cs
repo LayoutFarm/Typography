@@ -131,7 +131,7 @@ namespace Typography.OpenFont.Tables
             private ushort[] _endIndices;
             private ushort[] _coverageIndices;
 
-            private int RangeCount { get { return _startIndices.Length; } }
+            private int RangeCount => _startIndices.Length;
         }
 
         public static CoverageTable CreateFrom(BinaryReader reader, long beginAt)

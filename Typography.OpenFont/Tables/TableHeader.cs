@@ -9,7 +9,7 @@ namespace Typography.OpenFont.Tables
         readonly uint _checkSum;
         readonly uint _offset;
         readonly uint _length;
-        string _tagName;
+        readonly string _tagName;
 
         public TableHeader(uint tag, uint checkSum, uint offset, uint len)
         {
@@ -38,6 +38,6 @@ namespace Typography.OpenFont.Tables
         public override string ToString()
         {
             return "{" + Tag + "}";
-        } 
+        }
     }
 }

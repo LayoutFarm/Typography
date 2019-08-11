@@ -40,7 +40,7 @@ namespace PixelFarm.CpuBlit
 
         ICoordTransformer ICoordTransformer.MultiplyWith(ICoordTransformer another)
         {
-            return this._affine.MultiplyWith(another);
+            return _affine.MultiplyWith(another);
         }
         ICoordTransformer ICoordTransformer.CreateInvert()
         {
