@@ -15,8 +15,8 @@ namespace Typography.OpenFont.Tables
         public const string _N = "BASE";
         public override string Name => _N;
 
-        internal AxisTable _horizontalAxis;
-        internal AxisTable _verticalAxis;
+        public AxisTable _horizontalAxis;
+        public AxisTable _verticalAxis;
 
         protected override void ReadContentFrom(BinaryReader reader)
         {
