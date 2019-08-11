@@ -309,6 +309,8 @@ namespace Typography.OpenFont.Tables
                 else
                 {
                     arg1and2 = reader.ReadUInt16();
+                    arg1 = (short)((arg1and2 >> 8) & 0xff);
+                    arg2 = (short)((arg1and2) & 0xff);
                 }
                 //-----------------------------------------
                 float xscale = 1;
