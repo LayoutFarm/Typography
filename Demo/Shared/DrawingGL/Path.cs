@@ -87,12 +87,15 @@ namespace DrawingGL
             {
                 _points.Add(new PathPoint(_lastMoveX, _lastMoveY, PathPointKind.Point));
             }
-            _lastMoveX = _latestX;
-            _lastMoveY = _latestY;
+            //_lastMoveX = _latestX;
+            //_lastMoveY = _latestY;
 
             //add curve
             _points.Add(new PathPoint(_lastMoveX, _lastMoveY, PathPointKind.CloseFigure));
 
+
+            _latestX = _lastMoveX;
+            _latestY = _lastMoveY;
         }
         public void LineTo(float x1, float y1)
         {
