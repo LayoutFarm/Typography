@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Typography.OpenFont.Tables
 {
-    class BASE : TableEntry
+    public class BASE : TableEntry
     {
         public const string _N = "BASE";
         public override string Name => _N;
@@ -82,6 +82,11 @@ namespace Typography.OpenFont.Tables
                 _verticalAxis = ReadAxisTable(reader);
                 _verticalAxis.isVerticalAxis = true;
             }
+            if (itemVarStoreOffset > 0)
+            {
+                //TODO
+            }
+
         }
 
         public class AxisTable
@@ -89,6 +94,12 @@ namespace Typography.OpenFont.Tables
             public bool isVerticalAxis; //false = horizontal , true= verical axis
             public string[] baseTagList;
             public BaseScript[] baseScripts;
+#if DEBUG
+            public override string ToString()
+            {
+                return isVerticalAxis ? "vertical_axis" : "horizontal_axis";
+            }
+#endif
         }
 
         static AxisTable ReadAxisTable(BinaryReader reader)
@@ -129,7 +140,7 @@ namespace Typography.OpenFont.Tables
         static string ConvertToTagString(byte[] iden_tag_bytes)
         {
             return new string(new char[] {
-                 (char)iden_tag_bytes[0] ,
+                 (char)iden_tag_bytes[0],
                  (char)iden_tag_bytes[1],
                  (char)iden_tag_bytes[2],
                  (char)iden_tag_bytes[3]});
@@ -158,6 +169,43 @@ namespace Typography.OpenFont.Tables
             //Tag 	    baselineTags[baseTagCount] 	Array of 4-byte baseline identification tags — must be in alphabetical order
 
             //see baseline tag =>  https://docs.microsoft.com/en-us/typography/opentype/spec/baselinetags
+
+
+            //Baseline Tag                  
+            //'hang'  
+            //Baseline for HorizAxis: The hanging baseline.This is the horizontal line from which syllables seem to hang in Tibetan and other similar scripts.
+            //Baseline for VertAxis:  The hanging baseline, (which now appears vertical) for Tibetan(or some other similar script) characters rotated 90 degrees clockwise, 
+            //                        for vertical writing mode.            
+            //------
+            //'icfb'  
+            //HorizAxis: Ideographic character face bottom edge. (See Ideographic Character Face below for usage.)
+            //VertAxis: Ideographic character face left edge. (See Ideographic Character Face below for usage.)
+            //--------
+            //'icft' 
+            //HorizAxis: Ideographic character face top edge. (See Ideographic Character Face below for usage.) 
+            //VertAxis: Ideographic character face right edge. (See Ideographic Character Face below for usage.)
+            //-----
+            //'ideo' 
+            //HorizAxis: Ideographic em-box bottom edge. (See Ideographic Em-Box below for usage.) 
+            //VertAxis: Ideographic em-box left edge. If this tag is present in the VertAxis, the value must be set to 0. (See Ideographic Em - Box below for usage.)
+
+            //-------
+            //'idtp'  
+            //HorizAxis: Ideographic em-box top edge baseline. (See Ideographic Em - Box below for usage.)
+            //VertAxis: Ideographic em-box right edge baseline.
+            //          If this tag is present in the VertAxis, 
+            //          the value is strongly recommended to be set to head.unitsPerEm. (See Ideographic Em - Box below for usage.)
+            //-------
+            //'math' 
+            //HorizAxis: The baseline about which mathematical characters are centered. 	
+            //VertAxis: The baseline about which mathematical characters, when rotated 90 degrees clockwise for vertical writing mode, are centered.
+
+            //-------
+            //'romn'
+            //HorizAxis: The baseline used by alphabetic scripts such as Latin, Cyrillic and Greek.
+            //VertAxis: The alphabetic baseline for characters rotated 90 degrees clockwise for vertical writing mode. (This would not apply to alphabetic characters that remain upright in vertical writing mode, since these characters are not rotated.)
+
+
             ushort baseTagCount = reader.ReadUInt16();
             string[] baselineTags = new string[baseTagCount];
             for (int i = 0; i < baseTagCount; ++i)
@@ -208,7 +256,9 @@ namespace Typography.OpenFont.Tables
                 BaseScriptRecord baseScriptRecord = baseScriptRecord_offsets[i];
                 reader.BaseStream.Position = baseScriptListStartAt + baseScriptRecord.baseScriptOffset;
                 //
-                baseScripts[i] = ReadBaseScriptTable(reader);
+                BaseScript baseScipt = ReadBaseScriptTable(reader);
+                baseScipt.ScriptIdenTag = baseScriptRecord.baseScriptTag;
+                baseScripts[i] = baseScipt;
             }
             return baseScripts;
         }
@@ -235,11 +285,18 @@ namespace Typography.OpenFont.Tables
 
         public class BaseScript
         {
+            public string ScriptIdenTag;
             public BaseValues baseValues;
             public BaseLangSysRecord[] baseLangSysRecords;
             public MinMax MinMax;
             public BaseScript() { }
 
+#if DEBUG
+            public override string ToString()
+            {
+                return ScriptIdenTag;
+            }
+#endif
         }
         static BaseScript ReadBaseScriptTable(BinaryReader reader)
         {
