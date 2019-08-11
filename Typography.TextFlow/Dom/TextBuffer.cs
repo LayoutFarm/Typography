@@ -26,7 +26,7 @@ namespace Typography.TextLayout
         }
     }
 
-    class ReusableTextBuffer : TextBuffer
+    public class ReusableTextBuffer : TextBuffer
     {
         public ReusableTextBuffer()
         {

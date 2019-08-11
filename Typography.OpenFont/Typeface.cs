@@ -641,7 +641,7 @@ namespace Typography.OpenFont
 
             public static int CalculateRecommendLineSpacing(this Typeface typeface, out LineSpacingChoice choice)
             {
-
+ 
                 if (RecommendToUseTypoMetricsForLineSpacing(typeface))
                 {
                     choice = LineSpacingChoice.TypoMetric;

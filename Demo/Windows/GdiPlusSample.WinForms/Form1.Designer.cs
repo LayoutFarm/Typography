@@ -38,6 +38,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.lstHintList = new System.Windows.Forms.ListBox();
             this.cmdMeasureTextSpan = new System.Windows.Forms.Button();
+            this.chkFlipY = new System.Windows.Forms.CheckBox();
+            this.txtMsgInfo = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // lstFontList
@@ -51,7 +53,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(690, 184);
+            this.label2.Location = new System.Drawing.Point(948, 168);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(70, 13);
             this.label2.TabIndex = 28;
@@ -60,18 +62,18 @@
             // lstFontSizes
             // 
             this.lstFontSizes.FormattingEnabled = true;
-            this.lstFontSizes.Location = new System.Drawing.Point(693, 200);
+            this.lstFontSizes.Location = new System.Drawing.Point(951, 184);
             this.lstFontSizes.Name = "lstFontSizes";
             this.lstFontSizes.Size = new System.Drawing.Size(121, 212);
             this.lstFontSizes.TabIndex = 27;
             // 
             // txtInputChar
             // 
-            this.txtInputChar.Location = new System.Drawing.Point(12, 29);
+            this.txtInputChar.Location = new System.Drawing.Point(693, 270);
             this.txtInputChar.Name = "txtInputChar";
             this.txtInputChar.Size = new System.Drawing.Size(101, 20);
             this.txtInputChar.TabIndex = 26;
-            this.txtInputChar.Text = "0123456789";
+            this.txtInputChar.Text = "tfjpb09";
             // 
             // chkFillBackground
             // 
@@ -97,14 +99,14 @@
             // 
             this.cmbPositionTech.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbPositionTech.FormattingEnabled = true;
-            this.cmbPositionTech.Location = new System.Drawing.Point(451, 38);
+            this.cmbPositionTech.Location = new System.Drawing.Point(693, 168);
             this.cmbPositionTech.Name = "cmbPositionTech";
             this.cmbPositionTech.Size = new System.Drawing.Size(224, 21);
             this.cmbPositionTech.TabIndex = 32;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(119, 29);
+            this.button1.Location = new System.Drawing.Point(693, 316);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(81, 37);
             this.button1.TabIndex = 34;
@@ -114,14 +116,14 @@
             // lstHintList
             // 
             this.lstHintList.FormattingEnabled = true;
-            this.lstHintList.Location = new System.Drawing.Point(451, 65);
+            this.lstHintList.Location = new System.Drawing.Point(693, 195);
             this.lstHintList.Name = "lstHintList";
             this.lstHintList.Size = new System.Drawing.Size(224, 69);
             this.lstHintList.TabIndex = 36;
             // 
             // cmdMeasureTextSpan
             // 
-            this.cmdMeasureTextSpan.Location = new System.Drawing.Point(206, 31);
+            this.cmdMeasureTextSpan.Location = new System.Drawing.Point(693, 359);
             this.cmdMeasureTextSpan.Name = "cmdMeasureTextSpan";
             this.cmdMeasureTextSpan.Size = new System.Drawing.Size(153, 37);
             this.cmdMeasureTextSpan.TabIndex = 37;
@@ -129,11 +131,34 @@
             this.cmdMeasureTextSpan.UseVisualStyleBackColor = true;
             this.cmdMeasureTextSpan.Click += new System.EventHandler(this.cmdMeasureTextSpan_Click);
             // 
+            // chkFlipY
+            // 
+            this.chkFlipY.AutoSize = true;
+            this.chkFlipY.Checked = true;
+            this.chkFlipY.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkFlipY.Location = new System.Drawing.Point(693, 403);
+            this.chkFlipY.Name = "chkFlipY";
+            this.chkFlipY.Size = new System.Drawing.Size(49, 17);
+            this.chkFlipY.TabIndex = 38;
+            this.chkFlipY.Text = "FlipY";
+            this.chkFlipY.UseVisualStyleBackColor = true;
+            this.chkFlipY.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // txtMsgInfo
+            // 
+            this.txtMsgInfo.Location = new System.Drawing.Point(693, 437);
+            this.txtMsgInfo.Multiline = true;
+            this.txtMsgInfo.Name = "txtMsgInfo";
+            this.txtMsgInfo.Size = new System.Drawing.Size(379, 178);
+            this.txtMsgInfo.TabIndex = 39;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1185, 750);
+            this.Controls.Add(this.txtMsgInfo);
+            this.Controls.Add(this.chkFlipY);
             this.Controls.Add(this.cmdMeasureTextSpan);
             this.Controls.Add(this.lstHintList);
             this.Controls.Add(this.button1);
@@ -163,5 +188,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListBox lstHintList;
         private System.Windows.Forms.Button cmdMeasureTextSpan;
+        private System.Windows.Forms.CheckBox chkFlipY;
+        private System.Windows.Forms.TextBox txtMsgInfo;
     }
 }

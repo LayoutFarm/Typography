@@ -64,9 +64,10 @@ namespace Typography.OpenFont.Tables
 
         //Tag 	    achVendID[4] 	    char 4 
         public uint achVendID;          //see 'registered venders' at https://www.microsoft.com/typography/links/vendorlist.aspx
-                                        //uint16 	fsSelection 	 
-                                        //uint16 	usFirstCharIndex 	 
-                                        //uint16 	usLastCharIndex 
+
+        //uint16 	fsSelection 	 
+        //uint16 	usFirstCharIndex 	 
+        //uint16 	usLastCharIndex 
         public ushort fsSelection;      //Contains information concerning the nature of the font patterns
         public ushort usFirstCharIndex;
         public ushort usLastCharIndex;

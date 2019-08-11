@@ -44,6 +44,9 @@ namespace Typography.TextLayout
         /// scaled line gap (in pixel)
         /// </summary>
         public float LineGapInPx => _lineGap * _pxscale;
+        /// <summary>
+        /// base-line-to-based line distance
+        /// </summary>
         public float BtbdInPx => _btbd * _pxscale;
         public ushort StopAt
         {

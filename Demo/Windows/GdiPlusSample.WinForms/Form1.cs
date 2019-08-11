@@ -1,4 +1,4 @@
-﻿//MIT, 2016-2017, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
@@ -134,7 +134,7 @@ namespace SampleWinForms
             //credit:
             //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+            g.TranslateTransform(0.0F, -(float)500);// Translate the drawing area accordingly   
 
 
             _currentTextPrinter.FillBackground = this.chkFillBackground.Checked;
@@ -145,11 +145,12 @@ namespace SampleWinForms
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             _currentTextPrinter.TargetGraphics = g;
             //render at specific pos
-            float x_pos = 0, y_pos = 100;
+            int lineSpacingPx = (int)System.Math.Ceiling(_currentTextPrinter.FontLineSpacingPx);
+            float x_pos = 0, y_pos = y_pos = lineSpacingPx * 2; //start 1st line
             char[] textBuffer = txtInputChar.Text.ToCharArray();
 
             //test draw multiple lines
-            float lineSpacingPx = _currentTextPrinter.FontLineSpacingPx;
+
             for (int i = 0; i < 3; ++i)
             {
                 _currentTextPrinter.DrawString(
@@ -166,88 +167,37 @@ namespace SampleWinForms
             //-----------------------  
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly            
-                                                    //-----------------------   
+            g.TranslateTransform(0.0F, -(float)500);// Translate the drawing area accordingly            
 
+            //-----------------------   
         }
-
-        ////=========================================================================
-        ////msdf texture generator example
-        //private void cmdBuildMsdfTexture_Click(object sender, System.EventArgs e)
-        //{
-        //    string sampleFontFile = Path.Combine("..", "..", "..", "TestFonts", "tahoma.ttf");
-        //    CreateSampleMsdfTextureFont(
-        //        sampleFontFile,
-        //        18,
-        //        0,
-        //        255,
-        //        "d:\\WImageTest\\sample_msdf.png");
-        //}
-        //static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
-        //{
-        //    //sample
-        //    var reader = new OpenFontReader();
-
-        //    using (var fs = new FileStream(fontfile, FileMode.Open))
-        //    {
-        //        //1. read typeface from font file
-        //        Typeface typeface = reader.Read(fs);
-        //        //sample: create sample msdf texture 
-        //        //-------------------------------------------------------------
-        //        var builder = new GlyphPathBuilder(typeface);
-        //        //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
-        //        //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
-        //        //-------------------------------------------------------------
-        //        var atlasBuilder = new SimpleFontAtlasBuilder();
-
-
-        //        for (ushort n = startGlyphIndex; n <= endGlyphIndex; ++n)
-        //        {
-        //            //build glyph
-        //            builder.BuildFromGlyphIndex(n, sizeInPoint);
-        //            var glyphToContour = new GlyphTranslatorToContour();
-        //            builder.ReadShapes(glyphToContour);
-        //            //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours()); 
-
-        //            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour);
-        //            atlasBuilder.AddGlyph(n, glyphImg);
-
-        //            //using (Bitmap bmp = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-        //            //{
-        //            //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-        //            //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
-        //            //    bmp.UnlockBits(bmpdata);
-        //            //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
-        //            //}
-        //        }
-
-        //        var glyphImg2 = atlasBuilder.BuildSingleImage();
-        //        using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-        //        {
-        //            var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
-        //                System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-        //            int[] intBuffer = glyphImg2.GetImageBuffer();
-
-        //            System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
-        //            bmp.UnlockBits(bmpdata);
-        //            bmp.Save("d:\\WImageTest\\a_total.png");
-        //        }
-        //        atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
-        //    }
-        //}
-
 
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
 
-        private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
+
+        void RenderAndShowMeasureBox()
         {
+            bool flipY = chkFlipY.Checked;
+
             //set some Gdi+ props... 
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             g.Clear(Color.White);
-            //credit:
-            //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+
+            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
+            Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
+
+            float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
+            int lineSpacing = (int)System.Math.Ceiling(_currentTextPrinter.FontLineSpacingPx);
+
+
+            if (flipY)
+            {
+                //credit:
+                //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
+                g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+                g.TranslateTransform(0.0F, -500);// Translate the drawing area accordingly   
+            }
+
 
             //--------------------------------
             //textspan measurement sample
@@ -255,7 +205,8 @@ namespace SampleWinForms
             _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
-            float x_pos = 0, y_pos = 100;
+            float x_pos = 0, y_pos = lineSpacing * 2; //start 1st line
+
             char[] textBuffer = txtInputChar.Text.ToCharArray();
 
             //Example 1: this is a basic draw sample
@@ -273,12 +224,11 @@ namespace SampleWinForms
             //Example 2: print glyph plan to 'user' list-> then draw it (or hold it/ not draw)                         
             //you can create you own class to hold userGlyphPlans.***
             //2.1
-
             _reusableUnscaledGlyphPlanList.Clear();
             _currentTextPrinter.GenerateGlyphPlan(textBuffer, 0, textBuffer.Length, _reusableUnscaledGlyphPlanList);
             //2.2
             //and we can print the formatted glyph plan later.
-            y_pos -= _currentTextPrinter.FontLineSpacingPx;
+            y_pos -= lineSpacing;//next line
             _currentTextPrinter.FillColor = Color.Red;
 
             _currentTextPrinter.DrawFromGlyphPlans(
@@ -287,27 +237,18 @@ namespace SampleWinForms
                   y_pos
              );
 
-            //Example 3: MeasureString   
-
-            Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
-
-            UnscaledGlyphPlanList userGlyphPlans = new UnscaledGlyphPlanList();
-
-            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(userGlyphPlans);
-
+            //Example 3: MeasureString    
+            UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
+            _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
             MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
               textBuffer, 0, textBuffer.Length,
               _currentTextPrinter.FontSizeInPoints);
 
-
-            Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
-            float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
-
-            int j = userGlyphPlans.Count;
+            int j = glyphPlans.Count;
             float backup_xpos = x_pos;
             for (int i = 0; i < j; ++i)
             {
-                UnscaledGlyphPlan glyphPlan = userGlyphPlans[i];
+                UnscaledGlyphPlan glyphPlan = glyphPlans[i];
                 Typography.OpenFont.Glyph glyph = typeface.GetGlyphByIndex(glyphPlan.glyphIndex);
                 //
                 Typography.OpenFont.Bounds b = glyph.Bounds;
@@ -324,20 +265,52 @@ namespace SampleWinForms
             }
 
             x_pos = backup_xpos;
+
+            g.FillRectangle(Brushes.Red, new RectangleF(0, 0, 5, 5));//reference point(0,0)
+            g.FillRectangle(Brushes.Green, new RectangleF(x_pos, y_pos, 3, 3));
+
+
             float x_pos2 = x_pos + strBox.width + 10;
-            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.CalculateLineHeight());
+            g.DrawRectangle(Pens.Black, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.CalculateLineHeight());
+            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.AscendingInPx - strBox.DescendingInPx);
+
             g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
             g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.AscendingInPx, x_pos2, y_pos + strBox.AscendingInPx);//ascending
 
 
-            //------------
+            ////------------
+            ////draw another line (for reference)
+            y_pos -= lineSpacing;//next line
+
+
             _currentTextPrinter.FillColor = Color.Black;
+
+            _currentTextPrinter.DrawFromGlyphPlans(
+                  new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
+                  x_pos,
+                  y_pos
+             );
             //transform back
-            g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
+            if (flipY)
+            {
+                g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
+                g.TranslateTransform(0.0F, -500);// Translate the drawing area accordingly   
+            }
+
+            //---------
+
+            //txtMsgInfo.Text = "choice:" + choice.ToString() + "=" + lineSpacing.ToString();
+        }
+        private void cmdMeasureTextSpan_Click(object sender, System.EventArgs e)
+        {
+            RenderAndShowMeasureBox();
         }
 
+        private void checkBox1_CheckedChanged(object sender, System.EventArgs e)
+        {
+            RenderAndShowMeasureBox();
+        }
 
 
     }

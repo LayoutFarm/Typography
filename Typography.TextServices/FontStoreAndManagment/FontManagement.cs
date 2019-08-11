@@ -511,6 +511,7 @@ namespace Typography.FontManagement
 
         public static MyFunc<string, Stream> CustomFontStreamLoader;
 
+
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
         {
             if (!Directory.Exists(folder)) return;
@@ -544,7 +545,7 @@ namespace Typography.FontManagement
                 }
             }
         }
-        public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection)
+        public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection, bool recursive = false)
         {
 
             if (CustomSystemFontListLoader != null)
@@ -560,6 +561,7 @@ namespace Typography.FontManagement
 
             // Windows system fonts
             LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
+
 
             // These are reasonable places to look for fonts on Linux
             LoadFontsFromFolder(fontCollection, "/usr/share/fonts", true);
