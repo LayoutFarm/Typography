@@ -298,8 +298,7 @@ namespace Typography.OpenFont.Tables
                 Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
                 short arg1 = 0;
-                short arg2 = 0;
-                ushort arg1and2 = 0;
+                short arg2 = 0; 
 
                 if (HasFlag(flags, CompositeGlyphFlags.ARG_1_AND_2_ARE_WORDS))
                 {
@@ -308,7 +307,7 @@ namespace Typography.OpenFont.Tables
                 }
                 else
                 {
-                    arg1and2 = reader.ReadUInt16();
+                    ushort arg1and2 = reader.ReadUInt16();
                     arg1 = (short)((arg1and2 >> 8) & 0xff);
                     arg2 = (short)((arg1and2) & 0xff);
                 }
