@@ -474,16 +474,13 @@ namespace Typography.OpenFont
         static T ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, T resultTable)
             where T : TableEntry
         {
-
-            TableEntry found;
-            if (tables.TryGetTable(resultTable.Name, out found))
+             
+            if (tables.TryGetTable(resultTable.Name, out TableEntry found))
             {
                 //found table name
                 //check if we have read this table or not
-                if (found is UnreadTableEntry)
-                {
-                    UnreadTableEntry unreadTableEntry = found as UnreadTableEntry;
-
+                if (found is UnreadTableEntry unreadTableEntry)
+                {                    
                     //set header before actal read
                     resultTable.Header = found.Header;
                     if (unreadTableEntry.HasCustomContentReader)
