@@ -15,6 +15,9 @@ namespace Typography.OpenFont.Tables
         public const string _N = "BASE";
         public override string Name => _N;
 
+        internal AxisTable _horizontalAxis;
+        internal AxisTable _verticalAxis;
+
         protected override void ReadContentFrom(BinaryReader reader)
         {
             //BASE Header
@@ -70,17 +73,25 @@ namespace Typography.OpenFont.Tables
             if (horizAxisOffset > 0)
             {
                 reader.BaseStream.Position = tableStartAt + horizAxisOffset;
-                ReadAxisTable(reader);
-
+                _horizontalAxis = ReadAxisTable(reader);
+                _horizontalAxis.isVerticalAxis = false;
             }
             if (vertAxisOffset > 0)
             {
                 reader.BaseStream.Position = tableStartAt + vertAxisOffset;
-                ReadAxisTable(reader);
+                _verticalAxis = ReadAxisTable(reader);
+                _verticalAxis.isVerticalAxis = true;
             }
-            ///....TODO: developing ....
         }
-        void ReadAxisTable(BinaryReader reader)
+
+        public class AxisTable
+        {
+            public bool isVerticalAxis; //false = horizontal , true= verical axis
+            public string[] baseTagList;
+            public BaseScript[] baseScripts;
+        }
+
+        static AxisTable ReadAxisTable(BinaryReader reader)
         {
             //An Axis table is used to render scripts either horizontally or vertically. 
             //It consists of offsets, measured from the beginning of the Axis table,
@@ -101,16 +112,18 @@ namespace Typography.OpenFont.Tables
             ushort baseTagListOffset = reader.ReadUInt16();
             ushort baseScriptListOffset = reader.ReadUInt16();
 
+            AxisTable axisTable = new AxisTable();
             if (baseTagListOffset > 0)
             {
                 reader.BaseStream.Position = axisTableStartAt + baseTagListOffset;
-                ReadBaseTagList(reader);
+                axisTable.baseTagList = ReadBaseTagList(reader);
             }
             if (baseScriptListOffset > 0)
             {
                 reader.BaseStream.Position = axisTableStartAt + baseScriptListOffset;
-                ReadBaseScriptList(reader);
+                axisTable.baseScripts = ReadBaseScriptList(reader);
             }
+            return axisTable;
         }
 
         static string ConvertToTagString(byte[] iden_tag_bytes)
@@ -121,7 +134,7 @@ namespace Typography.OpenFont.Tables
                  (char)iden_tag_bytes[2],
                  (char)iden_tag_bytes[3]});
         }
-        void ReadBaseTagList(BinaryReader reader)
+        static string[] ReadBaseTagList(BinaryReader reader)
         {
             //BaseTagList Table
 
@@ -146,13 +159,14 @@ namespace Typography.OpenFont.Tables
 
             //see baseline tag =>  https://docs.microsoft.com/en-us/typography/opentype/spec/baselinetags
             ushort baseTagCount = reader.ReadUInt16();
+            string[] baselineTags = new string[baseTagCount];
             for (int i = 0; i < baseTagCount; ++i)
             {
-                string tagString = ConvertToTagString(reader.ReadBytes(4));
-
+                baselineTags[i] = ConvertToTagString(reader.ReadBytes(4));
             }
+            return baselineTags;
         }
-        void ReadBaseScriptList(BinaryReader reader)
+        static BaseScript[] ReadBaseScriptList(BinaryReader reader)
         {
             //BaseScriptList Table
 
@@ -172,7 +186,8 @@ namespace Typography.OpenFont.Tables
 
             long baseScriptListStartAt = reader.BaseStream.Position;
             ushort baseScriptCount = reader.ReadUInt16();
-            BaseScriptRecord[] records = new BaseScriptRecord[baseScriptCount];
+
+            BaseScriptRecord[] baseScriptRecord_offsets = new BaseScriptRecord[baseScriptCount];
             for (int i = 0; i < baseScriptCount; ++i)
             {
                 //BaseScriptRecord
@@ -185,14 +200,17 @@ namespace Typography.OpenFont.Tables
                 //Type 	    Name 	            Description
                 //Tag 	    baseScriptTag 	    4-byte script identification tag
                 //Offset16 	baseScriptOffset 	Offset to BaseScript table, from beginning of BaseScriptList             
-                records[i] = new BaseScriptRecord(ConvertToTagString(reader.ReadBytes(4)), reader.ReadUInt16());
+                baseScriptRecord_offsets[i] = new BaseScriptRecord(ConvertToTagString(reader.ReadBytes(4)), reader.ReadUInt16());
             }
+            BaseScript[] baseScripts = new BaseScript[baseScriptCount];
             for (int i = 0; i < baseScriptCount; ++i)
             {
-                BaseScriptRecord baseScriptRecord = records[i];
+                BaseScriptRecord baseScriptRecord = baseScriptRecord_offsets[i];
                 reader.BaseStream.Position = baseScriptListStartAt + baseScriptRecord.baseScriptOffset;
-                ReadBaseScriptTable(reader);
+                //
+                baseScripts[i] = ReadBaseScriptTable(reader);
             }
+            return baseScripts;
         }
         struct BaseScriptRecord
         {
@@ -204,7 +222,7 @@ namespace Typography.OpenFont.Tables
                 this.baseScriptOffset = offset;
             }
         }
-        struct BaseLangSysRecord
+        public struct BaseLangSysRecord
         {
             public readonly string baseScriptTag;
             public readonly ushort baseScriptOffset;
@@ -215,7 +233,15 @@ namespace Typography.OpenFont.Tables
             }
         }
 
-        void ReadBaseScriptTable(BinaryReader reader)
+        public class BaseScript
+        {
+            public BaseValues baseValues;
+            public BaseLangSysRecord[] baseLangSysRecords;
+            public MinMax MinMax;
+            public BaseScript() { }
+
+        }
+        static BaseScript ReadBaseScriptTable(BinaryReader reader)
         {
             //BaseScript Table
             //A BaseScript table organizes and specifies the baseline data and min/max extent data for one script. 
@@ -238,11 +264,11 @@ namespace Typography.OpenFont.Tables
             ushort baseValueOffset = reader.ReadUInt16();
             ushort defaultMinMaxOffset = reader.ReadUInt16();
             ushort baseLangSysCount = reader.ReadUInt16();
-            BaseLangSysRecord[] records = null;
+            BaseLangSysRecord[] baseLangSysRecords = null;
 
             if (baseLangSysCount > 0)
             {
-                records = new BaseLangSysRecord[baseLangSysCount];
+                baseLangSysRecords = new BaseLangSysRecord[baseLangSysCount];
                 for (int i = 0; i < baseLangSysCount; ++i)
                 {
                     //BaseLangSysRecord
@@ -254,22 +280,28 @@ namespace Typography.OpenFont.Tables
                     //Type 	        Name 	        Description
                     //Tag 	        baseLangSysTag 	4-byte language system identification tag
                     //Offset16 	    minMaxOffset 	Offset to MinMax table, from beginning of BaseScript table
-                    records[i] = new BaseLangSysRecord(ConvertToTagString(reader.ReadBytes(4)), reader.ReadUInt16());
+                    baseLangSysRecords[i] = new BaseLangSysRecord(ConvertToTagString(reader.ReadBytes(4)), reader.ReadUInt16());
                 }
             }
 
+            BaseScript baseScript = new BaseScript();
+            baseScript.baseLangSysRecords = baseLangSysRecords;
             //--------------------
             if (baseValueOffset > 0)
             {
                 reader.BaseStream.Position = baseScriptTableStartAt + baseValueOffset;
-                ReadBaseValues(reader);
+                baseScript.baseValues = ReadBaseValues(reader);
+
             }
             if (defaultMinMaxOffset > 0)
             {
                 reader.BaseStream.Position = baseScriptTableStartAt + defaultMinMaxOffset;
+                baseScript.MinMax = ReadMinMaxTable(reader);
             }
+
+            return baseScript;
         }
-        void ReadBaseValues(BinaryReader reader)
+        static BaseValues ReadBaseValues(BinaryReader reader)
         {
             //A BaseValues table lists the coordinate positions of all baselines named in the baselineTags array of the corresponding BaseTagList and
             //identifies a default baseline for a script.
@@ -287,15 +319,62 @@ namespace Typography.OpenFont.Tables
             //
             ushort defaultBaselineIndex = reader.ReadUInt16();
             ushort baseCoordCount = reader.ReadUInt16();
-            ushort[] baseCoords = Utils.ReadUInt16Array(reader, baseCoordCount);
+            ushort[] baseCoords_Offset = Utils.ReadUInt16Array(reader, baseCoordCount);
 
+            BaseCoord[] baseCoords = new BaseCoord[baseCoordCount];
             for (int i = 0; i < baseCoordCount; ++i)
             {
-                reader.BaseStream.Position = baseValueTableStartAt + baseCoords[i];
-                ReadBaseCoordTable(reader);
+                reader.BaseStream.Position = baseValueTableStartAt + baseCoords_Offset[i];
+                baseCoords[i] = ReadBaseCoordTable(reader);
+            }
+
+            return new BaseValues(defaultBaselineIndex, baseCoords);
+        }
+        public struct BaseValues
+        {
+            public readonly ushort defaultBaseLineIndex;
+            public readonly BaseCoord[] baseCoords;
+
+            public BaseValues(ushort defaultBaseLineIndex, BaseCoord[] baseCoords)
+            {
+                this.defaultBaseLineIndex = defaultBaseLineIndex;
+                this.baseCoords = baseCoords;
             }
         }
-        void ReadBaseCoordTable(BinaryReader reader)
+
+
+        public struct BaseCoord
+        {
+            public readonly ushort baseCoordFormat;
+            /// <summary>
+            ///  X or Y value, in design units
+            /// </summary>
+            public readonly short coord;
+
+            public readonly ushort referenceGlyph; //found in format2
+            public readonly ushort baseCoordPoint; //found in format2
+
+            public BaseCoord(ushort baseCoordFormat, short coord)
+            {
+                this.baseCoordFormat = baseCoordFormat;
+                this.coord = coord;
+                this.referenceGlyph = this.baseCoordPoint = 0;
+            }
+            public BaseCoord(ushort baseCoordFormat, short coord, ushort referenceGlyph, ushort baseCoordPoint)
+            {
+                this.baseCoordFormat = baseCoordFormat;
+                this.coord = coord;
+                this.referenceGlyph = referenceGlyph;
+                this.baseCoordPoint = baseCoordPoint;
+            }
+#if DEBUG
+            public override string ToString()
+            {
+                return "format:" + baseCoordFormat + ",coord=" + coord;
+            }
+#endif
+        }
+        static BaseCoord ReadBaseCoordTable(BinaryReader reader)
         {
             //BaseCoord Tables
             //Within the BASE table, a BaseCoord table defines baseline and min/max extent values.
@@ -366,23 +445,137 @@ namespace Typography.OpenFont.Tables
             {
                 default: throw new System.NotSupportedException();
                 case 1:
-                    {
-                        short coordinate = reader.ReadInt16();
-                    }
-                    break;
+                    return new BaseCoord(1,
+                        reader.ReadInt16());//coord
                 case 2:
-                    {
-                        short coordinate = reader.ReadInt16();
-                        ushort referenceGlyph = reader.ReadUInt16();
-                        ushort baseCoordPoint = reader.ReadUInt16();
-                    }
-                    break;
+                    return new BaseCoord(2,
+                        reader.ReadInt16(), //coordinate
+                        reader.ReadUInt16(), //referenceGlyph
+                        reader.ReadUInt16()); //baseCoordPoint
                 case 3:
-                    //TODO: implement this...
-                    break;
+#if DEBUG
+
+#endif
+                    return new BaseCoord();
+                    //    //TODO: implement this...
+                    //    break;
             }
 
 
         }
+
+
+        static MinMax ReadMinMaxTable(BinaryReader reader)
+        {
+            //The MinMax table specifies extents for scripts and language systems.
+            //It also contains an array of FeatMinMaxRecords used to define feature-specific extents.
+
+            //...
+
+            //Text-processing clients should use the following procedure to access the script, language system, and feature-specific extent data:
+
+            //Determine script extents in relation to the text content.
+            //Select language-specific extent values with respect to the language system in use.
+            //Have the application or user choose feature-specific extent values.
+            //If no extent values are defined for a language system or for language-specific features,
+            //use the default min/max extent values for the script.
+
+            //MinMax table
+            //Type 	            Name 	            Description
+            //Offset16 	        minCoord 	        Offset to BaseCoord table that defines the minimum extent value, from the beginning of MinMax table (may be NULL)
+            //Offset16      	maxCoord 	        Offset to BaseCoord table that defines maximum extent value, from the beginning of MinMax table (may be NULL)
+            //uint16 	        featMinMaxCount 	Number of FeatMinMaxRecords — may be zero (0)
+            //FeatMinMaxRecord 	featMinMaxRecords[featMinMaxCount] 	Array of FeatMinMaxRecords, in alphabetical order by featureTableTag
+
+
+            //FeatMinMaxRecord
+            //Type              Name                Description
+            //Tag               featureTableTag     4 - byte feature identification tag — must match feature tag in FeatureList
+            //Offset16          minCoord            Offset to BaseCoord table that defines the minimum extent value, from beginning of MinMax table(may be NULL)
+            //Offset16          maxCoord            Offset to BaseCoord table that defines the maximum extent value, from beginning of MinMax table(may be NULL)
+
+
+            long startMinMaxTableAt = reader.BaseStream.Position;
+            //
+            MinMax minMax = new MinMax();
+            ushort minCoordOffset = reader.ReadUInt16();
+            ushort maxCoordOffset = reader.ReadUInt16();
+            ushort featMinMaxCount = reader.ReadUInt16();
+
+            FeatureMinMaxOffset[] minMaxFeatureOffsets = null;
+            if (featMinMaxCount > 0)
+            {
+                minMaxFeatureOffsets = new FeatureMinMaxOffset[featMinMaxCount];
+                for (int i = 0; i < featMinMaxCount; ++i)
+                {
+                    minMaxFeatureOffsets[i] = new FeatureMinMaxOffset(
+                        ConvertToTagString(reader.ReadBytes(4)), //featureTableTag
+                        reader.ReadUInt16(), //minCoord offset
+                        reader.ReadUInt16() //maxCoord offset
+                        );
+                }
+            }
+
+            //----------
+            if (minCoordOffset > 0)
+            {
+                reader.BaseStream.Position = startMinMaxTableAt + minCoordOffset;
+                minMax.minCoord = ReadBaseCoordTable(reader);
+            }
+            if (maxCoordOffset > 0)
+            {
+                reader.BaseStream.Position = startMinMaxTableAt + maxCoordOffset;
+                minMax.maxCoord = ReadBaseCoordTable(reader);
+            }
+
+            if (minMaxFeatureOffsets != null)
+            {
+                var featureMinMaxRecords = new FeatureMinMax[minMaxFeatureOffsets.Length];
+                for (int i = 0; i < minMaxFeatureOffsets.Length; ++i)
+                {
+                    FeatureMinMaxOffset featureMinMaxOffset = minMaxFeatureOffsets[i];
+
+                    var featureMinMax = new FeatureMinMax();
+                    //tag
+                    featureMinMax.featureTableTag = featureMinMaxOffset.featureTableTag;
+                    //min
+                    reader.BaseStream.Position = startMinMaxTableAt + featureMinMaxOffset.minCoord;//min
+                    featureMinMax.minCoord = ReadBaseCoordTable(reader);
+                    //max
+                    reader.BaseStream.Position = startMinMaxTableAt + featureMinMaxOffset.maxCoord;//max
+                    featureMinMax.maxCoord = ReadBaseCoordTable(reader);
+
+                    featureMinMaxRecords[i] = featureMinMax;
+                }
+                minMax.featureMinMaxRecords = featureMinMaxRecords;
+            }
+            return minMax;
+        }
+
+        public class MinMax
+        {
+            public BaseCoord minCoord;
+            public BaseCoord maxCoord;
+            public FeatureMinMax[] featureMinMaxRecords;
+        }
+        public struct FeatureMinMax
+        {
+            public string featureTableTag;
+            public BaseCoord minCoord;
+            public BaseCoord maxCoord;
+        }
+        struct FeatureMinMaxOffset
+        {
+            public readonly string featureTableTag;
+            public readonly ushort minCoord;
+            public readonly ushort maxCoord;
+            public FeatureMinMaxOffset(string featureTableTag, ushort minCoord, ushort maxCoord)
+            {
+                this.featureTableTag = featureTableTag;
+                this.minCoord = minCoord;
+                this.maxCoord = maxCoord;
+            }
+        }
+
     }
 }
