@@ -18,7 +18,7 @@ namespace Typography.TextLayout
             _mustRebuildTables = true;
         }
 
-        public void DoSubstitution(IGlyphIndexList codePoints)
+        public void DoSubstitution(IGlyphIndexList glyphIndexList)
         {
             // Rebuild tables if configuration changed
             if (_mustRebuildTables)
@@ -33,9 +33,9 @@ namespace Typography.TextLayout
             // https://www.microsoft.com/typography/otspec/gsub.htm
             foreach (GSUB.LookupTable lookupTable in _lookupTables)
             {
-                for (int pos = 0; pos < codePoints.Count; ++pos)
+                for (int pos = 0; pos < glyphIndexList.Count; ++pos)
                 {
-                    lookupTable.DoSubstitutionAt(codePoints, pos, codePoints.Count - pos);
+                    lookupTable.DoSubstitutionAt(glyphIndexList, pos, glyphIndexList.Count - pos);
                 }
             }
         }

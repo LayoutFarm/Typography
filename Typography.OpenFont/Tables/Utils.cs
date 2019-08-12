@@ -9,6 +9,11 @@ namespace Typography.OpenFont
 {
     static class Utils
     {
+        public static float ReadF2Dot14(this BinaryReader reader)
+        {
+            return ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+        }
+
         public static Bounds ReadBounds(BinaryReader input)
         {
             short xmin = input.ReadInt16(), ymin = input.ReadInt16(), xmax = input.ReadInt16(), ymax = input.ReadInt16();
