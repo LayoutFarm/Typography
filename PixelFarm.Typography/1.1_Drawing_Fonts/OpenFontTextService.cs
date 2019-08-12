@@ -36,7 +36,7 @@ namespace LayoutFarm
             _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-                
+
             });
 
 
@@ -266,10 +266,10 @@ namespace LayoutFarm
 
         }
         float ITextService.MeasureBlankLineHeight(RequestFont font)
-        {
-            LineSpacingChoice sel_linespcingChoice;
+        { 
             Typeface typeface = ResolveTypeface(font);
-            return (int)(Math.Round(typeface.CalculateRecommendLineSpacing(out sel_linespcingChoice) *
+
+            return (int)(Math.Round(typeface.CalculateMaxLineClipHeight() *
                                     typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints)));
         }
         //
