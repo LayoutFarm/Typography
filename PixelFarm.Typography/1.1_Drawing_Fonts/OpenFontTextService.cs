@@ -177,7 +177,7 @@ namespace LayoutFarm
 
             //
 
-            lineHeight = (int)Math.Round(typeface.CalculateRecommendLineSpacing() * scale);
+            lineHeight = (int)Math.Round(typeface.CalculateMaxLineClipHeight() * scale);
 
             _reusableTextBuffer.SetRawCharBuffer(null);
         }

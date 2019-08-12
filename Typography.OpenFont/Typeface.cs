@@ -100,7 +100,14 @@ namespace Typography.OpenFont
         /// OS2 sTypoDescender, in font designed unit
         /// </summary>
         public short Descender => OS2Table.sTypoDescender;
-
+        /// <summary>
+        /// OS2 usWinAscender
+        /// </summary>
+        public ushort ClipedAscender => OS2Table.usWinAscent;
+        /// <summary>
+        /// OS2 usWinDescender
+        /// </summary>
+        public ushort ClipedDescender => OS2Table.usWinDescent;
 
         /// <summary>
         /// OS2 Linegap
@@ -742,7 +749,8 @@ namespace Typography.OpenFont
             }
             public static int CalculateRecommendLineSpacing(this Typeface typeface)
             {
-                return CalculateRecommendLineSpacing(typeface, out var _);
+                return CalculateMaxLineClipHeight(typeface);
+                //return CalculateRecommendLineSpacing(typeface, out var _);
             }
             public static int CalculateLineSpacing(this Typeface typeface, LineSpacingChoice choice)
             {

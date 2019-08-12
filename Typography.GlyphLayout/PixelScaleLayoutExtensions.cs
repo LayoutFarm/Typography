@@ -439,7 +439,8 @@ namespace Typography.TextLayout
                      typeface.Ascender,
                      typeface.Descender,
                      typeface.LineGap,
-                     (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
+                     typeface.ClipedAscender,
+                     typeface.ClipedDescender,
                      pxscale);
 
             }
@@ -457,7 +458,8 @@ namespace Typography.TextLayout
                  typeface.Ascender,
                  typeface.Descender,
                  typeface.LineGap,
-                 (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
+                 typeface.ClipedAscender,
+                 typeface.ClipedDescender,
                  pxscale);
 
                 mstrbox.StopAt = (ushort)stopAtChar;
@@ -470,7 +472,8 @@ namespace Typography.TextLayout
                     typeface.Ascender,
                     typeface.Descender,
                     typeface.LineGap,
-                    (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
+                    typeface.ClipedAscender,
+                    typeface.ClipedDescender,
                     pxscale);
             }
 

@@ -233,13 +233,13 @@ namespace Typography.TextServices
             //check if we use cache feature or not
             MeasuredStringBox measureStringBox = _glyphLayout.LayoutAndMeasureString(str, startAt, len, _fontSizeInPts);
             w = (int)measureStringBox.width;
-            h = (int)Math.Ceiling(measureStringBox.CalculateLineHeight(_currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts)));
+            h = (int)Math.Ceiling(measureStringBox.ClipHeightInPx);
         }
         public void MeasureString(char[] str, int startAt, int len, int limitWidth, out int charFit, out int charFitWidth)
         {
             MeasuredStringBox measureStringBox = _glyphLayout.LayoutAndMeasureString(str, startAt, len, _fontSizeInPts, limitWidth);
             int w = (int)measureStringBox.width;
-            int h = (int)Math.Ceiling(measureStringBox.CalculateLineHeight(_currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts)));
+            int h = (int)Math.Ceiling(measureStringBox.ClipHeightInPx);
             charFit = measureStringBox.StopAt;
             charFitWidth = (int)Math.Ceiling(measureStringBox.width);
         }

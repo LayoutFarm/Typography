@@ -180,7 +180,7 @@ namespace SampleWinForms
         {
             bool flipY = chkFlipY.Checked;
 
-            
+           
 
             //set some Gdi+ props... 
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -188,7 +188,7 @@ namespace SampleWinForms
 
             Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
             Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
-            typeface.CalculateRecommendLineSpacing();
+            
 
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints); 
             int lineSpacing = (int)System.Math.Ceiling((double)typeface.CalculateLineSpacing(LineSpacingChoice.TypoMetric) * pxscale);
@@ -211,7 +211,7 @@ namespace SampleWinForms
             _currentTextPrinter.UpdateGlyphLayoutSettings();
 
             //render at specific pos
-            float x_pos = 0, y_pos = lineSpacing * 2; //start 1st line
+            float x_pos = 0, y_pos = lineSpacing * 2; 
 
             char[] textBuffer = txtInputChar.Text.ToCharArray();
 
@@ -277,8 +277,10 @@ namespace SampleWinForms
 
 
             float x_pos2 = x_pos + strBox.width + 10;
-            g.DrawRectangle(Pens.Black, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.CalculateLineHeight());
-            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.AscendingInPx - strBox.DescendingInPx);
+
+
+            g.DrawRectangle(Pens.Black, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.ClipHeightInPx);
+            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.LineSpaceInPx);
 
             g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
             g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
