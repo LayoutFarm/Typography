@@ -89,7 +89,6 @@ namespace Typography.Rendering
             //Your Implementation ...
             s_registerDetails = new Dictionary<int, GlyphTextureBuildDetail[]>();
             //set default detail
-
             if (s_default == null)
             {
                 SetDefaultDetails(new GlyphTextureBuildDetail[] {
@@ -107,10 +106,7 @@ namespace Typography.Rendering
                     DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
             });
-            Register(new RequestFont("Sarabun", 14), new GlyphTextureBuildDetail[]
-            {
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction},
-            }, false, false);
+            
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
