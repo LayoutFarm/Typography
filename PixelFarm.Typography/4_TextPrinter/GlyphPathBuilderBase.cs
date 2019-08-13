@@ -24,7 +24,7 @@ namespace Typography.Contours
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
-        bool _useInterpreter;
+
 
         public GlyphPathBuilderBase(Typeface typeface)
         {
@@ -40,11 +40,7 @@ namespace Typography.Contours
         /// <summary>
         /// process glyph with true type instructions
         /// </summary>
-        public bool UseTrueTypeInstructions
-        {
-            get => _useInterpreter;
-            set => _useInterpreter = value;
-        }
+        public bool UseTrueTypeInstructions { get; set; }
 
         /// <summary>
         /// build glyph shape from glyphIndex to be read
@@ -98,23 +94,32 @@ namespace Typography.Contours
         protected float RecentFontSizeInPixels { get; private set; }
         protected virtual void FitCurrentGlyph(Glyph glyph)
         {
-            if (RecentFontSizeInPixels > 0 && UseTrueTypeInstructions &&
-                  _typeface.HasPrepProgramBuffer &&
-                  glyph.HasGlyphInstructions)
+            try
             {
-                if (_trueTypeInterpreter == null)
+                if (RecentFontSizeInPixels > 0 && UseTrueTypeInstructions &&
+                 _typeface.HasPrepProgramBuffer &&
+                 glyph.HasGlyphInstructions)
                 {
-                    _trueTypeInterpreter = new TrueTypeInterpreter();
-                    _trueTypeInterpreter.SetTypeFace(_typeface);
+                    if (_trueTypeInterpreter == null)
+                    {
+                        _trueTypeInterpreter = new TrueTypeInterpreter();
+                        _trueTypeInterpreter.SetTypeFace(_typeface);
+                    }
+                    _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
+                    //output as points,
+                    _outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyph.GlyphIndex, RecentFontSizeInPixels);
+                    //***
+                    //all points are scaled from _trueTypeInterpreter, 
+                    //so not need further scale.=> set _recentPixelScale=1
+                    _recentPixelScale = 1;
                 }
-                _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
-                //output as points,
-                _outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyph.GlyphIndex, RecentFontSizeInPixels);
-                //***
-                //all points are scaled from _trueTypeInterpreter, 
-                //so not need further scale.=> set _recentPixelScale=1
-                _recentPixelScale = 1;
             }
+            catch (System.Exception ex)
+            {
+
+            }
+
+
         }
 
         Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();

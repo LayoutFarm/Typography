@@ -107,8 +107,10 @@ namespace Typography.Rendering
                     DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
             });
-
-
+            Register(new RequestFont("Sarabun", 14), new GlyphTextureBuildDetail[]
+            {
+                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction},
+            }, false, false);
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
@@ -117,6 +119,7 @@ namespace Typography.Rendering
 
         public static GlyphTextureBuildDetail[] TryGetGlyphTextureBuildDetail(RequestFont reqFont, bool forAnySize = true, bool forAnyStyle = true)
         {
+
             if (s_registerDetails == null)
             {
                 SetupDefaults();
@@ -135,6 +138,14 @@ namespace Typography.Rendering
             int fontKey = RequestFont.CalculateFontKey(reqFont.Name.ToLower(), sizeInPt, fontStyle);
             if (!s_registerDetails.TryGetValue(fontKey, out var found))
             {
+                //find general config
+
+                if (forAnySize == false || forAnySize == false)
+                {
+                    //get general style
+                    return TryGetGlyphTextureBuildDetail(reqFont, true, true);
+                }
+
                 //not found that font key
                 //create default
                 //...
@@ -271,7 +282,7 @@ namespace Typography.Rendering
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                         TextureKindForNewFont,
-                       GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont),
+                       GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont, false, false),
                        (glyphIndex, glyphImage, outputAtlasBuilder) =>
                         {
                             if (outputAtlasBuilder != null)

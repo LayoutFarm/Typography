@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-
-using Typography.TextLayout;
 using Typography.FontManagement;
 using System.IO;
 
