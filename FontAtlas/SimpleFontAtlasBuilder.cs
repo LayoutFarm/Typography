@@ -41,10 +41,7 @@ namespace Typography.Rendering
         /// <param name="img"></param>
         public void AddGlyph(ushort glyphIndex, GlyphImage img)
         {
-            var glyphCache = new CacheGlyph();
-            glyphCache.glyphIndex = glyphIndex;
-            glyphCache.img = img;
-            _glyphs[glyphIndex] = glyphCache;
+            _glyphs[glyphIndex] = new CacheGlyph(glyphIndex, img);
         }
 
         public void SetAtlasInfo(PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind, float fontSizeInPts)
@@ -316,8 +313,5 @@ namespace Typography.Rendering
                 }
             }
         }
-
     }
-
-
 }

@@ -41,14 +41,19 @@ namespace Typography.Rendering
     }
 
     class CacheGlyph
-    {
-        internal GlyphImage img;
+    {       
+        public readonly  ushort glyphIndex;
+        internal readonly GlyphImage img;
         public Rectangle area;
-        public ushort glyphIndex;
-
-#if DEBUG
-        public CacheGlyph()
+        public CacheGlyph(ushort glyphIndex, GlyphImage img)
         {
+            this.glyphIndex = glyphIndex;
+            this.img = img;
+        }
+#if DEBUG
+        public override string ToString()
+        {
+            return glyphIndex.ToString();
         }
 #endif
     }
