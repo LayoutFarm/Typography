@@ -25,12 +25,18 @@ namespace Typography.Contours
         /// </summary>
         float _recentPixelScale;
 
+        Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
 
         public GlyphPathBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
             this.UseTrueTypeInstructions = true;//default?
             _recentPixelScale = 1;
+
+            if (typeface.IsCffFont)
+            {
+                _cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();
+            }
         }
         public Typeface Typeface => _typeface;
         /// <summary>
@@ -97,8 +103,8 @@ namespace Typography.Contours
             try
             {
                 if (RecentFontSizeInPixels > 0 && UseTrueTypeInstructions &&
-                 _typeface.HasPrepProgramBuffer &&
-                 glyph.HasGlyphInstructions)
+                    _typeface.HasPrepProgramBuffer &&
+                    glyph.HasGlyphInstructions)
                 {
                     if (_trueTypeInterpreter == null)
                     {
@@ -118,11 +124,8 @@ namespace Typography.Contours
             {
 
             }
-
-
         }
 
-        Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine = new OpenFont.CFF.CffEvaluationEngine();
         public virtual void ReadShapes(IGlyphTranslator tx)
         {
             //read output from glyph points
