@@ -73,8 +73,8 @@ namespace PixelFarm.Drawing.Fonts
                 }
             );
 
-            //3.   
-            ChangeFont(new RequestFont("Source Sans Pro", 10));
+            //3.
+            ChangeFont(painter.CurrentFont);
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
 
