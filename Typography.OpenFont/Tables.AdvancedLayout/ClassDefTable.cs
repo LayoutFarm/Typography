@@ -162,6 +162,7 @@ namespace Typography.OpenFont.Tables
 #endif
         }
 
+
         public int GetClassValue(int glyphIndex)
         {
             switch (Format)
@@ -178,20 +179,28 @@ namespace Typography.OpenFont.Tables
                     }
                 case 2:
                     {
-                        //TODO: review a proper method here again
-                        //esp. binary search
+                        
                         for (int i = 0; i < records.Length; ++i)
                         {
-                            ClassRangeRecord rec = records[i];                            
-                            if (glyphIndex >= rec.startGlyphId && glyphIndex <= rec.endGlyphId)
+                            //TODO: review a proper method here again
+                            //esp. binary search
+                            ClassRangeRecord rec = records[i];
+                            if (rec.startGlyphId <= glyphIndex)
                             {
-                                return rec.classNo;
+                                if (glyphIndex <= rec.endGlyphId)
+                                {
+                                    return rec.classNo;
+                                }
+                            }
+                            else
+                            {
+                                return -1;//no need to go further
                             }
                         }
                         return -1;
                     }
             }
-        }
+        } 
     }
 
 }
