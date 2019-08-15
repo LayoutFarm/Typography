@@ -239,7 +239,16 @@ namespace Typography.OpenFont
                 case RoundMode.Super45: SetSuperRound(Sqrt2Over2); break;
             }
 
-            Execute(new InstructionStream(instructions), false, false);
+            try
+            {
+                Execute(new InstructionStream(instructions), false, false);
+            }
+            catch (InvalidFontException)
+            {
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("invalid_font_ex:");
+#endif
+            }
         }
 
 #if DEBUG
