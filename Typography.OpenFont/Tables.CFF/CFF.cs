@@ -1657,7 +1657,7 @@ namespace Typography.OpenFont.CFF
             this.Name = name;
             _operatorOperandKind = operatorOperandKind;
         }
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public static CFFOperator GetOperatorByKey(byte b0, byte b1)
         {

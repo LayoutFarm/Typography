@@ -77,10 +77,8 @@ namespace Typography.OpenFont.Tables
                 this.featureTag = featureTag;
                 this.offset = offset;
             }
-            public string FeatureName
-            {
-                get { return Utils.TagToString(featureTag); }
-            }
+
+            public string FeatureName => Utils.TagToString(featureTag);
 #if DEBUG
             public override string ToString()
             {

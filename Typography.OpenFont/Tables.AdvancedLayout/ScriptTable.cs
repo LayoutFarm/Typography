@@ -68,10 +68,7 @@ namespace Typography.OpenFont.Tables
         public LangSysTable defaultLang;
         public LangSysTable[] langSysTables;
         public uint scriptTag;
-        public string ScriptTagName
-        {
-            get { return Utils.TagToString(this.scriptTag); }
-        }
+        public string ScriptTagName => Utils.TagToString(this.scriptTag);
 
         public static ScriptTable CreateFrom(BinaryReader reader, long beginAt)
         {
