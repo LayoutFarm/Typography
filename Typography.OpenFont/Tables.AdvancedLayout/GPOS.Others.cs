@@ -42,9 +42,9 @@ namespace Typography.OpenFont.Tables
                 _pairSets = new PairSet[rowCount];
                 for (int i = 0; i < rowCount; ++i)
                 {
-                    //GlyphID 	SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
-                    //ValueRecord 	Value1 	Positioning data for the first glyph in the pair
-                    //ValueRecord 	Value2 	Positioning data for the second glyph in the pair
+                    //GlyphID 	    SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
+                    //ValueRecord 	Value1 	        Positioning data for the first glyph in the pair
+                    //ValueRecord 	Value2 	        Positioning data for the second glyph in the pair
                     ushort secondGlyph = reader.ReadUInt16();
                     ValueRecord v1 = ValueRecord.CreateFrom(reader, v1format);
                     ValueRecord v2 = ValueRecord.CreateFrom(reader, v2format);
@@ -57,6 +57,7 @@ namespace Typography.OpenFont.Tables
                 int j = _pairSets.Length;
                 for (int i = 0; i < j; ++i)
                 {
+                    //TODO: binary search?
                     if (_pairSets[i].secondGlyph == secondGlyphIndex)
                     {
                         //found
@@ -114,7 +115,7 @@ namespace Typography.OpenFont.Tables
             public ushort XAdvDevice;
             public ushort YAdvDevice;
 
-            public ushort valueFormat;
+            ushort valueFormat;
             public void ReadFrom(BinaryReader reader, ushort valueFormat)
             {
                 this.valueFormat = valueFormat;
@@ -178,10 +179,48 @@ namespace Typography.OpenFont.Tables
 
             public static ValueRecord CreateFrom(BinaryReader reader, ushort valueFormat)
             {
+                if (valueFormat == 0)
+                    return null;//empty
+
                 var v = new ValueRecord();
                 v.ReadFrom(reader, valueFormat);
                 return v;
             }
+
+#if DEBUG
+            public override string ToString()
+            {
+                StringBuilder stbuilder = new StringBuilder();
+                bool appendComma = false;
+                if (XPlacement != 0)
+                {
+                    stbuilder.Append("XPlacement=" + XPlacement);
+                    appendComma = true;
+                }
+
+                
+
+                if (YPlacement != 0)
+                {
+                    if (appendComma) { stbuilder.Append(','); }
+                    stbuilder.Append(" YPlacement=" + YPlacement);
+                    appendComma = true;
+                }
+                if (XAdvance != 0)
+                {
+                    if (appendComma) { stbuilder.Append(','); }
+                    stbuilder.Append(" XAdvance=" + XAdvance);
+                    appendComma = true;
+                }
+                if (YAdvance != 0)
+                {
+                    if (appendComma) { stbuilder.Append(','); }
+                    stbuilder.Append(" YAdvance=" + YAdvance);
+                    appendComma = true;
+                } 
+                return stbuilder.ToString();
+            }
+#endif
         }
 
 

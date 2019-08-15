@@ -150,11 +150,11 @@ namespace Typography.OpenFont.Tables
                     case 1:
                         {
                             //Single Adjustment Positioning: Format 1
-                            //Value 	    Type 	    Description
-                            //uint16 	    PosFormat 	Format identifier-format = 1
-                            //Offset16 	    Coverage 	Offset to Coverage table-from beginning of SinglePos subtable
-                            //uint16 	    ValueFormat Defines the types of data in the ValueRecord
-                            //ValueRecord 	Value 	    Defines positioning value(s)-applied to all glyphs in the Coverage table 
+                            //Value 	    Type 	        Description
+                            //uint16 	    PosFormat 	    Format identifier-format = 1
+                            //Offset16 	    Coverage 	    Offset to Coverage table-from beginning of SinglePos subtable
+                            //uint16 	    ValueFormat     Defines the types of data in the ValueRecord
+                            //ValueRecord 	Value 	        Defines positioning value(s)-applied to all glyphs in the Coverage table 
                             ushort coverage = reader.ReadUInt16();
                             ushort valueFormat = reader.ReadUInt16();
                             var subTable = new LkSubTableType1(ValueRecord.CreateFrom(reader, valueFormat));
@@ -204,29 +204,173 @@ namespace Typography.OpenFont.Tables
                     //find marker
                     CoverageTable covTable = this.CoverageTable;
                     int lim = inputGlyphs.Count - 1;
-                    for (int i = 0; i < lim; ++i) //start at 0
+                    for (int i = 0; i < lim; ++i)
                     {
-                        ushort glyph_advW;
-                        int firstGlyphFound = covTable.FindPosition(inputGlyphs.GetGlyph(i, out glyph_advW));
+                        int firstGlyphFound = covTable.FindPosition(inputGlyphs.GetGlyph(i, out ushort glyph_advW));
                         if (firstGlyphFound > -1)
                         {
                             //test this with Palatino A-Y sequence
                             PairSetTable pairSet = _pairSetTables[firstGlyphFound];
-                            //check second glyph 
-                            ushort second_glyph_w;
-                            ushort second_glyph_index = inputGlyphs.GetGlyph(i + 1, out second_glyph_w);
-                            PairSet foundPairSet;
-                            if (pairSet.FindPairSet(second_glyph_index, out foundPairSet))
+
+                            //check second glyph  
+                            ushort second_glyph_index = inputGlyphs.GetGlyph(i + 1, out ushort second_glyph_w);
+
+                            if (pairSet.FindPairSet(second_glyph_index, out PairSet foundPairSet))
                             {
                                 ValueRecord v1 = foundPairSet.value1;
                                 ValueRecord v2 = foundPairSet.value2;
-                                //TODO: recheck for vertical writing ...
-                                inputGlyphs.AppendGlyphAdvance(i, v1.XAdvance, 0);
-                                inputGlyphs.AppendGlyphAdvance(i + 1, v2.XAdvance, 0);
+                                //TODO: recheck for vertical writing ... (YAdvance)
+                                if (v1 != null)
+                                {
+                                    inputGlyphs.AppendGlyphAdvance(i, v1.XAdvance, 0);
+                                }
+
+                                if (v2 != null)
+                                {
+                                    inputGlyphs.AppendGlyphAdvance(i + 1, v2.XAdvance, 0);
+                                }
+
                             }
                         }
                     }
                 }
+            }
+
+            /// <summary>
+            /// Lookup Type2, Format2: Class pair adjustment
+            /// </summary>
+            class LkSubTableType2Fmt2 : LookupSubTable
+            {
+                //Format 2 defines a pair as a set of two glyph classes and modifies the positions of all the glyphs in a class
+                readonly Lk2Class1Record[] _class1records;
+                readonly ClassDefTable _class1Def;
+                readonly ClassDefTable _class2Def;
+
+                public LkSubTableType2Fmt2(Lk2Class1Record[] class1records, ClassDefTable class1Def, ClassDefTable class2Def)
+                {
+                    _class1records = class1records;
+                    _class1Def = class1Def;
+                    _class2Def = class2Def;
+                }
+                public CoverageTable CoverageTable { get; set; }
+                public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
+                {
+
+                    //coverage
+                    //The Coverage table lists the indices of the first glyphs that may appear in each glyph pair.
+                    //More than one pair may begin with the same glyph, 
+                    //but the Coverage table lists the glyph index only once
+
+                    CoverageTable covTable = this.CoverageTable;
+                    int lim = inputGlyphs.Count - 1;
+                    for (int i = 0; i < lim; ++i) //start at 0
+                    {
+                        ushort glyph1_index = inputGlyphs.GetGlyph(i, out ushort glyph_advW);
+                        int record1Index = covTable.FindPosition(glyph1_index);
+                        if (record1Index > -1)
+                        {
+                            int class1_no = _class1Def.GetClassValue(glyph1_index);
+                            if (class1_no > -1)
+                            {
+                                ushort glyph2_index = inputGlyphs.GetGlyph(i + 1, out ushort glyph_advW2);
+                                int class2_no = _class2Def.GetClassValue(glyph2_index);
+
+                                if (class2_no > -1)
+                                {
+                                    Lk2Class1Record class1Rec = _class1records[class1_no];
+                                    //TODO: recheck for vertical writing ... (YAdvance)
+                                    Lk2Class2Record pair = class1Rec.class2Records[class2_no];
+
+                                    ValueRecord v1 = pair.value1;
+                                    ValueRecord v2 = pair.value2;
+
+                                    if (v1 != null && v1.XAdvance != 0)
+                                    {
+                                        inputGlyphs.AppendGlyphAdvance(i, v1.XAdvance, 0);
+                                    }
+
+                                    if (v2 != null)
+                                    {
+                                        inputGlyphs.AppendGlyphAdvance(i + 1, v2.XAdvance, 0);
+                                    }
+                                }
+                            } 
+                        }
+
+                    }
+                }
+            }
+            struct Lk2Class1Record
+            {
+                // a Class1Record enumerates all pairs that contain a particular class as a first component.
+                //The Class1Record array stores all Class1Records according to class value.
+
+                //Note: Class1Records are not tagged with a class value identifier.
+                //Instead, the index value of a Class1Record in the array defines the class value represented by the record.
+                //For example, the first Class1Record enumerates pairs that begin with a Class 0 glyph,
+                //the second Class1Record enumerates pairs that begin with a Class 1 glyph, and so on.
+
+                //Each Class1Record contains an array of Class2Records (Class2Record), which also are ordered by class value. 
+                //One Class2Record must be declared for each class in the ClassDef2 table, including Class 0.
+                //--------------------------------
+                //Class1Record
+                //Value 	Type 	Description
+                //struct 	Class2Record[Class2Count] 	Array of Class2 records-ordered by Class2
+                //--------------------------------
+                public readonly Lk2Class2Record[] class2Records;
+                public Lk2Class1Record(Lk2Class2Record[] class2Records)
+                {
+                    this.class2Records = class2Records;
+                }
+                //#if DEBUG
+                //                public override string ToString()
+                //                {
+                //                    System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();
+                //                    for (int i = 0; i < class2Records.Length; ++i)
+                //                    {
+                //                        Lk2Class2Record rec = class2Records[i];
+                //                        string str = rec.ToString();
+
+                //                        if (str != "value1:,value2:")
+                //                        {
+                //                            //skip
+                //                            stbuilder.Append("i=" + i + "=>" + str + "    ");
+                //                        }
+                //                    }
+                //                    return stbuilder.ToString();
+                //                    //return base.ToString();
+                //                }
+                //#endif
+            }
+
+            class Lk2Class2Record
+            {
+                //A Class2Record consists of two ValueRecords,
+                //one for the first glyph in a class pair (Value1) and one for the second glyph (Value2).
+                //If the PairPos subtable has a value of zero (0) for ValueFormat1 or ValueFormat2, 
+                //the corresponding record (ValueRecord1 or ValueRecord2) will be empty.
+
+                //Class2Record
+                //--------------------------------
+                //Value 	    Type 	Description
+                //ValueRecord 	Value1 	Positioning for first glyph-empty if ValueFormat1 = 0
+                //ValueRecord 	Value2 	Positioning for second glyph-empty if ValueFormat2 = 0
+                //--------------------------------
+                public readonly ValueRecord value1;//null= empty
+                public readonly ValueRecord value2;//null= empty
+
+                public Lk2Class2Record(ValueRecord value1, ValueRecord value2)
+                {
+                    this.value1 = value1;
+                    this.value2 = value2;
+                }
+
+#if DEBUG
+                public override string ToString()
+                {
+                    return "value1:" + (value1?.ToString()) + ",value2:" + value2?.ToString();
+                }
+#endif
             }
 
             /// <summary>
@@ -290,7 +434,7 @@ namespace Typography.OpenFont.Tables
                 //A PairValueRecord specifies the second glyph in a pair (SecondGlyph) and defines a ValueRecord for each glyph (Value1 and Value2). 
                 //If ValueFormat1 is set to zero (0) in the PairPos subtable, ValueRecord1 will be empty; similarly, if ValueFormat2 is 0, Value2 will be empty.
 
-                //Example 4 at the end of this chapter shows a PairPosFormat1 subtable that defines two cases of pair kerning.
+
                 //PairValueRecord
                 //Value 	    Type 	        Description
                 //GlyphID 	    SecondGlyph 	GlyphID of second glyph in the pair-first glyph is listed in the Coverage table
@@ -323,7 +467,7 @@ namespace Typography.OpenFont.Tables
                 //If the PairPos subtable has a value of zero (0) for ValueFormat1 or ValueFormat2, 
                 //the corresponding record (ValueRecord1 or ValueRecord2) will be empty.
 
-                //Example 5 at the end of this chapter demonstrates pair kerning with glyph classes in a PairPosFormat2 subtable.
+
                 //Class2Record
                 //--------------------------------
                 //Value 	    Type 	Description
@@ -360,7 +504,6 @@ namespace Typography.OpenFont.Tables
                         }
                     case 2:
                         {
-                            //.... TODO: implement this
                             ushort coverage = reader.ReadUInt16();
                             ushort value1Format = reader.ReadUInt16();
                             ushort value2Format = reader.ReadUInt16();
@@ -369,17 +512,28 @@ namespace Typography.OpenFont.Tables
                             ushort class1Count = reader.ReadUInt16();
                             ushort class2Count = reader.ReadUInt16();
 
+                            Lk2Class1Record[] class1Records = new Lk2Class1Record[class1Count];
                             for (int c1 = 0; c1 < class1Count; ++c1)
                             {
                                 //for each c1 record
+
+                                Lk2Class2Record[] class2Records = new Lk2Class2Record[class2Count];
                                 for (int c2 = 0; c2 < class2Count; ++c2)
                                 {
-
+                                    class2Records[c2] = new Lk2Class2Record(
+                                          ValueRecord.CreateFrom(reader, value1Format),
+                                          ValueRecord.CreateFrom(reader, value2Format));
                                 }
-
+                                class1Records[c1] = new Lk2Class1Record(class2Records);
                             }
 
-                            return new UnImplementedLookupSubTable("GPOS Lookup Table Type 2 Format 2");
+                            var subTable = new LkSubTableType2Fmt2(class1Records,
+                                                ClassDefTable.CreateFrom(reader, subTableStartAt + classDef1_offset),
+                                                ClassDefTable.CreateFrom(reader, subTableStartAt + classDef2_offset));
+
+
+                            subTable.CoverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
+                            return subTable;
                         }
                 }
             }

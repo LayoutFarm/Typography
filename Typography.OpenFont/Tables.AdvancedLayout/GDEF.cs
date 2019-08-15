@@ -204,10 +204,17 @@ namespace Typography.OpenFont.Tables
                     {
                         ushort startGlyph = classDef.startGlyph;
                         ushort[] classValues = classDef.classValueArray;
-                        int len = classValues.Length;
                         int gIndex = startGlyph;
-                        for (int i = 0; i < len; ++i)
+                        for (int i = 0; i < classValues.Length; ++i)
                         {
+#if DEBUG
+                            ushort classV = classValues[i];
+                            if (classV > (ushort)GlyphClassKind.Component)
+                            {
+
+                            }
+#endif
+
                             inputGlyphs[gIndex].GlyphClass = (GlyphClassKind)classValues[i];
                             gIndex++;
                         }
@@ -217,10 +224,18 @@ namespace Typography.OpenFont.Tables
                 case 2:
                     {
                         ClassDefTable.ClassRangeRecord[] records = classDef.records;
-                        int len = records.Length;
-                        for (int n = 0; n < len; ++n)
+                        for (int n = 0; n < records.Length; ++n)
                         {
                             ClassDefTable.ClassRangeRecord rec = records[n];
+
+#if DEBUG
+
+                            if (rec.classNo > (ushort)GlyphClassKind.Component)
+                            {
+
+                            }
+#endif
+
                             GlyphClassKind glyphKind = (GlyphClassKind)rec.classNo;
                             for (int i = rec.startGlyphId; i <= rec.endGlyphId; ++i)
                             {
