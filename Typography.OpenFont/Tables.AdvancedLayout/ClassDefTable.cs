@@ -114,7 +114,7 @@ namespace Typography.OpenFont.Tables
                     {
                         classDefTable.startGlyph = reader.ReadUInt16();
                         ushort glyphCount = reader.ReadUInt16();
-                        classDefTable.classValueArray = Utils.ReadUInt16Array(reader, glyphCount); 
+                        classDefTable.classValueArray = Utils.ReadUInt16Array(reader, glyphCount);
                     }
                     break;
                 case 2:
@@ -162,8 +162,36 @@ namespace Typography.OpenFont.Tables
 #endif
         }
 
-
-
+        public int GetClassValue(int glyphIndex)
+        {
+            switch (Format)
+            {
+                default: throw new NotSupportedException();
+                case 1:
+                    {
+                        if (glyphIndex >= startGlyph &&
+                            glyphIndex < classValueArray.Length)
+                        {
+                            return classValueArray[startGlyph + (glyphIndex - startGlyph)];
+                        }
+                        return -1;
+                    }
+                case 2:
+                    {
+                        //TODO: review a proper method here again
+                        //esp. binary search
+                        for (int i = 0; i < records.Length; ++i)
+                        {
+                            ClassRangeRecord rec = records[i];                            
+                            if (glyphIndex >= rec.startGlyphId && glyphIndex <= rec.endGlyphId)
+                            {
+                                return rec.classNo;
+                            }
+                        }
+                        return -1;
+                    }
+            }
+        }
     }
 
 }
