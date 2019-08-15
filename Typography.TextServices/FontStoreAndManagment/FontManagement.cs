@@ -552,17 +552,9 @@ namespace Typography.FontManagement
             {
                 CustomSystemFontListLoader(fontCollection);
                 return;
-            }
-
-            LoadFontsFromFolder(fontCollection, @"D:\projects\Typography\Demo\Windows\TestFonts");
-            LoadFontsFromFolder(fontCollection, @"D:\projects\Typography\Demo\Windows\Test_PrivateFonts");
-            //-----
-            return;
-
+            } 
             // Windows system fonts
-            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
-
-
+            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts"); 
             // These are reasonable places to look for fonts on Linux
             LoadFontsFromFolder(fontCollection, "/usr/share/fonts", true);
             LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", true);
