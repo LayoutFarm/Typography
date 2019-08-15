@@ -337,13 +337,15 @@ namespace Typography.OpenFont
             //--------------
 
 
-            Kern kern = ReadTableIfExists(tables, input, new Kern());
+            Kern kern = ReadTableIfExists(tables, input, new Kern()); //deprecated
             //--------------
             //advanced typography
             GDEF gdef = ReadTableIfExists(tables, input, new GDEF());
             GSUB gsub = ReadTableIfExists(tables, input, new GSUB());
             GPOS gpos = ReadTableIfExists(tables, input, new GPOS());
             BASE baseTable = ReadTableIfExists(tables, input, new BASE());
+            JSTF jstf = ReadTableIfExists(tables, input, new JSTF());
+
             COLR colr = ReadTableIfExists(tables, input, new COLR());
             CPAL cpal = ReadTableIfExists(tables, input, new CPAL());
             VerticalHeader vhea = ReadTableIfExists(tables, input, new VerticalHeader());
@@ -474,13 +476,13 @@ namespace Typography.OpenFont
         static T ReadTableIfExists<T>(TableEntryCollection tables, BinaryReader reader, T resultTable)
             where T : TableEntry
         {
-             
+
             if (tables.TryGetTable(resultTable.Name, out TableEntry found))
             {
                 //found table name
                 //check if we have read this table or not
                 if (found is UnreadTableEntry unreadTableEntry)
-                {                    
+                {
                     //set header before actal read
                     resultTable.Header = found.Header;
                     if (unreadTableEntry.HasCustomContentReader)
