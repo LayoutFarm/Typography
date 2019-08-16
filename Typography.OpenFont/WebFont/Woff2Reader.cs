@@ -315,6 +315,7 @@ namespace Typography.WebFont
             {
                 glyphs[i] = BuildSimpleGlyphStructure(reader,
                     ref allGlyphs[i],
+                    glyfTable._emptyGlyph,
                     pntPerContours, ref pntContourIndex,
                     flagStream, ref curFlagsIndex);
             }
@@ -347,7 +348,7 @@ namespace Typography.WebFont
                 for (ushort i = 0; i < j; ++i)
                 {
                     int compositeGlyphIndex = compositeGlyphs[i];
-                    glyphs[compositeGlyphIndex] = ReadCompositeGlyph(glyphs, reader, i);
+                    glyphs[compositeGlyphIndex] = ReadCompositeGlyph(glyphs, reader, i, glyfTable._emptyGlyph);
                 }
             }
 
@@ -500,6 +501,7 @@ namespace Typography.WebFont
 
         static Glyph BuildSimpleGlyphStructure(BinaryReader glyphStreamReader,
             ref TempGlyph tmpGlyph,
+            Glyph emptyGlyph,
             ushort[] pntPerContours, ref int pntContourIndex,
             byte[] flagStream, ref int flagStreamIndex)
         {
@@ -530,7 +532,7 @@ namespace Typography.WebFont
             //    5) Read instructionLength bytes from instructionStream, and store these in the reconstituted glyph as instructions. 
 
 
-            if (tmpGlyph.numContour == 0) return Glyph.Empty;
+            if (tmpGlyph.numContour == 0) return emptyGlyph;
             if (tmpGlyph.numContour < 0)
             {
                 //composite glyph,
@@ -727,7 +729,7 @@ namespace Typography.WebFont
             return Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_INSTRUCTIONS);
         }
 
-        static Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, ushort compositeGlyphIndex)
+        static Glyph ReadCompositeGlyph(Glyph[] createdGlyphs, BinaryReader reader, ushort compositeGlyphIndex, Glyph emptyGlyph)
         {
 
             //Decoding of Composite Glyphs
@@ -758,7 +760,7 @@ namespace Typography.WebFont
                 {
                     // This glyph is not read yet, resolve it first!
                     long storedOffset = reader.BaseStream.Position;
-                    Glyph missingGlyph = ReadCompositeGlyph(createdGlyphs, reader, glyphIndex);
+                    Glyph missingGlyph = ReadCompositeGlyph(createdGlyphs, reader, glyphIndex, emptyGlyph);
                     createdGlyphs[glyphIndex] = missingGlyph;
                     reader.BaseStream.Position = storedOffset;
                 }
@@ -915,7 +917,7 @@ namespace Typography.WebFont
             }
 
 
-            return finalGlyph ?? Glyph.Empty;
+            return finalGlyph ?? emptyGlyph;
         }
 
         struct TripleEncodingRecord

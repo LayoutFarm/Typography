@@ -184,10 +184,7 @@ namespace Typography.OpenFont
         public short MinY => _bounds.YMin;
         public short MaxY => _bounds.YMax;
 
-        //--------------------
-        //both ttf and cff
-        public static readonly Glyph Empty = new Glyph(new GlyphPointF[0], new ushort[0], Bounds.Zero, null, 0);
-
+       
 #if DEBUG
         public readonly int dbugId;
         static int s_debugTotalId;

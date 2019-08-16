@@ -11,6 +11,12 @@ namespace Typography.OpenFont.Tables
         //
         Glyph[] _glyphs;
         GlyphLocations _glyphLocations;
+
+        //--------------------
+        //both ttf and cff
+        //we don't share EmptyGlyph between typefaces
+        internal readonly Glyph _emptyGlyph = new Glyph(new GlyphPointF[0], new ushort[0], Bounds.Zero, null, 0);
+
         public Glyf(GlyphLocations glyphLocations)
         {
             _glyphLocations = glyphLocations;
@@ -59,7 +65,7 @@ namespace Typography.OpenFont.Tables
                 }
                 else
                 {
-                    _glyphs[i] = Glyph.Empty;
+                    _glyphs[i] = _emptyGlyph;
                 }
             }
 
@@ -514,7 +520,7 @@ namespace Typography.OpenFont.Tables
             //------------------------------------------------------------ 
 
 
-            return finalGlyph ?? Glyph.Empty;
+            return finalGlyph ?? _emptyGlyph;
         }
     }
 }
