@@ -6,72 +6,7 @@ using System.Collections.Generic;
 
 namespace Msdfgen
 {
-    public struct FloatRGB
-    {
-        public float r, g, b;
-        public FloatRGB(float r, float g, float b)
-        {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-        }
-#if DEBUG
-        public override string ToString()
-        {
-            return r + "," + g + "," + b;
-        }
-#endif
-    }
-    public struct Pair<T, U>
-    {
-        public T first;
-        public U second;
-        public Pair(T first, U second)
-        {
-            this.first = first;
-            this.second = second;
-        }
-    }
-    public class FloatBmp
-    {
-        float[] buffer;
-        public FloatBmp(int w, int h)
-        {
-            this.Width = w;
-            this.Height = h;
-            buffer = new float[w * h];
-        }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public void SetPixel(int x, int y, float value)
-        {
-            this.buffer[x + (y * Width)] = value;
-        }
-        public float GetPixel(int x, int y)
-        {
-            return this.buffer[x + (y * Width)];
-        }
-    }
-    public class FloatRGBBmp
-    {
-        FloatRGB[] buffer;
-        public FloatRGBBmp(int w, int h)
-        {
-            this.Width = w;
-            this.Height = h;
-            buffer = new FloatRGB[w * h];
-        }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public void SetPixel(int x, int y, FloatRGB value)
-        {
-            this.buffer[x + (y * Width)] = value;
-        }
-        public FloatRGB GetPixel(int x, int y)
-        {
-            return this.buffer[x + (y * Width)];
-        }
-    }
+
     public static class SdfGenerator
     {
         //siged distance field generator
@@ -204,13 +139,23 @@ namespace Msdfgen
         }
 
     }
-    struct MultiDistance
-    {
-        public double r, g, b;
-        public double med;
-    }
+
+
     public static class MsdfGenerator
     {
+        //multi-channel signed distance field generator
+        struct EdgePoint
+        {
+            public SignedDistance minDistance;
+            public EdgeHolder nearEdge;
+            public double nearParam;
+        }
+        struct MultiDistance
+        {
+            public double r, g, b;
+            public double med;
+        }
+
         static float median(float a, float b, float c)
         {
             return Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c));
@@ -264,7 +209,8 @@ namespace Msdfgen
         }
         static void msdfErrorCorrection(FloatRGBBmp output, Vector2 threshold)
         {
-            List<Pair<int, int>> clashes = new List<Msdfgen.Pair<int, int>>();
+            //Pair<int,int> is List<Point>
+            List<Pair<int, int>> clashes = new List<Pair<int, int>>();
             int w = output.Width, h = output.Height;
             for (int y = 0; y < h; ++y)
             {
@@ -285,7 +231,8 @@ namespace Msdfgen
                 Pair<int, int> clash = clashes[i];
                 FloatRGB pixel = output.GetPixel(clash.first, clash.second);
                 float med = median(pixel.r, pixel.g, pixel.b);
-                pixel.r = med; pixel.g = med; pixel.b = med;
+                //set new value back
+                output.SetPixel(clash.first, clash.second, new FloatRGB(med, med, med));
             }
             //for (std::vector<std::pair<int, int>>::const_iterator clash = clashes.begin(); clash != clashes.end(); ++clash)
             //{
@@ -294,14 +241,8 @@ namespace Msdfgen
             //    pixel.r = med, pixel.g = med, pixel.b = med;
             //}
         }
-        //multi-channel signed distance field generator
-        struct EdgePoint
-        {
-            public SignedDistance minDistance;
-            public EdgeHolder nearEdge;
-            public double nearParam;
-        }
-        public static int[] ConvertToIntBmp(Msdfgen.FloatRGBBmp input)
+
+        public static int[] ConvertToIntBmp(FloatRGBBmp input)
         {
             int height = input.Height;
             int width = input.Width;
@@ -313,20 +254,20 @@ namespace Msdfgen
                 {
                     //a b g r
                     //----------------------------------
-                    Msdfgen.FloatRGB pixel = input.GetPixel(x, y);
+                    FloatRGB pixel = input.GetPixel(x, y);
                     //a b g r
                     //for big-endian color
                     //int abgr = (255 << 24) |
-                    //    Msdfgen.Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
-                    //    Msdfgen.Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
-                    //    Msdfgen.Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
+                    //    Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
+                    //    Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                    //    Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
 
                     //for little-endian color
 
                     int abgr = (255 << 24) |
-                        Msdfgen.Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
-                        Msdfgen.Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
-                        Msdfgen.Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
+                        Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
+                        Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                        Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
 
                     output[(y * width) + x] = abgr;
                     //----------------------------------
@@ -337,6 +278,8 @@ namespace Msdfgen
             }
             return output;
         }
+
+
         public static void generateMSDF(FloatRGBBmp output, Shape shape, double range, Vector2 scale, Vector2 translate, double edgeThreshold)
         {
             List<Contour> contours = shape.contours;

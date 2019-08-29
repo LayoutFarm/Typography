@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
-
-using Typography.TextLayout;
 using Typography.FontManagement;
 using System.IO;
 
@@ -233,13 +230,13 @@ namespace Typography.TextServices
             //check if we use cache feature or not
             MeasuredStringBox measureStringBox = _glyphLayout.LayoutAndMeasureString(str, startAt, len, _fontSizeInPts);
             w = (int)measureStringBox.width;
-            h = (int)Math.Ceiling(measureStringBox.CalculateLineHeight(_currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts)));
+            h = (int)Math.Ceiling(measureStringBox.ClipHeightInPx);
         }
         public void MeasureString(char[] str, int startAt, int len, int limitWidth, out int charFit, out int charFitWidth)
         {
             MeasuredStringBox measureStringBox = _glyphLayout.LayoutAndMeasureString(str, startAt, len, _fontSizeInPts, limitWidth);
             int w = (int)measureStringBox.width;
-            int h = (int)Math.Ceiling(measureStringBox.CalculateLineHeight(_currentTypeface.CalculateScaleToPixelFromPointSize(_fontSizeInPts)));
+            int h = (int)Math.Ceiling(measureStringBox.ClipHeightInPx);
             charFit = measureStringBox.StopAt;
             charFitWidth = (int)Math.Ceiling(measureStringBox.width);
         }
@@ -449,17 +446,30 @@ namespace Typography.TextServices
         {
             //load 
             //check if we have create this typeface or not 
-            Typeface typeface;
-            if (!_loadedTypefaces.TryGetValue(installedFont, out typeface))
+
+            if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface typeface))
             {
-                //TODO: review how to load font here
-                using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
-                { 
-                    var reader = new OpenFontReader();
-                    typeface = reader.Read(fs, installedFont.ActualStreamOffset);
-                    typeface.Filename = installedFont.FontPath; 
+                //TODO: review how to load font here 
+                if (Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader != null)
+                {
+                    using (var fontStream = Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader(installedFont.FontPath))
+                    {
+                        var reader = new OpenFontReader();
+                        typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
+                        typeface.Filename = installedFont.FontPath;
+                    }
+                }
+                else
+                {
+                    using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
+                    {
+                        var reader = new OpenFontReader();
+                        typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                        typeface.Filename = installedFont.FontPath;
+                    }
                 }
                 return _loadedTypefaces[installedFont] = typeface;
+
             }
             return typeface;
         }
