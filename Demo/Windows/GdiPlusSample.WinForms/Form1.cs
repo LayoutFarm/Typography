@@ -7,7 +7,8 @@ using System.Windows.Forms;
 using Typography.TextLayout;
 using Typography.Contours;
 using Typography.TextServices;
-
+using Typography.OpenFont;
+using Typography.OpenFont.Extensions;
 namespace SampleWinForms
 {
     public partial class Form1 : Form
@@ -179,16 +180,19 @@ namespace SampleWinForms
         {
             bool flipY = chkFlipY.Checked;
 
+           
+
             //set some Gdi+ props... 
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             g.Clear(Color.White);
 
             Typography.OpenFont.Typeface typeface = _currentTextPrinter.Typeface;
             Typography.OpenFont.TypefaceExtension2.UpdateAllCffGlyphBounds(typeface);
+            
 
-            float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints);
-            int lineSpacing = (int)System.Math.Ceiling(_currentTextPrinter.FontLineSpacingPx);
-
+            float pxscale = typeface.CalculateScaleToPixelFromPointSize(_currentTextPrinter.FontSizeInPoints); 
+            int lineSpacing = (int)System.Math.Ceiling((double)typeface.CalculateLineSpacing(LineSpacingChoice.TypoMetric) * pxscale);
+            
 
             if (flipY)
             {
@@ -204,8 +208,10 @@ namespace SampleWinForms
             //--------------------------------  
             _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
+            _currentTextPrinter.UpdateGlyphLayoutSettings();
+
             //render at specific pos
-            float x_pos = 0, y_pos = lineSpacing * 2; //start 1st line
+            float x_pos = 0, y_pos = lineSpacing * 2; 
 
             char[] textBuffer = txtInputChar.Text.ToCharArray();
 
@@ -237,16 +243,12 @@ namespace SampleWinForms
                   y_pos
              );
 
-            //Example 3: MeasureString   
-
+            //Example 3: MeasureString    
             UnscaledGlyphPlanList glyphPlans = new UnscaledGlyphPlanList();
-
             _currentTextPrinter.GlyphLayoutMan.GenerateUnscaledGlyphPlans(glyphPlans);
-
             MeasuredStringBox strBox = _currentTextPrinter.GlyphLayoutMan.LayoutAndMeasureString(
               textBuffer, 0, textBuffer.Length,
               _currentTextPrinter.FontSizeInPoints);
-
 
             int j = glyphPlans.Count;
             float backup_xpos = x_pos;
@@ -275,8 +277,11 @@ namespace SampleWinForms
 
 
             float x_pos2 = x_pos + strBox.width + 10;
-            g.DrawRectangle(Pens.Black, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.CalculateLineHeight());
-            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.AscendingInPx - strBox.DescendingInPx);
+
+
+            g.DrawRectangle(Pens.Black, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.ClipHeightInPx);
+            g.DrawRectangle(Pens.Red, x_pos, y_pos + strBox.DescendingInPx, strBox.width, strBox.LineSpaceInPx);
+
             g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
             g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.AscendingInPx, x_pos2, y_pos + strBox.AscendingInPx);//ascending
@@ -285,6 +290,7 @@ namespace SampleWinForms
             ////------------
             ////draw another line (for reference)
             y_pos -= lineSpacing;//next line
+
 
             _currentTextPrinter.FillColor = Color.Black;
 

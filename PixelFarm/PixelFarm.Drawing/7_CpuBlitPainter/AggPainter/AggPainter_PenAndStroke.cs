@@ -39,15 +39,12 @@ namespace PixelFarm.CpuBlit
         }
         public LineRenderingTechnique LineRenderingTech
         {
-            get { return _lineRenderingTech; }
+            get => _lineRenderingTech;
             set
             {
 
-                if (value == LineRenderingTechnique.OutlineAARenderer &&
-                    _outlineRas == null)
+                if (value == LineRenderingTechnique.OutlineAARenderer && _outlineRas == null)
                 {
-
-
                     _lineProfileAA = new Rasterization.Lines.LineProfileAnitAlias(this.StrokeWidth, null);
 
                     var blender = new PixelBlenderBGRA();

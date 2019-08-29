@@ -63,11 +63,11 @@
             // 
             // cmdBuildMsdfTexture
             // 
-            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1266, 445);
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1266, 430);
             this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
-            this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 28);
+            this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 43);
             this.cmdBuildMsdfTexture.TabIndex = 22;
-            this.cmdBuildMsdfTexture.Text = "Make MsdfTexture";
+            this.cmdBuildMsdfTexture.Text = "Goto MsdfTextureForm";
             this.cmdBuildMsdfTexture.UseVisualStyleBackColor = true;
             this.cmdBuildMsdfTexture.Click += new System.EventHandler(this.cmdBuildMsdfTexture_Click);
             // 

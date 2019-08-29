@@ -49,8 +49,8 @@ namespace Tesselate
         public class Node
         {
             public DictKey Key = new DictKey();
-            public Node next;
-            public Node prev;
+            internal Node next;
+            internal Node prev;
             public void Delete()
             {
                 this.next.prev = this.prev;
@@ -59,40 +59,40 @@ namespace Tesselate
         }
         public Dictionary(Tesselator tesselator)
         {
-            Node nodeHead;
-            nodeHead = _head;
+
+            Node nodeHead = _head;
             nodeHead.Key = null;
             nodeHead.next = nodeHead;
             nodeHead.prev = nodeHead;
             _tess = tesselator;
         }
 
-        public static void dictDeleteDict(Dictionary dict)
-        {
-            Node node, next;
-            for (node = dict._head.next; node != dict._head; node = next)
-            {
-                next = node.next;
-                node = null;
-            }
+        //public static void dictDeleteDict(Dictionary dict)
+        //{
+        //    Node node, next;
+        //    for (node = dict._head.next; node != dict._head; node = next)
+        //    {
+        //        next = node.next;
+        //        node = null;
+        //    }
 
-            dict = null;
-        }
+        //    dict = null;
+        //}
 
-        public Dictionary.Node Insert(DictKey k)
+        public Node Insert(DictKey k)
         {
             return this.InsertBefore(_head, k);
         }
 
         public Node InsertBefore(Node node, DictKey key)
         {
-            Node newNode;
+
             do
             {
                 node = node.prev;
-            } while (node.Key != null && !ActiveRegion.EdgeLeq(_tess, node.Key, key));
+            } while (node.Key != null && !ActiveRegion.EdgeLeq(_tess.currentSweepVertex, node.Key, key));
 
-            newNode = new Node();
+            var newNode = new Node();
             newNode.Key = key;
             newNode.next = node.next;
             node.next.prev = newNode;
@@ -112,7 +112,7 @@ namespace Tesselate
             do
             {
                 node = node.next;
-            } while (node.Key != null && !ActiveRegion.EdgeLeq(dict._tess, key, node.Key));
+            } while (node.Key != null && !ActiveRegion.EdgeLeq(dict._tess.currentSweepVertex, key, node.Key));
             return node;
         }
     }

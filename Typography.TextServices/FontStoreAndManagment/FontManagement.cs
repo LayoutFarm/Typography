@@ -242,7 +242,7 @@ namespace Typography.FontManagement
                 {
                     var reader = new OpenFontReader();
                     PreviewFontInfo previewFont = reader.ReadPreview(stream);
-                    if (string.IsNullOrEmpty(previewFont.Name))
+                    if (previewFont == null || string.IsNullOrEmpty(previewFont.Name))
                     {
                         //err!
                         return false;
@@ -503,6 +503,15 @@ namespace Typography.FontManagement
 
     public static class InstalledTypefaceCollectionExtensions
     {
+
+        public delegate R MyFunc<T1, T2, R>(T1 t1, T2 t2);
+        public delegate R MyFunc<T, R>(T t);
+
+        public static Action<InstalledTypefaceCollection> CustomSystemFontListLoader;
+
+        public static MyFunc<string, Stream> CustomFontStreamLoader;
+
+
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
         {
             if (!Directory.Exists(folder)) return;
@@ -528,29 +537,36 @@ namespace Typography.FontManagement
             }
 
             //2. browse recursively; on Linux, fonts are organised in subdirectories
-            foreach (string subfolder in Directory.GetDirectories(folder))
+            if (recursive)
             {
-                LoadFontsFromFolder(fontCollection, subfolder, recursive);
+                foreach (string subfolder in Directory.GetDirectories(folder))
+                {
+                    LoadFontsFromFolder(fontCollection, subfolder, recursive);
+                }
             }
-
         }
         public static void LoadSystemFonts(this InstalledTypefaceCollection fontCollection, bool recursive = false)
         {
 
+            if (CustomSystemFontListLoader != null)
+            {
+                CustomSystemFontListLoader(fontCollection);
+                return;
+            } 
             // Windows system fonts
-            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
-
-            // These are reasonable places to look for fonts on Linux            
-            LoadFontsFromFolder(fontCollection, "/usr/share/fonts", recursive);
-            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", recursive);
-            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts", recursive);
-            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts", recursive);
+            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts"); 
+            // These are reasonable places to look for fonts on Linux
+            LoadFontsFromFolder(fontCollection, "/usr/share/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texlive/texmf-dist/fonts", true);
+            LoadFontsFromFolder(fontCollection, "/usr/share/texmf/fonts", true);
 
             // OS X system fonts (https://support.apple.com/en-us/HT201722)
+
             LoadFontsFromFolder(fontCollection, "/System/Library/Fonts");
             LoadFontsFromFolder(fontCollection, "/Library/Fonts");
-        }
 
+        }
 
         //for Windows , how to find Windows' Font Directory from Windows Registry
         //        string[] localMachineFonts = Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", false).GetValueNames();

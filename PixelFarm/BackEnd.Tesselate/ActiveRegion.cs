@@ -192,8 +192,9 @@ namespace Tesselate
             eDst._otherHalfOfThisEdge._winding += eSrc._otherHalfOfThisEdge._winding;
         }
 
-        public static bool EdgeLeq(Tesselator tess, ActiveRegion reg1, ActiveRegion reg2)
-        /*
+        public static bool EdgeLeq(ContourVertex currentSweepVertex, ActiveRegion reg1, ActiveRegion reg2)        
+        {
+            /*
          * Both edges must be directed from right to left (this is the canonical
          * direction for the upper edge of each region).
          *
@@ -204,8 +205,7 @@ namespace Tesselate
          * Special case: if both edge destinations are at the sweep event,
          * we sort the edges by slope (they would otherwise compare equally).
          */
-        {
-            ContourVertex currentSweepVertex = tess.currentSweepVertex;
+          
             HalfEdge e1, e2;
             double t1, t2;
             e1 = reg1._upperHalfEdge;
@@ -530,13 +530,13 @@ namespace Tesselate
                 }
             }
         }
-
         static void SpliceMergeVertices(Tesselator tess, HalfEdge e1, HalfEdge e2)
-        /*
+        {
+
+            /*
          * Two vertices with idential coordinates are combined into one.
          * e1.Org is kept, while e2.Org is discarded.
          */
-        {
             //int[] data4 = new int[4];
             //double[] weights4 = new double[] { 0.5f, 0.5f, 0, 0 };
             //data4[0] = e1.originVertex.clientIndex;
@@ -558,14 +558,15 @@ namespace Tesselate
 
 
         static void VertexWeights(ContourVertex isect, ContourVertex org, ContourVertex dst, out double weights0, out double weights1)
-        /*
-         * Find some weights which describe how the intersection vertex is
-         * a linear combination of "org" and "dest".  Each of the two edges
-         * which generated "isect" is allocated 50% of the weight; each edge
-         * splits the weight between its org and dst according to the
-         * relative distance to "isect".
-         */
         {
+            /*
+        * Find some weights which describe how the intersection vertex is
+        * a linear combination of "org" and "dest".  Each of the two edges
+        * which generated "isect" is allocated 50% of the weight; each edge
+        * splits the weight between its org and dst according to the
+        * relative distance to "isect".
+        */
+
             double t1 = VertL1dist(org, isect);
             double t2 = VertL1dist(dst, isect);
             weights0 = 0.5 * t2 / (t1 + t2);
@@ -579,12 +580,15 @@ namespace Tesselate
         static void GetIntersectData(Tesselator tess, ContourVertex isect,
                ContourVertex orgUp, ContourVertex dstUp,
                ContourVertex orgLo, ContourVertex dstLo)
-        /*
+        {
+
+            /*
          * We've computed a new intersection point, now we need a "data" pointer
          * from the user so that we can refer to this new vertex in the
          * rendering callbacks.
          */
-        {
+
+
             //int[] data4 = new int[4];
             //double[] weights4 = new double[4];
             //data4[0] = orgUp.clientIndex;
@@ -605,7 +609,8 @@ namespace Tesselate
         }
 
         static bool CheckForRightSplice(Tesselator tess, ActiveRegion regUp)
-        /*
+        {
+            /*
          * Check the upper and lower edge of "regUp", to make sure that the
          * eUp.Org is above eLo, or eLo.Org is below eUp (depending on which
          * origin is leftmost).
@@ -630,7 +635,7 @@ namespace Tesselate
          * This is a guaranteed solution, no matter how degenerate things get.
          * Basically this is a combinatorial solution to a numerical problem.
          */
-        {
+
             ActiveRegion regLo = RegionBelow(regUp);
             HalfEdge eUp = regUp._upperHalfEdge;
             HalfEdge eLo = regLo._upperHalfEdge;
@@ -673,25 +678,25 @@ namespace Tesselate
         }
 
         static bool CheckForLeftSplice(Tesselator tess, ActiveRegion regUp)
-        /*
-         * Check the upper and lower edge of "regUp", to make sure that the
-         * eUp.Dst is above eLo, or eLo.Dst is below eUp (depending on which
-         * destination is rightmost).
-         *
-         * Theoretically, this should always be true.  However, splitting an edge
-         * into two pieces can change the results of previous tests.  For example,
-         * suppose at one point we checked eUp and eLo, and decided that eUp.Dst
-         * is barely above eLo.  Then later, we split eLo into two edges (eg. from
-         * a splice operation like this one).  This can change the result of
-         * the test so that now eUp.Dst is incident to eLo, or barely below it.
-         * We must correct this condition to maintain the dictionary invariants
-         * (otherwise new edges might get inserted in the wrong place in the
-         * dictionary, and bad stuff will happen).
-         *
-         * We fix the problem by just splicing the offending vertex into the
-         * other edge.
-         */
         {
+            /*
+        * Check the upper and lower edge of "regUp", to make sure that the
+        * eUp.Dst is above eLo, or eLo.Dst is below eUp (depending on which
+        * destination is rightmost).
+        *
+        * Theoretically, this should always be true.  However, splitting an edge
+        * into two pieces can change the results of previous tests.  For example,
+        * suppose at one point we checked eUp and eLo, and decided that eUp.Dst
+        * is barely above eLo.  Then later, we split eLo into two edges (eg. from
+        * a splice operation like this one).  This can change the result of
+        * the test so that now eUp.Dst is incident to eLo, or barely below it.
+        * We must correct this condition to maintain the dictionary invariants
+        * (otherwise new edges might get inserted in the wrong place in the
+        * dictionary, and bad stuff will happen).
+        *
+        * We fix the problem by just splicing the offending vertex into the
+        * other edge.
+        */
             ActiveRegion regLo = RegionBelow(regUp);
             HalfEdge eUp = regUp._upperHalfEdge;
             HalfEdge eLo = regLo._upperHalfEdge;
@@ -728,9 +733,9 @@ namespace Tesselate
 
         static void Swap(ref ContourVertex a, ref ContourVertex b)
         {
-            ContourVertex t = a;
+            var temp = a;
             a = b;
-            b = t;
+            b = temp;
         }
 
         /* Given parameters a,x,b,y returns the value (b*x+a*y)/(a+b),
@@ -819,11 +824,12 @@ namespace Tesselate
         static void EdgeIntersect(ContourVertex o1, ContourVertex d1,
             ContourVertex o2, ContourVertex d2,
             ref ContourVertex v)
-        /* Given edges (o1,d1) and (o2,d2), compute their point of intersection.
-         * The computed point is guaranteed to lie in the intersection of the
-         * bounding rectangles defined by each edge.
-         */
         {
+          /* Given edges (o1,d1) and (o2,d2), compute their point of intersection.
+          * The computed point is guaranteed to lie in the intersection of the
+          * bounding rectangles defined by each edge.
+          */
+
             double z1, z2;
             /* This is certainly not the most efficient way to find the intersection
              * of two line segments, but it is very numerically stable.
@@ -889,16 +895,17 @@ namespace Tesselate
         }
 
         static bool CheckForIntersect(Tesselator tess, ActiveRegion regUp)
-        /*
-         * Check the upper and lower edges of the given region to see if
-         * they intersect.  If so, create the intersection and add it
-         * to the data structures.
-         *
-         * Returns true if adding the new intersection resulted in a recursive
-         * call to AddRightEdges(); in this case all "dirty" regions have been
-         * checked for intersections, and possibly regUp has been deleted.
-         */
         {
+            /*
+        * Check the upper and lower edges of the given region to see if
+        * they intersect.  If so, create the intersection and add it
+        * to the data structures.
+        *
+        * Returns true if adding the new intersection resulted in a recursive
+        * call to AddRightEdges(); in this case all "dirty" regions have been
+        * checked for intersections, and possibly regUp has been deleted.
+        */
+
             ActiveRegion regLo = RegionBelow(regUp);
             HalfEdge eUp = regUp._upperHalfEdge;
             HalfEdge eLo = regLo._upperHalfEdge;
@@ -1077,22 +1084,22 @@ namespace Tesselate
             Mesh.meshSplice(eLo.Oprev, eUp);
             eUp._originVertex.x = isect.x;
             eUp._originVertex.y = isect.y;
-            tess._vertexPriorityQue.Add(out eUp._originVertex._priorityQueueHandle, eUp._originVertex); /* __gl_pqSortInsert */
+            tess._vertexPriorityQue.Add(eUp._originVertex, out eUp._originVertex._priorityQueueHandle); /* __gl_pqSortInsert */
             GetIntersectData(tess, eUp._originVertex, orgUp, dstUp, orgLo, dstLo);
             regUp.RegionAbove()._dirty = regUp._dirty = regLo._dirty = true;
             return false;
         }
 
         static void WalkDirtyRegions(Tesselator tess, ActiveRegion regUp)
-        /*
-         * When the upper or lower edge of any region changes, the region is
-         * marked "dirty".  This routine walks through all the dirty regions
-         * and makes sure that the dictionary invariants are satisfied
-         * (see the comments at the beginning of this file).  Of course
-         * new dirty regions can be created as we make changes to restore
-         * the invariants.
-         */
         {
+            /*
+       * When the upper or lower edge of any region changes, the region is
+       * marked "dirty".  This routine walks through all the dirty regions
+       * and makes sure that the dictionary invariants are satisfied
+       * (see the comments at the beginning of this file).  Of course
+       * new dirty regions can be created as we make changes to restore
+       * the invariants.
+       */
             ActiveRegion regLo = RegionBelow(regUp);
             HalfEdge eUp, eLo;
             for (; ; )
@@ -1182,38 +1189,39 @@ namespace Tesselate
 
 
         static void ConnectRightVertex(Tesselator tess, ActiveRegion regUp, HalfEdge eBottomLeft)
-        /*
-         * Purpose: connect a "right" vertex vEvent (one where all edges go left)
-         * to the unprocessed portion of the mesh.  Since there are no right-going
-         * edges, two regions (one above vEvent and one below) are being merged
-         * into one.  "regUp" is the upper of these two regions.
-         *
-         * There are two reasons for doing this (adding a right-going edge):
-         *  - if the two regions being merged are "inside", we must add an edge
-         *    to keep them separated (the combined region would not be monotone).
-         *  - in any case, we must leave some record of vEvent in the dictionary,
-         *    so that we can merge vEvent with features that we have not seen yet.
-         *    For example, maybe there is a vertical edge which passes just to
-         *    the right of vEvent; we would like to splice vEvent into this edge.
-         *
-         * However, we don't want to connect vEvent to just any vertex.  We don''t
-         * want the new edge to cross any other edges; otherwise we will create
-         * intersection vertices even when the input data had no self-intersections.
-         * (This is a bad thing; if the user's input data has no intersections,
-         * we don't want to generate any false intersections ourselves.)
-         *
-         * Our eventual goal is to connect vEvent to the leftmost unprocessed
-         * vertex of the combined region (the union of regUp and regLo).
-         * But because of unseen vertices with all right-going edges, and also
-         * new vertices which may be created by edge intersections, we don''t
-         * know where that leftmost unprocessed vertex is.  In the meantime, we
-         * connect vEvent to the closest vertex of either chain, and mark the region
-         * as "fixUpperEdge".  This flag says to delete and reconnect this edge
-         * to the next processed vertex on the boundary of the combined region.
-         * Quite possibly the vertex we connected to will turn out to be the
-         * closest one, in which case we won''t need to make any changes.
-         */
         {
+            /*
+     * Purpose: connect a "right" vertex vEvent (one where all edges go left)
+     * to the unprocessed portion of the mesh.  Since there are no right-going
+     * edges, two regions (one above vEvent and one below) are being merged
+     * into one.  "regUp" is the upper of these two regions.
+     *
+     * There are two reasons for doing this (adding a right-going edge):
+     *  - if the two regions being merged are "inside", we must add an edge
+     *    to keep them separated (the combined region would not be monotone).
+     *  - in any case, we must leave some record of vEvent in the dictionary,
+     *    so that we can merge vEvent with features that we have not seen yet.
+     *    For example, maybe there is a vertical edge which passes just to
+     *    the right of vEvent; we would like to splice vEvent into this edge.
+     *
+     * However, we don't want to connect vEvent to just any vertex.  We don''t
+     * want the new edge to cross any other edges; otherwise we will create
+     * intersection vertices even when the input data had no self-intersections.
+     * (This is a bad thing; if the user's input data has no intersections,
+     * we don't want to generate any false intersections ourselves.)
+     *
+     * Our eventual goal is to connect vEvent to the leftmost unprocessed
+     * vertex of the combined region (the union of regUp and regLo).
+     * But because of unseen vertices with all right-going edges, and also
+     * new vertices which may be created by edge intersections, we don''t
+     * know where that leftmost unprocessed vertex is.  In the meantime, we
+     * connect vEvent to the closest vertex of either chain, and mark the region
+     * as "fixUpperEdge".  This flag says to delete and reconnect this edge
+     * to the next processed vertex on the boundary of the combined region.
+     * Quite possibly the vertex we connected to will turn out to be the
+     * closest one, in which case we won''t need to make any changes.
+     */
+
             HalfEdge eNew;
             HalfEdge eTopLeft = eBottomLeft._nextEdgeCCWAroundOrigin;
             ActiveRegion regLo = RegionBelow(regUp);
@@ -1332,24 +1340,24 @@ namespace Tesselate
         }
 
         static void ConnectLeftVertex(Tesselator tess, ContourVertex vEvent)
-        /*
-         * Purpose: connect a "left" vertex (one where both edges go right)
-         * to the processed portion of the mesh.  Let R be the active region
-         * containing vEvent, and let U and L be the upper and lower edge
-         * chains of R.  There are two possibilities:
-         *
-         * - the normal case: split R into two regions, by connecting vEvent to
-         *   the rightmost vertex of U or L lying to the left of the sweep line
-         *
-         * - the degenerate case: if vEvent is close enough to U or L, we
-         *   merge vEvent into that edge chain.  The sub-cases are:
-         *	- merging with the rightmost vertex of U or L
-         *	- merging with the active edge of U or L
-         *	- merging with an already-processed portion of U or L
-         */
         {
-            ActiveRegion regUp, regLo, reg;
-            HalfEdge eUp, eLo, eNew;
+            /*
+       * Purpose: connect a "left" vertex (one where both edges go right)
+       * to the processed portion of the mesh.  Let R be the active region
+       * containing vEvent, and let U and L be the upper and lower edge
+       * chains of R.  There are two possibilities:
+       *
+       * - the normal case: split R into two regions, by connecting vEvent to
+       *   the rightmost vertex of U or L lying to the left of the sweep line
+       *
+       * - the degenerate case: if vEvent is close enough to U or L, we
+       *   merge vEvent into that edge chain.  The sub-cases are:
+       *	- merging with the rightmost vertex of U or L
+       *	- merging with the active edge of U or L
+       *	- merging with an already-processed portion of U or L
+       */
+
+
             ActiveRegion tmp = new ActiveRegion();
             /* assert( vEvent.anEdge.Onext.Onext == vEvent.anEdge ); */
 
@@ -1357,10 +1365,10 @@ namespace Tesselate
             tmp._upperHalfEdge = vEvent._edgeThisIsOriginOf._otherHalfOfThisEdge;
             /* __GL_DICTLISTKEY */
             /* __gl_dictListSearch */
-            regUp = Dictionary.dictSearch(tess._edgeDictionary, tmp).Key;
-            regLo = RegionBelow(regUp);
-            eUp = regUp._upperHalfEdge;
-            eLo = regLo._upperHalfEdge;
+            ActiveRegion regUp = Dictionary.dictSearch(tess._edgeDictionary, tmp).Key;
+            ActiveRegion regLo = RegionBelow(regUp);
+            HalfEdge eUp = regUp._upperHalfEdge;
+            HalfEdge eLo = regLo._upperHalfEdge;
             /* Try merging with U or L first */
             if (ContourVertex.EdgeSign(eUp.DirectionVertex, vEvent, eUp._originVertex) == 0)
             {
@@ -1371,9 +1379,10 @@ namespace Tesselate
             /* Connect vEvent to rightmost processed vertex of either chain.
              * e.Dst is the vertex that we will connect to vEvent.
              */
-            reg = eLo.DirectionVertex.VertLeq(eUp.DirectionVertex) ? regUp : regLo;
+            ActiveRegion reg = eLo.DirectionVertex.VertLeq(eUp.DirectionVertex) ? regUp : regLo;
             if (regUp._inside || reg._fixUpperEdge)
             {
+                HalfEdge eNew;
                 if (reg == regUp)
                 {
                     eNew = Mesh.meshConnect(vEvent._edgeThisIsOriginOf._otherHalfOfThisEdge, eUp._nextEdgeCCWAroundLeftFace);
@@ -1404,19 +1413,22 @@ namespace Tesselate
 
 
         static void SweepEvent(Tesselator tess, ContourVertex vEvent)
-        /*
-         * Does everything necessary when the sweep line crosses a vertex.
-         * Updates the mesh and the edge dictionary.
-         */
+
         {
-            ActiveRegion regUp, reg;
-            HalfEdge e, eTopLeft, eBottomLeft;
-            tess.currentSweepVertex = vEvent; 	/* for access in EdgeLeq() */
+            /*
+            * Does everything necessary when the sweep line crosses a vertex.
+            * Updates the mesh and the edge dictionary.
+            */
+
+            tess.currentSweepVertex = vEvent;
+
+            /* for access in EdgeLeq() */
             /* Check if this vertex is the right endpoint of an edge that is
              * already in the dictionary.  In this case we don't need to waste
              * time searching for the location to insert new edges.
              */
-            e = vEvent._edgeThisIsOriginOf;
+
+            HalfEdge e = vEvent._edgeThisIsOriginOf;
             while (e._regionThisIsUpperEdgeOf == null)
             {
                 e = e._nextEdgeCCWAroundOrigin;
@@ -1435,10 +1447,10 @@ namespace Tesselate
              * to their winding number, and delete the edges from the dictionary.
              * This takes care of all the left-going edges from vEvent.
              */
-            regUp = TopLeftRegion(e._regionThisIsUpperEdgeOf);
-            reg = RegionBelow(regUp);
-            eTopLeft = reg._upperHalfEdge;
-            eBottomLeft = FinishLeftRegions(tess, reg, null);
+            ActiveRegion regUp = TopLeftRegion(e._regionThisIsUpperEdgeOf);
+            ActiveRegion reg = RegionBelow(regUp);
+            HalfEdge eTopLeft = reg._upperHalfEdge;
+            HalfEdge eBottomLeft = FinishLeftRegions(tess, reg, null);
             /* Next we process all the right-going edges from vEvent.  This
              * involves adding the edges to the dictionary, and creating the
              * associated "active regions" which record information about the
@@ -1463,14 +1475,14 @@ namespace Tesselate
          */
         const double SENTINEL_COORD = (4 * Tesselator.MAX_COORD);
         static void AddSentinel(Tesselator tess, double t)
-        /*
-         * We add two sentinel edges above and below all other edges,
-         * to avoid special cases at the top and bottom.
-         */
         {
-            HalfEdge halfEdge;
+
+            //We add two sentinel edges above and below all other edges,
+            //to avoid special cases at the top and bottom.
+
+
             ActiveRegion activeRedion = new ActiveRegion();
-            halfEdge = tess._mesh.MakeEdge();
+            HalfEdge halfEdge = tess._mesh.MakeEdge();
             halfEdge._originVertex.x = SENTINEL_COORD;
             halfEdge._originVertex.y = t;
             halfEdge.DirectionVertex.x = -SENTINEL_COORD;
@@ -1487,11 +1499,11 @@ namespace Tesselate
 
 
         static void InitEdgeDict(Tesselator tess)
-        /*
-         * We maintain an ordering of edge intersections with the sweep line.
-         * This order is maintained in a dynamic dictionary.
-         */
         {
+
+            //We maintain an ordering of edge intersections with the sweep line.
+            //This order is maintained in a dynamic dictionary.
+
             /* __gl_dictListNewDict */
             tess._edgeDictionary = new Dictionary(tess);
             AddSentinel(tess, -SENTINEL_COORD);
@@ -1570,17 +1582,18 @@ namespace Tesselate
             }
         }
 
+        /// <summary>
+        ///  Insert all vertices into the priority queue which determines the
+        ///  order in which vertices cross the sweep line.
+        /// </summary>
+        /// <param name="tess"></param>
         static void InitPriorityQue(Tesselator tess)
-        /*
-         * Insert all vertices into the priority queue which determines the
-         * order in which vertices cross the sweep line.
-         */
         {
             MaxFirstList<ContourVertex> priorityQue = tess._vertexPriorityQue = new MaxFirstList<ContourVertex>();
             ContourVertex vertexHead = tess._mesh._vertexHead;
             for (ContourVertex curVertex = vertexHead._nextVertex; curVertex != vertexHead; curVertex = curVertex._nextVertex)
             {
-                priorityQue.Add(out curVertex._priorityQueueHandle, curVertex);
+                priorityQue.Add(curVertex, out curVertex._priorityQueueHandle);
             }
         }
 
@@ -1590,23 +1603,27 @@ namespace Tesselate
             tess._vertexPriorityQue = null; /* __gl_pqSortDeletePriorityQ */
         }
 
-
+        /// <summary>
+        /// Delete any degenerate faces with only two edges.
+        /// </summary>
+        /// <param name="mesh"></param>
+        /// <returns></returns>
         static bool RemoveDegenerateFaces(Mesh mesh)
-        /*
-         * Delete any degenerate faces with only two edges.  WalkDirtyRegions()
-         * will catch almost all of these, but it won't catch degenerate faces
-         * produced by splice operations on already-processed edges.
-         * The two places this can happen are in FinishLeftRegions(), when
-         * we splice in a "temporary" edge produced by ConnectRightVertex(),
-         * and in CheckForLeftSplice(), where we splice already-processed
-         * edges to ensure that our dictionary invariants are not violated
-         * by numerical errors.
-         *
-         * In both these cases it is *very* dangerous to delete the offending
-         * edge at the time, since one of the routines further up the stack
-         * will sometimes be keeping a pointer to that edge.
-         */
         {
+
+            //WalkDirtyRegions()
+            //will catch almost all of these, but it won't catch degenerate faces
+            //produced by splice operations on already - processed edges.
+
+            // The two places this can happen are in FinishLeftRegions(), when
+            // we splice in a "temporary" edge produced by ConnectRightVertex(),
+            //and in CheckForLeftSplice(), where we splice already-processed
+            //edges to ensure that our dictionary invariants are not violated
+            //by numerical errors.
+
+            //In both these cases it is *very * dangerous to delete the offending
+            //edge at the time, since one of the routines further up the stack
+            //will sometimes be keeping a pointer to that edge.
             Face f, fNext;
             HalfEdge e;
             for (f = mesh._faceHead._nextFace; f != mesh._faceHead; f = fNext)

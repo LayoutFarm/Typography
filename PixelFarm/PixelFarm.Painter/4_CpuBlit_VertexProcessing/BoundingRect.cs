@@ -28,7 +28,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 {
     public static class BoundingRect
     {
-        
+
         public static RectD GetBoundingRect(this VertexStore vxs)
         {
             RectD bounds = RectD.ZeroIntersection;
@@ -38,8 +38,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public static bool GetBoundingRect(this VertexStore vxs, ref RectD rect)
         {
-            double x1, y1, x2, y2;
-            bool rValue = GetBoundingRectSingle(vxs, out x1, out y1, out x2, out y2);
+            bool rValue = GetBoundingRectSingle(vxs,
+                out double x1, out double y1,
+                out double x2, out double y2);
+
             if (x1 < rect.Left)
             {
                 rect.Left = x1;
@@ -87,21 +89,27 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             int index = 0;
             VertexCmd cmd;
-            while ((cmd = vxs.GetVertex(index++, out x, out y)) != VertexCmd.NoMore)
+
+            for (; ; )
             {
-                //IsEmpty => check cmd != NoMore
-                if (x < x1) x1 = x;
-                if (y < y1) y1 = y;
-                if (x > x2) x2 = x;
-                if (y > y2) y2 = y;
-                //if (VertexHelper.IsVertextCommand(PathAndFlags))
-                //{
-                //    if (x < x1) x1 = x;
-                //    if (y < y1) y1 = y;
-                //    if (x > x2) x2 = x;
-                //    if (y > y2) y2 = y;
-                //}
+                cmd = vxs.GetVertex(index++, out x, out y);
+                switch (cmd)
+                {
+                    case VertexCmd.Close:
+                        //in this case we don't include that x,y
+                        break;
+                    case VertexCmd.NoMore:
+                        goto EXIT_LOOP;
+                    default:
+                        if (x < x1) x1 = x;
+                        if (y < y1) y1 = y;
+                        if (x > x2) x2 = x;
+                        if (y > y2) y2 = y;
+                        break;
+                }
             }
+        EXIT_LOOP:
+
             return x1 <= x2 && y1 <= y2;
         }
     }
@@ -110,54 +118,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     //----------------------------------------------------
     public static class BoundingRectInt
     {
-        public static bool GetBoundingRect(VertexStore vxs, ref RectInt rect)
+        public static void GetBoundingRect(this VertexStore vxs, ref RectInt rect)
         {
-            int x1, y1, x2, y2;
-            bool rValue = GetBoundingRect(vxs, out x1, out y1, out x2, out y2);
-            rect.Left = x1;
-            rect.Bottom = y1;
-            rect.Right = x2;
-            rect.Top = y2;
-            return rValue;
-        }
-        public static RectInt GetBoundingRect(VertexStore vxs)
-        {
-            int x1, y1, x2, y2;
-            bool rValue = GetBoundingRect(vxs, out x1, out y1, out x2, out y2);
-            return new RectInt(x1, y1, x2, y2);
+            RectD rect1 = new RectD();
+            BoundingRect.GetBoundingRect(vxs, ref rect1);
+            rect.Left = (int)System.Math.Round(rect1.Left);
+            rect.Bottom = (int)System.Math.Round(rect1.Bottom);
+            rect.Right = (int)System.Math.Round(rect1.Right);
+            rect.Top = (int)System.Math.Round(rect1.Top);
         }
 
-
-        //-----------------------------------------------------bounding_rect_single
-        //template<class VertexSource, class CoordT> 
-        static bool GetBoundingRect(
-          VertexStore vxs,
-          out int x1, out int y1,
-          out int x2, out int y2)
-        {
-
-            int x = 0;
-            int y = 0;
-
-            x1 = int.MaxValue;
-            y1 = int.MaxValue;
-            x2 = int.MinValue;
-            y2 = int.MinValue;
-
-            int index = 0;
-            while (vxs.GetVertex(index++, out double x_d, out double y_d) != VertexCmd.NoMore)
-            {
-                x = (int)x_d;
-                y = (int)y_d;
-                //if (VertexHelper.IsVertextCommand(PathAndFlags))
-                //{
-                if (x < x1) x1 = x;
-                if (y < y1) y1 = y;
-                if (x > x2) x2 = x;
-                if (y > y2) y2 = y;
-                //}
-            }
-            return x1 <= x2 && y1 <= y2;
-        }
     }
 }

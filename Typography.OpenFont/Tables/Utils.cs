@@ -9,15 +9,23 @@ namespace Typography.OpenFont
 {
     static class Utils
     {
+        /// <summary>
+        /// read float, 2.14 format
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         public static float ReadF2Dot14(this BinaryReader reader)
         {
             return ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
         }
 
-        public static Bounds ReadBounds(BinaryReader input)
+        public static Bounds ReadBounds(BinaryReader input) 
         {
-            short xmin = input.ReadInt16(), ymin = input.ReadInt16(), xmax = input.ReadInt16(), ymax = input.ReadInt16();
-            return new Bounds(xmin, ymin, xmax, ymax);
+            return new Bounds(
+                input.ReadInt16(),//xmin
+                input.ReadInt16(), //ymin
+                input.ReadInt16(), //xmax
+                input.ReadInt16());//ymax
         }
 
         public static string TagToString(uint tag)
@@ -27,34 +35,44 @@ namespace Typography.OpenFont
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
-        public static int ReadUInt24(BinaryReader reader)
+        public static int ReadUInt24(this BinaryReader reader)
         {
             byte highByte = reader.ReadByte();
             return (highByte << 16) | reader.ReadUInt16();
         }
-
-        public static ushort[] ReadUInt16Array(BinaryReader reader, int nRecords)
+        /// <summary>
+        /// 16.16 float format
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static float ReadFixed(this BinaryReader reader)
+        {
+            //16.16 format
+            return (float)reader.ReadUInt32() / (1 << 16);
+        }
+        
+        public static ushort[] ReadUInt16Array(this BinaryReader reader, int nRecords)
         {
             ushort[] arr = new ushort[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            for (int i = 0; i < arr.Length; ++i)
             {
                 arr[i] = reader.ReadUInt16();
             }
             return arr;
         }
-        public static uint[] ReadUInt16ArrayAsUInt32Array(BinaryReader reader, int nRecords)
+        public static uint[] ReadUInt16ArrayAsUInt32Array(this BinaryReader reader, int nRecords)
         {
             uint[] arr = new uint[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            for (int i = 0; i < arr.Length; ++i)
             {
                 arr[i] = reader.ReadUInt16();
             }
             return arr;
         }
-        public static uint[] ReadUInt32Array(BinaryReader reader, int nRecords)
+        public static uint[] ReadUInt32Array(this BinaryReader reader, int nRecords)
         {
             uint[] arr = new uint[nRecords];
-            for (int i = 0; i < nRecords; ++i)
+            for (int i = 0; i < arr.Length; ++i)
             {
                 arr[i] = reader.ReadUInt32();
             }

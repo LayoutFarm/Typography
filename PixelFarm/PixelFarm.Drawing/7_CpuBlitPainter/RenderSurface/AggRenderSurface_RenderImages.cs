@@ -1,5 +1,4 @@
-﻿//MIT, 2014-present, WinterDev
-
+﻿//MIT, 2014-present, WinterDev 
 //----------------------------------------------------------------------------
 // Anti-Grain Geometry - Version 2.4
 // Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
@@ -17,7 +16,15 @@
 // Contact: mcseem@antigrain.com
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
-//----------------------------------------------------------------------------
+//---------------------------------------------------------------------------- 
+// Paint.NET (MIT,from version 3.36.7, see=> https://github.com/rivy/OpenPDN  
+// Copyright (C) dotPDN LLC, Rick Brewster, Tom Jackson, and contributors.     
+// Portions Copyright (C) Microsoft Corporation. All Rights Reserved.          
+// See src/Resources/Files/License.txt for full licensing and attribution      
+// details.                                                                   
+// .                                                                         
+//---------------------------------------------------------------------------- 
+
 
 using System;
 using PixelFarm.Drawing;
@@ -28,6 +35,7 @@ using PixelFarm.CpuBlit.Rasterization;
 using PixelFarm.CpuBlit.FragmentProcessing;
 using PixelFarm.CpuBlit.Imaging;
 
+
 namespace PixelFarm.CpuBlit
 {
     partial class AggRenderSurface
@@ -36,12 +44,20 @@ namespace PixelFarm.CpuBlit
         //
         SubBitmap _subBitmap = new SubBitmap();
         SpanInterpolatorLinear _spanInterpolator = new SpanInterpolatorLinear();//reusable
-        ImgSpanGenRGBA_BilinearClip _imgSpanGenBilinearClip = new ImgSpanGenRGBA_BilinearClip(Drawing.Color.Black); //reusable
-        ImgSpanGenRGBA_NN_StepXBy1 _img_NN_StepX = new ImgSpanGenRGBA_NN_StepXBy1();
+
+
+        ImgSpanGen _currentImgSpanGen;
+        ImgSpanGen _imgSpanGenCustom;
+
+        ImgSpanGenRGBA_NN_StepXBy1 _imgSpanGenNNStepXBy1 = new ImgSpanGenRGBA_NN_StepXBy1(); //built-in
+        ImgSpanGenRGBA_BilinearClip _imgSpanGenBilinearClip = new ImgSpanGenRGBA_BilinearClip(Color.Black); //built-in
+
+
+
         Affine _reuseableAffine = Affine.NewIdentity();
         int _destImageChanged = 0;
-        //
-        //
+
+
         public bool UseSubPixelRendering => _bmpRasterizer.ScanlineRenderMode == ScanlineRenderMode.SubPixelLcdEffect;
 
         static void BuildOrgImgRectVxs(int srcW, int srcH, VertexStore output)
@@ -85,7 +101,7 @@ namespace PixelFarm.CpuBlit
                 plans[i] = AffinePlan.Translate(destX, destY);
                 i++;
             }
-            return Affine.NewMatix2(plans);
+            return Affine.New(plans);
         }
         static Affine CreateAffine(double destX, double destY)
         {
@@ -94,7 +110,7 @@ namespace PixelFarm.CpuBlit
             {
                 plan = AffinePlan.Translate(destX, destY);
             }
-            return Affine.NewMatix(plan);
+            return Affine.New(plan);
         }
 
         /// <summary>
@@ -141,8 +157,8 @@ namespace PixelFarm.CpuBlit
 
             double scaleX = inScaleX;
             double scaleY = inScaleY;
-            Affine graphicsTransform = this.CurrentTransformMatrix;
-            if (!graphicsTransform.IsIdentity())
+            ICoordTransformer graphicsTransform = this.CurrentTransformMatrix;
+            if (!graphicsTransform.IsIdentity)
             {
                 if (scaleX != 1 || scaleY != 1 || angleRadians != 0)
                 {
@@ -215,13 +231,13 @@ namespace PixelFarm.CpuBlit
 
                     // We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
                     _spanInterpolator.Transformer = destRectTransform.CreateInvert();
-                    _imgSpanGenBilinearClip.BackgroundColor = Drawing.Color.Black;
-                    _imgSpanGenBilinearClip.SetInterpolator(_spanInterpolator);
-                    _imgSpanGenBilinearClip.SetSrcBitmap(source);
+                    _currentImgSpanGen.BackgroundColor = Drawing.Color.Black;
+                    _currentImgSpanGen.SetInterpolator(_spanInterpolator);
+                    _currentImgSpanGen.SetSrcBitmap(source);
 
                     destRectTransform.TransformToVxs(imgBoundsPath, v1);
-                    Render(v1, _imgSpanGenBilinearClip);
-                    _imgSpanGenBilinearClip.ReleaseSrcBitmap();
+                    Render(v1, _currentImgSpanGen);
+                    _currentImgSpanGen.ReleaseSrcBitmap();
 
                     // this is some debug you can enable to visualize the dest bounding box
                     //LineFloat(BoundingRect.left, BoundingRect.top, BoundingRect.right, BoundingRect.top, WHITE);
@@ -249,12 +265,20 @@ namespace PixelFarm.CpuBlit
                     switch (source.BitDepth)
                     {
                         case 32:
+                            if (_imgSpanGenCustom != null)
+                            {
+                                //use custom span gen
+                                _imgSpanGenCustom.SetInterpolator(_spanInterpolator);
+                                _imgSpanGenCustom.SetSrcBitmap(source);
+                                imgSpanGen = _imgSpanGenCustom;
+                            }
+                            else
+                            {
+                                _imgSpanGenNNStepXBy1.SetInterpolator(_spanInterpolator);
+                                _imgSpanGenNNStepXBy1.SetSrcBitmap(source);
+                                imgSpanGen = _imgSpanGenNNStepXBy1;
+                            }
 
-
-
-                            _img_NN_StepX.SetInterpolator(_spanInterpolator);
-                            _img_NN_StepX.SetSrcBitmap(source);
-                            imgSpanGen = _img_NN_StepX;
 
                             break;
                         //case 24:
@@ -305,28 +329,38 @@ namespace PixelFarm.CpuBlit
             }
         }
 
+
+
         public void Render(IBitmapSrc source, AffinePlan[] affinePlans)
         {
             using (VxsTemp.Borrow(out var v1, out var v2))
             {
 
                 BuildOrgImgRectVxs(source.Width, source.Height, v1);
-                var destRectTransform = new AffineMat();
-                destRectTransform.BuildFromAffinePlans(affinePlans);
 
+                AffineMat destRectTransform;
+                if (affinePlans == null)
+                {
+                    destRectTransform = AffineMat.Iden;
+                    _reuseableAffine.SetElements(destRectTransform);
+                }
+                else
+                {
+                    destRectTransform = new AffineMat();
+                    destRectTransform.BuildFromAffinePlans(affinePlans);
+                    _reuseableAffine.SetElements(destRectTransform.CreateInvert());
+                }
                 //TODO: review reusable span generator an interpolator *** 
                 //We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]
 
-                _reuseableAffine.SetElements(destRectTransform.CreateInvert());
                 _spanInterpolator.Transformer = _reuseableAffine;
 
-
-                _imgSpanGenBilinearClip.BackgroundColor = Drawing.Color.Transparent;
-                _imgSpanGenBilinearClip.SetInterpolator(_spanInterpolator);
-                _imgSpanGenBilinearClip.SetSrcBitmap(source);
+                _currentImgSpanGen.BackgroundColor = Drawing.Color.Transparent;
+                _currentImgSpanGen.SetInterpolator(_spanInterpolator);
+                _currentImgSpanGen.SetSrcBitmap(source);
                 TransformToVxs(ref destRectTransform, v1, v2);
-                Render(v2, _imgSpanGenBilinearClip);
-                _imgSpanGenBilinearClip.ReleaseSrcBitmap();
+                Render(v2, _currentImgSpanGen);
+                _currentImgSpanGen.ReleaseSrcBitmap();
             }
         }
         public void Render(IBitmapSrc source, ICoordTransformer coordtx)
@@ -343,20 +377,19 @@ namespace PixelFarm.CpuBlit
 
                 //We invert it because it is the transform to make the image go to the same position as the polygon. LBB [2/24/2004]         
                 _spanInterpolator.Transformer = coordtx.CreateInvert();
-                _imgSpanGenBilinearClip.BackgroundColor = Color.Transparent;
-                _imgSpanGenBilinearClip.SetInterpolator(_spanInterpolator);
-                _imgSpanGenBilinearClip.SetSrcBitmap(source);
+                _currentImgSpanGen.BackgroundColor = Color.Transparent;
+                _currentImgSpanGen.SetInterpolator(_spanInterpolator);
+                _currentImgSpanGen.SetSrcBitmap(source);
                 TransformToVxs(coordtx, v1, v2);
-                Render(v2, _imgSpanGenBilinearClip);
-                _imgSpanGenBilinearClip.ReleaseSrcBitmap();
+                Render(v2, _currentImgSpanGen);
+                _currentImgSpanGen.ReleaseSrcBitmap();
             }
-
         }
 
 
         public void Render(IBitmapSrc source, double destX, double destY, double srcX, double srcY, double srcW, double srcH)
         {
-            //copy some part of src img to destination 
+            //map some part of src img to destination 
             _subBitmap.SetSrcBitmap(source, (int)srcX, (int)srcY, (int)srcW, (int)srcH);
             Render(_subBitmap, destX, destY);
             _subBitmap.Reset();
@@ -384,8 +417,9 @@ namespace PixelFarm.CpuBlit
 
             double scaleX = inScaleX;
             double scaleY = inScaleY;
-            Affine graphicsTransform = this.CurrentTransformMatrix;
-            if (!graphicsTransform.IsIdentity())
+
+            ICoordTransformer graphicsTransform = this.CurrentTransformMatrix;
+            if (!graphicsTransform.IsIdentity)
             {
                 if (scaleX != 1 || scaleY != 1 || angleRadians != 0)
                 {
@@ -468,11 +502,11 @@ namespace PixelFarm.CpuBlit
                     //    Drawing.Color.Black,
                     //    spanInterpolator);
                     _spanInterpolator.Transformer = destRectTransform.CreateInvert();
-                    _imgSpanGenBilinearClip.SetInterpolator(_spanInterpolator);
-                    _imgSpanGenBilinearClip.SetSrcBitmap(source);
+                    _currentImgSpanGen.SetInterpolator(_spanInterpolator);
+                    _currentImgSpanGen.SetSrcBitmap(source);
                     destRectTransform.TransformToVxs(imgBoundsPath, v1);
-                    Render(v1, _imgSpanGenBilinearClip);
-                    _imgSpanGenBilinearClip.ReleaseSrcBitmap();
+                    Render(v1, _currentImgSpanGen);
+                    _currentImgSpanGen.ReleaseSrcBitmap();
                 }
 
 
@@ -527,10 +561,20 @@ namespace PixelFarm.CpuBlit
                     switch (source.BitDepth)
                     {
                         case 32:
+                            if (_imgSpanGenCustom != null)
+                            {
+                                //use custom span gen
+                                _imgSpanGenCustom.SetInterpolator(_spanInterpolator);
+                                _imgSpanGenCustom.SetSrcBitmap(source);
+                                imgSpanGen = _imgSpanGenCustom;
+                            }
+                            else
+                            {
+                                _imgSpanGenNNStepXBy1.SetInterpolator(_spanInterpolator);
+                                _imgSpanGenNNStepXBy1.SetSrcBitmap(source);
+                                imgSpanGen = _imgSpanGenNNStepXBy1;
+                            }
 
-                            _img_NN_StepX.SetInterpolator(_spanInterpolator);
-                            _img_NN_StepX.SetSrcBitmap(source);
-                            imgSpanGen = _img_NN_StepX;
                             break;
                         //case 8:
                         //    imgSpanGen = new ImgSpanGenGray_NNStepXby1(source, interpolator);
@@ -551,6 +595,9 @@ namespace PixelFarm.CpuBlit
             }
 
         }
+
+
+
     }
 
 
@@ -587,7 +634,7 @@ namespace PixelFarm.CpuBlit
                 get { throw new NotSupportedException(); }
             }
 
-            public RectInt GetBounds() => new RectInt(_x, _y, _x + _w, _y + _h); 
+            public RectInt GetBounds() => new RectInt(_x, _y, _x + _w, _y + _h);
             public int GetBufferOffsetXY32(int x, int y)
             {
                 //goto row
@@ -617,5 +664,6 @@ namespace PixelFarm.CpuBlit
             }
         }
     }
+
 
 }

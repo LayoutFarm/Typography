@@ -1,15 +1,10 @@
 ﻿//BSD, 2014-present, WinterDev 
-#define WIN32
+
 
 using System.Runtime.InteropServices;
 namespace PixelFarm.CpuBlit
 {
-
-
-
-#if !COSMOS && WIN32
-    [System.Security.SuppressUnmanagedCodeSecurity] //apply this to all native methods in this class
-#endif
+    [System.Security.SuppressUnmanagedCodeSecurity] //apply this to all native methods in this class 
     public static class NativeMemMx
     {
         //check this ....
@@ -18,7 +13,7 @@ namespace PixelFarm.CpuBlit
         //TODO: review here again***
         //this is platform specific ***
 
-#if WIN32
+#if !__MOBILE__ && PIXEL_FARM_NET20
         [DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl)]
         public static unsafe extern void memset(byte* dest, byte c, int byteCount);
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl)]

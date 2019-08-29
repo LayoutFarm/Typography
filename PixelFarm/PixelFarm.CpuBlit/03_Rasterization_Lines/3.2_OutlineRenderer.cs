@@ -510,10 +510,22 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         }
                         else
                         {
+                            int prev_x = sx;
+                            int prev_y = sy;
                             while (Math.Abs(sx - lp.x1) + Math.Abs(sy - lp.y1) > lp2.len)
                             {
                                 sx = (lp.x1 + sx) >> 1;
                                 sy = (lp.y1 + sy) >> 1;
+
+                                if (sx == prev_x && sy == prev_y)
+                                {
+                                    //stop infinite loop
+                                    //note:not found in original agg source
+                                    break;
+                                }
+
+                                prev_x = sx;
+                                prev_y = sy;
                             }
                         }
                         Line1NoClip(lp2, sx, sy);
@@ -573,10 +585,22 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         }
                         else
                         {
+                            int prev_x = ex;
+                            int prev_y = ey;
                             while (Math.Abs(ex - lp.x2) + Math.Abs(ey - lp.y2) > lp2.len)
                             {
                                 ex = (lp.x2 + ex) >> 1;
                                 ey = (lp.y2 + ey) >> 1;
+
+                                if (ex == prev_x && ey == prev_y)
+                                {
+                                    //stop infinite loop
+                                    //note:not found in original agg source
+                                    break;
+                                }
+
+                                prev_x = ex;
+                                prev_y = ey;
                             }
                         }
                         Line2NoClip(lp2, ex, ey);
@@ -641,10 +665,22 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         }
                         else
                         {
+                            int prev_x = sx;
+                            int prev_y = sy;
                             while (Math.Abs(sx - lp.x1) + Math.Abs(sy - lp.y1) > lp2.len)
                             {
                                 sx = (lp.x1 + sx) >> 1;
                                 sy = (lp.y1 + sy) >> 1;
+
+                                if (sx == prev_x && sy == prev_y)
+                                {
+                                    //stop infinite loop
+                                    //note:not found in original agg source
+                                    break;
+                                }
+
+                                prev_x = sx;
+                                prev_y = sy;
                             }
                         }
                         if ((flags & 2) != 0)
@@ -654,10 +690,21 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
                         }
                         else
                         {
+                            int prev_x = ex;
+                            int prev_y = ey;
                             while (Math.Abs(ex - lp.x2) + Math.Abs(ey - lp.y2) > lp2.len)
                             {
                                 ex = (lp.x2 + ex) >> 1;
                                 ey = (lp.y2 + ey) >> 1;
+
+                                if (ex == prev_x && ey == prev_y)
+                                {
+                                    //stop infinite loop
+                                    //note:not found in original agg source
+                                    break;
+                                }
+                                prev_x = ex;
+                                prev_y = ey;
                             }
                         }
                         Line3NoClip(lp2, sx, sy, ex, ey);

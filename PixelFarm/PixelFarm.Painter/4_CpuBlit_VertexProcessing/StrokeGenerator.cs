@@ -24,7 +24,7 @@ using PixelFarm.VectorMath;
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.VertexProcessing
 {
-    static class MyMath
+    public static class MyMath
     {
 
 
@@ -113,8 +113,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             return p0.Y - (m1) * p0.X;
         }
-
-
     }
 
 
@@ -614,8 +612,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         _lineGen.MoveTo(x, y);
                         break;
                     case VertexCmd.Close:
-                    case VertexCmd.CloseAndEndFigure:
-
                         _lineGen.Close(_positiveSideVectors, _negativeSideVectors);
                         WriteOutput(outputVxs, true);
                         has_some_results = false;

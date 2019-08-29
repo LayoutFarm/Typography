@@ -1,8 +1,12 @@
 ﻿//MIT, 2016, Viktor Chlumsky, Multi-channel signed distance field generator, from https://github.com/Chlumsky/msdfgen
 //MIT, 2017-present, WinterDev (C# port)
-/// Edge color specifies which color channels an edge belongs to.
+ 
 namespace Msdfgen
 {
+    /// <summary>
+    /// Edge color specifies which color channels an edge belongs to.
+    /// </summary>
+    [System.Flags]
     public enum EdgeColor
     {
         BLACK = 0,

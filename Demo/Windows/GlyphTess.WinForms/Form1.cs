@@ -56,6 +56,7 @@ namespace Test_WinForm_TessGlyph
             {
                 _g = this.panel1.CreateGraphics();
             }
+
             _g.Clear(Color.White);
 
             //-------

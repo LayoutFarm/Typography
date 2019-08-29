@@ -45,6 +45,9 @@
     <Compile Include="..\gdiplussample.winforms\gdiplus\GlyphTranslatorToGdiPath.cs">
       <Link>GdiPlus\GlyphTranslatorToGdiPath.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarmSample.WinForms\PixelFarm\BitmapHelper.cs">
+      <Link>PixelFarm\BitmapHelper.cs</Link>
+    </Compile>
     <Compile Include="..\textboxsample.winforms\textboxcontroller\SampleTextBoxController.cs">
       <Link>GdiPlus\SampleTextBoxController.cs</Link>
     </Compile>
@@ -54,7 +57,6 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="PixelFarm\BitmapHelper.cs" />
     <Compile Include="PixelFarm\MouseButtonsAndKeys.cs" />
     <Compile Include="PixelFarm\SampleTextBoxControllerForPixelFarm.cs" />
     <Compile Include="PixelFarm\VisualLine.cs" />
@@ -92,10 +94,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.Contours\Typography.Contours.csproj">
-      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
-      <Name>Typography.Contours</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>

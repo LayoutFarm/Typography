@@ -7,30 +7,52 @@ namespace Typography.TextLayout
         /// pixel scaled size
         /// </summary>
         public readonly float width; //4 
+
         readonly float _pxscale; //4
 
-        readonly short _ascending; //2
+        /// <summary>
+        /// unscaled typographic ascending (sTypoAscending)
+        /// </summary>
+        readonly short _ascending; //2 bytes
+        /// <summary>
+        /// unscaled typographic descending (sTypoDescending)
+        /// </summary>
         readonly short _descending;//2
+        /// <summary>
+        /// unscaled typographic linegap (sTypoLineGap)
+        /// </summary>
         readonly short _lineGap; //2
-        readonly short _btbd;//Baseline-to-Baseline Distance,  2 byte
 
-        ushort _stopAt;
+        /// <summary>
+        /// clip Ascending (usWinAscending)
+        /// </summary>
+        readonly ushort _clipDescending; //2
+        /// <summary>
+        /// clip Descending (usWinDescending)
+        /// </summary>
+        readonly ushort _clipAscending;//2
+
+        ushort _stopAt;//2
 
         public MeasuredStringBox(float width,
             short ascending,
             short descending,
             short lineGap,
-            short btbd,
+            ushort clipAscending,
+            ushort clipDescending,
             float pxscale)
         {
+            //baseline-to-baseline distance
             this.width = width;
             _stopAt = 0;
+
             _ascending = ascending;
             _descending = descending;
             _lineGap = lineGap;
-            _btbd = btbd;
-            _pxscale = pxscale;
+            _clipAscending = clipAscending;
+            _clipDescending = clipDescending;
 
+            _pxscale = pxscale;
         }
         /// <summary>
         /// scaled ascending (in pixel)
@@ -45,9 +67,19 @@ namespace Typography.TextLayout
         /// </summary>
         public float LineGapInPx => _lineGap * _pxscale;
         /// <summary>
-        /// base-line-to-based line distance
+        /// total clip height 
         /// </summary>
-        public float BtbdInPx => _btbd * _pxscale;
+        public float ClipHeightInPx => (_clipAscending + _clipDescending) * _pxscale;
+        public float ClipAscendingInPx => _clipAscending * _pxscale;
+        public float ClipDescendingInPx => _clipDescending * _pxscale;
+
+
+
+        /// <summary>       
+        /// recommened linespace (base-line-to-based line distance)
+        /// </summary>
+        public float LineSpaceInPx => ((_ascending - _descending) + _lineGap) * _pxscale;
+
         public ushort StopAt
         {
             get => _stopAt;
@@ -61,21 +93,12 @@ namespace Typography.TextLayout
                                 box._ascending,
                                 box._descending,
                                 box._lineGap,
-                                box._btbd,
+                                box._clipAscending,
+                                box._clipDescending,
                                 box._pxscale * scale
                                 );
             measureBox._stopAt = box._stopAt;
             return measureBox;
-        }
-    }
-
-    public static class MeasuredStringBoxExtension
-    {
-
-        public static float CalculateLineHeight(this MeasuredStringBox box, float scale = 1)
-        {
-            return box.BtbdInPx;
-            //return box.ascending - box.descending + box.lineGap;
         }
     }
 }

@@ -100,19 +100,16 @@ namespace PixelFarm.CpuBlit.Rasterization.Lines
         public void Dispose()
         {
             _ren.ReleaseConvArray(_covers);
-            _ren.ReleaseDistArray(_dist);
-
-
+            _ren.ReleaseDistArray(_dist); 
         }
 
         public void AdjustForward()
         {
             _li.adjust_forward();
         }
-        public int Y
-        {
-            get { return _li.Y; }
-        }
+
+        public int Y => _li.Y;
+
         public void Prev()
         {
             _li.Prev();

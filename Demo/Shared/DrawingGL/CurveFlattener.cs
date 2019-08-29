@@ -183,7 +183,7 @@ namespace DrawingGL
                             }
                             else
                             {
-                                //use sub div flattern
+                                //use sub div flatten
                                 _curve4Div.Flatten(
                                     latest_x, latest_y,
                                     p1.x, p1.y,

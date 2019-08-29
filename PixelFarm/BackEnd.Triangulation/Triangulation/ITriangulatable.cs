@@ -32,7 +32,7 @@
 using System.Collections.Generic;
 namespace Poly2Tri
 {
-    public interface Triangulatable
+    public interface Triangulable
     {
         void Prepare(TriangulationContext tcx);
         IList<TriangulationPoint> Points { get; } // MM: Neither of these are used via interface (yet?)

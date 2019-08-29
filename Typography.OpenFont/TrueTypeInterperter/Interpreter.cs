@@ -244,10 +244,11 @@ namespace Typography.OpenFont
                 Execute(new InstructionStream(instructions), false, false);
             }
             catch (InvalidFontException)
-            {
+            { 
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine("invalid_font_ex:");
 #endif
+ 
             }
         }
 

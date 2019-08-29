@@ -22,9 +22,6 @@
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit
 {
-
-
-
     public static class PainterExtensions
     {
 
@@ -64,8 +61,6 @@ namespace PixelFarm.CpuBlit
             p.FillRect(left, top, width, height);
             p.FillColor = prevColor;
         }
-
-       
         public static void Fill(this Painter p, VertexStore vxs, Color color)
         {
             Color prevColor = p.FillColor;
@@ -80,10 +75,40 @@ namespace PixelFarm.CpuBlit
             p.Draw(vxs);
             p.StrokeColor = prevColor;
         }
+        public static void Fill(this Painter p, Region rgn, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            p.Fill(rgn);
+            p.FillColor = prevColor;
+        }
+
+        /// <summary>
+        /// create stroke-vxs from a given vxs, and fill stroke-vxs with input color
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="vxs"></param>
+        /// <param name="strokeW"></param>
+        /// <param name="color"></param>
+        public static void FillStroke(this Painter p, VertexStore vxs, float strokeW, Color color)
+        {
+            Color prevColor = p.FillColor;
+            p.FillColor = color;
+            using (VectorToolBox.Borrow(out VertexProcessing.Stroke s))
+            using (VxsTemp.Borrow(out var v1))
+            {
+                s.Width = strokeW;
+                s.MakeVxs(vxs, v1);
+                p.Fill(v1);
+            }
+
+            p.FillColor = prevColor;
+        }
+        
 #if DEBUG
         static int dbugId = 0;
 #endif
-         
+
 
     }
 

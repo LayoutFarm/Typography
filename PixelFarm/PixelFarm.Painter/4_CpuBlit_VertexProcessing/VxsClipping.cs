@@ -23,7 +23,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
 
 
-        public static void CombinePaths(
+        public static VertexStore CombinePaths(
             VertexStore a,
             VertexStore b,
             VxsClipperType vxsClipType,
@@ -33,7 +33,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             using (VectorToolBox.Borrow(out VxsClipper clipper))
             {
-                clipper.CombinePathsInternal(a, b, vxsClipType, separateIntoSmallSubPaths, results);
+                return clipper.CombinePathsInternal(a, b, vxsClipType, separateIntoSmallSubPaths, results);
             }
         }
 
@@ -47,7 +47,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         }
         //
-        void CombinePathsInternal(
+        VertexStore CombinePathsInternal(
            VertexStore a,
            VertexStore b,
            VxsClipperType vxsClipType,
@@ -68,9 +68,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             if (separateIntoSmallSubPaths)
             {
+
+                VertexStore firstOutput = null;
+                //in this case we expect that resultList must not be null*** 
+
                 foreach (List<IntPoint> polygon in _intersectedPolys)
                 {
-                    int j = polygon.Count;
+                    int j = polygon.Count; //***
+
                     if (j > 0)
                     {
                         //first one
@@ -90,11 +95,18 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             }
 
                             pw.CloseFigure();
-                            resultList.Add(v1.CreateTrim()); //copy
+
+                            VertexStore result = v1.CreateTrim();
+                            if (firstOutput == null)
+                            {
+                                firstOutput = result;
+                            }
+                            resultList.Add(result); //copy 
                             pw.Clear();
                         }
                     }
                 }
+                return firstOutput;
             }
             else
             {
@@ -122,7 +134,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         }
                     }
                     pw.Stop();
-                    resultList.Add(v1.CreateTrim());
+                    VertexStore output = v1.CreateTrim();
+                    if (resultList != null)
+                    {
+                        resultList.Add(output);//also add to here
+                    }
+                    return output;
+
                 }
             }
         }
@@ -177,4 +195,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
         }
     }
+
+
 }

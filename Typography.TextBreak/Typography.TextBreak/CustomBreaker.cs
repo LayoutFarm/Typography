@@ -84,7 +84,10 @@ namespace Typography.TextBreak
             }
         }
 
-
+        public void BreakWords(char[] charBuff)
+        {
+            BreakWords(charBuff, 0, charBuff.Length);
+        }
         public void BreakWords(char[] charBuff, int startAt, int len)
         {
             //conver to char buffer 
@@ -141,7 +144,7 @@ namespace Typography.TextBreak
             //TODO: review here
             char[] buffer = inputstr.ToCharArray();
             BreakWords(buffer, 0, inputstr.Length); //all
-        } 
+        }
         public BreakingEngine GetBreakingEngineFor(char c)
         {
             return SelectEngine(c);

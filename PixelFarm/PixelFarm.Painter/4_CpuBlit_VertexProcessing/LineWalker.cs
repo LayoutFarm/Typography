@@ -118,11 +118,10 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     case VertexCmd.LineTo:
                         _walkStateMan.LineTo(x, y);
                         break;
-                    case VertexCmd.P2c:
-                    case VertexCmd.P3c:
+                    case VertexCmd.C3:
+                    case VertexCmd.C4:
                         throw new NotSupportedException();
                     case VertexCmd.Close:
-                    case VertexCmd.CloseAndEndFigure:
                         _walkStateMan.CloseFigure();
                         break;
                 }

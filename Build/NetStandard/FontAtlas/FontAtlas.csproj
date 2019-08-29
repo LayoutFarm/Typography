@@ -13,12 +13,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Typography.Contours\Typography.Contours.csproj" />
+    <ProjectReference Include="..\..\..\x_autogen_netstandard2.0\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj" />
     <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
     <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj" />
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />
   </ItemGroup>
 
   <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
+
+
 
 </Project>

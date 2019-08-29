@@ -75,7 +75,7 @@ namespace PixelFarm.CpuBlit
         public override RenderVxFormattedString CreateRenderVx(string textspan)
         {
 
-            var renderVxFmtStr = new AggRenderVxFormattedString(textspan);
+            var renderVxFmtStr = new AggRenderVxFormattedString();
             if (_textPrinter != null)
             {
                 char[] buffer = textspan.ToCharArray();
@@ -84,7 +84,15 @@ namespace PixelFarm.CpuBlit
             }
             return renderVxFmtStr;
         }
-
+        public override RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len)
+        {
+            var renderVxFmtStr = new AggRenderVxFormattedString();
+            if (_textPrinter != null)
+            {
+                _textPrinter.PrepareStringForRenderVx(renderVxFmtStr, textspanBuff, startAt, len);
+            }
+            return renderVxFmtStr;
+        }
 
 
     }

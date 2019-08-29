@@ -54,10 +54,10 @@ namespace burningmime.curves
         /// Use a thread-static instance to prevent multithreading issues without needing to re-allocate on each run.
         /// </summary>
         [ThreadStatic]
-        private static CurveFit _instance;
+        private static CurveFit s_instance;
         private static CurveFit GetInstance()
         {
-            return _instance ?? (_instance = new CurveFit());
+            return s_instance ?? (s_instance = new CurveFit());
         }
 #else
         private static CurveFit GetInstance()

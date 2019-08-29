@@ -25,7 +25,7 @@ namespace Typography.OpenFont.Tables
         {
             get => _glyphs;
             internal set => _glyphs = value;
-        } 
+        }
         protected override void ReadContentFrom(BinaryReader reader)
         {
 
@@ -302,7 +302,7 @@ namespace Typography.OpenFont.Tables
                 }
                 Glyph newGlyph = Glyph.Clone(createdGlyphs[glyphIndex], compositeGlyphIndex);
 
-                int arg1 = 0;//arg1, arg2 may be int8,uint8,int16,uint 16
+                int arg1 = 0;//arg1, arg2 may be int8,uint8,int16,uint 16 
                 int arg2 = 0;//arg1, arg2 may be int8,uint8,int16,uint 16
 
                 if (HasFlag(flags, CompositeGlyphFlags.ARG_1_AND_2_ARE_WORDS))
@@ -326,7 +326,6 @@ namespace Typography.OpenFont.Tables
                 }
                 else
                 {
-
                     //0x0002  ARGS_ARE_XY_VALUES Bit 1: If this is set,
                     //the arguments are **signed xy values**
                     //otherwise, they are unsigned point numbers.

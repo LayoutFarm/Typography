@@ -73,7 +73,6 @@ namespace Tesselate
 
         public bool Equal2D(ContourVertex OtherVertex) => (x == OtherVertex.x && y == OtherVertex.y);
 
-
         public static double EdgeEval(ContourVertex u, ContourVertex v, ContourVertex w)
         {
             /* Given three vertices u,v,w such that VertLeq(u,v) && VertLeq(v,w),

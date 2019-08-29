@@ -61,7 +61,7 @@ namespace PixelFarm.CpuBlit.Rasterization
         /// </summary>
         SingleLineBuffer _grayScaleLine = new SingleLineBuffer();
         LcdDistributionLut _currentLcdLut = null;
-
+        bool _supportTransparentBG = false;
 
         internal ScanlineSubPixelRasterizer()
         {
@@ -509,9 +509,42 @@ namespace PixelFarm.CpuBlit.Rasterization
                 //--------------------------------------------------------      
 
                 //write the 3 color-component of current pixel.
-                destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (e_2 * color_alpha)) + (exc0 << 16)) >> 16); //swap on the fly
-                destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - exc1) * (e_1 * color_alpha)) + (exc1 << 16)) >> 16);
-                destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - exc2) * (e_0 * color_alpha)) + (exc2 << 16)) >> 16);//swap on the fly
+
+                int d_0 = destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (e_2 * color_alpha)) + (exc0 << 16)) >> 16); //swap on the fly
+                int d_1 = destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - exc1) * (e_1 * color_alpha)) + (exc1 << 16)) >> 16);
+                int d_2 = destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - exc2) * (e_0 * color_alpha)) + (exc2 << 16)) >> 16);//swap on the fly 
+                //---------------------------------------------------------
+                if (_supportTransparentBG)
+                {
+                    if (d_0 == 255 && d_1 == 255 && d_2 == 255)
+                    {
+                        //alpha =0
+                    }
+                    else if (d_1 == 255)
+                    {
+                        bool skip = false;
+                        if (d_0 == 255)
+                        {
+                            if (d_2 > 240)
+                            {
+                                skip = true;
+                            }
+                        }
+                        else if (d_2 == 255)
+                        {
+                            if (d_0 > 240)
+                            {
+                                skip = true;
+                            }
+                        }
+                        destImgBuffer[destImgIndex + 3] = (byte)(skip ? 0 : 255);
+                    }
+                    else
+                    {
+                        destImgBuffer[destImgIndex + 3] = 255;
+                    }
+                }
+
                 //---------------------------------------------------------
                 destImgIndex += 4;
                 srcIndex += 3;
@@ -557,6 +590,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                             destImgBuffer[destImgIndex] = (byte)((((color_c0 - exc0) * (ec_r3 * color_alpha)) + (exc0 << 16)) >> 16); //swap on the fly
                             destImgBuffer[destImgIndex + 1] = (byte)((((color_c1 - exc1) * (ec_r2 * color_alpha)) + (exc1 << 16)) >> 16);
                             destImgBuffer[destImgIndex + 2] = (byte)((((color_c2 - exc2) * (ec_r1 * color_alpha)) + (exc2 << 16)) >> 16);//swap on the fly
+
                             destImgIndex += 4;
 
 
@@ -599,8 +633,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 }
             }
         }
-
-
+        
 #if DEBUG
         static float mix(float farColor, float nearColor, float weight)
         {
@@ -1517,9 +1550,8 @@ namespace PixelFarm.CpuBlit.Rasterization
 
 
     //----------------------------
-    public class CustomDestBitmapRasterizer : DestBitmapRasterizer
+    public abstract class CustomDestBitmapRasterizer : DestBitmapRasterizer
     {
-
     }
 
 

@@ -77,17 +77,27 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             get => _strokeGen.Shorten;
             set => _strokeGen.Shorten = value;
         }
+        public StrokeSideForClosedShape StrokeSideForClosedShape
+        {
+            get => _strokeGen.StrokeSideForClosedShape;
+            set => _strokeGen.StrokeSideForClosedShape = value;
+        }
+        public StrokeSideForOpenShape StrokeSideForOpenShape
+        {
+            get => _strokeGen.StrokeSideForOpenShape;
+            set => _strokeGen.StrokeSideForOpenShape = value;
+        }
         public VertexStore MakeVxs(VertexStore sourceVxs, VertexStore outputVxs)
         {
             StrokeGenerator strkgen = _strokeGen;
             int j = sourceVxs.Count;
             strkgen.Reset();
-            VertexCmd cmd;
-            double x = 0, y = 0, startX = 0, startY = 0;
 
+            double x = 0, y = 0, startX = 0, startY = 0,
+                  latest_x = 0, latest_y = 0;
             for (int i = 0; i < j; ++i)
             {
-                cmd = sourceVxs.GetVertex(i, out x, out y);
+                VertexCmd cmd = sourceVxs.GetVertex(i, out x, out y);
                 switch (cmd)
                 {
                     case VertexCmd.NoMore:
@@ -99,19 +109,14 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                             strkgen.Close();
                             strkgen.WriteTo(outputVxs);
                             strkgen.Reset();
-                        }
-                        else
-                        {
-
-                        }
-                        break;
-                    case VertexCmd.CloseAndEndFigure:
-                        if (i < j)
-                        {
-                            //close command
-                            strkgen.Close();
-                            strkgen.WriteTo(outputVxs);
-                            strkgen.Reset();
+                            if (i < j - 1)
+                            {
+                                VertexCmd nextCmd = sourceVxs.GetCommand(i + 1);
+                                if (nextCmd != VertexCmd.MoveTo)
+                                {
+                                    strkgen.AddVertex(startX, startY, VertexCmd.MoveTo);
+                                }
+                            }
                         }
                         else
                         {
@@ -119,25 +124,47 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                         }
                         break;
                     case VertexCmd.LineTo:
-                    case VertexCmd.P2c://user must flatten the curve before do stroke
-                    case VertexCmd.P3c://user must flatten the curve before do stroke 
-                        strkgen.AddVertex(x, y, cmd);
+                    case VertexCmd.C3://user must flatten the curve before do stroke
+                    case VertexCmd.C4://user must flatten the curve before do stroke 
+                        strkgen.AddVertex(latest_x = x, latest_y = y, cmd);
                         break;
                     case VertexCmd.MoveTo:
+                        {
+                            //for stroke,
+                            if (strkgen.VertexCount > 0)
+                            {
+                                strkgen.Close();
+                                strkgen.WriteTo(outputVxs);
+                                strkgen.Reset();
+                            }
+                        }
+
                         strkgen.AddVertex(x, y, cmd);
-                        startX = x;
-                        startY = y;
+                        latest_x = startX = x;
+                        latest_y = startY = y;
                         break;
                     default: throw new System.NotSupportedException();
                 }
             }
-            //---
-            EXIT_LOOP:
+        //---
+        EXIT_LOOP:
             //
             strkgen.WriteTo(outputVxs);
             strkgen.Reset();
 
             return outputVxs;
+        }
+        /// <summary>
+        /// make vxs + create trim copy
+        /// </summary>
+        /// <param name="sourceVxs"></param>
+        /// <returns></returns>
+        public VertexStore CreateTrim(VertexStore sourceVxs)
+        {
+            using (VxsTemp.Borrow(out var v1))
+            {
+                return MakeVxs(sourceVxs, v1).CreateTrim();
+            }
         }
     }
 

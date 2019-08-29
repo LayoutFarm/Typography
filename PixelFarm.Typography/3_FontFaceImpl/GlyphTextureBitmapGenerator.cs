@@ -1,6 +1,7 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
+using PixelFarm.Contours;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
@@ -21,7 +22,7 @@ namespace PixelFarm.Drawing.Fonts
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder); 
+        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder);
         public GlyphTextureBitmapGenerator()
         {
 
@@ -29,7 +30,7 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void CreateTextureFontBuildDetail(
             Typeface typeface, float sizeInPoint,
-            TextureKind textureKind,
+            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
             GlyphTextureBuildDetail[] details,
             OnEachFinishTotal onFinishTotal)
         {
@@ -78,7 +79,7 @@ namespace PixelFarm.Drawing.Fonts
 
         public void CreateTextureFontFromInputChars(
             Typeface typeface, float sizeInPoint,
-            TextureKind textureKind,
+            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
             char[] chars,
             OnEachFinishTotal onFinishTotal)
         {
@@ -131,20 +132,23 @@ namespace PixelFarm.Drawing.Fonts
             var builder = new GlyphPathBuilder(typeface);
             builder.SetHintTechnique(hintTechnique);
             //
-            if (atlasBuilder.TextureKind == TextureKind.Msdf)
+            if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
             {
                 MsdfGenParams msdfGenParams = new MsdfGenParams();
                 int j = glyphIndices.Length;
+                float pxscale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
                 for (int i = 0; i < j; ++i)
                 {
                     ushort gindex = glyphIndices[i];
                     //create picture with unscaled version set scale=-1
                     //(we will create glyph contours and analyze them)
                     builder.BuildFromGlyphIndex(gindex, -1);
-                    var glyphToContour = new GlyphContourBuilder();
-                    builder.ReadShapes(glyphToContour);
+                    var glyphToContour = new ContourBuilder();
+                    builder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
+
                     //msdfgen with  scale the glyph to specific shapescale
-                    msdfGenParams.shapeScale = 1f / 64; //as original
+                    //msdfGenParams.shapeScale = 1f / 64; //as original
+                    msdfGenParams.shapeScale = pxscale;
                     GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, msdfGenParams);
                     //
                     atlasBuilder.AddGlyph(gindex, glyphImg);

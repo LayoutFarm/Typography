@@ -1,4 +1,4 @@
-﻿//MIT, 2014-2017, WinterDev 
+﻿//MIT, 2014-present, WinterDev 
 
 using System.IO;
 using Typography.OpenFont;
@@ -7,13 +7,11 @@ namespace PixelFarm.Drawing.Fonts
 {
     public static class OpenFontLoader
     {
-        public static FontFace LoadFont(
-            Typeface typeface)
+        public static FontFace LoadFont(Typeface typeface)
         {
             //read font file 
             //TODO:...
             //set shape engine ***  
-
             var openFont = new NOpenFontFace(typeface, typeface.Name, typeface.Filename);
             return openFont;
         }
