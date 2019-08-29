@@ -2,15 +2,58 @@
 
 using System;
 using System.Collections.Generic;
+using PixelFarm.Contours;
+
 using Typography.OpenFont;
+
 namespace Typography.Contours
 {
+    public class GlyphTranslatorToContourBuilder : IGlyphTranslator
+    {
+        IContourBuilder _b;
+
+        public GlyphTranslatorToContourBuilder(IContourBuilder b) => _b = b;
+
+        public void BeginRead(int contourCount) => _b.BeginRead(contourCount);
+
+        public void CloseContour() => _b.CloseContour();
+
+        public void Curve3(float x1, float y1, float x2, float y2) => _b.Curve3(x1, y1, x2, y2);
+
+        public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3) => _b.Curve4(x1, y1, x2, y2, x3, y3);
+
+        public void EndRead() => _b.EndRead();
+
+        public void LineTo(float x1, float y1) => _b.LineTo(x1, y1);
+
+        public void MoveTo(float x0, float y0) => _b.MoveTo(x0, y0);
+    }
+    public class ContourToGlyphTranslator : IContourBuilder
+    {
+        readonly IGlyphTranslator _tx;
+
+        public ContourToGlyphTranslator(IGlyphTranslator tx) => _tx = tx;
+
+        public void BeginRead(int contourCount) => _tx.BeginRead(contourCount);
+
+        public void CloseContour() => _tx.CloseContour();
+
+        public void Curve3(float x1, float y1, float x2, float y2) => _tx.Curve3(x1, y1, x2, y2);
+
+        public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3) => _tx.Curve4(x1, y1, x2, y2, x3, y3);
+
+        public void EndRead() => _tx.EndRead();
+
+        public void LineTo(float x1, float y1) => _tx.LineTo(x1, y1);
+
+        public void MoveTo(float x0, float y0) => _tx.MoveTo(x0, y0);
+    }
 
     public class GlyphPathBuilder : GlyphPathBuilderBase
     {
         GlyphOutlineAnalyzer _fitShapeAnalyzer = new GlyphOutlineAnalyzer();
-        Dictionary<ushort, GlyphDynamicOutline> _fitoutlineCollection = new Dictionary<ushort, GlyphDynamicOutline>();
-        GlyphDynamicOutline _latestDynamicOutline;
+        Dictionary<ushort, DynamicOutline> _fitOutlineCollection = new Dictionary<ushort, DynamicOutline>();
+        DynamicOutline _latestDynamicOutline;
 
         public GlyphPathBuilder(Typeface typeface)
             : base(typeface)
@@ -51,7 +94,7 @@ namespace Typography.Contours
                 //
                 if (this.UseVerticalHinting)
                 {
-                    if (!_fitoutlineCollection.TryGetValue(glyph.GlyphIndex, out _latestDynamicOutline))
+                    if (!_fitOutlineCollection.TryGetValue(glyph.GlyphIndex, out _latestDynamicOutline))
                     {
 
                         //---------------------------------------------
@@ -65,15 +108,22 @@ namespace Typography.Contours
                         //contBuilder.LineTo(x, y + h);
                         //contBuilder.CloseFigure(); 
                         //--------------------------------------------- 
+
+
                         _latestDynamicOutline = _fitShapeAnalyzer.CreateDynamicOutline(
                             _outputGlyphPoints,
                             _outputContours);
                         //add more information for later scaling process
                         _latestDynamicOutline.OriginalAdvanceWidth = glyph.OriginalAdvanceWidth;
-                        _latestDynamicOutline.OriginalGlyphControlBounds = glyph.Bounds;
+
+                        _latestDynamicOutline.SetDynamicEdgeOffsetFromMasterOutline(GlyphDynamicEdgeOffset);
+
+                        _latestDynamicOutline.SetOriginalGlyphControlBounds(
+                            glyph.Bounds.XMin, glyph.Bounds.YMin,
+                            glyph.Bounds.XMax, glyph.Bounds.YMax);
                         //store to our dynamic outline collection
                         //so we can reuse it
-                        _fitoutlineCollection.Add(glyph.GlyphIndex, _latestDynamicOutline);
+                        _fitOutlineCollection.Add(glyph.GlyphIndex, _latestDynamicOutline);
                         //-------------------
                         //
                         _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateScaleToPixel(RecentFontSizeInPixels));
@@ -110,7 +160,7 @@ namespace Typography.Contours
                 {
                     toPixelScale = 1;
                 }
-                _latestDynamicOutline.GenerateOutput(tx, toPixelScale);
+                _latestDynamicOutline.GenerateOutput(new ContourToGlyphTranslator(tx), toPixelScale);
             }
             else
             {
@@ -118,6 +168,6 @@ namespace Typography.Contours
             }
         }
 
-        public GlyphDynamicOutline LatestGlyphFitOutline => _latestDynamicOutline;
+        public DynamicOutline LatestGlyphFitOutline => _latestDynamicOutline;
     }
 }

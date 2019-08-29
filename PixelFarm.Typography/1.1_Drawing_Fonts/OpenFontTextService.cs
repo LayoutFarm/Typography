@@ -14,8 +14,6 @@ using Typography.FontManagement;
 namespace LayoutFarm
 {
 
-
-
     public class OpenFontTextService : ITextService
     {
         /// <summary>
@@ -29,8 +27,6 @@ namespace LayoutFarm
 
         public OpenFontTextService(Typography.OpenFont.ScriptLang scLang = null)
         {
-
-
             _system_id = PixelFarm.Drawing.Internal.RequestFontCacheAccess.GetNewCacheSystemId();
 
             //set up typography text service
@@ -40,7 +36,7 @@ namespace LayoutFarm
             _txtServices.InstalledFontCollection = InstalledTypefaceCollection.GetSharedTypefaceCollection(collection =>
             {
                 collection.SetFontNameDuplicatedHandler((f0, f1) => FontNameDuplicatedDecision.Skip);
-                collection.LoadSystemFonts(); //load system fonts
+
             });
 
 
@@ -76,7 +72,10 @@ namespace LayoutFarm
             //_shapingServices.SetCurrentScriptLang(scLang);
             //--------------- 
         }
-
+        public void LoadSystemFonts()
+        {
+            _txtServices.InstalledFontCollection.LoadSystemFonts();
+        }
 
         public void LoadFontsFromFolder(string folder)
         {
@@ -151,9 +150,15 @@ namespace LayoutFarm
                 //
                 //we cache used line segment for a while
                 //we ask for caching context for a specific typeface and font size   
+#if DEBUG
+                if (lineSeg.Length > _reusableTextBuffer.Len)
+                {
+
+                }
+#endif
                 GlyphPlanSequence seq = _txtServices.GetUnscaledGlyphPlanSequence(_reusableTextBuffer,
-                     lineSeg.StartAt,
-                     lineSeg.Length);
+                 lineSeg.StartAt,
+                 lineSeg.Length);
 
                 int seqLen = seq.Count;
 
@@ -172,7 +177,7 @@ namespace LayoutFarm
 
             //
 
-            lineHeight = (int)Math.Round(typeface.CalculateRecommendLineSpacing() * scale);
+            lineHeight = (int)Math.Round(typeface.CalculateMaxLineClipHeight() * scale);
 
             _reusableTextBuffer.SetRawCharBuffer(null);
         }
@@ -261,10 +266,10 @@ namespace LayoutFarm
 
         }
         float ITextService.MeasureBlankLineHeight(RequestFont font)
-        {
-            LineSpacingChoice sel_linespcingChoice;
+        { 
             Typeface typeface = ResolveTypeface(font);
-            return (int)(Math.Round(typeface.CalculateRecommendLineSpacing(out sel_linespcingChoice) *
+
+            return (int)(Math.Round(typeface.CalculateMaxLineClipHeight() *
                                     typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints)));
         }
         //
@@ -272,13 +277,11 @@ namespace LayoutFarm
         //
         struct MyLineSegment : ILineSegment
         {
-            ILineSegmentList _owner;
             readonly int _startAt;
             readonly int _len;
             internal ScriptLang scriptLang;
-            public MyLineSegment(ILineSegmentList owner, int startAt, int len)
+            public MyLineSegment(int startAt, int len)
             {
-                _owner = owner;
                 _startAt = startAt;
                 _len = len;
                 this.scriptLang = null;
@@ -312,7 +315,6 @@ namespace LayoutFarm
             public int dbugStartAt;
             public int dbugLen;
 #endif
-
 
             void IDisposable.Dispose()
             {
@@ -357,7 +359,7 @@ namespace LayoutFarm
             MyLineSegmentList lineSegments = MyLineSegmentList.GetFreeLineSegmentList();
             foreach (BreakSpan breakSpan in _txtServices.BreakToLineSegments(str, textBufferSpan.start, textBufferSpan.len))
             {
-                MyLineSegment lineSeg = new MyLineSegment(lineSegments, breakSpan.startAt, breakSpan.len);
+                MyLineSegment lineSeg = new MyLineSegment(breakSpan.startAt, breakSpan.len);
                 lineSeg.scriptLang = breakSpan.scLang;
                 lineSegments.AddLineSegment(lineSeg);
             }
