@@ -212,12 +212,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short offsetX, offsetY, advW; //all from pen-pos
+                    //all from pen-pos 
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
                     accumW += (short)Math.Round(advW * pxscale);
                 }
 
@@ -229,12 +229,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short offsetX, offsetY, advW; //all from pen-pos
+                    //all from pen-pos 
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
                     accumW += advW * pxscale;
                 }
             }
@@ -257,12 +257,12 @@ namespace Typography.TextLayout
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
 
-                    short offsetX, offsetY, advW; //all from pen-pos
+                     //all from pen-pos
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
 
                     stopAtGlyphIndex = i; //***
                     //
@@ -285,12 +285,12 @@ namespace Typography.TextLayout
                 int finalGlyphCount = glyphPositions.Count;
                 for (int i = 0; i < finalGlyphCount; ++i)
                 {
-                    short offsetX, offsetY, advW; //all from pen-pos
+                    //all from pen-pos
                     ushort glyphIndex = glyphPositions.GetGlyph(i,
                         out ushort input_offset,
-                        out offsetX,
-                        out offsetY,
-                        out advW);
+                        out short offsetX,
+                        out short offsetY,
+                        out short advW);
 
 
                     stopAtGlyphIndex = i; //***
@@ -417,7 +417,7 @@ namespace Typography.TextLayout
             bool snapToGrid = true)
         {
             //1. unscale layout, in design unit
-            glyphLayout.Layout(textBuffer, startAt, len); 
+            glyphLayout.Layout(textBuffer, startAt, len);
 
             //2. scale  to specific font size           
 
@@ -439,7 +439,8 @@ namespace Typography.TextLayout
                      typeface.Ascender,
                      typeface.Descender,
                      typeface.LineGap,
-                    (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
+                     typeface.ClipedAscender,
+                     typeface.ClipedDescender,
                      pxscale);
 
             }
@@ -452,13 +453,17 @@ namespace Typography.TextLayout
                     snapToGrid,
                     out int stopAtChar);
 
-                return new MeasuredStringBox(
+                var mstrbox = new MeasuredStringBox(
                  scaled_accumX,
                  typeface.Ascender,
                  typeface.Descender,
                  typeface.LineGap,
-                 (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
+                 typeface.ClipedAscender,
+                 typeface.ClipedDescender,
                  pxscale);
+
+                mstrbox.StopAt = (ushort)stopAtChar;
+                return mstrbox;
             }
             else
             {
@@ -467,7 +472,8 @@ namespace Typography.TextLayout
                     typeface.Ascender,
                     typeface.Descender,
                     typeface.LineGap,
-                    (short)Typography.OpenFont.Extensions.TypefaceExtensions.CalculateRecommendLineSpacing(typeface),
+                    typeface.ClipedAscender,
+                    typeface.ClipedDescender,
                     pxscale);
             }
 

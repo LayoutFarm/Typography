@@ -689,13 +689,13 @@ namespace Typography.WebFont
                     //If the bit WE_HAVE_A_SCALE is set,
                     //the scale value is read in 2.14 format-the value can be between -2 to almost +2.
                     //The glyph will be scaled by this value before grid-fitting. 
-                    xscale = yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    xscale = yscale = reader.ReadF2Dot14(); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_AN_X_AND_Y_SCALE))
                 {
-                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    xscale = reader.ReadF2Dot14(); /* Format 2.14 */
+                    yscale = reader.ReadF2Dot14(); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_A_TWO_BY_TWO))
@@ -716,10 +716,10 @@ namespace Typography.WebFont
                     //Note that the behavior of the USE_MY_METRICS operation is undefined for rotated composite components. 
                     useMatrix = true;
                     hasScale = true;
-                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    scale01 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    scale10 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    xscale = reader.ReadF2Dot14(); /* Format 2.14 */
+                    scale01 = reader.ReadF2Dot14(); /* Format 2.14 */
+                    scale10 = reader.ReadF2Dot14();/* Format 2.14 */
+                    yscale = reader.ReadF2Dot14(); /* Format 2.14 */
 
                 }
 
@@ -794,13 +794,13 @@ namespace Typography.WebFont
                     //If the bit WE_HAVE_A_SCALE is set,
                     //the scale value is read in 2.14 format-the value can be between -2 to almost +2.
                     //The glyph will be scaled by this value before grid-fitting. 
-                    xscale = yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    xscale = yscale = reader.ReadF2Dot14(); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_AN_X_AND_Y_SCALE))
                 {
-                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    xscale = reader.ReadF2Dot14(); /* Format 2.14 */
+                    yscale = reader.ReadF2Dot14(); /* Format 2.14 */
                     hasScale = true;
                 }
                 else if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.WE_HAVE_A_TWO_BY_TWO))
@@ -821,10 +821,10 @@ namespace Typography.WebFont
                     //Note that the behavior of the USE_MY_METRICS operation is undefined for rotated composite components. 
                     useMatrix = true;
                     hasScale = true;
-                    xscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    scale01 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    scale10 = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
-                    yscale = ((float)reader.ReadInt16()) / (1 << 14); /* Format 2.14 */
+                    xscale = reader.ReadF2Dot14(); /* Format 2.14 */
+                    scale01 = reader.ReadF2Dot14(); /* Format 2.14 */
+                    scale10 = reader.ReadF2Dot14(); /* Format 2.14 */
+                    yscale = reader.ReadF2Dot14(); /* Format 2.14 */
 
                     if (Glyf.HasFlag(flags, Glyf.CompositeGlyphFlags.UNSCALED_COMPONENT_OFFSET))
                     {
@@ -1320,6 +1320,37 @@ namespace Typography.WebFont
 
         public BrotliDecompressStreamFunc DecompressHandler;
 
+        public Woff2Reader()
+        {
+#if DEBUG
+            dbugVerifyKnownTables();
+#endif
+        }
+#if DEBUG
+
+        static bool s_dbugPassVeriKnownTables;
+        static void dbugVerifyKnownTables()
+        {
+            if (s_dbugPassVeriKnownTables)
+            {
+                return;
+            }
+            //--------------
+            Dictionary<string, bool> uniqueNames = new Dictionary<string, bool>();
+            foreach (string name in s_knownTableTags)
+            {
+                if (!uniqueNames.ContainsKey(name))
+                {
+                    uniqueNames.Add(name, true);
+                }
+                else
+                {
+                    throw new System.Exception();
+                }
+            }
+        }
+#endif
+
         public PreviewFontInfo ReadPreview(BinaryReader reader)
         {
 
@@ -1674,12 +1705,13 @@ namespace Typography.WebFont
             PrepTable._N,//12
             CFFTable._N,//13
             "VORG",//14 
-            "EBDT",//15, 
+            EBDT._N,//15, 
 
+            
             //---------------
-            EBLCTable._N,//16
+            EBLC._N,//16
             Gasp._N,//17
-            "hdmx",//18
+            HorizontalDeviceMetrics._N,//18
             Kern._N,//19
             "LTSH",//20 
             "PCLT",//21
@@ -1690,7 +1722,7 @@ namespace Typography.WebFont
             GDEF._N,//26
             GPOS._N,//27
             GSUB._N,//28            
-            "EBSC", //29
+            EBSC._N, //29
             "JSTF", //30
             MathTable._N,//31
              //---------------
@@ -1716,8 +1748,8 @@ namespace Typography.WebFont
             //15 =>	EBDT,	    31 =>MATH,	    47 =>fvar,	     63 =>arbitrary tag follows,...
             //-------------------------------------------------------------------
 
-            "CBDT", //32
-            "CBLC",//33
+            CBDT._N, //32
+            CBLC._N,//33
             COLR._N,//34
             CPAL._N,//35,
             SvgTable._N,//36

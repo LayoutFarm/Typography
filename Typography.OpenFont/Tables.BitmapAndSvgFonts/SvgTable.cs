@@ -1,11 +1,13 @@
 ﻿//Apache2, 2017-present, WinterDev 
 
-
+using System.Collections.Generic;
 using System.IO;
 namespace Typography.OpenFont.Tables
 {
     class SvgTable : TableEntry
     {
+
+
         public const string _N = "SVG "; //with 1 whitespace ***
         public override string Name => _N;
         //
@@ -14,7 +16,7 @@ namespace Typography.OpenFont.Tables
         //which allows some or all glyphs in the font to be defined with color, gradients, or animation.
 
 
-
+        Dictionary<ushort, byte[]> _dicSvgEntries;
         SvgDocumentEntry[] _entries; //TODO: review again
         protected override void ReadContentFrom(BinaryReader reader)
         {
@@ -78,16 +80,17 @@ namespace Typography.OpenFont.Tables
 
                 if (entry.endGlyphID - entry.startGlyphID > 0)
                 {
+                    //TODO review here again
                     throw new System.NotSupportedException();
                 }
 
                 reader.BaseStream.Seek(svgDocIndexStartAt + entry.svgDocOffset, SeekOrigin.Begin);
 
-
                 if (entry.svgDocLength == 0)
                 {
                     throw new System.NotSupportedException();
                 }
+
                 //
                 byte[] svgData = reader.ReadBytes((int)entry.svgDocLength);
                 _entries[i].svgBuffer = svgData;
@@ -103,10 +106,30 @@ namespace Typography.OpenFont.Tables
                 {
                     //TODO: gzip-encoded
                     _entries[i].compressed = true;
+                    //decompress...
                 }
             }
         }
 
+
+        public bool ReadSvgContent(ushort glyphIndex, System.Text.StringBuilder outputStBuilder)
+        {
+            if (_dicSvgEntries == null)
+            {
+                _dicSvgEntries = new Dictionary<ushort, byte[]>();
+                for (int i = 0; i < _entries.Length; ++i)
+                {
+                    SvgDocumentEntry en = _entries[i];
+                    _dicSvgEntries.Add(en.startGlyphID, en.svgBuffer);
+                }
+            }
+            if (_dicSvgEntries.TryGetValue(glyphIndex, out byte[] svgData))
+            {
+                outputStBuilder.Append(System.Text.Encoding.UTF8.GetString(svgData));
+                return true;
+            }
+            return false;
+        }
 #if DEBUG
         static void dbugSaveAsHtml(string filename, string originalGlyphSvg)
         {

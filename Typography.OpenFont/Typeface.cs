@@ -5,6 +5,7 @@ using Typography.OpenFont.Tables;
 
 namespace Typography.OpenFont
 {
+
     public class Typeface
     {
         readonly Bounds _bounds;
@@ -15,6 +16,7 @@ namespace Typography.OpenFont
         readonly NameEntry _nameEntry;
         //
         CFFTable _cffTable;
+        BitmapFontGlyphSource _bitmapFontGlyphSource;
 
         internal Typeface(
             NameEntry nameEntry,
@@ -24,6 +26,7 @@ namespace Typography.OpenFont
             HorizontalMetrics horizontalMetrics,
             OS2Table os2Table)
         {
+
             _nameEntry = nameEntry;
             _bounds = bounds;
             _unitsPerEm = unitsPerEm;
@@ -51,7 +54,25 @@ namespace Typography.OpenFont
             //------
             _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs;
         }
+        internal Typeface(
+             NameEntry nameEntry,
+             Bounds bounds,
+             ushort unitsPerEm,
+             BitmapFontGlyphSource bitmapFontGlyphSource,
+             Glyph[] glyphs,
+             HorizontalMetrics horizontalMetrics,
+             OS2Table os2Table)
+        {
 
+            _nameEntry = nameEntry;
+            _bounds = bounds;
+            _unitsPerEm = unitsPerEm;
+            _bitmapFontGlyphSource = bitmapFontGlyphSource;
+            _horizontalMetrics = horizontalMetrics;
+            OS2Table = os2Table;
+
+            _glyphs = glyphs;
+        }
         /// <summary>
         /// control values in Font unit
         /// </summary>
@@ -79,7 +100,14 @@ namespace Typography.OpenFont
         /// OS2 sTypoDescender, in font designed unit
         /// </summary>
         public short Descender => OS2Table.sTypoDescender;
-
+        /// <summary>
+        /// OS2 usWinAscender
+        /// </summary>
+        public ushort ClipedAscender => OS2Table.usWinAscent;
+        /// <summary>
+        /// OS2 usWinDescender
+        /// </summary>
+        public ushort ClipedDescender => OS2Table.usWinDescent;
 
         /// <summary>
         /// OS2 Linegap
@@ -287,7 +315,8 @@ namespace Typography.OpenFont
         //---------        
         internal PostTable PostTable { get; set; }
         internal bool _evalCffGlyphBounds;
-        internal bool IsCffFont => _cffTable != null;
+        public bool IsCffFont => _cffTable != null;
+
         //---------
         internal MathTable _mathTable;
         internal MathGlyphs.MathGlyphInfo[] _mathGlyphInfos;
@@ -295,7 +324,23 @@ namespace Typography.OpenFont
         //
         public MathGlyphs.MathConstants MathConsts => (_mathTable != null) ? _mathTable._mathConstTable : null;
         //---------
+
+
+        //svg and bitmap font
         internal SvgTable _svgTable;
+        public void ReadSvgContent(Glyph glyph, System.Text.StringBuilder output)
+        {
+            if (_svgTable != null)
+            {
+                _svgTable.ReadSvgContent(glyph.GlyphIndex, output);
+            }
+        }
+
+        public bool IsBitmapFont => _bitmapFontGlyphSource != null;
+        public void ReadBitmapContent(Glyph glyph, System.IO.Stream output)
+        {
+            _bitmapFontGlyphSource.CopyBitmapContent(glyph, output);
+        }
     }
 
 
@@ -601,35 +646,112 @@ namespace Typography.OpenFont
                 return hhea.Ascent + hhea.Descent + hhea.LineGap;
             }
 
+
             public static int CalculateRecommendLineSpacing(this Typeface typeface, out LineSpacingChoice choice)
             {
-                
-                if (RecommendToUseTypoMetricsForLineSpacing(typeface))
-                {
-                    choice = LineSpacingChoice.TypoMetric;
-                    return Calculate_TypoMetricLineSpacing(typeface);
-                }
-                else
-                {
-                    //check if we are on Windows or mac 
-                    if (CurrentEnv.CurrentOSName == CurrentOSName.Mac)
-                    {
-                        choice = LineSpacingChoice.Mac;
-                        return CalculateBTBD_Mac(typeface);
-                    }
-                    else
-                    {
-                        choice = LineSpacingChoice.Windows;
-                        return Calculate_BTBD_Windows(typeface);
-                    }
-                }
+
+                //from https://docs.microsoft.com/en-us/typography/opentype/spec/os2#wa
+                //usWinAscent
+                //Format: 	uint16
+                //Description: 
+                //The “Windows ascender” metric. 
+                //This should be used to specify the height above the baseline for a clipping region.
+
+                //This is similar to the sTypoAscender field, 
+                //and also to the ascender field in the 'hhea' table.
+                //There are important differences between these, however.
+
+                //In the Windows GDI implementation, 
+                //the usWinAscent and usWinDescent values have been used to determine
+                //the size of the bitmap surface in the TrueType rasterizer.
+                //Windows GDI will clip any portion of a TrueType glyph outline that appears above the usWinAscent value.
+                //If any clipping is unacceptable, then the value should be set greater than or equal to yMax.
+
+                //Note: This pertains to the default position of glyphs,
+                //not their final position in layout after data from the GPOS or 'kern' table has been applied.
+                //Also, this clipping behavior also interacts with the VDMX table:
+                //if a VDMX table is present and there is data for the current device aspect ratio and rasterization size,
+                //then the VDMX data will supersede the usWinAscent and usWinDescent values.
+
+                //****
+                //Some legacy applications use the usWinAscent and usWinDescent values to determine default line spacing.
+                //This is **strongly discouraged**. The sTypo* fields should be used for this purpose.
+
+                //Note that some applications use either the usWin* values or the sTypo* values to determine default line spacing,
+                //depending on whether the USE_TYPO_METRICS flag (bit 7) of the fsSelection field is set.
+                //This may be useful to provide **compatibility with legacy documents using older fonts**,
+                //while also providing better and more-portable layout using newer fonts. 
+                //See fsSelection for additional details.
+
+                //Applications that use the sTypo* fields for default line spacing can use the usWin* 
+                //values to determine the size of a clipping region. 
+                //Some applications use a clipping region for editing scenarios to determine what portion of the display surface to re-draw when text is edited, or how large a selection rectangle to draw when text is selected. This is an appropriate use for the usWin* values.
+
+                //Early versions of this specification suggested that the usWinAscent value be computed as the yMax 
+                //for all characters in the Windows “ANSI” character set. 
+
+                //For new fonts, the value should be determined based on the primary languages the font is designed to support,
+                //and **should take into consideration additional height that may be required to accommodate tall glyphs or mark positioning.*** 
+
+                //-----------------------------------------------------------------------------------
+                //usWinDescent
+                //Format: 	uint16
+                //Description:
+                //The “Windows descender” metric.This should be used to specify the vertical extent
+                //below the baseline for a clipping region.
+
+                //This is similar to the sTypoDescender field,
+                //and also to the descender field in the 'hhea' table.
+
+                //***
+                //There are important differences between these, however.
+                //Some of these differences are described below.
+                //In addition, the usWinDescent value treats distances below the baseline as positive values;
+                //thus, usWinDescent is usually a positive value, while sTypoDescender and hhea.descender are usually negative.
+
+                //In the Windows GDI implementation,
+                //the usWinDescent and usWinAscent values have been used 
+                //to determine the size of the bitmap surface in the TrueType rasterizer.
+                //Windows GDI will clip any portion of a TrueType glyph outline that appears below(-1 × usWinDescent). 
+                //If any clipping is unacceptable, then the value should be set greater than or equal to(-yMin).
+
+                //Note: This pertains to the default position of glyphs,
+                //not their final position in layout after data from the GPOS or 'kern' table has been applied.
+                //Also, this clipping behavior also interacts with the VDMX table:
+                //if a VDMX table is present and there is data for the current device aspect ratio and rasterization size,
+                //***then the VDMX data will supersede the usWinAscent and usWinDescent values.****
+                //-----------------------------------------------------------------------------------
+
+                //so ...
+                choice = LineSpacingChoice.TypoMetric;
+                return Calculate_TypoMetricLineSpacing(typeface);
+
+                //if (RecommendToUseTypoMetricsForLineSpacing(typeface))
+                //{
+                //    choice = LineSpacingChoice.TypoMetric;
+                //    return Calculate_TypoMetricLineSpacing(typeface);
+                //}
+                //else
+                //{
+                //    //check if we are on Windows or mac 
+                //    if (CurrentEnv.CurrentOSName == CurrentOSName.Mac)
+                //    {
+                //        choice = LineSpacingChoice.Mac;
+                //        return CalculateBTBD_Mac(typeface);
+                //    }
+                //    else
+                //    {
+                //        choice = LineSpacingChoice.Windows;
+                //        return Calculate_BTBD_Windows(typeface);
+                //    }
+                //}
+
             }
             public static int CalculateRecommendLineSpacing(this Typeface typeface)
             {
-                return CalculateRecommendLineSpacing(typeface, out var _);
+                return CalculateMaxLineClipHeight(typeface);
+                //return CalculateRecommendLineSpacing(typeface, out var _);
             }
-
-
             public static int CalculateLineSpacing(this Typeface typeface, LineSpacingChoice choice)
             {
                 switch (choice)
@@ -642,6 +764,11 @@ namespace Typography.OpenFont
                     case LineSpacingChoice.TypoMetric:
                         return Calculate_TypoMetricLineSpacing(typeface);
                 }
+            }
+            public static int CalculateMaxLineClipHeight(this Typeface typeface)
+            {
+                //TODO: review here
+                return typeface.OS2Table.usWinAscent + typeface.OS2Table.usWinDescent;
             }
 
         }
@@ -735,7 +862,7 @@ namespace Typography.OpenFont
             /// <summary>
             /// curve flatten steps  => this a copy from Typography.Contours's GlyphPartFlattener
             /// </summary>
-            int nsteps = 3;
+            int _nsteps = 3;
             bool _contourOpen = false;
             bool _first_eval = true;
             public CffBoundFinder()
@@ -769,10 +896,10 @@ namespace Typography.OpenFont
 
                 //this a copy from Typography.Contours -> GlyphPartFlattener
 
-                float eachstep = (float)1 / nsteps;
+                float eachstep = (float)1 / _nsteps;
                 float t = eachstep;//start
 
-                for (int n = 1; n < nsteps; ++n)
+                for (int n = 1; n < _nsteps; ++n)
                 {
                     float c = 1.0f - t;
 
@@ -797,10 +924,10 @@ namespace Typography.OpenFont
                 //this a copy from Typography.Contours -> GlyphPartFlattener
 
 
-                float eachstep = (float)1 / nsteps;
+                float eachstep = (float)1 / _nsteps;
                 float t = eachstep;//start
 
-                for (int n = 1; n < nsteps; ++n)
+                for (int n = 1; n < _nsteps; ++n)
                 {
                     float c = 1.0f - t;
 
@@ -904,6 +1031,7 @@ namespace Typography.OpenFont
         }
         public static void UpdateAllCffGlyphBounds(this Typeface typeface)
         {
+            //TODO: review here again,
 
             if (typeface.IsCffFont && !typeface._evalCffGlyphBounds)
             {

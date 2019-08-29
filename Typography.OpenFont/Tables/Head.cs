@@ -43,11 +43,11 @@ namespace Typography.OpenFont.Tables
         public ushort UnitsPerEm { get; private set; }
         public ulong Created { get; private set; }
         public ulong Modified { get; private set; }
-        public Bounds Bounds { get { return _bounds; } }
+        public Bounds Bounds => _bounds;
         public ushort MacStyle { get; private set; }
         public ushort LowestRecPPEM { get; private set; }
         public short FontDirectionHint { get; private set; }
-        public bool WideGlyphLocations { get { return _indexToLocFormat > 0; } }
+        public bool WideGlyphLocations => _indexToLocFormat > 0;
         public short GlyphDataFormat { get; private set; }
 
     }

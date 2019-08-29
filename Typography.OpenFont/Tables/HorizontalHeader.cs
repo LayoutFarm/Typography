@@ -20,7 +20,7 @@ namespace Typography.OpenFont.Tables
         //FWORD     Ascender        Typographic ascent(Distance from baseline of highest ascender).
         //FWORD     Descender       Typographic descent(Distance from baseline of lowest descender).
         //FWORD     LineGap         Typographic line gap.
-        //Negative  LineGap         values are treated as zero in Windows 3.1, and in Mac OS System 6 and System 7.
+        //                          Negative  LineGap values are treated as zero in Windows 3.1, and in Mac OS System 6 and System 7.
         //UFWORD    advanceWidthMax     Maximum advance width value in 'hmtx' table.
         //FWORD     minLeftSideBearing  Minimum left sidebearing value in 'hmtx' table.
         //FWORD     minRightSideBearing     Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).
