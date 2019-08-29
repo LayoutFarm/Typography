@@ -80,7 +80,7 @@ namespace SampleWinForms
             bool found = false;
             foreach (InstalledFont ff in installedFontCollection.GetInstalledFontIter())
             {
-                if (!found && ff.FontName == "Tahoma")
+                if (!found && ff.FontName == "Source Sans Pro")
                 {
                     selectedFF = ff;
                     selected_index = ffcount;
@@ -305,7 +305,7 @@ namespace SampleWinForms
             //draw line mark
 
             float x_pos2 = x_pos + strBox.width + 10;
-            g.DrawRectangle(Pens.Red, x_pos, y_pos, strBox.width, strBox.CalculateLineHeight());
+            g.DrawRectangle(Pens.Red, x_pos, y_pos, strBox.width, strBox.LineSpaceInPx);
             g.DrawLine(Pens.Blue, x_pos, y_pos, x_pos2, y_pos); //baseline
             g.DrawLine(Pens.Green, x_pos, y_pos + strBox.DescendingInPx, x_pos2, y_pos + strBox.DescendingInPx);//descending
             g.DrawLine(Pens.Magenta, x_pos, y_pos + strBox.AscendingInPx, x_pos2, y_pos + strBox.AscendingInPx);//ascending

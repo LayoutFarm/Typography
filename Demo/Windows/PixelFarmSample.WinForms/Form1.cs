@@ -8,6 +8,7 @@ using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
+using PixelFarm.Contours;
 
 using Typography.OpenFont;
 using Typography.TextLayout;
@@ -16,6 +17,8 @@ using Typography.Contours;
 using Typography.WebFont;
 
 using BrotliSharpLib;
+using PaintLab.Svg;
+using LayoutFarm.WebLexer;
 
 namespace SampleWinForms
 {
@@ -40,10 +43,16 @@ namespace SampleWinForms
 
             var dicProvider = new Typography.TextBreak.IcuSimpleTextFileDictionaryProvider() { DataDir = "../../../../../Typography.TextBreak/icu62/brkitr" };
             Typography.TextBreak.CustomBreakerBuilder.Setup(dicProvider);
-
             this.Load += new System.EventHandler(this.Form1_Load);
+            SetupWoffDecompressFunctions();
 
 
+            MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
+
+        }
+
+        void SetupWoffDecompressFunctions()
+        {
             //
             //Woff
             WoffDefaultZlibDecompressFunc.DecompressHandler = (byte[] compressedBytes, byte[] decompressedResult) =>
@@ -108,6 +117,7 @@ namespace SampleWinForms
             };
         }
 
+
         void RenderByGlyphName(string selectedGlyphName)
         {
             //---------------------------------------------
@@ -129,9 +139,9 @@ namespace SampleWinForms
 
             //test print 3 lines
 #if DEBUG
-            GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-            GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-            GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+            DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+            DynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+            DynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
 
@@ -162,7 +172,7 @@ namespace SampleWinForms
 
 
             //copy from Agg's memory buffer to gdi 
-            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
+            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSizeNotFlip(_destImg, _winBmp);
             _g.Clear(System.Drawing.Color.White);
             _g.DrawImage(_winBmp, new System.Drawing.Point(10, 0));
         }
@@ -170,6 +180,56 @@ namespace SampleWinForms
         bool _readyToRender;
 
         LayoutFarm.OpenFontTextService _textService;
+
+        VgVisualDocHost _vgDocHost = new VgVisualDocHost();
+        MemBitmap ParseAndRenderSvg(System.Text.StringBuilder svgContent)
+        {
+            //----------
+            //copy from HtmlRenderer's SvgViewer demo
+            //----------  
+            var docBuilder = new VgDocBuilder();
+            var parser = new SvgParser(docBuilder);
+            TextSnapshot textSnapshot = new TextSnapshot(svgContent.ToString());
+            parser.ParseDocument(textSnapshot);
+
+            VgVisualDocBuilder builder = new VgVisualDocBuilder();
+            VgVisualElement vgVisElem = builder.CreateVgVisualDoc(docBuilder.ResultDocument, _vgDocHost).VgRootElem;
+            RectD bounds = vgVisElem.GetRectBounds();
+            float actualXOffset = (float)-bounds.Left;
+            float actualYOffset = (float)-bounds.Bottom;
+
+            int bmpW = (int)Math.Round(bounds.Width);
+            int bmpH = (int)Math.Round(bounds.Height);
+
+            if (bmpW == 0 || bmpH == 0)
+            {
+                return null;
+            }
+            MemBitmap memBitmap = new MemBitmap(bmpW, bmpH);
+            using (AggPainterPool.Borrow(memBitmap, out AggPainter p))
+            using (VgPaintArgsPool.Borrow(p, out VgPaintArgs paintArgs))
+            {
+                float orgX = p.OriginX;
+                float orgY = p.OriginY;
+                p.SetOrigin(actualXOffset, actualYOffset);
+
+                p.Clear(PixelFarm.Drawing.Color.White);
+
+                p.FillColor = PixelFarm.Drawing.Color.Black;
+
+                double prevStrokeW = p.StrokeWidth;
+
+                vgVisElem.Paint(paintArgs);
+
+                p.StrokeWidth = prevStrokeW;//restore 
+
+                p.SetOrigin(orgX, orgY);//restore
+            }
+
+            return memBitmap;
+        }
+
+
         void UpdateRenderOutput()
         {
             if (!_readyToRender) return;
@@ -188,6 +248,8 @@ namespace SampleWinForms
                 _textService.LoadFontsFromFolder("../../../TestFonts");
 
                 _devVxsTextPrinter = new VxsTextPrinter(_painter, _textService);
+                _devVxsTextPrinter.SetSvgBmpBuilderFunc(ParseAndRenderSvg);
+
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                 _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
 
@@ -239,9 +301,9 @@ namespace SampleWinForms
 
                         //test print 3 lines
 #if DEBUG
-                        GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-                        GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-                        GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+                        DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+                        DynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+                        DynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
@@ -255,7 +317,7 @@ namespace SampleWinForms
 
 
                         //copy from Agg's memory buffer to gdi 
-                        PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
+                        PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSizeNotFlip(_destImg, _winBmp);
                         _g.Clear(Color.White);
                         _g.DrawImage(_winBmp, new Point(10, 0));
 
@@ -303,7 +365,7 @@ namespace SampleWinForms
                 {
                     _painter.SetOrigin(0, 0);
                     //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-                    PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
+                    PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
                     //--------------- 
                     //7. just render our bitmap
                     _g.Clear(Color.White);
@@ -322,11 +384,12 @@ namespace SampleWinForms
             _debugGlyphVisualizer.DrawBorder = _glyphRenderOptions.DrawBorder;
 
             _debugGlyphVisualizer.ShowTess = _contourAnalysisOpts.ShowTess;
-            _debugGlyphVisualizer.WalkTrianglesAndEdges = _contourAnalysisOpts.ShowTriangle;
+            _debugGlyphVisualizer.ShowTriangles = _contourAnalysisOpts.ShowTriangles;
+            _debugGlyphVisualizer.DrawTrianglesAndEdges = _contourAnalysisOpts.ShowTriangles;
             _debugGlyphVisualizer.DrawEndLineHub = _contourAnalysisOpts.DrawLineHubConn;
             _debugGlyphVisualizer.DrawPerpendicularLine = _contourAnalysisOpts.DrawPerpendicularLine;
-            _debugGlyphVisualizer.WalkCentroidBone = _contourAnalysisOpts.DrawCentroidBone;
-            _debugGlyphVisualizer.WalkGlyphBone = _contourAnalysisOpts.DrawGlyphBone;
+            _debugGlyphVisualizer.DrawCentroid = _contourAnalysisOpts.DrawCentroidBone;
+            _debugGlyphVisualizer.DrawCentroid = _contourAnalysisOpts.DrawGlyphBone;
 
             _debugGlyphVisualizer.GlyphEdgeOffset = _contourAnalysisOpts.EdgeOffset;
 
@@ -335,9 +398,9 @@ namespace SampleWinForms
             _debugGlyphVisualizer.DrawGlyphPoint = _contourAnalysisOpts.DrawGlyphPoint;
 
 #if DEBUG
-            GlyphDynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
-            GlyphDynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
-            GlyphDynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
+            DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
+            DynamicOutline.dbugActualPosToConsole = _contourAnalysisOpts.WriteFitOutputToConsole;
+            DynamicOutline.dbugUseHorizontalFitValue = _contourAnalysisOpts.UseHorizontalFitAlignment;
 #endif
 
 
@@ -353,13 +416,13 @@ namespace SampleWinForms
                 RenderGrids(800, 600, _gridSize, _painter);
             }
             _painter.SetOrigin(0, 0);
+
+
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
-            //--------------- 
+            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
+            _g.Clear(System.Drawing.Color.White);
             //7. just render our bitmap
-            _g.Clear(Color.White);
-            _g.DrawImage(_winBmp, new Point(30, 100));
-            //g.DrawRectangle(Pens.White, new System.Drawing.Rectangle(30, 20, winBmp.Width, winBmp.Height));
+            _g.DrawImage(_winBmp, new System.Drawing.Point(10, 0));
         }
 
         void RenderWithMsdfImg(Typeface typeface, char testChar, float sizeInPoint)
@@ -374,10 +437,10 @@ namespace SampleWinForms
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
-            var glyphToContour = new GlyphContourBuilder();
+            var glyphToContour = new ContourBuilder();
             var msdfGenPars = new MsdfGenParams();
 
-            builder.ReadShapes(glyphToContour);
+            builder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
             //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
             MsdfGenParams genParams = new MsdfGenParams();
             GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
@@ -400,7 +463,7 @@ namespace SampleWinForms
             }
 
             //6. use this util to copy image from Agg actual image to System.Drawing.Bitmap
-            PixelFarm.CpuBlit.Imaging.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
+            PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSize(_destImg, _winBmp);
             //--------------- 
             //7. just render our bitmap
             _g.Clear(Color.White);
@@ -432,180 +495,11 @@ namespace SampleWinForms
 
         private void cmdBuildMsdfTexture_Click(object sender, EventArgs e)
         {
-
-            //samples...
-            //1. create texture from specific glyph index range
-            string sampleFontFile = "../../../TestFonts/tahoma.ttf";
-            CreateSampleMsdfTextureFont(
-                sampleFontFile,
-                18,
-                0,
-                100,
-                "d:\\WImageTest\\sample_msdf.png");
-            //---------------------------------------------------------
-            //2. for debug, create from some unicode chars
-            //
-            //CreateSampleMsdfTextureFont(
-            //   sampleFontFile,
-            //   18,
-            //  new char[] { 'I' },
-            //  "d:\\WImageTest\\sample_msdf.png");
-            //---------------------------------------------------------
-            ////3.
-            //GlyphTranslatorToContour tx = new GlyphTranslatorToContour();
-            //tx.BeginRead(1);
-            ////tx.MoveTo(10, 10);
-            ////tx.LineTo(25, 25);
-            ////tx.LineTo(15, 10);
-            //tx.MoveTo(3.84f, 0);
-            //tx.LineTo(1.64f, 0);
-            //tx.LineTo(1.64f, 18.23f);
-            //tx.LineTo(3.84f, 18.23f);
-            //tx.CloseContour();
-            //tx.EndRead();
-            ////
-            //CreateSampleMsdfImg(tx, "d:\\WImageTest\\tx_contour2.bmp");
-
-        }
-        static void CreateSampleMsdfTextureFont(
-          string fontfile, float sizeInPoint,
-          char[] chars, string outputFile)
-        {
-            //sample
-            var reader = new OpenFontReader();
-            using (var fs = new FileStream(fontfile, FileMode.Open))
-            {
-                //1. read typeface from font file
-                Typeface typeface = reader.Read(fs);
-                //sample: create sample msdf texture 
-                //-------------------------------------------------------------
-                var builder = new GlyphPathBuilder(typeface);
-                //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
-                //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
-                //-------------------------------------------------------------
-                var atlasBuilder = new SimpleFontAtlasBuilder();
-
-                MsdfGenParams msdfGenParams = new MsdfGenParams();
-
-                int j = chars.Length;
-                for (int i = 0; i < j; ++i)
-                {
-                    //build glyph
-                    ushort gindex = typeface.LookupIndex(chars[i]);
-                    builder.BuildFromGlyphIndex(gindex, -1);
-
-                    var glyphToContour = new GlyphContourBuilder();
-                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
-                    builder.ReadShapes(glyphToContour);
-                    msdfGenParams.shapeScale = 1f / 64;
-                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, msdfGenParams);
-                    atlasBuilder.AddGlyph(gindex, glyphImg);
-                    int w = glyphImg.Width;
-                    int h = glyphImg.Height;
-                    using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                    {
-                        var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                        int[] imgBuffer = glyphImg.GetImageBuffer();
-                        System.Runtime.InteropServices.Marshal.Copy(imgBuffer, 0, bmpdata.Scan0, imgBuffer.Length);
-                        bmp.UnlockBits(bmpdata);
-                        bmp.Save("d:\\WImageTest\\a001_xn2_" + (chars[i]) + ".png");
-                    }
-                }
-
-                var glyphImg2 = atlasBuilder.BuildSingleImage();
-                using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                {
-                    var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
-                        System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                    int[] intBuffer = glyphImg2.GetImageBuffer();
-
-                    System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
-                    bmp.UnlockBits(bmpdata);
-                    bmp.Save("d:\\WImageTest\\a_total.png");
-                }
-                atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
-            }
+            FormMsdfTest2 test2 = new FormMsdfTest2();
+            test2.Show();
         }
 
-        static void CreateSampleMsdfImg(GlyphContourBuilder tx, string outputFile)
-        {
-            //sample
 
-            MsdfGenParams msdfGenParams = new MsdfGenParams();
-            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(tx, msdfGenParams);
-            int w = glyphImg.Width;
-            int h = glyphImg.Height;
-            using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-            {
-                var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                int[] imgBuffer = glyphImg.GetImageBuffer();
-                System.Runtime.InteropServices.Marshal.Copy(imgBuffer, 0, bmpdata.Scan0, imgBuffer.Length);
-                bmp.UnlockBits(bmpdata);
-                bmp.Save(outputFile);
-            }
-
-        }
-        static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
-        {
-            //sample
-            var reader = new OpenFontReader();
-
-            using (var fs = new FileStream(fontfile, FileMode.Open))
-            {
-                //1. read typeface from font file
-                Typeface typeface = reader.Read(fs);
-                //sample: create sample msdf texture 
-                //-------------------------------------------------------------
-                var builder = new GlyphPathBuilder(typeface);
-                //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
-                //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
-                //-------------------------------------------------------------
-                var atlasBuilder = new SimpleFontAtlasBuilder();
-
-
-                for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
-                {
-                    //build glyph
-                    builder.BuildFromGlyphIndex(gindex, sizeInPoint);
-
-                    var glyphToContour = new GlyphContourBuilder();
-                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
-                    var genParams = new MsdfGenParams();
-                    builder.ReadShapes(glyphToContour);
-                    //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
-                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
-                    atlasBuilder.AddGlyph(gindex, glyphImg);
-
-                    using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                    {
-                        int[] buffer = glyphImg.GetImageBuffer();
-
-                        var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                        System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
-                        bmp.UnlockBits(bmpdata);
-                        bmp.Save("d:\\WImageTest\\a001_xn2_" + gindex + ".png");
-                    }
-                }
-
-                var glyphImg2 = atlasBuilder.BuildSingleImage();
-                using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                {
-                    var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
-                        System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                    int[] intBuffer = glyphImg2.GetImageBuffer();
-
-                    System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
-                    bmp.UnlockBits(bmpdata);
-                    bmp.Save("d:\\WImageTest\\a_total.png");
-                }
-                atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.bin");
-                //
-                //-----------
-                //test read texture info back
-                var atlasBuilder2 = new SimpleFontAtlasBuilder();
-                var readbackFontAtlas = atlasBuilder2.LoadFontInfo("d:\\WImageTest\\a_info.bin");
-            }
-        }
         private void Form1_Load(object sender, EventArgs e1)
         {
             this.Text = "Render with PixelFarm";
@@ -755,7 +649,7 @@ namespace SampleWinForms
             glyphTextureGen.CreateTextureFontFromInputChars(
                 typeface,
                 fontSizeInPoints,
-                TextureKind.StencilLcdEffect,
+                PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
                 sampleChars,
                 (glyphIndex, glyphImage, outputAtlasBuilder) =>
                 {

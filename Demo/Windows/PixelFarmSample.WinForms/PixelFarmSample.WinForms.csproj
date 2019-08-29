@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET20</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET20,</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,8 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugGlyphVisualizer.cs" />
@@ -47,12 +49,22 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormMsdfTest2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMsdfTest2.Designer.cs">
+      <DependentUpon>FormMsdfTest2.cs</DependentUpon>
+    </Compile>
     <Compile Include="IcuSimpleTextFileDictionaryProvider.cs" />
     <Compile Include="PixelFarm\BitmapHelper.cs" />
+    <Compile Include="PixelFarm\GdiBitmapIO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMsdfTest2.resx">
+      <DependentUpon>FormMsdfTest2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -75,10 +87,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\N20\Typography.Contours\Typography.Contours.csproj">
-      <Project>{b999f927-08c5-4328-b07e-69acc1392da4}</Project>
-      <Name>Typography.Contours</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c6807d05-09be-4313-9f8b-bd2d51c55819}</Project>
       <Name>Typography.GlyphLayout</Name>
@@ -102,6 +110,10 @@
     <ProjectReference Include="..\..\..\PixelFarm\BackEnd.Triangulation\BackEnd.Triangulation.csproj">
       <Project>{c5e5802d-6a45-4fe9-bae7-5f0ae91d72c1}</Project>
       <Name>BackEnd.Triangulation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\PixelFarm\PaintLab.Svg\PaintLab.Svg.csproj">
+      <Project>{466dd2ae-eadc-4e20-82b3-da6d018006c5}</Project>
+      <Name>PaintLab.Svg</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>

@@ -296,8 +296,7 @@ namespace Typography.TextServices
             }
             //
             string fontNameUpper = newfont.FontName.ToUpper();
-            InstalledFont found;
-            if (selectedFontGroup.TryGetValue(fontNameUpper, out found))
+            if (selectedFontGroup.TryGetValue(fontNameUpper, out InstalledFont found))
             {
                 //TODO:
                 //we already have this font name
@@ -325,9 +324,8 @@ namespace Typography.TextServices
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
 
-            //find font group
-            FontGroup foundFontGroup;
-            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out foundFontGroup))
+            //find font group 
+            if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out FontGroup foundFontGroup))
             {
                 InstalledFont foundInstalledFont;
                 foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont);
@@ -340,7 +338,6 @@ namespace Typography.TextServices
         {
             //not auto resolve
             FontGroup selectedFontGroup;
-            InstalledFont _found;
             switch (wellknownSubFam)
             {
                 default: return null;
@@ -349,7 +346,7 @@ namespace Typography.TextServices
                 case InstalledFontStyle.Italic: selectedFontGroup = _italic; break;
                 case (InstalledFontStyle.Bold | InstalledFontStyle.Italic): selectedFontGroup = _bold_italic; break;
             }
-            selectedFontGroup.TryGetValue(fontName.ToUpper(), out _found);
+            selectedFontGroup.TryGetValue(fontName.ToUpper(), out InstalledFont _found);
             return _found;
         }
         //public FindResult GetFont(string fontName, InstalledFontStyle style, out InstalledFont found)
