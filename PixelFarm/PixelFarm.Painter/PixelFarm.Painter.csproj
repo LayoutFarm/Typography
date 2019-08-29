@@ -140,6 +140,9 @@
     <Compile Include="..\pixelfarm.vectors\3_transform\Viewport.cs">
       <Link>0_REF_Vectors\3_Transform\Viewport.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Vectors\4_Utils\PolygonSimplifier.cs">
+      <Link>0_REF_Vectors\PolygonSimplifier.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Vectors\5_Clipper\cliper.cs">
       <Link>0_REF_Vectors\5_Clipper\cliper.cs</Link>
     </Compile>
@@ -147,9 +150,10 @@
       <Link>0_REF_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
     <Compile Include="0_Base\ForNet20.cs" />
+    <Compile Include="2_General\TempContext.cs" />
     <Compile Include="3_Cpu_Blit\ColorRGBAf.cs" />
     <Compile Include="3_Cpu_Blit\PainterExtensions.cs" />
-    <Compile Include="2_Canvas\ColorEx.cs" />
+    <Compile Include="2_General\ColorEx.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\BoundingRect.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\CurveFlattener.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\LineWalker.cs" />
@@ -160,10 +164,10 @@
     <Compile Include="4_CpuBlit_VertexProcessing\StrokeGenerator.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\StrokeGen.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\StrokeMath.cs" />
+    <Compile Include="4_CpuBlit_VertexProcessing\SvgArcSegment.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VectorToolBox.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexData.cs" />
-    <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs" />
-    <Compile Include="2_Canvas\ITextPrinter.cs" />
+    <Compile Include="2_General\ITextPrinter.cs" />
     <Compile Include="3_Cpu_Blit\MemBitmap.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexHitTester.cs" />
     <Compile Include="4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs" />

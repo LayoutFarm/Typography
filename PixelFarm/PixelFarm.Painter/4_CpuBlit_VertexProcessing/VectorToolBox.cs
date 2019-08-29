@@ -66,73 +66,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
     }
 
 
-    //--------------------------------------------------
-
-    public struct TempContext<T> : IDisposable
-    {
-        internal readonly T _tool;
-        internal TempContext(out T tool)
-        {
-            Temp<T>.GetFreeItem(out _tool);
-            tool = _tool;
-        }
-        public void Dispose()
-        {
-            Temp<T>.Release(_tool);
-        }
-    }
-
-    public static class Temp<T>
-    {
-        [System.ThreadStatic]
-        static Stack<T> s_pool;
-        [System.ThreadStatic]
-        static Func<T> s_newHandler;
-        [System.ThreadStatic]
-        static Action<T> s_releaseCleanUp;
-
-        public static TempContext<T> Borrow(out T freeItem)
-        {
-            return new TempContext<T>(out freeItem);
-        }
-
-        public static void SetNewHandler(Func<T> newHandler, Action<T> releaseCleanUp = null)
-        {
-            //set new instance here, must set this first***
-            if (s_pool == null)
-            {
-                s_pool = new Stack<T>();
-            }
-            s_newHandler = newHandler;
-            s_releaseCleanUp = releaseCleanUp;
-        }
-        internal static void GetFreeItem(out T freeItem)
-        {
-            if (s_pool.Count > 0)
-            {
-                freeItem = s_pool.Pop();
-            }
-            else
-            {
-                freeItem = s_newHandler();
-            }
-        }
-        internal static void Release(T item)
-        {
-            s_releaseCleanUp?.Invoke(item);
-            s_pool.Push(item);
-            //... 
-        }
-        public static bool IsInit()
-        {
-            return s_pool != null;
-        }
-    }
-
-
 }
 namespace PixelFarm.Drawing
 {
+
+    using PixelFarm.CpuBlit;
 
     public static class VxsTemp
     {
@@ -150,8 +88,47 @@ namespace PixelFarm.Drawing
         {
             return new VxsContext3(out vxs1, out vxs2, out vxs3);
         }
-
-
+        /// <summary>
+        /// create contour(closed, open) from input flatten XYs,and put into output vxs
+        /// </summary>
+        /// <param name="flattenXYs"></param>
+        /// <param name="vxs"></param>
+        /// <param name="closedContour"></param>
+        /// <returns></returns>
+        public static VxsContext1 Borrow(float[] flattenXYs, out VertexStore vxs, bool closedContour = true)
+        {
+            VxsContext1 context1 = Borrow(out vxs);
+            using (VectorToolBox.Borrow(vxs, out PathWriter pw))
+            {
+                if (closedContour)
+                {
+                    pw.WritePolygon(flattenXYs);
+                }
+                else
+                {
+                    pw.WritePolylines(flattenXYs);
+                }
+            }
+            return context1;
+        }
+        public static VxsContext1 Borrow(double[] flattenXYs, out VertexStore vxs, bool closedContour = true)
+        {
+            VxsContext1 context1 = Borrow(out vxs);
+            using (VectorToolBox.Borrow(vxs, out PathWriter pw))
+            {
+                pw.MoveTo(flattenXYs[0], flattenXYs[1]);
+                for (int i = 2; i < flattenXYs.Length;)
+                {
+                    pw.LineTo(flattenXYs[i], flattenXYs[i + 1]);
+                    i += 2;
+                }
+                if (closedContour)
+                {
+                    pw.CloseFigure();
+                }
+            }
+            return context1;
+        }
         //for net20 -- check this
         //TODO: https://stackoverflow.com/questions/18333885/threadstatic-v-s-threadlocalt-is-generic-better-than-attribute
 
@@ -179,7 +156,9 @@ namespace PixelFarm.Drawing
             }
             else
             {
-                return new VertexStore(true);
+                VertexStore vxs = new VertexStore();
+                VertexStore.SetSharedState(vxs, true);
+                return vxs;
             }
         }
     }
@@ -194,7 +173,14 @@ namespace PixelFarm.Drawing
             if (!Temp<Stroke>.IsInit())
             {
                 Temp<Stroke>.SetNewHandler(() => new Stroke(1),
-                    s => s.Width = 1);//reset?
+                    s =>
+                    {
+                        s.Width = 1;
+                        s.LineCap = LineCap.Butt;
+                        s.LineJoin = LineJoin.Miter;
+                        s.StrokeSideForClosedShape = StrokeSideForClosedShape.Both;
+                    }
+                    );//reset?
             }
             return Temp<Stroke>.Borrow(out stroke);
         }
@@ -222,6 +208,14 @@ namespace PixelFarm.Drawing
             }
             return Temp<Arc>.Borrow(out arc);
         }
+        public static TempContext<SvgArcSegment> Borrow(out SvgArcSegment arc)
+        {
+            if (!Temp<SvgArcSegment>.IsInit())
+            {
+                Temp<SvgArcSegment>.SetNewHandler(() => new SvgArcSegment());
+            }
+            return Temp<SvgArcSegment>.Borrow(out arc);
+        }
         public static TempContext<Ellipse> Borrow(out Ellipse ellipse)
         {
             if (!Temp<Ellipse>.IsInit())
@@ -229,6 +223,14 @@ namespace PixelFarm.Drawing
                 Temp<Ellipse>.SetNewHandler(() => new Ellipse());
             }
             return Temp<Ellipse>.Borrow(out ellipse);
+        }
+        public static TempContext<Spiral> Borrow(out Spiral spiral)
+        {
+            if (!Temp<Spiral>.IsInit())
+            {
+                Temp<Spiral>.SetNewHandler(() => new Spiral());
+            }
+            return Temp<Spiral>.Borrow(out spiral);
         }
         public static TempContext<SimpleRect> Borrow(out SimpleRect simpleRect)
         {
@@ -266,6 +268,359 @@ namespace PixelFarm.Drawing
             }
             return Temp<CurveFlattener>.Borrow(out flattener);
         }
+        public static TempContext<PolygonSimplifier> Borrow(out PolygonSimplifier flattener)
+        {
+            if (!Temp<PolygonSimplifier>.IsInit())
+            {
+                Temp<PolygonSimplifier>.SetNewHandler(
+                    () => new PolygonSimplifier(),
+                    f => f.Reset());
+            }
+            return Temp<PolygonSimplifier>.Borrow(out flattener);
+        }
+    }
 
+    public class PolygonSimplifier
+    {
+        public PolygonSimplifier()
+        {
+
+        }
+        public void Reset()
+        {
+            EnableHighQuality = false;
+            Tolerance = 0.5f;//default
+        }
+        public bool EnableHighQuality { get; set; }
+        public float Tolerance { get; set; }
+        public void Simplify(List<VectorMath.Vector2> inputPoints, List<VectorMath.Vector2> simplifiedOutput)
+        {
+
+            PixelFarm.CpuBlit.VertexProcessing.SimplificationHelpers.Simplify(
+                 inputPoints,
+                 (p1, p2) => p1 == p2,
+                     p => p.x,
+                     p => p.y,
+                     simplifiedOutput,
+                     Tolerance,
+                     EnableHighQuality);
+        }
+    }
+
+    public interface IVector2dProvider
+    {
+        int CoordCount { get; }
+        void GetCoord(int index, out double x, out double y);
+        void GetCoord(int index, out float x, out float y);
+    }
+
+    public class Vec2dSource : IVector2dProvider
+    {
+        List<PixelFarm.VectorMath.Vector2> _vecSource;
+        public Vec2dSource()
+        {
+        }
+        public void SetVectorSource(List<PixelFarm.VectorMath.Vector2> source)
+        {
+            _vecSource = source;
+        }
+        int IVector2dProvider.CoordCount => _vecSource.Count;
+        void IVector2dProvider.GetCoord(int index, out double x, out double y)
+        {
+            PixelFarm.VectorMath.Vector2 vec = _vecSource[index];
+            x = vec.x;
+            y = vec.y;
+        }
+        void IVector2dProvider.GetCoord(int index, out float x, out float y)
+        {
+            PixelFarm.VectorMath.Vector2 vec = _vecSource[index];
+            x = (float)vec.x;
+            y = (float)vec.y;
+        }
+    }
+
+
+    public static class PathWriterExtensions
+    {
+        public static void WritePolylines(this PathWriter pw, IVector2dProvider points)
+        {
+            int count = points.CoordCount;
+            if (count > 1)
+            {
+                points.GetCoord(0, out double x, out double y);
+                pw.MoveTo(x, y);
+                for (int i = 1; i < count; ++i)
+                {
+                    points.GetCoord(i, out x, out y);
+                    pw.LineTo(x, y);
+                }
+            }
+        }
+        public static void WritePolylines(this PathWriter pw, float[] points)
+        {
+            int j = points.Length;
+            if (j >= 4)
+            {
+                pw.MoveTo(points[0], points[1]);
+                for (int i = 2; i < j;)
+                {
+                    pw.LineTo(points[i], points[i + 1]);
+                    i += 2;
+                }
+            }
+        }
+        public static void WritePolylines(this PathWriter pw, double[] points)
+        {
+            int j = points.Length;
+            if (j >= 4)
+            {
+                pw.MoveTo(points[0], points[1]);
+                for (int i = 2; i < j;)
+                {
+                    pw.LineTo(points[i], points[i + 1]);
+                    i += 2;
+                }
+            }
+        }
+
+        //-----------------------------------------------------------------------------------------
+        public static void WritePolygon(this PathWriter pw, IVector2dProvider points)
+        {
+            int count = points.CoordCount;
+            if (count > 1)
+            {
+                points.GetCoord(0, out double x, out double y);
+                pw.MoveTo(x, y);
+                for (int i = 1; i < count; ++i)
+                {
+                    pw.LineTo(x, y);
+                }
+                pw.CloseFigure();
+            }
+
+        }
+        public static void WritePolygon(this PathWriter pw, float[] points)
+        {
+            int j = points.Length;
+            if (j >= 4)
+            {
+                pw.MoveTo(points[0], points[1]);
+                for (int i = 2; i < j;)
+                {
+                    pw.LineTo(points[i], points[i + 1]);
+                    i += 2;
+                }
+                pw.CloseFigure();
+            }
+        }
+        public static void WritePolygon(this PathWriter pw, double[] points)
+        {
+            int j = points.Length;
+            if (j >= 4)
+            {
+                pw.MoveTo(points[0], points[1]);
+                for (int i = 2; i < j;)
+                {
+                    pw.LineTo(points[i], points[i + 1]);
+                    i += 2;
+                }
+                pw.CloseFigure();
+            }
+        }
+        //-----------------------------------------------------------------------------------------
+
+        public static void WriteSmoothCurve3(this PathWriter pw, IVector2dProvider points, bool closedShape)
+        {
+            int coordCount = points.CoordCount;
+            switch (coordCount)
+            {
+                case 0:
+                case 1: return;
+                case 2:
+                    {
+                        points.GetCoord(0, out double x, out double y);
+                        pw.MoveTo(x, y);
+                        points.GetCoord(1, out x, out y);
+                        pw.LineTo(x, y);
+                    }
+                    break;
+                case 3:
+                    {
+                        points.GetCoord(0, out double x0, out double y0);
+                        points.GetCoord(1, out double x1, out double y1);
+                        points.GetCoord(2, out double x2, out double y2);
+                        pw.MoveTo(x0, y0);
+                        pw.Curve3(x1, y1, x2, y2);
+                        if (closedShape)
+                        {
+                            pw.SmoothCurve3(x0, y0);
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        points.GetCoord(0, out double x0, out double y0);
+                        points.GetCoord(1, out double x1, out double y1);
+                        points.GetCoord(2, out double x2, out double y2);
+                        pw.MoveTo(x0, y0);
+                        pw.Curve3(x1, y1, x2, y2);
+                        for (int i = 3; i < coordCount; ++i)
+                        {
+                            points.GetCoord(i, out double x, out double y);
+                            pw.SmoothCurve3(x, y);
+                        }
+                        if (closedShape)
+                        {
+                            pw.SmoothCurve3(x0, y0);
+                        }
+                    }
+                    break;
+            }
+        }
+        public static void WriteSmoothCurve4(this PathWriter pw, IVector2dProvider points, bool closedShape)
+        {
+            int coordCount = points.CoordCount;
+            switch (coordCount)
+            {
+                case 0:
+                case 1: return;
+                case 2:
+                    {
+                        points.GetCoord(0, out double x, out double y);
+                        pw.MoveTo(x, y);
+                        points.GetCoord(1, out x, out y);
+                        pw.LineTo(x, y);
+                    }
+                    break;
+                case 3:
+                    {
+                        points.GetCoord(0, out double x0, out double y0);
+                        points.GetCoord(1, out double x1, out double y1);
+                        points.GetCoord(2, out double x2, out double y2);
+                        pw.MoveTo(x0, y0);
+                        pw.Curve3(x1, y1, x2, y2);//***, we have 3 points, so we use Curve3
+                        if (closedShape)
+                        {
+                            pw.SmoothCurve3(x0, y0);
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        points.GetCoord(0, out double x0, out double y0);
+                        points.GetCoord(1, out double x1, out double y1);
+                        points.GetCoord(2, out double x2, out double y2);
+                        points.GetCoord(3, out double x3, out double y3);
+                        pw.MoveTo(x0, y0);
+                        pw.Curve4(x1, y1, x2, y2, x3, y3);
+
+                        for (int i = 4; i < coordCount - 1;)
+                        {
+                            points.GetCoord(i, out x2, out y2);
+                            points.GetCoord(i + 1, out x3, out y3);
+                            pw.SmoothCurve4(x2, y2, x3, y3);
+                            i += 2;
+                        }
+                        if (closedShape)
+                        {
+                            pw.SmoothCurve4(x3, y3, x0, y0);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+
+
+
+    public class Spiral
+    {
+        double _x;
+        double _y;
+        double _r1;
+        double _r2;
+        double _step;
+        double _start_angle;
+        double _angle;
+        double _curr_r;
+        double _da;
+        double _dr;
+        bool _start;
+        public Spiral()
+        {
+
+        }
+        public void SetParameters(double x, double y, double r1, double r2, double step, double start_angle = 0)
+        {
+            _x = x;
+            _y = y;
+            _r1 = r1;
+            _r2 = r2;
+            _step = step;
+            _start_angle = start_angle;
+            _angle = start_angle;
+            _da = AggMath.deg2rad(4.0);
+            _dr = _step / 90.0;
+        }
+        IEnumerable<VertexData> GetVertexIter()
+        {
+            //--------------
+            //rewind
+            _angle = _start_angle;
+            _curr_r = _r1;
+            _start = true;
+            //--------------
+
+            VertexCmd cmd;
+            double x, y;
+            for (; ; )
+            {
+                cmd = GetNextVertex(out x, out y);
+                switch (cmd)
+                {
+                    case VertexCmd.NoMore:
+                        {
+                            yield return new VertexData(cmd, x, y);
+                            yield break;
+                        }
+                    default:
+                        {
+                            yield return new VertexData(cmd, x, y);
+                        }
+                        break;
+                }
+            }
+        }
+        public VertexStore MakeVxs(VertexStore vxs)
+        {
+
+            foreach (VertexData v in this.GetVertexIter())
+            {
+                vxs.AddVertex(v.x, v.y, v.command);
+            }
+            return vxs;
+        }
+
+        public VertexCmd GetNextVertex(out double x, out double y)
+        {
+            x = 0;
+            y = 0;
+            if (_curr_r > _r2)
+            {
+                return VertexCmd.NoMore;
+            }
+
+            x = _x + Math.Cos(_angle) * _curr_r;
+            y = _y + Math.Sin(_angle) * _curr_r;
+            _curr_r += _dr;
+            _angle += _da;
+            if (_start)
+            {
+                _start = false;
+                return VertexCmd.MoveTo;
+            }
+            return VertexCmd.LineTo;
+        }
     }
 }

@@ -31,17 +31,11 @@ namespace PixelFarm.Drawing
         double[] _coord_xy;
         byte[] _cmds;
 
-        //***
-        RenderVx _cachedAreaRenderVx;
-        RenderVx _cachedBorderRenerVx;
-        //
-
 #if DEBUG
         public readonly bool dbugIsTrim;
         static int dbugTotal = 0;
         public readonly int dbugId = dbugGetNewId();
         public int dbugNote;
-
         static int dbugGetNewId()
         {
             return dbugTotal++;
@@ -49,12 +43,14 @@ namespace PixelFarm.Drawing
 #endif
         public VertexStore()
         {
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine("vxs_1_dbugId=" + dbugId);
+#endif
             AllocIfRequired(2);
-        }
-        public VertexStore(bool isShared)
+        } 
+        public static void SetSharedState(VertexStore vxs, bool isShared)
         {
-            AllocIfRequired(2);
-            IsShared = isShared;
+            vxs.IsShared = isShared;
         }
         public bool IsShared { get; private set; }
         /// <summary>
@@ -109,9 +105,6 @@ namespace PixelFarm.Drawing
             //System.Array.Clear(m_cmds, 0, m_cmds.Length);
             System.Array.Clear(_cmds, 0, _vertices_count); //only latest 
             _vertices_count = 0;
-            //
-            _cachedAreaRenderVx = null;
-            //
         }
         public void ConfirmNoMore()
         {
@@ -126,27 +119,16 @@ namespace PixelFarm.Drawing
 
             }
 #endif
-            if (_vertices_count >= _allocated_vertices_count)
+
+            if (_vertices_count + 1 >= _allocated_vertices_count)
             {
-                AllocIfRequired(_vertices_count);
+                AllocIfRequired(_vertices_count + 1);
             }
             _coord_xy[_vertices_count << 1] = x;
             _coord_xy[(_vertices_count << 1) + 1] = y;
             _cmds[_vertices_count] = (byte)cmd;
             _vertices_count++;
         }
-        //--------------------------------------------------
-
-
-        public void EndGroup()
-        {
-            if (_vertices_count > 0)
-            {
-                _cmds[_vertices_count - 1] = (byte)VertexCmd.CloseAndEndFigure;
-            }
-
-        }
-
 
         internal void ReplaceVertex(int index, double x, double y)
         {
@@ -174,49 +156,6 @@ namespace PixelFarm.Drawing
         }
 
 
-        //--------------------------------------------------
-        public static void SetAreaRenderVx(VertexStore vxs, RenderVx renderVx)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-            vxs._cachedAreaRenderVx = renderVx;
-        }
-        public static RenderVx GetAreaRenderVx(VertexStore vxs)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-
-            return vxs._cachedAreaRenderVx;
-        }
-        public static void SetBorderRenderVx(VertexStore vxs, RenderVx renderVx)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-            vxs._cachedBorderRenerVx = renderVx;
-        }
-        public static RenderVx GetBorderRenderVx(VertexStore vxs)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-            return vxs._cachedBorderRenerVx;
-        }
-        //--------------------------------------------------
 #if DEBUG
         public override string ToString()
         {
@@ -317,8 +256,8 @@ namespace PixelFarm.Drawing
                 //alloc a new one
                 int new_alloc = _vertices_count + another._vertices_count;
 
-                _allocated_vertices_count = new_alloc;
-                _vertices_count = new_alloc;//new 
+
+                //_vertices_count = new_alloc;//new 
 
                 var new_coord_xy = new double[(new_alloc + 1) << 1];//*2
                 var new_cmds = new byte[(new_alloc + 1)];
@@ -362,6 +301,7 @@ namespace PixelFarm.Drawing
                 _coord_xy = new_coord_xy;
                 _cmds = new_cmds;
                 _vertices_count += another._vertices_count;
+                _allocated_vertices_count = new_alloc;
             }
             else
             {
@@ -372,7 +312,7 @@ namespace PixelFarm.Drawing
                   _vertices_count << 1,//*2 //
                   another._vertices_count << 1);
 
-                
+
 
                 //B.2 
                 System.Array.Copy(
@@ -383,12 +323,15 @@ namespace PixelFarm.Drawing
                       another._vertices_count);
 
                 _vertices_count += another._vertices_count;
+
             }
         }
         private VertexStore(VertexStore src, bool trim)
         {
             //for copy from src to this instance
-
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine("vxs_3_dbugId=" + dbugId);
+#endif
 
             _vertices_count = src._vertices_count;
 
@@ -447,7 +390,9 @@ namespace PixelFarm.Drawing
         private VertexStore(VertexStore src, PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer tx)
         {
             //for copy from src to this instance
-
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine("vxs_4_dbugId=" + dbugId);
+#endif
             _allocated_vertices_count = src._allocated_vertices_count;
             _vertices_count = src._vertices_count;
             //
@@ -511,24 +456,20 @@ namespace PixelFarm.Drawing
 
     public static class VertexStoreExtensions
     {
-        /// <summary>
-        /// add 2nd curve point (for C3,C4 curve)
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public static void AddP2c(this VertexStore vxs, double x, double y)
+
+
+        public static void AddC3To(this VertexStore vxs, double x1, double y1, double x2, double y2)
         {
-            vxs.AddVertex(x, y, VertexCmd.P2c);
+            vxs.AddVertex(x1, y1, VertexCmd.C3);
+            vxs.AddVertex(x2, y2, VertexCmd.LineTo);
         }
-        /// <summary>
-        /// add 3rd curve point (for C4 curve)
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public static void AddP3c(this VertexStore vxs, double x, double y)
+        public static void AddC4To(this VertexStore vxs, double x1, double y1, double x2, double y2, double x3, double y3)
         {
-            vxs.AddVertex(x, y, VertexCmd.P3c);
+            vxs.AddVertex(x1, y1, VertexCmd.C4);
+            vxs.AddVertex(x2, y2, VertexCmd.C4);
+            vxs.AddVertex(x3, y3, VertexCmd.LineTo);
         }
+
         public static void AddMoveTo(this VertexStore vxs, double x0, double y0)
         {
             vxs.AddVertex(x0, y0, VertexCmd.MoveTo);
@@ -542,10 +483,16 @@ namespace PixelFarm.Drawing
             double x2, double y2,
             double x3, double y3)
         {
-            vxs.AddVertex(x1, y1, VertexCmd.P3c);
-            vxs.AddVertex(x2, y2, VertexCmd.P3c);
+            vxs.AddVertex(x1, y1, VertexCmd.C4);
+            vxs.AddVertex(x2, y2, VertexCmd.C4);
             vxs.AddVertex(x3, y3, VertexCmd.LineTo);
-
+        }
+        public static void AddCurve3To(this VertexStore vxs,
+           double x1, double y1,
+           double x2, double y2)
+        {
+            vxs.AddVertex(x1, y1, VertexCmd.C3);
+            vxs.AddVertex(x2, y2, VertexCmd.LineTo);
         }
         public static void AddCloseFigure(this VertexStore vxs)
         {
@@ -559,28 +506,8 @@ namespace PixelFarm.Drawing
         {
             vxs.AddVertex(0, 0, VertexCmd.NoMore);
         }
-        /// <summary>
-        /// copy + translate vertext data from src to outputVxs
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="dx"></param>
-        /// <param name="dy"></param>
-        /// <param name="outputVxs"></param>
-        /// <returns></returns>
-        public static VertexStore TranslateToNewVxs(this VertexStore src, double dx, double dy, VertexStore outputVxs)
-        {
-            int count = src.Count;
-            VertexCmd cmd;
-            double x, y;
-            for (int i = 0; i < count; ++i)
-            {
-                cmd = src.GetVertex(i, out x, out y);
-                x += dx;
-                y += dy;
-                outputVxs.AddVertex(x, y, cmd);
-            }
-            return outputVxs;
-        }
+
+
     }
 
     public static class VertexHelper

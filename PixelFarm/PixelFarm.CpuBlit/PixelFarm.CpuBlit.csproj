@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WIN</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,10 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="05_PixelProcessing\BitmapBlenderBase.cs" />
-    <Compile Include="05_PixelProcessing\CO.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs" />
-    <Compile Include="04_FragmentProcessing_Gradient\GradientSpanGen.cs" />
-    <Compile Include="04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs" />
     <Compile Include="05_PixelProcessing\MemBitmapBinder.cs" />
     <Compile Include="05_PixelProcessing\PixelBlenderOthers.cs" />
@@ -68,7 +65,7 @@
     <Content Include="x_backup\4_ImgSpanGenGray.txt" />
     <Compile Include="04_FragmentProcessing\IGammaFunction.cs" />
     <Compile Include="04_FragmentProcessing\ISpanInterpolator.cs" />
-    <Compile Include="05_PixelProcessing\PixelBlenders.cs" />
+    <Compile Include="05_PixelProcessing\PixelBlenderBGRA.cs" />
     <Compile Include="08_ImageResampling\ImageFreeTransform.cs" />
     <Compile Include="08_ImageResampling\ImageInterpolationQuality.cs" />
     <Compile Include="08_ImageResampling\ImageTransform.cs" />
@@ -81,7 +78,7 @@
     <Content Include="x_backup\FilterImageSpanGenerator.ImageBufferAccessor.txt" />
     <Compile Include="04_FragmentProcessing\GammaLookUpTable.cs" />
     <Compile Include="05_PixelProcessing\IBitmapBlender.cs" />
-    <Compile Include="05_PixelProcessing\PixelBlenderRGBA.cs" />
+    <Compile Include="05_PixelProcessing\PixelBlender32.cs" />
     <Compile Include="03_Rasterization\1_Scanline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="03_Rasterization\2_ScanlinePacked8.cs" />

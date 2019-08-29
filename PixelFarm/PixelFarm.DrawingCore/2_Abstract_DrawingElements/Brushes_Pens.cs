@@ -61,218 +61,183 @@ namespace PixelFarm.Drawing
     }
 
 
-    public abstract class GeometryGraidentBrush : Brush
-    {
-
-    }
-
-
-    public class LinearGradientPair
-    {
-        public readonly Color c1;
-        public readonly float x1;
-        public readonly float y1;
-
-
-        public readonly Color c2;
-        public readonly float x2;
-        public readonly float y2;
-        public readonly double Distance;
-        public readonly double Angle;
-
-        public readonly GradientDirection Direction;
-        readonly bool NeedSwap;
-
-        public int steps;
-
-        public LinearGradientPair(PointF stop1, Color c1, PointF stop2, Color c2)
-        {
-            this.c1 = c1;
-            this.c2 = c2;
-            this.x1 = stop1.X;
-            this.y1 = stop1.Y;
-            this.x2 = stop2.X;
-            this.y2 = stop2.Y;
-
-            float dx = stop2.X - stop1.X;
-            float dy = stop2.Y - stop1.Y;
-            NeedSwap = dx < 0;
-
-            if (dx == 0)
-            {
-                //vertical
-                Direction = GradientDirection.Vertical;
-                Distance = Math.Abs(dy);
-            }
-            else if (dy == 0)
-            {
-                //horizontal
-                Direction = GradientDirection.Horizontal;
-                Distance = Math.Abs(dx);
-            }
-            else
-            {
-                Direction = GradientDirection.Angle;
-                Distance = Math.Sqrt(dx * dx + dy * dy);
-            }
-            Angle = (double)Math.Atan2(dy, dx);
-            steps = 256;
-        }
-
-        public void GetProperSwapVertices(
-            out float x1, out float y1, out Color c1,
-            out float x2, out float y2, out Color c2)
-        {
-            if (NeedSwap)
-            {
-                x1 = this.x2;
-                y1 = this.y2;
-                c1 = this.c2;
-                //
-                x2 = this.x1;
-                y2 = this.y1;
-                c2 = this.c1;
-            }
-            else
-            {
-                x1 = this.x1;
-                y1 = this.y1;
-                c1 = this.c1;
-                //
-                x2 = this.x2;
-                y2 = this.y2;
-                c2 = this.c2;
-            }
-
-        }
-        public enum GradientDirection : byte
-        {
-            Vertical,
-            Horizontal,
-            Angle
-        }
-    }
-
-
-    public sealed class CircularGradientBrush : GeometryGraidentBrush
+    public abstract class GeometryGradientBrush : Brush
     {
         object _innerBrush;
-        LinearGradientPair _firstGradientPair;
-        List<LinearGradientPair> _colorPairs;
-
-        PointF _latesStop;
-        Color _latestColor;
-
-        public CircularGradientBrush(PointF stop1, Color c1, PointF stop2, Color c2)
-        {
-            _firstGradientPair = new LinearGradientPair(stop1, c1, stop2, c2);
-            _latesStop = stop2;
-            _latestColor = c2;
-        }
-        public void AddMoreColorStop(PointF stop2, Color c2)
-        {
-            if (_colorPairs == null)
-            {
-                _colorPairs = new List<LinearGradientPair>();
-                _colorPairs.Add(_firstGradientPair);
-            }
-            var newpair = new LinearGradientPair(_latesStop, _latestColor, stop2, c2);
-            _colorPairs.Add(newpair);
-            _latesStop = stop2;
-            _latestColor = c2;
-        }
-        //first stop color, todo review here
-        public Color Color => _firstGradientPair.c1;
-
-        public int PairCount => (_colorPairs == null) ? 1 : _colorPairs.Count;
-
-        public LinearGradientPair GetFirstPair() => _firstGradientPair;
-
-        public IEnumerable<LinearGradientPair> GetColorPairIter()
-        {
-            if (_colorPairs == null)
-            {
-                yield return _firstGradientPair;
-            }
-            else
-            {
-                int j = _colorPairs.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    yield return _colorPairs[i];
-                }
-            }
-        }
-
+        public PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer CoordTransformer { get; set; }
         public override object InnerBrush
         {
             get => _innerBrush;
-
             set => _innerBrush = value;
         }
-        public override BrushKind BrushKind => BrushKind.CircularGraident;
-
         public override void Dispose()
         {
         }
-
     }
 
-    public sealed class LinearGradientBrush : GeometryGraidentBrush
+
+    public enum GradientOffsetUnit : byte
     {
+        Pixel,
+        Ratio,//0-1
+    }
+    public struct ColorStop
+    {
+        public readonly float Offset; //relative offset from center of circular gradient
+        public readonly GradientOffsetUnit OffsetUnit;
+        public readonly Color Color; //color at stop point
 
-        LinearGradientPair _latestPair;
-        List<LinearGradientPair> _colorPairs;
-
-        public LinearGradientBrush(PointF stop1, Color c1, PointF stop2, Color c2)
+        public ColorStop(float offset, GradientOffsetUnit unit, Color color)
         {
-            _latestPair = new LinearGradientPair(stop1, c1, stop2, c2);
-        }
-        public void AddMoreColorStop(PointF stop, Color color)
-        {
-            if (_colorPairs == null)
+            if (offset < 0)
             {
-                _colorPairs = new List<LinearGradientPair>();
-                _colorPairs.Add(_latestPair);
+                offset = 0;
+            }
+            else if (offset > 1)
+            {
+                offset = 1;
             }
 
-            _latestPair = new LinearGradientPair(
-                new PointF(_latestPair.x2, _latestPair.y2),
-                _latestPair.c2,
-                stop, color);
-            //
-            _colorPairs.Add(_latestPair);
+            Offset = offset;
+            OffsetUnit = unit;
+            Color = color;
         }
-
-        public int PairCount => (_colorPairs == null) ? 1 : _colorPairs.Count;
-
-
-        public IEnumerable<LinearGradientPair> GetColorPairIter()
+        public ColorStop(float offset, Color color)
         {
-            if (_colorPairs == null)
+            if (offset < 0)
             {
-                yield return _latestPair;
+                offset = 0;
             }
-            else
+            else if (offset > 1)
             {
-                int j = _colorPairs.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    yield return _colorPairs[i];
-                }
+                offset = 1;
             }
-        }
 
-        public override object InnerBrush { get; set; }
+            Offset = offset;
+            OffsetUnit = GradientOffsetUnit.Ratio;
+            Color = color;
+        }
+        public static readonly ColorStop Empty = new ColorStop();
+    }
+
+    /// <summary>
+    ///  It determines how a shape is filled beyond the defined edges of the gradient.
+    /// </summary>
+    public enum SpreadMethod : byte
+    {
+        //pad
+        //The final color of the gradient fills the shape beyond the gradient's edges.
+        Pad,
+
+        //reflect
+        //The gradient repeats in reverse beyond its edges.
+        Reflect,
+
+        //repeat
+        //The gradient repeats in the original order beyond its edges.
+        Repeat
+    }
+
+    public sealed class RadialGradientBrush : GeometryGradientBrush
+    {
+        ColorStop[] _stops;
+        bool _isValid;
+        public RadialGradientBrush(PointF start, PointF end, Color c1, Color c2)
+            : this(start, end, new ColorStop[]
+            {
+                new ColorStop(0, GradientOffsetUnit.Ratio,c1),
+                new ColorStop(1, GradientOffsetUnit.Ratio,c2),
+            })
+        {
+        }
+        public RadialGradientBrush(PointF start, float r, Color c1, Color c2)
+            : this(start, new PointF(start.X + r, start.Y), new ColorStop[]
+            {
+                new ColorStop(0, GradientOffsetUnit.Ratio,c1),
+                new ColorStop(1, GradientOffsetUnit.Ratio,c2),
+            })
+        {
+        }
+        public RadialGradientBrush(PointF start, float r, ColorStop[] stops)
+            : this(start, new PointF(start.X + r, start.Y), stops)
+        {
+        }
+        public RadialGradientBrush(PointF start, PointF end, ColorStop[] stops)
+        {
+            StartPoint = start;
+            EndPoint = end;
+
+            //must have at least 2 stops
+            if (stops.Length < 2)
+            {
+                return;
+            }
+            //---------------
+
+            _isValid = true;
+            _stops = stops;
+        }
+        public override BrushKind BrushKind => BrushKind.CircularGraident;
+        public SpreadMethod SpreadMethod { get; set; }
+        public PointF StartPoint { get; }
+        public PointF EndPoint { get; }
+        public ColorStop[] ColorStops => _stops;
+        public bool IsValid => _isValid;
+
+        public double Length => System.Math.Sqrt(
+                                    (EndPoint.Y - StartPoint.Y) * (EndPoint.Y - StartPoint.Y) +
+                                    (EndPoint.X - StartPoint.X) * (EndPoint.X - StartPoint.X)
+                                    );
+    }
+
+    public sealed class LinearGradientBrush : GeometryGradientBrush
+    {
+        ColorStop[] _stops;
+        bool _isValid;
+
+        public LinearGradientBrush(PointF start, PointF end, Color c1, Color c2)
+        {
+
+            StartPoint = start;
+            EndPoint = end;
+            _isValid = true;
+            _stops = new ColorStop[]
+            {
+                new ColorStop(0, GradientOffsetUnit.Ratio,c1),
+                new ColorStop(1, GradientOffsetUnit.Ratio,c2),
+            };
+        }
+        public LinearGradientBrush(PointF start, PointF end, ColorStop[] stops)
+        {
+            StartPoint = start;
+            EndPoint = end;
+
+            //must have at least 2 stops
+            if (stops.Length < 2)
+            {
+                return;
+            }
+            //---------------
+
+            _isValid = true;
+            _stops = stops;
+        }
         public override BrushKind BrushKind => BrushKind.LinearGradient;
-
-        public override void Dispose()
-        {
-        }
+        public SpreadMethod SpreadMethod { get; set; }
+        public PointF StartPoint { get; }
+        public PointF EndPoint { get; }
+        public ColorStop[] ColorStops => _stops;
+        public bool IsValid => _isValid;
+        //
+        public double Length => System.Math.Sqrt(
+                                    (EndPoint.Y - StartPoint.Y) * (EndPoint.Y - StartPoint.Y) +
+                                    (EndPoint.X - StartPoint.X) * (EndPoint.X - StartPoint.X)
+                                    );
+        public double Angle => System.Math.Atan2(EndPoint.Y - StartPoint.Y, EndPoint.X - StartPoint.X);
     }
 
 
-    public sealed class PolygonGraidentBrush : GeometryGraidentBrush
+    public sealed class PolygonGradientBrush : GeometryGradientBrush
     {
         public struct ColorVertex2d
         {
@@ -288,7 +253,7 @@ namespace PixelFarm.Drawing
         }
 
         List<ColorVertex2d> _colorVertices = new List<ColorVertex2d>();
-        public PolygonGraidentBrush(ColorVertex2d[] initVertices)
+        public PolygonGradientBrush(ColorVertex2d[] initVertices)
         {
             //start at least 3 vertices
             if (initVertices.Length < 2) throw new NotSupportedException();
@@ -322,9 +287,26 @@ namespace PixelFarm.Drawing
             _strokeColor = color;
             _brush = new SolidBrush(color);
         }
+        public Pen(Color color, float width)
+        {
+            Width = width;
+            _strokeColor = color;
+            _brush = new SolidBrush(color);
+        }
         public Pen(Brush brush)
         {
+            Width = 1;//default
             _brush = brush;
+            if (brush is SolidBrush solidBrush)
+            {
+                _strokeColor = solidBrush.Color;
+            }
+            else
+            {
+                _strokeColor = Color.Black;
+            }
+
+            //TODO: review here
         }
         public override Brush Brush => _brush;
         public Color StrokeColor => _strokeColor;
@@ -332,6 +314,8 @@ namespace PixelFarm.Drawing
         public override object InnerPen { get; set; }
         public override float Width { get; set; }
         public override DashStyle DashStyle { get; set; }
+        public Color Color => _strokeColor;
+
         public override void Dispose()
         {
         }

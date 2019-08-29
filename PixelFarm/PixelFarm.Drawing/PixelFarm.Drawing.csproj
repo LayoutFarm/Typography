@@ -127,17 +127,17 @@
     <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs">
       <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\GradientSpanGen.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\GradientSpanGen.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs">
-      <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\IGradientValueCalculator_and_Impl.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs">
       <Link>0_REF_CpuBlit\04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\MemBitmapBinder.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\MemBitmapBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\PixelBlender32.cs">
+      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlender32.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\PixelBlenderBGRA.cs">
+      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenderBGRA.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs">
       <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs</Link>
@@ -147,9 +147,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\DashStyle.cs">
       <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\DashStyle.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\GraphicsPath.cs">
-      <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\GraphicsPath.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Image.cs">
       <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\Image.cs</Link>
@@ -162,6 +159,9 @@
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\1_VertexStore.cs">
       <Link>0_REF_DrawingCore\3_Canvas\1_VertexStore.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\CO.cs">
+      <Link>0_REF_DrawingCore\3_Canvas\CO.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\3_DrawBoard\CRC32Calculator.cs">
       <Link>0_REF_DrawingCore\3_DrawBoard\CRC32Calculator.cs</Link>
@@ -268,20 +268,11 @@
     <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\BitmapBlenderBase.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\BitmapBlenderBase.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\CO.cs">
-      <Link>0_REF_CpuBlit\05_PixelProcessing\CO.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\IBitmapBlender.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\IBitmapBlender.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\05_pixelprocessing\PixelBlenderOthers.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenderOthers.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\05_PixelProcessing\PixelBlenderRGBA.cs">
-      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenderRGBA.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.CpuBlit\05_pixelprocessing\PixelBlenders.cs">
-      <Link>0_REF_CpuBlit\05_PixelProcessing\PixelBlenders.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.CpuBlit\05_pixelprocessing\SubBitmapBlender.cs">
       <Link>0_REF_CpuBlit\05_PixelProcessing\SubBitmapBlender.cs</Link>
@@ -304,11 +295,14 @@
     <Compile Include="..\PixelFarm.Painter\0_Base\ForNet20.cs">
       <Link>0_REF_Painter\0_Base\ForNet20.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\2_Canvas\ColorEx.cs">
-      <Link>0_REF_Painter\2_Canvas\ColorEx.cs</Link>
+    <Compile Include="..\PixelFarm.Painter\2_General\ColorEx.cs">
+      <Link>0_REF_Painter\2_General\ColorEx.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.Painter\2_Canvas\ITextPrinter.cs">
-      <Link>0_REF_Painter\2_Canvas\ITextPrinter.cs</Link>
+    <Compile Include="..\PixelFarm.Painter\2_General\ITextPrinter.cs">
+      <Link>0_REF_Painter\2_General\ITextPrinter.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Painter\2_General\TempContext.cs">
+      <Link>0_REF_Painter\2_General\TempContext.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs">
       <Link>0_REF_Painter\0_REF_CpuBlit\ColorRGBAf.cs</Link>
@@ -349,6 +343,9 @@
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\StrokeMath.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\StrokeMath.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\SvgArcSegment.cs">
+      <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\SvgArcSegment.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VectorToolBox.cs</Link>
     </Compile>
@@ -357,9 +354,6 @@
     </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexHitTester.cs</Link>
-    </Compile>
-    <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs">
-      <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexStoreBuilder.cs</Link>
     </Compile>
     <Compile Include="..\PixelFarm.Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs">
       <Link>0_REF_Painter\4_CpuBlit_VertexProcessing\VertexStoreExtensions.cs</Link>
@@ -541,6 +535,12 @@
     <Compile Include="..\PixelFarm.Vectors\3_transform\Viewport.cs">
       <Link>0_REF_Painter\1_Vectors\3_Transform\Viewport.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Vectors\4_Utils\PolygonSimplifier.cs">
+      <Link>0_REF_Painter\1_Vectors\4_Utils\PolygonSimplifier.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\4_Utils\Spline2D.cs">
+      <Link>0_REF_Painter\1_Vectors\4_Utils\Spline2D.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Vectors\4_Utils\SvgArc.cs">
       <Link>0_REF_Painter\1_Vectors\4_Utils\SvgArc.cs</Link>
     </Compile>
@@ -553,19 +553,73 @@
     <Compile Include="..\PixelFarm.Vectors\5_Clipper\ClipLiangBarsky.cs">
       <Link>0_REF_Painter\1_Vectors\5_Clipper\ClipLiangBarsky.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\0_Triangle.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\0_Triangle.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\1_Line.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\1_Line.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\2_CentroidPair.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\2_CentroidPair.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\3_BoneJoint.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\3_BoneJoint.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\4_Bone.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\4_Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\5_CentroidLineAndHub.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\5_CentroidLineAndHub.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\Contour.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\Contour.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\ContourBuilder.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\ContourBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\ContourParts.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\ContourParts.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\CurveGen.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\CurveGen.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\DynamicOutline.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\DynamicOutline.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\IntermediateOutline.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\IntermediateOutline.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\MyMath.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\MyMath.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\OutlineWalker.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\OutlineWalker.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\PartFlattener.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\PartFlattener.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\Rect.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\Rect.cs</Link>
+    </Compile>
+    <Compile Include="..\PixelFarm.Vectors\6_Contours\Vertex.cs">
+      <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
+    </Compile>
     <Compile Include="4_PlatformServices\StorageService.cs" />
+    <Compile Include="5_VertexProcessoring\Figures.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_BrushAndFill.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_PenAndStroke.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_FontAndText.cs" />
-    <Compile Include="7_CpuBlitPainter\DrawBoard\AggGradientBrushes.cs" />
+    <Compile Include="7_CpuBlitPainter\DrawBoard\GradientBrushes.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\AggRenderVx.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\Canvas2dExtension.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\dbugVertexSourceIO.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\LineDashGenerator.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\RectBorderHelper.cs" />
     <Compile Include="7_CpuBlitPainter\DrawBoard\SvgRenderVx.cs" />
+    <Compile Include="7_CpuBlitPainter\DrawBoard\VertexStoreExtensions2.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeBmpLut.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\BorderDouble.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\ClipProxyImage.cs" />
     <Compile Include="7_CpuBlitPainter\Others\1_Base\GammaFuntions.cs" />
@@ -578,13 +632,38 @@
     <Compile Include="7_CpuBlitPainter\Others\3_Filter\RecursiveBlur.cs" />
     <Compile Include="7_CpuBlitPainter\Others\3_Filter\SharpenFilter.cs" />
     <Compile Include="7_CpuBlitPainter\Others\3_Filter\StackBlur.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\4_Image\FilterMan.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\4_Image\FloodFiller.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\4_Image\Queue.cs" />
-    <Compile Include="7_CpuBlitPainter\Others\4_Image\Transposer.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\BezierCurveReconstruction.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\BitmapBasedRegion.cs" />
+    <Compile Include="7_CpuBlitPainter\DrawBoard\CpuBlitRegion.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\FloodFillTools.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\MixedRegion.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\PixelEvaluators.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\FloodFill.cs" />
+    <Compile Include="7_CpuBlitPainter\Others\3_Filter\Transposer.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\OutlineTracer.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\ReconstructedRegionData.cs" />
+    <Compile Include="7_CpuBlitPainter\PathReconstruction\VxsRegion.cs" />
+    <Compile Include="7_CpuBlitPainter\AggPainter\AggPainterPool.cs" />
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface.cs" />
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface_RenderImages.cs" />
     <Compile Include="8_ImgReaders\ImageReaders.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\BasicElements.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\ContourCornerAndAnalyzingElems.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeColor.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeColoring.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EdgeSegment.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\EquationSolver.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen2.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen3.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\SignedDistance.cs" />
+    <Compile Include="7_CpuBlitPainter\Msdf\SpriteTextureMapData.cs" />
+    <Compile Include="9_BitmapAtlas\BinPacker.cs" />
+    <Compile Include="9_BitmapAtlas\BitmapAtlasFile.cs" />
+    <Compile Include="9_BitmapAtlas\AtlasItemImage.cs" />
+    <Compile Include="9_BitmapAtlas\BitmapAtlasManager.cs" />
+    <Compile Include="9_BitmapAtlas\SimpleBitmaptAtlas.cs" />
+    <Compile Include="9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -594,7 +673,7 @@
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="4_Utils\" />
+    <Folder Include="6_Contours\" />
   </ItemGroup>
   <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

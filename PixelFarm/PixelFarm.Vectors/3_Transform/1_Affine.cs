@@ -112,7 +112,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             shx = v2_shx; sy = v3_sy;
             tx = v4_tx; ty = v5_ty;
         }
-
+        public float[] Get3x3MatrixElements() =>
+            new float[]
+            {
+               (float) sx,(float) shy,(float)0,
+               (float) shx, (float) sy, 0,
+               (float) tx, (float) ty, 1
+            };
         /// <summary>
         /// inside-values will be CHANGED after call this
         /// </summary>
@@ -354,9 +360,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             return degree * (180d / Math.PI);
         }
-
-
     }
+
 
     public class Affine : ICoordTransformer
     {
@@ -391,10 +396,11 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
             _isIdenHint = false;
         }
-        ICoordTransformer ICoordTransformer.CreateInvert()
-        {
-            return CreateInvert();
-        }
+
+
+
+        public float[] Get3x3MatrixElements() => _elems.Get3x3MatrixElements();
+        ICoordTransformer ICoordTransformer.CreateInvert() => CreateInvert();
         public ICoordTransformer MultiplyWith(ICoordTransformer another)
         {
             if (another is Affine)
@@ -589,10 +595,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                     break;
 
             }
-
-
-
-
         }
         //----------------------------------------------------------
         public static Affine operator *(Affine a, Affine b)
@@ -613,33 +615,33 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             return newIden;
         }
 
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1)
+        public static Affine New(AffinePlan p0, AffinePlan p1)
         {
             AffinePlan p_empty = new AffinePlan();
             return new Affine(2, ref p0, ref p1, ref p_empty, ref p_empty, ref p_empty, null);
         }
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2)
+        public static Affine New(AffinePlan p0, AffinePlan p1, AffinePlan p2)
         {
             AffinePlan p_empty = new AffinePlan();
             return new Affine(3, ref p0, ref p1, ref p2, ref p_empty, ref p_empty, null);
         }
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3)
+        public static Affine New(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3)
         {
             AffinePlan p_empty = new AffinePlan();
             return new Affine(4, ref p0, ref p1, ref p2, ref p3, ref p_empty, null);
         }
-        public static Affine NewMatix(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3, AffinePlan p4)
+        public static Affine New(AffinePlan p0, AffinePlan p1, AffinePlan p2, AffinePlan p3, AffinePlan p4)
         {
             return new Affine(5, ref p0, ref p1, ref p2, ref p3, ref p4, null);
         }
 
-        public static Affine NewMatix(AffinePlan creationPlan)
+        public static Affine New(AffinePlan plan)
         {
-            return new Affine(IdentityMatrix, creationPlan);
+            return new Affine(IdentityMatrix, plan);
         }
-        public static Affine NewMatix2(params AffinePlan[] creationPlans)
+        public static Affine New(params AffinePlan[] plans)
         {
-            return new Affine(creationPlans);
+            return new Affine(plans);
         }
 
         //====================================================trans_affine_rotation
@@ -650,14 +652,32 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         public static Affine NewRotation(double angRad)
         {
             double cos_rad, sin_rad;
+
             return new Affine(
-               cos_rad = Math.Cos(angRad), sin_rad = Math.Sin(angRad),
+               cos_rad = Math.Cos(angRad),
+               sin_rad = Math.Sin(angRad),
                 -sin_rad, cos_rad,
                 0.0, 0.0);
+
         }
-        public static Affine NewRotationFromDeg(double degree)
+        public static Affine NewRotation(double angRad, double rotationCenterX, double rotationCenterY)
+        {
+            return Affine.New(AffinePlan.Translate(-rotationCenterX, -rotationCenterY),
+                              AffinePlan.Rotate(angRad),
+                              AffinePlan.Translate(rotationCenterX, rotationCenterY)
+                           );
+
+        }
+        public static Affine NewRotationDeg(double degree)
         {
             return NewRotation(degree * (Math.PI / 180d));
+        }
+        public static Affine NewRotationDeg(double degree, double rotationCenterX, double rotationCenterY)
+        {
+            return Affine.New(AffinePlan.Translate(-rotationCenterX, -rotationCenterY),
+                             AffinePlan.RotateDeg(degree),
+                             AffinePlan.Translate(rotationCenterX, rotationCenterY)
+                         );
         }
         //====================================================trans_affine_scaling
         // Scaling matrix. x, y - scale coefficients by X and Y respectively
@@ -1120,31 +1140,27 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
 
         // Check to see if the matrix is not degenerate
-        public bool IsNotDegenerated(double epsilon)
-        {
-            return Math.Abs(_elems.sx) > epsilon && Math.Abs(_elems.sy) > epsilon;
-        }
+        public bool IsNotDegenerated(double epsilon) => Math.Abs(_elems.sx) > epsilon && Math.Abs(_elems.sy) > epsilon;
 
         // Check to see if it's an identity matrix
-        public bool IsIdentity()
+        public bool IsIdentity
         {
-            if (!_isIdenHint)
+            get
             {
-                return is_equal_eps(_elems.sx, 1.0) && is_equal_eps(_elems.shy, 0.0) &&
-                   is_equal_eps(_elems.shx, 0.0) && is_equal_eps(_elems.sy, 1.0) &&
-                   is_equal_eps(_elems.tx, 0.0) && is_equal_eps(_elems.ty, 0.0);
-            }
-            else
-            {
-                return true;
+                if (!_isIdenHint)
+                {
+                    return is_equal_eps(_elems.sx, 1.0) && is_equal_eps(_elems.shy, 0.0) &&
+                       is_equal_eps(_elems.shx, 0.0) && is_equal_eps(_elems.sy, 1.0) &&
+                       is_equal_eps(_elems.tx, 0.0) && is_equal_eps(_elems.ty, 0.0);
+                }
+                else
+                {
+                    return true;
+                }
             }
         }
 
-        static bool is_equal_eps(double v1, double v2)
-        {
-            return Math.Abs(v1 - v2) <= (EPSILON);
-        }
-
+        static bool is_equal_eps(double v1, double v2) => Math.Abs(v1 - v2) <= (EPSILON);
 
         //public static VertexStore TranslateTransformToVxs(VertexStoreSnap src, double dx, double dy, VertexStore vxs)
         //{
@@ -1159,10 +1175,6 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //    }
         //    return vxs;
         //}
-
-
-
-
         // Check to see if two matrices are equal
         //public bool is_equal(Affine m, double epsilon)
         //{
@@ -1217,4 +1229,27 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         //}
 
     }
+
+
+
+    public static class AffineTransformExtensions
+    {
+        public static void TransformPoints(this Affine aff, PixelFarm.Drawing.PointF[] points)
+        {
+            for (int i = 0; i < points.Length; ++i)
+            {
+                Drawing.PointF p = points[i];
+
+                float x = p.X;
+                float y = p.Y;
+                aff.Transform(ref x, ref y);
+
+                points[i] = new Drawing.PointF(x, y);
+            }
+        }
+    }
+
+
+
+
 }

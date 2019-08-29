@@ -207,6 +207,66 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
+        public void CreateHalfCap(VertexStore output, Vertex2d v0, Vertex2d v1)
+        {
+
+            output.Clear();
+
+            double len = v0.CalLen(v1);
+            double dx1 = (v1.y - v0.y) / len;
+            double dy1 = (v1.x - v0.x) / len;
+
+
+            dx1 *= _width; //** 
+            dy1 *= _width;
+
+            if (_line_cap != LineCap.Round)
+            {
+                double dx2 = 0;
+                double dy2 = 0;
+
+                if (_line_cap == LineCap.Square)
+                {
+                    dx2 = dy1 * _width_sign;
+                    dy2 = dx1 * _width_sign;
+                }
+                AddVertex(output, v0.x - dx1 - dx2, v0.y + dy1 - dy2);
+                AddVertex(output, v0.x + dx1 - dx2, v0.y - dy1 - dy2);
+            }
+            else
+            {
+                //round cap
+                double da = Math.Acos(_width_abs / (_width_abs + 0.125 / _approx_scale)) * 2;
+                double a1;
+                int i;
+                int n = (int)(Math.PI / da);
+                da = Math.PI / (n + 1);
+                AddVertex(output, v0.x - dx1, v0.y + dy1);
+                if (_width_sign > 0)
+                {
+                    a1 = Math.Atan2(dy1, -dx1);
+                    a1 += da;
+                    for (i = 0; i < n; i++)
+                    {
+                        AddVertex(output, v0.x + Math.Cos(a1) * _width,
+                                       v0.y + Math.Sin(a1) * _width);
+                        a1 += da;
+                    }
+                }
+                else
+                {
+                    a1 = Math.Atan2(-dy1, dx1);
+                    a1 -= da;
+                    for (i = 0; i < n; i++)
+                    {
+                        AddVertex(output, v0.x + Math.Cos(a1) * _width,
+                                       v0.y + Math.Sin(a1) * _width);
+                        a1 -= da;
+                    }
+                }
+                AddVertex(output, v0.x + dx1, v0.y - dy1);
+            }
+        }
         public void CreateJoin(VertexStore output,
                                Vertex2d v0,
                                Vertex2d v1,

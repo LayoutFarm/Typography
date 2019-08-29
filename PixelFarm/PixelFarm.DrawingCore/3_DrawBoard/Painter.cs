@@ -23,8 +23,17 @@ using System.Collections.Generic;
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
+    public enum FillingRule
+    {
+        NonZero,//default
+        EvenOdd
+    }
 
-
+    public enum TargetBuffer
+    {
+        ColorBuffer,
+        MaskBuffer
+    }
     /// <summary>
     /// this class provides drawing method on specific drawboard,
     /// (0,0) is on left-lower corner for every implementaion
@@ -42,6 +51,8 @@ namespace PixelFarm.Drawing
         public abstract float OriginX { get; }
         public abstract float OriginY { get; }
         public abstract void SetOrigin(float ox, float oy);
+        public abstract PixelFarm.CpuBlit.VertexProcessing.ICoordTransformer CoordTransformer { get; set; }
+
         public abstract RenderQuality RenderQuality { get; set; }
 
         public abstract int Width { get; }
@@ -53,10 +64,15 @@ namespace PixelFarm.Drawing
         /// </summary>
         /// <param name="vxs"></param>
         public abstract void SetClipRgn(VertexStore vxs);
+        public abstract TargetBuffer TargetBuffer { get; set; }
+        public abstract FillingRule FillingRule { get; set; }
+
+        public abstract bool EnableMask { get; set; }
         //
         public abstract double StrokeWidth { get; set; }
         public abstract SmoothingMode SmoothingMode { get; set; }
         public abstract bool UseSubPixelLcdEffect { get; set; }
+        public abstract float FillOpacity { get; set; }
         public abstract Color FillColor { get; set; }
         public abstract Color StrokeColor { get; set; }
 
@@ -65,8 +81,6 @@ namespace PixelFarm.Drawing
         public abstract IDashGenerator LineDashGen { get; set; }
         //
 
-
-        //
         public abstract Brush CurrentBrush { get; set; }
         public abstract Pen CurrentPen { get; set; }
 
@@ -94,17 +108,20 @@ namespace PixelFarm.Drawing
         public abstract void DrawImage(Image actualImage, params CpuBlit.VertexProcessing.AffinePlan[] affinePlans);
         public abstract void DrawImage(Image actualImage, double left, double top, CpuBlit.VertexProcessing.ICoordTransformer coordTx);
 
-        public abstract void ApplyFilter(ImageFilter imgFilter);
-
-
+        public abstract void ApplyFilter(IImageFilter imgFilter);
         ////////////////////////////////////////////////////////////////////////////
         //vertext store/snap/rendervx
-
         public abstract void Fill(VertexStore vxs);
         public abstract void Draw(VertexStore vxs);
+        //---------------------------------------
+        public abstract void Fill(Region rgn);
+        public abstract void Draw(Region rgn);
+        //---------------------------------------
+
 
         public abstract RenderVx CreateRenderVx(VertexStore vxs);
         public abstract RenderVxFormattedString CreateRenderVx(string textspan);
+        public abstract RenderVxFormattedString CreateRenderVx(char[] textspanBuff, int startAt, int len);
         public abstract void FillRenderVx(Brush brush, RenderVx renderVx);
         public abstract void FillRenderVx(RenderVx renderVx);
         public abstract void DrawRenderVx(RenderVx renderVx);
@@ -120,22 +137,8 @@ namespace PixelFarm.Drawing
            double x,
            double y);
         public abstract void DrawString(RenderVxFormattedString renderVx, double x, double y);
-        //////////////////////////////////////////////////////////////////////////////
-        //user's object 
-        internal Stack<object> _userObjectStack = new Stack<object>();
-
     }
 
-    namespace PainterExtensions
-    {
-        public static class PainterExt
-        {
-            public static void StackClearUserObject(this Painter p)
-            {
-                p._userObjectStack.Clear();
-            }
-        }
-    }
 
     public interface IDashGenerator
     {

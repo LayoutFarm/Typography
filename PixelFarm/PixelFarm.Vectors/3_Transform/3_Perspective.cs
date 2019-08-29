@@ -47,8 +47,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         }
         public ICoordTransformer Left => _left;
         public ICoordTransformer Right => _right;
-
         public CoordTransformerKind Kind => CoordTransformerKind.TransformChain;
+        public bool IsIdentity => false; //TODO: impl here again
+
     }
 
     public struct PerspectiveMat
@@ -70,11 +71,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                tx, ty, w2;
         //------------------------------------------------------- 
         // Identity matrix
+        bool _isIdentity = false;
+        bool _isIdentiyMatEvaluated = false;
         public Perspective()
         {
             sx = 1; shy = 0; w0 = 0;
             shx = 0; sy = 1; w1 = 0;
             tx = 0; ty = 0; w2 = 1;
+            _isIdentity = true;
+            _isIdentiyMatEvaluated = true;
         }
 
         // Custom matrix
@@ -143,7 +148,27 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             quad_to_quad(src, dst);
         }
+        public bool IsIdentity
+        {
+            get
+            {
 
+                //else 
+                if (!_isIdentiyMatEvaluated)
+                {
+                    _isIdentiyMatEvaluated = true;
+                    return _isIdentity = (sx == 1 && shy == 0 && w0 == 0 &&
+                        shx == 0 && sy == 1 && w1 == 0 &&
+                        tx == 0 && ty == 0 && w2 == 1);
+                }
+                else
+                {
+                    return _isIdentity;
+                }
+
+
+            }
+        }
         ICoordTransformer ICoordTransformer.MultiplyWith(ICoordTransformer another)
         {
             if (another is Affine)

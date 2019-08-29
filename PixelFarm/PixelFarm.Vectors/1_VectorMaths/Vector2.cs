@@ -869,4 +869,237 @@ namespace PixelFarm.VectorMath
         }
 
     }
+
+
+    public static class Vector2Ext
+    {
+        public static Vector2 Rotate(this Vector2 v, int degree)
+        {
+            double radian = degree * Math.PI / 180.0;
+            double sin = Math.Sin(radian);
+            double cos = Math.Cos(radian);
+            double nx = v.X * cos - v.Y * sin;
+            double ny = v.X * sin + v.Y * cos;
+
+            return new Vector2((float)nx, (float)ny);
+        }
+        public static Vector2 NewLength(this Vector2 v, double newLength)
+        {
+            //radian
+            double atan = Math.Atan2(v.Y, v.X);
+            return new Vector2(
+                      (float)(Math.Cos(atan) * newLength),
+                      (float)(Math.Sin(atan) * newLength));
+        }
+
+        public static Vector2f Rotate(this Vector2f v, int degree)
+        {
+            double radian = degree * Math.PI / 180.0;
+            double sin = Math.Sin(radian);
+            double cos = Math.Cos(radian);
+            double nx = v.X * cos - v.Y * sin;
+            double ny = v.X * sin + v.Y * cos;
+
+            return new Vector2f((float)nx, (float)ny);
+        }
+        public static Vector2f NewLength(this Vector2f v, double newLength)
+        {
+            //radian
+            double atan = Math.Atan2(v.Y, v.X);
+            return new Vector2f(
+                      (float)(Math.Cos(atan) * newLength),
+                      (float)(Math.Sin(atan) * newLength));
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Vector2f
+    {
+        static Vector2f zeroVector = new Vector2f(0f, 0f);
+        static Vector2f unitVector = new Vector2f(1f, 1f);
+        static Vector2f unitXVector = new Vector2f(1f, 0f);
+        static Vector2f unitYVector = new Vector2f(0f, 1f);
+        public float X;
+        public float Y;
+        public static readonly Vector2f Zero = new Vector2f(0, 0);
+        public Vector2f(float x, float y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+        public static Vector2f operator +(Vector2f v1, Vector2f v2)
+        {
+            return new Vector2f(v1.X + v2.X, v1.Y + v2.Y);
+        }
+        public static Vector2f operator +(Vector2f v1, float n)
+        {
+            return new Vector2f(v1.X + n, v1.Y + n);
+        }
+
+        public static Vector2f operator -(Vector2f v1, Vector2f v2)
+        {
+            return new Vector2f(v1.X - v2.X, v1.Y - v2.Y);
+        }
+        public static Vector2f operator /(Vector2f v1, float n)
+        {
+            return new Vector2f(v1.X / n, v1.Y / n);
+        }
+        public static Vector2f operator *(Vector2f v1, float n)
+        {
+            return new Vector2f(v1.X * n, v1.Y * n);
+        }
+        public static Vector2f operator *(float n, Vector2f v1)
+        {
+            return new Vector2f(v1.X * n, v1.Y * n);
+        }
+        public static bool operator ==(Vector2f v1, Vector2f v2)
+        {
+            return (v1.X == v2.X) && (v1.Y == v2.Y);
+        }
+        public static bool operator !=(Vector2f v1, Vector2f v2)
+        {
+            return (v1.X != v2.X) || (v1.Y != v2.Y);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        public static Vector2f Min(Vector2f value1, Vector2f value2)
+        {
+            return new Vector2f(
+                (value1.X < value2.X) ? value1.X : value2.X,
+                (value1.Y < value2.Y) ? value1.Y : value2.Y
+                );
+        }
+        public static Vector2f Max(Vector2f value1, Vector2f value2)
+        {
+            return new Vector2f(
+                (value1.X > value2.X) ? value1.X : value2.X,
+                (value1.Y > value2.Y) ? value1.Y : value2.Y
+                );
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj is Vector2f)
+            {
+                Vector2f v2 = (Vector2f)obj;
+                return this == v2;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public static Vector2f Normalize(Vector2f value)
+        {
+            double factor = 1.0f / (double)Math.Sqrt((value.X * value.X) + (value.Y * value.Y));
+            return new Vector2f((float)(value.X * factor), (float)(value.Y * factor));
+            //value.X *= val;
+            //value.Y *= val;
+            //return value;
+        }
+
+
+        public static Vector2f One
+        {
+            get { return unitVector; }
+        }
+
+        public static Vector2f UnitX
+        {
+            get { return unitXVector; }
+        }
+
+        public static Vector2f UnitY
+        {
+            get { return unitYVector; }
+        }
+        public static double Dot(Vector2f value1, Vector2f value2)
+        {
+            return (value1.X * value2.X) + (value1.Y * value2.Y);
+        }
+        public double Length()
+        {
+            return Math.Sqrt((X * X) + (Y * Y));
+        }
+
+        public double LengthSquared()
+        {
+            return (X * X) + (Y * Y);
+        }
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + X + "," + Y + ")";
+        }
+#endif
+
+
+    }
+
+    public struct Matrix3x2f
+    {
+        /// <summary>
+        /// Gets the identity matrix.
+        /// </summary>
+        /// <value>The identity matrix.</value>
+        public readonly static Matrix3x2f Identity = new Matrix3x2f(1, 0, 0, 1, 0, 0);
+        /// <summary>
+        /// Element (1,1)
+        /// </summary>
+        public float M11;
+
+        /// <summary>
+        /// Element (1,2)
+        /// </summary>
+        public float M12;
+
+        /// <summary>
+        /// Element (2,1)
+        /// </summary>
+        public float M21;
+
+        /// <summary>
+        /// Element (2,2)
+        /// </summary>
+        public float M22;
+
+        /// <summary>
+        /// Element (3,1)
+        /// </summary>
+        public float M31;
+
+        /// <summary>
+        /// Element (3,2)
+        /// </summary>
+        public float M32;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Matrix3x2"/> struct.
+        /// </summary>
+        /// <param name="value">The value that will be assigned to all components.</param>
+        public Matrix3x2f(float value)
+        {
+            M11 = M12 =
+            M21 = M22 =
+            M31 = M32 = value;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Matrix3x2"/> struct.
+        /// </summary>
+        /// <param name="M11">The value to assign at row 1 column 1 of the matrix.</param>
+        /// <param name="M12">The value to assign at row 1 column 2 of the matrix.</param>
+        /// <param name="M21">The value to assign at row 2 column 1 of the matrix.</param>
+        /// <param name="M22">The value to assign at row 2 column 2 of the matrix.</param>
+        /// <param name="M31">The value to assign at row 3 column 1 of the matrix.</param>
+        /// <param name="M32">The value to assign at row 3 column 2 of the matrix.</param>
+        public Matrix3x2f(float M11, float M12, float M21, float M22, float M31, float M32)
+        {
+            this.M11 = M11; this.M12 = M12;
+            this.M21 = M21; this.M22 = M22;
+            this.M31 = M31; this.M32 = M32;
+        }
+    }
+
 }

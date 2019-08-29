@@ -36,7 +36,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         ICoordTransformer MultiplyWith(ICoordTransformer another);
         ICoordTransformer CreateInvert();
         CoordTransformerKind Kind { get; }
+        bool IsIdentity { get; }
     }
+
 
 
     public enum CoordTransformerKind
@@ -48,5 +50,5 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         TransformChain,
     }
 
-     
+
 }

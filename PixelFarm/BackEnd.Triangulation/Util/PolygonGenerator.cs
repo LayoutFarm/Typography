@@ -35,7 +35,7 @@ namespace Poly2Tri
     public class PolygonGenerator
     {
         static readonly Random RNG = new Random();
-        private static double PI_2 = 2.0 * Math.PI;
+        const double PI_2 = 2.0 * Math.PI;
         public static Polygon RandomCircleSweep(double scale, int vertexCount)
         {
             TriangulationPoint point;

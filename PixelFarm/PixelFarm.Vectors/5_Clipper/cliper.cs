@@ -67,8 +67,8 @@ namespace ClipperLib
     using Paths = List<IntPolygon>;
     public struct DoublePoint
     {
-        public double X;
-        public double Y;
+        public readonly double X;
+        public readonly double Y;
         public DoublePoint(double x = 0, double y = 0)
         {
             this.X = x; this.Y = y;

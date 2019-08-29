@@ -26,6 +26,8 @@ namespace PixelFarm.CpuBlit.PixelProcessing
     /// </summary>
     public class SubBitmapBlender : BitmapBlenderBase
     {
+        IBitmapSrc _sourceImage;
+
         public SubBitmapBlender(IBitmapBlender image,
             int arrayOffset32,
             int width,
@@ -70,16 +72,10 @@ namespace PixelFarm.CpuBlit.PixelProcessing
         {
             Attach(image, blender, image.BytesBetweenPixelsInclusive, 0, image.BitDepth);
         }
-
         public override void WriteBuffer(int[] newbuffer)
         {
-            if (_sourceImage != null)
-            {
-                _sourceImage.WriteBuffer(newbuffer);
-            }
-
+            _sourceImage?.WriteBuffer(newbuffer);
         }
-
         void AttachBuffer(PixelFarm.CpuBlit.Imaging.TempMemPtr buffer,
           int elemOffset,
           int width,
@@ -88,15 +84,11 @@ namespace PixelFarm.CpuBlit.PixelProcessing
           int bitDepth,
           int distanceInBytesBetweenPixelsInclusive)
         {
-
             SetBufferToNull();
             SetDimmensionAndFormat(width, height, strideInBytes, bitDepth,
                 distanceInBytesBetweenPixelsInclusive);
             SetBuffer(buffer, elemOffset);
-
         }
-
-        IBitmapSrc _sourceImage;
 
         void Attach(IBitmapSrc sourceImage,
           PixelBlender32 outputPxBlender,

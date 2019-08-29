@@ -40,11 +40,11 @@ namespace Poly2Tri
         {
         }
         public TriangulationMode TriangulationMode { get; protected set; }
-        public Triangulatable Triangulatable { get; private set; }
+        public Triangulable Triangulatable { get; private set; }
 
         public abstract TriangulationAlgorithm Algorithm { get; }
 
-        public virtual void PrepareTriangulation(Triangulatable t)
+        public virtual void PrepareTriangulation(Triangulable t)
         {
             Triangulatable = t;
             TriangulationMode = t.TriangulationMode;

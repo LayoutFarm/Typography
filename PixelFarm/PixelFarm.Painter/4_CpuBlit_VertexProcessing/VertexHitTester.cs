@@ -128,7 +128,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             int pp = vxs.Count;
             double vtx0, vty0;
             VertexCmd cmd = vxs.GetVertex(--pp, out vtx0, out vty0);
-            while (cmd == VertexCmd.NoMore)
+            while (cmd == VertexCmd.NoMore || cmd == VertexCmd.Close)
             {
                 cmd = vxs.GetVertex(--pp, out vtx0, out vty0);
             }

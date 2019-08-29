@@ -32,14 +32,9 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
 
         public VertexProcessing.ICoordTransformer Transformer
         {
-            get { return _trans; }
-            set { _trans = value; }
+            get => _trans;
+            set => _trans = value;
         }
-        public void GetLocalScale(out int x, out int y)
-        {
-            throw new System.NotImplementedException();
-        }
-
         //----------------------------------------------------------------
         public void Begin(double x, double y, int len)
         {

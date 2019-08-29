@@ -36,6 +36,14 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         double _dy_dbl;
         int _dx_int;
         int _dy_int;
+
+        protected const int BASE_SHITF = 8;
+        protected const int BASE_SCALE = (int)(1 << BASE_SHITF);
+        protected const int BASE_MASK = BASE_SCALE - 1;
+        protected IBitmapSrc _bmpSrc;
+
+
+
         public ImgSpanGen()
         {
             _dx_dbl = 0.5;
@@ -48,8 +56,7 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
             _interpolator = interpolator;
         }
 
-        public abstract void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len);
-        //
+
         protected ISpanInterpolator Interpolator => _interpolator;
         //
         public double dx => _dx_dbl;
@@ -67,5 +74,25 @@ namespace PixelFarm.CpuBlit.FragmentProcessing
         }
         public void SetFilterOffset(double d) => SetFilterOffset(d, d);
         public virtual void Prepare() { }
+        public Drawing.Color BackgroundColor
+        {
+            get;
+            set;
+        }
+        public abstract void GenerateColors(Drawing.Color[] outputColors, int startIndex, int x, int y, int len);
+
+
+        internal void SetSrcBitmap(IBitmapSrc src)
+        {
+            if (src.BitDepth != 32)
+            {
+                throw new NotSupportedException("The source is expected to be 32 bit.");
+            }
+            _bmpSrc = src;
+        }
+        internal void ReleaseSrcBitmap()
+        {
+            _bmpSrc = null;
+        }
     }
 }

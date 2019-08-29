@@ -1,6 +1,6 @@
 ﻿
 /////////////////////////////////////////////////////////////////////////////////
-// Paint.NET                                                                   //
+// Paint.NET (MIT,from version 3.36.7, see=> https://github.com/rivy/OpenPDN   //
 // Copyright (C) dotPDN LLC, Rick Brewster, Tom Jackson, and contributors.     //
 // Portions Copyright (C) Microsoft Corporation. All Rights Reserved.          //
 // See src/Resources/Files/License.txt for full licensing and attribution      //
@@ -19,6 +19,8 @@ namespace PixelFarm.CpuBlit.Imaging
     /// </summary>
     public class ShapenFilterPdn
     {
+        SharpenRenderer _shRenderer1 = new SharpenRenderer();
+
         public unsafe int[] Sharpen(int* srcBuffer1, int w, int h, int srcBufferStrideInBytes, int radius)
         {
             unsafe
@@ -35,9 +37,9 @@ namespace PixelFarm.CpuBlit.Imaging
                     MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, srcBufferStrideInBytes / 4);
                     Surface destSurface = new Surface(srcBufferStrideInBytes, w, h, destMemHolder);
                     //
-                    SharpenRenderer shRenderer1 = new SharpenRenderer();
-                    shRenderer1.Amount = radius;
-                    shRenderer1.Render(srcSurface, destSurface, new PixelFarm.Drawing.Rectangle[]{
+
+                    _shRenderer1.Amount = radius;
+                    _shRenderer1.Render(srcSurface, destSurface, new PixelFarm.Drawing.Rectangle[]{
                             new PixelFarm.Drawing.Rectangle(0,0, w ,h )
                     }, 0, 1);
                 }
@@ -69,9 +71,9 @@ namespace PixelFarm.CpuBlit.Imaging
                         MemHolder destMemHolder = new MemHolder((IntPtr)outputPtr, bufferPtr.LengthInBytes / 4);
                         Surface destSurface = new Surface(stride, w, h, destMemHolder);
                         //
-                        SharpenRenderer shRenderer1 = new SharpenRenderer();
-                        shRenderer1.Amount = radius;
-                        shRenderer1.Render(srcSurface, destSurface, new PixelFarm.Drawing.Rectangle[]{
+                      
+                        _shRenderer1.Amount = radius;
+                        _shRenderer1.Render(srcSurface, destSurface, new PixelFarm.Drawing.Rectangle[]{
                             new PixelFarm.Drawing.Rectangle(0,0,w,h)
                         }, 0, 1);
                     }

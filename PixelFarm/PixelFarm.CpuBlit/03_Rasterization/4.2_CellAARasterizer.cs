@@ -36,13 +36,10 @@
 using poly_subpix = PixelFarm.CpuBlit.Rasterization.PolySubPix;
 namespace PixelFarm.CpuBlit.Rasterization
 {
+    
     partial class ScanlineRasterizer
     {
-        enum FillingRule
-        {
-            NonZero,
-            EvenOdd
-        }
+
 
         //-----------------------------------------------------------------cell_aa
         // A pixel cell. There're no constructors defined and it was done ***

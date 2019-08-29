@@ -34,15 +34,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
 
     public static class VertexStoreTransformExtensions
     {
-        /// <summary>
-        /// we do NOT store vxs, return original outputVxs
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="outputVxs"></param>
-        public static void TransformToVertexSnap(this Affine affine, VertexStore src, VertexStore output)
-        {
-            affine.TransformToVxs(src, output);
-        }
+       
         /// <summary>
         /// we do NOT store vxs, return original outputVxs
         /// </summary>

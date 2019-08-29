@@ -20,9 +20,11 @@ namespace PixelFarm.Drawing
         {
             _releaseLocalBmpIfRequired = true;
         }
-        public override void NotifyUsage()
+#if DEBUG
+        public override void dbugNotifyUsage()
         {
         }
+#endif
         //
         public override int Width => _memBmp.Width;
         public override int Height => _memBmp.Height;
