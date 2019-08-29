@@ -13,6 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)FontAtlasFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphImages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MsdfGlyphGen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MultiSizeFontAtlas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MultiSizeFontAtlasBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleFontAtlas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleFontAtlasBuilder.cs" />
   </ItemGroup>

@@ -4,7 +4,8 @@
 using System.Collections.Generic;
 
 using PixelFarm.Drawing.Fonts;
-using Typography.Contours;
+
+using PixelFarm.Contours;
 
 namespace Typography.Rendering
 {
@@ -20,9 +21,10 @@ namespace Typography.Rendering
             MaxAtlasWidth = 800;
         }
         public int MaxAtlasWidth { get; set; }
-        public TextureKind TextureKind { get; private set; }
+        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKind { get; private set; }
         public float FontSizeInPoints { get; private set; }
         public string FontFilename { get; set; }
+        public int FontKey { get; set; }
         public CompactOption SpaceCompactOption { get; set; }
         //
         public enum CompactOption
@@ -39,13 +41,10 @@ namespace Typography.Rendering
         /// <param name="img"></param>
         public void AddGlyph(ushort glyphIndex, GlyphImage img)
         {
-            var glyphCache = new CacheGlyph();
-            glyphCache.glyphIndex = glyphIndex;
-            glyphCache.img = img;
-            _glyphs[glyphIndex] = glyphCache;
+            _glyphs[glyphIndex] = new CacheGlyph(glyphIndex, img);
         }
 
-        public void SetAtlasInfo(TextureKind textureKind, float fontSizeInPts)
+        public void SetAtlasInfo(PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind, float fontSizeInPts)
         {
             this.TextureKind = textureKind;
             this.FontSizeInPoints = fontSizeInPts;
@@ -208,25 +207,37 @@ namespace Typography.Rendering
 
             //new total glyph img
             GlyphImage glyphImage = new GlyphImage(totalImgWidth, imgH);
-            //flip vertical Y 
+            //bool flipY = false;
+            //if (flipY)
+            //{
+            int[] totalBufferFlipY = new int[totalBuffer.Length];
+            int srcRowIndex = imgH - 1;
+            int strideInBytes = totalImgWidth * 4;
+            for (int i = 0; i < imgH; ++i)
             {
-                int[] totalBufferFlipY = new int[totalBuffer.Length];
-                int srcRowIndex = imgH - 1;
-                int strideInBytes = totalImgWidth * 4;
-                for (int i = 0; i < imgH; ++i)
-                {
-                    //copy each row from src to dst
-                    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
-                    srcRowIndex--;
-                }
-                totalBuffer = totalBufferFlipY;
+                //copy each row from src to dst
+                System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+                srcRowIndex--;
             }
+            totalBuffer = totalBufferFlipY;
+            //}
+            //else
+            //{
+            //int[] totalBufferFlipY = new int[totalBuffer.Length];
+            //int srcRowIndex = 0;
+            //int strideInBytes = totalImgWidth * 4;
+            //for (int i = 0; i < imgH; ++i)
+            //{
+            //    //copy each row from src to dst
+            //    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+            //    srcRowIndex++;
+            //}
+            //totalBuffer = totalBufferFlipY;
+            //}
             glyphImage.SetImageBuffer(totalBuffer, true);
             _latestGenGlyphImage = glyphImage;
             return glyphImage;
-
         }
-
         public void SaveFontInfo(System.IO.Stream outputStream)
         {
 
@@ -237,7 +248,7 @@ namespace Typography.Rendering
 
             FontAtlasFile fontAtlasFile = new FontAtlasFile();
             fontAtlasFile.StartWrite(outputStream);
-            fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontSizeInPoints);
+            fontAtlasFile.WriteOverviewFontInfo(FontFilename, FontKey, FontSizeInPoints);
 
             fontAtlasFile.WriteTotalImageInfo(
                 (ushort)_latestGenGlyphImage.Width,
@@ -247,19 +258,8 @@ namespace Typography.Rendering
             //
             fontAtlasFile.WriteGlyphList(_glyphs);
             fontAtlasFile.EndWrite();
+        }
 
-        }
-        /// <summary>
-        /// save font info into xml document
-        /// </summary>
-        /// <param name="filename"></param>
-        public void SaveFontInfo(string filename)
-        {
-            using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Create))
-            {
-                SaveFontInfo(fs);
-            }
-        }
         public SimpleFontAtlas CreateSimpleFontAtlas()
         {
             SimpleFontAtlas simpleFontAtlas = new SimpleFontAtlas();
@@ -286,22 +286,12 @@ namespace Typography.Rendering
             return simpleFontAtlas;
         }
 
-        public SimpleFontAtlas LoadFontInfo(string filename)
-        {
-
-            FontAtlasFile atlasFile = new FontAtlasFile();
-            using (System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Open))
-            {
-                //read font atlas from stream data
-                return LoadFontInfo(fs);
-            }
-        }
-        public SimpleFontAtlas LoadFontInfo(System.IO.Stream dataStream)
+        public List<SimpleFontAtlas> LoadFontAtlasInfo(System.IO.Stream dataStream)
         {
             FontAtlasFile atlasFile = new FontAtlasFile();
             //read font atlas from stream data
             atlasFile.Read(dataStream);
-            return atlasFile.Result;
+            return atlasFile.ResultSimpleFontAtlasList;
         }
 
         static void CopyToDest(int[] srcPixels, int srcW, int srcH, int[] targetPixels, int targetX, int targetY, int totalTargetWidth)
@@ -323,8 +313,5 @@ namespace Typography.Rendering
                 }
             }
         }
-
     }
-
-
 }

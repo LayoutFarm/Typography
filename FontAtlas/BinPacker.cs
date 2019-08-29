@@ -8,8 +8,8 @@ namespace Typography.Rendering
     {
         //TODO: review here 
         public int X, Y, Width, Height;
-        public int Right { get { return X + Width; } }
-        public int Bottom { get { return Y + Height; } }
+        public int Right => X + Width;
+        public int Bottom => Y + Height;
         public BinPackRect(int x, int y, int width, int height)
         {
             X = x;
@@ -24,7 +24,7 @@ namespace Typography.Rendering
                    rect.Right <= Right && rect.Bottom <= Bottom;
         }
 
-        public override string ToString() { return X + "," + Y + "," + Width + "," + Height; }
+        public override string ToString() => X + "," + Y + "," + Width + "," + Height;
     }
 
     struct ResizableArray<T>
@@ -35,7 +35,7 @@ namespace Typography.Rendering
         public T[] Data;
         public int Count;
 
-        public T this[int index] { get { return Data[index]; } }
+        public T this[int index] => Data[index];
 
         public ResizableArray(int capacity)
         {
