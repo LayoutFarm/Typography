@@ -117,16 +117,7 @@ namespace PixelFarm.CpuBlit
             //TODO:
             //goto latest path command
         }
-        //public void Transform(ref AffineMat aff)
-        //{
-        //    int count = _myvxs.Count;
-        //    for (int i = 0; i < count; ++i)
-        //    {
-        //        VertexCmd cmd = _myvxs.GetVertex(i, out double x, out double y);
-        //        aff.Transform(ref x, ref y);
-        //        _myvxs.ReplaceVertex
-        //    } 
-        //}
+      
         public void UnbindVxs()
         {
             _myvxs = null;
@@ -883,105 +874,5 @@ namespace PixelFarm.CpuBlit
             SplineCurveSegment(writer, points[i], points[i + 1], points[i + 2], points[i + 3], points[0], points[1], points[2], points[3], tension);
 
         }
-    }
-
-
-    public class CpuBlitGraphicsPath : PixelFarm.Drawing.GraphicsPath
-    {
-
-        //TODO: review this again
-
-        internal VertexStore _vxs;
-        PathWriter _writer;
-        public CpuBlitGraphicsPath()
-        {
-            _vxs = new VertexStore();
-            _writer = new PathWriter();
-            _writer.BindVxs(_vxs);
-        }
-        public void ReplaceVxs(VertexStore newVxs)
-        {
-            _vxs = newVxs;
-            _writer = new PathWriter();
-            _writer.BindVxs(_vxs);
-        }
-        public override void AddArc(float x, float y, float width, float height, float startAngle, float sweepAngle)
-        {
-            float r1 = width / 2;
-            float r2 = height / 2;
-            _writer.SvgArcToCurve4(r1, r2, startAngle, 0, 0, x + r1, y + r2, false);
-        }
-        public override void AddArc(RectangleF rectF, float startAngle, float sweepAngle)
-        {
-            AddArc(rectF.Left, rectF.Top, rectF.Width, rectF.Height, startAngle, sweepAngle);
-        }
-        public override void AddBezierCurve(Drawing.PointF p1, Drawing.PointF p2, Drawing.PointF p3, Drawing.PointF p4)
-        {
-            _writer.MoveTo(p1.X, p1.Y);
-            _writer.Curve4(p2.X, p2.Y, p3.X, p3.Y, p4.X, p4.Y);
-        }
-        public override void AddBeziers(Drawing.PointF[] points)
-        {
-        }
-        public override void AddCurve(Drawing.PointF p1, Drawing.PointF p2, Drawing.PointF p3, Drawing.PointF p4)
-        {
-        }
-        public override void AddCurve(Drawing.PointF[] points)
-        {
-
-        }
-        public override void AddCurve(Drawing.PointF[] points, float tension)
-        {
-
-        }
-
-        public override void AddEllipse(float x, float y, float w, float h)
-        {
-
-        }
-        public override void AddLine(Drawing.PointF p1, Drawing.PointF p2)
-        {
-            _writer.MoveTo(p1.X, p1.Y);
-            _writer.LineTo(p2.X, p2.Y);
-        }
-        public override void AddLine(float x1, float y1, float x2, float y2)
-        {
-            _writer.MoveTo(x1, y1);
-            _writer.LineTo(x1, y2);
-        }
-        public override void AddPath(GraphicsPath another, bool connect)
-        {
-
-        }
-        public override void AddRectangle(RectangleF rectF)
-        {
-        }
-        public override GraphicsPath Clone()
-        {
-            CpuBlitGraphicsPath newClone = new CpuBlitGraphicsPath();
-            newClone._vxs.AppendVertexStore(_vxs);
-
-            return newClone;
-        }
-        public override void CloseFigure()
-        {
-            _writer.CloseFigure();
-
-        }
-        public override int PointCount
-        {
-            get
-            {
-                //TODO: review this again
-                return _vxs.Count;
-            }
-        }
-        public override RectangleF GetBounds()
-        {
-            RectD bounds = _vxs.GetBoundingRect();
-            return new RectangleF((float)(bounds.Left), (float)bounds.Top, (float)(bounds.Width), (float)(bounds.Height));
-        }
-
-
     }
 }

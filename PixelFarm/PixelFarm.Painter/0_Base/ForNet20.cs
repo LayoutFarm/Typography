@@ -24,10 +24,7 @@ namespace System
     public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
     public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, in T7, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7);
     public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8);
-#endif
-
-
-
+#endif 
 }
 namespace System.Runtime.InteropServices
 {
@@ -36,14 +33,15 @@ namespace System.Runtime.InteropServices
         public TargetedPatchingOptOutAttribute(string msg) { }
     }
 }
+
 namespace System.Runtime.CompilerServices
 {
     public partial class ExtensionAttribute : Attribute { }
 }
-namespace System.Linq
-{
-    public class dummy { }
-}
+//namespace System.Linq
+//{
+//    public class dummy { }
+//}
 
 namespace System.Collections.Generic
 {
@@ -115,6 +113,15 @@ namespace System.Collections.Generic
         public int Count => _dic.Count;
 
         public bool IsReadOnly => false;
+
+
+        public void UnionWith(HashSet<T> another)
+        {
+            foreach (T a in another)
+            {
+                Add(a);
+            }
+        }
     }
 
     public static class MyLinq
@@ -160,7 +167,18 @@ namespace System.Collections.Generic
             }
             return newdic;
         }
-
+        public static bool Contains<T>(this T[] arr, T elem)
+        {
+            for (int i = 0; i < arr.Length; ++i)
+            {
+                if (arr[i].Equals(elem))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+      
         public static bool Contains<T>(this IEnumerable<T> list, T value)
         {
             foreach (T elem in list)
@@ -385,6 +403,32 @@ namespace System.Collections.Generic
             return false;
         }
         public static T FirstOrDefault<T>(this IEnumerable<T> list, Func<T, bool> predicate)
+        {
+            foreach (T t in list)
+            {
+                if (predicate(t))
+                {
+                    return t;
+                }
+            }
+            return default(T);
+        }
+        public static T First<T>(this T[] arr, Func<T, bool> predicate)
+        {
+            for (int i = 0; i < arr.Length; ++i)
+            {
+                if (predicate(arr[i]))
+                {
+                    return arr[i];
+                }
+            }
+            return default(T);
+        }
+        public static T Last<T>(this T[] arr)
+        {
+            return arr[arr.Length - 1];
+        }
+        public static T First<T>(this IEnumerable<T> list, Func<T, bool> predicate)
         {
             foreach (T t in list)
             {

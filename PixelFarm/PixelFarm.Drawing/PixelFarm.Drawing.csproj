@@ -148,9 +148,6 @@
     <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\DashStyle.cs">
       <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\DashStyle.cs</Link>
     </Compile>
-    <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\GraphicsPath.cs">
-      <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\GraphicsPath.cs</Link>
-    </Compile>
     <Compile Include="..\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Image.cs">
       <Link>0_REF_DrawingCore\2_Abstract_DrawingElements\Image.cs</Link>
     </Compile>

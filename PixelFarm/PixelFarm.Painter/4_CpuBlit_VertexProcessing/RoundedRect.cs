@@ -103,11 +103,15 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _leftTopRadius = new Vector2(leftTopRadius, leftTopRadius);
         }
 
-        public void SetRadius(double rx1, double ry1, double rx2, double ry2,
-                              double rx3, double ry3, double rx4, double ry4)
+        public void SetRadius(double leftBottomRx, double leftBottomRy,
+                              double rightBottomRx, double rightBottomRy,
+                              double rightTopRx, double rightTopRy,
+                              double leftTopRx, double leftTopRy)
         {
-            _leftBottomRadius.x = rx1; _leftBottomRadius.y = ry1; _rightBottomRadius.x = rx2; _rightBottomRadius.y = ry2;
-            _rightTopRadius.x = rx3; _rightTopRadius.y = ry3; _leftTopRadius.x = rx4; _leftTopRadius.y = ry4;
+            _leftBottomRadius.x = leftBottomRx; _leftBottomRadius.y = leftBottomRy;
+            _rightBottomRadius.x = rightBottomRx; _rightBottomRadius.y = rightBottomRy;
+            _rightTopRadius.x = rightTopRx; _rightTopRadius.y = rightTopRy;
+            _leftTopRadius.x = leftTopRx; _leftTopRadius.y = leftTopRy;
         }
 
         public void NormalizeRadius()

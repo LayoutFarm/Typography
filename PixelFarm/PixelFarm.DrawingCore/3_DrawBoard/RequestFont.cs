@@ -57,10 +57,11 @@ namespace PixelFarm.Drawing
         }
         public RequestFont(string facename, Len fontSize, FontStyle style = FontStyle.Regular)
         {
+            
             //Lang = "en";//default
             Name = facename;
             Size = fontSize; //store user font size here
-            //SizeInPoints = fontSizeInPts;
+
             Style = style;
             float fontSizeInPts = SizeInPoints = fontSize.ToPoints();
             FontKey = CalculateFontKey(facename, fontSizeInPts, style);
@@ -136,14 +137,11 @@ namespace PixelFarm.Drawing
 
         //------------------ 
         //caching ...
-        //store latest platform's actual font  as WeakReference
-        //access this by PixelFarm.Drawing.Internal.RequestFontCacheAccess
+
         internal int _platform_id;//resolve by system id
-        internal object _latestResolved; //result of the actual font, we store it as weak reference
+        internal object _latestResolved; //result of the actual font
         internal int _whitespace_width;
         internal int _generalLineSpacingInPx;
-
-        //------------------ 
 
 
         //TODO: review here again
@@ -156,6 +154,7 @@ namespace PixelFarm.Drawing
         public float DescentInPixels => _descentInPx;
         public float AscentInPixels => _ascentInPx;
         public float LineGapInPixels => _lineGapInPx;
+
         /// <summary>
         /// already in pixels
         /// </summary>

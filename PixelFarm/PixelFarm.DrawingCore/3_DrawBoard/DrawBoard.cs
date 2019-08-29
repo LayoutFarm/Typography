@@ -85,10 +85,7 @@ namespace PixelFarm.Drawing
         public abstract void FillRectangle(Brush brush, float left, float top, float width, float height);
         public abstract void DrawRectangle(Color color, float left, float top, float width, float height);
         //------------------------------------------------------- 
-        //path,  polygons,ellipse spline,contour,   
-        public abstract void FillPath(Color color, GraphicsPath gfxPath);
-        public abstract void FillPath(Brush brush, GraphicsPath gfxPath);
-        public abstract void DrawPath(GraphicsPath gfxPath);
+       
         public abstract void FillPolygon(Brush brush, PointF[] points);
         public abstract void FillPolygon(Color color, PointF[] points);
         //-------------------------------------------------------  

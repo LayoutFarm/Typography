@@ -188,7 +188,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs" Link="PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Brushes_Pens.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\CombineMode.cs" Link="PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\CombineMode.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\DashStyle.cs" Link="PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\DashStyle.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\GraphicsPath.cs" Link="PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\GraphicsPath.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Image.cs" Link="PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Image.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Region.cs" Link="PixelFarm\PixelFarm.DrawingCore\2_Abstract_DrawingElements\Region.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.DrawingCore\3_DrawBoard\0_VertexCommandAndOrientation.cs" Link="PixelFarm\PixelFarm.DrawingCore\3_DrawBoard\0_VertexCommandAndOrientation.cs" />

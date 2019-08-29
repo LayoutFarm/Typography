@@ -38,7 +38,7 @@ namespace PixelFarm.Drawing
         }
 
 
-        public char[] GetRawCharBuffer() { return _rawString; }
+        public char[] GetRawCharBuffer() => _rawString;
     }
 
     //implement this interface to handler font measurement/ glyph layout position

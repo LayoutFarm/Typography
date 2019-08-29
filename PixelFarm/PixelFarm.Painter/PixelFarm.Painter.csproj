@@ -140,6 +140,9 @@
     <Compile Include="..\pixelfarm.vectors\3_transform\Viewport.cs">
       <Link>0_REF_Vectors\3_Transform\Viewport.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Vectors\4_Utils\PolygonSimplifier.cs">
+      <Link>0_REF_Vectors\PolygonSimplifier.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Vectors\5_Clipper\cliper.cs">
       <Link>0_REF_Vectors\5_Clipper\cliper.cs</Link>
     </Compile>

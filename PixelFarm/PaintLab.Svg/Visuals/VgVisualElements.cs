@@ -207,7 +207,7 @@ namespace PaintLab.Svg
         internal float _imgY;
 
         VertexStore _vxsPath;
-        bool _isVxsPathOwner;
+        bool _isRenderVxOwner;
 
         public VgVisualElement(WellknownSvgElementName wellknownName,
             SvgVisualSpec visualSpec,
@@ -231,6 +231,14 @@ namespace PaintLab.Svg
         //
         public ICoordTransformer CoordTx { get; set; }
 
+
+        RenderVx _renderVx;
+        public RenderVx RenderVx => _renderVx;
+        public void SetRenderVx(RenderVx renderVx, bool isOwner)
+        {
+            _renderVx = renderVx;
+            _isRenderVxOwner = isOwner;
+        }
         public VertexStore VxsPath
         {
             get => _vxsPath;
@@ -242,28 +250,26 @@ namespace PaintLab.Svg
                     throw new NotSupportedException("can't not store shared vxs");
                 }
 #endif
-                ReleaseVxsPath(); //release old _vxsPath
-
-                _isVxsPathOwner = true;//
                 _vxsPath = value;
+                ReleaseRenderVx();
+            }
+        }
+        void ReleaseRenderVx()
+        {
+            if (_renderVx != null)
+            {
+                if (_isRenderVxOwner)
+                {
+                    _renderVx.Dispose();
+                }
+                _renderVx = null;
             }
         }
 
-        void ReleaseVxsPath()
-        {
-            if (_vxsPath != null)
-            {
-                if (_isVxsPathOwner)
-                {
-                    _vxsPath.Dispose();
-                }
-                //
-                _vxsPath = null;
-            }
-        }
         public void Dispose()
         {
-            ReleaseVxsPath();
+            _isRenderVxOwner = false;
+            ReleaseRenderVx();
         }
 
         public LayoutFarm.ImageBinder ImageBinder
@@ -376,6 +382,7 @@ namespace PaintLab.Svg
                          elems[0], elems[1],
                          elems[2], elems[3],
                          elems[4], elems[5]);
+
                 case SvgTransformKind.Rotation:
                     SvgRotate rotateTx = (SvgRotate)transformation;
                     if (rotateTx.SpecificRotationCenter)
@@ -385,25 +392,21 @@ namespace PaintLab.Svg
 
                         //translate to center 
                         //rotate and the translate back
-                        return transformation.ResolvedICoordTransformer = Affine.New(
-                                PixelFarm.CpuBlit.VertexProcessing.AffinePlan.Translate(-rotateTx.CenterX, -rotateTx.CenterY),
-                                PixelFarm.CpuBlit.VertexProcessing.AffinePlan.Rotate(AggMath.deg2rad(rotateTx.Angle)),
-                                PixelFarm.CpuBlit.VertexProcessing.AffinePlan.Translate(rotateTx.CenterX, rotateTx.CenterY)
-                            );
+                        return transformation.ResolvedICoordTransformer = Affine.NewRotationDeg(rotateTx.Angle, rotateTx.CenterX, rotateTx.CenterY);
                     }
                     else
                     {
-                        return transformation.ResolvedICoordTransformer = PixelFarm.CpuBlit.VertexProcessing.Affine.NewRotation(AggMath.deg2rad(rotateTx.Angle));
+                        return transformation.ResolvedICoordTransformer = Affine.NewRotationDeg(rotateTx.Angle);
                     }
                 case SvgTransformKind.Scale:
                     SvgScale scaleTx = (SvgScale)transformation;
-                    return transformation.ResolvedICoordTransformer = PixelFarm.CpuBlit.VertexProcessing.Affine.NewScaling(scaleTx.X, scaleTx.Y);
+                    return transformation.ResolvedICoordTransformer = Affine.NewScaling(scaleTx.X, scaleTx.Y);
                 case SvgTransformKind.Shear:
                     SvgShear shearTx = (SvgShear)transformation;
-                    return transformation.ResolvedICoordTransformer = PixelFarm.CpuBlit.VertexProcessing.Affine.NewSkewing(shearTx.X, shearTx.Y);
+                    return transformation.ResolvedICoordTransformer = Affine.NewSkewing(shearTx.X, shearTx.Y);
                 case SvgTransformKind.Translation:
                     SvgTranslate translateTx = (SvgTranslate)transformation;
-                    return transformation.ResolvedICoordTransformer = PixelFarm.CpuBlit.VertexProcessing.Affine.NewTranslation(translateTx.X, translateTx.Y);
+                    return transformation.ResolvedICoordTransformer = Affine.NewTranslation(translateTx.X, translateTx.Y);
             }
         }
 
@@ -720,12 +723,11 @@ namespace PaintLab.Svg
 
                             }
                             //our mask  need a little swap (TODO: review this, this is temp fix)
-                            //maskBmp.SaveImage("d:\\WImageTest\\mask01.png");
+                            //maskBmp.SaveImage("mask01.png");
                             // maskBmp.InvertColor();
                             maskElem.SetBitmapSnapshot(maskBmp, true);
-                            // maskBmp.SaveImage("d:\\WImageTest\\mask01_inverted.png");
+                            // maskBmp.SaveImage("mask01_inverted.png");
                         }
-
 
                         if (maskElem.BackingImage != null)
                         {
@@ -982,7 +984,7 @@ namespace PaintLab.Svg
                         }
 
                         bool tryLoadOnce = false;
-                        EVAL_STATE:
+                    EVAL_STATE:
                         switch (this.ImageBinder.State)
                         {
                             case LayoutFarm.BinderState.Unload:
@@ -1154,11 +1156,35 @@ namespace PaintLab.Svg
                             {
                                 if (useGradientColor)
                                 {
-                                    p.Fill(VxsPath);
+                                    RenderVx renderVx = this.RenderVx;
+                                    if (renderVx != null)
+                                    {
+                                        //has render vx     
+                                        p.FillRenderVx(renderVx);
+
+                                    }
+                                    else
+                                    {
+                                        renderVx = p.CreateRenderVx(VxsPath);
+                                        SetRenderVx(renderVx, true);
+                                        p.FillRenderVx(renderVx);
+                                    }
+
                                 }
                                 else if (p.FillColor.A > 0)
                                 {
-                                    p.Fill(VxsPath);
+                                    RenderVx renderVx = this.RenderVx;
+                                    if (renderVx != null)
+                                    {
+                                        //has render vx     
+                                        p.FillRenderVx(renderVx);
+                                    }
+                                    else
+                                    {
+                                        renderVx = p.CreateRenderVx(VxsPath);
+                                        SetRenderVx(renderVx, true);
+                                        p.FillRenderVx(renderVx);
+                                    }
                                 }
                                 //to draw stroke
                                 //stroke width must > 0 and stroke-color must not be transparent color

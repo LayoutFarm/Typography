@@ -17,8 +17,7 @@ namespace Tesselate
         {
             this.Data = data;
         }
-        public T Data { get; set; }
-        public int NodeNumber { get; set; }
+        public T Data { get; private set; }
 #if DEBUG
         public override string ToString()
         {
@@ -45,10 +44,6 @@ namespace Tesselate
         void SortData()
         {
             _innerList.Sort(MaxFirstSort);
-            for (int i = _innerList.Count - 1; i >= 0; --i)
-            {
-                _innerList[i].NodeNumber = i;
-            }
             _isSorted = true;
         }
         public T DeleteMin()
@@ -74,43 +69,120 @@ namespace Tesselate
         public void Add(T data, out RefItem<T> refItem)
         {
             RefItem<T> item = new RefItem<T>(data);
-            _innerList.Add(item);
-            _isSorted = false;
             refItem = item;
-        }
 
-        int BinSearch(RefItem<T> refItem, int begin, int end)
-        {
-            int pos = begin + ((end - begin) / 2);
-            RefItem<T> sample = _innerList[pos];
-            if (refItem == sample)
+            if (_isSorted)
             {
-            }
-            else
-            {
-                if (sample.Data.CompareTo(refItem.Data) <= 0)
+                int pos = FindProperInsertPos(data);
+                if (pos >= _innerList.Count)
                 {
-                    //search down
-                    end = end - ((pos - begin) / 2);
-                    if (end == begin)
-                    {
-                        return -1;
-                    }
-                    return BinSearch(refItem, begin, end);
+                    _innerList.Add(item);
                 }
                 else
                 {
-                    //search up
-                    begin = pos + (end - pos) / 2;
-                    if (end == begin)
+                    _innerList.Insert(pos, item);
+                }
+
+                //SortData();
+                //int actualPos = BinSearch(item, 0, _innerList.Count - 1);
+                //if (actualPos != pos)
+                //{
+
+                //}
+            }
+            else
+            {
+                _innerList.Add(item);
+            }
+        }
+        internal int FindProperInsertPos(T data)
+        {
+            int begin = 0;
+            int end = _innerList.Count - 1;
+        TRY_AGAIN:
+            int pos = begin + ((end - begin) / 2);
+            T sample = _innerList[pos].Data;
+            int compare = sample.CompareTo(data);
+
+            if (compare == 0)
+            {
+                return pos + 1;
+            }
+            else
+            {
+                if (begin >= end)
+                {
+                    //stop
+                    if (compare >= 0)
                     {
-                        return -1;
+                        return pos + 1;
                     }
-                    return BinSearch(refItem, begin, end);
+
+                    return pos;
+                }
+                if (compare < 0)
+                {
+                    //this is MaxFirst list
+                    //data at this pos is lesser than refItem.Data
+                    //we need to move to the begin side of the list                      
+                    end = pos - 1;
+                    goto TRY_AGAIN;
+                    //return BinSearch(refItem, begin, pos - 1);
+                }
+                else
+                {
+                    //this is MaxFirst list
+                    //data at this pos is greater than refItem.Data
+                    //we need to move to the end of this list                     
+                    begin = pos + 1;
+                    goto TRY_AGAIN;
+                    //return BinSearch(refItem, pos + 1, end);
                 }
             }
+        }
+        int BinSearch(RefItem<T> refItem, int begin, int end)
+        {
+        TRY_AGAIN:
+            int pos = begin + ((end - begin) / 2);
+            RefItem<T> sample = _innerList[pos];
 
-            return -1;//not found
+            if (refItem == sample)
+            {
+                return pos;
+            }
+            else
+            {
+                if (begin == end)
+                {
+                    return -1;//not found
+                }
+                if (sample.Data.CompareTo(refItem.Data) < 0)
+                {
+                    //this is MaxFirst list
+                    //data at this pos is lesser than refItem.Data
+                    //we need to move to the begin side of the list                      
+                    end = pos - 1;
+                    goto TRY_AGAIN;
+                    //return BinSearch(refItem, begin, pos - 1);
+                }
+                else
+                {
+                    //this is MaxFirst list
+                    //data at this pos is greater than refItem.Data
+                    //we need to move to the end of this list                     
+                    begin = pos + 1;
+                    goto TRY_AGAIN;
+                    //return BinSearch(refItem, pos + 1, end);
+                }
+            }
+        }
+        public int Search(RefItem<T> refItem)
+        {
+            if (!_isSorted)
+            {
+                SortData();
+            }
+            return BinSearch(refItem, 0, _innerList.Count - 1);
         }
         public void Delete(RefItem<T> refItem)
         {
@@ -118,14 +190,33 @@ namespace Tesselate
 
             if (_isSorted)
             {
-                //use binary search to find node 
-                //1. find middle point 
-                int removeAt = refItem.NodeNumber;
-                for (int i = _innerList.Count - 1; i > removeAt; --i)
+                int pos = BinSearch(refItem, 0, _innerList.Count - 1);
+                if (pos > -1)
                 {
-                    _innerList[i].NodeNumber = i - 1;
+                    _innerList.RemoveAt(pos);
                 }
-                _innerList.RemoveAt(removeAt);
+                //int actualPos = -1;
+                //for (int i = _innerList.Count - 1; i >= 0; --i)
+                //{
+                //    if (_innerList[i] == refItem)
+                //    {
+                //        actualPos = i;
+                //        break;
+                //    }
+                //}
+
+                //if (pos != actualPos)
+                //{
+
+                //}
+                //for (int i = _innerList.Count - 1; i >= 0; --i)
+                //{
+                //    if (_innerList[i] == refItem)
+                //    {
+                //        _innerList.RemoveAt(i);
+                //        break;
+                //    }
+                //}
             }
             else
             {

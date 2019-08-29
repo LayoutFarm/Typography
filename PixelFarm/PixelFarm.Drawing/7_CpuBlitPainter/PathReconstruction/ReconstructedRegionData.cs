@@ -21,7 +21,7 @@ namespace PixelFarm.PathReconstruction
         /// <summary>
         /// (must be) sorted hSpans, from reconstruction
         /// </summary>
-        public HSpan[] HSpans { get; internal set; }
+        public HSpan[] HSpans { get;  set; }
         /// <summary>
         /// reconstructed outline
         /// </summary>

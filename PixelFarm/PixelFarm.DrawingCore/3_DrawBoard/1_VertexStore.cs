@@ -23,18 +23,13 @@
 using PixelFarm.CpuBlit;
 namespace PixelFarm.Drawing
 {
-    public sealed class VertexStore : System.IDisposable
+    public sealed class VertexStore
     {
 
         int _vertices_count;
         int _allocated_vertices_count;
         double[] _coord_xy;
         byte[] _cmds;
-
-        //***
-        RenderVx _cachedAreaRenderVx;
-        RenderVx _cachedBorderRenerVx;
-        //
 
 #if DEBUG
         public readonly bool dbugIsTrim;
@@ -51,29 +46,11 @@ namespace PixelFarm.Drawing
 #if DEBUG
             System.Diagnostics.Debug.WriteLine("vxs_1_dbugId=" + dbugId);
 #endif
-
             AllocIfRequired(2);
-        }
-        public VertexStore(bool isShared)
+        } 
+        public static void SetSharedState(VertexStore vxs, bool isShared)
         {
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine("vxs_2_dbugId=" + dbugId);
-#endif
-            AllocIfRequired(2);
-            IsShared = isShared;
-        }
-        public void Dispose()
-        {
-            if (_cachedBorderRenerVx != null)
-            {
-                _cachedBorderRenerVx.Dispose();
-                _cachedBorderRenerVx = null;
-            }
-            if (_cachedAreaRenderVx != null)
-            {
-                _cachedAreaRenderVx.Dispose();
-                _cachedAreaRenderVx = null;
-            }
+            vxs.IsShared = isShared;
         }
         public bool IsShared { get; private set; }
         /// <summary>
@@ -128,18 +105,6 @@ namespace PixelFarm.Drawing
             //System.Array.Clear(m_cmds, 0, m_cmds.Length);
             System.Array.Clear(_cmds, 0, _vertices_count); //only latest 
             _vertices_count = 0;
-            //
-            if (_cachedAreaRenderVx != null)
-            {
-                _cachedAreaRenderVx.Dispose();
-                _cachedAreaRenderVx = null;
-            }
-            //
-            if (_cachedBorderRenerVx != null)
-            {
-                _cachedBorderRenerVx.Dispose();
-                _cachedBorderRenerVx = null;
-            }
         }
         public void ConfirmNoMore()
         {
@@ -191,57 +156,6 @@ namespace PixelFarm.Drawing
         }
 
 
-        //--------------------------------------------------
-        public static void SetAreaRenderVx(VertexStore vxs, RenderVx renderVx)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-            if (vxs._cachedAreaRenderVx != null)
-            {
-
-            }
-            vxs._cachedAreaRenderVx = renderVx;
-        }
-        public static RenderVx GetAreaRenderVx(VertexStore vxs)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-
-            return vxs._cachedAreaRenderVx;
-        }
-        public static void SetBorderRenderVx(VertexStore vxs, RenderVx renderVx)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-            if (vxs._cachedBorderRenerVx != null)
-            {
-
-            }
-            vxs._cachedBorderRenerVx = renderVx;
-        }
-        public static RenderVx GetBorderRenderVx(VertexStore vxs)
-        {
-#if DEBUG
-            if (vxs.IsShared)
-            {
-                throw new System.NotSupportedException();//don't store renderVx in shared Vxs
-            }
-#endif
-            return vxs._cachedBorderRenerVx;
-        }
-        //--------------------------------------------------
 #if DEBUG
         public override string ToString()
         {
@@ -542,7 +456,7 @@ namespace PixelFarm.Drawing
 
     public static class VertexStoreExtensions
     {
-        
+
 
         public static void AddC3To(this VertexStore vxs, double x1, double y1, double x2, double y2)
         {
@@ -555,7 +469,7 @@ namespace PixelFarm.Drawing
             vxs.AddVertex(x2, y2, VertexCmd.C4);
             vxs.AddVertex(x3, y3, VertexCmd.LineTo);
         }
-        
+
         public static void AddMoveTo(this VertexStore vxs, double x0, double y0)
         {
             vxs.AddVertex(x0, y0, VertexCmd.MoveTo);

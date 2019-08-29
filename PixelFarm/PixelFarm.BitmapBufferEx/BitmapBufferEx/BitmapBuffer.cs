@@ -9,7 +9,7 @@ namespace BitmapBufferEx
     public abstract class GeneralTransform
     {
         public abstract RectD TransformBounds(RectD r1);
-        public abstract PointD Transform(PointD p); 
+        public abstract PointD Transform(PointD p);
         public abstract MatrixTransform Inverse
         {
             get;
@@ -19,20 +19,20 @@ namespace BitmapBufferEx
     public class MatrixTransform : GeneralTransform
     {
         MatrixTransform _inverseVersion;
-        Affine affine;
+        Affine _affine;
         public MatrixTransform(AffinePlan[] affPlans)
         {
-            affine = Affine.New(affPlans);
+            _affine = Affine.New(affPlans);
         }
         public MatrixTransform(Affine affine)
         {
-            this.affine = affine;
+            _affine = affine;
         }
         public override PointD Transform(PointD p)
         {
             double p_x = p.X;
             double p_y = p.Y;
-            affine.Transform(ref p_x, ref p_y);
+            _affine.Transform(ref p_x, ref p_y);
             return new PointD(p_x, p_y);
         }
         public override MatrixTransform Inverse
@@ -41,7 +41,7 @@ namespace BitmapBufferEx
             {
                 if (_inverseVersion == null)
                 {
-                    return _inverseVersion = new MatrixTransform(affine.CreateInvert());
+                    return _inverseVersion = new MatrixTransform(_affine.CreateInvert());
                 }
                 return _inverseVersion;
             }
@@ -64,10 +64,10 @@ namespace BitmapBufferEx
             var tmp2 = new PointD(r1.Right, r1.Bottom);
             var tmp3 = new PointD(r1.Left, r1.Bottom);
 
-            affine.Transform(ref tmp0.X, ref tmp0.Y);
-            affine.Transform(ref tmp1.X, ref tmp1.Y);
-            affine.Transform(ref tmp2.X, ref tmp2.Y);
-            affine.Transform(ref tmp3.X, ref tmp3.Y);
+            _affine.Transform(ref tmp0.X, ref tmp0.Y);
+            _affine.Transform(ref tmp1.X, ref tmp1.Y);
+            _affine.Transform(ref tmp2.X, ref tmp2.Y);
+            _affine.Transform(ref tmp3.X, ref tmp3.Y);
             return FindMaxBounds(tmp0, tmp1, tmp2, tmp3);
         }
 
@@ -247,10 +247,10 @@ namespace BitmapBufferEx
         //we store color as 'straight alpha'
         byte _r, _g, _b, _a;
 
-        public byte R { get { return _r; } }
-        public byte G { get { return _g; } }
-        public byte B { get { return _b; } }
-        public byte A { get { return _a; } }
+        public byte R => _r;
+        public byte G => _g;
+        public byte B => _b;
+        public byte A => _a;
 
         public static ColorInt CreateNew(ColorInt oldColor, byte a)
         {
@@ -346,7 +346,7 @@ namespace BitmapBufferEx
     {
         //from WriteableBitmap*** 
         public static readonly BitmapBuffer Empty = new BitmapBuffer();
-        int _lenInBytes;
+        readonly int _lenInBytes;
 
         //in this version , only 32 bits          
         public BitmapBuffer(int w, int h, IntPtr _orgBuffer, int lenInBytes, bool isOwner = false)
