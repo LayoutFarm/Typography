@@ -142,16 +142,7 @@ namespace PixelFarm.Drawing.Fonts
             //}
         }
 
-        /// <summary>
-        /// draw specfic glyph with current settings, at specific position
-        /// </summary>
-        /// <param name="glyph"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void DrawGlyph(Glyph glyph, double x, double y)
-        {
-            //TODO...
-        }
+        
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
         {
             UpdateGlyphLayoutSettings();
