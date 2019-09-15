@@ -106,7 +106,7 @@ namespace Typography.Rendering
                     DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
             });
-            
+
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
@@ -347,6 +347,7 @@ namespace Typography.Rendering
 #if DEBUG
                         //write temp debug info
 #if !__MOBILE__
+                        System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
                         System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", reqFont.Name + ",size" + reqFont.SizeInPoints + "pts");
 #endif
 #endif
