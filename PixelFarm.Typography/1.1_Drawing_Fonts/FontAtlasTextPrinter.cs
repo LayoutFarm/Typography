@@ -169,7 +169,14 @@ namespace PixelFarm.Drawing.Fonts
             UpdateGlyphLayoutSettings();
             Typeface typeface = _currentTypeface;
         }
+        public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
+        {
 
+            //1. update some props.. 
+            //2. update current type face
+            UpdateGlyphLayoutSettings();
+            Typeface typeface = _currentTypeface;
+        }
         public override void DrawCaret(float x, float y)
         {
             //TODO: remove draw caret here, this is for debug only 

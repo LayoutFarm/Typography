@@ -212,7 +212,6 @@ namespace LayoutFarm
             //and cache into level-0
 
             float pxSize = Typeface.ConvPointsToPixels(font.SizeInPoints);
-
             float pxscale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
 
             float recommedLineSpacingInPx = typeface.CalculateRecommendLineSpacing() * pxscale;

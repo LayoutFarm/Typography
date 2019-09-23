@@ -115,7 +115,10 @@ namespace PixelFarm.Drawing.Fonts
         {
             UpdateGlyphLayoutSettings();
         }
-
+        public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
+        {
+            UpdateGlyphLayoutSettings();
+        }
         public override void DrawCaret(float x, float y)
         {
             //TODO: remove draw caret here, this is for debug only 
