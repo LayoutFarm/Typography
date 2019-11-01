@@ -76,6 +76,11 @@ namespace Typography.OpenFont.Tables
         public const string _N = "cmap";
         public override string Name => _N;
 
+
+        List<CharacterMap> _charMaps = new List<CharacterMap>();
+        List<CharMapFormat14> _charMap14List;
+        Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
+
         /// <summary>
         /// find glyph index from given codepoint
         /// </summary>
@@ -124,9 +129,7 @@ namespace Typography.OpenFont.Tables
             return found;
         }
 
-        List<CharacterMap> _charMaps = new List<CharacterMap>();
-        List<CharMapFormat14> _charMap14List;
-        Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
+
 
         protected override void ReadContentFrom(BinaryReader input)
         {
