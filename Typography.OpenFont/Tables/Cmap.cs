@@ -99,23 +99,23 @@ namespace Typography.OpenFont.Tables
                 for (int i = 0; i < _charMaps.Length; ++i)
                 {
                     CharacterMap cmap = _charMaps[i];
-                    ushort gid = cmap.GetGlyphIndex(codepoint);
 
                     //https://www.microsoft.com/typography/OTSPEC/cmap.htm 
 
                     if (found == 0)
                     {
-                        found = gid;
+                        found = cmap.GetGlyphIndex(codepoint);
                     }
                     else if (cmap.PlatformId == 3 && cmap.EncodingId == 1)
                     {
                         //...When building a Unicode font for Windows, 
                         // the platform ID should be 3 and the encoding ID should be 1
-                        if ((gid = cmap.GetGlyphIndex(codepoint)) != 0)
+                        ushort gid = cmap.GetGlyphIndex(codepoint);
+                        if (gid != 0)
                         {
                             found = gid;
                         }
-                    }                     
+                    }
                 }
                 _codepointToGlyphs[codepoint] = found;
             }
