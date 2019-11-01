@@ -107,18 +107,15 @@ namespace Typography.OpenFont.Tables
             // If there is a second codepoint, we are asked whether this is an UVS sequence
             //  -> if true, return a glyph ID
             //  -> otherwise, return 0
-            if (nextCodepoint > 0)
+            if (nextCodepoint > 0 && _charMap14List != null)
             {
-                foreach (CharacterMap cmap in _charMaps)
-                {
-                    if (cmap is CharMapFormat14 cmap14)
+                foreach (CharMapFormat14 cmap14 in _charMap14List)
+                { 
+                    ushort gid = cmap14.CharacterPairToGlyphIndex(codepoint, found, nextCodepoint);
+                    if (gid > 0)
                     {
-                        ushort gid = cmap14.CharacterPairToGlyphIndex(codepoint, found, nextCodepoint);
-                        if (gid > 0)
-                        {
-                            return gid;
-                        }
-                    }
+                        return gid;
+                    } 
                 }
 
                 return 0;
@@ -128,6 +125,7 @@ namespace Typography.OpenFont.Tables
         }
 
         List<CharacterMap> _charMaps = new List<CharacterMap>();
+        List<CharMapFormat14> _charMap14List = new List<CharMapFormat14>();
         Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         protected override void ReadContentFrom(BinaryReader input)
@@ -155,6 +153,14 @@ namespace Typography.OpenFont.Tables
                 cmap.PlatformId = platformIds[i];
                 cmap.EncodingId = encodingIds[i];
                 _charMaps.Add(cmap);
+
+                //
+                if (cmap is CharMapFormat14 cmap14)
+                {
+                    if (_charMap14List == null) _charMap14List = new List<CharMapFormat14>();
+                    //
+                    _charMap14List.Add(cmap14);
+                }
             }
         }
 
