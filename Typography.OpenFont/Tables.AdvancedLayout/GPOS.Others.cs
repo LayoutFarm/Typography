@@ -198,7 +198,7 @@ namespace Typography.OpenFont.Tables
                     appendComma = true;
                 }
 
-                
+
 
                 if (YPlacement != 0)
                 {
@@ -217,7 +217,7 @@ namespace Typography.OpenFont.Tables
                     if (appendComma) { stbuilder.Append(','); }
                     stbuilder.Append(" YAdvance=" + YAdvance);
                     appendComma = true;
-                } 
+                }
                 return stbuilder.ToString();
             }
 #endif
@@ -555,7 +555,8 @@ namespace Typography.OpenFont.Tables
                 ushort[] baseAnchorOffsets = Utils.ReadUInt16Array(reader, classCount * baseCount);
                 for (int i = 0; i < baseCount; ++i)
                 {
-                    BaseRecord baseRec = new BaseRecord(classCount);
+                    AnchorPoint[] anchors = new AnchorPoint[classCount];
+                    BaseRecord baseRec = new BaseRecord(anchors);
 
                     //each base has anchor point for mark glyph'class
                     for (int n = 0; n < classCount; ++n)
@@ -567,7 +568,7 @@ namespace Typography.OpenFont.Tables
                             //bug?
                             continue;
                         }
-                        baseRec.anchors[n] = AnchorPoint.CreateFrom(reader, beginAt + offset);
+                        anchors[n] = AnchorPoint.CreateFrom(reader, beginAt + offset);
                     }
 
                     baseArrTable._records[i] = baseRec;
@@ -592,9 +593,9 @@ namespace Typography.OpenFont.Tables
 
             public readonly AnchorPoint[] anchors;
 
-            public BaseRecord(int classCount)
+            public BaseRecord(AnchorPoint[] anchors)
             {
-                anchors = new AnchorPoint[classCount];
+                this.anchors = anchors;
             }
 #if DEBUG
             public override string ToString()
