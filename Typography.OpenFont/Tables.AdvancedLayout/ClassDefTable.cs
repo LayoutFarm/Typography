@@ -92,7 +92,7 @@ namespace Typography.OpenFont.Tables
     //---------------------------------------
     class ClassDefTable
     {
-        public int Format { get; private set; }
+        public int Format { get; internal set; }
         //----------------
         //format 1
         public ushort startGlyph;

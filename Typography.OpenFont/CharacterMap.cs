@@ -11,11 +11,11 @@ namespace Typography.OpenFont
     {
         public override ushort Format => 4;
 
-        readonly ushort[] _startCode; //Starting character code for each segment
-        readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
-        readonly ushort[] _idDelta; //Delta for all character codes in segment
-        readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
-        readonly ushort[] _glyphIdArray;
+        internal readonly ushort[] _startCode; //Starting character code for each segment
+        internal readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
+        internal readonly ushort[] _idDelta; //Delta for all character codes in segment
+        internal readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
+        internal readonly ushort[] _glyphIdArray;
         public CharMapFormat4(ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
         {
             _startCode = startCode;
@@ -25,7 +25,7 @@ namespace Typography.OpenFont
             _glyphIdArray = glyphIdArray;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // This lookup table only supports 16-bit codepoints
             if (codepoint > ushort.MaxValue)
@@ -90,7 +90,7 @@ namespace Typography.OpenFont
             _startGlyphIds = startGlyphIds;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // https://www.microsoft.com/typography/otspec/cmap.htm#format12
             // "Groups must be sorted by increasing startCharCode."
@@ -116,7 +116,7 @@ namespace Typography.OpenFont
             _startCode = startCode;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // The firstCode and entryCount values specify a subrange (beginning at firstCode,
             // length = entryCount) within the range of possible character codes.
@@ -127,8 +127,8 @@ namespace Typography.OpenFont
             return i >= 0 && i < _glyphIdArray.Length ? _glyphIdArray[i] : (ushort)0;
         }
 
-        readonly ushort _startCode;
-        readonly ushort[] _glyphIdArray;
+        internal readonly ushort _startCode;
+        internal readonly ushort[] _glyphIdArray;
     }
 
 
@@ -146,7 +146,7 @@ namespace Typography.OpenFont
     class CharMapFormat14 : CharacterMap
     {
         public override ushort Format => 14;
-        protected override ushort RawCharacterToGlyphIndex(int character) => 0;
+        public override ushort GetGlyphIndex(int character) => 0;
 
         public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
         {
@@ -331,7 +331,7 @@ namespace Typography.OpenFont
     {
         public override ushort Format => 0;
 
-        protected override ushort RawCharacterToGlyphIndex(int character) => 0;
+        public override ushort GetGlyphIndex(int character) => 0;
     }
 
     abstract class CharacterMap
@@ -341,12 +341,9 @@ namespace Typography.OpenFont
         public abstract ushort Format { get; }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
-        public ushort CharacterToGlyphIndex(int codepoint)
-        {
-            return RawCharacterToGlyphIndex(codepoint);
-        }
+        
 
-        protected abstract ushort RawCharacterToGlyphIndex(int codepoint);
+        public abstract ushort GetGlyphIndex(int codepoint);
 
         //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
         //{
@@ -437,5 +434,5 @@ namespace Typography.OpenFont
         //            break;
         //    }
         //}
-    } 
+    }
 }

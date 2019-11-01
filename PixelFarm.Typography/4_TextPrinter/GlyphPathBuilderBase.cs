@@ -55,7 +55,7 @@ namespace Typography.Contours
         /// <param name="sizeInPoints"></param>
         public void BuildFromGlyphIndex(ushort glyphIndex, float sizeInPoints)
         {
-            BuildFromGlyph(_typeface.GetGlyphByIndex(glyphIndex), sizeInPoints);
+            BuildFromGlyph(_typeface.GetGlyph(glyphIndex), sizeInPoints);
         }
         /// <summary>
         /// build glyph shape from glyph to be read
@@ -144,7 +144,7 @@ namespace Typography.Contours
     {
         public static void Build(this GlyphPathBuilderBase builder, char c, float sizeInPoints)
         {
-            builder.BuildFromGlyphIndex((ushort)builder.Typeface.LookupIndex(c), sizeInPoints);
+            builder.BuildFromGlyphIndex((ushort)builder.Typeface.GetGlyphIndex(c), sizeInPoints);
         }
         public static void SetHintTechnique(this GlyphPathBuilderBase builder, HintTechnique hintTech)
         {

@@ -205,11 +205,11 @@ namespace Typography.TextLayout
                     int endAt = rngInfo.EndAt;
                     for (int codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
                     {
-                        ushort glyghIndex = typeface.LookupIndex(codePoint);
-                        if (glyghIndex > 0)
+                        ushort glyphIndex = typeface.GetGlyphIndex(codePoint);
+                        if (glyphIndex > 0)
                         {
                             //add this glyph index
-                            outputGlyphIndexList.Add(glyghIndex);
+                            outputGlyphIndexList.Add(glyphIndex);
                         }
                     }
                 }

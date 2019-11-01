@@ -71,27 +71,34 @@ namespace Typography.OpenFont.Tables
     //or map correctly to these codepoints from other codepages and character sets. 
     ////////////////////////////////////////////////////////////////////////
 
-    class Cmap : TableEntry
+    partial class Cmap : TableEntry
     {
         public const string _N = "cmap";
         public override string Name => _N;
 
+
+        List<CharacterMap> _charMaps = new List<CharacterMap>();
+        List<CharMapFormat14> _charMap14List;
+        Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
+
         /// <summary>
-        /// find glyph index from given codepoint
+        /// find glyph index from given codepoint(s)
         /// </summary>
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns>glyph index</returns>
-        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
+        public ushort GetGlyphIndex(int codepoint, int nextCodepoint, out bool skipNextCodepoint)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
             // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
+
+            skipNextCodepoint = false; //default
 
             if (!_codepointToGlyphs.TryGetValue(codepoint, out ushort found))
             {
                 foreach (CharacterMap cmap in _charMaps)
                 {
-                    ushort gid = cmap.CharacterToGlyphIndex(codepoint);
+                    ushort gid = cmap.GetGlyphIndex(codepoint);
 
                     //https://www.microsoft.com/typography/OTSPEC/cmap.htm
                     //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
@@ -110,23 +117,17 @@ namespace Typography.OpenFont.Tables
             if (nextCodepoint > 0 && _charMap14List != null)
             {
                 foreach (CharMapFormat14 cmap14 in _charMap14List)
-                { 
+                {
                     ushort gid = cmap14.CharacterPairToGlyphIndex(codepoint, found, nextCodepoint);
                     if (gid > 0)
                     {
+                        skipNextCodepoint = true;
                         return gid;
-                    } 
+                    }
                 }
-
-                return 0;
             }
-
             return found;
         }
-
-        List<CharacterMap> _charMaps = new List<CharacterMap>();
-        List<CharMapFormat14> _charMap14List = new List<CharMapFormat14>();
-        Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         protected override void ReadContentFrom(BinaryReader input)
         {

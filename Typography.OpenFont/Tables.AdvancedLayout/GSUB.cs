@@ -31,7 +31,7 @@ namespace Typography.OpenFont.Tables
 
     ////////////////////////////////////////////////////////////////
 
-    public class GSUB : GlyphShapingTableEntry
+    public partial class GSUB : GlyphShapingTableEntry
     {
         public const string _N = "GSUB";
         public override string Name => _N;
@@ -43,9 +43,9 @@ namespace Typography.OpenFont.Tables
             LookupTable lookupTable = new LookupTable(lookupType, lookupFlags, markFilteringSet);
             foreach (long subTableOffset in subTableOffsets)
             {
-                LookupSubTable subTable = lookupTable.ReadSubTable(reader, lookupTablePos + subTableOffset); 
+                LookupSubTable subTable = lookupTable.ReadSubTable(reader, lookupTablePos + subTableOffset);
                 subTable.OwnerGSub = this;
-                lookupTable.SubTables.Add(subTable); 
+                lookupTable.SubTables.Add(subTable);
             }
             LookupList.Add(lookupTable);
         }
@@ -111,7 +111,7 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
-        public class LookupTable
+        public partial class LookupTable
         {
             //--------------------------
             public ushort lookupType { get; private set; }
@@ -424,7 +424,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 switch (format)
                 {
-                    default: 
+                    default:
                         throw new NotSupportedException();
                     case 1:
                         {

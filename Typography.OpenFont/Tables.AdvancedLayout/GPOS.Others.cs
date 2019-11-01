@@ -35,7 +35,7 @@ namespace Typography.OpenFont.Tables
 
         class PairSetTable
         {
-            PairSet[] _pairSets;
+            internal PairSet[] _pairSets;
             public void ReadFrom(BinaryReader reader, ushort v1format, ushort v2format)
             {
                 ushort rowCount = reader.ReadUInt16();
@@ -391,8 +391,8 @@ namespace Typography.OpenFont.Tables
             //-------------------
             //uint16 	Class 	                Class defined for this mark
             //Offset16 	MarkAnchor 	            Offset to Anchor table-from beginning of MarkArray table
-            MarkRecord[] _records;
-            AnchorPoint[] _anchorPoints;
+            internal MarkRecord[] _records;
+            internal AnchorPoint[] _anchorPoints;
             public AnchorPoint GetAnchorPoint(int index)
             {
                 return _anchorPoints[index];
@@ -511,14 +511,14 @@ namespace Typography.OpenFont.Tables
                 return _anchorPoints[index * _classCount + markClassId];
             }
 
-            private Mark2ArrayTable(ushort classCount, AnchorPoint[] anchorPoints)
+            public Mark2ArrayTable(ushort classCount, AnchorPoint[] anchorPoints)
             {
                 _classCount = classCount;
                 _anchorPoints = anchorPoints;
             }
 
-            private readonly ushort _classCount;
-            private readonly AnchorPoint[] _anchorPoints;
+            internal readonly ushort _classCount;
+            internal readonly AnchorPoint[] _anchorPoints;
         }
 
         class BaseArrayTable
@@ -538,7 +538,7 @@ namespace Typography.OpenFont.Tables
             // Note: Anchor tables are not tagged with class value identifiers.
             //Instead, the index value of an Anchor table in the array defines the class value represented by the Anchor table.
 
-            BaseRecord[] _records;
+            internal BaseRecord[] _records;
 
             public BaseRecord GetBaseRecords(int index)
             {

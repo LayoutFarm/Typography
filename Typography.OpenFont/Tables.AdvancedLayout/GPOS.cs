@@ -65,7 +65,7 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
-        public class LookupTable
+        public partial class LookupTable
         {
             public ushort lookupType { get; private set; }
             public readonly ushort lookupFlags;
@@ -193,7 +193,7 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableType2Fmt1 : LookupSubTable
             {
-                PairSetTable[] _pairSetTables;
+                internal PairSetTable[] _pairSetTables;
                 public LkSubTableType2Fmt1(PairSetTable[] pairSetTables)
                 {
                     _pairSetTables = pairSetTables;
@@ -242,9 +242,9 @@ namespace Typography.OpenFont.Tables
             class LkSubTableType2Fmt2 : LookupSubTable
             {
                 //Format 2 defines a pair as a set of two glyph classes and modifies the positions of all the glyphs in a class
-                readonly Lk2Class1Record[] _class1records;
-                readonly ClassDefTable _class1Def;
-                readonly ClassDefTable _class2Def;
+                internal readonly Lk2Class1Record[] _class1records;
+                internal readonly ClassDefTable _class1Def;
+                internal readonly ClassDefTable _class2Def;
 
                 public LkSubTableType2Fmt2(Lk2Class1Record[] class1records, ClassDefTable class1Def, ClassDefTable class2Def)
                 {
@@ -294,7 +294,7 @@ namespace Typography.OpenFont.Tables
                                         inputGlyphs.AppendGlyphAdvance(i + 1, v2.XAdvance, 0);
                                     }
                                 }
-                            } 
+                            }
                         }
 
                     }
