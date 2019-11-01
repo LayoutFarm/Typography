@@ -187,7 +187,7 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt1 : LookupSubTable
             {
-                public LkSubTableT1Fmt1(CoverageTable coverageTable, short deltaGlyph)
+                public LkSubTableT1Fmt1(CoverageTable coverageTable, ushort deltaGlyph)
                 {
                     this.CoverageTable = coverageTable;
                     this.DeltaGlyph = deltaGlyph;
@@ -195,7 +195,7 @@ namespace Typography.OpenFont.Tables
                 /// <summary>
                 /// Add to original GlyphID to get substitute GlyphID
                 /// </summary>
-                public short DeltaGlyph { get; private set; }
+                public ushort DeltaGlyph { get; private set; }
                 public CoverageTable CoverageTable { get; private set; }
 
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
@@ -321,7 +321,7 @@ namespace Typography.OpenFont.Tables
                     default: throw new NotSupportedException();
                     case 1:
                         {
-                            short deltaGlyph = reader.ReadInt16();
+                            ushort deltaGlyph = reader.ReadUInt16();
                             CoverageTable coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                             return new LkSubTableT1Fmt1(coverageTable, deltaGlyph);
                         }
