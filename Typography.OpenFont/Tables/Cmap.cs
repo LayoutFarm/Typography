@@ -82,12 +82,12 @@ namespace Typography.OpenFont.Tables
         Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         /// <summary>
-        /// find glyph index from given codepoint
+        /// find glyph index from given codepoint(s)
         /// </summary>
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns>glyph index</returns>
-        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
+        public ushort GetGlyphIndex(int codepoint, int nextCodepoint = 0)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
             // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
@@ -96,7 +96,7 @@ namespace Typography.OpenFont.Tables
             {
                 foreach (CharacterMap cmap in _charMaps)
                 {
-                    ushort gid = cmap.CharacterToGlyphIndex(codepoint);
+                    ushort gid = cmap.GetGlyphIndex(codepoint);
 
                     //https://www.microsoft.com/typography/OTSPEC/cmap.htm
                     //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1

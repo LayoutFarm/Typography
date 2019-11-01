@@ -143,13 +143,9 @@ namespace Typography.OpenFont
         /// <returns></returns>
         public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
         {
-            return CmapTable.LookupIndex(codepoint, nextCodepoint);
-        }
-
-        public Glyph Lookup(int codepoint)
-        {
-            return _glyphs[LookupIndex(codepoint)];
-        }
+            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint);
+        } 
+         
         public Glyph GetGlyphByIndex(ushort glyphIndex)
         {
             return _glyphs[glyphIndex];

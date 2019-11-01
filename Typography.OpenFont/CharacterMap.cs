@@ -25,7 +25,7 @@ namespace Typography.OpenFont
             _glyphIdArray = glyphIdArray;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // This lookup table only supports 16-bit codepoints
             if (codepoint > ushort.MaxValue)
@@ -90,7 +90,7 @@ namespace Typography.OpenFont
             _startGlyphIds = startGlyphIds;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // https://www.microsoft.com/typography/otspec/cmap.htm#format12
             // "Groups must be sorted by increasing startCharCode."
@@ -116,7 +116,7 @@ namespace Typography.OpenFont
             _startCode = startCode;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // The firstCode and entryCount values specify a subrange (beginning at firstCode,
             // length = entryCount) within the range of possible character codes.
@@ -146,7 +146,7 @@ namespace Typography.OpenFont
     class CharMapFormat14 : CharacterMap
     {
         public override ushort Format => 14;
-        protected override ushort RawCharacterToGlyphIndex(int character) => 0;
+        public override ushort GetGlyphIndex(int character) => 0;
 
         public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
         {
@@ -331,7 +331,7 @@ namespace Typography.OpenFont
     {
         public override ushort Format => 0;
 
-        protected override ushort RawCharacterToGlyphIndex(int character) => 0;
+        public override ushort GetGlyphIndex(int character) => 0;
     }
 
     abstract class CharacterMap
@@ -341,12 +341,9 @@ namespace Typography.OpenFont
         public abstract ushort Format { get; }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
-        public ushort CharacterToGlyphIndex(int codepoint)
-        {
-            return RawCharacterToGlyphIndex(codepoint);
-        }
+        
 
-        protected abstract ushort RawCharacterToGlyphIndex(int codepoint);
+        public abstract ushort GetGlyphIndex(int codepoint);
 
         //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
         //{
@@ -437,5 +434,5 @@ namespace Typography.OpenFont
         //            break;
         //    }
         //}
-    } 
+    }
 }
