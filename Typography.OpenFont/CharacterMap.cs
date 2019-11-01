@@ -151,12 +151,12 @@ namespace Typography.OpenFont
         public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
         {
             // Only check codepoint if nextCodepoint is a variation selector
-            VariationSelector sel;
-            if (_variationSelectors.TryGetValue(nextCodepoint, out sel))
+
+            if (_variationSelectors.TryGetValue(nextCodepoint, out VariationSelector sel))
             {
                 // If the sequence is a non-default UVS, return the mapped glyph
-                ushort ret = 0;
-                if (sel.UVSMappings.TryGetValue(codepoint, out ret))
+            
+                if (sel.UVSMappings.TryGetValue(codepoint, out ushort ret))
                 {
                     return ret;
                 }

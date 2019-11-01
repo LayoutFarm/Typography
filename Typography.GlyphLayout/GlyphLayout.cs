@@ -153,8 +153,8 @@ namespace Typography.TextLayout
         public GlyphLayoutPlanContext GetPlanOrCreate(Typeface typeface, ScriptLang scriptLang)
         {
             GlyphLayoutPlanKey key = new GlyphLayoutPlanKey(typeface, scriptLang.internalName);
-            GlyphLayoutPlanContext context;
-            if (!_collection.TryGetValue(key, out context))
+
+            if (!_collection.TryGetValue(key, out GlyphLayoutPlanContext context))
             {
                 var glyphSubstitution = (typeface.GSUBTable != null) ? new GlyphSubstitution(typeface, scriptLang.shortname) : null;
                 var glyphPosition = (typeface.GPOSTable != null) ? new GlyphSetPosition(typeface, scriptLang.shortname) : null;
@@ -166,8 +166,8 @@ namespace Typography.TextLayout
     }
     struct GlyphLayoutPlanKey
     {
-        public Typeface t;
-        public int scriptInternameName;
+        public readonly Typeface t;
+        public readonly int scriptInternameName;
         public GlyphLayoutPlanKey(Typeface t, int scriptInternameName)
         {
             this.t = t;
@@ -195,7 +195,7 @@ namespace Typography.TextLayout
         /// <summary>
         /// offset from the start of input codepoint buffer
         /// </summary>
-        public ushort user_char_offset;
+        public readonly ushort user_char_offset;
         public dbugCodePointFromUserChar(ushort user_char_offset, int codePoint)
         {
             this.user_char_offset = user_char_offset;

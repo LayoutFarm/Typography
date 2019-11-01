@@ -41,8 +41,8 @@ namespace PixelFarm.Drawing.BitmapAtlas
         }
         public void Delete(T key)
         {
-            U found;
-            if (_loadBmps.TryGetValue(key, out found))
+
+            if (_loadBmps.TryGetValue(key, out U found))
             {
                 found.Dispose();
                 _loadBmps.Remove(key);
