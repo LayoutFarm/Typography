@@ -106,7 +106,11 @@ namespace LayoutFarm
         }
 
         //
-        public ScriptLang CurrentScriptLang => _txtServices.CurrentScriptLang;
+        public ScriptLang CurrentScriptLang
+        {
+            get => _txtServices.CurrentScriptLang;
+            set => _txtServices.CurrentScriptLang = value;
+        }
         //
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, int[] outputGlyphAdvances, out int outputTotalW, out int outputLineHeight)
         {
@@ -265,7 +269,7 @@ namespace LayoutFarm
 
         }
         float ITextService.MeasureBlankLineHeight(RequestFont font)
-        { 
+        {
             Typeface typeface = ResolveTypeface(font);
 
             return (int)(Math.Round(typeface.CalculateMaxLineClipHeight() *
