@@ -332,6 +332,10 @@ namespace Typography.TextLayout
         public void Layout(IList<int> inputCodePoints, int startAt, int len)
         {
 
+            if (len > 1)
+            {
+
+            }
             //
             //[B]
             // convert codepoint-list to input glyph-list 
@@ -341,12 +345,12 @@ namespace Typography.TextLayout
             for (int i = 0; i < end; ++i)
             {
                 //find glyph index by specific codepoint 
-                ushort glyphIndex = _typeface.LookupIndex(inputCodePoints[i]);
+                ushort glyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i]);
                 if (i + 1 < end)
                 {
                     // Maybe this is a UVS sequence; in that case,
                     //***SKIP*** the second codepoint 
-                    ushort variationGlyphIndex = _typeface.LookupIndex(inputCodePoints[i], inputCodePoints[i + 1]);
+                    ushort variationGlyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i], inputCodePoints[i + 1]);
                     if (variationGlyphIndex > 0)
                     {
                         //user glyph index from next codepoint
@@ -358,6 +362,8 @@ namespace Typography.TextLayout
                         continue;//*** 
                     }
                 }
+
+
                 _inputGlyphs.AddGlyph(i, glyphIndex);
             }
             //continue below...

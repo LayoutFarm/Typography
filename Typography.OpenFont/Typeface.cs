@@ -141,11 +141,21 @@ namespace Typography.OpenFont
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns></returns>
-        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
+        public ushort GetGlyphIndex(int codepoint, int nextCodepoint = 0)
         {
             return CmapTable.GetGlyphIndex(codepoint, nextCodepoint);
-        } 
-         
+        }
+        /// <summary>
+        /// find glyph index by 2 consecutive code point
+        /// </summary>
+        /// <param name="codepoint"></param>
+        /// <param name="nextCodepoint"></param>
+        /// <returns></returns>
+        public ushort GetGlyphIndex(ushort codepoint, ushort nextCodepoint = '\0')
+        {
+            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint);
+        }
+
         public Glyph GetGlyphByIndex(ushort glyphIndex)
         {
             return _glyphs[glyphIndex];
@@ -195,7 +205,7 @@ namespace Typography.OpenFont
 
                     //but user can provide their own map here...
 
-                    return LookupIndex(AdobeGlyphList.GetUnicodeValueByGlyphName(glyphName));
+                    return GetGlyphIndex(AdobeGlyphList.GetUnicodeValueByGlyphName(glyphName));
                 }
             }
             return 0;
@@ -204,7 +214,7 @@ namespace Typography.OpenFont
 
         public ushort GetAdvanceWidth(int codepoint)
         {
-            return _horizontalMetrics.GetAdvanceWidth(LookupIndex(codepoint));
+            return _horizontalMetrics.GetAdvanceWidth(GetGlyphIndex(codepoint));
         }
         public ushort GetHAdvanceWidthFromGlyphIndex(ushort glyphIndex)
         {
