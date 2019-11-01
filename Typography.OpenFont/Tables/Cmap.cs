@@ -125,7 +125,7 @@ namespace Typography.OpenFont.Tables
         }
 
         List<CharacterMap> _charMaps = new List<CharacterMap>();
-        List<CharMapFormat14> _charMap14List = new List<CharMapFormat14>();
+        List<CharMapFormat14> _charMap14List;
         Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
         protected override void ReadContentFrom(BinaryReader input)
