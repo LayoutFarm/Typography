@@ -80,6 +80,7 @@ namespace Typography.OpenFont.Tables
         List<CharMapFormat14> _charMap14List;
         Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
+
         /// <summary>
         /// find glyph index from given codepoint(s)
         /// </summary>
@@ -95,20 +96,27 @@ namespace Typography.OpenFont.Tables
 
             if (!_codepointToGlyphs.TryGetValue(codepoint, out ushort found))
             {
-
                 for (int i = 0; i < _charMaps.Length; ++i)
                 {
                     CharacterMap cmap = _charMaps[i];
                     ushort gid = cmap.GetGlyphIndex(codepoint);
 
-                    //https://www.microsoft.com/typography/OTSPEC/cmap.htm
-                    //...When building a Unicode font for Windows, the platform ID should be 3 and the encoding ID should be 1
-                    if (found == 0 || (gid != 0 && cmap.PlatformId == 3 && cmap.EncodingId == 1))
+                    //https://www.microsoft.com/typography/OTSPEC/cmap.htm 
+
+                    if (found == 0)
                     {
                         found = gid;
                     }
+                    else if (cmap.PlatformId == 3 && cmap.EncodingId == 1)
+                    {
+                        //...When building a Unicode font for Windows, 
+                        // the platform ID should be 3 and the encoding ID should be 1
+                        if ((gid = cmap.GetGlyphIndex(codepoint)) != 0)
+                        {
+                            found = gid;
+                        }
+                    }                     
                 }
-
                 _codepointToGlyphs[codepoint] = found;
             }
 
