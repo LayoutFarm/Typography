@@ -11,11 +11,11 @@ namespace Typography.OpenFont
     {
         public override ushort Format => 4;
 
-        readonly ushort[] _startCode; //Starting character code for each segment
-        readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
-        readonly ushort[] _idDelta; //Delta for all character codes in segment
-        readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
-        readonly ushort[] _glyphIdArray;
+        internal readonly ushort[] _startCode; //Starting character code for each segment
+        internal readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
+        internal readonly ushort[] _idDelta; //Delta for all character codes in segment
+        internal readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
+        internal readonly ushort[] _glyphIdArray;
         public CharMapFormat4(ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
         {
             _startCode = startCode;
@@ -127,8 +127,8 @@ namespace Typography.OpenFont
             return i >= 0 && i < _glyphIdArray.Length ? _glyphIdArray[i] : (ushort)0;
         }
 
-        readonly ushort _startCode;
-        readonly ushort[] _glyphIdArray;
+        internal readonly ushort _startCode;
+        internal readonly ushort[] _glyphIdArray;
     }
 
 

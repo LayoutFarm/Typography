@@ -71,7 +71,7 @@ namespace Typography.OpenFont.Tables
     //or map correctly to these codepoints from other codepages and character sets. 
     ////////////////////////////////////////////////////////////////////////
 
-    class Cmap : TableEntry
+    partial class Cmap : TableEntry
     {
         public const string _N = "cmap";
         public override string Name => _N;
@@ -110,12 +110,12 @@ namespace Typography.OpenFont.Tables
             if (nextCodepoint > 0 && _charMap14List != null)
             {
                 foreach (CharMapFormat14 cmap14 in _charMap14List)
-                { 
+                {
                     ushort gid = cmap14.CharacterPairToGlyphIndex(codepoint, found, nextCodepoint);
                     if (gid > 0)
                     {
                         return gid;
-                    } 
+                    }
                 }
 
                 return 0;

@@ -5,7 +5,7 @@ using PixelFarm.CpuBlit;
 using System.IO;
 namespace PixelFarm.Drawing.WinGdi
 {
-    public sealed class GdiBitmapIO : MemBitmapIO
+    public sealed partial class GdiBitmapIO : MemBitmapIO
     {
         public override MemBitmap LoadImage(string filename)
         {
