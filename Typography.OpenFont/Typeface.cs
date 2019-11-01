@@ -146,12 +146,12 @@ namespace Typography.OpenFont
             return CmapTable.GetGlyphIndex(codepoint, nextCodepoint);
         }
         /// <summary>
-        /// find glyph index by 2 consecutive code point
+        /// find glyph index by 2 consecutive code points
         /// </summary>
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns></returns>
-        public ushort GetGlyphIndex(ushort codepoint, ushort nextCodepoint = '\0')
+        public ushort GetGlyphIndex(ushort codepoint, ushort nextCodepoint = 0)
         {
             return CmapTable.GetGlyphIndex(codepoint, nextCodepoint);
         }

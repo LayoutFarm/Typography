@@ -353,7 +353,7 @@ namespace Typography.TextLayout
                     ushort variationGlyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i], inputCodePoints[i + 1]);
                     if (variationGlyphIndex > 0)
                     {
-                        //user glyph index from next codepoint
+                        //use glyph index from next codepoint
                         glyphIndex = variationGlyphIndex;
                         //but record as current code point i
                         _inputGlyphs.AddGlyph(i, glyphIndex);
