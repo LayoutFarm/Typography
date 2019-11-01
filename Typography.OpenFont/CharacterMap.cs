@@ -146,7 +146,7 @@ namespace Typography.OpenFont
     class CharMapFormat14 : CharacterMap
     {
         public override ushort Format => 14;
-        public override ushort GetGlyphIndex(int character) => 0;
+        public override ushort GetGlyphIndex(int codepoint) => 0;
 
         public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
         {
@@ -331,7 +331,7 @@ namespace Typography.OpenFont
     {
         public override ushort Format => 0;
 
-        public override ushort GetGlyphIndex(int character) => 0;
+        public override ushort GetGlyphIndex(int codepoint) => 0;
     }
 
     abstract class CharacterMap
