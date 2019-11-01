@@ -69,7 +69,7 @@ namespace PixelFarm.Drawing.Fonts
                 {
                     ms.SetLength(0);
 
-                    Glyph glyph = typeface.GetGlyphByIndex(i);
+                    Glyph glyph = typeface.GetGlyph(i);
                     typeface.ReadBitmapContent(glyph, ms);                    
 
                     GlyphBitmap glyphBitmap = new GlyphBitmap();

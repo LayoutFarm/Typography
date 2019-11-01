@@ -152,7 +152,7 @@ namespace SampleWinForms
             //in this version
             //create a glyph-plan manully
             ushort selectedGlyphIndex =
-                glyphNameListUserControl1.Typeface.GetGlyphIndexByName(selectedGlyphName);
+                glyphNameListUserControl1.Typeface.GetGlyphIndex(selectedGlyphName);
 
             glyphPlanList.Append(
                 new Typography.TextLayout.UnscaledGlyphPlan(0, selectedGlyphIndex, 0, 0, 0));

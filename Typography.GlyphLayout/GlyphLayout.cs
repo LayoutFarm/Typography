@@ -331,11 +331,6 @@ namespace Typography.TextLayout
         }
         public void Layout(IList<int> inputCodePoints, int startAt, int len)
         {
-
-            if (len > 1)
-            {
-
-            }
             //
             //[B]
             // convert codepoint-list to input glyph-list 
@@ -345,26 +340,24 @@ namespace Typography.TextLayout
             for (int i = 0; i < end; ++i)
             {
                 //find glyph index by specific codepoint 
-                ushort glyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i]);
+
                 if (i + 1 < end)
                 {
-                    // Maybe this is a UVS sequence; in that case,
-                    //***SKIP*** the second codepoint 
-                    ushort variationGlyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i], inputCodePoints[i + 1]);
-                    if (variationGlyphIndex > 0)
+                    ushort glyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i], inputCodePoints[i + 1], out bool skipNextCodepoint);
+                    _inputGlyphs.AddGlyph(i, glyphIndex);
+                    if (skipNextCodepoint)
                     {
-                        //use glyph index from next codepoint
-                        glyphIndex = variationGlyphIndex;
-                        //but record as current code point i
-                        _inputGlyphs.AddGlyph(i, glyphIndex);
-
-                        ++i; //skip
-                        continue;//*** 
+                        // Maybe this is a UVS sequence; in that case,
+                        //***SKIP*** the second codepoint 
+                        ++i;
                     }
+                }
+                else
+                {
+                    _inputGlyphs.AddGlyph(i, _typeface.GetGlyphIndex(inputCodePoints[i], 0, out bool skipNextCodepoint));
                 }
 
 
-                _inputGlyphs.AddGlyph(i, glyphIndex);
             }
             //continue below...
             Layout(_inputGlyphs);
@@ -405,7 +398,7 @@ namespace Typography.TextLayout
                 ushort glyIndex, input_codepointOffset, input_mapLen;
                 glyphs.GetGlyphIndexAndMap(i, out glyIndex, out input_codepointOffset, out input_mapLen);
                 //
-                Glyph orgGlyph = _typeface.GetGlyphByIndex(glyIndex);
+                Glyph orgGlyph = _typeface.GetGlyph(glyIndex);
                 //this is original value WITHOUT fit-to-grid adjust
                 _glyphPositions.AddGlyph(input_codepointOffset, glyIndex, orgGlyph);
             }

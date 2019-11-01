@@ -87,10 +87,12 @@ namespace Typography.OpenFont.Tables
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns>glyph index</returns>
-        public ushort GetGlyphIndex(int codepoint, int nextCodepoint = 0)
+        public ushort GetGlyphIndex(int codepoint, int nextCodepoint, out bool skipNextCodepoint)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
             // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."
+
+            skipNextCodepoint = false; //default
 
             if (!_codepointToGlyphs.TryGetValue(codepoint, out ushort found))
             {
@@ -119,17 +121,13 @@ namespace Typography.OpenFont.Tables
                     ushort gid = cmap14.CharacterPairToGlyphIndex(codepoint, found, nextCodepoint);
                     if (gid > 0)
                     {
+                        skipNextCodepoint = true;
                         return gid;
                     }
                 }
-
-                return 0;
             }
-
             return found;
         }
-
-
 
         protected override void ReadContentFrom(BinaryReader input)
         {

@@ -134,6 +134,9 @@ namespace Typography.OpenFont
 
         public string Name => _nameEntry.FontName;
         public string FontSubFamily => _nameEntry.FontSubFamily;
+
+        public int GlyphCount => _glyphs.Length;
+
         //
         /// <summary>
         /// find glyph index by codepoint
@@ -141,9 +144,13 @@ namespace Typography.OpenFont
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns></returns>
-        public ushort GetGlyphIndex(int codepoint, int nextCodepoint = 0)
+        public ushort GetGlyphIndex(int codepoint, int nextCodepoint, out bool skipNextCodepoint)
         {
-            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint);
+            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
+        }
+        public ushort GetGlyphIndex(int codepoint)
+        {            
+            return CmapTable.GetGlyphIndex(codepoint, 0, out bool skipNextCodepoint);
         }
         /// <summary>
         /// find glyph index by 2 consecutive code points
@@ -151,42 +158,16 @@ namespace Typography.OpenFont
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns></returns>
-        public ushort GetGlyphIndex(ushort codepoint, ushort nextCodepoint = 0)
+        public ushort GetGlyphIndex(ushort codepoint, ushort nextCodepoint, out bool skipNextCodepoint)
         {
-            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint);
+            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
         }
 
-        public Glyph GetGlyphByIndex(ushort glyphIndex)
-        {
-            return _glyphs[glyphIndex];
-        }
-        //
-        public int GlyphCount => _glyphs.Length;
-        //
-        public Glyph GetGlyphByName(string glyphName)
+        public ushort GetGlyphIndex(string glyphName)
         {
             if (_cffTable != null)
             {
-                //early preview ...
-                List<CFF.Cff1Font> cff1Fonts = _cffTable.Cff1FontSet._fonts;
-                for (int i = 0; i < cff1Fonts.Count; i++)
-                {
-                    Glyph glyph = cff1Fonts[i].GetGlyphByName(glyphName);
-                    if (glyph != null) return glyph;
-                }
-                return null;
-            }
-            else if (PostTable != null)
-            {
-                return GetGlyphByIndex(GetGlyphIndexByName(glyphName));
-            }
-            return null;
-        }
-        public ushort GetGlyphIndexByName(string glyphName)
-        {
-            if (_cffTable != null)
-            {
-                return GetGlyphByName(glyphName)?.GlyphIndex ?? 0;
+                return GetGlyph(glyphName)?.GlyphIndex ?? 0;
             }
             else if (PostTable != null)
             {
@@ -210,7 +191,30 @@ namespace Typography.OpenFont
             }
             return 0;
         }
-
+        public Glyph GetGlyph(ushort glyphIndex)
+        {
+            return _glyphs[glyphIndex];
+        } 
+        public Glyph GetGlyph(string glyphName)
+        {
+            if (_cffTable != null)
+            {
+                //early preview ...
+                List<CFF.Cff1Font> cff1Fonts = _cffTable.Cff1FontSet._fonts;
+                for (int i = 0; i < cff1Fonts.Count; i++)
+                {
+                    Glyph glyph = cff1Fonts[i].GetGlyphByName(glyphName);
+                    if (glyph != null) return glyph;
+                }
+                return null;
+            }
+            else if (PostTable != null)
+            {
+                return GetGlyph(GetGlyphIndex(glyphName));
+            }
+            return null;
+        }
+       
 
         public ushort GetAdvanceWidth(int codepoint)
         {
@@ -1053,7 +1057,7 @@ namespace Typography.OpenFont
 
                     //}
 #endif
-                    Glyph g = typeface.GetGlyphByIndex(i);
+                    Glyph g = typeface.GetGlyph(i);
                     boundFinder.Reset();
 
                     evalEngine.Run(boundFinder,
