@@ -76,8 +76,7 @@ namespace Typography.OpenFont.Tables
         public const string _N = "cmap";
         public override string Name => _N;
 
-
-        List<CharacterMap> _charMaps = new List<CharacterMap>();
+        CharacterMap[] _charMaps = null;
         List<CharMapFormat14> _charMap14List;
         Dictionary<int, ushort> _codepointToGlyphs = new Dictionary<int, ushort>();
 
@@ -96,8 +95,10 @@ namespace Typography.OpenFont.Tables
 
             if (!_codepointToGlyphs.TryGetValue(codepoint, out ushort found))
             {
-                foreach (CharacterMap cmap in _charMaps)
+
+                for (int i = 0; i < _charMaps.Length; ++i)
                 {
+                    CharacterMap cmap = _charMaps[i];
                     ushort gid = cmap.GetGlyphIndex(codepoint);
 
                     //https://www.microsoft.com/typography/OTSPEC/cmap.htm
@@ -147,13 +148,14 @@ namespace Typography.OpenFont.Tables
                 offsets[i] = input.ReadUInt32();
             }
 
+            _charMaps = new CharacterMap[tableCount];
             for (int i = 0; i < tableCount; i++)
             {
                 input.BaseStream.Seek(beginAt + offsets[i], SeekOrigin.Begin);
                 CharacterMap cmap = ReadCharacterMap(input);
                 cmap.PlatformId = platformIds[i];
                 cmap.EncodingId = encodingIds[i];
-                _charMaps.Add(cmap);
+                _charMaps[i] = cmap;
 
                 //
                 if (cmap is CharMapFormat14 cmap14)
