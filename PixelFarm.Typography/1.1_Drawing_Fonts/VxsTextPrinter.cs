@@ -137,6 +137,7 @@ namespace PixelFarm.Drawing.Fonts
             if (Typeface == null) return;
             _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
+            _textServices.CurrentScriptLang = this.ScriptLang;
 
             ////2.3
             //if (_pxScaleEngine != null)
@@ -145,7 +146,7 @@ namespace PixelFarm.Drawing.Fonts
             //}
         }
 
-        
+
         public void MeasureString(char[] buffer, int startAt, int len, out int w, out int h)
         {
             UpdateGlyphLayoutSettings();
@@ -247,10 +248,10 @@ namespace PixelFarm.Drawing.Fonts
                     GlyphBitmap glyphBmp = _glyphSvgStore.GetGlyphBitmap(snapToPx.CurrentGlyphIndex);
                     //how to draw the image
                     //1. 
-                    if(glyphBmp != null)
+                    if (glyphBmp != null)
                     {
                         _painter.DrawImage(glyphBmp.Bitmap);
-                    }                    
+                    }
                 }
             }
             else if (_currentTypeface.IsBitmapFont)

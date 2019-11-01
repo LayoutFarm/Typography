@@ -9,7 +9,7 @@ namespace TypographyTest.WinForms
 
     public partial class BasicFontOptionsUserControl : UserControl
     {
-        BasicFontOptions _options;
+        readonly BasicFontOptions _options;
 
         public BasicFontOptionsUserControl()
         {
@@ -18,10 +18,8 @@ namespace TypographyTest.WinForms
             _options = new BasicFontOptions();
 
         }
-        public BasicFontOptions Options
-        {
-            get { return _options; }
-        }
+        public BasicFontOptions Options => _options;
+
 
         private void OpenFontOptions_Load(object sender, EventArgs e)
         {
