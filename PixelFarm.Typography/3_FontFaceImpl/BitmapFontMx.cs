@@ -274,7 +274,7 @@ namespace Typography.Rendering
                     GlyphImage totalGlyphsImg = null;
                     SimpleFontAtlasBuilder atlasBuilder = null;
                     var glyphTextureGen = new GlyphTextureBitmapGenerator();
-                    glyphTextureGen.CreateTextureFontBuildDetail(
+                    glyphTextureGen.CreateTextureFontFromBuildDetail(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                         TextureKindForNewFont,
@@ -309,7 +309,7 @@ namespace Typography.Rendering
                     //    totalGlyphsImg.GetImageBuffer(),
                     //    totalGlyphsImg.Width * 4,
                     //    totalGlyphsImg.Width, totalGlyphsImg.Height,
-                    //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
+                    //    "total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                     ////save image to cache
                     SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
 #endif
