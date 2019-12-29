@@ -74,7 +74,6 @@
     <Compile Include="3_FontFaceImpl\OpenFontLoader.cs" />
     <Compile Include="1.1_Drawing_Fonts\VxsTextPrinter.cs" />
     <Compile Include="3_FontFaceImpl\ScriptLangConv.cs" />
-    <Compile Include="3_FontFaceImpl\TextureFontLoader.cs" />
     <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
     <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
     <Compile Include="4_TextPrinter\GlyphMeshCollection.cs" />

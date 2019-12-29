@@ -96,8 +96,8 @@ namespace PixelFarm.Drawing.BitmapAtlas
         }
         void ReadOverviewBitmapInfo(BinaryReader reader)
         {
-            _atlas.BitmapFilename = reader.ReadString();
-
+            ushort utf8StrLen = reader.ReadUInt16();
+            _atlas.BitmapFilename = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(utf8StrLen));
         }
 
         void ReadImgUrlDict(BinaryReader reader)
@@ -156,7 +156,10 @@ namespace PixelFarm.Drawing.BitmapAtlas
             {
                 bmpfilename = "";
             }
-            _writer.Write(bmpfilename);
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(bmpfilename);
+            _writer.Write((ushort)buffer.Length); //***ushort *
+            _writer.Write(buffer);
+
         }
         internal void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
         {

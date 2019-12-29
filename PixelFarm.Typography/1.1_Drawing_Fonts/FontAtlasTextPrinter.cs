@@ -28,9 +28,6 @@ namespace PixelFarm.Drawing.Fonts
         MemBitmap _alphaBmp;
 
 
-        /// <summary>
-        /// target canvas
-        /// </summary>
         AggPainter _painter;
         RequestFont _font;
         //-----------------------------------------------------------  
@@ -257,8 +254,9 @@ namespace PixelFarm.Drawing.Fonts
             for (int i = 0; i < seqLen; ++i)
             {
                 UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
-                TextureGlyphMapData glyphData;
-                if (!_fontAtlas.TryGetGlyphMapData(unscaledGlyphPlan.glyphIndex, out glyphData))
+
+                if (!_fontAtlas.TryGetGlyphMapData(unscaledGlyphPlan.glyphIndex,
+                    out TextureGlyphMapData glyphData))
                 {
                     //if no glyph data, we should render a missing glyph ***
                     continue;
@@ -266,8 +264,8 @@ namespace PixelFarm.Drawing.Fonts
                 //--------------------------------------
                 //TODO: review precise height in float
                 //-------------------------------------- 
-                int srcX, srcY, srcW, srcH;
-                glyphData.GetRect(out srcX, out srcY, out srcW, out srcH);
+
+                glyphData.GetRect(out int srcX, out int srcY, out int srcW, out int srcH);
 
                 float ngx = acc_x + (float)Math.Round(unscaledGlyphPlan.OffsetX * scale);
                 float ngy = acc_y + (float)Math.Round(unscaledGlyphPlan.OffsetY * scale);

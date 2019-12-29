@@ -78,7 +78,7 @@ namespace PixelFarm.Drawing.Fonts
 
                     //glyphBitmap.Bitmap = ...                     
                     glyphBitmap.Bitmap = MemBitmap.LoadBitmap(ms);
-                    //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "d:\\WImageTest\\testGlyphBmp_" + i + ".png");
+                    //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
 
                     _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
                 }

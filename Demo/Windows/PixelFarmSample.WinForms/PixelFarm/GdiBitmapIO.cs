@@ -96,5 +96,7 @@ namespace PixelFarm.Drawing.WinGdi
                 bmp.Save(filename, format);
             }
         }
+
+       
     }
 }

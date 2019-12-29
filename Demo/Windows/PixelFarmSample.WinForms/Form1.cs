@@ -663,8 +663,7 @@ namespace SampleWinForms
 
             atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
             totalGlyphsImg = atlasBuilder.BuildSingleImage();
-            string fontTextureImg = "d:\\WImageTest\\test_glyph_atlas.png";
-
+            string fontTextureImg = "test_glyph_atlas.png";
 
             //create atlas
             SimpleFontAtlas fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
@@ -718,9 +717,8 @@ namespace SampleWinForms
         private void button2_Click(object sender, EventArgs e)
         {
 
-
             OpenFontReader openFontReader = new OpenFontReader();
-            string filename = "d:\\WImageTest\\Sarabun-Regular.woff";
+            string filename = "Sarabun-Regular.woff";
             //using (FileStream fs = new FileStream(filename, FileMode.Open))
             //{
             //    PreviewFontInfo previewFont = openFontReader.ReadPreview(fs);
@@ -837,18 +835,90 @@ namespace SampleWinForms
         }
         private void button3_Click(object sender, EventArgs e)
         {
-            string filename = "d:\\WImageTest\\Sarabun-Regular.woff2";
-            //string filename = "d:\\WImageTest\\Roboto-Regular.woff2"; 
-
+            string filename = "Sarabun-Regular.woff2";
 
             OpenFontReader openFontReader = new OpenFontReader();
             using (FileStream fs = new FileStream(filename, FileMode.Open))
             {
                 PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
-
             }
-
         }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //read string from txtSampleChars
+            //please make sure all are unique. (TODO: check it)
+            //then create a font atlas from the sample chars
 
+
+            GlyphImage totalGlyphsImg = null;
+            SimpleFontAtlasBuilder atlasBuilder = null;
+            var glyphTextureGen = new GlyphTextureBitmapGenerator();
+            //
+            Typeface typeface = _basicOptions.Typeface;
+            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
+
+            PixelFarm.Drawing.RequestFont reqFont = new PixelFarm.Drawing.RequestFont(
+                typeface.Name,
+                fontSizeInPoints,
+                 PixelFarm.Drawing.FontStyle.Regular
+                );
+
+            GlyphTextureBuildDetail[] buildDetails = new GlyphTextureBuildDetail[]
+            {
+               new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+               new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+            };
+
+
+            glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
+                fontSizeInPoints,
+                PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
+                buildDetails,
+                (glyphIndex, glyphImage, outputAtlasBuilder) =>
+                {
+                    if (outputAtlasBuilder != null)
+                    {
+                        //finish
+                        atlasBuilder = outputAtlasBuilder;
+                    }
+                });
+
+
+            atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
+            totalGlyphsImg = atlasBuilder.BuildSingleImage();
+
+
+            atlasBuilder.FontFilename = typeface.Name;
+            atlasBuilder.FontKey = reqFont.FontKey; 
+
+            string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
+
+            using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
+            {
+                atlasBuilder.SaveFontInfo(fs);
+            }
+            //read .info back and convert to base64
+            byte[] atlas_info_content = File.ReadAllBytes(textureName + ".info");
+            string base64 = Convert.ToBase64String(atlas_info_content);
+
+            //create atlas
+            SimpleFontAtlas fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
+            fontAtlas.TotalGlyph = totalGlyphsImg;
+            using (MemBitmap memBmp = MemBitmap.CreateFromCopy(totalGlyphsImg.Width, totalGlyphsImg.Height, totalGlyphsImg.GetImageBuffer()))
+            using (System.Drawing.Bitmap bmp = new Bitmap(memBmp.Width, memBmp.Height))
+            {
+                var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, memBmp.Width, memBmp.Height),
+                    System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                var tmpMem = MemBitmap.GetBufferPtr(memBmp);
+                unsafe
+                {
+                    PixelFarm.CpuBlit.NativeMemMx.MemCopy((byte*)bmpdata.Scan0,
+                        (byte*)tmpMem.Ptr,
+                        tmpMem.LengthInBytes);
+                }
+                bmp.UnlockBits(bmpdata);
+                bmp.Save(textureName + ".png");
+            }
+        }
     }
 }
