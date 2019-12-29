@@ -213,8 +213,7 @@ namespace Typography.OpenFont
                 return GetGlyph(GetGlyphIndex(glyphName));
             }
             return null;
-        }
-       
+        }      
 
         public ushort GetAdvanceWidth(int codepoint)
         {

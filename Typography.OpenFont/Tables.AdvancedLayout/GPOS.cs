@@ -23,6 +23,11 @@ namespace Typography.OpenFont.Tables
                 subTable.OwnerGPos = this;
                 lookupTable.SubTables.Add(subTable);
             }
+
+#if DEBUG
+            lookupTable.dbugLkIndex = LookupList.Count;
+#endif
+
             LookupList.Add(lookupTable);
         }
 
@@ -47,7 +52,7 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         public class UnImplementedLookupSubTable : LookupSubTable
         {
-            string _msg;
+            readonly string _msg;
             public UnImplementedLookupSubTable(string message)
             {
                 _msg = message;
@@ -67,6 +72,10 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         public partial class LookupTable
         {
+#if DEBUG
+            public int dbugLkIndex;
+#endif
+
             public ushort lookupType { get; private set; }
             public readonly ushort lookupFlags;
             public readonly ushort markFilteringSet;

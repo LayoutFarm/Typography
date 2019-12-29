@@ -79,9 +79,11 @@ namespace Typography.TextLayout
         bool _enableComposition = true;
         bool _mustRebuildTables = true;
         Typeface _typeface;
-        List<GSUB.LookupTable> _lookupTables = new List<GSUB.LookupTable>();
 
-        void RebuildTables()
+
+        internal List<GSUB.LookupTable> _lookupTables = new List<GSUB.LookupTable>();
+
+        internal void RebuildTables()
         {
             _lookupTables.Clear();
 

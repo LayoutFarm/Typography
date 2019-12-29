@@ -356,8 +356,6 @@ namespace Typography.TextLayout
                 {
                     _inputGlyphs.AddGlyph(i, _typeface.GetGlyphIndex(inputCodePoints[i], 0, out bool skipNextCodepoint));
                 }
-
-
             }
             //continue below...
             Layout(_inputGlyphs);
@@ -395,12 +393,14 @@ namespace Typography.TextLayout
             {
                 //at this stage _inputGlyphs and _glyphPositions 
                 //has member 1:1
-                ushort glyIndex, input_codepointOffset, input_mapLen;
-                glyphs.GetGlyphIndexAndMap(i, out glyIndex, out input_codepointOffset, out input_mapLen);
+                glyphs.GetGlyphIndexAndMap(i,
+                    out ushort glyphIndex,
+                    out ushort input_codepointOffset,
+                    out ushort input_mapLen);
                 //
-                Glyph orgGlyph = _typeface.GetGlyph(glyIndex);
+                Glyph orgGlyph = _typeface.GetGlyph(glyphIndex);
                 //this is original value WITHOUT fit-to-grid adjust
-                _glyphPositions.AddGlyph(input_codepointOffset, glyIndex, orgGlyph);
+                _glyphPositions.AddGlyph(input_codepointOffset, glyphIndex, orgGlyph);
             }
 
             PositionTechnique posTech = this.PositionTechnique;
@@ -594,8 +594,6 @@ namespace Typography.TextLayout
             pos.advanceW += appendAdvX;//TODO: review for appendY
             _glyphPosList[index] = pos;
         }
-
-
     }
 
     struct GlyphPos

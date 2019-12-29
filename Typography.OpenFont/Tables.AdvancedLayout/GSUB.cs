@@ -47,6 +47,10 @@ namespace Typography.OpenFont.Tables
                 subTable.OwnerGSub = this;
                 lookupTable.SubTables.Add(subTable);
             }
+
+#if DEBUG
+            lookupTable.dbugLkIndex = LookupList.Count;
+#endif
             LookupList.Add(lookupTable);
         }
 
@@ -113,8 +117,11 @@ namespace Typography.OpenFont.Tables
         /// </summary>
         public partial class LookupTable
         {
+#if DEBUG
+            public int dbugLkIndex;
+#endif
             //--------------------------
-            public ushort lookupType { get; private set; }
+            public ushort lookupType { get; internal set; }
             public readonly ushort lookupFlags;
             public readonly ushort markFilteringSet;
             //--------------------------
@@ -346,10 +353,8 @@ namespace Typography.OpenFont.Tables
                     if (foundPos > -1)
                     {
                         SequenceTable seqTable = SeqTables[foundPos];
-                        //replace current glyph index with new seq
-#if DEBUG
+                        //replace current glyph index with new seq#if DEBUG
                         int new_seqCount = seqTable.substituteGlyphs.Length;
-#endif
                         glyphIndices.Replace(pos, seqTable.substituteGlyphs);
                         return true;
                     }
