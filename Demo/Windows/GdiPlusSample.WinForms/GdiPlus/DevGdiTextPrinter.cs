@@ -111,6 +111,7 @@ namespace SampleWinForms
             DrawFromGlyphPlans(
                 new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
                 x, y);
+             
 
         }
         public void UpdateGlyphLayoutSettings()
@@ -134,6 +135,8 @@ namespace SampleWinForms
 
             //draw data in glyph plan 
             //3. render each glyph 
+
+            y += FontDescedingPx;//**
 
             float sizeInPoints = this.FontSizeInPoints;
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);

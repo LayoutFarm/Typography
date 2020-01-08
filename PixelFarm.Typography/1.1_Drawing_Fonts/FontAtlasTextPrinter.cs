@@ -164,7 +164,7 @@ namespace PixelFarm.Drawing.Fonts
             //1. update some props.. 
             //2. update current type face
             UpdateGlyphLayoutSettings();
-            Typeface typeface = _currentTypeface;
+            //Typeface typeface = _currentTypeface;
         }
         public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
         {
@@ -172,7 +172,7 @@ namespace PixelFarm.Drawing.Fonts
             //1. update some props.. 
             //2. update current type face
             UpdateGlyphLayoutSettings();
-            Typeface typeface = _currentTypeface;
+            //Typeface typeface = _currentTypeface;
         }
         public override void DrawCaret(float x, float y)
         {
@@ -220,8 +220,9 @@ namespace PixelFarm.Drawing.Fonts
             //TODO:
             //if (x,y) is left top
             //we need to adjust y again
-
             // 
+            top += FontDescedingPx;
+
 
             PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind = _fontAtlas.TextureKind;
 

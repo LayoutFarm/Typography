@@ -212,6 +212,8 @@ namespace PixelFarm.Drawing.Fonts
                 top += this.FontLineSpacingPx;
             }
 
+            top += FontDescedingPx;
+
             float fontSizePoint = this.FontSizeInPoints;
             float scale = _currentTypeface.CalculateScaleToPixelFromPointSize(fontSizePoint);
 

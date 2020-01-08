@@ -307,11 +307,18 @@ namespace SampleWinForms
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
-                        float x_pos = 0, y_pos = 50;
+                        float x_pos = 0, y_pos = 100;
                         float lineSpacingPx = _selectedTextPrinter.FontLineSpacingPx;
-                        for (int i = 0; i < 1; ++i)
+                        for (int i = 0; i < 3; ++i)
                         {
                             _selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
+#if DEBUG
+                            var prevColor = _painter.FillColor;
+                            _painter.FillColor = PixelFarm.Drawing.Color.Red;
+                            _painter.FillRect(x_pos, y_pos, 5, 5);
+                            _painter.FillColor = prevColor;
+#endif
+
                             y_pos -= lineSpacingPx;
                         }
 
@@ -889,7 +896,7 @@ namespace SampleWinForms
 
 
             atlasBuilder.FontFilename = typeface.Name;
-            atlasBuilder.FontKey = reqFont.FontKey; 
+            atlasBuilder.FontKey = reqFont.FontKey;
 
             string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
 
