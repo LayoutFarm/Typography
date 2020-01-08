@@ -307,27 +307,39 @@ namespace SampleWinForms
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
-                        float x_pos = 0, y_pos = 100;
+                        float x_pos = 0, y_pos = 0;
                         float lineSpacingPx = _selectedTextPrinter.FontLineSpacingPx;
                         for (int i = 0; i < 3; ++i)
                         {
                             _selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
 #if DEBUG
+                            //show debug info...
                             var prevColor = _painter.FillColor;
+                            var prevStrokColor = _painter.StrokeColor;
                             _painter.FillColor = PixelFarm.Drawing.Color.Red;
-                            _painter.FillRect(x_pos, y_pos, 5, 5);
+                            _painter.FillRect(x_pos, y_pos, 5, 5); //
+
+
+                            _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                            _painter.DrawLine(x_pos, y_pos + _selectedTextPrinter.FontAscendingPx, x_pos + 300, y_pos + _selectedTextPrinter.FontAscendingPx);//bottom most
+
+                            _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                            _painter.DrawLine(x_pos, y_pos + lineSpacingPx, x_pos + 300, y_pos + lineSpacingPx);//bottom most
+
                             _painter.FillColor = prevColor;
+                            _painter.StrokeColor = prevColor;
 #endif
 
-                            y_pos -= lineSpacingPx;
+
+
+                            y_pos += lineSpacingPx;
                         }
 
 
                         //copy from Agg's memory buffer to gdi 
                         PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSizeNotFlip(_destImg, _winBmp);
                         _g.Clear(Color.White);
-                        _g.DrawImage(_winBmp, new Point(10, 0));
-
+                        _g.DrawImage(_winBmp, new Point(0, 0));
                     }
                     break;
 

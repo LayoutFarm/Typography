@@ -46,9 +46,9 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(349, 11);
+            this.button1.Location = new System.Drawing.Point(370, 44);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(81, 37);
+            this.button1.Size = new System.Drawing.Size(60, 36);
             this.button1.TabIndex = 0;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
@@ -56,9 +56,9 @@
             // txtInputChar
             // 
             this.txtInputChar.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(222)));
-            this.txtInputChar.Location = new System.Drawing.Point(0, -2);
+            this.txtInputChar.Location = new System.Drawing.Point(370, 12);
             this.txtInputChar.Name = "txtInputChar";
-            this.txtInputChar.Size = new System.Drawing.Size(168, 21);
+            this.txtInputChar.Size = new System.Drawing.Size(191, 21);
             this.txtInputChar.TabIndex = 1;
             this.txtInputChar.Text = "a";
             // 
@@ -106,7 +106,7 @@
             // 
             // cmdMeasureString
             // 
-            this.cmdMeasureString.Location = new System.Drawing.Point(436, 11);
+            this.cmdMeasureString.Location = new System.Drawing.Point(436, 44);
             this.cmdMeasureString.Name = "cmdMeasureString";
             this.cmdMeasureString.Size = new System.Drawing.Size(125, 37);
             this.cmdMeasureString.TabIndex = 71;
@@ -117,7 +117,7 @@
             // lblStringSize
             // 
             this.lblStringSize.AutoSize = true;
-            this.lblStringSize.Location = new System.Drawing.Point(433, 51);
+            this.lblStringSize.Location = new System.Drawing.Point(433, 84);
             this.lblStringSize.Name = "lblStringSize";
             this.lblStringSize.Size = new System.Drawing.Size(77, 13);
             this.lblStringSize.TabIndex = 72;
