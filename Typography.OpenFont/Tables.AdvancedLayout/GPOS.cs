@@ -575,9 +575,11 @@ namespace Typography.OpenFont.Tables
                 {
                     int xpos = 0;
                     //find marker
-
                     int j = inputGlyphs.Count;
-                    for (int i = 1; i < j; ++i) //start at 1
+
+                    startAt = Math.Max(startAt, 1);
+
+                    for (int i = startAt; i < j; ++i) //start at 1
                     {
                         ushort glyph_advW;
                         int markFound = MarkCoverageTable.FindPosition(inputGlyphs.GetGlyph(i, out glyph_advW));
@@ -761,63 +763,80 @@ namespace Typography.OpenFont.Tables
             }
 
             //-----------------------------------------------------------------
+            //https://docs.microsoft.com/en-us/typography/opentype/otspec180/gpos#lookup-type-6--marktomark-attachment-positioning-subtable
             /// <summary>
             /// Lookup Type 6: MarkToMark Attachment
+            /// defines the position of one mark relative to another mark 
             /// </summary>
             class LkSubTableType6 : LookupSubTable
             {
+
                 public CoverageTable MarkCoverage1 { get; set; }
                 public CoverageTable MarkCoverage2 { get; set; }
                 public MarkArrayTable Mark1ArrayTable { get; set; }
                 public Mark2ArrayTable Mark2ArrayTable { get; set; } // Mark2 attachment points used to attach Mark1 glyphs to a specific Mark2 glyph. 
 
+
                 public override void DoGlyphPosition(IGlyphPositions inputGlyphs, int startAt, int len)
                 {
+                    //The attaching mark is Mark1, 
+                    //and the base mark being attached to is Mark2.
+
+                    //The Mark2 glyph (that combines with a Mark1 glyph) is the glyph preceding the Mark1 glyph in glyph string order 
+                    //(skipping glyphs according to LookupFlags)
+
+                    //@prepare: we must found mark2 glyph before mark1
+#if DEBUG
+                    if (len == 3 || len == 4)
+                    {
+
+                    }
+#endif
                     //find marker
                     startAt = Math.Max(startAt, 1);
                     int lim = Math.Min(startAt + len, inputGlyphs.Count);
 
-                    for (int i = startAt; i < lim; ++i) // start at 1
+                    for (int i = startAt; i < lim; ++i)
                     {
                         ushort glyph_adv_w;
-                        int markFound = MarkCoverage1.FindPosition(inputGlyphs.GetGlyph(i, out glyph_adv_w));
-                        if (markFound > -1)
+                        int mark1Found = MarkCoverage1.FindPosition(inputGlyphs.GetGlyph(i, out glyph_adv_w));
+                        if (mark1Found > -1)
                         {
                             //this is mark glyph
-                            //then-> look back for base
+                            //then-> look back for base mark (mark2)
                             ushort prev_pos_adv_w;
-                            int baseFound = MarkCoverage2.FindPosition(inputGlyphs.GetGlyph(i - 1, out prev_pos_adv_w));
-                            if (baseFound > -1)
+                            int mark2Found = MarkCoverage2.FindPosition(inputGlyphs.GetGlyph(i - 1, out prev_pos_adv_w));
+                            if (mark2Found > -1)
                             {
-                                int markClassId = this.Mark1ArrayTable.GetMarkClass(markFound);
-                                AnchorPoint mark2BaseAnchor = this.Mark2ArrayTable.GetAnchorPoint(baseFound, markClassId);
-                                AnchorPoint mark1Anchor = this.Mark1ArrayTable.GetAnchorPoint(markFound);
+                                int mark1ClassId = this.Mark1ArrayTable.GetMarkClass(mark1Found);
+                                AnchorPoint mark2BaseAnchor = this.Mark2ArrayTable.GetAnchorPoint(mark2Found, mark1ClassId);
+                                AnchorPoint mark1Anchor = this.Mark1ArrayTable.GetAnchorPoint(mark1Found);
 
                                 // TODO: review here
                                 if (mark1Anchor.ycoord < 0)
                                 {
-                                    //eg. น้ำ
-                                    //change yoffset of prev pos
-                                    inputGlyphs.AppendGlyphOffset(i - 1 /*PREV*/, 0, (short)(-mark1Anchor.ycoord));
-                                    int actualBasePos = FindActualBaseGlyphBackward(inputGlyphs, i - 1);
-                                    if (actualBasePos > -1)
-                                    {
-                                        short actual_base_offset_x, acutal_base_offset_y;
-                                        inputGlyphs.GetOffset(actualBasePos, out actual_base_offset_x, out acutal_base_offset_y);
-                                        inputGlyphs.AppendGlyphOffset(
-                                            i,
-                                            (short)(actual_base_offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
-                                            0);
-                                    }
+                                    //temp HACK!
+                                    //eg. น้ำ in Tahoma 
+                                    
+                                    inputGlyphs.AppendGlyphOffset(i - 1 /*PREV*/, mark1Anchor.xcoord, mark1Anchor.ycoord);                                     
                                 }
                                 else
                                 {
+                                    //short offset_x, offset_y;
+                                    //inputGlyphs.GetOffset(i - 1/*PREV*/, out offset_x, out offset_y);
+                                    //inputGlyphs.AppendGlyphOffset(
+                                    //     i,
+                                    //     (short)(offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
+                                    //     (short)(offset_y + mark2BaseAnchor.ycoord - mark1Anchor.ycoord));
+
+
+                                    //TEMP hack
                                     short offset_x, offset_y;
                                     inputGlyphs.GetOffset(i - 1/*PREV*/, out offset_x, out offset_y);
                                     inputGlyphs.AppendGlyphOffset(
                                          i,
                                          (short)(offset_x + mark2BaseAnchor.xcoord - mark1Anchor.xcoord),
-                                         (short)(offset_y + mark2BaseAnchor.ycoord - mark1Anchor.ycoord));
+                                         (short)(offset_y + mark1Anchor.ycoord - mark2BaseAnchor.ycoord));
                                 }
                             }
                         }
