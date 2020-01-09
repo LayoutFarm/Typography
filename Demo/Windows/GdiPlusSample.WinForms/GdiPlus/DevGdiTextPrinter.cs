@@ -93,10 +93,10 @@ namespace SampleWinForms
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
 
-        public override void DrawCaret(float x, float y)
-        {
-            this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
-        }
+        //public override void DrawCaret(float x, float y)
+        //{
+        //    this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
+        //}
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -134,9 +134,7 @@ namespace SampleWinForms
             UpdateVisualOutputSettings();
 
             //draw data in glyph plan 
-            //3. render each glyph 
-
-            y += FontDescedingPx;//**
+            //3. render each glyph  
 
             float sizeInPoints = this.FontSizeInPoints;
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
