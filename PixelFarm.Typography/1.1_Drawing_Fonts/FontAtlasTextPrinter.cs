@@ -220,9 +220,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO:
             //if (x,y) is left top
             //we need to adjust y again
-            // 
-            top += FontDescedingPx;
-
+            //           
 
             PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind = _fontAtlas.TextureKind;
 
@@ -340,21 +338,16 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void DrawString(char[] text, int startAt, int len, double x, double y)
         {
-            InternalDrawString(text, startAt, len, (float)x, (float)y);
+            DrawString(text, startAt, len, (float)x, (float)y);
         }
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
-            InternalDrawString(textBuffer, startAt, len, x, y);
-        }
-
-        void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
-        {
-
             //create temp buffer span that describe the part of a whole char buffer
-            TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
+            TextBufferSpan textBufferSpan = new TextBufferSpan(textBuffer, startAt, len);
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
             //with specific request font      
             DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font), startAt, len, x, y);
-        }
+        } 
+        
     }
 }
