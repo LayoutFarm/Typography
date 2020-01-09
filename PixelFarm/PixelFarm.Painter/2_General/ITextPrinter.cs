@@ -65,8 +65,9 @@ namespace PixelFarm.Drawing
 
         void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
             RequestFont font, int[] outputXAdvances, out int outputTotalW, out int lineHeight);
-    }
 
+        PixelFarm.Drawing.TextBaseline Baseline { get; set; }
+    }
 
 
     /// <summary>
@@ -74,7 +75,8 @@ namespace PixelFarm.Drawing
     /// </summary>
     public interface ITextPrinter
     {
-        bool StartDrawOnLeftTop { get; set; }
+        //
+        TextBaseline TextBaseline { get; set; }
         void DrawString(char[] text, int startAt, int len, double left, double top);
         /// <summary>
         /// render from RenderVxFormattedString object to specific pos
@@ -91,6 +93,19 @@ namespace PixelFarm.Drawing
         void ChangeStrokeColor(Color strokColor);
         //-------------
         void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
+    }
+
+    public enum TextBaseline
+    {
+        //top" || "hanging" || "middle" || "alphabetic" || "ideographic" || "bottom";
+        //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline
+        Alphabetic,//Html5 default
+
+        Top,
+        Hanging, //not implemented
+        Middle,//not implemented
+        Ideographics,//not implemented
+        Bottom,
     }
 
     public static class ITextPrinterExtensions

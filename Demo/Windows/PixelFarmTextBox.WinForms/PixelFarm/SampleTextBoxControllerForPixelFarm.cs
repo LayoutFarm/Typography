@@ -2,14 +2,13 @@
 
 using System.Drawing;
 using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
 namespace SampleWinForms.UI
 {
 
     class SampleTextBoxControllerForPixelFarm : SampleTextBoxController
     {
         Graphics g;
-        VxsTextPrinter _printer;
+        PixelFarm.Drawing.VxsTextPrinter _printer;
         MemBitmap destImg;
 
         AggPainter p;
@@ -30,7 +29,7 @@ namespace SampleWinForms.UI
 
             _openFontTextServices = new LayoutFarm.OpenFontTextService();
 
-            _printer = new VxsTextPrinter(p, _openFontTextServices);
+            _printer = new PixelFarm.Drawing.VxsTextPrinter(p, _openFontTextServices);
             _visualLine = new VisualLine();
             _visualLine.BindLine(_line);
             _visualLine.Y = 100;
@@ -77,9 +76,9 @@ namespace SampleWinForms.UI
             g.FillRectangle(Brushes.Green, _mousedown_X, _mousedown_Y, 5, 5);
 #endif
         }
-        public VxsTextPrinter TextPrinter
+        public PixelFarm.Drawing.VxsTextPrinter TextPrinter
         {
-            get { return _printer; }
+            get => _printer;
             set
             {
                 _printer = value;

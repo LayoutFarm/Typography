@@ -30,7 +30,7 @@ namespace SampleWinForms
         Bitmap _winBmp;
 
         TextPrinterBase _selectedTextPrinter = null;
-        VxsTextPrinter _devVxsTextPrinter = null;
+        PixelFarm.Drawing.VxsTextPrinter _devVxsTextPrinter = null;
 
         UI.DebugGlyphVisualizer _debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
         TypographyTest.BasicFontOptions _basicOptions;
@@ -49,6 +49,16 @@ namespace SampleWinForms
 
             MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
 
+
+            lstTextBaseline.Items.AddRange(
+               new object[] {
+                   PixelFarm.Drawing.TextBaseline.Alphabetic,
+                   PixelFarm.Drawing.TextBaseline.Bottom,
+                   PixelFarm.Drawing.TextBaseline.Top,
+                   //TODO: implement other types
+               });
+            lstTextBaseline.SelectedIndex = 0;//default
+            lstTextBaseline.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
         }
 
         void SetupWoffDecompressFunctions()
@@ -247,7 +257,7 @@ namespace SampleWinForms
                 _textService = new LayoutFarm.OpenFontTextService();
                 _textService.LoadFontsFromFolder("../../../TestFonts");
 
-                _devVxsTextPrinter = new VxsTextPrinter(_painter, _textService);
+                _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
                 _devVxsTextPrinter.SetSvgBmpBuilderFunc(ParseAndRenderSvg);
 
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
@@ -299,6 +309,9 @@ namespace SampleWinForms
                         _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
                         _selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
 
+
+                        _selectedTextPrinter.TextBaseline = (PixelFarm.Drawing.TextBaseline)lstTextBaseline.SelectedItem;
+
                         //test print 3 lines
 #if DEBUG
                         DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
@@ -309,6 +322,8 @@ namespace SampleWinForms
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
                         float x_pos = 0, y_pos = 0;
                         float lineSpacingPx = _selectedTextPrinter.FontLineSpacingPx;
+
+                        const int REF_LINE_LEN = 300;
                         for (int i = 0; i < 3; ++i)
                         {
                             _selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
@@ -317,22 +332,63 @@ namespace SampleWinForms
                             var prevColor = _painter.FillColor;
                             var prevStrokColor = _painter.StrokeColor;
                             _painter.FillColor = PixelFarm.Drawing.Color.Red;
-                            _painter.FillRect(x_pos, y_pos, 5, 5); //
+                            _painter.FillRect(x_pos, y_pos, 5, 5); // start point
+
+                            //see   //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline
+                            switch (_selectedTextPrinter.TextBaseline)
+                            {
+                                default:
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("UNIMPLEMENTED" + _selectedTextPrinter.TextBaseline.ToString());
+                                        goto case PixelFarm.Drawing.TextBaseline.Alphabetic;//
+                                    }
+                                case PixelFarm.Drawing.TextBaseline.Alphabetic:
+                                    {
+                                        //alphabetic baseline
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos,
+                                                          x_pos + REF_LINE_LEN, y_pos);
+
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos - _selectedTextPrinter.FontDescedingPx,
+                                                          x_pos + REF_LINE_LEN, y_pos - _selectedTextPrinter.FontDescedingPx);//bottom most
+
+                                    }
+                                    break;
+                                case PixelFarm.Drawing.TextBaseline.Top:
+                                    {
+                                        //alphabetic baseline
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos + _selectedTextPrinter.FontAscendingPx,
+                                                          x_pos + REF_LINE_LEN, y_pos + _selectedTextPrinter.FontAscendingPx);
+                                        //em bottom
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos + (_selectedTextPrinter.FontAscendingPx - _selectedTextPrinter.FontDescedingPx),
+                                                          x_pos + REF_LINE_LEN, y_pos + (_selectedTextPrinter.FontAscendingPx - _selectedTextPrinter.FontDescedingPx));//bottom most
 
 
-                            _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
-                            _painter.DrawLine(x_pos, y_pos + _selectedTextPrinter.FontAscendingPx, x_pos + 300, y_pos + _selectedTextPrinter.FontAscendingPx);//bottom most
+                                    }
+                                    break;
+                                case PixelFarm.Drawing.TextBaseline.Bottom:
+                                    {
+                                        //alphabetic baseline
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos + _selectedTextPrinter.FontDescedingPx,
+                                                          x_pos + REF_LINE_LEN, y_pos + _selectedTextPrinter.FontDescedingPx);
+                                        //em bottom
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos,
+                                                          x_pos + REF_LINE_LEN, y_pos);//bottom most 
+                                    }
+                                    break;
+                            }
 
-                            _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
-                            _painter.DrawLine(x_pos, y_pos + lineSpacingPx, x_pos + 300, y_pos + lineSpacingPx);//bottom most
 
                             _painter.FillColor = prevColor;
                             _painter.StrokeColor = prevColor;
 #endif
+                            y_pos += (_selectedTextPrinter.FontAscendingPx - _selectedTextPrinter.FontDescedingPx);
 
-
-
-                            y_pos += lineSpacingPx;
                         }
 
 
@@ -939,5 +995,7 @@ namespace SampleWinForms
                 bmp.Save(textureName + ".png");
             }
         }
+
+
     }
 }

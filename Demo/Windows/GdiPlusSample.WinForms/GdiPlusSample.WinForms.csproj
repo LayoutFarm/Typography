@@ -53,6 +53,7 @@
     <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
     </Compile>
+    <Compile Include="DevTextPrinter\TextBaseline.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -51,6 +51,9 @@
     <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
       <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\GdiPlusSample.WinForms\DevTextPrinter\TextBaseline.cs">
+      <Link>DevTextPrinter\TextBaseline.cs</Link>
+    </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\DevGdiTextPrinter.cs">
       <Link>GdiPlus\DevGdiTextPrinter.cs</Link>
     </Compile>

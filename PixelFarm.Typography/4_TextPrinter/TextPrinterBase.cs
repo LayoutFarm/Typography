@@ -5,12 +5,14 @@ using Typography.TextLayout;
 
 namespace Typography.Contours
 {
+
     /// <summary>
     /// base TextPrinter class
     /// </summary>
     public abstract class TextPrinterBase
     {
         Typography.Contours.HintTechnique _hintTech;
+
         public TextPrinterBase()
         {
             FontSizeInPoints = 14;//
@@ -19,7 +21,6 @@ namespace Typography.Contours
 
         public abstract Typography.TextLayout.GlyphLayout GlyphLayoutMan { get; }
         public abstract Typography.OpenFont.Typeface Typeface { get; set; }
-
         public virtual void GenerateGlyphPlan(
                   char[] textBuffer,
                   int startAt,
@@ -30,14 +31,14 @@ namespace Typography.Contours
             glyphLayout.Layout(textBuffer, startAt, len);
             glyphLayout.GenerateUnscaledGlyphPlans(unscaledGlyphPlan);
         }
-
-
         public bool FillBackground { get; set; }
         public bool DrawOutline { get; set; }
         public float FontAscendingPx { get; set; }
         public float FontDescedingPx { get; set; }
         public float FontLineGapPx { get; set; }
         public float FontLineSpacingPx { get; set; }
+        public PixelFarm.Drawing.TextBaseline TextBaseline { get; set; }
+
         public bool SimulateSlant { get; set; }
 
         public Typography.Contours.HintTechnique HintTechnique
@@ -64,8 +65,9 @@ namespace Typography.Contours
         public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
         public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
+
         /// <summary>
-        /// draw string at (xpos,ypos) of baseline 
+        /// draw string at (xpos,ypos), depend on baseline
         /// </summary>
         /// <param name="textBuffer"></param>
         /// <param name="startAt"></param>
@@ -81,15 +83,7 @@ namespace Typography.Contours
         /// <param name="top"></param>
         public abstract void DrawFromGlyphPlans(GlyphPlanSequence glyphPlanList, int startAt, int len, float left, float top);
 
-        /// <summary>
-        /// draw caret at xpos,ypos (sample only)
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public abstract void DrawCaret(float x, float y);
 
-
-        //----------------------------------------------------
         //helper methods
         public void DrawString(char[] textBuffer, float left, float top)
         {
@@ -99,8 +93,6 @@ namespace Typography.Contours
         {
             DrawFromGlyphPlans(glyphPlanSeq, 0, glyphPlanSeq.Count, left, top);
         }
-
-
     }
 
 }

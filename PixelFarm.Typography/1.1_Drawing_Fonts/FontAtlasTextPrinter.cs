@@ -41,8 +41,7 @@ namespace PixelFarm.Drawing.Fonts
         Dictionary<GlyphImage, MemBitmap> _sharedGlyphImgs = new Dictionary<GlyphImage, MemBitmap>();
 
         public FontAtlasTextPrinter(AggPainter painter)
-        {
-            StartDrawOnLeftTop = true;
+        { 
             _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
@@ -82,11 +81,7 @@ namespace PixelFarm.Drawing.Fonts
             //clear alpha buffer
         }
 
-        /// <summary>
-        /// start draw on 'left-top' of a given area box
-        /// </summary>
-        public bool StartDrawOnLeftTop { get; set; }
-
+       
 
         public AntialiasTechnique AntialiasTech { get; set; }
 
@@ -141,6 +136,7 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
+        public TextBaseline TextBaseline { get; set; }
 
         void SetupMaskPixelBlender(int width, int height)
         {
@@ -347,7 +343,7 @@ namespace PixelFarm.Drawing.Fonts
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
             //with specific request font      
             DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font), startAt, len, x, y);
-        } 
-        
+        }
+
     }
 }

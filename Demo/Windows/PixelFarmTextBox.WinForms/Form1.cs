@@ -27,7 +27,7 @@ namespace PixelFarmTextBox.WinForms
         Bitmap winBmp;
 
         TextPrinterBase selectedTextPrinter = null;
-        VxsTextPrinter _devVxsTextPrinter = null;
+        PixelFarm.Drawing.VxsTextPrinter _devVxsTextPrinter = null;
         SampleWinForms.UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new SampleWinForms.UI.SampleTextBoxControllerForPixelFarm();
 
         TypographyTest.BasicFontOptions _basicOptions;
@@ -79,7 +79,7 @@ namespace PixelFarmTextBox.WinForms
 
             _openFontTextService = new LayoutFarm.OpenFontTextService();
             //....
-            _devVxsTextPrinter = new VxsTextPrinter(painter, _openFontTextService);
+            _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(painter, _openFontTextService);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
             _devVxsTextPrinter.FontSizeInPoints = 10;
