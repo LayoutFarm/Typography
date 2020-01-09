@@ -66,7 +66,7 @@ namespace PixelFarm.Drawing
         void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
             RequestFont font, int[] outputXAdvances, out int outputTotalW, out int lineHeight);
 
-        PixelFarm.Drawing.TextBaseline Baseline { get; set; }
+        
     }
 
 
