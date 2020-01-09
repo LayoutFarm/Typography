@@ -64,7 +64,7 @@ namespace SampleWinForms.UI
 
                 if (caret_index == 0)
                 {
-                    _printer.DrawCaret(X, this.Y);
+                    //_printer.DrawCaret(X, this.Y);
                 }
                 else
                 {
@@ -76,7 +76,7 @@ namespace SampleWinForms.UI
             else
             {
 
-                _printer.DrawCaret(X, this.Y);
+                //_printer.DrawCaret(X, this.Y);
             }
         }
     }

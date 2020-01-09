@@ -74,7 +74,7 @@ namespace SampleWinForms.UI
             else
             {
 
-                _printer.DrawCaret(X, this.Y);
+                //_printer.DrawCaret(X, this.Y);
             }
         }
     }

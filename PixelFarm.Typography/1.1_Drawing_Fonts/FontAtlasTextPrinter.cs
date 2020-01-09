@@ -174,11 +174,11 @@ namespace PixelFarm.Drawing.Fonts
             UpdateGlyphLayoutSettings();
             //Typeface typeface = _currentTypeface;
         }
-        public override void DrawCaret(float x, float y)
-        {
-            //TODO: remove draw caret here, this is for debug only 
+        //public override void DrawCaret(float x, float y)
+        //{
+        //    //TODO: remove draw caret here, this is for debug only 
 
-        }
+        //}
 
         public void UpdateGlyphLayoutSettings()
         {
