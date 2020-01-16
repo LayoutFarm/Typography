@@ -22,15 +22,36 @@ namespace Typography.OpenFont
     {
         public readonly string Name;
         public readonly string SubFamilyName;
+        public readonly string TypographicFamilyName;
+        public readonly string TypographicSubFamilyName;
         public readonly Extensions.TranslatedOS2FontStyle OS2TranslatedStyle;
         public readonly ushort Weight;
         PreviewFontInfo[] _ttcfMembers;
 
-        public PreviewFontInfo(string fontName, string fontSubFam, ushort weight,
+        public PreviewFontInfo(string fontName, string fontSubFam,
+            string tFamilyName, string tSubFamilyName,
+            ushort weight,
             Extensions.TranslatedOS2FontStyle os2TranslatedStyle = Extensions.TranslatedOS2FontStyle.UNSET)
         {
             Name = fontName;
             SubFamilyName = fontSubFam;
+            TypographicFamilyName = tFamilyName;
+            TypographicSubFamilyName = tSubFamilyName;
+
+#if DEBUG
+            //please note that some fontName != typographicFontName
+            //this may effect how to search a font
+            if (fontName != tFamilyName && tFamilyName != null)
+            {
+
+            }
+            if (fontSubFam != tSubFamilyName && tSubFamilyName != null)
+            {
+
+            }
+#endif
+
+
             Weight = weight;
             OS2TranslatedStyle = os2TranslatedStyle;
         }
@@ -312,8 +333,10 @@ namespace Typography.OpenFont
             OS2Table os2Table = ReadTableIfExists(tables, input, new OS2Table());
 
             return new PreviewFontInfo(
-              nameEntry.TypographicFamilyName ?? nameEntry.FontName,
-              nameEntry.TypographyicSubfamilyName ?? nameEntry.FontSubFamily,
+              nameEntry.FontName,
+              nameEntry.FontSubFamily,
+              nameEntry.TypographicFamilyName,
+              nameEntry.TypographyicSubfamilyName,
               os2Table.usWeightClass,
               Extensions.TypefaceExtensions.TranslatedOS2FontStyle(os2Table));
         }
