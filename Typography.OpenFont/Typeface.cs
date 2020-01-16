@@ -163,7 +163,32 @@ namespace Typography.OpenFont
             return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
         }
 
-        public ushort GetGlyphIndex(string glyphName)
+ 
+        public void CollectUnicode(List<uint> unicodes)
+        {
+            CmapTable.CollectUnicode(unicodes);
+        }
+        
+        public Glyph GetGlyphByName(string glyphName)
+        {
+            if (_cffTable != null)
+            {
+                //early preview ...
+                List<CFF.Cff1Font> cff1Fonts = _cffTable.Cff1FontSet._fonts;
+                for (int i = 0; i < cff1Fonts.Count; i++)
+                {
+                    Glyph glyph = cff1Fonts[i].GetGlyphByName(glyphName);
+                    if (glyph != null) return glyph;
+                }
+                return null;
+            }
+            else if (PostTable != null)
+            {
+                return GetGlyph(GetGlyphIndexByName(glyphName));
+            }
+            return null;
+        }
+        public ushort GetGlyphIndexByName(string glyphName) 
         {
             if (_cffTable != null)
             {

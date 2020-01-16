@@ -75,9 +75,9 @@
             // 
             // glyphNameListUserControl1
             // 
-            this.glyphNameListUserControl1.Location = new System.Drawing.Point(607, 446);
+            this.glyphNameListUserControl1.Location = new System.Drawing.Point(456, 446);
             this.glyphNameListUserControl1.Name = "glyphNameListUserControl1";
-            this.glyphNameListUserControl1.Size = new System.Drawing.Size(159, 385);
+            this.glyphNameListUserControl1.Size = new System.Drawing.Size(310, 385);
             this.glyphNameListUserControl1.TabIndex = 70;
             this.glyphNameListUserControl1.Typeface = null;
             // 
