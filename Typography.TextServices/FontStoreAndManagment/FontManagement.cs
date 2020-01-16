@@ -12,12 +12,18 @@ namespace Typography.FontManagement
     {
         internal InstalledTypeface(string fontName,
             string fontSubFamily,
+            string tFamilyName,
+            string tSubFamilyName,
             string fontPath,
             TypefaceStyle typefaceStyle,
             ushort weight)
         {
             FontName = fontName;
             FontSubFamily = fontSubFamily;
+
+            TypographicFamilyName = tFamilyName;
+            TypographicFontSubFamily = tSubFamilyName;
+
             FontPath = fontPath;
             TypefaceStyle = typefaceStyle;
             Weight = weight;
@@ -25,6 +31,8 @@ namespace Typography.FontManagement
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
+        public string TypographicFamilyName { get; internal set; }
+        public string TypographicFontSubFamily { get; internal set; }
         public TypefaceStyle TypefaceStyle { get; internal set; }
         public ushort Weight { get; internal set; }
 
@@ -91,17 +99,18 @@ namespace Typography.FontManagement
         class InstalledTypefaceGroup
         {
             public Dictionary<string, InstalledTypeface> _members = new Dictionary<string, InstalledTypeface>();
-            public void AddFont(InstalledTypeface installedFont)
+
+            public void AddFont(string registerName, InstalledTypeface installedFont)
             {
-                _members.Add(installedFont.FontName.ToUpper(), installedFont);
+                _members.Add(registerName, installedFont);
             }
-            public bool TryGetValue(string fontName, out InstalledTypeface found)
+            public bool TryGetValue(string registerName, out InstalledTypeface found)
             {
-                return _members.TryGetValue(fontName, out found);
+                return _members.TryGetValue(registerName, out found);
             }
-            public void Replace(InstalledTypeface newone)
+            public void Replace(string registerName, InstalledTypeface newone)
             {
-                _members[newone.FontName.ToUpper()] = newone;
+                _members[registerName] = newone;
             }
 
 #if DEBUG
@@ -126,6 +135,7 @@ namespace Typography.FontManagement
         FontNameDuplicatedHandler _fontNameDuplicatedHandler;
         FontNotFoundHandler _fontNotFoundHandler;
 
+        Dictionary<string, InstalledTypeface> _otherFontNames = new Dictionary<string, InstalledTypeface>();
 
 
         public InstalledTypefaceCollection()
@@ -231,7 +241,15 @@ namespace Typography.FontManagement
                     case "ITALIC": typefaceStyle = TypefaceStyle.Italic; break;
                 }
             }
-            return Register(new InstalledTypeface(previewFont.Name, previewFont.SubFamilyName, srcPath, typefaceStyle, previewFont.Weight) { ActualStreamOffset = previewFont.ActualStreamOffset });
+            return Register(new InstalledTypeface(
+                previewFont.Name,
+                previewFont.SubFamilyName,
+                previewFont.TypographicFamilyName,
+                previewFont.TypographicSubFamilyName,
+                srcPath,
+                typefaceStyle,
+                previewFont.Weight)
+            { ActualStreamOffset = previewFont.ActualStreamOffset });
         }
         public bool AddFontStreamSource(IFontStreamSource src)
         {
@@ -328,11 +346,22 @@ namespace Typography.FontManagement
                     break;
             }
 
-            //
-            string fontNameUpper = newTypeface.FontName.ToUpper();
+            //------------------
+            //for font management
+            //we use 'typographic family name' if avaliable,            
+            string register_name = newTypeface.TypographicFamilyName;
+            bool use_typographicFontFam = true;
+            if (register_name == null)
+            {
+                //switch to font name, this should not be null!
+                register_name = newTypeface.FontName;
+                use_typographicFontFam = false;
+            }
 
-            InstalledTypeface found;
-            if (selectedFontGroup.TryGetValue(fontNameUpper, out found))
+            register_name = register_name.ToUpper(); //***  
+            bool register_result = false;
+
+            if (selectedFontGroup.TryGetValue(register_name, out InstalledTypeface found))
             {
                 //TODO:
                 //we already have this font name
@@ -344,24 +373,32 @@ namespace Typography.FontManagement
                     {
                         default:
                             throw new NotSupportedException();
-
                         case FontNameDuplicatedDecision.Skip:
-                            return false;
+                            break;
                         case FontNameDuplicatedDecision.Replace:
-                            selectedFontGroup.Replace(newTypeface);
-                            return true;
+                            selectedFontGroup.Replace(register_name, newTypeface);
+                            register_result = true;
+                            break;
                     }
-                }
-                else
-                {
-                    return false;
                 }
             }
             else
             {
-                selectedFontGroup.AddFont(newTypeface);
-                return true;
+                selectedFontGroup.AddFont(register_name, newTypeface);
+                register_result = true;
             }
+
+            if (use_typographicFontFam &&
+                newTypeface.FontName != newTypeface.TypographicFamilyName &&
+                newTypeface.TypefaceStyle == TypefaceStyle.Regular)
+            {
+                //in this case, the code above register the typeface with TypographicFamilyName
+                //so we register this typeface with original name too
+                _otherFontNames.Add(newTypeface.FontName.ToUpper(), newTypeface);
+            }
+
+            return register_result;
+
         }
 
         public InstalledTypeface GetInstalledTypeface(string fontName, string subFamName)
@@ -369,23 +406,26 @@ namespace Typography.FontManagement
             string upperCaseFontName = fontName.ToUpper();
             string upperCaseSubFamName = subFamName.ToUpper();
 
-
-            //find font group 
-
+            InstalledTypeface foundInstalledFont;
+            //find font group  
             if (_subFamToFontGroup.TryGetValue(upperCaseSubFamName, out InstalledTypefaceGroup foundFontGroup))
             {
-                InstalledTypeface foundInstalledFont;
                 if (foundFontGroup.TryGetValue(upperCaseFontName, out foundInstalledFont))
                 {
                     return foundInstalledFont;
                 }
             }
 
+            //
+            if (_otherFontNames.TryGetValue(upperCaseFontName, out foundInstalledFont))
+            {
+                return foundInstalledFont;
+            } 
             //not found
             if (_fontNotFoundHandler != null)
             {
                 return _fontNotFoundHandler(this, fontName, subFamName);
-            }
+            } 
 
             return null; //not found
         }
@@ -552,9 +592,9 @@ namespace Typography.FontManagement
             {
                 CustomSystemFontListLoader(fontCollection);
                 return;
-            } 
+            }
             // Windows system fonts
-            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts"); 
+            LoadFontsFromFolder(fontCollection, "c:\\Windows\\Fonts");
             // These are reasonable places to look for fonts on Linux
             LoadFontsFromFolder(fontCollection, "/usr/share/fonts", true);
             LoadFontsFromFolder(fontCollection, "/usr/share/wine/fonts", true);
