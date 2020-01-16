@@ -12,17 +12,25 @@ namespace Typography.TextServices
     {
         internal InstalledFont(string fontName,
             string fontSubFamily,
+            string typographicFontName,
+            string typographicfontSubFamily,
             string fontPath,
             ushort weight)
         {
             FontName = fontName;
             FontSubFamily = fontSubFamily;
+            TypographicFontName = typographicFontName;
+            TypographicFontSubFamily = typographicfontSubFamily;
+
             FontPath = fontPath;
             Weight = weight;
         }
 
         public string FontName { get; internal set; }
         public string FontSubFamily { get; internal set; }
+        public string TypographicFontName { get; internal set; }
+        public string TypographicFontSubFamily { get; internal set; }
+
         public ushort Weight { get; internal set; }
 
         public string FontPath { get; internal set; }
@@ -260,6 +268,8 @@ namespace Typography.TextServices
                         if (!RegisterFont(new InstalledFont(
                                             member.Name,
                                             member.SubFamilyName,
+                                            member.TypographicFamilyName,
+                                            member.TypographicSubFamilyName,
                                             src.PathName,
                                             member.Weight)
                         { StreamOffset = member.ActualStreamOffset }))
@@ -275,6 +285,8 @@ namespace Typography.TextServices
                     return RegisterFont(new InstalledFont(
                            previewFont.Name,
                            previewFont.SubFamilyName,
+                           previewFont.TypographicFamilyName,
+                           previewFont.TypographicSubFamilyName,
                            src.PathName,
                            previewFont.Weight));
                 }
@@ -284,8 +296,7 @@ namespace Typography.TextServices
         bool RegisterFont(InstalledFont newfont)
         {
             FontGroup selectedFontGroup;
-            string fontsubFamUpperCaseName = newfont.FontSubFamily.ToUpper();
-
+            string fontsubFamUpperCaseName = newfont.FontSubFamily.ToUpper(); 
             if (!_subFamToFontGroup.TryGetValue(fontsubFamUpperCaseName, out selectedFontGroup))
             {
                 //create new group, we don't known this font group before 
@@ -294,6 +305,12 @@ namespace Typography.TextServices
                 _subFamToFontGroup.Add(fontsubFamUpperCaseName, selectedFontGroup);
                 _allFontGroups.Add(selectedFontGroup);
             }
+
+            if(newfont.TypographicFontName != newfont.FontName)
+            {
+
+            }
+
             //
             string fontNameUpper = newfont.FontName.ToUpper();
             if (selectedFontGroup.TryGetValue(fontNameUpper, out InstalledFont found))
