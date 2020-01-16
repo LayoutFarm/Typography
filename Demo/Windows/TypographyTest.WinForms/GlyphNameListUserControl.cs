@@ -43,10 +43,13 @@ namespace TypographyTest.WinForms
                     //find user name first
                     string unicode_hexForm = this.txtHexUnicode.Text;
                     int unicode = Convert.ToInt32(unicode_hexForm, 16);
-                    ushort glyphIndex = _selectedTypeface.LookupIndex(unicode);
-                    //
+                    ushort glyphIndex = _selectedTypeface.LookupIndex(unicode); 
+                     
                     if (glyphIndex > 0)
                     {
+                        Glyph foundGlyph = _selectedTypeface.GetGlyphByIndex(glyphIndex);
+
+                        //display
                         this.listBox1.SelectedIndex = glyphIndex;
                     }
                 };
