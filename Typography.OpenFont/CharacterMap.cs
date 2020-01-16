@@ -76,6 +76,18 @@ namespace Typography.OpenFont
                 return _glyphIdArray[offset - _idRangeOffset.Length + i];
             }
         }
+        public override void CollectUnicodeChars(List<uint> unicodes)
+        {
+            for (int i = 0; i < _startCode.Length; ++i)
+            {
+                uint start = _startCode[i];
+                uint stop = _endCode[i];
+                for (uint u = start; u <= stop; ++u)
+                {
+                    unicodes.Add(u);
+                }
+            }
+        }
     }
 
     class CharMapFormat12 : CharacterMap
@@ -104,6 +116,18 @@ namespace Typography.OpenFont
             }
             return 0;
         }
+        public override void CollectUnicodeChars(List<uint> unicodes)
+        {
+            for (int i = 0; i < _startCharCodes.Length; ++i)
+            {
+                uint start = _startCharCodes[i];
+                uint stop = _endCharCodes[i];
+                for (uint u = start; u <= stop; ++u)
+                {
+                    unicodes.Add(u);
+                }
+            }
+        }
     }
 
     class CharMapFormat6 : CharacterMap
@@ -129,6 +153,15 @@ namespace Typography.OpenFont
 
         readonly ushort _startCode;
         readonly ushort[] _glyphIdArray;
+
+        public override void CollectUnicodeChars(List<uint> unicodes)
+        {
+            ushort u = _startCode;
+            for (uint i = 0; i < _glyphIdArray.Length; ++i)
+            {
+                unicodes.Add(u + i);
+            }
+        }
     }
 
 
@@ -151,12 +184,12 @@ namespace Typography.OpenFont
         public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
         {
             // Only check codepoint if nextCodepoint is a variation selector
-            VariationSelector sel;
-            if (_variationSelectors.TryGetValue(nextCodepoint, out sel))
+
+            if (_variationSelectors.TryGetValue(nextCodepoint, out VariationSelector sel))
             {
                 // If the sequence is a non-default UVS, return the mapped glyph
-                ushort ret = 0;
-                if (sel.UVSMappings.TryGetValue(codepoint, out ret))
+
+                if (sel.UVSMappings.TryGetValue(codepoint, out ushort ret))
                 {
                     return ret;
                 }
@@ -180,6 +213,15 @@ namespace Typography.OpenFont
             // In all other cases, return 0
             return 0;
         }
+
+        public override void CollectUnicodeChars(List<uint> unicodes)
+        {
+            //TODO: review here
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine("not implemented");
+#endif
+        }
+
 
         public static CharMapFormat14 Create(BinaryReader reader)
         {
@@ -330,8 +372,8 @@ namespace Typography.OpenFont
     class NullCharMap : CharacterMap
     {
         public override ushort Format => 0;
-
         protected override ushort RawCharacterToGlyphIndex(int character) => 0;
+        public override void CollectUnicodeChars(List<uint> unicodes) {  /*nothing*/}
     }
 
     abstract class CharacterMap
@@ -347,6 +389,9 @@ namespace Typography.OpenFont
         }
 
         protected abstract ushort RawCharacterToGlyphIndex(int codepoint);
+        public abstract void CollectUnicodeChars(List<uint> unicodes);
+
+
 
         //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
         //{
@@ -441,27 +486,27 @@ namespace Typography.OpenFont
 
 
 
-    public class GlyphIndexCollector
-    {
-        Dictionary<int, List<ushort>> _registerSegments = new Dictionary<int, List<ushort>>();
-        public bool HasRegisterSegment(int segmentNumber)
-        {
-            return _registerSegments.ContainsKey(segmentNumber);
-        }
-        public void RegisterGlyphRangeIndex(int segmentNumber, List<ushort> glyphIndexList)
-        {
-            _registerSegments.Add(segmentNumber, glyphIndexList);
-        }
-        public IEnumerable<ushort> GetGlyphIndexIter()
-        {
-            foreach (List<ushort> list in _registerSegments.Values)
-            {
-                int j = list.Count;
-                for (int i = 0; i < j; ++i)
-                {
-                    yield return list[i];
-                }
-            }
-        }
-    }
+    //public class GlyphIndexCollector
+    //{
+    //    Dictionary<int, List<ushort>> _registerSegments = new Dictionary<int, List<ushort>>();
+    //    public bool HasRegisterSegment(int segmentNumber)
+    //    {
+    //        return _registerSegments.ContainsKey(segmentNumber);
+    //    }
+    //    public void RegisterGlyphRangeIndex(int segmentNumber, List<ushort> glyphIndexList)
+    //    {
+    //        _registerSegments.Add(segmentNumber, glyphIndexList);
+    //    }
+    //    public IEnumerable<ushort> GetGlyphIndexIter()
+    //    {
+    //        foreach (List<ushort> list in _registerSegments.Values)
+    //        {
+    //            int j = list.Count;
+    //            for (int i = 0; i < j; ++i)
+    //            {
+    //                yield return list[i];
+    //            }
+    //        }
+    //    }
+    //}
 }

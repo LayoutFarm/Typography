@@ -43,8 +43,8 @@ namespace TypographyTest.WinForms
                     //find user name first
                     string unicode_hexForm = this.txtHexUnicode.Text;
                     int unicode = Convert.ToInt32(unicode_hexForm, 16);
-                    ushort glyphIndex = _selectedTypeface.LookupIndex(unicode); 
-                     
+                    ushort glyphIndex = _selectedTypeface.LookupIndex(unicode);
+
                     if (glyphIndex > 0)
                     {
                         Glyph foundGlyph = _selectedTypeface.GetGlyphByIndex(glyphIndex);
@@ -53,6 +53,11 @@ namespace TypographyTest.WinForms
                         this.listBox1.SelectedIndex = glyphIndex;
                     }
                 };
+            };
+
+            lstUnicodes.SelectedIndexChanged += (s, e) =>
+            {
+                this.txtHexUnicode.Text = (string)lstUnicodes.SelectedItem;
             };
 
 
@@ -169,6 +174,8 @@ namespace TypographyTest.WinForms
             }
 
             ShowGlyphNameList(_allGlyphNameMapList);
+
+            lstUnicodes.Items.Clear();
         }
         void ShowGlyphNameList(List<GlyphNameMapInfo> srcList)
         {
@@ -177,7 +184,18 @@ namespace TypographyTest.WinForms
             {
                 listBox1.Items.Add(mapInfo);
             }
+        }
 
+        void cmdListAllUnicodes_Click(object sender, EventArgs e)
+        {
+            List<uint> unicodes = new List<uint>();
+            _selectedTypeface.CollectUnicode(unicodes);
+            //show in list in hex 
+            lstUnicodes.Items.Clear();
+            foreach (uint u in unicodes)
+            {
+                lstUnicodes.Items.Add(String.Format("{0:X}", u).ToLower());
+            }
         }
     }
 }
