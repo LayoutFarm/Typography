@@ -208,8 +208,9 @@ namespace Typography.Rendering
                     _msdfTextureFonts.Add(simpleFontAtlas.FontFilename, simpleFontAtlas);
                 }
             }
-
         }
+        static object s_loadDataLock = new object();
+
         /// <summary>
         /// get from cache or create a new one
         /// </summary>
@@ -251,22 +252,25 @@ namespace Typography.Rendering
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
-                    using (System.IO.Stream textureInfoFileStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
-                    using (System.IO.Stream fontAtlasImgStream = StorageService.Provider.ReadDataStream(fontTextureImgFilename))
+                    lock (s_loadDataLock)
                     {
-                        try
+                        using (System.IO.Stream textureInfoFileStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
+                        using (System.IO.Stream fontAtlasImgStream = StorageService.Provider.ReadDataStream(fontTextureImgFilename))
                         {
-                            //TODO: review here
-                            fontAtlas = atlasBuilder.LoadFontAtlasInfo(textureInfoFileStream)[0];
-                            fontAtlas.TotalGlyph = ReadGlyphImages(fontAtlasImgStream);
-                            fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
-                            _createdAtlases.Add(fontKey, fontAtlas);
+                            try
+                            {
+                                //TODO: review here
+                                fontAtlas = atlasBuilder.LoadFontAtlasInfo(textureInfoFileStream)[0];
+                                fontAtlas.TotalGlyph = ReadGlyphImages(fontAtlasImgStream);
+                                fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
+                                _createdAtlases.Add(fontKey, fontAtlas);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw ex;
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
+                    } 
 
                 }
                 else

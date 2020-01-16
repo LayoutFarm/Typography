@@ -348,6 +348,11 @@ namespace Typography.TextServices
             //https://stackoverflow.com/questions/2351087/what-is-the-best-32bit-hash-function-for-short-strings-tag-names
             return CRC32.CalculateCRC32(buffer.UnsafeGetInternalBuffer(), startAt, len);
         }
+
+#if DEBUG
+        public bool dbug_disableCache = false;
+#endif
+
         public GlyphPlanSequence GetUnscaledGlyphPlanSequence(
             GlyphLayout glyphLayout,
             TextBuffer buffer, int start, int seqLen)
@@ -370,7 +375,13 @@ namespace Typography.TextServices
             GlyphPlanSequence planSeq = GlyphPlanSequence.Empty;
             GlyphPlanSeqCollection seqCol = _glyphPlanSeqSet.GetSeqCollectionOrCreateIfNotExist(seqLen);
 
-            if (!seqCol.TryGetCacheGlyphPlanSeq(seqHashValue, out planSeq))
+            if (
+
+#if DEBUG
+                dbug_disableCache ||
+#endif
+
+                !seqCol.TryGetCacheGlyphPlanSeq(seqHashValue, out planSeq))
             {
                 //create a new one if we don't has a cache
                 //1. layout 
@@ -387,7 +398,15 @@ namespace Typography.TextServices
                 int post_count = _reusableGlyphPlanList.Count;
                 planSeq = new GlyphPlanSequence(_reusableGlyphPlanList, pre_count, post_count - pre_count);
                 //
-                seqCol.Register(seqHashValue, planSeq);
+
+#if DEBUG
+                if (!dbug_disableCache)
+                {
+#endif
+                    seqCol.Register(seqHashValue, planSeq);
+#if DEBUG
+                }
+#endif
             }
             return planSeq;
         }
@@ -442,11 +461,13 @@ namespace Typography.TextServices
         {
             return GetTypefaceOrCreateNew(installedFont);
         }
+
+
+        static object s_fontStreamLock = new object();
         Typeface GetTypefaceOrCreateNew(InstalledTypeface installedFont)
         {
             //load 
             //check if we have create this typeface or not 
-
             if (!_loadedTypefaces.TryGetValue(installedFont, out Typeface typeface))
             {
                 //TODO: review how to load font here 
@@ -455,17 +476,24 @@ namespace Typography.TextServices
                     using (var fontStream = Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader(installedFont.FontPath))
                     {
                         var reader = new OpenFontReader();
-                        typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
-                        typeface.Filename = installedFont.FontPath;
+                        lock (fontStream)
+                        {
+                            typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
+                            typeface.Filename = installedFont.FontPath;
+                        }
                     }
+
                 }
                 else
                 {
-                    using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
+                    lock (s_fontStreamLock)
                     {
-                        var reader = new OpenFontReader();
-                        typeface = reader.Read(fs, installedFont.ActualStreamOffset);
-                        typeface.Filename = installedFont.FontPath;
+                        using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
+                        {
+                            var reader = new OpenFontReader();
+                            typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                            typeface.Filename = installedFont.FontPath;
+                        }
                     }
                 }
                 return _loadedTypefaces[installedFont] = typeface;

@@ -104,7 +104,18 @@ namespace PixelFarm.Drawing.Fonts
 
         void ReadOverviewFontInfo(BinaryReader reader)
         {
+            //read str len
+
+            //-------------
+            //new version:
+            //ushort utf8BufferLen = reader.ReadUInt16();
+            //byte[] utf8Filename = reader.ReadBytes(utf8BufferLen);
+            //_atlas.FontFilename = System.Text.Encoding.UTF8.GetString(utf8Filename);
+            //ushort utf8BufferLen = reader.ReadUInt16();
+            //byte[] utf8Filename = reader.ReadBytes(utf8BufferLen);
+            //-------------
             _atlas.FontFilename = reader.ReadString();
+            //
             _atlas.FontKey = reader.ReadInt32();
             _atlas.OriginalFontSizePts = reader.ReadSingle();
         }
@@ -144,7 +155,14 @@ namespace PixelFarm.Drawing.Fonts
                 throw new NotSupportedException();
             }
 #endif
-            _writer.Write(fontFileName);
+
+            byte[] utf8Filenames = System.Text.Encoding.UTF8.GetBytes(fontFileName);
+            if (utf8Filenames.Length > ushort.MaxValue)
+            {
+                throw new NotSupportedException();
+            }
+            _writer.Write((ushort)utf8Filenames.Length);
+            _writer.Write(utf8Filenames);
             _writer.Write(fontKey);
             _writer.Write(sizeInPt);
         }

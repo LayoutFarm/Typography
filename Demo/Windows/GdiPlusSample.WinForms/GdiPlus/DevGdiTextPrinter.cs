@@ -111,7 +111,7 @@ namespace SampleWinForms
             DrawFromGlyphPlans(
                 new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
                 x, y);
-             
+
 
         }
         public void UpdateGlyphLayoutSettings()
@@ -148,6 +148,8 @@ namespace SampleWinForms
             float cx = 0;
             float cy = 0;
 
+            float baseline = y;
+
             var snapToPxScale = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, pxscale);
 
             while (snapToPxScale.Read())
@@ -166,8 +168,9 @@ namespace SampleWinForms
                 //------
                 //then move pen point to the position we want to draw a glyph
 
+
                 cx = (float)Math.Round(snapToPxScale.ExactX + x);
-                cy = (float)Math.Floor(snapToPxScale.ExactY + y);
+                cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
 
                 g.TranslateTransform(cx, cy);
 
