@@ -234,8 +234,8 @@ namespace Typography.OpenFont
                 return null;
             }
             else if (PostTable != null)
-            {
-                return GetGlyph(GetGlyphIndex(glyphName));
+            { 
+                return GetGlyph(GetGlyphIndexByName(glyphName));
             }
             return null;
         }      
