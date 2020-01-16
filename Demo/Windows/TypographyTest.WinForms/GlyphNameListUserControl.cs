@@ -35,6 +35,24 @@ namespace TypographyTest.WinForms
                 }
             };
 
+            this.txtHexUnicode.KeyDown += (s, e) =>
+            {
+
+                if (e.KeyCode == Keys.Enter)
+                {
+                    //find user name first
+                    string unicode_hexForm = this.txtHexUnicode.Text;
+                    int unicode = Convert.ToInt32(unicode_hexForm, 16);
+                    ushort glyphIndex = _selectedTypeface.LookupIndex(unicode);
+                    //
+                    if (glyphIndex > 0)
+                    {
+                        this.listBox1.SelectedIndex = glyphIndex;
+                    }
+                };
+            };
+
+
             this.textBox1.KeyDown += (s, e) =>
             {
                 if (e.KeyCode == Keys.Enter)

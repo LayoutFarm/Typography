@@ -31,6 +31,7 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.chkRenderGlyph = new System.Windows.Forms.CheckBox();
+            this.txtHexUnicode = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // listBox1
@@ -60,10 +61,18 @@
             this.chkRenderGlyph.Text = "Render";
             this.chkRenderGlyph.UseVisualStyleBackColor = true;
             // 
+            // txtHexUnicode
+            // 
+            this.txtHexUnicode.Location = new System.Drawing.Point(0, 324);
+            this.txtHexUnicode.Name = "txtHexUnicode";
+            this.txtHexUnicode.Size = new System.Drawing.Size(147, 20);
+            this.txtHexUnicode.TabIndex = 3;
+            // 
             // GlyphNameListUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.txtHexUnicode);
             this.Controls.Add(this.chkRenderGlyph);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.listBox1);
@@ -80,5 +89,6 @@
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox chkRenderGlyph;
+        private System.Windows.Forms.TextBox txtHexUnicode;
     }
 }
