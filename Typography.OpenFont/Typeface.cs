@@ -154,6 +154,11 @@ namespace Typography.OpenFont
         {
             return _glyphs[glyphIndex];
         }
+
+        public void CollectUnicode(List<uint> unicodes)
+        {
+            CmapTable.CollectUnicode(unicodes);
+        }
         //
         public int GlyphCount => _glyphs.Length;
         //

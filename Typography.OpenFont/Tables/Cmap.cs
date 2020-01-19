@@ -385,5 +385,13 @@ namespace Typography.OpenFont.Tables
                 case 14: return CharMapFormat14.Create(input);
             }
         }
+
+        public void CollectUnicode(List<uint> unicodes)
+        {
+            foreach (CharacterMap cmap in _charMaps)
+            {
+                cmap.CollectUnicodeChars(unicodes);
+            }
+        }
     }
 }
