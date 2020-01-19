@@ -296,12 +296,26 @@ namespace Typography.FontManagement
         bool Register(InstalledTypeface newTypeface)
         {
 
+         
+
             InstalledTypefaceGroup selectedFontGroup = null;
+
+            string fontSubFamUpperCaseName = newTypeface.TypographicFontSubFamily;
+            bool use_typographicSubFam = true;
+            if (fontSubFamUpperCaseName == null)
+            {
+                //switch to FontSubFamily, this should not be null!
+                fontSubFamUpperCaseName = newTypeface.FontSubFamily;
+                use_typographicSubFam = false;
+            }
+            fontSubFamUpperCaseName = fontSubFamUpperCaseName.ToUpper();
+            //--------------
+
             switch (newTypeface.TypefaceStyle)
             {
                 default:
                     {
-                        string fontSubFamUpperCaseName = newTypeface.FontSubFamily.ToUpper();
+                         
                         if (!_subFamToFontGroup.TryGetValue(fontSubFamUpperCaseName, out selectedFontGroup))
                         {
                             //create new group, we don't known this font group before 
@@ -325,7 +339,7 @@ namespace Typography.FontManagement
                 case TypefaceStyle.Regular:
                     {
                         selectedFontGroup = _regular;
-                        string fontSubFamUpperCaseName = newTypeface.FontSubFamily.ToUpper();
+                       
                         if (fontSubFamUpperCaseName != "REGULAR" &&
                             !_subFamToFontGroup.TryGetValue(fontSubFamUpperCaseName, out selectedFontGroup))
                         {
