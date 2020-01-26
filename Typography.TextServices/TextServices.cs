@@ -460,10 +460,8 @@ namespace Typography.TextServices
         public Typeface GetTypeface(InstalledTypeface installedFont)
         {
             return GetTypefaceOrCreateNew(installedFont);
-        }
+        } 
 
-
-        static object s_fontStreamLock = new object();
         Typeface GetTypefaceOrCreateNew(InstalledTypeface installedFont)
         {
             //load 
@@ -476,25 +474,23 @@ namespace Typography.TextServices
                     using (var fontStream = Typography.FontManagement.InstalledTypefaceCollectionExtensions.CustomFontStreamLoader(installedFont.FontPath))
                     {
                         var reader = new OpenFontReader();
-                        lock (fontStream)
-                        {
-                            typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
-                            typeface.Filename = installedFont.FontPath;
-                        }
+
+                        typeface = reader.Read(fontStream, installedFont.ActualStreamOffset);
+                        typeface.Filename = installedFont.FontPath;
+
                     }
 
                 }
                 else
                 {
-                    lock (s_fontStreamLock)
+
+                    using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
                     {
-                        using (var fs = new FileStream(installedFont.FontPath, FileMode.Open, FileAccess.Read))
-                        {
-                            var reader = new OpenFontReader();
-                            typeface = reader.Read(fs, installedFont.ActualStreamOffset);
-                            typeface.Filename = installedFont.FontPath;
-                        }
+                        var reader = new OpenFontReader();
+                        typeface = reader.Read(fs, installedFont.ActualStreamOffset);
+                        typeface.Filename = installedFont.FontPath;
                     }
+
                 }
                 return _loadedTypefaces[installedFont] = typeface;
 
