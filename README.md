@@ -4,12 +4,12 @@
 Pure C# Font Reader, Glyph Layout and Rendering.
 ---
 
-During developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
-I think _'How-to-render-a-font-glyph'_ may be useful for other libraries.
+While developing the [PixelFarm Rendering library](https://github.com/PaintLab/PixelFarm),
+I figured that the way to render a glyph from a font may be useful for other libraries.
 
-So, I spinned off the _'How-to-render-a-font-glyph'_ part to here, the **Typography** library.
+So, I spinned off the way to render a glyph from a font to here, the **Typography** library.
 
-The Typography lib does NOT need the PixelFarm Rendering library.
+The Typography library does NOT need the PixelFarm Rendering library.
 
 ![gdiplus_sample1](https://cloud.githubusercontent.com/assets/7447159/24084514/1969489e-0d1e-11e7-8748-965e9e84693b.png)
 
@@ -23,6 +23,20 @@ Concept
 ---
 
  * 1.Load .ttf, .otf, .ttc, .otc, .woff, .woff2 files, with OpenFontReader.
+ ```cs
+System.IO.Stream stream = null;
+var reader = new Typography.OpenFont.OpenFontReader();
+var typeface = reader.Read(stream); // stream is disposed inside Read
+if (typeface is null &&
+    reader.ReadPreview(stream) is var preview &&
+    preview.IsFontCollection) {
+  // .ttc or .otc
+  for (int i = 0; i < preview.MemberCount; i++) {
+    typeface = reader.Read(stream, preview.GetMember(i).ActualStreamOffset); // choose a font...
+  }
+}
+// use typeface
+ ```
  
  * 2.Rasterize a character to a bitmap with a pure software renderer which has Agg(anti grain geometry) Quality! with 
       our PixelFarm's MiniAgg :) (https://github.com/PaintLab/PixelFarm)
