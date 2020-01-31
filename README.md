@@ -24,7 +24,7 @@ Concept
 
  * 1.Load .ttf, .otf, .ttc, .otc, .woff, .woff2 files, with OpenFontReader.
  ```cs
-System.IO.Stream stream = null;
+System.IO.Stream stream = ...;
 var reader = new Typography.OpenFont.OpenFontReader();
 var typeface = reader.Read(stream); // stream is disposed inside Read
 if (typeface is null &&
