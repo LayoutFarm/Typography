@@ -563,13 +563,13 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1.vvcurveto: _insts.AddOp(OperatorName.vvcurveto); StopStemCount(); break;
                     //-------------------------------------------------------------------
                     //4.3 Hint Operators
-                    case (byte)Type2Operator1.hstem: AddStemToList(OperatorName.hstem, ref _hintStemCount); break;
-                    case (byte)Type2Operator1.vstem: AddStemToList(OperatorName.vstem, ref _hintStemCount); break;
-                    case (byte)Type2Operator1.vstemhm: AddStemToList(OperatorName.vstemhm, ref _hintStemCount); break;
-                    case (byte)Type2Operator1.hstemhm: AddStemToList(OperatorName.hstemhm, ref _hintStemCount); break;
+                    case (byte)Type2Operator1.hstem: AddStemToList(OperatorName.hstem); break;
+                    case (byte)Type2Operator1.vstem: AddStemToList(OperatorName.vstem); break;
+                    case (byte)Type2Operator1.vstemhm: AddStemToList(OperatorName.vstemhm); break;
+                    case (byte)Type2Operator1.hstemhm: AddStemToList(OperatorName.hstemhm); break;
                     //-------------------------------------------------------------------
-                    case (byte)Type2Operator1.hintmask: AddHintMaskToList(ref reader, ref _hintStemCount); StopStemCount(); break;
-                    case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(ref reader, ref _hintStemCount); StopStemCount(); break;
+                    case (byte)Type2Operator1.hintmask: AddHintMaskToList(ref reader); StopStemCount(); break;
+                    case (byte)Type2Operator1.cntrmask: AddCounterMaskToList(ref reader); StopStemCount(); break;
                     //-------------------------------------------------------------------
                     //4.7: Subroutine Operators                   
                     case (byte)Type2Operator1._return:
@@ -669,7 +669,7 @@ namespace Typography.OpenFont.CFF
             _doStemCount = false;
         }
         OperatorName _latestOpName = OperatorName.Unknown;
-        void AddStemToList(OperatorName stemName, ref int hintStemCount)
+        void AddStemToList(OperatorName stemName)
         {
             //support 4 kinds 
 
@@ -706,14 +706,14 @@ namespace Typography.OpenFont.CFF
                     _current_integer_count--;
                 }
             }
-            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
+            _hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
             _insts.AddOp(stemName);
             _current_integer_count = 0;//clear
             _foundSomeStem = true;
             _latestOpName = stemName;
         }
 
-        void AddHintMaskToList(ref SimpleBinaryReader reader, ref int hintStemCount)
+        void AddHintMaskToList(ref SimpleBinaryReader reader)
         {
             if (_foundSomeStem && _current_integer_count > 0)
             {
@@ -742,7 +742,7 @@ namespace Typography.OpenFont.CFF
                         case OperatorName.hstem:
                             //add vstem  ***( from reason above)
 
-                            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
+                            _hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
                             _insts.AddOp(OperatorName.vstem);
 
                             _latestOpName = OperatorName.vstem;
@@ -750,7 +750,7 @@ namespace Typography.OpenFont.CFF
                             break;
                         case OperatorName.hstemhm:
                             //add vstem  ***( from reason above) ??
-                            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
+                            _hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
                             _insts.AddOp(OperatorName.vstem);
                             _latestOpName = OperatorName.vstem;
                             _current_integer_count = 0;//clear
@@ -759,7 +759,7 @@ namespace Typography.OpenFont.CFF
                             //-------
                             //TODO: review here? 
                             //found this in xits.otf
-                            hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
+                            _hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
                             _insts.AddOp(OperatorName.vstem);
                             _latestOpName = OperatorName.vstem;
                             _current_integer_count = 0;//clear
@@ -774,12 +774,12 @@ namespace Typography.OpenFont.CFF
                 }
             }
 
-            if (hintStemCount == 0)
+            if (_hintStemCount == 0)
             {
                 if (!_foundSomeStem)
                 {
-                    hintStemCount = (_current_integer_count / 2);
-                    if (hintStemCount == 0)
+                    _hintStemCount = (_current_integer_count / 2);
+                    if (_hintStemCount == 0)
                     {
                         return;
                     }
@@ -793,7 +793,7 @@ namespace Typography.OpenFont.CFF
 
             //---------------------- 
             //this is my hintmask extension, => to fit with our Evaluation stack
-            int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
+            int properNumberOfMaskBytes = (_hintStemCount + 7) / 8;
 
             if (reader.Position + properNumberOfMaskBytes >= reader.BufferLength)
             {
@@ -872,14 +872,14 @@ namespace Typography.OpenFont.CFF
                 }
             }
         }
-        void AddCounterMaskToList(ref SimpleBinaryReader reader, ref int hintStemCount)
+        void AddCounterMaskToList(ref SimpleBinaryReader reader)
         {
-            if (hintStemCount == 0)
+            if (_hintStemCount == 0)
             {
                 if (!_foundSomeStem)
                 {
                     //????
-                    hintStemCount = (_current_integer_count / 2);
+                    _hintStemCount = (_current_integer_count / 2);
                     _foundSomeStem = true;//?
                 }
                 else
@@ -889,11 +889,11 @@ namespace Typography.OpenFont.CFF
             }
             else
             {
-                hintStemCount += (_current_integer_count / 2);
+                _hintStemCount += (_current_integer_count / 2);
             }
             //---------------------- 
             //this is my hintmask extension, => to fit with our Evaluation stack
-            int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
+            int properNumberOfMaskBytes = (_hintStemCount + 7) / 8;
             if (reader.Position + properNumberOfMaskBytes >= reader.BufferLength)
             {
                 throw new NotSupportedException();
