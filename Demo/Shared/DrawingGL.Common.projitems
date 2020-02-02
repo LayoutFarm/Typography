@@ -9,6 +9,12 @@
     <Import_RootNamespace>DrawingGL.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\PixelFarm.Typography\4_TextPrinter\GlyphMeshCollection.cs">
+      <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\PixelFarm.Typography\4_TextPrinter\TextPrinterBase.cs">
+      <Link>DevTextPrinter\TextPrinterBase.cs</Link>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)DevTextPrinter\FontManagement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Color.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DrawingGL\Shaders.cs" />

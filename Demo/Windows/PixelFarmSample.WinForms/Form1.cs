@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+//MIT, 2016-present, WinterDev
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -432,7 +432,7 @@ namespace SampleWinForms
             _painter.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
             var builder = new GlyphPathBuilder(typeface);
-            builder.SetHintTechnique(_glyphRenderOptions.HintTechnique);
+            builder.TrueTypeHintTechnique = _glyphRenderOptions.HintTechnique;
 
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);

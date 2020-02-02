@@ -36,9 +36,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphPathBuilderBase.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\AdvancingFront.cs">
       <Link>BackEnd.Triangulation\delaunay\AdvancingFront.cs</Link>
     </Compile>
@@ -119,9 +116,6 @@
     </Compile>
     <Compile Include="..\..\Shared\DrawingGL\TessTool.cs">
       <Link>DrawingGL\TessTool.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\Tesselate\ActiveRegion.cs">
       <Link>Tess\ActiveRegion.cs</Link>

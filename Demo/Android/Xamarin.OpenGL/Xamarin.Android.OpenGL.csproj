@@ -51,15 +51,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\Typography.Contours\GlyphPathBuilderBase.cs">
-      <Link>App\GlyphPathBuilderBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\TextPrinterBase.cs">
-      <Link>App\TextPrinterBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Typography.Contours\GlyphMeshCollection.cs">
-      <Link>App\GlyphMeshCollection.cs</Link>
-    </Compile>
     <Compile Include="App\CustomApp.cs" />
     <Compile Include="GLView1.cs" />
     <Compile Include="MainActivity.cs" />
