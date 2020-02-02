@@ -1117,7 +1117,8 @@ namespace Typography.OpenFont.CFF
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
-                    glyphData.GlyphInstructions = instList.Insts.ToArray();
+                    //
+                    glyphData.GlyphInstructions = instList.CopyInstructions();
                 }
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
             }

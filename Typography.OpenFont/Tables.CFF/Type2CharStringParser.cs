@@ -278,7 +278,7 @@ namespace Typography.OpenFont.CFF
         {
             _insts = new List<Type2Instruction>();
         }
-        public List<Type2Instruction> Insts => _insts;
+
         public Type2Instruction RemoveLast()
         {
             int last = _insts.Count - 1;
@@ -326,6 +326,15 @@ namespace Typography.OpenFont.CFF
             if (firstInst.Op != OperatorName.LoadInt) { throw new NotSupportedException(); }
             //the replace
             _insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
+        }
+
+        /// <summary>
+        /// copy instruction to array
+        /// </summary>
+        /// <returns></returns>
+        public Type2Instruction[] CopyInstructions()
+        {
+            return _insts.ToArray();
         }
 #if DEBUG
         void debugCheck()

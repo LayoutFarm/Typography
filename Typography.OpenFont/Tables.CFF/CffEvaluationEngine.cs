@@ -126,12 +126,6 @@ namespace Typography.OpenFont.CFF
             {
                 Type2Instruction inst = instructionList[i];
 
-#if DEBUG
-                if (inst.Op != OperatorName.LoadInt)
-                {
-                }
-#endif
-
                 switch (inst.Op)
                 {
                     default: throw new NotSupportedException();
