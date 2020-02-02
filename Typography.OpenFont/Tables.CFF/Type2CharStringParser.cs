@@ -545,7 +545,10 @@ namespace Typography.OpenFont.CFF
                             //he second byte contains the next higher order bits and
                             //the fourth byte contains the lowest order bits.
 
+                            //eg. found in font Asana Math regular, glyph_index: 114 , 292, 1070 etc.
+
                             _insts.AddFloat(reader.ReadFloatFixed1616());
+
                             if (_doStemCount)
                             {
                                 _current_integer_count++;
