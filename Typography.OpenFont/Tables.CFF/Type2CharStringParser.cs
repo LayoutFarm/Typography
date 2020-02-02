@@ -887,6 +887,10 @@ namespace Typography.OpenFont.CFF
                     throw new NotSupportedException();
                 }
             }
+            else
+            {
+                hintStemCount += (_current_integer_count / 2);
+            }
             //---------------------- 
             //this is my hintmask extension, => to fit with our Evaluation stack
             int properNumberOfMaskBytes = (hintStemCount + 7) / 8;
