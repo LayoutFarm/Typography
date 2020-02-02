@@ -81,7 +81,7 @@ namespace Typography.OpenFont.CFF
         {
             Run(tx, cff1Font, glyphData.GlyphInstructions, scale);
         }
-        internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2GlyphInstructionList instructionList, float scale = 1)
+        internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2Instruction[] instructionList, float scale = 1)
         {
 
             //all fields are set to new values***
@@ -110,24 +110,21 @@ namespace Typography.OpenFont.CFF
             scaleTx.EndRead();
 
         }
-        void Run(IGlyphTranslator tx, Type2GlyphInstructionList instructionList, ref double currentX, ref double currentY)
+        void Run(IGlyphTranslator tx, Type2Instruction[] instructionList, ref double currentX, ref double currentY)
         {
             //recursive ***
 
             Type2EvaluationStack evalStack = GetFreeEvalStack(); //**
 #if DEBUG
-            evalStack.dbugGlyphIndex = instructionList.dbugGlyphIndex;
+            //evalStack.dbugGlyphIndex = instructionList.dbugGlyphIndex;
 #endif
             evalStack._currentX = currentX;
-            evalStack._currentY = currentY;
+            evalStack._currentY = currentY; 
+            evalStack.GlyphTranslator = tx; 
 
-            List<Type2Instruction> insts = instructionList.Insts;
-            evalStack.GlyphTranslator = tx;
-            int j = insts.Count;
-
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < instructionList.Length; ++i)
             {
-                Type2Instruction inst = insts[i];
+                Type2Instruction inst = instructionList[i];
 
 #if DEBUG
                 if (inst.Op != OperatorName.LoadInt)
