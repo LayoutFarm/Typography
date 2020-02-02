@@ -253,7 +253,7 @@ namespace Typography.OpenFont.CFF
     {
 
         internal double _currentX;
-        internal double _currentY; 
+        internal double _currentY;
 
         double[] _argStack = new double[50];
         int _currentIndex = 0; //current stack index
@@ -320,21 +320,15 @@ namespace Typography.OpenFont.CFF
             //a position at the relative coordinates(dx1, dy1) 
             //see [NOTE4]
 #if DEBUG
-            if ((_currentIndex % 2) != 0)
+            if (_currentIndex != 2)
             {
                 throw new NotSupportedException();
             }
 #endif
 
-            for (int i = 0; i < _currentIndex;)
-            {
-                _currentX += _argStack[i];
-                _currentY += _argStack[i + 1];
-                i += 2;
-            }
 
             _glyphTranslator.CloseContour();
-            _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
+            _glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)(_currentY += _argStack[1]));
 
             _currentIndex = 0; //clear stack 
         }
@@ -348,21 +342,9 @@ namespace Typography.OpenFont.CFF
 
             //moves the current point 
             //dx1 units in the horizontal direction
-            //see [NOTE4]
+            //see [NOTE4] 
 
-            double hSum = 0;
-            int m = 0;
-            for (int n = _currentIndex; n >= 1; --n)
-            {
-                hSum += _argStack[m];
-                m++;
-            }
-#if DEBUG
-
-#endif
-
-            _glyphTranslator.MoveTo((float)(_currentX += hSum), (float)_currentY);
-
+            _glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)_currentY);
             _currentIndex = 0; //clear stack 
         }
         public void V_MoveTo()
@@ -370,22 +352,14 @@ namespace Typography.OpenFont.CFF
             //|- dy1 vmoveto (4) |-
             //moves the current point 
             //dy1 units in the vertical direction.
-            //see [NOTE4]
-
-            double vSum = 0;
-            int m = 0;
-            for (int n = _currentIndex; n >= 1; --n)
-            {
-                vSum += _argStack[m];
-                m++;
-            }
-
+            //see [NOTE4] 
 #if DEBUG
-
+            if (_currentIndex > 1)
+            {
+                throw new NotSupportedException();
+            }
 #endif
-
-            _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += vSum));
-
+            _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += _argStack[0]));
             _currentIndex = 0; //clear stack 
         }
         public void R_LineTo()

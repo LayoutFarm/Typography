@@ -288,6 +288,7 @@ namespace Typography.OpenFont.CFF
 #endif
             _insts.Add(new Type2Instruction(opName, value));
         }
+        public int Count => _insts.Count;
         internal void ChangeFirstInstToGlyphWidthValue()
         {
             //check the first element must be loadint
@@ -320,7 +321,7 @@ namespace Typography.OpenFont.CFF
 
         public void dbugDumpInstructionListToFile(string filename)
         {
-            dbugCffInstHelper.dbugDumpInstructionListToFile(_insts, filename);             
+            dbugCffInstHelper.dbugDumpInstructionListToFile(_insts, filename);
         }
 #endif
     }
@@ -359,20 +360,43 @@ namespace Typography.OpenFont.CFF
 
     class Type2CharStringParser
     {
+        //from https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+        //Type 2 Charstring Organization:
+        //...
+        //The sequence and form of a Type 2 charstring program may be represented as:
+
+        //w? {hs* vs* cm* hm* mt subpath}? {mt subpath}* endchar
+
+        //where,
+        //w= width,
+        //hs = hstem or hstemhm command
+        //vs = vstem or vstemhm command
+        //cm = cntrmask operator
+        //hm = hintmask operator
+        //mt = moveto (i.e.any of the moveto) operators
+
+        //subpath = refers to the construction of a subpath(one complete closed contour),
+        // 	        which may include hintmaskoperators where appropriate.
+
+        //-------------
+        //
+        //width: If the charstring has a width other than that of defaultWidthX(see Technical Note #5176, “The Compact Font Format Specification”),
+        // it must be specified as the first number in the charstring,
+        //and encoded as the difference from nominalWidthX
+
 
         public Type2CharStringParser()
         {
-
         }
 
-#if DEBUG 
+#if DEBUG
         int _dbugCount = 0;
         int _dbugInstructionListMark = 0;
-#endif
-
-
+#endif 
         int _hintStemCount = 0;
         bool _foundSomeStem = false;
+        bool _enterPathConstructionSeq = false;
+
         Type2GlyphInstructionList _insts;
         int _current_integer_count = 0;
         bool _doStemCount = true;
@@ -394,6 +418,8 @@ namespace Typography.OpenFont.CFF
                 _localSubrBias = CalculateBias(currentCff1Font._localSubrRawBufferList.Count);
             }
         }
+
+
         static int CalculateBias(int nsubr)
         {
             //-------------
@@ -498,12 +524,7 @@ namespace Typography.OpenFont.CFF
                     case (byte)Type2Operator1._Reserved17_: //???
                         //reserved, do nothing ?
                         break;
-                    case (byte)Type2Operator1.endchar:
-                        _insts.AddOp(OperatorName.endchar);
-                        cont = false;
-                        //when we found end char
-                        //stop reading this...
-                        break;
+
                     case (byte)Type2Operator1.escape: //12
                         {
 
@@ -555,9 +576,17 @@ namespace Typography.OpenFont.CFF
                             StopStemCount();
                         }
                         break;
-                    case (byte)Type2Operator1.rmoveto: _insts.AddOp(OperatorName.rmoveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.hmoveto: _insts.AddOp(OperatorName.hmoveto); StopStemCount(); break;
-                    case (byte)Type2Operator1.vmoveto: _insts.AddOp(OperatorName.vmoveto); StopStemCount(); break;
+
+                    //---------------------------------------------------------------------------
+                    case (byte)Type2Operator1.endchar:
+                        AddEndCharOp();
+                        cont = false;
+                        //when we found end char
+                        //stop reading this...
+                        break;
+                    case (byte)Type2Operator1.rmoveto: AddMoveToOp(OperatorName.rmoveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.hmoveto: AddMoveToOp(OperatorName.hmoveto); StopStemCount(); break;
+                    case (byte)Type2Operator1.vmoveto: AddMoveToOp(OperatorName.vmoveto); StopStemCount(); break;
                     //---------------------------------------------------------------------------
                     case (byte)Type2Operator1.rlineto: _insts.AddOp(OperatorName.rlineto); StopStemCount(); break;
                     case (byte)Type2Operator1.hlineto: _insts.AddOp(OperatorName.hlineto); StopStemCount(); break;
@@ -642,6 +671,7 @@ namespace Typography.OpenFont.CFF
             _hintStemCount = 0;
             _current_integer_count = 0;
             _foundSomeStem = false;
+            _enterPathConstructionSeq = false;
             _doStemCount = true;
 
             _insts = new Type2GlyphInstructionList();
@@ -677,8 +707,82 @@ namespace Typography.OpenFont.CFF
             _doStemCount = false;
         }
         OperatorName _latestOpName = OperatorName.Unknown;
+
+        void AddEndCharOp()
+        {
+            //from https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+            //Note 4 The first stack - clearing operator, which must be one of
+            //hstem, hstemhm, vstem, vstemhm, 
+            //cntrmask, hintmask, 
+            //hmoveto, vmoveto, rmoveto,
+            //or endchar,
+            //takes an additional argument — the width(as described earlier), which may be expressed as zero or one numeric argument
+
+            if (!_foundSomeStem && !_enterPathConstructionSeq)
+            {
+                if (_insts.Count > 0)
+                {
+                    _insts.ChangeFirstInstToGlyphWidthValue();
+                }
+            }
+            //takes an additional argument — the width(as described earlier), which may be expressed as zero or one numeric argument
+            _insts.AddOp(OperatorName.endchar);
+        }
+
+
+
+        /// <summary>
+        /// for hmoveto, vmoveto, rmoveto
+        /// </summary>
+        /// <param name="op"></param>
+        void AddMoveToOp(OperatorName op)
+        {
+            //from https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+            //Note 4 The first stack - clearing operator, which must be one of
+            //hstem, hstemhm, vstem, vstemhm, 
+            //cntrmask, hintmask, 
+            //hmoveto, vmoveto, rmoveto,
+            //or endchar,
+            //takes an additional argument — the width(as described earlier), which may be expressed as zero or one numeric argument 
+            //just add
+
+            if (!_foundSomeStem && !_enterPathConstructionSeq)
+            {
+                if (op == OperatorName.rmoveto)
+                {
+                    if ((_insts.Count % 2) != 0)
+                    {
+                        _insts.ChangeFirstInstToGlyphWidthValue();
+                    }
+                }
+                else
+                {
+                    //vmoveto, hmoveto
+                    if (_insts.Count > 1)
+                    {
+                        //...
+                        _insts.ChangeFirstInstToGlyphWidthValue();
+                    }
+                }
+            }
+            _enterPathConstructionSeq = true;
+            _insts.AddOp(op);
+        }
+        /// <summary>
+        /// for hstem, hstemhm, vstem, vstemhm
+        /// </summary>
+        /// <param name="stemName"></param>
         void AddStemToList(OperatorName stemName)
         {
+
+            //from https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+            //Note 4 The first stack - clearing operator, which must be one of
+            //hstem, hstemhm, vstem, vstemhm, 
+            //cntrmask, hintmask, 
+            //hmoveto, vmoveto, rmoveto,
+            //or endchar,
+            //takes an additional argument — the width(as described earlier), which may be expressed as zero or one numeric argument
+
             //support 4 kinds 
 
             //1. 
@@ -698,8 +802,7 @@ namespace Typography.OpenFont.CFF
 
             if ((_current_integer_count % 2) != 0)
             {
-                //all kind has even number of stem               
-
+                //all kind has even number of stem
                 if (_foundSomeStem)
                 {
 #if DEBUG
@@ -720,7 +823,10 @@ namespace Typography.OpenFont.CFF
             _foundSomeStem = true;
             _latestOpName = stemName;
         }
-
+        /// <summary>
+        /// add hintmask
+        /// </summary>
+        /// <param name="reader"></param>
         void AddHintMaskToList(ref SimpleBinaryReader reader)
         {
             if (_foundSomeStem && _current_integer_count > 0)
@@ -752,7 +858,6 @@ namespace Typography.OpenFont.CFF
 
                             _hintStemCount += (_current_integer_count / 2); //save a snapshot of stem count
                             _insts.AddOp(OperatorName.vstem);
-
                             _latestOpName = OperatorName.vstem;
                             _current_integer_count = 0; //clear
                             break;
@@ -880,6 +985,10 @@ namespace Typography.OpenFont.CFF
                 }
             }
         }
+        /// <summary>
+        /// cntrmask
+        /// </summary>
+        /// <param name="reader"></param>
         void AddCounterMaskToList(ref SimpleBinaryReader reader)
         {
             if (_hintStemCount == 0)

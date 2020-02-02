@@ -1045,15 +1045,18 @@ namespace Typography.OpenFont
                 CffBoundFinder boundFinder = new CffBoundFinder();
                 for (ushort i = 0; i < j; ++i)
                 {
-#if DEBUG
 
-                    //if (i == 3084)
-                    //{
-
-                    //}
-#endif
                     Glyph g = typeface.GetGlyphByIndex(i);
                     boundFinder.Reset();
+
+#if DEBUG
+                    //if (i == 106 && typeface.Name == "Cyrillic Modern")
+                    //{
+                    //    CFF.dbugCffInstHelper.dbugDumpInstructionListToFile(
+                    //        g._cff1GlyphData.GlyphInstructions,
+                    //        "test_106.txt");
+                    //}
+#endif
 
                     evalEngine.Run(boundFinder,
                         g._ownerCffFont,
