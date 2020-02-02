@@ -1,4 +1,4 @@
-﻿//MIT, 2014-present, WinterDev 
+//MIT, 2014-present, WinterDev 
 using System;
 using System.Collections.Generic;
 
@@ -25,7 +25,7 @@ namespace PixelFarm.Drawing.Fonts
             _name = fontName;
             _path = fontPath;
 
-            _glyphPathBuilder = new GlyphPathBuilder(typeface);
+            _glyphPathBuilder = new GlyphPathBuilder { Typeface = typeface };
         }
         public override string Name => _name;
 

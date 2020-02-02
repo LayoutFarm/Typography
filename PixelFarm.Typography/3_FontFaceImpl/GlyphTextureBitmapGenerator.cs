@@ -1,4 +1,4 @@
-﻿//MIT, 2017-present, WinterDev
+//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
 using PixelFarm.Contours;
@@ -129,7 +129,7 @@ namespace PixelFarm.Drawing.Fonts
 
             //sample: create sample msdf texture 
             //-------------------------------------------------------------
-            var builder = new GlyphPathBuilder(typeface);
+            var builder = new GlyphPathBuilder { Typeface = typeface };
             builder.TrueTypeHintTechnique = hintTechnique;
             //
             if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)

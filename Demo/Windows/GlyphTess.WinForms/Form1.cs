@@ -71,7 +71,7 @@ namespace Test_WinForm_TessGlyph
                 var typeface = reader.Read(fs);
 
                 //--
-                var builder = new GlyphPathBuilder(typeface);
+                var builder = new GlyphPathBuilder { Typeface = typeface };
                 builder.Build(selectedChar, 300);
 
                 var txToPath = new GlyphTranslatorToPath();

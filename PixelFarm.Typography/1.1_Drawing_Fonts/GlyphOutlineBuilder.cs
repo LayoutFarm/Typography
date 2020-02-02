@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+//MIT, 2016-present, WinterDev
 
 using System;
 using System.Collections.Generic;
@@ -56,9 +56,9 @@ namespace Typography.Contours
         DynamicOutline _latestDynamicOutline;
 
         public GlyphOutlineBuilder(Typeface typeface)
-            : base(typeface)
+            : base()
         {
-
+            Typeface = typeface;
             //for specific typeface ***
             //float offsetLenFromMasterOutline = GlyphDynamicEdgeOffset;
             //_latestDynamicOutline.SetDynamicEdgeOffsetFromMasterOutline(offsetLenFromMasterOutline / toPixelScale);

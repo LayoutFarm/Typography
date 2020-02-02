@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+//MIT, 2016-present, WinterDev
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -67,7 +67,7 @@ namespace SampleWinForms
                 //--------------------------------
 
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
+                _currentGlyphPathBuilder = new GlyphPathBuilder { Typeface = _currentTypeface };
                 //for gdi path***
                 //3. glyph reader,output as Gdi+ GraphicsPath
                 _txToGdiPath = new GlyphTranslatorToGdiPath();

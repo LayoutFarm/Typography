@@ -1,4 +1,4 @@
-﻿//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
+//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
@@ -96,7 +96,7 @@ namespace DrawingGL.Text
                     }
 
                     //2. glyph builder
-                    _currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
+                    _currentGlyphPathBuilder = new GlyphPathBuilder { Typeface = Typeface };
                     _currentGlyphPathBuilder.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
 
                     //3. glyph translater
