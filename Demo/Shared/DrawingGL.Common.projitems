@@ -27,7 +27,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\ES2Utils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\GeometryUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ES2Utils\MiniShaderProgram.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder\GlyphPathBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Dictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\Face.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tesselate\HalfEdge.cs" />

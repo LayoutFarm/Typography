@@ -15,7 +15,7 @@ namespace PixelFarm.Drawing.Fonts
     {
         public ScriptLang ScriptLang;
         public char[] OnlySelectedGlyphIndices;
-        public HintTechnique HintTechnique;
+        public TrueTypeHintTechnique HintTechnique;
         public bool DoFilter;
     }
 
@@ -98,13 +98,13 @@ namespace PixelFarm.Drawing.Fonts
             //------------------------------------------------------------- 
             //we can specfic subset with special setting for each set 
             CreateTextureFontFromGlyphIndices(typeface, sizeInPoint,
-                HintTechnique.TrueTypeInstruction_VerticalOnly, atlasBuilder, false, GetUniqueGlyphIndexList(glyphIndices));
+                TrueTypeHintTechnique.Instructions_VerticalOnly, atlasBuilder, false, GetUniqueGlyphIndexList(glyphIndices));
             onFinishTotal(0, null, atlasBuilder);
         }
         void CreateTextureFontFromGlyphIndices(
               Typeface typeface,
               float sizeInPoint,
-              HintTechnique hintTechnique,
+              TrueTypeHintTechnique hintTechnique,
               SimpleFontAtlasBuilder atlasBuilder,
               bool applyFilter,
               char[] chars)
@@ -121,7 +121,7 @@ namespace PixelFarm.Drawing.Fonts
         void CreateTextureFontFromGlyphIndices(
               Typeface typeface,
               float sizeInPoint,
-              HintTechnique hintTechnique,
+              TrueTypeHintTechnique hintTechnique,
               SimpleFontAtlasBuilder atlasBuilder,
               bool applyFilter,
               ushort[] glyphIndices)
@@ -130,7 +130,7 @@ namespace PixelFarm.Drawing.Fonts
             //sample: create sample msdf texture 
             //-------------------------------------------------------------
             var builder = new GlyphPathBuilder(typeface);
-            builder.SetHintTechnique(hintTechnique);
+            builder.TrueTypeHintTechnique = hintTechnique;
             //
             if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
             {

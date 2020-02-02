@@ -47,16 +47,16 @@ namespace Typography.Contours
         /// <summary>
         /// store typeface and its builder
         /// </summary>
-        Dictionary<Typeface, GlyphPathBuilder> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphPathBuilder>();
+        Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
         /// <summary>
         /// glyph mesh data for specific condition
         /// </summary>
         GlyphMeshCollection<GlyphMeshData> _hintGlyphCollection = new GlyphMeshCollection<GlyphMeshData>();
 
-        GlyphPathBuilder _currentGlyphBuilder;
+        GlyphOutlineBuilder _currentGlyphBuilder;
         Typeface _currentTypeface;
         float _currentFontSizeInPoints;
-        HintTechnique _currentHintTech;
+        TrueTypeHintTechnique _currentHintTech;
 
 
         GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
@@ -65,7 +65,7 @@ namespace Typography.Contours
         {
 
         }
-        public void SetHintTechnique(HintTechnique hintTech)
+        public void SetTrueTypeHintTechnique(TrueTypeHintTechnique hintTech)
         {
             _currentHintTech = hintTech;
 
@@ -102,7 +102,7 @@ namespace Typography.Contours
             _cacheGlyphPathBuilders.TryGetValue(_currentTypeface, out _currentGlyphBuilder);
             if (_currentGlyphBuilder == null)
             {
-                _currentGlyphBuilder = new GlyphPathBuilder(typeface);
+                _currentGlyphBuilder = new GlyphOutlineBuilder(typeface);
             }
             //----------------------------------------------
             _currentFontSizeInPoints = fontSizeInPoints;
@@ -125,7 +125,7 @@ namespace Typography.Contours
             if (!_hintGlyphCollection.TryGetCacheGlyph(glyphIndex, out glyphMeshData))
             {
                 //if not found then create new glyph vxs and cache it
-                _currentGlyphBuilder.SetHintTechnique(_currentHintTech);
+                _currentGlyphBuilder.TrueTypeHintTechnique = _currentHintTech;
                 _currentGlyphBuilder.BuildFromGlyphIndex(glyphIndex, _currentFontSizeInPoints);
                 DynamicOutline dynamicOutline = _currentGlyphBuilder.LatestGlyphFitOutline;
                 //-----------------------------------  

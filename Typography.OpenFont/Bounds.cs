@@ -6,29 +6,25 @@ namespace Typography.OpenFont
     /// <summary>
     /// original glyph bounds
     /// </summary>
-    public struct Bounds
+    public readonly struct Bounds
     {
-        readonly short _xmin;
-        readonly short _ymin;
-        readonly short _xmax;
-        readonly short _ymax;
         public static readonly Bounds Zero = new Bounds(0, 0, 0, 0);
         public Bounds(short xmin, short ymin, short xmax, short ymax)
         {
-            _xmin = xmin;
-            _ymin = ymin;
-            _xmax = xmax;
-            _ymax = ymax;
+            XMin = xmin;
+            YMin = ymin;
+            XMax = xmax;
+            YMax = ymax;
         }
 
-        public short XMin => _xmin;
-        public short YMin => _ymin;
-        public short XMax => _xmax;
-        public short YMax => _ymax;
+        public short XMin { get; }
+        public short YMin { get; }
+        public short XMax { get; }
+        public short YMax { get; }
 #if DEBUG
         public override string ToString()
         {
-            return "(" + _xmin + "," + _ymin + "," + _xmax + "," + _ymax + ")";
+            return "(" + XMin + "," + YMin + "," + XMax + "," + YMax + ")";
         }
 #endif
     }

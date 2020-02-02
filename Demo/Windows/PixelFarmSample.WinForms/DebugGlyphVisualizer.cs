@@ -39,11 +39,11 @@ namespace SampleWinForms.UI
 
         Typeface _typeface;
         float _sizeInPoint;
-        GlyphPathBuilder _builder;
+        GlyphOutlineBuilder _builder;
 
         PixelFarm.Drawing.Painter _painter;
         float _pxscale;
-        HintTechnique _latestHint;
+        TrueTypeHintTechnique _latestHint;
         char _testChar;
 
         public PixelFarm.Drawing.Painter CanvasPainter
@@ -56,7 +56,7 @@ namespace SampleWinForms.UI
         {
             _typeface = typeface;
             _sizeInPoint = sizeInPoint;
-            _builder = new GlyphPathBuilder(typeface);
+            _builder = new GlyphOutlineBuilder(typeface);
             FillBackGround = true;//default 
 
         }
@@ -88,9 +88,9 @@ namespace SampleWinForms.UI
             _painter.FillRect(x, y, sizeInPx, sizeInPx, color);
         }
         public float GlyphEdgeOffset { get; set; }
-        public void RenderChar(char testChar, HintTechnique hint)
+        public void RenderChar(char testChar, TrueTypeHintTechnique hint)
         {
-            _builder.SetHintTechnique(hint);
+            _builder.TrueTypeHintTechnique = hint;
 #if DEBUG
             Joint.dbugTotalId = 0;//reset
             _builder.dbugAlwaysDoCurveAnalysis = true;

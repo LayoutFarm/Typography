@@ -16,21 +16,15 @@ namespace Typography.Rendering
     public class FontBitmapCache<T, U> : IDisposable
         where U : IDisposable
     {
-        Dictionary<T, U> _loadBmps = new Dictionary<T, U>();
-        LoadNewBmpDelegate<T, U> _loadNewBmpDel;
+        readonly Dictionary<T, U> _loadBmps = new Dictionary<T, U>();
+        readonly LoadNewBmpDelegate<T, U> _loadNewBmpDel;
         public FontBitmapCache(LoadNewBmpDelegate<T, U> loadNewBmpDel)
         {
             _loadNewBmpDel = loadNewBmpDel;
         }
-        public U GetOrCreateNewOne(T key)
-        {
-            U found;
-            if (!_loadBmps.TryGetValue(key, out found))
-            {
-                return _loadBmps[key] = _loadNewBmpDel(key);
-            }
-            return found;
-        }
+        public U GetOrCreateNewOne(T key) =>
+            _loadBmps.TryGetValue(key, out var found) ? found :
+            _loadBmps[key] = _loadNewBmpDel(key);
         public void Dispose()
         {
             Clear();
@@ -92,8 +86,8 @@ namespace Typography.Rendering
             if (s_default == null)
             {
                 SetDefaultDetails(new GlyphTextureBuildDetail[] {
-                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = TrueTypeHintTechnique.Instructions_VerticalOnly },
+                    new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = TrueTypeHintTechnique.None},
                 });
             }
             //
@@ -101,10 +95,10 @@ namespace Typography.Rendering
             //eg. Tahoma             
             Register(new RequestFont("tahoma", 10), new GlyphTextureBuildDetail[]
             {
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = TrueTypeHintTechnique.Instructions_VerticalOnly },
                 new GlyphTextureBuildDetail{ OnlySelectedGlyphIndices=new char[]{ 'x', 'X', '7','k','K','Z','z','R','Y','%' },
-                    DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
-                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+                    DoFilter = false ,  HintTechnique = TrueTypeHintTechnique.None},
+                new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = TrueTypeHintTechnique.None},
             });
             
         }

@@ -123,7 +123,7 @@ namespace SampleWinForms
         }
         void UpdateVisualOutputSettings()
         {
-            _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
+            _currentGlyphPathBuilder.TrueTypeHintTechnique = this.HintTechnique;
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
         }

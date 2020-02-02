@@ -97,21 +97,7 @@ namespace DrawingGL.Text
 
                     //2. glyph builder
                     _currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
-                    _currentGlyphPathBuilder.UseTrueTypeInstructions = false; //reset
-                    _currentGlyphPathBuilder.UseVerticalHinting = false; //reset
-                    switch (this.HintTechnique)
-                    {
-                        case HintTechnique.TrueTypeInstruction:
-                            _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
-                            break;
-                        case HintTechnique.TrueTypeInstruction_VerticalOnly:
-                            _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
-                            _currentGlyphPathBuilder.UseVerticalHinting = true;
-                            break;
-                        case HintTechnique.CustomAutoFit:
-                            //custom agg autofit 
-                            break;
-                    }
+                    _currentGlyphPathBuilder.TrueTypeHintTechnique = this.HintTechnique;
 
                     //3. glyph translater
                     _pathTranslator = new GlyphTranslatorToPath();

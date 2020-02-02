@@ -35,18 +35,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Build\N20\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{29ed0dfe-373c-4e98-bd4b-43f8e5fb16f6}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Build\N20\Typography.TextServices\Typography.TextServices.csproj">
-      <Project>{6b0e034b-0ebd-4907-ad7f-437de66d78d4}</Project>
-      <Name>Typography.TextServices</Name>
-    </ProjectReference>
     <ProjectReference Include="..\x_autogen2\PixelFarm.MiniAgg.One\PixelFarm.MiniAgg.One.csproj">
       <Project>{fb5f78f5-c921-405d-8f21-42f7c15c2ad9}</Project>
       <Name>PixelFarm.MiniAgg.One</Name>
@@ -58,7 +46,7 @@
   <ItemGroup>
     <Compile Include="1.1_Drawing_Fonts\FontAtlasTextPrinter.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphBitmapStore.cs" />
-    <Compile Include="1.1_Drawing_Fonts\GlyphPathBuilder.cs" />
+    <Compile Include="1.1_Drawing_Fonts\GlyphOutlineBuilder.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphSvgStore.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphMeshStore.cs" />
@@ -78,10 +66,12 @@
     <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
     <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
     <Compile Include="4_TextPrinter\GlyphMeshCollection.cs" />
-    <Compile Include="4_TextPrinter\GlyphPathBuilderBase.cs" />
     <Compile Include="4_TextPrinter\TextPrinterBase.cs" />
     <Compile Include="4_TextPrinter\GlyphOutlineAnalyzer.cs" />
   </ItemGroup>
+  <Import Project="..\Typography.TextServices\Typography.TextServices.projitems" Label="Shared" Condition="Exists('..\Typography.TextServices\Typography.TextServices.projitems')" />
+  <Import Project="..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" Condition="Exists('..\Typography.OpenFont\Typography.OpenFont.projitems')" />
+  <Import Project="..\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" Condition="Exists('..\Typography.GlyphLayout\Typography.GlyphLayout.projitems')" />
   <Import Project="..\Typography.MsdfGen\Typography.MsdfGen.projitems" Label="Shared" />
   <Import Project="..\FontAtlas\FontAtlas.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

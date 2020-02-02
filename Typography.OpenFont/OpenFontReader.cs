@@ -353,7 +353,7 @@ namespace Typography.OpenFont
 
             //---
             PostTable postTable = ReadTableIfExists(tables, input, new PostTable());
-            CFFTable ccf = ReadTableIfExists(tables, input, new CFFTable());
+            CFFTable cff = ReadTableIfExists(tables, input, new CFFTable());
 
             //--------------
             Cmap cmaps = ReadTableIfExists(tables, input, new Cmap());
@@ -411,7 +411,7 @@ namespace Typography.OpenFont
             if (glyf == null)
             {
                 //check if this is cff table ?
-                if (ccf == null)
+                if (cff == null)
                 {
 
                     //check  cbdt/cblc ?
@@ -427,13 +427,13 @@ namespace Typography.OpenFont
 
 
                         typeface = new Typeface(
-                          nameEntry,
-                          header.Bounds,
-                          header.UnitsPerEm,
-                          bmpFontGlyphSrc,
-                          glyphs,
-                          horizontalMetrics,
-                          os2Table);
+                            nameEntry,
+                            header.Bounds,
+                            header.UnitsPerEm,
+                            bmpFontGlyphSrc,
+                            glyphs,
+                            horizontalMetrics,
+                            os2Table);
                         isBitmapFont = true;
                     }
                     else
@@ -449,12 +449,12 @@ namespace Typography.OpenFont
                     //PostScript outline font 
                     isPostScriptOutline = true;
                     typeface = new Typeface(
-                          nameEntry,
-                          header.Bounds,
-                          header.UnitsPerEm,
-                          ccf,
-                          horizontalMetrics,
-                          os2Table);
+                        nameEntry,
+                        header.Bounds,
+                        header.UnitsPerEm,
+                        cff,
+                        horizontalMetrics,
+                        os2Table);
                 }
             }
             else

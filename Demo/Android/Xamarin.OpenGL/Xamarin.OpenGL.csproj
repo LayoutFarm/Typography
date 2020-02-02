@@ -85,16 +85,8 @@
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
-      <Project>{8ce29063-ca6c-4913-bf2d-764ce857da06}</Project>
-      <Name>Typography.GlyphLayout</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Build\NetStandard\Typography.OpenFont\Typography.OpenFont.csproj">
-      <Project>{280d17d5-4435-4ead-839a-33c5a8990e7e}</Project>
-      <Name>Typography.OpenFont</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <Import Project="..\..\..\Typography.OpenFont\Typography.OpenFont.projitems" Label="Shared" Condition="Exists('..\..\..\Typography.OpenFont\Typography.OpenFont.projitems')" />
+  <Import Project="..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.projitems" Label="Shared" Condition="Exists('..\..\..\Typography.GlyphLayout\Typography.GlyphLayout.projitems')" />
   <Import Project="..\..\Shared\DrawingGL.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

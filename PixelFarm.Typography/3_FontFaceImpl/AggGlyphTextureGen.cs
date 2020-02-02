@@ -27,7 +27,7 @@ namespace Typography.Contours
         public Color GlyphColor { get; set; }
         public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKind { get; set; }
         public AggPainter Painter { get; set; }
-        public GlyphImage CreateGlyphImage(GlyphPathBuilder builder, float pxscale)
+        public GlyphImage CreateGlyphImage(GlyphOutlineBuilder builder, float pxscale)
         {
 
             _txToVxs.Reset();

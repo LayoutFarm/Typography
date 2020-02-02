@@ -7,6 +7,7 @@ using System.Text;
 
 
 using System.Windows.Forms;
+using Typography.OpenFont;
 using Typography.Contours;
 
 namespace TypographyTest.WinForms
@@ -47,15 +48,15 @@ namespace TypographyTest.WinForms
         {
             //---------- 
 
-            lstHintList.Items.Add(HintTechnique.None);
-            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
-            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
-            lstHintList.Items.Add(HintTechnique.CustomAutoFit);
+            lstHintList.Items.Add(TrueTypeHintTechnique.None);
+            lstHintList.Items.Add(TrueTypeHintTechnique.Instructions);
+            lstHintList.Items.Add(TrueTypeHintTechnique.Instructions_VerticalOnly);
+            lstHintList.Items.Add(TrueTypeHintTechnique.CustomAutoFit);
 
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) =>
             {
-                _renderOptions.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
+                _renderOptions.HintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
                 _renderOptions.InvokeAttachEvents();
             };
         }

@@ -16,7 +16,7 @@ namespace Typography.Contours
         Dictionary<ushort, T> _currentGlyphDic = null;
         Dictionary<GlyphKey, Dictionary<ushort, T>> _registerGlyphCollection = new Dictionary<GlyphKey, Dictionary<ushort, T>>();
 
-        public void SetCacheInfo(Typeface typeface, float sizeInPts, HintTechnique hintTech)
+        public void SetCacheInfo(Typeface typeface, float sizeInPts, TrueTypeHintTechnique hintTech)
         {
             //TODO: review key object again, if we need to store a typeface object ?
             //check if we have create the context for this request parameters?
@@ -66,7 +66,7 @@ namespace Typography.Contours
         }
         struct GlyphKey
         {
-            public HintTechnique hintTech;
+            public TrueTypeHintTechnique hintTech;
             public Typeface typeface;
             public float sizeInPts;
         }

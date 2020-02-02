@@ -49,13 +49,13 @@ namespace Typography.Contours
         public void MoveTo(float x0, float y0) => _tx.MoveTo(x0, y0);
     }
 
-    public class GlyphPathBuilder : GlyphPathBuilderBase
+    public class GlyphOutlineBuilder : GlyphPathBuilder
     {
         GlyphOutlineAnalyzer _fitShapeAnalyzer = new GlyphOutlineAnalyzer();
         Dictionary<ushort, DynamicOutline> _fitOutlineCollection = new Dictionary<ushort, DynamicOutline>();
         DynamicOutline _latestDynamicOutline;
 
-        public GlyphPathBuilder(Typeface typeface)
+        public GlyphOutlineBuilder(Typeface typeface)
             : base(typeface)
         {
 
@@ -92,7 +92,7 @@ namespace Typography.Contours
                     return;
                 }
                 //
-                if (this.UseVerticalHinting)
+                if (this.UseTrueTypeVerticalHinting)
                 {
                     if (!_fitOutlineCollection.TryGetValue(glyph.GlyphIndex, out _latestDynamicOutline))
                     {
@@ -132,10 +132,10 @@ namespace Typography.Contours
                     }
                     else
                     {
-                        if (IsSizeChanged)
+                        if (HasSizeChanged)
                         {
                             _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateScaleToPixel(RecentFontSizeInPixels));
-                            IsSizeChanged = false;
+                            HasSizeChanged = false;
                         }
                     }
                 }
@@ -151,7 +151,7 @@ namespace Typography.Contours
                 base.ReadShapes(tx);
                 return;
             }
-            if (!TemporaryDisableCustomFit && this.UseVerticalHinting)
+            if (!TemporaryDisableCustomFit && this.UseTrueTypeVerticalHinting)
             {
                 //read from our auto hint fitoutline
                 //need scale from original. 
