@@ -110,7 +110,8 @@ namespace Typography.OpenFont
                 Typeface.HasPrepProgramBuffer &&
                 glyph.HasGlyphInstructions)
             {
-                _trueTypeInterpreter ??= new TrueTypeInterpreter(Typeface);
+                if (_trueTypeInterpreter == null)
+                    _trueTypeInterpreter = new TrueTypeInterpreter(Typeface);
                 _trueTypeInterpreter.UseVerticalHinting = this.UseTrueTypeVerticalHinting;
                 //output as points,
                 _outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyph.GlyphIndex, RecentFontSizeInPixels);
