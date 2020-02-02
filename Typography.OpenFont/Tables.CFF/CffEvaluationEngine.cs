@@ -140,7 +140,10 @@ namespace Typography.OpenFont.CFF
                         break;
                     case OperatorName.LoadInt:
                         evalStack.Push(inst.Value);
-                        break;                    //
+                        break;
+                    case OperatorName.LoadFloat:
+                        evalStack.Push(inst.ReadValueAsFixed1616());
+                        break;
                     case OperatorName.endchar:
                         evalStack.EndChar();
                         break;

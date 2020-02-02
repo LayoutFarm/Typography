@@ -39,6 +39,22 @@ namespace Typography.OpenFont.CFF
             _dbug_OnlyOp = true;
 #endif
         }
+
+
+        public float ReadValueAsFixed1616()
+        {
+            byte b0 = (byte)((0xff) & Value >> 24);
+            byte b1 = (byte)((0xff) & Value >> 16);
+            byte b2 = (byte)((0xff) & Value >> 8);
+            byte b3 = (byte)((0xff) & Value >> 0);
+
+
+            ///This number is interpreted as a Fixed; that is, a signed number with 16 bits of fraction
+            float int_part = (short)((b0 << 8) | b1);
+            float fraction_part = (short)((b2 << 8) | b3) / (float)(1 << 16);
+            return int_part + fraction_part;
+        }
+
 #if DEBUG
         bool _dbug_OnlyOp;
         public override string ToString()
@@ -51,6 +67,10 @@ namespace Typography.OpenFont.CFF
             {
                 switch (Op)
                 {
+                    case OperatorName.LoadInt:
+                        return Value.ToString();
+                    case OperatorName.LoadFloat:
+                        return ReadValueAsFixed1616().ToString();
                     case OperatorName.hintmask1:
                     case OperatorName.hintmask2:
                     case OperatorName.hintmask3:
@@ -172,6 +192,7 @@ namespace Typography.OpenFont.CFF
         Unknown,
         //
         LoadInt,
+        LoadFloat,
         GlyphWidth,
         //---------------------
         //type2Operator1
@@ -272,6 +293,15 @@ namespace Typography.OpenFont.CFF
             debugCheck();
 #endif
             _insts.Add(new Type2Instruction(OperatorName.LoadInt, intValue));
+        }
+        public void AddFloat(int float1616Fmt)
+        {
+#if DEBUG
+            debugCheck();
+            //var test = new Type2Instruction(OperatorName.LoadFloat, float1616Fmt);
+            //string str = test.ToString();
+#endif 
+            _insts.Add(new Type2Instruction(OperatorName.LoadFloat, float1616Fmt));
         }
         public void AddOp(OperatorName opName)
         {
@@ -456,11 +486,16 @@ namespace Typography.OpenFont.CFF
             }
             public int BufferLength => _buffer.Length;
             public int Position => _pos;
-            public int ReadInt32()
+
+            public int ReadFloatFixed1616()
             {
-                int result = BitConverter.ToInt32(_buffer, _pos);
+                byte b0 = _buffer[_pos];
+                byte b1 = _buffer[_pos + 1];
+                byte b2 = _buffer[_pos + 2];
+                byte b3 = _buffer[_pos + 3];
+
                 _pos += 4;
-                return result;
+                return (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
             }
         }
 
@@ -491,7 +526,26 @@ namespace Typography.OpenFont.CFF
                                 Debug.WriteLine("err!:" + b0);
                                 return;
                             }
+                            //
                             _insts.AddInt(ReadIntegerNumber(ref reader, b0));
+                            if (_doStemCount)
+                            {
+                                _current_integer_count++;
+                            }
+                        }
+                        break;
+                    case 255:
+                        {
+
+                            //from https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5177.Type2.pdf
+                            //If the charstring byte contains the value 255,
+                            //the next four bytes indicate a two’s complement signed number.
+
+                            //The first of these four bytes contains the highest order bits,
+                            //he second byte contains the next higher order bits and
+                            //the fourth byte contains the lowest order bits.
+
+                            _insts.AddFloat(reader.ReadFloatFixed1616());
                             if (_doStemCount)
                             {
                                 _current_integer_count++;
@@ -1105,11 +1159,6 @@ namespace Typography.OpenFont.CFF
             {
                 byte b1 = _reader.ReadByte();
                 return -(b0 - 251) * 256 - b1 - 108;
-            }
-            else if (b0 == 255)
-            {
-                //next 4 bytes interpreted as a 32 - bit two’s-complement number
-                return _reader.ReadInt32();
             }
             else
             {
