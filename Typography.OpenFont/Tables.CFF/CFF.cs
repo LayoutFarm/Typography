@@ -1,4 +1,4 @@
-﻿//Apapche2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
+﻿//Apache2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
 //
 //Apache PDFBox
 //Copyright 2014 The Apache Software Foundation
@@ -521,7 +521,7 @@ namespace Typography.OpenFont.CFF
 
         public string Name { get; set; }
         public ushort GlyphIndex { get; set; }
-        internal Type2GlyphInstructionList GlyphInstructions { get; set; }
+        internal Type2Instruction[] GlyphInstructions { get; set; }
 
 #if DEBUG
         public override string ToString()
@@ -984,7 +984,7 @@ namespace Typography.OpenFont.CFF
             }
         }
         void ReadCharsetsFormat2()
-        {   
+        {
 
             //note:eg, Adobe's source-code-pro font
 
@@ -1117,11 +1117,25 @@ namespace Typography.OpenFont.CFF
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
-                    glyphData.GlyphInstructions = instList;
+                    //use compact form or not
+
+                    if (_useCompactInstruction)
+                    {
+                        //this is our extension 
+                        glyphData.GlyphInstructions = _instCompacter.Compact(instList.InnerInsts);
+                    }
+                    else
+                    {
+                        glyphData.GlyphInstructions = instList.InnerInsts.ToArray();
+
+                    }
                 }
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
             }
         }
+        //---------------
+        bool _useCompactInstruction = true;
+        Type2InstructionCompacter _instCompacter = new Type2InstructionCompacter();
 
 
         void ReadFormat0Encoding()

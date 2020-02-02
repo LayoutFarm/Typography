@@ -1,4 +1,4 @@
-﻿//Apapche2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
+﻿//Apache2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
 //MIT, 2018-present, WinterDev  
 
 using System;
@@ -81,7 +81,7 @@ namespace Typography.OpenFont.CFF
         {
             Run(tx, cff1Font, glyphData.GlyphInstructions, scale);
         }
-        internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2GlyphInstructionList instructionList, float scale = 1)
+        internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2Instruction[] instructionList, float scale = 1)
         {
 
             //all fields are set to new values***
@@ -110,32 +110,44 @@ namespace Typography.OpenFont.CFF
             scaleTx.EndRead();
 
         }
-        void Run(IGlyphTranslator tx, Type2GlyphInstructionList instructionList, ref double currentX, ref double currentY)
+        void Run(IGlyphTranslator tx, Type2Instruction[] instructionList, ref double currentX, ref double currentY)
         {
             //recursive ***
 
             Type2EvaluationStack evalStack = GetFreeEvalStack(); //**
 #if DEBUG
-            evalStack.dbugGlyphIndex = instructionList.dbugGlyphIndex;
+            //evalStack.dbugGlyphIndex = instructionList.dbugGlyphIndex;
 #endif
             evalStack._currentX = currentX;
             evalStack._currentY = currentY;
-
-            List<Type2Instruction> insts = instructionList.Insts;
             evalStack.GlyphTranslator = tx;
-            int j = insts.Count;
 
-            for (int i = 0; i < j; ++i)
+            for (int i = 0; i < instructionList.Length; ++i)
             {
-                Type2Instruction inst = insts[i];
-
-#if DEBUG
-                if (inst.Op != OperatorName.LoadInt)
+                Type2Instruction inst = instructionList[i];
+                //----------
+                //this part is our extension to the original
+                int merge_flags = inst.Op >> 6;//upper 2 bits is our extension flags
+                switch (merge_flags)
                 {
+                    case 0: //nothing
+                        break;
+                    case 1:
+                        evalStack.Push(inst.Value);
+                        break;
+                    case 2:
+                        evalStack.Push((short)(inst.Value >> 16));
+                        evalStack.Push((short)(inst.Value >> 0));
+                        break;
+                    case 3:
+                        evalStack.Push((sbyte)(inst.Value >> 24));
+                        evalStack.Push((sbyte)(inst.Value >> 16));
+                        evalStack.Push((sbyte)(inst.Value >> 8));
+                        evalStack.Push((sbyte)(inst.Value >> 0));
+                        break;
                 }
-#endif
-
-                switch (inst.Op)
+                //----------
+                switch ((OperatorName)((inst.Op & 0b111111)))//we use only 6 lower bits for op_name
                 {
                     default: throw new NotSupportedException();
                     case OperatorName.GlyphWidth:
@@ -143,7 +155,26 @@ namespace Typography.OpenFont.CFF
                         break;
                     case OperatorName.LoadInt:
                         evalStack.Push(inst.Value);
-                        break;                    //
+                        break;
+                    case OperatorName.LoadSbyte4:
+                        //4 consecutive sbyte
+                        evalStack.Push((sbyte)(inst.Value >> 24));
+                        evalStack.Push((sbyte)(inst.Value >> 16));
+                        evalStack.Push((sbyte)(inst.Value >> 8));
+                        evalStack.Push((sbyte)(inst.Value >> 0));
+                        break;
+                    case OperatorName.LoadSbyte3:
+                        evalStack.Push((sbyte)(inst.Value >> 24));
+                        evalStack.Push((sbyte)(inst.Value >> 16));
+                        evalStack.Push((sbyte)(inst.Value >> 8));
+                        break;
+                    case OperatorName.LoadShort2:
+                        evalStack.Push((short)(inst.Value >> 16));
+                        evalStack.Push((short)(inst.Value >> 0));
+                        break;
+                    case OperatorName.LoadFloat:
+                        evalStack.Push(inst.ReadValueAsFixed1616());
+                        break;
                     case OperatorName.endchar:
                         evalStack.EndChar();
                         break;
@@ -258,7 +289,6 @@ namespace Typography.OpenFont.CFF
         internal double _currentX;
         internal double _currentY;
 
-
         double[] _argStack = new double[50];
         int _currentIndex = 0; //current stack index
 
@@ -324,25 +354,15 @@ namespace Typography.OpenFont.CFF
             //a position at the relative coordinates(dx1, dy1) 
             //see [NOTE4]
 #if DEBUG
-            if (dbugGlyphIndex == 207)
+            if (_currentIndex != 2)
             {
-
+                throw new NotSupportedException();
             }
 #endif
-            int i = 0;
-            if ((_currentIndex % 2) != 0)
-            {
-                i = 1;
-            }
-            for (; i < _currentIndex;)
-            {
-                _currentX += _argStack[i];
-                _currentY += _argStack[i + 1];
-                i += 2;
-            }
+
 
             _glyphTranslator.CloseContour();
-            _glyphTranslator.MoveTo((float)(_currentX), (float)(_currentY));
+            _glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)(_currentY += _argStack[1]));
 
             _currentIndex = 0; //clear stack 
         }
@@ -356,25 +376,9 @@ namespace Typography.OpenFont.CFF
 
             //moves the current point 
             //dx1 units in the horizontal direction
-            //see [NOTE4]
+            //see [NOTE4] 
 
-            double hSum = 0;
-            int m = 0;
-            for (int n = _currentIndex; n >= 1; --n)
-            {
-                hSum += _argStack[m];
-                m++;
-            }
-#if DEBUG
-            if (_currentIndex != 1)
-            {
-
-                // throw new NotSupportedException();
-            }
-#endif
-
-            _glyphTranslator.MoveTo((float)(_currentX += hSum), (float)_currentY);
-
+            _glyphTranslator.MoveTo((float)(_currentX += _argStack[0]), (float)_currentY);
             _currentIndex = 0; //clear stack 
         }
         public void V_MoveTo()
@@ -382,26 +386,14 @@ namespace Typography.OpenFont.CFF
             //|- dy1 vmoveto (4) |-
             //moves the current point 
             //dy1 units in the vertical direction.
-            //see [NOTE4]
-
-            double vSum = 0;
-            int m = 0;
-            for (int n = _currentIndex; n >= 1; --n)
-            {
-                vSum += _argStack[m];
-                m++;
-            }
-
+            //see [NOTE4] 
 #if DEBUG
-            if (_currentIndex != 1)
+            if (_currentIndex > 1)
             {
-
-                //throw new NotSupportedException();
+                throw new NotSupportedException();
             }
 #endif
-
-            _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += vSum));
-
+            _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += _argStack[0]));
             _currentIndex = 0; //clear stack 
         }
         public void R_LineTo()
@@ -557,12 +549,9 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 6) != 0)
             {
-                // i++;
+                throw new NotSupportedException();
             }
-            if (dbugGlyphIndex == 192)
-            {
 
-            }
 #endif
             double curX = _currentX;
             double curY = _currentY;
@@ -645,10 +634,7 @@ namespace Typography.OpenFont.CFF
             //end horizontal/ vertical.
 
 #if DEBUG
-            if (dbugGlyphIndex == 496)
-            {
 
-            }
 #endif
             int i = 0;
             int remainder = 0;
@@ -792,10 +778,6 @@ namespace Typography.OpenFont.CFF
         {
 
 #if DEBUG
-            if (dbugGlyphIndex == 192)
-            {
-
-            }
 
 #endif
             //|- { dxa dya dxb dyb dxc dyc} +dxd dyd rcurveline(24) |-
@@ -838,10 +820,6 @@ namespace Typography.OpenFont.CFF
         public void R_LineCurve()
         {
 #if DEBUG
-            if (dbugGlyphIndex == 192)
-            {
-
-            }
 
 #endif
             //|- { dxa dya} +dxb dyb dxc dyc dxd dyd rlinecurve(25) |-
@@ -884,10 +862,7 @@ namespace Typography.OpenFont.CFF
         {
 
 #if DEBUG
-            if (dbugGlyphIndex == 207)
-            {
 
-            }
 
 #endif
 
@@ -1148,6 +1123,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1159,6 +1135,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1171,7 +1148,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1183,6 +1160,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1437,6 +1415,8 @@ namespace Typography.OpenFont.CFF
         }
 #endif
     }
+
+
 
 
 }

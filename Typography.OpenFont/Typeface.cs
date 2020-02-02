@@ -149,7 +149,7 @@ namespace Typography.OpenFont
             return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
         }
         public ushort GetGlyphIndex(int codepoint)
-        {            
+        {
             return CmapTable.GetGlyphIndex(codepoint, 0, out bool skipNextCodepoint);
         }
         /// <summary>
@@ -163,12 +163,12 @@ namespace Typography.OpenFont
             return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
         }
 
- 
+
         public void CollectUnicode(List<uint> unicodes)
         {
             CmapTable.CollectUnicode(unicodes);
         }
-        
+
         public Glyph GetGlyphByName(string glyphName)
         {
             if (_cffTable != null)
@@ -188,7 +188,7 @@ namespace Typography.OpenFont
             }
             return null;
         }
-        public ushort GetGlyphIndexByName(string glyphName) 
+        public ushort GetGlyphIndexByName(string glyphName)
         {
             if (_cffTable != null)
             {
@@ -219,7 +219,7 @@ namespace Typography.OpenFont
         public Glyph GetGlyph(ushort glyphIndex)
         {
             return _glyphs[glyphIndex];
-        } 
+        }
         public Glyph GetGlyph(string glyphName)
         {
             if (_cffTable != null)
@@ -234,11 +234,11 @@ namespace Typography.OpenFont
                 return null;
             }
             else if (PostTable != null)
-            { 
+            {
                 return GetGlyph(GetGlyphIndexByName(glyphName));
             }
             return null;
-        }      
+        }
 
         public ushort GetAdvanceWidth(int codepoint)
         {
@@ -1074,13 +1074,6 @@ namespace Typography.OpenFont
                 CffBoundFinder boundFinder = new CffBoundFinder();
                 for (ushort i = 0; i < j; ++i)
                 {
-#if DEBUG
-
-                    //if (i == 3084)
-                    //{
-
-                    //}
-#endif
                     Glyph g = typeface.GetGlyph(i);
                     boundFinder.Reset();
 
