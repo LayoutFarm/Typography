@@ -123,7 +123,7 @@ namespace SampleWinForms
         }
         void UpdateVisualOutputSettings()
         {
-            _currentGlyphPathBuilder.TrueTypeHintTechnique = this.HintTechnique;
+            _currentGlyphPathBuilder.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
         }
@@ -138,7 +138,7 @@ namespace SampleWinForms
             float sizeInPoints = this.FontSizeInPoints;
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
             //
-            _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.HintTechnique);
+            _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.TrueTypeHintTechnique);
 
 
             //this draw a single line text span*** 

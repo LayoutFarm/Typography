@@ -142,7 +142,7 @@ namespace SampleWinForms
             _currentTextPrinter.DrawOutline = this.chkBorder.Checked;
 
             //-----------------------  
-            _currentTextPrinter.HintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
+            _currentTextPrinter.TrueTypeHintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             _currentTextPrinter.TargetGraphics = g;
             //render at specific pos
@@ -206,7 +206,7 @@ namespace SampleWinForms
             //--------------------------------
             //textspan measurement sample
             //--------------------------------  
-            _currentTextPrinter.HintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
+            _currentTextPrinter.TrueTypeHintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             _currentTextPrinter.UpdateGlyphLayoutSettings();
 

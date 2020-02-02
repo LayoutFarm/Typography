@@ -147,7 +147,7 @@ namespace SampleWinForms
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
 
             //-----------------------  
-            _currentTextPrinter.HintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
+            _currentTextPrinter.TrueTypeHintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             _currentTextPrinter.TargetGraphics = g;
             //render at specific pos
@@ -260,7 +260,7 @@ namespace SampleWinForms
             //--------------------------------
             //textspan measurement sample
             //--------------------------------  
-            _currentTextPrinter.HintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
+            _currentTextPrinter.TrueTypeHintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 100;

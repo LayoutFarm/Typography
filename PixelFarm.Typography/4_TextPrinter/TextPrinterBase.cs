@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+//MIT, 2016-present, WinterDev
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
@@ -39,7 +39,7 @@ namespace Typography.Contours
         public float FontLineSpacingPx { get; set; }
         public bool SimulateSlant { get; set; }
 
-        public TrueTypeHintTechnique HintTechnique { get; set; }
+        public TrueTypeHintTechnique TrueTypeHintTechnique { get; set; }
 
         float _fontSizeInPoints;
         public float FontSizeInPoints

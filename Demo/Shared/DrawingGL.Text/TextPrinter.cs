@@ -97,7 +97,7 @@ namespace DrawingGL.Text
 
                     //2. glyph builder
                     _currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
-                    _currentGlyphPathBuilder.TrueTypeHintTechnique = this.HintTechnique;
+                    _currentGlyphPathBuilder.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
 
                     //3. glyph translater
                     _pathTranslator = new GlyphTranslatorToPath();
@@ -129,7 +129,7 @@ namespace DrawingGL.Text
 
             //in this version we store original glyph into the mesh collection
             //and then we scale it later, so I just specific font size=0 (you can use any value)
-            _glyphMeshCollection.SetCacheInfo(this.Typeface, 0, this.HintTechnique);
+            _glyphMeshCollection.SetCacheInfo(this.Typeface, 0, this.TrueTypeHintTechnique);
 
 
             GlyphLayoutMan.Typeface = this.Typeface;

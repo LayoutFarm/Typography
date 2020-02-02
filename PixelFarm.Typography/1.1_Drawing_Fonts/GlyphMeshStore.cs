@@ -1,4 +1,4 @@
-﻿//MIT, 2016-present, WinterDev
+//MIT, 2016-present, WinterDev
 
 using System;
 using System.Collections.Generic;
@@ -56,20 +56,10 @@ namespace Typography.Contours
         GlyphOutlineBuilder _currentGlyphBuilder;
         Typeface _currentTypeface;
         float _currentFontSizeInPoints;
-        TrueTypeHintTechnique _currentHintTech;
 
+        readonly GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
 
-        GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
-
-        public GlyphMeshStore()
-        {
-
-        }
-        public void SetTrueTypeHintTechnique(TrueTypeHintTechnique hintTech)
-        {
-            _currentHintTech = hintTech;
-
-        }
+        public GlyphMeshStore() { }
 
         /// <summary>
         /// simulate italic glyph
@@ -77,6 +67,7 @@ namespace Typography.Contours
         public bool SimulateOblique { get; set; }
 
         public bool FlipGlyphUpward { get; set; }
+        public TrueTypeHintTechnique TrueTypeHintTechnique { get; set; }
 
 
         /// <summary>
@@ -111,7 +102,7 @@ namespace Typography.Contours
             //temp fix, temp disable customfit if we build emoji font
             _currentGlyphBuilder.TemporaryDisableCustomFit = (typeface.COLRTable != null) && (typeface.CPALTable != null);
             //------------------------------------------ 
-            _hintGlyphCollection.SetCacheInfo(typeface, _currentFontSizeInPoints, _currentHintTech);
+            _hintGlyphCollection.SetCacheInfo(typeface, _currentFontSizeInPoints, TrueTypeHintTechnique);
         }
 
         /// <summary>
@@ -125,7 +116,7 @@ namespace Typography.Contours
             if (!_hintGlyphCollection.TryGetCacheGlyph(glyphIndex, out glyphMeshData))
             {
                 //if not found then create new glyph vxs and cache it
-                _currentGlyphBuilder.TrueTypeHintTechnique = _currentHintTech;
+                _currentGlyphBuilder.TrueTypeHintTechnique = TrueTypeHintTechnique;
                 _currentGlyphBuilder.BuildFromGlyphIndex(glyphIndex, _currentFontSizeInPoints);
                 DynamicOutline dynamicOutline = _currentGlyphBuilder.LatestGlyphFitOutline;
                 //-----------------------------------  

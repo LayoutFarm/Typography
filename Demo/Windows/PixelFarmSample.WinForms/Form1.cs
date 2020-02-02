@@ -134,7 +134,7 @@ namespace SampleWinForms
             _selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
-            _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+            _selectedTextPrinter.TrueTypeHintTechnique = _glyphRenderOptions.HintTechnique;
             _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
 
             //test print 3 lines
@@ -295,7 +295,7 @@ namespace SampleWinForms
                         _selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                         _selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
-                        _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
+                        _selectedTextPrinter.TrueTypeHintTechnique = _glyphRenderOptions.HintTechnique;
                         _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
                         _selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
 

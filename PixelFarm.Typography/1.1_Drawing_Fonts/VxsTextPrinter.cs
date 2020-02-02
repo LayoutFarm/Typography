@@ -132,7 +132,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             //2.1              
             if (Typeface == null) return;
-            _glyphMeshStore.SetTrueTypeHintTechnique(this.HintTechnique);
+            _glyphMeshStore.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
             _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
             ////2.3
@@ -221,7 +221,7 @@ namespace PixelFarm.Drawing.Fonts
             bool hasColorGlyphs = (colrTable != null) && (cpalTable != null);
 
             //--------------------------------------------------- 
-            _glyphMeshStore.SetTrueTypeHintTechnique(this.HintTechnique);
+            _glyphMeshStore.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
             _glyphMeshStore.SimulateOblique = this.SimulateSlant;
             //---------------------------------------------------
