@@ -294,14 +294,17 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
 
             //you can check/compare the compact form and the original form
-            //dbugReExpandAndCompare_ForStep1(_step1List, insts);
-            //dbugReExpandAndCompare_ForStep2(_step2List, insts);
+            dbugReExpandAndCompare_ForStep1(_step1List, insts);
+            dbugReExpandAndCompare_ForStep2(_step2List, insts);
 #endif
             return _step2List.ToArray();
             //return _step1List.ToArray();
 
         }
 #if DEBUG
+
+
+         
         void dbugReExpandAndCompare_ForStep1(List<Type2Instruction> step1, List<Type2Instruction> org)
         {
             List<Type2Instruction> expand1 = new List<Type2Instruction>(org.Count);
