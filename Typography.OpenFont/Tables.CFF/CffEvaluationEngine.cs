@@ -119,8 +119,8 @@ namespace Typography.OpenFont.CFF
             //evalStack.dbugGlyphIndex = instructionList.dbugGlyphIndex;
 #endif
             evalStack._currentX = currentX;
-            evalStack._currentY = currentY; 
-            evalStack.GlyphTranslator = tx; 
+            evalStack._currentY = currentY;
+            evalStack.GlyphTranslator = tx;
 
             for (int i = 0; i < instructionList.Length; ++i)
             {
@@ -253,8 +253,7 @@ namespace Typography.OpenFont.CFF
     {
 
         internal double _currentX;
-        internal double _currentY;
-
+        internal double _currentY; 
 
         double[] _argStack = new double[50];
         int _currentIndex = 0; //current stack index
@@ -321,17 +320,13 @@ namespace Typography.OpenFont.CFF
             //a position at the relative coordinates(dx1, dy1) 
             //see [NOTE4]
 #if DEBUG
-            if (dbugGlyphIndex == 207)
-            {
-
-            }
-#endif
-            int i = 0;
             if ((_currentIndex % 2) != 0)
             {
-                i = 1;
+                throw new NotSupportedException();
             }
-            for (; i < _currentIndex;)
+#endif
+
+            for (int i = 0; i < _currentIndex;)
             {
                 _currentX += _argStack[i];
                 _currentY += _argStack[i + 1];
@@ -363,11 +358,7 @@ namespace Typography.OpenFont.CFF
                 m++;
             }
 #if DEBUG
-            if (_currentIndex != 1)
-            {
 
-                // throw new NotSupportedException();
-            }
 #endif
 
             _glyphTranslator.MoveTo((float)(_currentX += hSum), (float)_currentY);
@@ -390,11 +381,7 @@ namespace Typography.OpenFont.CFF
             }
 
 #if DEBUG
-            if (_currentIndex != 1)
-            {
 
-                //throw new NotSupportedException();
-            }
 #endif
 
             _glyphTranslator.MoveTo((float)_currentX, (float)(_currentY += vSum));
@@ -554,12 +541,9 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 6) != 0)
             {
-                // i++;
+                throw new NotSupportedException();
             }
-            if (dbugGlyphIndex == 192)
-            {
 
-            }
 #endif
             double curX = _currentX;
             double curY = _currentY;
@@ -642,10 +626,7 @@ namespace Typography.OpenFont.CFF
             //end horizontal/ vertical.
 
 #if DEBUG
-            if (dbugGlyphIndex == 496)
-            {
 
-            }
 #endif
             int i = 0;
             int remainder = 0;
@@ -789,10 +770,6 @@ namespace Typography.OpenFont.CFF
         {
 
 #if DEBUG
-            if (dbugGlyphIndex == 192)
-            {
-
-            }
 
 #endif
             //|- { dxa dya dxb dyb dxc dyc} +dxd dyd rcurveline(24) |-
@@ -835,10 +812,6 @@ namespace Typography.OpenFont.CFF
         public void R_LineCurve()
         {
 #if DEBUG
-            if (dbugGlyphIndex == 192)
-            {
-
-            }
 
 #endif
             //|- { dxa dya} +dxb dyb dxc dyc dxd dyd rlinecurve(25) |-
@@ -881,10 +854,7 @@ namespace Typography.OpenFont.CFF
         {
 
 #if DEBUG
-            if (dbugGlyphIndex == 207)
-            {
 
-            }
 
 #endif
 
@@ -1145,6 +1115,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1156,6 +1127,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1168,7 +1140,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
-
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;
@@ -1180,6 +1152,7 @@ namespace Typography.OpenFont.CFF
 #if DEBUG
             if ((_currentIndex % 2) != 0)
             {
+                throw new NotSupportedException();
             }
 #endif
             //hintCount += _currentIndex / 2;

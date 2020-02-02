@@ -320,14 +320,22 @@ namespace Typography.OpenFont.CFF
 
         public void dbugDumpInstructionListToFile(string filename)
         {
+            dbugCffInstHelper.dbugDumpInstructionListToFile(_insts, filename);             
+        }
+#endif
+    }
+
+#if DEBUG
+    public static class dbugCffInstHelper
+    {
+        internal static void dbugDumpInstructionListToFile(this IEnumerable<Type2Instruction> insts, string filename)
+        {
             using (FileStream fs = new FileStream(filename, FileMode.Create))
             using (StreamWriter w = new StreamWriter(fs))
             {
-
-                int j = _insts.Count;
-                for (int i = 0; i < j; ++i)
+                int i = 0;
+                foreach (Type2Instruction inst in insts)
                 {
-                    Type2Instruction inst = _insts[i];
 
                     w.Write("[" + i + "] ");
                     if (inst.Op == OperatorName.LoadInt)
@@ -340,13 +348,13 @@ namespace Typography.OpenFont.CFF
                         w.Write(inst.ToString());
                         w.WriteLine();
                     }
+                    i++;
                 }
             }
         }
-#endif
-
     }
 
+#endif
 
 
     class Type2CharStringParser
