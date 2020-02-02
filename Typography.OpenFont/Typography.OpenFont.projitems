@@ -52,6 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapAndSvgFonts\CBDT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapAndSvgFonts\CBLC.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapAndSvgFonts\EBLC.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\Type2InstructionCompacter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\HorizontalDeviceMetrics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Kern.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\LinearThreashold.cs" />

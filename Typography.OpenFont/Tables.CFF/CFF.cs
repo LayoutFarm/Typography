@@ -1117,11 +1117,25 @@ namespace Typography.OpenFont.CFF
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
-                    glyphData.GlyphInstructions = instList.Insts.ToArray();
+                    //use compact form or not
+
+                    if (_useCompactInstruction)
+                    {
+                        //this is our extension 
+                        glyphData.GlyphInstructions = _instCompacter.Compact(instList.InnerInsts);
+                    }
+                    else
+                    {
+                        glyphData.GlyphInstructions = instList.InnerInsts.ToArray();
+
+                    }
                 }
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
             }
         }
+        //---------------
+        bool _useCompactInstruction = true;
+        Type2InstructionCompacter _instCompacter = new Type2InstructionCompacter();
 
 
         void ReadFormat0Encoding()

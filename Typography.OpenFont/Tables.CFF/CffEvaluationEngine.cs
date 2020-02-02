@@ -125,14 +125,29 @@ namespace Typography.OpenFont.CFF
             for (int i = 0; i < instructionList.Length; ++i)
             {
                 Type2Instruction inst = instructionList[i];
-
-#if DEBUG
-                if (inst.Op != OperatorName.LoadInt)
+                //----------
+                //this part is our extension to the original
+                int merge_flags = inst.Op >> 6;//upper 2 bits is our extension flags
+                switch (merge_flags)
                 {
+                    case 0: //nothing
+                        break;
+                    case 1:
+                        evalStack.Push(inst.Value);
+                        break;
+                    case 2:
+                        evalStack.Push((short)(inst.Value >> 16));
+                        evalStack.Push((short)(inst.Value >> 0));
+                        break;
+                    case 3:
+                        evalStack.Push((sbyte)(inst.Value >> 24));
+                        evalStack.Push((sbyte)(inst.Value >> 16));
+                        evalStack.Push((sbyte)(inst.Value >> 8));
+                        evalStack.Push((sbyte)(inst.Value >> 0));
+                        break;
                 }
-#endif
-
-                switch (inst.Op)
+                //----------
+                switch ((OperatorName)((inst.Op & 0b111111)))//we use only 6 lower bits for op_name
                 {
                     default: throw new NotSupportedException();
                     case OperatorName.GlyphWidth:
@@ -140,6 +155,22 @@ namespace Typography.OpenFont.CFF
                         break;
                     case OperatorName.LoadInt:
                         evalStack.Push(inst.Value);
+                        break;
+                    case OperatorName.LoadSbyte4:
+                        //4 consecutive sbyte
+                        evalStack.Push((sbyte)(inst.Value >> 24));
+                        evalStack.Push((sbyte)(inst.Value >> 16));
+                        evalStack.Push((sbyte)(inst.Value >> 8));
+                        evalStack.Push((sbyte)(inst.Value >> 0));
+                        break;
+                    case OperatorName.LoadSbyte3:
+                        evalStack.Push((sbyte)(inst.Value >> 24));
+                        evalStack.Push((sbyte)(inst.Value >> 16));
+                        evalStack.Push((sbyte)(inst.Value >> 8));
+                        break;
+                    case OperatorName.LoadShort2:
+                        evalStack.Push((short)(inst.Value >> 16));
+                        evalStack.Push((short)(inst.Value >> 0));
                         break;
                     case OperatorName.LoadFloat:
                         evalStack.Push(inst.ReadValueAsFixed1616());
@@ -1384,6 +1415,8 @@ namespace Typography.OpenFont.CFF
         }
 #endif
     }
+
+
 
 
 }
