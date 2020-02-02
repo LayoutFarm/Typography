@@ -1,4 +1,4 @@
-﻿//MIT, 2015, Michael Popoloski's SharpFont
+//MIT, 2015, Michael Popoloski's SharpFont
 using System;
 using System.Numerics;
 
@@ -7,7 +7,7 @@ namespace Typography.OpenFont
 
     public class TrueTypeInterpreter
     {
-        public TrueTypeInterpreter(Typeface typeface) => Typeface = typeface;
+        public TrueTypeInterpreter() { }
         Typeface _currentTypeFace;
         SharpFontInterpreter _interpreter;
         public Typeface Typeface
@@ -32,8 +32,7 @@ namespace Typography.OpenFont
                 {
                     _interpreter.InitializeFunctionDefs(_currentTypeFace.FpgmProgramBuffer);
                 }
-
-             }
+            }
         }
 
         public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPixel)

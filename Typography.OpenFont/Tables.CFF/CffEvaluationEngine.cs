@@ -1,4 +1,4 @@
-﻿//Apache2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
+//Apache2, 2018, apache/pdfbox Authors ( https://github.com/apache/pdfbox) 
 //MIT, 2018-present, WinterDev  
 
 using System;
@@ -11,10 +11,11 @@ namespace Typography.OpenFont.CFF
 
     public class CffEvaluationEngine
     {
-
+#if DEBUG
         CFF.Cff1Font _cff1Font;
 
-        float _scale = 1;//default 
+        float _scale = 1;//default
+#endif
         Stack<Type2EvaluationStack> _evalStackPool = new Stack<Type2EvaluationStack>();
 
         class PxScaleGlyphTx : IGlyphTranslator
@@ -84,10 +85,12 @@ namespace Typography.OpenFont.CFF
         internal void Run(IGlyphTranslator tx, Cff1Font cff1Font, Type2Instruction[] instructionList, float scale = 1)
         {
 
+#if DEBUG
             //all fields are set to new values***
 
             _cff1Font = cff1Font;
             _scale = scale;
+#endif
 
             double currentX = 0, currentY = 0;
 

@@ -17,31 +17,24 @@ namespace Typography.OpenFont
     }
     public class GlyphPathBuilder
     {
-        TrueTypeInterpreter _trueTypeInterpreter;
+        readonly TrueTypeInterpreter _trueTypeInterpreter = new TrueTypeInterpreter();
         protected GlyphPointF[] _outputGlyphPoints;
         protected ushort[] _outputContours;
-
-        protected CFF.Cff1Font _ownerCff;
-        protected CFF.Cff1GlyphData _cffGlyphData;
 
         /// <summary>
         /// scale for converting latest glyph points to latest request font size
         /// </summary>
         float _recentPixelScale;
-        readonly CFF.CffEvaluationEngine _cffEvalEngine;
+        protected CFF.Cff1Font _ownerCff;
+        protected CFF.Cff1GlyphData _cffGlyphData;
+        readonly CFF.CffEvaluationEngine _cffEvalEngine = new CFF.CffEvaluationEngine();
 
-        public GlyphPathBuilder(Typeface typeface)
+        public GlyphPathBuilder()
         {
-            Typeface = typeface;
             this.TrueTypeHintTechnique = TrueTypeHintTechnique.Instructions;//default?
             _recentPixelScale = 1;
-
-            if (typeface.IsCffFont)
-            {
-                _cffEvalEngine = new CFF.CffEvaluationEngine();
-            }
         }
-        public Typeface Typeface { get; private set; }
+        public Typeface Typeface { get; set; }
         /// <summary>
         /// process glyph with true type instructions
         /// </summary>
@@ -110,8 +103,7 @@ namespace Typography.OpenFont
                 Typeface.HasPrepProgramBuffer &&
                 glyph.HasGlyphInstructions)
             {
-                if (_trueTypeInterpreter == null)
-                    _trueTypeInterpreter = new TrueTypeInterpreter(Typeface);
+                _trueTypeInterpreter.Typeface = Typeface;
                 _trueTypeInterpreter.UseVerticalHinting = this.UseTrueTypeVerticalHinting;
                 //output as points,
                 _outputGlyphPoints = _trueTypeInterpreter.HintGlyph(glyph.GlyphIndex, RecentFontSizeInPixels);
