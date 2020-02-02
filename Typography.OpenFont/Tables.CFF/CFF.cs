@@ -1089,6 +1089,9 @@ namespace Typography.OpenFont.CFF
             Type2CharStringParser type2Parser = new Type2CharStringParser();
             type2Parser.SetCurrentCff1Font(_currentCff1Font);
 
+#if DEBUG
+            //double total = 0;
+#endif
             for (int i = 0; i < glyphCount; ++i)
             {
                 CffIndexOffset offset = offsets[i];
@@ -1123,6 +1126,11 @@ namespace Typography.OpenFont.CFF
                     {
                         //this is our extension 
                         glyphData.GlyphInstructions = _instCompacter.Compact(instList.InnerInsts);
+
+#if DEBUG
+                        //total += glyphData.GlyphInstructions.Length / (float)instList.InnerInsts.Count;
+#endif
+
                     }
                     else
                     {
@@ -1132,6 +1140,11 @@ namespace Typography.OpenFont.CFF
                 }
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
             }
+
+#if DEBUG
+            //double avg = total / glyphCount;
+#endif
+
         }
         //---------------
         bool _useCompactInstruction = true;
