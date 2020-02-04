@@ -44,12 +44,12 @@ namespace PixelFarm.Drawing.Fonts
     {
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;
-        Dictionary<Typeface, GlyphBitmapList> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphBitmapList>();
+        Dictionary<Typeface, GlyphBitmapList> _cachedBmpList = new Dictionary<Typeface, GlyphBitmapList>();
 
         public void SetCurrentTypeface(Typeface typeface)
         {
             _currentTypeface = typeface;
-            if (_cacheGlyphPathBuilders.TryGetValue(typeface, out _bitmapList))
+            if (_cachedBmpList.TryGetValue(typeface, out _bitmapList))
             {
                 return;
             }
@@ -60,7 +60,7 @@ namespace PixelFarm.Drawing.Fonts
 
             //if not create a new one
             _bitmapList = new GlyphBitmapList();
-            _cacheGlyphPathBuilders.Add(typeface, _bitmapList);
+            _cachedBmpList.Add(typeface, _bitmapList);
 
             int glyphCount = typeface.GlyphCount;
             using (System.IO.MemoryStream ms = new System.IO.MemoryStream())

@@ -105,6 +105,8 @@ namespace PixelFarm.Drawing
             }
         }
 
+        public TextBaseline TextBaseline { get; set; }
+
         public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
         {
             UpdateGlyphLayoutSettings();

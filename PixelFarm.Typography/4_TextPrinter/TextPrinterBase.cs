@@ -12,15 +12,16 @@ namespace Typography.Contours
     public abstract class TextPrinterBase
     {
         Typography.Contours.HintTechnique _hintTech;
-
         public TextPrinterBase()
         {
             FontSizeInPoints = 14;//
-            ScriptLang = Typography.OpenFont.ScriptLangs.Latin;//default?
+            ScriptLang = ScriptLangs.Latin;//default?
         }
 
-        public abstract Typography.TextLayout.GlyphLayout GlyphLayoutMan { get; }
-        public abstract Typography.OpenFont.Typeface Typeface { get; set; }
+
+        public abstract GlyphLayout GlyphLayoutMan { get; }
+        public abstract Typeface Typeface { get; set; }
+
         public virtual void GenerateGlyphPlan(
                   char[] textBuffer,
                   int startAt,
@@ -41,11 +42,7 @@ namespace Typography.Contours
 
         public bool SimulateSlant { get; set; }
 
-        public Typography.Contours.HintTechnique HintTechnique
-        {
-            get => _hintTech;
-            set => _hintTech = value;
-        }
+        public HintTechnique HintTechnique { get; set; }
 
         float _fontSizeInPoints;
         public float FontSizeInPoints
@@ -62,8 +59,8 @@ namespace Typography.Contours
         }
 
         protected virtual void OnFontSizeChanged() { }
-        public Typography.OpenFont.ScriptLang ScriptLang { get; set; }
-        public Typography.TextLayout.PositionTechnique PositionTechnique { get; set; }
+        public ScriptLang ScriptLang { get; set; }
+        public PositionTechnique PositionTechnique { get; set; }
         public bool EnableLigature { get; set; }
 
         /// <summary>

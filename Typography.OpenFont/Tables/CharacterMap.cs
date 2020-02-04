@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Typography.OpenFont
+namespace Typography.OpenFont.Tables
 {
     class CharMapFormat4 : CharacterMap
     {
@@ -395,5 +395,4 @@ namespace Typography.OpenFont
             return $"fmt:{ Format }, plat:{ PlatformId }, enc:{ EncodingId }";
         }
     }
-     
 }

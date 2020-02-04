@@ -506,7 +506,7 @@ namespace SampleWinForms
             //p.UseSubPixelRendering = chkLcdTechnique.Checked;
             _painter.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
-            var builder = new GlyphPathBuilder(typeface);
+            var builder = new GlyphOutlineBuilder(typeface);
             builder.SetHintTechnique(_glyphRenderOptions.HintTechnique);
 
             //----------------------------------------------------

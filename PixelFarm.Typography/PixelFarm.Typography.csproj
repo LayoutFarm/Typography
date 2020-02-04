@@ -77,7 +77,7 @@
     <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
     <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
     <Compile Include="4_TextPrinter\GlyphMeshCollection.cs" />
-    <Compile Include="4_TextPrinter\GlyphPathBuilderBase.cs" />
+    <Compile Include="4_TextPrinter\GlyphOutlineBuilderBase.cs" />
     <Compile Include="4_TextPrinter\TextPrinterBase.cs" />
     <Compile Include="4_TextPrinter\GlyphOutlineAnalyzer.cs" />
   </ItemGroup>
