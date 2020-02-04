@@ -10,8 +10,17 @@ namespace Typography.OpenFont
     {
         Typeface _currentTypeFace;
         SharpFontInterpreter _interpreter;
+        public Typeface Typeface
+        {
+            get => _currentTypeFace;
+            set => SetTypeFace(value);
+        }
+
         public void SetTypeFace(Typeface typeface)
         {
+            //still preserve this for compat with others,
+            //wait for other libs...
+
             _currentTypeFace = typeface;
             Tables.MaxProfile maximumProfile = _currentTypeFace.MaxProfile;
             _interpreter = new SharpFontInterpreter(
@@ -243,12 +252,12 @@ namespace Typography.OpenFont
             {
                 Execute(new InstructionStream(instructions), false, false);
             }
-            catch (InvalidFontException)
-            { 
+            catch (InvalidTrueTypeFontException)
+            {
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine("invalid_font_ex:");
 #endif
- 
+
             }
         }
 
@@ -1085,7 +1094,7 @@ namespace Typography.OpenFont
                         {
                             var b = _stack.Pop();
                             if (b == 0)
-                                throw new InvalidFontException("Division by zero.");
+                                throw new InvalidTrueTypeFontException("Division by zero.");
 
                             var a = _stack.Pop();
                             var result = ((long)a << 6) / b;
@@ -1111,7 +1120,7 @@ namespace Typography.OpenFont
                     case OpCode.FDEF:
                         {
                             if (!allowFunctionDefs || inFunction)
-                                throw new InvalidFontException("Can't define functions here.");
+                                throw new InvalidTrueTypeFontException("Can't define functions here.");
 
                             _functions[_stack.Pop()] = stream;
                             while (SkipNext(ref stream) != OpCode.ENDF) ;
@@ -1120,7 +1129,7 @@ namespace Typography.OpenFont
                     case OpCode.IDEF:
                         {
                             if (!allowFunctionDefs || inFunction)
-                                throw new InvalidFontException("Can't define functions here.");
+                                throw new InvalidTrueTypeFontException("Can't define functions here.");
 
                             _instructionDefs[_stack.Pop()] = stream;
                             while (SkipNext(ref stream) != OpCode.ENDF) ;
@@ -1129,7 +1138,7 @@ namespace Typography.OpenFont
                     case OpCode.ENDF:
                         {
                             if (!inFunction)
-                                throw new InvalidFontException("Found invalid ENDF marker outside of a function definition.");
+                                throw new InvalidTrueTypeFontException("Found invalid ENDF marker outside of a function definition.");
                             return;
                         }
                     case OpCode.CALL:
@@ -1137,7 +1146,7 @@ namespace Typography.OpenFont
                         {
                             _callStackSize++;
                             if (_callStackSize > MaxCallStack)
-                                throw new InvalidFontException("Stack overflow; infinite recursion?");
+                                throw new InvalidTrueTypeFontException("Stack overflow; infinite recursion?");
 
                             var function = _functions[_stack.Pop()];
                             var count = opcode == OpCode.LOOPCALL ? _stack.Pop() : 1;
@@ -1261,11 +1270,11 @@ namespace Typography.OpenFont
                             // check if this is a runtime-defined opcode
                             var index = (int)opcode;
                             if (index > _instructionDefs.Length || !_instructionDefs[index].IsValid)
-                                throw new InvalidFontException("Unknown opcode in font program.");
+                                throw new InvalidTrueTypeFontException("Unknown opcode in font program.");
 
                             _callStackSize++;
                             if (_callStackSize > MaxCallStack)
-                                throw new InvalidFontException("Stack overflow; infinite recursion?");
+                                throw new InvalidTrueTypeFontException("Stack overflow; infinite recursion?");
 
                             Execute(_instructionDefs[index], true, false);
                             _callStackSize--;
@@ -1278,7 +1287,7 @@ namespace Typography.OpenFont
         int CheckIndex(int index, int length)
         {
             if (index < 0 || index >= length)
-                throw new InvalidFontException();
+                throw new InvalidTrueTypeFontException();
             return index;
         }
 
@@ -1372,7 +1381,7 @@ namespace Typography.OpenFont
             {
                 case 0: return _twilight;
                 case 1: return _points;
-                default: throw new InvalidFontException("Invalid zone pointer.");
+                default: throw new InvalidTrueTypeFontException("Invalid zone pointer.");
             }
         }
 
@@ -1386,7 +1395,7 @@ namespace Typography.OpenFont
                 case 0: roundPeriod = period / 2; break;
                 case 0x40: roundPeriod = period; break;
                 case 0x80: roundPeriod = period * 2; break;
-                default: throw new InvalidFontException("Unknown rounding period multiplier.");
+                default: throw new InvalidTrueTypeFontException("Unknown rounding period multiplier.");
             }
 
             // bits 5-4 are the phase
@@ -1812,7 +1821,7 @@ namespace Typography.OpenFont
             public int NextByte()
             {
                 if (Done)
-                    throw new InvalidFontException();
+                    throw new InvalidTrueTypeFontException();
                 return instructions[ip++];
             }
 
@@ -1894,7 +1903,7 @@ namespace Typography.OpenFont
             public void Swap()
             {
                 if (_count < 2)
-                    throw new InvalidFontException();
+                    throw new InvalidTrueTypeFontException();
 
                 var tmp = _s[_count - 1];
                 _s[_count - 1] = _s[_count - 2];
@@ -1904,21 +1913,21 @@ namespace Typography.OpenFont
             public void Push(int value)
             {
                 if (_count == _s.Length)
-                    throw new InvalidFontException();
+                    throw new InvalidTrueTypeFontException();
                 _s[_count++] = value;
             }
 
             public int Pop()
             {
                 if (_count == 0)
-                    throw new InvalidFontException();
+                    throw new InvalidTrueTypeFontException();
                 return _s[--_count];
             }
 
             public int Peek(int index)
             {
                 if (index < 0 || index >= _count)
-                    throw new InvalidFontException();
+                    throw new InvalidTrueTypeFontException();
                 return _s[_count - index - 1];
             }
         }

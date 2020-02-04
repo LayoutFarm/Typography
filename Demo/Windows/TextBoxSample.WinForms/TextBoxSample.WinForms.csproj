@@ -39,8 +39,8 @@
     <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphMeshCollection.cs">
       <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphPathBuilderBase.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilderBase.cs</Link>
+    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphOutlineBuilderBase.cs">
+      <Link>GlyphOutlineBuilder\GlyphOutlineBuilderBase.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\TextPrinterBase.cs">
       <Link>DevTextPrinter\TextPrinterBase.cs</Link>
@@ -48,8 +48,8 @@
     <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
       <Link>DevTextPrinter\FontManagement.cs</Link>
     </Compile>
-    <Compile Include="..\..\Shared\GlyphPathBuilder\GlyphPathBuilder.cs">
-      <Link>GlyphPathBuilder\GlyphPathBuilder.cs</Link>
+    <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
+      <Link>GlyphOutlineBuilder\GlyphOutlineBuilder.cs</Link>
     </Compile>
     <Compile Include="..\GdiPlusSample.WinForms\GdiPlus\DevGdiTextPrinter.cs">
       <Link>GdiPlus\DevGdiTextPrinter.cs</Link>

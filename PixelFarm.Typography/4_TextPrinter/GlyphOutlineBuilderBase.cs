@@ -10,7 +10,7 @@ namespace Typography.Contours
     //-----------------------------------
 
 
-    public abstract class GlyphPathBuilderBase
+    public abstract class GlyphOutlineBuilderBase
     {
         readonly Typeface _typeface;
         TrueTypeInterpreter _trueTypeInterpreter;
@@ -27,7 +27,7 @@ namespace Typography.Contours
 
         Typography.OpenFont.CFF.CffEvaluationEngine _cffEvalEngine;
 
-        public GlyphPathBuilderBase(Typeface typeface)
+        public GlyphOutlineBuilderBase(Typeface typeface)
         {
             _typeface = typeface;
             this.UseTrueTypeInstructions = true;//default?
@@ -91,12 +91,12 @@ namespace Typography.Contours
             else
             {
                 _recentPixelScale = Typeface.CalculateScaleToPixel(RecentFontSizeInPixels);
-                IsSizeChanged = true;
+                HasSizeChanged = true;
             }
             //-------------------------------------
             FitCurrentGlyph(glyph);
         }
-        protected bool IsSizeChanged { get; set; }
+        protected bool HasSizeChanged { get; set; }
         protected float RecentFontSizeInPixels { get; private set; }
         protected virtual void FitCurrentGlyph(Glyph glyph)
         {
@@ -109,7 +109,7 @@ namespace Typography.Contours
                     if (_trueTypeInterpreter == null)
                     {
                         _trueTypeInterpreter = new TrueTypeInterpreter();
-                        _trueTypeInterpreter.SetTypeFace(_typeface);
+                        _trueTypeInterpreter.Typeface = _typeface;
                     }
                     _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                     //output as points,
@@ -142,11 +142,11 @@ namespace Typography.Contours
 
     public static class GlyphPathBuilderExtensions
     {
-        public static void Build(this GlyphPathBuilderBase builder, char c, float sizeInPoints)
+        public static void Build(this GlyphOutlineBuilderBase builder, char c, float sizeInPoints)
         {
             builder.BuildFromGlyphIndex((ushort)builder.Typeface.GetGlyphIndex(c), sizeInPoints);
         }
-        public static void SetHintTechnique(this GlyphPathBuilderBase builder, HintTechnique hintTech)
+        public static void SetHintTechnique(this GlyphOutlineBuilderBase builder, HintTechnique hintTech)
         {
 
             builder.UseTrueTypeInstructions = false;//reset
@@ -184,6 +184,12 @@ namespace Typography.Contours
         /// <summary>
         /// custom hint
         /// </summary>
-        CustomAutoFit
+        CustomAutoFit,
+
+        /// <summary>
+        /// Cff instruction hint
+        /// </summary>
+        CffHintInstruction
+
     }
 }

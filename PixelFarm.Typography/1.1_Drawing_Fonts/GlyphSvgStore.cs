@@ -12,7 +12,7 @@ namespace PixelFarm.Drawing.Fonts
     {
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;
-        Dictionary<Typeface, GlyphBitmapList> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphBitmapList>();
+        Dictionary<Typeface, GlyphBitmapList> _cacheGlyphBmpLists = new Dictionary<Typeface, GlyphBitmapList>();
 
         SvgBmpBuilderFunc _svgBmpBuilderFunc;
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilder)
@@ -23,7 +23,7 @@ namespace PixelFarm.Drawing.Fonts
         public void SetCurrentTypeface(Typeface typeface)
         {
             _currentTypeface = typeface;
-            if (_cacheGlyphPathBuilders.TryGetValue(typeface, out _bitmapList))
+            if (_cacheGlyphBmpLists.TryGetValue(typeface, out _bitmapList))
             {
                 return;
             }
@@ -31,7 +31,7 @@ namespace PixelFarm.Drawing.Fonts
             //or create a single texture atlas. 
             //if not create a new one
             _bitmapList = new GlyphBitmapList();
-            _cacheGlyphPathBuilders.Add(typeface, _bitmapList);
+            _cacheGlyphBmpLists.Add(typeface, _bitmapList);
             int glyphCount = typeface.GlyphCount;
 
             System.Text.StringBuilder stbuilder = new System.Text.StringBuilder();

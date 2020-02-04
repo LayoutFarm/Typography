@@ -77,7 +77,7 @@ namespace PixelFarm.Drawing.Fonts
             ChangeFont(painter.CurrentFont);
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
-
+        public TextBaseline TextBaseline { get; set; }
         public void Dispose()
         {
             //clear this

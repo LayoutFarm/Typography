@@ -47,13 +47,13 @@ namespace Typography.Contours
         /// <summary>
         /// store typeface and its builder
         /// </summary>
-        Dictionary<Typeface, GlyphPathBuilder> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphPathBuilder>();
+        Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphOutlineBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
         /// <summary>
         /// glyph mesh data for specific condition
         /// </summary>
         GlyphMeshCollection<GlyphMeshData> _hintGlyphCollection = new GlyphMeshCollection<GlyphMeshData>();
 
-        GlyphPathBuilder _currentGlyphBuilder;
+        GlyphOutlineBuilder _currentGlyphBuilder;
         Typeface _currentTypeface;
         float _currentFontSizeInPoints;
         HintTechnique _currentHintTech;
@@ -87,10 +87,10 @@ namespace Typography.Contours
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
             //temp fix,        
-            if (_currentGlyphBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(typeface))
+            if (_currentGlyphBuilder != null && !_cacheGlyphOutlineBuilders.ContainsKey(typeface))
             {
                 //store current typeface to cache
-                _cacheGlyphPathBuilders[_currentTypeface] = _currentGlyphBuilder;
+                _cacheGlyphOutlineBuilders[_currentTypeface] = _currentGlyphBuilder;
             }
             _currentTypeface = typeface;
             _currentGlyphBuilder = null;
@@ -99,10 +99,10 @@ namespace Typography.Contours
             //----------------------------
             //check if we have this in cache ?
             //if we don't have it, this _currentTypeface will set to null ***                  
-            _cacheGlyphPathBuilders.TryGetValue(_currentTypeface, out _currentGlyphBuilder);
+            _cacheGlyphOutlineBuilders.TryGetValue(_currentTypeface, out _currentGlyphBuilder);
             if (_currentGlyphBuilder == null)
             {
-                _currentGlyphBuilder = new GlyphPathBuilder(typeface);
+                _currentGlyphBuilder = new GlyphOutlineBuilder(typeface);
             }
             //----------------------------------------------
             _currentFontSizeInPoints = fontSizeInPoints;

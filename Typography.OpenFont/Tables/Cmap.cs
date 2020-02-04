@@ -82,7 +82,7 @@ namespace Typography.OpenFont.Tables
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns>glyph index</returns>
-        public ushort LookupIndex(int codepoint, int nextCodepoint = 0)
+        public ushort GetGlyphIndex(int codepoint, int nextCodepoint = 0)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
             // "character codes that do not correspond to any glyph in the font should be mapped to glyph index 0."

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Typography.OpenFont
+namespace Typography.OpenFont.Tables
 {
     class CharMapFormat4 : CharacterMap
     {
@@ -485,28 +485,4 @@ namespace Typography.OpenFont
     }
 
 
-
-    //public class GlyphIndexCollector
-    //{
-    //    Dictionary<int, List<ushort>> _registerSegments = new Dictionary<int, List<ushort>>();
-    //    public bool HasRegisterSegment(int segmentNumber)
-    //    {
-    //        return _registerSegments.ContainsKey(segmentNumber);
-    //    }
-    //    public void RegisterGlyphRangeIndex(int segmentNumber, List<ushort> glyphIndexList)
-    //    {
-    //        _registerSegments.Add(segmentNumber, glyphIndexList);
-    //    }
-    //    public IEnumerable<ushort> GetGlyphIndexIter()
-    //    {
-    //        foreach (List<ushort> list in _registerSegments.Values)
-    //        {
-    //            int j = list.Count;
-    //            for (int i = 0; i < j; ++i)
-    //            {
-    //                yield return list[i];
-    //            }
-    //        }
-    //    }
-    //}
 }

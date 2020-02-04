@@ -129,7 +129,7 @@ namespace PixelFarm.Drawing.Fonts
 
             //sample: create sample msdf texture 
             //-------------------------------------------------------------
-            var builder = new GlyphPathBuilder(typeface);
+            var builder = new GlyphOutlineBuilder(typeface);
             builder.SetHintTechnique(hintTechnique);
             //
             if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
