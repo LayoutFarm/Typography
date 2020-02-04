@@ -1,4 +1,4 @@
-//MIT, 2016-present, WinterDev, Sam Hocevar
+﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
 using Typography.Contours;
 using Typography.OpenFont;
@@ -111,6 +111,8 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
+        public TextBaseline TextBaseline { get; set; }
+
         public void PrepareStringForRenderVx(RenderVxFormattedString renderVx, char[] text, int startAt, int len)
         {
             UpdateGlyphLayoutSettings();
@@ -132,7 +134,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             //2.1              
             if (Typeface == null) return;
-            _glyphMeshStore.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
+            _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _currentFontSizePxScale = Typeface.CalculateScaleToPixelFromPointSize(FontSizeInPoints);
 
             ////2.3
@@ -221,7 +223,7 @@ namespace PixelFarm.Drawing.Fonts
             bool hasColorGlyphs = (colrTable != null) && (cpalTable != null);
 
             //--------------------------------------------------- 
-            _glyphMeshStore.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
+            _glyphMeshStore.SetHintTechnique(this.HintTechnique);
             _glyphMeshStore.SetFont(_currentTypeface, fontSizePoint);
             _glyphMeshStore.SimulateOblique = this.SimulateSlant;
             //---------------------------------------------------

@@ -1089,6 +1089,9 @@ namespace Typography.OpenFont.CFF
             Type2CharStringParser type2Parser = new Type2CharStringParser();
             type2Parser.SetCurrentCff1Font(_currentCff1Font);
 
+#if DEBUG
+            //double total = 0;
+#endif
             for (int i = 0; i < glyphCount; ++i)
             {
                 CffIndexOffset offset = offsets[i];
@@ -1117,11 +1120,35 @@ namespace Typography.OpenFont.CFF
                 Type2GlyphInstructionList instList = type2Parser.ParseType2CharString(buffer);
                 if (instList != null)
                 {
-                    glyphData.GlyphInstructions = instList.Insts.ToArray();
+                    //use compact form or not
+
+                    if (_useCompactInstruction)
+                    {
+                        //this is our extension 
+                        glyphData.GlyphInstructions = _instCompacter.Compact(instList.InnerInsts);
+
+#if DEBUG
+                        //total += glyphData.GlyphInstructions.Length / (float)instList.InnerInsts.Count;
+#endif
+
+                    }
+                    else
+                    {
+                        glyphData.GlyphInstructions = instList.InnerInsts.ToArray();
+
+                    }
                 }
                 glyphs[i] = new Glyph(_currentCff1Font, glyphData);
             }
+
+#if DEBUG
+            //double avg = total / glyphCount;
+#endif
+
         }
+        //---------------
+        bool _useCompactInstruction = true;
+        Type2InstructionCompacter _instCompacter = new Type2InstructionCompacter();
 
 
         void ReadFormat0Encoding()

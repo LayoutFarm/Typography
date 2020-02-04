@@ -17,13 +17,19 @@ namespace Typography.OpenFont.CFF
     //must be used in a CFF (Compact Font Format) or OpenType font 
     //file to create a complete font program
 
-
-
     struct Type2Instruction
     {
         public readonly int Value;
-        public readonly OperatorName Op;
+        public readonly byte Op;
         public Type2Instruction(OperatorName op, int value)
+        {
+            this.Op = (byte)op;
+            this.Value = value;
+#if DEBUG
+            _dbug_OnlyOp = false;
+#endif
+        }
+        public Type2Instruction(byte op, int value)
         {
             this.Op = op;
             this.Value = value;
@@ -33,7 +39,7 @@ namespace Typography.OpenFont.CFF
         }
         public Type2Instruction(OperatorName op)
         {
-            this.Op = op;
+            this.Op = (byte)op;
             this.Value = 0;
 #if DEBUG
             _dbug_OnlyOp = true;
@@ -55,31 +61,102 @@ namespace Typography.OpenFont.CFF
             return int_part + fraction_part;
         }
 
+        internal bool IsLoadInt => (OperatorName)Op == OperatorName.LoadInt;
+
 #if DEBUG
         bool _dbug_OnlyOp;
+
+        [System.ThreadStatic]
+        static System.Text.StringBuilder s_dbugSb;
+
         public override string ToString()
         {
+
+            int merge_flags = Op >> 6; //upper most 2 bits we use as our extension
+            //so operator name is lower 6 bits
+
+            int only_operator = Op & 0b111111;
+            OperatorName op_name = (OperatorName)only_operator;
+
             if (_dbug_OnlyOp)
             {
-                return Op.ToString();
+                return op_name.ToString();
             }
             else
             {
-                switch (Op)
+                if (s_dbugSb == null)
+                {
+                    s_dbugSb = new System.Text.StringBuilder();
+                }
+                s_dbugSb.Length = 0;//reset
+
+                bool has_ExtenedForm = true;
+
+
+                //this is my extension
+                switch (merge_flags)
+                {
+#if DEBUG
+                    default: throw new NotSupportedException();
+#endif
+                    case 0:
+                        //nothing 
+                        has_ExtenedForm = false;
+                        break;
+                    case 1:
+                        //contains merge data for LoadInt
+                        s_dbugSb.Append(Value.ToString() + " ");
+                        break;
+                    case 2:
+                        //contains merge data for LoadShort2
+                        s_dbugSb.Append((short)(Value >> 16) + " " + (short)(Value >> 0) + " ");
+                        break;
+                    case 3:
+                        //contains merge data for LoadSbyte4
+                        s_dbugSb.Append((sbyte)(Value >> 24) + " " + (sbyte)(Value >> 16) + " " + (sbyte)(Value >> 8) + " " + (sbyte)(Value) + " ");
+                        break;
+                }
+
+                switch (op_name)
                 {
                     case OperatorName.LoadInt:
-                        return Value.ToString();
+                        s_dbugSb.Append(Value);
+                        break;
                     case OperatorName.LoadFloat:
-                        return ReadValueAsFixed1616().ToString();
+                        s_dbugSb.Append(ReadValueAsFixed1616().ToString());
+                        break;
+                    //-----------
+                    case OperatorName.LoadShort2:
+                        s_dbugSb.Append((short)(Value >> 16) + " " + (short)(Value >> 0));
+                        break;
+                    case OperatorName.LoadSbyte4:
+                        s_dbugSb.Append((sbyte)(Value >> 24) + " " + (sbyte)(Value >> 16) + " " + (sbyte)(Value >> 8) + " " + (sbyte)(Value));
+                        break;
+                    case OperatorName.LoadSbyte3:
+                        s_dbugSb.Append((sbyte)(Value >> 24) + " " + (sbyte)(Value >> 16) + " " + (sbyte)(Value >> 8));
+                        break;
+                    //-----------     
                     case OperatorName.hintmask1:
                     case OperatorName.hintmask2:
                     case OperatorName.hintmask3:
                     case OperatorName.hintmask4:
                     case OperatorName.hintmask_bits:
-                        return Op.ToString() + " " + Convert.ToString(Value, 2);
+                        s_dbugSb.Append((op_name).ToString() + " " + Convert.ToString(Value, 2));
+                        break;
                     default:
-                        return Op.ToString() + " " + Value.ToString();
+                        if (has_ExtenedForm)
+                        {
+                            s_dbugSb.Append((op_name).ToString());
+                        }
+                        else
+                        {
+                            s_dbugSb.Append((op_name).ToString() + " " + Value.ToString());
+                        }
+
+                        break;
                 }
+
+                return s_dbugSb.ToString();
 
             }
 
@@ -194,6 +271,11 @@ namespace Typography.OpenFont.CFF
         LoadInt,
         LoadFloat,
         GlyphWidth,
+
+        LoadSbyte4, //my extension, 4 sbyte in an int32
+        LoadSbyte3, //my extension, 3 sbytes in an int32
+        LoadShort2, //my extension, 2 short in an int32
+
         //---------------------
         //type2Operator1
         //---------------------
@@ -274,11 +356,12 @@ namespace Typography.OpenFont.CFF
     class Type2GlyphInstructionList
     {
         List<Type2Instruction> _insts;
+
         public Type2GlyphInstructionList()
         {
             _insts = new List<Type2Instruction>();
         }
-        public List<Type2Instruction> Insts => _insts;
+
         public Type2Instruction RemoveLast()
         {
             int last = _insts.Count - 1;
@@ -323,10 +406,16 @@ namespace Typography.OpenFont.CFF
         {
             //check the first element must be loadint
             Type2Instruction firstInst = _insts[0];
-            if (firstInst.Op != OperatorName.LoadInt) { throw new NotSupportedException(); }
+            if (!firstInst.IsLoadInt) { throw new NotSupportedException(); }
             //the replace
             _insts[0] = new Type2Instruction(OperatorName.GlyphWidth, firstInst.Value);
         }
+
+
+
+
+        internal List<Type2Instruction> InnerInsts => _insts;
+
 #if DEBUG
         void debugCheck()
         {
@@ -369,7 +458,7 @@ namespace Typography.OpenFont.CFF
                 {
 
                     w.Write("[" + i + "] ");
-                    if (inst.Op == OperatorName.LoadInt)
+                    if (inst.IsLoadInt)
                     {
                         w.Write(inst.Value.ToString());
                         w.Write(' ');
@@ -684,7 +773,7 @@ namespace Typography.OpenFont.CFF
                             if (_currentCff1Font != null)
                             {
                                 Type2Instruction inst = _insts.RemoveLast();
-                                if (inst.Op != OperatorName.LoadInt)
+                                if (!inst.IsLoadInt)
                                 {
                                     throw new NotSupportedException();
                                 }
@@ -702,7 +791,7 @@ namespace Typography.OpenFont.CFF
                             if (_currentCff1Font != null)
                             {
                                 Type2Instruction inst = _insts.RemoveLast();
-                                if (inst.Op != OperatorName.LoadInt)
+                                if (!inst.IsLoadInt)
                                 {
                                     throw new NotSupportedException();
                                 }

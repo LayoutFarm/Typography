@@ -1,4 +1,4 @@
-//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -134,7 +134,7 @@ namespace SampleWinForms
             _selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             _selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
-            _selectedTextPrinter.TrueTypeHintTechnique = _glyphRenderOptions.HintTechnique;
+            _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
             _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
 
             //test print 3 lines
@@ -295,7 +295,7 @@ namespace SampleWinForms
                         _selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                         _selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
-                        _selectedTextPrinter.TrueTypeHintTechnique = _glyphRenderOptions.HintTechnique;
+                        _selectedTextPrinter.HintTechnique = _glyphRenderOptions.HintTechnique;
                         _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
                         _selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
 
@@ -431,8 +431,8 @@ namespace SampleWinForms
             //p.UseSubPixelRendering = chkLcdTechnique.Checked;
             _painter.Clear(PixelFarm.Drawing.Color.White);
             //----------------------------------------------------
-            var builder = new GlyphPathBuilder { Typeface = typeface };
-            builder.TrueTypeHintTechnique = _glyphRenderOptions.HintTechnique;
+            var builder = new GlyphOutlineBuilder(typeface);
+            builder.SetHintTechnique(_glyphRenderOptions.HintTechnique);
 
             //----------------------------------------------------
             builder.Build(testChar, sizeInPoint);

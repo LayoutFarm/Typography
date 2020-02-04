@@ -14,12 +14,10 @@ namespace Typography.OpenFont
         //TODO: implement vertical metrics
         readonly HorizontalMetrics _horizontalMetrics;
         readonly NameEntry _nameEntry;
-
         //
-        readonly CFFTable _cffTable;
-        readonly BitmapFontGlyphSource _bitmapFontGlyphSource;
+        CFFTable _cffTable;
+        BitmapFontGlyphSource _bitmapFontGlyphSource;
 
-        /// <summary>TrueType font constructor</summary>
         internal Typeface(
             NameEntry nameEntry,
             Bounds bounds,
@@ -36,7 +34,6 @@ namespace Typography.OpenFont
             _horizontalMetrics = horizontalMetrics;
             OS2Table = os2Table;
         }
-        /// <summary>PostScript outline (CFF) font constructor</summary>
         internal Typeface(
            NameEntry nameEntry,
            Bounds bounds,
@@ -57,7 +54,6 @@ namespace Typography.OpenFont
             //------
             _glyphs = _cffTable.Cff1FontSet._fonts[0]._glyphs;
         }
-        /// <summary>Bitmap font constructor</summary>
         internal Typeface(
              NameEntry nameEntry,
              Bounds bounds,

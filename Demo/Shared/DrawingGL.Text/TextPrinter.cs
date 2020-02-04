@@ -1,4 +1,4 @@
-//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
+﻿//MIT, 2017, Zou Wei(github/zwcloud), WinterDev
 using System.Collections.Generic;
 using Typography.OpenFont;
 using Typography.TextLayout;
@@ -96,8 +96,22 @@ namespace DrawingGL.Text
                     }
 
                     //2. glyph builder
-                    _currentGlyphPathBuilder = new GlyphPathBuilder { Typeface = Typeface };
-                    _currentGlyphPathBuilder.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
+                    _currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
+                    _currentGlyphPathBuilder.UseTrueTypeInstructions = false; //reset
+                    _currentGlyphPathBuilder.UseVerticalHinting = false; //reset
+                    switch (this.HintTechnique)
+                    {
+                        case HintTechnique.TrueTypeInstruction:
+                            _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
+                            break;
+                        case HintTechnique.TrueTypeInstruction_VerticalOnly:
+                            _currentGlyphPathBuilder.UseTrueTypeInstructions = true;
+                            _currentGlyphPathBuilder.UseVerticalHinting = true;
+                            break;
+                        case HintTechnique.CustomAutoFit:
+                            //custom agg autofit 
+                            break;
+                    }
 
                     //3. glyph translater
                     _pathTranslator = new GlyphTranslatorToPath();
@@ -129,7 +143,7 @@ namespace DrawingGL.Text
 
             //in this version we store original glyph into the mesh collection
             //and then we scale it later, so I just specific font size=0 (you can use any value)
-            _glyphMeshCollection.SetCacheInfo(this.Typeface, 0, this.TrueTypeHintTechnique);
+            _glyphMeshCollection.SetCacheInfo(this.Typeface, 0, this.HintTechnique);
 
 
             GlyphLayoutMan.Typeface = this.Typeface;

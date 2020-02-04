@@ -27,7 +27,7 @@ namespace SampleWinForms
 
             //choose Thai script for 'complex script' testing.
             //you can change this to test other script.
-            _currentTextPrinter.ScriptLang = ScriptLangs.Latin;
+            _currentTextPrinter.ScriptLang = Typography.OpenFont.ScriptLangs.Latin;
             //----------
             button1.Click += (s, e) => UpdateRenderOutput();
             //simple load test fonts from local test dir
@@ -42,10 +42,10 @@ namespace SampleWinForms
             cmbPositionTech.SelectedIndex = 0;
             cmbPositionTech.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
             //----------
-            lstHintList.Items.Add(TrueTypeHintTechnique.None);
-            lstHintList.Items.Add(TrueTypeHintTechnique.Instructions);
-            lstHintList.Items.Add(TrueTypeHintTechnique.Instructions_VerticalOnly);
-            lstHintList.Items.Add(TrueTypeHintTechnique.CustomAutoFit);
+            lstHintList.Items.Add(HintTechnique.None);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction);
+            lstHintList.Items.Add(HintTechnique.TrueTypeInstruction_VerticalOnly);
+            lstHintList.Items.Add(HintTechnique.CustomAutoFit);
             lstHintList.SelectedIndex = 0;
             lstHintList.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
 
@@ -147,7 +147,7 @@ namespace SampleWinForms
             g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
 
             //-----------------------  
-            _currentTextPrinter.TrueTypeHintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
+            _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             _currentTextPrinter.TargetGraphics = g;
             //render at specific pos
@@ -260,7 +260,7 @@ namespace SampleWinForms
             //--------------------------------
             //textspan measurement sample
             //--------------------------------  
-            _currentTextPrinter.TrueTypeHintTechnique = (TrueTypeHintTechnique)lstHintList.SelectedItem;
+            _currentTextPrinter.HintTechnique = (HintTechnique)lstHintList.SelectedItem;
             _currentTextPrinter.PositionTechnique = (PositionTechnique)cmbPositionTech.SelectedItem;
             //render at specific pos
             float x_pos = 0, y_pos = 100;

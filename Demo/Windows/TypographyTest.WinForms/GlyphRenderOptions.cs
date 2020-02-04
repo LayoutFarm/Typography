@@ -1,6 +1,5 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
-using Typography.OpenFont;
 using Typography.Contours;
 namespace TypographyTest
 {
@@ -12,10 +11,10 @@ namespace TypographyTest
 
         public GlyphRenderOptions()
         {
-            HintTechnique = TrueTypeHintTechnique.None;
+            HintTechnique = HintTechnique.None;
             FillBackground = true;
         }
-        public TrueTypeHintTechnique HintTechnique
+        public HintTechnique HintTechnique
         {
             get; set;
         }

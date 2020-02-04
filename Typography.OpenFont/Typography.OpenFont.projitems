@@ -14,9 +14,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\MacPostFormat1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AdditionalInfo\OS2_IBMFontClassParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Bounds.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables\CharacterMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Glyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPathBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlyphPointF.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IGlyphTranslator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\ByteOrderSwappingBinaryReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OpenFontReader.cs" />
@@ -52,6 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapAndSvgFonts\CBDT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapAndSvgFonts\CBLC.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.BitmapAndSvgFonts\EBLC.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tables.CFF\Type2InstructionCompacter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\HorizontalDeviceMetrics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\Kern.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Others\LinearThreashold.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\MVar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables.Variations\VVar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\Cmap.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tables\CharacterMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\Head.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\HorizontalHeader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\HorizontalMetrics.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tables\TableHeader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tables\Utils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\TrueTypeInterpreter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidTrueTypeFontException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TrueTypeInterperter\InvalidFontException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Typeface.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebFont\Woff2Reader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebFont\WoffReader.cs" />

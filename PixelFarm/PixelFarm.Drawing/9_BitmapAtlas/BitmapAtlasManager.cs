@@ -20,8 +20,7 @@ namespace PixelFarm.Drawing.BitmapAtlas
         }
         public U GetOrCreateNewOne(T key)
         {
-            U found;
-            if (!_loadBmps.TryGetValue(key, out found))
+            if (!_loadBmps.TryGetValue(key, out U found))
             {
                 return _loadBmps[key] = _loadNewBmpDel(key);
             }
@@ -41,8 +40,7 @@ namespace PixelFarm.Drawing.BitmapAtlas
         }
         public void Delete(T key)
         {
-            U found;
-            if (_loadBmps.TryGetValue(key, out found))
+            if (_loadBmps.TryGetValue(key, out U found))
             {
                 found.Dispose();
                 _loadBmps.Remove(key);

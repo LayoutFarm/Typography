@@ -6,8 +6,11 @@ namespace Typography.OpenFont
     /// <summary>
     /// original glyph bounds
     /// </summary>
-    public readonly struct Bounds
+    public struct Bounds
     {
+
+        //TODO: will be changed to => public readonly struct Bounds 
+
         public static readonly Bounds Zero = new Bounds(0, 0, 0, 0);
         public Bounds(short xmin, short ymin, short xmax, short ymax)
         {

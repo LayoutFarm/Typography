@@ -1,4 +1,4 @@
-//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev
 
 using System;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace Typography.Contours
         /// <summary>
         /// store typeface and its builder
         /// </summary>
-        Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
+        Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphOutlineBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
         /// <summary>
         /// glyph mesh data for specific condition
         /// </summary>
@@ -56,10 +56,20 @@ namespace Typography.Contours
         GlyphOutlineBuilder _currentGlyphBuilder;
         Typeface _currentTypeface;
         float _currentFontSizeInPoints;
+        HintTechnique _currentHintTech;
 
-        readonly GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
 
-        public GlyphMeshStore() { }
+        GlyphTranslatorToVxs _tovxs = new GlyphTranslatorToVxs();
+
+        public GlyphMeshStore()
+        {
+
+        }
+        public void SetHintTechnique(HintTechnique hintTech)
+        {
+            _currentHintTech = hintTech;
+
+        }
 
         /// <summary>
         /// simulate italic glyph
@@ -67,7 +77,6 @@ namespace Typography.Contours
         public bool SimulateOblique { get; set; }
 
         public bool FlipGlyphUpward { get; set; }
-        public TrueTypeHintTechnique TrueTypeHintTechnique { get; set; }
 
 
         /// <summary>
@@ -78,10 +87,10 @@ namespace Typography.Contours
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
             //temp fix,        
-            if (_currentGlyphBuilder != null && !_cacheGlyphPathBuilders.ContainsKey(typeface))
+            if (_currentGlyphBuilder != null && !_cacheGlyphOutlineBuilders.ContainsKey(typeface))
             {
                 //store current typeface to cache
-                _cacheGlyphPathBuilders[_currentTypeface] = _currentGlyphBuilder;
+                _cacheGlyphOutlineBuilders[_currentTypeface] = _currentGlyphBuilder;
             }
             _currentTypeface = typeface;
             _currentGlyphBuilder = null;
@@ -90,7 +99,7 @@ namespace Typography.Contours
             //----------------------------
             //check if we have this in cache ?
             //if we don't have it, this _currentTypeface will set to null ***                  
-            _cacheGlyphPathBuilders.TryGetValue(_currentTypeface, out _currentGlyphBuilder);
+            _cacheGlyphOutlineBuilders.TryGetValue(_currentTypeface, out _currentGlyphBuilder);
             if (_currentGlyphBuilder == null)
             {
                 _currentGlyphBuilder = new GlyphOutlineBuilder(typeface);
@@ -102,7 +111,7 @@ namespace Typography.Contours
             //temp fix, temp disable customfit if we build emoji font
             _currentGlyphBuilder.TemporaryDisableCustomFit = (typeface.COLRTable != null) && (typeface.CPALTable != null);
             //------------------------------------------ 
-            _hintGlyphCollection.SetCacheInfo(typeface, _currentFontSizeInPoints, TrueTypeHintTechnique);
+            _hintGlyphCollection.SetCacheInfo(typeface, _currentFontSizeInPoints, _currentHintTech);
         }
 
         /// <summary>
@@ -116,7 +125,7 @@ namespace Typography.Contours
             if (!_hintGlyphCollection.TryGetCacheGlyph(glyphIndex, out glyphMeshData))
             {
                 //if not found then create new glyph vxs and cache it
-                _currentGlyphBuilder.TrueTypeHintTechnique = TrueTypeHintTechnique;
+                _currentGlyphBuilder.SetHintTechnique(_currentHintTech);
                 _currentGlyphBuilder.BuildFromGlyphIndex(glyphIndex, _currentFontSizeInPoints);
                 DynamicOutline dynamicOutline = _currentGlyphBuilder.LatestGlyphFitOutline;
                 //-----------------------------------  

@@ -1,4 +1,4 @@
-//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev
 //-----------------------------------  
 using System;
 using PixelFarm.CpuBlit.VertexProcessing;
@@ -15,7 +15,7 @@ namespace Typography.Contours
     /// </summary>
     public class AggGlyphTextureGen
     {
-        readonly GlyphTranslatorToVxs _txToVxs = new GlyphTranslatorToVxs();
+        GlyphTranslatorToVxs _txToVxs = new GlyphTranslatorToVxs();
 
         public AggGlyphTextureGen()
         {
@@ -27,7 +27,7 @@ namespace Typography.Contours
         public Color GlyphColor { get; set; }
         public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKind { get; set; }
         public AggPainter Painter { get; set; }
-        public GlyphImage CreateGlyphImage(OpenFont.GlyphPathBuilder builder, float pxscale)
+        public GlyphImage CreateGlyphImage(GlyphOutlineBuilder builder, float pxscale)
         {
 
             _txToVxs.Reset();

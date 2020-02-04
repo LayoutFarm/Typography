@@ -1,39 +1,41 @@
-//MIT, 2015, Michael Popoloski's SharpFont
+﻿//MIT, 2015, Michael Popoloski's SharpFont
 using System;
 using System.Numerics;
 
 namespace Typography.OpenFont
 {
 
+
     public class TrueTypeInterpreter
     {
-        public TrueTypeInterpreter() { }
         Typeface _currentTypeFace;
         SharpFontInterpreter _interpreter;
         public Typeface Typeface
         {
             get => _currentTypeFace;
-            set
+            set => SetTypeFace(value);
+        }
+
+        public void SetTypeFace(Typeface typeface)
+        {
+            //still preserve this for compat with others,
+            //wait for other libs...
+
+            _currentTypeFace = typeface;
+            Tables.MaxProfile maximumProfile = _currentTypeFace.MaxProfile;
+            _interpreter = new SharpFontInterpreter(
+                maximumProfile.MaxStackElements,
+                maximumProfile.MaxStorage,
+                maximumProfile.MaxFunctionDefs,
+                maximumProfile.MaxInstructionDefs,
+                maximumProfile.MaxTwilightPoints);
+            // the fpgm table optionally contains a program to run at initialization time 
+            if (_currentTypeFace.FpgmProgramBuffer != null)
             {
-                _currentTypeFace =
-                    value.IsCffFont ?
-                    throw new ArgumentException("For CFF fonts, use " +
-                        typeof(CFF.CffEvaluationEngine).FullName + ".") :
-                    value;
-                var maximumProfile = _currentTypeFace.MaxProfile;
-                _interpreter = new SharpFontInterpreter(
-                    maximumProfile.MaxStackElements,
-                    maximumProfile.MaxStorage,
-                    maximumProfile.MaxFunctionDefs,
-                    maximumProfile.MaxInstructionDefs,
-                    maximumProfile.MaxTwilightPoints);
-                // the fpgm table optionally contains a program to run at initialization time 
-                if (_currentTypeFace.FpgmProgramBuffer != null)
-                {
-                    _interpreter.InitializeFunctionDefs(_currentTypeFace.FpgmProgramBuffer);
-                }
+                _interpreter.InitializeFunctionDefs(_currentTypeFace.FpgmProgramBuffer);
             }
         }
+
 
         public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPixel)
         {
@@ -251,11 +253,11 @@ namespace Typography.OpenFont
                 Execute(new InstructionStream(instructions), false, false);
             }
             catch (InvalidTrueTypeFontException)
-            { 
+            {
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine("invalid_font_ex:");
 #endif
- 
+
             }
         }
 

@@ -427,13 +427,13 @@ namespace Typography.OpenFont
 
 
                         typeface = new Typeface(
-                            nameEntry,
-                            header.Bounds,
-                            header.UnitsPerEm,
-                            bmpFontGlyphSrc,
-                            glyphs,
-                            horizontalMetrics,
-                            os2Table);
+                          nameEntry,
+                          header.Bounds,
+                          header.UnitsPerEm,
+                          bmpFontGlyphSrc,
+                          glyphs,
+                          horizontalMetrics,
+                          os2Table);
                         isBitmapFont = true;
                     }
                     else
@@ -449,12 +449,12 @@ namespace Typography.OpenFont
                     //PostScript outline font 
                     isPostScriptOutline = true;
                     typeface = new Typeface(
-                        nameEntry,
-                        header.Bounds,
-                        header.UnitsPerEm,
-                        cff,
-                        horizontalMetrics,
-                        os2Table);
+                          nameEntry,
+                          header.Bounds,
+                          header.UnitsPerEm,
+                          cff,
+                          horizontalMetrics,
+                          os2Table);
                 }
             }
             else

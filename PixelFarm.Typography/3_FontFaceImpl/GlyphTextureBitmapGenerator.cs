@@ -1,4 +1,4 @@
-//MIT, 2017-present, WinterDev
+﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
 using PixelFarm.Contours;
@@ -15,7 +15,7 @@ namespace PixelFarm.Drawing.Fonts
     {
         public ScriptLang ScriptLang;
         public char[] OnlySelectedGlyphIndices;
-        public TrueTypeHintTechnique HintTechnique;
+        public HintTechnique HintTechnique;
         public bool DoFilter;
     }
 
@@ -98,13 +98,13 @@ namespace PixelFarm.Drawing.Fonts
             //------------------------------------------------------------- 
             //we can specfic subset with special setting for each set 
             CreateTextureFontFromGlyphIndices(typeface, sizeInPoint,
-                TrueTypeHintTechnique.Instructions_VerticalOnly, atlasBuilder, false, GetUniqueGlyphIndexList(glyphIndices));
+                HintTechnique.TrueTypeInstruction_VerticalOnly, atlasBuilder, false, GetUniqueGlyphIndexList(glyphIndices));
             onFinishTotal(0, null, atlasBuilder);
         }
         void CreateTextureFontFromGlyphIndices(
               Typeface typeface,
               float sizeInPoint,
-              TrueTypeHintTechnique hintTechnique,
+              HintTechnique hintTechnique,
               SimpleFontAtlasBuilder atlasBuilder,
               bool applyFilter,
               char[] chars)
@@ -121,7 +121,7 @@ namespace PixelFarm.Drawing.Fonts
         void CreateTextureFontFromGlyphIndices(
               Typeface typeface,
               float sizeInPoint,
-              TrueTypeHintTechnique hintTechnique,
+              HintTechnique hintTechnique,
               SimpleFontAtlasBuilder atlasBuilder,
               bool applyFilter,
               ushort[] glyphIndices)
@@ -129,8 +129,8 @@ namespace PixelFarm.Drawing.Fonts
 
             //sample: create sample msdf texture 
             //-------------------------------------------------------------
-            var builder = new GlyphPathBuilder { Typeface = typeface };
-            builder.TrueTypeHintTechnique = hintTechnique;
+            var builder = new GlyphOutlineBuilder(typeface);
+            builder.SetHintTechnique(hintTechnique);
             //
             if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
             {

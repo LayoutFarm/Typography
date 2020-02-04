@@ -41,11 +41,17 @@
     <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphMeshCollection.cs">
       <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphOutlineBuilderBase.cs">
+      <Link>GlyphPathBuilder\GlyphOutlineBuilderBase.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\TextPrinterBase.cs">
       <Link>DevTextPrinter\TextPrinterBase.cs</Link>
     </Compile>
     <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
       <Link>DevTextPrinter\FontManagement.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs">
+      <Link>GlyphPathBuilder\GlyphOutlineBuilder.cs</Link>
     </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

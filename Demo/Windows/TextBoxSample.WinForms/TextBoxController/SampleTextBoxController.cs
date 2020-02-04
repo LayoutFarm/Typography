@@ -35,7 +35,7 @@ namespace SampleWinForms.UI
             //credit:
             //http://stackoverflow.com/questions/1485745/flip-coordinates-when-drawing-to-control
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -300F);// Translate the drawing area accordingly   
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly   
 
 
             _printer.TargetGraphics = g;
@@ -43,7 +43,7 @@ namespace SampleWinForms.UI
             //----------
             //transform back
             g.ScaleTransform(1.0F, -1.0F);// Flip the Y-Axis 
-            g.TranslateTransform(0.0F, -300F);// Translate the drawing area accordingly                          
+            g.TranslateTransform(0.0F, -(float)300);// Translate the drawing area accordingly                          
 
             //----------
 #if DEBUG

@@ -81,7 +81,7 @@ namespace PixelFarmTextBox.WinForms
             //....
             _devVxsTextPrinter = new VxsTextPrinter(painter, _openFontTextService);
             _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
-            _devVxsTextPrinter.PositionTechnique = PositionTechnique.OpenFont;
+            _devVxsTextPrinter.PositionTechnique = Typography.TextLayout.PositionTechnique.OpenFont;
             _devVxsTextPrinter.FontSizeInPoints = 10;
 
             _controllerForPixelFarm.BindHostGraphics(g);
@@ -127,7 +127,7 @@ namespace PixelFarmTextBox.WinForms
                         selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
                         selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
 
-                        selectedTextPrinter.TrueTypeHintTechnique = TrueTypeHintTechnique.None;
+                        selectedTextPrinter.HintTechnique = HintTechnique.None;
                         selectedTextPrinter.EnableLigature = true;
                         _devVxsTextPrinter.UpdateGlyphLayoutSettings();
                         //
@@ -156,7 +156,7 @@ namespace PixelFarmTextBox.WinForms
             selectedTextPrinter.FontSizeInPoints = _basicOptions.FontSizeInPoints;
             selectedTextPrinter.ScriptLang = _basicOptions.ScriptLang;
             selectedTextPrinter.PositionTechnique = _basicOptions.PositionTech;
-            selectedTextPrinter.TrueTypeHintTechnique = TrueTypeHintTechnique.None;
+            selectedTextPrinter.HintTechnique = HintTechnique.None;
             selectedTextPrinter.EnableLigature = true;
             _devVxsTextPrinter.UpdateGlyphLayoutSettings();
 

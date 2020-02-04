@@ -1,4 +1,4 @@
-//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev
 
 using System;
 using System.Collections.Generic;
@@ -49,16 +49,16 @@ namespace Typography.Contours
         public void MoveTo(float x0, float y0) => _tx.MoveTo(x0, y0);
     }
 
-    public class GlyphOutlineBuilder : GlyphPathBuilder
+    public class GlyphOutlineBuilder : GlyphOutlineBuilderBase
     {
         GlyphOutlineAnalyzer _fitShapeAnalyzer = new GlyphOutlineAnalyzer();
         Dictionary<ushort, DynamicOutline> _fitOutlineCollection = new Dictionary<ushort, DynamicOutline>();
         DynamicOutline _latestDynamicOutline;
 
         public GlyphOutlineBuilder(Typeface typeface)
-            : base()
+            : base(typeface)
         {
-            Typeface = typeface;
+
             //for specific typeface ***
             //float offsetLenFromMasterOutline = GlyphDynamicEdgeOffset;
             //_latestDynamicOutline.SetDynamicEdgeOffsetFromMasterOutline(offsetLenFromMasterOutline / toPixelScale);
@@ -92,7 +92,7 @@ namespace Typography.Contours
                     return;
                 }
                 //
-                if (this.UseTrueTypeVerticalHinting)
+                if (this.UseVerticalHinting)
                 {
                     if (!_fitOutlineCollection.TryGetValue(glyph.GlyphIndex, out _latestDynamicOutline))
                     {
@@ -151,7 +151,7 @@ namespace Typography.Contours
                 base.ReadShapes(tx);
                 return;
             }
-            if (!TemporaryDisableCustomFit && this.UseTrueTypeVerticalHinting)
+            if (!TemporaryDisableCustomFit && this.UseVerticalHinting)
             {
                 //read from our auto hint fitoutline
                 //need scale from original. 

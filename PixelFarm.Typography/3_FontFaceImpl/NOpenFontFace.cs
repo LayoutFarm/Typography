@@ -1,4 +1,4 @@
-//MIT, 2014-present, WinterDev 
+﻿//MIT, 2014-present, WinterDev 
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +17,7 @@ namespace PixelFarm.Drawing.Fonts
 
         //TODO: review again,
         //remove ...
-        GlyphPathBuilder _glyphPathBuilder;
+        GlyphOutlineBuilder _glyphPathBuilder;
 
         public NOpenFontFace(Typeface typeface, string fontName, string fontPath)
         {
@@ -25,7 +25,7 @@ namespace PixelFarm.Drawing.Fonts
             _name = fontName;
             _path = fontPath;
 
-            _glyphPathBuilder = new GlyphPathBuilder { Typeface = typeface };
+            _glyphPathBuilder = new GlyphOutlineBuilder(typeface);
         }
         public override string Name => _name;
 
@@ -40,7 +40,7 @@ namespace PixelFarm.Drawing.Fonts
 
         //TODO: review again,
         //remove ...
-        internal GlyphPathBuilder VxsBuilder => _glyphPathBuilder;
+        internal GlyphOutlineBuilder VxsBuilder => _glyphPathBuilder;
 
         public override float GetScale(float pointSize) => _typeface.CalculateScaleToPixelFromPointSize(pointSize);
 

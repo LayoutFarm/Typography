@@ -43,7 +43,7 @@ namespace SampleWinForms.UI
 
         PixelFarm.Drawing.Painter _painter;
         float _pxscale;
-        TrueTypeHintTechnique _latestHint;
+        HintTechnique _latestHint;
         char _testChar;
 
         public PixelFarm.Drawing.Painter CanvasPainter
@@ -88,9 +88,9 @@ namespace SampleWinForms.UI
             _painter.FillRect(x, y, sizeInPx, sizeInPx, color);
         }
         public float GlyphEdgeOffset { get; set; }
-        public void RenderChar(char testChar, TrueTypeHintTechnique hint)
+        public void RenderChar(char testChar, HintTechnique hint)
         {
-            _builder.TrueTypeHintTechnique = hint;
+            _builder.SetHintTechnique(hint);
 #if DEBUG
             Joint.dbugTotalId = 0;//reset
             _builder.dbugAlwaysDoCurveAnalysis = true;

@@ -1,4 +1,4 @@
-//MIT, 2016-present, WinterDev
+﻿//MIT, 2016-present, WinterDev
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -19,7 +19,7 @@ namespace SampleWinForms
     class DevGdiTextPrinter : TextPrinterBase
     {
         Typeface _currentTypeface;
-        GlyphPathBuilder _currentGlyphPathBuilder;
+        GlyphOutlineBuilder _currentGlyphPathBuilder;
         GlyphTranslatorToGdiPath _txToGdiPath;
         GlyphLayout _glyphLayout = new GlyphLayout();
         SolidBrush _fillBrush = new SolidBrush(Color.Black);
@@ -67,7 +67,7 @@ namespace SampleWinForms
                 //--------------------------------
 
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder { Typeface = _currentTypeface };
+                _currentGlyphPathBuilder = new GlyphOutlineBuilder(_currentTypeface);
                 //for gdi path***
                 //3. glyph reader,output as Gdi+ GraphicsPath
                 _txToGdiPath = new GlyphTranslatorToGdiPath();
@@ -123,7 +123,7 @@ namespace SampleWinForms
         }
         void UpdateVisualOutputSettings()
         {
-            _currentGlyphPathBuilder.TrueTypeHintTechnique = this.TrueTypeHintTechnique;
+            _currentGlyphPathBuilder.SetHintTechnique(this.HintTechnique);
             _fillBrush.Color = this.FillColor;
             _outlinePen.Color = this.OutlineColor;
         }
@@ -138,7 +138,7 @@ namespace SampleWinForms
             float sizeInPoints = this.FontSizeInPoints;
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
             //
-            _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.TrueTypeHintTechnique);
+            _glyphMeshCollections.SetCacheInfo(this.Typeface, sizeInPoints, this.HintTechnique);
 
 
             //this draw a single line text span*** 

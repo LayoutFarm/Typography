@@ -1,4 +1,4 @@
-//MIT, 2017-present, WinterDev
+﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -67,12 +67,12 @@ namespace Test_WinForm_TessGlyph
 
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
-                var reader = new OpenFontReader();
-                var typeface = reader.Read(fs);
+                OpenFontReader reader = new OpenFontReader();
+                Typeface typeface = reader.Read(fs);
 
                 //--
-                var builder = new GlyphPathBuilder { Typeface = typeface };
-                builder.Build(selectedChar, 300);
+                var builder = new Typography.Contours.GlyphOutlineBuilder(typeface);
+                builder.BuildFromGlyphIndex(typeface.LookupIndex(selectedChar), 300);
 
                 var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();
