@@ -146,8 +146,8 @@ namespace Typography.OpenFont
         /// <returns></returns>
 
         public ushort GetGlyphIndex(int codepoint, int nextCodepoint, out bool skipNextCodepoint)
-        {
-            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
+        { 
+            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint); 
         }
         public ushort GetGlyphIndex(int codepoint)
         {

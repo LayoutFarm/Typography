@@ -87,6 +87,7 @@ namespace Typography.OpenFont.Tables
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns>glyph index</returns>
+
         public ushort GetGlyphIndex(int codepoint, int nextCodepoint, out bool skipNextCodepoint)
         {
             // https://www.microsoft.com/typography/OTSPEC/cmap.htm
