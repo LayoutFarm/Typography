@@ -10,8 +10,17 @@ namespace Typography.OpenFont
     {
         Typeface _currentTypeFace;
         SharpFontInterpreter _interpreter;
+        public Typeface Typeface
+        {
+            get => _currentTypeFace;
+            set => SetTypeFace(value);
+        }
+
         public void SetTypeFace(Typeface typeface)
         {
+            //still preserve this for compat with others,
+            //wait for other libs...
+
             _currentTypeFace = typeface;
             Tables.MaxProfile maximumProfile = _currentTypeFace.MaxProfile;
             _interpreter = new SharpFontInterpreter(
@@ -244,11 +253,11 @@ namespace Typography.OpenFont
                 Execute(new InstructionStream(instructions), false, false);
             }
             catch (InvalidTrueTypeFontException)
-            { 
+            {
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine("invalid_font_ex:");
 #endif
- 
+
             }
         }
 

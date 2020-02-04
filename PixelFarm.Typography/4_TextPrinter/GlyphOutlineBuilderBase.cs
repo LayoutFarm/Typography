@@ -109,7 +109,7 @@ namespace Typography.Contours
                     if (_trueTypeInterpreter == null)
                     {
                         _trueTypeInterpreter = new TrueTypeInterpreter();
-                        _trueTypeInterpreter.SetTypeFace(_typeface);
+                        _trueTypeInterpreter.Typeface = _typeface;
                     }
                     _trueTypeInterpreter.UseVerticalHinting = this.UseVerticalHinting;
                     //output as points,
