@@ -89,7 +89,7 @@ namespace PixelFarm.Drawing.Fonts
             int i = 0;
             foreach (char ch in chars)
             {
-                glyphIndices.Add(typeface.LookupIndex(ch));
+                glyphIndices.Add(typeface.GetGlyphIndex(ch));
                 i++;
             }
             //-------------------------------------------------------------
@@ -113,7 +113,7 @@ namespace PixelFarm.Drawing.Fonts
             ushort[] glyphIndices = new ushort[j];
             for (int i = 0; i < j; ++i)
             {
-                glyphIndices[i] = typeface.LookupIndex(chars[i]);
+                glyphIndices[i] = typeface.GetGlyphIndex(chars[i]);
             }
 
             CreateTextureFontFromGlyphIndices(typeface, sizeInPoint, hintTechnique, atlasBuilder, applyFilter, glyphIndices);
