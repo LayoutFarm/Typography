@@ -91,12 +91,12 @@ namespace Typography.Contours
             else
             {
                 _recentPixelScale = Typeface.CalculateScaleToPixel(RecentFontSizeInPixels);
-                IsSizeChanged = true;
+                HasSizeChanged = true;
             }
             //-------------------------------------
             FitCurrentGlyph(glyph);
         }
-        protected bool IsSizeChanged { get; set; }
+        protected bool HasSizeChanged { get; set; }
         protected float RecentFontSizeInPixels { get; private set; }
         protected virtual void FitCurrentGlyph(Glyph glyph)
         {

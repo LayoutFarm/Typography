@@ -132,10 +132,10 @@ namespace Typography.Contours
                     }
                     else
                     {
-                        if (IsSizeChanged)
+                        if (HasSizeChanged)
                         {
                             _latestDynamicOutline.GenerateOutput(null, Typeface.CalculateScaleToPixel(RecentFontSizeInPixels));
-                            IsSizeChanged = false;
+                            HasSizeChanged = false;
                         }
                     }
                 }
