@@ -49,13 +49,13 @@ namespace Typography.Contours
         public void MoveTo(float x0, float y0) => _tx.MoveTo(x0, y0);
     }
 
-    public class GlyphPathBuilder : GlyphPathBuilderBase
+    public class GlyphOutlineBuilder : GlyphOutlineBuilderBase
     {
         GlyphOutlineAnalyzer _fitShapeAnalyzer = new GlyphOutlineAnalyzer();
         Dictionary<ushort, DynamicOutline> _fitOutlineCollection = new Dictionary<ushort, DynamicOutline>();
         DynamicOutline _latestDynamicOutline;
 
-        public GlyphPathBuilder(Typeface typeface)
+        public GlyphOutlineBuilder(Typeface typeface)
             : base(typeface)
         {
 

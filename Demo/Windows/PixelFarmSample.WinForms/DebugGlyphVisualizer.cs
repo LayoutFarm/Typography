@@ -39,7 +39,7 @@ namespace SampleWinForms.UI
 
         Typeface _typeface;
         float _sizeInPoint;
-        GlyphPathBuilder _builder;
+        GlyphOutlineBuilder _builder;
 
         PixelFarm.Drawing.Painter _painter;
         float _pxscale;
@@ -56,7 +56,7 @@ namespace SampleWinForms.UI
         {
             _typeface = typeface;
             _sizeInPoint = sizeInPoint;
-            _builder = new GlyphPathBuilder(typeface);
+            _builder = new GlyphOutlineBuilder(typeface);
             FillBackGround = true;//default 
 
         }

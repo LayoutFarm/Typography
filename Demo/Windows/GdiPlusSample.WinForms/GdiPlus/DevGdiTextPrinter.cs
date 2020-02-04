@@ -19,7 +19,7 @@ namespace SampleWinForms
     class DevGdiTextPrinter : TextPrinterBase
     {
         Typeface _currentTypeface;
-        GlyphPathBuilder _currentGlyphPathBuilder;
+        GlyphOutlineBuilder _currentGlyphPathBuilder;
         GlyphTranslatorToGdiPath _txToGdiPath;
         GlyphLayout _glyphLayout = new GlyphLayout();
         SolidBrush _fillBrush = new SolidBrush(Color.Black);
@@ -67,7 +67,7 @@ namespace SampleWinForms
                 //--------------------------------
 
                 //2. glyph builder
-                _currentGlyphPathBuilder = new GlyphPathBuilder(_currentTypeface);
+                _currentGlyphPathBuilder = new GlyphOutlineBuilder(_currentTypeface);
                 //for gdi path***
                 //3. glyph reader,output as Gdi+ GraphicsPath
                 _txToGdiPath = new GlyphTranslatorToGdiPath();

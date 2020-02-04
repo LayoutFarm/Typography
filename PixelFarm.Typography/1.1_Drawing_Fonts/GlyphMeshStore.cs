@@ -47,13 +47,13 @@ namespace Typography.Contours
         /// <summary>
         /// store typeface and its builder
         /// </summary>
-        Dictionary<Typeface, GlyphPathBuilder> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphPathBuilder>();
+        Dictionary<Typeface, GlyphOutlineBuilder> _cacheGlyphPathBuilders = new Dictionary<Typeface, GlyphOutlineBuilder>();
         /// <summary>
         /// glyph mesh data for specific condition
         /// </summary>
         GlyphMeshCollection<GlyphMeshData> _hintGlyphCollection = new GlyphMeshCollection<GlyphMeshData>();
 
-        GlyphPathBuilder _currentGlyphBuilder;
+        GlyphOutlineBuilder _currentGlyphBuilder;
         Typeface _currentTypeface;
         float _currentFontSizeInPoints;
         HintTechnique _currentHintTech;
@@ -102,7 +102,7 @@ namespace Typography.Contours
             _cacheGlyphPathBuilders.TryGetValue(_currentTypeface, out _currentGlyphBuilder);
             if (_currentGlyphBuilder == null)
             {
-                _currentGlyphBuilder = new GlyphPathBuilder(typeface);
+                _currentGlyphBuilder = new GlyphOutlineBuilder(typeface);
             }
             //----------------------------------------------
             _currentFontSizeInPoints = fontSizeInPoints;
