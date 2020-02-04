@@ -144,6 +144,7 @@ namespace Typography.OpenFont
         /// <param name="codepoint"></param>
         /// <param name="nextCodepoint"></param>
         /// <returns></returns>
+
         public ushort GetGlyphIndex(int codepoint, int nextCodepoint, out bool skipNextCodepoint)
         {
             return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
@@ -151,19 +152,7 @@ namespace Typography.OpenFont
         public ushort GetGlyphIndex(int codepoint)
         {
             return CmapTable.GetGlyphIndex(codepoint, 0, out bool skipNextCodepoint);
-        }
-        /// <summary>
-        /// find glyph index by 2 consecutive code points
-        /// </summary>
-        /// <param name="codepoint"></param>
-        /// <param name="nextCodepoint"></param>
-        /// <returns></returns>
-        public ushort GetGlyphIndex(ushort codepoint, ushort nextCodepoint, out bool skipNextCodepoint)
-        {
-            return CmapTable.GetGlyphIndex(codepoint, nextCodepoint, out skipNextCodepoint);
-        }
-
-
+        } 
         public void CollectUnicode(List<uint> unicodes)
         {
             CmapTable.CollectUnicode(unicodes);

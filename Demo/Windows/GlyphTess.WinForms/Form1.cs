@@ -68,13 +68,10 @@ namespace Test_WinForm_TessGlyph
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
                 OpenFontReader reader = new OpenFontReader();
-                Typeface typeface = reader.Read(fs);
+                Typeface typeface = reader.Read(fs); 
 
-                //--
- 
                 var builder = new Typography.Contours.GlyphOutlineBuilder(typeface);
-                builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300);
- 
+                builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300); 
 
                 var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();

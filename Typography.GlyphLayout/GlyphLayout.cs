@@ -339,8 +339,7 @@ namespace Typography.TextLayout
             int end = startAt + len;
             for (int i = 0; i < end; ++i)
             {
-                //find glyph index by specific codepoint 
-
+                //find glyph index by specific codepoint  
                 if (i + 1 < end)
                 {
                     ushort glyphIndex = _typeface.GetGlyphIndex(inputCodePoints[i], inputCodePoints[i + 1], out bool skipNextCodepoint);
