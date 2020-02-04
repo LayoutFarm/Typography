@@ -96,7 +96,7 @@ namespace PixelFarm.Drawing.Fonts
 
         public override FontStyle FontStyle => _style;
 
-        public override FontGlyph GetGlyph(char c) => GetGlyphByIndex(_typeFace.LookupIndex(c));
+        public override FontGlyph GetGlyph(char c) => GetGlyphByIndex(_typeFace.GetGlyphIndex(c));
 
         public override FontGlyph GetGlyphByIndex(ushort glyphIndex)
         {

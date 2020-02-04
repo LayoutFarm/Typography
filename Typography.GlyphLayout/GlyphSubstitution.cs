@@ -205,7 +205,7 @@ namespace Typography.TextLayout
                     int endAt = rngInfo.EndAt;
                     for (int codePoint = rngInfo.StartAt; codePoint <= endAt; ++codePoint)
                     {
-                        ushort glyghIndex = typeface.LookupIndex(codePoint);
+                        ushort glyghIndex = typeface.GetGlyphIndex(codePoint);
                         if (glyghIndex > 0)
                         {
                             //add this glyph index
