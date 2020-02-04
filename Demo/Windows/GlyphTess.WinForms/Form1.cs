@@ -72,7 +72,7 @@ namespace Test_WinForm_TessGlyph
 
                 //--
                 var builder = new Typography.Contours.GlyphPathBuilder(typeface);
-                builder.BuildFromGlyphIndex(typeface.LookupIndex(selectedChar), 300);
+                builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300);
 
                 var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();
