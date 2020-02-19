@@ -296,7 +296,7 @@ namespace Typography.FontManagement
         bool Register(InstalledTypeface newTypeface)
         {
 
-         
+
 
             InstalledTypefaceGroup selectedFontGroup = null;
 
@@ -315,7 +315,7 @@ namespace Typography.FontManagement
             {
                 default:
                     {
-                         
+
                         if (!_subFamToFontGroup.TryGetValue(fontSubFamUpperCaseName, out selectedFontGroup))
                         {
                             //create new group, we don't known this font group before 
@@ -339,7 +339,7 @@ namespace Typography.FontManagement
                 case TypefaceStyle.Regular:
                     {
                         selectedFontGroup = _regular;
-                       
+
                         if (fontSubFamUpperCaseName != "REGULAR" &&
                             !_subFamToFontGroup.TryGetValue(fontSubFamUpperCaseName, out selectedFontGroup))
                         {
@@ -434,12 +434,12 @@ namespace Typography.FontManagement
             if (_otherFontNames.TryGetValue(upperCaseFontName, out foundInstalledFont))
             {
                 return foundInstalledFont;
-            } 
+            }
             //not found
             if (_fontNotFoundHandler != null)
             {
                 return _fontNotFoundHandler(this, fontName, subFamName);
-            } 
+            }
 
             return null; //not found
         }
@@ -568,7 +568,15 @@ namespace Typography.FontManagement
 
         public static void LoadFontsFromFolder(this InstalledTypefaceCollection fontCollection, string folder, bool recursive = false)
         {
-            if (!Directory.Exists(folder)) return;
+            if (!Directory.Exists(folder))
+            {
+#if DEBUG
+
+                System.Diagnostics.Debug.WriteLine("LoadFontsFromFolder, not found folder:" + folder);
+
+#endif
+                return;
+            }
             //-------------------------------------
 
             // 1. font dir
