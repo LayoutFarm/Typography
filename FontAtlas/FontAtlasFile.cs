@@ -104,22 +104,17 @@ namespace PixelFarm.Drawing.Fonts
 
         void ReadOverviewFontInfo(BinaryReader reader)
         {
-            //read str len
-
-            //-------------
-            //new version:
-            //ushort utf8BufferLen = reader.ReadUInt16();
-            //byte[] utf8Filename = reader.ReadBytes(utf8BufferLen);
-            //_atlas.FontFilename = System.Text.Encoding.UTF8.GetString(utf8Filename);
-            //ushort utf8BufferLen = reader.ReadUInt16();
-            //byte[] utf8Filename = reader.ReadBytes(utf8BufferLen);
-            //-------------
-            _atlas.FontFilename = reader.ReadString();
-            //
+            //read str len 
+            _atlas.FontFilename = ReadLengthPrefixUtf8String(reader);
             _atlas.FontKey = reader.ReadInt32();
             _atlas.OriginalFontSizePts = reader.ReadSingle();
         }
-
+        static string ReadLengthPrefixUtf8String(BinaryReader reader)
+        {
+            ushort utf8BufferLen = reader.ReadUInt16();
+            byte[] utf8Buffer = reader.ReadBytes(utf8BufferLen);
+            return System.Text.Encoding.UTF8.GetString(utf8Buffer);
+        }
         //------------------------------------------------------------
         BinaryWriter _writer;
         internal void StartWrite(Stream outputStream)
@@ -141,6 +136,16 @@ namespace PixelFarm.Drawing.Fonts
             _writer.Write((ushort)FontTextureObjectKind.OverviewMultiSizeFontInfo);
             _writer.Write((ushort)count);
         }
+        void WriteLengthPrefixUtf8String(string value)
+        {
+            byte[] utf8Buffer = System.Text.Encoding.UTF8.GetBytes(value);
+            if (utf8Buffer.Length > ushort.MaxValue)
+            {
+                throw new NotSupportedException();
+            }
+            _writer.Write((ushort)utf8Buffer.Length);
+            _writer.Write(utf8Buffer);
+        }
         internal void WriteOverviewFontInfo(string fontFileName, int fontKey, float sizeInPt)
         {
             _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
@@ -156,13 +161,7 @@ namespace PixelFarm.Drawing.Fonts
             }
 #endif
 
-            byte[] utf8Filenames = System.Text.Encoding.UTF8.GetBytes(fontFileName);
-            if (utf8Filenames.Length > ushort.MaxValue)
-            {
-                throw new NotSupportedException();
-            }
-            _writer.Write((ushort)utf8Filenames.Length);
-            _writer.Write(utf8Filenames);
+            WriteLengthPrefixUtf8String(fontFileName);
             _writer.Write(fontKey);
             _writer.Write(sizeInPt);
         }
