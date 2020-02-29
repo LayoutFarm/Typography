@@ -163,7 +163,7 @@ namespace Typography.OpenFont.Tables
         }
 
 
-        public int GetClassValue(int glyphIndex)
+        public int GetClassValue(ushort glyphIndex)
         {
             switch (Format)
             {
