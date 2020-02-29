@@ -173,13 +173,13 @@ namespace Typography.OpenFont.Tables
                         if (glyphIndex >= startGlyph &&
                             glyphIndex < classValueArray.Length)
                         {
-                            return classValueArray[startGlyph + (glyphIndex - startGlyph)];
+                            return classValueArray[glyphIndex - startGlyph];
                         }
                         return -1;
                     }
                 case 2:
                     {
-                        
+
                         for (int i = 0; i < records.Length; ++i)
                         {
                             //TODO: review a proper method here again
@@ -200,7 +200,7 @@ namespace Typography.OpenFont.Tables
                         return -1;
                     }
             }
-        } 
+        }
     }
 
 }
