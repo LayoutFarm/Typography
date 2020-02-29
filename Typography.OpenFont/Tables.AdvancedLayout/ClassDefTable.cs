@@ -163,7 +163,7 @@ namespace Typography.OpenFont.Tables
         }
 
 
-        public int GetClassValue(int glyphIndex)
+        public int GetClassValue(ushort glyphIndex)
         {
             switch (Format)
             {
@@ -173,7 +173,7 @@ namespace Typography.OpenFont.Tables
                         if (glyphIndex >= startGlyph &&
                             glyphIndex < classValueArray.Length)
                         {
-                            return classValueArray[startGlyph + (glyphIndex - startGlyph)];
+                            return classValueArray[glyphIndex - startGlyph];
                         }
                         return -1;
                     }
