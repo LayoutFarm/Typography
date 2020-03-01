@@ -4,10 +4,10 @@ namespace System
 {
     public abstract class PlatformMemory
     {
-        static PlatformMemory platformMem;
+        static PlatformMemory s_platformMem;
         public static void SetPlatformMemImpl(PlatformMemory p)
         {
-            platformMem = p;
+            s_platformMem = p;
         }
         //------------------------------------------------------------------------
         protected abstract void ProtectBlockLargeImpl(IntPtr h, ulong n, bool readAccess, bool writeAccess);
@@ -32,7 +32,7 @@ namespace System
         }
         public static void Free(IntPtr hmem)
         {
-            platformMem.FreeImpl(hmem);
+            s_platformMem.FreeImpl(hmem);
         }
         //public static void FreeLarge(IntPtr hmem, ulong len)
         //{
@@ -48,11 +48,11 @@ namespace System
         //}
         public static IntPtr Allocate(ulong bytes)
         {
-            return platformMem.AllocateImpl(bytes);
+            return s_platformMem.AllocateImpl(bytes);
         }
         public static IntPtr AllocateBitmap(int w, int h, out IntPtr handle)
         {
-            return platformMem.AllocateBitmapImpl(w, h, out handle);
+            return s_platformMem.AllocateBitmapImpl(w, h, out handle);
         }
         //public static void SetToZero(IntPtr ptr, ulong len)
         //{

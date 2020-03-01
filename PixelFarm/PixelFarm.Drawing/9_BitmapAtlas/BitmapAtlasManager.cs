@@ -20,7 +20,8 @@ namespace PixelFarm.Drawing.BitmapAtlas
         }
         public U GetOrCreateNewOne(T key)
         {
-            if (!_loadBmps.TryGetValue(key, out U found))
+            U found;
+            if (!_loadBmps.TryGetValue(key, out found))
             {
                 return _loadBmps[key] = _loadNewBmpDel(key);
             }
@@ -40,7 +41,8 @@ namespace PixelFarm.Drawing.BitmapAtlas
         }
         public void Delete(T key)
         {
-            if (_loadBmps.TryGetValue(key, out U found))
+            U found;
+            if (_loadBmps.TryGetValue(key, out found))
             {
                 found.Dispose();
                 _loadBmps.Remove(key);
@@ -92,16 +94,16 @@ namespace PixelFarm.Drawing.BitmapAtlas
             if (!_createdAtlases.TryGetValue(atlasName, out SimpleBitmaptAtlas foundAtlas))
             {
                 //check from pre-built cache (if availiable)   
-                string fontTextureInfoFile = atlasName + ".info";
-                string fontTextureImgFilename = atlasName + ".png";
+                string textureInfoFile = atlasName + ".info";
+                string textureImgFilename = atlasName + ".png";
                 //check if the file exist
 
-                if (StorageService.Provider.DataExists(fontTextureInfoFile) &&
-                    StorageService.Provider.DataExists(fontTextureImgFilename))
+                if (StorageService.Provider.DataExists(textureInfoFile) &&
+                    StorageService.Provider.DataExists(textureImgFilename))
                 {
                     SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
-                    using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
-                    using (System.IO.Stream fontImgStream = StorageService.Provider.ReadDataStream(fontTextureImgFilename))
+                    using (System.IO.Stream dataStream = StorageService.Provider.ReadDataStream(textureInfoFile))
+                    using (System.IO.Stream fontImgStream = StorageService.Provider.ReadDataStream(textureImgFilename))
                     {
                         try
                         {
@@ -120,9 +122,21 @@ namespace PixelFarm.Drawing.BitmapAtlas
 
                 }
             }
+            if (foundAtlas != null)
+            {
+                outputBitmap = _loadAtlases.GetOrCreateNewOne(foundAtlas);
+                return foundAtlas;
+            }
+            else
+            {
+#if DEBUG
+                //show warning about this
+                System.Diagnostics.Debug.WriteLine("not found atlas:" + atlasName);
+#endif
 
-            outputBitmap = _loadAtlases.GetOrCreateNewOne(foundAtlas);
-            return foundAtlas;
+                outputBitmap = default(B);
+                return null;
+            }
         }
 
         public void Clear()
