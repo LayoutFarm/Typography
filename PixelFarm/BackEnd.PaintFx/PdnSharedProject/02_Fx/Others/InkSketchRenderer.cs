@@ -60,15 +60,12 @@ namespace PaintFx.Effects
             conv[4] = new int[] { -1, -1, -5, -1, -1 };
         }
 
-        private static readonly int[][] conv;
-        private const int size = 5;
-        private const int radius = (size - 1) / 2;
-
-        private UnaryPixelOps.Desaturate desaturateOp = new UnaryPixelOps.Desaturate();
-        private UserBlendOps.DarkenBlendOp darkenOp = new UserBlendOps.DarkenBlendOp();
-        GlowRenderer glowRenderer;
-
-        private int inkOutline;
+        static readonly int[][] conv;
+        const int SIZE = 5;
+        const int RADIUS = (SIZE - 1) / 2;
+        readonly UnaryPixelOps.Desaturate _desaturateOp = new UnaryPixelOps.Desaturate();
+        readonly UserBlendOps.DarkenBlendOp _darkenOp = new UserBlendOps.DarkenBlendOp();
+        int _inkOutline;
 
 
         public InkSketchRenderer()
@@ -77,22 +74,18 @@ namespace PaintFx.Effects
             //glowRenderer.BrightnessAndContrastRenderer = new BrightnessAndContrastRenderer();
             //glowRenderer.BlurRenderer = new GaussainBlurRenderer();
         }
-        public GlowRenderer GlowRenderer
-        {
-            get { return glowRenderer; }
-            set { glowRenderer = value; }
-        }
+        public GlowRenderer GlowRenderer { get; set; }
         public void SetParameters(int inkOutline, int radius, int brightness, int contrast)
         {
-            this.inkOutline = inkOutline;
-            glowRenderer.SetParameters(radius, brightness, contrast);
+            _inkOutline = inkOutline;
+            GlowRenderer.SetParameters(radius, brightness, contrast);
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int startIndex, int length)
         {
             unsafe
             {
                 // Glow backgound 
-                glowRenderer.Render(src, dst, rois, startIndex, length);
+                GlowRenderer.Render(src, dst, rois, startIndex, length);
 
                 // Create black outlines by finding the edges of objects 
 
@@ -102,8 +95,8 @@ namespace PaintFx.Effects
 
                     for (int y = roi.Top; y < roi.Bottom; ++y)
                     {
-                        int top = y - radius;
-                        int bottom = y + radius + 1;
+                        int top = y - RADIUS;
+                        int bottom = y + RADIUS + 1;
 
                         if (top < 0)
                         {
@@ -120,8 +113,8 @@ namespace PaintFx.Effects
 
                         for (int x = roi.Left; x < roi.Right; ++x)
                         {
-                            int left = x - radius;
-                            int right = x + radius + 1;
+                            int left = x - RADIUS;
+                            int right = x + RADIUS + 1;
 
                             if (left < 0)
                             {
@@ -140,11 +133,11 @@ namespace PaintFx.Effects
                             for (int v = top; v < bottom; v++)
                             {
                                 ColorBgra* pRow = src.GetRowAddress(v);
-                                int j = v - y + radius;
+                                int j = v - y + RADIUS;
 
                                 for (int u = left; u < right; u++)
                                 {
-                                    int i1 = u - x + radius;
+                                    int i1 = u - x + RADIUS;
                                     int w = conv[j][i1];
 
                                     ColorBgra* pRef = pRow + u;
@@ -161,10 +154,10 @@ namespace PaintFx.Effects
                                 PixelUtils.ClampToByte(r));
 
                             // Desaturate 
-                            topLayer = this.desaturateOp.Apply(topLayer);
+                            topLayer = _desaturateOp.Apply(topLayer);
 
                             // Adjust Brightness and Contrast 
-                            if (topLayer.R > (this.inkOutline * 255 / 100))
+                            if (topLayer.R > (_inkOutline * 255 / 100))
                             {
                                 topLayer = ColorBgra.FromBgra(255, 255, 255, topLayer.A);
                             }
@@ -174,7 +167,7 @@ namespace PaintFx.Effects
                             }
 
                             // Change Blend Mode to Darken 
-                            ColorBgra myPixel = this.darkenOp.Apply(topLayer, *dstPtr);
+                            ColorBgra myPixel = _darkenOp.Apply(topLayer, *dstPtr);
                             *dstPtr = myPixel;
 
                             ++srcPtr;

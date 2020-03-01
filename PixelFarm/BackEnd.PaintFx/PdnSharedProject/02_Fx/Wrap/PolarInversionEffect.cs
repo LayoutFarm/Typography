@@ -8,20 +8,20 @@
 /////////////////////////////////////////////////////////////////////////////////
 //MIT, 2017-present, WinterDev
 
-using PixelFarm.Drawing;
+
 namespace PaintFx.Effects
 {
 
     public class PolarInversionEffRenderer : WrapBasedRenderer
     {
-        private double amount;
+        private double _amount;
         public PolarInversionEffRenderer()
         {
 
         }
         public void SetParameters(double amount)
         {
-            this.amount = amount;
+            _amount = amount;
         }
         protected override void InverseTransform(ref TransformData data)
         {
@@ -29,7 +29,7 @@ namespace PaintFx.Effects
             double y = data.Y;
 
             // NOTE: when x and y are zero, this will divide by zero and return NaN
-            double invertDistance = PixelUtils.Lerp(1d, DefaultRadius2 / ((x * x) + (y * y)), amount);
+            double invertDistance = PixelUtils.Lerp(1d, DefaultRadius2 / ((x * x) + (y * y)), _amount);
 
             data.X = x * invertDistance;
             data.Y = y * invertDistance;

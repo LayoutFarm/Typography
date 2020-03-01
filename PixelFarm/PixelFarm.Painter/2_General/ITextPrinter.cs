@@ -74,8 +74,7 @@ namespace PixelFarm.Drawing
     /// for printing a string to target canvas
     /// </summary>
     public interface ITextPrinter
-    {
-
+    { 
         TextBaseline TextBaseline { get; set; }
         void DrawString(char[] text, int startAt, int len, double left, double top);
         /// <summary>
@@ -93,8 +92,8 @@ namespace PixelFarm.Drawing
         void ChangeStrokeColor(Color strokColor);
         //-------------
         void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
-    }
-   
+    } 
+
     public enum TextBaseline
     {
         //top" || "hanging" || "middle" || "alphabetic" || "ideographic" || "bottom";

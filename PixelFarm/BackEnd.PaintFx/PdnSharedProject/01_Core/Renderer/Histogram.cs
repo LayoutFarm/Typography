@@ -18,19 +18,19 @@ namespace PaintFx
     /// </summary>
     public abstract class Histogram
     {
-        protected long[][] histogram;
+        protected long[][] _histogram;
         public long[][] HistogramValues
         {
             get
             {
-                return this.histogram;
+                return _histogram;
             }
 
             set
             {
-                if (value.Length == this.histogram.Length && value[0].Length == this.histogram[0].Length)
+                if (value.Length == _histogram.Length && value[0].Length == _histogram[0].Length)
                 {
-                    this.histogram = value;
+                    _histogram = value;
                     OnHistogramUpdated();
                 }
                 else
@@ -40,29 +40,17 @@ namespace PaintFx
             }
         }
 
-        public int Channels
-        {
-            get
-            {
-                return this.histogram.Length;
-            }
-        }
+        public int Channels => _histogram.Length;
 
-        public int Entries
-        {
-            get
-            {
-                return this.histogram[0].Length;
-            }
-        }
+        public int Entries => _histogram[0].Length;
 
         protected internal Histogram(int channels, int entries)
         {
-            this.histogram = new long[channels][];
+            _histogram = new long[channels][];
 
             for (int channel = 0; channel < channels; ++channel)
             {
-                this.histogram[channel] = new long[entries];
+                _histogram[channel] = new long[entries];
             }
         }
 
@@ -75,22 +63,16 @@ namespace PaintFx
             }
         }
 
-        protected ColorBgra[] visualColors;
-        public ColorBgra GetVisualColor(int channel)
-        {
-            return visualColors[channel];
-        }
+        protected ColorBgra[] _visualColors;
+        public ColorBgra GetVisualColor(int channel) => _visualColors[channel];
 
-        public long GetOccurrences(int channel, int val)
-        {
-            return histogram[channel][val];
-        }
+        public long GetOccurrences(int channel, int val) => _histogram[channel][val];
 
         public long GetMax()
         {
             long max = -1;
 
-            foreach (long[] channelHistogram in histogram)
+            foreach (long[] channelHistogram in _histogram)
             {
                 foreach (long i in channelHistogram)
                 {
@@ -108,7 +90,7 @@ namespace PaintFx
         {
             long max = -1;
 
-            foreach (long i in histogram[channel])
+            foreach (long i in _histogram[channel])
             {
                 if (i > max)
                 {
@@ -125,7 +107,7 @@ namespace PaintFx
 
             for (int channel = 0; channel < Channels; ++channel)
             {
-                long[] channelHistogram = histogram[channel];
+                long[] channelHistogram = _histogram[channel];
                 long avg = 0;
                 long sum = 0;
 
@@ -154,7 +136,7 @@ namespace PaintFx
 
             for (int channel = 0; channel < Channels; ++channel)
             {
-                long[] channelHistogram = histogram[channel];
+                long[] channelHistogram = _histogram[channel];
                 long integral = 0;
                 long sum = 0;
 
@@ -187,7 +169,7 @@ namespace PaintFx
         /// </summary>
         protected void Clear()
         {
-            histogram.Initialize();
+            _histogram.Initialize();
         }
 
         protected abstract void AddSurfaceRectangleToHistogram(Surface surface, Rectangle rect);

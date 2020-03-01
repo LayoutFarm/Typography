@@ -29,10 +29,10 @@ namespace PaintFx
     /// </remarks>
     public sealed class RenderArgs : IDisposable
     {
-        private Surface surface;
+        Surface _surface;
         //private Bitmap bitmap;
         //private Graphics graphics;
-        private bool disposed = false;
+        bool _disposed = false;
 
         /// <summary>
         /// Gets the Surface that has been associated with this instance of RenderArgs.
@@ -41,12 +41,12 @@ namespace PaintFx
         {
             get
             {
-                if (this.disposed)
+                if (_disposed)
                 {
                     throw new ObjectDisposedException("RenderArgs");
                 }
 
-                return this.surface;
+                return _surface;
             }
         }
 
@@ -107,7 +107,7 @@ namespace PaintFx
         {
             get
             {
-                if (this.disposed)
+                if (_disposed)
                 {
                     throw new ObjectDisposedException("RenderArgs");
                 }
@@ -126,7 +126,7 @@ namespace PaintFx
         {
             get
             {
-                if (this.disposed)
+                if (_disposed)
                 {
                     throw new ObjectDisposedException("RenderArgs");
                 }
@@ -145,12 +145,12 @@ namespace PaintFx
         {
             get
             {
-                if (this.disposed)
+                if (_disposed)
                 {
                     throw new ObjectDisposedException("RenderArgs");
                 }
 
-                return this.surface.Width;
+                return _surface.Width;
             }
         }
 
@@ -164,12 +164,12 @@ namespace PaintFx
         {
             get
             {
-                if (this.disposed)
+                if (_disposed)
                 {
                     throw new ObjectDisposedException("RenderArgs");
                 }
 
-                return this.surface.Height;
+                return _surface.Height;
             }
         }
 
@@ -182,7 +182,7 @@ namespace PaintFx
         /// </param>
         public RenderArgs(Surface surface)
         {
-            this.surface = surface;
+            _surface = surface;
             //this.bitmap = null;
             //this.graphics = null;
         }
@@ -207,9 +207,9 @@ namespace PaintFx
 
         private void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!_disposed)
             {
-                this.disposed = true;
+                _disposed = true;
 
                 if (disposing)
                 {

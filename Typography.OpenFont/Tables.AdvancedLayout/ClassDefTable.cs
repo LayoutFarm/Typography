@@ -179,7 +179,7 @@ namespace Typography.OpenFont.Tables
                     }
                 case 2:
                     {
-                        
+
                         for (int i = 0; i < records.Length; ++i)
                         {
                             //TODO: review a proper method here again
@@ -200,7 +200,7 @@ namespace Typography.OpenFont.Tables
                         return -1;
                     }
             }
-        } 
+        }
     }
 
 }

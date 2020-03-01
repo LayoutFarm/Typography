@@ -12,61 +12,61 @@ namespace PaintFx.Effects
 {
     public class BrightnessAndContrastRenderer : EffectRendererBase
     {
-        private int brightness;
-        private int contrast;
-        private int multiply;
-        private int divide;
-        private byte[] rgbTable;
+        int _brightness;
+        int _contrast;
+        int _multiply;
+        int _divide;
+        byte[] _rgbTable;
 
         public void SetParameters(int brightness, int contrast)
         {
-            this.brightness = brightness;
-            this.contrast = contrast;
-            if (this.contrast < 0)
+            _brightness = brightness;
+            _contrast = contrast;
+            if (_contrast < 0)
             {
-                this.multiply = this.contrast + 100;
-                this.divide = 100;
+                _multiply = _contrast + 100;
+                _divide = 100;
             }
-            else if (this.contrast > 0)
+            else if (_contrast > 0)
             {
-                this.multiply = 100;
-                this.divide = 100 - this.contrast;
+                _multiply = 100;
+                _divide = 100 - _contrast;
             }
             else
             {
-                this.multiply = 1;
-                this.divide = 1;
+                _multiply = 1;
+                _divide = 1;
             }
 
-            if (this.rgbTable == null)
+            if (_rgbTable == null)
             {
-                this.rgbTable = new byte[65536];
+                _rgbTable = new byte[65536];
             }
 
-            if (this.divide == 0)
+            if (_divide == 0)
             {
                 for (int intensity = 0; intensity < 256; ++intensity)
                 {
-                    if (intensity + this.brightness < 128)
+                    if (intensity + _brightness < 128)
                     {
-                        this.rgbTable[intensity] = 0;
+                        _rgbTable[intensity] = 0;
                     }
                     else
                     {
-                        this.rgbTable[intensity] = 255;
+                        _rgbTable[intensity] = 255;
                     }
                 }
             }
-            else if (this.divide == 100)
+            else if (_divide == 100)
             {
                 for (int intensity = 0; intensity < 256; ++intensity)
                 {
-                    int shift = (intensity - 127) * this.multiply / this.divide + 127 - intensity + this.brightness;
+                    int shift = (intensity - 127) * _multiply / _divide + 127 - intensity + _brightness;
 
                     for (int col = 0; col < 256; ++col)
                     {
                         int index = (intensity * 256) + col;
-                        this.rgbTable[index] = PixelUtils.ClampToByte(col + shift);
+                        _rgbTable[index] = PixelUtils.ClampToByte(col + shift);
                     }
                 }
             }
@@ -74,12 +74,12 @@ namespace PaintFx.Effects
             {
                 for (int intensity = 0; intensity < 256; ++intensity)
                 {
-                    int shift = (intensity - 127 + this.brightness) * this.multiply / this.divide + 127 - intensity;
+                    int shift = (intensity - 127 + _brightness) * _multiply / _divide + 127 - intensity;
 
                     for (int col = 0; col < 256; ++col)
                     {
                         int index = (intensity * 256) + col;
-                        this.rgbTable[index] = PixelUtils.ClampToByte(col + shift);
+                        _rgbTable[index] = PixelUtils.ClampToByte(col + shift);
                     }
                 }
             }
@@ -98,13 +98,13 @@ namespace PaintFx.Effects
                         ColorBgra* dstRowPtr = dst.GetPointAddressUnchecked(rect.Left, y);
                         ColorBgra* dstRowEndPtr = dstRowPtr + rect.Width;
 
-                        if (divide == 0)
+                        if (_divide == 0)
                         {
                             while (dstRowPtr < dstRowEndPtr)
                             {
                                 ColorBgra col = *srcRowPtr;
                                 int i = col.GetIntensityByte();
-                                uint c = this.rgbTable[i];
+                                uint c = _rgbTable[i];
                                 dstRowPtr->Bgra = (col.Bgra & 0xff000000) | c | (c << 8) | (c << 16);
 
                                 ++dstRowPtr;
@@ -119,9 +119,9 @@ namespace PaintFx.Effects
                                 int i = col.GetIntensityByte();
                                 int shiftIndex = i * 256;
 
-                                col.R = this.rgbTable[shiftIndex + col.R];
-                                col.G = this.rgbTable[shiftIndex + col.G];
-                                col.B = this.rgbTable[shiftIndex + col.B];
+                                col.R = _rgbTable[shiftIndex + col.R];
+                                col.G = _rgbTable[shiftIndex + col.G];
+                                col.B = _rgbTable[shiftIndex + col.B];
 
                                 *dstRowPtr = col;
                                 ++dstRowPtr;

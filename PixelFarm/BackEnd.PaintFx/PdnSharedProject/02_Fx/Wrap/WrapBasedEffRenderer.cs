@@ -37,22 +37,11 @@ namespace PaintFx.Effects
 {
     public abstract class WrapBasedRenderer : EffectRendererBase
     {
-
-
-        double offsetX;
-        double offsetY;
-        private WarpEdgeBehavior edgeBehavior = WarpEdgeBehavior.Wrap;
-        protected int quality = 2;
-        protected ColorBgra colPrimary;
-        protected ColorBgra colSecondary;
-        private double defaultRadius;
-        private double defaultRadius2;
-        private double defaultRadiusR;
-
-        private double width;
-        private double height;
-        private double xCenterOffset;
-        private double yCenterOffset;
+        protected int _quality = 2;
+        protected ColorBgra _colPrimary;
+        protected ColorBgra _colSecondary;
+        private double _xCenterOffset;
+        private double _yCenterOffset;
         protected struct TransformData
         {
             public double X;
@@ -61,15 +50,15 @@ namespace PaintFx.Effects
 
         public void BasicSetup(double defaultRadius, double defaultRadius2, double defaultRadiusR, int w, int h)
         {
-            this.width = w;
-            this.height = h;
-            this.defaultRadius = defaultRadius;
-            this.defaultRadius2 = defaultRadius2;
-            this.defaultRadiusR = defaultRadiusR;
+            this.Width = w;
+            this.Height = h;
+            this.DefaultRadius = defaultRadius;
+            this.DefaultRadius2 = defaultRadius2;
+            this.DefaultRadiusR = defaultRadiusR;
 
         }
-        public double Width { get { return width; } }
-        public double Height { get { return height; } }
+        public double Width { get; private set; }
+        public double Height { get; private set; }
 
         static bool IsOnSurface(Surface src, float u, float v)
         {
@@ -104,9 +93,9 @@ namespace PaintFx.Effects
             ColorBgra colTransparent = ColorBgra.Transparent;
             unsafe
             {
-                int aaSampleCount = quality * quality;
+                int aaSampleCount = _quality * _quality;
                 PointF* aaPoints = stackalloc PointF[aaSampleCount];
-                PixelUtils.GetRgssOffsets(aaPoints, aaSampleCount, quality);
+                PixelUtils.GetRgssOffsets(aaPoints, aaSampleCount, _quality);
                 ColorBgra* samples = stackalloc ColorBgra[aaSampleCount];
 
                 TransformData td;
@@ -119,11 +108,11 @@ namespace PaintFx.Effects
                     {
                         ColorBgra* dstPtr = dst.GetPointAddressUnchecked(rect.Left, y);
 
-                        double relativeY = y - this.yCenterOffset;
+                        double relativeY = y - _yCenterOffset;
 
                         for (int x = rect.Left; x < rect.Right; x++)
                         {
-                            double relativeX = x - this.xCenterOffset;
+                            double relativeX = x - _xCenterOffset;
 
                             int sampleCount = 0;
 
@@ -134,10 +123,10 @@ namespace PaintFx.Effects
 
                                 InverseTransform(ref td);
 
-                                float sampleX = (float)(td.X + this.xCenterOffset);
-                                float sampleY = (float)(td.Y + this.yCenterOffset);
+                                float sampleX = (float)(td.X + _xCenterOffset);
+                                float sampleY = (float)(td.Y + _yCenterOffset);
 
-                                ColorBgra sample = colPrimary;
+                                ColorBgra sample = _colPrimary;
 
                                 if (IsOnSurface(src, sampleX, sampleY))
                                 {
@@ -145,7 +134,7 @@ namespace PaintFx.Effects
                                 }
                                 else
                                 {
-                                    switch (this.edgeBehavior)
+                                    switch (this.EdgeBehavior)
                                     {
                                         case WarpEdgeBehavior.Clamp:
                                             sample = src.GetBilinearSampleClamped(sampleX, sampleY);
@@ -163,11 +152,11 @@ namespace PaintFx.Effects
                                             break;
 
                                         case WarpEdgeBehavior.Primary:
-                                            sample = colPrimary;
+                                            sample = _colPrimary;
                                             break;
 
                                         case WarpEdgeBehavior.Secondary:
-                                            sample = colSecondary;
+                                            sample = _colSecondary;
                                             break;
 
                                         case WarpEdgeBehavior.Transparent:
@@ -196,92 +185,46 @@ namespace PaintFx.Effects
         }
 
 
-        public WarpEdgeBehavior EdgeBehavior
-        {
-            get
-            {
-                return edgeBehavior;
-            }
-
-            set
-            {
-                edgeBehavior = value;
-            }
-        }
+        public WarpEdgeBehavior EdgeBehavior { get; set; } = WarpEdgeBehavior.Wrap;
 
         public int Quality
         {
             get
             {
-                return quality;
+                return _quality;
             }
 
             set
             {
-                quality = value;
+                _quality = value;
             }
         }
 
 
 
-        public double OffsetX
-        {
-            get
-            {
-                return offsetX;
-            }
-            set
-            {
-                offsetX = value;
-            }
-        }
-        public double OffsetY
-        {
-            get { return offsetY; }
-            set
-            {
-                offsetY = value;
-            }
-        }
+        public double OffsetX { get; set; }
+        public double OffsetY { get; set; }
         public void SetCenterOffset(double centerOffsetX, double centerOffsetY)
         {
-            this.xCenterOffset = centerOffsetX;
-            this.yCenterOffset = centerOffsetY;
+            _xCenterOffset = centerOffsetX;
+            _yCenterOffset = centerOffsetY;
         }
 
 
         /// <summary>
         /// The radius (in pixels) of the largest circle that can completely fit within the effect selection bounds
         /// </summary>
-        public double DefaultRadius
-        {
-            get
-            {
-                return this.defaultRadius;
-            }
-        }
+        public double DefaultRadius { get; private set; }
 
         /// <summary>
         /// The square of the DefaultRadius
         /// </summary>
-        protected double DefaultRadius2
-        {
-            get
-            {
-                return this.defaultRadius2;
-            }
-        }
+        protected double DefaultRadius2 { get; private set; }
 
         /// <summary>
         /// The reciprical of the DefaultRadius
         /// </summary>
-        protected double DefaultRadiusR
-        {
-            get
-            {
-                return this.defaultRadiusR;
-            }
-        }
+        protected double DefaultRadiusR { get; private set; }
 
     }
 

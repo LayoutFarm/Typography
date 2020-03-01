@@ -45,8 +45,6 @@ namespace burningmime.curves
     /// </summary>
     public struct CubicBezier : IEquatable<CubicBezier>
     {
-
-
         // Control points
         public readonly VECTOR p0;
         public readonly VECTOR p1;
@@ -67,10 +65,10 @@ namespace burningmime.curves
         {
             get
             {
-                return (HasSomeNanComponentXY(p0.x, p0.y) ||
-                  HasSomeNanComponentXY(p1.x, p1.y) ||
-                  HasSomeNanComponentXY(p2.x, p2.y) ||
-                  HasSomeNanComponentXY(p3.x, p3.y));
+                return (HasSomeNanComponentXY(p0.X, p0.Y) ||
+                  HasSomeNanComponentXY(p1.X, p1.Y) ||
+                  HasSomeNanComponentXY(p2.X, p2.Y) ||
+                  HasSomeNanComponentXY(p3.X, p3.Y));
             }
         }
         static bool HasSomeNanComponentXY(double x, double y)
@@ -85,7 +83,7 @@ namespace burningmime.curves
         /// </summary>
         /// <param name="t">Time value at which to sample (should be between 0 and 1, though it won't fail if outside that range).</param>
         /// <returns>Sampled point.</returns>
-#if !UNITY && !PIXEL_FARM_NET20
+#if !UNITY && !PIXEL_FARM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public VECTOR Sample(FLOAT t)
@@ -103,7 +101,7 @@ namespace burningmime.curves
         /// </summary>
         /// <param name="t">Time value at which to sample (should be between 0 and 1, though it won't fail if outside that range).</param>
         /// <returns>First derivative of curve at sampled point.</returns>
-#if !UNITY && !PIXEL_FARM_NET20
+#if !UNITY && !PIXEL_FARM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public VECTOR Derivative(FLOAT t)
@@ -120,7 +118,7 @@ namespace burningmime.curves
         /// </summary>
         /// <param name="t">Time value at which to sample (should be between 0 and 1, though it won't fail if outside that range).</param>
         /// <returns>Direction the curve is going at that point.</returns>
-#if !UNITY && !PIXEL_FARM_NET20
+#if !UNITY && !PIXEL_FARM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public VECTOR Tangent(FLOAT t)
@@ -178,7 +176,7 @@ namespace burningmime.curves
         private struct JenkinsHash
         {
             private int _current;
-#if !UNITY && !PIXEL_FARM_NET20
+#if !UNITY && !PIXEL_FARM
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
             public void Mixin(int hash)
@@ -197,7 +195,7 @@ namespace burningmime.curves
                 }
             }
 
-#if !UNITY && !PIXEL_FARM_NET20
+#if !UNITY && !PIXEL_FARM
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
             public int GetValue()

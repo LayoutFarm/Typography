@@ -69,6 +69,17 @@ namespace burningmime.curves
         public static VECTOR Lerp(VECTOR a, VECTOR b, FLOAT amount) { return VECTOR.Lerp(a, b, amount); }
         public static FLOAT GetX(VECTOR v) { return v.x; }
         public static FLOAT GetY(VECTOR v) { return v.y; }
+#elif SYSTEM_NUMERICS_VECTOR
+        public static FLOAT Distance(VECTOR a, VECTOR b) { return VECTOR.Distance(a, b); }
+        public static FLOAT DistanceSquared(VECTOR a, VECTOR b) { return VECTOR.DistanceSquared(a, b); }
+        public static FLOAT Dot(VECTOR a, VECTOR b) { return VECTOR.Dot(a, b); }
+        public static VECTOR Normalize(VECTOR v) { return VECTOR.Normalize(v); }
+        public static FLOAT Length(VECTOR v) { return v.Length(); }
+        public static FLOAT LengthSquared(VECTOR v) { return v.LengthSquared(); }
+        public static VECTOR Lerp(VECTOR a, VECTOR b, FLOAT amount) { return VECTOR.Lerp(a, b, amount); }
+        public static FLOAT GetX(VECTOR v) { return v.X; }
+        public static FLOAT GetY(VECTOR v) { return v.Y; }
+
 #elif PIXEL_FARM_NET20
 
         public static FLOAT Distance(VECTOR a, VECTOR b) { return (a - b).Length; }

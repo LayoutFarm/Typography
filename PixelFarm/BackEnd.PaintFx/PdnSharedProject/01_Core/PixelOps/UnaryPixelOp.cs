@@ -18,8 +18,7 @@ namespace PaintFx
     /// result of the form: d = F(c)
     /// </summary>
 
-    public unsafe abstract class UnaryPixelOp
-        : PixelOp
+    public unsafe abstract class UnaryPixelOp : PixelOp
     {
         public abstract ColorBgra Apply(ColorBgra color);
 

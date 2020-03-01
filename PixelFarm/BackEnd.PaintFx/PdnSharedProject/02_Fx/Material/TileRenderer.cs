@@ -15,31 +15,31 @@ namespace PaintFx.Effects
 {
     public class TileRenderer : EffectRendererBase
     {
-        private double rotation;
-        private double squareSize;
-        private double curvature;
+        double _rotation;
+        double _squareSize;
+        double _curvature;
 
-        private int quality;
-        private float sin;
-        private float cos;
-        private float scale;
-        private float intensity;
+        int _quality;
+        float _sin;
+        float _cos;
+        float _scale;
+        float _intensity;
         public void SetParameters(double rotation, double squareSize, double curvature, int quality)
         {
-            this.rotation = rotation;
-            this.squareSize = squareSize;
-            this.curvature = curvature;
+            _rotation = rotation;
+            _squareSize = squareSize;
+            _curvature = curvature;
 
-            this.sin = (float)Math.Sin(this.rotation * Math.PI / 180.0);
-            this.cos = (float)Math.Cos(this.rotation * Math.PI / 180.0);
-            this.scale = (float)(Math.PI / this.squareSize);
-            this.intensity = (float)(this.curvature * this.curvature / 10.0 * Math.Sign(this.curvature));
+            _sin = (float)Math.Sin(_rotation * Math.PI / 180.0);
+            _cos = (float)Math.Cos(_rotation * Math.PI / 180.0);
+            _scale = (float)(Math.PI / _squareSize);
+            _intensity = (float)(_curvature * _curvature / 10.0 * Math.Sign(_curvature));
 
-            this.quality = quality;
+            _quality = quality;
 
-            if (this.quality != 1)
+            if (_quality != 1)
             {
-                ++this.quality;
+                ++_quality;
             }
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int start, int len)
@@ -51,9 +51,9 @@ namespace PaintFx.Effects
                 float hw = width / 2.0f;
                 float hh = height / 2.0f;
 
-                int aaSampleCount = this.quality * this.quality;
+                int aaSampleCount = _quality * _quality;
                 PointF* aaPointsArray = stackalloc PointF[aaSampleCount];
-                PixelUtils.GetRgssOffsets(aaPointsArray, aaSampleCount, this.quality);
+                PixelUtils.GetRgssOffsets(aaPointsArray, aaSampleCount, _quality);
                 ColorBgra* samples = stackalloc ColorBgra[aaSampleCount];
 
                 for (int n = start; n < start + len; ++n)
@@ -76,14 +76,14 @@ namespace PaintFx.Effects
                                 float u1 = i + pt.X;
                                 float v1 = j - pt.Y;
 
-                                float s1 = cos * u1 + sin * v1;
-                                float t1 = -sin * u1 + cos * v1;
+                                float s1 = _cos * u1 + _sin * v1;
+                                float t1 = -_sin * u1 + _cos * v1;
 
-                                float s2 = s1 + this.intensity * (float)Math.Tan(s1 * this.scale);
-                                float t2 = t1 + this.intensity * (float)Math.Tan(t1 * this.scale);
+                                float s2 = s1 + _intensity * (float)Math.Tan(s1 * _scale);
+                                float t2 = t1 + _intensity * (float)Math.Tan(t1 * _scale);
 
-                                float u2 = cos * s2 - sin * t2;
-                                float v2 = sin * s2 + cos * t2;
+                                float u2 = _cos * s2 - _sin * t2;
+                                float v2 = _sin * s2 + _cos * t2;
 
                                 float xSample = hw + u2;
                                 float ySample = hh + v2;

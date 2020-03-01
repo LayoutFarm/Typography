@@ -13,28 +13,28 @@ namespace PaintFx.Effects
 {
     public class BulgeEffectRenderer : EffectRendererBase
     {
-        private int amount;
-        private float offsetX;
-        private float offsetY;
+        int _amount;
+        float _offsetX;
+        float _offsetY;
         public void SetParameters(int amount, float offsetX, float offsetY)
         {
-            this.amount = amount;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
+            _amount = amount;
+            _offsetX = offsetX;
+            _offsetY = offsetY;
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int startIndex, int length)
         {
 
-            float bulge = this.amount;
+            float bulge = _amount;
 
             float hw = dst.Width / 2.0f;
             float hh = dst.Height / 2.0f;
             float maxrad = Math.Min(hw, hh);
             float maxrad2 = maxrad * maxrad;
-            float amt = this.amount / 100.0f;
+            float amt = _amount / 100.0f;
 
-            hh = hh + this.offsetY * hh;
-            hw = hw + this.offsetX * hw;
+            hh = hh + _offsetY * hh;
+            hw = hw + _offsetX * hw;
             unsafe
             {
                 for (int n = startIndex; n < startIndex + length; ++n)

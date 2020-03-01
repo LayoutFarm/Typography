@@ -18,7 +18,7 @@
     <Optimize>false</Optimize>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants> TRACE; DEBUG; PIXEL_FARM; PIXEL_FARM_NET20;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PIXEL_FARM;SYSTEM_NUMERICS_VECTOR;</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -399,5 +399,8 @@
     <Folder Include="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\RenderSurface" />
     <Folder Include="PixelFarm\PixelFarm.Drawing\8_ImgReaders" />
     <Folder Include="PixelFarm\PixelFarm.Drawing\9_BitmapAtlas" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
 </Project>
