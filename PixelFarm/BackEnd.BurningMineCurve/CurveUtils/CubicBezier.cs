@@ -65,10 +65,10 @@ namespace burningmime.curves
         {
             get
             {
-                return (HasSomeNanComponentXY(p0.x, p0.y) ||
-                  HasSomeNanComponentXY(p1.x, p1.y) ||
-                  HasSomeNanComponentXY(p2.x, p2.y) ||
-                  HasSomeNanComponentXY(p3.x, p3.y));
+                return (HasSomeNanComponentXY(p0.X, p0.Y) ||
+                  HasSomeNanComponentXY(p1.X, p1.Y) ||
+                  HasSomeNanComponentXY(p2.X, p2.Y) ||
+                  HasSomeNanComponentXY(p3.X, p3.Y));
             }
         }
         static bool HasSomeNanComponentXY(double x, double y)
