@@ -14,18 +14,18 @@ namespace PaintFx.Effects
 {
     public class AutoLevelRenderer : EffectRendererBase
     {
-        private UnaryPixelOps.Level levels = null;
+        UnaryPixelOps.Level _levels = null;
         public void SetParameters(Surface src, Rectangle rgn)
         {
             HistogramRgb histogram = new HistogramRgb();
             histogram.UpdateHistogram(src, rgn);
-            this.levels = histogram.MakeLevelsAuto();
+            _levels = histogram.MakeLevelsAuto();
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int startIndex, int length)
         {
-            if (this.levels.isValid)
+            if (_levels.isValid)
             {
-                this.levels.Apply(dst, src, rois, startIndex, length);
+                _levels.Apply(dst, src, rois, startIndex, length);
             }
         }
 

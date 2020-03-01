@@ -13,11 +13,10 @@ namespace PaintFx
 {
     public static class GradientRenderers
     {
-        public abstract class LinearBase
-            : GradientRenderer
+        public abstract class LinearBase : GradientRenderer
         {
-            protected float dtdx;
-            protected float dtdy;
+            protected float _dtdx;
+            protected float _dtdy;
 
             public override void BeforeRender()
             {
@@ -26,20 +25,20 @@ namespace PaintFx
 
                 if (EndPoint.X == StartPoint.X)
                 {
-                    this.dtdx = 0;
+                    _dtdx = 0;
                 }
                 else
                 {
-                    this.dtdx = vec.X / (mag * mag);
+                    _dtdx = vec.X / (mag * mag);
                 }
 
                 if (EndPoint.Y == StartPoint.Y)
                 {
-                    this.dtdy = 0;
+                    _dtdy = 0;
                 }
                 else
                 {
-                    this.dtdy = vec.Y / (mag * mag);
+                    _dtdy = vec.Y / (mag * mag);
                 }
 
                 base.BeforeRender();
@@ -51,15 +50,14 @@ namespace PaintFx
             }
         }
 
-        public abstract class LinearStraight
-            : LinearBase
+        public abstract class LinearStraight : LinearBase
         {
             public override float ComputeUnboundedLerp(int x, int y)
             {
                 float dx = x - StartPoint.X;
                 float dy = y - StartPoint.Y;
 
-                float lerp = (dx * this.dtdx) + (dy * this.dtdy);
+                float lerp = (dx * _dtdx) + (dy * _dtdy);
 
                 return lerp;
             }
@@ -70,8 +68,7 @@ namespace PaintFx
             }
         }
 
-        public sealed class LinearReflected
-            : LinearStraight
+        public sealed class LinearReflected : LinearStraight
         {
             public override float BoundLerp(float t)
             {
@@ -84,8 +81,7 @@ namespace PaintFx
             }
         }
 
-        public sealed class LinearClamped
-            : LinearStraight
+        public sealed class LinearClamped : LinearStraight
         {
             public override float BoundLerp(float t)
             {
@@ -98,16 +94,15 @@ namespace PaintFx
             }
         }
 
-        public sealed class LinearDiamond
-            : LinearStraight
+        public sealed class LinearDiamond : LinearStraight
         {
             public override float ComputeUnboundedLerp(int x, int y)
             {
                 float dx = x - StartPoint.X;
                 float dy = y - StartPoint.Y;
 
-                float lerp1 = (dx * this.dtdx) + (dy * this.dtdy);
-                float lerp2 = (dx * this.dtdy) - (dy * this.dtdx);
+                float lerp1 = (dx * _dtdx) + (dy * _dtdy);
+                float lerp2 = (dx * _dtdy) - (dy * _dtdx);
 
                 float absLerp1 = Math.Abs(lerp1);
                 float absLerp2 = Math.Abs(lerp2);
@@ -126,10 +121,9 @@ namespace PaintFx
             }
         }
 
-        public sealed class Radial
-            : GradientRenderer
+        public sealed class Radial : GradientRenderer
         {
-            private float invDistanceScale;
+            float _invDistanceScale;
 
             public override void BeforeRender()
             {
@@ -137,11 +131,11 @@ namespace PaintFx
 
                 if (distanceScale == 0)
                 {
-                    this.invDistanceScale = 0;
+                    _invDistanceScale = 0;
                 }
                 else
                 {
-                    this.invDistanceScale = 1.0f / distanceScale;
+                    _invDistanceScale = 1.0f / distanceScale;
                 }
 
                 base.BeforeRender();
@@ -154,7 +148,7 @@ namespace PaintFx
 
                 float distance = (float)Math.Sqrt(dx * dx + dy * dy);
 
-                return distance * this.invDistanceScale;
+                return distance * _invDistanceScale;
             }
 
             public override float BoundLerp(float t)
@@ -168,15 +162,14 @@ namespace PaintFx
             }
         }
 
-        public sealed class Conical
-            : GradientRenderer
+        public sealed class Conical : GradientRenderer
         {
-            private float tOffset;
-            private const float invPi = (float)(1.0 / Math.PI);
+            float _tOffset;
+            const float INV_PI = (float)(1.0 / Math.PI);
 
             public override void BeforeRender()
             {
-                this.tOffset = -ComputeUnboundedLerp((int)EndPoint.X, (int)EndPoint.Y);
+                _tOffset = -ComputeUnboundedLerp((int)EndPoint.X, (int)EndPoint.Y);
                 base.BeforeRender();
             }
 
@@ -187,9 +180,9 @@ namespace PaintFx
 
                 float theta = (float)Math.Atan2(ay, ax);
 
-                float t = theta * invPi;
+                float t = theta * INV_PI;
 
-                return t + this.tOffset;
+                return t + _tOffset;
             }
 
             public override float BoundLerp(float t)

@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
@@ -10,7 +10,7 @@
     <FileAlignment>512</FileAlignment>
     <AssemblyName>PixelFarm.One.HtmlRenderer</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' "
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants> TRACE; DEBUG; PIXEL_FARM; PIXEL_FARM_NET20; NET20; MINIMAL; GLES; WIN32; GL_ENABLE; SHARPZIPLIB;</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' "
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <DefineConstants> TRACE; PIXEL_FARM; PIXEL_FARM_NET20; NET20; MINIMAL; GLES; WIN32; GL_ENABLE; SHARPZIPLIB;</DefineConstants>
   </PropertyGroup>
-  <ItemGroup xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs" />
@@ -438,16 +438,7 @@
     <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\General\ISegment.cs" Link="PixelFarm\BackEnd.TreeCollection\General\ISegment.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\General\RedBlackTree.cs" Link="PixelFarm\BackEnd.TreeCollection\General\RedBlackTree.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\General\SegmentTree.cs" Link="PixelFarm\BackEnd.TreeCollection\General\SegmentTree.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\HeightTree\DocumentLocation.cs" Link="PixelFarm\BackEnd.TreeCollection\HeightTree\DocumentLocation.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\HeightTree\HeightTree.cs" Link="PixelFarm\BackEnd.TreeCollection\HeightTree\HeightTree.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\PlainDocument\PlainTextDocument.cs" Link="PixelFarm\BackEnd.TreeCollection\PlainDocument\PlainTextDocument.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\TextDocument\IDocumentLine.cs" Link="PixelFarm\BackEnd.TreeCollection\TextDocument\IDocumentLine.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\TextDocument\IReadonlyTextDocument.cs" Link="PixelFarm\BackEnd.TreeCollection\TextDocument\IReadonlyTextDocument.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\TextDocument\ITextSource.cs" Link="PixelFarm\BackEnd.TreeCollection\TextDocument\ITextSource.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\TextDocument\ITextSourceVersion.cs" Link="PixelFarm\BackEnd.TreeCollection\TextDocument\ITextSourceVersion.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\TextDocument\StringTextSource.cs" Link="PixelFarm\BackEnd.TreeCollection\TextDocument\StringTextSource.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\TextDocument\TextChangeEventArgs.cs" Link="PixelFarm\BackEnd.TreeCollection\TextDocument\TextChangeEventArgs.cs" />
-    <Compile Include="..\..\PixelFarm\BackEnd.TreeCollection\TextDocument\UnicodeNewLine.cs" Link="PixelFarm\BackEnd.TreeCollection\TextDocument\UnicodeNewLine.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.Triangulation\x_notused\DTSweepBasin.cs" Link="PixelFarm\BackEnd.Triangulation\x_notused\DTSweepBasin.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.Triangulation\x_notused\DTSweepEdgeEvent.cs" Link="PixelFarm\BackEnd.Triangulation\x_notused\DTSweepEdgeEvent.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.Triangulation\x_notused\DTSweepPointComparator.cs" Link="PixelFarm\BackEnd.Triangulation\x_notused\DTSweepPointComparator.cs" />
@@ -530,6 +521,7 @@
     <Compile Include="..\..\PixelFarm\PaintLab.RenderTree\6_debug\IdbugOutputWindow.cs" Link="PixelFarm\PaintLab.RenderTree\6_debug\IdbugOutputWindow.cs" />
     <Compile Include="..\..\PixelFarm\PaintLab.RenderTree\8_EventQueue\EventQueueSystem.cs" Link="PixelFarm\PaintLab.RenderTree\8_EventQueue\EventQueueSystem.cs" />
     <Compile Include="..\..\PixelFarm\PaintLab.AbstractPlatform\Accessories\KnownColors.cs" Link="PixelFarm\PaintLab.AbstractPlatform\Accessories\KnownColors.cs" />
+    <Compile Include="..\..\PixelFarm\PaintLab.AbstractPlatform\CanvasViewport.cs" Link="PixelFarm\PaintLab.AbstractPlatform\CanvasViewport.cs" />
     <Compile Include="..\..\PixelFarm\PaintLab.AbstractPlatform\TempContext.cs" Link="PixelFarm\PaintLab.AbstractPlatform\TempContext.cs" />
     <Compile Include="..\..\PixelFarm\PaintLab.YourImplementation\0_FrameworkInit\CommonTextServiceSetup.cs" Link="PixelFarm\PaintLab.YourImplementation\0_FrameworkInit\CommonTextServiceSetup.cs" />
     <Compile Include="..\..\PixelFarm\PaintLab.YourImplementation\0_FrameworkInit\FrameworkInitGLES.cs" Link="PixelFarm\PaintLab.YourImplementation\0_FrameworkInit\FrameworkInitGLES.cs" />
@@ -962,7 +954,7 @@
     <Compile Include="..\..\..\..\Typography\Typography.TextServices\TextServices.cs" Link="Typography\Typography.TextServices\TextServices.cs" />
     <Compile Include="..\..\..\..\Typography\Typography.TextServices\Utils\CRC32.cs" Link="Typography\Typography.TextServices\Utils\CRC32.cs" />
   </ItemGroup>
-  <ItemGroup xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup
     <Folder Include="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color" />
     <Folder Include="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core" />
     <Folder Include="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\PixelOps" />
@@ -1023,9 +1015,7 @@
     <Folder Include="PixelFarm\BackEnd.SharpZipLib\Zip" />
     <Folder Include="PixelFarm\BackEnd.Tesselate" />
     <Folder Include="PixelFarm\BackEnd.TreeCollection\General" />
-    <Folder Include="PixelFarm\BackEnd.TreeCollection\HeightTree" />
     <Folder Include="PixelFarm\BackEnd.TreeCollection\PlainDocument" />
-    <Folder Include="PixelFarm\BackEnd.TreeCollection\TextDocument" />
     <Folder Include="PixelFarm\BackEnd.Triangulation\x_notused" />
     <Folder Include="PixelFarm\BackEnd.TypeMirror" />
     <Folder Include="PixelFarm\PaintLab.PlatformBridge\Common" />

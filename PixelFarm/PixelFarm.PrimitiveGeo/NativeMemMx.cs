@@ -18,8 +18,9 @@ namespace PixelFarm.CpuBlit
         public static unsafe extern void memset(byte* dest, byte c, int byteCount);
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl)]
         public static unsafe extern void memcpy(byte* dest, byte* src, int byteCount);
-#else
-        //this need System.Runtime.CompilerServices.Unsafe
+
+#elif NETCORE3
+    //this need System.Runtime.CompilerServices.Unsafe
         public static unsafe void memset(byte* dest, byte c, int byteCount)
         {
             System.Runtime.CompilerServices.Unsafe.InitBlock((void*)(System.IntPtr)dest, c, (uint)byteCount);
@@ -28,6 +29,11 @@ namespace PixelFarm.CpuBlit
         {
             System.Runtime.CompilerServices.Unsafe.CopyBlock((void*)(System.IntPtr)dest, (void*)(System.IntPtr)src, (uint)byteCount);
         }
+#else
+        [DllImport("msvcrt.dll", EntryPoint = "memset", CallingConvention = CallingConvention.Cdecl)]
+        public static unsafe extern void memset(byte* dest, byte c, int byteCount);
+        [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl)]
+        public static unsafe extern void memcpy(byte* dest, byte* src, int byteCount);      
 #endif
         public static void MemSet(byte[] dest, int startAt, byte value, int count)
         {

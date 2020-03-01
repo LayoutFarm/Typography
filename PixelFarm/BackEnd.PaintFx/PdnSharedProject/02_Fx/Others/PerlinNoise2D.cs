@@ -36,23 +36,20 @@
 //MIT, 2017-present, WinterDev
 using System;
 
-using PixelFarm.Drawing;
-
 namespace PaintFx.Effects
 {
     internal static class PerlinNoise2D
     {
         // precalculated rotation matrix coefficients
-        private static readonly double rot_11;
-        private static readonly double rot_12;
-        private static readonly double rot_21;
-        private static readonly double rot_22;
+        static readonly double rot_11;
+        static readonly double rot_12;
+        static readonly double rot_21;
+        static readonly double rot_22;
 
-        private static readonly int[] permuteLookup;
+        static readonly int[] s_permuteLookup;
 
-        private static readonly int[] permutationTable =
-            new int[]
-            {
+        static readonly int[] s_permutationTable = new int[]
+          {
                 151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7,
                 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6,
                 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35,
@@ -71,16 +68,16 @@ namespace PaintFx.Effects
                 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150,
                 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128,
                 195, 78, 66, 215, 61, 156, 180
-            };
+          };
 
         static PerlinNoise2D()
         {
-            permuteLookup = new int[512];
+            s_permuteLookup = new int[512];
 
             for (int i = 0; i < 256; i++)
             {
-                permuteLookup[256 + i] = permutationTable[i];
-                permuteLookup[i] = permutationTable[i];
+                s_permuteLookup[256 + i] = s_permutationTable[i];
+                s_permuteLookup[i] = s_permutationTable[i];
             }
 
             // precalculate a rotation matrix - arbitary angle... 
@@ -177,20 +174,20 @@ namespace PaintFx.Effects
             double u = Fade(x);
             double v = Fade(y);
 
-            int a = permuteLookup[ix + seed] + iy;
-            int aa = permuteLookup[a];
-            int ab = permuteLookup[a + 1];
-            int b = permuteLookup[ix + 1 + seed] + iy;
-            int ba = permuteLookup[b];
-            int bb = permuteLookup[b + 1];
+            int a = s_permuteLookup[ix + seed] + iy;
+            int aa = s_permuteLookup[a];
+            int ab = s_permuteLookup[a + 1];
+            int b = s_permuteLookup[ix + 1 + seed] + iy;
+            int ba = s_permuteLookup[b];
+            int bb = s_permuteLookup[b + 1];
 
-            double gradAA = Grad(permuteLookup[aa], x, y);
-            double gradBA = Grad(permuteLookup[ba], x - 1, y);
+            double gradAA = Grad(s_permuteLookup[aa], x, y);
+            double gradBA = Grad(s_permuteLookup[ba], x - 1, y);
 
             double edge1 = Lerp(gradAA, gradBA, u);
 
-            double gradAB = Grad(permuteLookup[ab], x, y - 1);
-            double gradBB = Grad(permuteLookup[bb], x - 1, y - 1);
+            double gradAB = Grad(s_permuteLookup[ab], x, y - 1);
+            double gradBB = Grad(s_permuteLookup[bb], x - 1, y - 1);
 
             double edge2 = Lerp(gradAB, gradBB, u);
 

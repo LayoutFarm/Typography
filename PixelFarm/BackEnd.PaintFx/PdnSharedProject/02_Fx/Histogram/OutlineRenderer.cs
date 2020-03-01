@@ -13,24 +13,13 @@ namespace PaintFx.Effects
 
     public class OutlineRenderer : HistogramRenderer
     {
-        private int thickness;
-        private int intensity;
-        public int Thickness
-        {
-            get { return thickness; }
-            set { thickness = value; }
-
-        }
-        public int Intensity
-        {
-            get { return intensity; }
-            set { intensity = value; }
-        }
+        public int Thickness { get; set; }
+        public int Intensity { get; set; }
 
         public unsafe override ColorBgra Apply(ColorBgra src, int area, int* hb, int* hg, int* hr, int* ha)
         {
-            int minCount1 = area * (100 - this.intensity) / 200;
-            int minCount2 = area * (100 + this.intensity) / 200;
+            int minCount1 = area * (100 - this.Intensity) / 200;
+            int minCount2 = area * (100 + this.Intensity) / 200;
 
             int bCount = 0;
             int b1 = 0;
@@ -122,7 +111,7 @@ namespace PaintFx.Effects
         {
             for (int i = startIndex; i < startIndex + length; ++i)
             {
-                RenderRect(this.thickness, src, dest, renderRects[i]);
+                RenderRect(this.Thickness, src, dest, renderRects[i]);
             }
         }
     }

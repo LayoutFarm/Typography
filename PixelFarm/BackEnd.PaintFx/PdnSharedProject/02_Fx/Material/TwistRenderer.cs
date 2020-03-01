@@ -15,37 +15,37 @@ namespace PaintFx.Effects
 {
     public class TwistRenderer : EffectRendererBase
     {
-        const double inv100 = 1.0 / 100.0;
+        const double INV100 = 1.0 / 100.0;
 
-        double amount;
-        double size;
-        int quality;
-        double offsetX;
-        double offsetY;
+        double _amount;
+        double _size;
+        int _quality;
+        double _offsetX;
+        double _offsetY;
         public void SetParameters(double amount, double size, int quality, double offsetX, double offsetY)
         {
-            this.amount = amount;
-            this.size = size;
-            this.quality = quality;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
+            _amount = amount;
+            _size = size;
+            _quality = quality;
+            _offsetX = offsetX;
+            _offsetY = offsetY;
 
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int start, int len)
         {
             unsafe
             {
-                double twist = this.amount * this.amount * Math.Sign(this.amount);
+                double twist = _amount * _amount * Math.Sign(_amount);
 
                 float hw = dst.Width / 2.0f;
-                hw += (float)(hw * this.offsetX);
+                hw += (float)(hw * _offsetX);
                 float hh = dst.Height / 2.0f;
-                hh += (float)(hh * this.offsetY);
+                hh += (float)(hh * _offsetY);
 
                 //*double maxrad = Math.Min(dst.Width / 2.0, dst.Height / 2.0);
                 double invmaxrad = 1.0 / Math.Min(dst.Width / 2.0, dst.Height / 2.0);
 
-                int aaLevel = this.quality;
+                int aaLevel = _quality;
                 int aaSamples = aaLevel * aaLevel;
                 PointF* aaPoints = stackalloc PointF[aaSamples];
                 PixelUtils.GetRgssOffsets(aaPoints, aaSamples, aaLevel);
@@ -77,11 +77,11 @@ namespace PaintFx.Effects
                                 double rad = Math.Sqrt(u * u + v * v);
                                 double theta = Math.Atan2(v, u);
 
-                                double t = 1 - ((rad * this.size) * invmaxrad);
+                                double t = 1 - ((rad * _size) * invmaxrad);
 
                                 t = (t < 0) ? 0 : (t * t * t);
 
-                                theta += (t * twist) * inv100;
+                                theta += (t * twist) * INV100;
 
                                 float sampleX = (hw + (float)(rad * Math.Cos(theta)));
                                 float sampleY = (hh + (float)(rad * Math.Sin(theta)));

@@ -18,9 +18,8 @@ namespace PaintFx
     /// 
     /// See UserBlendOps.cs for guidelines on implementation.
     /// </summary>
-    
-    public abstract class UserBlendOp
-        : BinaryPixelOp
+
+    public abstract class UserBlendOp : BinaryPixelOp
     {
         public virtual UserBlendOp CreateWithOpacity(int opacity)
         {

@@ -13,132 +13,109 @@ namespace PaintFx
 {
     public abstract class GradientRenderer
     {
-        private BinaryPixelOp normalBlendOp;
-        private ColorBgra startColor;
-        private ColorBgra endColor;
-        private PointF startPoint;
-        private PointF endPoint;
-        private bool alphaBlending;
-        private bool alphaOnly;
+        BinaryPixelOp _normalBlendOp;
+        ColorBgra _startColor;
+        ColorBgra _endColor;
+        PointF _startPoint;
+        PointF _endPoint;
+        bool _alphaBlending;
+        bool _alphaOnly;
 
-        private bool lerpCacheIsValid = false;
-        private byte[] lerpAlphas;
-        private ColorBgra[] lerpColors;
+        bool _lerpCacheIsValid = false;
+        byte[] _lerpAlphas;
+        ColorBgra[] _lerpColors;
 
         public ColorBgra StartColor
         {
-            get
-            {
-                return this.startColor;
-            }
-
+            get => _startColor;
             set
             {
-                if (this.startColor != value)
+                if (_startColor != value)
                 {
-                    this.startColor = value;
-                    this.lerpCacheIsValid = false;
+                    _startColor = value;
+                    _lerpCacheIsValid = false;
                 }
             }
         }
 
         public ColorBgra EndColor
         {
-            get
-            {
-                return this.endColor;
-            }
-
+            get => _endColor;
             set
             {
-                if (this.endColor != value)
+                if (_endColor != value)
                 {
-                    this.endColor = value;
-                    this.lerpCacheIsValid = false;
+                    _endColor = value;
+                    _lerpCacheIsValid = false;
                 }
             }
         }
 
         public PointF StartPoint
         {
-            get
-            {
-                return this.startPoint;
-            }
-
+            get => _startPoint;
             set
             {
-                this.startPoint = value;
+                _startPoint = value;
             }
         }
 
         public PointF EndPoint
         {
-            get
-            {
-                return this.endPoint;
-            }
-
+            get => _endPoint;
             set
             {
-                this.endPoint = value;
+                _endPoint = value;
             }
         }
 
         public bool AlphaBlending
         {
-            get
-            {
-                return this.alphaBlending;
-            }
+            get => _alphaBlending;
 
             set
             {
-                this.alphaBlending = value;
+                _alphaBlending = value;
             }
         }
 
         public bool AlphaOnly
         {
-            get
-            {
-                return this.alphaOnly;
-            }
-
+            get => _alphaOnly;
             set
             {
-                this.alphaOnly = value;
+                _alphaOnly = value;
             }
         }
 
         public virtual void BeforeRender()
         {
-            if (!this.lerpCacheIsValid)
+            if (!_lerpCacheIsValid)
             {
                 byte startAlpha;
                 byte endAlpha;
 
-                if (this.alphaOnly)
+                if (_alphaOnly)
                 {
-                    ComputeAlphaOnlyValuesFromColors(this.startColor, this.endColor, out startAlpha, out endAlpha);
+                    ComputeAlphaOnlyValuesFromColors(_startColor, _endColor, out startAlpha, out endAlpha);
                 }
                 else
                 {
-                    startAlpha = this.startColor.A;
-                    endAlpha = this.endColor.A;
+                    startAlpha = _startColor.A;
+                    endAlpha = _endColor.A;
                 }
 
-                this.lerpAlphas = new byte[256];
-                this.lerpColors = new ColorBgra[256];
+                _lerpAlphas = new byte[256];
+                _lerpColors = new ColorBgra[256];
 
                 for (int i = 0; i < 256; ++i)
                 {
                     byte a = (byte)i;
-                    this.lerpColors[a] = ColorBgra.Blend(this.startColor, this.endColor, a);
-                    this.lerpAlphas[a] = (byte)(startAlpha + ((endAlpha - startAlpha) * a) / 255);
+                    _lerpColors[a] = ColorBgra.Blend(_startColor, _endColor, a);
+                    _lerpAlphas[a] = (byte)(startAlpha + ((endAlpha - startAlpha) * a) / 255);
                 }
 
-                this.lerpCacheIsValid = true;
+                _lerpCacheIsValid = true;
             }
         }
 
@@ -160,21 +137,21 @@ namespace PaintFx
             byte startAlpha;
             byte endAlpha;
 
-            if (this.alphaOnly)
+            if (_alphaOnly)
             {
-                ComputeAlphaOnlyValuesFromColors(this.startColor, this.endColor, out startAlpha, out endAlpha);
+                ComputeAlphaOnlyValuesFromColors(_startColor, _endColor, out startAlpha, out endAlpha);
             }
             else
             {
-                startAlpha = this.startColor.A;
-                endAlpha = this.endColor.A;
+                startAlpha = _startColor.A;
+                endAlpha = _endColor.A;
             }
 
             for (int ri = startIndex; ri < startIndex + length; ++ri)
             {
                 Rectangle rect = rois[ri];
 
-                if (this.startPoint.Equals(this.endPoint))
+                if (_startPoint.Equals(_endPoint))
                 {
                     // Start and End point are the same ... fill with solid color.
                     for (int y = rect.Top; y < rect.Bottom; ++y)
@@ -185,24 +162,24 @@ namespace PaintFx
                         {
                             ColorBgra result;
 
-                            if (this.alphaOnly && this.alphaBlending)
+                            if (_alphaOnly && _alphaBlending)
                             {
                                 byte resultAlpha = (byte)PixelUtils.FastDivideShortByByte((ushort)(pixelPtr->A * endAlpha), 255);
                                 result = *pixelPtr;
                                 result.A = resultAlpha;
                             }
-                            else if (this.alphaOnly && !this.alphaBlending)
+                            else if (_alphaOnly && !_alphaBlending)
                             {
                                 result = *pixelPtr;
                                 result.A = endAlpha;
                             }
-                            else if (!this.alphaOnly && this.alphaBlending)
+                            else if (!_alphaOnly && _alphaBlending)
                             {
-                                result = this.normalBlendOp.Apply(*pixelPtr, this.endColor);
+                                result = _normalBlendOp.Apply(*pixelPtr, _endColor);
                             }
                             else //if (!this.alphaOnly && !this.alphaBlending)
                             {
-                                result = this.endColor;
+                                result = _endColor;
                             }
 
                             *pixelPtr = result;
@@ -216,32 +193,32 @@ namespace PaintFx
                     {
                         ColorBgra* pixelPtr = surface.GetPointAddress(rect.Left, y);
 
-                        if (this.alphaOnly && this.alphaBlending)
+                        if (_alphaOnly && _alphaBlending)
                         {
                             for (int x = rect.Left; x < rect.Right; ++x)
                             {
                                 float lerpUnbounded = ComputeUnboundedLerp(x, y);
                                 float lerpBounded = BoundLerp(lerpUnbounded);
                                 byte lerpByte = (byte)(lerpBounded * 255.0f);
-                                byte lerpAlpha = this.lerpAlphas[lerpByte];
+                                byte lerpAlpha = _lerpAlphas[lerpByte];
                                 byte resultAlpha = PixelUtils.FastScaleByteByByte(pixelPtr->A, lerpAlpha);
                                 pixelPtr->A = resultAlpha;
                                 ++pixelPtr;
                             }
                         }
-                        else if (this.alphaOnly && !this.alphaBlending)
+                        else if (_alphaOnly && !_alphaBlending)
                         {
                             for (int x = rect.Left; x < rect.Right; ++x)
                             {
                                 float lerpUnbounded = ComputeUnboundedLerp(x, y);
                                 float lerpBounded = BoundLerp(lerpUnbounded);
                                 byte lerpByte = (byte)(lerpBounded * 255.0f);
-                                byte lerpAlpha = this.lerpAlphas[lerpByte];
+                                byte lerpAlpha = _lerpAlphas[lerpByte];
                                 pixelPtr->A = lerpAlpha;
                                 ++pixelPtr;
                             }
                         }
-                        else if (!this.alphaOnly && (this.alphaBlending && (startAlpha != 255 || endAlpha != 255)))
+                        else if (!_alphaOnly && (_alphaBlending && (startAlpha != 255 || endAlpha != 255)))
                         {
                             // If we're doing all color channels, and we're doing alpha blending, and if alpha blending is necessary
                             for (int x = rect.Left; x < rect.Right; ++x)
@@ -249,8 +226,8 @@ namespace PaintFx
                                 float lerpUnbounded = ComputeUnboundedLerp(x, y);
                                 float lerpBounded = BoundLerp(lerpUnbounded);
                                 byte lerpByte = (byte)(lerpBounded * 255.0f);
-                                ColorBgra lerpColor = this.lerpColors[lerpByte];
-                                ColorBgra result = this.normalBlendOp.Apply(*pixelPtr, lerpColor);
+                                ColorBgra lerpColor = _lerpColors[lerpByte];
+                                ColorBgra result = _normalBlendOp.Apply(*pixelPtr, lerpColor);
                                 *pixelPtr = result;
                                 ++pixelPtr;
                             }
@@ -262,7 +239,7 @@ namespace PaintFx
                                 float lerpUnbounded = ComputeUnboundedLerp(x, y);
                                 float lerpBounded = BoundLerp(lerpUnbounded);
                                 byte lerpByte = (byte)(lerpBounded * 255.0f);
-                                ColorBgra lerpColor = this.lerpColors[lerpByte];
+                                ColorBgra lerpColor = _lerpColors[lerpByte];
                                 *pixelPtr = lerpColor;
                                 ++pixelPtr;
                             }
@@ -276,8 +253,8 @@ namespace PaintFx
 
         protected internal GradientRenderer(bool alphaOnly, BinaryPixelOp normalBlendOp)
         {
-            this.normalBlendOp = normalBlendOp;
-            this.alphaOnly = alphaOnly;
+            _normalBlendOp = normalBlendOp;
+            _alphaOnly = alphaOnly;
         }
     }
 }

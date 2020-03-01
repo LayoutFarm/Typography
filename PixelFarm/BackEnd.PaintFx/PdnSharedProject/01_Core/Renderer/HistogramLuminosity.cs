@@ -16,13 +16,12 @@ namespace PaintFx
     /// if desired). This can then be used to retrieve percentile, average, peak,
     /// and distribution information.
     /// </summary>
-    public sealed class HistogramLuminosity
-        : Histogram
+    public sealed class HistogramLuminosity : Histogram
     {
         public HistogramLuminosity()
             : base(1, 256)
         {
-            this.visualColors = new ColorBgra[] { ColorBgra.Black };
+            _visualColors = new ColorBgra[] { ColorBgra.Black };
         }
 
         public override ColorBgra GetMeanColor()
@@ -39,7 +38,7 @@ namespace PaintFx
 
         protected override unsafe void AddSurfaceRectangleToHistogram(Surface surface, Rectangle rect)
         {
-            long[] histogramLuminosity = histogram[0];
+            long[] histogramLuminosity = _histogram[0];
 
             for (int y = rect.Top; y < rect.Bottom; ++y)
             {
