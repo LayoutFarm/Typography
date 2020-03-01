@@ -1,4 +1,4 @@
-﻿//MIT, 2020-present, WinterDev 
+﻿//MIT, 2014-present, WinterDev 
 
 namespace PixelFarm.Drawing
 {
@@ -14,4 +14,5 @@ namespace PixelFarm.Drawing
         Ideographics,//not implemented
         Bottom,
     }
+
 }

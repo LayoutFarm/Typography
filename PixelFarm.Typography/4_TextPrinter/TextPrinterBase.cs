@@ -16,6 +16,8 @@ namespace Typography.Contours
         {
             FontSizeInPoints = 14;//
             ScriptLang = ScriptLangs.Latin;//default?
+
+             
         }
 
 
