@@ -50,9 +50,9 @@ namespace PaintFx.Effects
 
             private void Transform(RotateZoomEffectConfigToken token, int x, int y, out float sx, out float sy, out float sz)
             {
-                float rb = token.preRotateZ;
-                float ra = token.postRotateZ;
-                float r = -token.tilt;
+                float rb = token._preRotateZ;
+                float ra = token._postRotateZ;
+                float r = -token._tilt;
                 float crb = (float)Math.Cos(rb);
                 float cr = (float)Math.Cos(r);
                 float cra = (float)Math.Cos(ra);
@@ -87,135 +87,86 @@ namespace PaintFx.Effects
         {
             lock (this)
             {
-                computedOnce = new RzInfo();
-                computedOnce.Update(this);
+                ComputedOnce = new RzInfo();
+                ComputedOnce.Update(this);
             }
         }
+        public bool HighQuality { get; set; }
+        internal RzInfo ComputedOnce { get; private set; }
 
-        private bool highQuality;
-        public bool HighQuality
-        {
-            get
-            {
-                return highQuality;
-            }
-
-            set
-            {
-                this.highQuality = value;
-            }
-        }
-
-        private RzInfo computedOnce;
-        internal RzInfo ComputedOnce
-        {
-            get
-            {
-                return computedOnce;
-            }
-        }
-
-        private float preRotateZ;
+        float _preRotateZ;
         public float PreRotateZ
         {
-            get
-            {
-                return preRotateZ;
-            }
-
+            get => _preRotateZ;
             set
             {
-                preRotateZ = value;
+                _preRotateZ = value;
                 UpdateRzInfo();
             }
         }
 
-        private float postRotateZ;
+        float _postRotateZ;
         public float PostRotateZ
         {
-            get
-            {
-                return postRotateZ;
-            }
-
+            get => _postRotateZ;
             set
             {
-                postRotateZ = value;
+                _postRotateZ = value;
                 UpdateRzInfo();
             }
         }
 
-        private float tilt;
+        float _tilt;
         public float Tilt
         {
-            get
-            {
-                return tilt;
-            }
-
+            get => _tilt;
             set
             {
-                tilt = value;
+                _tilt = value;
                 UpdateRzInfo();
             }
         }
 
-        private float zoom;
+        float _zoom;
         public float Zoom
         {
-            get
-            {
-                return zoom;
-            }
-
+            get => _zoom;
             set
             {
-                zoom = value;
+                _zoom = value;
                 UpdateRzInfo();
             }
         }
 
-        private bool sourceAsBackground;
+        bool _sourceAsBackground;
         public bool SourceAsBackground
         {
-            get
-            {
-                return sourceAsBackground;
-            }
-
+            get => _sourceAsBackground;
             set
             {
-                sourceAsBackground = value;
+                _sourceAsBackground = value;
                 UpdateRzInfo();
             }
         }
 
-        private bool tile;
+        bool _tile;
         public bool Tile
         {
-            get
-            {
-                return tile;
-            }
-
+            get => _tile;
             set
             {
-                tile = value;
+                _tile = value;
                 UpdateRzInfo();
             }
         }
 
-        private PointF offset;
+        PointF _offset;
         public PointF Offset
         {
-            get
-            {
-                return offset;
-            }
-
+            get => _offset;
             set
             {
-                offset = value;
+                _offset = value;
                 UpdateRzInfo();
             }
         }
@@ -223,27 +174,27 @@ namespace PaintFx.Effects
         public RotateZoomEffectConfigToken(bool highQuality, float preRotateZ, float postRotateZ,
             float tilt, float zoom, PointF offset, bool sourceAsBackground, bool tile)
         {
-            this.highQuality = highQuality;
-            this.preRotateZ = preRotateZ;
-            this.postRotateZ = postRotateZ;
-            this.tilt = tilt;
-            this.zoom = zoom;
-            this.offset = offset;
-            this.sourceAsBackground = sourceAsBackground;
-            this.tile = tile;
+            this.HighQuality = highQuality;
+            _preRotateZ = preRotateZ;
+            _postRotateZ = postRotateZ;
+            _tilt = tilt;
+            _zoom = zoom;
+            _offset = offset;
+            _sourceAsBackground = sourceAsBackground;
+            _tile = tile;
             UpdateRzInfo();
         }
 
         protected RotateZoomEffectConfigToken(RotateZoomEffectConfigToken copyMe)
         {
-            this.highQuality = copyMe.highQuality;
-            this.preRotateZ = copyMe.preRotateZ;
-            this.postRotateZ = copyMe.postRotateZ;
-            this.tilt = copyMe.tilt;
-            this.zoom = copyMe.zoom;
-            this.offset = copyMe.offset;
-            this.sourceAsBackground = copyMe.sourceAsBackground;
-            this.tile = copyMe.tile;
+            this.HighQuality = copyMe.HighQuality;
+            _preRotateZ = copyMe._preRotateZ;
+            _postRotateZ = copyMe._postRotateZ;
+            _tilt = copyMe._tilt;
+            _zoom = copyMe._zoom;
+            _offset = copyMe._offset;
+            _sourceAsBackground = copyMe._sourceAsBackground;
+            _tile = copyMe._tile;
             UpdateRzInfo();
         }
 

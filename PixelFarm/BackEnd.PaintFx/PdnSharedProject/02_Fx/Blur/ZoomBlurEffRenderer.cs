@@ -12,25 +12,25 @@ namespace PaintFx.Effects
 {
     public class ZoomBlurEffRenderer : EffectRendererBase
     {
-        int amount;
-        double offsetX;
-        double offsetY;
+        int _amount;
+        double _offsetX;
+        double _offsetY;
         public void SetParameters(int amount, double offsetX, double offsetY)
         {
-            this.amount = amount;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
+            _amount = amount;
+            _offsetX = offsetX;
+            _offsetY = offsetY;
         }
-        const int n = 64;
+        const int N = 64;
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int startIndex, int length)
         {
             long w = dst.Width;
             long h = dst.Height;
-            long fox = (long)(dst.Width * offsetX * 32768.0);
-            long foy = (long)(dst.Height * offsetY * 32768.0);
+            long fox = (long)(dst.Width * _offsetX * 32768.0);
+            long foy = (long)(dst.Height * _offsetY * 32768.0);
             long fcx = fox + (w << 15);
             long fcy = foy + (h << 15);
-            long fz = this.amount;
+            long fz = _amount;
 
 
             unsafe
@@ -61,7 +61,7 @@ namespace PaintFx.Effects
                             sa += srcPtr->A;
                             ++sc;
 
-                            for (int i = 0; i < n; ++i)
+                            for (int i = 0; i < N; ++i)
                             {
                                 fx -= ((fx >> 4) * fz) >> 10;
                                 fy -= ((fy >> 4) * fz) >> 10;

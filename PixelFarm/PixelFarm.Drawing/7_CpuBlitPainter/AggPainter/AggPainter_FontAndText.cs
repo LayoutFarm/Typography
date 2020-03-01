@@ -64,13 +64,9 @@ namespace PixelFarm.CpuBlit
 
             }
         }
-        public override void DrawString(RenderVxFormattedString renderVx, double x, double y)
+        public override void DrawString(RenderVxFormattedString renderVx, double left, double top)
         {
-            //draw string from render vx
-            if (_textPrinter != null)
-            {
-                _textPrinter.DrawString(renderVx, x, y);
-            }
+            _textPrinter?.DrawString(renderVx, left, top);
         }
         public override RenderVxFormattedString CreateRenderVx(string textspan)
         {
@@ -93,7 +89,5 @@ namespace PixelFarm.CpuBlit
             }
             return renderVxFmtStr;
         }
-
-
     }
 }

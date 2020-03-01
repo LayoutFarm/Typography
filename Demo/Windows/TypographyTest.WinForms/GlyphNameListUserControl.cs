@@ -47,7 +47,7 @@ namespace TypographyTest.WinForms
 
                     if (glyphIndex > 0)
                     {
-                        Glyph foundGlyph = _selectedTypeface.GetGlyphByIndex(glyphIndex);
+                        Glyph foundGlyph = _selectedTypeface.GetGlyph(glyphIndex);
 
                         //display
                         this.listBox1.SelectedIndex = glyphIndex;
@@ -75,7 +75,7 @@ namespace TypographyTest.WinForms
                     else
                     {
                         //show 
-                        Glyph found = _selectedTypeface.GetGlyphByName(userSupplyGlyphName);
+                        Glyph found = _selectedTypeface.GetGlyph(userSupplyGlyphName);
                         if (found != null && found.GlyphIndex != 0)
                         {
                             ShowGlyphNameList(_allGlyphNameMapList);

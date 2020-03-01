@@ -38,7 +38,7 @@ namespace PixelFarm.Drawing.Fonts
             for (ushort i = 0; i < glyphCount; ++i)
             {
                 stbuilder.Length = 0;//reset
-                Glyph glyph = typeface.GetGlyphByIndex(i);
+                Glyph glyph = typeface.GetGlyph(i);
                 typeface.ReadSvgContent(glyph, stbuilder);
                 //create bitmap from svg  
 
@@ -58,7 +58,7 @@ namespace PixelFarm.Drawing.Fonts
                 }
 
                 //
-                //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "d:\\WImageTest\\testGlyphBmp_" + i + ".png");
+                //MemBitmapExtensions.SaveImage(glyphBitmap.Bitmap, "testGlyphBmp_" + i + ".png");
                 _bitmapList.RegisterBitmap(glyph.GlyphIndex, glyphBitmap);
             }
 

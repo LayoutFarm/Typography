@@ -31,7 +31,7 @@ namespace Typography.OpenFont.Tables
 
     ////////////////////////////////////////////////////////////////
 
-    public class GSUB : GlyphShapingTableEntry
+    public partial class GSUB : GlyphShapingTableEntry
     {
         public const string _N = "GSUB";
         public override string Name => _N;
@@ -43,10 +43,14 @@ namespace Typography.OpenFont.Tables
             LookupTable lookupTable = new LookupTable(lookupType, lookupFlags, markFilteringSet);
             foreach (long subTableOffset in subTableOffsets)
             {
-                LookupSubTable subTable = lookupTable.ReadSubTable(reader, lookupTablePos + subTableOffset); 
+                LookupSubTable subTable = lookupTable.ReadSubTable(reader, lookupTablePos + subTableOffset);
                 subTable.OwnerGSub = this;
-                lookupTable.SubTables.Add(subTable); 
+                lookupTable.SubTables.Add(subTable);
             }
+
+#if DEBUG
+            lookupTable.dbugLkIndex = LookupList.Count;
+#endif
             LookupList.Add(lookupTable);
         }
 
@@ -111,10 +115,13 @@ namespace Typography.OpenFont.Tables
         /// <summary>
         /// sub table of a lookup list
         /// </summary>
-        public class LookupTable
+        public partial class LookupTable
         {
+#if DEBUG
+            public int dbugLkIndex;
+#endif
             //--------------------------
-            public ushort lookupType { get; private set; }
+            public ushort lookupType { get; internal set; }
             public readonly ushort lookupFlags;
             public readonly ushort markFilteringSet;
             //--------------------------
@@ -187,7 +194,7 @@ namespace Typography.OpenFont.Tables
             /// </summary>
             class LkSubTableT1Fmt1 : LookupSubTable
             {
-                public LkSubTableT1Fmt1(CoverageTable coverageTable, short deltaGlyph)
+                public LkSubTableT1Fmt1(CoverageTable coverageTable, ushort deltaGlyph)
                 {
                     this.CoverageTable = coverageTable;
                     this.DeltaGlyph = deltaGlyph;
@@ -195,7 +202,7 @@ namespace Typography.OpenFont.Tables
                 /// <summary>
                 /// Add to original GlyphID to get substitute GlyphID
                 /// </summary>
-                public short DeltaGlyph { get; private set; }
+                public ushort DeltaGlyph { get; private set; }
                 public CoverageTable CoverageTable { get; private set; }
 
                 public override bool DoSubstitutionAt(IGlyphIndexList glyphIndices, int pos, int len)
@@ -321,7 +328,7 @@ namespace Typography.OpenFont.Tables
                     default: throw new NotSupportedException();
                     case 1:
                         {
-                            short deltaGlyph = reader.ReadInt16();
+                            ushort deltaGlyph = reader.ReadUInt16();
                             CoverageTable coverageTable = CoverageTable.CreateFrom(reader, subTableStartAt + coverage);
                             return new LkSubTableT1Fmt1(coverageTable, deltaGlyph);
                         }
@@ -346,10 +353,8 @@ namespace Typography.OpenFont.Tables
                     if (foundPos > -1)
                     {
                         SequenceTable seqTable = SeqTables[foundPos];
-                        //replace current glyph index with new seq
-#if DEBUG
+                        //replace current glyph index with new seq#if DEBUG
                         int new_seqCount = seqTable.substituteGlyphs.Length;
-#endif
                         glyphIndices.Replace(pos, seqTable.substituteGlyphs);
                         return true;
                     }
@@ -424,7 +429,7 @@ namespace Typography.OpenFont.Tables
                 ushort format = reader.ReadUInt16();
                 switch (format)
                 {
-                    default: 
+                    default:
                         throw new NotSupportedException();
                     case 1:
                         {

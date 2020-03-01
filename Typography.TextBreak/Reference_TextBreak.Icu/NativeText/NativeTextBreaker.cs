@@ -128,7 +128,7 @@ namespace Typography.TextBreak.ICU
             NativeTextBreakerLib.MyFtLibGetFullVersion(out major, out minor, out revision);
             if (dataHolder == null)
             {
-                //dataHolder = new InMemoryIcuDataHolder(@"d:\WImageTest\icudt57l\icudt57l.dat");
+               
                 dataHolder = new InMemoryIcuDataHolder(icudatafile);
                 dataHolder.Use();
             }
@@ -230,7 +230,7 @@ namespace Typography.TextBreak.ICU
 
             int major, minor, revision;
             NativeTextBreakerLib.MyFtLibGetFullVersion(out major, out minor, out revision);
-            NativeTextBreaker.SetICUDataFile(@"d:\WImageTest\icudt57l\icudt57l.dat");
+            NativeTextBreaker.SetICUDataFile(@"icudt57l\icudt57l.dat");
 
             string str = "ABCD EFGH IJKL\0";
             var textBreaker = new NativeTextBreaker(TextBreakKind.Word, "en-US");

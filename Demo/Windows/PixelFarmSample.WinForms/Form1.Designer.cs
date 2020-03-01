@@ -41,13 +41,15 @@
             this.txtSampleChars = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.lstTextBaseline = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(349, 11);
+            this.button1.Location = new System.Drawing.Point(370, 44);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(81, 37);
+            this.button1.Size = new System.Drawing.Size(60, 36);
             this.button1.TabIndex = 0;
             this.button1.Text = "Render!";
             this.button1.UseVisualStyleBackColor = true;
@@ -55,9 +57,9 @@
             // txtInputChar
             // 
             this.txtInputChar.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(222)));
-            this.txtInputChar.Location = new System.Drawing.Point(0, -2);
+            this.txtInputChar.Location = new System.Drawing.Point(370, 12);
             this.txtInputChar.Name = "txtInputChar";
-            this.txtInputChar.Size = new System.Drawing.Size(168, 21);
+            this.txtInputChar.Size = new System.Drawing.Size(191, 21);
             this.txtInputChar.TabIndex = 1;
             this.txtInputChar.Text = "a";
             // 
@@ -105,7 +107,7 @@
             // 
             // cmdMeasureString
             // 
-            this.cmdMeasureString.Location = new System.Drawing.Point(436, 11);
+            this.cmdMeasureString.Location = new System.Drawing.Point(436, 44);
             this.cmdMeasureString.Name = "cmdMeasureString";
             this.cmdMeasureString.Size = new System.Drawing.Size(125, 37);
             this.cmdMeasureString.TabIndex = 71;
@@ -116,7 +118,7 @@
             // lblStringSize
             // 
             this.lblStringSize.AutoSize = true;
-            this.lblStringSize.Location = new System.Drawing.Point(433, 51);
+            this.lblStringSize.Location = new System.Drawing.Point(433, 84);
             this.lblStringSize.Name = "lblStringSize";
             this.lblStringSize.Size = new System.Drawing.Size(77, 13);
             this.lblStringSize.TabIndex = 72;
@@ -160,11 +162,31 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(1266, 571);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(121, 28);
+            this.button4.TabIndex = 77;
+            this.button4.Text = "TestFontAtlas";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // lstTextBaseline
+            // 
+            this.lstTextBaseline.FormattingEnabled = true;
+            this.lstTextBaseline.Location = new System.Drawing.Point(436, 126);
+            this.lstTextBaseline.Name = "lstTextBaseline";
+            this.lstTextBaseline.Size = new System.Drawing.Size(120, 95);
+            this.lstTextBaseline.TabIndex = 78;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1393, 857);
+            this.Controls.Add(this.lstTextBaseline);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.txtSampleChars);
@@ -200,6 +222,8 @@
         private System.Windows.Forms.TextBox txtSampleChars;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.ListBox lstTextBaseline;
     }
 }
 

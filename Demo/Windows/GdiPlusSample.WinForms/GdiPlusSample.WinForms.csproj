@@ -47,6 +47,9 @@
     <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\TextPrinterBase.cs">
       <Link>DevTextPrinter\TextPrinterBase.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs">
+      <Link>DevTextPrinter\TextBaseline.cs</Link>
+    </Compile>
     <Compile Include="..\..\Shared\DevTextPrinter\FontManagement.cs">
       <Link>DevTextPrinter\FontManagement.cs</Link>
     </Compile>

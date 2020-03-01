@@ -12,10 +12,10 @@ namespace PaintFx.Effects
 {
     public class ColorDiffEffectRenderer
     {
-        protected double[][] weights;
+        protected double[][] _weights;
         public void Render(RenderArgs dstArg, RenderArgs srcArg, Rectangle[] rois, int startIndex, int len)
         {
-            RenderColorDifferenceEffect(this.weights, dstArg, srcArg, rois, startIndex, len);
+            RenderColorDifferenceEffect(_weights, dstArg, srcArg, rois, startIndex, len);
         }
         public unsafe void RenderColorDifferenceEffect(
              double[][] weights,

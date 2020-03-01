@@ -168,20 +168,12 @@ namespace PixelFarm.Drawing
             _viewportWidth = width;
             _viewportHeight = height;
         }
-        internal bool PushLocalClipArea(float left, float top, float w, float h)
-        {
-            Rectangle currentClip = _drawBoard.CurrentClipRect;
-            return _drawBoard.PushClipAreaRect((int)left, (int)top, (int)w, (int)h, ref currentClip);
-        }
+        
         public void AttachToNormalBuffer()
         {
             _drawBoard.ExitCurrentDrawboardBuffer();
         }
-        internal void PopLocalClipArea()
-        {
-            //return; 
-            _drawBoard.PopClipAreaRect();
-        }
+        
         internal Rectangle CurrentClipRect => _drawBoard.CurrentClipRect;
         public void DrawImage(Image img, float x, float y, float w, float h)
         {

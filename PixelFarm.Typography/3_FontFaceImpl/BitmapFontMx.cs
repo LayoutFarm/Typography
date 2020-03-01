@@ -106,7 +106,7 @@ namespace Typography.Rendering
                     DoFilter = false ,  HintTechnique = Typography.Contours.HintTechnique.None},
                 new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
             });
-            
+
         }
         public static void SetDefaultDetails(GlyphTextureBuildDetail[] defaultDetails)
         {
@@ -208,8 +208,9 @@ namespace Typography.Rendering
                     _msdfTextureFonts.Add(simpleFontAtlas.FontFilename, simpleFontAtlas);
                 }
             }
-
         }
+        static object s_loadDataLock = new object();
+
         /// <summary>
         /// get from cache or create a new one
         /// </summary>
@@ -251,22 +252,25 @@ namespace Typography.Rendering
                     StorageService.Provider.DataExists(fontTextureImgFilename))
                 {
                     SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
-                    using (System.IO.Stream textureInfoFileStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
-                    using (System.IO.Stream fontAtlasImgStream = StorageService.Provider.ReadDataStream(fontTextureImgFilename))
+                    lock (s_loadDataLock)
                     {
-                        try
+                        using (System.IO.Stream textureInfoFileStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
+                        using (System.IO.Stream fontAtlasImgStream = StorageService.Provider.ReadDataStream(fontTextureImgFilename))
                         {
-                            //TODO: review here
-                            fontAtlas = atlasBuilder.LoadFontAtlasInfo(textureInfoFileStream)[0];
-                            fontAtlas.TotalGlyph = ReadGlyphImages(fontAtlasImgStream);
-                            fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
-                            _createdAtlases.Add(fontKey, fontAtlas);
+                            try
+                            {
+                                //TODO: review here
+                                fontAtlas = atlasBuilder.LoadFontAtlasInfo(textureInfoFileStream)[0];
+                                fontAtlas.TotalGlyph = ReadGlyphImages(fontAtlasImgStream);
+                                fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
+                                _createdAtlases.Add(fontKey, fontAtlas);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw ex;
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
+                    } 
 
                 }
                 else
@@ -274,7 +278,7 @@ namespace Typography.Rendering
                     GlyphImage totalGlyphsImg = null;
                     SimpleFontAtlasBuilder atlasBuilder = null;
                     var glyphTextureGen = new GlyphTextureBitmapGenerator();
-                    glyphTextureGen.CreateTextureFontBuildDetail(
+                    glyphTextureGen.CreateTextureFontFromBuildDetail(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                         TextureKindForNewFont,
@@ -309,7 +313,7 @@ namespace Typography.Rendering
                     //    totalGlyphsImg.GetImageBuffer(),
                     //    totalGlyphsImg.Width * 4,
                     //    totalGlyphsImg.Width, totalGlyphsImg.Height,
-                    //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
+                    //    "total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
                     ////save image to cache
                     SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
 #endif
@@ -347,6 +351,7 @@ namespace Typography.Rendering
 #if DEBUG
                         //write temp debug info
 #if !__MOBILE__
+                        System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
                         System.IO.File.WriteAllText(fontTextureInfoFile + ".txt", reqFont.Name + ",size" + reqFont.SizeInPoints + "pts");
 #endif
 #endif

@@ -40,7 +40,7 @@ namespace Typography.OpenFont
         public GlyphPointF[] HintGlyph(ushort glyphIndex, float glyphSizeInPixel)
         {
 
-            Glyph glyph = _currentTypeFace.GetGlyphByIndex(glyphIndex);
+            Glyph glyph = _currentTypeFace.GetGlyph(glyphIndex);
             //-------------------------------------------
             //1. start with original points/contours from glyph 
             int horizontalAdv = _currentTypeFace.GetHAdvanceWidthFromGlyphIndex(glyphIndex);

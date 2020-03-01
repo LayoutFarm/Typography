@@ -36,15 +36,15 @@ namespace Typography.OpenFont.Tables
             _numOfHMetrics = numOfHMetrics;
             _numGlyphs = numGlyphs;
         }
-        public ushort GetAdvanceWidth(int index)
+        public ushort GetAdvanceWidth(ushort index)
         {
             return _advanceWidths[index];
         }
-        public short GetLeftSideBearing(int index)
+        public short GetLeftSideBearing(ushort index)
         {
             return _leftSideBearings[index];
         }
-        public void GetHMatric(int index, out ushort advWidth, out short lsb)
+        public void GetHMatric(ushort index, out ushort advWidth, out short lsb)
         {
             advWidth = _advanceWidths[index];
             lsb = _leftSideBearings[index];

@@ -15,23 +15,23 @@ namespace PaintFx.Effects
 {
     public class JulianFractalRenderer : EffectRendererBase
     {
-        double factor;
-        double zoom;
-        double angle;
-        double angleTheta;
-        int quality;
+        double _factor;
+        double _zoom;
+        double _angle;
+        double _angleTheta;
+        int _quality;
 
         static readonly double log2_10000 = Math.Log(10000);
-        const double jr = 0.3125;
-        const double ji = 0.03;
+        const double JR = 0.3125;
+        const double JI = 0.03;
 
         public void SetParameters(double zoom, int quality, double angle, double factor)
         {
-            this.zoom = zoom;
-            this.quality = quality;
-            this.angle = angle;
-            this.angleTheta = (this.angle * Math.PI * 2) / 360.0;
-            this.factor = factor;
+            _zoom = zoom;
+            _quality = quality;
+            _angle = angle;
+            _angleTheta = (_angle * Math.PI * 2) / 360.0;
+            _factor = factor;
         }
         public override void Render(Surface src, Surface dest, Rectangle[] rois, int startIndex, int length)
         {
@@ -40,10 +40,10 @@ namespace PaintFx.Effects
                 int w = dest.Width;
                 int h = dest.Height;
                 double invH = 1.0 / h;
-                double invZoom = 1.0 / this.zoom;
-                double invQuality = 1.0 / this.quality;
+                double invZoom = 1.0 / _zoom;
+                double invQuality = 1.0 / _quality;
                 double aspect = (double)h / (double)w;
-                int count = this.quality * this.quality + 1;
+                int count = _quality * _quality + 1;
                 double invCount = 1.0 / (double)count;
 
                 for (int ri = startIndex; ri < startIndex + length; ++ri)
@@ -69,7 +69,7 @@ namespace PaintFx.Effects
                                 double radius = Math.Sqrt((u * u) + (v * v));
                                 double radiusP = radius;
                                 double theta = Math.Atan2(v, u);
-                                double thetaP = theta + this.angleTheta;
+                                double thetaP = theta + _angleTheta;
 
                                 double uP = radiusP * Math.Cos(thetaP);
                                 double vP = radiusP * Math.Sin(thetaP);
@@ -77,9 +77,9 @@ namespace PaintFx.Effects
                                 double jX = (uP - vP * aspect) * invZoom;
                                 double jY = (vP + uP * aspect) * invZoom;
 
-                                double j = Julia(jX, jY, jr, ji);
+                                double j = Julia(jX, jY, JR, JI);
 
-                                double c = this.factor * j;
+                                double c = _factor * j;
 
 
                                 b += PixelUtils.ClampToByte(c - 768);

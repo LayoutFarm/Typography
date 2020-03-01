@@ -13,13 +13,13 @@ namespace PaintFx.Effects
 {
     public class SepiaRenderer : EffectRendererBase
     {
-        private UnaryPixelOp levels;
-        private UnaryPixelOp desaturate;
+        readonly UnaryPixelOp _levels;
+        readonly UnaryPixelOp _desaturate;
         public SepiaRenderer()
         {
-            this.desaturate = new UnaryPixelOps.Desaturate();
+            _desaturate = new UnaryPixelOps.Desaturate();
 
-            this.levels = new UnaryPixelOps.Level(
+            _levels = new UnaryPixelOps.Level(
                 ColorBgra.Black,
                 ColorBgra.White,
                 new float[] { 1.2f, 1.0f, 0.8f },
@@ -28,8 +28,8 @@ namespace PaintFx.Effects
         }
         public override void Render(Surface src, Surface dest, Rectangle[] rois, int startIndex, int length)
         {
-            this.desaturate.Apply(dest, src, rois, startIndex, length);
-            this.levels.Apply(dest, dest, rois, startIndex, length);
+            _desaturate.Apply(dest, src, rois, startIndex, length);
+            _levels.Apply(dest, dest, rois, startIndex, length);
         }
     }
 }

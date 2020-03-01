@@ -31,7 +31,7 @@ namespace PixelFarm.Drawing
             this.len = len;
             _rawString = rawCharBuffer;
         }
-        
+
         public override string ToString()
         {
             return start + ":" + len;
@@ -74,8 +74,8 @@ namespace PixelFarm.Drawing
     /// </summary>
     public interface ITextPrinter
     {
+        //
         TextBaseline TextBaseline { get; set; }
-        bool StartDrawOnLeftTop { get; set; }
         void DrawString(char[] text, int startAt, int len, double left, double top);
         /// <summary>
         /// render from RenderVxFormattedString object to specific pos
@@ -93,19 +93,8 @@ namespace PixelFarm.Drawing
         //-------------
         void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
     }
-    public enum TextBaseline
-    {
-        //top" || "hanging" || "middle" || "alphabetic" || "ideographic" || "bottom";
-        //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline
-        Alphabetic,//Html5 default
 
-        Top,
-        Hanging, //not implemented
-        Middle,//not implemented
-        Ideographics,//not implemented
-        Bottom,
-    }
-
+   
     public static class ITextPrinterExtensions
     {
         public static void DrawString(this ITextPrinter textPrinter, string text, double left, double top)
@@ -119,7 +108,7 @@ namespace PixelFarm.Drawing
             //TODO: review here!!!
             //Do Not alloc new char[]
             //plan: use Span<T>  or some ptr to string           
-            
+
             char[] textBuffer = text.ToCharArray();
             textPrinter.DrawString(textBuffer, 0, textBuffer.Length, left, top);
         }

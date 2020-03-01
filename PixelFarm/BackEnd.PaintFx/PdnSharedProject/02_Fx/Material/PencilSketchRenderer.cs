@@ -14,8 +14,8 @@ namespace PaintFx.Effects
 {
     public class PencilSketchRenderer
     {
-        int _pencilTipSize;
-        int _colorRange;
+        readonly int _pencilTipSize;
+        readonly int _colorRange;
 
 
         GaussainBlurRenderer _gaussainBlueRenderer = new GaussainBlurRenderer();

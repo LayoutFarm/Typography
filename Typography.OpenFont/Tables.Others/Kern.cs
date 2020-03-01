@@ -166,8 +166,8 @@ namespace Typography.OpenFont.Tables
             {
                 //find if we have this left & right ?
                 uint key = (uint)((left << 16) | right);
-                short found;
-                _kernDic.TryGetValue(key, out found);
+              
+                _kernDic.TryGetValue(key, out short found);
                 return found;
             }
         }

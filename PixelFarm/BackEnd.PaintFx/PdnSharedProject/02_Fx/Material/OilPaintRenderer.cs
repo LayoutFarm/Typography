@@ -15,19 +15,19 @@ namespace PaintFx.Effects
 {
     public class OilPaintRenderer
     {
-        private int brushSize;
-        private byte coarseness;
+        int _brushSize;
+        byte _coarseness;
         public void SetParameters(int brushSize, byte coarseness)
         {
-            this.brushSize = brushSize;
-            this.coarseness = coarseness;
+            _brushSize = brushSize;
+            _coarseness = coarseness;
         }
         public unsafe void Render(Surface src, Surface dst, Rectangle[] rois, int start, int len)
         {
             int width = src.Width;
             int height = src.Height;
 
-            int arrayLens = 1 + this.coarseness;
+            int arrayLens = 1 + _coarseness;
 
             int localStoreSize = arrayLens * 5 * sizeof(int);
 
@@ -49,7 +49,7 @@ namespace PaintFx.Effects
             uint* avgAlpha = (uint*)p;
             p += arrayLens * sizeof(uint);
 
-            byte maxIntensity = this.coarseness;
+            byte maxIntensity = _coarseness;
 
             //TODO: review here
             for (int r = start; r < start + len; ++r)
@@ -65,8 +65,8 @@ namespace PaintFx.Effects
                 {
                     ColorBgra* dstPtr = dst.GetPointAddressUnchecked(rect.Left, y);
 
-                    int top = y - brushSize;
-                    int bottom = y + brushSize + 1;
+                    int top = y - _brushSize;
+                    int bottom = y + _brushSize + 1;
 
                     if (top < 0)
                     {
@@ -82,8 +82,8 @@ namespace PaintFx.Effects
                     {
                         PlatformMemory.SetToZero(localStore, (ulong)localStoreSize);
 
-                        int left = x - brushSize;
-                        int right = x + brushSize + 1;
+                        int left = x - _brushSize;
+                        int right = x + _brushSize + 1;
 
                         if (left < 0)
                         {

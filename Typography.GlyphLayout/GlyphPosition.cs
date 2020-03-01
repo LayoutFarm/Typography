@@ -12,9 +12,9 @@ namespace Typography.TextLayout
     class GlyphSetPosition
     {
 
-        Typeface _typeface;
+        readonly Typeface _typeface;
         GPOS _gposTable;
-        List<GPOS.LookupTable> _lookupTables;
+        internal List<GPOS.LookupTable> _lookupTables;
         public GlyphSetPosition(Typeface typeface, string lang)
         {
             this.Lang = lang;
@@ -69,7 +69,6 @@ namespace Typography.TextLayout
                 }
 
                 //-----------------------
-
                 _lookupTables = new List<GPOS.LookupTable>();
                 int j = features.Count;
                 for (int i = 0; i < j; ++i)

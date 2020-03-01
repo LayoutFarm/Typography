@@ -11,11 +11,11 @@ namespace Typography.OpenFont.Tables
     {
         public override ushort Format => 4;
 
-        readonly ushort[] _startCode; //Starting character code for each segment
-        readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
-        readonly ushort[] _idDelta; //Delta for all character codes in segment
-        readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
-        readonly ushort[] _glyphIdArray;
+        internal readonly ushort[] _startCode; //Starting character code for each segment
+        internal readonly ushort[] _endCode;//Ending character code for each segment, last = 0xFFFF.      
+        internal readonly ushort[] _idDelta; //Delta for all character codes in segment
+        internal readonly ushort[] _idRangeOffset; //Offset in bytes to glyph indexArray, or 0 (not offset in bytes unit)
+        internal readonly ushort[] _glyphIdArray;
         public CharMapFormat4(ushort[] startCode, ushort[] endCode, ushort[] idDelta, ushort[] idRangeOffset, ushort[] glyphIdArray)
         {
             _startCode = startCode;
@@ -25,7 +25,7 @@ namespace Typography.OpenFont.Tables
             _glyphIdArray = glyphIdArray;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // This lookup table only supports 16-bit codepoints
             if (codepoint > ushort.MaxValue)
@@ -102,7 +102,7 @@ namespace Typography.OpenFont.Tables
             _startGlyphIds = startGlyphIds;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // https://www.microsoft.com/typography/otspec/cmap.htm#format12
             // "Groups must be sorted by increasing startCharCode."
@@ -140,7 +140,7 @@ namespace Typography.OpenFont.Tables
             _startCode = startCode;
         }
 
-        protected override ushort RawCharacterToGlyphIndex(int codepoint)
+        public override ushort GetGlyphIndex(int codepoint)
         {
             // The firstCode and entryCount values specify a subrange (beginning at firstCode,
             // length = entryCount) within the range of possible character codes.
@@ -151,9 +151,9 @@ namespace Typography.OpenFont.Tables
             return i >= 0 && i < _glyphIdArray.Length ? _glyphIdArray[i] : (ushort)0;
         }
 
-        readonly ushort _startCode;
-        readonly ushort[] _glyphIdArray;
 
+        internal readonly ushort _startCode;
+        internal readonly ushort[] _glyphIdArray; 
         public override void CollectUnicodeChars(List<uint> unicodes)
         {
             ushort u = _startCode;
@@ -179,16 +179,16 @@ namespace Typography.OpenFont.Tables
     class CharMapFormat14 : CharacterMap
     {
         public override ushort Format => 14;
-        protected override ushort RawCharacterToGlyphIndex(int character) => 0;
-
+        public override ushort GetGlyphIndex(int character) => 0;
         public ushort CharacterPairToGlyphIndex(int codepoint, ushort defaultGlyphIndex, int nextCodepoint)
         {
             // Only check codepoint if nextCodepoint is a variation selector
 
             if (_variationSelectors.TryGetValue(nextCodepoint, out VariationSelector sel))
             {
-                // If the sequence is a non-default UVS, return the mapped glyph
 
+                // If the sequence is a non-default UVS, return the mapped glyph
+ 
                 if (sel.UVSMappings.TryGetValue(codepoint, out ushort ret))
                 {
                     return ret;
@@ -372,117 +372,27 @@ namespace Typography.OpenFont.Tables
     class NullCharMap : CharacterMap
     {
         public override ushort Format => 0;
-        protected override ushort RawCharacterToGlyphIndex(int character) => 0;
+        public override ushort GetGlyphIndex(int character) => 0;
         public override void CollectUnicodeChars(List<uint> unicodes) {  /*nothing*/}
+ 
     }
 
     abstract class CharacterMap
     {
         //https://www.microsoft.com/typography/otspec/cmap.htm
-
         public abstract ushort Format { get; }
         public ushort PlatformId { get; set; }
         public ushort EncodingId { get; set; }
+ 
         public ushort CharacterToGlyphIndex(int codepoint)
         {
-            return RawCharacterToGlyphIndex(codepoint);
+            return GetGlyphIndex(codepoint);
+        } 
+        public abstract ushort GetGlyphIndex(int codepoint);
+        public abstract void CollectUnicodeChars(List<uint> unicodes); 
+        public override string ToString()
+        {
+            return $"fmt:{ Format }, plat:{ PlatformId }, enc:{ EncodingId }";
         }
-
-        protected abstract ushort RawCharacterToGlyphIndex(int codepoint);
-        public abstract void CollectUnicodeChars(List<uint> unicodes);
-
-
-
-        //public void CollectGlyphIndexListFromSampleChar(char starAt, char endAt, GlyphIndexCollector collector)
-        //{
-        //    // TODO: Fast segment lookup using bit operations?
-        //    switch (_cmapFormat)
-        //    {
-        //        default: throw new NotSupportedException();
-        //        case 4:
-        //            {
-        //                for (int i = 0; i < _segCount; i++)
-        //                { 
-        //                    if (_endCode[i] >= sampleChar && _startCode[i] <= sampleChar)
-        //                    {
-
-        //                        //found on this range *** 
-        //                        if (_idRangeOffset[i] == 0)
-        //                        {
-        //                            //add entire range
-        //                            if (!collector.HasRegisterSegment(i))
-        //                            {
-
-        //                                List<ushort> glyphIndexList = new List<ushort>();
-        //                                char beginAt = (char)_startCode[i];
-        //                                char endAt = (char)_endCode[i];
-        //                                int delta = _idDelta[i];
-        //                                for (char m = beginAt; m <= endAt; ++m)
-        //                                {
-        //                                    glyphIndexList.Add((ushort)((m + delta) % 65536));
-        //                                }
-        //                                collector.RegisterGlyphRangeIndex(i, glyphIndexList);
-        //                            }
-        //                            return;
-        //                        }
-        //                        else
-        //                        {
-        //                            //If the idRangeOffset value for the segment is not 0,
-        //                            //the mapping of character codes relies on glyphIdArray. 
-        //                            //The character code offset from startCode is added to the idRangeOffset value.
-        //                            //This sum is used as an offset from the current location within idRangeOffset itself to index out the correct glyphIdArray value. 
-        //                            //This obscure indexing trick works because glyphIdArray immediately follows idRangeOffset in the font file.
-        //                            //The C expression that yields the glyph index is:
-
-        //                            //*(idRangeOffset[i]/2 
-        //                            //+ (c - startCount[i]) 
-        //                            //+ &idRangeOffset[i])
-
-        //                            if (!collector.HasRegisterSegment(i))
-        //                            {
-        //                                List<ushort> glyphIndexList = new List<ushort>();
-        //                                char beginAt = (char)_startCode[i];
-        //                                char endAt = (char)_endCode[i];
-        //                                for (char m = beginAt; m <= endAt; ++m)
-        //                                {
-        //                                    var offset = _idRangeOffset[i] / 2 + (m - _startCode[i]);
-        //                                    // I want to thank Microsoft for this clever pointer trick
-        //                                    // TODO: What if the value fetched is inside the _idRangeOffset table?
-        //                                    // TODO: e.g. (offset - _idRangeOffset.Length + i < 0)
-        //                                    glyphIndexList.Add(_glyphIdArray[offset - _idRangeOffset.Length + i]);
-        //                                }
-        //                                collector.RegisterGlyphRangeIndex(i, glyphIndexList);
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            break;
-        //        case 6:
-        //            {
-        //                //The firstCode and entryCount values specify a subrange (beginning at firstCode, length = entryCount)
-        //                //within the range of possible character codes.
-        //                //Codes outside of this subrange are mapped to glyph index 0.
-        //                //The offset of the code (from the first code) within this subrange is used as index to the glyphIdArray,
-        //                //which provides the glyph index value. 
-        //                if (sampleChar >= _fmt6_start && sampleChar < _fmt6_end)
-        //                {
-        //                    //in range            
-        //                    if (!collector.HasRegisterSegment(0))
-        //                    {
-        //                        List<ushort> glyphIndexList = new List<ushort>();
-        //                        for (ushort m = _fmt6_start; m < _fmt6_end; ++m)
-        //                        {
-        //                            glyphIndexList.Add((ushort)(m - _fmt6_start));
-        //                        }
-        //                        collector.RegisterGlyphRangeIndex(0, glyphIndexList);
-        //                    }
-        //                }
-        //            }
-        //            break;
-        //    }
-        //}
     }
-
-
 }

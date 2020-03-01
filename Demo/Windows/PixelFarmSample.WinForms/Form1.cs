@@ -30,7 +30,7 @@ namespace SampleWinForms
         Bitmap _winBmp;
 
         TextPrinterBase _selectedTextPrinter = null;
-        VxsTextPrinter _devVxsTextPrinter = null;
+        PixelFarm.Drawing.VxsTextPrinter _devVxsTextPrinter = null;
 
         UI.DebugGlyphVisualizer _debugGlyphVisualizer = new UI.DebugGlyphVisualizer();
         TypographyTest.BasicFontOptions _basicOptions;
@@ -49,6 +49,16 @@ namespace SampleWinForms
 
             MemBitmapExtensions.DefaultMemBitmapIO = new PixelFarm.Drawing.WinGdi.GdiBitmapIO();
 
+
+            lstTextBaseline.Items.AddRange(
+               new object[] {
+                   PixelFarm.Drawing.TextBaseline.Alphabetic,
+                   PixelFarm.Drawing.TextBaseline.Bottom,
+                   PixelFarm.Drawing.TextBaseline.Top,
+                   //TODO: implement other types
+               });
+            lstTextBaseline.SelectedIndex = 0;//default
+            lstTextBaseline.SelectedIndexChanged += (s, e) => UpdateRenderOutput();
         }
 
         void SetupWoffDecompressFunctions()
@@ -247,7 +257,7 @@ namespace SampleWinForms
                 _textService = new LayoutFarm.OpenFontTextService();
                 _textService.LoadFontsFromFolder("../../../TestFonts");
 
-                _devVxsTextPrinter = new VxsTextPrinter(_painter, _textService);
+                _devVxsTextPrinter = new PixelFarm.Drawing.VxsTextPrinter(_painter, _textService);
                 _devVxsTextPrinter.SetSvgBmpBuilderFunc(ParseAndRenderSvg);
 
                 _devVxsTextPrinter.ScriptLang = _basicOptions.ScriptLang;
@@ -299,6 +309,9 @@ namespace SampleWinForms
                         _selectedTextPrinter.EnableLigature = _glyphRenderOptions.EnableLigature;
                         _selectedTextPrinter.SimulateSlant = _contourAnalysisOpts.SimulateSlant;
 
+
+                        _selectedTextPrinter.TextBaseline = (PixelFarm.Drawing.TextBaseline)lstTextBaseline.SelectedItem;
+
                         //test print 3 lines
 #if DEBUG
                         DynamicOutline.dbugTestNewGridFitting = _contourAnalysisOpts.EnableGridFit;
@@ -307,20 +320,82 @@ namespace SampleWinForms
 #endif
 
                         char[] printTextBuffer = this.txtInputChar.Text.ToCharArray();
-                        float x_pos = 0, y_pos = 50;
+                        float x_pos = 0, y_pos = 0;
                         float lineSpacingPx = _selectedTextPrinter.FontLineSpacingPx;
-                        for (int i = 0; i < 1; ++i)
+
+                        const int REF_LINE_LEN = 300;
+                        for (int i = 0; i < 3; ++i)
                         {
                             _selectedTextPrinter.DrawString(printTextBuffer, x_pos, y_pos);
-                            y_pos -= lineSpacingPx;
+#if DEBUG
+                            //show debug info...
+                            var prevColor = _painter.FillColor;
+                            var prevStrokColor = _painter.StrokeColor;
+                            _painter.FillColor = PixelFarm.Drawing.Color.Red;
+                            _painter.FillRect(x_pos, y_pos, 5, 5); // start point
+
+                            //see   //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline
+                            switch (_selectedTextPrinter.TextBaseline)
+                            {
+                                default:
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("UNIMPLEMENTED" + _selectedTextPrinter.TextBaseline.ToString());
+                                        goto case PixelFarm.Drawing.TextBaseline.Alphabetic;//
+                                    }
+                                case PixelFarm.Drawing.TextBaseline.Alphabetic:
+                                    {
+                                        //alphabetic baseline
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos,
+                                                          x_pos + REF_LINE_LEN, y_pos);
+
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos - _selectedTextPrinter.FontDescedingPx,
+                                                          x_pos + REF_LINE_LEN, y_pos - _selectedTextPrinter.FontDescedingPx);//bottom most
+
+                                    }
+                                    break;
+                                case PixelFarm.Drawing.TextBaseline.Top:
+                                    {
+                                        //alphabetic baseline
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos + _selectedTextPrinter.FontAscendingPx,
+                                                          x_pos + REF_LINE_LEN, y_pos + _selectedTextPrinter.FontAscendingPx);
+                                        //em bottom
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos + (_selectedTextPrinter.FontAscendingPx - _selectedTextPrinter.FontDescedingPx),
+                                                          x_pos + REF_LINE_LEN, y_pos + (_selectedTextPrinter.FontAscendingPx - _selectedTextPrinter.FontDescedingPx));//bottom most
+
+
+                                    }
+                                    break;
+                                case PixelFarm.Drawing.TextBaseline.Bottom:
+                                    {
+                                        //alphabetic baseline
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Gray;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos + _selectedTextPrinter.FontDescedingPx,
+                                                          x_pos + REF_LINE_LEN, y_pos + _selectedTextPrinter.FontDescedingPx);
+                                        //em bottom
+                                        _painter.StrokeColor = PixelFarm.Drawing.Color.Blue;
+                                        _painter.DrawLine(x_pos,           /**/ y_pos,
+                                                          x_pos + REF_LINE_LEN, y_pos);//bottom most 
+                                    }
+                                    break;
+                            }
+
+
+                            _painter.FillColor = prevColor;
+                            _painter.StrokeColor = prevColor;
+#endif
+                            y_pos += (_selectedTextPrinter.FontAscendingPx - _selectedTextPrinter.FontDescedingPx);
+
                         }
 
 
                         //copy from Agg's memory buffer to gdi 
                         PixelFarm.CpuBlit.BitmapHelper.CopyToGdiPlusBitmapSameSizeNotFlip(_destImg, _winBmp);
                         _g.Clear(Color.White);
-                        _g.DrawImage(_winBmp, new Point(10, 0));
-
+                        _g.DrawImage(_winBmp, new Point(0, 0));
                     }
                     break;
 
@@ -663,8 +738,7 @@ namespace SampleWinForms
 
             atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
             totalGlyphsImg = atlasBuilder.BuildSingleImage();
-            string fontTextureImg = "d:\\WImageTest\\test_glyph_atlas.png";
-
+            string fontTextureImg = "test_glyph_atlas.png";
 
             //create atlas
             SimpleFontAtlas fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
@@ -718,9 +792,8 @@ namespace SampleWinForms
         private void button2_Click(object sender, EventArgs e)
         {
 
-
             OpenFontReader openFontReader = new OpenFontReader();
-            string filename = "d:\\WImageTest\\Sarabun-Regular.woff";
+            string filename = "Sarabun-Regular.woff";
             //using (FileStream fs = new FileStream(filename, FileMode.Open))
             //{
             //    PreviewFontInfo previewFont = openFontReader.ReadPreview(fs);
@@ -837,18 +910,92 @@ namespace SampleWinForms
         }
         private void button3_Click(object sender, EventArgs e)
         {
-            string filename = "d:\\WImageTest\\Sarabun-Regular.woff2";
-            //string filename = "d:\\WImageTest\\Roboto-Regular.woff2"; 
-
+            string filename = "Sarabun-Regular.woff2";
 
             OpenFontReader openFontReader = new OpenFontReader();
             using (FileStream fs = new FileStream(filename, FileMode.Open))
             {
                 PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
-
             }
-
         }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //read string from txtSampleChars
+            //please make sure all are unique. (TODO: check it)
+            //then create a font atlas from the sample chars
+
+
+            GlyphImage totalGlyphsImg = null;
+            SimpleFontAtlasBuilder atlasBuilder = null;
+            var glyphTextureGen = new GlyphTextureBitmapGenerator();
+            //
+            Typeface typeface = _basicOptions.Typeface;
+            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
+
+            PixelFarm.Drawing.RequestFont reqFont = new PixelFarm.Drawing.RequestFont(
+                typeface.Name,
+                fontSizeInPoints,
+                 PixelFarm.Drawing.FontStyle.Regular
+                );
+
+            GlyphTextureBuildDetail[] buildDetails = new GlyphTextureBuildDetail[]
+            {
+               new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
+               new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
+            };
+
+
+            glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
+                fontSizeInPoints,
+                PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
+                buildDetails,
+                (glyphIndex, glyphImage, outputAtlasBuilder) =>
+                {
+                    if (outputAtlasBuilder != null)
+                    {
+                        //finish
+                        atlasBuilder = outputAtlasBuilder;
+                    }
+                });
+
+
+            atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
+            totalGlyphsImg = atlasBuilder.BuildSingleImage();
+
+
+            atlasBuilder.FontFilename = typeface.Name;
+            atlasBuilder.FontKey = reqFont.FontKey;
+
+            string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
+
+            using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
+            {
+                atlasBuilder.SaveFontInfo(fs);
+            }
+            //read .info back and convert to base64
+            byte[] atlas_info_content = File.ReadAllBytes(textureName + ".info");
+            string base64 = Convert.ToBase64String(atlas_info_content);
+
+            //create atlas
+            SimpleFontAtlas fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
+            fontAtlas.TotalGlyph = totalGlyphsImg;
+            using (MemBitmap memBmp = MemBitmap.CreateFromCopy(totalGlyphsImg.Width, totalGlyphsImg.Height, totalGlyphsImg.GetImageBuffer()))
+            using (System.Drawing.Bitmap bmp = new Bitmap(memBmp.Width, memBmp.Height))
+            {
+                var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, memBmp.Width, memBmp.Height),
+                    System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                var tmpMem = MemBitmap.GetBufferPtr(memBmp);
+                unsafe
+                {
+                    PixelFarm.CpuBlit.NativeMemMx.MemCopy((byte*)bmpdata.Scan0,
+                        (byte*)tmpMem.Ptr,
+                        tmpMem.LengthInBytes);
+                }
+                bmp.UnlockBits(bmpdata);
+                bmp.Save(textureName + ".png");
+            }
+        }
+
 
     }
 }

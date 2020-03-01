@@ -719,19 +719,16 @@ namespace Typography.OpenFont
 
         public static ScriptLang GetRegisteredScriptLang(string shortname)
         {
-            ScriptLang found;
-            s_registeredScriptTags.TryGetValue(shortname, out found);
+            s_registeredScriptTags.TryGetValue(shortname, out ScriptLang found);
             return found;
         }
         public static ScriptLang GetRegisteredScriptLangFromLanguageName(string languageName)
         {
-            ScriptLang found;
-            s_registerScriptFromFullNames.TryGetValue(languageName, out found);
+            s_registerScriptFromFullNames.TryGetValue(languageName, out ScriptLang found);
             return found;
         }
         public static IEnumerable<ScriptLang> GetRegiteredScriptLangIter()
         {
-
             foreach (ScriptLang scriptLang in s_registeredScriptTags.Values)
             {
                 yield return scriptLang;

@@ -137,22 +137,7 @@ namespace PaintFx
         }
 
         public static readonly Color TransparentKey = Color.FromArgb(192, 192, 192);
-
-
-
-        private static bool allowGCFullCollect = true;
-        public static bool AllowGCFullCollect
-        {
-            get
-            {
-                return allowGCFullCollect;
-            }
-
-            set
-            {
-                allowGCFullCollect = value;
-            }
-        }
+        public static bool AllowGCFullCollect { get; set; } = true;
 
         public static void GCFullCollect()
         {
@@ -1724,7 +1709,7 @@ namespace PaintFx
             return CopyStream(input, output, -1);
         }
 
-        private struct Edge
+        struct Edge
         {
             public int miny;   // int
             public int maxy;   // int

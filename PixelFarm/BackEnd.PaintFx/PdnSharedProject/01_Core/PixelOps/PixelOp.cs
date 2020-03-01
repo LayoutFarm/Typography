@@ -12,8 +12,7 @@ using PixelFarm.Drawing;
 
 namespace PaintFx
 {
-    public unsafe abstract class PixelOp
-        : IPixelOp
+    public unsafe abstract class PixelOp : IPixelOp
     {
         /// <summary>
         /// Computes alpha for r OVER l operation.

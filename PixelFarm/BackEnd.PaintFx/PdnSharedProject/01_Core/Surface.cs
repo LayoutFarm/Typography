@@ -17,12 +17,12 @@ namespace PaintFx
     public class MemHolder
     {
         unsafe int* _memAddress;
-        int _len; //len of int32 array 
+
         /// <param name="ptr">ptr to int32*</param>
         /// <param name="len">length of this int32[]</param>
         public MemHolder(IntPtr ptr, int len)
         {
-            _len = len;
+            Length = len;
             unsafe
             {
                 _memAddress = (int*)ptr;
@@ -31,7 +31,7 @@ namespace PaintFx
         /// <summary>
         /// len of int32[] array
         /// </summary>
-        internal int Length => _len;
+        internal int Length { get; private set; }
 
         internal IntPtr Ptr
         {
@@ -45,7 +45,7 @@ namespace PaintFx
         }
         public MemHolder CreateSubMem(int startOffset, int len)
         {
-            if (startOffset >= 0 && len <= _len)
+            if (startOffset >= 0 && len <= Length)
             {
                 unsafe
                 {
@@ -67,12 +67,7 @@ namespace PaintFx
 
     public sealed class Surface : IDisposable
     {
-
-        int _width;
-        int _height;
-        int _stride;
         MemHolder _memHolder;
-        bool _disposed = false;
 
         /// <summary>
         /// Creates a new instance of the Surface class.
@@ -81,9 +76,9 @@ namespace PaintFx
         /// <param name="height">The height, in pixels, of the new Surface.</param>
         public Surface(int stride, int width, int height, MemHolder memHolder)
         {
-            _stride = stride;
-            _width = width;
-            _height = height;
+            Stride = stride;
+            Width = width;
+            Height = height;
             _memHolder = memHolder; //mem buffer 
             //try
             //{
@@ -99,13 +94,7 @@ namespace PaintFx
             //MemoryBlock scan0 = new MemoryBlock(width, height);
             //Create(width, height, stride, scan0);
         }
-        public bool IsDisposed
-        {
-            get
-            {
-                return _disposed;
-            }
-        }
+        public bool IsDisposed { get; private set; } = false;
 
 
         /// <summary>
@@ -114,13 +103,7 @@ namespace PaintFx
         /// <remarks>
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public int Width
-        {
-            get
-            {
-                return _width;
-            }
-        }
+        public int Width { get; private set; }
 
         /// <summary>
         /// Gets the height, in pixels, of this Surface.
@@ -128,13 +111,7 @@ namespace PaintFx
         /// <remarks>
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public int Height
-        {
-            get
-            {
-                return _height;
-            }
-        }
+        public int Height { get; private set; }
 
         /// <summary>
         /// Gets the stride, in bytes, for this Surface.
@@ -145,13 +122,7 @@ namespace PaintFx
         /// Stride will always be equal to <b>or greater than</b> Width * ColorBgra.SizeOf.
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public int Stride
-        {
-            get
-            {
-                return _stride;
-            }
-        }
+        public int Stride { get; private set; }
 
 
         /// <summary>
@@ -161,13 +132,7 @@ namespace PaintFx
         /// This is a convenience function that returns Rectangle(0, 0, Width, Height).
         /// This property will never throw an ObjectDisposedException.
         /// </remarks>
-        public Rectangle Bounds
-        {
-            get
-            {
-                return new Rectangle(0, 0, _width, _height);
-            }
-        }
+        public Rectangle Bounds =>new Rectangle(0, 0, Width, Height);
 
         ///// <summary>
         ///// Creates a new instance of the Surface class.
@@ -269,12 +234,12 @@ namespace PaintFx
         /// <returns>The number of bytes between (0,0) and (0,y).</returns>
         public long GetRowByteOffset(int y)
         {
-            if (y < 0 || y >= _height)
+            if (y < 0 || y >= Height)
             {
                 throw new ArgumentOutOfRangeException("y", "Out of bounds: y=" + y.ToString());
             }
 
-            return (long)y * (long)_stride;
+            return (long)y * (long)Stride;
         }
 
         /// <summary>
@@ -295,7 +260,7 @@ namespace PaintFx
             //            }
             //#endif
 
-            return (long)y * (long)_stride;
+            return (long)y * (long)Stride;
         }
 
         /// <summary>
@@ -340,7 +305,7 @@ namespace PaintFx
         /// </returns>
         public long GetColumnByteOffset(int x)
         {
-            if (x < 0 || x >= _width)
+            if (x < 0 || x >= Width)
             {
                 throw new ArgumentOutOfRangeException("x", x, "Out of bounds");
             }
@@ -452,7 +417,7 @@ namespace PaintFx
             //            }
             //#endif
 
-            return *(x + (ColorBgra*)(((byte*)_memHolder.Ptr) + (y * _stride)));
+            return *(x + (ColorBgra*)(((byte*)_memHolder.Ptr) + (y * Stride)));
         }
 
         /// <summary>
@@ -523,7 +488,7 @@ namespace PaintFx
             //            }
             //#endif
 
-            return unchecked(x + (ColorBgra*)(((byte*)_memHolder.Ptr) + (y * _stride)));
+            return unchecked(x + (ColorBgra*)(((byte*)_memHolder.Ptr) + (y * Stride)));
         }
 
         /// <summary>
@@ -568,7 +533,7 @@ namespace PaintFx
         /// <returns>true if (x,y) is in bounds, false if it's not.</returns>
         public bool IsVisible(int x, int y)
         {
-            return x >= 0 && x < _width && y >= 0 && y < _height;
+            return x >= 0 && x < Width && y >= 0 && y < Height;
         }
 
         /// <summary>
@@ -630,27 +595,27 @@ namespace PaintFx
                 int sx = iu;
                 if (sx < 0)
                 {
-                    sx = (_width - 1) + ((sx + 1) % _width);
+                    sx = (Width - 1) + ((sx + 1) % Width);
                 }
-                else if (sx > (_width - 1))
+                else if (sx > (Width - 1))
                 {
-                    sx = sx % _width;
+                    sx = sx % Width;
                 }
 
                 int sy = iv;
                 if (sy < 0)
                 {
-                    sy = (_height - 1) + ((sy + 1) % _height);
+                    sy = (Height - 1) + ((sy + 1) % Height);
                 }
-                else if (sy > (_height - 1))
+                else if (sy > (Height - 1))
                 {
-                    sy = sy % _height;
+                    sy = sy % Height;
                 }
 
                 int sleft = sx;
                 int sright;
 
-                if (sleft == (_width - 1))
+                if (sleft == (Width - 1))
                 {
                     sright = 0;
                 }
@@ -662,7 +627,7 @@ namespace PaintFx
                 int stop = sy;
                 int sbottom;
 
-                if (stop == (_height - 1))
+                if (stop == (Height - 1))
                 {
                     sbottom = 0;
                 }
@@ -693,7 +658,7 @@ namespace PaintFx
             float u = x;
             float v = y;
 
-            if (u >= 0 && v >= 0 && u < _width && v < _height)
+            if (u >= 0 && v >= 0 && u < Width && v < Height)
             {
                 unchecked
                 {
@@ -715,7 +680,7 @@ namespace PaintFx
                     int sleft = sx;
                     int sright;
 
-                    if (sleft == (_width - 1))
+                    if (sleft == (Width - 1))
                     {
                         sright = sleft;
                     }
@@ -727,7 +692,7 @@ namespace PaintFx
                     int stop = sy;
                     int sbottom;
 
-                    if (stop == (_height - 1))
+                    if (stop == (Height - 1))
                     {
                         sbottom = stop;
                     }
@@ -800,7 +765,7 @@ namespace PaintFx
                 int sleft = sx;
                 int sright;
 
-                if (sleft == (_width - 1))
+                if (sleft == (Width - 1))
                 {
                     sright = sleft;
                 }
@@ -812,7 +777,7 @@ namespace PaintFx
                 int stop = sy;
                 int sbottom;
 
-                if (stop == (_height - 1))
+                if (stop == (Height - 1))
                 {
                     sbottom = stop;
                 }
@@ -842,14 +807,14 @@ namespace PaintFx
         {
             get
             {
-                if (_disposed)
+                if (IsDisposed)
                 {
                     throw new ObjectDisposedException("Surface");
                 }
 
-                if (x < 0 || y < 0 || x >= _width || y >= _height)
+                if (x < 0 || y < 0 || x >= Width || y >= Height)
                 {
-                    throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(_width - 1, _height - 1).ToString());
+                    throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(Width - 1, Height - 1).ToString());
                 }
 
                 unsafe
@@ -860,14 +825,14 @@ namespace PaintFx
 
             set
             {
-                if (_disposed)
+                if (IsDisposed)
                 {
                     throw new ObjectDisposedException("Surface");
                 }
 
-                if (x < 0 || y < 0 || x >= _width || y >= _height)
+                if (x < 0 || y < 0 || x >= Width || y >= Height)
                 {
-                    throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(_width - 1, _height - 1).ToString());
+                    throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(Width - 1, Height - 1).ToString());
                 }
 
                 unsafe
@@ -961,27 +926,27 @@ namespace PaintFx
 
 
             Surface ss = (Surface)source;
-            if (_disposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException("Surface");
             }
 
-            if (_stride == ss._stride &&
-                (_width * ColorBgra.SizeOf) == _stride &&
-                _width == ss._width &&
-                _height == ss._height)
+            if (Stride == ss.Stride &&
+                (Width * ColorBgra.SizeOf) == Stride &&
+                Width == ss.Width &&
+                Height == ss.Height)
             {
                 unsafe
                 {
                     PlatformMemory.Copy((byte*)source._memHolder.Ptr,
                                (void*)ss._memHolder.Ptr,
-                                ((ulong)(_height - 1) * (ulong)_stride) + ((ulong)_width * (ulong)ColorBgra.SizeOf));
+                                ((ulong)(Height - 1) * (ulong)Stride) + ((ulong)Width * (ulong)ColorBgra.SizeOf));
                 }
             }
             else
             {
-                int copyWidth = Math.Min(_width, ss._width);
-                int copyHeight = Math.Min(_height, ss._height);
+                int copyWidth = Math.Min(Width, ss.Width);
+                int copyHeight = Math.Min(Height, ss.Height);
 
                 unsafe
                 {
@@ -1006,7 +971,7 @@ namespace PaintFx
         /// </remarks>
         public void CopySurface(Surface source, Point dstOffset)
         {
-            if (_disposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException("Surface");
             }
@@ -1061,13 +1026,13 @@ namespace PaintFx
         /// </param>
         public void CopySurface(Surface source, Rectangle sourceRoi)
         {
-            if (_disposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException("Surface");
             }
 
             sourceRoi.Intersect(source.Bounds);
-            int copiedWidth = Math.Min(_width, sourceRoi.Width);
+            int copiedWidth = Math.Min(Width, sourceRoi.Width);
             int copiedHeight = Math.Min(this.Height, sourceRoi.Height);
 
             if (copiedWidth == 0 || copiedHeight == 0)
@@ -1094,7 +1059,7 @@ namespace PaintFx
         /// </remarks>
         public void CopySurface(Surface source, Point dstOffset, Rectangle sourceRoi)
         {
-            if (_disposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException("Surface");
             }
@@ -1175,7 +1140,7 @@ namespace PaintFx
         /// </remarks>
         public void CopySurface(Surface source, Rectangle[] region, int startIndex, int length)
         {
-            if (_disposed)
+            if (IsDisposed)
             {
                 throw new ObjectDisposedException("Surface");
             }
@@ -1268,11 +1233,11 @@ namespace PaintFx
         {
             unsafe
             {
-                for (int y = 0; y < _height; ++y)
+                for (int y = 0; y < Height; ++y)
                 {
                     ColorBgra* dstPtr = GetRowAddressUnchecked(y);
 
-                    for (int x = 0; x < _width; ++x)
+                    for (int x = 0; x < Width; ++x)
                     {
                         byte v = (byte)((((x ^ y) & 8) * 8) + 191);
                         *dstPtr = ColorBgra.FromBgra(v, v, v, 255);
@@ -1310,7 +1275,7 @@ namespace PaintFx
             }
             else if (source.Width <= Width || source.Height <= Height)
             {
-                if (source._width < 2 || source._height < 2 || _width < 2 || _height < 2)
+                if (source.Width < 2 || source.Height < 2 || Width < 2 || Height < 2)
                 {
                     this.NearestNeighborFitSurface(source, dstRoi);
                 }
@@ -1327,12 +1292,12 @@ namespace PaintFx
                     {
                         //from dst  => find proper source (y)
 
-                        double srcTop = (double)(dstY * source._height) / (double)_height;
+                        double srcTop = (double)(dstY * source.Height) / (double)Height;
                         double srcTopFloor = Math.Floor(srcTop);
                         double srcTopWeight = 1 - (srcTop - srcTopFloor);
                         int srcTopInt = (int)srcTopFloor;
 
-                        double srcBottom = (double)((dstY + 1) * source._height) / (double)_height;
+                        double srcBottom = (double)((dstY + 1) * source.Height) / (double)Height;
                         double srcBottomFloor = Math.Floor(srcBottom - 0.00001);
                         double srcBottomWeight = srcBottom - srcBottomFloor;
                         int srcBottomInt = (int)srcBottomFloor;
@@ -1343,12 +1308,12 @@ namespace PaintFx
                         {
                             //from dst=> find proper source (x)
 
-                            double srcLeft = (double)(dstX * source._width) / (double)_width;
+                            double srcLeft = (double)(dstX * source.Width) / (double)Width;
                             double srcLeftFloor = Math.Floor(srcLeft);
                             double srcLeftWeight = 1 - (srcLeft - srcLeftFloor);
                             int srcLeftInt = (int)srcLeftFloor;
 
-                            double srcRight = (double)((dstX + 1) * source._width) / (double)_width;
+                            double srcRight = (double)((dstX + 1) * source.Width) / (double)Width;
                             double srcRightFloor = Math.Floor(srcRight - 0.00001);
                             double srcRightWeight = srcRight - srcRightFloor;
                             int srcRightInt = (int)srcRightFloor;
@@ -1371,7 +1336,7 @@ namespace PaintFx
                                 greenSum += srcLeftPtr->G * srcLeftWeight * a;
                                 redSum += srcLeftPtr->R * srcLeftWeight * a;
                                 alphaSum += srcLeftPtr->A * srcLeftWeight;
-                                srcLeftPtr = (ColorBgra*)((byte*)srcLeftPtr + source._stride);
+                                srcLeftPtr = (ColorBgra*)((byte*)srcLeftPtr + source.Stride);
                             }
 
                             // right fractional edge
@@ -1383,7 +1348,7 @@ namespace PaintFx
                                 greenSum += srcRightPtr->G * srcRightWeight * a;
                                 redSum += srcRightPtr->R * srcRightWeight * a;
                                 alphaSum += srcRightPtr->A * srcRightWeight;
-                                srcRightPtr = (ColorBgra*)((byte*)srcRightPtr + source._stride);
+                                srcRightPtr = (ColorBgra*)((byte*)srcRightPtr + source.Stride);
                             }
 
                             // top fractional edge
@@ -1496,7 +1461,7 @@ namespace PaintFx
             }
             else if (source.Width <= Width || source.Height <= Height)
             {
-                if (source._width < 2 || source._height < 2 || _width < 2 || _height < 2)
+                if (source.Width < 2 || source.Height < 2 || Width < 2 || Height < 2)
                 {
                     this.NearestNeighborFitSurface(source, dstRoi);
                 }
@@ -1517,12 +1482,12 @@ namespace PaintFx
                     {
                         //from dst  => find proper source (y)
 
-                        double srcTop = (double)(dstY * source._height) / (double)dstHeight;
+                        double srcTop = (double)(dstY * source.Height) / (double)dstHeight;
                         double srcTopFloor = Math.Floor(srcTop);
                         double srcTopWeight = 1 - (srcTop - srcTopFloor);
                         int srcTopInt = (int)srcTopFloor;
 
-                        double srcBottom = (double)((dstY + 1) * source._height) / (double)dstHeight;
+                        double srcBottom = (double)((dstY + 1) * source.Height) / (double)dstHeight;
                         double srcBottomFloor = Math.Floor(srcBottom - 0.00001);
                         double srcBottomWeight = srcBottom - srcBottomFloor;
                         int srcBottomInt = (int)srcBottomFloor;
@@ -1533,12 +1498,12 @@ namespace PaintFx
                         {
                             //from dst=> find proper source (x)
 
-                            double srcLeft = (double)(dstX * source._width) / (double)dstWidth;
+                            double srcLeft = (double)(dstX * source.Width) / (double)dstWidth;
                             double srcLeftFloor = Math.Floor(srcLeft);
                             double srcLeftWeight = 1 - (srcLeft - srcLeftFloor);
                             int srcLeftInt = (int)srcLeftFloor;
 
-                            double srcRight = (double)((dstX + 1) * source._width) / (double)dstWidth;
+                            double srcRight = (double)((dstX + 1) * source.Width) / (double)dstWidth;
                             double srcRightFloor = Math.Floor(srcRight - 0.00001);
                             double srcRightWeight = srcRight - srcRightFloor;
                             int srcRightInt = (int)srcRightFloor;
@@ -1561,7 +1526,7 @@ namespace PaintFx
                                 greenSum += srcLeftPtr->G * srcLeftWeight * a;
                                 redSum += srcLeftPtr->R * srcLeftWeight * a;
                                 alphaSum += srcLeftPtr->A * srcLeftWeight;
-                                srcLeftPtr = (ColorBgra*)((byte*)srcLeftPtr + source._stride);
+                                srcLeftPtr = (ColorBgra*)((byte*)srcLeftPtr + source.Stride);
                             }
 
                             // right fractional edge
@@ -1573,7 +1538,7 @@ namespace PaintFx
                                 greenSum += srcRightPtr->G * srcRightWeight * a;
                                 redSum += srcRightPtr->R * srcRightWeight * a;
                                 alphaSum += srcRightPtr->A * srcRightWeight;
-                                srcRightPtr = (ColorBgra*)((byte*)srcRightPtr + source._stride);
+                                srcRightPtr = (ColorBgra*)((byte*)srcRightPtr + source.Stride);
                             }
 
                             // top fractional edge
@@ -1699,13 +1664,13 @@ namespace PaintFx
             {
                 for (int dstY = roi.Top; dstY < roi.Bottom; ++dstY)
                 {
-                    int srcY = (dstY * source._height) / _height;
+                    int srcY = (dstY * source.Height) / Height;
                     ColorBgra* srcRow = source.GetRowAddressUnchecked(srcY);
                     ColorBgra* dstPtr = this.GetPointAddressUnchecked(roi.Left, dstY);
 
                     for (int dstX = roi.Left; dstX < roi.Right; ++dstX)
                     {
-                        int srcX = (dstX * source._width) / _width;
+                        int srcX = (dstX * source.Width) / Width;
                         *dstPtr = *(srcRow + srcX);
                         ++dstPtr;
                     }
@@ -1759,10 +1724,10 @@ namespace PaintFx
         /// </remarks>
         public void BicubicFitSurface(Surface source, Rectangle dstRoi)
         {
-            float leftF = (1 * (float)(_width - 1)) / (float)(source._width - 1);
-            float topF = (1 * (_height - 1)) / (float)(source._height - 1);
-            float rightF = ((float)(source._width - 3) * (float)(_width - 1)) / (float)(source._width - 1);
-            float bottomF = ((float)(source.Height - 3) * (float)(_height - 1)) / (float)(source._height - 1);
+            float leftF = (1 * (float)(Width - 1)) / (float)(source.Width - 1);
+            float topF = (1 * (Height - 1)) / (float)(source.Height - 1);
+            float rightF = ((float)(source.Width - 3) * (float)(Width - 1)) / (float)(source.Width - 1);
+            float bottomF = ((float)(source.Height - 3) * (float)(Height - 1)) / (float)(source.Height - 1);
 
             int left = (int)Math.Ceiling((double)leftF);
             int top = (int)Math.Ceiling((double)topF);
@@ -1771,10 +1736,10 @@ namespace PaintFx
 
             Rectangle[] rois = new Rectangle[] {
                                                    Rectangle.FromLTRB(left, top, right, bottom),
-                                                   new Rectangle(0, 0, _width, top),
-                                                   new Rectangle(0, top, left, _height - top),
-                                                   new Rectangle(right, top, _width - right, _height - top),
-                                                   new Rectangle(left, bottom, right - left, _height - bottom)
+                                                   new Rectangle(0, 0, Width, top),
+                                                   new Rectangle(0, top, left, Height - top),
+                                                   new Rectangle(right, top, Width - right, Height - top),
+                                                   new Rectangle(left, bottom, right - left, Height - bottom)
                                                };
 
             for (int i = 0; i < rois.Length; ++i)
@@ -1801,7 +1766,7 @@ namespace PaintFx
         private void BicubicFitSurfaceChecked(Surface source, Rectangle dstRoi)
         {
 
-            if (_width < 2 || _height < 2 || source._width < 2 || source._height < 2)
+            if (Width < 2 || Height < 2 || source.Width < 2 || source.Height < 2)
             {
                 SuperSamplingFitSurface(source, dstRoi);
             }
@@ -1810,7 +1775,7 @@ namespace PaintFx
                 unsafe
                 {
                     Rectangle roi = Rectangle.Intersect(dstRoi, this.Bounds);
-                    Rectangle roiIn = Rectangle.Intersect(dstRoi, new Rectangle(1, 1, _width - 1, _height - 1));
+                    Rectangle roiIn = Rectangle.Intersect(dstRoi, new Rectangle(1, 1, Width - 1, Height - 1));
 
                     IntPtr rColCacheIP = PlatformMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
                     double* rColCache = (double*)rColCacheIP.ToPointer();
@@ -1818,7 +1783,7 @@ namespace PaintFx
                     // Precompute and then cache the value of R() for each column
                     for (int dstX = roi.Left; dstX < roi.Right; ++dstX)
                     {
-                        double srcColumn = (double)(dstX * (source._width - 1)) / (double)(_width - 1);
+                        double srcColumn = (double)(dstX * (source.Width - 1)) / (double)(Width - 1);
                         double srcColumnFloor = Math.Floor(srcColumn);
                         double srcColumnFrac = srcColumn - srcColumnFloor;
                         int srcColumnInt = (int)srcColumn;
@@ -1836,7 +1801,7 @@ namespace PaintFx
 
                     for (int dstY = roi.Top; dstY < roi.Bottom; ++dstY)
                     {
-                        double srcRow = (double)(dstY * (source._height - 1)) / (double)(_height - 1);
+                        double srcRow = (double)(dstY * (source.Height - 1)) / (double)(Height - 1);
                         double srcRowFloor = (double)Math.Floor(srcRow);
                         double srcRowFrac = srcRow - srcRowFloor;
                         int srcRowInt = (int)srcRow;
@@ -1855,7 +1820,7 @@ namespace PaintFx
 
                         for (int dstX = roi.Left; dstX < roi.Right; dstX++)
                         {
-                            double srcColumn = (double)(dstX * (source._width - 1)) / (double)(_width - 1);
+                            double srcColumn = (double)(dstX * (source.Width - 1)) / (double)(Width - 1);
                             double srcColumnFloor = Math.Floor(srcColumn);
                             double srcColumnFrac = srcColumn - srcColumnFloor;
                             int srcColumnInt = (int)srcColumn;
@@ -1900,7 +1865,7 @@ namespace PaintFx
                                     ++srcPtr;
                                 }
 
-                                srcPtr = (ColorBgra*)((byte*)(srcPtr - 4) + source._stride);
+                                srcPtr = (ColorBgra*)((byte*)(srcPtr - 4) + source.Stride);
                             }
 
                             double alpha = alphaSum / totalWeight;
@@ -1942,7 +1907,7 @@ namespace PaintFx
         /// </summary>
         public void BicubicFitSurfaceUnchecked(Surface source, Rectangle dstRoi)
         {
-            if (_width < 2 || _height < 2 || source._width < 2 || source._height < 2)
+            if (Width < 2 || Height < 2 || source.Width < 2 || source.Height < 2)
             {
                 SuperSamplingFitSurface(source, dstRoi);
             }
@@ -1951,7 +1916,7 @@ namespace PaintFx
                 unsafe
                 {
                     Rectangle roi = Rectangle.Intersect(dstRoi, this.Bounds);
-                    Rectangle roiIn = Rectangle.Intersect(dstRoi, new Rectangle(1, 1, _width - 1, _height - 1));
+                    Rectangle roiIn = Rectangle.Intersect(dstRoi, new Rectangle(1, 1, Width - 1, Height - 1));
 
                     IntPtr rColCacheIP = PlatformMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
                     double* rColCache = (double*)rColCacheIP.ToPointer();
@@ -1959,7 +1924,7 @@ namespace PaintFx
                     // Precompute and then cache the value of R() for each column
                     for (int dstX = roi.Left; dstX < roi.Right; ++dstX)
                     {
-                        double srcColumn = (double)(dstX * (source._width - 1)) / (double)(_width - 1);
+                        double srcColumn = (double)(dstX * (source.Width - 1)) / (double)(Width - 1);
                         double srcColumnFloor = Math.Floor(srcColumn);
                         double srcColumnFrac = srcColumn - srcColumnFloor;
                         int srcColumnInt = (int)srcColumn;
@@ -1977,7 +1942,7 @@ namespace PaintFx
 
                     for (int dstY = roi.Top; dstY < roi.Bottom; ++dstY)
                     {
-                        double srcRow = (double)(dstY * (source._height - 1)) / (double)(_height - 1);
+                        double srcRow = (double)(dstY * (source.Height - 1)) / (double)(Height - 1);
                         double srcRowFloor = Math.Floor(srcRow);
                         double srcRowFrac = srcRow - srcRowFloor;
                         int srcRowInt = (int)srcRow;
@@ -1995,7 +1960,7 @@ namespace PaintFx
 
                         for (int dstX = roi.Left; dstX < roi.Right; dstX++)
                         {
-                            double srcColumn = (double)(dstX * (source._width - 1)) / (double)(_width - 1);
+                            double srcColumn = (double)(dstX * (source.Width - 1)) / (double)(Width - 1);
                             double srcColumnFloor = Math.Floor(srcColumn);
                             double srcColumnFrac = srcColumn - srcColumnFloor;
                             int srcColumnInt = (int)srcColumn;
@@ -2026,7 +1991,7 @@ namespace PaintFx
                                 greenSum += (a0 * srcPtr[0].G * w0) + (a1 * srcPtr[1].G * w1) + (a2 * srcPtr[2].G * w2) + (a3 * srcPtr[3].G * w3);
                                 redSum += (a0 * srcPtr[0].R * w0) + (a1 * srcPtr[1].R * w1) + (a2 * srcPtr[2].R * w2) + (a3 * srcPtr[3].R * w3);
 
-                                srcPtr = (ColorBgra*)((byte*)srcPtr + source._stride);
+                                srcPtr = (ColorBgra*)((byte*)srcPtr + source.Stride);
                             }
 
                             double alpha = alphaSum / totalWeight;
@@ -2083,7 +2048,7 @@ namespace PaintFx
         /// <remarks>This method was implemented with correctness, not performance, in mind.</remarks>
         public void BilinearFitSurface(Surface source, Rectangle dstRoi)
         {
-            if (dstRoi.Width < 2 || dstRoi.Height < 2 || _width < 2 || _height < 2)
+            if (dstRoi.Width < 2 || dstRoi.Height < 2 || Width < 2 || Height < 2)
             {
                 SuperSamplingFitSurface(source, dstRoi);
             }
@@ -2096,11 +2061,11 @@ namespace PaintFx
                     for (int dstY = roi.Top; dstY < roi.Bottom; ++dstY)
                     {
                         ColorBgra* dstRowPtr = this.GetRowAddressUnchecked(dstY);
-                        float srcRow = (float)(dstY * (source._height - 1)) / (float)(_height - 1);
+                        float srcRow = (float)(dstY * (source.Height - 1)) / (float)(Height - 1);
 
                         for (int dstX = roi.Left; dstX < roi.Right; dstX++)
                         {
-                            float srcColumn = (float)(dstX * (source._width - 1)) / (float)(_width - 1);
+                            float srcColumn = (float)(dstX * (source.Width - 1)) / (float)(Width - 1);
                             *dstRowPtr = source.GetBilinearSample(srcColumn, srcRow);
                             ++dstRowPtr;
                         }
@@ -2163,9 +2128,9 @@ namespace PaintFx
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (!IsDisposed)
             {
-                _disposed = true;
+                IsDisposed = true;
 
                 //if (disposing)
                 //{

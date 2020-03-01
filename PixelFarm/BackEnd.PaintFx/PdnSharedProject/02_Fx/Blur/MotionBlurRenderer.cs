@@ -14,28 +14,16 @@ namespace PaintFx.Effects
 
     public class MotionBlurRenderer : EffectRendererBase
     {
-        private double angle;
-        private int distance;
-        private bool centered;
-        private PointF[] points;
+        PointF[] _points;
 
-        public double Angle
-        {
-            get { return angle; }
-        }
-        public int Distance
-        {
-            get { return distance; }
-        }
-        public bool Centered
-        {
-            get { return centered; }
-        }
+        public double Angle { get; private set; }
+        public int Distance { get; private set; }
+        public bool Centered { get; private set; }
         public void SetParameters(double angle, int distance, bool centered)
         {
-            this.angle = angle;
-            this.distance = distance;
-            this.centered = centered;
+            this.Angle = angle;
+            this.Distance = distance;
+            this.Centered = centered;
 
 
             float start_x = 0, start_y = 0;
@@ -55,18 +43,18 @@ namespace PaintFx.Effects
                 end_y /= 2.0f;
             }
 
-            this.points = new PointF[((1 + distance) * 3) / 2];
+            _points = new PointF[((1 + distance) * 3) / 2];
 
-            if (this.points.Length == 1)
+            if (_points.Length == 1)
             {
-                this.points[0] = new PointF(0, 0);
+                _points[0] = new PointF(0, 0);
             }
             else
             {
-                for (int i = 0; i < this.points.Length; ++i)
+                for (int i = 0; i < _points.Length; ++i)
                 {
-                    float frac = (float)i / (float)(this.points.Length - 1);
-                    this.points[i] = PixelUtils.Lerp(
+                    float frac = (float)i / (float)(_points.Length - 1);
+                    _points[i] = PixelUtils.Lerp(
                         new PointF(start_x, start_y),
                         new PointF(end_x, end_y),
                         frac);
@@ -78,7 +66,7 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                ColorBgra* samples = stackalloc ColorBgra[this.points.Length];
+                ColorBgra* samples = stackalloc ColorBgra[_points.Length];
 
                 for (int i = startIndex; i < startIndex + length; ++i)
                 {
@@ -92,12 +80,12 @@ namespace PaintFx.Effects
                         {
                             int sampleCount = 0;
 
-                            PointF a = new PointF((float)x + points[0].X, (float)y + points[0].Y);
-                            PointF b = new PointF((float)x + points[points.Length - 1].X, (float)y + points[points.Length - 1].Y);
+                            PointF a = new PointF((float)x + _points[0].X, (float)y + _points[0].Y);
+                            PointF b = new PointF((float)x + _points[_points.Length - 1].X, (float)y + _points[_points.Length - 1].Y);
 
-                            for (int j = 0; j < this.points.Length; ++j)
+                            for (int j = 0; j < _points.Length; ++j)
                             {
-                                PointF pt = new PointF(this.points[j].X + (float)x, this.points[j].Y + (float)y);
+                                PointF pt = new PointF(_points[j].X + (float)x, _points[j].Y + (float)y);
 
                                 if (pt.X >= 0 && pt.Y >= 0 && pt.X <= (src.Width - 1) && pt.Y <= (src.Height - 1))
                                 {

@@ -27,8 +27,7 @@ namespace PaintFx
         /// result(color) = color
         /// </summary>
 
-        public class Identity
-            : UnaryPixelOp
+        public class Identity : UnaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra color)
             {
@@ -50,21 +49,20 @@ namespace PaintFx
         /// Always returns a constant color.
         /// </summary>
 
-        public class Constant
-            : UnaryPixelOp
+        public class Constant : UnaryPixelOp
         {
-            private ColorBgra setColor;
+            ColorBgra _setColor;
 
             public override ColorBgra Apply(ColorBgra color)
             {
-                return setColor;
+                return _setColor;
             }
 
             public unsafe override void Apply(ColorBgra* dst, ColorBgra* src, int length)
             {
                 while (length > 0)
                 {
-                    *dst = setColor;
+                    *dst = _setColor;
                     ++dst;
                     --length;
                 }
@@ -74,7 +72,7 @@ namespace PaintFx
             {
                 while (length > 0)
                 {
-                    *ptr = setColor;
+                    *ptr = _setColor;
                     ++ptr;
                     --length;
                 }
@@ -82,7 +80,7 @@ namespace PaintFx
 
             public Constant(ColorBgra setColor)
             {
-                this.setColor = setColor;
+                _setColor = setColor;
             }
         }
 
@@ -90,27 +88,26 @@ namespace PaintFx
         /// Blends pixels with the specified constant color.
         /// </summary>
 
-        public class BlendConstant
-            : UnaryPixelOp
+        public class BlendConstant : UnaryPixelOp
         {
-            private ColorBgra blendColor;
+            ColorBgra _blendColor;
 
             public override ColorBgra Apply(ColorBgra color)
             {
-                int a = blendColor.A;
+                int a = _blendColor.A;
                 int invA = 255 - a;
 
-                int r = ((color.R * invA) + (blendColor.R * a)) / 256;
-                int g = ((color.G * invA) + (blendColor.G * a)) / 256;
-                int b = ((color.B * invA) + (blendColor.B * a)) / 256;
-                byte a2 = ComputeAlpha(color.A, blendColor.A);
+                int r = ((color.R * invA) + (_blendColor.R * a)) / 256;
+                int g = ((color.G * invA) + (_blendColor.G * a)) / 256;
+                int b = ((color.B * invA) + (_blendColor.B * a)) / 256;
+                byte a2 = ComputeAlpha(color.A, _blendColor.A);
 
                 return ColorBgra.FromBgra((byte)b, (byte)g, (byte)r, a2);
             }
 
             public BlendConstant(ColorBgra blendColor)
             {
-                this.blendColor = blendColor;
+                _blendColor = blendColor;
             }
         }
 
@@ -119,15 +116,14 @@ namespace PaintFx
         /// Useful if you want to set only the alpha value of a given region.
         /// </summary>
 
-        public class SetChannel
-            : UnaryPixelOp
+        public class SetChannel : UnaryPixelOp
         {
-            private int channel;
-            private byte setValue;
+            int _channel;
+            byte _setValue;
 
             public override ColorBgra Apply(ColorBgra color)
             {
-                color[channel] = setValue;
+                color[_channel] = _setValue;
                 return color;
             }
 
@@ -136,7 +132,7 @@ namespace PaintFx
                 while (length > 0)
                 {
                     *dst = *src;
-                    (*dst)[channel] = setValue;
+                    (*dst)[_channel] = _setValue;
                     ++dst;
                     ++src;
                     --length;
@@ -147,7 +143,7 @@ namespace PaintFx
             {
                 while (length > 0)
                 {
-                    (*ptr)[channel] = setValue;
+                    (*ptr)[_channel] = _setValue;
                     ++ptr;
                     --length;
                 }
@@ -156,8 +152,8 @@ namespace PaintFx
 
             public SetChannel(int channel, byte setValue)
             {
-                this.channel = channel;
-                this.setValue = setValue;
+                _channel = channel;
+                _setValue = setValue;
             }
         }
 
@@ -172,18 +168,18 @@ namespace PaintFx
         public class SetAlphaChannel
             : UnaryPixelOp
         {
-            private UInt32 addValue;
+            uint _addValue;
 
             public override ColorBgra Apply(ColorBgra color)
             {
-                return ColorBgra.FromUInt32((color.Bgra & 0x00ffffff) + addValue);
+                return ColorBgra.FromUInt32((color.Bgra & 0x00ffffff) + _addValue);
             }
 
             public override unsafe void Apply(ColorBgra* dst, ColorBgra* src, int length)
             {
                 while (length > 0)
                 {
-                    dst->Bgra = (src->Bgra & 0x00ffffff) + addValue;
+                    dst->Bgra = (src->Bgra & 0x00ffffff) + _addValue;
                     ++dst;
                     ++src;
                     --length;
@@ -194,7 +190,7 @@ namespace PaintFx
             {
                 while (length > 0)
                 {
-                    ptr->Bgra = (ptr->Bgra & 0x00ffffff) + addValue;
+                    ptr->Bgra = (ptr->Bgra & 0x00ffffff) + _addValue;
                     ++ptr;
                     --length;
                 }
@@ -202,7 +198,7 @@ namespace PaintFx
 
             public SetAlphaChannel(byte alphaValue)
             {
-                addValue = (uint)alphaValue << 24;
+                _addValue = (uint)alphaValue << 24;
             }
         }
 
@@ -210,8 +206,7 @@ namespace PaintFx
         /// Specialization of SetAlphaChannel that always sets alpha to 255.
         /// </summary>
 
-        public class SetAlphaChannelTo255
-            : UnaryPixelOp
+        public class SetAlphaChannelTo255 : UnaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra color)
             {
@@ -244,8 +239,7 @@ namespace PaintFx
         /// Inverts a pixel's color, and passes through the alpha component.
         /// </summary>
 
-        public class Invert
-            : UnaryPixelOp
+        public class Invert : UnaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra color)
             {
@@ -257,16 +251,15 @@ namespace PaintFx
         /// If the color is within the red tolerance, remove it
         /// </summary>
 
-        public class RedEyeRemove
-            : UnaryPixelOp
+        public class RedEyeRemove : UnaryPixelOp
         {
-            private int tolerence;
-            private double setSaturation;
+            int _tolerence;
+            double _setSaturation;
 
             public RedEyeRemove(int tol, int sat)
             {
-                tolerence = tol;
-                setSaturation = (double)sat / 100;
+                _tolerence = tol;
+                _setSaturation = (double)sat / 100;
             }
 
             public override ColorBgra Apply(ColorBgra color)
@@ -278,10 +271,10 @@ namespace PaintFx
                 int difference = color.R - Math.Max(color.B, color.G);
 
                 // If it is within tolerence, and the saturation is high
-                if ((difference > tolerence) && (saturation > 100))
+                if ((difference > _tolerence) && (saturation > 100))
                 {
                     double i = 255.0 * color.GetIntensity();
-                    byte ib = (byte)(i * setSaturation); // adjust the red color for user inputted saturation
+                    byte ib = (byte)(i * _setSaturation); // adjust the red color for user inputted saturation
                     return ColorBgra.FromBgra((byte)color.B, (byte)color.G, ib, color.A);
                 }
                 else
@@ -327,8 +320,7 @@ namespace PaintFx
         /// Inverts a pixel's color and its alpha component.
         /// </summary>
 
-        public class InvertWithAlpha
-            : UnaryPixelOp
+        public class InvertWithAlpha : UnaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra color)
             {
@@ -341,8 +333,7 @@ namespace PaintFx
         /// is unaffected.
         /// </summary>
 
-        public class AverageChannels
-            : UnaryPixelOp
+        public class AverageChannels : UnaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra color)
             {
@@ -352,8 +343,7 @@ namespace PaintFx
         }
 
 
-        public class Desaturate
-            : UnaryPixelOp
+        public class Desaturate : UnaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra color)
             {
@@ -395,8 +385,7 @@ namespace PaintFx
         }
 
 
-        public class LuminosityCurve
-            : UnaryPixelOp
+        public class LuminosityCurve : UnaryPixelOp
         {
             public byte[] Curve = new byte[256];
 
@@ -422,8 +411,7 @@ namespace PaintFx
         }
 
 
-        public class ChannelCurve
-            : UnaryPixelOp
+        public class ChannelCurve : UnaryPixelOp
         {
             public byte[] CurveB = new byte[256];
             public byte[] CurveG = new byte[256];
@@ -477,16 +465,13 @@ namespace PaintFx
         }
 
 
-        public class Level
-            : ChannelCurve
+        public class Level : ChannelCurve
         {
-            private ColorBgra colorInLow;
+            ColorBgra _colorInLow;
             public ColorBgra ColorInLow
             {
-                get
-                {
-                    return colorInLow;
-                }
+                get => _colorInLow;
+
 
                 set
                 {
@@ -505,33 +490,30 @@ namespace PaintFx
                         value.B = 254;
                     }
 
-                    if (colorInHigh.R < value.R + 1)
+                    if (_colorInHigh.R < value.R + 1)
                     {
-                        colorInHigh.R = (byte)(value.R + 1);
+                        _colorInHigh.R = (byte)(value.R + 1);
                     }
 
-                    if (colorInHigh.G < value.G + 1)
+                    if (_colorInHigh.G < value.G + 1)
                     {
-                        colorInHigh.G = (byte)(value.R + 1);
+                        _colorInHigh.G = (byte)(value.R + 1);
                     }
 
-                    if (colorInHigh.B < value.B + 1)
+                    if (_colorInHigh.B < value.B + 1)
                     {
-                        colorInHigh.B = (byte)(value.R + 1);
+                        _colorInHigh.B = (byte)(value.R + 1);
                     }
 
-                    colorInLow = value;
+                    _colorInLow = value;
                     UpdateLookupTable();
                 }
             }
 
-            private ColorBgra colorInHigh;
+            ColorBgra _colorInHigh;
             public ColorBgra ColorInHigh
             {
-                get
-                {
-                    return colorInHigh;
-                }
+                get => _colorInHigh;
 
                 set
                 {
@@ -550,34 +532,30 @@ namespace PaintFx
                         value.B = 1;
                     }
 
-                    if (colorInLow.R > value.R - 1)
+                    if (_colorInLow.R > value.R - 1)
                     {
-                        colorInLow.R = (byte)(value.R - 1);
+                        _colorInLow.R = (byte)(value.R - 1);
                     }
 
-                    if (colorInLow.G > value.G - 1)
+                    if (_colorInLow.G > value.G - 1)
                     {
-                        colorInLow.G = (byte)(value.R - 1);
+                        _colorInLow.G = (byte)(value.R - 1);
                     }
 
-                    if (colorInLow.B > value.B - 1)
+                    if (_colorInLow.B > value.B - 1)
                     {
-                        colorInLow.B = (byte)(value.R - 1);
+                        _colorInLow.B = (byte)(value.R - 1);
                     }
 
-                    colorInHigh = value;
+                    _colorInHigh = value;
                     UpdateLookupTable();
                 }
             }
 
-            private ColorBgra colorOutLow;
+            ColorBgra _colorOutLow;
             public ColorBgra ColorOutLow
             {
-                get
-                {
-                    return colorOutLow;
-                }
-
+                get => _colorOutLow;
                 set
                 {
                     if (value.R == 255)
@@ -595,33 +573,30 @@ namespace PaintFx
                         value.B = 254;
                     }
 
-                    if (colorOutHigh.R < value.R + 1)
+                    if (_colorOutHigh.R < value.R + 1)
                     {
-                        colorOutHigh.R = (byte)(value.R + 1);
+                        _colorOutHigh.R = (byte)(value.R + 1);
                     }
 
-                    if (colorOutHigh.G < value.G + 1)
+                    if (_colorOutHigh.G < value.G + 1)
                     {
-                        colorOutHigh.G = (byte)(value.G + 1);
+                        _colorOutHigh.G = (byte)(value.G + 1);
                     }
 
-                    if (colorOutHigh.B < value.B + 1)
+                    if (_colorOutHigh.B < value.B + 1)
                     {
-                        colorOutHigh.B = (byte)(value.B + 1);
+                        _colorOutHigh.B = (byte)(value.B + 1);
                     }
 
-                    colorOutLow = value;
+                    _colorOutLow = value;
                     UpdateLookupTable();
                 }
             }
 
-            private ColorBgra colorOutHigh;
+            ColorBgra _colorOutHigh;
             public ColorBgra ColorOutHigh
             {
-                get
-                {
-                    return colorOutHigh;
-                }
+                get => _colorOutHigh;
 
                 set
                 {
@@ -640,27 +615,27 @@ namespace PaintFx
                         value.B = 1;
                     }
 
-                    if (colorOutLow.R > value.R - 1)
+                    if (_colorOutLow.R > value.R - 1)
                     {
-                        colorOutLow.R = (byte)(value.R - 1);
+                        _colorOutLow.R = (byte)(value.R - 1);
                     }
 
-                    if (colorOutLow.G > value.G - 1)
+                    if (_colorOutLow.G > value.G - 1)
                     {
-                        colorOutLow.G = (byte)(value.G - 1);
+                        _colorOutLow.G = (byte)(value.G - 1);
                     }
 
-                    if (colorOutLow.B > value.B - 1)
+                    if (_colorOutLow.B > value.B - 1)
                     {
-                        colorOutLow.B = (byte)(value.B - 1);
+                        _colorOutLow.B = (byte)(value.B - 1);
                     }
 
-                    colorOutHigh = value;
+                    _colorOutHigh = value;
                     UpdateLookupTable();
                 }
             }
 
-            private float[] gamma = new float[3];
+            float[] _gamma = new float[3];
             public float GetGamma(int index)
             {
                 if (index < 0 || index >= 3)
@@ -668,7 +643,7 @@ namespace PaintFx
                     throw new ArgumentOutOfRangeException("index", index, "Index must be between 0 and 2");
                 }
 
-                return gamma[index];
+                return _gamma[index];
             }
 
             public void SetGamma(int index, float val)
@@ -678,7 +653,7 @@ namespace PaintFx
                     throw new ArgumentOutOfRangeException("index", index, "Index must be between 0 and 2");
                 }
 
-                gamma[index] = PixelUtils.Clamp(val, 0.1f, 10.0f);
+                _gamma[index] = PixelUtils.Clamp(val, 0.1f, 10.0f);
                 UpdateLookupTable();
             }
 
@@ -707,9 +682,9 @@ namespace PaintFx
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    if (colorOutHigh[i] < colorOutLow[i] ||
-                        colorInHigh[i] <= colorInLow[i] ||
-                        gamma[i] < 0)
+                    if (_colorOutHigh[i] < _colorOutLow[i] ||
+                        _colorInHigh[i] <= _colorInLow[i] ||
+                        _gamma[i] < 0)
                     {
                         isValid = false;
                         return;
@@ -736,17 +711,17 @@ namespace PaintFx
 
             public Level(ColorBgra in_lo, ColorBgra in_hi, float[] gamma, ColorBgra out_lo, ColorBgra out_hi)
             {
-                colorInLow = in_lo;
-                colorInHigh = in_hi;
-                colorOutLow = out_lo;
-                colorOutHigh = out_hi;
+                _colorInLow = in_lo;
+                _colorInHigh = in_hi;
+                _colorOutLow = out_lo;
+                _colorOutHigh = out_hi;
 
                 if (gamma.Length != 3)
                 {
                     throw new ArgumentException("gamma", "gamma must be a float[3]");
                 }
 
-                this.gamma = gamma;
+                _gamma = gamma;
                 UpdateLookupTable();
             }
 
@@ -757,20 +732,20 @@ namespace PaintFx
 
                 for (int i = 0; i < 3; i++)
                 {
-                    float v = (input[i] - colorInLow[i]);
+                    float v = (input[i] - _colorInLow[i]);
 
                     if (v < 0)
                     {
-                        ret[i] = colorOutLow[i];
+                        ret[i] = _colorOutLow[i];
                     }
-                    else if (v + colorInLow[i] >= colorInHigh[i])
+                    else if (v + _colorInLow[i] >= _colorInHigh[i])
                     {
-                        ret[i] = colorOutHigh[i];
+                        ret[i] = _colorOutHigh[i];
                     }
                     else
                     {
                         ret[i] = (byte)PixelUtils.Clamp(
-                            colorOutLow[i] + (colorOutHigh[i] - colorOutLow[i]) * Math.Pow(v / (colorInHigh[i] - colorInLow[i]), gamma[i]),
+                            _colorOutLow[i] + (_colorOutHigh[i] - _colorOutLow[i]) * Math.Pow(v / (_colorInHigh[i] - _colorInLow[i]), _gamma[i]),
                             0.0f,
                             255.0f);
                     }
@@ -793,11 +768,11 @@ namespace PaintFx
 
                 for (int i = 0; i < 3; i++)
                 {
-                    beforeOut[i] = colorInLow[i] + (colorInHigh[i] - colorInLow[i]) *
-                        (float)Math.Pow((float)(after[i] - colorOutLow[i]) / (colorOutHigh[i] - colorOutLow[i]), 1 / gamma[i]);
+                    beforeOut[i] = _colorInLow[i] + (_colorInHigh[i] - _colorInLow[i]) *
+                        (float)Math.Pow((float)(after[i] - _colorOutLow[i]) / (_colorOutHigh[i] - _colorOutLow[i]), 1 / _gamma[i]);
 
-                    slopesOut[i] = (float)(colorInHigh[i] - colorInLow[i]) / ((colorOutHigh[i] - colorOutLow[i]) * gamma[i]) *
-                        (float)Math.Pow((float)(after[i] - colorOutLow[i]) / (colorOutHigh[i] - colorOutLow[i]), 1 / gamma[i] - 1);
+                    slopesOut[i] = (float)(_colorInHigh[i] - _colorInLow[i]) / ((_colorOutHigh[i] - _colorOutLow[i]) * _gamma[i]) *
+                        (float)Math.Pow((float)(after[i] - _colorOutLow[i]) / (_colorOutHigh[i] - _colorOutLow[i]), 1 / _gamma[i] - 1);
 
                     if (float.IsInfinity(slopesOut[i]) || float.IsNaN(slopesOut[i]))
                     {
@@ -808,7 +783,7 @@ namespace PaintFx
 
             public object Clone()
             {
-                Level copy = new Level(colorInLow, colorInHigh, (float[])gamma.Clone(), colorOutLow, colorOutHigh);
+                Level copy = new Level(_colorInLow, _colorInHigh, (float[])_gamma.Clone(), _colorOutLow, _colorOutHigh);
 
                 copy.CurveB = (byte[])this.CurveB.Clone();
                 copy.CurveG = (byte[])this.CurveG.Clone();
@@ -819,29 +794,28 @@ namespace PaintFx
         }
 
 
-        public class HueSaturationLightness
-            : UnaryPixelOp
+        public class HueSaturationLightness : UnaryPixelOp
         {
-            private int hueDelta;
-            private int satFactor;
-            private UnaryPixelOp blendOp;
+            readonly int _hueDelta;
+            readonly int _satFactor;
+            UnaryPixelOp _blendOp;
 
             public HueSaturationLightness(int hueDelta, int satDelta, int lightness)
             {
-                this.hueDelta = hueDelta;
-                this.satFactor = (satDelta * 1024) / 100;
+                _hueDelta = hueDelta;
+                _satFactor = (satDelta * 1024) / 100;
 
                 if (lightness == 0)
                 {
-                    blendOp = new UnaryPixelOps.Identity();
+                    _blendOp = new UnaryPixelOps.Identity();
                 }
                 else if (lightness > 0)
                 {
-                    blendOp = new UnaryPixelOps.BlendConstant(ColorBgra.FromBgra(255, 255, 255, (byte)((lightness * 255) / 100)));
+                    _blendOp = new UnaryPixelOps.BlendConstant(ColorBgra.FromBgra(255, 255, 255, (byte)((lightness * 255) / 100)));
                 }
                 else // if (lightness < 0)
                 {
-                    blendOp = new UnaryPixelOps.BlendConstant(ColorBgra.FromBgra(0, 0, 0, (byte)((-lightness * 255) / 100)));
+                    _blendOp = new UnaryPixelOps.BlendConstant(ColorBgra.FromBgra(0, 0, 0, (byte)((-lightness * 255) / 100)));
                 }
             }
 
@@ -849,14 +823,14 @@ namespace PaintFx
             {
                 //adjust saturation
                 byte intensity = color.GetIntensityByte();
-                color.R = PixelUtils.ClampToByte((intensity * 1024 + (color.R - intensity) * satFactor) >> 10);
-                color.G = PixelUtils.ClampToByte((intensity * 1024 + (color.G - intensity) * satFactor) >> 10);
-                color.B = PixelUtils.ClampToByte((intensity * 1024 + (color.B - intensity) * satFactor) >> 10);
+                color.R = PixelUtils.ClampToByte((intensity * 1024 + (color.R - intensity) * _satFactor) >> 10);
+                color.G = PixelUtils.ClampToByte((intensity * 1024 + (color.G - intensity) * _satFactor) >> 10);
+                color.B = PixelUtils.ClampToByte((intensity * 1024 + (color.B - intensity) * _satFactor) >> 10);
 
                 HsvColor hsvColor = HsvColor.FromColor(color.ToColor());
                 int hue = hsvColor.Hue;
 
-                hue += hueDelta;
+                hue += _hueDelta;
 
                 while (hue < 0)
                 {
@@ -871,7 +845,7 @@ namespace PaintFx
                 hsvColor.Hue = hue;
 
                 ColorBgra newColor = ColorBgra.FromColor(hsvColor.ToColor());
-                newColor = blendOp.Apply(newColor);
+                newColor = _blendOp.Apply(newColor);
                 newColor.A = color.A;
 
                 return newColor;

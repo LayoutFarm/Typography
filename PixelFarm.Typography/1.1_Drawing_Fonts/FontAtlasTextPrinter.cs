@@ -28,9 +28,6 @@ namespace PixelFarm.Drawing.Fonts
         MemBitmap _alphaBmp;
 
 
-        /// <summary>
-        /// target canvas
-        /// </summary>
         AggPainter _painter;
         RequestFont _font;
         //-----------------------------------------------------------  
@@ -44,8 +41,7 @@ namespace PixelFarm.Drawing.Fonts
         Dictionary<GlyphImage, MemBitmap> _sharedGlyphImgs = new Dictionary<GlyphImage, MemBitmap>();
 
         public FontAtlasTextPrinter(AggPainter painter)
-        {
-            StartDrawOnLeftTop = true;
+        { 
             _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
@@ -77,7 +73,7 @@ namespace PixelFarm.Drawing.Fonts
             ChangeFont(painter.CurrentFont);
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
-        public TextBaseline TextBaseline { get; set; }
+       
         public void Dispose()
         {
             //clear this
@@ -85,11 +81,7 @@ namespace PixelFarm.Drawing.Fonts
             //clear alpha buffer
         }
 
-        /// <summary>
-        /// start draw on 'left-top' of a given area box
-        /// </summary>
-        public bool StartDrawOnLeftTop { get; set; }
-
+       
 
         public AntialiasTechnique AntialiasTech { get; set; }
 
@@ -144,6 +136,7 @@ namespace PixelFarm.Drawing.Fonts
             }
         }
 
+        public TextBaseline TextBaseline { get; set; }
 
         void SetupMaskPixelBlender(int width, int height)
         {
@@ -167,14 +160,21 @@ namespace PixelFarm.Drawing.Fonts
             //1. update some props.. 
             //2. update current type face
             UpdateGlyphLayoutSettings();
-            Typeface typeface = _currentTypeface;
+            //Typeface typeface = _currentTypeface;
         }
-
-        public override void DrawCaret(float x, float y)
+        public void PrepareStringForRenderVx(RenderVxFormattedString renderVx)
         {
-            //TODO: remove draw caret here, this is for debug only 
 
+            //1. update some props.. 
+            //2. update current type face
+            UpdateGlyphLayoutSettings();
+            //Typeface typeface = _currentTypeface;
         }
+        //public override void DrawCaret(float x, float y)
+        //{
+        //    //TODO: remove draw caret here, this is for debug only 
+
+        //}
 
         public void UpdateGlyphLayoutSettings()
         {
@@ -191,16 +191,16 @@ namespace PixelFarm.Drawing.Fonts
             w = s.Width;
             h = s.Height;
         }
-        /// <summary>
-        /// draw specfic glyph with current settings, at specific position
-        /// </summary>
-        /// <param name="glyph"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void DrawGlyph(Glyph glyph, double x, double y)
-        {
-            //TODO...
-        }
+        ///// <summary>
+        ///// draw specfic glyph with current settings, at specific position
+        ///// </summary>
+        ///// <param name="glyph"></param>
+        ///// <param name="x"></param>
+        ///// <param name="y"></param>
+        //public void DrawGlyph(Glyph glyph, double x, double y)
+        //{
+        //    //TODO...
+        //}
         public void DrawString(RenderVxFormattedString renderVx, double x, double y)
         {
             //TODO...
@@ -216,8 +216,7 @@ namespace PixelFarm.Drawing.Fonts
             //TODO:
             //if (x,y) is left top
             //we need to adjust y again
-
-            // 
+            //           
 
             PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind = _fontAtlas.TextureKind;
 
@@ -250,8 +249,9 @@ namespace PixelFarm.Drawing.Fonts
             for (int i = 0; i < seqLen; ++i)
             {
                 UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
-                TextureGlyphMapData glyphData;
-                if (!_fontAtlas.TryGetGlyphMapData(unscaledGlyphPlan.glyphIndex, out glyphData))
+
+                if (!_fontAtlas.TryGetGlyphMapData(unscaledGlyphPlan.glyphIndex,
+                    out TextureGlyphMapData glyphData))
                 {
                     //if no glyph data, we should render a missing glyph ***
                     continue;
@@ -259,8 +259,8 @@ namespace PixelFarm.Drawing.Fonts
                 //--------------------------------------
                 //TODO: review precise height in float
                 //-------------------------------------- 
-                int srcX, srcY, srcW, srcH;
-                glyphData.GetRect(out srcX, out srcY, out srcW, out srcH);
+
+                glyphData.GetRect(out int srcX, out int srcY, out int srcW, out int srcH);
 
                 float ngx = acc_x + (float)Math.Round(unscaledGlyphPlan.OffsetX * scale);
                 float ngy = acc_y + (float)Math.Round(unscaledGlyphPlan.OffsetY * scale);
@@ -334,21 +334,16 @@ namespace PixelFarm.Drawing.Fonts
         }
         public void DrawString(char[] text, int startAt, int len, double x, double y)
         {
-            InternalDrawString(text, startAt, len, (float)x, (float)y);
+            DrawString(text, startAt, len, (float)x, (float)y);
         }
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
-            InternalDrawString(textBuffer, startAt, len, x, y);
-        }
-
-        void InternalDrawString(char[] buffer, int startAt, int len, float x, float y)
-        {
-
             //create temp buffer span that describe the part of a whole char buffer
-            TextBufferSpan textBufferSpan = new TextBufferSpan(buffer, startAt, len);
+            TextBufferSpan textBufferSpan = new TextBufferSpan(textBuffer, startAt, len);
             //ask text service to parse user input char buffer and create a glyph-plan-sequence (list of glyph-plan) 
             //with specific request font      
             DrawFromGlyphPlans(_textServices.CreateGlyphPlanSeq(ref textBufferSpan, _font), startAt, len, x, y);
         }
+
     }
 }

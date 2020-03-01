@@ -16,13 +16,12 @@ namespace PaintFx
     /// if desired). This can then be used to retrieve percentile, average, peak,
     /// and distribution information.
     /// </summary>
-    public sealed class HistogramRgb
-        : Histogram
+    public sealed class HistogramRgb : Histogram
     {
         public HistogramRgb()
             : base(3, 256)
         {
-            visualColors = new ColorBgra[]{
+            _visualColors = new ColorBgra[]{
                                               ColorBgra.Blue,
                                               ColorBgra.Green,
                                               ColorBgra.Red
@@ -44,9 +43,9 @@ namespace PaintFx
 
         protected override unsafe void AddSurfaceRectangleToHistogram(Surface surface, Rectangle rect)
         {
-            long[] histogramB = histogram[0];
-            long[] histogramG = histogram[1];
-            long[] histogramR = histogram[2];
+            long[] histogramB = _histogram[0];
+            long[] histogramG = _histogram[1];
+            long[] histogramR = _histogram[2];
 
             for (int y = rect.Top; y < rect.Bottom; ++y)
             {
@@ -75,8 +74,8 @@ namespace PaintFx
 
             for (int c = 0; c < 3; c++)
             {
-                long[] channelHistogramOutput = histogram[c];
-                long[] channelHistogramInput = inputHistogram.histogram[c];
+                long[] channelHistogramOutput = _histogram[c];
+                long[] channelHistogramInput = inputHistogram._histogram[c];
 
                 for (int v = 0; v <= 255; v++)
                 {

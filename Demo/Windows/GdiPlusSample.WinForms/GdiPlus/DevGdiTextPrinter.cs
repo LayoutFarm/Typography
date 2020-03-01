@@ -93,10 +93,10 @@ namespace SampleWinForms
         public Color OutlineColor { get; set; }
         public Graphics TargetGraphics { get; set; }
 
-        public override void DrawCaret(float x, float y)
-        {
-            this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
-        }
+        //public override void DrawCaret(float x, float y)
+        //{
+        //    this.TargetGraphics.DrawLine(Pens.Red, x, y, x, y + this.FontAscendingPx);
+        //}
         UnscaledGlyphPlanList _reusableUnscaledGlyphPlanList = new UnscaledGlyphPlanList();
         public override void DrawString(char[] textBuffer, int startAt, int len, float x, float y)
         {
@@ -111,6 +111,7 @@ namespace SampleWinForms
             DrawFromGlyphPlans(
                 new GlyphPlanSequence(_reusableUnscaledGlyphPlanList),
                 x, y);
+
 
         }
         public void UpdateGlyphLayoutSettings()
@@ -133,7 +134,7 @@ namespace SampleWinForms
             UpdateVisualOutputSettings();
 
             //draw data in glyph plan 
-            //3. render each glyph 
+            //3. render each glyph  
 
             float sizeInPoints = this.FontSizeInPoints;
             float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(sizeInPoints);
@@ -146,6 +147,8 @@ namespace SampleWinForms
 
             float cx = 0;
             float cy = 0;
+
+            float baseline = y;
 
             var snapToPxScale = new GlyphPlanSequenceSnapPixelScaleLayout(seq, startAt, len, pxscale);
 
@@ -165,8 +168,9 @@ namespace SampleWinForms
                 //------
                 //then move pen point to the position we want to draw a glyph
 
+
                 cx = (float)Math.Round(snapToPxScale.ExactX + x);
-                cy = (float)Math.Floor(snapToPxScale.ExactY + y);
+                cy = (float)Math.Floor(snapToPxScale.ExactY + baseline);
 
                 g.TranslateTransform(cx, cy);
 

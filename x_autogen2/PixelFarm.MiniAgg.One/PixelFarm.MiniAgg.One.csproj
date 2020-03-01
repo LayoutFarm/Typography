@@ -551,6 +551,9 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\2_General\TempContext.cs">
       <Link>PixelFarm\PixelFarm.Painter\2_General\TempContext.cs</Link>
     </Compile>
+    <Compile Include="..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs">
+      <Link>PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs</Link>
+    </Compile>
     <Compile Include="..\..\PixelFarm\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs">
       <Link>PixelFarm\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs</Link>
     </Compile>

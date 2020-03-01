@@ -17,8 +17,7 @@ namespace PaintFx
     /// result of the form: c = F(a, b)
     /// </summary>
 
-    public unsafe abstract class BinaryPixelOp
-        : PixelOp
+    public unsafe abstract class BinaryPixelOp : PixelOp
     {
         public abstract ColorBgra Apply(ColorBgra lhs, ColorBgra rhs);
 

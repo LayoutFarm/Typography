@@ -28,7 +28,7 @@ SOFTWARE.
 namespace System.Numerics
 {
     //FOR NET20
-#if NET20 || COSMOS || DEFINE_VECTOR2 || PIXEL_FARM_NET20
+#if NET20 || COSMOS || DEFINE_VECTOR2 || PIXEL_FARM_NET20 || PIXEL_FARM
 
     public struct Vector2
     {
