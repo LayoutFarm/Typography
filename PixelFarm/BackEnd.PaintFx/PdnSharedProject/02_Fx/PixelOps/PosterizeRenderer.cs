@@ -14,18 +14,17 @@ namespace PaintFx.Effects
 {
     public class PosterizeRenderer : EffectRendererBase
     {
-        private class PosterizePixelOp
-        : UnaryPixelOp
+        private class PosterizePixelOp : UnaryPixelOp
         {
-            private byte[] redLevels;
-            private byte[] greenLevels;
-            private byte[] blueLevels;
+            byte[] _redLevels;
+            byte[] _greenLevels;
+            byte[] _blueLevels;
 
             public PosterizePixelOp(int red, int green, int blue)
             {
-                this.redLevels = CalcLevels(red);
-                this.greenLevels = CalcLevels(green);
-                this.blueLevels = CalcLevels(blue);
+                _redLevels = CalcLevels(red);
+                _greenLevels = CalcLevels(green);
+                _blueLevels = CalcLevels(blue);
             }
 
             private static byte[] CalcLevels(int levelCount)
@@ -60,16 +59,16 @@ namespace PaintFx.Effects
 
             public override ColorBgra Apply(ColorBgra color)
             {
-                return ColorBgra.FromBgra(blueLevels[color.B], greenLevels[color.G], redLevels[color.R], color.A);
+                return ColorBgra.FromBgra(_blueLevels[color.B], _greenLevels[color.G], _redLevels[color.R], color.A);
             }
 
             public unsafe override void Apply(ColorBgra* ptr, int length)
             {
                 while (length > 0)
                 {
-                    ptr->B = this.blueLevels[ptr->B];
-                    ptr->G = this.greenLevels[ptr->G];
-                    ptr->R = this.redLevels[ptr->R];
+                    ptr->B = _blueLevels[ptr->B];
+                    ptr->G = _greenLevels[ptr->G];
+                    ptr->R = _redLevels[ptr->R];
 
                     ++ptr;
                     --length;
@@ -80,9 +79,9 @@ namespace PaintFx.Effects
             {
                 while (length > 0)
                 {
-                    dst->B = this.blueLevels[src->B];
-                    dst->G = this.greenLevels[src->G];
-                    dst->R = this.redLevels[src->R];
+                    dst->B = _blueLevels[src->B];
+                    dst->G = _greenLevels[src->G];
+                    dst->R = _redLevels[src->R];
                     dst->A = src->A;
 
                     ++dst;
@@ -92,15 +91,15 @@ namespace PaintFx.Effects
             }
         }
 
-        private UnaryPixelOp op;
+        UnaryPixelOp _op;
 
         public void SetParameters(int red, int green, int blue)
         {
-            this.op = new PosterizePixelOp(red, green, blue);
+            _op = new PosterizePixelOp(red, green, blue);
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int start, int len)
         {
-            this.op.Apply(dst, src, rois, start, len);
+            _op.Apply(dst, src, rois, start, len);
         }
     }
 }

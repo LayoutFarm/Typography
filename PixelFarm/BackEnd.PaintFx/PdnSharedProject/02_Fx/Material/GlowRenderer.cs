@@ -14,23 +14,15 @@ namespace PaintFx.Effects
 {
     public class GlowRenderer : EffectRendererBase
     {
-        UserBlendOps.ScreenBlendOp screenBlendOp = new UserBlendOps.ScreenBlendOp();
+        UserBlendOps.ScreenBlendOp _screenBlendOp = new UserBlendOps.ScreenBlendOp();
 
         public void SetParameters(int radius, int brightness, int contrast)
         {
             BlurRenderer.Radius = radius;
             BrightnessAndContrastRenderer.SetParameters(brightness, contrast);
         }
-        public GaussainBlurRenderer BlurRenderer
-        {
-            get;
-            set;
-        }
-        public BrightnessAndContrastRenderer BrightnessAndContrastRenderer
-        {
-            get;
-            set;
-        }
+        public GaussainBlurRenderer BlurRenderer { get; set; }
+        public BrightnessAndContrastRenderer BrightnessAndContrastRenderer { get; set; }
         public override void Render(
             Surface src,
             Surface dest,
@@ -55,7 +47,7 @@ namespace PaintFx.Effects
                         ColorBgra* srcPtr = src.GetPointAddressUnchecked(roi.Left, y);
 
 
-                        screenBlendOp.Apply(dstPtr, srcPtr, dstPtr, roi.Width);
+                        _screenBlendOp.Apply(dstPtr, srcPtr, dstPtr, roi.Width);
                     }
                 }
             }

@@ -17,24 +17,24 @@ namespace PaintFx.Effects
     {
         sealed class FExtentKey
         {
-            private int srcLength;
-            private int weightsLength;
+            int _srcLength;
+            int _weightsLength;
 
             public override int GetHashCode()
             {
-                return unchecked(srcLength + (weightsLength << 16));
+                return unchecked(_srcLength + (_weightsLength << 16));
             }
 
             public override bool Equals(object obj)
             {
                 FExtentKey fek = (FExtentKey)obj;
-                return srcLength == fek.srcLength && weightsLength == fek.weightsLength;
+                return _srcLength == fek._srcLength && _weightsLength == fek._weightsLength;
             }
 
             public FExtentKey(int srcLength, int weightsLength)
             {
-                this.srcLength = srcLength;
-                this.weightsLength = weightsLength;
+                _srcLength = srcLength;
+                _weightsLength = weightsLength;
             }
         }
 
@@ -44,17 +44,17 @@ namespace PaintFx.Effects
             public int[] fEnds;
         }
 
-        static Dictionary<FExtentKey, FExtent> fCache = new Dictionary<FExtentKey, FExtent>();
-        static Queue<FExtentKey> fCacheQ = new Queue<FExtentKey>();
+        static Dictionary<FExtentKey, FExtent> s_fCache = new Dictionary<FExtentKey, FExtent>();
+        static Queue<FExtentKey> s_fCacheQ = new Queue<FExtentKey>();
 
         static FExtent GetFExtent(int srcLength, int weightsLength)
         {
             FExtentKey key = new FExtentKey(srcLength, weightsLength);
 
             FExtent extent;
-            lock (fCache)
+            lock (s_fCache)
             {
-                extent = (FExtent)fCache[key];
+                extent = (FExtent)s_fCache[key];
             }
 
             int fOffset = -weightsLength / 2;
@@ -91,16 +91,16 @@ namespace PaintFx.Effects
                     }
                 }
 
-                lock (fCache)
+                lock (s_fCache)
                 {
-                    if (fCache.Count > 16)
+                    if (s_fCache.Count > 16)
                     {
-                        FExtentKey top = fCacheQ.Dequeue();
-                        fCache.Remove(top);
+                        FExtentKey top = s_fCacheQ.Dequeue();
+                        s_fCache.Remove(top);
                     }
 
-                    fCache[key] = extent;
-                    fCacheQ.Enqueue(key);
+                    s_fCache[key] = extent;
+                    s_fCacheQ.Enqueue(key);
                 }
             }
 

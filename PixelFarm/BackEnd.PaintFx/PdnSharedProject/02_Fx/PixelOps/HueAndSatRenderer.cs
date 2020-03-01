@@ -11,37 +11,37 @@
 
 using PixelFarm.Drawing;
 namespace PaintFx.Effects
-{   
+{
     public class HueAndSatRenderer : EffectRendererBase
     {
-        private int hue;
-        private int saturation;
-        private int lightness;
-        private UnaryPixelOp pixelOp;
+        int _hue;
+        int _saturation;
+        int _lightness;
+        UnaryPixelOp _pixelOp;
         public void SetParameters(int hue, int sat, int lightness)
         {
-            this.hue = hue;
-            this.saturation = sat;
-            this.lightness = lightness;
+            _hue = hue;
+            _saturation = sat;
+            _lightness = lightness;
 
             // map the range [0,100] -> [0,100] and the range [101,200] -> [103,400]
-            if (this.saturation > 100)
+            if (_saturation > 100)
             {
-                this.saturation = ((this.saturation - 100) * 3) + 100;
+                _saturation = ((_saturation - 100) * 3) + 100;
             }
 
-            if (this.hue == 0 && this.saturation == 100 && this.lightness == 0)
+            if (_hue == 0 && _saturation == 100 && _lightness == 0)
             {
-                this.pixelOp = new UnaryPixelOps.Identity();
+                _pixelOp = new UnaryPixelOps.Identity();
             }
             else
             {
-                this.pixelOp = new UnaryPixelOps.HueSaturationLightness(this.hue, this.saturation, this.lightness);
+                _pixelOp = new UnaryPixelOps.HueSaturationLightness(_hue, _saturation, _lightness);
             }
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int start, int len)
         {
-            this.pixelOp.Apply(dst, src, rois, start, len);
+            _pixelOp.Apply(dst, src, rois, start, len);
         }
     }
 }

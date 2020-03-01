@@ -15,12 +15,7 @@ namespace PaintFx.Effects
 {
     public class GaussainBlurRenderer : EffectRendererBase
     {
-        private int radius;
-        public int Radius
-        {
-            get { return radius; }
-            set { radius = value; }
-        }
+        public int Radius { get; set; }
         public static int[] CreateGaussianBlurRow(int amount)
         {
             int size = 1 + (amount * 2);
@@ -40,7 +35,7 @@ namespace PaintFx.Effects
         {
             unsafe
             {
-                if (this.radius == 0)
+                if (this.Radius == 0)
                 {
                     for (int ri = startIndex; ri < startIndex + length; ++ri)
                     {
@@ -51,7 +46,7 @@ namespace PaintFx.Effects
                 }
 
 
-                int r = this.radius;
+                int r = this.Radius;
                 int[] w = CreateGaussianBlurRow(r);
                 int wlen = w.Length;
 

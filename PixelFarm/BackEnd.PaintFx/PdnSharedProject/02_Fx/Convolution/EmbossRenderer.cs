@@ -14,38 +14,37 @@ namespace PaintFx.Effects
 {
     public class EmbossRenderer : EffectRendererBase
     {
-        private double angle;
-        private double[][] weights;
-        public double Angle => angle;
+        double[][] _weights;
+        public double Angle { get; private set; }
 
         public void SetParameters(double angle)
         {
-            this.angle = angle;
+            this.Angle = angle;
             // adjust and convert angle to radians
-            double r = (double)this.angle * 2.0 * Math.PI / 360.0;
+            double r = (double)this.Angle * 2.0 * Math.PI / 360.0;
 
             // angle delta for each weight
             double dr = Math.PI / 4.0;
 
             // for r = 0 this builds an emboss filter pointing straight left
-            this.weights = new double[3][];
+            _weights = new double[3][];
 
             for (int i = 0; i < 3; ++i)
             {
-                this.weights[i] = new double[3];
+                _weights[i] = new double[3];
             }
 
-            this.weights[0][0] = Math.Cos(r + dr);
-            this.weights[0][1] = Math.Cos(r + 2.0 * dr);
-            this.weights[0][2] = Math.Cos(r + 3.0 * dr);
+            _weights[0][0] = Math.Cos(r + dr);
+            _weights[0][1] = Math.Cos(r + 2.0 * dr);
+            _weights[0][2] = Math.Cos(r + 3.0 * dr);
 
-            this.weights[1][0] = Math.Cos(r);
-            this.weights[1][1] = 0;
-            this.weights[1][2] = Math.Cos(r + 4.0 * dr);
+            _weights[1][0] = Math.Cos(r);
+            _weights[1][1] = 0;
+            _weights[1][2] = Math.Cos(r + 4.0 * dr);
 
-            this.weights[2][0] = Math.Cos(r - dr);
-            this.weights[2][1] = Math.Cos(r - 2.0 * dr);
-            this.weights[2][2] = Math.Cos(r - 3.0 * dr);
+            _weights[2][0] = Math.Cos(r - dr);
+            _weights[2][1] = Math.Cos(r - 2.0 * dr);
+            _weights[2][2] = Math.Cos(r - 3.0 * dr);
         }
         public override void Render(Surface src, Surface dst, Rectangle[] rois, int start, int len)
         {
@@ -97,7 +96,7 @@ namespace PaintFx.Effects
                             {
                                 for (int fx = fxStart; fx < fxEnd; ++fx)
                                 {
-                                    double weight = this.weights[fy][fx];
+                                    double weight = _weights[fy][fx];
                                     ColorBgra c = src.GetPointUnchecked(x - 1 + fx, y - 1 + fy);
                                     double intensity = (double)c.GetIntensityByte();
                                     sum += weight * intensity;

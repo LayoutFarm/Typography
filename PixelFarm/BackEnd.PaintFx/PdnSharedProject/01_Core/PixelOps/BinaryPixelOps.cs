@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 //MIT, 2017-present, WinterDev
-using System; 
+using System;
 namespace PaintFx
 {
     /// <summary>
@@ -24,8 +24,7 @@ namespace PaintFx
         /// <summary>
         /// F(lhs, rhs) = rhs.A + lhs.R,g,b
         /// </summary>
-        public class SetAlphaChannel
-            : BinaryPixelOp
+        public class SetAlphaChannel : BinaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra lhs, ColorBgra rhs)
             {
@@ -37,8 +36,7 @@ namespace PaintFx
         /// <summary>
         /// F(lhs, rhs) = lhs.R,g,b + rhs.A
         /// </summary>
-        public class SetColorChannels
-            : BinaryPixelOp
+        public class SetColorChannels : BinaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra lhs, ColorBgra rhs)
             {
@@ -51,8 +49,7 @@ namespace PaintFx
         /// result(lhs,rhs) = rhs
         /// </summary>
 
-        public class AssignFromRhs
-            : BinaryPixelOp
+        public class AssignFromRhs : BinaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra lhs, ColorBgra rhs)
             {
@@ -78,8 +75,7 @@ namespace PaintFx
         /// result(lhs,rhs) = lhs
         /// </summary>
 
-        public class AssignFromLhs
-            : BinaryPixelOp
+        public class AssignFromLhs : BinaryPixelOp
         {
             public override ColorBgra Apply(ColorBgra lhs, ColorBgra rhs)
             {
@@ -92,8 +88,7 @@ namespace PaintFx
         }
 
 
-        public class Swap
-            : BinaryPixelOp
+        public class Swap : BinaryPixelOp
         {
             BinaryPixelOp swapMyArgs;
 
