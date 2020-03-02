@@ -112,10 +112,12 @@ namespace LayoutFarm
             set => _txtServices.CurrentScriptLang = value;
         }
         //
-        public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, int[] outputGlyphAdvances, out int outputTotalW, out int outputLineHeight)
+        public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, RequestFont font, ref TextSpanMeasureResult measureResult)
         {
-            CalculateUserCharGlyphAdvancePos(ref textBufferSpan, this.BreakToLineSegments(ref textBufferSpan), font, outputGlyphAdvances, out outputTotalW, out outputLineHeight);
-
+            CalculateUserCharGlyphAdvancePos(ref textBufferSpan,
+                this.BreakToLineSegments(ref textBufferSpan),
+                font,
+                ref measureResult);
         }
         //
         ReusableTextBuffer _reusableTextBuffer = new ReusableTextBuffer();
@@ -123,7 +125,7 @@ namespace LayoutFarm
         public void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
             ILineSegmentList lineSegs,
             RequestFont font,
-            int[] outputUserInputCharAdvance, out int outputTotalW, out int lineHeight)
+            ref TextSpanMeasureResult measureResult)
         {
 
             //layout  
@@ -132,19 +134,21 @@ namespace LayoutFarm
             //  
             Typeface typeface = ResolveTypeface(font);
             _txtServices.SetCurrentFont(typeface, font.SizeInPoints);
-
-
             MyLineSegmentList mylineSegs = (MyLineSegmentList)lineSegs;
             float scale = typeface.CalculateScaleToPixelFromPointSize(font.SizeInPoints);
-            outputTotalW = 0;
+
             int j = mylineSegs.Count;
             int pos = 0; //start at 0
 
             _reusableTextBuffer.SetRawCharBuffer(textBufferSpan.GetRawCharBuffer());
 
+            short minOffsetY = 0;
+            short maxOffsetY = 0;
+            int outputTotalW = 0;
+            bool hasSomeExtraOffsetY = false;
+
             for (int i = 0; i < j; ++i)
             {
-
                 //get each segment
                 MyLineSegment lineSeg = (MyLineSegment)mylineSegs.GetSegment(i);
                 //each line seg may has different script lang
@@ -169,20 +173,36 @@ namespace LayoutFarm
                 for (int s = 0; s < seqLen; ++s)
                 {
                     UnscaledGlyphPlan glyphPlan = seq[s];
+                    if (glyphPlan.OffsetY != 0)
+                    {
+                        hasSomeExtraOffsetY = true;
+                        if (minOffsetY > glyphPlan.OffsetY)
+                        {
+                            minOffsetY = glyphPlan.OffsetY;
+                        }
+                        if (maxOffsetY < glyphPlan.OffsetY)
+                        {
+                            maxOffsetY = glyphPlan.OffsetY;
+                        }
 
-                    double actualAdvX = glyphPlan.AdvanceX;
+                    }
 
                     outputTotalW +=
-                        outputUserInputCharAdvance[pos + glyphPlan.input_cp_offset] +=
-                        (int)Math.Round(actualAdvX * scale);
+                                  measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale);
                 }
                 pos += lineSeg.Length;
             }
 
-            //
 
-            lineHeight = (int)Math.Round(typeface.CalculateMaxLineClipHeight() * scale);
+            measureResult.outputTotalW = outputTotalW;
+            measureResult.lineHeight = (ushort)Math.Round(typeface.CalculateMaxLineClipHeight() * scale);
 
+            if (hasSomeExtraOffsetY)
+            {
+                measureResult.hasSomeExtraOffsetY = true;
+                measureResult.minOffsetY = (short)Math.Round(minOffsetY * scale);
+                measureResult.maxOffsetY = (short)Math.Round(maxOffsetY * scale);
+            }
             _reusableTextBuffer.SetRawCharBuffer(null);
         }
 
