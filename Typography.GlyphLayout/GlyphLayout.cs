@@ -454,12 +454,12 @@ namespace Typography.TextLayout
             int finalGlyphCount = glyphPositions.Count;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
-                short offsetX, offsetY, advW;
+
                 ushort glyphIndex = glyphPositions.GetGlyph(i,
                     out ushort input_offset,
-                    out offsetX,
-                    out offsetY,
-                    out advW);
+                    out short offsetX,
+                    out short offsetY,
+                    out short advW);
                 //
                 outputGlyphPlanList.Append(new UnscaledGlyphPlan(
                     input_offset,
@@ -477,12 +477,11 @@ namespace Typography.TextLayout
             int finalGlyphCount = glyphPositions.Count;
             for (int i = 0; i < finalGlyphCount; ++i)
             {
-                short offsetX, offsetY, advW;
                 ushort glyphIndex = glyphPositions.GetGlyph(i,
                     out ushort input_offset,
-                    out offsetX,
-                    out offsetY,
-                    out advW);
+                    out short offsetX,
+                    out short offsetY,
+                    out short advW);
 
                 yield return new UnscaledGlyphPlan(
                     input_offset,
