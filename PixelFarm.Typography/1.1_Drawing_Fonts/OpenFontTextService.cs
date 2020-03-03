@@ -188,7 +188,7 @@ namespace LayoutFarm
                     }
 
                     outputTotalW +=
-                                  measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale);
+                          measureResult.outputXAdvances[pos + glyphPlan.input_cp_offset] += (int)Math.Round(glyphPlan.AdvanceX * scale);
                 }
                 pos += lineSeg.Length;
             }
@@ -199,9 +199,12 @@ namespace LayoutFarm
 
             if (hasSomeExtraOffsetY)
             {
-                measureResult.hasSomeExtraOffsetY = true;
                 measureResult.minOffsetY = (short)Math.Round(minOffsetY * scale);
                 measureResult.maxOffsetY = (short)Math.Round(maxOffsetY * scale);
+                if (measureResult.maxOffsetY != 0 || measureResult.minOffsetY != 0)
+                {
+                    measureResult.hasSomeExtraOffsetY = true;
+                }
             }
             _reusableTextBuffer.SetRawCharBuffer(null);
         }

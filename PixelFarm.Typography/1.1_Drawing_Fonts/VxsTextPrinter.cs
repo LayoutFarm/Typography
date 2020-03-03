@@ -324,8 +324,7 @@ namespace PixelFarm.Drawing
 
                         _painter.SetOrigin((float)Math.Round(left + snapToPx.ExactX), (float)Math.Floor(baseLine + snapToPx.ExactY));
 
-                        ushort colorLayerStart;
-                        if (colrTable.LayerIndices.TryGetValue(snapToPx.CurrentGlyphIndex, out colorLayerStart))
+                        if (colrTable.LayerIndices.TryGetValue(snapToPx.CurrentGlyphIndex, out ushort colorLayerStart))
                         {
                             //TODO: optimize this                        
                             //we found color info for this glyph 
