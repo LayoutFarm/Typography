@@ -64,9 +64,9 @@
             // 
             this.button1.Location = new System.Drawing.Point(678, 42);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(115, 44);
+            this.button1.Size = new System.Drawing.Size(197, 44);
             this.button1.TabIndex = 2;
-            this.button1.Text = "TestMsdfGen3";
+            this.button1.Text = "MultiGlyphSize,TestMsdfGen3";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 

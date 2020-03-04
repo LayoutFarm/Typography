@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-present, WinterDev
 //-----------------------------------  
 using System;
-using System.Collections.Generic; 
-using PixelFarm.Contours; 
+using System.Collections.Generic;
+using PixelFarm.Contours;
 namespace Typography.Rendering
 {
 
@@ -149,8 +149,7 @@ namespace Typography.Rendering
         }
         //---------------------------------------------------------------------
 
-        public static GlyphImage CreateMsdfImage(
-             ContourBuilder glyphToContour, MsdfGenParams genParams)
+        public static GlyphImage CreateMsdfImage(ContourBuilder glyphToContour, MsdfGenParams genParams)
         {
             // create msdf shape , then convert to actual image
             return CreateMsdfImage(CreateMsdfShape(glyphToContour, genParams.shapeScale), genParams);
