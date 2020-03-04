@@ -624,8 +624,8 @@ namespace ExtMsdfGen
                     //we save to msdf_shape_lut2.png
                     //and check it from external program
                     //but we generate msdf bitmap from msdf_shape_lut.png 
-                    bmpLut.SaveImage("d:\\WImageTest\\msdf_shape_lut2.png");//intern
-                    var bmp5 = MemBitmap.LoadBitmap("d:\\WImageTest\\msdf_shape_lut2.png");
+                    bmpLut.SaveImage("msdf_shape_lut2.png");//intern
+                    var bmp5 = MemBitmap.LoadBitmap("msdf_shape_lut2.png");
                     int[] lutBuffer5 = bmp5.CopyImgBuffer(bmpLut.Width, bmpLut.Height);
                     if (bmpLut.Width == 338 && bmpLut.Height == 477)
                     {
@@ -635,7 +635,7 @@ namespace ExtMsdfGen
                     //generate actual sprite
                     SpriteTextureMapData<MemBitmap> spriteTextureMapData = MsdfGlyphGen.CreateMsdfImage(shape, MsdfGenParams, edgeBmpLut);
                     //save msdf bitmap to file              
-                    spriteTextureMapData.Source.SaveImage("d:\\WImageTest\\msdf_shape.png");
+                    spriteTextureMapData.Source.SaveImage("msdf_shape.png");
                     return spriteTextureMapData;
                 }
 
@@ -809,8 +809,8 @@ namespace ExtMsdfGen
         //                    //we save to msdf_shape_lut2.png
         //                    //and check it from external program
         //                    //but we generate msdf bitmap from msdf_shape_lut.png 
-        //                    bmpLut.SaveImage("d:\\WImageTest\\msdf_shape_lut2.png");//intern
-        //                    var bmp5 = MemBitmap.LoadBitmap("d:\\WImageTest\\msdf_shape_lut2.png");
+        //                    bmpLut.SaveImage("msdf_shape_lut2.png");//intern
+        //                    var bmp5 = MemBitmap.LoadBitmap("msdf_shape_lut2.png");
         //                    int[] lutBuffer5 = bmp5.CopyImgBuffer(bmpLut.Width, bmpLut.Height);
         //                    if (bmpLut.Width == 338 && bmpLut.Height == 477)
         //                    {
@@ -820,7 +820,7 @@ namespace ExtMsdfGen
         //                    //generate actual sprite
         //                    SpriteTextureMapData<MemBitmap> spriteTextureMapData = MsdfGlyphGen.CreateMsdfImage(shape, MsdfGenParams, edgeBmpLut);
         //                    //save msdf bitmap to file              
-        //                    spriteTextureMapData.Source.SaveImage("d:\\WImageTest\\msdf_shape.png");
+        //                    spriteTextureMapData.Source.SaveImage(msdf_shape.png");
         //                    return spriteTextureMapData;
         //                }
 

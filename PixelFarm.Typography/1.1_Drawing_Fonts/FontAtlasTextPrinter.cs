@@ -285,7 +285,7 @@ namespace PixelFarm.Drawing.Fonts
 
 
 #if DEBUG
-                //_alphaBmp.SaveImage("d:\\WImageTest\\alpha_0.png");
+                //_alphaBmp.SaveImage("alpha_0.png");
 #endif
 
                 _painter.UseSubPixelLcdEffect = false; //***
@@ -309,7 +309,7 @@ namespace PixelFarm.Drawing.Fonts
                             _painter.FillRect(gx + 1, gy, srcW, srcH);
 
 #if DEBUG
-                            //  _painter.RenderSurface.DestBitmap.SaveImage("d:\\WImageTest\\alpha_2.png");
+                            //  _painter.RenderSurface.DestBitmap.SaveImage("alpha_2.png");
 #endif
 
                         }

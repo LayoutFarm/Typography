@@ -528,7 +528,7 @@ namespace SampleWinForms
             //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
             //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
             //    bmp.UnlockBits(bmpdata);
-            //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
+            //    bmp.Save("a001_xn2_" + n + ".png");
             //}
 
             if (_contourAnalysisOpts.ShowGrid)
@@ -767,7 +767,7 @@ namespace SampleWinForms
             //    totalGlyphsImg.GetImageBuffer(),
             //    totalGlyphsImg.Width * 4,
             //    totalGlyphsImg.Width, totalGlyphsImg.Height,
-            //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
+            //    "total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
             ////save image to cache
             //SaveImgBufferToFile(totalGlyphsImg, fontTextureImg);
 #endif

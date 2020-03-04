@@ -39,7 +39,7 @@ namespace SampleWinForms
                 18,
                 0,
                 100,
-                "d:\\WImageTest\\sample_msdf.png");
+                "sample_msdf.png");
             //---------------------------------------------------------
             //2. for debug, create from some unicode chars
             //
@@ -47,7 +47,7 @@ namespace SampleWinForms
             //   sampleFontFile,
             //   18,
             //  new char[] { 'I' },
-            //  "d:\\WImageTest\\sample_msdf.png");
+            //  "sample_msdf.png");
             //---------------------------------------------------------
             ////3.
             //GlyphTranslatorToContour tx = new GlyphTranslatorToContour();
@@ -127,7 +127,7 @@ namespace SampleWinForms
                         var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
                         System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
                         bmp.UnlockBits(bmpdata);
-                        bmp.Save("d:\\WImageTest\\a001_xn2_" + gindex + ".png");
+                        bmp.Save("a001_xn2_" + gindex + ".png");
                     }
                 }
 
@@ -143,7 +143,7 @@ namespace SampleWinForms
                     bmp.Save(outputFile);
                 }
 
-                string saveToFile = "d:\\WImageTest\\a_info.bin";
+                string saveToFile = "a_info.bin";
                 using (System.IO.FileStream saveFs = new FileStream(saveToFile, FileMode.Create))
                 {
                     atlasBuilder.SaveFontInfo(saveFs);
@@ -217,7 +217,7 @@ namespace SampleWinForms
                 var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
                 System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
                 bmp.UnlockBits(bmpdata);
-                bmp.Save("d:\\WImageTest\\msdf_shape.png");
+                bmp.Save("msdf_shape.png");
                 //
             }
 

@@ -500,7 +500,7 @@ namespace PixelFarm.CpuBlit.Imaging
                 //outputBuffer, 0,
                 //bmpdata2.Scan0, outputBuffer.Length);
                 //outputbmp.UnlockBits(bmpdata2);
-                ////outputbmp.Save("d:\\WImageTest\\n_lion_bicubic.png");
+                ////outputbmp.Save("n_lion_bicubic.png");
                 //return outputbmp;
                 return destCB;
             }
