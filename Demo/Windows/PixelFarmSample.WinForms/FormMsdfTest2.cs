@@ -28,7 +28,7 @@ namespace SampleWinForms
 
         }
 
-        private void cmdTestMsdfGen_Click(object sender, EventArgs e)
+        private void cmdGenMsdfGlyphAtlas_Click(object sender, EventArgs e)
         {
 
             //samples...

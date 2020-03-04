@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.cmdTestMsdfGen = new System.Windows.Forms.Button();
+            this.cmdGenMsdfGlyphAtlas = new System.Windows.Forms.Button();
             this.cmdTestMsdfGen2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.lstFontFiles = new System.Windows.Forms.ListBox();
@@ -40,15 +40,15 @@
             this.txtGlyphIndexStop = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
-            // cmdTestMsdfGen
+            // cmdGenMsdfGlyphAtlas
             // 
-            this.cmdTestMsdfGen.Location = new System.Drawing.Point(236, 123);
-            this.cmdTestMsdfGen.Name = "cmdTestMsdfGen";
-            this.cmdTestMsdfGen.Size = new System.Drawing.Size(115, 44);
-            this.cmdTestMsdfGen.TabIndex = 0;
-            this.cmdTestMsdfGen.Text = "TestMsdfGen";
-            this.cmdTestMsdfGen.UseVisualStyleBackColor = true;
-            this.cmdTestMsdfGen.Click += new System.EventHandler(this.cmdTestMsdfGen_Click);
+            this.cmdGenMsdfGlyphAtlas.Location = new System.Drawing.Point(236, 123);
+            this.cmdGenMsdfGlyphAtlas.Name = "cmdGenMsdfGlyphAtlas";
+            this.cmdGenMsdfGlyphAtlas.Size = new System.Drawing.Size(171, 44);
+            this.cmdGenMsdfGlyphAtlas.TabIndex = 0;
+            this.cmdGenMsdfGlyphAtlas.Text = "Gen Msdf Glyph Atlas";
+            this.cmdGenMsdfGlyphAtlas.UseVisualStyleBackColor = true;
+            this.cmdGenMsdfGlyphAtlas.Click += new System.EventHandler(this.cmdGenMsdfGlyphAtlas_Click);
             // 
             // cmdTestMsdfGen2
             // 
@@ -143,7 +143,7 @@
             this.Controls.Add(this.lstFontFiles);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.cmdTestMsdfGen2);
-            this.Controls.Add(this.cmdTestMsdfGen);
+            this.Controls.Add(this.cmdGenMsdfGlyphAtlas);
             this.Name = "FormMsdfTest2";
             this.Text = "FormMsdfTest2";
             this.Load += new System.EventHandler(this.FormMsdfTest2_Load);
@@ -154,7 +154,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button cmdTestMsdfGen;
+        private System.Windows.Forms.Button cmdGenMsdfGlyphAtlas;
         private System.Windows.Forms.Button cmdTestMsdfGen2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListBox lstFontFiles;
