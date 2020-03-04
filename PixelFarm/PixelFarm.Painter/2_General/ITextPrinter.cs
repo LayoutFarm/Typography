@@ -58,15 +58,23 @@ namespace PixelFarm.Drawing
         void MeasureString(ref TextBufferSpan textBufferSpan, RequestFont font, int maxWidth, out int charFit, out int charFitWidth);
 
         void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan,
-            RequestFont font,
-            int[] outputXAdvances,
-            out int outputTotalW,
-            out int lineHeight);
-
+                RequestFont font,
+                ref TextSpanMeasureResult result);
         void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
-            RequestFont font, int[] outputXAdvances, out int outputTotalW, out int lineHeight);
+                RequestFont font, 
+                ref TextSpanMeasureResult result);
     }
 
+    public struct TextSpanMeasureResult
+    {
+        public int[] outputXAdvances;
+        public int outputTotalW;
+        public ushort lineHeight;
+
+        public bool hasSomeExtraOffsetY;
+        public short minOffsetY;
+        public short maxOffsetY;
+    }
 
 
     /// <summary>
@@ -94,7 +102,7 @@ namespace PixelFarm.Drawing
         void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
     }
 
-   
+
     public static class ITextPrinterExtensions
     {
         public static void DrawString(this ITextPrinter textPrinter, string text, double left, double top)
