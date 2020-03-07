@@ -97,10 +97,6 @@ namespace SampleWinForms
         void BuildAtlas_FromInputChars()
         {
 
-            GlyphImage totalGlyphsImg = null;
-            SimpleFontAtlasBuilder atlasBuilder = null;
-            var glyphTextureGen = new GlyphTextureBitmapGenerator();
-
             if (!float.TryParse(txtSelectedFontSize.Text, out float fontSizeInPoints))
             {
                 MessageBox.Show("err: selected font size " + txtSelectedFontSize.Text);
@@ -108,35 +104,31 @@ namespace SampleWinForms
             }
 
 
-            glyphTextureGen.CreateTextureFontFromInputChars(
+            //1. create glyph-texture-bitmap generator
+            var glyphTextureGen = new GlyphTextureBitmapGenerator();
+
+            //2. generate the glyphs
+            SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromInputChars(
                _typeface,
                fontSizeInPoints,
-              (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
-               GetUniqueChars(),
-               (glyphIndex, glyphImage, outputAtlasBuilder) =>
-               {
-                   if (outputAtlasBuilder != null)
-                   {
-                       //finish
-                       atlasBuilder = outputAtlasBuilder;
-                   }
-               }
+               (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
+               GetUniqueChars()
             );
 
             atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
-            //
-            totalGlyphsImg = atlasBuilder.BuildSingleImage();
+
+
+            //3. merge all glyph in the builder into a single image
+            GlyphImage totalGlyphsImg = atlasBuilder.BuildSingleImage();
             string fontTextureImg = "test_glyph_atlas.png";
 
-            //create atlas
-            SimpleFontAtlas fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
-            fontAtlas.TotalGlyph = totalGlyphsImg;
-            //copy to Gdi+ and save
-            //TODO: use helper method
-
-            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
-
+            //4. save to png
             SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, fontTextureImg);
+            //-----------------------------------------------
+            
+            
+            //let view result...
+            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);           
 
             this.lblOutput.Text = "output: " + fontTextureImg;
             this.picOutput.Image = new Bitmap(fontTextureImg);
@@ -173,20 +165,18 @@ namespace SampleWinForms
         void BuiltAtlas_FromUserOptions()
         {
 
-            //we can create font atlas by specific script-langs
+            //we can create font atlas by specific script-langs  
+            //-------------------------------------------------------------------------------
 
-            GlyphImage totalGlyphsImg = null;
-            SimpleFontAtlasBuilder atlasBuilder = null;
-            var glyphTextureGen = new GlyphTextureBitmapGenerator();
-            //
+            //setting...
             Typeface typeface = _typeface;
-
             if (!float.TryParse(txtSelectedFontSize.Text, out float fontSizeInPoints))
             {
                 MessageBox.Show("err: selected font size " + txtSelectedFontSize.Text);
                 return;
             }
 
+            //create request font, indeed we need its 'FontKey'
             PixelFarm.Drawing.RequestFont reqFont = new PixelFarm.Drawing.RequestFont(
                 typeface.Name,
                 fontSizeInPoints,
@@ -194,16 +184,17 @@ namespace SampleWinForms
                 );
 
 
-            //user may want only some scripts lang (not entire font)
-            //so we specific 
+            //user may want only some script lang (not all script in the font)            
+            //and each script user may want different glyph-gen technique.
+            //so we use GlyphTextureBuildDetail to describe that information.
 
-            List<GlyphTextureBuildDetail> buildDetails1 = new List<GlyphTextureBuildDetail>();
+            List<GlyphTextureBuildDetail> buildDetails = new List<GlyphTextureBuildDetail>();
 
             foreach (UIFontScriptOpt scriptLangUI in _availableScripts)
             {
                 if (scriptLangUI.Selected)
                 {
-                    buildDetails1.Add(new GlyphTextureBuildDetail()
+                    buildDetails.Add(new GlyphTextureBuildDetail()
                     {
                         ScriptLang = scriptLangUI.ScriptLang,
                         DoFilter = scriptLangUI.DoFilter,
@@ -212,55 +203,54 @@ namespace SampleWinForms
                 }
             }
 
-            if (buildDetails1.Count == 0)
+            if (buildDetails.Count == 0)
             {
                 MessageBox.Show("please select some script");
                 return;
             }
 
+            //-------------------------------------------------------------------------------
 
-            GlyphTextureBuildDetail[] buildDetails = buildDetails1.ToArray();
 
-            glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
+            //1. create glyph-texture-bitmap generator
+            var glyphTextureGen = new GlyphTextureBitmapGenerator();
+
+            //2. generate the glyphs
+            SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
                 fontSizeInPoints,
                 (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
-                buildDetails,
-                (glyphIndex, glyphImage, outputAtlasBuilder) =>
-                {
-                    if (outputAtlasBuilder != null)
-                    {
-                        //finish
-                        atlasBuilder = outputAtlasBuilder;
-                    }
-                });
-
+                buildDetails.ToArray());
 
             atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
-            totalGlyphsImg = atlasBuilder.BuildSingleImage();
-
-
-
             atlasBuilder.FontFilename = typeface.Name;
             atlasBuilder.FontKey = reqFont.FontKey;
 
+            //3. merge all glyph in the builder into a single image
+            GlyphImage totalGlyphsImg = atlasBuilder.BuildSingleImage();
+
+
             string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
-
-            using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
-            {
-                atlasBuilder.SaveFontInfo(fs);
-            }
-
             string output_imgFilename = textureName + ".png";
 
-            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
+            //4. save atlas info to disk
+            using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
+            {
+                atlasBuilder.SaveAtlasInfo(fs);
+            }
 
+            //5. save total-glyph-image to disk
             SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, output_imgFilename);
+
+
+            ///------------------------------------------------
+            //lets view result ...
+
+            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
 
             uiFontAtlasFileViewer1.LoadFontAtlasFile(textureName + ".info", textureName + ".png");
 
             this.picOutput.Image = new Bitmap(output_imgFilename);
             this.lblOutput.Text = "Output: " + output_imgFilename;
-
 
             ////read .info back and convert to base64
             //byte[] atlas_info_content = File.ReadAllBytes(textureName + ".info");

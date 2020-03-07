@@ -182,7 +182,7 @@ namespace SampleWinForms
             string saveToFile = "a_info.bin";
             using (System.IO.FileStream saveFs = new FileStream(saveToFile, FileMode.Create))
             {
-                atlasBuilder.SaveFontInfo(saveFs);
+                atlasBuilder.SaveAtlasInfo(saveFs);
                 saveFs.Flush();
                 saveFs.Close();
             }

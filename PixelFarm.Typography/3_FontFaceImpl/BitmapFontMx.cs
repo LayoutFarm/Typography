@@ -270,27 +270,19 @@ namespace Typography.Rendering
                                 throw ex;
                             }
                         }
-                    } 
+                    }
 
                 }
                 else
                 {
                     GlyphImage totalGlyphsImg = null;
-                    SimpleFontAtlasBuilder atlasBuilder = null;
+
                     var glyphTextureGen = new GlyphTextureBitmapGenerator();
-                    glyphTextureGen.CreateTextureFontFromBuildDetail(
+                    SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(
                         resolvedTypeface,
                         reqFont.SizeInPoints,
                         TextureKindForNewFont,
-                       GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont, false, false),
-                       (glyphIndex, glyphImage, outputAtlasBuilder) =>
-                        {
-                            if (outputAtlasBuilder != null)
-                            {
-                                //finish
-                                atlasBuilder = outputAtlasBuilder;
-                            }
-                        }
+                        GlyphTextureCustomConfigs.TryGetGlyphTextureBuildDetail(reqFont, false, false)
                     );
 
                     atlasBuilder.FontFilename = reqFont.Name;//TODO: review here, check if we need 'filename' or 'fontname'
@@ -345,7 +337,7 @@ namespace Typography.Rendering
                     //save font info to cache
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
                     {
-                        atlasBuilder.SaveFontInfo(ms);
+                        atlasBuilder.SaveAtlasInfo(ms);
                         //System.IO.File.WriteAllBytes(fontTextureInfoFile, ms.ToArray());
                         StorageService.Provider.SaveData(fontTextureInfoFile, ms.ToArray());
 #if DEBUG
