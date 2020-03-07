@@ -689,7 +689,7 @@ namespace Typography.OpenFont
                 return scriptLang;
             }
         }
-        public static bool TryGenUnicodeLangBitsArray(string langShortName, out UnicodeLangBits[] unicodeLangBits)
+        public static bool TryGetUnicodeLangBitsArray(string langShortName, out UnicodeLangBits[] unicodeLangBits)
         {
             return s_registeredScriptTagsToUnicodeLangBits.TryGetValue(langShortName, out unicodeLangBits);
         }
