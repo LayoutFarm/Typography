@@ -57,12 +57,8 @@ namespace SampleWinForms
 
         void LoadAtlasImgFile(string atlasImgFile)
         {
-            using (var bmp1 = new Bitmap(atlasImgFile))
-            {
-                bmp1.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                _atlasBmp = new Bitmap(bmp1);
-            }
 
+            _atlasBmp = new Bitmap(atlasImgFile);
             SimpleUtils.DisposeExistingPictureBoxImage(pictureBox1);
             pictureBox1.Image = _atlasBmp;
         }
@@ -92,12 +88,19 @@ namespace SampleWinForms
                 TreeNode atlasNode = new TreeNode();
                 atlasNode.Text = fontAtlas.FontFilename + ", count=" + fontAtlas.GlyphDic.Count;
 
-                treeView1.Nodes.Add(atlasNode);
-                //
+                treeView1.Nodes.Add(atlasNode); 
+
+                List<TempGlyphMap> tmpGlyphMaps = new List<TempGlyphMap>(fontAtlas.GlyphDic.Count);
                 foreach (var kv in fontAtlas.GlyphDic)
                 {
+                    tmpGlyphMaps.Add(new TempGlyphMap { glyphIndex = kv.Key, glyphMap = kv.Value });
+                }
+                tmpGlyphMaps.Sort((a, b) => a.glyphIndex.CompareTo(b.glyphIndex));
+
+                foreach (TempGlyphMap tmpGlyphMap in tmpGlyphMaps)
+                {
                     TreeNode glyphMapNode = new TreeNode();
-                    glyphMapNode.Tag = new TempGlyphMap { glyphIndex = kv.Key, glyphMap = kv.Value };
+                    glyphMapNode.Tag = tmpGlyphMap;
                     glyphMapNode.Text = glyphMapNode.Tag.ToString();
                     atlasNode.Nodes.Add(glyphMapNode);
                 }
