@@ -150,6 +150,7 @@ namespace PixelFarm.Drawing.Fonts
                     //create picture with unscaled version set scale=-1
                     //(we will create glyph contours and analyze them)
                     outlineBuilder.BuildFromGlyphIndex(gindex, -1);
+
                     var glyphToContour = new ContourBuilder();
                     outlineBuilder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
 
