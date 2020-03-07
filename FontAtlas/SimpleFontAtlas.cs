@@ -54,7 +54,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             return true;
         }
-
+        public Dictionary<ushort, TextureGlyphMapData> GlyphDic => _glyphLocations;
 
         public static Dictionary<ushort, TextureGlyphMapData> CloneLocationWithOffset(SimpleFontAtlas org, int dx, int dy)
         {
