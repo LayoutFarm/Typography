@@ -124,9 +124,9 @@
             // 
             // cmdTestFontAtlas
             // 
-            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1266, 387);
+            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1126, 387);
             this.cmdTestFontAtlas.Name = "cmdTestFontAtlas";
-            this.cmdTestFontAtlas.Size = new System.Drawing.Size(121, 53);
+            this.cmdTestFontAtlas.Size = new System.Drawing.Size(134, 53);
             this.cmdTestFontAtlas.TabIndex = 73;
             this.cmdTestFontAtlas.Text = "Goto TestFontAtlas ...";
             this.cmdTestFontAtlas.UseVisualStyleBackColor = true;
