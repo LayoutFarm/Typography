@@ -12,11 +12,7 @@ namespace Typography.TextBreak
     {
         //read from original ICU's dictionary
         //.. 
-        public string DataDir
-        {
-            get;
-            set;
-        }
+        public string DataDir { get; set; }
         public override IEnumerable<string> GetSortedUniqueWordList(string dicName)
         {
             //user can provide their own data 

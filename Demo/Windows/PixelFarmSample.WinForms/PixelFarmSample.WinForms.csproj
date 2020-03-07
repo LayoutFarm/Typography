@@ -49,6 +49,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormFontAtlas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormFontAtlas.Designer.cs">
+      <DependentUpon>FormFontAtlas.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMsdfTest2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -62,6 +68,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormFontAtlas.resx">
+      <DependentUpon>FormFontAtlas.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMsdfTest2.resx">
       <DependentUpon>FormMsdfTest2.cs</DependentUpon>
@@ -78,6 +87,10 @@
     </Compile>
     <None Include="..\TestFonts\latinmodern-math.otf">
       <Link>Test\latinmodern-math.otf</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\TestFonts\Sarabun-Regular.woff">
+      <Link>Test\Sarabun-Regular.woff</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\TestFonts\SourceSansPro-Regular.ttf">
