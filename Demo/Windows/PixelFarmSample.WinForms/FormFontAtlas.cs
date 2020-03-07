@@ -20,7 +20,7 @@ namespace SampleWinForms
     {
         Typeface _typeface;
 
-        List<CustomUIFontScriptOpt> _availableScripts = new List<CustomUIFontScriptOpt>();
+        List<UIFontScriptOpt> _availableScripts = new List<UIFontScriptOpt>();
         public FormFontAtlas()
         {
             InitializeComponent();
@@ -51,7 +51,7 @@ namespace SampleWinForms
                         if (typeface.DoesSupportUnicode(unicodeLang))
                         {
                             //
-                            CustomUIFontScriptOpt customUIFontScript = new CustomUIFontScriptOpt();
+                            UIFontScriptOpt customUIFontScript = new UIFontScriptOpt();
                             customUIFontScript.SetInfo(scriptLang, unicodeLang);
                             _availableScripts.Add(customUIFontScript);
 
@@ -210,7 +210,7 @@ namespace SampleWinForms
 
             List<GlyphTextureBuildDetail> buildDetails1 = new List<GlyphTextureBuildDetail>();
 
-            foreach (CustomUIFontScriptOpt scriptLangUI in _availableScripts)
+            foreach (UIFontScriptOpt scriptLangUI in _availableScripts)
             {
                 if (scriptLangUI.Selected)
                 {
