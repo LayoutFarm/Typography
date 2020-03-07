@@ -224,11 +224,9 @@ namespace Typography.Rendering
             //6. generate final output
             //TODO: rename GlyphImage to another name to distinquist
             //between small glyph and a large one
-            return PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, totalBufferFlipY);
-            //GlyphImage glyphImage = new GlyphImage(totalImgWidth, imgH);
-            //glyphImage.SetImageBuffer(totalBufferFlipY, true);
-            //_latestGenGlyphImage = glyphImage;
-            //return glyphImage;
+
+            return _latestGenGlyphImage = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, totalBufferFlipY);
+
         }
         public void SaveAtlasInfo(System.IO.Stream outputStream)
         {
