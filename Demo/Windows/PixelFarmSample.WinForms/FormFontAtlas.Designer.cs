@@ -38,12 +38,14 @@
             this.txtSelectedFontSize = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cmbTextureKind = new System.Windows.Forms.ComboBox();
+            this.chkShowAtlasViewer = new System.Windows.Forms.CheckBox();
+            this.uiFontAtlasFileViewer1 = new SampleWinForms.UIFontAtlasFileViewer();
             ((System.ComponentModel.ISupportInitialize)(this.picOutput)).BeginInit();
             this.SuspendLayout();
             // 
             // txtSampleChars
             // 
-            this.txtSampleChars.Location = new System.Drawing.Point(17, 683);
+            this.txtSampleChars.Location = new System.Drawing.Point(511, 12);
             this.txtSampleChars.Name = "txtSampleChars";
             this.txtSampleChars.Size = new System.Drawing.Size(119, 20);
             this.txtSampleChars.TabIndex = 75;
@@ -51,7 +53,7 @@
             // 
             // cmdBuildAtlasFromText
             // 
-            this.cmdBuildAtlasFromText.Location = new System.Drawing.Point(142, 681);
+            this.cmdBuildAtlasFromText.Location = new System.Drawing.Point(636, 10);
             this.cmdBuildAtlasFromText.Name = "cmdBuildAtlasFromText";
             this.cmdBuildAtlasFromText.Size = new System.Drawing.Size(111, 23);
             this.cmdBuildAtlasFromText.TabIndex = 76;
@@ -130,11 +132,31 @@
             this.cmbTextureKind.Size = new System.Drawing.Size(157, 21);
             this.cmbTextureKind.TabIndex = 84;
             // 
+            // chkShowAtlasViewer
+            // 
+            this.chkShowAtlasViewer.AutoSize = true;
+            this.chkShowAtlasViewer.Location = new System.Drawing.Point(331, 681);
+            this.chkShowAtlasViewer.Name = "chkShowAtlasViewer";
+            this.chkShowAtlasViewer.Size = new System.Drawing.Size(114, 17);
+            this.chkShowAtlasViewer.TabIndex = 85;
+            this.chkShowAtlasViewer.Text = "Show Atlas Viewer";
+            this.chkShowAtlasViewer.UseVisualStyleBackColor = true;
+            this.chkShowAtlasViewer.CheckedChanged += new System.EventHandler(this.chkShowAtlasViewer_CheckedChanged);
+            // 
+            // uiFontAtlasFileViewer1
+            // 
+            this.uiFontAtlasFileViewer1.Location = new System.Drawing.Point(11, 10);
+            this.uiFontAtlasFileViewer1.Name = "uiFontAtlasFileViewer1";
+            this.uiFontAtlasFileViewer1.Size = new System.Drawing.Size(1152, 667);
+            this.uiFontAtlasFileViewer1.TabIndex = 86;
+            this.uiFontAtlasFileViewer1.Visible = false;
+            // 
             // FormFontAtlas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1163, 727);
+            this.Controls.Add(this.chkShowAtlasViewer);
             this.Controls.Add(this.cmbTextureKind);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtSelectedFontSize);
@@ -145,6 +167,7 @@
             this.Controls.Add(this.picOutput);
             this.Controls.Add(this.cmdBuildAtlasFromText);
             this.Controls.Add(this.txtSampleChars);
+            this.Controls.Add(this.uiFontAtlasFileViewer1);
             this.Name = "FormFontAtlas";
             this.Text = "FormFontAtlas";
             this.Load += new System.EventHandler(this.FormFontAtlas_Load);
@@ -166,5 +189,7 @@
         private System.Windows.Forms.TextBox txtSelectedFontSize;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox cmbTextureKind;
+        private System.Windows.Forms.CheckBox chkShowAtlasViewer;
+        private UIFontAtlasFileViewer uiFontAtlasFileViewer1;
     }
 }

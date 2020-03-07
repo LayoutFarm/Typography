@@ -32,6 +32,7 @@
             this.chkSelected = new System.Windows.Forms.CheckBox();
             this.chkDoFilter = new System.Windows.Forms.CheckBox();
             this.cmbHintTech = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -65,21 +66,31 @@
             // cmbHintTech
             // 
             this.cmbHintTech.FormattingEnabled = true;
-            this.cmbHintTech.Location = new System.Drawing.Point(77, 29);
+            this.cmbHintTech.Location = new System.Drawing.Point(118, 29);
             this.cmbHintTech.Name = "cmbHintTech";
             this.cmbHintTech.Size = new System.Drawing.Size(171, 21);
             this.cmbHintTech.TabIndex = 3;
             // 
-            // CustomUIFontScriptOpt
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(77, 29);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(29, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Hint:";
+            // 
+            // UIFontScriptOpt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.cmbHintTech);
             this.Controls.Add(this.chkDoFilter);
             this.Controls.Add(this.chkSelected);
             this.Controls.Add(this.label1);
-            this.Name = "CustomUIFontScriptOpt";
-            this.Size = new System.Drawing.Size(275, 64);
+            this.Name = "UIFontScriptOpt";
+            this.Size = new System.Drawing.Size(383, 64);
             this.Load += new System.EventHandler(this.CustomUIFontScriptOpt_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -92,5 +103,6 @@
         private System.Windows.Forms.CheckBox chkSelected;
         private System.Windows.Forms.CheckBox chkDoFilter;
         private System.Windows.Forms.ComboBox cmbHintTech;
+        private System.Windows.Forms.Label label2;
     }
 }

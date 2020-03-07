@@ -41,11 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomUIFontScriptOpt.cs">
+    <Compile Include="UIFontScriptOpt.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="CustomUIFontScriptOpt.Designer.cs">
-      <DependentUpon>CustomUIFontScriptOpt.cs</DependentUpon>
+    <Compile Include="UIFontScriptOpt.Designer.cs">
+      <DependentUpon>UIFontScriptOpt.cs</DependentUpon>
     </Compile>
     <Compile Include="DebugGlyphVisualizer.cs" />
     <Compile Include="DebugGlyphVisualizerInfoView.cs" />
@@ -72,8 +72,18 @@
     <Compile Include="PixelFarm\GdiBitmapIO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="CustomUIFontScriptOpt.resx">
-      <DependentUpon>CustomUIFontScriptOpt.cs</DependentUpon>
+    <Compile Include="UIFontAtlasFileViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UIFontAtlasFileViewer.Designer.cs">
+      <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Utils.cs" />
+    <EmbeddedResource Include="UIFontAtlasFileViewer.resx">
+      <DependentUpon>UIFontAtlasFileViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIFontScriptOpt.resx">
+      <DependentUpon>UIFontScriptOpt.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

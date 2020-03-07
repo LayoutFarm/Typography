@@ -63,7 +63,7 @@
             // 
             // cmdBuildMsdfTexture
             // 
-            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1266, 446);
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1266, 692);
             this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
             this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 43);
             this.cmdBuildMsdfTexture.TabIndex = 22;
@@ -124,7 +124,7 @@
             // 
             // cmdTestFontAtlas
             // 
-            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1266, 495);
+            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1266, 387);
             this.cmdTestFontAtlas.Name = "cmdTestFontAtlas";
             this.cmdTestFontAtlas.Size = new System.Drawing.Size(121, 53);
             this.cmdTestFontAtlas.TabIndex = 73;

@@ -25,9 +25,10 @@ namespace SampleWinForms
         {
             InitializeComponent();
 
+            uiFontAtlasFileViewer1.BringToFront();
+
             this.cmbTextureKind.Items.Add(PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect);
             this.cmbTextureKind.Items.Add(PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf);
-
             this.cmbTextureKind.SelectedIndex = 0;//default
         }
 
@@ -60,10 +61,6 @@ namespace SampleWinForms
                     }
                 }
             }
-
-
-
-
         }
 
         private void FormFontAtlas_Load(object sender, EventArgs e)
@@ -76,15 +73,7 @@ namespace SampleWinForms
             BuildAtlas_FromInputChars();
         }
 
-        static void DisposeExistingPictureBoxImage(PictureBox pictureBox)
-        {
-            if (pictureBox.Image is Bitmap currentBmp)
-            {
-                pictureBox.Image = null;
-                currentBmp.Dispose();
-                currentBmp = null;
-            }
-        }
+
         char[] GetUniqueChars()
         {
             //
@@ -145,9 +134,9 @@ namespace SampleWinForms
             //copy to Gdi+ and save
             //TODO: use helper method
 
-            DisposeExistingPictureBoxImage(picOutput);
+            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
 
-            SaveGlyphImageToPngFile(totalGlyphsImg, fontTextureImg);
+            SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, fontTextureImg);
 
             this.lblOutput.Text = "output: " + fontTextureImg;
             this.picOutput.Image = new Bitmap(fontTextureImg);
@@ -223,6 +212,13 @@ namespace SampleWinForms
                 }
             }
 
+            if (buildDetails1.Count == 0)
+            {
+                MessageBox.Show("please select some script");
+                return;
+            }
+
+
             GlyphTextureBuildDetail[] buildDetails = buildDetails1.ToArray();
 
             glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
@@ -256,9 +252,11 @@ namespace SampleWinForms
 
             string output_imgFilename = textureName + ".png";
 
-            DisposeExistingPictureBoxImage(picOutput);
+            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
 
-            SaveGlyphImageToPngFile(totalGlyphsImg, output_imgFilename);
+            SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, output_imgFilename);
+
+            uiFontAtlasFileViewer1.LoadFontAtlasFile(textureName + ".info", textureName + ".png");
 
             this.picOutput.Image = new Bitmap(output_imgFilename);
             this.lblOutput.Text = "Output: " + output_imgFilename;
@@ -273,37 +271,20 @@ namespace SampleWinForms
 
         }
 
-        static void SaveGlyphImageToPngFile(GlyphImage totalGlyphsImg, string imgFilename)
-        {
-
-            //TODO: use helper method 
-            using (MemBitmap memBmp = MemBitmap.CreateFromCopy(totalGlyphsImg.Width, totalGlyphsImg.Height, totalGlyphsImg.GetImageBuffer()))
-            using (System.Drawing.Bitmap bmp = new Bitmap(memBmp.Width, memBmp.Height))
-            {
-                var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, memBmp.Width, memBmp.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                var tmpMem = MemBitmap.GetBufferPtr(memBmp);
-                unsafe
-                {
-                    PixelFarm.CpuBlit.NativeMemMx.MemCopy((byte*)bmpdata.Scan0,
-                        (byte*)tmpMem.Ptr,
-                        tmpMem.LengthInBytes);
-                }
-                bmp.UnlockBits(bmpdata);
-
-                if (System.IO.File.Exists(imgFilename))
-                {
-                    System.IO.File.Delete(imgFilename);
-                }
-                bmp.Save(imgFilename);
-            }
-        }
 
         private void cmdBuildFromSelectedScriptLangs_Click(object sender, EventArgs e)
         {
             BuiltAtlas_FromUserOptions();
         }
 
+        private void cmdShowAtlasViewer_Click(object sender, EventArgs e)
+        {
 
+        }
+
+        private void chkShowAtlasViewer_CheckedChanged(object sender, EventArgs e)
+        {
+            uiFontAtlasFileViewer1.Visible = chkShowAtlasViewer.Checked;
+        }
     }
 }
