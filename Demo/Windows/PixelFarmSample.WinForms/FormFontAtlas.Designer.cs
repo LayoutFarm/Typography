@@ -37,6 +37,7 @@
             this.cmdBuildFromSelectedScriptLangs = new System.Windows.Forms.Button();
             this.txtSelectedFontSize = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.cmbTextureKind = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.picOutput)).BeginInit();
             this.SuspendLayout();
             // 
@@ -95,7 +96,7 @@
             // 
             // cmdBuildFromSelectedScriptLangs
             // 
-            this.cmdBuildFromSelectedScriptLangs.Location = new System.Drawing.Point(168, 15);
+            this.cmdBuildFromSelectedScriptLangs.Location = new System.Drawing.Point(331, 10);
             this.cmdBuildFromSelectedScriptLangs.Name = "cmdBuildFromSelectedScriptLangs";
             this.cmdBuildFromSelectedScriptLangs.Size = new System.Drawing.Size(157, 36);
             this.cmdBuildFromSelectedScriptLangs.TabIndex = 81;
@@ -120,11 +121,21 @@
             this.label2.TabIndex = 83;
             this.label2.Text = "Font Size (points)";
             // 
+            // cmbTextureKind
+            // 
+            this.cmbTextureKind.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTextureKind.FormattingEnabled = true;
+            this.cmbTextureKind.Location = new System.Drawing.Point(168, 25);
+            this.cmbTextureKind.Name = "cmbTextureKind";
+            this.cmbTextureKind.Size = new System.Drawing.Size(157, 21);
+            this.cmbTextureKind.TabIndex = 84;
+            // 
             // FormFontAtlas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1163, 727);
+            this.Controls.Add(this.cmbTextureKind);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtSelectedFontSize);
             this.Controls.Add(this.cmdBuildFromSelectedScriptLangs);
@@ -154,5 +165,6 @@
         private System.Windows.Forms.Button cmdBuildFromSelectedScriptLangs;
         private System.Windows.Forms.TextBox txtSelectedFontSize;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox cmbTextureKind;
     }
 }

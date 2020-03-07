@@ -13,7 +13,6 @@ using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.Rendering;
-using Typography.TextLayout;
 
 namespace SampleWinForms
 {
@@ -25,14 +24,20 @@ namespace SampleWinForms
         public FormFontAtlas()
         {
             InitializeComponent();
+
+            this.cmbTextureKind.Items.Add(PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect);
+            this.cmbTextureKind.Items.Add(PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf);
+
+            this.cmbTextureKind.SelectedIndex = 0;//default
         }
 
         public void SetFont(Typeface typeface, float fontSizeInPoints)
         {
             _typeface = typeface;
-            
+
             this.Text = typeface.Name + ", size=" + fontSizeInPoints + "pts";
             this.txtSelectedFontSize.Text = fontSizeInPoints.ToString();
+
 
             this.flowLayoutPanel1.Controls.Clear();
             _availableScripts.Clear();
@@ -54,8 +59,11 @@ namespace SampleWinForms
                         }
                     }
                 }
-
             }
+
+
+
+
         }
 
         private void FormFontAtlas_Load(object sender, EventArgs e)
@@ -105,7 +113,7 @@ namespace SampleWinForms
             glyphTextureGen.CreateTextureFontFromInputChars(
                _typeface,
                fontSizeInPoints,
-               PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
+              (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
                GetUniqueChars(),
                (glyphIndex, glyphImage, outputAtlasBuilder) =>
                {
@@ -127,6 +135,15 @@ namespace SampleWinForms
             fontAtlas.TotalGlyph = totalGlyphsImg;
             //copy to Gdi+ and save
             //TODO: use helper method
+            {
+                if (picOutput.Image is Bitmap currentBmp)
+                {
+                    picOutput.Image = null;
+                    currentBmp.Dispose();
+                    currentBmp = null;
+                }
+            }
+
             SaveGlyphImageToPngFile(totalGlyphsImg, fontTextureImg);
 
             this.lblOutput.Text = "output: " + fontTextureImg;
@@ -207,7 +224,7 @@ namespace SampleWinForms
 
             glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
                 fontSizeInPoints,
-                PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
+                (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
                 buildDetails,
                 (glyphIndex, glyphImage, outputAtlasBuilder) =>
                 {
@@ -234,10 +251,19 @@ namespace SampleWinForms
                 atlasBuilder.SaveFontInfo(fs);
             }
 
-
             string output_imgFilename = textureName + ".png";
 
+            {
+                if (picOutput.Image is Bitmap currentBmp)
+                {
+                    picOutput.Image = null;
+                    currentBmp.Dispose();
+                    currentBmp = null;
+                }
+            }
+
             SaveGlyphImageToPngFile(totalGlyphsImg, output_imgFilename);
+
             this.picOutput.Image = new Bitmap(output_imgFilename);
             this.lblOutput.Text = "Output: " + output_imgFilename;
 
@@ -281,5 +307,7 @@ namespace SampleWinForms
         {
             BuiltAtlas_FromUserOptions();
         }
+
+
     }
 }
