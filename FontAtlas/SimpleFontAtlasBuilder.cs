@@ -219,6 +219,14 @@ namespace Typography.Rendering
                 srcRowIndex--;
             }
 
+            //flipY on atlas info too
+            for (int i = 0; i < glyphList.Count; ++i)
+            {
+                CacheGlyph g = glyphList[i];
+                Rectangle rect = g.area;
+                g.area = new Rectangle(rect.X, imgH - (rect.Y + rect.Height), rect.Width, rect.Height);
+            }
+
 
             //***
             //6. generate final output
@@ -233,7 +241,7 @@ namespace Typography.Rendering
 
             if (_latestGenGlyphImage == null)
             {
-                BuildSingleImage();
+                throw new System.Exception("");
             }
 
             FontAtlasFile fontAtlasFile = new FontAtlasFile();
