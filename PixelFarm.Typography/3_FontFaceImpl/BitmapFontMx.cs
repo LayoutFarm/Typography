@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using PixelFarm.Drawing;
 using PixelFarm.Drawing.Fonts;
 using PixelFarm.Platforms;
+using PixelFarm.CpuBlit;
 
 using Typography.OpenFont;
 
@@ -193,7 +194,7 @@ namespace Typography.Rendering
         {
             //multiple font atlas that share the same glyphImg
 
-            GlyphImage glyphImg = ReadGlyphImages(totalGlyphImgStream);
+            PixelFarm.CpuBlit.MemBitmap glyphImg = ReadGlyphImages(totalGlyphImgStream);
             for (int i = 0; i < simpleFontAtlases.Length; ++i)
             {
                 SimpleFontAtlas simpleFontAtlas = simpleFontAtlases[i];
@@ -302,7 +303,7 @@ namespace Typography.Rendering
                 atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
 
                 //4. merge all glyph in the builder into a single image
-                GlyphImage totalGlyphsImg = atlasBuilder.BuildSingleImage();
+                PixelFarm.CpuBlit.MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
 
                 //-------------------------------------------------------------
 
@@ -316,8 +317,8 @@ namespace Typography.Rendering
                 //    totalGlyphsImg.Width * 4,
                 //    totalGlyphsImg.Width, totalGlyphsImg.Height,
                 //    "total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
-                ////save image to cache
-                SaveImgBufferToFile(totalGlyphsImg, fontTextureImgFilename);
+                ////save image to cache                 
+                totalGlyphsImg.SaveImage(fontTextureImgFilename);
 #endif
 
 
@@ -366,20 +367,9 @@ namespace Typography.Rendering
             return fontAtlas;
         }
 
-        static GlyphImage ReadGlyphImages(System.IO.Stream stream)
+        static PixelFarm.CpuBlit.MemBitmap ReadGlyphImages(System.IO.Stream stream)
         {
-            using (PixelFarm.CpuBlit.MemBitmap bmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(stream))
-            {
-                GlyphImage img = new GlyphImage(bmp.Width, bmp.Height);
-                int[] buffer = new int[bmp.Width * bmp.Height];
-                unsafe
-                {
-                    PixelFarm.CpuBlit.Imaging.TempMemPtr tmp = PixelFarm.CpuBlit.MemBitmap.GetBufferPtr(bmp);
-                    System.Runtime.InteropServices.Marshal.Copy(tmp.Ptr, buffer, 0, bmp.Width * bmp.Height);
-                    img.SetImageBuffer(buffer, true);
-                }
-                return img;
-            }
+            return PixelFarm.CpuBlit.MemBitmap.LoadBitmap(stream);
         }
         static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
         {

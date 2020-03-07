@@ -120,16 +120,16 @@ namespace SampleWinForms
 
 
             //4. merge all glyph in the builder into a single image
-            GlyphImage totalGlyphsImg = atlasBuilder.BuildSingleImage();
+            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
             string fontTextureImg = "test_glyph_atlas.png";
 
             //5. save to png
-            SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, fontTextureImg);
+            totalGlyphsImg.SaveImage(fontTextureImg);
             //-----------------------------------------------
-            
-            
+
+
             //let view result...
-            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);           
+            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
 
             this.lblOutput.Text = "output: " + fontTextureImg;
             this.picOutput.Image = new Bitmap(fontTextureImg);
@@ -228,7 +228,7 @@ namespace SampleWinForms
             atlasBuilder.FontKey = reqFont.FontKey;
 
             //4. merge all glyph in the builder into a single image
-            GlyphImage totalGlyphsImg = atlasBuilder.BuildSingleImage();
+            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
 
 
             string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
@@ -241,8 +241,7 @@ namespace SampleWinForms
             }
 
             //6. save total-glyph-image to disk
-            SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, output_imgFilename);
-
+            totalGlyphsImg.SaveImage(output_imgFilename); 
 
             ///------------------------------------------------
             //lets view result ...
