@@ -76,6 +76,15 @@ namespace SampleWinForms
             BuildAtlas_FromInputChars();
         }
 
+        static void DisposeExistingPictureBoxImage(PictureBox pictureBox)
+        {
+            if (pictureBox.Image is Bitmap currentBmp)
+            {
+                pictureBox.Image = null;
+                currentBmp.Dispose();
+                currentBmp = null;
+            }
+        }
         char[] GetUniqueChars()
         {
             //
@@ -135,14 +144,8 @@ namespace SampleWinForms
             fontAtlas.TotalGlyph = totalGlyphsImg;
             //copy to Gdi+ and save
             //TODO: use helper method
-            {
-                if (picOutput.Image is Bitmap currentBmp)
-                {
-                    picOutput.Image = null;
-                    currentBmp.Dispose();
-                    currentBmp = null;
-                }
-            }
+
+            DisposeExistingPictureBoxImage(picOutput);
 
             SaveGlyphImageToPngFile(totalGlyphsImg, fontTextureImg);
 
@@ -253,14 +256,7 @@ namespace SampleWinForms
 
             string output_imgFilename = textureName + ".png";
 
-            {
-                if (picOutput.Image is Bitmap currentBmp)
-                {
-                    picOutput.Image = null;
-                    currentBmp.Dispose();
-                    currentBmp = null;
-                }
-            }
+            DisposeExistingPictureBoxImage(picOutput);
 
             SaveGlyphImageToPngFile(totalGlyphsImg, output_imgFilename);
 
