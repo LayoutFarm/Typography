@@ -41,6 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomUIFontScriptOpt.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomUIFontScriptOpt.Designer.cs">
+      <DependentUpon>CustomUIFontScriptOpt.cs</DependentUpon>
+    </Compile>
     <Compile Include="DebugGlyphVisualizer.cs" />
     <Compile Include="DebugGlyphVisualizerInfoView.cs" />
     <Compile Include="Form1.cs">
@@ -66,6 +72,9 @@
     <Compile Include="PixelFarm\GdiBitmapIO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CustomUIFontScriptOpt.resx">
+      <DependentUpon>CustomUIFontScriptOpt.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

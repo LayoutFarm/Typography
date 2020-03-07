@@ -38,10 +38,8 @@
             this.cmdMeasureString = new System.Windows.Forms.Button();
             this.lblStringSize = new System.Windows.Forms.Label();
             this.cmdTestFontAtlas = new System.Windows.Forms.Button();
-            this.txtSampleChars = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
             this.lstTextBaseline = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
@@ -65,7 +63,7 @@
             // 
             // cmdBuildMsdfTexture
             // 
-            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1266, 430);
+            this.cmdBuildMsdfTexture.Location = new System.Drawing.Point(1266, 446);
             this.cmdBuildMsdfTexture.Name = "cmdBuildMsdfTexture";
             this.cmdBuildMsdfTexture.Size = new System.Drawing.Size(121, 43);
             this.cmdBuildMsdfTexture.TabIndex = 22;
@@ -126,21 +124,13 @@
             // 
             // cmdTestFontAtlas
             // 
-            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1266, 537);
+            this.cmdTestFontAtlas.Location = new System.Drawing.Point(1266, 495);
             this.cmdTestFontAtlas.Name = "cmdTestFontAtlas";
-            this.cmdTestFontAtlas.Size = new System.Drawing.Size(121, 28);
+            this.cmdTestFontAtlas.Size = new System.Drawing.Size(121, 53);
             this.cmdTestFontAtlas.TabIndex = 73;
-            this.cmdTestFontAtlas.Text = "TestFontAtlas";
+            this.cmdTestFontAtlas.Text = "Goto TestFontAtlas ...";
             this.cmdTestFontAtlas.UseVisualStyleBackColor = true;
             this.cmdTestFontAtlas.Click += new System.EventHandler(this.cmdTestFontAtlas_Click);
-            // 
-            // txtSampleChars
-            // 
-            this.txtSampleChars.Location = new System.Drawing.Point(1266, 511);
-            this.txtSampleChars.Name = "txtSampleChars";
-            this.txtSampleChars.Size = new System.Drawing.Size(119, 20);
-            this.txtSampleChars.TabIndex = 74;
-            this.txtSampleChars.Text = "sample!";
             // 
             // button2
             // 
@@ -162,16 +152,6 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
-            // button4
-            // 
-            this.button4.Location = new System.Drawing.Point(1266, 571);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(121, 28);
-            this.button4.TabIndex = 77;
-            this.button4.Text = "TestFontAtlas";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
             // lstTextBaseline
             // 
             this.lstTextBaseline.FormattingEnabled = true;
@@ -186,10 +166,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1393, 857);
             this.Controls.Add(this.lstTextBaseline);
-            this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.txtSampleChars);
             this.Controls.Add(this.cmdTestFontAtlas);
             this.Controls.Add(this.lblStringSize);
             this.Controls.Add(this.cmdMeasureString);
@@ -219,10 +197,8 @@
         private System.Windows.Forms.Button cmdMeasureString;
         private System.Windows.Forms.Label lblStringSize;
         private System.Windows.Forms.Button cmdTestFontAtlas;
-        private System.Windows.Forms.TextBox txtSampleChars;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
         private System.Windows.Forms.ListBox lstTextBaseline;
     }
 }
