@@ -1,6 +1,6 @@
 ﻿namespace SampleWinForms
 {
-    partial class CustomUIFontScriptOpt
+    partial class UIFontScriptOpt
     {
         /// <summary> 
         /// Required designer variable.

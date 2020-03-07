@@ -10,9 +10,9 @@ using Typography.OpenFont;
 
 namespace SampleWinForms
 {
-    public partial class CustomUIFontScriptOpt : UserControl
+    public partial class UIFontScriptOpt : UserControl
     {
-        public CustomUIFontScriptOpt()
+        public UIFontScriptOpt()
         {
             InitializeComponent();
 
