@@ -22,16 +22,16 @@ namespace PixelFarm.Drawing.Fonts
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachFinishTotal(int glyphIndex, GlyphImage glyphImage, SimpleFontAtlasBuilder atlasBuilder);
+        public delegate void OnEachGlyph(int glyphIndex, GlyphImage glyphImage);
         public GlyphTextureBitmapGenerator()
         {
-            
+
         }
-        public void CreateTextureFontFromBuildDetail(
+        public SimpleFontAtlasBuilder CreateTextureFontFromBuildDetail(
             Typeface typeface, float sizeInPoint,
             PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
             GlyphTextureBuildDetail[] details,
-            OnEachFinishTotal onFinishTotal)
+            OnEachGlyph onFinishTotal = null)
         {
             //-------------------------------------------------------------
             var atlasBuilder = new SimpleFontAtlasBuilder();
@@ -73,14 +73,15 @@ namespace PixelFarm.Drawing.Fonts
                         );
                 }
             }
-            onFinishTotal(0, null, atlasBuilder);
+            onFinishTotal?.Invoke(0, null);
+            return atlasBuilder;
         }
 
-        public void CreateTextureFontFromInputChars(
+        public SimpleFontAtlasBuilder CreateTextureFontFromInputChars(
             Typeface typeface, float sizeInPoint,
             PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
             char[] chars,
-            OnEachFinishTotal onFinishTotal)
+            OnEachGlyph onFinishTotal = null)
         {
 
             //convert input chars into glyphIndex
@@ -98,7 +99,8 @@ namespace PixelFarm.Drawing.Fonts
             //we can specfic subset with special setting for each set 
             CreateTextureFontFromGlyphIndices(typeface, sizeInPoint,
                 HintTechnique.TrueTypeInstruction_VerticalOnly, atlasBuilder, false, GetUniqueGlyphIndexList(glyphIndices));
-            onFinishTotal(0, null, atlasBuilder);
+            onFinishTotal?.Invoke(0, null);
+            return atlasBuilder;
         }
         void CreateTextureFontFromGlyphIndices(
               Typeface typeface,
@@ -128,8 +130,8 @@ namespace PixelFarm.Drawing.Fonts
 
             //sample: create sample msdf texture 
             //-------------------------------------------------------------
-            var builder = new GlyphOutlineBuilder(typeface);
-            builder.SetHintTechnique(hintTechnique);
+            var outlineBuilder = new GlyphOutlineBuilder(typeface);
+            outlineBuilder.SetHintTechnique(hintTechnique);
             //
             if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
             {
@@ -141,9 +143,9 @@ namespace PixelFarm.Drawing.Fonts
                     ushort gindex = glyphIndices[i];
                     //create picture with unscaled version set scale=-1
                     //(we will create glyph contours and analyze them)
-                    builder.BuildFromGlyphIndex(gindex, -1);
+                    outlineBuilder.BuildFromGlyphIndex(gindex, -1);
                     var glyphToContour = new ContourBuilder();
-                    builder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
+                    outlineBuilder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
 
                     //msdfgen with  scale the glyph to specific shapescale
                     //msdfGenParams.shapeScale = 1f / 64; //as original
@@ -176,9 +178,9 @@ namespace PixelFarm.Drawing.Fonts
                     {
                         //build glyph
                         ushort gindex = glyphIndices[i];
-                        builder.BuildFromGlyphIndex(gindex, sizeInPoint);
+                        outlineBuilder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
-                        GlyphImage glyphImg = aggTextureGen.CreateGlyphImage(builder, 1);
+                        GlyphImage glyphImg = aggTextureGen.CreateGlyphImage(outlineBuilder, 1);
                         if (applyFilter)
                         {
 
