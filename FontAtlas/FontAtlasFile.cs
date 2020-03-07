@@ -8,7 +8,6 @@ using Typography.Rendering;
 namespace PixelFarm.Drawing.Fonts
 {
 
-
     public class FontAtlasFile
     {
         //Typography's custom font atlas file        
@@ -149,7 +148,6 @@ namespace PixelFarm.Drawing.Fonts
         }
         internal void WriteOverviewFontInfo(string fontFileName, int fontKey, float sizeInPt)
         {
-            _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
 
 #if DEBUG
             if (string.IsNullOrEmpty(fontFileName))
@@ -162,6 +160,8 @@ namespace PixelFarm.Drawing.Fonts
             }
 #endif
 
+
+            _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
             WriteLengthPrefixUtf8String(fontFileName);
             _writer.Write(fontKey);
             _writer.Write(sizeInPt);
@@ -176,9 +176,6 @@ namespace PixelFarm.Drawing.Fonts
         }
         internal void WriteGlyphList(Dictionary<ushort, CacheGlyph> glyphs)
         {
-            //kind
-            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
-
             int totalNum = glyphs.Count;
 #if DEBUG
             if (totalNum >= ushort.MaxValue)
@@ -186,7 +183,10 @@ namespace PixelFarm.Drawing.Fonts
                 throw new NotSupportedException();
             }
 #endif
-            //1.count
+
+            //kind
+            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
+            //count
             _writer.Write((ushort)totalNum);
             // 
             foreach (CacheGlyph g in glyphs.Values)
@@ -209,7 +209,6 @@ namespace PixelFarm.Drawing.Fonts
         //--------------------
         internal void WriteGlyphList(Dictionary<ushort, TextureGlyphMapData> glyphs)
         {
-            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
             //total number
             int totalNum = glyphs.Count;
 #if DEBUG
@@ -219,27 +218,28 @@ namespace PixelFarm.Drawing.Fonts
             }
 #endif
 
+            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
+            //count
             _writer.Write((ushort)totalNum);
             // 
             foreach (var kp in glyphs)
             {
                 ushort glyphIndex = kp.Key;
                 TextureGlyphMapData g = kp.Value;
-                //1. code point
+                //1. glyph index
                 _writer.Write((ushort)glyphIndex);
+
                 //2. area, left,top,width,height
                 _writer.Write((ushort)g.Left);
                 _writer.Write((ushort)g.Top);
                 _writer.Write((ushort)g.Width);
                 _writer.Write((ushort)g.Height);
+
                 //3. texture offset                
                 _writer.Write((short)g.TextureXOffset);//short
                 _writer.Write((short)g.TextureYOffset);//short
             }
         }
-
-
-
     }
 
 }
