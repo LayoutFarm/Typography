@@ -238,7 +238,7 @@ namespace Typography.Rendering
             _latestGenGlyphImage = glyphImage;
             return glyphImage;
         }
-        public void SaveFontInfo(System.IO.Stream outputStream)
+        public void SaveAtlasInfo(System.IO.Stream outputStream)
         {
 
             if (_latestGenGlyphImage == null)
