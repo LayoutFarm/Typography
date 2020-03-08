@@ -39,8 +39,20 @@ namespace Test_WinForm_TessGlyph
 
 
             txtIncrementalTessStep.KeyUp += (s, e) => UpdateOutput();
-            txtDivCurveRecursiveLimit.KeyUp += (s, e) => UpdateOutput();
-            txtDivAngleTolerenceEpsilon.KeyUp += (s, e) => UpdateOutput();
+            txtDivCurveRecursiveLimit.KeyUp += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    UpdateOutput();
+                }
+            };
+            txtDivAngleTolerenceEpsilon.KeyUp += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    UpdateOutput();
+                }
+            };
         }
 
         void UpdateOutput()
@@ -60,18 +72,17 @@ namespace Test_WinForm_TessGlyph
             _g.Clear(Color.White);
 
             //-------
-            //string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf";
-            //string testFont = @"D:\projects\Typography\Demo\Windows\TestFonts\SourceSerifPro-Regular.otf";
-            string testFont = @"D:\projects\Typography\Demo\Windows\TestFonts\SourceSansPro-Light.ttf";
-            //string testFont = @"D:\projects\Typography\Demo\Windows\TestFonts\Sarabun-Regular.ttf";
+            //string testFont = "c:\\Windows\\Fonts\\Tahoma.ttf"; 
+            string testFont = @"Test\SourceSansPro-Regular.ttf";
+
 
             using (FileStream fs = new FileStream(testFont, FileMode.Open, FileAccess.Read))
             {
                 OpenFontReader reader = new OpenFontReader();
-                Typeface typeface = reader.Read(fs); 
+                Typeface typeface = reader.Read(fs);
 
                 var builder = new Typography.Contours.GlyphOutlineBuilder(typeface);
-                builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300); 
+                builder.BuildFromGlyphIndex(typeface.GetGlyphIndex(selectedChar), 300);
 
                 var txToPath = new GlyphTranslatorToPath();
                 var writablePath = new WritablePath();

@@ -297,9 +297,11 @@ namespace Msdfgen
             for (int y = 0; y < h; ++y)
             {
                 int row = shape.InverseYAxis ? h - y - 1 : y;
+
                 for (int x = 0; x < w; ++x)
                 {
                     Vector2 p = (new Vector2(x + .5, y + .5) / scale) - translate;
+
                     EdgePoint sr = new EdgePoint { minDistance = SignedDistance.INFINITE },
                         sg = new EdgePoint { minDistance = SignedDistance.INFINITE },
                         sb = new EdgePoint { minDistance = SignedDistance.INFINITE };
@@ -318,10 +320,14 @@ namespace Msdfgen
                         g = new EdgePoint { minDistance = SignedDistance.INFINITE },
                         b = new EdgePoint { minDistance = SignedDistance.INFINITE };
                         for (int ee = 0; ee < edgeCount; ++ee)
-                        {
+                        {   
+                            
                             EdgeHolder edge = edges[ee];
-                            double param;
-                            SignedDistance distance = edge.edgeSegment.signedDistance(p, out param);
+
+                            //find signedDistance from given pixel to the edge segment
+
+                            SignedDistance distance = edge.edgeSegment.signedDistance(p, out double param);
+
                             if (edge.HasComponent(EdgeColor.RED) && distance < r.minDistance)
                             {
                                 r.minDistance = distance;
@@ -341,6 +347,7 @@ namespace Msdfgen
                                 b.nearParam = param;
                             }
                         }
+                        //after test current pixel with all edges in a contour
                         //----------------
                         if (r.minDistance < sr.minDistance)
                             sr = r;
@@ -373,6 +380,8 @@ namespace Msdfgen
                         if (windings[n] < 0 && medMinDistance <= 0 && Math.Abs(medMinDistance) < Math.Abs(negDist))
                             negDist = medMinDistance;
                     }
+
+                    //after test a given pixel with all contours
                     if (sr.nearEdge != null)
                         sr.nearEdge.edgeSegment.distanceToPseudoDistance(ref sr.minDistance, p, sr.nearParam);
                     if (sg.nearEdge != null)

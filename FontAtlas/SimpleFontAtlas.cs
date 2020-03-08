@@ -44,7 +44,7 @@ namespace PixelFarm.Drawing.Fonts
             _glyphLocations.Add(glyphIndex, glyphData);
         }
         public bool UseSharedGlyphImage { get; set; }
-        public GlyphImage TotalGlyph { get; set; }
+        public PixelFarm.CpuBlit.MemBitmap TotalGlyph { get; set; }
         public bool TryGetGlyphMapData(ushort glyphIndex, out TextureGlyphMapData glyphdata)
         {
             if (!_glyphLocations.TryGetValue(glyphIndex, out glyphdata))
@@ -54,7 +54,7 @@ namespace PixelFarm.Drawing.Fonts
             }
             return true;
         }
-
+        public Dictionary<ushort, TextureGlyphMapData> GlyphDic => _glyphLocations;
 
         public static Dictionary<ushort, TextureGlyphMapData> CloneLocationWithOffset(SimpleFontAtlas org, int dx, int dy)
         {

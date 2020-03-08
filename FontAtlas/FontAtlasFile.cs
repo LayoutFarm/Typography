@@ -8,12 +8,11 @@ using Typography.Rendering;
 namespace PixelFarm.Drawing.Fonts
 {
 
-
     public class FontAtlasFile
     {
         //Typography's custom font atlas file        
         SimpleFontAtlas _atlas;
-        List<SimpleFontAtlas> _simpleFontAtlasList;
+
         enum FontTextureObjectKind : ushort
         {
             End,
@@ -24,12 +23,12 @@ namespace PixelFarm.Drawing.Fonts
         }
 
 
-        public List<SimpleFontAtlas> ResultSimpleFontAtlasList => _simpleFontAtlasList;
+        public List<SimpleFontAtlas> ResultSimpleFontAtlasList { get; private set; }
 
         public void Read(Stream inputStream)
         {
             //custom font atlas file                        
-            _simpleFontAtlasList = new List<SimpleFontAtlas>();
+            ResultSimpleFontAtlasList = new List<SimpleFontAtlas>();
             using (BinaryReader reader = new BinaryReader(inputStream, System.Text.Encoding.UTF8))
             {
                 //1. version
@@ -50,7 +49,7 @@ namespace PixelFarm.Drawing.Fonts
                         case FontTextureObjectKind.OverviewFontInfo:
                             //start new atlas
                             _atlas = new SimpleFontAtlas();
-                            _simpleFontAtlasList.Add(_atlas);
+                            ResultSimpleFontAtlasList.Add(_atlas);
                             ReadOverviewFontInfo(reader);
                             break;
                         case FontTextureObjectKind.End:
@@ -83,21 +82,22 @@ namespace PixelFarm.Drawing.Fonts
             for (int i = 0; i < glyphCount; ++i)
             {
                 //read each glyph map info
-                //1. codepoint
-                var glyphMap = new TextureGlyphMapData();
-                ushort glyphIndex = reader.ReadUInt16();
-                //2. area, left,top,width,height
 
+                var glyphMap = new TextureGlyphMapData();
+
+                //1. glyph index
+                ushort glyphIndex = reader.ReadUInt16();
+
+                //2. area
                 glyphMap.Left = reader.ReadUInt16();
                 glyphMap.Top = reader.ReadUInt16();
                 glyphMap.Width = reader.ReadUInt16();
                 glyphMap.Height = reader.ReadUInt16();
-                //---------------------------------------
+
                 //3. texture offset
                 glyphMap.TextureXOffset = reader.ReadInt16();
                 glyphMap.TextureYOffset = reader.ReadInt16();
 
-                //---------------------------------------
                 _atlas.AddGlyph(glyphIndex, glyphMap);
             }
         }
@@ -148,7 +148,6 @@ namespace PixelFarm.Drawing.Fonts
         }
         internal void WriteOverviewFontInfo(string fontFileName, int fontKey, float sizeInPt)
         {
-            _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
 
 #if DEBUG
             if (string.IsNullOrEmpty(fontFileName))
@@ -161,6 +160,8 @@ namespace PixelFarm.Drawing.Fonts
             }
 #endif
 
+
+            _writer.Write((ushort)FontTextureObjectKind.OverviewFontInfo);
             WriteLengthPrefixUtf8String(fontFileName);
             _writer.Write(fontKey);
             _writer.Write(sizeInPt);
@@ -175,8 +176,6 @@ namespace PixelFarm.Drawing.Fonts
         }
         internal void WriteGlyphList(Dictionary<ushort, CacheGlyph> glyphs)
         {
-            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
-            //total number
             int totalNum = glyphs.Count;
 #if DEBUG
             if (totalNum >= ushort.MaxValue)
@@ -185,30 +184,31 @@ namespace PixelFarm.Drawing.Fonts
             }
 #endif
 
+            //kind
+            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
+            //count
             _writer.Write((ushort)totalNum);
             // 
             foreach (CacheGlyph g in glyphs.Values)
             {
-                //1. code point
+                //1. glyph index
                 _writer.Write((ushort)g.glyphIndex);
-                //2. area, left,top,width,height
+
+                //2. area
                 _writer.Write((ushort)g.area.Left);
                 _writer.Write((ushort)g.area.Top);
                 _writer.Write((ushort)g.area.Width);
                 _writer.Write((ushort)g.area.Height);
 
-
                 //3. texture offset                
                 GlyphImage img = g.img;
-                _writer.Write((short)img.TextureOffsetX);//short
-                _writer.Write((short)img.TextureOffsetY);//short
-
+                _writer.Write((short)img.TextureOffsetX);
+                _writer.Write((short)img.TextureOffsetY);
             }
         }
         //--------------------
         internal void WriteGlyphList(Dictionary<ushort, TextureGlyphMapData> glyphs)
         {
-            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
             //total number
             int totalNum = glyphs.Count;
 #if DEBUG
@@ -218,27 +218,28 @@ namespace PixelFarm.Drawing.Fonts
             }
 #endif
 
+            _writer.Write((ushort)FontTextureObjectKind.GlyphList);
+            //count
             _writer.Write((ushort)totalNum);
             // 
             foreach (var kp in glyphs)
             {
                 ushort glyphIndex = kp.Key;
                 TextureGlyphMapData g = kp.Value;
-                //1. code point
+                //1. glyph index
                 _writer.Write((ushort)glyphIndex);
+
                 //2. area, left,top,width,height
                 _writer.Write((ushort)g.Left);
                 _writer.Write((ushort)g.Top);
                 _writer.Write((ushort)g.Width);
                 _writer.Write((ushort)g.Height);
+
                 //3. texture offset                
                 _writer.Write((short)g.TextureXOffset);//short
                 _writer.Write((short)g.TextureYOffset);//short
             }
         }
-
-
-
     }
 
 }

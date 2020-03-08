@@ -34,8 +34,7 @@ namespace TypographyTest.WinForms
             SetupRenderOptions();
             //
             this.lstFontSizes.SelectedIndex = 0;// lstFontSizes.Items.Count - 3;
-            var instTypeface = lstFontList.SelectedItem as InstalledTypeface;
-            if (instTypeface != null)
+            if (lstFontList.SelectedItem is InstalledTypeface instTypeface)
             {
                 _options.InstalledTypeface = instTypeface;
             }

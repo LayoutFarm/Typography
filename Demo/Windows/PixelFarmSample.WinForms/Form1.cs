@@ -528,7 +528,7 @@ namespace SampleWinForms
             //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
             //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
             //    bmp.UnlockBits(bmpdata);
-            //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
+            //    bmp.Save("a001_xn2_" + n + ".png");
             //}
 
             if (_contourAnalysisOpts.ShowGrid)
@@ -705,95 +705,20 @@ namespace SampleWinForms
         }
 
         private void cmdTestFontAtlas_Click(object sender, EventArgs e)
-        {
-            //read string from txtSampleChars
-            //please make sure all are unique. (TODO: check it)
-            //then create a font atlas from the sample chars
+        { 
 
-            char[] sampleChars = txtSampleChars.Text.ToCharArray();
-            if (sampleChars.Length == 0) return;
-            //
+            FormFontAtlas fontAtlas = new FormFontAtlas();
 
-            GlyphImage totalGlyphsImg = null;
-            SimpleFontAtlasBuilder atlasBuilder = null;
-            var glyphTextureGen = new GlyphTextureBitmapGenerator();
-            //
-            Typeface typeface = _basicOptions.Typeface;
-            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
-            //
-            glyphTextureGen.CreateTextureFontFromInputChars(
-                typeface,
-                fontSizeInPoints,
-                PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
-                sampleChars,
-                (glyphIndex, glyphImage, outputAtlasBuilder) =>
-                {
-                    if (outputAtlasBuilder != null)
-                    {
-                        //finish
-                        atlasBuilder = outputAtlasBuilder;
-                    }
-                }
-            );
+            fontAtlas.SetFont(_basicOptions.Typeface, _basicOptions.FontSizeInPoints);
 
-            atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
-            totalGlyphsImg = atlasBuilder.BuildSingleImage();
-            string fontTextureImg = "test_glyph_atlas.png";
-
-            //create atlas
-            SimpleFontAtlas fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
-            fontAtlas.TotalGlyph = totalGlyphsImg;
-            //
-            using (MemBitmap memBmp = MemBitmap.CreateFromCopy(totalGlyphsImg.Width, totalGlyphsImg.Height, totalGlyphsImg.GetImageBuffer()))
-            using (System.Drawing.Bitmap bmp = new Bitmap(memBmp.Width, memBmp.Height))
-            {
-                var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, memBmp.Width, memBmp.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                var tmpMem = MemBitmap.GetBufferPtr(memBmp);
-                unsafe
-                {
-                    PixelFarm.CpuBlit.NativeMemMx.MemCopy((byte*)bmpdata.Scan0,
-                        (byte*)tmpMem.Ptr,
-                        tmpMem.LengthInBytes);
-                }
-                bmp.UnlockBits(bmpdata);
-                bmp.Save(fontTextureImg);
-            }
-
-
-#if DEBUG
-            //save glyph image for debug
-            //PixelFarm.Agg.ActualImage.SaveImgBufferToPngFile(
-            //    totalGlyphsImg.GetImageBuffer(),
-            //    totalGlyphsImg.Width * 4,
-            //    totalGlyphsImg.Width, totalGlyphsImg.Height,
-            //    "d:\\WImageTest\\total_" + reqFont.Name + "_" + reqFont.SizeInPoints + ".png");
-            ////save image to cache
-            //SaveImgBufferToFile(totalGlyphsImg, fontTextureImg);
-#endif
-
-            //cache the atlas
-            //_createdAtlases.Add(fontKey, fontAtlas);
-            ////
-            ////calculate some commonly used values
-            //fontAtlas.SetTextureScaleInfo(
-            //    resolvedTypeface.CalculateScaleToPixelFromPointSize(fontAtlas.OriginalFontSizePts),
-            //    resolvedTypeface.CalculateScaleToPixelFromPointSize(reqFont.SizeInPoints));
-            ////TODO: review here, use scaled or unscaled values
-            //fontAtlas.SetCommonFontMetricValues(
-            //    resolvedTypeface.Ascender,
-            //    resolvedTypeface.Descender,
-            //    resolvedTypeface.LineGap,
-            //    resolvedTypeface.CalculateRecommendLineSpacing());
-
-            ///
+            fontAtlas.Show();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
 
             OpenFontReader openFontReader = new OpenFontReader();
-            string filename = "Sarabun-Regular.woff";
+            string filename = "Test/Sarabun-Regular.woff";
             //using (FileStream fs = new FileStream(filename, FileMode.Open))
             //{
             //    PreviewFontInfo previewFont = openFontReader.ReadPreview(fs);
@@ -918,84 +843,6 @@ namespace SampleWinForms
                 PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
             }
         }
-        private void button4_Click(object sender, EventArgs e)
-        {
-            //read string from txtSampleChars
-            //please make sure all are unique. (TODO: check it)
-            //then create a font atlas from the sample chars
-
-
-            GlyphImage totalGlyphsImg = null;
-            SimpleFontAtlasBuilder atlasBuilder = null;
-            var glyphTextureGen = new GlyphTextureBitmapGenerator();
-            //
-            Typeface typeface = _basicOptions.Typeface;
-            float fontSizeInPoints = _basicOptions.FontSizeInPoints;
-
-            PixelFarm.Drawing.RequestFont reqFont = new PixelFarm.Drawing.RequestFont(
-                typeface.Name,
-                fontSizeInPoints,
-                 PixelFarm.Drawing.FontStyle.Regular
-                );
-
-            GlyphTextureBuildDetail[] buildDetails = new GlyphTextureBuildDetail[]
-            {
-               new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Latin, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.TrueTypeInstruction_VerticalOnly },
-               new GlyphTextureBuildDetail{ ScriptLang= ScriptLangs.Thai, DoFilter= false, HintTechnique = Typography.Contours.HintTechnique.None},
-            };
-
-
-            glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
-                fontSizeInPoints,
-                PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect,
-                buildDetails,
-                (glyphIndex, glyphImage, outputAtlasBuilder) =>
-                {
-                    if (outputAtlasBuilder != null)
-                    {
-                        //finish
-                        atlasBuilder = outputAtlasBuilder;
-                    }
-                });
-
-
-            atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
-            totalGlyphsImg = atlasBuilder.BuildSingleImage();
-
-
-            atlasBuilder.FontFilename = typeface.Name;
-            atlasBuilder.FontKey = reqFont.FontKey;
-
-            string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
-
-            using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
-            {
-                atlasBuilder.SaveFontInfo(fs);
-            }
-            //read .info back and convert to base64
-            byte[] atlas_info_content = File.ReadAllBytes(textureName + ".info");
-            string base64 = Convert.ToBase64String(atlas_info_content);
-
-            //create atlas
-            SimpleFontAtlas fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
-            fontAtlas.TotalGlyph = totalGlyphsImg;
-            using (MemBitmap memBmp = MemBitmap.CreateFromCopy(totalGlyphsImg.Width, totalGlyphsImg.Height, totalGlyphsImg.GetImageBuffer()))
-            using (System.Drawing.Bitmap bmp = new Bitmap(memBmp.Width, memBmp.Height))
-            {
-                var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, memBmp.Width, memBmp.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                var tmpMem = MemBitmap.GetBufferPtr(memBmp);
-                unsafe
-                {
-                    PixelFarm.CpuBlit.NativeMemMx.MemCopy((byte*)bmpdata.Scan0,
-                        (byte*)tmpMem.Ptr,
-                        tmpMem.LengthInBytes);
-                }
-                bmp.UnlockBits(bmpdata);
-                bmp.Save(textureName + ".png");
-            }
-        }
-
-
+       
     }
 }

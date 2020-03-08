@@ -12,7 +12,7 @@ namespace Typography.Rendering
 
     public class SimpleFontAtlasBuilder
     {
-        GlyphImage _latestGenGlyphImage;
+        PixelFarm.CpuBlit.MemBitmap _latestGenGlyphImage;
         Dictionary<ushort, CacheGlyph> _glyphs = new Dictionary<ushort, CacheGlyph>();
 
         public SimpleFontAtlasBuilder()
@@ -49,7 +49,7 @@ namespace Typography.Rendering
             this.TextureKind = textureKind;
             this.FontSizeInPoints = fontSizeInPts;
         }
-        public GlyphImage BuildSingleImage()
+        public PixelFarm.CpuBlit.MemBitmap BuildSingleImage()
         {
             //1. add to list 
             var glyphList = new List<CacheGlyph>(_glyphs.Count);
@@ -168,8 +168,7 @@ namespace Typography.Rendering
                 {
                     CacheGlyph g = glyphList[i];
                     BinPackRect newRect = binPacker.Insert(g.img.Width, g.img.Height);
-                    g.area = new Rectangle(newRect.X, newRect.Y,
-                        g.img.Width, g.img.Height);
+                    g.area = new Rectangle(newRect.X, newRect.Y, g.img.Width, g.img.Height);
 
 
                     //recalculate proper max midth again, after arrange and compact space
@@ -180,18 +179,19 @@ namespace Typography.Rendering
                 }
             }
             // ------------------------------- 
-            //4. create array that can hold data  
-            int[] totalBuffer = new int[totalImgWidth * imgH];
+            //4. create a mergeBmpBuffer
+            //please note that original glyph image is head-down (Y axis)
+            //so we will flip-Y axis again in step 5.
+            int[] mergeBmpBuffer = new int[totalImgWidth * imgH];
             if (SpaceCompactOption == CompactOption.BinPack) //again here?
             {
                 for (int i = glyphList.Count - 1; i >= 0; --i)
                 {
                     CacheGlyph g = glyphList[i];
-                    //copy data to totalBuffer
+                    //copy glyph image buffer to specific area of final result buffer
                     GlyphImage img = g.img;
-                    CopyToDest(img.GetImageBuffer(), img.Width, img.Height, totalBuffer, g.area.Left, g.area.Top, totalImgWidth);
+                    CopyToDest(img.GetImageBuffer(), img.Width, img.Height, mergeBmpBuffer, g.area.Left, g.area.Top, totalImgWidth);
                 }
-
             }
             else
             {
@@ -199,51 +199,49 @@ namespace Typography.Rendering
                 for (int i = 0; i < glyphCount; ++i)
                 {
                     CacheGlyph g = glyphList[i];
-                    //copy data to totalBuffer
+                    //copy glyph image buffer to specific area of final result buffer
                     GlyphImage img = g.img;
-                    CopyToDest(img.GetImageBuffer(), img.Width, img.Height, totalBuffer, g.area.Left, g.area.Top, totalImgWidth);
+                    CopyToDest(img.GetImageBuffer(), img.Width, img.Height, mergeBmpBuffer, g.area.Left, g.area.Top, totalImgWidth);
                 }
             }
 
-            //new total glyph img
-            GlyphImage glyphImage = new GlyphImage(totalImgWidth, imgH);
-            //bool flipY = false;
-            //if (flipY)
-            //{
-            int[] totalBufferFlipY = new int[totalBuffer.Length];
+            //5. since the mergeBmpBuffer is head-down
+            //we will flipY axis again to head-up, the head-up img is easy to read and debug
+
+            int[] totalBufferFlipY = new int[mergeBmpBuffer.Length];
             int srcRowIndex = imgH - 1;
-            int strideInBytes = totalImgWidth * 4;
+            int strideInBytes = totalImgWidth * 4;//32 argb
+
             for (int i = 0; i < imgH; ++i)
             {
                 //copy each row from src to dst
-                System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
+                System.Buffer.BlockCopy(mergeBmpBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
                 srcRowIndex--;
             }
-            totalBuffer = totalBufferFlipY;
-            //}
-            //else
-            //{
-            //int[] totalBufferFlipY = new int[totalBuffer.Length];
-            //int srcRowIndex = 0;
-            //int strideInBytes = totalImgWidth * 4;
-            //for (int i = 0; i < imgH; ++i)
-            //{
-            //    //copy each row from src to dst
-            //    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
-            //    srcRowIndex++;
-            //}
-            //totalBuffer = totalBufferFlipY;
-            //}
-            glyphImage.SetImageBuffer(totalBuffer, true);
-            _latestGenGlyphImage = glyphImage;
-            return glyphImage;
+
+            //flipY on atlas info too
+            for (int i = 0; i < glyphList.Count; ++i)
+            {
+                CacheGlyph g = glyphList[i];
+                Rectangle rect = g.area;
+                g.area = new Rectangle(rect.X, imgH - (rect.Y + rect.Height), rect.Width, rect.Height);
+            }
+
+
+            //***
+            //6. generate final output
+            //TODO: rename GlyphImage to another name to distinquist
+            //between small glyph and a large one
+
+            return _latestGenGlyphImage = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, totalBufferFlipY);
+
         }
-        public void SaveFontInfo(System.IO.Stream outputStream)
+        public void SaveAtlasInfo(System.IO.Stream outputStream)
         {
 
             if (_latestGenGlyphImage == null)
             {
-                BuildSingleImage();
+                throw new System.Exception("");
             }
 
             FontAtlasFile fontAtlasFile = new FontAtlasFile();

@@ -191,7 +191,7 @@ namespace SampleWinForms
         //        18,
         //        0,
         //        255,
-        //        "d:\\WImageTest\\sample_msdf.png");
+        //        "sample_msdf.png");
         //}
         //static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
         //{
@@ -227,7 +227,7 @@ namespace SampleWinForms
         //            //    var bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
         //            //    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
         //            //    bmp.UnlockBits(bmpdata);
-        //            //    bmp.Save("d:\\WImageTest\\a001_xn2_" + n + ".png");
+        //            //    bmp.Save("a001_xn2_" + n + ".png");
         //            //}
         //        }
 
@@ -240,9 +240,9 @@ namespace SampleWinForms
 
         //            System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
         //            bmp.UnlockBits(bmpdata);
-        //            bmp.Save("d:\\WImageTest\\a_total.png");
+        //            bmp.Save("a_total.png");
         //        }
-        //        atlasBuilder.SaveFontInfo("d:\\WImageTest\\a_info.xml");
+        //        atlasBuilder.SaveFontInfo("a_info.xml");
         //    }
         //}
 

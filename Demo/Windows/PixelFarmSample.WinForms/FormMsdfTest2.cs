@@ -25,21 +25,38 @@ namespace SampleWinForms
             InitializeComponent();
             //
             _textServices = new LayoutFarm.OpenFontTextService();
+
         }
 
-        private void cmdTestMsdfGen_Click(object sender, EventArgs e)
+        private void cmdGenMsdfGlyphAtlas_Click(object sender, EventArgs e)
         {
 
             //samples...
             //1. create texture from specific glyph index range
-            string sampleFontFile = "../../../TestFonts/tahoma.ttf";
+            string sampleFontFile = (string)lstFontFiles.SelectedItem;
+
+            if (!int.TryParse(txtFontSize.Text, out int fontSize))
+            {
+                fontSize = 18;
+            }
+
+            if (!ushort.TryParse(txtGlyphIndexStart.Text, out ushort glyphIndexStart))
+            {
+                glyphIndexStart = 0;
+            }
+
+            if (!ushort.TryParse(txtGlyphIndexStop.Text, out ushort glyphIndexStop))
+            {
+                glyphIndexStop = 1;
+            }
+
 
             CreateSampleMsdfTextureFont(
                 sampleFontFile,
-                18,
-                0,
-                100,
-                "d:\\WImageTest\\sample_msdf.png");
+                fontSize,
+                glyphIndexStart,
+                glyphIndexStop,
+                "sample_msdf.png");
             //---------------------------------------------------------
             //2. for debug, create from some unicode chars
             //
@@ -47,7 +64,7 @@ namespace SampleWinForms
             //   sampleFontFile,
             //   18,
             //  new char[] { 'I' },
-            //  "d:\\WImageTest\\sample_msdf.png");
+            //  "sample_msdf.png");
             //---------------------------------------------------------
             ////3.
             //GlyphTranslatorToContour tx = new GlyphTranslatorToContour();
@@ -78,10 +95,7 @@ namespace SampleWinForms
 
             public void Curve3(float x1, float y1, float x2, float y2) => _c.Curve3(x1, y1, x2, y2);
 
-            public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3)
-            {
-                throw new NotImplementedException();
-            }
+            public void Curve4(float x1, float y1, float x2, float y2, float x3, float y3) => _c.Curve4(x1, y1, x2, y2, x3, y3);
 
             public void EndRead() => _c.EndRead();
 
@@ -89,77 +103,91 @@ namespace SampleWinForms
 
             public void MoveTo(float x0, float y0) => _c.MoveTo(x0, y0);
         }
+
         static void CreateSampleMsdfTextureFont(string fontfile, float sizeInPoint, ushort startGlyphIndex, ushort endGlyphIndex, string outputFile)
         {
             //sample
+
             var reader = new OpenFontReader();
 
+            Typeface typeface = null;
             using (var fs = new FileStream(fontfile, FileMode.Open))
             {
                 //1. read typeface from font file
-                Typeface typeface = reader.Read(fs);
-                //sample: create sample msdf texture 
-                //-------------------------------------------------------------
-                var builder = new GlyphOutlineBuilder(typeface);
-                //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
-                //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
-                //-------------------------------------------------------------
-                var atlasBuilder = new SimpleFontAtlasBuilder();
+                typeface = reader.Read(fs);
+            }
+
+            //sample: create sample msdf texture 
+            //-------------------------------------------------------------
+            var builder = new GlyphOutlineBuilder(typeface);
+            //builder.UseTrueTypeInterpreter = this.chkTrueTypeHint.Checked;
+            //builder.UseVerticalHinting = this.chkVerticalHinting.Checked;
+            //-------------------------------------------------------------
+            RequestFont reqFont = new RequestFont(typeface.Name, sizeInPoint);
+
+            var atlasBuilder = new SimpleFontAtlasBuilder();
+            atlasBuilder.FontFilename = System.IO.Path.GetFileName(fontfile);
+            atlasBuilder.FontKey = reqFont.FontKey;
+            //create temp folder for each glyph
+
+            string tempFolderName = "tmp_msdf";
+            if (Directory.Exists(tempFolderName))
+            {
+                //DANGER!
+                Directory.Delete(tempFolderName, true);
+            }
+            Directory.CreateDirectory(tempFolderName);
+
+            if (endGlyphIndex < 1)
+            {
+                endGlyphIndex = (ushort)(typeface.GlyphCount - 1);
+            }
 
 
-                for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
+            for (ushort gindex = startGlyphIndex; gindex <= endGlyphIndex; ++gindex)
+            {
+                //build glyph
+                builder.BuildFromGlyphIndex(gindex, sizeInPoint);
+
+                var glyphContourBuilder = new ContourBuilder();
+                //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
+                var genParams = new MsdfGenParams();
+                builder.ReadShapes(new GlyphContourBuilder2(glyphContourBuilder));
+                //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
+                GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphContourBuilder, genParams);
+                atlasBuilder.AddGlyph(gindex, glyphImg);
+
+                using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                 {
-                    //build glyph
-                    builder.BuildFromGlyphIndex(gindex, sizeInPoint);
-
-                    var glyphContourBuilder = new ContourBuilder();
-                    //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
-                    var genParams = new MsdfGenParams();
-                    builder.ReadShapes(new GlyphContourBuilder2(glyphContourBuilder));
-                    //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
-                    GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphContourBuilder, genParams);
-                    atlasBuilder.AddGlyph(gindex, glyphImg);
-
-                    using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                    {
-                        int[] buffer = glyphImg.GetImageBuffer();
-
-                        var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                        System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
-                        bmp.UnlockBits(bmpdata);
-                        bmp.Save("d:\\WImageTest\\a001_xn2_" + gindex + ".png");
-                    }
-                }
-
-                GlyphImage glyphImg2 = atlasBuilder.BuildSingleImage();
-                using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                {
-                    var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
-                        System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                    int[] intBuffer = glyphImg2.GetImageBuffer();
-
-                    System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
+                    int[] buffer = glyphImg.GetImageBuffer();
+                    var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
+                    System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
                     bmp.UnlockBits(bmpdata);
-                    bmp.Save(outputFile);
-                }
-
-                string saveToFile = "d:\\WImageTest\\a_info.bin";
-                using (System.IO.FileStream saveFs = new FileStream(saveToFile, FileMode.Create))
-                {
-                    atlasBuilder.SaveFontInfo(saveFs);
-                    saveFs.Flush();
-                    saveFs.Close();
-                }
-
-                //
-                //-----------
-                //test read texture info back
-                var atlasBuilder2 = new SimpleFontAtlasBuilder();
-                using (System.IO.FileStream readFromFs = new FileStream(saveToFile, FileMode.Open))
-                {
-                    var readbackFontAtlas = atlasBuilder2.LoadFontAtlasInfo(readFromFs);
+                    bmp.Save(tempFolderName + "//glyph_" + gindex + ".png");
                 }
             }
+
+            MemBitmap glyphImg2 = atlasBuilder.BuildSingleImage();
+            glyphImg2.SaveImage(outputFile);
+
+
+            string saveToFile = "a_info.bin";
+            using (System.IO.FileStream saveFs = new FileStream(saveToFile, FileMode.Create))
+            {
+                atlasBuilder.SaveAtlasInfo(saveFs);
+                saveFs.Flush();
+                saveFs.Close();
+            }
+
+            //
+            //-----------
+            //test read texture info back
+            var atlasBuilder2 = new SimpleFontAtlasBuilder();
+            using (System.IO.FileStream readFromFs = new FileStream(saveToFile, FileMode.Open))
+            {
+                var readbackFontAtlas = atlasBuilder2.LoadFontAtlasInfo(readFromFs);
+            }
+
         }
 
         static void CreateSampleMsdfImg(ContourBuilder tx, string outputFile)
@@ -217,7 +245,7 @@ namespace SampleWinForms
                 var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg.Width, glyphImg.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
                 System.Runtime.InteropServices.Marshal.Copy(buffer, 0, bmpdata.Scan0, buffer.Length);
                 bmp.UnlockBits(bmpdata);
-                bmp.Save("d:\\WImageTest\\msdf_shape.png");
+                bmp.Save("msdf_shape.png");
                 //
             }
 
@@ -323,11 +351,7 @@ namespace SampleWinForms
 
             var bmpFontMx = new BitmapFontManager<MemBitmap>(
                  _textServices,
-                 atlas =>
-                 {
-                     GlyphImage totalGlyphImg = atlas.TotalGlyph;
-                     return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
-                 }
+                 atlas => atlas.TotalGlyph
              );
 
             string multiSizeFontAtlasFilename = "tahoma_set1.multisize_fontAtlas";
@@ -397,6 +421,15 @@ namespace SampleWinForms
 
         }
 
+        private void FormMsdfTest2_Load(object sender, EventArgs e)
+        {
+            string[] fontfiles = Directory.GetFiles("Test");//example only, you can change this
+            lstFontFiles.Items.AddRange(fontfiles);
+            if (fontfiles.Length > 0)
+            {
+                lstFontFiles.SelectedIndex = 0;
+            }
+        }
 
         //public static Msdfgen.Shape CreateMsdfShape(GlyphContourBuilder glyphToContour, float pxScale)
         //{
