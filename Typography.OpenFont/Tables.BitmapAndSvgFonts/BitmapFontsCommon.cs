@@ -787,7 +787,7 @@ namespace Typography.OpenFont.Tables.BitmapFonts
             bitmapGlyph.Bounds = new Bounds(0, 0, smallGlyphMetric.width, smallGlyphMetric.height);
             //then 
             //byte[] buff = reader.ReadBytes((int)dataLen);
-            //System.IO.File.WriteAllBytes("d:\\WImageTest\\testBitmapGlyph_" + glyph.GlyphIndex + ".png", buff);
+            //System.IO.File.WriteAllBytes("testBitmapGlyph_" + glyph.GlyphIndex + ".png", buff);
         }
         public override void ReadRawBitmap(BinaryReader reader, Glyph bitmapGlyph, Stream outputStream)
         {
