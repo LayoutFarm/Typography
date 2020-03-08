@@ -44,7 +44,7 @@ namespace PixelFarm.Drawing.Fonts
             _glyphLocations.Add(glyphIndex, glyphData);
         }
         public bool UseSharedGlyphImage { get; set; }
-        public GlyphImage TotalGlyph { get; set; }
+        public PixelFarm.CpuBlit.MemBitmap TotalGlyph { get; set; }
         public bool TryGetGlyphMapData(ushort glyphIndex, out TextureGlyphMapData glyphdata)
         {
             if (!_glyphLocations.TryGetValue(glyphIndex, out glyphdata))

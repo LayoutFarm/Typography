@@ -115,20 +115,21 @@ namespace SampleWinForms
                GetUniqueChars()
             );
 
+            //3. set information before write to font-info
             atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
 
 
-            //3. merge all glyph in the builder into a single image
-            GlyphImage totalGlyphsImg = atlasBuilder.BuildSingleImage();
+            //4. merge all glyph in the builder into a single image
+            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
             string fontTextureImg = "test_glyph_atlas.png";
 
-            //4. save to png
-            SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, fontTextureImg);
+            //5. save to png
+            totalGlyphsImg.SaveImage(fontTextureImg);
             //-----------------------------------------------
-            
-            
+
+
             //let view result...
-            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);           
+            SimpleUtils.DisposeExistingPictureBoxImage(picOutput);
 
             this.lblOutput.Text = "output: " + fontTextureImg;
             this.picOutput.Image = new Bitmap(fontTextureImg);
@@ -221,26 +222,26 @@ namespace SampleWinForms
                 (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
                 buildDetails.ToArray());
 
+            //3. set information before write to font-info
             atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
             atlasBuilder.FontFilename = typeface.Name;
             atlasBuilder.FontKey = reqFont.FontKey;
 
-            //3. merge all glyph in the builder into a single image
-            GlyphImage totalGlyphsImg = atlasBuilder.BuildSingleImage();
+            //4. merge all glyph in the builder into a single image
+            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
 
 
             string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
             string output_imgFilename = textureName + ".png";
 
-            //4. save atlas info to disk
+            //5. save atlas info to disk
             using (FileStream fs = new FileStream(textureName + ".info", FileMode.Create))
             {
                 atlasBuilder.SaveAtlasInfo(fs);
             }
 
-            //5. save total-glyph-image to disk
-            SimpleUtils.SaveGlyphImageToPngFile(totalGlyphsImg, output_imgFilename);
-
+            //6. save total-glyph-image to disk
+            totalGlyphsImg.SaveImage(output_imgFilename); 
 
             ///------------------------------------------------
             //lets view result ...

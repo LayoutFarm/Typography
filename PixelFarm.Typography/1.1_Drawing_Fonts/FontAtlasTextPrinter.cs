@@ -38,10 +38,8 @@ namespace PixelFarm.Drawing.Fonts
         LayoutFarm.OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
         SimpleFontAtlas _fontAtlas;
-        Dictionary<GlyphImage, MemBitmap> _sharedGlyphImgs = new Dictionary<GlyphImage, MemBitmap>();
-
         public FontAtlasTextPrinter(AggPainter painter)
-        { 
+        {
             _painter = painter;
 
             this.PositionTechnique = PositionTechnique.OpenFont;
@@ -50,30 +48,14 @@ namespace PixelFarm.Drawing.Fonts
             //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(
                 _textServices,
-                atlas =>
-                {
-                    GlyphImage totalGlyphImg = atlas.TotalGlyph;
-                    if (atlas.UseSharedGlyphImage)
-                    {
-                        if (!_sharedGlyphImgs.TryGetValue(totalGlyphImg, out MemBitmap found))
-                        {
-                            found = MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
-                            _sharedGlyphImgs.Add(totalGlyphImg, found);
-                        }
-                        return found;
-                    }
-                    else
-                    {
-                        return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
-                    }
-                }
+                atlas => atlas.TotalGlyph
             );
 
             //3.
             ChangeFont(painter.CurrentFont);
             SetupMaskPixelBlender(painter.Width, painter.Height);
         }
-       
+
         public void Dispose()
         {
             //clear this
@@ -81,7 +63,7 @@ namespace PixelFarm.Drawing.Fonts
             //clear alpha buffer
         }
 
-       
+
 
         public AntialiasTechnique AntialiasTech { get; set; }
 

@@ -167,17 +167,9 @@ namespace SampleWinForms
                 }
             }
 
-            GlyphImage glyphImg2 = atlasBuilder.BuildSingleImage();
-            using (Bitmap bmp = new Bitmap(glyphImg2.Width, glyphImg2.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-            {
-                var bmpdata = bmp.LockBits(new System.Drawing.Rectangle(0, 0, glyphImg2.Width, glyphImg2.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadWrite, bmp.PixelFormat);
-                int[] intBuffer = glyphImg2.GetImageBuffer();
+            MemBitmap glyphImg2 = atlasBuilder.BuildSingleImage();
+            glyphImg2.SaveImage(outputFile);
 
-                System.Runtime.InteropServices.Marshal.Copy(intBuffer, 0, bmpdata.Scan0, intBuffer.Length);
-                bmp.UnlockBits(bmpdata);
-                bmp.Save(outputFile);
-            }
 
             string saveToFile = "a_info.bin";
             using (System.IO.FileStream saveFs = new FileStream(saveToFile, FileMode.Create))
@@ -359,11 +351,7 @@ namespace SampleWinForms
 
             var bmpFontMx = new BitmapFontManager<MemBitmap>(
                  _textServices,
-                 atlas =>
-                 {
-                     GlyphImage totalGlyphImg = atlas.TotalGlyph;
-                     return MemBitmap.CreateFromCopy(totalGlyphImg.Width, totalGlyphImg.Height, totalGlyphImg.GetImageBuffer());
-                 }
+                 atlas => atlas.TotalGlyph
              );
 
             string multiSizeFontAtlasFilename = "tahoma_set1.multisize_fontAtlas";
