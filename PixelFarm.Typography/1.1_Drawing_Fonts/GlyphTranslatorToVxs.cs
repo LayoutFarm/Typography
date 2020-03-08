@@ -64,6 +64,20 @@ namespace PixelFarm.Drawing.Fonts
             _pw.Clear();
         }
 
+        public void WriteUnFlattenOutput(VertexStore output, float scale)
+        {
+            if (scale == 1)
+            {
+                output.AppendVertexStore(_vxs);
+            }
+            else
+            {
+                var mat = PixelFarm.CpuBlit.VertexProcessing.Affine.New(
+                    new PixelFarm.CpuBlit.VertexProcessing.AffinePlan(
+                        PixelFarm.CpuBlit.VertexProcessing.AffineMatrixCommand.Scale, scale, scale));
+                mat.TransformToVxs(_vxs, output); 
+            }
+        }
         /// <summary>
         /// write output to vxs
         /// </summary>
@@ -75,7 +89,6 @@ namespace PixelFarm.Drawing.Fonts
             {
                 WriteOutput(output, f, scale);
             }
-
         }
         /// <summary>
         /// write output to vxs

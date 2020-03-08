@@ -115,14 +115,80 @@ namespace Typography.Contours
         }
 
         /// <summary>
+        /// always create new vxs for this glyph, no caching
+        /// </summary>
+        /// <param name="glyphIndex"></param>
+        /// <returns></returns>
+        public VertexStore GetNewUnFlattenVxs(ushort glyphIndex)
+        {
+            _currentGlyphBuilder.BuildFromGlyphIndex(glyphIndex, _currentFontSizeInPoints);
+            DynamicOutline dynamicOutline = _currentGlyphBuilder.LatestGlyphFitOutline;
+
+            //-----------------------------------  
+            _tovxs.Reset();
+            float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_currentFontSizeInPoints);
+
+            if (dynamicOutline != null)
+            {
+                dynamicOutline.GenerateOutput(new ContourToGlyphTranslator(_tovxs), pxscale);
+                //version 3
+
+                if (FlipGlyphUpward)
+                {
+                    using (VxsTemp.Borrow(out var v1))
+                    {
+                        _tovxs.WriteUnFlattenOutput(v1, 1);
+                        return v1.CreateTrim(s_invertY);
+                    }
+
+                }
+                else
+                {
+                    using (VxsTemp.Borrow(out var v1))
+                    {
+                        _tovxs.WriteUnFlattenOutput(v1, 1);
+                        return v1.CreateTrim();
+                    }
+                }
+            }
+            else
+            {
+
+                if (FlipGlyphUpward)
+                {
+                    using (VxsTemp.Borrow(out var v1))
+                    {
+                        _currentGlyphBuilder.ReadShapes(_tovxs);
+                        _tovxs.WriteUnFlattenOutput(v1, 1); //write to temp buffer first 
+
+                        //then
+                        return v1.CreateTrim(s_invertY);
+                    }
+                }
+                else
+                {
+                    //no dynamic outline
+                    using (VxsTemp.Borrow(out var v1))
+                    {
+                        _currentGlyphBuilder.ReadShapes(_tovxs);
+                        //TODO: review here,
+                        //float pxScale = _glyphPathBuilder.GetPixelScale(); 
+
+                        _tovxs.WriteUnFlattenOutput(v1, 1);
+                        return v1.CreateTrim();
+                    }
+                }
+            }
+
+        }
+        /// <summary>
         /// get existing or create new one from current font setting
         /// </summary>
         /// <param name="glyphIndex"></param>
         /// <returns></returns>
         GlyphMeshData InternalGetGlyphMesh(ushort glyphIndex)
         {
-            GlyphMeshData glyphMeshData;
-            if (!_hintGlyphCollection.TryGetCacheGlyph(glyphIndex, out glyphMeshData))
+            if (!_hintGlyphCollection.TryGetCacheGlyph(glyphIndex, out GlyphMeshData glyphMeshData))
             {
                 //if not found then create new glyph vxs and cache it
                 _currentGlyphBuilder.SetHintTechnique(_currentHintTech);
@@ -177,8 +243,8 @@ namespace Typography.Contours
                 float pxscale = _currentTypeface.CalculateScaleToPixelFromPointSize(_currentFontSizeInPoints);
                 DynamicOutline dynamicOutline = glyphMeshData.dynamicOutline;
                 if (dynamicOutline != null)
-                { 
-                    dynamicOutline.GenerateOutput(new ContourToGlyphTranslator(_tovxs), pxscale); 
+                {
+                    dynamicOutline.GenerateOutput(new ContourToGlyphTranslator(_tovxs), pxscale);
                     //version 3
 
                     if (FlipGlyphUpward)
