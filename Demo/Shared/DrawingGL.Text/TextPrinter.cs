@@ -18,7 +18,7 @@ namespace DrawingGL.Text
         //3. generate glyph runs into textrun 
         GlyphTranslatorToPath _pathTranslator;
         string _currentFontFile;
-        GlyphPathBuilder _currentGlyphPathBuilder;
+        GlyphOutlineBuilder _currentGlyphPathBuilder;
 
         //
         // for tess
@@ -96,7 +96,7 @@ namespace DrawingGL.Text
                     }
 
                     //2. glyph builder
-                    _currentGlyphPathBuilder = new GlyphPathBuilder(Typeface);
+                    _currentGlyphPathBuilder = new GlyphOutlineBuilder(Typeface);
                     _currentGlyphPathBuilder.UseTrueTypeInstructions = false; //reset
                     _currentGlyphPathBuilder.UseVerticalHinting = false; //reset
                     switch (this.HintTechnique)
@@ -199,10 +199,7 @@ namespace DrawingGL.Text
         {
 
         }
-        public override void DrawCaret(float x, float y)
-        {
-
-        }
+        
     }
 
 
