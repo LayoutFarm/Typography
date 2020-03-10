@@ -33,7 +33,7 @@ namespace PixelFarm.Drawing.Fonts
         //-----------------------------------------------------------  
         Typeface _currentTypeface;
         Color _fontColor;
-
+        Color _textBgColorHint;
 
         LayoutFarm.OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
@@ -64,8 +64,8 @@ namespace PixelFarm.Drawing.Fonts
         }
 
         public void SetBackgroundColorHint(Color backgroundColor)
-        {
-            _painter.SetTextBackgroundColorHint(backgroundColor);
+        {            
+            _textBgColorHint = backgroundColor;
         }
 
         public AntialiasTechnique AntialiasTech { get; set; }
