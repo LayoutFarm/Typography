@@ -63,7 +63,10 @@ namespace PixelFarm.Drawing.Fonts
             //clear alpha buffer
         }
 
-
+        public void SetBackgroundColorHint(Color backgroundColor)
+        {
+            _painter.SetTextBackgroundColorHint(backgroundColor);
+        }
 
         public AntialiasTechnique AntialiasTech { get; set; }
 

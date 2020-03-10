@@ -66,7 +66,10 @@ namespace PixelFarm.Drawing
         {
 
         }
-
+        public void SetBackgroundColorHint(Color backgroundColor)
+        {
+            //currently, not used in this mode
+        }
         protected override void OnFontSizeChanged()
         {
             //update some font metrics property   
@@ -374,6 +377,8 @@ namespace PixelFarm.Drawing
             GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(ref buffSpan, _reqFont);
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
+
+       
     }
 
 
