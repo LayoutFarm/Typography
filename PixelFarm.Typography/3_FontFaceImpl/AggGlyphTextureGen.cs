@@ -165,8 +165,7 @@ namespace Typography.Contours
 
                 glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
                 //copy data from agg canvas to glyph image 
-                return glyphImage;
-
+                return glyphImage; 
             }
 
         }
