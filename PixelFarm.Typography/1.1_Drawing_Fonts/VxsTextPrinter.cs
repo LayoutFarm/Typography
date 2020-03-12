@@ -66,10 +66,7 @@ namespace PixelFarm.Drawing
         {
 
         }
-        public void SetBackgroundColorHint(Color backgroundColor)
-        {
-            //currently, not used in this mode
-        }
+        
         protected override void OnFontSizeChanged()
         {
             //update some font metrics property   
@@ -283,7 +280,6 @@ namespace PixelFarm.Drawing
             {
                 if (!hasColorGlyphs)
                 {
-
                     bool savedUseLcdMode = _painter.UseSubPixelLcdEffect; //save,restore later
                     RenderQuality savedRederQuality = _painter.RenderQuality;
                     _painter.RenderQuality = RenderQuality.HighQuality;
