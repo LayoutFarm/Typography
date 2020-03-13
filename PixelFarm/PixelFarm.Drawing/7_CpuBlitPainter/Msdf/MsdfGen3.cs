@@ -328,10 +328,7 @@ namespace ExtMsdfGen
         public SpriteTextureMapData<MemBitmap> GenerateMsdfTexture(VertexStore v1)
         {
 
-            Shape shape = CreateShape(v1, out EdgeBmpLut edgeBmpLut);
-
-
-
+            Shape shape = CreateShape(v1, out EdgeBmpLut edgeBmpLut); 
 
             if (MsdfGenParams == null)
             {
