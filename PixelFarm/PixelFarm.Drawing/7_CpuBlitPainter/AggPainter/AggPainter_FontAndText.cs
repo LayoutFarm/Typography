@@ -11,7 +11,7 @@ namespace PixelFarm.CpuBlit
         //font
         RequestFont _currentFont;
         ITextPrinter _textPrinter;
-
+         
         public ITextPrinter TextPrinter
         {
             get => _textPrinter;
@@ -66,6 +66,7 @@ namespace PixelFarm.CpuBlit
         }
         public override void DrawString(RenderVxFormattedString renderVx, double left, double top)
         {
+            //draw string from render vx 
             _textPrinter?.DrawString(renderVx, left, top);
         }
         public override RenderVxFormattedString CreateRenderVx(string textspan)
