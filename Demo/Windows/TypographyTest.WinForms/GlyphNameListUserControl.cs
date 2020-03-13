@@ -75,7 +75,7 @@ namespace TypographyTest.WinForms
                     else
                     {
                         //show 
-                        Glyph found = _selectedTypeface.GetGlyph(userSupplyGlyphName);
+                        Glyph found = _selectedTypeface.GetGlyphByName(userSupplyGlyphName);
                         if (found != null && found.GlyphIndex != 0)
                         {
                             ShowGlyphNameList(_allGlyphNameMapList);

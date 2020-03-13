@@ -66,7 +66,7 @@ namespace PixelFarm.Drawing
         {
 
         }
-
+        
         protected override void OnFontSizeChanged()
         {
             //update some font metrics property   
@@ -280,7 +280,6 @@ namespace PixelFarm.Drawing
             {
                 if (!hasColorGlyphs)
                 {
-
                     bool savedUseLcdMode = _painter.UseSubPixelLcdEffect; //save,restore later
                     RenderQuality savedRederQuality = _painter.RenderQuality;
                     _painter.RenderQuality = RenderQuality.HighQuality;
@@ -374,6 +373,8 @@ namespace PixelFarm.Drawing
             GlyphPlanSequence glyphPlanSeq = _textServices.CreateGlyphPlanSeq(ref buffSpan, _reqFont);
             DrawFromGlyphPlans(glyphPlanSeq, x, y);
         }
+
+       
     }
 
 

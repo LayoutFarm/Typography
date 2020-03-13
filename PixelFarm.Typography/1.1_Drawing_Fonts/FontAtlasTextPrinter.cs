@@ -33,7 +33,7 @@ namespace PixelFarm.Drawing.Fonts
         //-----------------------------------------------------------  
         Typeface _currentTypeface;
         Color _fontColor;
-
+        
 
         LayoutFarm.OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
@@ -62,8 +62,7 @@ namespace PixelFarm.Drawing.Fonts
             //clear maskbuffer
             //clear alpha buffer
         }
-
-
+ 
 
         public AntialiasTechnique AntialiasTech { get; set; }
 

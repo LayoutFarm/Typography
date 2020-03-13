@@ -181,7 +181,7 @@ namespace Typography.OpenFont
         {
             if (_cffTable != null)
             {
-                return GetGlyph(glyphName)?.GlyphIndex ?? 0;
+                return GetGlyphByName(glyphName)?.GlyphIndex ?? 0;
             }
             else if (PostTable != null)
             {
@@ -205,29 +205,12 @@ namespace Typography.OpenFont
             }
             return 0;
         }
+
         public Glyph GetGlyph(ushort glyphIndex)
         {
             return _glyphs[glyphIndex];
         }
-        public Glyph GetGlyph(string glyphName)
-        {
-            if (_cffTable != null)
-            {
-                //early preview ...
-                List<CFF.Cff1Font> cff1Fonts = _cffTable.Cff1FontSet._fonts;
-                for (int i = 0; i < cff1Fonts.Count; i++)
-                {
-                    Glyph glyph = cff1Fonts[i].GetGlyphByName(glyphName);
-                    if (glyph != null) return glyph;
-                }
-                return null;
-            }
-            else if (PostTable != null)
-            {
-                return GetGlyph(GetGlyphIndexByName(glyphName));
-            }
-            return null;
-        }
+       
 
         public ushort GetAdvanceWidth(int codepoint)
         {
