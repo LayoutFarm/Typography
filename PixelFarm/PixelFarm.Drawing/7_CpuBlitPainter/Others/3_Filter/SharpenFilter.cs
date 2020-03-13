@@ -112,7 +112,7 @@ namespace PixelFarm.CpuBlit.Imaging
 
     //                Sharpen(srcBuffer1, img.Stride, img.Width, img.Height, outputBuffer1);
     //            }
-    //            //ActualImage.SaveImgBufferToPngFile(output, img.Stride, img.Width + 1, img.Height + 1, "d:\\WImageTest\\test_1.png");
+    //            //ActualImage.SaveImgBufferToPngFile(output, img.Stride, img.Width + 1, img.Height + 1, "test_1.png");
     //            img.ReplaceBuffer(output);
     //        }
 
