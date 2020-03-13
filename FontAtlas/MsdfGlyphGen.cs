@@ -213,7 +213,7 @@ namespace Typography.Rendering
                 translate,//translate to positive quadrant
                 edgeThreshold);
             //-----------------------------------
-            int[] buffer = Msdfgen.MsdfGenerator.ConvertToIntBmp(frgbBmp, false);
+            int[] buffer = Msdfgen.FloatRGBBmp.ConvertToIntBmp(frgbBmp, false);
 
             GlyphImage img = new GlyphImage(w, h);
             img.TextureOffsetX = (short)translate.x; //TODO: review here, rounding err
