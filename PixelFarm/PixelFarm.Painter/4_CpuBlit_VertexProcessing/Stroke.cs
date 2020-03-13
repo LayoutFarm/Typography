@@ -91,7 +91,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         {
             StrokeGenerator strkgen = _strokeGen;
             int j = sourceVxs.Count;
-            strkgen.Reset();
+            strkgen.ClearTempVertice();
 
             double x = 0, y = 0, startX = 0, startY = 0,
                   latest_x = 0, latest_y = 0;

@@ -103,10 +103,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             _walkStateMan.Reset();
             int count = src.Count;
             VertexCmd cmd;
-            double x, y;
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out x, out y);
+                cmd = src.GetVertex(i, out double x, out double y);
                 switch (cmd)
                 {
                     case VertexCmd.MoveTo:

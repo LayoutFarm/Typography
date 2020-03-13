@@ -36,7 +36,7 @@ namespace PixelFarm.Drawing
             return Rectangle.FromLTRB(
                 System.Math.Max(_left, left),
                 System.Math.Max(_top, top),
-                System.Math.Min(_left + _top, left + width),
+                System.Math.Min(_left + _width, left + width),
                 System.Math.Min(_top + _height, top + height));
         }
         /// <summary>
@@ -51,7 +51,7 @@ namespace PixelFarm.Drawing
             return Rectangle.FromLTRB(
                 System.Math.Max(_left, 0),
                 System.Math.Max(_top, 0),
-                System.Math.Min(_left + _top, width),
+                System.Math.Min(_left + _width, width),
                 System.Math.Min(_top + _height, height));
         }
         int _prev_left, _prev_top, _prev_width, _prev_height;
@@ -69,7 +69,9 @@ namespace PixelFarm.Drawing
         public int Left => _left;
         public int Top => _top;
         public int Width => _width;
-        public int Height => _height;
+
+        public int Height { get => _height; set => _height = value; }
+
         public int Right => _left + _width;
         public int Bottom => _top + _height;
 
@@ -85,8 +87,15 @@ namespace PixelFarm.Drawing
         public void OffsetY(int dy)
         {
             _top += dy;
-        } 
-       
+        }
+
+
+#if DEBUG
+        public override string ToString()
+        {
+            return $"({_left},{_top},{_width},{_height})";
+        }
+#endif
     }
 
     public abstract class DrawBoard : System.IDisposable
@@ -158,8 +167,8 @@ namespace PixelFarm.Drawing
         public abstract Rectangle CurrentClipRect { get; }
         //------------------------------------------------------
         //buffer
-        public abstract void Clear(Color c);
-        public abstract void RenderTo(System.IntPtr destHdc, int sourceX, int sourceY, Rectangle destArea);
+        public abstract void Clear(Color c); //TODO: add SetClearColor(), Clear(), 
+        public abstract void RenderTo(System.IntPtr destHdc, int sourceX, int sourceY, Rectangle destArea); //TODO: review here
         public virtual void RenderTo(Image destImg, int srcX, int srcYy, int srcW, int srcH) { }
         //------------------------------------------------------- 
 
@@ -188,7 +197,11 @@ namespace PixelFarm.Drawing
         public abstract void DrawText(char[] buffer, int x, int y);
         public abstract void DrawText(char[] buffer, Rectangle logicalTextBox, int textAlignment);
         public abstract void DrawText(char[] buffer, int startAt, int len, Rectangle logicalTextBox, int textAlignment);
-
+        public abstract DrawTextTechnique DrawTextTechnique { get; set; }
+        //TODO: review here again
+        public abstract Color TextBackgroundColorHint { get; set; }//explicit set current text background color hint
+        public abstract bool SetLatestFillAsTextBackgroundColorHint();
+        public abstract bool LatestFillCouldbeUsedAsTextBackgroundHint();
         //-------------------------------------------------------
         /// <summary>
         /// create formatted string base on current font,font-size, font style
@@ -213,7 +226,7 @@ namespace PixelFarm.Drawing
         public abstract bool IsGpuDrawBoard { get; }
         public abstract void BlitFrom(DrawBoard src, float srcX, float srcY, float srcW, float srcH, float dstX, float dstY);
         public abstract BitmapBufferProvider GetInternalBitmapProvider();
-        public abstract DrawTextTechnique DrawTextTechnique { get; set; }
+
     }
 
     public enum DrawTextTechnique : byte

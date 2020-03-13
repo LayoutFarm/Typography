@@ -74,10 +74,8 @@ namespace PixelFarm.Drawing.BitmapAtlas
                 case CompactOption.BinPack:
                     {
                         //2. sort by glyph width
-                        itemList.Sort((a, b) =>
-                        {
-                            return a.img.Width.CompareTo(b.img.Width);
-                        });
+                        itemList.Sort((a, b) => a.img.Width.CompareTo(b.img.Width));
+
                         //3. layout 
                         for (int i = itemList.Count - 1; i >= 0; --i)
                         {
@@ -102,10 +100,8 @@ namespace PixelFarm.Drawing.BitmapAtlas
                 case CompactOption.ArrangeByHeight:
                     {
                         //2. sort by height
-                        itemList.Sort((a, b) =>
-                        {
-                            return a.img.Height.CompareTo(b.img.Height);
-                        });
+                        itemList.Sort((a, b) => a.img.Height.CompareTo(b.img.Height));
+
                         //3. layout 
                         int glyphCount = itemList.Count;
                         for (int i = 0; i < glyphCount; ++i)
@@ -159,7 +155,7 @@ namespace PixelFarm.Drawing.BitmapAtlas
             int imgH = currentY;
             // -------------------------------
             //compact image location
-            // TODO: review performance here again***
+            //TODO: review performance here again***
 
             int totalImgWidth = totalMaxLim;
             if (SpaceCompactOption == CompactOption.BinPack) //again here?
@@ -171,8 +167,7 @@ namespace PixelFarm.Drawing.BitmapAtlas
                 {
                     CacheBmp g = itemList[i];
                     BinPackRect newRect = binPacker.Insert(g.img.Width, g.img.Height);
-                    g.area = new Rectangle(newRect.X, newRect.Y,
-                        g.img.Width, g.img.Height);
+                    g.area = new Rectangle(newRect.X, newRect.Y, g.img.Width, g.img.Height);
 
 
                     //recalculate proper max midth again, after arrange and compact space
@@ -183,7 +178,7 @@ namespace PixelFarm.Drawing.BitmapAtlas
                 }
             }
             // ------------------------------- 
-            //4. create array that can hold data  
+            //4. create a mergeBmpBuffer
 
             MemBitmap totalBmp = new MemBitmap(totalImgWidth, imgH);
             if (SpaceCompactOption == CompactOption.BinPack) //again here?
@@ -243,27 +238,6 @@ namespace PixelFarm.Drawing.BitmapAtlas
                 _latestGenGlyphImage = glyphImage;
                 return glyphImage;
             }
-
-
-
-            //}
-            //else
-            //{
-            //int[] totalBufferFlipY = new int[totalBuffer.Length];
-            //int srcRowIndex = 0;
-            //int strideInBytes = totalImgWidth * 4;
-            //for (int i = 0; i < imgH; ++i)
-            //{
-            //    //copy each row from src to dst
-            //    System.Buffer.BlockCopy(totalBuffer, strideInBytes * srcRowIndex, totalBufferFlipY, strideInBytes * i, strideInBytes);
-            //    srcRowIndex++;
-            //}
-            //totalBuffer = totalBufferFlipY;
-            //}
-            //glyphImage.SetImageBuffer(totalBmp, true);
-            //_latestGenGlyphImage = glyphImage;
-            //return glyphImage;
-
         }
 
         public void SaveAtlasInfo(System.IO.Stream outputStream)
