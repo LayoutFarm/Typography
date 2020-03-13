@@ -63,15 +63,8 @@
     <Compile Include="1.1_Drawing_Fonts\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.1_Drawing_Fonts\GlyphMeshStore.cs" />
     <Compile Include="1.1_Drawing_Fonts\OpenFontTextService.cs" />
-    <Compile Include="1.3_DrawingFonts\ManagedShapingService.cs" />
-    <Compile Include="1.3_DrawingFonts\TextShapingAndLayoutService.cs" />
-    <Compile Include="2_Drawing_Text\ActualFont.cs" />
-    <Compile Include="2_Drawing_Text\FontFace.cs" />
-    <Compile Include="2_Drawing_Text\FontGlyph.cs" />
     <Compile Include="3_FontFaceImpl\BitmapFontMx.cs" />
     <Compile Include="3_FontFaceImpl\GlyphTextureBitmapGenerator.cs" />
-    <Compile Include="3_FontFaceImpl\NOpenFontFace.cs" />
-    <Compile Include="3_FontFaceImpl\OpenFontLoader.cs" />
     <Compile Include="1.1_Drawing_Fonts\VxsTextPrinter.cs" />
     <Compile Include="3_FontFaceImpl\ScriptLangConv.cs" />
     <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
