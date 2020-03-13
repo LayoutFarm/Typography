@@ -254,6 +254,11 @@ namespace SampleWinForms
                 glyphTextureGen.MsdfGenVersion = textureKindAndDesc.TechniqueDetail;
             }
 
+#if DEBUG
+            //overall, glyph atlas generation time
+            System.Diagnostics.Stopwatch dbugStopWatch = new System.Diagnostics.Stopwatch();
+            dbugStopWatch.Start();
+#endif
             SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
                 fontSizeInPoints,
                 textureKindAndDesc.Kind,
@@ -267,6 +272,11 @@ namespace SampleWinForms
             //4. merge all glyph in the builder into a single image
             MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
 
+#if DEBUG
+            dbugStopWatch.Stop();
+            this.Text += ", finished: build time(ms)=" + dbugStopWatch.ElapsedMilliseconds;
+            System.Diagnostics.Debug.WriteLine("font atlas build time (ms): " + dbugStopWatch.ElapsedMilliseconds);
+#endif
 
             string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
             string output_imgFilename = textureName + ".png";
