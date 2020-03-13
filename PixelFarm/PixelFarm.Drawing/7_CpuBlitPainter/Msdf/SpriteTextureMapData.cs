@@ -1,6 +1,6 @@
 ﻿//MIT, 2016-present, WinterDev
 
-namespace ExtMsdfGen
+namespace Msdfgen
 {
     public class SpriteTextureMapData<T>
     {

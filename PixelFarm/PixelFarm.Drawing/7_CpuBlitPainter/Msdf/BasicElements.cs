@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ExtMsdfGen
+namespace Msdfgen
 {
 
     public struct Vector2
@@ -177,7 +177,7 @@ namespace ExtMsdfGen
             }
         }
 
-        
+
     }
     public class Contour
     {
@@ -223,16 +223,7 @@ namespace ExtMsdfGen
                   ));
         }
 
-        public PixelFarm.CpuBlit.RectD GetRectBounds()
-        {
-            var boundsLeft = double.MaxValue;
-            var boundsRight = double.MinValue;
-            var boundsTop = double.MinValue;
-            var boundsBottom = double.MaxValue;
-
-            findBounds(ref boundsLeft, ref boundsBottom, ref boundsRight, ref boundsTop);
-            return new PixelFarm.CpuBlit.RectD(boundsLeft, boundsBottom, boundsRight, boundsTop);
-        }
+        
         public void findBounds(ref double left, ref double bottom, ref double right, ref double top)
         {
             if (!_hasCalculatedBounds)
@@ -309,7 +300,7 @@ namespace ExtMsdfGen
 
         }
 
-        
+
     }
 
     public struct FloatRGB
@@ -392,6 +383,85 @@ namespace ExtMsdfGen
         {
             return _buffer[x + (y * _w)];
         }
+        public static int[] ConvertToIntBmp(FloatRGBBmp input, bool flipY)
+        {
+            int height = input.Height;
+            int width = input.Width;
+
+            int[] output = new int[input.Width * input.Height];
+
+
+            if (flipY)
+            {
+                int dstLineHead = width * (height - 1);
+                for (int y = 0; y < height; ++y)
+                {
+                    for (int x = 0; x < width; ++x)
+                    {
+                        //a b g r
+                        //----------------------------------
+                        FloatRGB pixel = input.GetPixel(x, y);
+                        //a b g r
+                        //for big-endian color
+                        //int abgr = (255 << 24) |
+                        //    Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
+                        //    Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                        //    Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
+
+                        //for little-endian color
+
+                        output[dstLineHead + x] = (255 << 24) |
+                            Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
+                            Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                            Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
+
+                        //output[(y * width) + x] = abgr;
+                        //----------------------------------
+                        /**it++ = clamp(int(bitmap(x, y).r*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).g*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).b*0x100), 0xff);*/
+                    }
+
+                    dstLineHead -= width;
+                }
+            }
+            else
+            {
+                int dstLineHead = 0;
+                for (int y = 0; y < height; ++y)
+                {
+                    for (int x = 0; x < width; ++x)
+                    {
+                        //a b g r
+                        //----------------------------------
+                        FloatRGB pixel = input.GetPixel(x, y);
+                        //a b g r
+                        //for big-endian color
+                        //int abgr = (255 << 24) |
+                        //    Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
+                        //    Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                        //    Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
+
+                        //for little-endian color
+
+                        output[dstLineHead + x] = (255 << 24) |
+                            Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
+                            Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                            Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
+
+                        //output[(y * width) + x] = abgr;
+                        //----------------------------------
+                        /**it++ = clamp(int(bitmap(x, y).r*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).g*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).b*0x100), 0xff);*/
+                    }
+
+                    dstLineHead += width;
+                }
+            }
+            return output;
+        }
+
     }
 
 

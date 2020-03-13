@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using PixelFarm.Drawing;
 
-namespace ExtMsdfGen
+namespace Msdfgen
 {
     class CornerList
     {

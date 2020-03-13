@@ -152,7 +152,7 @@ namespace PixelFarm.Drawing.Fonts
                     MsdfGenParams msdfGenParams = new MsdfGenParams();
                     int j = glyphIndices.Length;
 
-                    ExtMsdfGen.MsdfGen3 gen3 = new ExtMsdfGen.MsdfGen3();
+                    Msdfgen.MsdfGen3 gen3 = new Msdfgen.MsdfGen3();
                     for (int i = 0; i < j; ++i)
                     {
                         ushort gindex = glyphIndices[i];
@@ -165,7 +165,7 @@ namespace PixelFarm.Drawing.Fonts
                         using (VxsTemp.Borrow(out var vxs1))
                         {
                             glyphToVxs.WriteUnFlattenOutput(vxs1, pxscale);
-                            ExtMsdfGen.SpriteTextureMapData<PixelFarm.CpuBlit.MemBitmap> mapData = gen3.GenerateMsdfTexture(vxs1);
+                            Msdfgen.SpriteTextureMapData<PixelFarm.CpuBlit.MemBitmap> mapData = gen3.GenerateMsdfTexture(vxs1);
 
                             CpuBlit.MemBitmap output = mapData.Source;
                             //convert membitmap to GlyphImage

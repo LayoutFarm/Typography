@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ExtMsdfGen
+namespace Msdfgen
 {
     /// <summary>
     /// parameter for msdf generation
@@ -188,7 +188,7 @@ namespace ExtMsdfGen
     }
     public static class MsdfGenerator
     {
-        
+
 
         static float median(float a, float b, float c)
         {
@@ -278,8 +278,8 @@ namespace ExtMsdfGen
             //    pixel.r = med, pixel.g = med, pixel.b = med;
             //}
         }
-         
- 
+
+
         public static void generateMSDF(FloatRGBBmp output, Shape shape, double range, Vector2 scale, Vector2 translate, double edgeThreshold)
         {
             List<Contour> contours = shape.contours;
