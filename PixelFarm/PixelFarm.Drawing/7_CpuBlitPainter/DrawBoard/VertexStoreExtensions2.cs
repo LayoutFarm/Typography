@@ -27,6 +27,22 @@ namespace PixelFarm.Drawing
 {
     public static class VertexStoreExtensions2
     {
+        public static void ReverseClockDirection(this VertexStore src, VertexStore outputVxs)
+        {
+            //temp fix for reverse clock direction
+            RectD bounds = src.GetBoundingRect();
+            double centerX = (bounds.Left + bounds.Width) / 2;
+            double centerY = (bounds.Top + bounds.Height) / 2;
+
+            Affine aff = Affine.New(AffinePlan.Translate(-centerX, -centerY),
+                 AffinePlan.Scale(1, -1),//flipY,
+                 AffinePlan.Translate(centerX, centerY));
+
+            aff.TransformToVxs(src, outputVxs);
+
+        }
+
+
         /// <summary>
         /// copy + translate vertext data from src to outputVxs
         /// </summary>
@@ -39,10 +55,9 @@ namespace PixelFarm.Drawing
         {
             int count = src.Count;
             VertexCmd cmd;
-            double x, y;
             for (int i = 0; i < count; ++i)
             {
-                cmd = src.GetVertex(i, out x, out y);
+                cmd = src.GetVertex(i, out double x, out double y);
                 x += dx;
                 y += dy;
                 outputVxs.AddVertex(x, y, cmd);

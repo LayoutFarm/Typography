@@ -74,7 +74,7 @@ namespace PixelFarm.CpuBlit.Rasterization
 
     public class PrebuiltGammaTable
     {
-        internal int[] _gammaLut = new int[ScanlineRasterizer.AA_SCALE];
+        internal readonly int[] _gammaLut = new int[ScanlineRasterizer.AA_SCALE];
         public PrebuiltGammaTable(IGammaFunction gamma_function)
         {
             for (int i = ScanlineRasterizer.AA_SCALE - 1; i >= 0; --i)
@@ -82,6 +82,20 @@ namespace PixelFarm.CpuBlit.Rasterization
                 _gammaLut[i] = AggMath.uround(
                     gamma_function.GetGamma((float)(i) / ScanlineRasterizer.AA_MASK) * ScanlineRasterizer.AA_MASK);
             }
+        }
+        private PrebuiltGammaTable() { }
+
+
+        public static PrebuiltGammaTable CreateSameValuesGammaTable(int value)
+        {
+            //TODO: review the name,
+            //in this case, it should not be call gamma table?
+            PrebuiltGammaTable table = new PrebuiltGammaTable();
+            for (int i = ScanlineRasterizer.AA_SCALE - 1; i >= 0; --i)
+            {
+                table._gammaLut[i] = value;
+            }
+            return table;
         }
 
     }
@@ -217,8 +231,9 @@ namespace PixelFarm.CpuBlit.Rasterization
             }
             else
             {
-                _gammaLut = _orgGammaLut;
                 _useDefaultGammaLut = true;
+                _gammaLut = _orgGammaLut;
+
             }
         }
         //------------------------------------------------------------------------
@@ -261,7 +276,7 @@ namespace PixelFarm.CpuBlit.Rasterization
                 case VertexCmd.C4:
                     LineTo(x, y);
                     break;
-                case VertexCmd.Close: 
+                case VertexCmd.Close:
                     ClosePolygon();
                     break;
                 default:

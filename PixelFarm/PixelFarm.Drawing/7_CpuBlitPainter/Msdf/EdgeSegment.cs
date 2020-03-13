@@ -26,6 +26,7 @@ namespace ExtMsdfGen
         public abstract void findBounds(ref double left, ref double bottom, ref double right, ref double top);
         public void distanceToPseudoDistance(ref SignedDistance distance, Vector2 origin, double param)
         {
+
             if (param < 0)
             {
                 Vector2 dir = direction(0).normalize();
@@ -78,6 +79,8 @@ namespace ExtMsdfGen
 
         }
         public abstract EdgeSegmentKind SegmentKind { get; }
+
+        
     }
     public class LinearSegment : EdgeSegment
     {
@@ -132,6 +135,7 @@ namespace ExtMsdfGen
             return mix(_p0, _p1, param);
         }
         public override EdgeSegmentKind SegmentKind => EdgeSegmentKind.LineSegment;
+       
 #if DEBUG
         public override string ToString()
         {
@@ -247,6 +251,8 @@ namespace ExtMsdfGen
                 return new SignedDistance(minDistance, Math.Abs(Vector2.dotProduct((_p2 - _p1).normalize(), (_p2 - origin).normalize())));
         }
         public override EdgeSegmentKind SegmentKind => EdgeSegmentKind.QuadraticSegment;
+
+         
 #if DEBUG
         public override string ToString()
         {
@@ -303,6 +309,8 @@ namespace ExtMsdfGen
             }
 
         }
+      
+
         public override void splitInThirds(out EdgeSegment part1, out EdgeSegment part2, out EdgeSegment part3)
         {
             part1 = new CubicSegment(_p0, Vector2.IsEq(_p0, _p1) ? _p0 : mix(_p0, _p1, 1 / 3.0), mix(mix(_p0, _p1, 1 / 3.0), mix(_p1, _p2, 1 / 3.0), 1 / 3.0), point(1 / 3.0), color);
