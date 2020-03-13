@@ -149,6 +149,7 @@ namespace PixelFarm.Drawing.Fonts
                 System.Diagnostics.Stopwatch dbugWatch = new System.Diagnostics.Stopwatch();
                 dbugWatch.Start();
 #endif
+                float pxscale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
                 if (MsdfGenVersion == 3)
                 {
                     MsdfGenParams msdfGenParams = new MsdfGenParams();
@@ -160,13 +161,13 @@ namespace PixelFarm.Drawing.Fonts
                         ushort gindex = glyphIndices[i];
                         //create picture with unscaled version set scale=-1
                         //(we will create glyph contours and analyze them)
-                        outlineBuilder.BuildFromGlyphIndex(gindex, sizeInPoint);
+                        outlineBuilder.BuildFromGlyphIndex(gindex, -1);
 
                         var glyphToVxs = new GlyphTranslatorToVxs();
                         outlineBuilder.ReadShapes(glyphToVxs);
                         using (VxsTemp.Borrow(out var vxs1))
                         {
-                            glyphToVxs.WriteUnFlattenOutput(vxs1, 1);
+                            glyphToVxs.WriteUnFlattenOutput(vxs1, pxscale);
                             ExtMsdfGen.SpriteTextureMapData<PixelFarm.CpuBlit.MemBitmap> mapData = gen3.GenerateMsdfTexture(vxs1);
 
                             CpuBlit.MemBitmap output = mapData.Source;
@@ -187,7 +188,7 @@ namespace PixelFarm.Drawing.Fonts
                 }
                 else
                 {
-                    float pxscale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
+
                     MsdfGenParams msdfGenParams = new MsdfGenParams();
                     int j = glyphIndices.Length;
 
