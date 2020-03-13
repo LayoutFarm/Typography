@@ -2,7 +2,7 @@
 //MIT, 2017-present, WinterDev (C# port)
 using System;
 
-namespace ExtMsdfGen
+namespace Msdfgen
 {
     public enum EdgeSegmentKind
     {
@@ -80,7 +80,7 @@ namespace ExtMsdfGen
         }
         public abstract EdgeSegmentKind SegmentKind { get; }
 
-        
+
     }
     public class LinearSegment : EdgeSegment
     {
@@ -135,7 +135,7 @@ namespace ExtMsdfGen
             return mix(_p0, _p1, param);
         }
         public override EdgeSegmentKind SegmentKind => EdgeSegmentKind.LineSegment;
-       
+
 #if DEBUG
         public override string ToString()
         {
@@ -252,7 +252,7 @@ namespace ExtMsdfGen
         }
         public override EdgeSegmentKind SegmentKind => EdgeSegmentKind.QuadraticSegment;
 
-         
+
 #if DEBUG
         public override string ToString()
         {
@@ -309,7 +309,7 @@ namespace ExtMsdfGen
             }
 
         }
-      
+
 
         public override void splitInThirds(out EdgeSegment part1, out EdgeSegment part2, out EdgeSegment part3)
         {

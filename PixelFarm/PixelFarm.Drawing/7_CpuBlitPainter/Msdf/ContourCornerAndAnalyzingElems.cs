@@ -1,7 +1,7 @@
 ﻿//MIT, 2019-present, WinterDev
 
 using System;
-namespace ExtMsdfGen
+namespace Msdfgen
 {
 
     public enum AreaKind : byte

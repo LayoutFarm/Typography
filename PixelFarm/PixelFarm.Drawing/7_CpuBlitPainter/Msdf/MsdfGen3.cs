@@ -9,7 +9,7 @@ using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
 using PixelFarm.Drawing;
 
-namespace ExtMsdfGen
+namespace Msdfgen
 {
     /// <summary>
     /// msdf texture generator
@@ -805,7 +805,7 @@ namespace ExtMsdfGen
             //}
         }
 
-        static SpriteTextureMapData<PixelFarm.CpuBlit.MemBitmap> CreateMsdfImage(ExtMsdfGen.Shape shape, MsdfGenParams genParams, int w, int h, Vector2 translate, EdgeBmpLut lutBuffer = null)
+        static SpriteTextureMapData<PixelFarm.CpuBlit.MemBitmap> CreateMsdfImage(Shape shape, MsdfGenParams genParams, int w, int h, Vector2 translate, EdgeBmpLut lutBuffer = null)
         {
             double edgeThreshold = genParams.edgeThreshold;
             if (edgeThreshold < 0)

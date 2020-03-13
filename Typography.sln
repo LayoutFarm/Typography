@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1022
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{EFD3FB30-FFF6-4717-9D2A-A909E6D01DEE}"
 EndProject
@@ -58,8 +58,6 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.TextFlow", "Typography.TextFlow\Typography.TextFlow.shproj", "{7A8A63D2-2CB5-41F5-8E83-6F6E54398CF4}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.TextServices", "Typography.TextServices\Typography.TextServices.shproj", "{D07686EE-2618-4C20-8EB5-32AD4C4D3810}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Typography.MsdfGen", "Typography.MsdfGen\Typography.MsdfGen.shproj", "{86A03BFA-0879-4449-8D6C-B1F9FB062E7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Typography.MsdfGen", "Build\N20\Typography.MsdfGen\Typography.MsdfGen.csproj", "{9A3B8B84-56BE-4AA1-8D90-1B3B3FEF1F71}"
 EndProject
@@ -119,14 +117,11 @@ Global
 		Typography.TextFlow\Typography.TextFlow.projitems*{333f3209-8da9-4d33-a560-299ed4c6dfa5}*SharedItemsImports = 4
 		PixelFarm\BackEnd.Triangulation\Triangulation.projitems*{4f435da3-706a-4e6d-ae29-e1e95bd6f68a}*SharedItemsImports = 13
 		FontAtlas\FontAtlas.projitems*{540a2ea6-dae3-4625-8951-b2c3118603a4}*SharedItemsImports = 4
-		Typography.MsdfGen\Typography.MsdfGen.projitems*{540a2ea6-dae3-4625-8951-b2c3118603a4}*SharedItemsImports = 4
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
 		Typography.TextFlow\Typography.TextFlow.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
 		Typography.TextServices\Typography.TextServices.projitems*{6b0e034b-0ebd-4907-ad7f-437de66d78d4}*SharedItemsImports = 4
 		Typography.TextFlow\Typography.TextFlow.projitems*{7a8a63d2-2cb5-41f5-8e83-6f6e54398cf4}*SharedItemsImports = 13
-		Typography.MsdfGen\Typography.MsdfGen.projitems*{86a03bfa-0879-4449-8d6c-b1f9fb062e7e}*SharedItemsImports = 13
 		Unpack_SH\Unpack_SH.projitems*{901a60ed-baef-45f6-8919-6e07ee6bad8d}*SharedItemsImports = 4
-		Typography.MsdfGen\Typography.MsdfGen.projitems*{9a3b8b84-56be-4aa1-8d90-1b3b3fef1f71}*SharedItemsImports = 4
 		Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems*{9a99f103-b119-4a4d-8093-6a03baa6d36b}*SharedItemsImports = 13
 		Demo\Shared\DrawingGL.Common.projitems*{a09b4bf0-2c5e-42e9-b23c-afd0b5a8697d}*SharedItemsImports = 4
 		FontAtlas\FontAtlas.projitems*{b2667a10-2969-493f-8e7b-23f21cbfb886}*SharedItemsImports = 4
@@ -2056,7 +2051,6 @@ Global
 		{9A99F103-B119-4A4D-8093-6A03BAA6D36B} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
 		{7A8A63D2-2CB5-41F5-8E83-6F6E54398CF4} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
 		{D07686EE-2618-4C20-8EB5-32AD4C4D3810} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
-		{86A03BFA-0879-4449-8D6C-B1F9FB062E7E} = {EDF760BE-F3FA-4361-AFFA-5CB70A3E9E55}
 		{9A3B8B84-56BE-4AA1-8D90-1B3B3FEF1F71} = {189B365C-127C-4377-88F3-C3D391B43993}
 		{333F3209-8DA9-4D33-A560-299ED4C6DFA5} = {189B365C-127C-4377-88F3-C3D391B43993}
 		{6B0E034B-0EBD-4907-AD7F-437DE66D78D4} = {189B365C-127C-4377-88F3-C3D391B43993}
