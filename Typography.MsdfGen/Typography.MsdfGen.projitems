@@ -11,7 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)EdgeColor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EdgeColoring.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EdgeHolder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EdgeSegment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EquationSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MsdfGen.cs" />

@@ -52,24 +52,29 @@ namespace Msdfgen
             color = (EdgeColor)((shifted | shifted >> 3) & (int)EdgeColor.WHITE);
             seed >>= 1;
         }
+
+
         public static void edgeColoringSimple(Shape shape, double angleThreshold, ulong seed = 0)
         {
             double crossThreshold = Math.Sin(angleThreshold);
             List<int> corners = new List<int>(); //TODO: review reusable list
+
 
             // for (std::vector<Contour>::iterator contour = shape.contours.begin(); contour != shape.contours.end(); ++contour)
             foreach (Contour contour in shape.contours)
             {
                 // Identify corners 
                 corners.Clear();
-                List<EdgeHolder> edges = contour.edges;
+                List<EdgeSegment> edges = contour.edges;
                 int edgeCount = edges.Count;
                 if (edgeCount != 0)
                 {
+
+                    //original
                     Vector2 prevDirection = edges[edgeCount - 1].direction(1);// (*(contour->edges.end() - 1))->direction(1); 
                     for (int i = 0; i < edgeCount; ++i)
                     {
-                        EdgeHolder edge = edges[i];
+                        EdgeSegment edge = edges[i];
                         if (isCorner(prevDirection.normalize(),
                             edge.direction(0).normalize(), crossThreshold))
                         {
@@ -77,6 +82,8 @@ namespace Msdfgen
                         }
                         prevDirection = edge.direction(1);
                     }
+
+
                 }
 
                 // Smooth contour
@@ -111,14 +118,14 @@ namespace Msdfgen
                     {
                         // Less than three edge segments for three colors => edges must be split
                         EdgeSegment[] parts = new EdgeSegment[7]; //empty array, TODO: review array alloc here
-                        edges[0].edgeSegment.splitInThirds(
+                        edges[0].splitInThirds(
                             out parts[0 + 3 * corner],
                             out parts[1 + 3 * corner],
                             out parts[2 + 3 * corner]);
 
                         if (edgeCount >= 2)
                         {
-                            edges[1].edgeSegment.splitInThirds(
+                            edges[1].splitInThirds(
                                 out parts[3 - 3 * corner],
                                 out parts[4 - 3 * corner],
                                 out parts[5 - 3 * corner]
@@ -136,23 +143,25 @@ namespace Msdfgen
                         contour.edges.Clear();
                         for (int i = 0; i < 7; ++i)
                         {
-                            edges.Add(new EdgeHolder(parts[i]));
+                            edges.Add(parts[i]);
                         }
                     }
                 }
                 // Multiple corners
                 else
                 {
+
+                    //original
                     int cornerCount = corners.Count;
                     int spline = 0;
                     int start = corners[0];
-                    int m = contour.edges.Count;
+
                     EdgeColor color = EdgeColor.WHITE;
                     switchColor(ref color, ref seed);
                     EdgeColor initialColor = color;
-                    for (int i = 0; i < m; ++i)
+                    for (int i = 0; i < edgeCount; ++i)
                     {
-                        int index = (start + i) % m;
+                        int index = (start + i) % edgeCount;
                         if (spline + 1 < cornerCount && corners[spline + 1] == index)
                         {
                             ++spline;
@@ -160,6 +169,8 @@ namespace Msdfgen
                         }
                         edges[index].color = color;
                     }
+
+
                 }
             }
         }

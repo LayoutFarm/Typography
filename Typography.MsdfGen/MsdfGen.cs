@@ -6,6 +6,32 @@ using System.Collections.Generic;
 
 namespace Msdfgen
 {
+    /// <summary>
+    /// parameter for msdf generation
+    /// </summary>
+    public class MsdfGenParams
+    {
+        public float scaleX = 1;
+        public float scaleY = 1;
+        public float shapeScale = 1;
+        public int minImgWidth = 5;
+        public int minImgHeight = 5;
+
+        public double angleThreshold = 3; //default
+        public double pxRange = 4; //default
+        public double edgeThreshold = 1.00000001;//default,(from original code)
+
+
+        public MsdfGenParams()
+        {
+
+        }
+        public void SetScale(float scaleX, float scaleY)
+        {
+            this.scaleX = scaleX;
+            this.scaleY = scaleY;
+        }
+    }
 
     public static class SdfGenerator
     {
@@ -52,12 +78,12 @@ namespace Msdfgen
                         {
                             Contour contour = contours[i];
                             SignedDistance minDistance = SignedDistance.INFINITE;
-                            List<EdgeHolder> edges = contour.edges;
+                            List<EdgeSegment> edges = contour.edges;
                             int edgeCount = edges.Count;
                             for (int ee = 0; ee < edgeCount; ++ee)
                             {
-                                EdgeHolder edge = edges[ee];
-                                SignedDistance distance = edge.edgeSegment.signedDistance(p, out dummy);
+                                EdgeSegment edge = edges[ee];
+                                SignedDistance distance = edge.signedDistance(p, out dummy);
                                 if (distance < minDistance)
                                     minDistance = distance;
                             }
@@ -121,12 +147,12 @@ namespace Msdfgen
                     for (int n = 0; n < m; ++n)
                     {
                         Contour contour = contours[n];
-                        List<EdgeHolder> edges = contour.edges;
+                        List<EdgeSegment> edges = contour.edges;
                         int nn = edges.Count;
                         for (int i = 0; i < nn; ++i)
                         {
-                            EdgeHolder edge = edges[i];
-                            SignedDistance distance = edge.edgeSegment.signedDistance(p, out dummy);
+                            EdgeSegment edge = edges[i];
+                            SignedDistance distance = edge.signedDistance(p, out dummy);
                             if (distance < minDistance)
                             {
                                 minDistance = distance;
@@ -140,21 +166,29 @@ namespace Msdfgen
 
     }
 
-
+    //multi-channel signed distance field generator
+    struct EdgePoint
+    {
+        public SignedDistance minDistance;
+        public EdgeSegment nearEdge;
+        public double nearParam;
+        public double CalculateContourColor(Vector2 p)
+        {
+            if (nearEdge != null)
+            {
+                nearEdge.distanceToPseudoDistance(ref minDistance, p, nearParam);
+            }
+            return minDistance.distance;
+        }
+    }
+    struct MultiDistance
+    {
+        public double r, g, b;
+        public double med;
+    }
     public static class MsdfGenerator
     {
-        //multi-channel signed distance field generator
-        struct EdgePoint
-        {
-            public SignedDistance minDistance;
-            public EdgeHolder nearEdge;
-            public double nearParam;
-        }
-        struct MultiDistance
-        {
-            public double r, g, b;
-            public double med;
-        }
+
 
         static float median(float a, float b, float c)
         {
@@ -209,6 +243,9 @@ namespace Msdfgen
         }
         static void msdfErrorCorrection(FloatRGBBmp output, Vector2 threshold)
         {
+            //tmp skip check pixel clash
+            //...
+
             //Pair<int,int> is List<Point>
             List<Pair<int, int>> clashes = new List<Pair<int, int>>();
             int w = output.Width, h = output.Height;
@@ -242,43 +279,6 @@ namespace Msdfgen
             //}
         }
 
-        public static int[] ConvertToIntBmp(FloatRGBBmp input)
-        {
-            int height = input.Height;
-            int width = input.Width;
-            int[] output = new int[input.Width * input.Height];
-
-            for (int y = height - 1; y >= 0; --y)
-            {
-                for (int x = 0; x < width; ++x)
-                {
-                    //a b g r
-                    //----------------------------------
-                    FloatRGB pixel = input.GetPixel(x, y);
-                    //a b g r
-                    //for big-endian color
-                    //int abgr = (255 << 24) |
-                    //    Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
-                    //    Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
-                    //    Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
-
-                    //for little-endian color
-
-                    int abgr = (255 << 24) |
-                        Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
-                        Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
-                        Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
-
-                    output[(y * width) + x] = abgr;
-                    //----------------------------------
-                    /**it++ = clamp(int(bitmap(x, y).r*0x100), 0xff);
-                    *it++ = clamp(int(bitmap(x, y).g*0x100), 0xff);
-                    *it++ = clamp(int(bitmap(x, y).b*0x100), 0xff);*/
-                }
-            }
-            return output;
-        }
-
 
         public static void generateMSDF(FloatRGBBmp output, Shape shape, double range, Vector2 scale, Vector2 translate, double edgeThreshold)
         {
@@ -297,11 +297,9 @@ namespace Msdfgen
             for (int y = 0; y < h; ++y)
             {
                 int row = shape.InverseYAxis ? h - y - 1 : y;
-
                 for (int x = 0; x < w; ++x)
                 {
                     Vector2 p = (new Vector2(x + .5, y + .5) / scale) - translate;
-
                     EdgePoint sr = new EdgePoint { minDistance = SignedDistance.INFINITE },
                         sg = new EdgePoint { minDistance = SignedDistance.INFINITE },
                         sb = new EdgePoint { minDistance = SignedDistance.INFINITE };
@@ -314,20 +312,15 @@ namespace Msdfgen
                     {
                         //for-each contour
                         Contour contour = contours[n];
-                        List<EdgeHolder> edges = contour.edges;
+                        List<EdgeSegment> edges = contour.edges;
                         int edgeCount = edges.Count;
                         EdgePoint r = new EdgePoint { minDistance = SignedDistance.INFINITE },
                         g = new EdgePoint { minDistance = SignedDistance.INFINITE },
                         b = new EdgePoint { minDistance = SignedDistance.INFINITE };
                         for (int ee = 0; ee < edgeCount; ++ee)
-                        {   
-                            
-                            EdgeHolder edge = edges[ee];
-
-                            //find signedDistance from given pixel to the edge segment
-
-                            SignedDistance distance = edge.edgeSegment.signedDistance(p, out double param);
-
+                        {
+                            EdgeSegment edge = edges[ee];
+                            SignedDistance distance = edge.signedDistance(p, out double param);
                             if (edge.HasComponent(EdgeColor.RED) && distance < r.minDistance)
                             {
                                 r.minDistance = distance;
@@ -347,7 +340,6 @@ namespace Msdfgen
                                 b.nearParam = param;
                             }
                         }
-                        //after test current pixel with all edges in a contour
                         //----------------
                         if (r.minDistance < sr.minDistance)
                             sr = r;
@@ -364,11 +356,11 @@ namespace Msdfgen
                         }
 
                         if (r.nearEdge != null)
-                            r.nearEdge.edgeSegment.distanceToPseudoDistance(ref r.minDistance, p, r.nearParam);
+                            r.nearEdge.distanceToPseudoDistance(ref r.minDistance, p, r.nearParam);
                         if (g.nearEdge != null)
-                            g.nearEdge.edgeSegment.distanceToPseudoDistance(ref g.minDistance, p, g.nearParam);
+                            g.nearEdge.distanceToPseudoDistance(ref g.minDistance, p, g.nearParam);
                         if (b.nearEdge != null)
-                            b.nearEdge.edgeSegment.distanceToPseudoDistance(ref b.minDistance, p, b.nearParam);
+                            b.nearEdge.distanceToPseudoDistance(ref b.minDistance, p, b.nearParam);
                         //--------------
                         medMinDistance = median(r.minDistance.distance, g.minDistance.distance, b.minDistance.distance);
                         contourSD[n].r = r.minDistance.distance;
@@ -380,14 +372,12 @@ namespace Msdfgen
                         if (windings[n] < 0 && medMinDistance <= 0 && Math.Abs(medMinDistance) < Math.Abs(negDist))
                             negDist = medMinDistance;
                     }
-
-                    //after test a given pixel with all contours
                     if (sr.nearEdge != null)
-                        sr.nearEdge.edgeSegment.distanceToPseudoDistance(ref sr.minDistance, p, sr.nearParam);
+                        sr.nearEdge.distanceToPseudoDistance(ref sr.minDistance, p, sr.nearParam);
                     if (sg.nearEdge != null)
-                        sg.nearEdge.edgeSegment.distanceToPseudoDistance(ref sg.minDistance, p, sg.nearParam);
+                        sg.nearEdge.distanceToPseudoDistance(ref sg.minDistance, p, sg.nearParam);
                     if (sb.nearEdge != null)
-                        sb.nearEdge.edgeSegment.distanceToPseudoDistance(ref sb.minDistance, p, sb.nearParam);
+                        sb.nearEdge.distanceToPseudoDistance(ref sb.minDistance, p, sb.nearParam);
 
                     MultiDistance msd;
                     msd.r = msd.g = msd.b = msd.med = SignedDistance.INFINITE.distance;
@@ -456,13 +446,12 @@ namespace Msdfgen
                     for (int n = 0; n < m; ++n)
                     {
                         Contour contour = contours[n];
-                        List<EdgeHolder> edges = contour.edges;
+                        List<EdgeSegment> edges = contour.edges;
                         int j = edges.Count;
                         for (int i = 0; i < j; ++i)
                         {
-                            EdgeHolder edge = edges[i];
-                            double param;
-                            SignedDistance distance = edge.edgeSegment.signedDistance(p, out param);
+                            EdgeSegment edge = edges[i];
+                            SignedDistance distance = edge.signedDistance(p, out double param);
 
                             if (edge.HasComponent(EdgeColor.RED) && distance < r.minDistance)
                             {
@@ -485,15 +474,15 @@ namespace Msdfgen
                         }
                         if (r.nearEdge != null)
                         {
-                            r.nearEdge.edgeSegment.distanceToPseudoDistance(ref r.minDistance, p, r.nearParam);
+                            r.nearEdge.distanceToPseudoDistance(ref r.minDistance, p, r.nearParam);
                         }
                         if (g.nearEdge != null)
                         {
-                            g.nearEdge.edgeSegment.distanceToPseudoDistance(ref g.minDistance, p, g.nearParam);
+                            g.nearEdge.distanceToPseudoDistance(ref g.minDistance, p, g.nearParam);
                         }
                         if (b.nearEdge != null)
                         {
-                            b.nearEdge.edgeSegment.distanceToPseudoDistance(ref b.minDistance, p, b.nearParam);
+                            b.nearEdge.distanceToPseudoDistance(ref b.minDistance, p, b.nearParam);
                         }
 
                         output.SetPixel(x, row,
@@ -511,5 +500,88 @@ namespace Msdfgen
                 msdfErrorCorrection(output, edgeThreshold / (scale * range));
             }
         }
+
+
+        public static int[] ConvertToIntBmp(FloatRGBBmp input, bool flipY)
+        {
+            int height = input.Height;
+            int width = input.Width;
+
+            int[] output = new int[input.Width * input.Height];
+
+
+            if (flipY)
+            {
+                int dstLineHead = width * (height - 1);
+                for (int y = 0; y < height; ++y)
+                {
+                    for (int x = 0; x < width; ++x)
+                    {
+                        //a b g r
+                        //----------------------------------
+                        FloatRGB pixel = input.GetPixel(x, y);
+                        //a b g r
+                        //for big-endian color
+                        //int abgr = (255 << 24) |
+                        //    Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
+                        //    Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                        //    Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
+
+                        //for little-endian color
+
+                        output[dstLineHead + x] = (255 << 24) |
+                            Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
+                            Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                            Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
+
+                        //output[(y * width) + x] = abgr;
+                        //----------------------------------
+                        /**it++ = clamp(int(bitmap(x, y).r*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).g*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).b*0x100), 0xff);*/
+                    }
+
+                    dstLineHead -= width;
+                }
+            }
+            else
+            {
+                int dstLineHead = 0;
+                for (int y = 0; y < height; ++y)
+                {
+                    for (int x = 0; x < width; ++x)
+                    {
+                        //a b g r
+                        //----------------------------------
+                        FloatRGB pixel = input.GetPixel(x, y);
+                        //a b g r
+                        //for big-endian color
+                        //int abgr = (255 << 24) |
+                        //    Vector2.Clamp((int)(pixel.r * 0x100), 0xff) |
+                        //    Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                        //    Vector2.Clamp((int)(pixel.b * 0x100), 0xff) << 16;
+
+                        //for little-endian color
+
+                        output[dstLineHead + x] = (255 << 24) |
+                            Vector2.Clamp((int)(pixel.r * 0x100), 0xff) << 16 |
+                            Vector2.Clamp((int)(pixel.g * 0x100), 0xff) << 8 |
+                            Vector2.Clamp((int)(pixel.b * 0x100), 0xff);
+
+                        //output[(y * width) + x] = abgr;
+                        //----------------------------------
+                        /**it++ = clamp(int(bitmap(x, y).r*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).g*0x100), 0xff);
+                        *it++ = clamp(int(bitmap(x, y).b*0x100), 0xff);*/
+                    }
+
+                    dstLineHead += width;
+                }
+            }
+            return output;
+        }
+
     }
+
+
 }

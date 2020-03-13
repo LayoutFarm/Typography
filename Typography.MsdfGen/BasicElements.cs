@@ -154,16 +154,15 @@ namespace Msdfgen
             for (int i = 0; i < j; ++i)
             {
                 Contour contour = contours[i];
-                List<EdgeHolder> edges = contour.edges;
+                List<EdgeSegment> edges = contour.edges;
                 if (edges.Count == 1)
                 {
-                    //TODO:
-                    EdgeSegment e0, e1, e2;
-                    edges[0].edgeSegment.splitInThirds(out e0, out e1, out e2);
+                    //TODO: 
+                    edges[0].splitInThirds(out EdgeSegment e0, out EdgeSegment e1, out EdgeSegment e2);
                     edges.Clear();
-                    edges.Add(new EdgeHolder(e0));
-                    edges.Add(new EdgeHolder(e1));
-                    edges.Add(new EdgeHolder(e2));
+                    edges.Add(e0);
+                    edges.Add(e1);
+                    edges.Add(e2);
 
                 }
             }
@@ -177,53 +176,87 @@ namespace Msdfgen
                 contours[i].findBounds(ref left, ref bottom, ref right, ref top);
             }
         }
+
+
     }
     public class Contour
     {
-        public List<EdgeHolder> edges = new List<EdgeHolder>();
-        public void AddEdge(EdgeSegment edge)
+        public List<EdgeSegment> edges = new List<EdgeSegment>();
+        bool _hasCalculatedBounds;
+        double _boundsLeft, _boundsRight, _boundsTop, _boundsBottom;
+
+        public T AddEdge<T>(T edge)
+            where T : EdgeSegment
         {
-            EdgeHolder holder = new EdgeHolder(edge);
-            edges.Add(holder);
+            edges.Add(edge);
+            return edge;
         }
-        public void AddLine(double x0, double y0, double x1, double y1)
+        public LinearSegment AddLine(double x0, double y0, double x1, double y1)
         {
-            this.AddEdge(new LinearSegment(new Vector2(x0, y0), new Vector2(x1, y1)));
+            return this.AddEdge(new LinearSegment(new Vector2(x0, y0), new Vector2(x1, y1)));
         }
 
-        public void AddQuadraticSegment(
+        public QuadraticSegment AddQuadraticSegment(
             double x0, double y0, //start
             double x1, double y1, //control  
             double x2, double y2) //end point
         {
             //'Curve3'
-            this.AddEdge(new QuadraticSegment(
-                new Vector2(x0, y0),
-                new Vector2(x1, y1),
-                new Vector2(x2, y2)
-                ));
+            return this.AddEdge(new QuadraticSegment(
+                  new Vector2(x0, y0),
+                  new Vector2(x1, y1),
+                  new Vector2(x2, y2)
+                  ));
         }
-        public void AddCubicSegment(double x0, double y0,
+        public CubicSegment AddCubicSegment(double x0, double y0,
             double x1, double y1,
             double x2, double y2,
             double x3, double y3)
         {
             //'Curve4'
 
-            this.AddEdge(new CubicSegment(
-               new Vector2(x0, y0),
-               new Vector2(x1, y1),
-               new Vector2(x2, y2),
-               new Vector2(x3, y3)
-               ));
+            return this.AddEdge(new CubicSegment(
+                  new Vector2(x0, y0),
+                  new Vector2(x1, y1),
+                  new Vector2(x2, y2),
+                  new Vector2(x3, y3)
+                  ));
         }
+
+        
         public void findBounds(ref double left, ref double bottom, ref double right, ref double top)
         {
-            int j = edges.Count;
-            for (int i = 0; i < j; ++i)
+            if (!_hasCalculatedBounds)
             {
-                edges[i].edgeSegment.findBounds(ref left, ref bottom, ref right, ref top);
+                int j = edges.Count;
+                _boundsLeft = double.MaxValue;
+                _boundsRight = double.MinValue;
+                _boundsTop = double.MinValue;
+                _boundsBottom = double.MaxValue;
+
+                for (int i = 0; i < j; ++i)
+                {
+                    edges[i].findBounds(ref _boundsLeft, ref _boundsBottom, ref _boundsRight, ref _boundsTop);
+                }
+                _hasCalculatedBounds = true;
             }
+            if (_boundsLeft < left)
+            {
+                left = _boundsLeft;
+            }
+            if (_boundsRight > right)
+            {
+                right = _boundsRight;
+            }
+            if (_boundsBottom < bottom)
+            {
+                bottom = _boundsBottom;
+            }
+            if (_boundsTop > top)
+            {
+                top = _boundsTop;
+            }
+
         }
         public int winding()
         {
@@ -243,7 +276,8 @@ namespace Msdfgen
                     break;
                 case 2:
                     {
-                        Vector2 a = edges[0].point(0), b = edges[0].point(0.5), c = edges[1].point(0), d = edges[1].point(0.5);
+                        Vector2 a = edges[0].point(0), b = edges[0].point(0.5),
+                                c = edges[1].point(0), d = edges[1].point(0.5);
                         total += Vector2.shoelace(a, b);
                         total += Vector2.shoelace(b, c);
                         total += Vector2.shoelace(c, d);
@@ -265,6 +299,8 @@ namespace Msdfgen
             return Vector2.sign(total);
 
         }
+
+
     }
 
     public struct FloatRGB
@@ -326,7 +362,7 @@ namespace Msdfgen
     /// </summary>
     public class FloatRGBBmp
     {
-        readonly FloatRGB[] _buffer;
+        public readonly FloatRGB[] _buffer;
 
         readonly int _w;
         readonly int _h;
