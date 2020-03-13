@@ -9,7 +9,6 @@
     <Import_RootNamespace>FontAtlas</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)BinPacker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FontAtlasFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlyphImages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MsdfGlyphGen.cs" />

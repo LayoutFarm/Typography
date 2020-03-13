@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using PixelFarm.Drawing.Fonts;
 
 using PixelFarm.Contours;
+using PixelFarm.Drawing.BitmapAtlas;
 
 namespace Typography.Rendering
 {

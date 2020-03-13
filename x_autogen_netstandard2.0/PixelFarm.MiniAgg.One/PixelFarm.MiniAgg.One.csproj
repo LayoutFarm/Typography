@@ -308,7 +308,6 @@
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeSegment.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeSegment.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EquationSolver.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EquationSolver.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen.cs" />
-    <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen2.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen2.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen3.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen3.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\SignedDistance.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\SignedDistance.cs" />
     <Compile Include="..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\SpriteTextureMapData.cs" Link="PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\SpriteTextureMapData.cs" />

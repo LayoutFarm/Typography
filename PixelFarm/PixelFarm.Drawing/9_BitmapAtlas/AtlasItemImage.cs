@@ -11,23 +11,11 @@ namespace PixelFarm.Drawing.BitmapAtlas
             this.Width = w;
             this.Height = h;
         }
-        public RectangleF OriginalBounds
-        {
-            get;
-            set;
-        }
+        public RectangleF OriginalBounds { get; set; }
         public int Width { get; }
         public int Height { get; }
-        public bool IsBigEndian
-        {
-            get;
-            private set;
-        }
-        public int BorderXY
-        {
-            get;
-            set;
-        }
+        public bool IsBigEndian { get; private set; }
+        public int BorderXY { get; set; }
         public MemBitmap Bitmap => _bmp;
         //
         public void SetBitmap(MemBitmap bmp, bool isBigEndian)

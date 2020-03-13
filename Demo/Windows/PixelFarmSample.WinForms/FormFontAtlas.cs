@@ -21,14 +21,39 @@ namespace SampleWinForms
         Typeface _typeface;
 
         List<UIFontScriptOpt> _availableScripts = new List<UIFontScriptOpt>();
+
+
+
+        class TextureKindAndDescription
+        {
+            public TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind kind, string desc)
+            {
+                Kind = kind;
+                Description = desc;
+            }
+
+            public ushort TechniqueDetail { get; set; }
+            public PixelFarm.Drawing.BitmapAtlas.TextureKind Kind { get; }
+            public string Description { get; }
+
+            public override string ToString()
+            {
+                return Description;
+            }
+        }
+
         public FormFontAtlas()
         {
             InitializeComponent();
 
             uiFontAtlasFileViewer1.BringToFront();
 
-            this.cmbTextureKind.Items.Add(PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect);
-            this.cmbTextureKind.Items.Add(PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf);
+            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect, "StencilLcd"));
+            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf, "Msdf"));
+
+            //msdf3 is our extension to the original Msdf technique
+            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf, "Msdf3") { TechniqueDetail = 3 });
+
             this.cmbTextureKind.SelectedIndex = 0;//default
         }
 
@@ -108,10 +133,16 @@ namespace SampleWinForms
             var glyphTextureGen = new GlyphTextureBitmapGenerator();
 
             //2. generate the glyphs
+            TextureKindAndDescription textureKindAndDesc = (TextureKindAndDescription)this.cmbTextureKind.SelectedItem;
+            if (textureKindAndDesc.Kind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
+            {
+                glyphTextureGen.MsdfGenVersion = textureKindAndDesc.TechniqueDetail;
+            }
+
             SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromInputChars(
                _typeface,
                fontSizeInPoints,
-               (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
+               textureKindAndDesc.Kind,
                GetUniqueChars()
             );
 
@@ -217,9 +248,20 @@ namespace SampleWinForms
             var glyphTextureGen = new GlyphTextureBitmapGenerator();
 
             //2. generate the glyphs
+            TextureKindAndDescription textureKindAndDesc = (TextureKindAndDescription)this.cmbTextureKind.SelectedItem;
+            if (textureKindAndDesc.Kind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
+            {
+                glyphTextureGen.MsdfGenVersion = textureKindAndDesc.TechniqueDetail;
+            }
+
+#if DEBUG
+            //overall, glyph atlas generation time
+            System.Diagnostics.Stopwatch dbugStopWatch = new System.Diagnostics.Stopwatch();
+            dbugStopWatch.Start();
+#endif
             SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
                 fontSizeInPoints,
-                (PixelFarm.Drawing.BitmapAtlas.TextureKind)this.cmbTextureKind.SelectedItem,
+                textureKindAndDesc.Kind,
                 buildDetails.ToArray());
 
             //3. set information before write to font-info
@@ -230,6 +272,11 @@ namespace SampleWinForms
             //4. merge all glyph in the builder into a single image
             MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
 
+#if DEBUG
+            dbugStopWatch.Stop();
+            this.Text += ", finished: build time(ms)=" + dbugStopWatch.ElapsedMilliseconds;
+            System.Diagnostics.Debug.WriteLine("font atlas build time (ms): " + dbugStopWatch.ElapsedMilliseconds);
+#endif
 
             string textureName = typeface.Name.ToLower() + "_" + reqFont.FontKey;
             string output_imgFilename = textureName + ".png";
@@ -241,7 +288,7 @@ namespace SampleWinForms
             }
 
             //6. save total-glyph-image to disk
-            totalGlyphsImg.SaveImage(output_imgFilename); 
+            totalGlyphsImg.SaveImage(output_imgFilename);
 
             ///------------------------------------------------
             //lets view result ...

@@ -30,8 +30,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\BasicElements.cs">
+      <Link>BasicElements.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeColor.cs">
+      <Link>EdgeColor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeColoring.cs">
+      <Link>EdgeColoring.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EdgeSegment.cs">
+      <Link>EdgeSegment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\EquationSolver.cs">
+      <Link>EquationSolver.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\MsdfGen.cs">
+      <Link>MsdfGen.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\PixelFarm\PixelFarm.Drawing\7_CpuBlitPainter\Msdf\SignedDistance.cs">
+      <Link>SignedDistance.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="..\..\..\Typography.MsdfGen\Typography.MsdfGen.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

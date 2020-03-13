@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ExtMsdfGen
+namespace Msdfgen
 {
 
     /// <summary>
@@ -52,10 +52,13 @@ namespace ExtMsdfGen
             color = (EdgeColor)((shifted | shifted >> 3) & (int)EdgeColor.WHITE);
             seed >>= 1;
         }
+
+
         public static void edgeColoringSimple(Shape shape, double angleThreshold, ulong seed = 0)
         {
             double crossThreshold = Math.Sin(angleThreshold);
             List<int> corners = new List<int>(); //TODO: review reusable list
+
 
             // for (std::vector<Contour>::iterator contour = shape.contours.begin(); contour != shape.contours.end(); ++contour)
             foreach (Contour contour in shape.contours)
@@ -66,6 +69,8 @@ namespace ExtMsdfGen
                 int edgeCount = edges.Count;
                 if (edgeCount != 0)
                 {
+
+                    //original
                     Vector2 prevDirection = edges[edgeCount - 1].direction(1);// (*(contour->edges.end() - 1))->direction(1); 
                     for (int i = 0; i < edgeCount; ++i)
                     {
@@ -77,6 +82,8 @@ namespace ExtMsdfGen
                         }
                         prevDirection = edge.direction(1);
                     }
+
+
                 }
 
                 // Smooth contour
@@ -143,16 +150,18 @@ namespace ExtMsdfGen
                 // Multiple corners
                 else
                 {
+
+                    //original
                     int cornerCount = corners.Count;
                     int spline = 0;
                     int start = corners[0];
-                    int m = contour.edges.Count;
+
                     EdgeColor color = EdgeColor.WHITE;
                     switchColor(ref color, ref seed);
                     EdgeColor initialColor = color;
-                    for (int i = 0; i < m; ++i)
+                    for (int i = 0; i < edgeCount; ++i)
                     {
-                        int index = (start + i) % m;
+                        int index = (start + i) % edgeCount;
                         if (spline + 1 < cornerCount && corners[spline + 1] == index)
                         {
                             ++spline;
@@ -160,6 +169,8 @@ namespace ExtMsdfGen
                         }
                         edges[index].color = color;
                     }
+
+
                 }
             }
         }

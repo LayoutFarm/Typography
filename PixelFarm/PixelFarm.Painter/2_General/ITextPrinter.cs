@@ -61,7 +61,7 @@ namespace PixelFarm.Drawing
                 RequestFont font,
                 ref TextSpanMeasureResult result);
         void CalculateUserCharGlyphAdvancePos(ref TextBufferSpan textBufferSpan, ILineSegmentList lineSegs,
-                RequestFont font, 
+                RequestFont font,
                 ref TextSpanMeasureResult result);
     }
 
@@ -98,6 +98,7 @@ namespace PixelFarm.Drawing
         //-------------
         void ChangeFillColor(Color fillColor);
         void ChangeStrokeColor(Color strokColor);
+       
         //-------------
         void MeasureString(char[] buffer, int startAt, int len, out int w, out int h);
     }
