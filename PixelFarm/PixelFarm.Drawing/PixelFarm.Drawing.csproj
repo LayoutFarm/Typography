@@ -307,6 +307,9 @@
     <Compile Include="..\PixelFarm.Painter\2_General\TempContext.cs">
       <Link>0_REF_Painter\2_General\TempContext.cs</Link>
     </Compile>
+    <Compile Include="..\PixelFarm.Painter\2_General\TextBaseline.cs">
+      <Link>0_REF_Painter\2_General\TextBaseline.cs</Link>
+    </Compile>
     <Compile Include="..\PixelFarm.Painter\3_Cpu_Blit\ColorRGBAf.cs">
       <Link>0_REF_Painter\0_REF_CpuBlit\ColorRGBAf.cs</Link>
     </Compile>
@@ -657,7 +660,6 @@
     <Compile Include="7_CpuBlitPainter\Msdf\EdgeSegment.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf\EquationSolver.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen2.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf\MsdfGen3.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf\SignedDistance.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf\SpriteTextureMapData.cs" />

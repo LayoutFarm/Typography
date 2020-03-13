@@ -158,12 +158,13 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double len = v0.CalLen(v1);
             double dx1 = (v1.y - v0.y) / len;
             double dy1 = (v1.x - v0.x) / len;
-            double dx2 = 0;
-            double dy2 = 0;
+
             dx1 *= _width;
             dy1 *= _width;
             if (_line_cap != LineCap.Round)
             {
+                double dx2 = 0;
+                double dy2 = 0;
                 if (_line_cap == LineCap.Square)
                 {
                     dx2 = dy1 * _width_sign;
@@ -207,7 +208,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
         }
 
-        public void CreateHalfCap(VertexStore output, Vertex2d v0, Vertex2d v1)
+
+        internal void CreateHalfCap(VertexStore output, Vertex2d v0, Vertex2d v1)
         {
 
             output.Clear();
@@ -216,15 +218,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             double dx1 = (v1.y - v0.y) / len;
             double dy1 = (v1.x - v0.x) / len;
 
-
-            dx1 *= _width; //** 
+            dx1 *= _width;
             dy1 *= _width;
-
             if (_line_cap != LineCap.Round)
             {
                 double dx2 = 0;
                 double dy2 = 0;
-
                 if (_line_cap == LineCap.Square)
                 {
                     dx2 = dy1 * _width_sign;
@@ -267,6 +266,9 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 AddVertex(output, v0.x + dx1, v0.y - dy1);
             }
         }
+
+
+
         public void CreateJoin(VertexStore output,
                                Vertex2d v0,
                                Vertex2d v1,

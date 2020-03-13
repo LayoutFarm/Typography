@@ -157,9 +157,8 @@ namespace ExtMsdfGen
                 List<EdgeSegment> edges = contour.edges;
                 if (edges.Count == 1)
                 {
-                    //TODO:
-                    EdgeSegment e0, e1, e2;
-                    edges[0].splitInThirds(out e0, out e1, out e2);
+                    //TODO: 
+                    edges[0].splitInThirds(out EdgeSegment e0, out EdgeSegment e1, out EdgeSegment e2);
                     edges.Clear();
                     edges.Add(e0);
                     edges.Add(e1);
@@ -177,6 +176,8 @@ namespace ExtMsdfGen
                 contours[i].findBounds(ref left, ref bottom, ref right, ref top);
             }
         }
+
+        
     }
     public class Contour
     {
@@ -307,6 +308,8 @@ namespace ExtMsdfGen
             return Vector2.sign(total);
 
         }
+
+        
     }
 
     public struct FloatRGB
@@ -368,7 +371,7 @@ namespace ExtMsdfGen
     /// </summary>
     public class FloatRGBBmp
     {
-        readonly FloatRGB[] _buffer;
+        public readonly FloatRGB[] _buffer;
 
         readonly int _w;
         readonly int _h;
