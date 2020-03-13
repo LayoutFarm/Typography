@@ -22,35 +22,12 @@ namespace PixelFarm.CpuBlit.VertexProcessing
         private const double RadiansPerDegree = Math.PI / 180.0;
         private const double DoublePI = Math.PI * 2;
 
-        public float RadiusX
-        {
-            get;
-            set;
-        }
+        public float RadiusX { get; set; }
+        public float RadiusY { get; set; }
+        public float Angle { get; set; }
+        public SvgArcSweep Sweep { get; set; }
+        public SvgArcSize Size { get; set; }
 
-        public float RadiusY
-        {
-            get;
-            set;
-        }
-
-        public float Angle
-        {
-            get;
-            set;
-        }
-
-        public SvgArcSweep Sweep
-        {
-            get;
-            set;
-        }
-
-        public SvgArcSize Size
-        {
-            get;
-            set;
-        }
         public float StartX { get; set; }
         public float StartY { get; set; }
         public float EndX { get; set; }
@@ -518,9 +495,8 @@ namespace PixelFarm.CpuBlit.VertexProcessing
                 if (centerFormArc.scaleUp)
                 {
                     int vxs_count = v1.Count;
-                    double px0, py0, px_last, py_last;
-                    v1.GetVertex(0, out px0, out py0);
-                    v1.GetVertex(vxs_count - 1, out px_last, out py_last);
+                    v1.GetVertex(0, out double px0, out double py0);
+                    v1.GetVertex(vxs_count - 1, out double px_last, out double py_last);
                     double distance1 = Math.Sqrt((px_last - px0) * (px_last - px0) + (py_last - py0) * (py_last - py0));
                     double distance2 = Math.Sqrt((endX - fromX) * (endX - fromX) + (endY - fromY) * (endY - fromY));
                     if (distance1 < distance2)

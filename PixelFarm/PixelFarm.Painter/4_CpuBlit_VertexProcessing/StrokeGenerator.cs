@@ -561,11 +561,7 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             this.StrokeWidth = 1;
         }
 
-        public LineCap LineCapStyle
-        {
-            get;
-            set;
-        }
+        public LineCap LineCapStyle { get; set; }
         public LineJoin LineJoinStyle
         {
             get => _lineGen.JoinKind;

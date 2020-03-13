@@ -273,6 +273,38 @@ namespace PixelFarm.CpuBlit.VertexProcessing
             }
             return output;
         }
+
+
+        public static bool IsClockwise(this VertexStore flattenVxs)
+        {
+            //TODO: review here again***
+            //---------------
+            //http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+            //check if hole or not
+            //clockwise or counter-clockwise 
+            //Some of the suggested methods will fail in the case of a non-convex polygon, such as a crescent. 
+            //Here's a simple one that will work with non-convex polygons (it'll even work with a self-intersecting polygon like a figure-eight, telling you whether it's mostly clockwise).
+
+            //Sum over the edges, (x2 − x1)(y2 + y1). 
+            //If the result is positive the curve is clockwise,
+            //if it's negative the curve is counter-clockwise. (The result is twice the enclosed area, with a +/- convention.)
+            double total = 0;
+            int j = flattenVxs.Count;
+
+            for (int i = 1; i < j; ++i)
+            {
+                flattenVxs.GetVertex(i - 1, out double x0, out double y0);
+                flattenVxs.GetVertex(i, out double x1, out double y1);
+                total += (x1 - x0) * (y1 + y0);
+            }
+            //the last one
+            {
+                flattenVxs.GetVertex(j - 1, out double x0, out double y0);
+                flattenVxs.GetVertex(0, out double x1, out double y1);
+                total += (x1 - x0) * (y1 + y0);
+            }
+            return total >= 0; //             
+        }
     }
 
 }
