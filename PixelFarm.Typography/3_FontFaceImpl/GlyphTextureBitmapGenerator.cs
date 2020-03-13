@@ -145,10 +145,7 @@ namespace PixelFarm.Drawing.Fonts
             //
             if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
             {
-#if DEBUG
-                System.Diagnostics.Stopwatch dbugWatch = new System.Diagnostics.Stopwatch();
-                dbugWatch.Start();
-#endif
+
                 float pxscale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
                 if (MsdfGenVersion == 3)
                 {
@@ -211,12 +208,6 @@ namespace PixelFarm.Drawing.Fonts
                         atlasBuilder.AddGlyph(gindex, glyphImg);
                     }
                 }
-#if DEBUG
-
-                dbugWatch.Stop();
-                long ellapseMs = dbugWatch.ElapsedMilliseconds;
-                System.Diagnostics.Debug.WriteLine("gen msdf: ver:" + MsdfGenVersion + ",ms=" + ellapseMs);
-#endif
             }
             else
             {
