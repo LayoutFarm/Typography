@@ -168,6 +168,8 @@ namespace Typography.Rendering
         {
             //glyph cahce for specific atlas 
             SetLoadNewBmpDel(_createNewDel);
+
+            //what texture kind when we need to create on demand
             TextureKindForNewFont = PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect;
 
         }
