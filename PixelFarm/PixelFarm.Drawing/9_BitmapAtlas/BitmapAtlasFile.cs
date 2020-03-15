@@ -90,7 +90,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             {
                 //read each glyph map info
 
-                var item = new AtlasItem(reader.ReadUInt16());   
+                var item = new AtlasItem(reader.ReadUInt16());
 
                 //2. area
                 item.Left = reader.ReadUInt16();
@@ -214,7 +214,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             // 
             foreach (BitmapAtlasItemSource g in items.Values)
             {
-                //1. glyph index
+                //1. unique uint16 name
                 _writer.Write((ushort)g.UniqueInt16Name);
 
                 //2. area
@@ -247,10 +247,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             // 
             foreach (var kp in items)
             {
-                ushort glyphIndex = kp.Key;
+                ushort uniqueName = kp.Key;
                 AtlasItem g = kp.Value;
-                //1. glyph index
-                _writer.Write((ushort)glyphIndex);
+                //1. unique uint16 name
+                _writer.Write((ushort)uniqueName);
 
                 //2. area, left,top,width,height
                 _writer.Write((ushort)g.Left);

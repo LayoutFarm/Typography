@@ -461,14 +461,14 @@ namespace Msdfgen
                     }
                     edgeBmpLut.SetBmpBuffer(bmpLut.Width, bmpLut.Height, lutBuffer5);
                     //generate actual sprite
-                    PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource spriteTextureMapData = CreateMsdfImage(shape, MsdfGenParams, imgW, imgH, translateVec, edgeBmpLut);
+                    PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource item = CreateMsdfImage(shape, MsdfGenParams, imgW, imgH, translateVec, edgeBmpLut);
                     //save msdf bitmap to file         
-                    using (MemBitmap memBmp = MemBitmap.CreateFromCopy(spriteTextureMapData.Width, spriteTextureMapData.Height, spriteTextureMapData.Source))
+                    using (MemBitmap memBmp = MemBitmap.CreateFromCopy(item.Width, item.Height, item.Source))
                     {
                         memBmp.SaveImage(dbug_msdf_output);
                     }
 
-                    return spriteTextureMapData;
+                    return item;
                 }
 
 #endif
