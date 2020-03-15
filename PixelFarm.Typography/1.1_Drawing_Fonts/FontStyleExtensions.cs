@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-present, WinterDev 
 
 
-namespace PixelFarm.Drawing.Fonts
+namespace PixelFarm.Drawing
 {
     public static class FontStyleExtensions
     {

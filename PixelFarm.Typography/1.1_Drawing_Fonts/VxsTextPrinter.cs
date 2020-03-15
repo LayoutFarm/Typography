@@ -22,7 +22,7 @@ namespace PixelFarm.Drawing
         float _currentFontSizePxScale;
 
         GlyphBitmapStore _glyphBitmapStore;
-        GlyphSvgStore _glyphSvgStore;
+        BitmapCacheForSvgGlyph _glyphSvgStore;
 
         public VxsTextPrinter(Painter painter, LayoutFarm.OpenFontTextService textService)
         {
@@ -37,7 +37,7 @@ namespace PixelFarm.Drawing
             ChangeFont(new RequestFont("Source Sans Pro", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();
-            _glyphSvgStore = new GlyphSvgStore();
+            _glyphSvgStore = new BitmapCacheForSvgGlyph();
         }
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
         {

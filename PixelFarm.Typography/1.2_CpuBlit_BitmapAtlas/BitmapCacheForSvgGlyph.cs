@@ -7,7 +7,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public delegate MemBitmap SvgBmpBuilderFunc(System.Text.StringBuilder stbuilder);
 
-    class GlyphSvgStore
+    class BitmapCacheForSvgGlyph
     {
         Typeface _currentTypeface;
         GlyphBitmapList _bitmapList;

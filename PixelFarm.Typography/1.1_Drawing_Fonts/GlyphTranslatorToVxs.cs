@@ -2,10 +2,11 @@
 
 using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
+using PixelFarm.Drawing;
+
 using Typography.OpenFont;
 
-using PixelFarm.Drawing;
-namespace PixelFarm.Contours
+namespace Typography.Contours
 {
 
     //this is PixelFarm version ***
