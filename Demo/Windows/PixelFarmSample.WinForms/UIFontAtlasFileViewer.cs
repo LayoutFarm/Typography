@@ -44,7 +44,7 @@ namespace SampleWinForms
         class TempGlyphMap
         {
             public ushort glyphIndex;
-            public TextureGlyphMapData glyphMap;
+            public AtlasItem glyphMap;
             public override string ToString()
             {
                 return glyphIndex + ", (" + glyphMap.Left + "," +
@@ -73,7 +73,7 @@ namespace SampleWinForms
             _atlasBuilder = new SimpleBitmapAtlasBuilder();
             List<SimpleBitmapAtlas> fontAtlasList = null;
             fontAtlasList = _atlasBuilder.LoadAtlasInfo(atlasInfo);
-              
+
 
             int count = fontAtlasList.Count;
             treeView1.Nodes.Clear();
@@ -122,7 +122,7 @@ namespace SampleWinForms
 
             _pic1Gfx.Clear(pictureBox1.BackColor);
             _pic1Gfx.DrawImage(_atlasBmp, 0, 0);
-            TextureGlyphMapData glyphMap = tmpGlyphMap.glyphMap;
+            AtlasItem glyphMap = tmpGlyphMap.glyphMap;
             _pic1Gfx.DrawRectangle(Pens.Red, new Rectangle { X = glyphMap.Left, Y = glyphMap.Top, Width = glyphMap.Width, Height = glyphMap.Height });
         }
     }
