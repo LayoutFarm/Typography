@@ -157,7 +157,7 @@ namespace SampleWinForms
                 //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
                 BitmapAtlasItemSource glyphImg = MsdfImageGen.CreateMsdfImageV1(glyphContourBuilder, genParams);
                 glyphImg.UniqueInt16Name = gindex;
-                atlasBuilder.AddGlyph(glyphImg);
+                atlasBuilder.AddItemSource(glyphImg);
 
                 using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                 {

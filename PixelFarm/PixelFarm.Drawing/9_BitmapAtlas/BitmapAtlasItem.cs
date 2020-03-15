@@ -21,32 +21,13 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         /// name of this item in string( eg. bitmap unqiue name)
         /// </summary>
         public string UniqueName { get; set; }
-
+        public Rectangle area;
         public void SetImageBuffer(int[] imgBuffer, bool isBigEndian = false)
         {
             Source = imgBuffer;
             IsBigEndian = isBigEndian;
         }
-
-
     }
-
-    class RelocationAtlasItem
-    {
-        internal readonly BitmapAtlasItemSource atlasItem;
-        public Rectangle area;
-        public RelocationAtlasItem(BitmapAtlasItemSource atlasItem)
-        {
-            this.atlasItem = atlasItem;
-        }
-#if DEBUG
-        public override string ToString()
-        {
-            return atlasItem.UniqueInt16Name.ToString();
-        }
-#endif
-    }
-
-
+     
 
 }

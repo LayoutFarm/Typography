@@ -139,7 +139,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             Msdfgen.MsdfGen3.PreviewSizeAndLocation(shape, genParams, out int imgW, out int imgH, out Msdfgen.Vector2 translate);
             //output is msdf v1
             return Msdfgen.MsdfGen3.CreateMsdfImage(shape, genParams, imgW, imgH, translate, null);//output is msdf v1, since we set lut=null
-
+         
         }
     }
 }

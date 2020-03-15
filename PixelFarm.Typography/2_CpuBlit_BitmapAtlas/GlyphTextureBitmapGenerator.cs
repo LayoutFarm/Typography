@@ -22,7 +22,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachGlyph(int glyphIndex, BitmapAtlasItemSource glyphImage);
+        public delegate void OnEachGlyph(BitmapAtlasItemSource glyphImage);
         public GlyphTextureBitmapGenerator()
         {
 
@@ -170,10 +170,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                             glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
                             BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);
                             glyphImg.UniqueInt16Name = gindex;
-                            _onEachGlyphDel?.Invoke(gindex, glyphImg);
+                            _onEachGlyphDel?.Invoke(glyphImg);
                             //
 
-                            atlasBuilder.AddGlyph(glyphImg);
+                            atlasBuilder.AddItemSource(glyphImg);
                         }
 
                     }
@@ -197,9 +197,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                             glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
                             BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);
                             glyphImg.UniqueInt16Name = gindex;
-                            _onEachGlyphDel?.Invoke(gindex, glyphImg);
+                            _onEachGlyphDel?.Invoke(glyphImg);
 
-                            atlasBuilder.AddGlyph(glyphImg);
+                            atlasBuilder.AddItemSource(glyphImg);
                         }
                     }
                 }
@@ -242,8 +242,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         }
                         //
                         glyphImg.UniqueInt16Name = gindex;
-                        _onEachGlyphDel?.Invoke(gindex, glyphImg);
-                        atlasBuilder.AddGlyph(glyphImg);
+                        _onEachGlyphDel?.Invoke(glyphImg);
+                        atlasBuilder.AddItemSource(glyphImg);
                     }
                 }
             }

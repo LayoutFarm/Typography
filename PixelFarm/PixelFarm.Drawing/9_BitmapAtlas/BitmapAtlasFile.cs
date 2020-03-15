@@ -199,9 +199,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _writer.Write(colorComponent);
             _writer.Write((byte)textureKind);
         }
-        internal void WriteGlyphList(Dictionary<ushort, RelocationAtlasItem> glyphs)
+        internal void WriteGlyphList(Dictionary<ushort, BitmapAtlasItemSource> items)
         {
-            int totalNum = glyphs.Count;
+            int totalNum = items.Count;
 #if DEBUG
             if (totalNum >= ushort.MaxValue)
             {
@@ -214,10 +214,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             //count
             _writer.Write((ushort)totalNum);
             // 
-            foreach (RelocationAtlasItem g in glyphs.Values)
+            foreach (BitmapAtlasItemSource g in items.Values)
             {
                 //1. glyph index
-                _writer.Write((ushort)g.atlasItem.UniqueInt16Name);
+                _writer.Write((ushort)g.UniqueInt16Name);
 
                 //2. area
                 _writer.Write((ushort)g.area.Left);
@@ -226,9 +226,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 _writer.Write((ushort)g.area.Height);
 
                 //3. texture offset                
-                BitmapAtlasItemSource img = g.atlasItem;
-                _writer.Write((short)img.TextureXOffset);
-                _writer.Write((short)img.TextureYOffset);
+              
+                _writer.Write((short)g.TextureXOffset);
+                _writer.Write((short)g.TextureYOffset);
             }
         }
         //--------------------
