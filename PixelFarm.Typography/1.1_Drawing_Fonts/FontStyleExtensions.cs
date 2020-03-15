@@ -3,7 +3,7 @@
 
 namespace PixelFarm.Drawing
 {
-    public static class FontStyleExtensions
+    static class FontStyleExtensions
     {
         public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this FontStyle style)
         {
