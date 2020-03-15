@@ -142,7 +142,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             {
                 SimpleBitmapAtlas simpleFontAtlas = simpleFontAtlases[i];
                 simpleFontAtlas.MainBitmap = mainBmp;
-                simpleFontAtlas.UseSharedGlyphImage = true;
+                simpleFontAtlas.UseSharedImage = true;
                 _createdAtlases.Add(simpleFontAtlas.FontKey, simpleFontAtlas);
 
                 if (simpleFontAtlas.TextureKind == TextureKind.Msdf)

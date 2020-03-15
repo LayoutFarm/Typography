@@ -230,8 +230,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             {
                 UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
 
-                if (!_fontAtlas.TryGetGlyphMapData(unscaledGlyphPlan.glyphIndex,
-                    out TextureGlyphMapData glyphData))
+                if (!_fontAtlas.TryGetItem(unscaledGlyphPlan.glyphIndex,
+                    out AtlasItem atlasItem))
                 {
                     //if no glyph data, we should render a missing glyph ***
                     continue;
@@ -240,7 +240,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //TODO: review precise height in float
                 //-------------------------------------- 
 
-                glyphData.GetRect(out int srcX, out int srcY, out int srcW, out int srcH);
+                atlasItem.GetRect(out int srcX, out int srcY, out int srcW, out int srcH);
 
                 float ngx = acc_x + (float)Math.Round(unscaledGlyphPlan.OffsetX * scale);
                 float ngy = acc_y + (float)Math.Round(unscaledGlyphPlan.OffsetY * scale);
@@ -250,8 +250,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 // -glyphData.TextureYOffset => restore to original pos 
                 //--------------------------
 
-                gx = (float)(left + (ngx - glyphData.TextureXOffset));
-                gy = (float)(top + (ngy + glyphData.TextureYOffset - srcH + lineHeight + desc));
+                gx = (float)(left + (ngx - atlasItem.TextureXOffset));
+                gy = (float)(top + (ngy + atlasItem.TextureYOffset - srcH + lineHeight + desc));
 
                 acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
                 gy = (float)Math.Floor(gy);// + lineHeight;

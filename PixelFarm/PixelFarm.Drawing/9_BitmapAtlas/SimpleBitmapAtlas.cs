@@ -11,7 +11,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     public class SimpleBitmapAtlas
     {
 
-        Dictionary<ushort, TextureGlyphMapData> _glyphLocations = new Dictionary<ushort, TextureGlyphMapData>();
+        Dictionary<ushort, AtlasItem> _atlasItems = new Dictionary<ushort, AtlasItem>();
 
 #if DEBUG
         static int s_totalDebugId;
@@ -21,12 +21,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
 
         }
-
-
         public int Width { get; set; }
         public int Height { get; set; }
-
-
         //------------
         /// <summary>
         /// original font size in point unit
@@ -36,45 +32,58 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public string FontFilename { get; set; }
         public int FontKey { get; set; }
         //------------
+        public Dictionary<ushort, AtlasItem> GlyphDic => _atlasItems;
         public Dictionary<string, ushort> ImgUrlDict { get; set; }
 
-        public void AddGlyph(ushort glyphIndex, TextureGlyphMapData glyphData)
+        internal void AddGlyph(ushort glyphIndex, AtlasItem glyphData)
         {
-            _glyphLocations.Add(glyphIndex, glyphData);
+            _atlasItems.Add(glyphIndex, glyphData);
         }
-        public bool UseSharedGlyphImage { get; set; }
+        public bool UseSharedImage { get; set; }
         public MemBitmap MainBitmap { get; set; }
-        public bool TryGetGlyphMapData(ushort glyphIndex, out TextureGlyphMapData glyphdata)
+        /// <summary>
+        /// try get atlas item by unique name
+        /// </summary>
+        /// <param name="uniqueUint16Name"></param>
+        /// <param name="atlasItem"></param>
+        /// <returns></returns>
+        public bool TryGetItem(ushort uniqueUint16Name, out AtlasItem atlasItem)
         {
-            if (!_glyphLocations.TryGetValue(glyphIndex, out glyphdata))
+            if (!_atlasItems.TryGetValue(uniqueUint16Name, out atlasItem))
             {
-                glyphdata = null;
+                atlasItem = null;
                 return false;
             }
             return true;
         }
-        public bool TryGetGlyphMapData(string itemName, out TextureGlyphMapData glyphdata)
+        /// <summary>
+        /// try get atlas item by unique name
+        /// </summary>
+        /// <param name="itemName"></param>
+        /// <param name="atlasItem"></param>
+        /// <returns></returns>
+        public bool TryGetItem(string itemName, out AtlasItem atlasItem)
         {
             //get img item by unique name
-            if (ImgUrlDict != null && 
+            if (ImgUrlDict != null &&
                 ImgUrlDict.TryGetValue(itemName, out ushort foundIndex) &&
-                _glyphLocations.TryGetValue(foundIndex, out glyphdata))
+                _atlasItems.TryGetValue(foundIndex, out atlasItem))
             {
                 return true;
             }
-            glyphdata = null;
+            atlasItem = null;
             return false;
         }
-        public Dictionary<ushort, TextureGlyphMapData> GlyphDic => _glyphLocations;
+       
 
-        public static Dictionary<ushort, TextureGlyphMapData> CloneLocationWithOffset(SimpleBitmapAtlas org, int dx, int dy)
+        public static Dictionary<ushort, AtlasItem> CloneLocationWithOffset(SimpleBitmapAtlas org, int dx, int dy)
         {
-            Dictionary<ushort, TextureGlyphMapData> cloneDic = new Dictionary<ushort, TextureGlyphMapData>();
-            foreach (var kp in org._glyphLocations)
+            Dictionary<ushort, AtlasItem> cloneDic = new Dictionary<ushort, AtlasItem>();
+            foreach (var kp in org._atlasItems)
             {
-                TextureGlyphMapData orgMapData = kp.Value;
+                AtlasItem orgMapData = kp.Value;
                 cloneDic.Add(kp.Key,
-                    new TextureGlyphMapData()
+                    new AtlasItem()
                     {
                         Left = orgMapData.Left + dx,
                         Top = orgMapData.Top + dy,

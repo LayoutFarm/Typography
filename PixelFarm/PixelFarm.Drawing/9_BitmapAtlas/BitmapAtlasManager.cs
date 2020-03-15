@@ -7,20 +7,7 @@ using PixelFarm.Platforms;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-    public class AtlasImageBinder : LayoutFarm.ImageBinder
-    {
-        public AtlasImageBinder(string atlasName, string imgName)
-        {
-            AtlasName = atlasName;
-            ImageName = imgName;
-        }
-        public string AtlasName { get; private set; }
-        public string ImageName { get; private set; }
-        public override bool IsAtlasImage => true;
-        public TextureGlyphMapData MapData { get; set; }
-    }
 
-    //TODO: review class and method names
     public delegate U LoadNewBmpDelegate<T, U>(T src);
 
     public class BitmapCache<T, U> : IDisposable

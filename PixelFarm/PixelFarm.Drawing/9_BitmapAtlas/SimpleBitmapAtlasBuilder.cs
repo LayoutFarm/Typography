@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-
     public class SimpleBitmapAtlasBuilder
     {
         MemBitmap _latestGenGlyphImage;
@@ -157,7 +156,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 BinPacker binPacker = new BinPacker(totalMaxLim, currentY);
                 for (int i = itemList.Count - 1; i >= 0; --i)
                 {
-                    BitmapAtlasItemSource  g = itemList[i];
+                    BitmapAtlasItemSource g = itemList[i];
                     BinPackRect newRect = binPacker.Insert(g.Width, g.Height);
                     g.area = new Rectangle(newRect.X, newRect.Y, g.Width, g.Height);
 
@@ -190,7 +189,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 {
                     BitmapAtlasItemSource g = itemList[i];
                     //copy glyph image buffer to specific area of final result buffer
-                  
+
                     CopyToDest(g.GetImageBuffer(), g.Width, g.Height, mergeBmpBuffer, g.area.Left, g.area.Top, totalImgWidth);
                 }
             }
@@ -256,7 +255,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 this.TextureKind);
             //
             //
-            atlasFile.WriteGlyphList(_items);
+            atlasFile.WriteAtlasItems(_items);
 
             if (ImgUrlDict != null)
             {
@@ -290,21 +289,20 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             atlas.TextureKind = this.TextureKind;
             atlas.OriginalFontSizePts = this.FontSizeInPoints;
 
-            foreach (BitmapAtlasItemSource cacheGlyph in _items.Values)
+            foreach (BitmapAtlasItemSource src in _items.Values)
             {
+                Rectangle area = src.area;
+                AtlasItem glyphData = new AtlasItem();
 
-                Rectangle area = cacheGlyph.area;
-                TextureGlyphMapData glyphData = new TextureGlyphMapData();
-
-                glyphData.Width = cacheGlyph.Width;
+                glyphData.Width = src.Width;
                 glyphData.Left = area.X;
                 glyphData.Top = area.Top;
                 glyphData.Height = area.Height;
 
-                glyphData.TextureXOffset = cacheGlyph.TextureXOffset;
-                glyphData.TextureYOffset = cacheGlyph.TextureYOffset;
+                glyphData.TextureXOffset = src.TextureXOffset;
+                glyphData.TextureYOffset = src.TextureYOffset;
 
-                atlas.AddGlyph(cacheGlyph.UniqueInt16Name, glyphData);
+                atlas.AddGlyph(src.UniqueInt16Name, glyphData);
             }
 
             return atlas;
@@ -315,7 +313,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             BitmapAtlasFile atlasFile = new BitmapAtlasFile();
             //read font atlas from stream data
             atlasFile.Read(dataStream);
-            return atlasFile.ResultSimpleFontAtlasList;
+            return atlasFile.AtlasList;
         }
 
         static void CopyToDest(int[] srcPixels, int srcW, int srcH, int[] targetPixels, int targetX, int targetY, int totalTargetWidth)

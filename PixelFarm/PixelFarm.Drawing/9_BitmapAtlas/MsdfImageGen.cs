@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using PixelFarm.Contours;
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-
     /// <summary>
     /// msdf image generator
     /// </summary>
@@ -24,8 +23,6 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
             return CreateMsdfShape(newFitContours);
         }
-
-
         static Msdfgen.Shape CreateMsdfShape(List<Contour> contours)
         {
             var shape = new Msdfgen.Shape();
@@ -122,8 +119,6 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
             return newc;
         }
-
-
         public static BitmapAtlasItemSource CreateMsdfImageV1(ContourBuilder contourBuilder, Msdfgen.MsdfGenParams genParams)
         {
             // create msdf shape , then convert to actual image
@@ -139,7 +134,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             Msdfgen.MsdfGen3.PreviewSizeAndLocation(shape, genParams, out int imgW, out int imgH, out Msdfgen.Vector2 translate);
             //output is msdf v1
             return Msdfgen.MsdfGen3.CreateMsdfImage(shape, genParams, imgW, imgH, translate, null);//output is msdf v1, since we set lut=null
-         
+
         }
     }
 }

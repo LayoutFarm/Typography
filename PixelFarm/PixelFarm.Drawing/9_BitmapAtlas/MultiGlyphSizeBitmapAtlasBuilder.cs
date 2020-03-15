@@ -13,32 +13,31 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     /// </summary>
     public class MultiGlyphSizeBitmapAtlasBuilder
     {
-        List<TempMerginhAtlasInfo> _atlasList = new List<TempMerginhAtlasInfo>();
+        List<TempMergingAtlasInfo> _atlasList = new List<TempMergingAtlasInfo>();
 
-        class TempMerginhAtlasInfo
+        class TempMergingAtlasInfo
         {
             public int fontKey;
             public string simpleFontAtlasFile;
             public string imgFile;
             public BitmapAtlasFile fontAtlasFile;
-            public Dictionary<ushort, TextureGlyphMapData> NewCloneLocations;
+            public Dictionary<ushort, AtlasItem> NewCloneLocations;
             public RequestFont reqFont;
             public TextureKind textureKind;
             public Dictionary<string, ushort> ImgUrlDict;
-
         }
 
         public void AddSimpleAtlasFile(RequestFont reqFont,
             string bitmapAtlasFile, string imgFile, TextureKind textureKind)
         {
             //TODO: use 'File' provider to access system file
-            var fontAtlasFile = new BitmapAtlasFile();
+            var fontAtlasFile = new BitmapAtlasFile(); 
             using (FileStream fs = new FileStream(bitmapAtlasFile, FileMode.Open))
             {
                 fontAtlasFile.Read(fs);
             }
 
-            var simpleFontAtlasInfo = new TempMerginhAtlasInfo()
+            var simpleFontAtlasInfo = new TempMergingAtlasInfo()
             {
                 reqFont = reqFont,
                 simpleFontAtlasFile = bitmapAtlasFile,
@@ -60,8 +59,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             const int interAtlasSpace = 2;
             for (int i = 0; i < j; ++i)
             {
-                TempMerginhAtlasInfo atlasInfo = _atlasList[i];
-                SimpleBitmapAtlas fontAtlas = atlasInfo.fontAtlasFile.ResultSimpleFontAtlasList[0];
+                TempMergingAtlasInfo atlasInfo = _atlasList[i];
+                SimpleBitmapAtlas fontAtlas = atlasInfo.fontAtlasFile.AtlasList[0];
                 totalHeight += fontAtlas.Height + interAtlasSpace;
                 if (i == 0)
                 {
@@ -81,8 +80,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             int offsetFromBottom = interAtlasSpace;//start offset 
             for (int i = j - 1; i >= 0; --i)
             {
-                TempMerginhAtlasInfo atlasInfo = _atlasList[i];
-                SimpleBitmapAtlas fontAtlas = atlasInfo.fontAtlasFile.ResultSimpleFontAtlasList[0];
+                TempMergingAtlasInfo atlasInfo = _atlasList[i];
+                SimpleBitmapAtlas fontAtlas = atlasInfo.fontAtlasFile.AtlasList[0];
                 offsetFromBottoms[i] = offsetFromBottom;
                 offsetFromBottom += fontAtlas.Height + interAtlasSpace;
             }
@@ -94,15 +93,15 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 AggPainter painter = AggPainter.Create(memBitmap);
                 for (int i = 0; i < j; ++i)
                 {
-                    TempMerginhAtlasInfo atlasInfo = _atlasList[i];
+                    TempMergingAtlasInfo atlasInfo = _atlasList[i];
                     BitmapAtlasFile atlasFile = atlasInfo.fontAtlasFile;
-                    SimpleBitmapAtlas fontAtlas = atlasInfo.fontAtlasFile.ResultSimpleFontAtlasList[0];
+                    SimpleBitmapAtlas fontAtlas = atlasInfo.fontAtlasFile.AtlasList[0];
 
                     atlasInfo.NewCloneLocations = SimpleBitmapAtlas.CloneLocationWithOffset(fontAtlas, 0, offsetFromBottoms[i]);
                     atlasInfo.ImgUrlDict = fontAtlas.ImgUrlDict;
 
-                    using (System.IO.Stream fontImgStream = PixelFarm.Platforms.StorageService.Provider.ReadDataStream(atlasInfo.imgFile))
-                    using (PixelFarm.CpuBlit.MemBitmap atlasBmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(fontImgStream))
+                    using (Stream fontImgStream = PixelFarm.Platforms.StorageService.Provider.ReadDataStream(atlasInfo.imgFile))
+                    using (MemBitmap atlasBmp =MemBitmap.LoadBitmap(fontImgStream))
                     {
                         painter.DrawImage(atlasBmp, 0, top);
                         top += atlasBmp.Height + interAtlasSpace;
@@ -128,8 +127,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //2. 
                 for (int i = 0; i < j; ++i)
                 {
-                    TempMerginhAtlasInfo atlasInfo = _atlasList[i];
-
+                    TempMergingAtlasInfo atlasInfo = _atlasList[i];
 
                     RequestFont reqFont = atlasInfo.reqFont;
                     fontAtlasFile.WriteOverviewFontInfo(reqFont.Name, reqFont.FontKey, reqFont.SizeInPoints);//size in points
@@ -141,7 +139,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         atlasInfo.textureKind);
                     //
 
-                    fontAtlasFile.WriteGlyphList(atlasInfo.NewCloneLocations);
+                    fontAtlasFile.WriteAtlasItems(atlasInfo.NewCloneLocations);
 
                     if (atlasInfo.ImgUrlDict != null)
                     {

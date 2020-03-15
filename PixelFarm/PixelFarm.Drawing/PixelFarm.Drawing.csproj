@@ -662,11 +662,12 @@
     <Compile Include="4_IO\ImageReaders.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf3\ContourCornerAndAnalyzingElems.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf3\MsdfGen3.cs" />
-    <Compile Include="9_BitmapAtlas\SpriteTextureMapData.cs" />
+    <Compile Include="9_BitmapAtlas\AtlasImageBinder.cs" />
+    <Compile Include="9_BitmapAtlas\AtlasItem.cs" />
     <Compile Include="9_BitmapAtlas\BinPacker.cs" />
     <Compile Include="9_BitmapAtlas\BitmapAtlasManager.cs" />
     <Compile Include="9_BitmapAtlas\BitmapAtlasFile.cs" />
-    <Compile Include="9_BitmapAtlas\BitmapAtlasItem.cs" />
+    <Compile Include="9_BitmapAtlas\AtlasItemSource.cs" />
     <Compile Include="9_BitmapAtlas\MsdfImageGen.cs" />
     <Compile Include="9_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs" />
     <Compile Include="9_BitmapAtlas\SimpleBitmapAtlas.cs" />
