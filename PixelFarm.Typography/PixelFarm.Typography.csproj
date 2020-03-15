@@ -62,12 +62,12 @@
     <Compile Include="1.2_CpuBlit_BitmapAtlas\BitmapCacheForSvgGlyph.cs" />
     <Compile Include="4_PixelFarm_Contours\GlyphTranslatorToVxs.cs" />
     <Compile Include="1.3_Typography_Contours\GlyphMeshStore.cs" />
-    <Compile Include="1.1_Drawing_Fonts\OpenFontTextService.cs" />
+    <Compile Include="1.1_General\OpenFontTextService.cs" />
     <Compile Include="1.2_CpuBlit_BitmapAtlas\BitmapFontMx.cs" />
     <Compile Include="1.2_CpuBlit_BitmapAtlas\GlyphTextureBitmapGenerator.cs" />
-    <Compile Include="1.1_Drawing_Fonts\VxsTextPrinter.cs" />
+    <Compile Include="1.1_General\VxsTextPrinter.cs" />
     <Compile Include="1.2_CpuBlit_BitmapAtlas\AggGlyphTextureGen.cs" />
-    <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
+    <Compile Include="1.1_General\FontStyleExtensions.cs" />
     <Compile Include="1.3_Typography_Contours\GlyphMeshCollection.cs" />
     <Compile Include="1.3_Typography_Contours\GlyphOutlineBuilderBase.cs" />
     <Compile Include="1.3_Typography_Contours\TextPrinterBase.cs" />
