@@ -1,10 +1,9 @@
 ﻿//MIT, 2019-present, WinterDev 
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont;
-using PixelFarm.CpuBlit;
+using Typography.OpenFont; 
 
-namespace PixelFarm.Drawing.Fonts
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public delegate MemBitmap SvgBmpBuilderFunc(System.Text.StringBuilder stbuilder);
 

@@ -66,7 +66,6 @@
     <Compile Include="3_FontFaceImpl\BitmapFontMx.cs" />
     <Compile Include="3_FontFaceImpl\GlyphTextureBitmapGenerator.cs" />
     <Compile Include="1.1_Drawing_Fonts\VxsTextPrinter.cs" />
-    <Compile Include="3_FontFaceImpl\ScriptLangConv.cs" />
     <Compile Include="3_FontFaceImpl\AggGlyphTextureGen.cs" />
     <Compile Include="1.1_Drawing_Fonts\FontStyleExtensions.cs" />
     <Compile Include="4_TextPrinter\GlyphMeshCollection.cs" />

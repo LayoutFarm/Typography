@@ -4,8 +4,8 @@ using PixelFarm.CpuBlit;
 using PixelFarm.CpuBlit.VertexProcessing;
 using Typography.OpenFont;
 
-
-namespace PixelFarm.Drawing.Fonts
+using PixelFarm.Drawing;
+namespace PixelFarm.Contours
 {
 
     //this is PixelFarm version ***
@@ -75,7 +75,7 @@ namespace PixelFarm.Drawing.Fonts
                 var mat = PixelFarm.CpuBlit.VertexProcessing.Affine.New(
                     new PixelFarm.CpuBlit.VertexProcessing.AffinePlan(
                         PixelFarm.CpuBlit.VertexProcessing.AffineMatrixCommand.Scale, scale, scale));
-                mat.TransformToVxs(_vxs, output); 
+                mat.TransformToVxs(_vxs, output);
             }
         }
         /// <summary>

@@ -7,9 +7,9 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.Contours;
-using PixelFarm.CpuBlit.BitmapAtlas;
 
-namespace PixelFarm.Drawing.Fonts
+using PixelFarm.Drawing;
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public class GlyphTextureBuildDetail
     {

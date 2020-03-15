@@ -12,7 +12,6 @@ using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using Typography.Rendering;
 using PixelFarm.CpuBlit.BitmapAtlas;
 
 namespace SampleWinForms

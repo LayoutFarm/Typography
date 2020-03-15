@@ -2,15 +2,13 @@
 using System;
 using System.Collections.Generic;
 
-using PixelFarm.CpuBlit;
+using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.PixelProcessing;
 using Typography.OpenFont;
-using Typography.Rendering;
 using Typography.TextLayout;
 using Typography.Contours;
 
-using PixelFarm.CpuBlit.BitmapAtlas;
-namespace PixelFarm.Drawing.Fonts
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
 
     public enum AntialiasTechnique

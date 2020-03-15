@@ -4,14 +4,10 @@ using System;
 using System.Collections.Generic;
 
 using PixelFarm.Drawing;
-using PixelFarm.Drawing.Fonts;
 using PixelFarm.Platforms;
-using PixelFarm.CpuBlit;
-
 using Typography.OpenFont;
-using PixelFarm.CpuBlit.BitmapAtlas;
 
-namespace Typography.Rendering
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public delegate U LoadNewBmpDelegate<T, U>(T src);
 
@@ -260,7 +256,7 @@ namespace Typography.Rendering
                 //check local caching, if found then load-> create it
 
                 SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
-                
+
 
                 lock (s_loadDataLock)
                 {

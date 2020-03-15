@@ -4,14 +4,10 @@ using System;
 using PixelFarm.CpuBlit.VertexProcessing;
 
 using PixelFarm.Drawing;
-using PixelFarm.Drawing.Fonts;
+using Typography.Contours;
+using PixelFarm.Contours;
 
-using PixelFarm.CpuBlit;
-using PixelFarm.CpuBlit.BitmapAtlas;
-
-
-
-namespace Typography.Contours
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     /// <summary>
     /// agg glyph texture generator
