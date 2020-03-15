@@ -326,7 +326,7 @@ namespace Msdfgen
             translate1 = new Vector2(-left + borderW, -bottom + borderW);
         }
 
-        public PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItem GenerateMsdfTexture(VertexStore vxs)
+        public PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource GenerateMsdfTexture(VertexStore vxs)
         {
 
             Shape shape = CreateShape(vxs, out EdgeBmpLut edgeBmpLut);
@@ -461,7 +461,7 @@ namespace Msdfgen
                     }
                     edgeBmpLut.SetBmpBuffer(bmpLut.Width, bmpLut.Height, lutBuffer5);
                     //generate actual sprite
-                    PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItem spriteTextureMapData = CreateMsdfImage(shape, MsdfGenParams, imgW, imgH, translateVec, edgeBmpLut);
+                    PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource spriteTextureMapData = CreateMsdfImage(shape, MsdfGenParams, imgW, imgH, translateVec, edgeBmpLut);
                     //save msdf bitmap to file         
                     using (MemBitmap memBmp = MemBitmap.CreateFromCopy(spriteTextureMapData.Width, spriteTextureMapData.Height, spriteTextureMapData.Source))
                     {
@@ -810,7 +810,7 @@ namespace Msdfgen
             //}
         }
 
-        internal static PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItem CreateMsdfImage(Shape shape, MsdfGenParams genParams, int w, int h, Vector2 translate, EdgeBmpLut lutBuffer = null)
+        internal static PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource CreateMsdfImage(Shape shape, MsdfGenParams genParams, int w, int h, Vector2 translate, EdgeBmpLut lutBuffer = null)
         {
             double edgeThreshold = genParams.edgeThreshold;
             if (edgeThreshold < 0)
@@ -848,11 +848,12 @@ namespace Msdfgen
                   edgeThreshold);
             }
 
-            var spriteData = new PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItem(w, h);
-            spriteData.Source = ConvertToIntBmp(frgbBmp, flipY);
-            spriteData.TextureXOffset = (float)translate.x;
-            spriteData.TextureYOffset = (float)translate.y;
-            return spriteData;
+            return new PixelFarm.CpuBlit.BitmapAtlas.BitmapAtlasItemSource(w, h)
+            {
+                Source = ConvertToIntBmp(frgbBmp, flipY),
+                TextureXOffset = (float)translate.x,
+                TextureYOffset = (float)translate.y
+            };             
         }
 
         static int[] ConvertToIntBmp(FloatRGBBmp input, bool flipY)

@@ -22,7 +22,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachGlyph(int glyphIndex, BitmapAtlasItem glyphImage);
+        public delegate void OnEachGlyph(int glyphIndex, BitmapAtlasItemSource glyphImage);
         public GlyphTextureBitmapGenerator()
         {
 
@@ -168,10 +168,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         using (VxsTemp.Borrow(out var vxs))
                         {
                             glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
-                            BitmapAtlasItem glyphImg = gen3.GenerateMsdfTexture(vxs);
+                            BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);
+                            glyphImg.UniqueInt16Name = gindex;
                             _onEachGlyphDel?.Invoke(gindex, glyphImg);
                             //
-                            atlasBuilder.AddGlyph(gindex, glyphImg);
+
+                            atlasBuilder.AddGlyph(glyphImg);
                         }
 
                     }
@@ -193,11 +195,11 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         using (VxsTemp.Borrow(out var vxs))
                         {
                             glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
-                            BitmapAtlasItem glyphImg = gen3.GenerateMsdfTexture(vxs);
-
+                            BitmapAtlasItemSource glyphImg = gen3.GenerateMsdfTexture(vxs);
+                            glyphImg.UniqueInt16Name = gindex;
                             _onEachGlyphDel?.Invoke(gindex, glyphImg);
-                            //
-                            atlasBuilder.AddGlyph(gindex, glyphImg);
+
+                            atlasBuilder.AddGlyph(glyphImg);
                         }
                     }
                 }
@@ -227,7 +229,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         ushort gindex = glyphIndices[i];
                         outlineBuilder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
-                        BitmapAtlasItem glyphImg = aggTextureGen.CreateAtlasItem(outlineBuilder, 1);
+                        BitmapAtlasItemSource glyphImg = aggTextureGen.CreateAtlasItem(outlineBuilder, 1);
                         if (applyFilter)
                         {
 
@@ -239,8 +241,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                             glyphImg.TextureYOffset += 1;
                         }
                         //
+                        glyphImg.UniqueInt16Name = gindex;
                         _onEachGlyphDel?.Invoke(gindex, glyphImg);
-                        atlasBuilder.AddGlyph(gindex, glyphImg);
+                        atlasBuilder.AddGlyph(glyphImg);
                     }
                 }
             }
@@ -251,9 +254,9 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         /// <param name="org"></param>
         /// <param name="radius"></param>
         /// <returns></returns>
-        static BitmapAtlasItem Sharpen(BitmapAtlasItem org, int radius)
+        static BitmapAtlasItemSource Sharpen(BitmapAtlasItemSource org, int radius)
         {
-            BitmapAtlasItem newImg = new BitmapAtlasItem(org.Width, org.Height);
+            BitmapAtlasItemSource newImg = new BitmapAtlasItemSource(org.Width, org.Height);
             CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new CpuBlit.Imaging.ShapenFilterPdn();
             int[] orgBuffer = org.GetImageBuffer();
             unsafe

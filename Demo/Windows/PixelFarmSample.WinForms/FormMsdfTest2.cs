@@ -155,8 +155,9 @@ namespace SampleWinForms
                 var genParams = new MsdfGenParams();
                 builder.ReadShapes(new GlyphContourBuilder2(glyphContourBuilder));
                 //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
-                BitmapAtlasItem glyphImg = MsdfImageGen.CreateMsdfImageV1(glyphContourBuilder, genParams);
-                atlasBuilder.AddGlyph(gindex, glyphImg);
+                BitmapAtlasItemSource glyphImg = MsdfImageGen.CreateMsdfImageV1(glyphContourBuilder, genParams);
+                glyphImg.UniqueInt16Name = gindex;
+                atlasBuilder.AddGlyph(glyphImg);
 
                 using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
                 {
@@ -196,7 +197,7 @@ namespace SampleWinForms
             //sample
 
             MsdfGenParams msdfGenParams = new MsdfGenParams();
-            BitmapAtlasItem glyphImg = MsdfImageGen.CreateMsdfImageV1(tx, msdfGenParams);
+            BitmapAtlasItemSource glyphImg = MsdfImageGen.CreateMsdfImageV1(tx, msdfGenParams);
             int w = glyphImg.Width;
             int h = glyphImg.Height;
             using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -237,7 +238,7 @@ namespace SampleWinForms
             //
             //
             var genParams = new MsdfGenParams();
-            BitmapAtlasItem glyphImg = MsdfImageGen.CreateMsdfImageV1(shape1, genParams);
+            BitmapAtlasItemSource glyphImg = MsdfImageGen.CreateMsdfImageV1(shape1, genParams);
 
             using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
             {

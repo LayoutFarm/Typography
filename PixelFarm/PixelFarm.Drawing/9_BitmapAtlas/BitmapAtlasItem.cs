@@ -4,61 +4,49 @@ using System;
 using PixelFarm.Drawing;
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-
-    public class BitmapAtlasItem : SpriteTextureMapData<int[]>
+    /// <summary>
+    /// Input for AtlasBuilder
+    /// </summary>
+    public class BitmapAtlasItemSource : AtlasItemSource<int[]>
     {
-        public BitmapAtlasItem(int w, int h) : base(0, 0, w, h) { }
-
+        public BitmapAtlasItemSource(int w, int h) : base(0, 0, w, h) { }
         public int[] GetImageBuffer() => Source;
         public bool IsBigEndian { get; set; }
+
+        /// <summary>
+        /// name of this item in int16 (eg. glyph index)
+        /// </summary>
+        public ushort UniqueInt16Name { get; set; }
+        /// <summary>
+        /// name of this item in string( eg. bitmap unqiue name)
+        /// </summary>
+        public string UniqueName { get; set; }
+
         public void SetImageBuffer(int[] imgBuffer, bool isBigEndian = false)
         {
             Source = imgBuffer;
             IsBigEndian = isBigEndian;
         }
+
+
     }
 
     class RelocationAtlasItem
     {
-        public readonly ushort glyphIndex;
-        internal readonly BitmapAtlasItem atlasItem;
+        internal readonly BitmapAtlasItemSource atlasItem;
         public Rectangle area;
-        public RelocationAtlasItem(ushort glyphIndex, BitmapAtlasItem atlasItem)
+        public RelocationAtlasItem(BitmapAtlasItemSource atlasItem)
         {
-            this.glyphIndex = glyphIndex;
             this.atlasItem = atlasItem;
         }
 #if DEBUG
         public override string ToString()
         {
-            return glyphIndex.ToString();
+            return atlasItem.UniqueInt16Name.ToString();
         }
 #endif
     }
 
-    public class TextureGlyphMapData
-    {
-        public int Left { get; set; }
-        public int Top { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
 
-        public float TextureXOffset { get; set; }
-        public float TextureYOffset { get; set; }
-
-        public void GetRect(out int x, out int y, out int w, out int h)
-        {
-            x = Left;
-            y = Top;
-            w = Width;
-            h = Height;
-        }
-#if DEBUG
-        public override string ToString()
-        {
-            return "(" + Left + "," + Top + "," + Width + "," + Height + ")";
-        }
-#endif
-    }
 
 }

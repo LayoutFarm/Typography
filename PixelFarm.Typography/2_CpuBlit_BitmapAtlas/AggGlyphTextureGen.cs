@@ -25,7 +25,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public Color GlyphColor { get; set; }
         public TextureKind TextureKind { get; set; }
         public AggPainter Painter { get; set; }
-        public BitmapAtlasItem CreateAtlasItem(GlyphOutlineBuilder builder, float pxscale)
+        public BitmapAtlasItemSource CreateAtlasItem(GlyphOutlineBuilder builder, float pxscale)
         {
 
             _txToVxs.Reset();
@@ -145,7 +145,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     h = painter.RenderSurface.DestBitmap.Height;
                 }
 
-                var glyphImage = new BitmapAtlasItem(w, h);
+                var glyphImage = new BitmapAtlasItemSource(w, h);
 
 #if DEBUG
                 if (dx < short.MinValue || dx > short.MaxValue)

@@ -517,7 +517,7 @@ namespace SampleWinForms
             builder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
             //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
             Msdfgen.MsdfGenParams genParams = new Msdfgen.MsdfGenParams();
-            BitmapAtlasItem glyphImg = MsdfImageGen.CreateMsdfImageV1(glyphToContour, genParams);
+            BitmapAtlasItemSource glyphImg = MsdfImageGen.CreateMsdfImageV1(glyphToContour, genParams);
 
             MemBitmap actualImg = MemBitmap.CreateFromCopy(glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer());
             _painter.DrawImage(actualImg, 0, 0);

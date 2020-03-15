@@ -7,7 +7,7 @@ using System.IO;
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
 
-    
+
     public class BitmapAtlasFile
     {
         SimpleBitmapAtlas _atlas;
@@ -20,7 +20,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             OverviewFontInfo,
             OverviewMultiSizeFontInfo,
 
-            OverviewBitmapInfo, 
+            OverviewBitmapInfo,
             ImgUrlDic,
         }
 
@@ -167,7 +167,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //
                 _writer.Write((ushort)kp.Value);
             }
-        } 
+        }
         internal void WriteOverviewMultiSizeFontInfo(ushort count)
         {
             _writer.Write((ushort)ObjectKind.OverviewMultiSizeFontInfo);
@@ -184,7 +184,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _writer.Write(utf8Buffer);
         }
         internal void WriteOverviewFontInfo(string fontFileName, int fontKey, float sizeInPt)
-        { 
+        {
 
             _writer.Write((ushort)ObjectKind.OverviewFontInfo);
             WriteLengthPrefixUtf8String(fontFileName);
@@ -217,7 +217,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             foreach (RelocationAtlasItem g in glyphs.Values)
             {
                 //1. glyph index
-                _writer.Write((ushort)g.glyphIndex);
+                _writer.Write((ushort)g.atlasItem.UniqueInt16Name);
 
                 //2. area
                 _writer.Write((ushort)g.area.Left);
@@ -226,7 +226,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 _writer.Write((ushort)g.area.Height);
 
                 //3. texture offset                
-                BitmapAtlasItem img = g.atlasItem;
+                BitmapAtlasItemSource img = g.atlasItem;
                 _writer.Write((short)img.TextureXOffset);
                 _writer.Write((short)img.TextureYOffset);
             }

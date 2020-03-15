@@ -316,7 +316,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             return PixelFarm.CpuBlit.MemBitmap.LoadBitmap(stream);
         }
-        static void SaveImgBufferToFile(BitmapAtlasItem glyphImg, string filename)
+        static void SaveImgBufferToFile(BitmapAtlasItemSource glyphImg, string filename)
         {
             using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), false))
@@ -331,10 +331,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         /// <param name="org"></param>
         /// <param name="radius"></param>
         /// <returns></returns>
-        static BitmapAtlasItem Sharpen(BitmapAtlasItem org, int radius)
+        static BitmapAtlasItemSource Sharpen(BitmapAtlasItemSource org, int radius)
         {
 
-            BitmapAtlasItem newImg = new BitmapAtlasItem(org.Width, org.Height);
+            BitmapAtlasItemSource newImg = new BitmapAtlasItemSource(org.Width, org.Height);
 
             PixelFarm.CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new PixelFarm.CpuBlit.Imaging.ShapenFilterPdn();
             int[] orgBuffer = org.GetImageBuffer();
