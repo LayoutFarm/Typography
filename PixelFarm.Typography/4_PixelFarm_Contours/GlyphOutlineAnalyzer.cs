@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-present, WinterDev
 using System;
 using System.Collections.Generic;
-using Typography.OpenFont;
 using PixelFarm.CpuBlit.VertexProcessing;
+using Typography.OpenFont;
 
 namespace PixelFarm.Contours
 {

@@ -2,7 +2,7 @@
 //MIT, 2015-2016, Michael Popoloski
 
 using System;
-namespace PixelFarm.Drawing.BitmapAtlas
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public struct BinPackRect
     {

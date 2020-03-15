@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Typography.OpenFont;
-using PixelFarm.CpuBlit;
-
-namespace PixelFarm.Drawing.Fonts
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
 
     class GlyphBitmap

@@ -3,42 +3,16 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.Contours;
-namespace Typography.Rendering
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-
     /// <summary>
-    /// parameter for msdf generation
+    /// msdf image generator
     /// </summary>
-    public class MsdfGenParams
+    public static class MsdfImageGen
     {
-        public float scaleX = 1;
-        public float scaleY = 1;
-        public float shapeScale = 1;
-        public int minImgWidth = 5;
-        public int minImgHeight = 5;
-
-        public double angleThreshold = 3; //default
-        public double pxRange = 4; //default
-        public double edgeThreshold = 1.00000001;//default,(from original code)
-
-
-        public MsdfGenParams()
+        public static Msdfgen.Shape CreateMsdfShape(ContourBuilder contourBuilder, float pxScale)
         {
-
-        }
-        public void SetScale(float scaleX, float scaleY)
-        {
-            this.scaleX = scaleX;
-            this.scaleY = scaleY;
-        }
-
-
-    }
-    public static class MsdfGlyphGen
-    {
-        public static Msdfgen.Shape CreateMsdfShape(ContourBuilder glyphToContour, float pxScale)
-        {
-            List<Contour> cnts = glyphToContour.GetContours();
+            List<Contour> cnts = contourBuilder.GetContours();
             List<Contour> newFitContours = new List<Contour>();
             int j = cnts.Count;
             for (int i = 0; i < j; ++i)
@@ -49,8 +23,6 @@ namespace Typography.Rendering
             }
             return CreateMsdfShape(newFitContours);
         }
-
-
         static Msdfgen.Shape CreateMsdfShape(List<Contour> contours)
         {
             var shape = new Msdfgen.Shape();
@@ -147,80 +119,22 @@ namespace Typography.Rendering
             }
             return newc;
         }
-        //---------------------------------------------------------------------
-
-        public static GlyphImage CreateMsdfImage(ContourBuilder glyphToContour, MsdfGenParams genParams)
+        public static BitmapAtlasItemSource CreateMsdfImageV1(ContourBuilder contourBuilder, Msdfgen.MsdfGenParams genParams)
         {
             // create msdf shape , then convert to actual image
-            return CreateMsdfImage(CreateMsdfShape(glyphToContour, genParams.shapeScale), genParams);
+            Msdfgen.Shape shape = CreateMsdfShape(contourBuilder, genParams.shapeScale);
+            //int w, int h, Vector2 translate
+            Msdfgen.MsdfGen3.PreviewSizeAndLocation(shape, genParams, out int imgW, out int imgH, out Msdfgen.Vector2 translate);
+            return Msdfgen.MsdfGen3.CreateMsdfImage(shape, genParams, imgW, imgH, translate, null);
         }
-
-        const double MAX = 1e240;
-        public static GlyphImage CreateMsdfImage(Msdfgen.Shape shape, MsdfGenParams genParams)
+        public static BitmapAtlasItemSource CreateMsdfImageV1(Msdfgen.Shape shape, Msdfgen.MsdfGenParams genParams)
         {
-            double left = MAX;
-            double bottom = MAX;
-            double right = -MAX;
-            double top = -MAX;
+            //output is msdf v1,
+            //int w, int h, Vector2 translate
+            Msdfgen.MsdfGen3.PreviewSizeAndLocation(shape, genParams, out int imgW, out int imgH, out Msdfgen.Vector2 translate);
+            //output is msdf v1
+            return Msdfgen.MsdfGen3.CreateMsdfImage(shape, genParams, imgW, imgH, translate, null);//output is msdf v1, since we set lut=null
 
-            shape.findBounds(ref left, ref bottom, ref right, ref top);
-            int w = (int)Math.Ceiling((right - left));
-            int h = (int)Math.Ceiling((top - bottom));
-
-            if (w < genParams.minImgWidth)
-            {
-                w = genParams.minImgWidth;
-            }
-            if (h < genParams.minImgHeight)
-            {
-                h = genParams.minImgHeight;
-            }
-
-
-            //temp, for debug with glyph 'I', tahoma font
-            //double edgeThreshold = 1.00000001;//default, if edgeThreshold < 0 then  set  edgeThreshold=1 
-            //Msdfgen.Vector2 scale = new Msdfgen.Vector2(0.98714652956298199, 0.98714652956298199);
-            //double pxRange = 4;
-            //translate = new Msdfgen.Vector2(12.552083333333332, 4.0520833333333330);
-            //double range = pxRange / Math.Min(scale.x, scale.y);
-
-
-            int borderW = (int)((float)w / 5f);
-
-            //org
-            //var translate = new Msdfgen.Vector2(left < 0 ? -left + borderW : borderW, bottom < 0 ? -bottom + borderW : borderW);
-            //test
-            var translate = new Msdfgen.Vector2(-left + borderW, -bottom + borderW);
-
-            w += borderW * 2; //borders,left- right
-            h += borderW * 2; //borders, top- bottom
-
-            double edgeThreshold = genParams.edgeThreshold;
-            if (edgeThreshold < 0)
-            {
-                edgeThreshold = 1.00000001; //use default if  edgeThreshold <0
-            }
-
-            var scale = new Msdfgen.Vector2(genParams.scaleX, genParams.scaleY); //scale               
-            double range = genParams.pxRange / Math.Min(scale.x, scale.y);
-            //---------
-            Msdfgen.FloatRGBBmp frgbBmp = new Msdfgen.FloatRGBBmp(w, h);
-            Msdfgen.EdgeColoring.edgeColoringSimple(shape, genParams.angleThreshold);
-            Msdfgen.MsdfGenerator.generateMSDF(frgbBmp,
-                shape,
-                range,
-                scale,
-                translate,//translate to positive quadrant
-                edgeThreshold);
-            //-----------------------------------
-            int[] buffer = Msdfgen.FloatRGBBmp.ConvertToIntBmp(frgbBmp, false);
-
-            GlyphImage img = new GlyphImage(w, h);
-            img.TextureOffsetX = (short)translate.x; //TODO: review here, rounding err
-            img.TextureOffsetY = (short)translate.y; //TODO: review here, rounding err
-            img.SetImageBuffer(buffer, false);
-            return img;
         }
-
     }
 }

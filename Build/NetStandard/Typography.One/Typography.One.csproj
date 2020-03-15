@@ -18,9 +18,9 @@
   <ItemGroup>
     <Compile Include="..\..\..\Demo\Shared\DevTextPrinter\FontManagement.cs" Link="DevTextPrinter\FontManagement.cs" />
     <Compile Include="..\..\..\Demo\Shared\GlyphOutlineBuilder\GlyphOutlineBuilder.cs" Link="GlyphPathBuilder\GlyphOutlineBuilder.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphMeshCollection.cs" Link="DevTextPrinter\GlyphMeshCollection.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphOutlineBuilderBase.cs" Link="GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />
-    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\TextPrinterBase.cs" Link="DevTextPrinter\TextPrinterBase.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs" Link="DevTextPrinter\GlyphMeshCollection.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs" Link="GlyphPathBuilder\GlyphOutlineBuilderBase.cs" />
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs" Link="DevTextPrinter\TextPrinterBase.cs" />
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs" Link="DevTextPrinter\TextBaseline.cs" />
   </ItemGroup>
 

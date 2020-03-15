@@ -1,8 +1,8 @@
 ﻿//MIT, 2016-present, WinterDev
 
-namespace Msdfgen
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-    public class SpriteTextureMapData<T>
+    public class AtlasItem
     {
         public int Left { get; set; }
         public int Top { get; set; }
@@ -11,15 +11,14 @@ namespace Msdfgen
 
         public float TextureXOffset { get; set; }
         public float TextureYOffset { get; set; }
-        public T Source { get; set; }
 
-        public SpriteTextureMapData(int left, int top, int width, int height)
+
+        public AtlasItem(ushort uniqueUint16Name)
         {
-            Left = left;
-            Top = top;
-            Width = width;
-            Height = height;
+            UniqueUint16Name = uniqueUint16Name;
         }
+
+        public ushort UniqueUint16Name { get; private set; }
         public void GetRect(out int x, out int y, out int w, out int h)
         {
             x = Left;
@@ -27,6 +26,12 @@ namespace Msdfgen
             w = Width;
             h = Height;
         }
-    }
 
+#if DEBUG
+        public override string ToString()
+        {
+            return "(" + Left + "," + Top + "," + Width + "," + Height + ")";
+        }
+#endif
+    }
 }

@@ -1,9 +1,9 @@
 ﻿//MIT, 2016-present, WinterDev 
 
 
-namespace PixelFarm.Drawing.Fonts
+namespace PixelFarm.Drawing
 {
-    public static class FontStyleExtensions
+    static class FontStyleExtensions
     {
         public static Typography.FontManagement.TypefaceStyle ConvToInstalledFontStyle(this FontStyle style)
         {

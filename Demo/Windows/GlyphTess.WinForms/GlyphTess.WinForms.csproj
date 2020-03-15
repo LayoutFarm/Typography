@@ -36,7 +36,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\PixelFarm.Typography\4_TextPrinter\GlyphOutlineBuilderBase.cs">
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
       <Link>GlyphOutlineBuilder\GlyphOutlineBuilderBase.cs</Link>
     </Compile>
     <Compile Include="..\..\..\pixelfarm\backend.triangulation\delaunay\AdvancingFront.cs">

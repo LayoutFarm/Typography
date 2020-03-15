@@ -27,6 +27,7 @@ namespace PixelFarmTextBox.WinForms
         Bitmap winBmp;
 
         TextPrinterBase selectedTextPrinter = null;
+
         PixelFarm.Drawing.VxsTextPrinter _devVxsTextPrinter = null;
         SampleWinForms.UI.SampleTextBoxControllerForPixelFarm _controllerForPixelFarm = new SampleWinForms.UI.SampleTextBoxControllerForPixelFarm();
 
@@ -103,7 +104,7 @@ namespace PixelFarmTextBox.WinForms
 
             //test option use be used with lcd subpixel rendering.
             //this demonstrate how we shift a pixel for subpixel rendering tech
-            _devVxsTextPrinter.AntialiasTechnique = AntialiasTechnique.LcdStencil;
+            _devVxsTextPrinter.AntialiasTechnique = PixelFarm.CpuBlit.BitmapAtlas.AntialiasTechnique.LcdStencil;
 
             //1. read typeface from font file 
             TypographyTest.RenderChoice renderChoice = _basicOptions.RenderChoice;

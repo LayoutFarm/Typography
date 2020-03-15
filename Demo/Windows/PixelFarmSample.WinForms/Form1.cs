@@ -7,12 +7,11 @@ using System.IO;
 using System.Windows.Forms;
 
 using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
+using PixelFarm.CpuBlit.BitmapAtlas;
 using PixelFarm.Contours;
 
 using Typography.OpenFont;
 using Typography.TextLayout;
-using Typography.Rendering;
 using Typography.Contours;
 using Typography.WebFont;
 
@@ -513,12 +512,12 @@ namespace SampleWinForms
             builder.Build(testChar, sizeInPoint);
             //----------------------------------------------------
             var glyphToContour = new ContourBuilder();
-            var msdfGenPars = new MsdfGenParams();
+
 
             builder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
             //glyphToContour.Read(builder.GetOutputPoints(), builder.GetOutputContours());
-            MsdfGenParams genParams = new MsdfGenParams();
-            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, genParams);
+            Msdfgen.MsdfGenParams genParams = new Msdfgen.MsdfGenParams();
+            BitmapAtlasItemSource glyphImg = MsdfImageGen.CreateMsdfImageV1(glyphToContour, genParams);
 
             MemBitmap actualImg = MemBitmap.CreateFromCopy(glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer());
             _painter.DrawImage(actualImg, 0, 0);
@@ -705,7 +704,7 @@ namespace SampleWinForms
         }
 
         private void cmdTestFontAtlas_Click(object sender, EventArgs e)
-        { 
+        {
 
             FormFontAtlas fontAtlas = new FormFontAtlas();
 
@@ -843,6 +842,6 @@ namespace SampleWinForms
                 PreviewFontInfo previewFontInfo = openFontReader.ReadPreview(fs);
             }
         }
-       
+
     }
 }
