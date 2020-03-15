@@ -8,7 +8,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 {
 
     public class BitmapAtlasFile
-    {   
+    {
         //one atlas file may contain more than 1 simple-atlas
 
 
@@ -90,10 +90,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             {
                 //read each glyph map info
 
-                var item = new AtlasItem();
-
-                //1. glyph index
-                ushort glyphIndex = reader.ReadUInt16();
+                var item = new AtlasItem(reader.ReadUInt16());   
 
                 //2. area
                 item.Left = reader.ReadUInt16();
@@ -105,7 +102,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 item.TextureXOffset = reader.ReadInt16();
                 item.TextureYOffset = reader.ReadInt16();
 
-                _atlas.AddGlyph(glyphIndex, item);
+                _atlas.AddAtlasItem(item);
             }
         }
 

@@ -83,12 +83,12 @@ namespace SampleWinForms
                 SimpleBitmapAtlas fontAtlas = fontAtlasList[i];
 
                 TreeNode atlasNode = new TreeNode();
-                atlasNode.Text = fontAtlas.FontFilename + ", count=" + fontAtlas.GlyphDic.Count;
+                atlasNode.Text = fontAtlas.FontFilename + ", count=" + fontAtlas.ItemDict.Count;
 
                 treeView1.Nodes.Add(atlasNode);
 
-                List<TempGlyphMap> tmpGlyphMaps = new List<TempGlyphMap>(fontAtlas.GlyphDic.Count);
-                foreach (var kv in fontAtlas.GlyphDic)
+                List<TempGlyphMap> tmpGlyphMaps = new List<TempGlyphMap>(fontAtlas.ItemDict.Count);
+                foreach (var kv in fontAtlas.ItemDict)
                 {
                     tmpGlyphMaps.Add(new TempGlyphMap { glyphIndex = kv.Key, glyphMap = kv.Value });
                 }

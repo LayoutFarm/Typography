@@ -291,18 +291,18 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             foreach (BitmapAtlasItemSource src in _items.Values)
             {
-                Rectangle area = src.area;
-                AtlasItem glyphData = new AtlasItem();
+                Rectangle area = src.area; 
 
-                glyphData.Width = src.Width;
-                glyphData.Left = area.X;
-                glyphData.Top = area.Top;
-                glyphData.Height = area.Height;
+                atlas.AddAtlasItem(new AtlasItem(src.UniqueInt16Name)
+                {
+                    Width = src.Width,
+                    Left = area.X,
+                    Top = area.Top,
+                    Height = area.Height,
 
-                glyphData.TextureXOffset = src.TextureXOffset;
-                glyphData.TextureYOffset = src.TextureYOffset;
-
-                atlas.AddGlyph(src.UniqueInt16Name, glyphData);
+                    TextureXOffset = src.TextureXOffset,
+                    TextureYOffset = src.TextureYOffset
+                });
             }
 
             return atlas;

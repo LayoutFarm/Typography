@@ -1,7 +1,7 @@
 ﻿//MIT, 2016-present, WinterDev
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
-{ 
+{
     public class AtlasItem
     {
         public int Left { get; set; }
@@ -12,6 +12,13 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public float TextureXOffset { get; set; }
         public float TextureYOffset { get; set; }
 
+
+        public AtlasItem(ushort uniqueUint16Name)
+        {
+            UniqueUint16Name = uniqueUint16Name;
+        }
+
+        public ushort UniqueUint16Name { get; private set; }
         public void GetRect(out int x, out int y, out int w, out int h)
         {
             x = Left;

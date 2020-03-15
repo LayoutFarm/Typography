@@ -32,12 +32,12 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public string FontFilename { get; set; }
         public int FontKey { get; set; }
         //------------
-        public Dictionary<ushort, AtlasItem> GlyphDic => _atlasItems;
+        public Dictionary<ushort, AtlasItem> ItemDict => _atlasItems;
         public Dictionary<string, ushort> ImgUrlDict { get; set; }
 
-        internal void AddGlyph(ushort glyphIndex, AtlasItem glyphData)
+        internal void AddAtlasItem(AtlasItem item)
         {
-            _atlasItems.Add(glyphIndex, glyphData);
+            _atlasItems.Add(item.UniqueUint16Name, item);
         }
         public bool UseSharedImage { get; set; }
         public MemBitmap MainBitmap { get; set; }
@@ -74,7 +74,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             atlasItem = null;
             return false;
         }
-       
+
 
         public static Dictionary<ushort, AtlasItem> CloneLocationWithOffset(SimpleBitmapAtlas org, int dx, int dy)
         {
@@ -82,18 +82,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             foreach (var kp in org._atlasItems)
             {
                 AtlasItem orgMapData = kp.Value;
-                cloneDic.Add(kp.Key,
-                    new AtlasItem()
-                    {
-                        Left = orgMapData.Left + dx,
-                        Top = orgMapData.Top + dy,
-                        //
-                        Width = orgMapData.Width,
-                        Height = orgMapData.Height,
-                        TextureXOffset = orgMapData.TextureXOffset,
-                        TextureYOffset = orgMapData.TextureYOffset
+                cloneDic.Add(kp.Key, new AtlasItem(orgMapData.UniqueUint16Name)
+                {
+                    Left = orgMapData.Left + dx,
+                    Top = orgMapData.Top + dy,
+                    //
+                    Width = orgMapData.Width,
+                    Height = orgMapData.Height,
+                    TextureXOffset = orgMapData.TextureXOffset,
+                    TextureYOffset = orgMapData.TextureYOffset
 
-                    });
+                });
             }
             return cloneDic;
         }
