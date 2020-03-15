@@ -9,6 +9,7 @@ using PixelFarm.Platforms;
 using PixelFarm.CpuBlit;
 
 using Typography.OpenFont;
+using PixelFarm.CpuBlit.BitmapAtlas;
 
 namespace Typography.Rendering
 {
@@ -155,22 +156,22 @@ namespace Typography.Rendering
     public class BitmapFontManager<B>
         where B : IDisposable
     {
-        FontBitmapCache<SimpleFontAtlas, B> _loadedGlyphs;
-        Dictionary<int, SimpleFontAtlas> _createdAtlases = new Dictionary<int, SimpleFontAtlas>();
-        Dictionary<string, SimpleFontAtlas> _msdfTextureFonts = new Dictionary<string, SimpleFontAtlas>();
+        FontBitmapCache<SimpleBitmapAtlas, B> _loadedGlyphs;
+        Dictionary<int, SimpleBitmapAtlas> _createdAtlases = new Dictionary<int, SimpleBitmapAtlas>();
+        Dictionary<string, SimpleBitmapAtlas> _msdfTextureFonts = new Dictionary<string, SimpleBitmapAtlas>();
 
         LayoutFarm.OpenFontTextService _textServices;
 
         public BitmapFontManager(
             LayoutFarm.OpenFontTextService textServices,
-            LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
+            LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
             : this(textServices)
         {
             //glyph cahce for specific atlas 
             SetLoadNewBmpDel(_createNewDel);
 
             //what texture kind when we need to create on demand
-            TextureKindForNewFont = PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect;
+            TextureKindForNewFont = TextureKind.StencilLcdEffect;
 
         }
         public BitmapFontManager(LayoutFarm.OpenFontTextService textServices)
@@ -178,12 +179,12 @@ namespace Typography.Rendering
             _textServices = textServices;
 
         }
-        protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleFontAtlas, B> _createNewDel)
+        protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
         {
-            _loadedGlyphs = new FontBitmapCache<SimpleFontAtlas, B>(_createNewDel);
+            _loadedGlyphs = new FontBitmapCache<SimpleBitmapAtlas, B>(_createNewDel);
         }
 
-        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKindForNewFont { get; set; }
+        public TextureKind TextureKindForNewFont { get; set; }
 
 
 
@@ -192,19 +193,19 @@ namespace Typography.Rendering
 #endif
 
 
-        public void AddSimpleFontAtlas(SimpleFontAtlas[] simpleFontAtlases, System.IO.Stream totalGlyphImgStream)
+        public void AddSimpleFontAtlas(SimpleBitmapAtlas[] simpleFontAtlases, System.IO.Stream totalGlyphImgStream)
         {
             //multiple font atlas that share the same glyphImg
 
-            PixelFarm.CpuBlit.MemBitmap glyphImg = ReadGlyphImages(totalGlyphImgStream);
+            MemBitmap mainBmp = ReadGlyphImages(totalGlyphImgStream);
             for (int i = 0; i < simpleFontAtlases.Length; ++i)
             {
-                SimpleFontAtlas simpleFontAtlas = simpleFontAtlases[i];
-                simpleFontAtlas.TotalGlyph = glyphImg;
+                SimpleBitmapAtlas simpleFontAtlas = simpleFontAtlases[i];
+                simpleFontAtlas.MainBitmap = mainBmp;
                 simpleFontAtlas.UseSharedGlyphImage = true;
                 _createdAtlases.Add(simpleFontAtlas.FontKey, simpleFontAtlas);
 
-                if (simpleFontAtlas.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
+                if (simpleFontAtlas.TextureKind == TextureKind.Msdf)
                 {
                     //if we have msdf texture
                     //then we can use this to do autoscale
@@ -219,7 +220,7 @@ namespace Typography.Rendering
         /// </summary>
         /// <param name="reqFont"></param>
         /// <returns></returns>
-        public SimpleFontAtlas GetFontAtlas(RequestFont reqFont, out B outputBitmap)
+        public SimpleBitmapAtlas GetFontAtlas(RequestFont reqFont, out B outputBitmap)
         {
 
 #if DEBUG
@@ -229,14 +230,14 @@ namespace Typography.Rendering
 
             int fontKey = reqFont.FontKey;
 
-            if (_createdAtlases.TryGetValue(fontKey, out SimpleFontAtlas fontAtlas))
+            if (_createdAtlases.TryGetValue(fontKey, out SimpleBitmapAtlas fontAtlas))
             {
                 outputBitmap = _loadedGlyphs.GetOrCreateNewOne(fontAtlas);
                 return fontAtlas;
             }
 
             //check if we have small msdf texture or not
-            if (_msdfTextureFonts.TryGetValue(reqFont.Name, out SimpleFontAtlas msdfTexture))
+            if (_msdfTextureFonts.TryGetValue(reqFont.Name, out SimpleBitmapAtlas msdfTexture))
             {
                 //use this
                 outputBitmap = _loadedGlyphs.GetOrCreateNewOne(msdfTexture);
@@ -258,7 +259,7 @@ namespace Typography.Rendering
             {
                 //check local caching, if found then load-> create it
 
-                SimpleFontAtlasBuilder atlasBuilder = new SimpleFontAtlasBuilder();
+                SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
                 lock (s_loadDataLock)
                 {
                     using (System.IO.Stream textureInfoFileStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
@@ -267,8 +268,8 @@ namespace Typography.Rendering
                         try
                         {
                             //TODO: review here
-                            fontAtlas = atlasBuilder.LoadFontAtlasInfo(textureInfoFileStream)[0];
-                            fontAtlas.TotalGlyph = ReadGlyphImages(fontAtlasImgStream);
+                            fontAtlas = atlasBuilder.LoadAtlasInfo(textureInfoFileStream)[0];
+                            fontAtlas.MainBitmap = ReadGlyphImages(fontAtlasImgStream);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
                         }
@@ -292,7 +293,7 @@ namespace Typography.Rendering
                 var glyphTextureGen = new GlyphTextureBitmapGenerator();
 
                 //2. generate the glyphs
-                SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(
+                SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(
                     resolvedTypeface,
                     reqFont.SizeInPoints,
                     TextureKindForNewFont,
@@ -302,7 +303,7 @@ namespace Typography.Rendering
                 //3. set information before write to font-info
                 atlasBuilder.FontFilename = reqFont.Name;//TODO: review here, check if we need 'filename' or 'fontname'
                 atlasBuilder.FontKey = reqFont.FontKey;
-                atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
+                atlasBuilder.SpaceCompactOption = SimpleBitmapAtlasBuilder.CompactOption.ArrangeByHeight;
 
                 //4. merge all glyph in the builder into a single image
                 PixelFarm.CpuBlit.MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
@@ -310,8 +311,8 @@ namespace Typography.Rendering
                 //-------------------------------------------------------------
 
                 //5. create a simple font atlas from information inside this atlas builder.
-                fontAtlas = atlasBuilder.CreateSimpleFontAtlas();
-                fontAtlas.TotalGlyph = totalGlyphsImg;
+                fontAtlas = atlasBuilder.CreateSimpleBitmapAtlas();
+                fontAtlas.MainBitmap = totalGlyphsImg;
 #if DEBUG
                 //save glyph image for debug
                 //PixelFarm.Agg.ActualImage.SaveImgBufferToPngFile(
@@ -373,7 +374,7 @@ namespace Typography.Rendering
         {
             return PixelFarm.CpuBlit.MemBitmap.LoadBitmap(stream);
         }
-        static void SaveImgBufferToFile(GlyphImage glyphImg, string filename)
+        static void SaveImgBufferToFile(BitmapAtlasItem glyphImg, string filename)
         {
             using (PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(
                    glyphImg.Width, glyphImg.Height, glyphImg.GetImageBuffer(), false))
@@ -388,10 +389,10 @@ namespace Typography.Rendering
         /// <param name="org"></param>
         /// <param name="radius"></param>
         /// <returns></returns>
-        static GlyphImage Sharpen(GlyphImage org, int radius)
+        static BitmapAtlasItem Sharpen(BitmapAtlasItem org, int radius)
         {
 
-            GlyphImage newImg = new GlyphImage(org.Width, org.Height);
+            BitmapAtlasItem newImg = new BitmapAtlasItem(org.Width, org.Height);
 
             PixelFarm.CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new PixelFarm.CpuBlit.Imaging.ShapenFilterPdn();
             int[] orgBuffer = org.GetImageBuffer();

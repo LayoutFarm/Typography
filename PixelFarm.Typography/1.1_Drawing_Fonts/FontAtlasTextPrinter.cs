@@ -9,6 +9,7 @@ using Typography.Rendering;
 using Typography.TextLayout;
 using Typography.Contours;
 
+using PixelFarm.CpuBlit.BitmapAtlas;
 namespace PixelFarm.Drawing.Fonts
 {
 
@@ -33,11 +34,11 @@ namespace PixelFarm.Drawing.Fonts
         //-----------------------------------------------------------  
         Typeface _currentTypeface;
         Color _fontColor;
-        
+
 
         LayoutFarm.OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
-        SimpleFontAtlas _fontAtlas;
+        SimpleBitmapAtlas _fontAtlas;
         public FontAtlasTextPrinter(AggPainter painter)
         {
             _painter = painter;
@@ -48,7 +49,7 @@ namespace PixelFarm.Drawing.Fonts
             //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(
                 _textServices,
-                atlas => atlas.TotalGlyph
+                atlas => atlas.MainBitmap
             );
 
             //3.
@@ -62,7 +63,7 @@ namespace PixelFarm.Drawing.Fonts
             //clear maskbuffer
             //clear alpha buffer
         }
- 
+
 
         public AntialiasTechnique AntialiasTech { get; set; }
 
@@ -199,7 +200,7 @@ namespace PixelFarm.Drawing.Fonts
             //we need to adjust y again
             //           
 
-            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind = _fontAtlas.TextureKind;
+            TextureKind textureKind = _fontAtlas.TextureKind;
 
             float gx = 0;
             float gy = 0;

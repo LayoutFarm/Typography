@@ -4,10 +4,13 @@ using System;
 using PixelFarm.CpuBlit.VertexProcessing;
 
 using PixelFarm.Drawing;
-using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
 
-using Typography.Rendering;
+using PixelFarm.CpuBlit;
+using PixelFarm.CpuBlit.BitmapAtlas;
+
+
+
 namespace Typography.Contours
 {
     /// <summary>
@@ -25,9 +28,9 @@ namespace Typography.Contours
 
         public Color BackGroundColor { get; set; }
         public Color GlyphColor { get; set; }
-        public PixelFarm.Drawing.BitmapAtlas.TextureKind TextureKind { get; set; }
+        public TextureKind TextureKind { get; set; }
         public AggPainter Painter { get; set; }
-        public GlyphImage CreateGlyphImage(GlyphOutlineBuilder builder, float pxscale)
+        public BitmapAtlasItem CreateGlyphImage(GlyphOutlineBuilder builder, float pxscale)
         {
 
             _txToVxs.Reset();
@@ -78,7 +81,7 @@ namespace Typography.Contours
 
                 h = vertical_margin + h + vertical_margin; //+bottom margin  
                 AggPainter painter = Painter;
-                if (TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect)
+                if (TextureKind == TextureKind.StencilLcdEffect)
                 {
 
                     glyphVxs.TranslateToNewVxs(dx + 0.33f, dy, vxs2); //offset to proper x of subpixel rendering  ***
@@ -122,7 +125,7 @@ namespace Typography.Contours
 
                     painter.UseSubPixelLcdEffect = false;
 
-                    if (TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilGreyScale)
+                    if (TextureKind == TextureKind.StencilGreyScale)
                     {
                         painter.Clear(Color.Empty);
                         painter.FillColor = Color.Black;
@@ -147,7 +150,7 @@ namespace Typography.Contours
                     h = painter.RenderSurface.DestBitmap.Height;
                 }
 
-                var glyphImage = new GlyphImage(w, h);
+                var glyphImage = new BitmapAtlasItem(w, h);
 
 #if DEBUG
                 if (dx < short.MinValue || dx > short.MaxValue)
@@ -160,12 +163,12 @@ namespace Typography.Contours
                 }
 #endif
 
-                glyphImage.TextureOffsetX = (short)dx;
-                glyphImage.TextureOffsetY = (short)dy;
+                glyphImage.TextureXOffset = (short)dx;
+                glyphImage.TextureYOffset = (short)dy;
 
                 glyphImage.SetImageBuffer(MemBitmapExtensions.CopyImgBuffer(painter.RenderSurface.DestBitmap, w, h), false);
                 //copy data from agg canvas to glyph image 
-                return glyphImage; 
+                return glyphImage;
             }
 
         }

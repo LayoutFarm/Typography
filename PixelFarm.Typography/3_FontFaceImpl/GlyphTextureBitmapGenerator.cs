@@ -7,7 +7,7 @@ using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
 using Typography.Contours;
-using Typography.Rendering;
+using PixelFarm.CpuBlit.BitmapAtlas;
 
 namespace PixelFarm.Drawing.Fonts
 {
@@ -22,7 +22,7 @@ namespace PixelFarm.Drawing.Fonts
     public class GlyphTextureBitmapGenerator
     {
 
-        public delegate void OnEachGlyph(int glyphIndex, GlyphImage glyphImage);
+        public delegate void OnEachGlyph(int glyphIndex, BitmapAtlasItem glyphImage);
         public GlyphTextureBitmapGenerator()
         {
 
@@ -33,15 +33,15 @@ namespace PixelFarm.Drawing.Fonts
         public ushort MsdfGenVersion { get; set; }
 
         OnEachGlyph _onEachGlyphDel;
-        public SimpleFontAtlasBuilder CreateTextureFontFromBuildDetail(
+        public SimpleBitmapAtlasBuilder CreateTextureFontFromBuildDetail(
             Typeface typeface, float sizeInPoint,
-            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
+            TextureKind textureKind,
             GlyphTextureBuildDetail[] details,
             OnEachGlyph onEachGlyphDel = null)
         {
             _onEachGlyphDel = onEachGlyphDel;
             //-------------------------------------------------------------
-            var atlasBuilder = new SimpleFontAtlasBuilder();
+            var atlasBuilder = new SimpleBitmapAtlasBuilder();
             atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
             //-------------------------------------------------------------  
             int j = details.Length;
@@ -85,9 +85,9 @@ namespace PixelFarm.Drawing.Fonts
             return atlasBuilder;
         }
 
-        public SimpleFontAtlasBuilder CreateTextureFontFromInputChars(
+        public SimpleBitmapAtlasBuilder CreateTextureFontFromInputChars(
             Typeface typeface, float sizeInPoint,
-            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind,
+            TextureKind textureKind,
             char[] chars,
             OnEachGlyph onEachGlyphDel = null)
         {
@@ -102,7 +102,7 @@ namespace PixelFarm.Drawing.Fonts
                 i++;
             }
             //-------------------------------------------------------------
-            var atlasBuilder = new SimpleFontAtlasBuilder();
+            var atlasBuilder = new SimpleBitmapAtlasBuilder();
             atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
             //------------------------------------------------------------- 
             //we can specfic subset with special setting for each set 
@@ -116,7 +116,7 @@ namespace PixelFarm.Drawing.Fonts
               Typeface typeface,
               float sizeInPoint,
               HintTechnique hintTechnique,
-              SimpleFontAtlasBuilder atlasBuilder,
+              SimpleBitmapAtlasBuilder atlasBuilder,
               bool applyFilter,
               char[] chars)
         {
@@ -133,7 +133,7 @@ namespace PixelFarm.Drawing.Fonts
               Typeface typeface,
               float sizeInPoint,
               HintTechnique hintTechnique,
-              SimpleFontAtlasBuilder atlasBuilder,
+              SimpleBitmapAtlasBuilder atlasBuilder,
               bool applyFilter,
               ushort[] glyphIndices)
         {
@@ -143,14 +143,40 @@ namespace PixelFarm.Drawing.Fonts
             var outlineBuilder = new GlyphOutlineBuilder(typeface);
             outlineBuilder.SetHintTechnique(hintTechnique);
             //
-            if (atlasBuilder.TextureKind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
+            if (atlasBuilder.TextureKind == TextureKind.Msdf)
             {
 
                 float pxscale = typeface.CalculateScaleToPixelFromPointSize(sizeInPoint);
+                var msdfGenParams = new Msdfgen.MsdfGenParams();
+                int j = glyphIndices.Length;
+
                 if (MsdfGenVersion == 3)
                 {
-                    MsdfGenParams msdfGenParams = new MsdfGenParams();
-                    int j = glyphIndices.Length;
+                    Msdfgen.MsdfGen3 gen3 = new Msdfgen.MsdfGen3();
+
+                    for (int i = 0; i < j; ++i)
+                    {
+                        ushort gindex = glyphIndices[i];
+                        //create picture with unscaled version set scale=-1
+                        //(we will create glyph contours and analyze them)
+
+                        outlineBuilder.BuildFromGlyphIndex(gindex, -1);
+
+                        var glyphToVxs = new GlyphTranslatorToVxs();
+                        outlineBuilder.ReadShapes(glyphToVxs);
+                        using (VxsTemp.Borrow(out var vxs))
+                        {
+                            glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
+                            BitmapAtlasItem glyphImg = gen3.GenerateMsdfTexture(vxs);
+                            _onEachGlyphDel?.Invoke(gindex, glyphImg);
+                            //
+                            atlasBuilder.AddGlyph(gindex, glyphImg);
+                        }
+
+                    }
+                }
+                else
+                {
 
                     Msdfgen.MsdfGen3 gen3 = new Msdfgen.MsdfGen3();
                     for (int i = 0; i < j; ++i)
@@ -162,50 +188,16 @@ namespace PixelFarm.Drawing.Fonts
 
                         var glyphToVxs = new GlyphTranslatorToVxs();
                         outlineBuilder.ReadShapes(glyphToVxs);
-                        using (VxsTemp.Borrow(out var vxs1))
-                        {
-                            glyphToVxs.WriteUnFlattenOutput(vxs1, pxscale);
-                            Msdfgen.SpriteTextureMapData<PixelFarm.CpuBlit.MemBitmap> mapData = gen3.GenerateMsdfTexture(vxs1);
 
-                            CpuBlit.MemBitmap output = mapData.Source;
-                            //convert membitmap to GlyphImage
-                            int[] img_buffer = CpuBlit.MemBitmap.CopyImgBuffer(output);
-                            GlyphImage glyphImg = new GlyphImage(mapData.Width, mapData.Height);
-                            glyphImg.SetImageBuffer(img_buffer, false);
-                            glyphImg.OriginalGlyphBounds = new Contours.RectangleF(mapData.Left, mapData.Top, mapData.Width, mapData.Height);
-                            glyphImg.TextureOffsetX = (short)mapData.TextureXOffset;
-                            glyphImg.TextureOffsetY = (short)mapData.TextureYOffset;
+                        using (VxsTemp.Borrow(out var vxs))
+                        {
+                            glyphToVxs.WriteUnFlattenOutput(vxs, pxscale);
+                            BitmapAtlasItem glyphImg = gen3.GenerateMsdfTexture(vxs);
 
                             _onEachGlyphDel?.Invoke(gindex, glyphImg);
                             //
                             atlasBuilder.AddGlyph(gindex, glyphImg);
                         }
-
-                    }
-                }
-                else
-                {
-
-                    MsdfGenParams msdfGenParams = new MsdfGenParams();
-                    int j = glyphIndices.Length;
-
-                    for (int i = 0; i < j; ++i)
-                    {
-                        ushort gindex = glyphIndices[i];
-                        //create picture with unscaled version set scale=-1
-                        //(we will create glyph contours and analyze them)
-                        outlineBuilder.BuildFromGlyphIndex(gindex, -1);
-
-                        var glyphToContour = new ContourBuilder();
-                        outlineBuilder.ReadShapes(new GlyphTranslatorToContourBuilder(glyphToContour));
-
-                        //msdfgen with  scale the glyph to specific shapescale
-                        //msdfGenParams.shapeScale = 1f / 64; //as original
-                        msdfGenParams.shapeScale = pxscale;
-                        GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphToContour, msdfGenParams);
-                        _onEachGlyphDel?.Invoke(gindex, glyphImg);
-                        //
-                        atlasBuilder.AddGlyph(gindex, glyphImg);
                     }
                 }
             }
@@ -234,7 +226,7 @@ namespace PixelFarm.Drawing.Fonts
                         ushort gindex = glyphIndices[i];
                         outlineBuilder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
-                        GlyphImage glyphImg = aggTextureGen.CreateGlyphImage(outlineBuilder, 1);
+                        BitmapAtlasItem glyphImg = aggTextureGen.CreateGlyphImage(outlineBuilder, 1);
                         if (applyFilter)
                         {
 
@@ -242,8 +234,8 @@ namespace PixelFarm.Drawing.Fonts
                             //TODO:
                             //the filter make the image shift x and y 1 px
                             //temp fix with this,
-                            glyphImg.TextureOffsetX += 1;
-                            glyphImg.TextureOffsetY += 1;
+                            glyphImg.TextureXOffset += 1;
+                            glyphImg.TextureYOffset += 1;
                         }
                         //
                         _onEachGlyphDel?.Invoke(gindex, glyphImg);
@@ -258,9 +250,9 @@ namespace PixelFarm.Drawing.Fonts
         /// <param name="org"></param>
         /// <param name="radius"></param>
         /// <returns></returns>
-        static GlyphImage Sharpen(GlyphImage org, int radius)
+        static BitmapAtlasItem Sharpen(BitmapAtlasItem org, int radius)
         {
-            GlyphImage newImg = new GlyphImage(org.Width, org.Height);
+            BitmapAtlasItem newImg = new BitmapAtlasItem(org.Width, org.Height);
             CpuBlit.Imaging.ShapenFilterPdn sharpen1 = new CpuBlit.Imaging.ShapenFilterPdn();
             int[] orgBuffer = org.GetImageBuffer();
             unsafe
