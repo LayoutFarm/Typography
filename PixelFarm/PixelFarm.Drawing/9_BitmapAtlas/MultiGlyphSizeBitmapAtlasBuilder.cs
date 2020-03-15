@@ -31,13 +31,13 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             string bitmapAtlasFile, string imgFile, TextureKind textureKind)
         {
             //TODO: use 'File' provider to access system file
-            var fontAtlasFile = new BitmapAtlasFile(); 
+            var fontAtlasFile = new BitmapAtlasFile();
             using (FileStream fs = new FileStream(bitmapAtlasFile, FileMode.Open))
             {
                 fontAtlasFile.Read(fs);
             }
 
-            var simpleFontAtlasInfo = new TempMergingAtlasInfo()
+            _atlasList.Add(new TempMergingAtlasInfo()
             {
                 reqFont = reqFont,
                 simpleFontAtlasFile = bitmapAtlasFile,
@@ -45,8 +45,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 fontAtlasFile = fontAtlasFile,
                 textureKind = textureKind
 
-            };
-            _atlasList.Add(simpleFontAtlasInfo);
+            });
         }
         public void BuildMultiFontSize(string multiFontSizeAtlasFilename, string imgOutputFilename)
         {
@@ -101,7 +100,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                     atlasInfo.ImgUrlDict = fontAtlas.ImgUrlDict;
 
                     using (Stream fontImgStream = PixelFarm.Platforms.StorageService.Provider.ReadDataStream(atlasInfo.imgFile))
-                    using (MemBitmap atlasBmp =MemBitmap.LoadBitmap(fontImgStream))
+                    using (MemBitmap atlasBmp = MemBitmap.LoadBitmap(fontImgStream))
                     {
                         painter.DrawImage(atlasBmp, 0, top);
                         top += atlasBmp.Height + interAtlasSpace;

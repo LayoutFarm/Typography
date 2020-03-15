@@ -7,7 +7,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public class SimpleBitmapAtlasBuilder
     {
-        MemBitmap _latestGenGlyphImage;
+        MemBitmap _latestResultBmp;
         Dictionary<ushort, BitmapAtlasItemSource> _items = new Dictionary<ushort, BitmapAtlasItemSource>();
 
         public SimpleBitmapAtlasBuilder()
@@ -223,17 +223,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 //6. generate final output
                 //TODO: rename GlyphImage to another name to distinquist
                 //between small glyph and a large one
-                return _latestGenGlyphImage = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, totalBufferFlipY);
+                return _latestResultBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, totalBufferFlipY);
             }
             else
             {
-                return _latestGenGlyphImage = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, mergeBmpBuffer);
+                return _latestResultBmp = PixelFarm.CpuBlit.MemBitmap.CreateFromCopy(totalImgWidth, imgH, mergeBmpBuffer);
             }
         }
         public void SaveAtlasInfo(System.IO.Stream outputStream)
         {
 
-            if (_latestGenGlyphImage == null)
+            if (_latestResultBmp == null)
             {
                 throw new System.Exception("");
             }
@@ -250,8 +250,8 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
 
             atlasFile.WriteTotalImageInfo(
-                (ushort)_latestGenGlyphImage.Width,
-                (ushort)_latestGenGlyphImage.Height, 4,
+                (ushort)_latestResultBmp.Width,
+                (ushort)_latestResultBmp.Height, 4,
                 this.TextureKind);
             //
             //
