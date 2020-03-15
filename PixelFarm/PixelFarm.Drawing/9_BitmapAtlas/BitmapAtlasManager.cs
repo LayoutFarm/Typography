@@ -69,23 +69,17 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         Msdf,
         Bitmap
     }
-    public class BitmapAtlasManager<B>
-        where B : IDisposable
-    {
-        BitmapCache<SimpleBitmapAtlas, B> _loadAtlases;
-        Dictionary<string, SimpleBitmapAtlas> _createdAtlases = new Dictionary<string, SimpleBitmapAtlas>();
-        TextureKind _textureKind;
 
-        public BitmapAtlasManager(TextureKind textureKind,
-            LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
-            : this(textureKind)
+
+    public class BitmapAtlasManager<B> where B : IDisposable
+    {
+        protected BitmapCache<SimpleBitmapAtlas, B> _loadAtlases;
+        Dictionary<string, SimpleBitmapAtlas> _createdAtlases = new Dictionary<string, SimpleBitmapAtlas>();
+
+        public BitmapAtlasManager(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
         {
             //glyph cahce for specific atlas 
             SetLoadNewBmpDel(_createNewDel);
-        }
-        public BitmapAtlasManager(TextureKind textureKind)
-        {
-            _textureKind = textureKind;
         }
         protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
         {

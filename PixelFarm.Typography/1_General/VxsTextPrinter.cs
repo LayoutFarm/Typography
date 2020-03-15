@@ -1,13 +1,16 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
+
+using PixelFarm.Drawing.Fonts;
+using PixelFarm.CpuBlit.BitmapAtlas;
+
 using Typography.Contours;
-using Typography.OpenFont; 
+using Typography.OpenFont;
 using Typography.TextLayout;
 
 namespace PixelFarm.Drawing
 { 
-    using PixelFarm.Drawing.Fonts;
-    using PixelFarm.CpuBlit.BitmapAtlas;
+
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
         LayoutFarm.OpenFontTextService _textServices;

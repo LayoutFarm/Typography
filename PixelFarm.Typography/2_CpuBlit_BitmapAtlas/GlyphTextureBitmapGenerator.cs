@@ -8,6 +8,7 @@ using Typography.TextLayout;
 using Typography.Contours;
 
 using PixelFarm.Drawing;
+
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public class GlyphTextureBuildDetail
@@ -41,7 +42,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             _onEachGlyphDel = onEachGlyphDel;
             //-------------------------------------------------------------
             var atlasBuilder = new SimpleBitmapAtlasBuilder();
-             
+
             atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
             //-------------------------------------------------------------  
             int j = details.Length;
@@ -102,7 +103,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                 i++;
             }
             //-------------------------------------------------------------
-            var atlasBuilder = new SimpleBitmapAtlasBuilder(); 
+            var atlasBuilder = new SimpleBitmapAtlasBuilder();
             atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
             //------------------------------------------------------------- 
             //we can specfic subset with special setting for each set 
@@ -226,7 +227,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         ushort gindex = glyphIndices[i];
                         outlineBuilder.BuildFromGlyphIndex(gindex, sizeInPoint);
 
-                        BitmapAtlasItem glyphImg = aggTextureGen.CreateGlyphImage(outlineBuilder, 1);
+                        BitmapAtlasItem glyphImg = aggTextureGen.CreateAtlasItem(outlineBuilder, 1);
                         if (applyFilter)
                         {
 

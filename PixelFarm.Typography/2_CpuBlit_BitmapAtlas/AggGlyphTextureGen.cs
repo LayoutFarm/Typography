@@ -5,7 +5,6 @@ using PixelFarm.CpuBlit.VertexProcessing;
 
 using PixelFarm.Drawing;
 using Typography.Contours;
-using PixelFarm.Contours;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
@@ -26,7 +25,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         public Color GlyphColor { get; set; }
         public TextureKind TextureKind { get; set; }
         public AggPainter Painter { get; set; }
-        public BitmapAtlasItem CreateGlyphImage(GlyphOutlineBuilder builder, float pxscale)
+        public BitmapAtlasItem CreateAtlasItem(GlyphOutlineBuilder builder, float pxscale)
         {
 
             _txToVxs.Reset();

@@ -9,47 +9,6 @@ using Typography.OpenFont;
 
 namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-    public delegate U LoadNewBmpDelegate<T, U>(T src);
-
-    public class FontBitmapCache<T, U> : IDisposable
-        where U : IDisposable
-    {
-        Dictionary<T, U> _loadBmps = new Dictionary<T, U>();
-        LoadNewBmpDelegate<T, U> _loadNewBmpDel;
-        public FontBitmapCache(LoadNewBmpDelegate<T, U> loadNewBmpDel)
-        {
-            _loadNewBmpDel = loadNewBmpDel;
-        }
-        public U GetOrCreateNewOne(T key)
-        {
-            U found;
-            if (!_loadBmps.TryGetValue(key, out found))
-            {
-                return _loadBmps[key] = _loadNewBmpDel(key);
-            }
-            return found;
-        }
-        public void Dispose()
-        {
-            Clear();
-        }
-        public void Clear()
-        {
-            foreach (U glbmp in _loadBmps.Values)
-            {
-                glbmp.Dispose();
-            }
-            _loadBmps.Clear();
-        }
-        public void Delete(T key)
-        {
-            if (_loadBmps.TryGetValue(key, out U found))
-            {
-                found.Dispose();
-                _loadBmps.Remove(key);
-            }
-        }
-    }
 
     public static class GlyphTextureCustomConfigs
     {
@@ -149,39 +108,21 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         }
     }
 
-    public class BitmapFontManager<B>
-        where B : IDisposable
+
+
+    public class BitmapFontManager<B> : BitmapAtlasManager<B> where B : IDisposable
     {
-        FontBitmapCache<SimpleBitmapAtlas, B> _loadedGlyphs;
+        LayoutFarm.OpenFontTextService _textServices;
         Dictionary<int, SimpleBitmapAtlas> _createdAtlases = new Dictionary<int, SimpleBitmapAtlas>();
         Dictionary<string, SimpleBitmapAtlas> _msdfTextureFonts = new Dictionary<string, SimpleBitmapAtlas>();
 
-        LayoutFarm.OpenFontTextService _textServices;
-
-        public BitmapFontManager(
-            LayoutFarm.OpenFontTextService textServices,
-            LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
-            : this(textServices)
-        {
-            //glyph cahce for specific atlas 
-            SetLoadNewBmpDel(_createNewDel);
-
-            //what texture kind when we need to create on demand
-            TextureKindForNewFont = TextureKind.StencilLcdEffect;
-
-        }
-        public BitmapFontManager(LayoutFarm.OpenFontTextService textServices)
+        public BitmapFontManager(LayoutFarm.OpenFontTextService textServices, LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
+            : base(_createNewDel)
         {
             _textServices = textServices;
-
-        }
-        protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
-        {
-            _loadedGlyphs = new FontBitmapCache<SimpleBitmapAtlas, B>(_createNewDel);
         }
 
         public TextureKind TextureKindForNewFont { get; set; }
-
 
 
 #if DEBUG
@@ -228,7 +169,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
             if (_createdAtlases.TryGetValue(fontKey, out SimpleBitmapAtlas fontAtlas))
             {
-                outputBitmap = _loadedGlyphs.GetOrCreateNewOne(fontAtlas);
+                outputBitmap = _loadAtlases.GetOrCreateNewOne(fontAtlas);
                 return fontAtlas;
             }
 
@@ -236,7 +177,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             if (_msdfTextureFonts.TryGetValue(reqFont.Name, out SimpleBitmapAtlas msdfTexture))
             {
                 //use this
-                outputBitmap = _loadedGlyphs.GetOrCreateNewOne(msdfTexture);
+                outputBitmap = _loadAtlases.GetOrCreateNewOne(msdfTexture);
                 return msdfTexture;
             }
 
@@ -364,7 +305,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             }
 
 
-            outputBitmap = _loadedGlyphs.GetOrCreateNewOne(fontAtlas);
+            outputBitmap = _loadAtlases.GetOrCreateNewOne(fontAtlas);
             return fontAtlas;
         }
 
@@ -406,10 +347,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             return newImg;
         }
 #endif
-        public void Clear()
-        {
-            _loadedGlyphs.Clear();
-        }
+
     }
 
 }
