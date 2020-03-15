@@ -1,7 +1,6 @@
 ﻿//MIT, 2017-present, WinterDev
 using System;
 using System.Collections.Generic;
-using PixelFarm.Contours;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
