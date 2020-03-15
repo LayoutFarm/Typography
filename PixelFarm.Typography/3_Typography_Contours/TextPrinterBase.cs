@@ -11,13 +11,11 @@ namespace Typography.Contours
     /// </summary>
     public abstract class TextPrinterBase
     {
-        Typography.Contours.HintTechnique _hintTech;
+        HintTechnique _hintTech;
         public TextPrinterBase()
         {
             FontSizeInPoints = 14;//
-            ScriptLang = ScriptLangs.Latin;//default?
-
-             
+            ScriptLang = ScriptLangs.Latin;//default? 
         }
 
 

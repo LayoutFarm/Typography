@@ -36,13 +36,13 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\PixelFarm.Typography\1.3_Typography_Contours\GlyphMeshCollection.cs">
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphMeshCollection.cs">
       <Link>DevTextPrinter\GlyphMeshCollection.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\1.3_Typography_Contours\GlyphOutlineBuilderBase.cs">
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\GlyphOutlineBuilderBase.cs">
       <Link>GlyphOutlineBuilder\GlyphOutlineBuilderBase.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\PixelFarm.Typography\1.3_Typography_Contours\TextPrinterBase.cs">
+    <Compile Include="..\..\..\PixelFarm.Typography\3_Typography_Contours\TextPrinterBase.cs">
       <Link>DevTextPrinter\TextPrinterBase.cs</Link>
     </Compile>
     <Compile Include="..\..\..\PixelFarm\PixelFarm.Painter\2_General\TextBaseline.cs">
