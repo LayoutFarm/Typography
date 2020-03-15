@@ -226,7 +226,7 @@ namespace LayoutFarm
             {
                 //not found ask the typeface store to load that font
                 //....
-                typeface = _txtServices.GetTypeface(font.Name, font.Style.ConvToInstalledFontStyle());
+                typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style));
                 if (typeface == null)
                 {
                     throw new NotSupportedException(font.Name);

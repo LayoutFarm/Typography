@@ -76,6 +76,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         protected BitmapCache<SimpleBitmapAtlas, B> _loadAtlases;
         Dictionary<string, SimpleBitmapAtlas> _createdAtlases = new Dictionary<string, SimpleBitmapAtlas>();
 
+        public BitmapAtlasManager() { }
         public BitmapAtlasManager(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
         {
             //glyph cahce for specific atlas 

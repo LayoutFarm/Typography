@@ -121,7 +121,10 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
         {
             _textServices = textServices;
         }
-
+        public BitmapFontManager(LayoutFarm.OpenFontTextService textServices)
+        {
+            _textServices = textServices;
+        }
         public TextureKind TextureKindForNewFont { get; set; }
 
 
