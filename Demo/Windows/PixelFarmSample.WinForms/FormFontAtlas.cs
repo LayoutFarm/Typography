@@ -12,7 +12,7 @@ using PixelFarm.CpuBlit;
 using PixelFarm.Drawing.Fonts;
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
-using Typography.Rendering;
+using PixelFarm.CpuBlit.BitmapAtlas;
 
 namespace SampleWinForms
 {
@@ -26,14 +26,14 @@ namespace SampleWinForms
 
         class TextureKindAndDescription
         {
-            public TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind kind, string desc)
+            public TextureKindAndDescription(TextureKind kind, string desc)
             {
                 Kind = kind;
                 Description = desc;
             }
 
             public ushort TechniqueDetail { get; set; }
-            public PixelFarm.Drawing.BitmapAtlas.TextureKind Kind { get; }
+            public TextureKind Kind { get; }
             public string Description { get; }
 
             public override string ToString()
@@ -48,11 +48,11 @@ namespace SampleWinForms
 
             uiFontAtlasFileViewer1.BringToFront();
 
-            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect, "StencilLcd"));
-            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf, "Msdf"));
+            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(TextureKind.StencilLcdEffect, "StencilLcd"));
+            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(TextureKind.Msdf, "Msdf"));
 
             //msdf3 is our extension to the original Msdf technique
-            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf, "Msdf3") { TechniqueDetail = 3 });
+            this.cmbTextureKind.Items.Add(new TextureKindAndDescription(TextureKind.Msdf, "Msdf3") { TechniqueDetail = 3 });
 
             this.cmbTextureKind.SelectedIndex = 0;//default
         }
@@ -134,12 +134,12 @@ namespace SampleWinForms
 
             //2. generate the glyphs
             TextureKindAndDescription textureKindAndDesc = (TextureKindAndDescription)this.cmbTextureKind.SelectedItem;
-            if (textureKindAndDesc.Kind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
+            if (textureKindAndDesc.Kind == TextureKind.Msdf)
             {
                 glyphTextureGen.MsdfGenVersion = textureKindAndDesc.TechniqueDetail;
             }
 
-            SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromInputChars(
+            SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromInputChars(
                _typeface,
                fontSizeInPoints,
                textureKindAndDesc.Kind,
@@ -147,11 +147,11 @@ namespace SampleWinForms
             );
 
             //3. set information before write to font-info
-            atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
+            atlasBuilder.SpaceCompactOption = SimpleBitmapAtlasBuilder.CompactOption.ArrangeByHeight;
 
 
             //4. merge all glyph in the builder into a single image
-            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
+            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage(true);
             string fontTextureImg = "test_glyph_atlas.png";
 
             //5. save to png
@@ -249,7 +249,7 @@ namespace SampleWinForms
 
             //2. generate the glyphs
             TextureKindAndDescription textureKindAndDesc = (TextureKindAndDescription)this.cmbTextureKind.SelectedItem;
-            if (textureKindAndDesc.Kind == PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf)
+            if (textureKindAndDesc.Kind == TextureKind.Msdf)
             {
                 glyphTextureGen.MsdfGenVersion = textureKindAndDesc.TechniqueDetail;
             }
@@ -259,18 +259,18 @@ namespace SampleWinForms
             System.Diagnostics.Stopwatch dbugStopWatch = new System.Diagnostics.Stopwatch();
             dbugStopWatch.Start();
 #endif
-            SimpleFontAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
+            SimpleBitmapAtlasBuilder atlasBuilder = glyphTextureGen.CreateTextureFontFromBuildDetail(typeface,
                 fontSizeInPoints,
                 textureKindAndDesc.Kind,
                 buildDetails.ToArray());
 
             //3. set information before write to font-info
-            atlasBuilder.SpaceCompactOption = SimpleFontAtlasBuilder.CompactOption.ArrangeByHeight;
+            atlasBuilder.SpaceCompactOption = SimpleBitmapAtlasBuilder.CompactOption.ArrangeByHeight;
             atlasBuilder.FontFilename = typeface.Name;
             atlasBuilder.FontKey = reqFont.FontKey;
 
             //4. merge all glyph in the builder into a single image
-            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
+            MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage(true);
 
 #if DEBUG
             dbugStopWatch.Stop();

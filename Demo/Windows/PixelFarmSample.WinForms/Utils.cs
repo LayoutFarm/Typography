@@ -3,9 +3,6 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-using PixelFarm.CpuBlit;
-using Typography.Rendering;
-
 namespace SampleWinForms
 {
     static class SimpleUtils
@@ -19,6 +16,6 @@ namespace SampleWinForms
                 currentBmp = null;
             }
         }
-       
+
     }
 }

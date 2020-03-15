@@ -4,9 +4,10 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.Platforms;
-namespace PixelFarm.Drawing.BitmapAtlas
+
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
-    //TODO: review class and method names
+
     public delegate U LoadNewBmpDelegate<T, U>(T src);
 
     public class BitmapCache<T, U> : IDisposable
@@ -48,28 +49,29 @@ namespace PixelFarm.Drawing.BitmapAtlas
         }
     }
 
-
-    public class BitmapAtlasManager<B>
-        where B : IDisposable
+    public enum TextureKind : byte
     {
-        BitmapCache<SimpleBitmaptAtlas, B> _loadAtlases;
-        Dictionary<string, SimpleBitmaptAtlas> _createdAtlases = new Dictionary<string, SimpleBitmaptAtlas>();
-        TextureKind _textureKind;
+        StencilLcdEffect, //default
+        StencilGreyScale,
+        Msdf,
+        Bitmap
+    }
 
-        public BitmapAtlasManager(TextureKind textureKind,
-            LoadNewBmpDelegate<SimpleBitmaptAtlas, B> _createNewDel)
-            : this(textureKind)
+
+    public class BitmapAtlasManager<B> where B : IDisposable
+    {
+        protected BitmapCache<SimpleBitmapAtlas, B> _loadAtlases;
+        Dictionary<string, SimpleBitmapAtlas> _createdAtlases = new Dictionary<string, SimpleBitmapAtlas>();
+
+        public BitmapAtlasManager() { }
+        public BitmapAtlasManager(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
         {
             //glyph cahce for specific atlas 
             SetLoadNewBmpDel(_createNewDel);
         }
-        public BitmapAtlasManager(TextureKind textureKind)
+        protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleBitmapAtlas, B> _createNewDel)
         {
-            _textureKind = textureKind;
-        }
-        protected void SetLoadNewBmpDel(LoadNewBmpDelegate<SimpleBitmaptAtlas, B> _createNewDel)
-        {
-            _loadAtlases = new BitmapCache<SimpleBitmaptAtlas, B>(_createNewDel);
+            _loadAtlases = new BitmapCache<SimpleBitmapAtlas, B>(_createNewDel);
         }
 
 #if DEBUG
@@ -80,7 +82,7 @@ namespace PixelFarm.Drawing.BitmapAtlas
         /// </summary>
         /// <param name="reqFont"></param>
         /// <returns></returns>
-        public SimpleBitmaptAtlas GetBitmapAtlas(string atlasName, out B outputBitmap)
+        public SimpleBitmapAtlas GetBitmapAtlas(string atlasName, out B outputBitmap)
         {
 
 #if DEBUG
@@ -89,7 +91,7 @@ namespace PixelFarm.Drawing.BitmapAtlas
 #endif
 
 
-            if (!_createdAtlases.TryGetValue(atlasName, out SimpleBitmaptAtlas foundAtlas))
+            if (!_createdAtlases.TryGetValue(atlasName, out SimpleBitmapAtlas foundAtlas))
             {
                 //check from pre-built cache (if availiable)   
                 string textureInfoFile = atlasName + ".info";
@@ -105,11 +107,9 @@ namespace PixelFarm.Drawing.BitmapAtlas
                     {
                         try
                         {
-                            foundAtlas = atlasBuilder.LoadAtlasInfo(dataStream);
-                            PixelFarm.CpuBlit.MemBitmap memBmp = PixelFarm.CpuBlit.MemBitmap.LoadBitmap(fontImgStream);
-                            AtlasItemImage atlasImg = new AtlasItemImage(memBmp.Width, memBmp.Height); //TODO: review new .ctor
-                            atlasImg.SetBitmap(memBmp, false);
-                            foundAtlas.TotalImg = atlasImg;
+                            List<SimpleBitmapAtlas> atlasList = atlasBuilder.LoadAtlasInfo(dataStream);
+                            foundAtlas = atlasList[0];
+                            foundAtlas.MainBitmap = MemBitmap.LoadBitmap(fontImgStream);
                             _createdAtlases.Add(atlasName, foundAtlas);
                         }
                         catch (Exception ex)

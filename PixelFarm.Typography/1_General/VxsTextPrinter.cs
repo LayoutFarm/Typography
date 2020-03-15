@@ -1,13 +1,15 @@
 ﻿//MIT, 2016-present, WinterDev, Sam Hocevar
 using System;
+
+using PixelFarm.Drawing.Fonts;
+using PixelFarm.CpuBlit.BitmapAtlas;
+
 using Typography.Contours;
 using Typography.OpenFont;
-using Typography.OpenFont.Extensions;
 using Typography.TextLayout;
-namespace PixelFarm.Drawing
-{
 
-    using PixelFarm.Drawing.Fonts;
+namespace PixelFarm.Drawing
+{ 
 
     public class VxsTextPrinter : TextPrinterBase, ITextPrinter
     {
@@ -23,7 +25,7 @@ namespace PixelFarm.Drawing
         float _currentFontSizePxScale;
 
         GlyphBitmapStore _glyphBitmapStore;
-        GlyphSvgStore _glyphSvgStore;
+        BitmapCacheForSvgGlyph _glyphSvgStore;
 
         public VxsTextPrinter(Painter painter, LayoutFarm.OpenFontTextService textService)
         {
@@ -38,7 +40,7 @@ namespace PixelFarm.Drawing
             ChangeFont(new RequestFont("Source Sans Pro", 10));
 
             _glyphBitmapStore = new GlyphBitmapStore();
-            _glyphSvgStore = new GlyphSvgStore();
+            _glyphSvgStore = new BitmapCacheForSvgGlyph();
         }
         public void SetSvgBmpBuilderFunc(SvgBmpBuilderFunc svgBmpBuilderFunc)
         {

@@ -55,6 +55,5 @@
       <Name>Typography.TextBreak</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\..\..\FontAtlas\FontAtlas.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

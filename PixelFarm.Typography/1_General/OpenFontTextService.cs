@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using PixelFarm.Drawing;
-using PixelFarm.Drawing.Fonts;
 
 using Typography.OpenFont;
 using Typography.OpenFont.Extensions;
@@ -227,7 +226,7 @@ namespace LayoutFarm
             {
                 //not found ask the typeface store to load that font
                 //....
-                typeface = _txtServices.GetTypeface(font.Name, font.Style.ConvToInstalledFontStyle());
+                typeface = _txtServices.GetTypeface(font.Name, PixelFarm.Drawing.FontStyleExtensions.ConvToInstalledFontStyle(font.Style));
                 if (typeface == null)
                 {
                     throw new NotSupportedException(font.Name);

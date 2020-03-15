@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 
-using PixelFarm.CpuBlit;
+using PixelFarm.Drawing;
 using PixelFarm.CpuBlit.PixelProcessing;
 using Typography.OpenFont;
-using Typography.Rendering;
 using Typography.TextLayout;
 using Typography.Contours;
 
-namespace PixelFarm.Drawing.Fonts
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
 
     public enum AntialiasTechnique
@@ -33,11 +32,11 @@ namespace PixelFarm.Drawing.Fonts
         //-----------------------------------------------------------  
         Typeface _currentTypeface;
         Color _fontColor;
-        
+
 
         LayoutFarm.OpenFontTextService _textServices;
         BitmapFontManager<MemBitmap> _bmpFontMx;
-        SimpleFontAtlas _fontAtlas;
+        SimpleBitmapAtlas _fontAtlas;
         public FontAtlasTextPrinter(AggPainter painter)
         {
             _painter = painter;
@@ -48,7 +47,7 @@ namespace PixelFarm.Drawing.Fonts
             //2. 
             _bmpFontMx = new BitmapFontManager<MemBitmap>(
                 _textServices,
-                atlas => atlas.TotalGlyph
+                atlas => atlas.MainBitmap
             );
 
             //3.
@@ -62,7 +61,7 @@ namespace PixelFarm.Drawing.Fonts
             //clear maskbuffer
             //clear alpha buffer
         }
- 
+
 
         public AntialiasTechnique AntialiasTech { get; set; }
 
@@ -199,7 +198,7 @@ namespace PixelFarm.Drawing.Fonts
             //we need to adjust y again
             //           
 
-            PixelFarm.Drawing.BitmapAtlas.TextureKind textureKind = _fontAtlas.TextureKind;
+            TextureKind textureKind = _fontAtlas.TextureKind;
 
             float gx = 0;
             float gy = 0;
@@ -231,8 +230,8 @@ namespace PixelFarm.Drawing.Fonts
             {
                 UnscaledGlyphPlan unscaledGlyphPlan = glyphPlanSeq[i];
 
-                if (!_fontAtlas.TryGetGlyphMapData(unscaledGlyphPlan.glyphIndex,
-                    out TextureGlyphMapData glyphData))
+                if (!_fontAtlas.TryGetItem(unscaledGlyphPlan.glyphIndex,
+                    out AtlasItem atlasItem))
                 {
                     //if no glyph data, we should render a missing glyph ***
                     continue;
@@ -241,7 +240,7 @@ namespace PixelFarm.Drawing.Fonts
                 //TODO: review precise height in float
                 //-------------------------------------- 
 
-                glyphData.GetRect(out int srcX, out int srcY, out int srcW, out int srcH);
+                atlasItem.GetRect(out int srcX, out int srcY, out int srcW, out int srcH);
 
                 float ngx = acc_x + (float)Math.Round(unscaledGlyphPlan.OffsetX * scale);
                 float ngy = acc_y + (float)Math.Round(unscaledGlyphPlan.OffsetY * scale);
@@ -251,8 +250,8 @@ namespace PixelFarm.Drawing.Fonts
                 // -glyphData.TextureYOffset => restore to original pos 
                 //--------------------------
 
-                gx = (float)(left + (ngx - glyphData.TextureXOffset));
-                gy = (float)(top + (ngy + glyphData.TextureYOffset - srcH + lineHeight + desc));
+                gx = (float)(left + (ngx - atlasItem.TextureXOffset));
+                gy = (float)(top + (ngy + atlasItem.TextureYOffset - srcH + lineHeight + desc));
 
                 acc_x += (float)Math.Round(unscaledGlyphPlan.AdvanceX * scale);
                 gy = (float)Math.Floor(gy);// + lineHeight;
