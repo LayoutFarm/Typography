@@ -6,16 +6,15 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using PixelFarm.CpuBlit.BitmapAtlas;
 
-using Typography.Rendering;
-using PixelFarm.Drawing.Fonts;
 namespace SampleWinForms
 {
     public partial class UIFontAtlasFileViewer : UserControl
     {
         string _atlasInfo;
         string _atlasImgFile;
-        SimpleFontAtlasBuilder _atlasBuilder;
+        SimpleBitmapAtlasBuilder _atlasBuilder;
         Bitmap _atlasBmp;
         Graphics _pic1Gfx;
 
@@ -71,24 +70,22 @@ namespace SampleWinForms
             LoadAtlasImgFile(_atlasImgFile);
 
             //load img
-            _atlasBuilder = new SimpleFontAtlasBuilder();
-            List<SimpleFontAtlas> fontAtlasList = null;
-            using (System.IO.FileStream readFromFs = new FileStream(atlasInfo, FileMode.Open))
-            {
-                fontAtlasList = _atlasBuilder.LoadFontAtlasInfo(readFromFs);
-            }
+            _atlasBuilder = new SimpleBitmapAtlasBuilder();
+            List<SimpleBitmapAtlas> fontAtlasList = null;
+            fontAtlasList = _atlasBuilder.LoadAtlasInfo(atlasInfo);
+              
 
             int count = fontAtlasList.Count;
             treeView1.Nodes.Clear();
 
             for (int i = 0; i < count; ++i)
             {
-                SimpleFontAtlas fontAtlas = fontAtlasList[i];
+                SimpleBitmapAtlas fontAtlas = fontAtlasList[i];
 
                 TreeNode atlasNode = new TreeNode();
                 atlasNode.Text = fontAtlas.FontFilename + ", count=" + fontAtlas.GlyphDic.Count;
 
-                treeView1.Nodes.Add(atlasNode); 
+                treeView1.Nodes.Add(atlasNode);
 
                 List<TempGlyphMap> tmpGlyphMaps = new List<TempGlyphMap>(fontAtlas.GlyphDic.Count);
                 foreach (var kv in fontAtlas.GlyphDic)

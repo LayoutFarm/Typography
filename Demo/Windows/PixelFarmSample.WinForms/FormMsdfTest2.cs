@@ -11,9 +11,11 @@ using Typography.Rendering;
 using Typography.Contours;
 
 using PixelFarm.Drawing;
-using PixelFarm.CpuBlit;
-using PixelFarm.Drawing.Fonts;
 using PixelFarm.Contours;
+using PixelFarm.CpuBlit;
+using PixelFarm.CpuBlit.BitmapAtlas;
+using Msdfgen;
+
 
 namespace SampleWinForms
 {
@@ -125,7 +127,7 @@ namespace SampleWinForms
             //-------------------------------------------------------------
             RequestFont reqFont = new RequestFont(typeface.Name, sizeInPoint);
 
-            var atlasBuilder = new SimpleFontAtlasBuilder();
+            var atlasBuilder = new SimpleBitmapAtlasBuilder();
             atlasBuilder.FontFilename = System.IO.Path.GetFileName(fontfile);
             atlasBuilder.FontKey = reqFont.FontKey;
             //create temp folder for each glyph
@@ -154,7 +156,7 @@ namespace SampleWinForms
                 var genParams = new MsdfGenParams();
                 builder.ReadShapes(new GlyphContourBuilder2(glyphContourBuilder));
                 //genParams.shapeScale = 1f / 64; //we scale later (as original C++ code use 1/64)
-                GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(glyphContourBuilder, genParams);
+                BitmapAtlasItem glyphImg = MsdfImageGen.CreateMsdfImageV1(glyphContourBuilder, genParams);
                 atlasBuilder.AddGlyph(gindex, glyphImg);
 
                 using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -167,7 +169,7 @@ namespace SampleWinForms
                 }
             }
 
-            MemBitmap glyphImg2 = atlasBuilder.BuildSingleImage();
+            MemBitmap glyphImg2 = atlasBuilder.BuildSingleImage(true);
             glyphImg2.SaveImage(outputFile);
 
 
@@ -182,10 +184,10 @@ namespace SampleWinForms
             //
             //-----------
             //test read texture info back
-            var atlasBuilder2 = new SimpleFontAtlasBuilder();
+            var atlasBuilder2 = new SimpleBitmapAtlasBuilder();
             using (System.IO.FileStream readFromFs = new FileStream(saveToFile, FileMode.Open))
             {
-                var readbackFontAtlas = atlasBuilder2.LoadFontAtlasInfo(readFromFs);
+                var readbackFontAtlas = atlasBuilder2.LoadAtlasInfo(readFromFs);
             }
 
         }
@@ -195,7 +197,7 @@ namespace SampleWinForms
             //sample
 
             MsdfGenParams msdfGenParams = new MsdfGenParams();
-            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(tx, msdfGenParams);
+            BitmapAtlasItem glyphImg = MsdfImageGen.CreateMsdfImageV1(tx, msdfGenParams);
             int w = glyphImg.Width;
             int h = glyphImg.Height;
             using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
@@ -236,7 +238,7 @@ namespace SampleWinForms
             //
             //
             var genParams = new MsdfGenParams();
-            GlyphImage glyphImg = MsdfGlyphGen.CreateMsdfImage(shape1, genParams);
+            BitmapAtlasItem glyphImg = MsdfImageGen.CreateMsdfImageV1(shape1, genParams);
 
             using (Bitmap bmp = new Bitmap(glyphImg.Width, glyphImg.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
             {
@@ -351,23 +353,23 @@ namespace SampleWinForms
 
             var bmpFontMx = new BitmapFontManager<MemBitmap>(
                  _textServices,
-                 atlas => atlas.TotalGlyph
+                 atlas => atlas.MainBitmap
              );
 
             string multiSizeFontAtlasFilename = "tahoma_set1.multisize_fontAtlas";
             string totalImgAtlasFilename = "tahoma_set1.multisize_fontAtlas.png";
             //in this version, mutlsize font texture must use the same typeface
             {
-                MultiSizeFontAtlasBuilder multiSizeFontAtlasBuilder = new MultiSizeFontAtlasBuilder();
+                MultiGlyphSizeBitmapAtlasBuilder multiSizeFontAtlasBuilder = new MultiGlyphSizeBitmapAtlasBuilder();
                 {
-                    bmpFontMx.TextureKindForNewFont = PixelFarm.Drawing.BitmapAtlas.TextureKind.StencilLcdEffect;
+                    bmpFontMx.TextureKindForNewFont = TextureKind.StencilLcdEffect;
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 10), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 11), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 12), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 13), bmpFontMx);
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 14), bmpFontMx);
 
-                    bmpFontMx.TextureKindForNewFont = PixelFarm.Drawing.BitmapAtlas.TextureKind.Msdf;
+                    bmpFontMx.TextureKindForNewFont = TextureKind.Msdf;
                     AddExistingOrCreateNewSimpleFontAtlas(multiSizeFontAtlasBuilder, new RequestFont("tahoma", 24), bmpFontMx);
                 }
 
@@ -377,7 +379,7 @@ namespace SampleWinForms
             }
             {
                 //test load the font altas back
-                FontAtlasFile atlasFile = new FontAtlasFile();
+                BitmapAtlasFile atlasFile = new BitmapAtlasFile();
                 using (FileStream fs = new FileStream(multiSizeFontAtlasFilename, FileMode.Open))
                 {
                     atlasFile.Read(fs);
@@ -387,7 +389,7 @@ namespace SampleWinForms
 
         }
         void AddExistingOrCreateNewSimpleFontAtlas(
-            MultiSizeFontAtlasBuilder multisizeFontAtlasBuilder,
+            MultiGlyphSizeBitmapAtlasBuilder multisizeFontAtlasBuilder,
             RequestFont reqFont,
             BitmapFontManager<MemBitmap> bmpFontMx)
         {
@@ -402,7 +404,7 @@ namespace SampleWinForms
             if (PixelFarm.Platforms.StorageService.Provider.DataExists(resolveFontTextureFile) &&
                 File.Exists(fontTextureImgFilename))
             {
-                multisizeFontAtlasBuilder.AddSimpleFontAtlasFile(reqFont,
+                multisizeFontAtlasBuilder.AddSimpleAtlasFile(reqFont,
                     resolveFontTextureFile,
                     fontTextureImgFilename,
                     bmpFontMx.TextureKindForNewFont
@@ -411,9 +413,9 @@ namespace SampleWinForms
             else
             {
                 //create a new one 
-                PixelFarm.Drawing.Fonts.SimpleFontAtlas fontAtlas = bmpFontMx.GetFontAtlas(reqFont, out MemBitmap fontBmp);
+                SimpleBitmapAtlas fontAtlas = bmpFontMx.GetFontAtlas(reqFont, out MemBitmap fontBmp);
                 bmpFontMx.GetFontAtlas(reqFont, out fontBmp);
-                multisizeFontAtlasBuilder.AddSimpleFontAtlasFile(reqFont,
+                multisizeFontAtlasBuilder.AddSimpleAtlasFile(reqFont,
                     resolveFontTextureFile,
                     fontTextureImgFilename,
                     bmpFontMx.TextureKindForNewFont);

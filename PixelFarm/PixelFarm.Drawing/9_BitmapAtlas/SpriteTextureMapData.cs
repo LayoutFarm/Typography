@@ -1,6 +1,6 @@
 ﻿//MIT, 2016-present, WinterDev
 
-namespace Msdfgen
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
     public class SpriteTextureMapData<T>
     {

@@ -260,6 +260,8 @@ namespace Typography.Rendering
                 //check local caching, if found then load-> create it
 
                 SimpleBitmapAtlasBuilder atlasBuilder = new SimpleBitmapAtlasBuilder();
+                
+
                 lock (s_loadDataLock)
                 {
                     using (System.IO.Stream textureInfoFileStream = StorageService.Provider.ReadDataStream(fontTextureInfoFile))
@@ -306,7 +308,7 @@ namespace Typography.Rendering
                 atlasBuilder.SpaceCompactOption = SimpleBitmapAtlasBuilder.CompactOption.ArrangeByHeight;
 
                 //4. merge all glyph in the builder into a single image
-                PixelFarm.CpuBlit.MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage();
+                PixelFarm.CpuBlit.MemBitmap totalGlyphsImg = atlasBuilder.BuildSingleImage(true);
 
                 //-------------------------------------------------------------
 

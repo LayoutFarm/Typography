@@ -42,6 +42,7 @@ namespace PixelFarm.Drawing.Fonts
             _onEachGlyphDel = onEachGlyphDel;
             //-------------------------------------------------------------
             var atlasBuilder = new SimpleBitmapAtlasBuilder();
+             
             atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
             //-------------------------------------------------------------  
             int j = details.Length;
@@ -102,7 +103,7 @@ namespace PixelFarm.Drawing.Fonts
                 i++;
             }
             //-------------------------------------------------------------
-            var atlasBuilder = new SimpleBitmapAtlasBuilder();
+            var atlasBuilder = new SimpleBitmapAtlasBuilder(); 
             atlasBuilder.SetAtlasInfo(textureKind, sizeInPoint);
             //------------------------------------------------------------- 
             //we can specfic subset with special setting for each set 

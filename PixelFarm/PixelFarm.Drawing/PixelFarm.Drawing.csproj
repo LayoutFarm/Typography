@@ -610,7 +610,7 @@
     <Compile Include="..\PixelFarm.Vectors\6_Contours\Vertex.cs">
       <Link>0_REF_Painter\1_Vectors\6_Contours\Vertex.cs</Link>
     </Compile>
-    <Compile Include="4_PlatformServices\StorageService.cs" />
+    <Compile Include="4_IO\StorageService.cs" />
     <Compile Include="5_VertexProcessoring\Figures.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter.cs" />
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_MaskAndClipping.cs" />
@@ -659,15 +659,17 @@
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainterPool.cs" />
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface.cs" />
     <Compile Include="7_CpuBlitPainter\RenderSurface\AggRenderSurface_RenderImages.cs" />
-    <Compile Include="8_ImgReaders\ImageReaders.cs" />
+    <Compile Include="4_IO\ImageReaders.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf3\ContourCornerAndAnalyzingElems.cs" />
     <Compile Include="7_CpuBlitPainter\Msdf3\MsdfGen3.cs" />
-    <Compile Include="7_CpuBlitPainter\Msdf3\SpriteTextureMapData.cs" />
+    <Compile Include="9_BitmapAtlas\SpriteTextureMapData.cs" />
     <Compile Include="9_BitmapAtlas\BinPacker.cs" />
-    <Compile Include="9_BitmapAtlas\BitmapAtlasFile.cs" />
-    <Compile Include="9_BitmapAtlas\AtlasItemImage.cs" />
     <Compile Include="9_BitmapAtlas\BitmapAtlasManager.cs" />
-    <Compile Include="9_BitmapAtlas\SimpleBitmaptAtlas.cs" />
+    <Compile Include="9_BitmapAtlas\BitmapAtlasFile.cs" />
+    <Compile Include="9_BitmapAtlas\BitmapAtlasItem.cs" />
+    <Compile Include="9_BitmapAtlas\MsdfImageGen.cs" />
+    <Compile Include="9_BitmapAtlas\MultiGlyphSizeBitmapAtlasBuilder.cs" />
+    <Compile Include="9_BitmapAtlas\SimpleBitmapAtlas.cs" />
     <Compile Include="9_BitmapAtlas\SimpleBitmapAtlasBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -677,9 +679,7 @@
   <ItemGroup>
     <Compile Include="7_CpuBlitPainter\AggPainter\AggPainter_Imgs.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="6_Contours\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\BackEnd.PaintFx\PdnSharedProject\PdnSharedProject.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

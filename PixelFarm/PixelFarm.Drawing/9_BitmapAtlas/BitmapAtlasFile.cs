@@ -3,33 +3,41 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-namespace PixelFarm.Drawing.BitmapAtlas
+
+namespace PixelFarm.CpuBlit.BitmapAtlas
 {
+
+    
     public class BitmapAtlasFile
     {
-        SimpleBitmaptAtlas _atlas;
+        SimpleBitmapAtlas _atlas;
+
         enum ObjectKind : ushort
         {
             End,
             TotalImageInfo,
             GlyphList,
             OverviewFontInfo,
-            //
-            OverviewBitmapInfo,
-            BmpItemList,
+            OverviewMultiSizeFontInfo,
+
+            OverviewBitmapInfo, 
             ImgUrlDic,
         }
-        public SimpleBitmaptAtlas Result => _atlas;
+
+
+        public List<SimpleBitmapAtlas> ResultSimpleFontAtlasList { get; private set; }
 
         public void Read(Stream inputStream)
         {
-            //custom font atlas file             
-            _atlas = new SimpleBitmaptAtlas();
+            //custom font atlas file                        
+            ResultSimpleFontAtlasList = new List<SimpleBitmapAtlas>();
             using (BinaryReader reader = new BinaryReader(inputStream, System.Text.Encoding.UTF8))
             {
                 //1. version
                 ushort fileversion = reader.ReadUInt16();
                 bool stop = false;
+                int listCount = 0;
+
                 while (!stop)
                 {
                     //2. read object kind
@@ -37,12 +45,15 @@ namespace PixelFarm.Drawing.BitmapAtlas
                     switch (objKind)
                     {
                         default: throw new NotSupportedException();
-                        case ObjectKind.OverviewBitmapInfo:
-                            ReadOverviewBitmapInfo(reader);
+                        case ObjectKind.OverviewMultiSizeFontInfo:
+                            listCount = reader.ReadUInt16();
                             break;
                         case ObjectKind.OverviewFontInfo:
-                            //ReadOverviewFontInfo(reader);
-                            throw new NotSupportedException();
+                            //start new atlas
+                            _atlas = new SimpleBitmapAtlas();
+                            ResultSimpleFontAtlasList.Add(_atlas);
+                            ReadOverviewFontInfo(reader);
+                            break;
                         case ObjectKind.End:
                             stop = true;
                             break;
@@ -76,31 +87,33 @@ namespace PixelFarm.Drawing.BitmapAtlas
             for (int i = 0; i < glyphCount; ++i)
             {
                 //read each glyph map info
-                //1. codepoint
-                var glyphMap = new BitmapMapData();
-                ushort glyphIndex = reader.ReadUInt16();
-                //2. area, left,top,width,height
 
+                var glyphMap = new TextureGlyphMapData();
+
+                //1. glyph index
+                ushort glyphIndex = reader.ReadUInt16();
+
+                //2. area
                 glyphMap.Left = reader.ReadUInt16();
                 glyphMap.Top = reader.ReadUInt16();
                 glyphMap.Width = reader.ReadUInt16();
                 glyphMap.Height = reader.ReadUInt16();
-                //---------------------------------------
+
                 //3. texture offset
                 glyphMap.TextureXOffset = reader.ReadInt16();
                 glyphMap.TextureYOffset = reader.ReadInt16();
 
-                //---------------------------------------
-                _atlas.AddBitmapMapData(glyphIndex, glyphMap);
+                _atlas.AddGlyph(glyphIndex, glyphMap);
             }
         }
-        void ReadOverviewBitmapInfo(BinaryReader reader)
+
+        void ReadOverviewFontInfo(BinaryReader reader)
         {
-            ushort utf8StrLen = reader.ReadUInt16();
-            _atlas.BitmapFilename = _atlas.BitmapFilename = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(utf8StrLen));
-
+            //read str len 
+            _atlas.FontFilename = ReadLengthPrefixUtf8String(reader);
+            _atlas.FontKey = reader.ReadInt32();
+            _atlas.OriginalFontSizePts = reader.ReadSingle();
         }
-
         void ReadImgUrlDict(BinaryReader reader)
         {
             Dictionary<string, ushort> imgUrlDict = new Dictionary<string, ushort>();
@@ -117,13 +130,19 @@ namespace PixelFarm.Drawing.BitmapAtlas
             }
             _atlas.ImgUrlDict = imgUrlDict;
         }
+        static string ReadLengthPrefixUtf8String(BinaryReader reader)
+        {
+            ushort utf8BufferLen = reader.ReadUInt16();
+            byte[] utf8Buffer = reader.ReadBytes(utf8BufferLen);
+            return System.Text.Encoding.UTF8.GetString(utf8Buffer);
+        }
         //------------------------------------------------------------
         BinaryWriter _writer;
         internal void StartWrite(Stream outputStream)
         {
             _writer = new BinaryWriter(outputStream, System.Text.Encoding.UTF8);
             //version            
-            _writer.Write((ushort)1);
+            _writer.Write((ushort)2);
         }
         internal void EndWrite()
         {
@@ -133,7 +152,6 @@ namespace PixelFarm.Drawing.BitmapAtlas
             _writer.Flush();
             _writer = null;
         }
-
         internal void WriteImgUrlDict(Dictionary<string, ushort> imgUrlDict)
         {
             _writer.Write((ushort)ObjectKind.ImgUrlDic);
@@ -149,17 +167,29 @@ namespace PixelFarm.Drawing.BitmapAtlas
                 //
                 _writer.Write((ushort)kp.Value);
             }
-        }
-        internal void WriteOverviewBitmapInfo(string bmpfilename)
+        } 
+        internal void WriteOverviewMultiSizeFontInfo(ushort count)
         {
-            _writer.Write((ushort)ObjectKind.OverviewBitmapInfo);
-            if (bmpfilename == null)
+            _writer.Write((ushort)ObjectKind.OverviewMultiSizeFontInfo);
+            _writer.Write((ushort)count);
+        }
+        void WriteLengthPrefixUtf8String(string value)
+        {
+            byte[] utf8Buffer = System.Text.Encoding.UTF8.GetBytes(value);
+            if (utf8Buffer.Length > ushort.MaxValue)
             {
-                bmpfilename = "";
+                throw new NotSupportedException();
             }
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(bmpfilename);
-            _writer.Write((ushort)buffer.Length); //***ushort *
-            _writer.Write(buffer);
+            _writer.Write((ushort)utf8Buffer.Length);
+            _writer.Write(utf8Buffer);
+        }
+        internal void WriteOverviewFontInfo(string fontFileName, int fontKey, float sizeInPt)
+        { 
+
+            _writer.Write((ushort)ObjectKind.OverviewFontInfo);
+            WriteLengthPrefixUtf8String(fontFileName);
+            _writer.Write(fontKey);
+            _writer.Write(sizeInPt);
         }
         internal void WriteTotalImageInfo(ushort width, ushort height, byte colorComponent, TextureKind textureKind)
         {
@@ -169,9 +199,41 @@ namespace PixelFarm.Drawing.BitmapAtlas
             _writer.Write(colorComponent);
             _writer.Write((byte)textureKind);
         }
-        internal void WriteGlyphList(Dictionary<ushort, CacheBmp> glyphs)
+        internal void WriteGlyphList(Dictionary<ushort, RelocationAtlasItem> glyphs)
         {
+            int totalNum = glyphs.Count;
+#if DEBUG
+            if (totalNum >= ushort.MaxValue)
+            {
+                throw new NotSupportedException();
+            }
+#endif
+
+            //kind
             _writer.Write((ushort)ObjectKind.GlyphList);
+            //count
+            _writer.Write((ushort)totalNum);
+            // 
+            foreach (RelocationAtlasItem g in glyphs.Values)
+            {
+                //1. glyph index
+                _writer.Write((ushort)g.glyphIndex);
+
+                //2. area
+                _writer.Write((ushort)g.area.Left);
+                _writer.Write((ushort)g.area.Top);
+                _writer.Write((ushort)g.area.Width);
+                _writer.Write((ushort)g.area.Height);
+
+                //3. texture offset                
+                BitmapAtlasItem img = g.atlasItem;
+                _writer.Write((short)img.TextureXOffset);
+                _writer.Write((short)img.TextureYOffset);
+            }
+        }
+        //--------------------
+        internal void WriteGlyphList(Dictionary<ushort, TextureGlyphMapData> glyphs)
+        {
             //total number
             int totalNum = glyphs.Count;
 #if DEBUG
@@ -181,24 +243,26 @@ namespace PixelFarm.Drawing.BitmapAtlas
             }
 #endif
 
+            _writer.Write((ushort)ObjectKind.GlyphList);
+            //count
             _writer.Write((ushort)totalNum);
             // 
-            foreach (CacheBmp g in glyphs.Values)
+            foreach (var kp in glyphs)
             {
-                //1. code point
-                _writer.Write((ushort)g.imgIndex);
-                //2. area, left,top,width,height
-                _writer.Write((ushort)g.area.Left);
-                _writer.Write((ushort)g.area.Top);
-                _writer.Write((ushort)g.area.Width);
-                _writer.Write((ushort)g.area.Height);
+                ushort glyphIndex = kp.Key;
+                TextureGlyphMapData g = kp.Value;
+                //1. glyph index
+                _writer.Write((ushort)glyphIndex);
 
+                //2. area, left,top,width,height
+                _writer.Write((ushort)g.Left);
+                _writer.Write((ushort)g.Top);
+                _writer.Write((ushort)g.Width);
+                _writer.Write((ushort)g.Height);
 
                 //3. texture offset                
-                AtlasItemImage img = g.img;
-                _writer.Write((short)img.TextureOffsetX);//short
-                _writer.Write((short)img.TextureOffsetY);//short
-
+                _writer.Write((short)g.TextureXOffset);//short
+                _writer.Write((short)g.TextureYOffset);//short
             }
         }
     }

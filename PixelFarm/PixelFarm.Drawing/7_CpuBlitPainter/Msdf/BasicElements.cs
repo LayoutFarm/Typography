@@ -176,8 +176,6 @@ namespace Msdfgen
                 contours[i].findBounds(ref left, ref bottom, ref right, ref top);
             }
         }
-
-
     }
     public class Contour
     {
