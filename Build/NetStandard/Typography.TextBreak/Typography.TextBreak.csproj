@@ -5,7 +5,9 @@
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
- 
+  <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
+  </ItemGroup>
 
   <Import Project="..\..\..\Typography.TextBreak\Typography.TextBreak\Typography.TextBreak.projitems" Label="Shared" />
 

@@ -12,6 +12,7 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
   

@@ -37,6 +37,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Compile Include="..\BackEnd.BurningMineCurve\curveutils\CubicBezier.cs">
       <Link>0_REF_BurningMineCurves\CubicBezier.cs</Link>
     </Compile>

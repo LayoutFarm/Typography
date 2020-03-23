@@ -38,6 +38,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <ProjectReference Include="..\..\PixelFarm.CpuBlit\PixelFarm.CpuBlit.csproj">
       <Project>{4d5ce655-58fa-4523-8e46-738b941e9e47}</Project>
       <Name>PixelFarm.CpuBlit</Name>

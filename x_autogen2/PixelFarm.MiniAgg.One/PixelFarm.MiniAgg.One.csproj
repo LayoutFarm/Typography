@@ -31,6 +31,7 @@
     <DefineConstants> TRACE; PIXEL_FARM; PIXEL_FARM_NET20;</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>

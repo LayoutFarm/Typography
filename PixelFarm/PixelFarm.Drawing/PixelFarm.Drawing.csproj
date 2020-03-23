@@ -39,6 +39,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Compile Include="..\PixelFarm.BitmapBufferEx\BitmapBufferEx\BitmapBuffer.cs">
       <Link>0_REF_BitmapBufferEx\BitmapBuffer.cs</Link>
     </Compile>

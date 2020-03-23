@@ -34,6 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Compile Include="AffinePlan.cs" />
     <Compile Include="BasicGeometries.cs" />
     <Compile Include="Color.cs" />

@@ -64,6 +64,7 @@
     <Compile Include="x_notused\FixedBitArray3.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Reference Include="System" />
   </ItemGroup>
   <Import Project="Triangulation.projitems" Label="Shared" />

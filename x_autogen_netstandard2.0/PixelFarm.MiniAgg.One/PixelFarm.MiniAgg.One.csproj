@@ -32,6 +32,7 @@
     <DefineConstants> TRACE; PIXEL_FARM; PIXEL_FARM_NET20;</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\ColorBgra.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\HsvColor.cs" />
     <Compile Include="..\..\PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs" Link="PixelFarm\BackEnd.PaintFx\PdnSharedProject\01_Core\Color\RgbColor.cs" />

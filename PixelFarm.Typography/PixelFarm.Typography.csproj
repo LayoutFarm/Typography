@@ -35,6 +35,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <ProjectReference Include="..\Build\N20\Typography.GlyphLayout\Typography.GlyphLayout.csproj">
       <Project>{c48f2c17-3c32-4f27-a96c-60a9d86df9cf}</Project>
       <Name>Typography.GlyphLayout</Name>

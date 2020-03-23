@@ -13,6 +13,7 @@
   <Import Project="..\..\..\Typography.TextFlow\Typography.TextFlow.projitems" Label="Shared" />
 
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <ProjectReference Include="..\Typography.GlyphLayout\Typography.GlyphLayout.csproj" />
     <ProjectReference Include="..\Typography.MsdfGen\Typography.MsdfGen.csproj" />
     <ProjectReference Include="..\Typography.OpenFont\Typography.OpenFont.csproj" />

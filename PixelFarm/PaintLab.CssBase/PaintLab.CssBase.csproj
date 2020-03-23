@@ -43,6 +43,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <ProjectReference Include="..\PixelFarm.PrimitiveGeo\PixelFarm.PrimitiveGeo.csproj">
       <Project>{b951ff5b-d7a0-4259-880d-cb7a0c001956}</Project>
       <Name>PixelFarm.PrimitiveGeo</Name>
