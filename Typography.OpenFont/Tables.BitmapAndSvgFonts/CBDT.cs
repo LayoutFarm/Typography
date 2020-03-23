@@ -39,8 +39,8 @@ namespace Typography.OpenFont.Tables
         GlyphBitmapDataFmt19 _format19 = new GlyphBitmapDataFmt19();
 
 
-        System.IO.MemoryStream _ms; //sub-stream contains image data
-        Typography.OpenFont.IO.ByteOrderSwappingBinaryReader _binReader;
+        System.IO.MemoryStream? _ms; //sub-stream contains image data
+        Typography.OpenFont.IO.ByteOrderSwappingBinaryReader? _binReader;
         public void Dispose()
         {
             if (_binReader != null)
@@ -69,6 +69,7 @@ namespace Typography.OpenFont.Tables
         }
         public void FillGlyphInfo(Glyph glyph)
         {
+            if (_binReader == null) throw new InvalidOperationException(nameof(ReadContentFrom) + " not called yet");
             //int srcOffset, int srcLen, int srcFormat,
             _binReader.BaseStream.Position = glyph.BitmapStreamOffset;
             switch (glyph.BitmapFormat)
@@ -82,6 +83,7 @@ namespace Typography.OpenFont.Tables
         }
         public void CopyBitmapContent(Glyph glyph, System.IO.Stream outputStream)
         {
+            if (_binReader == null) throw new InvalidOperationException(nameof(ReadContentFrom) + " not called yet");
             //1 
             _binReader.BaseStream.Position = glyph.BitmapStreamOffset;
             switch (glyph.BitmapFormat)

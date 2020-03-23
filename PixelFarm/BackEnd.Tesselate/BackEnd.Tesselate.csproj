@@ -33,8 +33,6 @@
     <ReleaseVersion>0.8.2</ReleaseVersion>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
-    <LangVersion>8.0</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -75,7 +73,6 @@
     <Compile Include="Tesselator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>

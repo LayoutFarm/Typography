@@ -13,8 +13,6 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-    <LangVersion>8.0</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,7 +36,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
     <Compile Include="05_PixelProcessing\BitmapBlenderBase.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\GouraudVerticeBuilder.cs" />
     <Compile Include="04_FragmentProcessing_Gradient\RGBAGouraudSpanGen.cs" />

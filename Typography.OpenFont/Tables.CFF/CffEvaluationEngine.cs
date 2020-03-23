@@ -114,13 +114,12 @@ namespace Typography.OpenFont.CFF
         {
             //recursive ***
 
-            Type2EvaluationStack evalStack = GetFreeEvalStack(); //**
+            Type2EvaluationStack evalStack = GetFreeEvalStack(tx); //**
 #if DEBUG
             //evalStack.dbugGlyphIndex = instructionList.dbugGlyphIndex;
 #endif
             evalStack._currentX = currentX;
             evalStack._currentY = currentY;
-            evalStack.GlyphTranslator = tx;
 
             for (int i = 0; i < instructionList.Length; ++i)
             {
@@ -265,7 +264,7 @@ namespace Typography.OpenFont.CFF
             ReleaseEvalStack(evalStack);//****
         }
 
-        Type2EvaluationStack GetFreeEvalStack()
+        Type2EvaluationStack GetFreeEvalStack(IGlyphTranslator tx)
         {
             if (_evalStackPool.Count > 0)
             {
@@ -273,7 +272,7 @@ namespace Typography.OpenFont.CFF
             }
             else
             {
-                return new Type2EvaluationStack();
+                return new Type2EvaluationStack(tx);
             }
         }
         void ReleaseEvalStack(Type2EvaluationStack evalStack)
@@ -297,9 +296,7 @@ namespace Typography.OpenFont.CFF
 
         public int dbugGlyphIndex;
 #endif
-        public Type2EvaluationStack()
-        {
-        }
+        public Type2EvaluationStack(IGlyphTranslator translator) => _glyphTranslator = translator;
 
         public void Reset()
         {
