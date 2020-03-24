@@ -601,7 +601,7 @@ namespace PaintLab.Svg
         VgVisualElement CreateLine(VgVisualElement parentNode, SvgLineSpec linespec)
         {
             VgVisualElement lineVisualElem = new VgVisualElement(WellknownSvgElementName.Line, linespec, _vgVisualDoc);
-            using (VxsTemp.Borrow(out var v1))
+            using (Tools.Borrow(out var v1))
             {
                 v1.AddMoveTo(linespec.X1.Number, linespec.Y1.Number);
                 v1.AddLineTo(linespec.X2.Number, linespec.Y2.Number);

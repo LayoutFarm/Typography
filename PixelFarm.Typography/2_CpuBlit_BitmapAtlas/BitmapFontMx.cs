@@ -141,7 +141,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
             for (int i = 0; i < simpleFontAtlases.Length; ++i)
             {
                 SimpleBitmapAtlas simpleFontAtlas = simpleFontAtlases[i];
-                simpleFontAtlas.MainBitmap = mainBmp;
+                simpleFontAtlas.SetMainBitmap(mainBmp, true);
                 simpleFontAtlas.UseSharedImage = true;
                 _createdAtlases.Add(simpleFontAtlas.FontKey, simpleFontAtlas);
 
@@ -211,7 +211,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
                         {
                             //TODO: review here
                             fontAtlas = atlasBuilder.LoadAtlasInfo(textureInfoFileStream)[0];
-                            fontAtlas.MainBitmap = ReadGlyphImages(fontAtlasImgStream);
+                            fontAtlas.SetMainBitmap(ReadGlyphImages(fontAtlasImgStream), true);
                             fontAtlas.OriginalFontSizePts = reqFont.SizeInPoints;
                             _createdAtlases.Add(fontKey, fontAtlas);
                         }
@@ -254,7 +254,7 @@ namespace PixelFarm.CpuBlit.BitmapAtlas
 
                 //5. create a simple font atlas from information inside this atlas builder.
                 fontAtlas = atlasBuilder.CreateSimpleBitmapAtlas();
-                fontAtlas.MainBitmap = totalGlyphsImg;
+                fontAtlas.SetMainBitmap(totalGlyphsImg, true);
 #if DEBUG
                 //save glyph image for debug
                 //PixelFarm.Agg.ActualImage.SaveImgBufferToPngFile(
